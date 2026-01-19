@@ -41,8 +41,17 @@ requirejs.config({
 });
 
 requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBackend) {
+
+    function getLanguage() {
+        let lang = navigator.language;
+        if (localStorage.languagePreference) {
+            lang = localStorage.languagePreference;
+        }
+        return lang || "enUS";
+    }
+
     function updateContent() {
-        console.log("updateContent() called"); // Debugging line
+        console.log("updateContent() called");
         const elements = document.querySelectorAll("[data-i18n]");
 
         elements.forEach(element => {
@@ -56,7 +65,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
         return new Promise((resolve, reject) => {
             i18next.use(i18nextHttpBackend).init(
                 {
-                    lng: "en",
+                    lng: getLanguage(),
                     fallbackLng: "en",
                     keySeparator: false,
                     nsSeparator: false,
@@ -64,7 +73,9 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                         escapeValue: false
                     },
                     backend: {
-                        loadPath: "locales/{{lng}}.json?v=" + Date.now()
+                        // REMOVED: Date.now() cache buster. 
+                        // Using a static version or relying on browser cache is better for performance.
+                        loadPath: "locales/{{lng}}.json"
                     }
                 },
                 function (err, t) {
@@ -74,7 +85,6 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                     } else {
                         console.log("i18next initialized");
                         window.i18next = i18next;
-                        console.log("i18next Store:", i18next.store.data);
                         resolve(i18next);
                     }
                 }
@@ -94,6 +104,11 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
         try {
             await initializeI18next();
 
+            // Setup language change listener
+            i18next.on("languageChanged", function () {
+                updateContent();
+            });
+
             if (document.readyState === "loading") {
                 document.addEventListener("DOMContentLoaded", function () {
                     updateContent();
@@ -102,26 +117,14 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 console.log("DOM already loaded, updating content immediately");
                 updateContent();
             }
+
+            // Load application logic after i18n is ready
+            requirejs(["utils/utils", "activity/activity"]);
+
         } catch (error) {
-            console.error("Error initializing i18next:", error);
+            console.error("Error initializing app:", error);
         }
     }
 
-    main().then(() => {
-        requirejs(["utils/utils", "activity/activity"]);
-    });
-
-    i18next.changeLanguage(lang, (err, t) => {
-        if (err) {
-            console.error("Error changing language:", err);
-            return;
-        }
-        updateContent();
-    });
-
-    i18next.on("languageChanged", function () {
-        updateContent();
-    });
+    main();
 });
-
-// requirejs(["utils/utils", "activity/activity"]);
