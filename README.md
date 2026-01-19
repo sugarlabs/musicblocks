@@ -6,6 +6,10 @@
     <img src="https://img.shields.io/github/license/sugarlabs/musicblocks" />
 </a>
 
+<a href="https://github.com/sugarlabs/musicblocks/actions/workflows/node.js.yml" alt="CI">
+    <img src="https://github.com/sugarlabs/musicblocks/actions/workflows/node.js.yml/badge.svg" />
+</a>
+
 # Music Blocks
 
 “_All musicians are subconsciously mathematicians._” — Monk
@@ -26,9 +30,9 @@ is audio-visual; it produces graphics, artwork and music. Here are a
 couple of screenshots to give you an idea of how the application looks
 like:
 
-![alt tag](./screenshots/Screenshot-1.png)
+![Music Blocks workspace showing block-based music programming](./screenshots/Screenshot-1.png)
 
-![alt tag](./screenshots/Screenshot-2.png)
+![Music Blocks rhythm and melody blocks interface](./screenshots/Screenshot-2.png)
 
 Visit the Music Blocks website for a hands on experience:
 [https://musicblocks.sugarlabs.org](https://musicblocks.sugarlabs.org).
@@ -162,6 +166,20 @@ Before you begin, ensure you have Docker installed on your machine. You can down
 To stop the Docker container, use `Ctrl + C` in your terminal. This
 will stop the container and free up the port it was using.
 
+## Troubleshooting
+When running Music Blocks locally using `npm run dev`, the UI may load successfully even if some interactions appear unresponsive.
+
+New contributors may observe console errors such as:
+- `$ is not defined`
+- `lang is not defined`
+- `p5 is not defined`
+
+These errors can occur due to script loading order and initialization differences in local environments.
+
+If the UI loads and assets render correctly, the setup is generally considered successful for development purposes.
+
+Future improvements may address these issues as part of ongoing refactoring efforts.
+
 ## Additional Notes
 
 - Make sure to replace `musicblocks` with the appropriate image name
@@ -219,6 +237,14 @@ Code](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md)
 provides a general overview of Sugar Lab's guidelines. See
 [Contributing](#CONTRIBUTING) section for specific details about this
 repository.
+
+### Developer Quick Start
+
+1. Clone and install: `git clone https://github.com/sugarlabs/musicblocks.git && npm install`
+2. Run locally: `npm run dev`
+3. Before pushing: `npm run lint && npx prettier --check . && npm test`
+
+For writing tests, see [docs/TESTING.md](./docs/TESTING.md).
 
 ## <a name="REPORTING_BUGS"></a>Reporting Bugs
 

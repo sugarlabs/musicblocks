@@ -1714,7 +1714,7 @@ msgid "Expand/collapse option toolbar"
 msgstr "توسیع / جمع آپشن ٹول بار"
 
 #: js/turtledefs.js:587
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxiliary toolbar."
 msgstr "آکسلیری ٹول بار کو وسعت دینے یا اسے ختم کرنے کے لئے اس بٹن پر کلک کریں۔"
 
 #: js/turtledefs.js:593

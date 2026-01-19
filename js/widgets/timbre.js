@@ -693,7 +693,7 @@ class TimbreWidget {
         } else if (this.isActive["distortion"] === true) {
             docById("effectsButtonCell").style.backgroundColor = platformColor.selectorBackground;
             if (this.distortionEffect.length !== 1) {
-                blockValue = this.dstortionEffect.length - 1;
+                blockValue = this.distortionEffect.length - 1;
             }
 
             docById("myRangeFx0").value = parseFloat(this.distortionParams[0]);

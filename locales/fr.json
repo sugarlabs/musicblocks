@@ -310,7 +310,7 @@
   "Load samples from server": "Charger des exemples depuis un serveur",
   "This button opens a viewer for loading example projects.": "Ce bouton ouvre une visionneuse pour charger des exemples de projets.",
   "Expand/collapse option toolbar": "Développer/réduire la barre d'outils des options",
-  "Click this button to expand or collapse the auxillary toolbar.": "Cliquez sur ce bouton pour développer ou réduire la barre d'outils auxiliaire.",
+  "Click this button to expand or collapse the auxiliary toolbar.": "Cliquez sur ce bouton pour développer ou réduire la barre d'outils auxiliaire.",
   "Displays help messages for the main and auxiliary toolbar, right-click contextual menu for blocks and canvas, and palettes.": "Affiche des messages d'aide pour la barre d'outils principale et auxiliaire, le menu contextuel par clic droit pour les blocs et le canevas, et les palettes.",
   "Click to run the project in slow mode.": "Cliquez pour exécuter le projet en mode lent.",
   "Click to run the project step by step.": "Cliquez pour exécuter le projet étape par étape.",

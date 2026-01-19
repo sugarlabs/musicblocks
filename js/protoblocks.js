@@ -628,7 +628,7 @@ class ProtoBlock {
 
     /**
      * Sets up a media block. Media blocks invoke a chooser and a thumbnail
-     * image is overlayed to represent the data associated with the block.
+     * image is overlaid to represent the data associated with the block.
      */
     mediaBlock() {
         this.style = "value";

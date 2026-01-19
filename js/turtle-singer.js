@@ -23,7 +23,8 @@
    getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
-   noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction
+   noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction,
+   SEMITONES
  */
 
 /*
@@ -1012,8 +1013,7 @@ class Singer {
                 noteObj = getNote(
                     anote,
                     octave,
-                    // FIXME: should not be hardwired to 12
-                    atrans + tur.singer.register * 12,
+                    atrans + tur.singer.register * SEMITONES,
                     tur.singer.keySignature,
                     tur.singer.movable,
                     direction,
@@ -1226,8 +1226,7 @@ class Singer {
                 const noteObj = getNote(
                     note,
                     octave,
-                    // FIXME: should not be hardwired to 12
-                    transposition + tur.singer.register * 12,
+                    transposition + tur.singer.register * SEMITONES,
                     tur.singer.keySignature,
                     tur.singer.movable,
                     direction,
@@ -1577,7 +1576,7 @@ class Singer {
             let tieDelay = tur.singer.tie ? tur.singer.tieCarryOver : 0;
 
             // If we are in a tie, depending upon parity, we either
-            // add the duration from the prvious note to the current
+            // add the duration from the previous note to the current
             // note, or we cache the duration and set the wait to
             // zero. TESTME: May not work when using dup and skip.
             if (tur.singer.tie) {
@@ -1751,7 +1750,7 @@ class Singer {
             }
 
             // If we are in a swing, depending upon parity, we either
-            // add the duration from the current note or we substract
+            // add the duration from the current note or we subtract
             // duration from the next note. Swing is triggered by an
             // initial notevalue. When that notevalue is encountered
             // again, the swing terminates, e.g., 8->4->4->4->8
@@ -2422,7 +2421,7 @@ class Singer {
                     const _ar = runAgainBlockParam;
                     const blockN = _ar[3];
 
-                    // Update args for pitch in hertz and current pitch and then redo the flow block they are attatched to(print/storein etc).
+                    // Update args for pitch in hertz and current pitch and then redo the flow block they are attached to(print/storein etc).
 
                     const args = [];
                     for (let i = 1; i <= activity.blocks.blockList[blockN].protoblock.args; i++) {

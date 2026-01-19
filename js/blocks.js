@@ -88,7 +88,7 @@ class Blocks {
         this.boundary = this.activity.boundary;
         this.macroDict = this.activity.macroDict;
 
-        /** Did the user right cick? */
+        /** Did the user right click? */
         this.stageClick = false;
 
         /** We keep a list of stacks in the trash. */
@@ -904,7 +904,7 @@ class Blocks {
                     continue;
                 }
 
-                /** Another database integrety check. */
+                /** Another database integrity check. */
                 if (this.blockList[cblk] === null) {
                     // eslint-disable-next-line no-console
                     console.debug("This is not good: we encountered a null block: " + cblk);
@@ -925,7 +925,7 @@ class Blocks {
                     }
                 }
 
-                /** Yet another database integrety check. */
+                /** Yet another database integrity check. */
                 if (!foundMatch) {
                     // eslint-disable-next-line no-console
                     console.debug(
@@ -2032,7 +2032,7 @@ class Blocks {
                                         this.actionHasReturn(b),
                                         this.actionHasArgs(b)
                                     );
-                                    this.setActionProtoVisiblity(false);
+                                    this.setActionProtoVisibility(false);
                                 }
                             }
                         }
@@ -2121,7 +2121,7 @@ class Blocks {
 
             /**
              * Put block adjustments inside a slight delay to make the
-             * addition/substraction of vspace and changes of block shape
+             * addition/subtraction of vspace and changes of block shape
              * appear less abrupt (and it can be a little racy).
              * If we changed the contents of a arg block, we may need a vspace.
              */
@@ -3073,7 +3073,7 @@ class Blocks {
         /**
          * Highlight a block
          * @param - blk - block
-         * @param - unhilight - new variable
+         * @param - unhighlight - new variable
          * @public
          * @returns {void}
          */
@@ -3120,7 +3120,7 @@ class Blocks {
          * @param - name - new variable
          * @param - blockOffset - new variable
          * @param - connections
-         * @param - postPorcess
+         * @param - postProcess
          * @param - postProcessArg - Post process Argument
          * @private
          * @returns {void}
@@ -3453,8 +3453,7 @@ class Blocks {
 
                 postProcessArg = [thisBlock, arg];
             } else if (name === "newnote") {
-                // eslint-disable-next-line no-unused-vars
-                postProcess = args => {};
+                postProcess = () => {};
                 postProcessArg = [thisBlock, null];
             } else {
                 postProcess = null;
@@ -3733,7 +3732,7 @@ class Blocks {
          * @public
          * @returns {void}
          */
-        this.setActionProtoVisiblity = state => {
+        this.setActionProtoVisibility = state => {
             /** By default, the nameddo protoblock is hidden. */
             const actionsPalette = this.activity.palettes.dict["action"];
             let stateChanged = false;
@@ -3764,7 +3763,7 @@ class Blocks {
         this.findUniqueActionName = (name, actionBlk) => {
             /** If we have a stack named 'action', make the protoblock visible. */
             if (name === _("action")) {
-                this.setActionProtoVisiblity(true);
+                this.setActionProtoVisibility(true);
             }
 
             /** Make sure we don't make two actions with the same name. */
@@ -5002,7 +5001,7 @@ class Blocks {
                 return;
             }
 
-            /** Get the numerator and demoninator of the meter divide block */
+            /** Get the numerator and denominator of the meter divide block */
             let dblk = this.blockList[blk].connections[2];
             if (dblk === null || this.blockList[dblk].name !== "divide") {
                 return;
@@ -5532,7 +5531,7 @@ class Blocks {
 
                 /** If we have a stack named 'action', make the protoblock visible. */
                 if (name === _("action")) {
-                    this.setActionProtoVisiblity(true);
+                    this.setActionProtoVisibility(true);
                 }
 
                 const oldName = name;
@@ -5782,7 +5781,7 @@ class Blocks {
                          * Ensure that there is a hidden block as the first
                          * block in the child flow (connection 2) of an action
                          * block (required to make the backward block function
-                         * propperly).
+                         * properly).
                          */
                         len = blockObjs[b][4].length;
                         if (blockObjs[b][4][2] == null) {
@@ -5841,6 +5840,11 @@ class Blocks {
             this._adjustTheseStacks = [];
             this._adjustTheseDocks = [];
             this._loadCounter = blockObjs.length;
+
+            // Preload audio samples for instruments used in this project (background task)
+            if (this.activity && this.activity.logo && this.activity.logo.synth) {
+                this.activity.logo.synth.preloadProjectSamples(blockObjs);
+            }
 
             /** We add new blocks to the end of the block list. */
             const blockOffset = this.blockList.length;
@@ -6690,8 +6694,7 @@ class Blocks {
          * @public
          * @returns {void}
          */
-        // eslint-disable-next-line no-unused-vars
-        this.cleanupAfterLoad = async name => {
+        this.cleanupAfterLoad = async () => {
             this._loadCounter -= 1;
             if (this._loadCounter > 0) {
                 return;
@@ -6760,6 +6763,10 @@ class Blocks {
 
             document.body.style.cursor = "default";
             document.getElementById("load-container").style.display = "none";
+            // Stop the loading animation interval to prevent CPU waste
+            if (this.activity.stopLoadAnimation) {
+                this.activity.stopLoadAnimation();
+            }
             const myCustomEvent = new Event("finishedLoading");
             document.dispatchEvent(myCustomEvent);
         };
@@ -7081,7 +7088,7 @@ class Blocks {
         /***
          * Clears all the blocks, updates the cache and refreshes the canvas.
          *
-         * @returnss {void}
+         * @returns {void}
          */
         this.clearParameterBlocks = () => {
             for (const blk in this.blockList) {
@@ -7103,7 +7110,7 @@ class Blocks {
          * @param logo
          * @param turtle
          * @param blk
-         * @returnss {void}
+         * @returns {void}
          */
         this.updateParameterBlock = (logo, turtle, blk) => {
             const name = this.blockList[blk].name;
@@ -7153,7 +7160,7 @@ class Blocks {
          * @param blk
          * @param value
          * @param turtle
-         * @returnss {void}
+         * @returns {void}
          */
         this.blockSetter = (logo, blk, value, turtle) => {
             if (typeof this.blockList[blk].protoblock.setter === "function") {
@@ -7170,7 +7177,7 @@ class Blocks {
         /***
          * Hides all the blocks.
          *
-         * @returnss {void}
+         * @returns {void}
          */
         this.hideBlocks = () => {
             this.activity.palettes.hide();

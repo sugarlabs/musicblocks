@@ -2062,7 +2062,7 @@ msgid "Expand/collapse option toolbar"
 msgstr "オプションツールバーをひょうじ"
 
 #: js/turtledefs.js:587
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxiliary toolbar."
 msgstr "このボタンを クリックすると 「サブメニュー」を  ひらいたりおりたたんだり することが できる。"
 
 #: js/turtledefs.js:593
