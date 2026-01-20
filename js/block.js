@@ -3023,9 +3023,9 @@ class Block {
                 setTimeout(() => {
                     moved =
                         Math.abs(event.stageX / that.activity.getStageScale() - that.original.x) +
-                        Math.abs(
-                            event.stageY / that.activity.getStageScale() - that.original.y
-                        ) >
+                            Math.abs(
+                                event.stageY / that.activity.getStageScale() - that.original.y
+                            ) >
                         20 && !window.hasMouse;
                     getInput = !moved;
                 }, 200);
@@ -3105,7 +3105,7 @@ class Block {
          * Unhighlights the block and resets the active block.
          * @param {Event} event - The mouseout event object.
          */
-        this.container.on("mouseout", event => {
+        this.container.on("click", event => {
             if (!that.blocks.getLongPressStatus()) {
                 // finalize interaction immediately
                 that._mouseoutCallback(event, moved, haveClick, true);
