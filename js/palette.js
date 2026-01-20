@@ -868,6 +868,111 @@ class Palette {
         this.showMenu(true);
     }
 
+    _fuzzyMatch(pattern, text) {
+        if (!pattern) return 100;
+        
+        pattern = pattern.toLowerCase();
+        text = text.toLowerCase();
+        
+        if (text.includes(pattern)) {
+            return 100 - text.indexOf(pattern);
+        }
+        
+        let patternIdx = 0;
+        let score = 0;
+        let consecutiveMatch = 0;
+        
+        for (let i = 0; i < text.length && patternIdx < pattern.length; i++) {
+            if (text[i] === pattern[patternIdx]) {
+                score += 1 + consecutiveMatch;
+                consecutiveMatch++;
+                patternIdx++;
+            } else {
+                consecutiveMatch = 0;
+            }
+        }
+        
+        return patternIdx === pattern.length ? score : -1;
+    }
+
+    /**
+     * Filter blocks based on search query
+     * @param {string} query - Search query
+     */
+    _filterBlocks(query) {
+        const paletteBody = docById("PaletteBody_items");
+        if (!paletteBody) return;
+
+        const rows = paletteBody.getElementsByTagName("tr");
+        let visibleCount = 0;
+
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const cells = row.getElementsByTagName("td");
+            
+            if (cells.length === 0) continue;
+
+            let maxScore = -1;
+            
+            for (let j = 0; j < cells.length; j++) {
+                const cell = cells[j];
+                const blockName = cell.getAttribute("data-block-name");
+                
+                if (blockName) {
+                    const score = this._fuzzyMatch(query, blockName);
+                    maxScore = Math.max(maxScore, score);
+                }
+            }
+
+            if (maxScore >= 0) {
+                row.style.display = "";
+                visibleCount++;
+                
+                for (let j = 0; j < cells.length; j++) {
+                    const cell = cells[j];
+                    if (query && maxScore > 0) {
+                        cell.style.backgroundColor = platformColor.selectorBackground;
+                    } else {
+                        cell.style.backgroundColor = "";
+                    }
+                }
+            } else {
+                row.style.display = "none";
+            }
+        }
+
+        this._updateNoResultsMessage(query, visibleCount);
+    }
+
+    /**
+     * Show/hide "no results" message
+     * @param {string} query - Search query
+     * @param {number} visibleCount - Number of visible blocks
+     */
+    _updateNoResultsMessage(query, visibleCount) {
+        const paletteBody = docById("PaletteBody_items");
+        if (!paletteBody) return;
+
+        const existingMsg = docById("noResultsMessage");
+        if (existingMsg) {
+            existingMsg.remove();
+        }
+
+        if (query && visibleCount === 0) {
+            const noResultsRow = document.createElement("tr");
+            noResultsRow.id = "noResultsMessage";
+            const noResultsCell = document.createElement("td");
+            noResultsCell.colSpan = "100";
+            noResultsCell.style.textAlign = "center";
+            noResultsCell.style.padding = "20px";
+            noResultsCell.style.color = platformColor.textColor;
+            noResultsCell.style.fontStyle = "italic";
+            noResultsCell.innerHTML = `${_("No blocks found for")} "${query}"`;
+            noResultsRow.appendChild(noResultsCell);
+            paletteBody.appendChild(noResultsRow);
+        }
+    }
+
     hideMenu() {
         docById(
             "palette"
@@ -927,6 +1032,68 @@ class Palette {
             label.style.fontWeight = "bold";
             label.style.color = platformColor.textColor;
             header.appendChild(label);
+
+            const searchContainer = document.createElement("div");
+            searchContainer.style.display = "flex";
+            searchContainer.style.alignItems = "center";
+            searchContainer.style.gap = "4px";
+            searchContainer.style.flex = "1";
+            searchContainer.style.marginLeft = "8px";
+            searchContainer.style.maxWidth = "200px";
+
+            const searchInput = document.createElement("input");
+            searchInput.type = "text";
+            searchInput.placeholder = _("Search blocks...");
+            searchInput.id = `paletteSearch_${this.name}`;
+            searchInput.style.flex = "1";
+            searchInput.style.padding = "4px 8px";
+            searchInput.style.border = `1px solid ${platformColor.selectorSelected}`;
+            searchInput.style.borderRadius = "4px";
+            searchInput.style.backgroundColor = platformColor.paletteBackground;
+            searchInput.style.color = platformColor.textColor;
+            searchInput.style.fontSize = "12px";
+            searchInput.style.outline = "none";
+
+            const paletteInstance = this;
+
+            let searchTimeout;
+            searchInput.addEventListener("input", function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    paletteInstance._filterBlocks(this.value);
+                }, 300);
+            });
+
+            searchInput.addEventListener("keydown", (e) => {
+                e.stopPropagation(); 
+            });
+
+            const clearBtn = document.createElement("button");
+            clearBtn.innerHTML = "✕";
+            clearBtn.title = _("Clear search");
+            clearBtn.style.padding = "4px 8px";
+            clearBtn.style.border = "none";
+            clearBtn.style.borderRadius = "4px";
+            clearBtn.style.backgroundColor = platformColor.selectorSelected;
+            clearBtn.style.color = platformColor.paletteBackground;
+            clearBtn.style.cursor = "pointer";
+            clearBtn.style.fontSize = "14px";
+            clearBtn.style.fontWeight = "bold";
+            clearBtn.style.display = "none";
+
+            clearBtn.onclick = () => {
+                searchInput.value = "";
+                paletteInstance._filterBlocks("");
+                clearBtn.style.display = "none";
+            };
+
+            searchInput.addEventListener("input", function() {
+                clearBtn.style.display = this.value ? "block" : "none";
+            });
+
+            searchContainer.appendChild(searchInput);
+            searchContainer.appendChild(clearBtn);
+            header.appendChild(searchContainer);
 
             const closeDownImg = document.createElement("span");
             closeDownImg.style.height = `${this.palettes.cellSize}px`;
@@ -1079,6 +1246,13 @@ class Palette {
 
             itemCell.style.width = `${img.width}px`;
             itemCell.style.paddingRight = `${this.palettes.cellSize}px`;
+            
+            const blockLabel = b.staticLabels && b.staticLabels.length > 0 
+                ? b.staticLabels.join(" ") 
+                : b.blkname;
+            itemCell.setAttribute("data-block-name", blockLabel);
+            itemCell.title = blockLabel; 
+            
             itemCell.appendChild(img);
         }
 
