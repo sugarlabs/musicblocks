@@ -346,21 +346,23 @@ class Block {
         const that = this;
         return new Promise((resolve, reject) => {
             let loopCount = 0;
+            const MAX_RETRIES = 20;
+            const INITIAL_DELAY = 50;
 
             const checkBounds = async counter => {
                 try {
                     if (counter !== undefined) {
                         loopCount = counter;
                     }
-                    if (loopCount > 10) {
-                        // race condition?
+                    if (loopCount > MAX_RETRIES) {
                         throw new Error("COULD NOT CREATE CACHE");
                     }
 
                     that.bounds = that.container.getBounds();
 
                     if (that.bounds === null) {
-                        await delayExecution(100);
+                        const delayTime = INITIAL_DELAY * Math.pow(2, loopCount);
+                        await delayExecution(delayTime);
                         that.regenerateArtwork(true, []);
                         checkBounds(loopCount + 1);
                     } else {
@@ -391,6 +393,8 @@ class Block {
         const that = this;
         return new Promise((resolve, reject) => {
             let loopCount = 0;
+            const MAX_RETRIES = 15;
+            const INITIAL_DELAY = 100;
 
             const updateBounds = async counter => {
                 try {
@@ -398,13 +402,14 @@ class Block {
                         loopCount = counter;
                     }
 
-                    if (loopCount > 5) {
+                    if (loopCount > MAX_RETRIES) {
                         throw new Error("COULD NOT UPDATE CACHE");
                     }
 
                     if (that.bounds === null) {
+                        const delayTime = INITIAL_DELAY * Math.pow(2, loopCount);
+                        await that.pause(delayTime);
                         updateBounds(loopCount + 1);
-                        await that.pause(200);
                     } else {
                         that.container.updateCache();
                         that.activity.refreshCanvas();
@@ -552,7 +557,7 @@ class Block {
             this.disconnectedBitmap.visible = false;
         }
 
-        // If it is a collapsed collapsable, hightlight the collapsed state.
+        // If it is a collapsed collapsable, highlight the collapsed state.
         if (this.collapsed) {
             // Show the highlighted collapsed artwork.
             if (this.highlightCollapseBlockBitmap !== null) {
@@ -639,7 +644,7 @@ class Block {
 
         this.container.visible = true;
 
-        // If it is a collapsed collapsable, unhightlight the collapsed state.
+        // If it is a collapsed collapsable, unhighlight the collapsed state.
         if (this.collapsed) {
             // Show the unhighlighted collapsed artwork.'
             // We may have a race condition...
@@ -1105,7 +1110,7 @@ class Block {
             that.container.addChild(that.disconnectedHighlightBitmap);
             that.disconnectedHighlightBitmap.x = 0;
             that.disconnectedHighlightBitmap.y = 0;
-            that.disconnectedHighlightBitmap.name = "bmp_disconnect_hightlight_" + thisBlock;
+            that.disconnectedHighlightBitmap.name = "bmp_disconnect_highlight_" + thisBlock;
             if (!that.activity.logo.runningLilypond) {
                 that.disconnectedHighlightBitmap.cursor = "pointer";
             }
@@ -2184,7 +2189,7 @@ class Block {
         this.collapseButtonBitmap.visible = isCollapsed;
         this.expandButtonBitmap.visible = !isCollapsed;
 
-        // These are the collpase-state bitmaps.
+        // These are the collapse-state bitmaps.
         this.collapseBlockBitmap.visible = !isCollapsed;
         this.highlightCollapseBlockBitmap.visible = false;
         this.collapseText.visible = !isCollapsed;
@@ -2990,7 +2995,7 @@ class Block {
          * @param {Event} event - The pressmove event.
          */
         this.container.on("pressmove", event => {
-            // FIXME: More voodoo
+            // Prevent the browser's default drag behavior
             event.nativeEvent.preventDefault();
 
             // Don't allow silence block to be dragged out of a note.
@@ -3019,7 +3024,7 @@ class Block {
             if (window.hasMouse) {
                 moved = true;
             } else {
-                // Make it eaiser to select text on mobile.
+                // Make it easier to select text on mobile.
                 setTimeout(() => {
                     moved =
                         Math.abs(event.stageX / that.activity.getStageScale() - that.original.x) +
@@ -3462,26 +3467,21 @@ class Block {
         };
 
         if (this.name === "text") {
-            // Reuse existing input element or create a new one
-            if (!_domCache.textLabelInput) {
-                const el = document.createElement("input");
-                el.id = "textLabel";
-                el.style.position = "absolute";
-                el.style.webkitUserSelect = "text";
-                el.style.mozUserSelect = "text";
-                el.style.msUserSelect = "text";
-                el.className = "text";
-                el.type = "text";
-                _domCache.textLabelInput = el;
-            }
+            // Create a new input element for this block
+            const el = document.createElement("input");
+            el.id = "textLabel";
+            el.style.position = "absolute";
+            el.style.webkitUserSelect = "text";
+            el.style.mozUserSelect = "text";
+            el.style.msUserSelect = "text";
+            el.className = "text";
+            el.type = "text";
 
             // Ensure it is the child of labelElem
-            if (_domCache.textLabelInput.parentNode !== labelElem) {
-                labelElem.innerHTML = "";
-                labelElem.appendChild(_domCache.textLabelInput);
-            }
+            labelElem.innerHTML = "";
+            labelElem.appendChild(el);
 
-            this.label = _domCache.textLabelInput;
+            this.label = el;
             this.label.value = safetext(labelValue);
             this.label.style.display = "";
             labelElem.classList.add("hasKeyboard");
@@ -4025,27 +4025,22 @@ class Block {
                         break;
                 }
             } else {
-                // Reuse existing input element or create a new one
-                if (!_domCache.numberLabelInput) {
-                    const el = document.createElement("input");
-                    el.id = "numberLabel";
-                    el.style.position = "absolute";
-                    el.style.webkitUserSelect = "text";
-                    el.style.mozUserSelect = "text";
-                    el.style.msUserSelect = "text";
-                    el.className = "number";
-                    el.type = "number";
-                    el.step = "any";
-                    _domCache.numberLabelInput = el;
-                }
+                // Create a new input element for this block
+                const el = document.createElement("input");
+                el.id = "numberLabel";
+                el.style.position = "absolute";
+                el.style.webkitUserSelect = "text";
+                el.style.mozUserSelect = "text";
+                el.style.msUserSelect = "text";
+                el.className = "number";
+                el.type = "number";
+                el.step = "any";
 
                 // Ensure it is the child of labelElem
-                if (_domCache.numberLabelInput.parentNode !== labelElem) {
-                    labelElem.innerHTML = "";
-                    labelElem.appendChild(_domCache.numberLabelInput);
-                }
+                labelElem.innerHTML = "";
+                labelElem.appendChild(el);
 
-                this.label = _domCache.numberLabelInput;
+                this.label = el;
                 this.label.value = safetext(labelValue);
                 labelElem.classList.add("hasKeyboard");
 
@@ -4577,7 +4572,7 @@ class Block {
                             this.blocks.actionHasReturn(c),
                             this.blocks.actionHasArgs(c)
                         );
-                        this.blocks.setActionProtoVisiblity(false);
+                        this.blocks.setActionProtoVisibility(false);
                     }
 
                     this.blocks.newNameddoBlock(
@@ -4606,7 +4601,7 @@ class Block {
                             this.blocks.actionHasReturn(c),
                             this.blocks.actionHasArgs(c)
                         );
-                        this.blocks.setActionProtoVisiblity(false);
+                        this.blocks.setActionProtoVisibility(false);
                     }
                     this.blocks.renameNameddos(oldValue, newValue);
                     this.blocks.palettes.hide();

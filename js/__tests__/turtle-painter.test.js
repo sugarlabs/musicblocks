@@ -49,7 +49,12 @@ describe("Painter Class", () => {
     let painter;
 
     beforeEach(() => {
+        jest.spyOn(window, "requestAnimationFrame").mockImplementation(cb => cb());
         painter = new Painter(mockTurtle);
+    });
+
+    afterEach(() => {
+        window.requestAnimationFrame.mockRestore();
     });
 
     describe("Constructor", () => {

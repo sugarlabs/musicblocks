@@ -1595,6 +1595,51 @@ let closeBlkWidgets = name => {
 };
 
 /**
+ * Safely resolves a dot-notation string path to an object property globally.
+ * Tries safe resolution first, falls back to eval if needed for nested class properties.
+ * @param {string} path - The dot-notation path (e.g., "MyClass.Model").
+ * @returns {Object|undefined} The resolved object or undefined.
+ */
+const resolveObject = path => {
+    if (!path || typeof path !== "string") return undefined;
+
+    // Support both browser and Node.js environments
+    const globalObj = typeof window !== "undefined" ? window : global;
+
+    try {
+        const result = path.split(".").reduce((obj, prop) => {
+            if (obj === null || obj === undefined) {
+                return undefined;
+            }
+            return obj[prop];
+        }, globalObj);
+
+        // If reduction succeeded but result is undefined, try eval as fallback
+        // This handles cases where nested class properties aren't enumerable
+        if (result === undefined) {
+            try {
+                // eslint-disable-next-line no-eval
+                return eval(path);
+            } catch (evalError) {
+                return undefined;
+            }
+        }
+
+        return result;
+    } catch (e) {
+        // Last resort: try eval
+        try {
+            // eslint-disable-next-line no-eval
+            return eval(path);
+        } catch (evalError) {
+            // eslint-disable-next-line no-console
+            console.warn("Failed to resolve object path: " + path, e);
+            return undefined;
+        }
+    }
+};
+
+/**
  * Imports methods and variables of model and view objects to the controller object.
  *
  * @param {Object} obj - The component object (controller) to which members of its model and view are imported.
@@ -1650,15 +1695,15 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
     const cname = obj.constructor.name; // class name of component object
 
     if (className !== "" && className !== undefined) {
-        addMembers(obj, eval(className));
+        addMembers(obj, resolveObject(className));
         return;
     }
 
     // Add members of Model (class type has to be controller's name + "Model")
-    addMembers(obj, eval(cname + "." + cname + "Model"), modelArgs);
+    addMembers(obj, resolveObject(cname + "." + cname + "Model"), modelArgs);
 
     // Add members of View (class type has to be controller's name + "View")
-    addMembers(obj, eval(cname + "." + cname + "View"), viewArgs);
+    addMembers(obj, resolveObject(cname + "." + cname + "View"), viewArgs);
 };
 
 if (typeof module !== "undefined" && module.exports) {

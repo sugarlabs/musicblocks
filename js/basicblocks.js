@@ -11,7 +11,7 @@
 
 // Definition of basic blocks common to all branches
 
-// Some names changed between the Python verison and the
+// Some names changed between the Python version and the
 // JS version so look up name in the conversion dictionary.
 
 /*

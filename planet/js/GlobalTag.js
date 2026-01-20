@@ -42,9 +42,9 @@ class GlobalTag {
             //.TRANS: On the Planet, we use labels to tag projects.
             _("Game"),
             //.TRANS: On the Planet, we use labels to tag projects.
-            _("Media"),
+            _("media"),
             //.TRANS: On the Planet, we use labels to tag projects.
-            _("Sensors"),
+            _("sensors"),
             //.TRANS: On the Planet, we use labels to tag projects.
             _("Effects"),
             //.TRANS: On the Planet, we use labels to tag projects.
@@ -71,7 +71,7 @@ class GlobalTag {
 
         if (this.selected) tag.classList.add(this.selectedClass);
 
-        tag.textContent = _(this.name);
+        tag.textContent = toTitleCase(_(this.name));
 
         // eslint-disable-next-line no-unused-vars
         tag.addEventListener("click", evt => {

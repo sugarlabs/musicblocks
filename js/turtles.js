@@ -467,6 +467,15 @@ Turtles.TurtlesModel = class {
      */
     removeTurtle(index) {
         if (index >= 0 && index < this._turtleList.length) {
+            const turtle = this._turtleList[index];
+
+            // Clear any active intervals to prevent memory leaks
+            if (turtle.interval !== undefined) {
+                const intervalId = turtle.interval;
+                clearInterval(intervalId);
+                turtle.interval = undefined;
+            }
+
             this._turtleList.splice(index, 1);
         }
     }
@@ -1248,15 +1257,32 @@ Turtles.TurtlesView = class {
             __makeBoundary();
         }
 
-        // Debounce the resize event to prevent performance issues
+        // Debounce or throttle the resize event based on device capability
         let resizeTimeout;
+        let ticking = false;
+
         window.addEventListener("resize", () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                handleCanvasResize();
-                __makeBoundary();
-                __makeBoundary2();
-            }, 150); // Wait 150ms after the last resize event to execute
+            const isHighEndDevice =
+                navigator.hardwareConcurrency && navigator.hardwareConcurrency >= 4;
+
+            if (isHighEndDevice) {
+                if (!ticking) {
+                    window.requestAnimationFrame(() => {
+                        handleCanvasResize();
+                        __makeBoundary();
+                        __makeBoundary2();
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            } else {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    handleCanvasResize();
+                    __makeBoundary();
+                    __makeBoundary2();
+                }, 150); // Wait 150ms after the last resize event to execute
+            }
         });
 
         return this;

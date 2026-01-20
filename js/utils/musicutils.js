@@ -54,7 +54,8 @@
   addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
   DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
   INTERVALVALUES, getIntervalRatio, frequencyToPitch, NOTESTEP,
-  GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP
+  GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
+  SEMITONES
 */
 
 /**
@@ -851,8 +852,24 @@ const POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
 const TWELTHROOT2 = 1.0594630943592953;
 // eslint-disable-next-line no-loss-of-precision
 const TWELVEHUNDRETHROOT2 = 1.0005777895065549;
+
+/**
+ * Frequency of A in octave 0, in Hz.
+ * @constant {number}
+ */
 const A0 = 27.5;
+
+/**
+ * Frequency of C in octave 8, in Hz.
+ * @constant {number}
+ */
 const C8 = 4186.01;
+
+/**
+ * Frequency of C in octave 10, in Hz.
+ * @constant {number}
+ */
+const C10 = 16744.04;
 
 /**
  * Octave ratio.
@@ -2860,14 +2877,13 @@ const frequencyToPitch = hz => {
 
     if (hz < A0) {
         return ["A", 0, 0];
-    } else if (hz > C8) {
-        // FIXME: set upper bound of C10
-        return ["C", 8, 0];
+    } else if (hz > C10) {
+        return ["C", 10, 0];
     }
 
     // Calculate cents to keep track of drift
     let cents = 0;
-    for (let i = 0; i < 8 * 1200; i++) {
+    for (let i = 0; i < 10 * 1200; i++) {
         const f = A0 * Math.pow(TWELVEHUNDRETHROOT2, i);
         if (hz < f * 1.0003 && hz > f * 0.9997) {
             cents = i % 100;
@@ -5771,7 +5787,7 @@ const noteIsSolfege = note => {
  * @returns {string} The solfege representation.
  */
 const getSolfege = note => {
-    // FIXME: Use mode-specific conversion.
+    // TODO: Use mode-specific conversion.
     if (noteIsSolfege(note)) {
         return note;
     } else {

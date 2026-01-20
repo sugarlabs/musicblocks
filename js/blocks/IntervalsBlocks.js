@@ -817,45 +817,77 @@ function setupIntervalsBlocks(activity) {
 
             tur.singer.inDuplicate = true;
 
+            /**
+             * Acquires the connectionStoreLock with proper waiting.
+             * Uses a polling mechanism to wait for the lock to be released.
+             * @param {number} maxRetries - Maximum number of retry attempts
+             * @param {number} retryInterval - Milliseconds between retries
+             * @returns {Promise<boolean>} - Resolves to true when lock is acquired
+             */
+            const __acquireLock = (maxRetries = 100, retryInterval = 10) => {
+                return new Promise(resolve => {
+                    let retries = 0;
+                    const tryAcquire = () => {
+                        if (!logo.connectionStoreLock) {
+                            logo.connectionStoreLock = true;
+                            resolve(true);
+                        } else if (retries < maxRetries) {
+                            retries++;
+                            setTimeout(tryAcquire, retryInterval);
+                        } else {
+                            // Force acquire after max retries to prevent deadlock
+                            console.warn(
+                                "connectionStoreLock: Max retries reached, forcing lock acquisition"
+                            );
+                            logo.connectionStoreLock = true;
+                            resolve(true);
+                        }
+                    };
+                    tryAcquire();
+                });
+            };
+
             // eslint-disable-next-line no-unused-vars
-            const __listener = event => {
+            const __listener = async event => {
                 tur.singer.inDuplicate = false;
                 tur.singer.duplicateFactor /= factor;
                 tur.singer.arpeggio = [];
-                // Check for a race condition.
-                // FIXME: Do something about the race condition.
-                if (logo.connectionStoreLock) {
-                    // eslint-disable-next-line no-console
-                    console.debug("LOCKED");
-                }
 
-                logo.connectionStoreLock = true;
+                // Acquire lock with proper waiting
+                await __acquireLock();
 
-                // The last turtle should restore the broken connections.
-                if (__lookForOtherTurtles(blk, turtle) === null) {
-                    const n = logo.connectionStore[turtle][blk].length;
-                    for (let i = 0; i < n; i++) {
-                        const obj = logo.connectionStore[turtle][blk].pop();
-                        activity.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
-                        if (obj[2] != null) {
-                            activity.blocks.blockList[obj[2]].connections[0] = obj[0];
+                try {
+                    // The last turtle should restore the broken connections.
+                    if (__lookForOtherTurtles(blk, turtle) === null) {
+                        const n = logo.connectionStore[turtle][blk].length;
+                        for (let i = 0; i < n; i++) {
+                            const obj = logo.connectionStore[turtle][blk].pop();
+                            activity.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
+                            if (obj[2] != null) {
+                                activity.blocks.blockList[obj[2]].connections[0] = obj[0];
+                            }
                         }
+                    } else {
+                        delete logo.connectionStore[turtle][blk];
                     }
-                } else {
-                    delete logo.connectionStore[turtle][blk];
+                } finally {
+                    logo.connectionStoreLock = false;
                 }
-                logo.connectionStoreLock = false;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
 
-            // Test for race condition.
-            // FIXME: Do something about the race condition.
-            if (logo.connectionStoreLock) {
-                // eslint-disable-next-line no-console
-                console.debug("LOCKED");
+            // Acquire lock synchronously for the main flow
+            // Note: This section runs synchronously, so we use a simple spin-wait
+            // with a maximum iteration count to prevent infinite loops
+            let lockAttempts = 0;
+            const maxLockAttempts = 1000;
+            while (logo.connectionStoreLock && lockAttempts < maxLockAttempts) {
+                lockAttempts++;
             }
-
+            if (lockAttempts >= maxLockAttempts) {
+                console.warn("connectionStoreLock: Max attempts reached in ArpeggioBlock flow");
+            }
             logo.connectionStoreLock = true;
 
             // Check to see if another turtle has already disconnected these blocks
