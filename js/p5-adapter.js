@@ -10,7 +10,7 @@ define(["p5.min"], function (p5) {
     } else {
         console.warn("p5-adapter: window.Tone not found!");
     }
-    
+
     // Save original AudioContext constructors to prevent p5.sound from hijacking them
     if (window.AudioContext) {
         window.OriginalAudioContext = window.AudioContext;

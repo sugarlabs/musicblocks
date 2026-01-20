@@ -7,7 +7,10 @@ define(["p5.sound.min"], function () {
         console.log("p5-sound-adapter: Restoring AudioContext");
         window.AudioContext = window.OriginalAudioContext;
     }
-    if (window.OriginalWebkitAudioContext && window.webkitAudioContext !== window.OriginalWebkitAudioContext) {
+    if (
+        window.OriginalWebkitAudioContext &&
+        window.webkitAudioContext !== window.OriginalWebkitAudioContext
+    ) {
         console.log("p5-sound-adapter: Restoring webkitAudioContext");
         window.webkitAudioContext = window.OriginalWebkitAudioContext;
     }
@@ -25,27 +28,29 @@ define(["p5.sound.min"], function () {
     }
 
     // Fix AudioNode.prototype.connect return value
-    // We force this patch because p5.sound is known to break chaining, 
+    // We force this patch because p5.sound is known to break chaining,
     // and sometimes the reference check fails (e.g. if p5.sound wraps it in a way that preserves identity or if we missed the timing).
     // The error "s.connect(...) is undefined" confirms we MUST ensure a return value.
     if (window.AudioNode && window.AudioNode.prototype) {
         var currentConnect = window.AudioNode.prototype.connect;
-        
+
         // Avoid double-patching if we already did it
         if (!currentConnect.isP5AdapterPatched) {
-             console.log("p5-sound-adapter: Forcing patch of AudioNode.prototype.connect to support chaining");
-             
-             window.AudioNode.prototype.connect = function() {
-                 var result = currentConnect.apply(this, arguments);
-                 // If the result is undefined (which breaks Tone.js chaining), return the destination (arguments[0])
-                 if (result === undefined) {
-                     return arguments[0]; 
-                 }
-                 return result;
-             };
-             
-             // Mark as patched
-             window.AudioNode.prototype.connect.isP5AdapterPatched = true;
+            console.log(
+                "p5-sound-adapter: Forcing patch of AudioNode.prototype.connect to support chaining"
+            );
+
+            window.AudioNode.prototype.connect = function () {
+                var result = currentConnect.apply(this, arguments);
+                // If the result is undefined (which breaks Tone.js chaining), return the destination (arguments[0])
+                if (result === undefined) {
+                    return arguments[0];
+                }
+                return result;
+            };
+
+            // Mark as patched
+            window.AudioNode.prototype.connect.isP5AdapterPatched = true;
         } else {
             console.log("p5-sound-adapter: AudioNode.prototype.connect already patched");
         }

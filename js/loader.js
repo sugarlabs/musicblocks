@@ -14,7 +14,7 @@
 requirejs.config({
     baseUrl: "lib",
     shim: {
-        easel: {
+        "easel": {
             exports: "createjs"
         },
         "p5.min": {
@@ -34,25 +34,25 @@ requirejs.config({
         }
     },
     paths: {
-        utils: "../js/utils",
-        widgets: "../js/widgets",
-        activity: "../js",
-        easel: "../lib/easeljs",
-        twewn: "../lib/tweenjs",
-        prefixfree: "../bower_components/prefixfree/prefixfree.min",
-        samples: "../sounds/samples",
-        planet: "../js/planet",
-        tonejsMidi: "../node_modules/@tonejs/midi/dist/Midi",
+        "utils": "../js/utils",
+        "widgets": "../js/widgets",
+        "activity": "../js",
+        "easel": "../lib/easeljs",
+        "twewn": "../lib/tweenjs",
+        "prefixfree": "../bower_components/prefixfree/prefixfree.min",
+        "samples": "../sounds/samples",
+        "planet": "../js/planet",
+        "tonejsMidi": "../node_modules/@tonejs/midi/dist/Midi",
         "p5.min": "../lib/p5.min",
         "p5.sound.min": "../lib/p5.sound.min",
         "p5.dom.min": "../lib/p5.dom.min",
         "p5-adapter": "../js/p5-adapter",
         "p5-sound-adapter": "../js/p5-sound-adapter",
-        i18next: [
+        "i18next": [
             "../lib/i18next.min",
             "https://cdn.jsdelivr.net/npm/i18next@23.11.5/dist/umd/i18next.min"
         ],
-        i18nextHttpBackend: [
+        "i18nextHttpBackend": [
             "../lib/i18nextHttpBackend.min",
             "https://cdn.jsdelivr.net/npm/i18next-http-backend@2.5.1/i18nextHttpBackend.min"
         ]
@@ -89,7 +89,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                         console.error("i18next init failed:", err);
                     }
                     window.i18next = i18next;
-                    resolve(i18next); 
+                    resolve(i18next);
                 }
             );
         });
