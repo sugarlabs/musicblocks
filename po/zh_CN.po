@@ -1571,7 +1571,7 @@ msgstr "流动"
 #: js/turtledefs.js:240
 #: planet/js/GlobalTag.js:48
 #. TRANS: On the Planet, we use labels to tag projects.
-msgid "Sensors"
+msgid "sensors"
 msgstr "传感器"
 
 #: js/rubrics.js:532
@@ -1580,7 +1580,7 @@ msgstr "传感器"
 #: js/blocks/MediaBlocks.js:930
 #: planet/js/GlobalTag.js:46
 #. TRANS: On the Planet, we use labels to tag projects.
-msgid "Media"
+msgid "media"
 # TRANS: machine translation
 msgstr "媒体"
 

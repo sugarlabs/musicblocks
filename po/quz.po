@@ -1742,7 +1742,7 @@ msgstr ""
 #: planet/js/GlobalTag.js:48
 #. TRANS: On the Planet, we use labels to tag projects.
 #. TRANS: sensores
-msgid "Sensors"
+msgid "sensors"
 msgstr "musyapakuq"
 
 #: js/rubrics.js:532
@@ -1752,7 +1752,7 @@ msgstr "musyapakuq"
 #: planet/js/GlobalTag.js:46
 #. TRANS: On the Planet, we use labels to tag projects.
 #. TRANS: medios
-msgid "Media"
+msgid "media"
 msgstr "imayna llamk’anapaq"
 
 #: js/rubrics.js:533
