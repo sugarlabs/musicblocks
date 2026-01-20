@@ -38,14 +38,14 @@ global.window = {
     document: {
         getElementById: jest.fn(() => ({ style: {} }))
     },
-    getComputedStyle: jest.fn(() => ({ display: 'block', visibility: 'visible' }))
+    getComputedStyle: jest.fn(() => ({ display: "block", visibility: "visible" }))
 };
 
 global.localStorage = window.localStorage;
 
 const Toolbar = require("../toolbar");
 
-const createMockElement = (id) => ({
+const createMockElement = id => ({
     id,
     style: {},
     setAttribute: jest.fn(),
@@ -189,7 +189,9 @@ describe("Toolbar Class", () => {
             }
         };
 
-        global.docById = jest.fn(id => elements[id] || { addEventListener: jest.fn(), querySelectorAll: jest.fn() });
+        global.docById = jest.fn(
+            id => elements[id] || { addEventListener: jest.fn(), querySelectorAll: jest.fn() }
+        );
         global.document = {
             body: {
                 style: {
@@ -245,7 +247,9 @@ describe("Toolbar Class", () => {
             }
         };
 
-        global.docById.mockImplementation(id => elements[id] || { addEventListener: jest.fn(), querySelectorAll: jest.fn() });
+        global.docById.mockImplementation(
+            id => elements[id] || { addEventListener: jest.fn(), querySelectorAll: jest.fn() }
+        );
 
         const mockActivity = {
             hideMsgs: jest.fn(),
@@ -278,7 +282,11 @@ describe("Toolbar Class", () => {
         const recordButton = { className: "recording" };
 
         global.docById.mockImplementation(id =>
-            id === "stop" ? stopIcon : id === "record" ? recordButton : { addEventListener: jest.fn(), querySelectorAll: jest.fn() }
+            id === "stop"
+                ? stopIcon
+                : id === "record"
+                ? recordButton
+                : { addEventListener: jest.fn(), querySelectorAll: jest.fn() }
         );
 
         const mockOnClick = jest.fn();
@@ -308,7 +316,9 @@ describe("Toolbar Class", () => {
                 appendChild: jest.fn()
             }
         };
-        global.docById.mockImplementation(id => elements[id] || { addEventListener: jest.fn(), querySelectorAll: jest.fn() });
+        global.docById.mockImplementation(
+            id => elements[id] || { addEventListener: jest.fn(), querySelectorAll: jest.fn() }
+        );
         global.document = {
             createElement: jest.fn(tagName => ({
                 tagName,
