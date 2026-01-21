@@ -7499,7 +7499,6 @@ class Activity {
 
             /*
             document.addEventListener("mousewheel", scrollEvent, false);
-            document.addEventListener("DOMMouseScroll", scrollEvent, false);
             */
 
             const activity = this;
