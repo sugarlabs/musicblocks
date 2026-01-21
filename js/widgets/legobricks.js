@@ -78,6 +78,10 @@ function LegoWidget() {
     this.selectedBackgroundColor = { name: "green", hue: 120 }; // Default green background
     this.eyeDropperCursor = null;
 
+    // Drag handler references for cleanup
+    this._dragMoveHandler = null;
+    this._dragUpHandler = null;
+
     // Pitch block handling properties (similar to PhraseMaker)
     this.blockNo = null;
     this.rowLabels = [];
@@ -273,6 +277,7 @@ function LegoWidget() {
         widgetWindow.onclose = () => {
             this._stopWebcam();
             this._deactivateEyeDropper(); // Clean up eye dropper mode
+            this._cleanupDragListeners(); // Clean up drag event listeners
             this.running = false;
             widgetWindow.destroy();
         };
@@ -1551,6 +1556,22 @@ function LegoWidget() {
     };
 
     /**
+     * Removes drag event listeners from document.
+     * @private
+     * @returns {void}
+     */
+    this._cleanupDragListeners = function () {
+        if (this._dragMoveHandler) {
+            document.removeEventListener("mousemove", this._dragMoveHandler);
+            this._dragMoveHandler = null;
+        }
+        if (this._dragUpHandler) {
+            document.removeEventListener("mouseup", this._dragUpHandler);
+            this._dragUpHandler = null;
+        }
+    };
+
+    /**
      * Makes image draggable.
      * @private
      * @param {HTMLElement} wrapper - The image wrapper element.
@@ -1575,7 +1596,11 @@ function LegoWidget() {
             e.preventDefault();
         };
 
-        document.onmousemove = e => {
+        // Remove old listeners if they exist (prevents accumulation)
+        this._cleanupDragListeners();
+
+        // Store handlers as instance properties for later cleanup
+        this._dragMoveHandler = e => {
             if (!isDragging) return;
             const dx = e.clientX - startX;
             const dy = e.clientY - startY;
@@ -1583,12 +1608,16 @@ function LegoWidget() {
             wrapper.style.top = `${initialY + dy}px`;
         };
 
-        document.onmouseup = () => {
+        this._dragUpHandler = () => {
             if (isDragging) {
                 isDragging = false;
                 wrapper.style.cursor = "grab";
             }
         };
+
+        // Use addEventListener instead of direct property assignment
+        document.addEventListener("mousemove", this._dragMoveHandler);
+        document.addEventListener("mouseup", this._dragUpHandler);
     };
 
     /**
