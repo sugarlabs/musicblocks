@@ -656,58 +656,74 @@
 
     <script>
         var elem = document.documentElement;
-        function openFullscreen() {
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen();
-                // For safari browser
-            } else if (elem.webkitRequestFullscreen) {
-                elem.webkitRequestFullscreen();
-                // For IE(supported above 10)
-            } else if (elem.msRequestFullscreen) {
-                elem.msRequestFullscreen();
-            } else if (elem.mozRequestFullscreen) {
-                elem.mozRequestFullscreen();
-            }
-        }
 
-        function closeFullscreen() {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) { /* Safari */
-                document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) { /* IE11 */
-                document.msExitFullscreen();
-            } else if (document.mozExitFullscreen) { /* IE11 */
-                document.mozExitFullscreen();
-            }
+    function openFullscreen() {
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen();
+        } else if (elem.mozRequestFullscreen) {
+            elem.mozRequestFullscreen();
         }
-        var count = 0;
-        function setIcon() {
-            var property = document.getElementById(FullScreen);
-            var iconCode = document.querySelector('#FullScrIcon');
-            //Calling full Screen
-            if (count == 0) {
-                openFullscreen();
-                iconCode.textContent = '\ue5d1';
-                count = 1;
-            }
-            //Closing full Screen
-            else {
-                closeFullscreen();
-                iconCode.textContent = '\ue5d0';
-                count = 0;
-            }
-        }
-        document.addEventListener('fullscreenchange', handleFullscreenChange);
-        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+    }
 
-        function handleFullscreenChange() {
-            var iconCode = document.querySelector('#FullScrIcon');
-            count = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement ? 1 : 0;
-            iconCode.textContent = count ? '\ue5d1' : '\ue5d0';
+    function closeFullscreen() {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        } else if (document.mozExitFullscreen) {
+            document.mozExitFullscreen();
         }
+    }
+
+    function setIcon() {
+        var iconCode = document.querySelector('#FullScrIcon');
+
+        // CHANGE 1:
+        // Determine fullscreen state using the browser fullscreen API
+        // instead of relying on a manual counter. This keeps the icon
+        // in sync when fullscreen is exited via ESC or browser controls.
+        var isFullscreen =
+            document.fullscreenElement ||
+            document.webkitFullscreenElement ||
+            document.mozFullScreenElement ||
+            document.msFullscreenElement;
+
+        if (!isFullscreen) {
+            openFullscreen();
+            iconCode.textContent = '\ue5d1'; // fullscreen_exit icon
+        } else {
+            closeFullscreen();
+            iconCode.textContent = '\ue5d0'; // fullscreen icon
+        }
+    }
+
+    function handleFullscreenChange() {
+        var iconCode = document.querySelector('#FullScrIcon');
+
+        // CHANGE 2:
+        // Update fullscreen icon based on actual fullscreen state.
+        // This removes the need for a separate state variable and
+        // prevents incorrect icon state when fullscreen is toggled
+        // outside the button (e.g., ESC key).
+        var isFullscreen =
+            document.fullscreenElement ||
+            document.webkitFullscreenElement ||
+            document.mozFullScreenElement ||
+            document.msFullscreenElement;
+
+        iconCode.textContent = isFullscreen ? '\ue5d1' : '\ue5d0';
+    }
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
     </script>
 
     <script>
