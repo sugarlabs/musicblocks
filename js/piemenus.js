@@ -2572,7 +2572,7 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
     if (localStorage.kanaPreference === "kana") {
         block._voiceWheel = new wheelnav("wheelDiv", null, 1200, 1200);
     } else {
-        block._voiceWheel = new wheelnav("wheelDiv", null, 800, 800);
+        block._voiceWheel = new wheelnav("wheelDiv", null, 1000, 1000);
     }
 
     // exit button
@@ -2585,7 +2585,7 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
     block._voiceWheel.colors = colors;
     block._voiceWheel.slicePathFunction = slicePath().DonutSlice;
     block._voiceWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-    block._voiceWheel.slicePathCustom.minRadiusPercent = 0.2;
+    block._voiceWheel.slicePathCustom.minRadiusPercent = 0.28;
     block._voiceWheel.slicePathCustom.maxRadiusPercent = 1;
     block._voiceWheel.sliceSelectedPathCustom = block._voiceWheel.slicePathCustom;
     block._voiceWheel.sliceInitPathCustom = block._voiceWheel.slicePathCustom;
