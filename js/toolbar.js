@@ -462,6 +462,8 @@ class Toolbar {
         const modalContainer = docById("modal-container");
         const newDropdown = docById("newdropdown");
 
+        const lastFocusedElement = document.activeElement;
+
         newDropdown.innerHTML = "";
         const title = document.createElement("div");
         title.classList.add("new-project-title");
@@ -478,12 +480,27 @@ class Toolbar {
         confirmationButton.classList.add("confirm-button");
         confirmationButton.id = "new-project";
         confirmationButton.textContent = _("Confirm");
+
+        confirmationButton.tabIndex = 0;
+        confirmationButton.setAttribute("role", "button");
+        confirmationButton.onkeydown = (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                confirmationButton.click();
+            }
+        };
+
         confirmationButtonLi.appendChild(confirmationButton);
         newDropdown.appendChild(confirmationButtonLi);
 
-        modalContainer.style.display = "flex";
-        confirmationButton.onclick = () => {
+        const cleanup = () => {
             modalContainer.style.display = "none";
+            modalContainer.removeEventListener('keydown', handleTrap);
+            if (lastFocusedElement) lastFocusedElement.focus();
+        };
+
+        confirmationButton.onclick = () => {
+            cleanup();
             onclick(this.activity);
         };
 
@@ -493,12 +510,51 @@ class Toolbar {
         cancelButton.classList.add("cancel-button");
         cancelButton.id = "cancel-project";
         cancelButton.textContent = _("Cancel");
+
+        cancelButton.tabIndex = 0;
+        cancelButton.setAttribute("role", "button");
+        cancelButton.onkeydown = (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                cancelButton.click();
+            }
+        };
+
         cancelButtonLi.appendChild(cancelButton);
         newDropdown.appendChild(cancelButtonLi);
         cancelButton.onclick = () => {
-            modalContainer.style.display = "none";
+            cleanup();
         };
+
         modalContainer.style.display = "flex";
+
+        const handleTrap = (e) => {
+            if (e.key === "Escape") {
+                cancelButton.click();
+                return;
+            }
+            if (e.key === "Tab") {
+                const focusable = [confirmationButton, cancelButton];
+                const first = focusable[0];
+                const last = focusable[focusable.length - 1];
+
+                if (e.shiftKey) {
+                    if (document.activeElement === first) {
+                        last.focus();
+                        e.preventDefault();
+                    }
+                } else {
+                    if (document.activeElement === last) {
+                        first.focus();
+                        e.preventDefault();
+                    }
+                }
+            }
+        };
+        modalContainer.addEventListener('keydown', handleTrap);
+
+        // Initial focus
+        confirmationButton.focus();
     }
 
     /**
