@@ -483,7 +483,7 @@ class Toolbar {
 
         confirmationButton.tabIndex = 0;
         confirmationButton.setAttribute("role", "button");
-        confirmationButton.onkeydown = (e) => {
+        confirmationButton.onkeydown = e => {
             if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 confirmationButton.click();
@@ -495,7 +495,7 @@ class Toolbar {
 
         const cleanup = () => {
             modalContainer.style.display = "none";
-            modalContainer.removeEventListener('keydown', handleTrap);
+            modalContainer.removeEventListener("keydown", handleTrap);
             if (lastFocusedElement) lastFocusedElement.focus();
         };
 
@@ -513,7 +513,7 @@ class Toolbar {
 
         cancelButton.tabIndex = 0;
         cancelButton.setAttribute("role", "button");
-        cancelButton.onkeydown = (e) => {
+        cancelButton.onkeydown = e => {
             if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 cancelButton.click();
@@ -528,7 +528,7 @@ class Toolbar {
 
         modalContainer.style.display = "flex";
 
-        const handleTrap = (e) => {
+        const handleTrap = e => {
             if (e.key === "Escape") {
                 cancelButton.click();
                 return;
@@ -551,7 +551,7 @@ class Toolbar {
                 }
             }
         };
-        modalContainer.addEventListener('keydown', handleTrap);
+        modalContainer.addEventListener("keydown", handleTrap);
 
         // Initial focus
         confirmationButton.focus();
