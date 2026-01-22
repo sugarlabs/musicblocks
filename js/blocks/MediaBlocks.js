@@ -941,7 +941,7 @@ function setupMediaBlocks(activity) {
          * @constructor
          */
         constructor() {
-            super("media", _("media"));
+            super("media", _("Media").toLowerCase());
 
             // Set palette and activity for the block
             this.setPalette("media", activity);
