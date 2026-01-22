@@ -1,0 +1,218 @@
+/* Teaching Tools Widget Styles */
+#teachingToolsWidget {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    height: 400px;
+    background: white;
+    border: 2px solid #2196F3;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+}
+
+.widget-header {
+    background: #2196F3;
+    color: white;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 6px 6px 0 0;
+}
+
+.widget-header h3 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    width: 25px;
+    height: 25px;
+}
+
+.widget-content {
+    padding: 15px;
+    height: calc(100% - 60px);
+    overflow-y: auto;
+}
+
+.lesson-selector {
+    margin-bottom: 15px;
+}
+
+.lesson-selector select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.lesson-description {
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+    padding: 5px 0;
+}
+
+.interactive-staff {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 15px;
+    background: #fafafa;
+}
+
+#staffSVG {
+    width: 100%;
+    height: auto;
+    cursor: crosshair;
+}
+
+.note-palette {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    justify-content: center;
+}
+
+.note-btn {
+    padding: 8px 12px;
+    border: 2px solid #2196F3;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.2s;
+}
+
+.note-btn:hover {
+    background: #e3f2fd;
+}
+
+.note-btn.selected {
+    background: #2196F3;
+    color: white;
+}
+
+.feedback-panel {
+    min-height: 40px;
+    margin-bottom: 15px;
+}
+
+.feedback {
+    padding: 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.feedback.success {
+    background: #c8e6c9;
+    color: #2e7d32;
+    border: 1px solid #4caf50;
+}
+
+.feedback.error {
+    background: #ffcdd2;
+    color: #c62828;
+    border: 1px solid #f44336;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50, #8bc34a);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+/* Staff line styles */
+#staffSVG line {
+    stroke: #333;
+    stroke-width: 1;
+}
+
+#staffSVG text {
+    user-select: none;
+    cursor: pointer;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    #teachingToolsWidget {
+        width: 90%;
+        height: 80%;
+    }
+    
+    .note-palette {
+        flex-wrap: wrap;
+    }
+    
+    .note-btn {
+        flex: 1;
+        min-width: 60px;
+    }
+}
+
+/* Dark mode support */
+body.dark-mode #teachingToolsWidget {
+    background: #424242;
+    color: white;
+    border-color: #64b5f6;
+}
+
+body.dark-mode .widget-header {
+    background: #1976d2;
+}
+
+body.dark-mode .interactive-staff {
+    background: #616161;
+    border-color: #757575;
+}
+
+body.dark-mode .lesson-selector select {
+    background: #616161;
+    color: white;
+    border-color: #757575;
+}
+
+body.dark-mode .lesson-description {
+    color: #bbb;
+}
+
+body.dark-mode .note-btn {
+    background: #616161;
+    color: white;
+    border-color: #64b5f6;
+}
+
+body.dark-mode .note-btn:hover {
+    background: #757575;
+}
+
+body.dark-mode #staffSVG line {
+    stroke: #e0e0e0;
+}
+
+body.dark-mode #staffSVG text {
+    fill: #e0e0e0;
+}

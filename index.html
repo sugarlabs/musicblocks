@@ -26,6 +26,7 @@
     <link rel="preload" href="dist/css/windows.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="lib/materialize-iso.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="css/darkmode.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/teachingtools.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="prefetch" as="video" href="loading-animation.webm" type="video/webm">
     <link rel="prefetch" as="video" href="loading-animation.mp4" type="video/mp4">
     <link rel="prefetch" as="image" href="loading-animation-ja.svg">
@@ -62,6 +63,8 @@
     <script src="lib/astring.min.js" defer></script>
 
     <script src="lib/acorn.min.js" defer></script>
+    
+    <script src="js/teachingtools.js" defer></script>
 
     <link rel="prefetch" type="application/l10n" href="./localization.ini" />
 
@@ -357,6 +360,10 @@
                                 </li>
                             </ul>
                             <ul class="aux right">
+                                <li>
+                                <a id="teachingToolsIcon" class="tooltipped" data-position="bottom" data-tooltip="Teaching Tools"><i
+                                        class="material-icons md-48">school</i></a>
+                                </li>
                                 <li>
                                 <a id="displayStatsIcon" class="tooltipped" data-position="bottom" data-delay="10"><i
                                         class="material-icons md-48">poll</i></a>
