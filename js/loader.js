@@ -63,6 +63,8 @@ if (typeof requirejs !== "undefined") {
             });
         }
 
+        const APP_VERSION = "3.4.1";
+
         async function initializeI18next() {
             return new Promise((resolve, reject) => {
                 i18next.use(i18nextHttpBackend).init(
@@ -75,9 +77,7 @@ if (typeof requirejs !== "undefined") {
                             escapeValue: false
                         },
                         backend: {
-                            // REMOVED: Date.now() cache buster. 
-                            // Using a static version or relying on browser cache is better for performance.
-                            loadPath: "locales/{{lng}}.json"
+                            loadPath: "locales/{{lng}}.json?v=" + APP_VERSION
                         }
                     },
                     function (err, t) {
