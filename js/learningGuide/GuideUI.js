@@ -3,21 +3,14 @@ window.GuideUI = {
         console.log(`Showing step: ${step.id}`);
         this.clearHighlights();
         
-        // Handle palette opening
-        if (step.action === "palette" && step.palette && window.activity?.blocks?.palettes) {
-            try {
-                console.log(`Opening palette: ${step.palette}`);
-                window.activity.blocks.palettes.showPalette(step.palette);
-            } catch (e) {
-                console.warn("Palette open failed:", step.palette, e);
-            }
-        }
-
-        // Create or update overlay
+        // Create or update overlay first
         this.createOverlay(step);
         
-        // Highlight target elements
+        // Highlight target elements before opening palette (so user can see what to click)
         this.highlightElements(step);
+        
+        // Handle palette opening - but don't mark as complete, user needs to actually open it
+        // Only try to open if the activity is fully loaded and palette system is ready
         
         // Create or update panel
         this.createPanel(step);
@@ -32,13 +25,7 @@ window.GuideUI = {
         }
 
         // Adjust overlay based on step type
-        if (step.action === "palette" || step.action === "block" || step.action === "pitch_inside") {
-            overlay.style.pointerEvents = "none";
-            overlay.style.background = "rgba(0,0,0,0.2)";
-        } else {
-            overlay.style.pointerEvents = "auto";
-            overlay.style.background = "rgba(0,0,0,0.5)";
-        }
+        overlay.style.pointerEvents = "none";
     },
 
     highlightElements(step) {
@@ -63,6 +50,12 @@ window.GuideUI = {
             } else {
                 console.warn(`Palette button not found: ${step.palette}`);
             }
+        }
+
+        if (step.action === "octave_change"){
+            document.querySelectorAll('.number').forEach(el => {
+                el.classList.add('lg-highlight');
+            });
         }
     },
 
@@ -125,14 +118,16 @@ window.GuideUI = {
             <div class="lg-buttons">
                 ${LG.step > 0 ? `<button class="lg-btn lg-prev" onclick="LG.prev()">← Previous</button>` : ''}
                 <button id="lg-next" class="lg-btn lg-next ${isCompleted ? 'lg-ready' : ''}" 
-                        ${isCompleted ? '' : 'disabled'} onclick="LG.next()">
+                        ${isCompleted ? '' : 'disabled'} 
+                        ${isCompleted ? '' : 'style="pointer-events: none;"'}
+                        onclick="LG.next()">
                     ${LG.step === GuideSteps.length - 1 ? '🎉 Finish' : 'Next →'}
                 </button>
                 <button class="lg-btn lg-close" onclick="LG.stop()">Close</button>
             </div>
         `;
 
-        // If already completed, enable next button
+        // If already completed, enable next button (but this is rare since watch will handle it)
         if (isCompleted) {
             this.unlock();
         }
@@ -161,6 +156,8 @@ window.GuideUI = {
         
         if (btn) {
             btn.disabled = false;
+            btn.removeAttribute("style");
+            btn.style.pointerEvents = "auto";
             btn.classList.add("lg-ready");
         }
         
