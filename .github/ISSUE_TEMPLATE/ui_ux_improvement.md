@@ -1,32 +1,32 @@
 ---
-name: 🐛 Bug Report
-about: Report an issue to help us improve
-title: "[Bug]"
-labels: "Issue-Bug"
+name: 🎨 UI/UX 
+about: Report UI or UX bugs, inconsistencies, or improvement suggestions
+title: "[UI/UX]"
+labels: "Issue-User-Experience"
 assignees: ""
 ---
 
 ### Description
 
-<!-- A brief description with a link to the page on the site where you found the issue. -->
+<!-- Briefly describe the UI/UX issue or improvement idea. -->
+
+### Current Behavior
+
+<!-- Describe the current user interface or user experience behavior. -->
 
 ### Expected Behavior
 
-<!-- A brief description of what you expected to happen. -->
+<!-- Describe the intended or preferred behavior of the interface. -->
 
 ### Screenshots
 
-<!-- Add screenshots, if applicable, to help explain your problem. -->
+<!-- Add screenshots, mockups, or references if available. -->
 
-### How to Reproduce
+### Proposed Approach (Optional)
 
-<!-- Add specific steps to reproduce that issue -->
+<!-- If you have ideas or suggestions, share them here. -->
 
-### Console log Errors:
-
-<!-- Upload console log screenshots to help explain your problem in much better fashion -->
-
-### Environment:
+### Environment
 
 -   Operating System: [e.g., Windows, macOS, Linux]
 -   Browser (if applicable): [e.g., Chrome, Firefox, Safari]
@@ -36,7 +36,7 @@ assignees: ""
 
 -   [ ] I have read and followed the project's code of conduct.
 -   [ ] I have searched for similar issues before creating this one.
--   [ ] I have provided all the necessary information to understand and reproduce the issue.
+-   [ ] I have provided enough information to understand the issue.
 -   [ ] I am willing to contribute to the resolution of this issue.
 
 ---
