@@ -5,6 +5,7 @@ function getRealActivity() {
     return null;
 }
 window._lgLastPalette = null;
+window._lgPaletteCounter = 0;
 window._lgPlayState = {
     started: false,
     ended: false
@@ -210,6 +211,15 @@ let LG = {
         }
 
         const blockList = activity.blocks.blockList;
+
+        if (step.action === "palette") {
+            this.initialCounts[this.step] = window._lgPaletteCounter;
+            console.log(
+                "🎨 Step initial palette counter:",
+                this.initialCounts[this.step]
+            );
+            return;
+        }
         // 👇 SPECIAL CASE: pitch_inside step
         if (step.action === "pitch_inside") {
             let count = 0;
@@ -587,6 +597,52 @@ let LG = {
     }
 };
 
+function addLearningGuideTopButton() {
+    const menuBtn = document.getElementById("toggleAuxBtn");
+    if (!menuBtn) {
+        console.warn("⚠️ Menu button not found yet");
+        return;
+    }
+
+    if (document.getElementById("learning-guide-top-btn")) return;
+
+    // Get correct insertion point
+    const menuLi = menuBtn.closest("li");
+    const ul = menuLi.parentElement;
+
+    const li = document.createElement("li");
+
+    const btn = document.createElement("a");
+    btn.id = "learning-guide-top-btn";
+    btn.className = "tooltipped";   // ✅ Materialize tooltip class
+
+    // ✅ Materialize tooltip attributes
+    btn.setAttribute("data-position", "bottom");
+    btn.setAttribute("data-delay", "10");
+    btn.setAttribute("data-tooltip", "Replay Learning Guide");
+
+    btn.style.cursor = "pointer";
+
+    btn.innerHTML = `<i class="material-icons md-48">school</i>`;
+
+    btn.onclick = () => {
+        console.log("🎓 Replay Learning Guide clicked");
+        window.startLearningGuide();
+    };
+
+    li.appendChild(btn);
+
+    // Insert after menu button
+    ul.insertBefore(li, menuLi.nextSibling);
+
+    // ✅ IMPORTANT: re-initialize Materialize tooltips
+    if (window.M && M.Tooltip) {
+        M.Tooltip.init(btn);
+    }
+
+    console.log("✅ Learning Guide button added with Materialize tooltip");
+}
+
 // Enhanced initialization
 document.addEventListener("DOMContentLoaded", () => {
     console.log("📄 DOM loaded, preparing guide initialization...");
@@ -602,13 +658,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 const original = activity.blocks.palettes.showPalette;
                 activity.blocks.palettes.showPalette = function (name) {
                     window._lgLastPalette = name;
+                    window._lgPaletteCounter++;
                     return original.call(this, name);
                 };
 
                 console.log("🎯 Learning Guide palette hook installed");
             }
         }, 300);
-        LG.init();
+        addLearningGuideTopButton();
+        if (!sessionStorage.getItem("learningGuidePlayed")) {
+            console.log("▶️ Auto-starting Learning Guide (once per reload)");
+            sessionStorage.setItem("learningGuidePlayed", "true");
+            LG.init();
+        }
     }, 2000); // Wait 2 seconds after DOM ready
 });
 
@@ -621,3 +683,17 @@ window.addEventListener("load", () => {
         }
     }, 1000);
 });
+
+window.startLearningGuide = function () {
+    console.log("🔁 Starting Learning Guide");
+
+    // Hard reset
+    LG.stop();
+    LG.active = false;
+    LG.step = 0;
+    LG.initialCounts = {};
+    clearInterval(LG.interval);
+
+    // Start fresh
+    LG.start();
+};

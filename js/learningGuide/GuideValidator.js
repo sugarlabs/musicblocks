@@ -53,10 +53,24 @@ window.GuideValidator = {
     },
 
     validatePalette(paletteName) {
-        const result = window._lgLastPalette === paletteName;
+        const initialCounter = LG.initialCounts[LG.step] ?? 0;
+        const currentCounter = window._lgPaletteCounter;
+
+        const result =
+            window._lgLastPalette === paletteName &&
+            currentCounter > initialCounter;
+
         console.log(
-            `🎨 Palette check — expected: ${paletteName}, last opened: ${window._lgLastPalette}, result: ${result}`
+            "🎨 Palette check",
+            {
+                expected: paletteName,
+                lastOpened: window._lgLastPalette,
+                initialCounter,
+                currentCounter,
+                result
+            }
         );
+
         return result;
     },
 

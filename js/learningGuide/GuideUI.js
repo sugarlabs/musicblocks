@@ -14,6 +14,7 @@ window.GuideUI = {
         
         // Create or update panel
         this.createPanel(step);
+        document.body.classList.remove("lg-step-done");
     },
 
     createOverlay(step) {
@@ -153,6 +154,7 @@ window.GuideUI = {
     unlock() {
         const btn = document.getElementById("lg-next");
         const status = document.getElementById("lg-status");
+        document.body.classList.add("lg-step-done");
         
         if (btn) {
             btn.disabled = false;

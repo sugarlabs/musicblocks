@@ -70,6 +70,20 @@ class HelpWidget {
      * @returns {void}
      */
     _setup(useActiveBlock, page) {
+        // 🔒 Disable built-in Take a Tour
+        if (!useActiveBlock && page === 0) {
+            console.log("🚫 Default tour disabled, launching Learning Guide instead");
+
+            // Close help window immediately
+            this.widgetWindow.destroy();
+
+            // Start your guide instead
+            if (window.startLearningGuide) {
+                window.startLearningGuide();
+            }
+
+            return;
+        }
         // Which help page are we on?
 
         this._helpDiv.style.width = 100 + "%";
