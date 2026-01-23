@@ -855,6 +855,24 @@
 
     </script>
 
+    <!-- Keyboard accessibility fix for toolbar/menu buttons -->
+    <script>
+        // Keyboard accessibility for elements with role="button"
+        document.addEventListener('DOMContentLoaded', function () {
+            const buttonElements = document.querySelectorAll('a[role="button"][tabindex="0"]');
+
+            buttonElements.forEach(function (element) {
+                element.addEventListener('keydown', function (event) {
+                    // Check if Enter (13) or Space (32) was pressed
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault(); // Prevent default scrolling on Space
+                        this.click(); // Trigger existing click handler
+                    }
+                });
+            });
+        });
+    </script>
+
 </body>
 
 </html>
