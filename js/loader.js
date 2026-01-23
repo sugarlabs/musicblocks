@@ -42,6 +42,7 @@ if (typeof requirejs !== "undefined") {
     });
 
     requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBackend) {
+        let l10nElements = null;
 
         function getLanguage() {
             let lang = navigator.language;
@@ -51,15 +52,18 @@ if (typeof requirejs !== "undefined") {
             return lang || "enUS";
         }
 
-
         function updateContent() {
             console.log("updateContent() called");
-            const elements = document.querySelectorAll("[data-i18n]");
+            if (!l10nElements) {
+                l10nElements = document.querySelectorAll("[data-i18n]");
+            }
 
-            elements.forEach(element => {
+            l10nElements.forEach(element => {
                 const key = element.getAttribute("data-i18n");
                 const translation = i18next.t(key);
-                element.textContent = translation;
+                if (element.textContent !== translation) {
+                    element.textContent = translation;
+                }
             });
         }
 
@@ -71,6 +75,7 @@ if (typeof requirejs !== "undefined") {
                     {
                         lng: getLanguage(),
                         fallbackLng: "en",
+                        dontVars: true,
                         keySeparator: false,
                         nsSeparator: false,
                         interpolation: {
@@ -91,14 +96,6 @@ if (typeof requirejs !== "undefined") {
                         }
                     }
                 );
-
-                i18next.on("initialized", function () {
-                    console.log("i18next initialized");
-                });
-
-                i18next.on("loaded", function (loaded) {
-                    console.log("i18next loaded:", loaded);
-                });
             });
         }
 
@@ -108,6 +105,8 @@ if (typeof requirejs !== "undefined") {
 
                 // Setup language change listener
                 i18next.on("languageChanged", function () {
+                    // Reset elements cache on language change if needed, 
+                    // though DOM structure usually stays same
                     updateContent();
                 });
 
@@ -131,66 +130,3 @@ if (typeof requirejs !== "undefined") {
         main();
     });
 }
-
-requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBackend) {
-    function updateContent() {
-        const elements = document.querySelectorAll("[data-i18n]");
-        elements.forEach(element => {
-            const key = element.getAttribute("data-i18n");
-            element.textContent = i18next.t(key);
-        });
-    }
-
-    function initializeI18next() {
-        return new Promise(resolve => {
-            i18next.use(i18nextHttpBackend).init(
-                {
-                    lng: "en",
-                    fallbackLng: "en",
-                    keySeparator: false,
-                    nsSeparator: false,
-                    interpolation: {
-                        escapeValue: false
-                    },
-                    backend: {
-                        loadPath: "locales/{{lng}}.json?v=" + Date.now()
-                    }
-                },
-                function (err) {
-                    if (err) {
-                        console.error("i18next init failed:", err);
-                    }
-                    window.i18next = i18next;
-                    resolve(i18next); 
-                }
-            );
-        });
-    }
-
-    async function main() {
-        await initializeI18next();
-
-        const lang = "en";
-
-        i18next.changeLanguage(lang, function (err) {
-            if (err) {
-                console.error("Error changing language:", err);
-                return;
-            }
-            updateContent();
-        });
-
-        if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", updateContent);
-        } else {
-            updateContent();
-        }
-
-        i18next.on("languageChanged", updateContent);
-
-        // Load app only after i18n is ready
-        requirejs(["utils/utils", "activity/activity"]);
-    }
-
-    main();
-});
