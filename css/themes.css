@@ -141,3 +141,16 @@
 }
 
 /* Your Custom Theme can go here if you don't want to modify the existing dark mode */
+/* Fix for Issue #5286: Error notification visibility in Dark Mode */
+.dark .toast, 
+.dark #toast-container .toast {
+  background-color: #d32f2f !important; /* Material Error Red */
+  color: #ffffff !important;           /* Pure white for maximum contrast */
+}
+
+/* If the notification uses the popupMsg class specifically */
+.dark .popupMsg {
+  background-color: #1a73e8 !important; /* High-visibility Blue */
+  color: #ffffff !important;
+  border: 1px solid #ffffff;
+}
