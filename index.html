@@ -548,7 +548,11 @@ document.addEventListener("DOMContentLoaded", init);
     </script>
     <script>
         $(document).ready(function () {
-            doSearch();
+            if (window.activity && typeof window.activity.doSearch === 'function') {
+                window.activity.doSearch();
+            } else if (typeof doSearch === 'function') {
+                doSearch();
+            }
         });
     </script>
 
