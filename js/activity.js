@@ -5041,18 +5041,11 @@ class Activity {
         };
 
         /**
-         * Calculate time such that no matter how long it takes to load the program, the loading
-         * animation will cycle at least once.
          * @param loadProject all params are from load project function
          */
         this.loadStartWrapper = async (func, arg1, arg2, arg3) => {
-            const time1 = new Date();
             await func(this, arg1, arg2, arg3);
-
-            const time2 = new Date();
-            const elapsedTime = time2.getTime() - time1.getTime();
-            const timeLeft = Math.max(6000 - elapsedTime);
-            setTimeout(this.showContents, timeLeft);
+            this.showContents();
         };
 
         /*
@@ -5060,13 +5053,19 @@ class Activity {
          * Shows contents of MB after loading screen.
          */
         this.showContents = () => {
-            document.getElementById("loading-image-container").style.display = "none";
-            document.getElementById("bottom-right-logo").style.display = "none";
-            document.getElementById("palette").style.display = "block";
-            // document.getElementById('canvas').style.display = 'none';
-            document.getElementById("hideContents").style.display = "block";
-            document.getElementById("buttoncontainerBOTTOM").style.display = "block";
-            document.getElementById("buttoncontainerTOP").style.display = "block";
+            clearInterval(window.intervalId);
+            document.getElementById("loadingText").textContent = _("Loading Complete!");
+
+            setTimeout(() => {
+                document.getElementById("loadingText").textContent = null;
+                document.getElementById("loading-image-container").style.display = "none";
+                document.getElementById("bottom-right-logo").style.display = "none";
+                document.getElementById("palette").style.display = "block";
+                // document.getElementById('canvas').style.display = 'none';
+                document.getElementById("hideContents").style.display = "block";
+                document.getElementById("buttoncontainerBOTTOM").style.display = "block";
+                document.getElementById("buttoncontainerTOP").style.display = "block";
+            }, 500);
         };
 
         this.justLoadStart = () => {
