@@ -1,20 +1,77 @@
+console.log("🟢 GuideUI.js file STARTED loading");
 window.GuideUI = {
     show(step) {
         console.log(`Showing step: ${step.id}`);
         this.clearHighlights();
-        
+
         // Create or update overlay first
         this.createOverlay(step);
-        
+
         // Highlight target elements before opening palette (so user can see what to click)
         this.highlightElements(step);
-        
+
         // Handle palette opening - but don't mark as complete, user needs to actually open it
         // Only try to open if the activity is fully loaded and palette system is ready
-        
+
         // Create or update panel
         this.createPanel(step);
         document.body.classList.remove("lg-step-done");
+
+        const aiHTML = `
+            <div id="lg-ai">
+                <div class="lg-ai-title">🤖 Need help?</div>
+
+                <div id="lg-ai-suggestions"></div>
+
+                <textarea id="lg-ai-input"
+                    placeholder="Ask a question about this step..."></textarea>
+
+                <button id="lg-ai-ask" class="lg-btn lg-next">
+                    Ask AI
+                </button>
+
+                <div id="lg-ai-response"></div>
+            </div>
+        `;
+
+        const panel = document.getElementById("lg-panel");
+        panel.insertAdjacentHTML("beforeend", aiHTML);
+
+        renderAISuggestions(step);
+        docById("lg-ai-ask").onclick = async () => {
+            const input = docById("lg-ai-input").value.trim();
+            if (!input) return;
+
+            const responseBox = docById("lg-ai-response");
+            const askBtn = docById("lg-ai-ask");
+
+            responseBox.innerHTML = "🤔 Thinking...";
+            askBtn.disabled = true;
+
+            try {
+                const answer = await GuideAI.ask({
+                    stepId: step.id,
+                    stepText: step.text,
+                    userQuestion: input
+                });
+
+                const formatAIResponse = (text) => {
+                    if (!text) return "";
+                    
+                    return text
+                    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // bold
+                    .replace(/\*(.*?)\*/g, "<em>$1</em>")             // italics (optional)
+                    .replace(/\n/g, "<br>");                           // line breaks
+                };
+                responseBox.innerHTML = formatAIResponse(answer);
+            } catch (err) {
+                console.error("❌ AI error:", err);
+                responseBox.innerHTML =
+                    "⚠️ Sorry, the AI is unavailable right now. Please try again.";
+            } finally {
+                askBtn.disabled = false;
+            }
+        };
     },
 
     createOverlay(step) {
@@ -53,7 +110,7 @@ window.GuideUI = {
             }
         }
 
-        if (step.action === "octave_change"){
+        if (step.action === "octave_change") {
             document.querySelectorAll('.number').forEach(el => {
                 el.classList.add('lg-highlight');
             });
@@ -88,11 +145,11 @@ window.GuideUI = {
         const arrow = document.createElement("div");
         arrow.className = "lg-arrow";
         arrow.id = "lg-arrow";
-        
+
         const rect = button.getBoundingClientRect();
         arrow.style.top = rect.top + rect.height / 2 - 10 + "px";
         arrow.style.left = rect.right + 8 + "px";
-        
+
         document.body.appendChild(arrow);
     },
 
@@ -105,7 +162,7 @@ window.GuideUI = {
         }
 
         const isCompleted = GuideValidator.check(step);
-        
+
         panel.innerHTML = `
             <div class="lg-header">
                 <span>Step ${LG.step + 1} / ${GuideSteps.length}</span>
@@ -155,14 +212,14 @@ window.GuideUI = {
         const btn = document.getElementById("lg-next");
         const status = document.getElementById("lg-status");
         document.body.classList.add("lg-step-done");
-        
+
         if (btn) {
             btn.disabled = false;
             btn.removeAttribute("style");
             btn.style.pointerEvents = "auto";
             btn.classList.add("lg-ready");
         }
-        
+
         if (status) {
             status.innerHTML = `
                 <span class="lg-status-icon">✅</span>
@@ -203,7 +260,8 @@ window.GuideUI = {
             ">Close</button>
         `;
         document.body.appendChild(finishMsg);
-        
+
         setTimeout(() => finishMsg.remove(), 5000);
-    }
+    },
 };
+console.log("✅ GuideUI loaded", window.GuideUI);

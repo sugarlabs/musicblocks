@@ -1,3 +1,4 @@
+console.log("🔎 At LearningGuide load, GuideUI =", window.GuideUI);
 function getRealActivity() {
     if (typeof globalActivity !== "undefined" && globalActivity?.blocks) {
         return globalActivity;
@@ -33,6 +34,23 @@ function hookPlayStopButtons() {
     }
 }
 
+function renderAISuggestions(step) {
+    const box = document.getElementById("lg-ai-suggestions");
+    box.innerHTML = "";
+
+    if (!step.aiHints) return;
+
+    step.aiHints.forEach(q => {
+        const btn = document.createElement("button");
+        btn.className = "lg-ai-chip";
+        btn.textContent = q;
+        btn.onclick = () => {
+            docById("lg-ai-input").value = q;
+        };
+        box.appendChild(btn);
+    });
+}
+
 let LG = {
     step: 0,
     active: false,
@@ -43,6 +61,7 @@ let LG = {
 
     init() {
         console.log("🎵 Learning Guide: Starting initialization...");
+        console.log("🔎 At LG.start, GuideUI =", window.GuideUI);
         const wait = setInterval(() => {
             const activity = getRealActivity();
 
@@ -697,3 +716,8 @@ window.startLearningGuide = function () {
     // Start fresh
     LG.start();
 };
+
+window.addEventListener("unhandledrejection", e => {
+    console.error("❌ AI failed:", e.reason);
+    e.preventDefault();
+});
