@@ -11,117 +11,153 @@
 
 /* global requirejs */
 
-requirejs.config({
-    baseUrl: "lib",
-    shim: {
-        easel: {
-            exports: "createjs"
-        }
-    },
-    paths: {
-        utils: "../js/utils",
-        widgets: "../js/widgets",
-        activity: "../js",
-        easel: "../lib/easeljs",
-        twewn: "../lib/tweenjs",
-        prefixfree: "../bower_components/prefixfree/prefixfree.min",
-        samples: "../sounds/samples",
-        planet: "../js/planet",
-        tonejsMidi: "../node_modules/@tonejs/midi/dist/Midi",
-        i18next: [
-            "../lib/i18next.min",
-            "https://cdn.jsdelivr.net/npm/i18next@23.11.5/dist/umd/i18next.min"
-        ],
-        i18nextHttpBackend: [
-            "../lib/i18nextHttpBackend.min",
-            "https://cdn.jsdelivr.net/npm/i18next-http-backend@2.5.1/i18nextHttpBackend.min"
-        ]
-    },
-    packages: []
-});
+if (typeof requirejs !== "undefined") {
+    requirejs.config({
+        baseUrl: "lib",
+        shim: {
+            easel: {
+                exports: "createjs"
+            }
+        },
+        paths: {
+            utils: "../js/utils",
+            widgets: "../js/widgets",
+            activity: "../js",
+            easel: "../lib/easeljs",
+            twewn: "../lib/tweenjs",
+            prefixfree: "../bower_components/prefixfree/prefixfree.min",
+            samples: "../sounds/samples",
+            planet: "../js/planet",
+            tonejsMidi: "../node_modules/@tonejs/midi/dist/Midi",
+            i18next: [
+                "../lib/i18next.min",
+                "https://cdn.jsdelivr.net/npm/i18next@23.11.5/dist/umd/i18next.min"
+            ],
+            i18nextHttpBackend: [
+                "../lib/i18nextHttpBackend.min",
+                "https://cdn.jsdelivr.net/npm/i18next-http-backend@2.5.1/i18nextHttpBackend.min"
+            ]
+        },
+        packages: []
+    });
 
-requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBackend) {
-    function updateContent() {
-        console.log("updateContent() called"); // Debugging line
-        const elements = document.querySelectorAll("[data-i18n]");
+    requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBackend) {
+        function getLanguage() {
+            let lang = "en";
+            if (typeof localStorage !== "undefined" && localStorage.getItem) {
+                lang = localStorage.getItem("languagePreference");
+            }
+            if (!lang || lang === "undefined" || lang === "null") {
+                lang = navigator.language || "en";
+            }
 
-        elements.forEach(element => {
-            const key = element.getAttribute("data-i18n");
-            const translation = i18next.t(key);
-            element.textContent = translation;
-        });
-    }
+            if (lang.startsWith("ja")) {
+                return "ja";
+            }
 
-    async function initializeI18next() {
-        return new Promise((resolve, reject) => {
-            i18next.use(i18nextHttpBackend).init(
-                {
-                    lng: "en",
-                    fallbackLng: "en",
-                    keySeparator: false,
-                    nsSeparator: false,
-                    interpolation: {
-                        escapeValue: false
-                    },
-                    backend: {
-                        loadPath: "locales/{{lng}}.json?v=" + Date.now()
-                    }
-                },
-                function (err, t) {
-                    if (err) {
-                        console.error("i18next init failed:", err);
-                        reject(err);
-                    } else {
-                        console.log("i18next initialized");
-                        window.i18next = i18next;
-                        console.log("i18next Store:", i18next.store.data);
-                        resolve(i18next);
-                    }
+            // Normalize for MusicBlocks locale filenames
+            if (lang.includes("-")) {
+                const parts = lang.split("-");
+                const base = parts[0];
+                const region = parts[1].toUpperCase();
+                const normalized = `${base}_${region}`;
+
+                // Known locales with region suffixes in the codebase
+                const supportedWithRegion = ["en_GB", "zh_CN", "zh_TW"];
+                if (supportedWithRegion.includes(normalized)) {
+                    return normalized;
                 }
-            );
+                return base;
+            }
 
-            i18next.on("initialized", function () {
-                console.log("i18next initialized");
+            return lang;
+        }
+
+        const updateContent = () => {
+            const l10nElements = document.querySelectorAll("[data-i18n]");
+            l10nElements.forEach(element => {
+                const key = element.getAttribute("data-i18n");
+                const translation = i18next.t(key);
+                if (element.textContent !== translation) {
+                    element.textContent = translation;
+                }
             });
+        };
 
-            i18next.on("loaded", function (loaded) {
-                console.log("i18next loaded:", loaded);
+        const APP_VERSION = "3.4.1";
+
+        async function initializeI18next() {
+            return new Promise((resolve, reject) => {
+                i18next.use(i18nextHttpBackend).init(
+                    {
+                        lng: getLanguage(),
+                        fallbackLng: "en",
+                        dontVars: true,
+                        keySeparator: false,
+                        nsSeparator: false,
+                        interpolation: {
+                            escapeValue: false
+                        },
+                        backend: {
+                            loadPath: "locales/{{lng}}.json?v=" + APP_VERSION
+                        }
+                    },
+                    function (err, t) {
+                        window.i18next = i18next;
+                        if (err) {
+                            console.error("i18next init failed:", err);
+                            reject(err);
+                        } else {
+                            console.log("i18next initialized");
+                            resolve(i18next);
+                        }
+                    }
+                );
             });
-        });
-    }
+        }
 
-    async function main() {
-        try {
-            await initializeI18next();
+        window.loadL10nSplashScreen = function () {
+            const lang = getLanguage();
+            const container = document.getElementById("loading-media");
+            if (!container) return;
+            const content = lang.startsWith("ja")
+                ? `<img src="loading-animation-ja.svg" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
+                : `<video loop autoplay muted playsinline fetchpriority="high" style="width: 90%; height: 100%; object-fit: contain;">
+                    <source src="loading-animation.webm" type="video/webm">
+                    <source src="loading-animation.mp4" type="video/mp4">
+                   </video>`;
+            container.innerHTML = `<div class="media-wrapper" style="width: 100%; aspect-ratio: 16/9; max-height: 500px; display: flex; justify-content: center; align-items: center;">${content}</div>`;
+        };
 
-            if (document.readyState === "loading") {
-                document.addEventListener("DOMContentLoaded", function () {
+        async function main() {
+            try {
+                window.loadL10nSplashScreen();
+                await initializeI18next();
+
+                // Setup language change listener
+                i18next.on("languageChanged", function () {
+                    // Reset elements cache on language change if needed, 
+                    // though DOM structure usually stays same
                     updateContent();
                 });
-            } else {
-                console.log("DOM already loaded, updating content immediately");
-                updateContent();
+
+                if (document.readyState === "loading") {
+                    document.addEventListener("DOMContentLoaded", function () {
+                        updateContent();
+                    });
+                } else {
+                    console.log("DOM already loaded, updating content immediately");
+                    updateContent();
+                }
+
+                // Load application logic after i18n is ready
+                requirejs(["utils/utils", "activity/activity"]);
+
+            } catch (error) {
+                // error already logged in initializeI18next or elsewhere
             }
-        } catch (error) {
-            console.error("Error initializing i18next:", error);
         }
-    }
 
-    main().then(() => {
-        requirejs(["utils/utils", "activity/activity"]);
+        main();
     });
-
-    i18next.changeLanguage(lang, (err, t) => {
-        if (err) {
-            console.error("Error changing language:", err);
-            return;
-        }
-        updateContent();
-    });
-
-    i18next.on("languageChanged", function () {
-        updateContent();
-    });
-});
-
-// requirejs(["utils/utils", "activity/activity"]);
+}
