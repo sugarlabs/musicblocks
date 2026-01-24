@@ -681,11 +681,14 @@ function setupPitchBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[0] === null || args[1] === null) activity.errorMsg(NOINPUTERRORMSG, blk);
+            // Check for missing inputs
+            if (args[0] === null || args[1] === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return;
+            }
 
-            const arg0 = args[0] === null ? "C" : args[0];
-            const arg1 = args[1] === null ? 4 : args[1];
-            Singer.PitchActions.setPitchNumberOffset(arg0, arg1, turtle, activity);
+            // Inputs are valid, proceed directly
+            Singer.PitchActions.setPitchNumberOffset(args[0], args[1], turtle, activity);
         }
     }
 
