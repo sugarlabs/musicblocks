@@ -103,7 +103,7 @@ If using Jest snapshots, update them with:
 
 ```sh
 npm test -- -u
-```  
+```
 
 ## 🎯 Contribution Guidelines  
 - Ensure all tests pass before creating a PR.  

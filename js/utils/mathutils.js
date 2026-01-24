@@ -324,6 +324,156 @@ class MathUtility {
             throw "NanError";
         }
     }
+
+    /**
+     * Returns sine of a (in degrees).
+     *
+     * @static
+     * @param {number} a
+     * @returns {number} - Sine of a.
+     * @throws {string} NAN error if the argument is not valid.
+     */
+    static doSin(a) {
+        if (typeof a === "number") {
+            return Math.sin(a * (Math.PI / 180));
+        } else {
+            throw "NanError";
+        }
+    }
+
+    /**
+     * Returns cosine of a (in degrees).
+     *
+     * @static
+     * @param {number} a
+     * @returns {number} - Cosine of a.
+     * @throws {string} NAN error if the argument is not valid.
+     */
+    static doCos(a) {
+        if (typeof a === "number") {
+            return Math.cos(a * (Math.PI / 180));
+        } else {
+            throw "NanError";
+        }
+    }
+
+    /**
+     * Returns tangent of a (in degrees).
+     *
+     * @static
+     * @param {number} a
+     * @returns {number} - Tangent of a.
+     * @throws {string} NAN error if the argument is not valid.
+     */
+    static doTan(a) {
+        if (typeof a === "number") {
+            return Math.tan(a * (Math.PI / 180));
+        } else {
+            throw "NanError";
+        }
+    }
+
+    /**
+     * Returns arcsine of a (result in degrees).
+     *
+     * @static
+     * @param {number} a
+     * @returns {number} - Arcsine of a.
+     * @throws {string} NAN error if the argument is not valid.
+     */
+    static doArcSin(a) {
+        if (typeof a === "number") {
+            return Math.asin(a) * (180 / Math.PI);
+        } else {
+            throw "NanError";
+        }
+    }
+
+    /**
+     * Returns arccosine of a (result in degrees).
+     *
+     * @static
+     * @param {number} a
+     * @returns {number} - Arccosine of a.
+     * @throws {string} NAN error if the argument is not valid.
+     */
+    static doArcCos(a) {
+        if (typeof a === "number") {
+            return Math.acos(a) * (180 / Math.PI);
+        } else {
+            throw "NanError";
+        }
+    }
+
+    /**
+     * Returns arctangent of a (result in degrees).
+     *
+     * @static
+     * @param {number} a
+     * @returns {number} - Arctangent of a.
+     * @throws {string} NAN error if the argument is not valid.
+     */
+    static doArcTan(a) {
+        if (typeof a === "number") {
+            return Math.atan(a) * (180 / Math.PI);
+        } else {
+            throw "NanError";
+        }
+    }
+
+    /**
+     * Returns natural logarithm of a.
+     *
+     * @static
+     * @param {number} a
+     * @returns {number} - Natural logarithm of a.
+     * @throws {string} NAN error if the argument is not valid.
+     */
+    static doLn(a) {
+        if (typeof a === "number") {
+            if (a <= 0) throw "NanError";
+            return Math.log(a);
+        } else {
+            throw "NanError";
+        }
+    }
+
+    /**
+     * Returns base 10 logarithm of a.
+     *
+     * @static
+     * @param {number} a
+     * @returns {number} - Base 10 logarithm of a.
+     * @throws {string} NAN error if the argument is not valid.
+     */
+    static doLog(a) {
+        if (typeof a === "number") {
+            if (a <= 0) throw "NanError";
+            return Math.log10(a);
+        } else {
+            throw "NanError";
+        }
+    }
+
+    /**
+     * Returns the value of PI.
+     *
+     * @static
+     * @returns {number} - PI.
+     */
+    static doPI() {
+        return Math.PI;
+    }
+
+    /**
+     * Returns the value of E.
+     *
+     * @static
+     * @returns {number} - E.
+     */
+    static doE() {
+        return Math.E;
+    }
 }
 // Ensure mathutils.js exports the MathUtility class
 if (typeof module !== "undefined" && module.exports) {

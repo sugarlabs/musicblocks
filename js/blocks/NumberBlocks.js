@@ -38,7 +38,7 @@ function setupNumberBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                "print"
             ) {
                 logo.statusFields.push([blk, "int"]);
             } else {
@@ -87,7 +87,7 @@ function setupNumberBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                "print"
             ) {
                 logo.statusFields.push([blk, "mod"]);
             } else {
@@ -157,7 +157,7 @@ function setupNumberBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                "print"
             ) {
                 logo.statusFields.push([blk, "power"]);
             } else {
@@ -208,7 +208,7 @@ function setupNumberBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                "print"
             ) {
                 logo.statusFields.push([blk, activity.blocks.blockList[blk].name]);
             } else {
@@ -260,7 +260,7 @@ function setupNumberBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                "print"
             ) {
                 logo.statusFields.push([blk, activity.blocks.blockList[blk].name]);
             } else {
@@ -322,7 +322,7 @@ function setupNumberBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                "print"
             ) {
                 logo.statusFields.push([blk, "distance"]);
             } else {
@@ -381,7 +381,7 @@ function setupNumberBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                "print"
             ) {
                 logo.statusFields.push([blk, "divide"]);
             } else {
@@ -457,7 +457,7 @@ function setupNumberBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                "print"
             ) {
                 logo.statusFields.push([blk, "multiply"]);
             } else {
@@ -488,21 +488,21 @@ function setupNumberBlocks(activity) {
                         a =
                             typeof activity.blocks.blockList[cblk1].value === "string"
                                 ? calcOctave(
-                                      tur.singer.currentOctave,
-                                      activity.blocks.blockList[cblk1].value,
-                                      tur.singer.lastNotePlayed,
-                                      activity.blocks.blockList[noteBlock].value
-                                  )
+                                    tur.singer.currentOctave,
+                                    activity.blocks.blockList[cblk1].value,
+                                    tur.singer.lastNotePlayed,
+                                    activity.blocks.blockList[noteBlock].value
+                                )
                                 : logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
 
                         b =
                             typeof activity.blocks.blockList[cblk2].value === "string"
                                 ? calcOctave(
-                                      tur.singer.currentOctave,
-                                      activity.blocks.blockList[cblk2].value,
-                                      tur.singer.lastNotePlayed,
-                                      activity.blocks.blockList[noteBlock].value
-                                  )
+                                    tur.singer.currentOctave,
+                                    activity.blocks.blockList[cblk2].value,
+                                    tur.singer.lastNotePlayed,
+                                    activity.blocks.blockList[noteBlock].value
+                                )
                                 : logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                         try {
                             return MathUtility.doMultiply(a, b);
@@ -568,7 +568,7 @@ function setupNumberBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                "print"
             ) {
                 logo.statusFields.push([blk, "neg"]);
             } else {
@@ -625,7 +625,7 @@ function setupNumberBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                "print"
             ) {
                 logo.statusFields.push([blk, "minus"]);
             } else {
@@ -656,21 +656,21 @@ function setupNumberBlocks(activity) {
                         a =
                             typeof activity.blocks.blockList[cblk1].value === "string"
                                 ? calcOctave(
-                                      tur.singer.currentOctave,
-                                      activity.blocks.blockList[cblk1].value,
-                                      tur.singer.lastNotePlayed,
-                                      activity.blocks.blockList[noteBlock].value
-                                  )
+                                    tur.singer.currentOctave,
+                                    activity.blocks.blockList[cblk1].value,
+                                    tur.singer.lastNotePlayed,
+                                    activity.blocks.blockList[noteBlock].value
+                                )
                                 : logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
 
                         b =
                             typeof activity.blocks.blockList[cblk2].value === "string"
                                 ? calcOctave(
-                                      tur.singer.currentOctave,
-                                      activity.blocks.blockList[cblk2].value,
-                                      tur.singer.lastNotePlayed,
-                                      activity.blocks.blockList[noteBlock].value
-                                  )
+                                    tur.singer.currentOctave,
+                                    activity.blocks.blockList[cblk2].value,
+                                    tur.singer.lastNotePlayed,
+                                    activity.blocks.blockList[noteBlock].value
+                                )
                                 : logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                     } else {
                         a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
@@ -737,7 +737,7 @@ function setupNumberBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                "print"
             ) {
                 logo.statusFields.push([blk, "plus"]);
             } else {
@@ -785,21 +785,21 @@ function setupNumberBlocks(activity) {
                             a =
                                 typeof activity.blocks.blockList[cblk1].value === "string"
                                     ? calcOctave(
-                                          tur.singer.currentOctave,
-                                          activity.blocks.blockList[cblk1].value,
-                                          tur.singer.lastNotePlayed,
-                                          activity.blocks.blockList[noteBlock].value
-                                      )
+                                        tur.singer.currentOctave,
+                                        activity.blocks.blockList[cblk1].value,
+                                        tur.singer.lastNotePlayed,
+                                        activity.blocks.blockList[noteBlock].value
+                                    )
                                     : logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
 
                             b =
                                 typeof activity.blocks.blockList[cblk2].value === "string"
                                     ? calcOctave(
-                                          tur.singer.currentOctave,
-                                          activity.blocks.blockList[cblk2].value,
-                                          tur.singer.lastNotePlayed,
-                                          activity.blocks.blockList[noteBlock].value
-                                      )
+                                        tur.singer.currentOctave,
+                                        activity.blocks.blockList[cblk2].value,
+                                        tur.singer.lastNotePlayed,
+                                        activity.blocks.blockList[noteBlock].value
+                                    )
                                     : logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                         }
                     } else {
@@ -1002,6 +1002,222 @@ function setupNumberBlocks(activity) {
     new OneOfBlock().setup(activity);
     new RandomBlock().setup(activity);
     new NumberBlock().setup(activity);
+
+    class SinBlock extends LeftBlock {
+        constructor() {
+            super("sin");
+            this.setPalette("number", activity);
+            this.setHelpString([_("The Sin block returns the sine of a number (degrees)."), "documentation", ""]);
+            this.formBlock({
+                name: _("sin"),
+                args: 1,
+                defaults: [45]
+            });
+        }
+        updateParameter(logo, turtle, blk) { return toFixed2(activity.blocks.blockList[blk].value); }
+        arg(logo, turtle, blk, receivedArg) {
+            return this.processArg(logo, turtle, blk, receivedArg, MathUtility.doSin, "sin");
+        }
+        processArg(logo, turtle, blk, receivedArg, func, name) {
+            if (logo.inStatusMatrix && activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print") {
+                logo.statusFields.push([blk, name]);
+            } else {
+                const cblk = activity.blocks.blockList[blk].connections[1];
+                if (cblk === null) {
+                    activity.errorMsg(NOINPUTERRORMSG, blk);
+                    return 0;
+                } else {
+                    const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                    try {
+                        return func(a);
+                    } catch (e) {
+                        logo.stopTurtle = true;
+                        activity.errorMsg(NANERRORMSG, blk);
+                        return 0;
+                    }
+                }
+            }
+        }
+    }
+
+    class CosBlock extends LeftBlock {
+        constructor() {
+            super("cos");
+            this.setPalette("number", activity);
+            this.setHelpString([_("The Cos block returns the cosine of a number (degrees)."), "documentation", ""]);
+            this.formBlock({
+                name: _("cos"),
+                args: 1,
+                defaults: [45]
+            });
+        }
+        updateParameter(logo, turtle, blk) { return toFixed2(activity.blocks.blockList[blk].value); }
+        arg(logo, turtle, blk, receivedArg) {
+            return new SinBlock().processArg(logo, turtle, blk, receivedArg, MathUtility.doCos, "cos");
+        }
+    }
+
+    class TanBlock extends LeftBlock {
+        constructor() {
+            super("tan");
+            this.setPalette("number", activity);
+            this.setHelpString([_("The Tan block returns the tangent of a number (degrees)."), "documentation", ""]);
+            this.formBlock({
+                name: _("tan"),
+                args: 1,
+                defaults: [45]
+            });
+        }
+        updateParameter(logo, turtle, blk) { return toFixed2(activity.blocks.blockList[blk].value); }
+        arg(logo, turtle, blk, receivedArg) {
+            return new SinBlock().processArg(logo, turtle, blk, receivedArg, MathUtility.doTan, "tan");
+        }
+    }
+
+    class ArcSinBlock extends LeftBlock {
+        constructor() {
+            super("arcsin");
+            this.setPalette("number", activity);
+            this.setHelpString([_("The ArcSin block returns the arcsine of a number."), "documentation", ""]);
+            this.formBlock({
+                name: _("arcsin"),
+                args: 1,
+                defaults: [0.5]
+            });
+        }
+        updateParameter(logo, turtle, blk) { return toFixed2(activity.blocks.blockList[blk].value); }
+        arg(logo, turtle, blk, receivedArg) {
+            return new SinBlock().processArg(logo, turtle, blk, receivedArg, MathUtility.doArcSin, "arcsin");
+        }
+    }
+
+    class ArcCosBlock extends LeftBlock {
+        constructor() {
+            super("arccos");
+            this.setPalette("number", activity);
+            this.setHelpString([_("The ArcCos block returns the arccosine of a number."), "documentation", ""]);
+            this.formBlock({
+                name: _("arccos"),
+                args: 1,
+                defaults: [0.5]
+            });
+        }
+        updateParameter(logo, turtle, blk) { return toFixed2(activity.blocks.blockList[blk].value); }
+        arg(logo, turtle, blk, receivedArg) {
+            return new SinBlock().processArg(logo, turtle, blk, receivedArg, MathUtility.doArcCos, "arccos");
+        }
+    }
+
+    class ArcTanBlock extends LeftBlock {
+        constructor() {
+            super("arctan");
+            this.setPalette("number", activity);
+            this.setHelpString([_("The ArcTan block returns the arctangent of a number."), "documentation", ""]);
+            this.formBlock({
+                name: _("arctan"),
+                args: 1,
+                defaults: [1]
+            });
+        }
+        updateParameter(logo, turtle, blk) { return toFixed2(activity.blocks.blockList[blk].value); }
+        arg(logo, turtle, blk, receivedArg) {
+            return new SinBlock().processArg(logo, turtle, blk, receivedArg, MathUtility.doArcTan, "arctan");
+        }
+    }
+
+    class LnBlock extends LeftBlock {
+        constructor() {
+            super("ln");
+            this.setPalette("number", activity);
+            this.setHelpString([_("The Ln block returns the natural logarithm."), "documentation", ""]);
+            this.formBlock({
+                name: _("ln"),
+                args: 1,
+                defaults: [Math.E]
+            });
+        }
+        updateParameter(logo, turtle, blk) { return toFixed2(activity.blocks.blockList[blk].value); }
+        arg(logo, turtle, blk, receivedArg) {
+            return new SinBlock().processArg(logo, turtle, blk, receivedArg, MathUtility.doLn, "ln");
+        }
+    }
+
+    class LogBlock extends LeftBlock {
+        constructor() {
+            super("log");
+            this.setPalette("number", activity);
+            this.setHelpString([_("The Log block returns the base-10 logarithm."), "documentation", ""]);
+            this.formBlock({
+                name: _("log"),
+                args: 1,
+                defaults: [10]
+            });
+        }
+        updateParameter(logo, turtle, blk) { return toFixed2(activity.blocks.blockList[blk].value); }
+        arg(logo, turtle, blk, receivedArg) {
+            return new SinBlock().processArg(logo, turtle, blk, receivedArg, MathUtility.doLog, "log");
+        }
+    }
+
+    class ConstantBlock extends LeftBlock {
+        constructor() {
+            super("constant");
+            this.setPalette("number", activity);
+            this.setHelpString([_("The Constant block returns a mathematical constant."), "documentation", ""]);
+            this.formBlock({
+                name: _("constant"),
+                args: 0,
+                flows: { type: 'value', types: [], labels: [] } // It's like a value block but prefilled
+            });
+            // We want a value block behavior but derived from LeftBlock is okay if we override arg?
+            // Actually, ValueBlock is better if we want to select the constant.
+            // But if we want a block that just outputs PI, a zeroArgBlock is fine.
+            // Let's make it a value block with a dropdown? MusicBlocks doesn't strongly support dropdowns in the same way.
+            // Let's just make PI and E blocks for now.
+        }
+    }
+
+    class PiBlock extends LeftBlock {
+        constructor() {
+            super("pi");
+            this.setPalette("number", activity);
+            this.setHelpString([_("PI"), "documentation", ""]);
+            this.formBlock({
+                name: "π",
+                args: 0
+            });
+        }
+        arg(logo, turtle, blk) {
+            return MathUtility.doPI();
+        }
+    }
+
+    class EBlock extends LeftBlock {
+        constructor() {
+            super("e");
+            this.setPalette("number", activity);
+            this.setHelpString([_("E"), "documentation", ""]);
+            this.formBlock({
+                name: "e",
+                args: 0
+            });
+        }
+        arg(logo, turtle, blk) {
+            return MathUtility.doE();
+        }
+    }
+
+    new SinBlock().setup(activity);
+    new CosBlock().setup(activity);
+    new TanBlock().setup(activity);
+    new ArcSinBlock().setup(activity);
+    new ArcCosBlock().setup(activity);
+    new ArcTanBlock().setup(activity);
+    new LnBlock().setup(activity);
+    new LogBlock().setup(activity);
+    new PiBlock().setup(activity);
+    new EBlock().setup(activity);
+
 }
 
 if (typeof module !== "undefined" && module.exports) {

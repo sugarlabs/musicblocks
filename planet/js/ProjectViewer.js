@@ -122,19 +122,14 @@ class ProjectViewer {
     }
 
     openProject() {
-        // newPageTitle = proj.ProjectName;
-        // document.title = newPageTitle;
         this.Planet.GlobalPlanet.openGlobalProject(this.id);
     }
 
     mergeProject() {
-        // newPageTitle = proj.ProjectName;
-        // document.title = newPageTitle;
         this.Planet.GlobalPlanet.mergeGlobalProject(this.id);
     }
 
     openReporter() {
-        // eslint-disable-next-line no-console
         document.getElementById("reportdescription").value = "";
         document.getElementById("projectviewer-report-content").style.display = "block";
         document.getElementById("projectviewer-reportsubmit-content").style.display = "none";
@@ -189,32 +184,26 @@ class ProjectViewer {
     }
 
     init() {
-        // eslint-disable-next-line no-unused-vars
         document.getElementById("projectviewer-download-file").addEventListener("click", evt => {
             this.download();
         });
 
-        // eslint-disable-next-line no-unused-vars
         document.getElementById("projectviewer-open-mb").addEventListener("click", evt => {
             this.openProject();
         });
 
-        // eslint-disable-next-line no-unused-vars
         document.getElementById("projectviewer-merge-mb").addEventListener("click", evt => {
             this.mergeProject();
         });
 
-        // eslint-disable-next-line no-unused-vars
         document.getElementById("projectviewer-report-project").addEventListener("click", evt => {
             this.openReporter();
         });
 
-        // eslint-disable-next-line no-unused-vars
         document.getElementById("projectviewer-report-submit").addEventListener("click", evt => {
             this.submitReporter();
         });
 
-        // eslint-disable-next-line no-unused-vars
         document.getElementById("projectviewer-report-close").addEventListener("click", evt => {
             this.closeReporter();
         });
