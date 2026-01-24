@@ -225,9 +225,6 @@ class PitchStaircase {
             return;
         }
 
-        /**
-         * @todo look to see if the same frequency is already in the list.
-         */
         const obj = frequencyToPitch(parseFloat(frequency) / inputNum);
         let foundStep = false;
         let repeatStep = false;
