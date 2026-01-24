@@ -227,6 +227,21 @@ const _blockMakeBitmap = (data, callback, args) => {
     img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
 };
 
+// Optimization: Cache static DOM elements to avoid repetitive querySelector/getElementById calls
+const _domCache = {
+    wheelDiv: null,
+    contextWheelDiv: null,
+    helpfulWheelDiv: null,
+    labelDiv: null
+};
+
+const _getStatic = id => {
+    if (!_domCache[id]) {
+        _domCache[id] = docById(id);
+    }
+    return _domCache[id];
+};
+
 /**
  * Define block instance objects and any methods that are intra-block.
  * Represents a block instance with associated methods.
@@ -331,21 +346,23 @@ class Block {
         const that = this;
         return new Promise((resolve, reject) => {
             let loopCount = 0;
+            const MAX_RETRIES = 20;
+            const INITIAL_DELAY = 50;
 
             const checkBounds = async counter => {
                 try {
                     if (counter !== undefined) {
                         loopCount = counter;
                     }
-                    if (loopCount > 10) {
-                        // race condition?
+                    if (loopCount > MAX_RETRIES) {
                         throw new Error("COULD NOT CREATE CACHE");
                     }
 
                     that.bounds = that.container.getBounds();
 
                     if (that.bounds === null) {
-                        await delayExecution(100);
+                        const delayTime = INITIAL_DELAY * Math.pow(2, loopCount);
+                        await delayExecution(delayTime);
                         that.regenerateArtwork(true, []);
                         checkBounds(loopCount + 1);
                     } else {
@@ -376,6 +393,8 @@ class Block {
         const that = this;
         return new Promise((resolve, reject) => {
             let loopCount = 0;
+            const MAX_RETRIES = 15;
+            const INITIAL_DELAY = 100;
 
             const updateBounds = async counter => {
                 try {
@@ -383,13 +402,14 @@ class Block {
                         loopCount = counter;
                     }
 
-                    if (loopCount > 5) {
+                    if (loopCount > MAX_RETRIES) {
                         throw new Error("COULD NOT UPDATE CACHE");
                     }
 
                     if (that.bounds === null) {
+                        const delayTime = INITIAL_DELAY * Math.pow(2, loopCount);
+                        await that.pause(delayTime);
                         updateBounds(loopCount + 1);
-                        await that.pause(200);
                     } else {
                         that.container.updateCache();
                         that.activity.refreshCanvas();
@@ -537,7 +557,7 @@ class Block {
             this.disconnectedBitmap.visible = false;
         }
 
-        // If it is a collapsed collapsable, hightlight the collapsed state.
+        // If it is a collapsed collapsable, highlight the collapsed state.
         if (this.collapsed) {
             // Show the highlighted collapsed artwork.
             if (this.highlightCollapseBlockBitmap !== null) {
@@ -624,7 +644,7 @@ class Block {
 
         this.container.visible = true;
 
-        // If it is a collapsed collapsable, unhightlight the collapsed state.
+        // If it is a collapsed collapsable, unhighlight the collapsed state.
         if (this.collapsed) {
             // Show the unhighlighted collapsed artwork.'
             // We may have a race condition...
@@ -1090,7 +1110,7 @@ class Block {
             that.container.addChild(that.disconnectedHighlightBitmap);
             that.disconnectedHighlightBitmap.x = 0;
             that.disconnectedHighlightBitmap.y = 0;
-            that.disconnectedHighlightBitmap.name = "bmp_disconnect_hightlight_" + thisBlock;
+            that.disconnectedHighlightBitmap.name = "bmp_disconnect_highlight_" + thisBlock;
             if (!that.activity.logo.runningLilypond) {
                 that.disconnectedHighlightBitmap.cursor = "pointer";
             }
@@ -2169,7 +2189,7 @@ class Block {
         this.collapseButtonBitmap.visible = isCollapsed;
         this.expandButtonBitmap.visible = !isCollapsed;
 
-        // These are the collpase-state bitmaps.
+        // These are the collapse-state bitmaps.
         this.collapseBlockBitmap.visible = !isCollapsed;
         this.highlightCollapseBlockBitmap.visible = false;
         this.collapseText.visible = !isCollapsed;
@@ -2785,7 +2805,7 @@ class Block {
         this._calculateBlockHitArea();
 
         this.container.on("mouseover", () => {
-            docById("contextWheelDiv").style.display = "none";
+            _getStatic("contextWheelDiv").style.display = "none";
 
             if (!that.activity.logo.runningLilypond) {
                 document.body.style.cursor = "pointer";
@@ -2807,14 +2827,17 @@ class Block {
          * @param {Event} event - The click event.
          */
         this.container.on("click", event => {
-            if (docById("helpfulWheelDiv") && docById("helpfulWheelDiv").style.display !== "none") {
-                docById("helpfulWheelDiv").style.display = "none";
+            if (
+                _getStatic("helpfulWheelDiv") &&
+                _getStatic("helpfulWheelDiv").style.display !== "none"
+            ) {
+                _getStatic("helpfulWheelDiv").style.display = "none";
             }
             // We might be able to check which button was clicked.
             if ("nativeEvent" in event) {
                 if ("button" in event.nativeEvent && event.nativeEvent.button == 2) {
                     that.blocks.stageClick = true;
-                    docById("wheelDiv").style.display = "none";
+                    _getStatic("wheelDiv").style.display = "none";
                     that.blocks.activeBlock = thisBlock;
                     piemenuBlockContext(that);
                     return;
@@ -2972,7 +2995,7 @@ class Block {
          * @param {Event} event - The pressmove event.
          */
         this.container.on("pressmove", event => {
-            // FIXME: More voodoo
+            // Prevent the browser's default drag behavior
             event.nativeEvent.preventDefault();
 
             // Don't allow silence block to be dragged out of a note.
@@ -3001,7 +3024,7 @@ class Block {
             if (window.hasMouse) {
                 moved = true;
             } else {
-                // Make it eaiser to select text on mobile.
+                // Make it easier to select text on mobile.
                 setTimeout(() => {
                     moved =
                         Math.abs(event.stageX / that.activity.getStageScale() - that.original.x) +
@@ -3427,7 +3450,7 @@ class Block {
             labelValue = this.value;
         }
 
-        const labelElem = docById("labelDiv");
+        const labelElem = _getStatic("labelDiv");
 
         const safetext = text => {
             // Best to avoid using these special characters in text strings
@@ -3447,12 +3470,24 @@ class Block {
         };
 
         if (this.name === "text") {
-            labelElem.innerHTML =
-                '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="text" type="text" value="' +
-                safetext(labelValue) +
-                '" />';
+            // Create a new input element for this block
+            const el = document.createElement("input");
+            el.id = "textLabel";
+            el.style.position = "absolute";
+            el.style.webkitUserSelect = "text";
+            el.style.mozUserSelect = "text";
+            el.style.msUserSelect = "text";
+            el.className = "text";
+            el.type = "text";
+
+            // Ensure it is the child of labelElem
+            labelElem.innerHTML = "";
+            labelElem.appendChild(el);
+
+            this.label = el;
+            this.label.value = safetext(labelValue);
+            this.label.style.display = "";
             labelElem.classList.add("hasKeyboard");
-            this.label = docById("textLabel");
 
             // set the position of cursor to the end (for text value)
             const valueLength = this.label.value.length;
@@ -3993,12 +4028,24 @@ class Block {
                         break;
                 }
             } else {
-                labelElem.innerHTML =
-                    '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' +
-                    labelValue +
-                    '" />';
+                // Create a new input element for this block
+                const el = document.createElement("input");
+                el.id = "numberLabel";
+                el.style.position = "absolute";
+                el.style.webkitUserSelect = "text";
+                el.style.mozUserSelect = "text";
+                el.style.msUserSelect = "text";
+                el.className = "number";
+                el.type = "number";
+                el.step = "any";
+
+                // Ensure it is the child of labelElem
+                labelElem.innerHTML = "";
+                labelElem.appendChild(el);
+
+                this.label = el;
+                this.label.value = safetext(labelValue);
                 labelElem.classList.add("hasKeyboard");
-                this.label = docById("numberLabel");
 
                 // set the position of cursor to the end (for number value)
                 const valueLength = this.label.value.length;
@@ -4075,16 +4122,18 @@ class Block {
                 that._labelChanged(false, true);
             });
 
-            this.label.style.left =
-                Math.round(
-                    (x + this.activity.blocksContainer.x) * this.activity.getStageScale() +
-                        canvasLeft
-                ) + "px";
-            this.label.style.top =
-                Math.round(
-                    (y + this.activity.blocksContainer.y) * this.activity.getStageScale() +
-                        canvasTop
-                ) + "px";
+            // Use GPU acceleration (transform) instead of left/top to avoid layout thrashing
+            const left = Math.round(
+                (x + this.activity.blocksContainer.x) * this.activity.getStageScale() + canvasLeft
+            );
+            const top = Math.round(
+                (y + this.activity.blocksContainer.y) * this.activity.getStageScale() + canvasTop
+            );
+
+            this.label.style.transform = `translate3d(${left}px, ${top}px, 0)`;
+            this.label.style.left = "0px";
+            this.label.style.top = "0px";
+
             this.label.style.width =
                 Math.round((selectorWidth * this.blocks.blockScale * this.protoblock.scale) / 2) +
                 "px";
@@ -4526,7 +4575,7 @@ class Block {
                             this.blocks.actionHasReturn(c),
                             this.blocks.actionHasArgs(c)
                         );
-                        this.blocks.setActionProtoVisiblity(false);
+                        this.blocks.setActionProtoVisibility(false);
                     }
 
                     this.blocks.newNameddoBlock(
@@ -4555,7 +4604,7 @@ class Block {
                             this.blocks.actionHasReturn(c),
                             this.blocks.actionHasArgs(c)
                         );
-                        this.blocks.setActionProtoVisiblity(false);
+                        this.blocks.setActionProtoVisibility(false);
                     }
                     this.blocks.renameNameddos(oldValue, newValue);
                     this.blocks.palettes.hide();
