@@ -866,7 +866,8 @@ class Activity {
         }
 
         //if any window resize event occurs:
-        this.addEventListener(window, "resize", () => repositionBlocks(this));
+        this._repositionBlocksListener = () => repositionBlocks(this);
+        this.addEventListener(window, "resize", this._repositionBlocksListener);
 
         /**
          * Finds and organizes blocks within the workspace.
@@ -3704,16 +3705,20 @@ class Activity {
         }
 
         let resizeTimeout;
-        this.addEventListener(window, "resize", () => {
+        this._resizeListener = () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
                 handleResize();
                 this._setupPaletteMenu();
             }, 100);
-        });
-        this.addEventListener(window, "orientationchange", handleResize);
+        };
+        this.addEventListener(window, "resize", this._resizeListener);
+        
+        this._orientationChangeListener = handleResize;
+        this.addEventListener(window, "orientationchange", this._orientationChangeListener);
+        
         const that = this;
-        const resizeCanvas_ = () => {
+        this._resizeCanvasListener = () => {
             try {
                 that._onResize(false);
                 document.getElementById("hideContents").click();
@@ -3723,8 +3728,8 @@ class Activity {
             }
         };
 
-        resizeCanvas_();
-        this.addEventListener(window, "orientationchange", resizeCanvas_);
+        this._resizeCanvasListener();
+        this.addEventListener(window, "orientationchange", this._resizeCanvasListener);
 
         /*
          * Restore last stack pushed to trashStack back onto canvas.
@@ -7565,6 +7570,26 @@ class Activity {
      * Removes all tracked event listeners.
      */
     cleanupEventListeners() {
+        if (this._resizeListener) {
+            this.removeEventListener(window, "resize", this._resizeListener);
+            this._resizeListener = null;
+        }
+        
+        if (this._orientationChangeListener) {
+            this.removeEventListener(window, "orientationchange", this._orientationChangeListener);
+            this._orientationChangeListener = null;
+        }
+        
+        if (this._resizeCanvasListener) {
+            this.removeEventListener(window, "orientationchange", this._resizeCanvasListener);
+            this._resizeCanvasListener = null;
+        }
+        
+        if (this._repositionBlocksListener) {
+            this.removeEventListener(window, "resize", this._repositionBlocksListener);
+            this._repositionBlocksListener = null;
+        }
+        
         while (this._listeners.length > 0) {
             const { target, type, listener, options } = this._listeners.pop();
             if (target && typeof target.removeEventListener === "function") {
