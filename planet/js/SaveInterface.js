@@ -74,9 +74,7 @@ class SaveInterface {
             const lower = raw.toLowerCase();
             if (lower.startsWith("data:")) {
                 // Only allow data:image/* (prevents data:text/html, data:application/svg+xml, etc.)
-                return /^data:image\/[a-z0-9.+-]+;base64,[a-z0-9+/=\s]+$/i.test(raw)
-                    ? raw
-                    : "";
+                return /^data:image\/[a-z0-9.+-]+;base64,[a-z0-9+/=\s]+$/i.test(raw) ? raw : "";
             }
 
             if (lower.startsWith("http://") || lower.startsWith("https://")) return raw;
@@ -104,9 +102,8 @@ class SaveInterface {
             .replace(new RegExp("{{ project_name }}", "g"), () => escapeHTML(name))
             // Always render project data as text, never as HTML.
             .replace(new RegExp("{{ data }}", "g"), () => escapeHTML(data))
-            .replace(
-                new RegExp("{{ project_image }}", "g"),
-                () => escapeHTML(sanitizeImageURL(image))
+            .replace(new RegExp("{{ project_image }}", "g"), () =>
+                escapeHTML(sanitizeImageURL(image))
             )
             .replace(new RegExp("{{ project_button }}", "g"), () => id);
 
