@@ -3713,10 +3713,10 @@ class Activity {
             }, 100);
         };
         this.addEventListener(window, "resize", this._resizeListener);
-        
+
         this._orientationChangeListener = handleResize;
         this.addEventListener(window, "orientationchange", this._orientationChangeListener);
-        
+
         const that = this;
         this._resizeCanvasListener = () => {
             try {
@@ -7574,22 +7574,22 @@ class Activity {
             this.removeEventListener(window, "resize", this._resizeListener);
             this._resizeListener = null;
         }
-        
+
         if (this._orientationChangeListener) {
             this.removeEventListener(window, "orientationchange", this._orientationChangeListener);
             this._orientationChangeListener = null;
         }
-        
+
         if (this._resizeCanvasListener) {
             this.removeEventListener(window, "orientationchange", this._resizeCanvasListener);
             this._resizeCanvasListener = null;
         }
-        
+
         if (this._repositionBlocksListener) {
             this.removeEventListener(window, "resize", this._repositionBlocksListener);
             this._repositionBlocksListener = null;
         }
-        
+
         while (this._listeners.length > 0) {
             const { target, type, listener, options } = this._listeners.pop();
             if (target && typeof target.removeEventListener === "function") {
