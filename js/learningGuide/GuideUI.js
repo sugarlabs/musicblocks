@@ -26,7 +26,7 @@ window.GuideUI = {
                 <textarea id="lg-ai-input"
                     placeholder="Ask a question about this step..."></textarea>
 
-                <button id="lg-ai-ask" class="lg-btn lg-next">
+                <button id="lg-ai-ask" class="lg-btn lg-ai-btn">
                     Ask AI
                 </button>
 
@@ -35,18 +35,27 @@ window.GuideUI = {
         `;
 
         const panel = document.getElementById("lg-panel");
+        if (!panel) {
+            console.error("❌ lg-panel not found");
+            return;
+        }
+        document.getElementById("lg-ai")?.remove();
         panel.insertAdjacentHTML("beforeend", aiHTML);
 
-        renderAISuggestions(step);
-        docById("lg-ai-ask").onclick = async () => {
-            const input = docById("lg-ai-input").value.trim();
+        const aiInput = docById("lg-ai-input");
+        const askBtn = docById("lg-ai-ask");
+        const responseBox = docById("lg-ai-response");
+
+        // 🚫 Stop Music Blocks global key handling
+        aiInput.addEventListener("keydown", e => e.stopPropagation());
+        aiInput.addEventListener("keyup", e => e.stopPropagation());
+
+        askBtn.onclick = async () => {
+            const input = aiInput.value.trim();
             if (!input) return;
 
-            const responseBox = docById("lg-ai-response");
-            const askBtn = docById("lg-ai-ask");
-
-            responseBox.innerHTML = "🤔 Thinking...";
             askBtn.disabled = true;
+            responseBox.innerHTML = "🤔 Thinking...";
 
             try {
                 const answer = await GuideAI.ask({
@@ -55,21 +64,18 @@ window.GuideUI = {
                     userQuestion: input
                 });
 
-                const formatAIResponse = (text) => {
-                    if (!text) return "";
-                    
-                    return text
-                    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // bold
-                    .replace(/\*(.*?)\*/g, "<em>$1</em>")             // italics (optional)
-                    .replace(/\n/g, "<br>");                           // line breaks
-                };
-                responseBox.innerHTML = formatAIResponse(answer);
-            } catch (err) {
-                console.error("❌ AI error:", err);
-                responseBox.innerHTML =
-                    "⚠️ Sorry, the AI is unavailable right now. Please try again.";
+                if (!responseBox) return;
+
+                responseBox.innerHTML = answer
+                    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                    .replace(/\*(.*?)\*/g, "<em>$1</em>")
+                    .replace(/\n/g, "<br>");
+                } catch (err) {
+                    console.error(err);
+                    responseBox.innerHTML =
+                        "⚠️ Sorry, the AI is unavailable right now. Please try again.";
             } finally {
-                askBtn.disabled = false;
+                if (askBtn) askBtn.disabled = false;
             }
         };
     },

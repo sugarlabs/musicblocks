@@ -184,6 +184,10 @@ margin: 8px 0;
 font-family: inherit;
 }
 
+.lg-ai-btn {
+    background: rgba(255,255,255,0.2);
+}
+
 #lg-ai-response {
     max-height: 180px;          /* adjust if needed */
     overflow-y: auto;
