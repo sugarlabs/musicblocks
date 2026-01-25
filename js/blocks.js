@@ -1726,6 +1726,9 @@ class Blocks {
                     start = this.blockList[b].connections.length - 1;
                 }
 
+                const ILLEGAL_BOUNCE_DIST = 400; // squared distance (20px)
+                let bounced = false;
+
                 for (let i = start; i < this.blockList[b].connections.length; i++) {
                     /**
                      * When converting from Python projects to JS format,
@@ -1781,11 +1784,36 @@ class Blocks {
                             min = dist;
                         }
                     } else {
-                        /**
-                         * TODO: bounce away from illegal connection?
-                         * only if the distance was small
-                         * console.debug('cannot not connect these two block types');
-                         */
+                        // Bounce away from illegal connection if the distance was small.
+                        if (!myBlock.isDragging) {
+                            const x2 =
+                                this.blockList[b].container.x + this.blockList[b].docks[i][0];
+                            const y2 =
+                                this.blockList[b].container.y + this.blockList[b].docks[i][1];
+
+                            const dx = x2 - x1;
+                            const dy = y2 - y1;
+                            const dist = dx * dx + dy * dy;
+
+                            if (!bounced && dist < ILLEGAL_BOUNCE_DIST) {
+                                console.debug("cannot connect these two block types");
+
+                                const distance = Math.sqrt(dist) || 0.0001;
+                                const bounceFactor = 60;
+
+                                // Snap back first
+                                if (myBlock.lastGoodX !== undefined) {
+                                    myBlock.container.x = myBlock.lastGoodX;
+                                    myBlock.container.y = myBlock.lastGoodY;
+                                }
+
+                                // Directional push away from illegal dock
+                                myBlock.container.x -= (dx / distance) * bounceFactor;
+                                myBlock.container.y -= (dy / distance) * bounceFactor;
+
+                                bounced = true;
+                            }
+                        }
                     }
                 }
             }
