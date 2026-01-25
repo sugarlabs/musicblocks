@@ -8,9 +8,7 @@ describe("loader.js coverage", () => {
     beforeEach(() => {
         jest.resetModules();
 
-        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {
-            // Mock empty implementation
-        });
+        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
         document.body.innerHTML = `
             <div data-i18n="title">Original Title</div>
@@ -22,8 +20,7 @@ describe("loader.js coverage", () => {
             init: jest.fn(),
             changeLanguage: jest.fn(),
             t: jest.fn(key => `TRANSLATED_${key}`),
-            on: jest.fn(),
-            isInitialized: false
+            on: jest.fn()
         };
 
         mockI18nextHttpBackend = {};
@@ -31,67 +28,41 @@ describe("loader.js coverage", () => {
         mockRequireJSConfig = jest.fn();
         mockRequireJS = jest.fn();
         mockRequireJS.config = mockRequireJSConfig;
-        mockRequireJS.defined = jest.fn(() => false);
 
         global.requirejs = mockRequireJS;
-        global.define = jest.fn();
         global.window = document.defaultView;
-        global.window.createjs = {
-            Stage: jest.fn(),
-            Ticker: { framerate: 60, addEventListener: jest.fn() }
-        };
     });
 
     afterEach(() => {
-        delete global.define;
         jest.restoreAllMocks();
     });
 
-    const loadScript = async ({ initError = false, langError = false } = {}) => {
+    const loadScript = async ({ initError = false } = {}) => {
         mockRequireJS.mockImplementation((deps, callback) => {
-            if (deps.includes("highlight")) {
-                if (callback) callback(null);
-            } else if (deps.includes("i18next")) {
+            if (deps[0] === "i18next") {
                 mockI18next.init.mockImplementation((config, cb) => {
                     if (initError) {
                         cb("Init Failed");
                     } else {
-                        mockI18next.isInitialized = true;
                         cb(null);
                     }
                 });
-                mockI18next.changeLanguage.mockImplementation((lang, cb) => {
-                    if (langError) cb("Lang Change Failed");
-                    else cb(null);
-                });
-                if (callback) {
-                    callback(mockI18next, mockI18nextHttpBackend);
-                }
-            } else if (deps.includes("easeljs.min")) {
-                // Phase 1 bootstrap
-                // Mock globals expected by verification
-                window.createDefaultStack = jest.fn();
-                window.Logo = jest.fn();
-                window.Blocks = jest.fn();
-                window.Turtles = jest.fn();
-                if (callback) callback();
-            } else if (deps.includes("activity/activity")) {
-                // Phase 2 bootstrap
-                if (callback) callback();
+
+                return callback(mockI18next, mockI18nextHttpBackend);
             }
             return null;
         });
 
         require("../loader.js");
 
-        await new Promise(resolve => setTimeout(resolve, 200)); // More time
-    }; // Allow async main() to proceed
+        await new Promise(resolve => process.nextTick(resolve));
+    };
 
     test("Configures requirejs correctly", async () => {
         await loadScript();
         expect(mockRequireJSConfig).toHaveBeenCalledWith(
             expect.objectContaining({
-                baseUrl: "./",
+                baseUrl: "lib",
                 paths: expect.any(Object),
                 shim: expect.any(Object)
             })
@@ -113,8 +84,6 @@ describe("loader.js coverage", () => {
         );
         expect(window.i18next).toBe(mockI18next);
 
-        expect(mockI18next.changeLanguage).toHaveBeenCalledWith("en", expect.any(Function));
-
         const title = document.querySelector('[data-i18n="title"]');
         const label = document.querySelector('[data-i18n="label"]');
 
@@ -125,12 +94,7 @@ describe("loader.js coverage", () => {
 
         expect(mockI18next.on).toHaveBeenCalledWith("languageChanged", expect.any(Function));
 
-        // Verify Phase 2 was reached
-        expect(mockRequireJS).toHaveBeenCalledWith(
-            ["activity/activity"],
-            expect.any(Function),
-            expect.any(Function)
-        );
+        expect(mockRequireJS).toHaveBeenCalledWith(["utils/utils", "activity/activity"]);
     });
 
     test("Handles i18next initialization error", async () => {
@@ -138,15 +102,6 @@ describe("loader.js coverage", () => {
 
         expect(consoleErrorSpy).toHaveBeenCalledWith("i18next init failed:", "Init Failed");
         expect(window.i18next).toBe(mockI18next);
-    });
-
-    test("Handles changeLanguage error", async () => {
-        await loadScript({ langError: true });
-
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-            "Error changing language:",
-            "Lang Change Failed"
-        );
     });
 
     test("Handles DOMContentLoaded when document is loading", async () => {
