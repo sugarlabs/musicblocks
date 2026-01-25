@@ -7680,10 +7680,16 @@ class Activity {
 const activity = new Activity();
 
 require(["domReady!"], doc => {
-    setTimeout(() => {
+    doBrowserCheck();
+    if (jQuery.browser.mozilla) {
+        setTimeout(() => {
+            activity.setupDependencies();
+            activity.domReady(doc);
+        }, 5000);
+    } else {
         activity.setupDependencies();
         activity.domReady(doc);
-    }, 5000);
+    }
 });
 
 define(MYDEFINES, () => {
