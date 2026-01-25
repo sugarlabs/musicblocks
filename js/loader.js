@@ -56,24 +56,22 @@ requirejs.config({
             "../lib/i18nextHttpBackend.min",
             "https://cdn.jsdelivr.net/npm/i18next-http-backend@2.5.1/i18nextHttpBackend.min"
         ]
-    },
-    packages: []
+    }
 });
 
 requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBackend) {
     function updateContent() {
-        const elements = document.querySelectorAll("[data-i18n]");
-        elements.forEach(element => {
-            const key = element.getAttribute("data-i18n");
-            element.textContent = i18next.t(key);
+        document.querySelectorAll("[data-i18n]").forEach(el => {
+            const key = el.getAttribute("data-i18n");
+            el.textContent = i18next.t(key);
         });
     }
 
-    function initializeI18next() {
+    function initI18n(lang) {
         return new Promise(resolve => {
             i18next.use(i18nextHttpBackend).init(
                 {
-                    lng: "en",
+                    lng: lang,
                     fallbackLng: "en",
                     keySeparator: false,
                     nsSeparator: false,
@@ -84,7 +82,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                         loadPath: "locales/{{lng}}.json?v=" + Date.now()
                     }
                 },
-                function (err) {
+                err => {
                     if (err) {
                         console.error("i18next init failed:", err);
                     }
@@ -96,17 +94,9 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
     }
 
     async function main() {
-        await initializeI18next();
-
         const lang = "en";
 
-        i18next.changeLanguage(lang, function (err) {
-            if (err) {
-                console.error("Error changing language:", err);
-                return;
-            }
-            updateContent();
-        });
+        await initI18n(lang);
 
         if (document.readyState === "loading") {
             document.addEventListener("DOMContentLoaded", updateContent);
