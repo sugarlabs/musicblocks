@@ -8,7 +8,7 @@ describe("loader.js coverage", () => {
     beforeEach(() => {
         jest.resetModules();
 
-        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
         document.body.innerHTML = `
             <div data-i18n="title">Original Title</div>
@@ -103,8 +103,6 @@ describe("loader.js coverage", () => {
         expect(consoleErrorSpy).toHaveBeenCalledWith("i18next init failed:", "Init Failed");
         expect(window.i18next).toBe(mockI18next);
     });
-
-
 
     test("Handles DOMContentLoaded when document is loading", async () => {
         Object.defineProperty(document, "readyState", {

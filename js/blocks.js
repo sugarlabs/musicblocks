@@ -1432,9 +1432,8 @@ class Blocks {
                                 this.blockList[silenceBlockobj.connections[0]].connections[c] ===
                                 silenceBlock
                             ) {
-                                this.blockList[silenceBlockobj.connections[0]].connections[
-                                    c
-                                ] = this.blockList.indexOf(thisBlockobj);
+                                this.blockList[silenceBlockobj.connections[0]].connections[c] =
+                                    this.blockList.indexOf(thisBlockobj);
                                 break;
                             }
                         }
@@ -1865,9 +1864,8 @@ class Blocks {
                                     i > ci + 1;
                                     i--
                                 ) {
-                                    this.blockList[newBlock].connections[i] = this.blockList[
-                                        newBlock
-                                    ].connections[i - 1];
+                                    this.blockList[newBlock].connections[i] =
+                                        this.blockList[newBlock].connections[i - 1];
                                 }
                             }
                             /** The new block is added below the current connection... */
