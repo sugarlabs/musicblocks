@@ -69,6 +69,77 @@ const VIDEOVALUE = "##__VIDEO__##";
 const NOTEBLOCKS = ["newnote", "osctime"];
 const PITCHBLOCKS = ["pitch", "steppitch", "hertz", "pitchnumber", "nthmodalpitch", "playdrum"];
 
+const ALLOWED_CONNECTIONS = new Set([
+    "vspaceout:vspacein",
+    "vspacein:vspaceout",
+    "in:out",
+    "out:in",
+    "in:vspaceout",
+    "vspaceout:in",
+    "out:vspacein",
+    "vspacein:out",
+    "numberin:numberout",
+    "numberin:anyout",
+    "numberout:numberin",
+    "anyout:numberin",
+    "textin:textout",
+    "textin:anyout",
+    "textout:textin",
+    "anyout:textin",
+    "booleanout:booleanin",
+    "booleanin:booleanout",
+    "mediain:mediaout",
+    "mediaout:mediain",
+    "mediain:textout",
+    "textout:mediain",
+    "filein:fileout",
+    "fileout:filein",
+    "casein:caseout",
+    "caseout:casein",
+    "vspaceout:casein",
+    "casein:vspaceout",
+    "vspacein:caseout",
+    "caseout:vspacein",
+    "solfegein:anyout",
+    "solfegein:solfegeout",
+    "solfegein:textout",
+    "solfegein:noteout",
+    "solfegein:scaledegreeout",
+    "solfegein:numberout",
+    "anyout:solfegein",
+    "solfegeout:solfegein",
+    "textout:solfegein",
+    "noteout:solfegein",
+    "scaledegreeout:solfegein",
+    "numberout:solfegein",
+    "notein:solfegeout",
+    "notein:scaledegreeout",
+    "notein:textout",
+    "notein:noteout",
+    "solfegeout:notein",
+    "scaledegreeout:notein",
+    "textout:notein",
+    "noteout:notein",
+    "pitchout:anyin",
+    "gridout:anyin",
+    "anyin:textout",
+    "anyin:mediaout",
+    "anyin:numberout",
+    "anyin:anyout",
+    "anyin:fileout",
+    "anyin:solfegeout",
+    "anyin:scaledegreeout",
+    "anyin:noteout",
+    "textout:anyin",
+    "mediaout:anyin",
+    "numberout:anyin",
+    "anyout:anyin",
+    "fileout:anyin",
+    "solfegeout:anyin",
+    "scaledegreeout:anyin",
+    "noteout:anyin"
+]);
+
 /**
  * Blocks holds the list of blocks and most of the block-associated
  * methods, since most block manipulations are inter-block.
@@ -1432,9 +1503,8 @@ class Blocks {
                                 this.blockList[silenceBlockobj.connections[0]].connections[c] ===
                                 silenceBlock
                             ) {
-                                this.blockList[silenceBlockobj.connections[0]].connections[
-                                    c
-                                ] = this.blockList.indexOf(thisBlockobj);
+                                this.blockList[silenceBlockobj.connections[0]].connections[c] =
+                                    this.blockList.indexOf(thisBlockobj);
                                 break;
                             }
                         }
@@ -1865,9 +1935,8 @@ class Blocks {
                                     i > ci + 1;
                                     i--
                                 ) {
-                                    this.blockList[newBlock].connections[i] = this.blockList[
-                                        newBlock
-                                    ].connections[i - 1];
+                                    this.blockList[newBlock].connections[i] =
+                                        this.blockList[newBlock].connections[i - 1];
                                 }
                             }
                             /** The new block is added below the current connection... */
@@ -2184,160 +2253,7 @@ class Blocks {
          */
         this._testConnectionType = (type1, type2) => {
             /** Can these two blocks dock? */
-            if (type1 === "vspaceout" && type2 === "vspacein") {
-                return true;
-            }
-            if (type1 === "vspacein" && type2 === "vspaceout") {
-                return true;
-            }
-
-            if (type1 === "in" && type2 === "out") {
-                return true;
-            }
-            if (type1 === "out" && type2 === "in") {
-                return true;
-            }
-            if (type1 === "in" && type2 === "vspaceout") {
-                return true;
-            }
-            if (type1 === "vspaceout" && type2 === "in") {
-                return true;
-            }
-            if (type1 === "out" && type2 === "vspacein") {
-                return true;
-            }
-            if (type1 === "vspacein" && type2 === "out") {
-                return true;
-            }
-            if (type1 === "numberin" && ["numberout", "anyout"].includes(type2)) {
-                return true;
-            }
-            if (["numberout", "anyout"].includes(type1) && type2 === "numberin") {
-                return true;
-            }
-            if (type1 === "textin" && ["textout", "anyout"].includes(type2)) {
-                return true;
-            }
-            if (["textout", "anyout"].includes(type1) && type2 === "textin") {
-                return true;
-            }
-            if (type1 === "booleanout" && type2 === "booleanin") {
-                return true;
-            }
-            if (type1 === "booleanin" && type2 === "booleanout") {
-                return true;
-            }
-            if (type1 === "mediain" && type2 === "mediaout") {
-                return true;
-            }
-            if (type1 === "mediaout" && type2 === "mediain") {
-                return true;
-            }
-            if (type1 === "mediain" && type2 === "textout") {
-                return true;
-            }
-            if (type2 === "mediain" && type1 === "textout") {
-                return true;
-            }
-            if (type1 === "filein" && type2 === "fileout") {
-                return true;
-            }
-            if (type1 === "fileout" && type2 === "filein") {
-                return true;
-            }
-            if (type1 === "casein" && type2 === "caseout") {
-                return true;
-            }
-            if (type1 === "caseout" && type2 === "casein") {
-                return true;
-            }
-            if (type1 === "vspaceout" && type2 === "casein") {
-                return true;
-            }
-            if (type1 === "casein" && type2 === "vspaceout") {
-                return true;
-            }
-            if (type1 === "vspacein" && type2 === "caseout") {
-                return true;
-            }
-            if (type1 === "caseout" && type2 === "vspacein") {
-                return true;
-            }
-            if (
-                type1 === "solfegein" &&
-                [
-                    "anyout",
-                    "solfegeout",
-                    "textout",
-                    "noteout",
-                    "scaledegreeout",
-                    "numberout"
-                ].includes(type2)
-            ) {
-                return true;
-            }
-            if (
-                type2 === "solfegein" &&
-                [
-                    "anyout",
-                    "solfegeout",
-                    "textout",
-                    "noteout",
-                    "scaledegreeout",
-                    "numberout"
-                ].includes(type1)
-            ) {
-                return true;
-            }
-            if (
-                type1 === "notein" &&
-                ["solfegeout", "scaledegreeout", "textout", "noteout"].includes(type2)
-            ) {
-                return true;
-            }
-            if (type1 === "pitchout" && type2 === "anyin") {
-                return true;
-            }
-            if (type1 === "gridout" && type2 === "anyin") {
-                return true;
-            }
-            if (
-                type2 === "notein" &&
-                ["solfegeout", "scaledegreeout", "textout", "noteout"].includes(type1)
-            ) {
-                return true;
-            }
-            if (
-                type1 === "anyin" &&
-                [
-                    "textout",
-                    "mediaout",
-                    "numberout",
-                    "anyout",
-                    "fileout",
-                    "solfegeout",
-                    "scaledegreeout",
-                    "noteout"
-                ].includes(type2)
-            ) {
-                return true;
-            }
-            if (
-                type2 === "anyin" &&
-                [
-                    "textout",
-                    "mediaout",
-                    "numberout",
-                    "anyout",
-                    "fileout",
-                    "solfegeout",
-                    "scaledegreeout",
-                    "noteout"
-                ].includes(type1)
-            ) {
-                return true;
-            }
-            return false;
+            return ALLOWED_CONNECTIONS.has(type1 + ":" + type2);
         };
 
         /**
