@@ -866,7 +866,8 @@ class Activity {
         }
 
         //if any window resize event occurs:
-        this.addEventListener(window, "resize", () => repositionBlocks(this));
+        this._handleRepositionBlocksOnResize = () => repositionBlocks(this);
+        this.addEventListener(window, "resize", this._handleRepositionBlocksOnResize);
 
         /**
          * Finds and organizes blocks within the workspace.
@@ -3702,14 +3703,16 @@ class Activity {
         }
 
         let resizeTimeout;
-        this.addEventListener(window, "resize", () => {
+        this._handleWindowResize = () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
                 handleResize();
                 this._setupPaletteMenu();
             }, 100);
-        });
-        this.addEventListener(window, "orientationchange", handleResize);
+        };
+        this.addEventListener(window, "resize", this._handleWindowResize);
+        this._handleOrientationChangeResize = handleResize;
+        this.addEventListener(window, "orientationchange", this._handleOrientationChangeResize);
         const that = this;
         const resizeCanvas_ = () => {
             try {
@@ -3722,7 +3725,8 @@ class Activity {
         };
 
         resizeCanvas_();
-        this.addEventListener(window, "orientationchange", resizeCanvas_);
+        this._handleOrientationChangeResizeCanvas = resizeCanvas_;
+        this.addEventListener(window, "orientationchange", this._handleOrientationChangeResizeCanvas);
 
         /*
          * Restore last stack pushed to trashStack back onto canvas.
