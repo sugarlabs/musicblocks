@@ -288,7 +288,9 @@ describe("Toolbar Class", () => {
     test("renderNewProjectIcon displays modal and handles confirmation", () => {
         const elements = {
             "modal-container": {
-                style: { display: "" }
+                style: { display: "" },
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn()
             },
             "newdropdown": {
                 innerHTML: "",
@@ -303,7 +305,9 @@ describe("Toolbar Class", () => {
                 textContent: "",
                 style: {},
                 onclick: null,
-                appendChild: jest.fn()
+                appendChild: jest.fn(),
+                addEventListener: jest.fn(),
+                focus: jest.fn()
             }))
         };
         global._ = jest.fn(str => str);
