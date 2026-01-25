@@ -24,7 +24,7 @@ const prettier = require("gulp-prettier");
 // File paths
 const files = {
     jsPath: "js/**/*.js",
-    cssPath: "css/*.css",
+    cssPath: ["css/*.css", "css/windows.css"],
     sassPath: "css/*.sass"
 };
 

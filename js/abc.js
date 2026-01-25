@@ -144,7 +144,7 @@ const processABCNotes = function (logo, turtle) {
                     logo.notationNotes[turtle] += "!>(!";
                     break;
                 case "end decrescendo":
-                    logo.notationNotes[turtle] += "!<(!";
+                    logo.notationNotes[turtle] += "!>)!";
                     break;
                 case "begin slur":
                     queueSlur = true;
@@ -223,7 +223,7 @@ const processABCNotes = function (logo, turtle) {
                     if (
                         logo.notation.notationStaging[turtle][i + j][NOTATIONINSIDECHORD] > 0 &&
                         logo.notation.notationStaging[turtle][i + j][NOTATIONINSIDECHORD] ===
-                            logo.notation.notationStaging[turtle][i + j - 1][NOTATIONINSIDECHORD]
+                        logo.notation.notationStaging[turtle][i + j - 1][NOTATIONINSIDECHORD]
                     ) {
                         // In a chord, so jump to next note.
                         j++;
@@ -258,31 +258,30 @@ const processABCNotes = function (logo, turtle) {
                 let k = 0;
 
                 while (k < count) {
-                    // const tupletDuration = 2 *
-                    //     logo.notation.notationStaging[turtle][i + j][
-                    //         NOTATIONDURATION];
+                    const currentObj = logo.notation.notationStaging[turtle][i + j];
+                    const currentNotes =
+                        typeof currentObj[NOTATIONNOTE] === "string"
+                            ? [currentObj[NOTATIONNOTE]]
+                            : currentObj[NOTATIONNOTE];
 
-                    if (typeof notes === "object") {
-                        if (notes.length > 1) {
-                            logo.notationNotes[turtle] += "[";
-                        }
-
-                        for (let ii = 0; ii < notes.length; ii++) {
-                            logo.notationNotes[turtle] += __toABCnote(notes[ii]);
-                            logo.notationNotes[turtle] += " ";
-                        }
-
-                        if (obj[NOTATIONSTACCATO]) {
-                            logo.notationNotes[turtle] += ".";
-                        }
-
-                        if (notes.length > 1) {
-                            logo.notationNotes[turtle] += "]";
-                        }
-
-                        logo.notationNotes[turtle] +=
-                            logo.notation.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
+                    if (currentNotes.length > 1) {
+                        logo.notationNotes[turtle] += "[";
                     }
+
+                    for (let ii = 0; ii < currentNotes.length; ii++) {
+                        logo.notationNotes[turtle] += __toABCnote(currentNotes[ii]);
+                        logo.notationNotes[turtle] += " ";
+                    }
+
+                    if (currentObj[NOTATIONSTACCATO]) {
+                        logo.notationNotes[turtle] += ".";
+                    }
+
+                    if (currentNotes.length > 1) {
+                        logo.notationNotes[turtle] += "]";
+                    }
+
+                    logo.notationNotes[turtle] += currentObj[NOTATIONROUNDDOWN];
                     j++; // Jump to next note.
                     k++; // Increment notes in tuplet.
                 }
@@ -319,64 +318,60 @@ const processABCNotes = function (logo, turtle) {
                         logo.notationNotes[turtle] += "]";
                     }
 
-                    logo.notationNotes[turtle] += obj[NOTATIONDURATION];
-                    for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
-                        logo.notationNotes[turtle] += ".";
-                    }
-
-                    logo.notationNotes[turtle] += " ";
-                }
-
-                if (obj[NOTATIONSTACCATO]) {
-                    logo.notationNotes[turtle] += ".";
-                }
-
-                if (obj[NOTATIONINSIDECHORD] > 0) {
-                    // Is logo the first note in the chord?
-                    if (
-                        i === 0 ||
-                        logo.notation.notationStaging[turtle][i - 1][NOTATIONINSIDECHORD] !==
-                            obj[NOTATIONINSIDECHORD]
-                    ) {
-                        // Open the chord.
-                        logo.notationNotes[turtle] += "[";
-                    }
-
-                    logo.notationNotes[turtle] += note;
-
-                    // Is logo the last note in the chord?
-                    if (
-                        i === logo.notation.notationStaging[turtle].length - 1 ||
-                        logo.notation.notationStaging[turtle][i + 1][NOTATIONINSIDECHORD] !==
-                            obj[NOTATIONINSIDECHORD]
-                    ) {
-                        // Close the chord and add note duration.
-                        logo.notationNotes[turtle] += "]";
-                        logo.notationNotes[turtle] += __convertDuration(obj[NOTATIONDURATION]);
-                        for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
-                            logo.notationNotes[turtle] += " ";
-                        }
-
-                        if (articulation) {
-                            logo.notationNotes[turtle] += " ";
-                        }
-
-                        logo.notationNotes[turtle] += " ";
-                    }
-                } else {
-                    logo.notationNotes[turtle] += note;
                     logo.notationNotes[turtle] += __convertDuration(obj[NOTATIONDURATION]);
                     for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
                         logo.notationNotes[turtle] += ".";
                     }
-
-                    if (articulation) {
-                        logo.notationNotes[turtle] += "";
+                } else {
+                    if (obj[NOTATIONSTACCATO]) {
+                        logo.notationNotes[turtle] += ".";
                     }
-                }
 
-                if (obj[NOTATIONSTACCATO]) {
-                    logo.notationNotes[turtle] += ".";
+                    if (obj[NOTATIONINSIDECHORD] > 0) {
+                        // Is logo the first note in the chord?
+                        if (
+                            i === 0 ||
+                            logo.notation.notationStaging[turtle][i - 1][NOTATIONINSIDECHORD] !==
+                            obj[NOTATIONINSIDECHORD]
+                        ) {
+                            // Open the chord.
+                            logo.notationNotes[turtle] += "[";
+                        }
+
+                        logo.notationNotes[turtle] += note;
+
+                        // Is logo the last note in the chord?
+                        if (
+                            i === logo.notation.notationStaging[turtle].length - 1 ||
+                            logo.notation.notationStaging[turtle][i + 1][NOTATIONINSIDECHORD] !==
+                            obj[NOTATIONINSIDECHORD]
+                        ) {
+                            // Close the chord and add note duration.
+                            logo.notationNotes[turtle] += "]";
+                            logo.notationNotes[turtle] += __convertDuration(obj[NOTATIONDURATION]);
+                            for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
+                                logo.notationNotes[turtle] += " ";
+                            }
+
+                            if (articulation) {
+                                logo.notationNotes[turtle] += " ";
+                            }
+                        }
+                    } else {
+                        logo.notationNotes[turtle] += note;
+                        logo.notationNotes[turtle] += __convertDuration(obj[NOTATIONDURATION]);
+                        for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
+                            logo.notationNotes[turtle] += ".";
+                        }
+
+                        if (articulation) {
+                            logo.notationNotes[turtle] += "";
+                        }
+                    }
+
+                    if (obj[NOTATIONSTACCATO]) {
+                        logo.notationNotes[turtle] += ".";
+                    }
                 }
 
                 targetDuration = 0;
