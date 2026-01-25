@@ -1,4 +1,5 @@
 {
+  "root": true,
   "env": {
     "es6": true,
     "browser": true,
@@ -13,8 +14,12 @@
       "globalReturn": false
     }
   },
-  "extends": ["eslint:recommended"],
-  "ignorePatterns": ["lib/**"],
+  "extends": [
+    "eslint:recommended"
+  ],
+  "ignorePatterns": [
+    "lib/**"
+  ],
   "rules": {
     "no-console": "off",
     "no-unused-vars": "off",
@@ -25,12 +30,12 @@
     "semi": "error",
     "no-duplicate-case": "error",
     "no-irregular-whitespace": "warn",
-    "no-prototype-builtins" : "off",
-    "no-useless-escape" : "off",
-    "no-inner-declarations" : "off",
-    "no-constant-assign" : "off",
-    "no-const-assign" : "off",
-    "no-dupe-keys" : "off",
-    "no-useless-catch" : "off"
+    "no-prototype-builtins": "off",
+    "no-useless-escape": "off",
+    "no-inner-declarations": "off",
+    "no-constant-assign": "off",
+    "no-const-assign": "off",
+    "no-dupe-keys": "off",
+    "no-useless-catch": "off"
   }
 }
