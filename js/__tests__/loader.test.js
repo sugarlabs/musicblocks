@@ -8,7 +8,7 @@ describe("loader.js coverage", () => {
     beforeEach(() => {
         jest.resetModules();
 
-        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => { });
 
         document.body.innerHTML = `
             <div data-i18n="title">Original Title</div>
@@ -37,20 +37,12 @@ describe("loader.js coverage", () => {
         jest.restoreAllMocks();
     });
 
-    const loadScript = async ({ initError = false, langError = false } = {}) => {
+    const loadScript = async ({ initError = false } = {}) => {
         mockRequireJS.mockImplementation((deps, callback) => {
             if (deps[0] === "i18next") {
                 mockI18next.init.mockImplementation((config, cb) => {
                     if (initError) {
                         cb("Init Failed");
-                    } else {
-                        cb(null);
-                    }
-                });
-
-                mockI18next.changeLanguage.mockImplementation((lang, cb) => {
-                    if (langError) {
-                        cb("Lang Change Failed");
                     } else {
                         cb(null);
                     }
@@ -92,8 +84,6 @@ describe("loader.js coverage", () => {
         );
         expect(window.i18next).toBe(mockI18next);
 
-        expect(mockI18next.changeLanguage).toHaveBeenCalledWith("en", expect.any(Function));
-
         const title = document.querySelector('[data-i18n="title"]');
         const label = document.querySelector('[data-i18n="label"]');
 
@@ -114,14 +104,7 @@ describe("loader.js coverage", () => {
         expect(window.i18next).toBe(mockI18next);
     });
 
-    test("Handles changeLanguage error", async () => {
-        await loadScript({ langError: true });
 
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-            "Error changing language:",
-            "Lang Change Failed"
-        );
-    });
 
     test("Handles DOMContentLoaded when document is loading", async () => {
         Object.defineProperty(document, "readyState", {

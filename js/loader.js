@@ -38,7 +38,7 @@ requirejs.config({
         "widgets": "../js/widgets",
         "activity": "../js",
         "easel": "../lib/easeljs",
-        "twewn": "../lib/tweenjs",
+        "tween": "../lib/tweenjs",
         "prefixfree": "../bower_components/prefixfree/prefixfree.min",
         "samples": "../sounds/samples",
         "planet": "../js/planet",
@@ -97,16 +97,6 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
 
     async function main() {
         await initializeI18next();
-
-        const lang = "en";
-
-        i18next.changeLanguage(lang, function (err) {
-            if (err) {
-                console.error("Error changing language:", err);
-                return;
-            }
-            updateContent();
-        });
 
         if (document.readyState === "loading") {
             document.addEventListener("DOMContentLoaded", updateContent);
