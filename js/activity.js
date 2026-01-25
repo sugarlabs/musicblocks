@@ -1900,8 +1900,9 @@ class Activity {
                 // Queue and take first step.
                 if (!this.turtles.running()) {
                     this.logo.runLogoCommands();
-                    document.getElementById("stop").style.color =
-                        this.toolbar.stopIconColorWhenPlaying;
+                    document.getElementById(
+                        "stop"
+                    ).style.color = this.toolbar.stopIconColorWhenPlaying;
                 }
                 this.logo.step();
             } else {
@@ -2221,8 +2222,9 @@ class Activity {
                     i < this.palettes.dict[this.palettes.activePalette].protoList.length;
                     i++
                 ) {
-                    const name =
-                        this.palettes.dict[this.palettes.activePalette].protoList[i]["name"];
+                    const name = this.palettes.dict[this.palettes.activePalette].protoList[i][
+                        "name"
+                    ];
                     if (name in obj["FLOWPLUGINS"]) {
                         // eslint-disable-next-line no-console
                         console.log("deleting " + name);
@@ -3726,7 +3728,11 @@ class Activity {
 
         resizeCanvas_();
         this._handleOrientationChangeResizeCanvas = resizeCanvas_;
-        this.addEventListener(window, "orientationchange", this._handleOrientationChangeResizeCanvas);
+        this.addEventListener(
+            window,
+            "orientationchange",
+            this._handleOrientationChangeResizeCanvas
+        );
 
         /*
          * Restore last stack pushed to trashStack back onto canvas.
@@ -4932,8 +4938,9 @@ class Activity {
                             }
                         }
                         staffBlocksMap[staffIndex].baseBlocks[0][0][firstnammedo][4][0] = blockId;
-                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][endnammedo][4][1] =
-                            null;
+                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
+                            endnammedo
+                        ][4][1] = null;
 
                         blockId += 2;
                     } else {
@@ -5001,8 +5008,9 @@ class Activity {
                                 prevnameddo
                             ][4][1] = blockId;
                         } else {
-                            staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3] =
-                                blockId;
+                            staffBlocksMap[staffIndex].repeatBlock[
+                                prevrepeatnameddo
+                            ][4][3] = blockId;
                         }
                         if (afternamedo !== -1) {
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
@@ -5853,8 +5861,8 @@ class Activity {
                                 let customName = "custom";
                                 if (myBlock.connections[1] !== null) {
                                     // eslint-disable-next-line max-len
-                                    customName =
-                                        this.blocks.blockList[myBlock.connections[1]].value;
+                                    customName = this.blocks.blockList[myBlock.connections[1]]
+                                        .value;
                                 }
                                 // eslint-disable-next-line no-console
                                 console.log(customName);
