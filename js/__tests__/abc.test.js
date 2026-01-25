@@ -68,7 +68,7 @@ describe("processABCNotes - Basic Note Processing", () => {
 
     it("should process notes and update notationNotes correctly", () => {
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("G^4 G^4 F4 F4 G^2 G^8 ");
+        expect(logo.notationNotes["0"]).toBe("G^4 F4 G^8 ");
     });
 
     it("should insert a newline after every 8 notes", () => {
@@ -158,7 +158,7 @@ describe("processABCNotes - Control Strings", () => {
         expect(out).toContain("\n");
         expect(out).toContain("!<(!");
         expect(out).toContain("!<)!");
-        expect(out).toContain("!>(!");
+        expect(out).toContain("!>)!");
         expect(out).toContain("V:1");
         expect(out).toContain("V:2");
         expect(out).toContain("V:3");
@@ -229,7 +229,7 @@ describe("processABCNotes - Tuplet Handling", () => {
         ];
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(1:1G^ 2G^ 2G^ 2  ");
+        expect(logo.notationNotes["0"]).toBe("(1:1G^ 2F 2G^ 2 ");
     });
 
     it("should handle array of notes (chords) inside tuplets", () => {
@@ -366,7 +366,7 @@ describe("processABCNotes - Tuplet Handling", () => {
         };
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(1:1G^ 2G^ 2G^ 2  ");
+        expect(logo.notationNotes["0"]).toBe("(1:1G^ 2F 2G^ 2 ");
     });
 });
 
