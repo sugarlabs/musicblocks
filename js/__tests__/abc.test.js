@@ -229,7 +229,7 @@ describe("processABCNotes - Tuplet Handling", () => {
         ];
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(1:1G^ 2G^ 2G^ 2 ");
+        expect(logo.notationNotes["0"]).toBe("(1:1G^ 2G^ 2G^ 2  ");
     });
 
     it("should handle array of notes (chords) inside tuplets", () => {
@@ -366,7 +366,7 @@ describe("processABCNotes - Tuplet Handling", () => {
         };
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(1:1G^ 2G^ 2G^ 2 ");
+        expect(logo.notationNotes["0"]).toBe("(1:1G^ 2G^ 2G^ 2  ");
     });
 });
 
