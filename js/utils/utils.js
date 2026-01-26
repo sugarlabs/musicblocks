@@ -570,9 +570,8 @@ function toTitleCase (str) {
 };
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { toTitleCase };
+    module.exports.toTitleCase = toTitleCase;
 }
-
 if (typeof window !== "undefined") {
     window.toTitleCase = toTitleCase;
 }
