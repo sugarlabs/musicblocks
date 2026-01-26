@@ -327,12 +327,10 @@ class JSEditor {
                 tooltip.style.whiteSpace = "nowrap";
                 tooltip.textContent = tooltipText;
 
-                tooltip.style.top = `${
-                    rect.bottom + window.scrollY + (positionOfTooltip !== "bottom" ? -30 : 20)
-                }px`;
-                tooltip.style.left = `${
-                    rect.left + window.scrollX + (positionOfTooltip !== "bottom" ? -135 : 0)
-                }px`;
+                tooltip.style.top = `${rect.bottom + window.scrollY + (positionOfTooltip !== "bottom" ? -30 : 20)
+                    }px`;
+                tooltip.style.left = `${rect.left + window.scrollX + (positionOfTooltip !== "bottom" ? -135 : 0)
+                    }px`;
             });
 
             targetButton.addEventListener("mouseout", () => {
@@ -556,7 +554,11 @@ class JSEditor {
             });
 
             // Apply highlight.js syntax highlighting for JavaScript
-            hljs.highlightElement(editor);
+            if (hljs.highlightElement) {
+                hljs.highlightElement(editor);
+            } else if (hljs.highlightBlock) {
+                hljs.highlightBlock(editor);
+            }
 
             // Add error highlighting
             this._highlightErrors(editor);
@@ -816,8 +818,7 @@ class JSEditor {
         const currentLine = lines[insertIndex].trim();
         if (!currentLine.endsWith("{") && !currentLine.endsWith(";")) {
             JSEditor.logConsole(
-                `Cannot add breakpoint to line ${
-                    lineNumber + 1
+                `Cannot add breakpoint to line ${lineNumber + 1
                 }. Breakpoints can only be added after lines ending with '{' or ';'`,
                 "red"
             );
@@ -830,8 +831,7 @@ class JSEditor {
             (lines[insertIndex + 1] && lines[insertIndex + 1].trim() === "debugger;")
         ) {
             JSEditor.logConsole(
-                `Cannot add breakpoint to line ${
-                    lineNumber + 1
+                `Cannot add breakpoint to line ${lineNumber + 1
                 } because there is already a breakpoint on an adjacent line.`,
                 "red"
             );
@@ -982,4 +982,8 @@ class JSEditor {
 
         JSEditor.logConsole("Status window opened.", "green");
     }
+}
+
+if (typeof module !== "undefined") {
+    module.exports = JSEditor;
 }
