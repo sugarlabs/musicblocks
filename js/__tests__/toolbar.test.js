@@ -37,30 +37,37 @@ global.window = {
     navigator: { language: "en-US" },
     document: {
         getElementById: jest.fn(() => ({ style: {} }))
-    }
+    },
+    getComputedStyle: jest.fn(() => ({ display: "block", visibility: "visible" }))
 };
 
 global.localStorage = window.localStorage;
 
 const Toolbar = require("../toolbar");
 
-global.document.getElementById = jest.fn(id => ({
+const createMockElement = id => ({
     id,
     style: {},
     setAttribute: jest.fn(),
+    getAttribute: jest.fn(),
     innerHTML: "",
-    classList: { add: jest.fn() },
-    appendChild: jest.fn()
-}));
+    classList: {
+        add: jest.fn(),
+        remove: jest.fn(),
+        contains: jest.fn()
+    },
+    appendChild: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    querySelectorAll: jest.fn(() => []),
+    querySelector: jest.fn(() => null),
+    focus: jest.fn(),
+    click: jest.fn(),
+    getBoundingClientRect: jest.fn(() => ({ top: 0, left: 0, width: 10, height: 10 }))
+});
 
-global.docById = jest.fn(id => ({
-    id,
-    setAttribute: jest.fn(),
-    innerHTML: "",
-    style: {},
-    classList: { add: jest.fn() },
-    appendChild: jest.fn()
-}));
+global.document.getElementById = jest.fn(createMockElement);
+global.docById = jest.fn(createMockElement);
 
 global._ = jest.fn(str => str);
 
@@ -136,7 +143,10 @@ describe("Toolbar Class", () => {
             return {
                 setAttribute: jest.fn(),
                 style: {},
-                classList: { add: jest.fn() }
+                classList: { add: jest.fn() },
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn(),
+                querySelectorAll: jest.fn(() => [])
             };
         });
 
@@ -179,7 +189,9 @@ describe("Toolbar Class", () => {
             }
         };
 
-        global.docById = jest.fn(id => elements[id]);
+        global.docById = jest.fn(
+            id => elements[id] || { addEventListener: jest.fn(), querySelectorAll: jest.fn() }
+        );
         global.document = {
             body: {
                 style: {
@@ -235,7 +247,9 @@ describe("Toolbar Class", () => {
             }
         };
 
-        global.docById.mockImplementation(id => elements[id] || {});
+        global.docById.mockImplementation(
+            id => elements[id] || { addEventListener: jest.fn(), querySelectorAll: jest.fn() }
+        );
 
         const mockActivity = {
             hideMsgs: jest.fn(),
@@ -268,7 +282,11 @@ describe("Toolbar Class", () => {
         const recordButton = { className: "recording" };
 
         global.docById.mockImplementation(id =>
-            id === "stop" ? stopIcon : id === "record" ? recordButton : {}
+            id === "stop"
+                ? stopIcon
+                : id === "record"
+                ? recordButton
+                : { addEventListener: jest.fn(), querySelectorAll: jest.fn() }
         );
 
         const mockOnClick = jest.fn();
@@ -288,14 +306,19 @@ describe("Toolbar Class", () => {
     test("renderNewProjectIcon displays modal and handles confirmation", () => {
         const elements = {
             "modal-container": {
-                style: { display: "" }
+                style: { display: "" },
+                setAttribute: jest.fn(),
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn()
             },
             "newdropdown": {
                 innerHTML: "",
                 appendChild: jest.fn()
             }
         };
-        global.docById = jest.fn(id => elements[id]);
+        global.docById.mockImplementation(
+            id => elements[id] || { addEventListener: jest.fn(), querySelectorAll: jest.fn() }
+        );
         global.document = {
             createElement: jest.fn(tagName => ({
                 tagName,
