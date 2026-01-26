@@ -575,7 +575,7 @@ if (typeof module !== "undefined" && module.exports) {
 
 if (typeof window !== "undefined") {
     window.toTitleCase = toTitleCase;
-
+}
 
 /**
  * Processes plugin data and updates the activity based on the provided JSON-encoded dictionary.
