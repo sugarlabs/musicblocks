@@ -7688,8 +7688,17 @@ const activity = new Activity();
 
 // Execute initialization once all RequireJS modules are loaded AND DOM is ready
 define(["domReady!"].concat(MYDEFINES), doc => {
-    activity.setupDependencies();
-    activity.domReady(doc);
-    activity.doContextMenus();
-    activity.doPluginsAndPaletteCols();
+    const initialize = () => {
+        if (typeof createDefaultStack !== "undefined") {
+            activity.setupDependencies();
+            activity.domReady(doc);
+            activity.doContextMenus();
+            activity.doPluginsAndPaletteCols();
+        } else {
+            // Race condition in Firefox: non-AMD scripts might not have
+            // finished global assignment yet.
+            setTimeout(initialize, 10);
+        }
+    };
+    initialize();
 });
