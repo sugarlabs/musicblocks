@@ -327,12 +327,10 @@ class JSEditor {
                 tooltip.style.whiteSpace = "nowrap";
                 tooltip.textContent = tooltipText;
 
-                tooltip.style.top = `${
-                    rect.bottom + window.scrollY + (positionOfTooltip !== "bottom" ? -30 : 20)
-                }px`;
-                tooltip.style.left = `${
-                    rect.left + window.scrollX + (positionOfTooltip !== "bottom" ? -135 : 0)
-                }px`;
+                tooltip.style.top = `${rect.bottom + window.scrollY + (positionOfTooltip !== "bottom" ? -30 : 20)
+                    }px`;
+                tooltip.style.left = `${rect.left + window.scrollX + (positionOfTooltip !== "bottom" ? -135 : 0)
+                    }px`;
             });
 
             targetButton.addEventListener("mouseout", () => {
@@ -549,12 +547,13 @@ class JSEditor {
         editorconsole.style.cursor = "text";
         this._editor.appendChild(editorconsole);
 
-        let hljsRetryCount = 0;
-        const maxRetries = 10; // Maximum retry attempts
+        // Track if hljs has loaded successfully
+        let hljsLoaded = false;
+        let hljsCheckInterval = null;
 
         const highlight = editor => {
             // Check if highlight.js is loaded and apply syntax highlighting
-            if (window.hljs) {
+            if (window.hljs && !hljsLoaded) {
                 try {
                     // Configure highlight.js for JavaScript
                     hljs.configure({
@@ -564,32 +563,58 @@ class JSEditor {
                     // Try modern API first (v11+), fallback to legacy API (v9-10)
                     if (typeof hljs.highlightElement === "function") {
                         hljs.highlightElement(editor);
+                        hljsLoaded = true;
                     } else if (typeof hljs.highlightBlock === "function") {
                         // Legacy API for older highlight.js versions
                         hljs.highlightBlock(editor);
+                        hljsLoaded = true;
                     }
-                    // Reset retry count on successful highlighting
-                    hljsRetryCount = 0;
+
+                    // Clear the interval check once hljs is loaded and working
+                    if (hljsLoaded && hljsCheckInterval) {
+                        clearInterval(hljsCheckInterval);
+                        hljsCheckInterval = null;
+                    }
                 } catch (e) {
                     // Silently handle highlighting errors to prevent editor crashes
                     console.warn("Syntax highlighting failed:", e);
                 }
-            } else if (hljsRetryCount < maxRetries) {
-                // If hljs isn't loaded yet, schedule a retry with exponential backoff
-                hljsRetryCount++;
-                const retryDelay = Math.min(100 * Math.pow(1.5, hljsRetryCount - 1), 1000);
-                setTimeout(() => {
-                    if (this._jar && window.hljs) {
-                        // Force a re-render to apply highlighting once hljs loads
-                        const currentCode = this._jar.toString();
-                        this._jar.updateCode(currentCode);
+            } else if (window.hljs && hljsLoaded) {
+                // hljs is loaded, apply highlighting on subsequent updates
+                try {
+                    if (typeof hljs.highlightElement === "function") {
+                        hljs.highlightElement(editor);
+                    } else if (typeof hljs.highlightBlock === "function") {
+                        hljs.highlightBlock(editor);
                     }
-                }, retryDelay);
+                } catch (e) {
+                    console.warn("Syntax highlighting failed:", e);
+                }
             }
 
             // Always add error highlighting (works independently of hljs)
             this._highlightErrors(editor);
         };
+
+        // Set up a periodic check for hljs availability
+        if (!window.hljs) {
+            hljsCheckInterval = setInterval(() => {
+                if (window.hljs && this._jar) {
+                    // hljs has loaded, trigger a re-render to apply highlighting  
+                    const currentCode = this._jar.toString();
+                    this._jar.updateCode(currentCode);
+                    // The interval will be cleared in the highlight function
+                }
+            }, 200); // Check every 200ms
+
+            // Clean up interval after 10 seconds to prevent infinite checks
+            setTimeout(() => {
+                if (hljsCheckInterval) {
+                    clearInterval(hljsCheckInterval);
+                    hljsCheckInterval = null;
+                }
+            }, 10000);
+        }
 
         this._jar = new CodeJar(codebox, highlight);
 
@@ -845,8 +870,7 @@ class JSEditor {
         const currentLine = lines[insertIndex].trim();
         if (!currentLine.endsWith("{") && !currentLine.endsWith(";")) {
             JSEditor.logConsole(
-                `Cannot add breakpoint to line ${
-                    lineNumber + 1
+                `Cannot add breakpoint to line ${lineNumber + 1
                 }. Breakpoints can only be added after lines ending with '{' or ';'`,
                 "red"
             );
@@ -859,8 +883,7 @@ class JSEditor {
             (lines[insertIndex + 1] && lines[insertIndex + 1].trim() === "debugger;")
         ) {
             JSEditor.logConsole(
-                `Cannot add breakpoint to line ${
-                    lineNumber + 1
+                `Cannot add breakpoint to line ${lineNumber + 1
                 } because there is already a breakpoint on an adjacent line.`,
                 "red"
             );
