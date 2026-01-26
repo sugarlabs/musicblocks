@@ -23,41 +23,30 @@ global.createjs = {
     Graphics: {
         getRGB: (r, g, b, a) => {
             return `rgba(${r}, ${g}, ${b}, ${a})`;
-        },
-    },
+        }
+    }
 };
 
 describe("munsell", () => {
-
     describe("interpColor", () => {
         it("should interpolate between two colors", () => {
             expect(
                 interpColor("#ff0000", "#0000ff", 0.5) // red and blue
             ).toBe("rgba(127, 0, 127, 1)"); // purple
-            expect(
-                interpColor("#00ff00", "#000000", 0.75)
-            ).toBe("rgba(0, 191, 0, 1)");
+            expect(interpColor("#00ff00", "#000000", 0.75)).toBe("rgba(0, 191, 0, 1)");
         });
 
         it("should return the first color if p = 1", () => {
-            expect(
-                interpColor("#123456", "#abcdef", 1)
-            ).toBe("#123456");
+            expect(interpColor("#123456", "#abcdef", 1)).toBe("#123456");
         });
 
         it("should return the second color if p = 0", () => {
-            expect(
-                interpColor("#123456", "#abcdef", 0)
-            ).toBe("#abcdef");
+            expect(interpColor("#123456", "#abcdef", 0)).toBe("#abcdef");
         });
 
         it("should handle undefined colors gracefully", () => {
-            expect(
-                interpColor(undefined, "#123456", 0.5)
-            ).toBe("rgba(18, 52, 86, 1)");
-            expect(
-                interpColor("#123456", undefined, 0.5)
-            ).toBe("rgba(18, 52, 86, 1)");
+            expect(interpColor(undefined, "#123456", 0.5)).toBe("rgba(18, 52, 86, 1)");
+            expect(interpColor("#123456", undefined, 0.5)).toBe("rgba(18, 52, 86, 1)");
         });
     });
 

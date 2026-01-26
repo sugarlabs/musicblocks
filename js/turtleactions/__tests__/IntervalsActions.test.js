@@ -1,6 +1,6 @@
 /**
  * @license
- * MusicBlocks v3.4.1
+ * MusicBlocks v3.6.2
  * Copyright (C) 2025 Anubhab
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,215 +16,260 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+const { setupIntervalsActions } = require("../IntervalsActions");
 
-const setupDrumActions = require("../DrumActions");
-
-describe("setupDrumActions", () => {
+describe("setupIntervalsActions", () => {
     let activity;
-    let targetTurtle;
+    let turtle;
+    let logo;
 
-    beforeAll(() => {
-        global.Singer = {
-            DrumActions: {},
-            processNote: jest.fn(),
+    beforeEach(() => {
+        jest.resetModules();
+
+        global._ = x => x;
+        global.NOINPUTERRORMSG = "NOINPUT";
+
+        global.MUSICALMODES = {
+            major: [2, 2, 1, 2, 2, 2, 1],
+            minor: [2, 1, 2, 2, 1, 2, 2]
         };
 
-        global.DEFAULTDRUM = "defaultDrum";
-        global.DRUMNAMES = {
-            drum1: ["d1", "drum1"],
-            drum2: ["d2", "drum2"],
-        };
-        global.NOISENAMES = {
-            noise1: ["n1", "noise1"],
-            noise2: ["n2", "noise2"],
-        };
-        global.DEFAULTVOLUME = 100;
-        global.last = jest.fn(arr => arr[arr.length - 1]);
-        global._ = jest.fn(msg => msg);
+        global.ALLNOTESTEP = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+        global.NOTENAMES = ["C", "D", "E", "F", "G", "A", "B"];
+
+        global.SEMITONETOINTERVALMAP = Array(13)
+            .fill(null)
+            .map(() => Array(7).fill("perfect"));
+
+        global.GetNotesForInterval = jest.fn(() => ({
+            firstNote: "C",
+            secondNote: "G",
+            octave: 0
+        }));
+
+        global.getNote = jest.fn(() => ["C"]);
+        global.getModeLength = jest.fn(() => 7);
 
         global.MusicBlocks = { isRun: false };
         global.Mouse = { getMouseFromTurtle: jest.fn() };
-    });
 
-    beforeEach(() => {
-        activity = {
-            turtles: { ithTurtle: jest.fn() },
-            blocks: { blockList: { 1: {} } },
-            logo: {
-                setDispatchBlock: jest.fn(),
-                setTurtleListener: jest.fn(),
-                clearNoteParams: jest.fn(),
-                inRhythmRuler: false,
-                rhythmRuler: { Drums: [], Rulers: [] },
-                _currentDrumBlock: null,
-            },
-            errorMsg: jest.fn(),
-        };
+        global.Singer = {};
 
-        targetTurtle = {
+        turtle = {
             singer: {
-                drumStyle: [],
-                inNoteBlock: [],
-                noteDrums: {},
-                synthVolume: {},
-                crescendoInitialVolume: {},
-                noteBeatValues: {},
-                beatFactor: 1,
-                pushedNote: false,
-                pitchDrumTable: {},
-            },
+                keySignature: "C major",
+                transposition: 0,
+                movable: false,
+                intervals: [],
+                chordIntervals: [],
+                semitoneIntervals: [],
+                ratioIntervals: [],
+                noteDirection: 1,
+                defineMode: []
+            }
         };
 
-        activity.turtles.ithTurtle.mockReturnValue(targetTurtle);
-        MusicBlocks.isRun = false;
-        Mouse.getMouseFromTurtle.mockReturnValue(null);
+        logo = {
+            synth: {
+                inTemperament: null,
+                startingPitch: null,
+                changeInTemperament: false
+            },
+            notation: {
+                notationKey: jest.fn()
+            },
+            temperamentSelected: [],
+            setDispatchBlock: jest.fn(),
+            setTurtleListener: jest.fn()
+        };
 
-        setupDrumActions(activity);
+        activity = {
+            turtles: {
+                ithTurtle: () => turtle
+            },
+            blocks: {
+                blockList: {},
+                updateBlockText: jest.fn()
+            },
+            logo,
+            errorMsg: jest.fn()
+        };
+
+        setupIntervalsActions(activity);
     });
 
-    describe("GetDrumname", () => {
-        it("resolves nickname", () => {
-            expect(Singer.DrumActions.GetDrumname("d1")).toBe("drum1");
-        });
-
-        it("falls back to default", () => {
-            expect(Singer.DrumActions.GetDrumname("unknown")).toBe(DEFAULTDRUM);
-        });
-
-        it("returns URL unchanged", () => {
-            const url = "https://example.com/drum.wav";
-            expect(Singer.DrumActions.GetDrumname(url)).toBe(url);
-        });
-
-        it("accepts full drum name", () => {
-            expect(Singer.DrumActions.GetDrumname("drum1")).toBe("drum1");
-        });
+    test("GetModename resolves modes", () => {
+        expect(Singer.IntervalsActions.GetModename("major")).toBe("major");
+        expect(Singer.IntervalsActions.GetModename("minor")).toBe("minor");
     });
 
-    describe("playDrum", () => {
-        it("plays standalone drum", () => {
-            targetTurtle.singer.noteDrums[1] = [];
-            Singer.DrumActions.playDrum("d1", 0, 1);
-
-            expect(Singer.processNote).toHaveBeenCalled();
-            expect(activity.logo.clearNoteParams).toHaveBeenCalledWith(
-                targetTurtle,
-                1,
-                []
-            );
-            expect(targetTurtle.singer.inNoteBlock).toContain(1);
-            expect(targetTurtle.singer.noteDrums[1]).toContain("drum1");
-            expect(targetTurtle.singer.pushedNote).toBe(true);
-        });
-
-        it("adds drum to existing note block", () => {
-            targetTurtle.singer.inNoteBlock.push(2);
-            targetTurtle.singer.noteDrums[2] = [];
-
-            Singer.DrumActions.playDrum("d1", 0, 1);
-            expect(targetTurtle.singer.noteDrums[2]).toContain("drum1");
-        });
-
-        it("respects drum style", () => {
-            targetTurtle.singer.inNoteBlock.push(2);
-            targetTurtle.singer.noteDrums[2] = [];
-            targetTurtle.singer.drumStyle.push("drum2");
-
-            Singer.DrumActions.playDrum("d1", 0, 1);
-            expect(targetTurtle.singer.noteDrums[2]).toContain("drum2");
-        });
-
-        it("initializes volume", () => {
-            targetTurtle.singer.inNoteBlock.push(2);
-            targetTurtle.singer.noteDrums[2] = [];
-            targetTurtle.singer.synthVolume = {};
-
-            Singer.DrumActions.playDrum("d1", 0, 1);
-            expect(targetTurtle.singer.synthVolume.drum1).toEqual([DEFAULTVOLUME]);
-            expect(
-                targetTurtle.singer.crescendoInitialVolume.drum1
-            ).toEqual([DEFAULTVOLUME]);
-        });
-
-        it("keeps existing volume", () => {
-            targetTurtle.singer.inNoteBlock.push(5);
-            targetTurtle.singer.noteDrums[5] = [];
-            targetTurtle.singer.synthVolume = { drum1: [30] };
-            targetTurtle.singer.crescendoInitialVolume = { drum1: [40] };
-
-            Singer.DrumActions.playDrum("d1", 0, 5);
-            expect(targetTurtle.singer.synthVolume.drum1).toEqual([30]);
-            expect(
-                targetTurtle.singer.crescendoInitialVolume.drum1
-            ).toEqual([40]);
-        });
-
-        it("removes block on callback", () => {
-            targetTurtle.singer.noteDrums[2] = [];
-            Singer.DrumActions.playDrum("d1", 0, 2);
-
-            const cb = Singer.processNote.mock.calls[0][5];
-            cb();
-            expect(targetTurtle.singer.inNoteBlock).not.toContain(2);
-        });
+    test("GetIntervalNumber base case", () => {
+        expect(typeof Singer.IntervalsActions.GetIntervalNumber(0)).toBe("number");
     });
 
-    describe.each([
-        ["setDrum", "_setdrum_0", true],
-        ["mapPitchToDrum", "_mapdrum_0", false],
-    ])("%s", (action, prefix, resetTable) => {
-        beforeEach(() => {
-            targetTurtle.singer.drumStyle = [];
-            targetTurtle.singer.pitchDrumTable = {};
-            MusicBlocks.isRun = false;
-            Mouse.getMouseFromTurtle.mockReturnValue(null);
+    test("GetIntervalNumber octave > 1", () => {
+        GetNotesForInterval.mockReturnValueOnce({
+            firstNote: "C",
+            secondNote: "C",
+            octave: 2
         });
-
-        it("sets drum and listener", () => {
-            Singer.DrumActions[action]("d1", 0, 1);
-            expect(targetTurtle.singer.drumStyle).toContain("drum1");
-            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(
-                1,
-                0,
-                prefix
-            );
-            expect(activity.logo.setTurtleListener).toHaveBeenCalled();
-        });
-
-        it("handles run mode", () => {
-            const mouse = { MB: { listeners: [] } };
-            MusicBlocks.isRun = true;
-            Mouse.getMouseFromTurtle.mockReturnValue(mouse);
-
-            Singer.DrumActions[action]("d1", 0);
-            expect(mouse.MB.listeners).toContain(prefix);
-        });
-
-        it("cleans up on listener", () => {
-            Singer.DrumActions[action]("d1", 0, 1);
-            const fn = activity.logo.setTurtleListener.mock.calls[0][2];
-            fn();
-            expect(targetTurtle.singer.drumStyle).toHaveLength(0);
-            if (resetTable) {
-                expect(targetTurtle.singer.pitchDrumTable).toEqual({});
-            }
-        });
+        expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBeGreaterThan(12);
     });
 
-    describe("playNoise", () => {
-        it("plays noise in note", () => {
-            targetTurtle.singer.inNoteBlock.push(2);
-            targetTurtle.singer.noteDrums[2] = [];
-            targetTurtle.singer.noteBeatValues[2] = [];
-
-            Singer.DrumActions.playNoise("n1", 0, 1);
-            expect(targetTurtle.singer.noteDrums[2]).toContain("noise1");
-            expect(targetTurtle.singer.noteBeatValues[2]).toContain(1);
+    test("GetIntervalNumber octave < -1", () => {
+        GetNotesForInterval.mockReturnValueOnce({
+            firstNote: "C",
+            secondNote: "D",
+            octave: -3
         });
+        expect(typeof Singer.IntervalsActions.GetIntervalNumber(0)).toBe("number");
+    });
 
-        it("errors without note block", () => {
-            Singer.DrumActions.playNoise("n1", 0, 1);
-            expect(activity.errorMsg).toHaveBeenCalled();
+    test("GetCurrentInterval normal", () => {
+        expect(typeof Singer.IntervalsActions.GetCurrentInterval(0)).toBe("string");
+    });
+
+    test("GetCurrentInterval perfect octave above", () => {
+        GetNotesForInterval.mockReturnValueOnce({
+            firstNote: "C",
+            secondNote: "C",
+            octave: 2
         });
+        expect(typeof Singer.IntervalsActions.GetCurrentInterval(0)).toBe("string");
+    });
+
+    test("GetCurrentInterval perfect octave below", () => {
+        GetNotesForInterval.mockReturnValueOnce({
+            firstNote: "C",
+            secondNote: "C",
+            octave: -1
+        });
+        expect(typeof Singer.IntervalsActions.GetCurrentInterval(0)).toBe("string");
+    });
+
+    test("GetCurrentInterval octave < -1", () => {
+        GetNotesForInterval.mockReturnValueOnce({
+            firstNote: "G",
+            secondNote: "C",
+            octave: -2
+        });
+        expect(typeof Singer.IntervalsActions.GetCurrentInterval(0)).toBe("string");
+    });
+
+    test("GetCurrentInterval totalIntervals > 21", () => {
+        GetNotesForInterval.mockReturnValueOnce({
+            firstNote: "C",
+            secondNote: "B",
+            octave: 3
+        });
+        expect(typeof Singer.IntervalsActions.GetCurrentInterval(0)).toBe("string");
+    });
+
+    test("setKey updates keySignature", () => {
+        Singer.IntervalsActions.setKey("C", "major", 0);
+        expect(turtle.singer.keySignature).toContain("C");
+        expect(logo.notation.notationKey).toHaveBeenCalled();
+    });
+
+    test("getCurrentKey / Mode / Length", () => {
+        expect(Singer.IntervalsActions.getCurrentKey(0)).toBe("C");
+        expect(Singer.IntervalsActions.getCurrentMode(0)).toBe("major");
+        expect(Singer.IntervalsActions.getModeLength(0)).toBe(7);
+    });
+
+    test("setMovableDo", () => {
+        Singer.IntervalsActions.setMovableDo(true, 0);
+        expect(turtle.singer.movable).toBe(true);
+    });
+
+    test("setScalarInterval push + pop", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        Singer.IntervalsActions.setScalarInterval(2, 0, "blk");
+        expect(turtle.singer.intervals.length).toBe(1);
+        listener();
+        expect(turtle.singer.intervals.length).toBe(0);
+    });
+
+    test("setScalarInterval error on null", () => {
+        Singer.IntervalsActions.setScalarInterval(null, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
+    });
+
+    test("setChordInterval push + pop", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        Singer.IntervalsActions.setChordInterval([1, 0], 0, "blk");
+        expect(turtle.singer.chordIntervals.length).toBe(1);
+        listener();
+        expect(turtle.singer.chordIntervals.length).toBe(0);
+    });
+
+    test("setSemitoneInterval zero ignored", () => {
+        Singer.IntervalsActions.setSemitoneInterval(0, 0);
+        expect(turtle.singer.semitoneIntervals.length).toBe(0);
+    });
+
+    test("setSemitoneInterval push + pop", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        Singer.IntervalsActions.setSemitoneInterval(2, 0, "blk");
+        expect(turtle.singer.semitoneIntervals.length).toBe(1);
+        listener();
+        expect(turtle.singer.semitoneIntervals.length).toBe(0);
+    });
+
+    test("setRatioInterval push + pop", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        Singer.IntervalsActions.setRatioInterval(1.5, 0, "blk");
+        expect(turtle.singer.ratioIntervals.length).toBe(1);
+        listener();
+        expect(turtle.singer.ratioIntervals.length).toBe(0);
+    });
+
+    test("defineMode success path", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+
+        activity.blocks.blockList.blk = { connections: [null, "text1"] };
+        activity.blocks.blockList.text1 = { name: "text" };
+
+        Singer.IntervalsActions.defineMode("custom", 0, "blk");
+
+        turtle.singer.defineMode.push(0, 4, 7);
+        listener();
+
+        expect(MUSICALMODES.custom).toBeDefined();
+    });
+
+    test("defineMode error paths", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+
+        activity.blocks.blockList.blk = { connections: [null, "text1"] };
+        activity.blocks.blockList.text1 = { name: "text" };
+
+        Singer.IntervalsActions.defineMode(null, 0, "blk");
+
+        turtle.singer.defineMode.push(4);
+        turtle.singer.defineMode.push(12);
+        turtle.singer.defineMode.push(4);
+
+        listener();
+
+        expect(activity.errorMsg).toHaveBeenCalled();
+    });
+
+    test("setTemperament state changes", () => {
+        Singer.IntervalsActions.setTemperament("equal", "C", 4);
+        expect(logo.synth.inTemperament).toBe("equal");
+        expect(logo.synth.startingPitch).toBe("C4");
+    });
+
+    test("setTemperament change flag", () => {
+        Singer.IntervalsActions.setTemperament("equal", "C", 4);
+        Singer.IntervalsActions.setTemperament("pythagorean", "C", 4);
+        expect(logo.synth.changeInTemperament).toBe(true);
     });
 });

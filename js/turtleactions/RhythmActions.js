@@ -149,7 +149,8 @@ function setupRhythmActions(activity) {
                         );
                     }
 
-                    Singer.processNote(activity,
+                    Singer.processNote(
+                        activity,
                         1 / tur.singer.noteValue[last(tur.singer.inNoteBlock)],
                         blkName === "osctime",
                         last(tur.singer.inNoteBlock),
@@ -174,9 +175,10 @@ function setupRhythmActions(activity) {
                     tur.singer.multipleVoices = false;
                 }
 
-                /** @todo FIXME: broken when nesting */
-                activity.logo.pitchBlocks = [];
-                activity.logo.drumBlocks = [];
+                if (tur.singer.inNoteBlock.length === 0) {
+                    activity.logo.pitchBlocks = [];
+                    activity.logo.drumBlocks = [];
+                }
             };
 
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
@@ -456,4 +458,8 @@ function setupRhythmActions(activity) {
             return value !== 0 ? 1 / value : 0;
         }
     };
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = setupRhythmActions;
 }

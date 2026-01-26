@@ -1,3 +1,7 @@
+html, body {
+  overscroll-behavior-x: none;
+}
+
 input[type="range"] {
   height: 4px;
   appearance: none;

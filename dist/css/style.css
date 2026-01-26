@@ -269,3 +269,4 @@ div#recordModeMenu .record-option.selected {
         line-height: 3;
     }
 }
+html, body { overscroll-behavior-x: none; }

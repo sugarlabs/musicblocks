@@ -58,8 +58,7 @@ class PitchStaircase {
      */
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
-        cell.innerHTML =
-            `&nbsp;&nbsp;<img 
+        cell.innerHTML = `&nbsp;&nbsp;<img 
                 src="header-icons/play-button.svg" 
                 title="${label}" 
                 alt="${label}" 
@@ -129,8 +128,9 @@ class PitchStaircase {
                     this._cellScale) /
                     3 +
                 "px";
-            stepCell.innerHTML =
-                `${frequency.toFixed(2)}<br>${this.Stairs[i][0]}${this.Stairs[i][1]}`;
+            stepCell.innerHTML = `${frequency.toFixed(2)}<br>${this.Stairs[i][0]}${
+                this.Stairs[i][1]
+            }`;
             stepCell.style.minWidth = stepCell.style.width;
             stepCell.style.maxWidth = stepCell.style.width;
             stepCell.style.height = PitchStaircase.BUTTONSIZE + "px";
@@ -153,7 +153,7 @@ class PitchStaircase {
             stepCell.style.backgroundRepeat = "no-repeat";
             stepCell.style.backgroundPosition = "center center";
 
-            stepCell.addEventListener("click", (event) => {
+            stepCell.addEventListener("click", event => {
                 this._dissectStair(event);
             });
 
@@ -604,7 +604,12 @@ class PitchStaircase {
         const w = window.innerWidth;
         this._cellScale = w / 1200;
 
-        const widgetWindow = window.widgetWindows.windowFor(this, "pitch staircase", "pitch staircase", true);
+        const widgetWindow = window.widgetWindows.windowFor(
+            this,
+            "pitch staircase",
+            "pitch staircase",
+            true
+        );
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -653,22 +658,6 @@ class PitchStaircase {
         this._musicRatio1 = widgetWindow.addInputButton("3");
         widgetWindow.addDivider();
         this._musicRatio2 = widgetWindow.addInputButton("2");
-
-        // TODO: THIS
-        // DO NOT COMMIT WITH THIS COMMENTED
-        /*
-        let cell = row.insertCell();
-        cell.innerHTML = '<h2>:</h2>';
-        cell.style.backgroundColor = platformColor.selectorBackground;
-
-        let cell = row.insertCell();
-        cell.innerHTML = '<input id="musicratio2" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="musicratio2" type="musicratio2" value="' + 2 + '" />';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.backgroundColor = platformColor.selectorBackground;
-        docById('musicratio2').classList.add('hasKeyboard');
-        */
 
         widgetWindow.addButton(
             "restore-button.svg",

@@ -342,6 +342,10 @@ class Toolbar {
             });
         }
 
+        $j(".tooltipped").on("click", function () {
+            $j(this).tooltip("close");
+        });
+
         $j(".materialize-iso, .dropdown-trigger").dropdown({
             constrainWidth: false,
             hover: false,
@@ -884,7 +888,7 @@ class Toolbar {
         const menuIcon = docById("menu");
         const auxToolbar = docById("aux-toolbar");
         menuIcon.onclick = () => {
-            var searchBar = docById("search");
+            const searchBar = docById("search");
             searchBar.classList.toggle("open");
             if (auxToolbar.style.display == "" || auxToolbar.style.display == "none") {
                 onclick(this.activity, false);

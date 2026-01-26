@@ -47,7 +47,7 @@ Globals location
 */
 
 /* exported PhraseMaker */
-// The last selected index for piemenu 
+// The last selected index for piemenu
 let lastIndex = 5;
 const MATRIXGRAPHICS = [
     "forward",
@@ -275,69 +275,68 @@ class PhraseMaker {
          * Width of the screen.
          * @type {number}
          */
-        var screenWidth = window.innerWidth;
+        const screenWidth = window.innerWidth;
 
         /**
          * Height of the screen.
          * @type {number}
          */
-        var screenHeight = window.innerHeight;
+        const screenHeight = window.innerHeight;
 
         /**
-          * Container element for floating windows.
-          * @type {HTMLElement}
-          */
-        var floatingWindowsDiv = document.getElementById("floatingWindows");
+         * Container element for floating windows.
+         * @type {HTMLElement}
+         */
+        const floatingWindowsDiv = document.getElementById("floatingWindows");
 
         /**
-          * Collection of window frame elements.
-          * @type {NodeListOf<Element>}
-          */
-        var windowFrameElements = floatingWindowsDiv.querySelectorAll(".windowFrame");
+         * Collection of window frame elements.
+         * @type {NodeListOf<Element>}
+         */
+        const windowFrameElements = floatingWindowsDiv.querySelectorAll(".windowFrame");
 
-        for (var i = 0; i < windowFrameElements.length; i++) {
-
+        for (let i = 0; i < windowFrameElements.length; i++) {
             /**
              * Current window frame element.
              * @type {Element}
              */
-            var windowFrame = windowFrameElements[i];
+            const windowFrame = windowFrameElements[i];
 
             /**
              * Widget body element within the window frame.
              * @type {Element}
              */
-            var wfWinBody = windowFrame.querySelector(".wfWinBody");
+            const wfWinBody = windowFrame.querySelector(".wfWinBody");
 
             /**
              * Widget element within the window frame.
              * @type {Element}
              */
-            var wfbWidget = windowFrame.querySelector(".wfbWidget");
+            const wfbWidget = windowFrame.querySelector(".wfbWidget");
 
             /**
              * Total width of the window frame.
              * @type {number}
              */
-            var totalWidth = parseFloat(window.getComputedStyle(windowFrame).width);
+            const totalWidth = parseFloat(window.getComputedStyle(windowFrame).width);
 
             /**
              * Total height of the window frame.
              * @type {number}
              */
-            var totalHeight = parseFloat(window.getComputedStyle(windowFrame).height);
+            const totalHeight = parseFloat(window.getComputedStyle(windowFrame).height);
 
             /**
              * Maximum allowed width for the window frame.
              * @type {number}
              */
-            var maxWidth = screenWidth * 0.8;
+            const maxWidth = screenWidth * 0.8;
 
             /**
              * Maximum allowed height for the window frame.
              * @type {number}
              */
-            var maxHeight = screenHeight * 0.8;
+            const maxHeight = screenHeight * 0.8;
 
             if (totalWidth > screenWidth || totalHeight > screenHeight) {
                 windowFrame.style.height = Math.min(totalHeight, maxHeight) + "px";
@@ -483,6 +482,19 @@ class PhraseMaker {
         let tempTable;
         this.activity = activity;
 
+        this._currentMusicalTime = 0; // Tracks duration used in the current bar
+
+        // Get the meter from the turtle's singer (Meter Block sets this)
+        const turtle = activity.turtles.ithTurtle(0); // Get turtle 0
+        const beatsPerMeasure = turtle.singer.beatsPerMeasure || 4; // Default to 4
+        const noteValuePerBeat = turtle.singer.noteValuePerBeat || 4; // Default to 4
+
+        // Calculate the duration of ONE measure
+        // beatsPerMeasure is the number of beats (e.g., 3 for 3/4)
+        // noteValuePerBeat is the note type that gets one beat (e.g., 4 for quarter note)
+        // For 3/4: 3 beats * (1/4) = 0.75
+        this._measureLimit = beatsPerMeasure / noteValuePerBeat;
+
         this._noteStored = [];
         this._noteBlocks = false;
         this._rests = 0;
@@ -531,8 +543,7 @@ class PhraseMaker {
 
             this.activity.logo.resetSynth(0);
             if (this.playingNow) {
-                this._playButton.innerHTML =
-                    `&nbsp;&nbsp;<img 
+                this._playButton.innerHTML = `&nbsp;&nbsp;<img 
                         src="header-icons/play-button.svg" 
                         title="${_("Play")}" 
                         alt="${_("Play")}" 
@@ -541,8 +552,7 @@ class PhraseMaker {
                         vertical-align="middle"
                     >&nbsp;&nbsp;`;
             } else {
-                this._playButton.innerHTML =
-                    `&nbsp;&nbsp;<img 
+                this._playButton.innerHTML = `&nbsp;&nbsp;<img 
                         src="header-icons/stop-button.svg" 
                         title="${_("Stop")}" 
                         alt="${_("Stop")}" 
@@ -666,8 +676,7 @@ class PhraseMaker {
 
             if (this.rowLabels[i] === "print") break;
             else if (drumName != null) {
-                cell.innerHTML =
-                    `&nbsp;&nbsp;<img 
+                cell.innerHTML = `&nbsp;&nbsp;<img 
                         src="${getDrumIcon(drumName)}" 
                         title="${_(drumName)}" 
                         alt="${_(drumName)}" 
@@ -676,8 +685,7 @@ class PhraseMaker {
                         vertical-align="middle"
                     >&nbsp;&nbsp;`;
             } else if (this.rowLabels[i].slice(0, 4) === "http") {
-                cell.innerHTML =
-                    `&nbsp;&nbsp;<img 
+                cell.innerHTML = `&nbsp;&nbsp;<img 
                         src="${getDrumIcon(this.rowLabels[i])}" 
                         title="${this.rowLabels[i]}" 
                         alt="${this.rowLabels[i]}" 
@@ -686,24 +694,21 @@ class PhraseMaker {
                         vertical-align="middle"
                     />&nbsp;&nbsp;`;
             } else if (MATRIXSYNTHS.includes(this.rowLabels[i])) {
-                cell.innerHTML =
-                    `&nbsp;&nbsp;<img 
+                cell.innerHTML = `&nbsp;&nbsp;<img 
                         src="images/synth2.svg" 
                         height="${iconSize}" 
                         width="${iconSize}" 
                         vertical-align="middle"
                     >&nbsp;&nbsp;`;
             } else if (MATRIXGRAPHICS.includes(this.rowLabels[i])) {
-                cell.innerHTML =
-                    `&nbsp;&nbsp;<img 
+                cell.innerHTML = `&nbsp;&nbsp;<img 
                         src="images/mouse.svg" 
                         height="${iconSize}" 
                         width="${iconSize}" 
                         vertical-align="middle"
                     >&nbsp;&nbsp;`;
             } else if (MATRIXGRAPHICS2.includes(this.rowLabels[i])) {
-                cell.innerHTML =
-                    `&nbsp;&nbsp;<img 
+                cell.innerHTML = `&nbsp;&nbsp;<img 
                         src="images/mouse.svg" 
                         height="${iconSize}" 
                         width="${iconSize}" 
@@ -729,15 +734,13 @@ class PhraseMaker {
                 // Don't add bellset image with sharps and flats.
                 noteName = this.rowLabels[i];
                 if (noteName in BELLSETIDX && this.rowArgs[i] === 4) {
-                    cell.innerHTML =
-                        `<img 
+                    cell.innerHTML = `<img 
                             src="images/8_bellset_key_${BELLSETIDX[noteName]}.svg" 
                             width="${cell.style.width}" 
                             vertical-align="middle"
                         >`;
                 } else if (["C", "do"].includes(noteName) && this.rowArgs[i] === 5) {
-                    cell.innerHTML =
-                        `<img 
+                    cell.innerHTML = `<img 
                             src="images/8_bellset_key_8.svg" 
                             width="${cell.style.width}" 
                             vertical-align="middle"
@@ -765,7 +768,7 @@ class PhraseMaker {
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
                 cell.setAttribute("alt", i + "__" + "drumblocks");
 
-                cell.onclick = (event) => {
+                cell.onclick = event => {
                     let eCell = event.target;
                     if (eCell.getAttribute("alt") === null) {
                         eCell = eCell.parentNode;
@@ -785,7 +788,7 @@ class PhraseMaker {
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
                 cell.setAttribute("alt", i + "__" + "synthsblocks");
 
-                cell.onclick = (event) => {
+                cell.onclick = event => {
                     let eCell = event.target;
                     if (eCell.getAttribute("alt") === null) {
                         eCell = eCell.parentNode;
@@ -804,7 +807,7 @@ class PhraseMaker {
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + "px";
                 cell.setAttribute("alt", i + "__" + "graphicsblocks");
 
-                cell.onclick = (event) => {
+                cell.onclick = event => {
                     let eCell = event.target;
                     if (eCell.getAttribute("alt") === null) {
                         eCell = eCell.parentNode;
@@ -819,12 +822,11 @@ class PhraseMaker {
                 blockLabel = this.activity.blocks.protoBlockDict[this.rowLabels[i]][
                     "staticLabels"
                 ][0];
-                cell.innerHTML =
-                    `${blockLabel}<br>${this.rowArgs[i][0]} ${this.rowArgs[i][1]}`;
+                cell.innerHTML = `${blockLabel}<br>${this.rowArgs[i][0]} ${this.rowArgs[i][1]}`;
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + "px";
                 cell.setAttribute("alt", i + "__" + "graphicsblocks2");
 
-                cell.onclick = (event) => {
+                cell.onclick = event => {
                     let eCell = event.target;
                     if (eCell.getAttribute("alt") === null) {
                         eCell = eCell.parentNode;
@@ -842,8 +844,9 @@ class PhraseMaker {
                     noteIsSolfege(this.rowLabels[i]) &&
                     !isCustomTemperament(this.activity.logo.synth.inTemperament)
                 ) {
-                    cell.innerHTML =
-                        `${i18nSolfege(this.rowLabels[i])}${this.rowArgs[i].toString().sub()}`;
+                    cell.innerHTML = `${i18nSolfege(this.rowLabels[i])}${this.rowArgs[i]
+                        .toString()
+                        .sub()}`;
                     noteObj = getNote(
                         this.rowLabels[i],
                         this.rowArgs[i],
@@ -890,7 +893,7 @@ class PhraseMaker {
                 }
                 cell.setAttribute("alt", i + "__" + "pitchblocks");
 
-                cell.onclick = (event) => {
+                cell.onclick = event => {
                     let eCell = event.target;
                     if (eCell.getAttribute("alt") === null) {
                         eCell = eCell.parentNode;
@@ -918,7 +921,6 @@ class PhraseMaker {
 
         // Add a row for lyrics if they are enabled in the ExtraBlocks.js
         if (this.lyricsON) {
-
             const lyricsRow = ptmTable.insertRow();
             lyricsRow.setAttribute("id", "lyricRow");
             lyricsRow.style.position = "sticky";
@@ -954,7 +956,8 @@ class PhraseMaker {
             if (!this._lyrics || this._lyrics.length === 0) {
                 this._lyrics = Array(this.activity.logo.tupletRhythms.length).fill("");
             } else if (this.activity.logo.tupletRhythms.length > this._lyrics.length) {
-                const additionalLength = this.activity.logo.tupletRhythms.length - this._lyrics.length;
+                const additionalLength =
+                    this.activity.logo.tupletRhythms.length - this._lyrics.length;
                 this._lyrics = this._lyrics.concat(Array(additionalLength).fill(""));
             }
             for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
@@ -993,19 +996,18 @@ class PhraseMaker {
                 lyricsInput.style.backgroundColor = platformColor.lyricsInputBackground;
 
                 inputCell.appendChild(lyricsInput);
-                inputCell.addEventListener("mouseover", (event) => {
+                inputCell.addEventListener("mouseover", event => {
                     event.target.style.backgroundColor = platformColor.selectorSelected;
                 });
 
-                inputCell.addEventListener("mouseout", (event) => {
+                inputCell.addEventListener("mouseout", event => {
                     event.target.style.backgroundColor = platformColor.lyricsInputBackground;
                 });
-                lyricsInput.addEventListener("focus", () => this.activity.isInputON = true);
-                lyricsInput.addEventListener("blur", () => this.activity.isInputON = false);
-                lyricsInput.addEventListener("input", (event) => {
+                lyricsInput.addEventListener("focus", () => (this.activity.isInputON = true));
+                lyricsInput.addEventListener("blur", () => (this.activity.isInputON = false));
+                lyricsInput.addEventListener("input", event => {
                     this._lyrics[i] = event.target.value;
                 });
-
             }
             lyricsRow.insertCell().appendChild(tempTable);
         }
@@ -1500,7 +1502,7 @@ class PhraseMaker {
             }
         }
 
-        let __selectionChanged = async (updatingArgs) => {
+        let __selectionChanged = async updatingArgs => {
             const thisBlockName = _blockNames[this._blockLabelsWheel.selectedNavItemIndex];
             let argBlock, z;
             if (updatingArgs === undefined) {
@@ -1552,8 +1554,7 @@ class PhraseMaker {
             let cell = this._headcols[blockIndex];
             const iconSize = PhraseMaker.ICONSIZE * (window.innerWidth / 1200);
             if (MATRIXGRAPHICS2.includes(this.rowLabels[blockIndex])) {
-                cell.innerHTML =
-                    `&nbsp;&nbsp;<img 
+                cell.innerHTML = `&nbsp;&nbsp;<img 
                         src="images/mouse.svg" 
                         height="${iconSize}" 
                         width="${iconSize}" 
@@ -1566,8 +1567,7 @@ class PhraseMaker {
                 blockLabel = this.activity.blocks.protoBlockDict[this.rowLabels[blockIndex]][
                     "staticLabels"
                 ][0];
-                cell.innerHTML =
-                    `${blockLabel}<br>${this.rowArgs[blockIndex][0]} ${this.rowArgs[blockIndex][1]}`;
+                cell.innerHTML = `${blockLabel}<br>${this.rowArgs[blockIndex][0]} ${this.rowArgs[blockIndex][1]}`;
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + "px";
             }
 
@@ -1778,7 +1778,7 @@ class PhraseMaker {
             this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
         }
 
-        let __selectionChanged = async (updatingArgs) => {
+        let __selectionChanged = async updatingArgs => {
             let thisBlockName = "hertz";
             let label, newBlock, argBlock, z;
             if (condition === "graphicsblocks") {
@@ -1829,16 +1829,14 @@ class PhraseMaker {
             let cell = this._headcols[blockIndex];
             const iconSize = PhraseMaker.ICONSIZE * (window.innerWidth / 1200);
             if (MATRIXSYNTHS.includes(this.rowLabels[blockIndex])) {
-                cell.innerHTML =
-                    `&nbsp;&nbsp;<img 
+                cell.innerHTML = `&nbsp;&nbsp;<img 
                         src="images/synth2.svg" 
                         height="${iconSize}" 
                         width="${iconSize}" 
                         vertical-align="middle"
                     >&nbsp;&nbsp;`;
             } else if (MATRIXGRAPHICS.includes(this.rowLabels[blockIndex])) {
-                cell.innerHTML =
-                    `&nbsp;&nbsp;<img 
+                cell.innerHTML = `&nbsp;&nbsp;<img 
                         src="images/mouse.svg" 
                         height="${iconSize}" 
                         width="${iconSize}" 
@@ -2184,8 +2182,7 @@ class PhraseMaker {
             const w = window.innerWidth;
             const iconSize = PhraseMaker.ICONSIZE * (w / 1200);
             if (drumName != null) {
-                cell.innerHTML =
-                    `&nbsp;&nbsp;<img 
+                cell.innerHTML = `&nbsp;&nbsp;<img 
                         src="${getDrumIcon(drumName)}" 
                         title="${_(drumName)}" 
                         alt="${_(drumName)}" 
@@ -2194,15 +2191,13 @@ class PhraseMaker {
                         vertical-align="middle"
                     >&nbsp;&nbsp;`;
             } else if (noteName in BELLSETIDX && this.rowArgs[index] === 4) {
-                cell.innerHTML =
-                    `<img 
+                cell.innerHTML = `<img 
                         src="images/8_bellset_key_${BELLSETIDX[noteName]}.svg" 
                         width="${cell.style.width}" 
                         vertical-align="middle"
                     >`;
             } else if (noteName === "C" && this.rowArgs[index] === 5) {
-                cell.innerHTML =
-                    `<img 
+                cell.innerHTML = `<img 
                         src="images/8_bellset_key_8.svg" 
                         width="${cell.style.width}" 
                         vertical-align="middle"
@@ -2217,8 +2212,9 @@ class PhraseMaker {
                 noteIsSolfege(this.rowLabels[i]) &&
                 !isCustomTemperament(this.activity.logo.synth.inTemperament)
             ) {
-                cell.innerHTML =
-                    `${i18nSolfege(this.rowLabels[index])}${this.rowArgs[index].toString().sub()}`;
+                cell.innerHTML = `${i18nSolfege(this.rowLabels[index])}${this.rowArgs[index]
+                    .toString()
+                    .sub()}`;
                 noteObj = getNote(
                     this.rowLabels[index],
                     this.rowArgs[index],
@@ -2592,7 +2588,7 @@ class PhraseMaker {
                         this._removePitchBlock(oldColumnBlockMap[sortedList[lastObj][3]][0]),
                         500
                     );
-                    this.columnBlocksMap = this.columnBlocksMap.filter((ele) => {
+                    this.columnBlocksMap = this.columnBlocksMap.filter(ele => {
                         return ele[0] !== oldColumnBlockMap[sortedList[lastObj][3]][0];
                     });
                     lastObj = i;
@@ -2646,7 +2642,6 @@ class PhraseMaker {
         }
 
         this.makeClickable();
-
     }
 
     /**
@@ -2708,15 +2703,17 @@ class PhraseMaker {
                 blockLabel = this.activity.blocks.protoBlockDict[this.rowLabels[i]][
                     "staticLabels"
                 ][0];
-                exportLabel.innerHTML =
-                    `${blockLabel}<br>${this.rowArgs[i][0]} ${this.rowArgs[i][1]}`;
+                exportLabel.innerHTML = `${blockLabel}<br>${this.rowArgs[i][0]} ${this.rowArgs[i][1]}`;
                 exportLabel.style.fontSize = Math.floor(this._cellScale * 12) + "px";
             } else {
                 if (noteIsSolfege(this.rowLabels[i])) {
-                    exportLabel.innerHTML =
-                        `${i18nSolfege(this.rowLabels[i])}${this.rowArgs[i].toString().sub()}`;
+                    exportLabel.innerHTML = `${i18nSolfege(this.rowLabels[i])}${this.rowArgs[i]
+                        .toString()
+                        .sub()}`;
                 } else {
-                    exportLabel.innerHTML = `${this.rowLabels[i]}${this.rowArgs[i].toString().sub()}`;
+                    exportLabel.innerHTML = `${this.rowLabels[i]}${this.rowArgs[i]
+                        .toString()
+                        .sub()}`;
                 }
             }
 
@@ -2806,7 +2803,7 @@ class PhraseMaker {
         const saveDocument = exportDocument;
         const uriData = saveDocument.documentElement.outerHTML;
         exportDocument.body.innerHTML +=
-            "<br><a id=\"downloadb1\" style=\"background: #C374E9; border-radius: 5%; padding: 0.3em; text-decoration: none; margin: 0.5em; color: white;\" download>Download Matrix</a>";
+            '<br><a id="downloadb1" style="background: #C374E9; border-radius: 5%; padding: 0.3em; text-decoration: none; margin: 0.5em; color: white;" download>Download Matrix</a>';
         exportDocument.getElementById("downloadb1").download = "MusicMatrix";
         exportDocument.getElementById("downloadb1").href = this._generateDataURI(uriData);
         exportDocument.close();
@@ -2846,6 +2843,10 @@ class PhraseMaker {
 
         const tupletTimeFactor = param[0][0] / param[0][1];
         const numberOfNotes = param[1].length;
+        // Check if current bar position is at 0 (start of a measure)
+        const isBarLine = this._currentMusicalTime < 0.001 && this._notesToPlay.length > 0;
+        const barStyle = isBarLine ? "3px solid #555" : "1px solid #ccc";
+
         let totalNoteInterval = 0;
         // const ptmTable = docById("ptmTable");
         let lcd;
@@ -2950,12 +2951,12 @@ class PhraseMaker {
             cell.style.lineHeight = 60 + "%";
             cell.style.fontSize = this._cellScale * 75 + "%";
             cell.style.textAlign = "center";
+            cell.style.borderLeft = i === 0 ? barStyle : "1px solid #ccc";
             obj = toFraction(numerator / (totalNoteInterval / tupletTimeFactor));
 
             if (obj[1] < 13) {
                 if (NOTESYMBOLS != undefined && obj[1] in NOTESYMBOLS) {
-                    cell.innerHTML =
-                        `${obj[0]}<br>&mdash;<br>${obj[1]}<br>
+                    cell.innerHTML = `${obj[0]}<br>&mdash;<br>${obj[1]}<br>
                         <img 
                             src="${NOTESYMBOLS[obj[1]]}" 
                             height="${(MATRIXSOLFEHEIGHT / 2) * this._cellScale}"
@@ -2995,14 +2996,15 @@ class PhraseMaker {
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
                 cell.style.backgroundColor = cellColor;
+                cell.style.borderLeft = i === 0 ? barStyle : "1px solid #ccc";
 
-                cell.onmouseover = (event) => {
+                cell.onmouseover = event => {
                     if (event.target.style.backgroundColor !== "black") {
                         event.target.style.backgroundColor = platformColor.selectorSelected;
                     }
                 };
 
-                cell.onmouseout = (event) => {
+                cell.onmouseout = event => {
                     if (event.target.style.backgroundColor !== "black") {
                         event.target.style.backgroundColor = event.target.getAttribute("cellColor");
                     }
@@ -3023,6 +3025,7 @@ class PhraseMaker {
         cell.style.textAlign = "center";
         cell.innerHTML = tupletValue;
         cell.style.backgroundColor = platformColor.tupletBackground;
+        cell.style.borderLeft = barStyle;
 
         // And a span in the note value column too.
         const noteValueRow = this._noteValueRow;
@@ -3037,7 +3040,16 @@ class PhraseMaker {
         cell.style.textAlign = "center";
         cell.innerHTML = noteValueToDisplay;
         cell.style.backgroundColor = platformColor.rhythmcellcolor;
+        cell.style.borderLeft = barStyle;
         this._matrixHasTuplets = true;
+
+        // Update time by the total span of the tuplet
+        this._currentMusicalTime += tupletTimeFactor;
+
+        // Reset if measure is full
+        if (this._currentMusicalTime >= this._measureLimit - 0.001) {
+            this._currentMusicalTime = 0;
+        }
     }
 
     /**
@@ -3069,6 +3081,15 @@ class PhraseMaker {
         const rowCount = this.rowLabels.length - this._rests;
         let drumName, row, cell, cellColor;
         for (let j = 0; j < numBeats; j++) {
+            const noteDuration = 1 / noteValue;
+
+            // Check if we are at the start of a new measure
+            // Use a tiny epsilon (0.001) for float math safety
+            const isBarLine =
+                this._currentMusicalTime < 0.001 && (j > 0 || this._notesToPlay.length > numBeats);
+
+            const barStyle = isBarLine ? "3px solid #555" : "1px solid #ccc";
+
             for (let i = 0; i < rowCount; i++) {
                 // Depending on the row, we choose a different background color.
                 if (
@@ -3096,16 +3117,17 @@ class PhraseMaker {
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
                 cell.style.backgroundColor = cellColor;
+                cell.style.borderLeft = barStyle;
                 // Using the alt attribute to store the note value
                 cell.setAttribute("alt", 1 / noteValue);
 
-                cell.addEventListener("mouseover", (event) => {
+                cell.addEventListener("mouseover", event => {
                     if (event.target.style.backgroundColor !== "black") {
                         event.target.style.backgroundColor = platformColor.selectorSelected;
                     }
                 });
 
-                cell.addEventListener("mouseout", (event) => {
+                cell.addEventListener("mouseout", event => {
                     if (event.target.style.backgroundColor !== "black") {
                         event.target.style.backgroundColor = event.target.getAttribute("cellColor");
                     }
@@ -3126,6 +3148,7 @@ class PhraseMaker {
             cell.style.backgroundColor = platformColor.rhythmcellcolor;
             cell.style.color = platformColor.textColor;
             cell.setAttribute("alt", noteValue);
+            cell.style.borderLeft = barStyle;
 
             if (this._matrixHasTuplets) {
                 // We may need to insert some blank cells in the extra rows
@@ -3138,6 +3161,7 @@ class PhraseMaker {
                 cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.backgroundColor = platformColor.tupletBackground;
+                cell.style.borderLeft = barStyle;
 
                 row = this._tupletValueRow;
                 cell = row.insertCell();
@@ -3147,6 +3171,13 @@ class PhraseMaker {
                 cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.backgroundColor = platformColor.tupletBackground;
+                cell.style.borderLeft = barStyle;
+            }
+
+            // Increment time and reset if we hit the limit
+            this._currentMusicalTime += noteDuration;
+            if (this._currentMusicalTime >= this._measureLimit - 0.001) {
+                this._currentMusicalTime = 0; // Reset for the next bar
             }
         }
     }
@@ -3217,7 +3248,7 @@ class PhraseMaker {
         this._blockMap[blk] = newBlockMap.filter((el, i) => {
             return (
                 i ===
-                newBlockMap.findIndex((ele) => {
+                newBlockMap.findIndex(ele => {
                     return JSON.stringify(ele) === JSON.stringify(el);
                 })
             );
@@ -3543,7 +3574,6 @@ class PhraseMaker {
         this._syncMarkedBlocks();
         this._restartGrid.call(this);
     }
-
 
     /**
      * Deletes a note from the grid and readjusts the notes accordingly.
@@ -4070,11 +4100,11 @@ class PhraseMaker {
                 cellTuplet.setAttribute("id", j);
             }
 
-            const __mouseDownHandler = (event) => {
+            const __mouseDownHandler = event => {
                 this._mouseDownCell = event.target;
             };
 
-            const __mouseUpHandler = (event) => {
+            const __mouseUpHandler = event => {
                 this._mouseUpCell = event.target;
                 if (this._mouseDownCell !== this._mouseUpCell) {
                     this._tieNotes(this._mouseDownCell, this._mouseUpCell);
@@ -4090,11 +4120,11 @@ class PhraseMaker {
 
             if (cellTuplet !== undefined) {
                 if (this.activity.logo.tupletRhythms[0][0] === "notes") {
-                    cell.onclick = (event) => {
+                    cell.onclick = event => {
                         this._createpiesubmenu(event.target.getAttribute("id"), null, "tupletnote");
                     };
                 } else {
-                    cell.onclick = (event) => {
+                    cell.onclick = event => {
                         this._createpiesubmenu(
                             event.target.getAttribute("id"),
                             null,
@@ -4102,7 +4132,7 @@ class PhraseMaker {
                         );
                     };
 
-                    cellTuplet.onclick = (event) => {
+                    cellTuplet.onclick = event => {
                         this._createpiesubmenu(
                             event.target.getAttribute("id"),
                             event.target.getAttribute("colspan"),
@@ -4144,7 +4174,7 @@ class PhraseMaker {
 
                 isMouseDown = false;
 
-                cell.onmousedown = (evt) => {
+                cell.onmousedown = evt => {
                     isMouseDown = true;
                     const i = Number(evt.target.getAttribute("data-i"));
                     const j = Number(evt.target.getAttribute("data-j"));
@@ -4158,7 +4188,7 @@ class PhraseMaker {
                     }
                 };
 
-                cell.onmouseover = (evt) => {
+                cell.onmouseover = evt => {
                     const i = Number(evt.target.getAttribute("data-i"));
                     const j = Number(evt.target.getAttribute("data-j"));
                     if (isMouseDown) {
@@ -4526,8 +4556,7 @@ class PhraseMaker {
                                     this.rowArgs[j]
                             );
                         } else {
-                            if (
-                                isCustomTemperament(this.activity.logo.synth.inTemperament)) {
+                            if (isCustomTemperament(this.activity.logo.synth.inTemperament)) {
                                 const notes = getTemperament(
                                     this.activity.logo.synth.inTemperament
                                 );
@@ -4612,8 +4641,7 @@ class PhraseMaker {
                     _("Play")
                 );
                 this.playingNow = false;
-                this._playButton.innerHTML =
-                    `&nbsp;&nbsp;<img 
+                this._playButton.innerHTML = `&nbsp;&nbsp;<img 
                         src="header-icons/play-button.svg" 
                         title="${_("Play")}" 
                         alt="${_("Play")}" 
@@ -4986,7 +5014,6 @@ class PhraseMaker {
             }
         }
     }
-
 
     /**
      * Saves the current matrix state as an action stack consisting of note and pitch blocks.
@@ -5443,13 +5470,7 @@ class PhraseMaker {
                     }
                 }
                 if (this.lyricsON) {
-                    newStack.push([
-                        thisBlock,
-                        "print",
-                        0,
-                        0,
-                        [previousBlock, thisBlock + 1, null]
-                    ]);
+                    newStack.push([thisBlock, "print", 0, 0, [previousBlock, thisBlock + 1, null]]);
                     previousBlock = thisBlock;
                     thisBlock += 1;
                     if (this._lyrics[i] && this._lyrics !== "") {
@@ -5475,6 +5496,6 @@ class PhraseMaker {
 
         // Create a new stack for the chunk.
         this.activity.blocks.loadNewBlocks(newStack);
-        activity.textMsg(_("New action block generated."), 3000 );
+        activity.textMsg(_("New action block generated."), 3000);
     }
 }

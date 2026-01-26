@@ -176,7 +176,9 @@ function setupPenBlocks(activity) {
          * @param {Object} turtle - The turtle object.
          */
         flow(args, logo, turtle) {
-            activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).painter.doStartFill();
+            activity.turtles
+                .getTurtle(activity.turtles.companionTurtle(turtle))
+                .painter.doStartFill();
         }
     }
 
@@ -192,7 +194,9 @@ function setupPenBlocks(activity) {
         }
 
         flow(args, logo, turtle) {
-            activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).painter.doEndFill();
+            activity.turtles
+                .getTurtle(activity.turtles.companionTurtle(turtle))
+                .painter.doEndFill();
         }
     }
 
@@ -225,7 +229,9 @@ function setupPenBlocks(activity) {
          * @param {Object} turtle - The turtle object.
          */
         flow(args, logo, turtle) {
-            const requiredTurtle = activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle));
+            const requiredTurtle = activity.turtles.getTurtle(
+                activity.turtles.companionTurtle(turtle)
+            );
             if (args.length === 3) {
                 const hue = requiredTurtle.painter.color;
                 const value = requiredTurtle.painter.value;
@@ -521,7 +527,9 @@ function setupPenBlocks(activity) {
             }
 
             if (typeof args[0] === "string") {
-                activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).painter.doSetFont(args[0]);
+                activity.turtles
+                    .getTurtle(activity.turtles.companionTurtle(turtle))
+                    .painter.doSetFont(args[0]);
             }
         }
     }
@@ -1228,4 +1236,7 @@ function setupPenBlocks(activity) {
     new SetShadeBlock().setup(activity);
     new SetGreyBlock().setup(activity);
     new SetColorBlock().setup(activity);
+}
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupPenBlocks };
 }

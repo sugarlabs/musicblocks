@@ -54,11 +54,11 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
 
     logo.notationNotes[turtle] = "\\meter\n";
 
-    const __toLilynote = (note) => {
+    const __toLilynote = note => {
         // Lilypond notes use is for sharp, es for flat,
         // , and ' for shifts in octave.
         // Also, notes must be lowercase.
-        // And the octave bounday is at C, not A.
+        // And the octave boundary is at C, not A.
 
         // Convert frequencies here.
         if (typeof note === "number") {
@@ -67,9 +67,19 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
         }
 
         const replacements = {
-            "♮": "!", "♯": "is", "♭": "es", "10": "''''''''",
-            "1": ",, ", "2": ", ", "3": "", "4": "'", "5": "''",
-            "6": "'''", "7": "''''", "8": "''''''", "9": "'''''''"
+            "♮": "!",
+            "♯": "is",
+            "♭": "es",
+            "10": "''''''''",
+            "1": ",, ",
+            "2": ", ",
+            "3": "",
+            "4": "'",
+            "5": "''",
+            "6": "'''",
+            "7": "''''",
+            "8": "''''''",
+            "9": "'''''''"
         };
 
         return note.replace(/[♮♯♭]|10|[1-9]/g, match => replacements[match]).toLowerCase();
@@ -592,14 +602,12 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             if (queueDecrescendo) {
                 queueDecrescendo = false;
                 logo.notationNotes[turtle] += "\\> ";
-
             }
         }
     }
 };
 
 const saveLilypondOutput = function (activity) {
-
     //.TRANS Animal names used in Lilypond output
     const RODENTS = [
         _("mouse"),
@@ -844,7 +852,8 @@ const saveLilypondOutput = function (activity) {
                 // console.debug("shortInstrumentName: " + shortInstrumentName);
             }
 
-            activity.logo.notationOutput += instrumentName.replace(/ /g, "").replace(".", "") + "Voice = ";
+            activity.logo.notationOutput +=
+                instrumentName.replace(/ /g, "").replace(".", "") + "Voice = ";
             if (tNumber > startDrums - 1) {
                 activity.logo.notationOutput += "\\new DrumStaff \\with {\n";
             } else {
@@ -858,7 +867,8 @@ const saveLilypondOutput = function (activity) {
                 activity.logo.notationOutput += '   shortInstrumentName = "' + "d" + num + '"\n';
                 activity.logo.notationOutput += '   midiInstrument = "snare drum"\n';
             } else {
-                activity.logo.notationOutput += '   shortInstrumentName = "' + shortInstrumentName + '"\n';
+                activity.logo.notationOutput +=
+                    '   shortInstrumentName = "' + shortInstrumentName + '"\n';
                 activity.logo.notationOutput += '   midiInstrument = "acoustic grand"\n';
             }
             // Automatic note splitting
@@ -986,5 +996,10 @@ const saveLilypondOutput = function (activity) {
 };
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { LILYPONDHEADER, getLilypondHeader, processLilypondNotes, saveLilypondOutput };
+    module.exports = {
+        LILYPONDHEADER,
+        getLilypondHeader,
+        processLilypondNotes,
+        saveLilypondOutput
+    };
 }

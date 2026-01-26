@@ -69,6 +69,77 @@ const VIDEOVALUE = "##__VIDEO__##";
 const NOTEBLOCKS = ["newnote", "osctime"];
 const PITCHBLOCKS = ["pitch", "steppitch", "hertz", "pitchnumber", "nthmodalpitch", "playdrum"];
 
+const ALLOWED_CONNECTIONS = new Set([
+    "vspaceout:vspacein",
+    "vspacein:vspaceout",
+    "in:out",
+    "out:in",
+    "in:vspaceout",
+    "vspaceout:in",
+    "out:vspacein",
+    "vspacein:out",
+    "numberin:numberout",
+    "numberin:anyout",
+    "numberout:numberin",
+    "anyout:numberin",
+    "textin:textout",
+    "textin:anyout",
+    "textout:textin",
+    "anyout:textin",
+    "booleanout:booleanin",
+    "booleanin:booleanout",
+    "mediain:mediaout",
+    "mediaout:mediain",
+    "mediain:textout",
+    "textout:mediain",
+    "filein:fileout",
+    "fileout:filein",
+    "casein:caseout",
+    "caseout:casein",
+    "vspaceout:casein",
+    "casein:vspaceout",
+    "vspacein:caseout",
+    "caseout:vspacein",
+    "solfegein:anyout",
+    "solfegein:solfegeout",
+    "solfegein:textout",
+    "solfegein:noteout",
+    "solfegein:scaledegreeout",
+    "solfegein:numberout",
+    "anyout:solfegein",
+    "solfegeout:solfegein",
+    "textout:solfegein",
+    "noteout:solfegein",
+    "scaledegreeout:solfegein",
+    "numberout:solfegein",
+    "notein:solfegeout",
+    "notein:scaledegreeout",
+    "notein:textout",
+    "notein:noteout",
+    "solfegeout:notein",
+    "scaledegreeout:notein",
+    "textout:notein",
+    "noteout:notein",
+    "pitchout:anyin",
+    "gridout:anyin",
+    "anyin:textout",
+    "anyin:mediaout",
+    "anyin:numberout",
+    "anyin:anyout",
+    "anyin:fileout",
+    "anyin:solfegeout",
+    "anyin:scaledegreeout",
+    "anyin:noteout",
+    "textout:anyin",
+    "mediaout:anyin",
+    "numberout:anyin",
+    "anyout:anyin",
+    "fileout:anyin",
+    "solfegeout:anyin",
+    "scaledegreeout:anyin",
+    "noteout:anyin"
+]);
+
 /**
  * Blocks holds the list of blocks and most of the block-associated
  * methods, since most block manipulations are inter-block.
@@ -88,7 +159,7 @@ class Blocks {
         this.boundary = this.activity.boundary;
         this.macroDict = this.activity.macroDict;
 
-        /** Did the user right cick? */
+        /** Did the user right click? */
         this.stageClick = false;
 
         /** We keep a list of stacks in the trash. */
@@ -904,7 +975,7 @@ class Blocks {
                     continue;
                 }
 
-                /** Another database integrety check. */
+                /** Another database integrity check. */
                 if (this.blockList[cblk] === null) {
                     // eslint-disable-next-line no-console
                     console.debug("This is not good: we encountered a null block: " + cblk);
@@ -925,7 +996,7 @@ class Blocks {
                     }
                 }
 
-                /** Yet another database integrety check. */
+                /** Yet another database integrity check. */
                 if (!foundMatch) {
                     // eslint-disable-next-line no-console
                     console.debug(
@@ -1432,9 +1503,8 @@ class Blocks {
                                 this.blockList[silenceBlockobj.connections[0]].connections[c] ===
                                 silenceBlock
                             ) {
-                                this.blockList[silenceBlockobj.connections[0]].connections[
-                                    c
-                                ] = this.blockList.indexOf(thisBlockobj);
+                                this.blockList[silenceBlockobj.connections[0]].connections[c] =
+                                    this.blockList.indexOf(thisBlockobj);
                                 break;
                             }
                         }
@@ -1865,9 +1935,8 @@ class Blocks {
                                     i > ci + 1;
                                     i--
                                 ) {
-                                    this.blockList[newBlock].connections[i] = this.blockList[
-                                        newBlock
-                                    ].connections[i - 1];
+                                    this.blockList[newBlock].connections[i] =
+                                        this.blockList[newBlock].connections[i - 1];
                                 }
                             }
                             /** The new block is added below the current connection... */
@@ -2032,7 +2101,7 @@ class Blocks {
                                         this.actionHasReturn(b),
                                         this.actionHasArgs(b)
                                     );
-                                    this.setActionProtoVisiblity(false);
+                                    this.setActionProtoVisibility(false);
                                 }
                             }
                         }
@@ -2121,7 +2190,7 @@ class Blocks {
 
             /**
              * Put block adjustments inside a slight delay to make the
-             * addition/substraction of vspace and changes of block shape
+             * addition/subtraction of vspace and changes of block shape
              * appear less abrupt (and it can be a little racy).
              * If we changed the contents of a arg block, we may need a vspace.
              */
@@ -2184,160 +2253,7 @@ class Blocks {
          */
         this._testConnectionType = (type1, type2) => {
             /** Can these two blocks dock? */
-            if (type1 === "vspaceout" && type2 === "vspacein") {
-                return true;
-            }
-            if (type1 === "vspacein" && type2 === "vspaceout") {
-                return true;
-            }
-
-            if (type1 === "in" && type2 === "out") {
-                return true;
-            }
-            if (type1 === "out" && type2 === "in") {
-                return true;
-            }
-            if (type1 === "in" && type2 === "vspaceout") {
-                return true;
-            }
-            if (type1 === "vspaceout" && type2 === "in") {
-                return true;
-            }
-            if (type1 === "out" && type2 === "vspacein") {
-                return true;
-            }
-            if (type1 === "vspacein" && type2 === "out") {
-                return true;
-            }
-            if (type1 === "numberin" && ["numberout", "anyout"].includes(type2)) {
-                return true;
-            }
-            if (["numberout", "anyout"].includes(type1) && type2 === "numberin") {
-                return true;
-            }
-            if (type1 === "textin" && ["textout", "anyout"].includes(type2)) {
-                return true;
-            }
-            if (["textout", "anyout"].includes(type1) && type2 === "textin") {
-                return true;
-            }
-            if (type1 === "booleanout" && type2 === "booleanin") {
-                return true;
-            }
-            if (type1 === "booleanin" && type2 === "booleanout") {
-                return true;
-            }
-            if (type1 === "mediain" && type2 === "mediaout") {
-                return true;
-            }
-            if (type1 === "mediaout" && type2 === "mediain") {
-                return true;
-            }
-            if (type1 === "mediain" && type2 === "textout") {
-                return true;
-            }
-            if (type2 === "mediain" && type1 === "textout") {
-                return true;
-            }
-            if (type1 === "filein" && type2 === "fileout") {
-                return true;
-            }
-            if (type1 === "fileout" && type2 === "filein") {
-                return true;
-            }
-            if (type1 === "casein" && type2 === "caseout") {
-                return true;
-            }
-            if (type1 === "caseout" && type2 === "casein") {
-                return true;
-            }
-            if (type1 === "vspaceout" && type2 === "casein") {
-                return true;
-            }
-            if (type1 === "casein" && type2 === "vspaceout") {
-                return true;
-            }
-            if (type1 === "vspacein" && type2 === "caseout") {
-                return true;
-            }
-            if (type1 === "caseout" && type2 === "vspacein") {
-                return true;
-            }
-            if (
-                type1 === "solfegein" &&
-                [
-                    "anyout",
-                    "solfegeout",
-                    "textout",
-                    "noteout",
-                    "scaledegreeout",
-                    "numberout"
-                ].includes(type2)
-            ) {
-                return true;
-            }
-            if (
-                type2 === "solfegein" &&
-                [
-                    "anyout",
-                    "solfegeout",
-                    "textout",
-                    "noteout",
-                    "scaledegreeout",
-                    "numberout"
-                ].includes(type1)
-            ) {
-                return true;
-            }
-            if (
-                type1 === "notein" &&
-                ["solfegeout", "scaledegreeout", "textout", "noteout"].includes(type2)
-            ) {
-                return true;
-            }
-            if (type1 === "pitchout" && type2 === "anyin") {
-                return true;
-            }
-            if (type1 === "gridout" && type2 === "anyin") {
-                return true;
-            }
-            if (
-                type2 === "notein" &&
-                ["solfegeout", "scaledegreeout", "textout", "noteout"].includes(type1)
-            ) {
-                return true;
-            }
-            if (
-                type1 === "anyin" &&
-                [
-                    "textout",
-                    "mediaout",
-                    "numberout",
-                    "anyout",
-                    "fileout",
-                    "solfegeout",
-                    "scaledegreeout",
-                    "noteout"
-                ].includes(type2)
-            ) {
-                return true;
-            }
-            if (
-                type2 === "anyin" &&
-                [
-                    "textout",
-                    "mediaout",
-                    "numberout",
-                    "anyout",
-                    "fileout",
-                    "solfegeout",
-                    "scaledegreeout",
-                    "noteout"
-                ].includes(type1)
-            ) {
-                return true;
-            }
-            return false;
+            return ALLOWED_CONNECTIONS.has(type1 + ":" + type2);
         };
 
         /**
@@ -3073,7 +2989,7 @@ class Blocks {
         /**
          * Highlight a block
          * @param - blk - block
-         * @param - unhilight - new variable
+         * @param - unhighlight - new variable
          * @public
          * @returns {void}
          */
@@ -3120,7 +3036,7 @@ class Blocks {
          * @param - name - new variable
          * @param - blockOffset - new variable
          * @param - connections
-         * @param - postPorcess
+         * @param - postProcess
          * @param - postProcessArg - Post process Argument
          * @private
          * @returns {void}
@@ -3453,8 +3369,7 @@ class Blocks {
 
                 postProcessArg = [thisBlock, arg];
             } else if (name === "newnote") {
-                // eslint-disable-next-line no-unused-vars
-                postProcess = args => {};
+                postProcess = () => {};
                 postProcessArg = [thisBlock, null];
             } else {
                 postProcess = null;
@@ -3733,7 +3648,7 @@ class Blocks {
          * @public
          * @returns {void}
          */
-        this.setActionProtoVisiblity = state => {
+        this.setActionProtoVisibility = state => {
             /** By default, the nameddo protoblock is hidden. */
             const actionsPalette = this.activity.palettes.dict["action"];
             let stateChanged = false;
@@ -3764,7 +3679,7 @@ class Blocks {
         this.findUniqueActionName = (name, actionBlk) => {
             /** If we have a stack named 'action', make the protoblock visible. */
             if (name === _("action")) {
-                this.setActionProtoVisiblity(true);
+                this.setActionProtoVisibility(true);
             }
 
             /** Make sure we don't make two actions with the same name. */
@@ -5002,7 +4917,7 @@ class Blocks {
                 return;
             }
 
-            /** Get the numerator and demoninator of the meter divide block */
+            /** Get the numerator and denominator of the meter divide block */
             let dblk = this.blockList[blk].connections[2];
             if (dblk === null || this.blockList[dblk].name !== "divide") {
                 return;
@@ -5532,7 +5447,7 @@ class Blocks {
 
                 /** If we have a stack named 'action', make the protoblock visible. */
                 if (name === _("action")) {
-                    this.setActionProtoVisiblity(true);
+                    this.setActionProtoVisibility(true);
                 }
 
                 const oldName = name;
@@ -5782,7 +5697,7 @@ class Blocks {
                          * Ensure that there is a hidden block as the first
                          * block in the child flow (connection 2) of an action
                          * block (required to make the backward block function
-                         * propperly).
+                         * properly).
                          */
                         len = blockObjs[b][4].length;
                         if (blockObjs[b][4][2] == null) {
@@ -5841,6 +5756,11 @@ class Blocks {
             this._adjustTheseStacks = [];
             this._adjustTheseDocks = [];
             this._loadCounter = blockObjs.length;
+
+            // Preload audio samples for instruments used in this project (background task)
+            if (this.activity && this.activity.logo && this.activity.logo.synth) {
+                this.activity.logo.synth.preloadProjectSamples(blockObjs);
+            }
 
             /** We add new blocks to the end of the block list. */
             const blockOffset = this.blockList.length;
@@ -6690,8 +6610,7 @@ class Blocks {
          * @public
          * @returns {void}
          */
-        // eslint-disable-next-line no-unused-vars
-        this.cleanupAfterLoad = async name => {
+        this.cleanupAfterLoad = async () => {
             this._loadCounter -= 1;
             if (this._loadCounter > 0) {
                 return;
@@ -6760,6 +6679,10 @@ class Blocks {
 
             document.body.style.cursor = "default";
             document.getElementById("load-container").style.display = "none";
+            // Stop the loading animation interval to prevent CPU waste
+            if (this.activity.stopLoadAnimation) {
+                this.activity.stopLoadAnimation();
+            }
             const myCustomEvent = new Event("finishedLoading");
             document.dispatchEvent(myCustomEvent);
         };
@@ -7081,7 +7004,7 @@ class Blocks {
         /***
          * Clears all the blocks, updates the cache and refreshes the canvas.
          *
-         * @returnss {void}
+         * @returns {void}
          */
         this.clearParameterBlocks = () => {
             for (const blk in this.blockList) {
@@ -7103,7 +7026,7 @@ class Blocks {
          * @param logo
          * @param turtle
          * @param blk
-         * @returnss {void}
+         * @returns {void}
          */
         this.updateParameterBlock = (logo, turtle, blk) => {
             const name = this.blockList[blk].name;
@@ -7153,7 +7076,7 @@ class Blocks {
          * @param blk
          * @param value
          * @param turtle
-         * @returnss {void}
+         * @returns {void}
          */
         this.blockSetter = (logo, blk, value, turtle) => {
             if (typeof this.blockList[blk].protoblock.setter === "function") {
@@ -7170,7 +7093,7 @@ class Blocks {
         /***
          * Hides all the blocks.
          *
-         * @returnss {void}
+         * @returns {void}
          */
         this.hideBlocks = () => {
             this.activity.palettes.hide();

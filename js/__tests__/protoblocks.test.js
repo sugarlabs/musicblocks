@@ -21,9 +21,9 @@ const ProtoBlock = require("../protoblocks");
 global.createjs = {
     Container: jest.fn(() => ({
         addChild: jest.fn(),
-        getBounds: jest.fn(() => ({ width: 50 })),
+        getBounds: jest.fn(() => ({ width: 50 }))
     })),
-    Text: jest.fn((text, font, color) => ({ text, font, color })),
+    Text: jest.fn((text, font, color) => ({ text, font, color }))
 };
 
 global.SVG = jest.fn(() => ({
@@ -35,7 +35,7 @@ global.SVG = jest.fn(() => ({
     basicBlock: jest.fn(() => "<svg></svg>"),
     docks: [[0, 0]],
     getWidth: jest.fn(() => 100),
-    getHeight: jest.fn(() => 50),
+    getHeight: jest.fn(() => 50)
 }));
 
 global.DEFAULTBLOCKSCALE = 1.0;

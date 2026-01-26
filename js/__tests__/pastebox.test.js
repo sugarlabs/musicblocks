@@ -20,7 +20,6 @@
 const PasteBox = require("../pastebox");
 
 describe("PasteBox", () => {
-
     const _Image = global.Image;
     const _window = global.window;
     const _createjs = global.createjs;
@@ -42,12 +41,12 @@ describe("PasteBox", () => {
             mockActivity = {
                 stage: { addChild: jest.fn() },
                 refreshCanvas: jest.fn(),
-                pasted: jest.fn(),
+                pasted: jest.fn()
             };
             mockDocById = jest.fn();
             global.docById = mockDocById;
-            global.base64Encode = jest.fn((x) => x);
-            global.window = { btoa: jest.fn((x) => x) };
+            global.base64Encode = jest.fn(x => x);
+            global.window = { btoa: jest.fn(x => x) };
 
             pasteBox = new PasteBox(mockActivity);
         });
@@ -64,7 +63,7 @@ describe("PasteBox", () => {
             pasteBox._container = { visible: true };
             mockDocById.mockReturnValue({
                 value: "foo",
-                style: { visibility: "visible" },
+                style: { visibility: "visible" }
             });
 
             pasteBox.hide();
@@ -101,10 +100,10 @@ describe("PasteBox", () => {
             mockActivity = {
                 stage: { addChild: jest.fn() },
                 refreshCanvas: jest.fn(),
-                pasted: jest.fn(),
+                pasted: jest.fn()
             };
-            global.base64Encode = jest.fn((x) => x);
-            global.window = { btoa: jest.fn((x) => x) };
+            global.base64Encode = jest.fn(x => x);
+            global.window = { btoa: jest.fn(x => x) };
             pasteBox = new PasteBox(mockActivity);
         });
 
@@ -113,7 +112,7 @@ describe("PasteBox", () => {
             global.createjs = {
                 Container: jest.fn(() => mockContainer),
                 Bitmap: jest.fn(),
-                Shape: jest.fn(),
+                Shape: jest.fn()
             };
 
             jest.spyOn(pasteBox, "_makeBoxBitmap");
@@ -141,7 +140,7 @@ describe("PasteBox", () => {
                 visible: false,
                 getBounds: jest.fn(() => ({ x: 0, y: 0, width: 300, height: 55 })),
                 on: jest.fn(),
-                hitArea: null,
+                hitArea: null
             };
 
             const mockBitmap = { type: "BITMAP" };
@@ -152,9 +151,9 @@ describe("PasteBox", () => {
                 Shape: jest.fn(() => ({
                     graphics: {
                         beginFill: jest.fn().mockReturnThis(),
-                        drawRect: jest.fn().mockReturnThis(),
-                    },
-                })),
+                        drawRect: jest.fn().mockReturnThis()
+                    }
+                }))
             };
 
             const img = { onload: null, src: "" };
@@ -179,27 +178,29 @@ describe("PasteBox", () => {
             mockActivity = { pasted: jest.fn(), refreshCanvas: jest.fn() };
             global.docById = jest.fn().mockReturnValue({
                 value: "",
-                style: { visibility: "visible" },
+                style: { visibility: "visible" }
             });
 
             global.createjs = {
                 Shape: jest.fn(() => ({
                     graphics: {
                         beginFill: jest.fn().mockReturnThis(),
-                        drawRect: jest.fn().mockReturnThis(),
-                    },
-                })),
+                        drawRect: jest.fn().mockReturnThis()
+                    }
+                }))
             };
 
             pasteBox = new PasteBox(mockActivity);
             pasteBox._scale = 1;
             pasteBox._container = {
                 getBounds: jest.fn(() => ({ x: 0, y: 0, width: 300, height: 55 })),
-                on: jest.fn((evt, cb) => { handler = cb; }),
+                on: jest.fn((evt, cb) => {
+                    handler = cb;
+                }),
                 hitArea: null,
                 x: 200,
                 y: 0,
-                visible: true,
+                visible: true
             };
 
             pasteBox._loadClearContainerHandler();

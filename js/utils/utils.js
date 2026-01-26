@@ -68,7 +68,27 @@ function _(text, options = {}) {
     if (!text) return "";
 
     try {
-        const removeChars = [",", "(", ")", "?", "¿", "<", ">", ".", "\n", '"', ":", "%s", "%d", "/", "'", ";", "×", "!", "¡"];
+        const removeChars = [
+            ",",
+            "(",
+            ")",
+            "?",
+            "¿",
+            "<",
+            ">",
+            ".",
+            "\n",
+            '"',
+            ":",
+            "%s",
+            "%d",
+            "/",
+            "'",
+            ";",
+            "×",
+            "!",
+            "¡"
+        ];
         let cleanedText = text;
         for (let char of removeChars) cleanedText = cleanedText.split(char).join("");
 
@@ -77,9 +97,9 @@ function _(text, options = {}) {
 
         if (lang.startsWith("ja")) {
             const kanaPref = localStorage.getItem("kanaPreference") || "kanji";
-            const script = (kanaPref === "kana") ? "kana" : "kanji";
+            const script = kanaPref === "kana" ? "kana" : "kanji";
 
-            const resolveObj = (key) => {
+            const resolveObj = key => {
                 let obj = i18next.t(key, { ...options, ns: undefined, returnObjects: true });
 
                 if (obj && typeof obj === "object") {
@@ -104,9 +124,6 @@ function _(text, options = {}) {
     }
 }
 
-
-
-
 /**
  * A string formatting function using placeholder substitution.
  * @function
@@ -117,7 +134,7 @@ function _(text, options = {}) {
 let format = (str, data) => {
     str = str.replace(/{([a-zA-Z0-9.]*)}/g, (match, name) => {
         let x = data;
-        name.split(".").forEach((v) => {
+        name.split(".").forEach(v => {
             if (x === undefined) {
                 // eslint-disable-next-line no-console
                 console.debug("Undefined value in template string", str, name, x, v);
@@ -126,7 +143,7 @@ let format = (str, data) => {
             x = x[v];
         });
 
-        return x;
+        return x === undefined ? "" : x;
     });
 
     return str.replace(/{_([a-zA-Z0-9]+)}/g, (match, item) => {
@@ -211,7 +228,7 @@ function windowWidth() {
  * @throws {string} Throws an error if the HTTP status code is greater than 299.
  * @returns {string} The response text from the server.
  */
-let httpGet = (projectName) => {
+let httpGet = projectName => {
     let xmlHttp = null;
     xmlHttp = new XMLHttpRequest();
     if (projectName === null) {
@@ -292,7 +309,7 @@ function HttpRequest(url, loadCallback, userCallback) {
  * @function
  */
 function doBrowserCheck() {
-    jQuery.uaMatch = (ua) => {
+    jQuery.uaMatch = ua => {
         ua = ua.toLowerCase();
 
         const match =
@@ -427,7 +444,7 @@ function docBySelector(selector) {
  * @param {Array} myList - The array from which to get the last element.
  * @returns {*} The last element of the array, or null if the array is empty.
  */
-let last = (myList) => {
+let last = myList => {
     const i = myList.length;
     if (i === 0) {
         return null;
@@ -495,7 +512,7 @@ function doSVG(canvas, logo, turtles, width, height, scale) {
  * @param {object} turtles - The turtles object.
  * @returns {boolean} True if all turtle SVG outputs are empty, false otherwise.
  */
-let isSVGEmpty = (turtles) => {
+let isSVGEmpty = turtles => {
     for (const turtle in turtles.turtleList) {
         turtles.getTurtle(turtle).painter.closeSVG();
         if (turtles.getTurtle(turtle).painter.svgOutput !== "") {
@@ -510,7 +527,7 @@ let isSVGEmpty = (turtles) => {
  * @param {string} file - The file path or name.
  * @returns {string} The file extension.
  */
-let fileExt = (file) => {
+let fileExt = file => {
     if (file === null) {
         return "";
     }
@@ -528,7 +545,7 @@ let fileExt = (file) => {
  * @param {string} file - The file path or name.
  * @returns {string} The basename.
  */
-let fileBasename = (file) => {
+let fileBasename = file => {
     const parts = file.split(".");
     if (parts.length === 1) {
         return parts[0];
@@ -545,7 +562,7 @@ let fileBasename = (file) => {
  * @param {string} str - The input string.
  * @returns {string} The string with the first character in uppercase.
  */
-let toTitleCase = (str) => {
+let toTitleCase = str => {
     if (typeof str !== "string") return;
     let tempStr = "";
     if (str.length > 1) tempStr = str.substring(1);
@@ -558,11 +575,49 @@ let toTitleCase = (str) => {
  * @param {string} pluginData - The JSON-encoded plugin data.
  * @returns {object|null} The processed plugin data object or null if parsing fails.
  */
-const processPluginData = (activity, pluginData) => {
+const processPluginData = (activity, pluginData, pluginSource) => {
     // Plugins are JSON-encoded dictionaries.
     if (pluginData === undefined) {
         return null;
     }
+
+    const isTrustedPluginSource = src => {
+        if (!src) return false;
+
+        // allow only local paths
+        return (
+            src.startsWith("./") ||
+            src.startsWith("../") ||
+            src.startsWith("/") ||
+            (!src.includes("http://") && !src.includes("https://"))
+        );
+    };
+
+    const safeEval = (code, label = "plugin") => {
+        if (typeof code !== "string") return;
+
+        // basic sanity limit (prevents huge payloads)
+        if (code.length > 500000) {
+            // eslint-disable-next-line no-console
+            console.warn("Plugin code too large:", label);
+            return;
+        }
+
+        try {
+            // eslint-disable-next-line no-eval
+            eval(code);
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error("Plugin execution failed:", label, e);
+        }
+    };
+
+    if (!isTrustedPluginSource(pluginSource)) {
+        // eslint-disable-next-line no-console
+        console.warn("Blocked untrusted plugin source:", pluginSource);
+        return null;
+    }
+
     let obj;
     try {
         obj = JSON.parse(pluginData);
@@ -702,18 +757,13 @@ const processPluginData = (activity, pluginData) => {
         for (const block in obj["BLOCKPLUGINS"]) {
             // eslint-disable-next-line no-console
             console.debug("adding plugin block " + block);
-            try {
-                eval(obj["BLOCKPLUGINS"][block]);
-            } catch (e) {
-                // eslint-disable-next-line no-console
-                console.debug("Failed to load plugin for " + block + ": " + e);
-            }
+            safeEval(obj["BLOCKPLUGINS"][block], "BLOCKPLUGINS:" + block);
         }
     }
 
     // Create the globals.
     if ("GLOBALS" in obj) {
-        eval(obj["GLOBALS"]);
+        safeEval(obj["GLOBALS"], "GLOBALS");
     }
 
     if ("PARAMETERPLUGINS" in obj) {
@@ -725,7 +775,7 @@ const processPluginData = (activity, pluginData) => {
     // Code to execute when plugin is loaded
     if ("ONLOAD" in obj) {
         for (const arg in obj["ONLOAD"]) {
-            eval(obj["ONLOAD"][arg]);
+            safeEval(obj["ONLOAD"][arg], "ONLOAD:" + arg);
         }
     }
 
@@ -754,7 +804,8 @@ const processPluginData = (activity, pluginData) => {
                 console.debug("Cannot find palette for protoblock " + protoblock);
             } else {
                 activity.blocks.protoBlockDict[protoblock].palette.add(
-                    activity.blocks.protoBlockDict[protoblock]);
+                    activity.blocks.protoBlockDict[protoblock]
+                );
             }
         } catch (e) {
             // eslint-disable-next-line no-console
@@ -781,7 +832,7 @@ const processPluginData = (activity, pluginData) => {
  * @param {string} rawData - Raw plugin data to process.
  * @returns {object|null} The processed plugin data object or null if parsing fails.
  */
-const processRawPluginData = (activity, rawData) => {
+const processRawPluginData = (activity, rawData, pluginSource) => {
     const lineData = rawData.split("\n");
     let cleanData = "";
 
@@ -803,7 +854,7 @@ const processRawPluginData = (activity, rawData) => {
     // try/catch while debugging your plugin.
     let obj;
     try {
-        obj = processPluginData(activity, cleanData.replace(/\n/g, ""));
+        obj = processPluginData(activity, cleanData.replace(/\n/g, ""), pluginSource);
     } catch (e) {
         obj = null;
         // eslint-disable-next-line no-console
@@ -982,7 +1033,7 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
     if (!hasSetupCamera) {
         navigator.getMedia(
             { video: true, audio: false },
-            (stream) => {
+            stream => {
                 if (navigator.mozGetUserMedia) {
                     video.mozSrcObject = stream;
                 } else {
@@ -992,7 +1043,7 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
                 video.play();
                 hasSetupCamera = true;
             },
-            (error) => {
+            error => {
                 errorMsg("Could not connect to camera");
                 // eslint-disable-next-line no-console
                 console.debug(error);
@@ -1204,7 +1255,7 @@ function GCD(a, b) {
  * @param {number} d - The input number.
  * @returns {string} The mixed fraction string.
  */
-let mixedNumber = (d) => {
+let mixedNumber = d => {
     // Return number as a mixed fraction string, e.g., "2 1/4"
 
     if (typeof d === "number") {
@@ -1316,7 +1367,7 @@ let nearestBeat = (d, b) => {
  * @param {number} d - The input number.
  * @returns {Array} An array representing the fraction in the form [numerator, denominator].
  */
-let oneHundredToFraction = (d) => {
+let oneHundredToFraction = d => {
     // Generate some simple fractions based on a scale of 1-100
 
     if (d < 1) {
@@ -1478,14 +1529,14 @@ let rgbToHex = (r, g, b) => {
  * @param {string} hex - Hexadecimal color code.
  * @returns {Object} Object with RGB values {r, g, b} or null if invalid hex code.
  */
-let hexToRGB = (hex) => {
+let hexToRGB = hex => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
         ? {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        }
+              r: parseInt(result[1], 16),
+              g: parseInt(result[2], 16),
+              b: parseInt(result[3], 16)
+          }
         : null;
 };
 
@@ -1495,7 +1546,7 @@ let hexToRGB = (hex) => {
  * @param {number} hex - Hexadecimal color code.
  * @returns {string} RGBA color value with alpha set to 1.
  */
-let hex2rgb = (hex) => {
+let hex2rgb = hex => {
     const bigint = parseInt(hex, 16);
     const r = (bigint >> 16) & 255;
     const g = (bigint >> 8) & 255;
@@ -1510,8 +1561,8 @@ let hex2rgb = (hex) => {
  * @param {number} duration - Duration of the delay in milliseconds.
  * @returns {Promise} A promise that resolves after the specified duration.
  */
-let delayExecution = (duration) => {
-    return new Promise((resolve) => {
+let delayExecution = duration => {
+    return new Promise(resolve => {
         setTimeout(() => {
             resolve(true);
         }, duration);
@@ -1533,12 +1584,57 @@ function closeWidgets() {
  * @param {string} name - The name of the widget to be closed.
  * @returns {void}
  */
-let closeBlkWidgets = (name) => {
+let closeBlkWidgets = name => {
     const widgetTitle = document.getElementsByClassName("wftTitle");
     for (let i = 0; i < widgetTitle.length; i++) {
         if (widgetTitle[i].innerHTML === name) {
             window.widgetWindows.hideWindow(widgetTitle[i].innerHTML);
             break;
+        }
+    }
+};
+
+/**
+ * Safely resolves a dot-notation string path to an object property globally.
+ * Tries safe resolution first, falls back to eval if needed for nested class properties.
+ * @param {string} path - The dot-notation path (e.g., "MyClass.Model").
+ * @returns {Object|undefined} The resolved object or undefined.
+ */
+const resolveObject = path => {
+    if (!path || typeof path !== "string") return undefined;
+
+    // Support both browser and Node.js environments
+    const globalObj = typeof window !== "undefined" ? window : global;
+
+    try {
+        const result = path.split(".").reduce((obj, prop) => {
+            if (obj === null || obj === undefined) {
+                return undefined;
+            }
+            return obj[prop];
+        }, globalObj);
+
+        // If reduction succeeded but result is undefined, try eval as fallback
+        // This handles cases where nested class properties aren't enumerable
+        if (result === undefined) {
+            try {
+                // eslint-disable-next-line no-eval
+                return eval(path);
+            } catch (evalError) {
+                return undefined;
+            }
+        }
+
+        return result;
+    } catch (e) {
+        // Last resort: try eval
+        try {
+            // eslint-disable-next-line no-eval
+            return eval(path);
+        } catch (evalError) {
+            // eslint-disable-next-line no-console
+            console.warn("Failed to resolve object path: " + path, e);
+            return undefined;
         }
     }
 };
@@ -1553,7 +1649,6 @@ let closeBlkWidgets = (name) => {
  * @returns {void}
  */
 let importMembers = (obj, className, modelArgs, viewArgs) => {
-
     /**
      * Adds methods and variables of one class to another class's instance.
      *
@@ -1574,7 +1669,6 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
         } else {
             obj.added = new ctype(...args);
         }
-
 
         // Loop for all method names of class type
         for (const name of Object.getOwnPropertyNames(ctype.prototype)) {
@@ -1601,15 +1695,15 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
     const cname = obj.constructor.name; // class name of component object
 
     if (className !== "" && className !== undefined) {
-        addMembers(obj, eval(className));
+        addMembers(obj, resolveObject(className));
         return;
     }
 
     // Add members of Model (class type has to be controller's name + "Model")
-    addMembers(obj, eval(cname + "." + cname + "Model"), modelArgs);
+    addMembers(obj, resolveObject(cname + "." + cname + "Model"), modelArgs);
 
     // Add members of View (class type has to be controller's name + "View")
-    addMembers(obj, eval(cname + "." + cname + "View"), viewArgs);
+    addMembers(obj, resolveObject(cname + "." + cname + "View"), viewArgs);
 };
 
 if (typeof module !== "undefined" && module.exports) {

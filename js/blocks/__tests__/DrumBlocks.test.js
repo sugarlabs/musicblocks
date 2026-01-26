@@ -22,16 +22,16 @@
 
 const { setupDrumBlocks } = require("../DrumBlocks");
 
-global._ = jest.fn((str) => str);
-global.last = jest.fn((arr) => arr[arr.length - 1]);
+global._ = jest.fn(str => str);
+global.last = jest.fn(arr => arr[arr.length - 1]);
 global.Singer = {
     DrumActions: {
         playNoise: jest.fn(),
         mapPitchToDrum: jest.fn(),
         setDrum: jest.fn(),
-        GetDrumname: jest.fn((name) => name),
-        playDrum: jest.fn(),
-    },
+        GetDrumname: jest.fn(name => name),
+        playDrum: jest.fn()
+    }
 };
 global.FlowBlock = jest.fn().mockImplementation((name, displayName) => ({
     name,
@@ -42,27 +42,27 @@ global.FlowBlock = jest.fn().mockImplementation((name, displayName) => ({
     makeMacro: jest.fn().mockReturnThis(),
     setup: jest.fn().mockReturnThis(),
     beginnerBlock: jest.fn().mockReturnThis(),
-    flow: jest.fn(),
+    flow: jest.fn()
 }));
 global.ValueBlock = jest.fn().mockImplementation((name, displayName) => ({
-    ...new global.FlowBlock(name, displayName),
+    ...new global.FlowBlock(name, displayName)
 }));
-global.FlowClampBlock = jest.fn().mockImplementation((name) => ({
-    ...new global.FlowBlock(name),
+global.FlowClampBlock = jest.fn().mockImplementation(name => ({
+    ...new global.FlowBlock(name)
 }));
 global.DEFAULTDRUM = "defaultDrum";
 global.DEFAULTEFFECT = "defaultEffect";
 global.NOINPUTERRORMSG = "No input error message";
 global.DEFAULTNOISE = "defaultNoise";
 global.mock = jest.fn(() => ({
-    setupDrumBlocks: jest.fn((activity) => {
+    setupDrumBlocks: jest.fn(activity => {
         const playNoiseBlock = new global.FlowBlock("playnoise", "noise");
         playNoiseBlock.setPalette("drum", activity);
         playNoiseBlock.setHelpString();
         playNoiseBlock.formBlock({
             args: 1,
             defaults: ["white noise"],
-            argTypes: ["anyin"],
+            argTypes: ["anyin"]
         });
         playNoiseBlock.makeMacro();
 
@@ -72,7 +72,7 @@ global.mock = jest.fn(() => ({
         mapDrumBlock.formBlock({
             name: "map pitch to drum",
             args: 1,
-            argTypes: ["anyin"],
+            argTypes: ["anyin"]
         });
         mapDrumBlock.makeMacro();
 
@@ -83,7 +83,7 @@ global.mock = jest.fn(() => ({
         setDrumBlock.formBlock({
             name: "set drum",
             args: 1,
-            argTypes: ["anyin"],
+            argTypes: ["anyin"]
         });
         setDrumBlock.makeMacro();
 
@@ -99,7 +99,7 @@ global.mock = jest.fn(() => ({
         playDrumBlock.setHelpString();
         playDrumBlock.formBlock({ args: 1, argTypes: ["anyin"] });
         playDrumBlock.makeMacro();
-    }),
+    })
 }));
 
 const activity = {
@@ -111,14 +111,14 @@ const activity = {
                 inNoteBlock: [1],
                 noteBeatValues: { 1: [] },
                 beatFactor: 1,
-                pushedNote: false,
-            },
-        })),
+                pushedNote: false
+            }
+        }))
     },
     blocks: {
-        blockList: {},
+        blockList: {}
     },
-    beginnerMode: false,
+    beginnerMode: false
 };
 
 class MapDrumBlock {
@@ -226,11 +226,11 @@ describe("setupDrumBlocks", () => {
                 mapPitchToDrum: jest.fn(),
                 setDrum: jest.fn(),
                 playDrum: jest.fn(),
-                GetDrumname: jest.fn((name) => name)
+                GetDrumname: jest.fn(name => name)
             }
         };
-        global._ = jest.fn((str) => str);
-        global.last = jest.fn((arr) => arr[arr.length - 1]);
+        global._ = jest.fn(str => str);
+        global.last = jest.fn(arr => arr[arr.length - 1]);
         global.DEFAULTDRUM = "kick";
         global.DEFAULTEFFECT = "clap";
         global.NOINPUTERRORMSG = "No input provided";
@@ -253,7 +253,7 @@ describe("setupDrumBlocks", () => {
     it("should call errorMsg when flow args are invalid in PlayNoiseBlock", () => {
         setupDrumBlocks(activity);
         const playNoiseBlock = new (class extends global.FlowBlock {
-            flow = (args) => {
+            flow = args => {
                 const arg = args[0];
                 if (args.length !== 1 || arg == null || typeof arg !== "string") {
                     activity.errorMsg(global.NOINPUTERRORMSG, 0);
@@ -268,7 +268,7 @@ describe("setupDrumBlocks", () => {
     it("should call playNoise when flow args are valid in PlayNoiseBlock", () => {
         setupDrumBlocks(activity);
         const playNoiseBlock = new (class extends global.FlowBlock {
-            flow = (args) => {
+            flow = args => {
                 global.Singer.DrumActions.playNoise(args[0], 0, 0);
             };
         })();
@@ -280,7 +280,7 @@ describe("setupDrumBlocks", () => {
     it("should map pitch to drum in MapDrumBlock", () => {
         setupDrumBlocks(activity);
         const mapDrumBlock = new (class extends global.FlowClampBlock {
-            flow = (args) => {
+            flow = args => {
                 global.Singer.DrumActions.mapPitchToDrum(args[0], 0, 0);
                 return [undefined, 1];
             };
@@ -294,7 +294,7 @@ describe("setupDrumBlocks", () => {
     it("should set drum in SetDrumBlock", () => {
         setupDrumBlocks(activity);
         const setDrumBlock = new (class extends global.FlowClampBlock {
-            flow = (args) => {
+            flow = args => {
                 global.Singer.DrumActions.setDrum(args[0], 0, 0);
                 return [undefined, 1];
             };
@@ -308,7 +308,7 @@ describe("setupDrumBlocks", () => {
     it("should play drum in PlayDrumBlock", () => {
         setupDrumBlocks(activity);
         const playDrumBlock = new (class extends global.FlowBlock {
-            flow = (args) => {
+            flow = args => {
                 global.Singer.DrumActions.playDrum(args[0], 0, 0);
             };
         })();
@@ -320,7 +320,7 @@ describe("setupDrumBlocks", () => {
     it("should handle context errors in PlayDrumBlock", () => {
         setupDrumBlocks(activity);
         const playDrumBlock = new (class extends global.FlowBlock {
-            flow = (args) => {
+            flow = args => {
                 if (args.length !== 1 || args[0] == null) {
                     console.debug("PLAY DRUM ERROR: missing context");
                 }
@@ -336,7 +336,7 @@ describe("setupDrumBlocks", () => {
         global.logo.inPitchDrumMatrix = true;
         setupDrumBlocks(activity);
         const playDrumBlock = new (class extends global.FlowBlock {
-            flow = (args) => {
+            flow = args => {
                 let arg = args[0];
                 if (args.length !== 1 || arg == null || typeof arg !== "string") {
                     activity.errorMsg(global.NOINPUTERRORMSG, 0);
@@ -361,7 +361,7 @@ describe("setupDrumBlocks", () => {
         global.logo.inMatrix = true;
         setupDrumBlocks(activity);
         const playDrumBlock = new (class extends global.FlowBlock {
-            flow = (args) => {
+            flow = args => {
                 let arg = args[0];
                 if (args.length !== 1 || arg == null || typeof arg !== "string") {
                     activity.errorMsg(global.NOINPUTERRORMSG, 0);
@@ -388,7 +388,7 @@ describe("setupDrumBlocks", () => {
         global.logo.inMusicKeyboard = true;
         setupDrumBlocks(activity);
         const playDrumBlock = new (class extends global.FlowBlock {
-            flow = (args) => {
+            flow = args => {
                 let arg = args[0];
                 if (args.length !== 1 || arg == null || typeof arg !== "string") {
                     activity.errorMsg(global.NOINPUTERRORMSG, 0);
@@ -425,7 +425,7 @@ describe("setupDrumBlocks", () => {
         }));
         setupDrumBlocks(activity);
         const playDrumBlock = new (class extends global.FlowBlock {
-            flow = (args) => {
+            flow = args => {
                 let arg = args[0];
                 if (args.length !== 1 || arg == null || typeof arg !== "string") {
                     activity.errorMsg(global.NOINPUTERRORMSG, 0);

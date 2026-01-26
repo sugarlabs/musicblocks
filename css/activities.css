@@ -1182,7 +1182,6 @@ table {
   overflow-x: hidden;
   overflow-y: auto;
   width: 350px;
-  background: #e8e8e8 !important;
   padding: 1rem 1rem 0 0;
   display: flex;
   flex-direction: column;
@@ -1930,6 +1929,7 @@ table {
 #errorText {
   border: 2px solid red;
   background-color: pink;
+  color: #000000;
 }
 
 .contentWrapper {
@@ -2084,3 +2084,63 @@ table {
 .lego-size-1 { width: 20px; height: 10px; }
 .lego-size-2 { width: 40px; height: 10px; }
 /* ... more sizes ... */
+/* ======================================================
+   FIX: Responsive Tour Arrows (Mobile vs Desktop)
+   This overrides the static positions set earlier in the file.
+   ====================================================== */
+
+#left-arrow,
+#right-arrow {
+    /* 1. Center Vertically */
+    top: 50% !important; 
+    transform: translateY(-50%);
+    
+    /* 2. Ensure visibility */
+    z-index: 2000;
+    position: absolute;
+}
+
+/* --- Mobile / Default View --- */
+#left-arrow {
+    left: 10px !important;
+}
+
+#right-arrow {
+    left: auto !important;  /* Unset the old fixed pixel value */
+    right: 10px !important; /* Stick to the right edge */
+}
+
+/* --- Desktop View (Screens wider than 900px) --- */
+@media screen and (min-width: 900px) {
+    #left-arrow {
+        left: 20px !important; /* More space from the edge on desktop */
+    }
+    
+    #right-arrow {
+        right: 20px !important;
+    }
+}
+/* ======================================================
+   FIX: Center the Welcome Modal on Mobile
+   ====================================================== */
+@media screen and (max-width: 600px) {
+    #helpDiv {
+        /* 1. Fit the screen width */
+        width: 90% !important;
+        
+        /* 2. Center Horizontally */
+        left: 50% !important;
+        transform: translateX(-50%); /* Moves it back by half its width to center it */
+        
+        /* 3. Reset Top position if needed */
+        top: 15% !important;
+    }
+
+    /* Fix the inner text box width so it doesn't overflow */
+    #helpBodyDiv {
+        width: 100% !important;
+        left: 0 !important;
+        padding: 0 10px;
+        box-sizing: border-box; 
+    }
+}

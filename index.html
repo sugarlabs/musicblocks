@@ -40,7 +40,7 @@
     <script src="lib/reqwest.js" defer></script>
 
     <!-- <script src="lib/jquery-3.7.1.js"></script> -->
-    <script src="lib/jquery-2.1.4.min.js" defer></script>
+    <script src="lib/jquery-2.1.4.min.js"></script>
     <script src="lib/jquery-ui.js" defer></script>
     <script src="lib/materialize.min.js" defer></script>
     <script src="lib/webL10n.js" defer></script>
@@ -58,12 +58,12 @@
     <!-- libgif.js (SuperGif) provides low-level GIF frame extraction.
      Browsers expose only the first frame of a GIF; SuperGif lets us
      step through frames so animated GIFs can be drawn onto our canvas. -->
-    <script src="https://cdn.jsdelivr.net/gh/buzzfeed/libgif-js/libgif.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/buzzfeed/libgif-js/libgif.js" defer></script>
 
     <!-- gif-animator.js integrates SuperGif with Music Blocks. It manages
      decoding and drawing GIF frames onto the turtle's overlay canvas.
      Canvas refreshing is handled separately by CreateJS Ticker. -->
-    <script src="js/gif-animator.js"></script>
+    <script src="js/gif-animator.js" defer></script>
     <script defer>
         document.addEventListener("DOMContentLoaded", function () {
             if (window.hljs) hljs.highlightAll();
@@ -84,9 +84,11 @@
     <script src="lib/tweenjs.min.js" defer></script>
     <script>
         let ast2blocklist_config;
-        fetch("js/js-export/ast2blocks.min.json")
-            .then(response => response.json())
-            .then(data => { ast2blocklist_config = data })
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("js/js-export/ast2blocks.min.json")
+                .then(response => response.json())
+                .then(data => { ast2blocklist_config = data });
+        });
     </script>
 </head>
 
@@ -99,7 +101,7 @@
         <div id="loading-image-container"
             style="position: fixed; top: 0; left: 0; width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #FFFFFF; z-index: 9999; contain: paint;">
             <div id="loading-media" style="width: 100%; padding: 0 20px; box-sizing: border-box;"></div>
-            <div class="loading-text" id="loadingText" style="margin-top: 2rem; min-height: 1.5em; font-size: 1.2rem;">
+            <div class="loading-text" id="loadingText" style="color:#333; margin-top: 2rem; min-height: 1.5em; font-size: 1.2rem;">
             </div>
             <a href="https://www.sugarlabs.org/" target="_blank" id="link-to-sugarLabs"
                 style="position: fixed; bottom: 20px; right: 20px;">
@@ -224,10 +226,10 @@
                 <div id="helpElem" tabindex="-1"></div>
 
                 <div id="wheelDiv" class="wheelNav"
-                    style="background-size: contain;background-image: url(./images/gray.svg)" tabindex="-1"></div>
+                    style=" display: none; background-size: contain;background-image: url(./images/gray.svg)" tabindex="-1"></div>
 
                 <div id="wheelDiv2" class="wheelNav"
-                    style="background-size: contain;background-image: url(./images/gray.svg);visibility: hidden"
+                    style="display: none; background-size: contain;background-image: url(./images/gray.svg);visibility: hidden"
                     tabindex="-1">
                 </div>
 
@@ -320,7 +322,7 @@
                             </a>
                             </li>
                             <li>
-                                <a id="newFile" class="tooltipped dropdown-trigger" data-position="left"
+                                <a id="newFile" class="tooltipped dropdown-trigger" data-position="bottom"
                                 data-activates="newdropdown">
                                 <i class="material-icons md-48">note_add</i>
                             </a>
@@ -331,14 +333,14 @@
                             </a>
                             </li>
                             <li>
-                            <a id="saveButton"  class="tooltipped dropdown-trigger" data-position="left"
+                            <a id="saveButton"  class="tooltipped dropdown-trigger" data-position="bottom"
                                 data-activates="saveddropdownbeg">
                                 <i id="save1" class="material-icons md-48">save_alt</i>
                             </a>
                             </li>
                             <li>
                             <a id="saveButtonAdvanced" style="display: none;"  class="tooltipped dropdown-trigger"
-                                data-position="left" data-activates="saveddropdown">
+                                data-position="bottom" data-activates="saveddropdown">
                                 <i id="save2" class="material-icons md-48">save_alt</i>
                             </a>
                             </li>
@@ -353,7 +355,7 @@
                             </a>
                             </li>
                             <li>
-                            <a id="toggleAuxBtn" class="tooltipped" data-position="left">
+                            <a id="toggleAuxBtn" class="tooltipped" data-position="bottom">
                                 <i id="menu" class="animated-icon material-icons md-48">menu</i>
                             </a>
                             </li>
@@ -400,7 +402,7 @@
                                         data-position="bottom"><i class="material-icons md-48">lock</i></a>
                                 </li>
                                 <li>
-                                    <a id="themeSelectIcon" class="tooltipped dropdown-trigger" data-position="left"
+                                    <a id="themeSelectIcon" class="tooltipped dropdown-trigger" data-position="bottom"
                                         data-activates="themedropdown" data-tooltip="Select Theme"><i
                                             class="material-icons md-48">brightness_7</i></a>
                                 </li>
@@ -413,7 +415,7 @@
                                             class="material-icons md-48">wrap_text</i></a>
                                 </li>
                                 <li>
-                                    <a id="chooseKeyIcon" class="tooltipped" data-position="left"><i
+                                    <a id="chooseKeyIcon" class="tooltipped" data-position="bottom"><i
                                             class="material-icons md-48">music_note</i></a>
                                 </li>
                                 <li>
@@ -439,7 +441,7 @@
                                             class="material-icons md-48">star_border</i></a>
                                 </li>
                                 <li>
-                                    <a id="languageSelectIcon" class="tooltipped dropdown-trigger" data-position="left"
+                                    <a id="languageSelectIcon" class="tooltipped dropdown-trigger" data-position="bottom"
                                         data-activates="languagedropdown" data-tooltip="Select Language"><i
                                             class="material-icons md-48">translate</i></a>
                                 </li>
@@ -543,6 +545,20 @@ document.addEventListener("DOMContentLoaded", init);
         }
     </script>
     <script>
+        let deferredPrompt;
+
+        window.addEventListener("beforeinstallprompt", (event) => {
+            event.preventDefault(); // Prevent automatic browser prompt
+            deferredPrompt = event;
+
+            // Show your install button here
+            const divInstall = document.getElementById("installButton");
+            if (divInstall) {
+                divInstall.classList.remove("hidden");
+            }
+        });
+    </script>
+    <script>
         $(document).ready(function () {
             doSearch();
         });
@@ -584,17 +600,10 @@ document.addEventListener("DOMContentLoaded", init);
                 const texts = [_("Do, Re, Mi, Fa, Sol, La, Ti, Do"), _("Loading Music Blocks..."), _("Reading Music...")];
                 let index = 0;
 
-                const intervalId = setInterval(function () {
+                window.intervalId = setInterval(function () {
                     loadingText.textContent = texts[index];
                     index = (index + 1) % texts.length;
                 }, 1500);
-
-                // Stop changing text and finalize loading after 6 seconds
-                setTimeout(function () {
-                    clearInterval(intervalId);
-                    loadingText.textContent = _("Loading Complete!");
-                    loadingText.style.opacity = 1;
-                }, 6000);
             }, 3000);
         });
 
@@ -820,6 +829,7 @@ document.addEventListener("DOMContentLoaded", init);
 
             window.addEventListener("resize", togglePlayOnlyMode);
         });
+
     </script>
 
 </body>
