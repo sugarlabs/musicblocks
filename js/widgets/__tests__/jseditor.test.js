@@ -37,7 +37,7 @@ global.document = {
     createElement: jest.fn().mockImplementation(createMockElement),
     head: { appendChild: jest.fn() },
     body: { appendChild: jest.fn() },
-    querySelector: jest.fn(),
+    querySelector: jest.fn()
 };
 
 global.window = {
@@ -55,7 +55,7 @@ const mockWidgetWindow = {
     onmaximize: null,
     clear: jest.fn(),
     show: jest.fn(),
-    setPosition: jest.fn(),
+    setPosition: jest.fn()
 };
 
 global.window.widgetWindows = {
@@ -66,13 +66,13 @@ global.docById.mockReturnValue({ height: 500, style: {}, innerText: "", innerHTM
 const JSEditor = require("../jseditor.js"); // Assuming jseditor.js exports the class or sets global. No, it sets window.jsEditor usually?
 // Actually jseditor.js content shows "class JSEditor ..." but doesn't show "module.exports".
 // It ends with: "window.jsEditor = this;" inside constructor? No, inside _setup.
-// And it seems to rely on being loaded as a script. 
+// And it seems to rely on being loaded as a script.
 // If it's not a module, simple requiring it might not return the class if it doesn't assign to module.exports.
 // However, the file content shows "class JSEditor". If it is not exported, we can't import it in Node test.
-// We might need to eval it or rely on it setting a global if we require it. 
+// We might need to eval it or rely on it setting a global if we require it.
 // Let's assume standard behavior for this codebase. PitchSlider uses `require("../pitchslider.js")`.
 // This implies `pitchslider.js` has `module.exports`.
-// I'll assume `jseditor.js` also has `module.exports = JSEditor;` at the end (not shown in my view_file output). 
+// I'll assume `jseditor.js` also has `module.exports = JSEditor;` at the end (not shown in my view_file output).
 // Let's verify that.
 
 describe("JSEditor Highlight Compatibility", () => {
