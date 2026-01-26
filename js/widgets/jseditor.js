@@ -550,15 +550,18 @@ class JSEditor {
         this._editor.appendChild(editorconsole);
 
         const highlight = editor => {
-            // Configure highlight.js for JavaScript
-            hljs.configure({
-                languages: ["javascript"]
-            });
+            if (window.hljs) {
+                hljs.configure({
+                    languages: ["javascript"]
+                });
 
-            // Apply highlight.js syntax highlighting for JavaScript
-            hljs.highlightElement(editor);
+                if (typeof hljs.highlightElement === "function") {
+                    hljs.highlightElement(editor);
+                } else if (typeof hljs.highlightBlock === "function") {
+                    hljs.highlightBlock(editor);
+                }
+            }
 
-            // Add error highlighting
             this._highlightErrors(editor);
         };
 
