@@ -6276,7 +6276,31 @@ class Activity {
 
             const that = this;
             $j("#helpfulSearch").autocomplete({
-                source: that.searchSuggestions,
+                source: function (request, response) {
+                    const term = request.term.toLowerCase();
+
+                    // Filter suggestions that contain the search term
+                    const matches = that.searchSuggestions.filter(item =>
+                        item.label.toLowerCase().includes(term)
+                    );
+
+                    // Sort with prefix matches first, then others
+                    matches.sort((a, b) => {
+                        const aLabel = a.label.toLowerCase();
+                        const bLabel = b.label.toLowerCase();
+                        const aStartsWith = aLabel.startsWith(term);
+                        const bStartsWith = bLabel.startsWith(term);
+
+                        // Prefix matches come first
+                        if (aStartsWith && !bStartsWith) return -1;
+                        if (!aStartsWith && bStartsWith) return 1;
+
+                        // Both start with term or both don't - sort alphabetically
+                        return aLabel.localeCompare(bLabel);
+                    });
+
+                    response(matches);
+                },
                 select: (event, ui) => {
                     event.preventDefault();
                     that.helpfulSearchWidget.value = ui.item.label;
