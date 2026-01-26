@@ -87,6 +87,40 @@ const getPieMenuSize = block => {
     return Math.min(canvas.width, canvas.height);
 };
 
+// Helper function to add a clickable overlay for the exit button
+// This ensures clicks are captured even when SVG elements don't receive them
+const addExitButtonOverlay = (exitCallback, containerId = "wheelDiv") => {
+    const overlayId = "exitButtonOverlay" + (containerId === "wheelDiv" ? "" : containerId);
+    let overlay = docById(overlayId);
+    const container = docById(containerId);
+
+    if (!overlay) {
+        overlay = document.createElement("div");
+        overlay.id = overlayId;
+        overlay.style.cssText = `
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 99999;
+            background: transparent;
+        `;
+        container.appendChild(overlay);
+    }
+
+    // Position the overlay at the center of the wheel
+    const wheelSize = parseInt(container.style.width) || 300;
+    overlay.style.left = wheelSize / 2 - 30 + "px";
+    overlay.style.top = wheelSize / 2 - 30 + "px";
+    overlay.style.display = "block";
+
+    overlay.onclick = () => {
+        exitCallback();
+        overlay.style.display = "none";
+    };
+};
+
 // Call the function initially and whenever the window is resized
 setWheelSize();
 window.addEventListener("resize", setWheelSize);
@@ -822,6 +856,11 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             that._octavesWheel.removeWheel();
         }
     };
+
+    // Add overlay to ensure exit button receives clicks
+    addExitButtonOverlay(() => {
+        block._exitWheel.navItems[0].navigateFunction();
+    });
 };
 
 const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, selectedNote) => {
@@ -1149,6 +1188,9 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     }
 
     block._exitWheel.navItems[0].navigateFunction = __exitMenu;
+
+    // Add overlay to ensure exit button receives clicks
+    addExitButtonOverlay(__exitMenu);
 };
 
 const piemenuNthModalPitch = (block, noteValues, note) => {
@@ -1409,6 +1451,11 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
         that._exitWheel.removeWheel();
         that._octavesWheel.removeWheel();
     };
+
+    // Add overlay to ensure exit button receives clicks
+    addExitButtonOverlay(() => {
+        block._exitWheel.navItems[0].navigateFunction();
+    });
 };
 
 const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidental) => {
@@ -1543,6 +1590,9 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
     block._exitWheel.navItems[0].navigateFunction = () => {
         __exitMenu();
     };
+
+    // Add overlay to ensure exit button receives clicks
+    addExitButtonOverlay(__exitMenu);
 };
 
 const piemenuNoteValue = (block, noteValue) => {
@@ -1784,6 +1834,9 @@ const piemenuNoteValue = (block, noteValue) => {
     block._exitWheel.navItems[0].navigateFunction = () => {
         __exitMenu();
     };
+
+    // Add overlay to ensure exit button receives clicks
+    addExitButtonOverlay(__exitMenu);
 };
 
 const piemenuNumber = (block, wheelValues, selectedValue) => {
@@ -1981,6 +2034,10 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     block._exitWheel.navItems[0].navigateFunction = () => {
         __exitMenu();
     };
+
+    // Add overlay to ensure exit button receives clicks
+    addExitButtonOverlay(__exitMenu);
+
     block._exitWheel.navItems[1].navigateFunction = () => {
         const cblk1 = that.connections[0];
         const cblk2 = that.blocks.blockList[cblk1]?.connections[0];
@@ -2254,6 +2311,9 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     block._exitWheel.navItems[0].navigateFunction = () => {
         __exitMenu();
     };
+
+    // Add overlay to ensure exit button receives clicks
+    addExitButtonOverlay(__exitMenu);
 };
 
 const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
@@ -2396,6 +2456,9 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     block._exitWheel.navItems[0].navigateFunction = () => {
         __exitMenu();
     };
+
+    // Add overlay to ensure exit button receives clicks
+    addExitButtonOverlay(__exitMenu);
 };
 
 const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
@@ -2631,6 +2694,9 @@ const piemenuChords = (block, selectedChord) => {
     block._exitWheel.navItems[0].navigateFunction = () => {
         __exitMenu();
     };
+
+    // Add overlay to ensure exit button receives clicks
+    addExitButtonOverlay(__exitMenu);
 };
 
 const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotate) => {
@@ -2809,6 +2875,12 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
     };
+
+    // Add overlay to ensure exit button receives clicks
+    addExitButtonOverlay(() => {
+        that._piemenuExitTime = new Date().getTime();
+        docById("wheelDiv").style.display = "none";
+    });
 };
 
 const piemenuIntervals = (block, selectedInterval) => {
@@ -3034,6 +3106,9 @@ const piemenuIntervals = (block, selectedInterval) => {
     }
 
     block._exitWheel.navItems[0].navigateFunction = __exitMenu;
+
+    // Add overlay to ensure exit button receives clicks
+    addExitButtonOverlay(__exitMenu);
 };
 
 const piemenuModes = (block, selectedMode) => {
@@ -3454,6 +3529,9 @@ const piemenuModes = (block, selectedMode) => {
 
     block._exitWheel.navItems[0].navigateFunction = __exitMenu;
     block._exitWheel.navItems[1].navigateFunction = __prepScale;
+
+    // Add overlay to ensure exit button receives clicks
+    addExitButtonOverlay(__exitMenu);
 };
 
 /*
@@ -3741,6 +3819,9 @@ const piemenuGrid = activity => {
         hidePiemenu(activity);
     };
 
+    // Add overlay to ensure exit button receives clicks (uses different div)
+    addExitButtonOverlay(() => hidePiemenu(activity), "wheelDivptm");
+
     if (docById("helpfulWheelDiv").style.display !== "none") {
         docById("helpfulWheelDiv").style.display = "none";
     }
@@ -3971,6 +4052,9 @@ const piemenuKey = activity => {
     };
 
     exitWheel.navItems[0].navigateFunction = __exitMenu;
+
+    // Add overlay to ensure exit button receives clicks
+    addExitButtonOverlay(__exitMenu);
 
     const __playNote = note => {
         const obj = getNote(
