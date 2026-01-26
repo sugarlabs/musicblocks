@@ -176,6 +176,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         "widgets/musickeyboard",
         "widgets/timbre",
         "widgets/oscilloscope",
+        "widgets/tuner",
         "widgets/sampler",
         "widgets/reflection",
         "widgets/legobricks",
@@ -1900,9 +1901,8 @@ class Activity {
                 // Queue and take first step.
                 if (!this.turtles.running()) {
                     this.logo.runLogoCommands();
-                    document.getElementById(
-                        "stop"
-                    ).style.color = this.toolbar.stopIconColorWhenPlaying;
+                    document.getElementById("stop").style.color =
+                        this.toolbar.stopIconColorWhenPlaying;
                 }
                 this.logo.step();
             } else {
@@ -2221,9 +2221,8 @@ class Activity {
                     i < this.palettes.dict[this.palettes.activePalette].protoList.length;
                     i++
                 ) {
-                    const name = this.palettes.dict[this.palettes.activePalette].protoList[i][
-                        "name"
-                    ];
+                    const name =
+                        this.palettes.dict[this.palettes.activePalette].protoList[i]["name"];
                     if (name in obj["FLOWPLUGINS"]) {
                         // eslint-disable-next-line no-console
                         console.log("deleting " + name);
@@ -3044,6 +3043,103 @@ class Activity {
 
             this.searchWidget.value = "";
             this.update = true;
+        };
+
+        /*
+         * Makes initial "start up" note for a brand new MB project
+         */
+        this.__makeNewNote = (octave, solf) => {
+            const newNote = [
+                [
+                    0,
+                    "newnote",
+                    300 - this.blocksContainer.x,
+                    300 - this.blocksContainer.y,
+                    [null, 1, 4, 8]
+                ],
+                [1, "divide", 0, 0, [0, 2, 3]],
+                [
+                    2,
+                    [
+                        "number",
+                        {
+                            value: 1
+                        }
+                    ],
+                    0,
+                    0,
+                    [1]
+                ],
+                [
+                    3,
+                    [
+                        "number",
+                        {
+                            value: 4
+                        }
+                    ],
+                    0,
+                    0,
+                    [1]
+                ],
+                [4, "vspace", 0, 0, [0, 5]],
+                [5, "pitch", 0, 0, [4, 6, 7, null]],
+                [
+                    6,
+                    [
+                        "solfege",
+                        {
+                            value: solf
+                        }
+                    ],
+                    0,
+                    0,
+                    [5]
+                ],
+                [
+                    7,
+                    [
+                        "number",
+                        {
+                            value: octave
+                        }
+                    ],
+                    0,
+                    0,
+                    [5]
+                ],
+                [8, "hidden", 0, 0, [0, null]]
+            ];
+
+            this.blocks.loadNewBlocks(newNote);
+            if (this.blocks.activeBlock !== null) {
+                // Connect the newly created block to the active block (if
+                // it is a hidden block at the end of a new note block).
+                const bottom = this.blocks.findBottomBlock(this.blocks.activeBlock);
+                if (
+                    this.blocks.blockList[bottom].name === "hidden" &&
+                    this.blocks.blockList[this.blocks.blockList[bottom].connections[0]].name ===
+                        "newnote"
+                ) {
+                    // The note block macro creates nine blocks.
+                    const newlyCreatedBlock = this.blocks.blockList.length - 9;
+
+                    // Set last connection of active block to the
+                    // newly created block.
+                    const lastConnection = this.blocks.blockList[bottom].connections.length - 1;
+                    this.blocks.blockList[bottom].connections[lastConnection] = newlyCreatedBlock;
+
+                    // Set first connection of the newly created block to
+                    // the active block.
+                    this.blocks.blockList[newlyCreatedBlock].connections[0] = bottom;
+                    // Adjust the dock positions to realign the stack.
+                    this.blocks.adjustDocks(bottom, true);
+                }
+            }
+
+            // Set new hidden block at the end of the newly created
+            // note block to the active block.
+            this.blocks.activeBlock = this.blocks.blockList.length - 1;
         };
 
         //To create a sampler widget
@@ -4937,9 +5033,8 @@ class Activity {
                             }
                         }
                         staffBlocksMap[staffIndex].baseBlocks[0][0][firstnammedo][4][0] = blockId;
-                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
-                            endnammedo
-                        ][4][1] = null;
+                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][endnammedo][4][1] =
+                            null;
 
                         blockId += 2;
                     } else {
@@ -5007,9 +5102,8 @@ class Activity {
                                 prevnameddo
                             ][4][1] = blockId;
                         } else {
-                            staffBlocksMap[staffIndex].repeatBlock[
-                                prevrepeatnameddo
-                            ][4][3] = blockId;
+                            staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3] =
+                                blockId;
                         }
                         if (afternamedo !== -1) {
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
@@ -5859,8 +5953,8 @@ class Activity {
                                 let customName = "custom";
                                 if (myBlock.connections[1] !== null) {
                                     // eslint-disable-next-line max-len
-                                    customName = this.blocks.blockList[myBlock.connections[1]]
-                                        .value;
+                                    customName =
+                                        this.blocks.blockList[myBlock.connections[1]].value;
                                 }
                                 // eslint-disable-next-line no-console
                                 console.log(customName);
