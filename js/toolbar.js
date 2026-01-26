@@ -403,7 +403,7 @@ class Toolbar {
             }
         }
 
-        var tempClick = (playIcon.onclick = () => {
+        const tempClick = (playIcon.onclick = () => {
             const hideMsgs = () => {
                 this.activity.hideMsgs();
             };
