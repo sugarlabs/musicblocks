@@ -53,6 +53,8 @@ class JSEditor {
         this._code = null;
         /** actual code backup up when help is shown */
         this._codeBck = null;
+        /** flag to track if hljs retry is scheduled */
+        this._hljsRetryScheduled = false;
 
         // setup editor window styles
         this._currentStyle = 0;
@@ -327,12 +329,10 @@ class JSEditor {
                 tooltip.style.whiteSpace = "nowrap";
                 tooltip.textContent = tooltipText;
 
-                tooltip.style.top = `${
-                    rect.bottom + window.scrollY + (positionOfTooltip !== "bottom" ? -30 : 20)
-                }px`;
-                tooltip.style.left = `${
-                    rect.left + window.scrollX + (positionOfTooltip !== "bottom" ? -135 : 0)
-                }px`;
+                tooltip.style.top = `${rect.bottom + window.scrollY + (positionOfTooltip !== "bottom" ? -30 : 20)
+                    }px`;
+                tooltip.style.left = `${rect.left + window.scrollX + (positionOfTooltip !== "bottom" ? -135 : 0)
+                    }px`;
             });
 
             targetButton.addEventListener("mouseout", () => {
@@ -550,18 +550,41 @@ class JSEditor {
         this._editor.appendChild(editorconsole);
 
         const highlight = editor => {
-            // Check if highlight.js is loaded
-            if (window.hljs && typeof window.hljs.highlightElement === "function") {
-                // Configure highlight.js for JavaScript
-                hljs.configure({
-                    languages: ["javascript"]
-                });
+            // Check if highlight.js is loaded and apply syntax highlighting
+            if (window.hljs) {
+                try {
+                    // Configure highlight.js for JavaScript
+                    hljs.configure({
+                        languages: ["javascript"]
+                    });
 
-                // Apply highlight.js syntax highlighting for JavaScript
-                hljs.highlightElement(editor);
+                    // Try modern API first (v11+), fallback to legacy API (v9-10)
+                    if (typeof hljs.highlightElement === "function") {
+                        hljs.highlightElement(editor);
+                    } else if (typeof hljs.highlightBlock === "function") {
+                        // Legacy API for older highlight.js versions
+                        hljs.highlightBlock(editor);
+                    }
+                } catch (e) {
+                    // Silently handle highlighting errors to prevent editor crashes
+                    console.warn("Syntax highlighting failed:", e);
+                }
+            } else {
+                // If hljs isn't loaded yet, schedule a retry
+                if (!this._hljsRetryScheduled) {
+                    this._hljsRetryScheduled = true;
+                    setTimeout(() => {
+                        this._hljsRetryScheduled = false;
+                        if (this._jar) {
+                            // Force a re-render to apply highlighting once hljs loads
+                            const currentCode = this._jar.toString();
+                            this._jar.updateCode(currentCode);
+                        }
+                    }, 100);
+                }
             }
 
-            // Add error highlighting
+            // Always add error highlighting (works independently of hljs)
             this._highlightErrors(editor);
         };
 
@@ -819,8 +842,7 @@ class JSEditor {
         const currentLine = lines[insertIndex].trim();
         if (!currentLine.endsWith("{") && !currentLine.endsWith(";")) {
             JSEditor.logConsole(
-                `Cannot add breakpoint to line ${
-                    lineNumber + 1
+                `Cannot add breakpoint to line ${lineNumber + 1
                 }. Breakpoints can only be added after lines ending with '{' or ';'`,
                 "red"
             );
@@ -833,8 +855,7 @@ class JSEditor {
             (lines[insertIndex + 1] && lines[insertIndex + 1].trim() === "debugger;")
         ) {
             JSEditor.logConsole(
-                `Cannot add breakpoint to line ${
-                    lineNumber + 1
+                `Cannot add breakpoint to line ${lineNumber + 1
                 } because there is already a breakpoint on an adjacent line.`,
                 "red"
             );
