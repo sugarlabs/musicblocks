@@ -568,7 +568,13 @@ function toTitleCase (str) {
     if (str.length > 1) tempStr = str.substring(1);
     return str.toUpperCase()[0] + tempStr;
 };
-window.toTitleCase = toTitleCase;
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { toTitleCase };
+}
+
+if (typeof window !== "undefined") {
+    window.toTitleCase = toTitleCase;
 
 
 /**
