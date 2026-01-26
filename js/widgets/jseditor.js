@@ -53,8 +53,6 @@ class JSEditor {
         this._code = null;
         /** actual code backup up when help is shown */
         this._codeBck = null;
-        /** flag to track if hljs retry is scheduled */
-        this._hljsRetryScheduled = false;
 
         // setup editor window styles
         this._currentStyle = 0;
