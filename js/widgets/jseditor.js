@@ -549,6 +549,9 @@ class JSEditor {
         editorconsole.style.cursor = "text";
         this._editor.appendChild(editorconsole);
 
+        let hljsRetryCount = 0;
+        const maxRetries = 10; // Maximum retry attempts
+
         const highlight = editor => {
             // Check if highlight.js is loaded and apply syntax highlighting
             if (window.hljs) {
@@ -565,23 +568,23 @@ class JSEditor {
                         // Legacy API for older highlight.js versions
                         hljs.highlightBlock(editor);
                     }
+                    // Reset retry count on successful highlighting
+                    hljsRetryCount = 0;
                 } catch (e) {
                     // Silently handle highlighting errors to prevent editor crashes
                     console.warn("Syntax highlighting failed:", e);
                 }
-            } else {
-                // If hljs isn't loaded yet, schedule a retry
-                if (!this._hljsRetryScheduled) {
-                    this._hljsRetryScheduled = true;
-                    setTimeout(() => {
-                        this._hljsRetryScheduled = false;
-                        if (this._jar) {
-                            // Force a re-render to apply highlighting once hljs loads
-                            const currentCode = this._jar.toString();
-                            this._jar.updateCode(currentCode);
-                        }
-                    }, 100);
-                }
+            } else if (hljsRetryCount < maxRetries) {
+                // If hljs isn't loaded yet, schedule a retry with exponential backoff
+                hljsRetryCount++;
+                const retryDelay = Math.min(100 * Math.pow(1.5, hljsRetryCount - 1), 1000);
+                setTimeout(() => {
+                    if (this._jar && window.hljs) {
+                        // Force a re-render to apply highlighting once hljs loads
+                        const currentCode = this._jar.toString();
+                        this._jar.updateCode(currentCode);
+                    }
+                }, retryDelay);
             }
 
             // Always add error highlighting (works independently of hljs)
