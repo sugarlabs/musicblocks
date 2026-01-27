@@ -421,12 +421,12 @@ class Toolbar {
                 handleClick();
             }, 2000);
 
-            stopIcon.addEventListener("click", function () {
+            stopIcon.onclick = function () {
                 clearTimeout(play_button_debounce_timeout);
                 isPlayIconRunning = true;
                 hideMsgs();
                 handleClick();
-            });
+            };
         });
     }
 
