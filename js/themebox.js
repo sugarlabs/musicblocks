@@ -263,7 +263,11 @@ class ThemeBox {
         } else {
             // Save preference to localStorage
             this.activity.storage.themePreference = this._theme;
-            localStorage.setItem("themePreference", this._theme);
+            try {
+                localStorage.setItem("themePreference", this._theme);
+            } catch (e) {
+                console.warn("Could not save theme preference:", e);
+            }
 
             // Apply theme instantly instead of reloading
             this.applyThemeInstantly();
