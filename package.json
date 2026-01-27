@@ -25,7 +25,7 @@
     "@babel/core": "^7.28.5",
     "@babel/eslint-parser": "^7.28.5",
     "@babel/preset-env": "^7.28.5",
-    "cypress": "^14.0.2",
+    "cypress": "^15.9.0",
     "electron": "^39.2.7",
     "electron-builder": "^26.0.12",
     "eslint": "^7.6.0",
@@ -63,7 +63,7 @@
     "tone": "^15.1.22"
   },
   "build": {
-    "appId": "com.musicblocks.app", 
+    "appId": "com.musicblocks.app",
     "productName": "Music Blocks",
     "mac": {
       "category": "public.app-category.music",
