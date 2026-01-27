@@ -1929,6 +1929,7 @@ table {
 #errorText {
   border: 2px solid red;
   background-color: pink;
+  color: #000000;
 }
 
 .contentWrapper {
