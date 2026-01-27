@@ -866,7 +866,8 @@ class Activity {
         }
 
         //if any window resize event occurs:
-        this.addEventListener(window, "resize", () => repositionBlocks(this));
+        this._handleRepositionBlocksOnResize = () => repositionBlocks(this);
+        this.addEventListener(window, "resize", this._handleRepositionBlocksOnResize);
 
         /**
          * Finds and organizes blocks within the workspace.
@@ -1899,8 +1900,9 @@ class Activity {
                 // Queue and take first step.
                 if (!this.turtles.running()) {
                     this.logo.runLogoCommands();
-                    document.getElementById("stop").style.color =
-                        this.toolbar.stopIconColorWhenPlaying;
+                    document.getElementById(
+                        "stop"
+                    ).style.color = this.toolbar.stopIconColorWhenPlaying;
                 }
                 this.logo.step();
             } else {
@@ -1968,7 +1970,6 @@ class Activity {
                 activity.save.savePNG.bind(activity.save),
                 activity.save.saveWAV.bind(activity.save),
                 activity.save.saveLilypond.bind(activity.save),
-                activity.save.saveLilypond.bind(afterSaveLilypond),
                 activity.save.afterSaveLilypondLY.bind(activity.save),
                 activity.save.saveAbc.bind(activity.save),
                 activity.save.saveMxml.bind(activity.save),
@@ -2220,8 +2221,9 @@ class Activity {
                     i < this.palettes.dict[this.palettes.activePalette].protoList.length;
                     i++
                 ) {
-                    const name =
-                        this.palettes.dict[this.palettes.activePalette].protoList[i]["name"];
+                    const name = this.palettes.dict[this.palettes.activePalette].protoList[i][
+                        "name"
+                    ];
                     if (name in obj["FLOWPLUGINS"]) {
                         // eslint-disable-next-line no-console
                         console.log("deleting " + name);
@@ -3702,14 +3704,16 @@ class Activity {
         }
 
         let resizeTimeout;
-        this.addEventListener(window, "resize", () => {
+        this._handleWindowResize = () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
                 handleResize();
                 this._setupPaletteMenu();
             }, 100);
-        });
-        this.addEventListener(window, "orientationchange", handleResize);
+        };
+        this.addEventListener(window, "resize", this._handleWindowResize);
+        this._handleOrientationChangeResize = handleResize;
+        this.addEventListener(window, "orientationchange", this._handleOrientationChangeResize);
         const that = this;
         const resizeCanvas_ = () => {
             try {
@@ -3722,7 +3726,12 @@ class Activity {
         };
 
         resizeCanvas_();
-        this.addEventListener(window, "orientationchange", resizeCanvas_);
+        this._handleOrientationChangeResizeCanvas = resizeCanvas_;
+        this.addEventListener(
+            window,
+            "orientationchange",
+            this._handleOrientationChangeResizeCanvas
+        );
 
         /*
          * Restore last stack pushed to trashStack back onto canvas.
@@ -4928,8 +4937,9 @@ class Activity {
                             }
                         }
                         staffBlocksMap[staffIndex].baseBlocks[0][0][firstnammedo][4][0] = blockId;
-                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][endnammedo][4][1] =
-                            null;
+                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
+                            endnammedo
+                        ][4][1] = null;
 
                         blockId += 2;
                     } else {
@@ -4997,8 +5007,9 @@ class Activity {
                                 prevnameddo
                             ][4][1] = blockId;
                         } else {
-                            staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3] =
-                                blockId;
+                            staffBlocksMap[staffIndex].repeatBlock[
+                                prevrepeatnameddo
+                            ][4][3] = blockId;
                         }
                         if (afternamedo !== -1) {
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
@@ -5041,18 +5052,11 @@ class Activity {
         };
 
         /**
-         * Calculate time such that no matter how long it takes to load the program, the loading
-         * animation will cycle at least once.
          * @param loadProject all params are from load project function
          */
         this.loadStartWrapper = async (func, arg1, arg2, arg3) => {
-            const time1 = new Date();
             await func(this, arg1, arg2, arg3);
-
-            const time2 = new Date();
-            const elapsedTime = time2.getTime() - time1.getTime();
-            const timeLeft = Math.max(6000 - elapsedTime);
-            setTimeout(this.showContents, timeLeft);
+            this.showContents();
         };
 
         /*
@@ -5060,13 +5064,19 @@ class Activity {
          * Shows contents of MB after loading screen.
          */
         this.showContents = () => {
-            document.getElementById("loading-image-container").style.display = "none";
-            document.getElementById("bottom-right-logo").style.display = "none";
-            document.getElementById("palette").style.display = "block";
-            // document.getElementById('canvas').style.display = 'none';
-            document.getElementById("hideContents").style.display = "block";
-            document.getElementById("buttoncontainerBOTTOM").style.display = "block";
-            document.getElementById("buttoncontainerTOP").style.display = "block";
+            clearInterval(window.intervalId);
+            document.getElementById("loadingText").textContent = _("Loading Complete!");
+
+            setTimeout(() => {
+                document.getElementById("loadingText").textContent = null;
+                document.getElementById("loading-image-container").style.display = "none";
+                document.getElementById("bottom-right-logo").style.display = "none";
+                document.getElementById("palette").style.display = "block";
+                // document.getElementById('canvas').style.display = 'none';
+                document.getElementById("hideContents").style.display = "block";
+                document.getElementById("buttoncontainerBOTTOM").style.display = "block";
+                document.getElementById("buttoncontainerTOP").style.display = "block";
+            }, 500);
         };
 
         this.justLoadStart = () => {
@@ -5849,8 +5859,8 @@ class Activity {
                                 let customName = "custom";
                                 if (myBlock.connections[1] !== null) {
                                     // eslint-disable-next-line max-len
-                                    customName =
-                                        this.blocks.blockList[myBlock.connections[1]].value;
+                                    customName = this.blocks.blockList[myBlock.connections[1]]
+                                        .value;
                                 }
                                 // eslint-disable-next-line no-console
                                 console.log(customName);
@@ -7681,10 +7691,16 @@ class Activity {
 const activity = new Activity();
 
 require(["domReady!"], doc => {
-    setTimeout(() => {
+    doBrowserCheck();
+    if (jQuery.browser.mozilla) {
+        setTimeout(() => {
+            activity.setupDependencies();
+            activity.domReady(doc);
+        }, 5000);
+    } else {
         activity.setupDependencies();
         activity.domReady(doc);
-    }, 5000);
+    }
 });
 
 define(MYDEFINES, () => {
