@@ -46,6 +46,7 @@
    Activity, LEADING, _THIS_IS_MUSIC_BLOCKS_, _THIS_IS_TURTLE_BLOCKS_,
    globalActivity, hideArrows, doAnalyzeProject
  */
+import { undo, redo } from "./history.js";
 const LEADING = 0;
 const BLOCKSCALES = [1, 1.5, 2, 3, 4];
 const _THIS_IS_MUSIC_BLOCKS_ = true;
@@ -197,6 +198,13 @@ let globalActivity;
  */
 const doAnalyzeProject = function () {
     return analyzeProject(globalActivity);
+};
+
+window.doSearch = function() {
+    if (globalActivity && globalActivity.searchWidget) {
+         globalActivity.searchWidget.style.visibility = "visible";
+         globalActivity.searchWidget.focus();
+    }
 };
 
 /**
@@ -7498,16 +7506,25 @@ class Activity {
             document.addEventListener("DOMMouseScroll", scrollEvent, false);
             */
 
-            const activity = this;
-            document.onkeydown = () => {
-                activity.__keyPressed(event);
-            };
-
-            if (this.planet !== undefined) {
-                this.planet.planet.setAnalyzeProject(doAnalyzeProject);
-            }
-        };
+         const activity = this;
+ window.addEventListener("keydown", (e) => {
+    console.log("GLOBAL key pressed:", e.key);
+    // Undo
+    if (e.ctrlKey && e.key.toLowerCase() === "z") {
+        e.preventDefault();
+        e.stopPropagation();
+        undo();
+        return;
     }
+    // Redo
+    if (e.ctrlKey && (e.key.toLowerCase() === "y")) {
+        e.preventDefault();
+        e.stopPropagation();
+        redo();
+        return;
+    }
+    // keep the rest of the existing logic if any
+}, true);
 
     /**
      * Managed addEventListener that tracks listeners for cleanup.

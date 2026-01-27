@@ -1,3 +1,10 @@
+function toTitleCase(str) {
+    if (!str) return "";
+    return str.replace(
+        /\w\S*/g,
+        txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+    );
+}
 // Copyright (c) 2017 Euan Ong
 //
 // This program is free software; you can redistribute it and/or
@@ -19,7 +26,6 @@
 
    GlobalTag
 */
-
 class GlobalTag {
     /* 
      this.tagNames = [

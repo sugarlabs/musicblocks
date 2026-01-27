@@ -57,9 +57,6 @@ function MusicKeyboard(activity) {
     const WHITEKEYS = [65, 83, 68, 70, 71, 72, 74, 75, 76];
     const SPACE = 32;
 
-    const saveOnKeyDown = document.onkeydown;
-    const saveOnKeyUp = document.onkeyup;
-
     const w = window.innerWidth;
     /**
      * Reference to the activity associated with the keyboard.
@@ -480,8 +477,10 @@ function MusicKeyboard(activity) {
             //event.preventDefault();
         };
 
-        document.onkeydown = __keyboarddown;
-        document.onkeyup = __keyboardup;
+        window.addEventListener("keydown", __keyboarddown, { capture: true });
+        window.addEventListener("keyup", __keyboardup, { capture: true });
+        this.__keyboarddown = __keyboarddown; // store for removal
+        this.__keyboardup = __keyboardup;
     };
 
     /**
@@ -630,8 +629,8 @@ function MusicKeyboard(activity) {
          */
         widgetWindow.onclose = () => {
             let myNode;
-            document.onkeydown = saveOnKeyDown;
-            document.onkeyup = saveOnKeyUp;
+            window.removeEventListener("keydown", this.__keyboarddown, { capture: true });
+            window.removeEventListener("keyup", this.__keyboardup, { capture: true });
 
             if (document.getElementById("keyboardHolder2")) {
                 document.getElementById("keyboardHolder2").style.display = "none";
