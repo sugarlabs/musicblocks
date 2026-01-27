@@ -4123,54 +4123,70 @@ const piemenuDissectNumber = widget => {
     // Show the wheel div
     docById("wheelDiv").style.display = "";
 
-    // Create the number wheel
-    const wheelSize = getPieMenuSize({ blocks: widget.activity.logo.blocks });
-    const numberWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
-    const exitWheel = new wheelnav("_exitWheel", numberWheel.raphael);
+    // Clean up any previous dissect number wheels
+    if (widget._numberWheel) {
+        widget._numberWheel.removeWheel();
+        widget._numberWheel = null;
+    }
+    if (widget._exitWheel) {
+        widget._exitWheel.removeWheel();
+        widget._exitWheel = null;
+    }
+
+    // Create the number wheel - calculate wheel size from canvas or use fixed size
+    let wheelSize;
+    try {
+        const canvas = widget.activity.turtles._canvas;
+        wheelSize = Math.min(canvas.width, canvas.height);
+    } catch (e) {
+        wheelSize = 300; // Fallback to fixed size
+    }
+    widget._numberWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
+    widget._exitWheel = new wheelnav("_exitWheel", widget._numberWheel.raphael);
 
     // Prepare labels with spacer
     const wheelLabels = wheelValues.map(v => v.toString());
     wheelLabels.push(null); // spacer
 
     wheelnav.cssMode = true;
-    numberWheel.keynavigateEnabled = false;
-    numberWheel.colors = platformColor.numberWheelcolors;
-    numberWheel.slicePathFunction = slicePath().DonutSlice;
-    numberWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-    numberWheel.slicePathCustom.minRadiusPercent = 0.2;
-    numberWheel.slicePathCustom.maxRadiusPercent = 0.6;
-    numberWheel.sliceSelectedPathCustom = numberWheel.slicePathCustom;
-    numberWheel.sliceInitPathCustom = numberWheel.slicePathCustom;
-    numberWheel.animatetime = 0;
-    numberWheel.createWheel(wheelLabels);
+    widget._numberWheel.keynavigateEnabled = false;
+    widget._numberWheel.colors = platformColor.numberWheelcolors;
+    widget._numberWheel.slicePathFunction = slicePath().DonutSlice;
+    widget._numberWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+    widget._numberWheel.slicePathCustom.minRadiusPercent = 0.2;
+    widget._numberWheel.slicePathCustom.maxRadiusPercent = 0.6;
+    widget._numberWheel.sliceSelectedPathCustom = widget._numberWheel.slicePathCustom;
+    widget._numberWheel.sliceInitPathCustom = widget._numberWheel.slicePathCustom;
+    widget._numberWheel.animatetime = 0;
+    widget._numberWheel.createWheel(wheelLabels);
 
     // Create exit wheel with close, minus, and plus buttons
-    exitWheel.colors = platformColor.exitWheelcolors2;
-    exitWheel.slicePathFunction = slicePath().DonutSlice;
-    exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-    exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-    exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
-    exitWheel.sliceSelectedPathCustom = exitWheel.slicePathCustom;
-    exitWheel.sliceInitPathCustom = exitWheel.slicePathCustom;
-    exitWheel.clickModeRotate = false;
-    exitWheel.initWheel(["×", "-", "+"]); // Close, minus, plus
-    exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
-    exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
-    exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
-    exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
-    exitWheel.navItems[1].sliceSelectedAttr.cursor = "pointer";
-    exitWheel.navItems[1].sliceHoverAttr.cursor = "pointer";
-    exitWheel.navItems[1].titleSelectedAttr.cursor = "pointer";
-    exitWheel.navItems[1].titleHoverAttr.cursor = "pointer";
-    exitWheel.navItems[2].sliceSelectedAttr.cursor = "pointer";
-    exitWheel.navItems[2].sliceHoverAttr.cursor = "pointer";
-    exitWheel.navItems[2].titleSelectedAttr.cursor = "pointer";
-    exitWheel.navItems[2].titleHoverAttr.cursor = "pointer";
-    exitWheel.createWheel();
+    widget._exitWheel.colors = platformColor.exitWheelcolors2;
+    widget._exitWheel.slicePathFunction = slicePath().DonutSlice;
+    widget._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+    widget._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+    widget._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+    widget._exitWheel.sliceSelectedPathCustom = widget._exitWheel.slicePathCustom;
+    widget._exitWheel.sliceInitPathCustom = widget._exitWheel.slicePathCustom;
+    widget._exitWheel.clickModeRotate = false;
+    widget._exitWheel.initWheel(["×", "-", "+"]); // Close, minus, plus
+    widget._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
+    widget._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
+    widget._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
+    widget._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
+    widget._exitWheel.navItems[1].sliceSelectedAttr.cursor = "pointer";
+    widget._exitWheel.navItems[1].sliceHoverAttr.cursor = "pointer";
+    widget._exitWheel.navItems[1].titleSelectedAttr.cursor = "pointer";
+    widget._exitWheel.navItems[1].titleHoverAttr.cursor = "pointer";
+    widget._exitWheel.navItems[2].sliceSelectedAttr.cursor = "pointer";
+    widget._exitWheel.navItems[2].sliceHoverAttr.cursor = "pointer";
+    widget._exitWheel.navItems[2].titleSelectedAttr.cursor = "pointer";
+    widget._exitWheel.navItems[2].titleHoverAttr.cursor = "pointer";
+    widget._exitWheel.createWheel();
 
     // Handle selection
     const __selectionChanged = () => {
-        const selectedIndex = numberWheel.selectedNavItemIndex;
+        const selectedIndex = widget._numberWheel.selectedNavItemIndex;
         const newValue = wheelValues[selectedIndex];
         widget._dissectNumber.value = newValue;
     };
@@ -4178,8 +4194,8 @@ const piemenuDissectNumber = widget => {
     // Handle exit
     const __exitMenu = () => {
         docById("wheelDiv").style.display = "none";
-        numberWheel.removeWheel();
-        exitWheel.removeWheel();
+        widget._numberWheel.removeWheel();
+        widget._exitWheel.removeWheel();
     };
 
     // Get button position for positioning the pie menu
@@ -4203,24 +4219,30 @@ const piemenuDissectNumber = widget => {
     // Navigate to current value
     const currentIndex = wheelValues.indexOf(currentValue);
     if (currentIndex !== -1) {
-        numberWheel.navigateWheel(currentIndex);
+        widget._numberWheel.navigateWheel(currentIndex);
     }
+
+    // Flag to prevent menu close when using +/- buttons
+    let isAdjusting = false;
 
     // Set up click handlers for number selections
     for (let i = 0; i < wheelValues.length; i++) {
-        numberWheel.navItems[i].navigateFunction = () => {
+        widget._numberWheel.navItems[i].navigateFunction = () => {
             __selectionChanged();
-            __exitMenu();
+            // Only exit if not adjusting via +/- buttons
+            if (!isAdjusting) {
+                __exitMenu();
+            }
         };
     }
 
     // Set up exit button (×)
-    exitWheel.navItems[0].navigateFunction = () => {
+    widget._exitWheel.navItems[0].navigateFunction = () => {
         __exitMenu();
     };
 
     // Set up decrement button (-)
-    exitWheel.navItems[1].navigateFunction = () => {
+    widget._exitWheel.navItems[1].navigateFunction = () => {
         const currentVal = parseInt(widget._dissectNumber.value);
         const currentIdx = wheelValues.indexOf(currentVal);
 
@@ -4228,11 +4250,15 @@ const piemenuDissectNumber = widget => {
         if (currentIdx > 0) {
             const newValue = wheelValues[currentIdx - 1];
             widget._dissectNumber.value = newValue;
+            // Set flag to prevent menu close, then navigate wheel
+            isAdjusting = true;
+            widget._numberWheel.navigateWheel(currentIdx - 1);
+            isAdjusting = false;
         }
     };
 
     // Set up increment button (+)
-    exitWheel.navItems[2].navigateFunction = () => {
+    widget._exitWheel.navItems[2].navigateFunction = () => {
         const currentVal = parseInt(widget._dissectNumber.value);
         const currentIdx = wheelValues.indexOf(currentVal);
 
@@ -4240,6 +4266,10 @@ const piemenuDissectNumber = widget => {
         if (currentIdx < wheelValues.length - 1) {
             const newValue = wheelValues[currentIdx + 1];
             widget._dissectNumber.value = newValue;
+            // Set flag to prevent menu close, then navigate wheel
+            isAdjusting = true;
+            widget._numberWheel.navigateWheel(currentIdx + 1);
+            isAdjusting = false;
         }
     };
 };
