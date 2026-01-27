@@ -326,7 +326,7 @@ class Toolbar {
             const elem = docById(obj[0]);
             if (strings[i].length === 3) {
                 if (elem !== undefined && elem !== null) {
-                    elem.textContent = obj[1];   // safe now
+                    elem.textContent = obj[1];   
                 }
             } else {
                 if (elem !== undefined && elem !== null) {
