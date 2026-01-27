@@ -810,7 +810,7 @@ class Toolbar {
         if (modeBtn && modeMenu && modeText) {
             // Load saved preference
             const savedMode = localStorage.getItem("musicBlocksRecordMode") || "screen";
-            modeText.textContent = savedMode === "canvas" ? "Canvas Only" : "Screen with Tools";
+            modeText.textContent = savedMode === "canvas" ? "Record Only Canvas" : "Record With Menus";
             
             // Update selected option styling
             modeOptions.forEach(option => {
