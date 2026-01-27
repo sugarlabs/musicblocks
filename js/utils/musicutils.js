@@ -4280,10 +4280,10 @@ function getNote(
                     // eslint-disable-next-line no-console
                     console.debug(
                         "WARNING: Key " +
-                            myKeySignature +
-                            " not found in " +
-                            thisScale +
-                            ". Using default of C"
+                        myKeySignature +
+                        " not found in " +
+                        thisScale +
+                        ". Using default of C"
                     );
                     offset = 0;
                     thisScale = NOTESSHARP;

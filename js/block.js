@@ -3023,10 +3023,10 @@ class Block {
                 setTimeout(() => {
                     moved =
                         Math.abs(event.stageX / that.activity.getStageScale() - that.original.x) +
-                            Math.abs(
-                                event.stageY / that.activity.getStageScale() - that.original.y
-                            ) >
-                            20 && !window.hasMouse;
+                        Math.abs(
+                            event.stageY / that.activity.getStageScale() - that.original.y
+                        ) >
+                        20 && !window.hasMouse;
                     getInput = !moved;
                 }, 200);
             }

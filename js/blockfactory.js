@@ -1121,10 +1121,10 @@ class SVG {
         let svg = this._startBoolean(
             this._strokeWidth / 2.0,
             this._radius * 5.5 +
-                this._strokeWidth / 2.0 +
-                this._innieY2 +
-                this._inniesSpacer +
-                this._expandY
+            this._strokeWidth / 2.0 +
+            this._innieY2 +
+            this._inniesSpacer +
+            this._expandY
         );
         svg += this._rLineTo(
             0,

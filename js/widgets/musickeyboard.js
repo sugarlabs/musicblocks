@@ -2371,7 +2371,7 @@ function MusicKeyboard(activity) {
         index = parseInt(index);
         if (
             this.activity.blocks.blockList[
-                this.layout[this.layout.length - index - 1].blockNumber
+            this.layout[this.layout.length - index - 1].blockNumber
             ] === undefined
         ) {
             return;
@@ -2779,10 +2779,10 @@ function MusicKeyboard(activity) {
                 newel2.setAttribute(
                     "alt",
                     this.displayLayout[p].noteName +
-                        "__" +
-                        this.displayLayout[p].noteOctave +
-                        "__" +
-                        this.displayLayout[p].blockNumber
+                    "__" +
+                    this.displayLayout[p].noteOctave +
+                    "__" +
+                    this.displayLayout[p].blockNumber
                 );
                 this.idContainer.push([
                     "blackRow" + myrow2Id.toString(),
@@ -2806,20 +2806,19 @@ function MusicKeyboard(activity) {
                 newel.setAttribute(
                     "alt",
                     this.displayLayout[p].noteName +
-                        "__" +
-                        this.displayLayout[p].voice +
-                        "__" +
-                        this.displayLayout[p].blockNumber
+                    "__" +
+                    this.displayLayout[p].voice +
+                    "__" +
+                    this.displayLayout[p].blockNumber
                 );
                 this.idContainer.push([
                     "whiteRow" + myrowId.toString(),
                     this.displayLayout[p].blockNumber
                 ]);
-                newel.innerHTML = `${
-                    myrowId < WHITEKEYS.length
+                newel.innerHTML = `${myrowId < WHITEKEYS.length
                         ? `<small>(${String.fromCharCode(WHITEKEYS[myrowId])})</small><br/>`
                         : ""
-                }${this.displayLayout[p].voice}`;
+                    }${this.displayLayout[p].voice}`;
 
                 this.displayLayout[p].objId = "whiteRow" + myrowId.toString();
 
@@ -2835,20 +2834,19 @@ function MusicKeyboard(activity) {
                 newel.setAttribute(
                     "alt",
                     this.displayLayout[p].noteName +
-                        "__" +
-                        this.displayLayout[p].noteOctave +
-                        "__" +
-                        this.displayLayout[p].blockNumber
+                    "__" +
+                    this.displayLayout[p].noteOctave +
+                    "__" +
+                    this.displayLayout[p].blockNumber
                 );
                 this.idContainer.push([
                     "hertzRow" + myrow3Id.toString(),
                     this.displayLayout[p].blockNumber
                 ]);
-                newel.innerHTML = `${
-                    myrow3Id < HERTZKEYS.length
+                newel.innerHTML = `${myrow3Id < HERTZKEYS.length
                         ? "<small>(${String.fromCharCode(HERTZKEYS[myrow3Id])})</small><br/>"
                         : ""
-                }${this.displayLayout[p].noteOctave}`;
+                    }${this.displayLayout[p].noteOctave}`;
 
                 this.displayLayout[p].objId = "hertzRow" + myrow3Id.toString();
 
@@ -2883,10 +2881,10 @@ function MusicKeyboard(activity) {
                 newel2.setAttribute(
                     "alt",
                     this.displayLayout[p].noteName +
-                        "__" +
-                        this.displayLayout[p].noteOctave +
-                        "__" +
-                        this.displayLayout[p].blockNumber
+                    "__" +
+                    this.displayLayout[p].noteOctave +
+                    "__" +
+                    this.displayLayout[p].blockNumber
                 );
                 this.idContainer.push([
                     "blackRow" + myrow2Id.toString(),
@@ -2942,10 +2940,10 @@ function MusicKeyboard(activity) {
                 newel2.setAttribute(
                     "alt",
                     this.displayLayout[p].noteName +
-                        "__" +
-                        this.displayLayout[p].noteOctave +
-                        "__" +
-                        this.displayLayout[p].blockNumber
+                    "__" +
+                    this.displayLayout[p].noteOctave +
+                    "__" +
+                    this.displayLayout[p].blockNumber
                 );
                 this.idContainer.push([
                     "blackRow" + myrow2Id.toString(),
@@ -2956,15 +2954,13 @@ function MusicKeyboard(activity) {
                     if (SOLFEGENAMES.includes(nname)) {
                         newel2.innerHTML = `<small>(${String.fromCharCode(
                             BLACKKEYS[myrow2Id]
-                        )})</small><br/>${i18nSolfege(nname)}${FLAT}${
-                            this.displayLayout[p].noteOctave
-                        }`;
+                        )})</small><br/>${i18nSolfege(nname)}${FLAT}${this.displayLayout[p].noteOctave
+                            }`;
                     } else {
                         newel2.innerHTML = `<small>(${String.fromCharCode(
                             BLACKKEYS[myrow2Id]
-                        )})</small><br/>${this.displayLayout[p].noteName}${
-                            this.displayLayout[p].noteOctave
-                        }`;
+                        )})</small><br/>${this.displayLayout[p].noteName}${this.displayLayout[p].noteOctave
+                            }`;
                     }
                 }
                 if (p < this.layout.length) {
@@ -2986,10 +2982,10 @@ function MusicKeyboard(activity) {
                 newel.setAttribute(
                     "alt",
                     this.displayLayout[p].noteName +
-                        "__" +
-                        this.displayLayout[p].noteOctave +
-                        "__" +
-                        this.displayLayout[p].blockNumber
+                    "__" +
+                    this.displayLayout[p].noteOctave +
+                    "__" +
+                    this.displayLayout[p].blockNumber
                 );
                 this.idContainer.push([
                     "whiteRow" + myrowId.toString(),
@@ -2998,19 +2994,16 @@ function MusicKeyboard(activity) {
 
                 if (this.displayLayout[p].blockNumber <= FAKEBLOCKNUMBER) {
                     if (SOLFEGENAMES.includes(this.displayLayout[p].noteName)) {
-                        newel.innerHTML = `${
-                            myrowId < WHITEKEYS.length
+                        newel.innerHTML = `${myrowId < WHITEKEYS.length
                                 ? `<small>(${String.fromCharCode(WHITEKEYS[myrowId])})</small><br/>`
                                 : ""
-                        }${i18nSolfege(this.displayLayout[p].noteName)}${
-                            this.displayLayout[p].noteOctave
-                        }`;
+                            }${i18nSolfege(this.displayLayout[p].noteName)}${this.displayLayout[p].noteOctave
+                            }`;
                     } else {
-                        newel.innerHTML = `${
-                            myrowId < WHITEKEYS.length
+                        newel.innerHTML = `${myrowId < WHITEKEYS.length
                                 ? `<small>(${String.fromCharCode(WHITEKEYS[myrowId])})</small><br/>`
                                 : ""
-                        }${this.displayLayout[p].noteName}${this.displayLayout[p].noteOctave}`;
+                            }${this.displayLayout[p].noteName}${this.displayLayout[p].noteOctave}`;
                     }
                 }
                 if (p < this.layout.length) {
@@ -3274,7 +3267,7 @@ function MusicKeyboard(activity) {
                                             {
                                                 value:
                                                     note.noteOctave[j][
-                                                        note.noteOctave[j].length - 1
+                                                    note.noteOctave[j].length - 1
                                                     ]
                                             }
                                         ],
@@ -3302,7 +3295,7 @@ function MusicKeyboard(activity) {
                                             {
                                                 value:
                                                     note.noteOctave[j][
-                                                        note.noteOctave[j].length - 1
+                                                    note.noteOctave[j].length - 1
                                                     ]
                                             }
                                         ],

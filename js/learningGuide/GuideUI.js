@@ -70,10 +70,10 @@ window.GuideUI = {
                     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
                     .replace(/\*(.*?)\*/g, "<em>$1</em>")
                     .replace(/\n/g, "<br>");
-                } catch (err) {
-                    console.error(err);
-                    responseBox.innerHTML =
-                        "⚠️ Sorry, the AI is unavailable right now. Please try again.";
+            } catch (err) {
+                console.error(err);
+                responseBox.innerHTML =
+                    "⚠️ Sorry, the AI is unavailable right now. Please try again.";
             } finally {
                 if (askBtn) askBtn.disabled = false;
             }
