@@ -47,7 +47,7 @@
     "@tonejs/midi": "^2.0.28",
     "autoprefixer": "^10.4.16",
     "compression": "^1.8.1",
-    "cssnano": "^6.1.2",
+    "cssnano": "^7.1.2",
     "express": "^4.21.2",
     "gulp-concat": "^2.6.1",
     "gulp-postcss": "^10.0.0",
@@ -63,7 +63,7 @@
     "tone": "^15.1.22"
   },
   "build": {
-    "appId": "com.musicblocks.app", 
+    "appId": "com.musicblocks.app",
     "productName": "Music Blocks",
     "mac": {
       "category": "public.app-category.music",
