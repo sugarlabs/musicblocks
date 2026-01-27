@@ -91,6 +91,69 @@ const getPieMenuSize = block => {
 setWheelSize();
 window.addEventListener("resize", setWheelSize);
 
+// Helper function to enable scroll-to-rotate for pie menus
+const enableWheelScroll = (wheel, itemCount) => {
+    const wheelDiv = document.getElementById("wheelDiv");
+    if (!wheelDiv || !wheel) return;
+
+    // Remove existing scroll handler if any
+    if (wheelDiv._scrollHandler) {
+        wheelDiv.removeEventListener("wheel", wheelDiv._scrollHandler);
+    }
+
+    let isScrolling = false;
+    let scrollTimeout = null;
+
+    const scrollHandler = event => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        // Throttle the scroll events (only process every 150ms)
+        if (isScrolling) return;
+        isScrolling = true;
+
+        // Calculate the direction and amount to rotate
+        const delta = event.deltaY > 0 ? 1 : -1;
+
+        // Get current selected index
+        const currentIndex = wheel.selectedNavItemIndex;
+
+        // Calculate next index (with wrapping)
+        let nextIndex = currentIndex + delta;
+        if (nextIndex < 0) {
+            nextIndex = itemCount - 1;
+        } else if (nextIndex >= itemCount) {
+            nextIndex = 0;
+        }
+
+        // Temporarily disable all navigate functions to prevent sound previews
+        const originalFunctions = [];
+        for (let i = 0; i < wheel.navItems.length; i++) {
+            originalFunctions[i] = wheel.navItems[i].navigateFunction;
+            wheel.navItems[i].navigateFunction = null;
+        }
+
+        // Navigate to the next item
+        wheel.navigateWheel(nextIndex);
+
+        // Restore navigate functions after a short delay
+        setTimeout(() => {
+            for (let i = 0; i < wheel.navItems.length; i++) {
+                wheel.navItems[i].navigateFunction = originalFunctions[i];
+            }
+        }, 50);
+
+        // Reset throttle after 150ms
+        setTimeout(() => {
+            isScrolling = false;
+        }, 150);
+    };
+
+    // Store the handler so we can remove it later
+    wheelDiv._scrollHandler = scrollHandler;
+    wheelDiv.addEventListener("wheel", scrollHandler, { passive: false });
+};
+
 const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accidental, custom) => {
     let prevPitch = null;
     // wheelNav pie menu for pitch selection
@@ -1633,7 +1696,7 @@ const piemenuNoteValue = (block, noteValue) => {
 
     docById("wheelDiv").style.position = "absolute";
     setWheelSize(300);
-
+    const halfWheelSize = wheelSize / 2;
     const selectorWidth = 150;
     const left = Math.round(
         (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
@@ -2554,6 +2617,9 @@ const piemenuChords = (block, selectedChord) => {
 
     block._chordWheel.navigateWheel(i);
 
+    // Enable scroll-to-rotate
+    enableWheelScroll(block._chordWheel, chordLabels.length);
+
     // Hide the widget when the selection is made.
     for (let i = 0; i < chordLabels.length; i++) {
         block._chordWheel.navItems[i].navigateFunction = () => {
@@ -2730,6 +2796,9 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
 
     block._voiceWheel.navigateWheel(i);
 
+    // Enable scroll-to-rotate
+    enableWheelScroll(block._voiceWheel, voiceLabels.length);
+
     // Set up handlers for voice preview.
     for (let i = 0; i < voiceValues.length; i++) {
         block._voiceWheel.navItems[i].navigateFunction = __voicePreview;
@@ -2859,7 +2928,7 @@ const piemenuIntervals = (block, selectedInterval) => {
         ) + "px";
 
     // Add function to each main menu for show/hide sub menus
-    // FIXME: Add all tabs to each interval
+    // TODO: Add all tabs to each interval
     const __setupAction = (i, activeTabs) => {
         that._intervalNameWheel.navItems[i].navigateFunction = () => {
             for (let l = 0; l < labels.length; l++) {
@@ -2896,6 +2965,9 @@ const piemenuIntervals = (block, selectedInterval) => {
     }
 
     block._intervalNameWheel.navigateWheel(i);
+
+    // Enable scroll-to-rotate
+    enableWheelScroll(block._intervalNameWheel, labels.length);
 
     const j = Number(obj[1]);
     if (INTERVALS[i][2].includes(j)) {

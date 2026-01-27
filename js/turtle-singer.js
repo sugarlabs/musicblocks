@@ -23,7 +23,8 @@
    getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
-   noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction
+   noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction,
+   SEMITONES
  */
 
 /*
@@ -1012,8 +1013,7 @@ class Singer {
                 noteObj = getNote(
                     anote,
                     octave,
-                    // FIXME: should not be hardwired to 12
-                    atrans + tur.singer.register * 12,
+                    atrans + tur.singer.register * SEMITONES,
                     tur.singer.keySignature,
                     tur.singer.movable,
                     direction,
@@ -1226,8 +1226,7 @@ class Singer {
                 const noteObj = getNote(
                     note,
                     octave,
-                    // FIXME: should not be hardwired to 12
-                    transposition + tur.singer.register * 12,
+                    transposition + tur.singer.register * SEMITONES,
                     tur.singer.keySignature,
                     tur.singer.movable,
                     direction,
@@ -1593,19 +1592,25 @@ class Singer {
                     ) {
                         match = false;
                     } else {
-                        /**
-                         * @todo FIXME: This check assumes that the order of the pitch blocks in a chord are the same
-                         */
-                        for (let i = 0; i < tur.singer.tieNotePitches.length; i++) {
-                            if (
-                                tur.singer.tieNotePitches[i][0] !=
-                                    tur.singer.notePitches[last(tur.singer.inNoteBlock)][i] ||
-                                tur.singer.tieNotePitches[i][1] !=
-                                    tur.singer.noteOctaves[last(tur.singer.inNoteBlock)][i]
-                            ) {
-                                match = false;
-                                break;
-                            }
+                        // Compare tied chords in an order-independent way (pitch, octave, cents)
+                        const normalizeChord = chord =>
+                            chord.map(p => `${p[0]}:${p[1]}:${p[2]}`).sort();
+
+                        const tiedChord = normalizeChord(tur.singer.tieNotePitches);
+
+                        const currentChord = normalizeChord(
+                            tur.singer.notePitches[last(tur.singer.inNoteBlock)].map((p, i) => [
+                                p,
+                                tur.singer.noteOctaves[last(tur.singer.inNoteBlock)][i],
+                                tur.singer.noteCents[last(tur.singer.inNoteBlock)][i]
+                            ])
+                        );
+
+                        if (
+                            tiedChord.length !== currentChord.length ||
+                            !tiedChord.every((v, i) => v === currentChord[i])
+                        ) {
+                            match = false;
                         }
                     }
 
@@ -2055,8 +2060,9 @@ class Singer {
                         0,
                         null
                     );
-                    const pitchNumber = getTemperament(activity.logo.synth.inTemperament)
-                        .pitchNumber;
+                    const pitchNumber = getTemperament(
+                        activity.logo.synth.inTemperament
+                    ).pitchNumber;
                     const ratio = [];
                     const number = [];
                     const numerator = [];

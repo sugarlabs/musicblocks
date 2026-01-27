@@ -73,7 +73,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
             GUIDEURL = "Docs/guide/index.html";
         } else {
             // Production environment
-            GUIDEURL = "https://musicblocks.sugarlabs.org/Docs/guide/";
+            GUIDEURL = "https://musicblocks.sugarlabs.org/Docs/guide/index.html";
         }
     }
 
@@ -141,8 +141,8 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
         _("pen"),
         _("number"),
         _("boolean"),
-        _("Media").toLowerCase(),
-        _("Sensors").toLowerCase(),
+        _("media"),
+        _("sensors"),
         _("heap"),
         _("dictionary"),
         _("ensemble"),
@@ -239,8 +239,8 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
         _("pen"),
         _("number"),
         _("boolean"),
-        _("Media").toLowerCase(),
-        _("Sensors").toLowerCase(),
+        _("media"),
+        _("sensors"),
         _("heap"),
         _("dictionary"),
         _("ensemble"),
