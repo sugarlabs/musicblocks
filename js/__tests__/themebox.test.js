@@ -54,7 +54,7 @@ describe("ThemeBox", () => {
         jest.spyOn(global.Storage.prototype, "getItem").mockImplementation(key => {
             return key === "themePreference" ? "light" : null;
         });
-        jest.spyOn(global.Storage.prototype, "setItem").mockImplementation(() => { });
+        jest.spyOn(global.Storage.prototype, "setItem").mockImplementation(() => {});
 
         // Object.defineProperty for location removed for Jest 30 compatibility
 

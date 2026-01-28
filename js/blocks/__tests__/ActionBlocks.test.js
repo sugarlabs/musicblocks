@@ -78,7 +78,7 @@ class FlowBlock extends BaseBlock {
     constructor(name) {
         super(name);
     }
-    flow() { }
+    flow() {}
 }
 
 class FlowClampBlock extends FlowBlock {
@@ -97,7 +97,7 @@ class LeftBlock extends BaseBlock {
     constructor(name) {
         super(name);
     }
-    arg() { }
+    arg() {}
 }
 
 class ValueBlock extends LeftBlock {
@@ -238,7 +238,9 @@ describe("ActionBlocks", () => {
             global.XMLHttpRequest.mockImplementation(() => mockHttp);
 
             const block = getBlock("returnToUrl");
-            jest.spyOn(block, "getHref").mockReturnValue("http://localhost?outurl=http://callback&dummy=1");
+            jest.spyOn(block, "getHref").mockReturnValue(
+                "http://localhost?outurl=http://callback&dummy=1"
+            );
 
             block.flow([100]);
 
