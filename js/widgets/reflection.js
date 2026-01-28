@@ -625,7 +625,54 @@ class ReflectionMatrix {
      * @returns {string} - The converted HTML text.
      */
     mdToHTML(md) {
-        let html = md;
+        const input = md === null || md === undefined ? "" : String(md);
+
+        const escapeHtml = value =>
+            String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/\"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+
+        const sanitizeUrl = url => {
+            if (url === null || url === undefined) return null;
+            const trimmed = String(url).trim();
+            if (trimmed === "") return null;
+            // Disallow whitespace/control chars to prevent attribute breaking and weird parsing.
+            // Avoid control-character regex ranges here to satisfy eslint `no-control-regex`.
+            if (/\s/.test(trimmed)) return null;
+            for (let i = 0; i < trimmed.length; i++) {
+                const code = trimmed.charCodeAt(i);
+                if (code <= 0x1f || code === 0x7f) return null;
+            }
+
+            const schemeMatch = trimmed.match(/^([a-zA-Z][a-zA-Z0-9+.-]*):/);
+            if (schemeMatch) {
+                const scheme = schemeMatch[1].toLowerCase();
+                if (scheme === "http" || scheme === "https" || scheme === "mailto") return trimmed;
+                return null;
+            }
+
+            // Allow relative URLs and same-page anchors.
+            if (trimmed.startsWith("#") || trimmed.startsWith("/") || trimmed.startsWith(".")) {
+                return trimmed;
+            }
+
+            // Treat everything else as unsafe-by-default.
+            return null;
+        };
+
+        // Extract markdown links before escaping so the URL can be validated safely.
+        const links = [];
+        let withPlaceholders = input.replace(/\[([^\]]+?)\]\(([^\)]+?)\)/g, (match, text, url) => {
+            const idx = links.length;
+            links.push({ text, url });
+            return `__MB_LINK_${idx}__`;
+        });
+
+        // Escape everything (prevents raw HTML injection).
+        let html = escapeHtml(withPlaceholders);
 
         // Headings
         html = html.replace(/^###### (.*$)/gim, "<h6>$1</h6>");
@@ -639,11 +686,21 @@ class ReflectionMatrix {
         html = html.replace(/\*\*(.*?)\*\*/gim, "<b>$1</b>");
         html = html.replace(/\*(.*?)\*/gim, "<i>$1</i>");
 
-        // Links
-        html = html.replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2' target='_blank'>$1</a>");
-
         // Line breaks
         html = html.replace(/\n/gim, "<br>");
+
+        // Re-insert links as safe anchors.
+        for (let i = 0; i < links.length; i++) {
+            const placeholder = `__MB_LINK_${i}__`;
+            const safeText = escapeHtml(links[i].text);
+            const safeUrl = sanitizeUrl(links[i].url);
+            const replacement = safeUrl
+                ? `<a href="${escapeHtml(
+                      safeUrl
+                  )}" target="_blank" rel="noopener noreferrer">${safeText}</a>`
+                : safeText;
+            html = html.split(placeholder).join(replacement);
+        }
 
         return html.trim();
     }
