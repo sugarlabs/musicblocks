@@ -68,7 +68,7 @@ let MYDEFINES = [
     "p5-sound-adapter",
     "p5.dom.min",
     // 'mespeak',
-    "Chart",
+    "Chart.js",
     "utils/utils",
     "activity/artwork",
     "widgets/status",
