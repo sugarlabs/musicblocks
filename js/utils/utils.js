@@ -39,8 +39,10 @@
    oneHundredToFraction, prepareMacroExports, preparePluginExports,
    processMacroData, processRawPluginData, rationalSum, rgbToHex,
    safeSVG, toFixed2, toTitleCase, windowHeight, windowWidth,
-   fnBrowserDetect
+   fnBrowserDetect, API_KEY
 */
+
+const API_KEY = "3tgTzMXbbw6xEKX7";
 
 /**
  * Changes the source of an image element from one SVG data URI to another.
@@ -68,30 +70,6 @@ function _(text, options = {}) {
     if (!text) return "";
 
     try {
-        const removeChars = [
-            ",",
-            "(",
-            ")",
-            "?",
-            "¿",
-            "<",
-            ">",
-            ".",
-            "\n",
-            '"',
-            ":",
-            "%s",
-            "%d",
-            "/",
-            "'",
-            ";",
-            "×",
-            "!",
-            "¡"
-        ];
-        let cleanedText = text;
-        for (let char of removeChars) cleanedText = cleanedText.split(char).join("");
-
         let translated = "";
         const lang = i18next.language;
 
@@ -223,44 +201,48 @@ function windowWidth() {
 }
 
 /**
- * Performs an HTTP GET request to retrieve data from the server.
+ * Performs an asynchronous HTTP GET request to retrieve data from the server using fetch.
  * @param {string|null} projectName - The name of the project (or null for the base URL).
- * @throws {string} Throws an error if the HTTP status code is greater than 299.
- * @returns {string} The response text from the server.
+ * @throws {Error} Throws an error if the HTTP response is not ok.
+ * @returns {Promise<string>} A promise that resolves to the response text from the server.
  */
-let httpGet = projectName => {
-    let xmlHttp = null;
-    xmlHttp = new XMLHttpRequest();
-    if (projectName === null) {
-        xmlHttp.open("GET", window.server, false);
-        xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
-    } else {
-        xmlHttp.open("GET", window.server + projectName, false);
-        xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
+let httpGet = async projectName => {
+    const url = projectName === null ? window.server : window.server + projectName;
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+            "x-api-key": API_KEY
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error("Error from server: " + response.statusText);
     }
 
-    xmlHttp.send();
-    if (xmlHttp.status > 299) {
-        throw "Error from server";
-    }
-
-    return xmlHttp.responseText;
+    return await response.text();
 };
 
 /**
- * Performs an HTTP POST request to send data to the server.
+ * Performs an asynchronous HTTP POST request to send data to the server using fetch.
  * @param {string} projectName - The name of the project.
  * @param {string} data - The data to be sent in the POST request.
- * @returns {string} The response text from the server.
+ * @returns {Promise<string>} A promise that resolves to the response text from the server.
  */
-let httpPost = (projectName, data) => {
-    let xmlHttp = null;
-    xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("POST", window.server + projectName, false);
-    xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
-    xmlHttp.send(data);
-    return xmlHttp.responseText;
-    // return 'https://apps.facebook.com/turtleblocks/?file=' + projectName;
+let httpPost = async (projectName, data) => {
+    const response = await fetch(window.server + projectName, {
+        method: "POST",
+        headers: {
+            "x-api-key": API_KEY,
+            "Content-Type": "application/json"
+        },
+        body: data
+    });
+
+    if (!response.ok) {
+        throw new Error("Error from server: " + response.statusText);
+    }
+
+    return await response.text();
 };
 
 /**
@@ -562,7 +544,7 @@ let fileBasename = file => {
  * @param {string} str - The input string.
  * @returns {string} The string with the first character in uppercase.
  */
-function toTitleCase (str) {
+function toTitleCase(str) {
     if (typeof str !== "string") return;
     let tempStr = "";
     if (str.length > 1) tempStr = str.substring(1);
@@ -600,10 +582,13 @@ const processPluginData = (activity, pluginData, pluginSource) => {
         );
     };
 
-    const safeEval = (code, label = "plugin") => {
+    /**
+     * Executes plugin code. 
+     * Note: Dynamic execution is necessary for the plugin system.
+     */
+    const safeExecute = (code, label = "plugin") => {
         if (typeof code !== "string") return;
 
-        // basic sanity limit (prevents huge payloads)
         if (code.length > 500000) {
             // eslint-disable-next-line no-console
             console.warn("Plugin code too large:", label);
@@ -611,8 +596,9 @@ const processPluginData = (activity, pluginData, pluginSource) => {
         }
 
         try {
-            // eslint-disable-next-line no-eval
-            eval(code);
+            // Using Function constructor as a slightly cleaner alternative to eval for global scope execution
+            const fn = new Function(code);
+            fn();
         } catch (e) {
             // eslint-disable-next-line no-console
             console.error("Plugin execution failed:", label, e);
@@ -764,13 +750,13 @@ const processPluginData = (activity, pluginData, pluginSource) => {
         for (const block in obj["BLOCKPLUGINS"]) {
             // eslint-disable-next-line no-console
             console.debug("adding plugin block " + block);
-            safeEval(obj["BLOCKPLUGINS"][block], "BLOCKPLUGINS:" + block);
+            safeExecute(obj["BLOCKPLUGINS"][block], "BLOCKPLUGINS:" + block);
         }
     }
 
     // Create the globals.
     if ("GLOBALS" in obj) {
-        safeEval(obj["GLOBALS"], "GLOBALS");
+        safeExecute(obj["GLOBALS"], "GLOBALS");
     }
 
     if ("PARAMETERPLUGINS" in obj) {
@@ -782,7 +768,7 @@ const processPluginData = (activity, pluginData, pluginSource) => {
     // Code to execute when plugin is loaded
     if ("ONLOAD" in obj) {
         for (const arg in obj["ONLOAD"]) {
-            safeEval(obj["ONLOAD"][arg], "ONLOAD:" + arg);
+            safeExecute(obj["ONLOAD"][arg], "ONLOAD:" + arg);
         }
     }
 
@@ -1020,14 +1006,6 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
     let streaming = false;
     const video = document.querySelector("#camVideo");
     const canvas = document.querySelector("#camCanvas");
-    navigator.getMedia =
-        navigator.getUserMedia ||
-        navigator.mozGetUserMedia ||
-        navigator.webkitGetUserMedia ||
-        navigator.msGetUserMedia;
-    if (navigator.getMedia === undefined) {
-        errorMsg("Your browser does not support the webcam");
-    }
 
     function draw() {
         canvas.width = w;
@@ -1038,24 +1016,22 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
     }
 
     if (!hasSetupCamera) {
-        navigator.getMedia(
-            { video: true, audio: false },
-            stream => {
-                if (navigator.mozGetUserMedia) {
-                    video.mozSrcObject = stream;
-                } else {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices
+                .getUserMedia({ video: true, audio: false })
+                .then(stream => {
                     video.srcObject = stream;
-                }
-
-                video.play();
-                hasSetupCamera = true;
-            },
-            error => {
-                errorMsg("Could not connect to camera");
-                // eslint-disable-next-line no-console
-                console.debug(error);
-            }
-        );
+                    video.play();
+                    hasSetupCamera = true;
+                })
+                .catch(error => {
+                    errorMsg(_("Could not connect to camera"));
+                    // eslint-disable-next-line no-console
+                    console.debug(error);
+                });
+        } else {
+            errorMsg(_("Your browser does not support the webcam"));
+        }
     } else {
         streaming = true;
         video.play();
@@ -1070,7 +1046,6 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
     video.addEventListener(
         "canplay",
         () => {
-            // console.debug("canplay", streaming, hasSetupCamera);
             if (!streaming) {
                 video.setAttribute("width", w);
                 video.setAttribute("height", h);
@@ -1540,10 +1515,10 @@ let hexToRGB = hex => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
         ? {
-              r: parseInt(result[1], 16),
-              g: parseInt(result[2], 16),
-              b: parseInt(result[3], 16)
-          }
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        }
         : null;
 };
 
@@ -1621,28 +1596,11 @@ const resolveObject = path => {
             return obj[prop];
         }, globalObj);
 
-        // If reduction succeeded but result is undefined, try eval as fallback
-        // This handles cases where nested class properties aren't enumerable
-        if (result === undefined) {
-            try {
-                // eslint-disable-next-line no-eval
-                return eval(path);
-            } catch (evalError) {
-                return undefined;
-            }
-        }
-
         return result;
     } catch (e) {
-        // Last resort: try eval
-        try {
-            // eslint-disable-next-line no-eval
-            return eval(path);
-        } catch (evalError) {
-            // eslint-disable-next-line no-console
-            console.warn("Failed to resolve object path: " + path, e);
-            return undefined;
-        }
+        // eslint-disable-next-line no-console
+        console.warn("Failed to resolve object path: " + path, e);
+        return undefined;
     }
 };
 
@@ -1699,10 +1657,18 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
         delete obj.added;
     };
 
-    const cname = obj.constructor.name; // class name of component object
-
     if (className !== "" && className !== undefined) {
         addMembers(obj, resolveObject(className));
+        return;
+    }
+
+    // Minification-safe way to get the class name
+    // Priority: Explicit _manualClassName > constructor.providedName
+    const cname = obj._manualClassName || obj.constructor.providedName;
+
+    if (!cname) {
+        // eslint-disable-next-line no-console
+        console.warn("importMembers: No class name found. Minification might have renamed it. Please provide _manualClassName or providedName.");
         return;
     }
 
