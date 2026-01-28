@@ -55,20 +55,57 @@ class SaveInterface {
     }
 
     prepareHTML(name, data, image, description, projectid) {
+        const escapeHTML = value => {
+            if (value === null || value === undefined) return "";
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/\"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        };
+
+        const sanitizeImageURL = value => {
+            if (value === null || value === undefined) return "";
+            const raw = String(value).trim();
+            if (raw === "") return "";
+
+            // Allow a conservative set of URL schemes only.
+            const lower = raw.toLowerCase();
+            if (lower.startsWith("data:")) {
+                // Only allow data:image/* (prevents data:text/html, data:application/svg+xml, etc.)
+                return /^data:image\/[a-z0-9.+-]+;base64,[a-z0-9+/=\s]+$/i.test(raw) ? raw : "";
+            }
+
+            if (lower.startsWith("http://") || lower.startsWith("https://")) return raw;
+
+            // Allow relative URLs (e.g., packaged assets) but reject scheme-like strings.
+            if (/^[a-z][a-z0-9+.-]*:/i.test(raw)) return "";
+            return raw;
+        };
+
         let file = this.htmlSaveTemplate;
         if (description === null || description === undefined)
             description = _("No description provided");
 
         let id = "";
-        if (projectid != undefined)
-            id = this.buttonTemplate.replace(new RegExp("{{ project_id }}", "g"), projectid);
+        if (projectid != undefined) {
+            const safeProjectId = encodeURIComponent(String(projectid));
+            id = this.buttonTemplate.replace(
+                new RegExp("{{ project_id }}", "g"),
+                () => safeProjectId
+            );
+        }
 
         file = file
-            .replace(new RegExp("{{ project_description }}", "g"), description)
-            .replace(new RegExp("{{ project_name }}", "g"), name)
-            .replace(new RegExp("{{ data }}", "g"), data)
-            .replace(new RegExp("{{ project_image }}", "g"), image)
-            .replace(new RegExp("{{ project_button }}", "g"), id);
+            .replace(new RegExp("{{ project_description }}", "g"), () => escapeHTML(description))
+            .replace(new RegExp("{{ project_name }}", "g"), () => escapeHTML(name))
+            // Always render project data as text, never as HTML.
+            .replace(new RegExp("{{ data }}", "g"), () => escapeHTML(data))
+            .replace(new RegExp("{{ project_image }}", "g"), () =>
+                escapeHTML(sanitizeImageURL(image))
+            )
+            .replace(new RegExp("{{ project_button }}", "g"), () => id);
 
         return file;
     }
