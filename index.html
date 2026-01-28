@@ -387,10 +387,15 @@
                                 </a>
                             </li>
                             <li>
-                                <a id="helpIcon" class="tooltipped" data-position="bottom">
-                                    <i class="material-icons md-48">help</i>
+                            <a id="helpIcon" class="tooltipped" data-position="bottom">
+                                <i class="material-icons md-48">help</i>
+                            </a>
+                            </li> 
+                            <li>                          
+                                <a id="installButton" class="tooltipped hidden" data-position="bottom" data-tooltip="Install App">
+                                    <i class="material-icons md-48">download</i>
                                 </a>
-                            </li>
+                            </li>                        
                         </ul>
                     </div>
                     <div class="nav-wrapper" id="aux-toolbar" style="display: none;" tabindex="-1">
@@ -604,10 +609,33 @@
             event.preventDefault(); // Prevent automatic browser prompt
             deferredPrompt = event;
 
-            // Show your install button here
-            const divInstall = document.getElementById("installButton");
-            if (divInstall) {
-                divInstall.classList.remove("hidden");
+            // Show the install button
+            const installButton = document.getElementById("installButton");
+            if (installButton) {
+                installButton.classList.remove("hidden");
+            }
+        });
+
+        // Handle install button click
+        document.addEventListener("DOMContentLoaded", function () {
+            const installButton = document.getElementById("installButton");
+            if (installButton) {
+                installButton.addEventListener("click", async function () {
+                    if (deferredPrompt) {
+                        // Show the install prompt
+                        deferredPrompt.prompt();
+                        
+                        // Wait for user choice
+                        const { outcome } = await deferredPrompt.userChoice;
+                        console.log(`User response to the install prompt: ${outcome}`);
+                        
+                        // Clear the deferredPrompt
+                        deferredPrompt = null;
+                        
+                        // Hide the button
+                        installButton.classList.add("hidden");
+                    }
+                });
             }
         });
     </script>
@@ -812,6 +840,12 @@
         document.addEventListener('mozfullscreenchange', handleFullscreenChange);
         document.addEventListener('MSFullscreenChange', handleFullscreenChange);
     </script>
+
+    <style>
+        #installButton.hidden {
+            display: none !important;
+        }
+    </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
