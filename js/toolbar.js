@@ -786,11 +786,17 @@ class Toolbar {
         const browser = fnBrowserDetect();
         const hideIn = ["firefox", "safari"];
 
-        if (hideIn.includes(browser)) {
+
+        if (hideIn.includes(browser) || (this.activity && this.activity.beginnerMode)) {
             Record.classList.add("hide");
+            const modeContainer = document.querySelector(".record-mode-container");
+            if (modeContainer) {
+                modeContainer.classList.add("hide");
+            }
             return;
         }
 
+        Record.classList.remove("hide");
         Record.style.display = "block";
         Record.innerHTML = `<i class="material-icons main">${RECORDBUTTON}</i>`;
         Record.onclick = () => rec_onclick(this.activity);
@@ -798,7 +804,8 @@ class Toolbar {
         // Show record mode dropdown container
         const modeContainer = document.querySelector(".record-mode-container");
         if (modeContainer) {
-            modeContainer.style.display = "block";
+            modeContainer.classList.remove("hide");
+            modeContainer.style.display = "flex";
         }
 
         // Initialize record mode dropdown
@@ -810,7 +817,7 @@ class Toolbar {
         if (modeBtn && modeMenu && modeText) {
             // Load saved preference
             const savedMode = localStorage.getItem("musicBlocksRecordMode") || "screen";
-            modeText.textContent = savedMode === "canvas" ? "Record Only Canvas" : "Record With Menus";
+            modeText.textContent = savedMode === "canvas" ? "Record canvas only" : "Record canvas and toolbars";
             
             // Update selected option styling
             modeOptions.forEach(option => {

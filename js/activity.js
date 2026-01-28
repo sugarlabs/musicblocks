@@ -1776,7 +1776,7 @@ class Activity {
                 recInside.classList.remove("blink");
                 // Prevent zero-byte files
                 if (!recordedChunks || recordedChunks.length === 0) {
-                    alert(_("No video was recorded. File not saved."));
+                    alert(_("Recorded file is empty. File not saved."));
                     flag = 0;
                     recording();
                     doRecordButton();
@@ -2052,6 +2052,11 @@ class Activity {
             // Regenerate palettes
             if (activity.regeneratePalettes) {
                 activity.regeneratePalettes();
+            }
+
+            // Update record button and dropdown visibility
+            if (activity.toolbar && typeof activity.toolbar.updateRecordButton === 'function') {
+                activity.toolbar.updateRecordButton(activity._doRecordButton.bind(activity));
             }
 
             // Force immediate canvas refresh

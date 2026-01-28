@@ -100,17 +100,6 @@ input[type="range"]:focus::-ms-fill-upper {
   background: #90c100;
 }
 
-.lego-brick {
-    display: inline-block;
-    background-color: #FF0000;
-    border: 1px solid #880000;
-    margin: 2px;
-}
-
-.lego-size-1 { width: 20px; height: 10px; }
-.lego-size-2 { width: 40px; height: 10px; }
-/* ... more sizes ... */
-
 /* Recording Mode Dropdown - Specific to record button only */
 li.record-mode-container {
     position: relative;
@@ -125,7 +114,7 @@ li.record-mode-container {
 li.record-mode-container .record-dropdown {
     position: relative;
     display: inline-block;
-    width: 140px;
+    width: 180px;
 }
 
 button#recordModeBtn.record-mode-btn {
@@ -188,18 +177,25 @@ div#recordModeMenu.record-dropdown-menu {
 }
 
 div#recordModeMenu .record-option {
-    padding: 2px 16px;
+    padding: 7px 12px;
     font-size: 12px;
     font-family: "Roboto", "Helvetica", "Arial", sans-serif;
     color: white !important;
     cursor: pointer;
     transition: background 0.2s;
-    white-space: nowrap;
-    text-align: center;
+    white-space: normal;
+    word-break: normal;
+    text-align: left;
     margin: 0;
     display: block;
-    line-height: 4;
-}
+    line-height: 1.4;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  div#recordModeMenu .record-option:last-child {
+    border-bottom: none;
+  }
 
 div#recordModeMenu .record-option:hover {
     background: #1565c0 !important;
