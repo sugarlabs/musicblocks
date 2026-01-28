@@ -556,7 +556,11 @@ class JSEditor {
             });
 
             // Apply highlight.js syntax highlighting for JavaScript
-            hljs.highlightElement(editor);
+            if (hljs.highlightElement) {
+                hljs.highlightElement(editor);
+            } else if (hljs.highlightBlock) {
+                hljs.highlightBlock(editor);
+            }
 
             // Add error highlighting
             this._highlightErrors(editor);
@@ -982,4 +986,8 @@ class JSEditor {
 
         JSEditor.logConsole("Status window opened.", "green");
     }
+}
+
+if (typeof module !== "undefined") {
+    module.exports = JSEditor;
 }
