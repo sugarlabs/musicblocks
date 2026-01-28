@@ -326,7 +326,7 @@ class Toolbar {
             const elem = docById(obj[0]);
             if (strings[i].length === 3) {
                 if (elem !== undefined && elem !== null) {
-                    elem.innerHTML = obj[1];
+                    elem.textContent = obj[1];   
                 }
             } else {
                 if (elem !== undefined && elem !== null) {
@@ -334,6 +334,7 @@ class Toolbar {
                 }
             }
         }
+
 
         if (!this.tooltipsDisabled) {
             $j(".tooltipped").tooltip({
