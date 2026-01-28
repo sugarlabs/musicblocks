@@ -124,7 +124,7 @@ class PitchStaircase {
             stepCell.setAttribute("id", frequency);
             stepCell.style.width =
                 (PitchStaircase.INNERWINDOWWIDTH *
-                    parseFloat(PitchStaircase.DEFAULTFREQUENCY / frequency) *
+                    (PitchStaircase.DEFAULTFREQUENCY / frequency) *
                     this._cellScale) /
                     3 +
                 "px";
@@ -212,11 +212,12 @@ class PitchStaircase {
 
         const oldcell = event.target;
         const frequency = Number(oldcell.getAttribute("id"));
+        const newFrequency = parseFloat(frequency) / inputNum;
 
         // Look for the Stair with this frequency.
         let n;
         for (n = 0; n < this.Stairs.length; n++) {
-            if (this.Stairs[n][2] === frequency) {
+            if (Math.abs(this.Stairs[n][2] - frequency) < 0.001) {
                 break;
             }
         }
@@ -228,18 +229,21 @@ class PitchStaircase {
         /**
          * @todo look to see if the same frequency is already in the list.
          */
-        const obj = frequencyToPitch(parseFloat(frequency) / inputNum);
+        const obj = frequencyToPitch(newFrequency);
         let foundStep = false;
         let repeatStep = false;
         let isStepDeleted = true;
         let i;
 
         for (i = 0; i < this.Stairs.length; i++) {
-            if (this.Stairs[i][2] < parseFloat(frequency) / inputNum) {
+            if (
+                this.Stairs[i][2] < newFrequency &&
+                Math.abs(this.Stairs[i][2] - newFrequency) >= 0.001
+            ) {
                 this.Stairs.splice(i, 0, [
                     obj[0],
                     obj[1],
-                    parseFloat(frequency) / inputNum,
+                    newFrequency,
                     this.Stairs[n][3] * parseFloat(inputNum2),
                     this.Stairs[n][4] * parseFloat(inputNum1),
                     this.Stairs[n][2],
@@ -249,11 +253,11 @@ class PitchStaircase {
                 break;
             }
 
-            if (this.Stairs[i][2] === parseFloat(frequency) / inputNum) {
+            if (Math.abs(this.Stairs[i][2] - newFrequency) < 0.001) {
                 this.Stairs.splice(i, 1, [
                     obj[0],
                     obj[1],
-                    parseFloat(frequency) / inputNum,
+                    newFrequency,
                     this.Stairs[n][3] * parseFloat(inputNum2),
                     this.Stairs[n][4] * parseFloat(inputNum1),
                     this.Stairs[n][2],
@@ -270,7 +274,7 @@ class PitchStaircase {
             this.Stairs.push([
                 obj[0],
                 obj[1],
-                parseFloat(frequency) / inputNum,
+                newFrequency,
                 this.Stairs[n][3] * parseFloat(inputNum2),
                 this.Stairs[n][4] * parseFloat(inputNum1),
                 this.Stairs[n][2],
@@ -621,37 +625,28 @@ class PitchStaircase {
 
         this.closed = false;
 
-        widgetWindow.addButton(
-            "play-chord.svg",
-            PitchStaircase.ICONSIZE,
-            _("Play chord")
-        ).onclick = () => {
-            this._playAll();
-        };
+        widgetWindow.addButton("play-chord.svg", PitchStaircase.ICONSIZE, _("Play chord")).onclick =
+            () => {
+                this._playAll();
+            };
 
-        widgetWindow.addButton(
-            "play-scale.svg",
-            PitchStaircase.ICONSIZE,
-            _("Play scale")
-        ).onclick = () => {
-            this.playUpAndDown();
-        };
+        widgetWindow.addButton("play-scale.svg", PitchStaircase.ICONSIZE, _("Play scale")).onclick =
+            () => {
+                this.playUpAndDown();
+            };
 
         this._save_lock = false;
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            PitchStaircase.ICONSIZE,
-            _("Save")
-        ).onclick = () => {
-            // Debounce button
-            if (!this._get_save_lock()) {
-                this._save_lock = true;
-                this._save();
-                setTimeout(() => {
-                    this._save_lock = false;
-                }, 1000);
-            }
-        };
+        widgetWindow.addButton("export-chunk.svg", PitchStaircase.ICONSIZE, _("Save")).onclick =
+            () => {
+                // Debounce button
+                if (!this._get_save_lock()) {
+                    this._save_lock = true;
+                    this._save();
+                    setTimeout(() => {
+                        this._save_lock = false;
+                    }, 1000);
+                }
+            };
         const wfbWidget = document.getElementsByClassName("wfbWidget")[0];
         wfbWidget.style.maxHeight = 10 * PitchStaircase.BUTTONSIZE + "px";
         wfbWidget.style.overflowY = "scroll";
@@ -659,21 +654,15 @@ class PitchStaircase {
         widgetWindow.addDivider();
         this._musicRatio2 = widgetWindow.addInputButton("2");
 
-        widgetWindow.addButton(
-            "restore-button.svg",
-            PitchStaircase.ICONSIZE,
-            _("Undo")
-        ).onclick = () => {
-            this._undo();
-        };
+        widgetWindow.addButton("restore-button.svg", PitchStaircase.ICONSIZE, _("Undo")).onclick =
+            () => {
+                this._undo();
+            };
 
-        widgetWindow.addButton(
-            "erase-button.svg",
-            PitchStaircase.ICONSIZE,
-            _("Clear")
-        ).onclick = () => {
-            while (this._undo());
-        };
+        widgetWindow.addButton("erase-button.svg", PitchStaircase.ICONSIZE, _("Clear")).onclick =
+            () => {
+                while (this._undo());
+            };
 
         // The pitch-staircase (psc) table
         this._pscTable = document.createElement("table");
