@@ -1111,19 +1111,19 @@ describe("numberToPitch", () => {
                 ]
             },
             "just intonation": {
-                "pitchNumber": 12,
-                "0": [1, "C", 4],
-                "1": [16 / 15, "D♭", 4],
-                "2": [9 / 8, "D", 4],
-                "3": [6 / 5, "E♭", 4],
-                "4": [5 / 4, "E", 4],
-                "5": [4 / 3, "F", 4],
-                "6": [45 / 32, "G♭", 4],
-                "7": [3 / 2, "G", 4],
-                "8": [8 / 5, "A♭", 4],
-                "9": [5 / 3, "A", 4],
-                "10": [9 / 5, "B♭", 4],
-                "11": [15 / 8, "B", 4]
+                pitchNumber: 12,
+                0: [1, "C", 4],
+                1: [16 / 15, "D♭", 4],
+                2: [9 / 8, "D", 4],
+                3: [6 / 5, "E♭", 4],
+                4: [5 / 4, "E", 4],
+                5: [4 / 3, "F", 4],
+                6: [45 / 32, "G♭", 4],
+                7: [3 / 2, "G", 4],
+                8: [8 / 5, "A♭", 4],
+                9: [5 / 3, "A", 4],
+                10: [9 / 5, "B♭", 4],
+                11: [15 / 8, "B", 4]
             }
         };
         global.isCustomTemperament = jest.fn(temp => {
@@ -1171,7 +1171,7 @@ describe("GetNotesForInterval", () => {
         const tur = {
             singer: {
                 noteStatus: null,
-                notePitches: { "1": ["C♯", "E♭"] },
+                notePitches: { 1: ["C♯", "E♭"] },
                 inNoteBlock: [1]
             }
         };
@@ -1585,7 +1585,7 @@ describe("noteToPitchOctave", () => {
 
 describe("pitchToFrequency", () => {
     global.TWELTHROOT2 = 1.0594630943592953;
-    global.TWELVEHUNDRETHROOT2 = 1.0005777895065549;
+    global.TWELVEHUNDRETHROOT2 = 1.0005777895065549; // eslint-disable-line no-loss-of-precision
     global.A0 = 27.5;
 
     it("calculates frequency with 0 cents", () => {
@@ -1610,7 +1610,7 @@ describe("pitchToFrequency", () => {
 
 describe("noteToFrequency", () => {
     global.TWELTHROOT2 = 1.0594630943592953;
-    global.TWELVEHUNDRETHROOT2 = 1.0005777895065549;
+    global.TWELVEHUNDRETHROOT2 = 1.0005777895065549; // eslint-disable-line no-loss-of-precision
     global.A0 = 27.5;
     it("converts note to frequency correctly", () => {
         const result = noteToFrequency("A4", "C");
