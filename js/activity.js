@@ -7676,21 +7676,19 @@ class Activity {
 
 const activity = new Activity();
 
-require(["domReady!"], doc => {
-    doBrowserCheck();
-    if (jQuery.browser.mozilla) {
-        setTimeout(() => {
+// Execute initialization once all RequireJS modules are loaded AND DOM is ready
+define(["domReady!"].concat(MYDEFINES), doc => {
+    const initialize = () => {
+        if (typeof createDefaultStack !== "undefined") {
             activity.setupDependencies();
             activity.domReady(doc);
-        }, 5000);
-    } else {
-        activity.setupDependencies();
-        activity.domReady(doc);
-    }
-});
-
-define(MYDEFINES, () => {
-    activity.setupDependencies();
-    activity.doContextMenus();
-    activity.doPluginsAndPaletteCols();
+            activity.doContextMenus();
+            activity.doPluginsAndPaletteCols();
+        } else {
+            // Race condition in Firefox: non-AMD scripts might not have
+            // finished global assignment yet.
+            setTimeout(initialize, 10);
+        }
+    };
+    initialize();
 });
