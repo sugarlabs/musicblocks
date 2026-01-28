@@ -620,12 +620,51 @@ class ReflectionMatrix {
     }
 
     /**
+     * Escapes HTML-sensitive characters to prevent script execution.
+     * @param {string} text - The raw text to escape.
+     * @returns {string} - The escaped text.
+     */
+    escapeHTML(text) {
+        if (!text) {
+            return "";
+        }
+
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+
+    /**
+     * Sanitizes URLs used inside markdown links.
+     * Rejects javascript:, data:, and vbscript: schemes.
+     * @param {string} url - The URL to sanitize.
+     * @returns {string|null} - The sanitized URL or null if unsafe.
+     */
+    sanitizeUrl(url) {
+        if (!url) {
+            return null;
+        }
+
+        const trimmed = url.trim();
+        const lower = trimmed.toLowerCase();
+
+        if (/^(javascript|data|vbscript):/.test(lower)) {
+            return null;
+        }
+
+        return trimmed.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+    }
+
+    /**
      * Converts Markdown text to HTML.
      * @param {string} md - The Markdown text.
      * @returns {string} - The converted HTML text.
      */
     mdToHTML(md) {
-        let html = md;
+        let html = this.escapeHTML(md);
 
         // Headings
         html = html.replace(/^###### (.*$)/gim, "<h6>$1</h6>");
@@ -640,7 +679,13 @@ class ReflectionMatrix {
         html = html.replace(/\*(.*?)\*/gim, "<i>$1</i>");
 
         // Links
-        html = html.replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2' target='_blank'>$1</a>");
+        html = html.replace(/\[(.*?)\]\((.*?)\)/gim, (match, text, url) => {
+            const safeUrl = this.sanitizeUrl(url);
+            if (!safeUrl) {
+                return text;
+            }
+            return `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+        });
 
         // Line breaks
         html = html.replace(/\n/gim, "<br>");
