@@ -35,10 +35,7 @@ Object.defineProperty(global, "localStorage", {
     writable: true
 });
 
-delete global.window.location;
-global.window.location = {
-    reload: jest.fn()
-};
+// Object.defineProperty setup removed for Jest 30 compatibility
 
 document.querySelectorAll = jest.fn(() => []);
 
@@ -53,8 +50,9 @@ describe("LanguageBox Class", () => {
     });
 
     it("should reload the window when OnClick is called", () => {
+        const reloadSpy = jest.spyOn(languageBox, "reload").mockImplementation();
         languageBox.OnClick();
-        expect(global.window.location.reload).toHaveBeenCalled();
+        expect(reloadSpy).toHaveBeenCalled();
     });
 
     it("should display 'already set' message when the selected language is the same", () => {

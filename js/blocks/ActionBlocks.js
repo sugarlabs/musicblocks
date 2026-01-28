@@ -157,7 +157,7 @@ function setupActionBlocks(activity) {
          * @param {Array} args - The arguments for the flow.
          */
         flow(args) {
-            const URL = window.location.href;
+            const URL = this.getHref();
             let urlParts;
             let outurl;
 
@@ -196,6 +196,10 @@ function setupActionBlocks(activity) {
 
                 xmlHttp.send(json);
             }
+        }
+
+        getHref() {
+            return window.location.href;
         }
     }
 
@@ -940,8 +944,8 @@ function setupActionBlocks(activity) {
              */
             this.setHelpString([
                 _("The Do block is used to initiate an action.") +
-                    " " +
-                    _("In the example, it is used with the One of block to choose a random phase."),
+                " " +
+                _("In the example, it is used with the One of block to choose a random phase."),
                 "documentation",
                 null,
                 "dohelp"
@@ -1024,8 +1028,8 @@ function setupActionBlocks(activity) {
             } else {
                 this.setHelpString([
                     _("The Listen block is used to listen for an event such as a mouse click.") +
-                        " " +
-                        _("When the event happens, an action is taken."),
+                    " " +
+                    _("When the event happens, an action is taken."),
                     "documentation",
                     null,
                     "broadcasthelp"
@@ -1206,10 +1210,10 @@ function setupActionBlocks(activity) {
              */
             this.setHelpString([
                 _("Each Start block is a separate voice.") +
-                    " " +
-                    _(
-                        "All of the Start blocks run at the same time when the Play button is pressed."
-                    ),
+                " " +
+                _(
+                    "All of the Start blocks run at the same time when the Play button is pressed."
+                ),
                 "documentation",
                 ""
             ]);
@@ -1300,8 +1304,8 @@ function setupActionBlocks(activity) {
                 _(
                     "The Action block is used to group together blocks so that they can be used more than once."
                 ) +
-                    " " +
-                    _("It is often used for storing a phrase of music that is repeated."),
+                " " +
+                _("It is often used for storing a phrase of music that is repeated."),
                 "documentation",
                 null,
                 "actionhelp"
@@ -1521,7 +1525,7 @@ function setupActionBlocks(activity) {
         /**
          * Handles the flow of the block.
          */
-        flow() {}
+        flow() { }
     }
 
     new ReturnBlock().setup(activity);

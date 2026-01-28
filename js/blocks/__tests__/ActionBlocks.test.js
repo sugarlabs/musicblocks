@@ -78,7 +78,7 @@ class FlowBlock extends BaseBlock {
     constructor(name) {
         super(name);
     }
-    flow() {}
+    flow() { }
 }
 
 class FlowClampBlock extends FlowBlock {
@@ -97,7 +97,7 @@ class LeftBlock extends BaseBlock {
     constructor(name) {
         super(name);
     }
-    arg() {}
+    arg() { }
 }
 
 class ValueBlock extends LeftBlock {
@@ -160,11 +160,7 @@ describe("ActionBlocks", () => {
             parseArg: jest.fn()
         };
 
-        global.window = {
-            location: {
-                href: "http://localhost"
-            }
-        };
+        // global.window mock removed for Jest 30 compatibility
         global.XMLHttpRequest = jest.fn();
         global.alert = jest.fn();
 
@@ -241,14 +237,9 @@ describe("ActionBlocks", () => {
             };
             global.XMLHttpRequest.mockImplementation(() => mockHttp);
 
-            Object.defineProperty(window, "location", {
-                value: {
-                    href: "http://localhost?outurl=http://callback&dummy=1"
-                },
-                writable: true
-            });
-
             const block = getBlock("returnToUrl");
+            jest.spyOn(block, "getHref").mockReturnValue("http://localhost?outurl=http://callback&dummy=1");
+
             block.flow([100]);
 
             expect(mockHttp.open).toHaveBeenCalledWith("POST", "http://callback", true);
@@ -263,14 +254,8 @@ describe("ActionBlocks", () => {
             };
             global.XMLHttpRequest.mockImplementation(() => mockHttp);
 
-            Object.defineProperty(window, "location", {
-                value: {
-                    href: "http://localhost"
-                },
-                writable: true
-            });
-
             const block = getBlock("returnToUrl");
+            jest.spyOn(block, "getHref").mockReturnValue("http://localhost");
             block.flow([42]);
 
             expect(mockHttp.open).toHaveBeenCalledWith("POST", undefined, true);

@@ -1,0 +1,2 @@
+body{--bg:#e8e8e8;--fg:#666;--overlay-bg:hsla(0,0%,100%,.75)}body.dark{--bg:#1d1d20;--fg:#e8e8e8;--overlay-bg:rgba(15,15,16,.75);background:var(--bg);color:var(--fg)}.dark #helpBodyDiv{background:#1d1d20;color:var(--fg)}.dark #helpBodyDiv p,.dark #helpBodyDiv>.heading{color:var(--fg)}.dark #floatingWindows .wfWinBody,.dark #floatingWindows .windowFrame{background-color:var(--bg)!important}
+/*# sourceMappingURL=darkmode.min.css.map */

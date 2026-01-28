@@ -199,6 +199,10 @@ class LanguageBox {
      * @returns {void}
      */
     OnClick() {
+        this.reload();
+    }
+
+    reload() {
         window.location.reload();
     }
     hide() {
