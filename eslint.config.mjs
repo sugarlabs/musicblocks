@@ -3,7 +3,6 @@ import globals from "globals";
 import babelParser from "@babel/eslint-parser";
 
 export default [
-    js.configs.recommended,
     {
         ignores: [
             "lib/**",
@@ -17,6 +16,7 @@ export default [
             "**/*.min.js"
         ]
     },
+    js.configs.recommended,
     {
         files: ["**/*.js"],
         languageOptions: {
