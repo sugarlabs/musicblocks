@@ -257,6 +257,7 @@ class Turtle {
         this.singer.tieCarryOver = 0;
         this.singer.tieFirstDrums = [];
         this.singer.drift = 0;
+        this.singer.maxLagCorrectionRatio = 0.25;
         this.singer.drumStyle = [];
         this.singer.voices = [];
         this.singer.backward = [];
