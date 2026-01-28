@@ -56,7 +56,7 @@ describe("ThemeBox", () => {
         });
         jest.spyOn(global.Storage.prototype, "setItem").mockImplementation(() => { });
 
-        // Object.defineProperty for location removed
+        // Object.defineProperty for location removed for Jest 30 compatibility
 
         // Reset body classes
         document.body.classList.remove("light", "dark");
