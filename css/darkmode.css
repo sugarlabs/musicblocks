@@ -33,3 +33,23 @@ body.dark {
 .dark #floatingWindows .windowFrame {
   background-color: var(--bg) !important;
 }
+
+
+/* Trash view colors for dark mode */
+.dark .trash-view {
+  background-color: #2d2d2d;
+  color: #e8e8e8;
+  border: 2px solid #4a9eff;
+}
+
+.dark .button-container {
+  background: #022363;
+  border-bottom: 1px solid #444444;
+}
+
+.dark .trash-item.hover {
+  background-color: #444444;
+}
+.dark .trash-item.selected {
+  background-color: #555555;
+}
