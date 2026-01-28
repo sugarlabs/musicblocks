@@ -2379,8 +2379,10 @@ function Synth() {
         this.tunerMic = new Tone.UserMedia();
         await this.tunerMic.open();
 
-        const analyser = new Tone.Analyser("waveform", 2048);
-        this.tunerMic.connect(analyser);
+        this.tunerAnalyser = new Tone.Analyser("waveform", 2048);
+        this.tunerMic.connect(this.tunerAnalyser);
+
+        const analyser = this.tunerAnalyser;
 
         const YIN = (sampleRate, bufferSize = 2048, threshold = 0.1) => {
             // Low-Pass Filter to remove high-frequency noise
@@ -2457,7 +2459,8 @@ function Synth() {
             };
         };
 
-        const detectPitch = YIN(Tone.context.sampleRate);
+        this.detectPitch = YIN(Tone.context.sampleRate);
+        const detectPitch = this.detectPitch;
         let tunerMode = "chromatic"; // Add mode state
         let targetPitch = { note: "A4", frequency: 440 }; // Default target pitch
 
@@ -3273,12 +3276,11 @@ function Synth() {
      * @returns {number} The detected frequency in Hz
      */
     this.getTunerFrequency = () => {
-        if (!this.tunerAnalyser) return 440; // Default to A4 if no analyser
+        if (!this.tunerAnalyser || !this.detectPitch) return 440; // Default to A4 if no analyser
 
         const buffer = this.tunerAnalyser.getValue();
-        // TODO: Implement actual pitch detection algorithm
-        // For now, return a default value
-        return 440;
+        const pitch = this.detectPitch(buffer);
+        return pitch > 0 ? pitch : 440;
     };
 
     // Test function to verify tuner accuracy
