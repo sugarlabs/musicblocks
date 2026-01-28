@@ -5,11 +5,11 @@
   This may take some time and memory for longer utterances.
 */
 
-var meSpeakFlashFallback = new function() {
+var meSpeakFlashFallback = new function () {
 
-    var swfDefaultId="meSpeakFallback",
-        swfDefaultUrl="meSpeakFallback.swf",
-        swfElementId="", swfViaAX=false, swfInstalled=false, swfHasLoaded=false, swfVol=1;
+    var swfDefaultId = "meSpeakFallback",
+        swfDefaultUrl = "meSpeakFallback.swf",
+        swfElementId = "", swfViaAX = false, swfInstalled = false, swfHasLoaded = false, swfVol = 1;
 
     // public
 
@@ -17,19 +17,19 @@ var meSpeakFlashFallback = new function() {
         var parentEl, url;
         if (swfInstalled) return true;
         if (!swfIsAvailable(10)) return false;
-        swfInstalled=true;
+        swfInstalled = true;
         // set defaults
-        swfElementId = (swfId && typeof swfId == "string")? swfId:swfDefaultId;
-        url = (swfUrl && typeof swfUrl == "string")? swfUrl:swfDefaultUrl;
+        swfElementId = (swfId && typeof swfId == "string") ? swfId : swfDefaultId;
+        url = (swfUrl && typeof swfUrl == "string") ? swfUrl : swfDefaultUrl;
         if (parentElementOrId) {
             if (typeof parentElementOrId == "string") {
-                parentEl=document.getElementById(parentElementOrId);
+                parentEl = document.getElementById(parentElementOrId);
             }
             else if (typeof parentElementOrId == "object") {
-                parentEl=parentElementOrId=null;
+                parentEl = parentElementOrId = null;
             }
         }
-        if (!parentEl) parentEl=document.getElementsByTagName("body")[0];
+        if (!parentEl) parentEl = document.getElementsByTagName("body")[0];
         if (!parentEl) return false;
         // inject
         var obj = swfCreate(
@@ -59,19 +59,19 @@ var meSpeakFlashFallback = new function() {
 
     function swfSetVolume(v) {
         if (wfHasLoaded) {
-            var obj=document.getElementById(swfElementId);
+            var obj = document.getElementById(swfElementId);
             if (obj) el.setVolume(v);
         }
-        swfVol=v;
+        swfVol = v;
     }
 
     function swfSpeak(txt, options) {
         if (swfHasLoaded && window.meSpeak) {
-            var obj=document.getElementById(swfElementId);
+            var obj = document.getElementById(swfElementId);
             if (obj) {
                 if (typeof options !== "object") options = {};
-                options.rawdata="array";
-                obj.play( meSpeak.speak(txt, options) );
+                options.rawdata = "array";
+                obj.play(meSpeak.speak(txt, options));
             }
         }
     }
@@ -81,8 +81,8 @@ var meSpeakFlashFallback = new function() {
     }
 
     function swfFallbackHandshake() {
-        swfHasLoaded=true;
-        if (swfVol!=1) swfSetVolume(swfVol);
+        swfHasLoaded = true;
+        if (swfVol != 1) swfSetVolume(swfVol);
         if (window.console) console.log("meSpeak-SWF-fallback available.");
     }
 
@@ -91,27 +91,27 @@ var meSpeakFlashFallback = new function() {
 
     function swfIsAvailable(leastMajorVersion) {
         // returns Boolean: flashplayer and version at least 10.x
-        var sf="Shockwave Flash", sfm="application/x-shockwave-flash";
+        var sf = "Shockwave Flash", sfm = "application/x-shockwave-flash";
         if (navigator.plugins !== undefined && typeof navigator.plugins[sf] == "object") {
-            var d=navigator.plugins[sf].description;
-            if (d && !(typeof navigator.mimeTypes !==undefined && navigator.mimeTypes[sfm] && !navigator.mimeTypes[sfm].enabledPlugin)) {
-                d=d.replace(/^.*\s+(\S+\s+\S+$)/, "$1");
-                if (leastMajorVersion<= parseInt(d.replace(/^(.*)\..*$/, "$1"), 10)) return true;
+            var d = navigator.plugins[sf].description;
+            if (d && !(typeof navigator.mimeTypes !== "undefined" && navigator.mimeTypes[sfm] && !navigator.mimeTypes[sfm].enabledPlugin)) {
+                d = d.replace(/^.*\s+(\S+\s+\S+$)/, "$1");
+                if (leastMajorVersion <= parseInt(d.replace(/^(.*)\..*$/, "$1"), 10)) return true;
             }
         }
         else if (window.ActiveXObject) {
             try {
-                var a=new ActiveXObject("ShockwaveFlash.ShockwaveFlash");
+                var a = new ActiveXObject("ShockwaveFlash.ShockwaveFlash");
                 if (a) {
-                    swfViaAX=true;
-                    d=a.GetVariable("$version");
+                    swfViaAX = true;
+                    d = a.GetVariable("$version");
                     if (d) {
-                        d=d.split(" ")[1].split(",");
-                        if (leastMajorVersion<= parseInt(d[0], 10)) return true;
+                        d = d.split(" ")[1].split(",");
+                        if (leastMajorVersion <= parseInt(d[0], 10)) return true;
                     }
                 }
             }
-            catch(e) {
+            catch (e) {
                 //
             }
         }
@@ -120,43 +120,43 @@ var meSpeakFlashFallback = new function() {
 
     function swfCreate(attributes, params) {
         if (swfViaAX) {
-            var att="", par="", i;
+            var att = "", par = "", i;
             for (i in attributes) {
-                var a=i.toLowerCase;
-                if (a=="data") {
-                    params.movie=attributes[i];
+                var a = i.toLowerCase;
+                if (a == "data") {
+                    params.movie = attributes[i];
                 }
-                else if (a=="styleclass") {
-                    att+=' class="'+attributes[i]+'"';
+                else if (a == "styleclass") {
+                    att += ' class="' + attributes[i] + '"';
                 }
-                else if (a!="classid") {
-                    att+=" "+i+'="'+attributes[i]+'"';
+                else if (a != "classid") {
+                    att += " " + i + '="' + attributes[i] + '"';
                 }
             }
             for (i in params) {
-                if (params[i] != Object.prototype[i]) par+=' <param name="'+i+'" value="'+params[i]+'" />';
+                if (params[i] != Object.prototype[i]) par += ' <param name="' + i + '" value="' + params[i] + '" />';
             }
-            var el=document.createElement("div");
-            el.outerHTML='<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"'+att+">"+par+"</object>";
+            var el = document.createElement("div");
+            el.outerHTML = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"' + att + ">" + par + "</object>";
             return el;
         }
         else {
-            var o=document.createElement("object");
+            var o = document.createElement("object");
             o.setAttribute("type", "application/x-shockwave-flash");
             for (var i in attributes) {
                 if (attributes[i] != Object.prototype[i]) {
-                    var a=i.toLowerCase();
-                    if (a=="styleclass") {
+                    var a = i.toLowerCase();
+                    if (a == "styleclass") {
                         o.setAttribute("class", attributes[i]);
                     }
-                    else if (a!="styleclass") {
+                    else if (a != "styleclass") {
                         o.setAttribute(i, attributes[i]);
                     }
                 }
             }
             for (i in params) {
                 if (attributes[i] != Object.prototype[i] && i.toLowerCase() != "movie") {
-                    var p=document.createElement("param");
+                    var p = document.createElement("param");
                     p.setAttribute("name", i);
                     p.setAttribute("value", attributes[i]);
                     o.appendChild(p);
@@ -168,33 +168,33 @@ var meSpeakFlashFallback = new function() {
 
     function swfRemove(obj) {
         try {
-            if (typeof obj =="string") obj=document.getElementById(obj);
-            if (!obj || typeof obj !="object") return;
+            if (typeof obj == "string") obj = document.getElementById(obj);
+            if (!obj || typeof obj != "object") return;
             if (swfViaAX) {
-                obj.style.display="none";
+                obj.style.display = "none";
                 swfRemoveObjectInIE(obj.id);
             }
             else if (obj.parentNode) {
                 obj.parentNode.removeChild(obj);
             }
-            swfInstalled=false;
+            swfInstalled = false;
         }
-        catch(e) {
+        catch (e) {
             //
         }
     }
 
     function swfRemoveObjectInIE(id) {
-        var obj=document.getElementById(obj);
+        var obj = document.getElementById(obj);
         if (obj) {
-            if (obj.readyState==4) {
+            if (obj.readyState == 4) {
                 for (var i in obj) {
-                    if (typeof obj[i] =="function") obj[i] = null;
+                    if (typeof obj[i] == "function") obj[i] = null;
                 }
                 if (obj.parentNode) obj.parentNode.removeChild(obj);
             }
             else {
-                setTimeout(function() {swfRemoveObjectInIE(id);}, 10);
+                setTimeout(function () { swfRemoveObjectInIE(id); }, 10);
             }
         }
     }
@@ -229,4 +229,3 @@ function meSpeakFallbackHandshake() {
     meSpeakFlashFallback.swfFallbackHandshake();
 }
 
-	

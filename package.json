@@ -12,7 +12,7 @@
   },
   "amd": {},
   "scripts": {
-    "lint": "eslint js/**/*.js",
+    "lint": "eslint .",
     "serve": "http-server -a 127.0.0.1 -p 3000 --gzip --brotli",
     "start": "node index.js",
     "dev": "nodemon index.js",
@@ -28,12 +28,12 @@
     "cypress": "^14.0.2",
     "electron": "^39.2.7",
     "electron-builder": "^26.0.12",
-    "eslint": "^7.6.0",
-    "eslint-config-prettier": "^6.15.0",
-    "eslint-config-standard": "^14.1.1",
-    "eslint-plugin-import": "^2.22.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1",
+    "eslint": "^9.19.0",
+    "@eslint/js": "^9.19.0",
+    "globals": "^15.14.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-promise": "^7.2.1",
     "gulp": "^5.0.1",
     "gulp-babel": "^8.0.0",
     "gulp-clean-css": "^4.3.0",
@@ -63,7 +63,7 @@
     "tone": "^15.1.22"
   },
   "build": {
-    "appId": "com.musicblocks.app", 
+    "appId": "com.musicblocks.app",
     "productName": "Music Blocks",
     "mac": {
       "category": "public.app-category.music",

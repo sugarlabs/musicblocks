@@ -10,13 +10,15 @@ export default [
             "dist/**",
             "node_modules/**",
             "bower_components/**",
-            "activity/**",
-            "planet/**",
-            "sounds/**"
+            "planet/libs/**",
+            "sounds/**",
+            "coverage/**",
+            "build/**",
+            "**/*.min.js"
         ]
     },
     {
-        files: ["js/**/*.js"],
+        files: ["**/*.js"],
         languageOptions: {
             ecmaVersion: 2022,
             sourceType: "script",
@@ -50,6 +52,12 @@ export default [
             "no-const-assign": "off",
             "no-dupe-keys": "off",
             "no-useless-catch": "off"
+        }
+    },
+    {
+        files: ["cypress/**/*.js"],
+        languageOptions: {
+            sourceType: "module"
         }
     }
 ];
