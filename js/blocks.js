@@ -1807,9 +1807,15 @@ class Blocks {
                                     myBlock.container.y = myBlock.lastGoodY;
                                 }
 
-                                // Directional push away from illegal dock
-                                myBlock.container.x -= (dx / distance) * bounceFactor;
-                                myBlock.container.y -= (dy / distance) * bounceFactor;
+                                // Directional push away from illegal dock based on block type
+                                if (myBlock.isArgBlock()) {
+                                    // Arg blocks bounce to the right
+                                    myBlock.container.x += bounceFactor;
+                                } else {
+                                    // Flow blocks bounce below and to the right
+                                    myBlock.container.x += bounceFactor * 0.7;
+                                    myBlock.container.y += bounceFactor;
+                                }
 
                                 bounced = true;
                             }
