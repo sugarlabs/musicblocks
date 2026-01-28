@@ -2931,6 +2931,12 @@ class Block {
                     }
                 }
             }
+
+            // Move state cleanup from mouseout to click for immediate UI response
+            if (!that.blocks.selectionModeOn) {
+                that.blocks.unhighlight(thisBlock, true);
+            }
+            that.blocks.activeBlock = null;
         });
 
         /**
@@ -3118,10 +3124,6 @@ class Block {
                 that.blocks.longPressTimeout = null;
                 that.blocks.clearLongPress();
             }
-            if (!that.blocks.selectionModeOn) {
-                that.blocks.unhighlight(thisBlock, true);
-            }
-            that.blocks.activeBlock = null;
 
             moved = false;
         });
@@ -3141,9 +3143,6 @@ class Block {
                 that.blocks.longPressTimeout = null;
                 that.blocks.clearLongPress();
             }
-
-            that.blocks.unhighlight(thisBlock, true);
-            that.blocks.activeBlock = null;
 
             moved = false;
         });
