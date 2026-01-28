@@ -37,7 +37,8 @@
    SPECIALINPUTS, STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
    TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, Turtles, TURTLESVG,
    updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_F,
-   SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator
+   SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
+   waitForReadiness
  */
 
 /*
@@ -7672,14 +7673,24 @@ const activity = new Activity();
 
 require(["domReady!"], doc => {
     doBrowserCheck();
-    if (jQuery.browser.mozilla) {
-        setTimeout(() => {
-            activity.setupDependencies();
-            activity.domReady(doc);
-        }, 5000);
-    } else {
+
+    const initializeApp = () => {
         activity.setupDependencies();
         activity.domReady(doc);
+    };
+
+    if (jQuery.browser.mozilla) {
+        // Use readiness-based initialization instead of arbitrary 5-second delay
+        // This polls for critical dependencies (createjs, Howler, DOM elements)
+        // and initializes as soon as they're ready (min 500ms, max 10s)
+        waitForReadiness(initializeApp, {
+            maxWait: 10000, // Maximum wait time (fallback)
+            minWait: 500, // Minimum wait for stability
+            checkInterval: 100
+        });
+    } else {
+        // Chromium browsers don't need the delay
+        initializeApp();
     }
 });
 
