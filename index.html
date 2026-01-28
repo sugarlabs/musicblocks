@@ -548,7 +548,9 @@ document.addEventListener("DOMContentLoaded", init);
     </script>
     <script>
         $(document).ready(function () {
-            doSearch();
+            if (typeof doSearch === "function") {
+                doSearch();
+            }
         });
     </script>
 
