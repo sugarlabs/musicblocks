@@ -12,11 +12,9 @@ on:
 jobs:
     build:
         runs-on: ubuntu-latest
-
         strategy:
             matrix:
                 node-version: [18.x, 20.x, 22.x, 24.x]
-
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
