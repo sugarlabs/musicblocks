@@ -68,7 +68,7 @@ let MYDEFINES = [
     "p5-sound-adapter",
     "p5.dom.min",
     // 'mespeak',
-    "Chart",
+    "Chart.js",
     "utils/utils",
     "activity/artwork",
     "widgets/status",
@@ -7684,6 +7684,8 @@ require(["domReady!"], doc => {
     setTimeout(() => {
         activity.setupDependencies();
         activity.domReady(doc);
+        // Initialize search functionality after activity is ready
+        activity.doSearch();
     }, 5000);
 });
 
