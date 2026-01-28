@@ -27,7 +27,7 @@
     "@babel/preset-env": "^7.28.5",
     "cypress": "^14.0.2",
     "electron": "40.0.0",
-    "electron-builder": "26.4.0",
+    "electron-builder": "26.6.0",
     "eslint": "^7.6.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-config-standard": "^14.1.1",
