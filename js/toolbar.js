@@ -786,14 +786,82 @@ class Toolbar {
         const browser = fnBrowserDetect();
         const hideIn = ["firefox", "safari"];
 
-        if (hideIn.includes(browser)) {
+
+        if (hideIn.includes(browser) || (this.activity && this.activity.beginnerMode)) {
             Record.classList.add("hide");
+            const modeContainer = document.querySelector(".record-mode-container");
+            if (modeContainer) {
+                modeContainer.classList.add("hide");
+            }
             return;
         }
 
+        Record.classList.remove("hide");
         Record.style.display = "block";
         Record.innerHTML = `<i class="material-icons main">${RECORDBUTTON}</i>`;
         Record.onclick = () => rec_onclick(this.activity);
+
+        // Show record mode dropdown container
+        const modeContainer = document.querySelector(".record-mode-container");
+        if (modeContainer) {
+            modeContainer.classList.remove("hide");
+            modeContainer.style.display = "flex";
+        }
+
+        // Initialize record mode dropdown
+        const modeBtn = docById("recordModeBtn");
+        const modeMenu = docById("recordModeMenu");
+        const modeText = docById("recordModeText");
+        const modeOptions = document.querySelectorAll(".record-option");
+        
+        if (modeBtn && modeMenu && modeText) {
+            // Load saved preference
+            const savedMode = localStorage.getItem("musicBlocksRecordMode") || "screen";
+            modeText.textContent = savedMode === "canvas" ? "Record canvas only" : "Record canvas and toolbars";
+            
+            // Update selected option styling
+            modeOptions.forEach(option => {
+                if (option.getAttribute("data-mode") === savedMode) {
+                    option.classList.add("selected");
+                } else {
+                    option.classList.remove("selected");
+                }
+            });
+            
+            // Toggle dropdown on button click
+            modeBtn.onclick = (e) => {
+                e.stopPropagation();
+                const isOpen = modeMenu.style.display === "block";
+                modeMenu.style.display = isOpen ? "none" : "block";
+                modeBtn.classList.toggle("active", !isOpen);
+            };
+            
+            // Handle option selection
+            modeOptions.forEach(option => {
+                option.onclick = () => {
+                    const selectedMode = option.getAttribute("data-mode");
+                    localStorage.setItem("musicBlocksRecordMode", selectedMode);
+                    modeText.textContent = option.textContent;
+                    
+                    // Update selected styling
+                    modeOptions.forEach(opt => opt.classList.remove("selected"));
+                    option.classList.add("selected");
+                    
+                    // Close menu
+                    modeMenu.style.display = "none";
+                    modeBtn.classList.remove("active");
+                    
+                    console.log("Recording mode changed to:", option.textContent);
+                };
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener("click", () => {
+                modeMenu.style.display = "none";
+                modeBtn.classList.remove("active");
+            });
+        }
+
     }
 
     /**
