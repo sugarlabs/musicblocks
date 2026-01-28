@@ -53,10 +53,10 @@ describe("processABCNotes - Basic Note Processing", () => {
 
     beforeEach(() => {
         logo = {
-            notationNotes: { "0": "" },
+            notationNotes: { 0: "" },
             notation: {
                 notationStaging: {
-                    "0": [
+                    0: [
                         [["G♯4"], 4, 0, null, null, -1, false],
                         [["F4"], 4, 0, null, null, -1, false],
                         [["G♯4"], 2, 0, null, null, -1, false]
@@ -88,7 +88,7 @@ describe("processABCNotes - Advanced Note Handling", () => {
     let logo;
 
     beforeEach(() => {
-        logo = { notationNotes: { "0": "" }, notation: { notationStaging: { "0": [] } } };
+        logo = { notationNotes: { 0: "" }, notation: { notationStaging: { 0: [] } } };
     });
 
     it("should handle frequency (number) inputs", () => {
@@ -125,7 +125,7 @@ describe("processABCNotes - Advanced Note Handling", () => {
 describe("processABCNotes - Control Strings", () => {
     let logo;
     beforeEach(() => {
-        logo = { notationNotes: { "0": "" }, notation: { notationStaging: { "0": [] } } };
+        logo = { notationNotes: { 0: "" }, notation: { notationStaging: { 0: [] } } };
     });
 
     it("should handle all string commands correctly", () => {
@@ -182,7 +182,7 @@ describe("processABCNotes - Control Strings", () => {
 describe("processABCNotes - Chords", () => {
     let logo;
     beforeEach(() => {
-        logo = { notationNotes: { "0": "" }, notation: { notationStaging: { "0": [] } } };
+        logo = { notationNotes: { 0: "" }, notation: { notationStaging: { 0: [] } } };
     });
 
     it("should handle chords correctly (Start, Middle, End)", () => {
@@ -218,7 +218,7 @@ describe("processABCNotes - Chords", () => {
 describe("processABCNotes - Tuplet Handling", () => {
     let logo;
     beforeEach(() => {
-        logo = { notationNotes: { "0": "" }, notation: { notationStaging: { "0": [] } } };
+        logo = { notationNotes: { 0: "" }, notation: { notationStaging: { 0: [] } } };
     });
 
     it("should process standard tuplets correctly", () => {
@@ -270,7 +270,7 @@ describe("processABCNotes - Edge Cases for 100% Coverage", () => {
     let logo;
 
     beforeEach(() => {
-        logo = { notationNotes: { "0": "" }, notation: { notationStaging: { "0": [] } } };
+        logo = { notationNotes: { 0: "" }, notation: { notationStaging: { 0: [] } } };
     });
 
     it("should handle array of notes in NOTATIONNOTE field", () => {
@@ -321,10 +321,10 @@ describe("saveAbcOutput", () => {
         activity = {
             logo: {
                 notationOutput: "",
-                notationNotes: { "0": "" },
+                notationNotes: { 0: "" },
                 notation: {
                     notationStaging: {
-                        "0": [[["G♯4"], 4, 0, null, null, -1, false]]
+                        0: [[["G♯4"], 4, 0, null, null, -1, false]]
                     }
                 }
             },
@@ -353,10 +353,10 @@ describe("saveAbcOutput", () => {
 describe("processABCNotes - Tuplet Handling", () => {
     it("should process tuplets correctly", () => {
         const logo = {
-            notationNotes: { "0": "" },
+            notationNotes: { 0: "" },
             notation: {
                 notationStaging: {
-                    "0": [
+                    0: [
                         [["G♯4"], 4, 0, 3, 2, -1, false],
                         [["F4"], 4, 0, 3, 2, -1, false],
                         [["G♯4"], 4, 0, 3, 2, -1, false]

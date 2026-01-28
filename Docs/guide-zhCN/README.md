@@ -755,8 +755,8 @@ notes.
 
 The *Set Drum* block is used to map the enclosed pitches into drum
 sounds. Drum sounds are played in a monopitch using the specified drum
-sample. In the example above, a `kick drum` will be substitued for
-each occurance of a `Re` `4`.
+sample. In the example above, a `kick drum` will be substituted for
+each occurrence of a `Re` `4`.
 
 *Set Drum* 块用于将封闭的音高映射到鼓中声音。
 鼓声使用指定的鼓在单声道中播放。
