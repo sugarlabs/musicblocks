@@ -12,7 +12,7 @@
 /*
    global
 
-   _
+   _, toTitleCase
 */
 /*
    exported
@@ -71,7 +71,7 @@ class GlobalTag {
 
         if (this.selected) tag.classList.add(this.selectedClass);
 
-        tag.textContent = toTitleCase(_(this.name));
+        tag.textContent = toTitleCase(this.name);
 
         // eslint-disable-next-line no-unused-vars
         tag.addEventListener("click", evt => {

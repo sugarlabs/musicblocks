@@ -24,7 +24,7 @@
    exported
 
    debounce, getCookie, setCookie, hideOnClickOutside,
-   updateCheckboxes
+   updateCheckboxes, toTitleCase
 */
 
 function debounce(func, wait, immediate) {
@@ -123,6 +123,18 @@ function updateCheckboxes(id) {
     for (let i = 0; i < elements.length; i++) url += `&${elements[i].name}=True`;
 
     urlel.value = url;
+}
+
+/**
+ * Converts the first character of a string to uppercase.
+ * @param {string} str - The input string.
+ * @returns {string} The string with the first character in uppercase.
+ */
+function toTitleCase(str) {
+    if (typeof str !== "string") return;
+    let tempStr = "";
+    if (str.length > 1) tempStr = str.substring(1);
+    return str.toUpperCase()[0] + tempStr;
 }
 
 $(document).ready(() => {

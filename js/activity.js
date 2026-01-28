@@ -7684,6 +7684,8 @@ require(["domReady!"], doc => {
     setTimeout(() => {
         activity.setupDependencies();
         activity.domReady(doc);
+        // Initialize search functionality after activity is ready
+        activity.doSearch();
     }, 5000);
 });
 
