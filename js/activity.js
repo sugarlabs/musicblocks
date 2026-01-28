@@ -7233,7 +7233,6 @@ class Activity {
                         return;
                     }
                     reader.readAsText(files[0]);
-                    reader.readAsText(files[0]);
                     window.scroll(0, 0);
                 }
             };
