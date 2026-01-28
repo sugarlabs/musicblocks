@@ -19,6 +19,14 @@
 
    GlobalTag
 */
+if (typeof window.toTitleCase !== "function") {
+    window.toTitleCase = function (str) {
+        if (typeof str !== "string") return "";
+        let tempStr = "";
+        if (str.length > 1) tempStr = str.substring(1);
+        return str.toUpperCase()[0] + tempStr;
+    };
+}
 
 class GlobalTag {
     /* 
@@ -71,7 +79,7 @@ class GlobalTag {
 
         if (this.selected) tag.classList.add(this.selectedClass);
 
-        tag.textContent = toTitleCase(_(this.name));
+        tag.textContent = window.toTitleCase(_(this.name));
 
         // eslint-disable-next-line no-unused-vars
         tag.addEventListener("click", evt => {
