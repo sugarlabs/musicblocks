@@ -199,8 +199,17 @@ class LanguageBox {
      * @returns {void}
      */
     OnClick() {
+        this.reload();
+    }
+
+    /**
+     * @public
+     * @returns {void}
+     */
+    reload() {
         window.location.reload();
     }
+
     hide() {
         const MSGPrefix =
             "<a href='#' class='language-link' " +
