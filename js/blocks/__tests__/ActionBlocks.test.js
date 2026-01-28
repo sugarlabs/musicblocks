@@ -160,11 +160,6 @@ describe("ActionBlocks", () => {
             parseArg: jest.fn()
         };
 
-        global.window = {
-            location: {
-                href: "http://localhost"
-            }
-        };
         global.XMLHttpRequest = jest.fn();
         global.alert = jest.fn();
 
@@ -241,14 +236,11 @@ describe("ActionBlocks", () => {
             };
             global.XMLHttpRequest.mockImplementation(() => mockHttp);
 
-            Object.defineProperty(window, "location", {
-                value: {
-                    href: "http://localhost?outurl=http://callback&dummy=1"
-                },
-                writable: true
-            });
-
             const block = getBlock("returnToUrl");
+            jest.spyOn(block, "getURL").mockReturnValue(
+                "http://localhost?outurl=http://callback&dummy=1"
+            );
+
             block.flow([100]);
 
             expect(mockHttp.open).toHaveBeenCalledWith("POST", "http://callback", true);
@@ -263,14 +255,9 @@ describe("ActionBlocks", () => {
             };
             global.XMLHttpRequest.mockImplementation(() => mockHttp);
 
-            Object.defineProperty(window, "location", {
-                value: {
-                    href: "http://localhost"
-                },
-                writable: true
-            });
-
             const block = getBlock("returnToUrl");
+            jest.spyOn(block, "getURL").mockReturnValue("http://localhost");
+
             block.flow([42]);
 
             expect(mockHttp.open).toHaveBeenCalledWith("POST", undefined, true);

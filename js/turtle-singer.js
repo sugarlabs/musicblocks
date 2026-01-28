@@ -153,6 +153,10 @@ class Singer {
         this.tieFirstDrums = [];
         this.synthVolume = {};
         this.drift = 0;
+        // Maximum fraction of note duration that can be used for lag correction per note.
+        // This prevents notes from being rushed when catching up to the master clock.
+        // Value of 0.25 means at most 25% of a note's duration can be skipped for catch-up.
+        this.maxLagCorrectionRatio = 0.25;
         this.drumStyle = [];
         this.voices = [];
         this.backward = [];
@@ -1569,8 +1573,18 @@ class Singer {
             const elapsedTime = (new Date().getTime() - activity.logo.firstNoteTime) / 1000;
 
             // When we are "drifting", we don't bother with lag.
-            const turtleLag =
-                tur.singer.drift === 0 ? Math.max(elapsedTime - tur.singer.turtleTime, 0) : 0;
+            // When not drifting, we limit the lag correction to prevent notes from being rushed.
+            // This ensures that note sequences play correctly even when the system is behind.
+            let turtleLag = 0;
+            if (tur.singer.drift === 0) {
+                const rawLag = Math.max(elapsedTime - tur.singer.turtleTime, 0);
+                // Calculate the maximum lag correction allowed for this note
+                // based on the note's duration to prevent rushing
+                const noteDuration = bpmFactor / noteBeatValue;
+                const maxLagCorrection = noteDuration * tur.singer.maxLagCorrectionRatio;
+                // Apply gradual lag correction: correct at most maxLagCorrection per note
+                turtleLag = Math.min(rawLag, maxLagCorrection);
+            }
 
             // Delay running graphics from second note in tie.
             let tieDelay = tur.singer.tie ? tur.singer.tieCarryOver : 0;

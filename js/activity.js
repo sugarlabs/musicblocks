@@ -37,7 +37,8 @@
    SPECIALINPUTS, STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
    TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, Turtles, TURTLESVG,
    updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_F,
-   SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator
+   SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
+   MUSICALMODES
  */
 
 /*
@@ -1900,9 +1901,8 @@ class Activity {
                 // Queue and take first step.
                 if (!this.turtles.running()) {
                     this.logo.runLogoCommands();
-                    document.getElementById(
-                        "stop"
-                    ).style.color = this.toolbar.stopIconColorWhenPlaying;
+                    document.getElementById("stop").style.color =
+                        this.toolbar.stopIconColorWhenPlaying;
                 }
                 this.logo.step();
             } else {
@@ -2221,9 +2221,8 @@ class Activity {
                     i < this.palettes.dict[this.palettes.activePalette].protoList.length;
                     i++
                 ) {
-                    const name = this.palettes.dict[this.palettes.activePalette].protoList[i][
-                        "name"
-                    ];
+                    const name =
+                        this.palettes.dict[this.palettes.activePalette].protoList[i]["name"];
                     if (name in obj["FLOWPLUGINS"]) {
                         // eslint-disable-next-line no-console
                         console.log("deleting " + name);
@@ -4937,9 +4936,8 @@ class Activity {
                             }
                         }
                         staffBlocksMap[staffIndex].baseBlocks[0][0][firstnammedo][4][0] = blockId;
-                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
-                            endnammedo
-                        ][4][1] = null;
+                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][endnammedo][4][1] =
+                            null;
 
                         blockId += 2;
                     } else {
@@ -5007,9 +5005,8 @@ class Activity {
                                 prevnameddo
                             ][4][1] = blockId;
                         } else {
-                            staffBlocksMap[staffIndex].repeatBlock[
-                                prevrepeatnameddo
-                            ][4][3] = blockId;
+                            staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3] =
+                                blockId;
                         }
                         if (afternamedo !== -1) {
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
@@ -5859,8 +5856,8 @@ class Activity {
                                 let customName = "custom";
                                 if (myBlock.connections[1] !== null) {
                                     // eslint-disable-next-line max-len
-                                    customName = this.blocks.blockList[myBlock.connections[1]]
-                                        .value;
+                                    customName =
+                                        this.blocks.blockList[myBlock.connections[1]].value;
                                 }
                                 // eslint-disable-next-line no-console
                                 console.log(customName);
@@ -6998,8 +6995,13 @@ class Activity {
             // Load custom mode saved in local storage.
             const custommodeData = this.storage.custommode;
             if (custommodeData !== undefined) {
-                // FIX ME: customMode is loaded but not yet used
-                JSON.parse(custommodeData);
+                // Parse and update the custom musical mode with saved data.
+                try {
+                    const customModeDataObj = JSON.parse(custommodeData);
+                    Object.assign(MUSICALMODES["custom"], customModeDataObj);
+                } catch (e) {
+                    console.error("Error parsing custommode data:", e);
+                }
             }
 
             this.fileChooser.addEventListener("click", () => {
@@ -7220,21 +7222,6 @@ class Activity {
                     });
                 };
 
-                // Music Block Parser from abc to MB
-                abcReader.onload = event => {
-                    //get the abc data and replace the / so that the block does not break
-                    let abcData = event.target.result;
-                    abcData = abcData.replace(/\\/g, "");
-
-                    const tunebook = new ABCJS.parseOnly(abcData);
-                    // eslint-disable-next-line no-console
-                    console.log(tunebook);
-                    tunebook.forEach(tune => {
-                        //call parseABC to parse abcdata to MB json
-                        this.parseABC(tune);
-                    });
-                };
-
                 // Work-around in case the handler is called by the
                 // widget drag & drop code.
                 if (files[0] !== undefined) {
@@ -7251,7 +7238,6 @@ class Activity {
                         abcReader.readAsText(files[0]);
                         return;
                     }
-                    reader.readAsText(files[0]);
                     reader.readAsText(files[0]);
                     window.scroll(0, 0);
                 }
@@ -7690,21 +7676,19 @@ class Activity {
 
 const activity = new Activity();
 
-require(["domReady!"], doc => {
-    doBrowserCheck();
-    if (jQuery.browser.mozilla) {
-        setTimeout(() => {
+// Execute initialization once all RequireJS modules are loaded AND DOM is ready
+define(["domReady!"].concat(MYDEFINES), doc => {
+    const initialize = () => {
+        if (typeof createDefaultStack !== "undefined") {
             activity.setupDependencies();
             activity.domReady(doc);
-        }, 5000);
-    } else {
-        activity.setupDependencies();
-        activity.domReady(doc);
-    }
-});
-
-define(MYDEFINES, () => {
-    activity.setupDependencies();
-    activity.doContextMenus();
-    activity.doPluginsAndPaletteCols();
+            activity.doContextMenus();
+            activity.doPluginsAndPaletteCols();
+        } else {
+            // Race condition in Firefox: non-AMD scripts might not have
+            // finished global assignment yet.
+            setTimeout(initialize, 10);
+        }
+    };
+    initialize();
 });
