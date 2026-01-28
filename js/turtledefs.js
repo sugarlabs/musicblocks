@@ -72,8 +72,8 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
             // Local environment
             GUIDEURL = "Docs/guide/index.html";
         } else {
-            // Production environment
-            GUIDEURL = "https://musicblocks.sugarlabs.org/Docs/guide/index.html";
+            // Production environment - use relative path
+            GUIDEURL = "./Docs/guide/index.html";
         }
     }
 
