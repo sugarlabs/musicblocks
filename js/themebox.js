@@ -15,7 +15,18 @@
    global _, platformColor
 */
 
-/* exported ThemeBox, themeConfigs */
+/* exported ThemeBox, themeConfigs, getSystemThemePreference */
+
+/**
+ * Detect system/browser color scheme preference
+ * @returns {string} "dark" or "light"
+ */
+function getSystemThemePreference() {
+    if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        return "dark";
+    }
+    return "light";
+}
 
 const themeConfigs = {
     dark: {
@@ -102,7 +113,8 @@ class ThemeBox {
      */
     constructor(activity) {
         this.activity = activity;
-        this._theme = activity.storage.themePreference || "light";
+        // Use stored preference if exists, otherwise detect system preference
+        this._theme = activity.storage.themePreference || getSystemThemePreference();
         this._themes = ["light", "dark"];
     }
 
