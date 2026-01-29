@@ -54,7 +54,8 @@
   addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
   DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
   INTERVALVALUES, getIntervalRatio, frequencyToPitch, NOTESTEP,
-  GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP
+  GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
+  SEMITONES
 */
 
 /**
@@ -840,6 +841,19 @@ const DEGREES = _("1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th");
  * @constant {number}
  */
 const SEMITONES = 12;
+
+/**
+ * Number of cents per semitone in 12-TET tuning.
+ * @constant {number}
+ */
+const CENTS_PER_SEMITONE = 100;
+
+/**
+ * Number of cents in an octave.
+ * Derived from SEMITONES for future temperament support.
+ * @constant {number}
+ */
+const CENTS_PER_OCTAVE = SEMITONES * CENTS_PER_SEMITONE;
 
 /**
  * Array representing powers of 2.
@@ -2882,18 +2896,20 @@ const frequencyToPitch = hz => {
 
     // Calculate cents to keep track of drift
     let cents = 0;
-    for (let i = 0; i < 10 * 1200; i++) {
+    // Standard tuning uses CENTS_PER_OCTAVE cents per octave.
+
+    for (let i = 0; i < 10 * CENTS_PER_OCTAVE; i++) {
         const f = A0 * Math.pow(TWELVEHUNDRETHROOT2, i);
         if (hz < f * 1.0003 && hz > f * 0.9997) {
-            cents = i % 100;
-            let j = Math.floor(i / 100);
+            cents = i % CENTS_PER_SEMITONE;
+            let j = Math.floor(i / CENTS_PER_SEMITONE);
             if (cents > 50) {
-                cents -= 100;
+                cents -= CENTS_PER_SEMITONE;
                 j += 1;
             }
             return [
-                PITCHES[(j + PITCHES.indexOf("A")) % 12],
-                Math.floor((j + PITCHES.indexOf("A")) / 12),
+                PITCHES[(j + PITCHES.indexOf("A")) % SEMITONES],
+                Math.floor((j + PITCHES.indexOf("A")) / SEMITONES),
                 cents
             ];
         }
@@ -5786,7 +5802,7 @@ const noteIsSolfege = note => {
  * @returns {string} The solfege representation.
  */
 const getSolfege = note => {
-    // FIXME: Use mode-specific conversion.
+    // TODO: Use mode-specific conversion.
     if (noteIsSolfege(note)) {
         return note;
     } else {

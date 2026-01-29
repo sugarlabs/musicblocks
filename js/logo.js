@@ -4,7 +4,7 @@
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
-// License as published by the Free Software Foundatioff; either
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
 //
 // You should have received a copy of the GNU Affero General Public
@@ -177,7 +177,7 @@ class Logo {
         this.inTempo = false;
         this.inPitchSlider = false;
         this.inMusicKeyboard = false;
-        this._currentDrumlock = null;
+        this._currentDrumBlock = null;
         this.inTimbre = false;
         this.inArpeggio = false;
         this.insideModeWidget = false;
@@ -1786,19 +1786,7 @@ class Logo {
 
         const tur = this.activity.turtles.ithTurtle(turtle);
 
-        if (Object.keys) {
-            if (Object.keys(tur.singer.embeddedGraphics).length === 0) return;
-        } else {
-            const isEmpty = true;
-            for (const key in tur.singer.embeddedGraphics) {
-                if (tur.singer.embeddedGraphics.hasOwnProperty(key)) {
-                    isEmpty = false;
-                    break;
-                }
-            }
-
-            if (isEmpty) return;
-        }
+        if (Object.keys(tur.singer.embeddedGraphics).length === 0) return;
 
         if (!(blk in tur.singer.embeddedGraphics)) return;
 
@@ -2337,7 +2325,7 @@ class Logo {
                     break;
 
                 case "clear":
-                    __clear(turtle, waitTime);
+                    __clear();
                     break;
 
                 case "fill":

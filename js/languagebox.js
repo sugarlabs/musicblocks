@@ -199,8 +199,17 @@ class LanguageBox {
      * @returns {void}
      */
     OnClick() {
+        this.reload();
+    }
+
+    /**
+     * @public
+     * @returns {void}
+     */
+    reload() {
         window.location.reload();
     }
+
     hide() {
         const MSGPrefix =
             "<a href='#' class='language-link' " +
@@ -234,7 +243,11 @@ class LanguageBox {
                 this._language = this._language.split("-")[0];
             }
 
-            localStorage.setItem("languagePreference", this._language);
+            try {
+                localStorage.setItem("languagePreference", this._language);
+            } catch (e) {
+                console.warn("Could not save language preference:", e);
+            }
             this.activity.textMsg(_("Music Blocks is already set to this language."));
         } else {
             this.activity.storage.languagePreference = this._language;

@@ -37,7 +37,8 @@
    SPECIALINPUTS, STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
    TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, Turtles, TURTLESVG,
    updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_F,
-   SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator
+   SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
+   MUSICALMODES
  */
 
 /*
@@ -65,7 +66,7 @@ let MYDEFINES = [
     "preloadjs.min",
     "howler",
     "p5.min",
-    "p5.sound.min",
+    "p5-sound-adapter",
     "p5.dom.min",
     // 'mespeak',
     "Chart",
@@ -74,7 +75,6 @@ let MYDEFINES = [
     "widgets/status",
     "widgets/help",
     "utils/munsell",
-    "activity/gif-animator",
     "activity/toolbar",
     "activity/trash",
     "activity/boundary",
@@ -308,6 +308,10 @@ class Activity {
         // Initialize GIF animator
         this.gifAnimator = new GIFAnimator();
 
+        // Dirty flag for canvas rendering optimization
+        // When true, the stage needs to be redrawn on the next animation frame
+        this.stageDirty = false;
+
         this.themes = ["light", "dark"];
         try {
             for (let i = 0; i < this.themes.length; i++) {
@@ -467,16 +471,26 @@ class Activity {
         };
 
         /*
-         * Ensure continuous canvas updates for animated content.
-         * The ticker runs at a fixed framerate to allow smooth GIF animation
-         * even when the turtle or UI is otherwise idle.
+         * Optimized canvas rendering using dirty flag pattern.
+         * The stage only updates when:
+         * 1. stageDirty flag is set (something changed)
+         * 2. Active tweens are running
+         * 3. GIF animations are playing
+         * This eliminates unnecessary 60fps updates when idle.
          */
-        createjs.Ticker.framerate = 60;
-        createjs.Ticker.on("tick", () => {
+        const renderLoop = () => {
             if (this.stage) {
-                this.stage.update();
+                const hasActiveTweens = createjs.Tween.hasActiveTweens();
+                const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
+
+                if (this.stageDirty || hasActiveTweens || hasActiveGifs) {
+                    this.stage.update();
+                    this.stageDirty = false;
+                }
             }
-        });
+            requestAnimationFrame(renderLoop);
+        };
+        requestAnimationFrame(renderLoop);
 
         /*
          * creates helpfulSearchDiv for search
@@ -853,7 +867,8 @@ class Activity {
         }
 
         //if any window resize event occurs:
-        this.addEventListener(window, "resize", () => repositionBlocks(this));
+        this._handleRepositionBlocksOnResize = () => repositionBlocks(this);
+        this.addEventListener(window, "resize", this._handleRepositionBlocksOnResize);
 
         /**
          * Finds and organizes blocks within the workspace.
@@ -1886,9 +1901,8 @@ class Activity {
                 // Queue and take first step.
                 if (!this.turtles.running()) {
                     this.logo.runLogoCommands();
-                    document.getElementById(
-                        "stop"
-                    ).style.color = this.toolbar.stopIconColorWhenPlaying;
+                    document.getElementById("stop").style.color =
+                        this.toolbar.stopIconColorWhenPlaying;
                 }
                 this.logo.step();
             } else {
@@ -1956,7 +1970,6 @@ class Activity {
                 activity.save.savePNG.bind(activity.save),
                 activity.save.saveWAV.bind(activity.save),
                 activity.save.saveLilypond.bind(activity.save),
-                activity.save.saveLilypond.bind(afterSaveLilypond),
                 activity.save.afterSaveLilypondLY.bind(activity.save),
                 activity.save.saveAbc.bind(activity.save),
                 activity.save.saveMxml.bind(activity.save),
@@ -2208,9 +2221,8 @@ class Activity {
                     i < this.palettes.dict[this.palettes.activePalette].protoList.length;
                     i++
                 ) {
-                    const name = this.palettes.dict[this.palettes.activePalette].protoList[i][
-                        "name"
-                    ];
+                    const name =
+                        this.palettes.dict[this.palettes.activePalette].protoList[i]["name"];
                     if (name in obj["FLOWPLUGINS"]) {
                         // eslint-disable-next-line no-console
                         console.log("deleting " + name);
@@ -3033,103 +3045,6 @@ class Activity {
             this.update = true;
         };
 
-        /*
-         * Makes initial "start up" note for a brand new MB project
-         */
-        this.__makeNewNote = (octave, solf) => {
-            const newNote = [
-                [
-                    0,
-                    "newnote",
-                    300 - this.blocksContainer.x,
-                    300 - this.blocksContainer.y,
-                    [null, 1, 4, 8]
-                ],
-                [1, "divide", 0, 0, [0, 2, 3]],
-                [
-                    2,
-                    [
-                        "number",
-                        {
-                            value: 1
-                        }
-                    ],
-                    0,
-                    0,
-                    [1]
-                ],
-                [
-                    3,
-                    [
-                        "number",
-                        {
-                            value: 4
-                        }
-                    ],
-                    0,
-                    0,
-                    [1]
-                ],
-                [4, "vspace", 0, 0, [0, 5]],
-                [5, "pitch", 0, 0, [4, 6, 7, null]],
-                [
-                    6,
-                    [
-                        "solfege",
-                        {
-                            value: solf
-                        }
-                    ],
-                    0,
-                    0,
-                    [5]
-                ],
-                [
-                    7,
-                    [
-                        "number",
-                        {
-                            value: octave
-                        }
-                    ],
-                    0,
-                    0,
-                    [5]
-                ],
-                [8, "hidden", 0, 0, [0, null]]
-            ];
-
-            this.blocks.loadNewBlocks(newNote);
-            if (this.blocks.activeBlock !== null) {
-                // Connect the newly created block to the active block (if
-                // it is a hidden block at the end of a new note block).
-                const bottom = this.blocks.findBottomBlock(this.blocks.activeBlock);
-                if (
-                    this.blocks.blockList[bottom].name === "hidden" &&
-                    this.blocks.blockList[this.blocks.blockList[bottom].connections[0]].name ===
-                        "newnote"
-                ) {
-                    // The note block macro creates nine blocks.
-                    const newlyCreatedBlock = this.blocks.blockList.length - 9;
-
-                    // Set last connection of active block to the
-                    // newly created block.
-                    const lastConnection = this.blocks.blockList[bottom].connections.length - 1;
-                    this.blocks.blockList[bottom].connections[lastConnection] = newlyCreatedBlock;
-
-                    // Set first connection of the newly created block to
-                    // the active block.
-                    this.blocks.blockList[newlyCreatedBlock].connections[0] = bottom;
-                    // Adjust the dock positions to realign the stack.
-                    this.blocks.adjustDocks(bottom, true);
-                }
-            }
-
-            // Set new hidden block at the end of the newly created
-            // note block to the active block.
-            this.blocks.activeBlock = this.blocks.blockList.length - 1;
-        };
-
         //To create a sampler widget
         this.makeSamplerWidget = (sampleName, sampleData) => {
             const samplerStack = [
@@ -3240,14 +3155,6 @@ class Activity {
             const KEYCODE_DOWN = 40;
             const DEL = 46;
             const V = 86;
-            // Shortcuts for creating new notes
-            const KEYCODE_D = 68; // do
-            const KEYCODE_R = 82; // re
-            const KEYCODE_M = 77; // mi
-            const KEYCODE_F = 70; // fa
-            const KEYCODE_S = 83; // so
-            const KEYCODE_L = 76; // la
-            const KEYCODE_T = 84; // ti
             const disableKeys =
                 document.getElementById("lilypondModal").style.display === "block" ||
                 this.searchWidget.style.visibility === "visible" ||
@@ -3362,50 +3269,7 @@ class Activity {
                         break;
                 }
             } else if (event.shiftKey && !disableKeys) {
-                const solfnotes_ = _("ti la sol fa mi re do").split(" ");
                 switch (event.keyCode) {
-                    case KEYCODE_D:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("D " + solfnotes_[6]);
-                            this.__makeNewNote(5, "do");
-                        }
-                        break;
-                    case KEYCODE_R:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("R " + solfnotes_[5]);
-                            this.__makeNewNote(5, "re");
-                        }
-                        break;
-                    case KEYCODE_M:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("M " + solfnotes_[4]);
-                            this.__makeNewNote(5, "mi");
-                        }
-                        break;
-                    case KEYCODE_F:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("F " + solfnotes_[3]);
-                            this.__makeNewNote(5, "fa");
-                        }
-                        break;
-                    case KEYCODE_S:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("S " + solfnotes_[2]);
-                            this.__makeNewNote(5, "sol");
-                        }
-                        break;
-                    case KEYCODE_L:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("L " + solfnotes_[1]);
-                            this.__makeNewNote(5, "la");
-                        }
-                        break;
-                    case KEYCODE_T:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("T " + solfnotes_[0]);
-                            this.__makeNewNote(5, "ti");
-                        }
-                        break;
                     case SPACE:
                         event.preventDefault();
                         if (this.turtleContainer.scaleX === 1) {
@@ -3436,7 +3300,6 @@ class Activity {
                         this._doFastButton();
                     }
                 } else if (!disableKeys) {
-                    const solfnotes_ = _("ti la sol fa mi re do").split(" ");
                     switch (event.keyCode) {
                         case END:
                             this.textMsg("END " + _("Jumping to the bottom of the page."));
@@ -3577,48 +3440,6 @@ class Activity {
                                 )
                             ) {
                                 this.logo.runLogoCommands();
-                            }
-                            break;
-                        case KEYCODE_D:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("d " + solfnotes_[6]);
-                                this.__makeNewNote(4, "do");
-                            }
-                            break;
-                        case KEYCODE_R:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("r " + solfnotes_[5]);
-                                this.__makeNewNote(4, "re");
-                            }
-                            break;
-                        case KEYCODE_M:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("m " + solfnotes_[4]);
-                                this.__makeNewNote(4, "mi");
-                            }
-                            break;
-                        case KEYCODE_F:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("f " + solfnotes_[3]);
-                                this.__makeNewNote(4, "fa");
-                            }
-                            break;
-                        case KEYCODE_S:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("s " + solfnotes_[2]);
-                                this.__makeNewNote(4, "sol");
-                            }
-                            break;
-                        case KEYCODE_L:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("l " + solfnotes_[1]);
-                                this.__makeNewNote(4, "la");
-                            }
-                            break;
-                        case KEYCODE_T:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("t " + solfnotes_[0]);
-                                this.__makeNewNote(4, "ti");
                             }
                             break;
                         default:
@@ -3882,14 +3703,16 @@ class Activity {
         }
 
         let resizeTimeout;
-        this.addEventListener(window, "resize", () => {
+        this._handleWindowResize = () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
                 handleResize();
                 this._setupPaletteMenu();
             }, 100);
-        });
-        this.addEventListener(window, "orientationchange", handleResize);
+        };
+        this.addEventListener(window, "resize", this._handleWindowResize);
+        this._handleOrientationChangeResize = handleResize;
+        this.addEventListener(window, "orientationchange", this._handleOrientationChangeResize);
         const that = this;
         const resizeCanvas_ = () => {
             try {
@@ -3902,7 +3725,12 @@ class Activity {
         };
 
         resizeCanvas_();
-        this.addEventListener(window, "orientationchange", resizeCanvas_);
+        this._handleOrientationChangeResizeCanvas = resizeCanvas_;
+        this.addEventListener(
+            window,
+            "orientationchange",
+            this._handleOrientationChangeResizeCanvas
+        );
 
         /*
          * Restore last stack pushed to trashStack back onto canvas.
@@ -4359,7 +4187,8 @@ class Activity {
         };
 
         /*
-         * Updates all canvas elements
+         * Updates all canvas elements by marking stage as dirty.
+         * The actual render will happen on the next animation frame.
          */
         this.refreshCanvas = () => {
             if (this.blockRefreshCanvas) {
@@ -4367,27 +4196,34 @@ class Activity {
             }
 
             this.blockRefreshCanvas = true;
-            // Force stage clear and update
-            this.stage.clear();
-            this.stage.update();
+            // Mark stage as needing update
+            this.stageDirty = true;
             this.update = true;
 
             const that = this;
             setTimeout(() => {
                 that.blockRefreshCanvas = false;
-                that.stage.update();
+                that.stageDirty = true;
             }, 5);
         };
 
         /*
-         * This set makes it so the stage only re-renders when an
-         * event handler indicates a change has happened.
+         * This sets the dirty flag so the stage re-renders on the next
+         * animation frame when an event handler indicates a change has happened.
          */
         this.__tick = event => {
             if (this.update || createjs.Tween.hasActiveTweens()) {
-                this.update = false; // Only update once
-                this.stage.update(event);
+                this.update = false;
+                this.stageDirty = true;
             }
+        };
+
+        /*
+         * Marks the stage as needing a redraw on the next animation frame.
+         * Call this whenever visual changes occur that need to be rendered.
+         */
+        this.markStageDirty = () => {
+            this.stageDirty = true;
         };
 
         /*
@@ -4493,7 +4329,7 @@ class Activity {
         /**
          * Loads MB project from Planet.
          * @param  projectID {Planet project ID}
-         * @param  flags     {parameteres}
+         * @param  flags     {parameters}
          * @param  env       {specifies environment}
          */
         const loadProject = (activity, projectID, flags, env) => {
@@ -5100,9 +4936,8 @@ class Activity {
                             }
                         }
                         staffBlocksMap[staffIndex].baseBlocks[0][0][firstnammedo][4][0] = blockId;
-                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
-                            endnammedo
-                        ][4][1] = null;
+                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][endnammedo][4][1] =
+                            null;
 
                         blockId += 2;
                     } else {
@@ -5170,9 +5005,8 @@ class Activity {
                                 prevnameddo
                             ][4][1] = blockId;
                         } else {
-                            staffBlocksMap[staffIndex].repeatBlock[
-                                prevrepeatnameddo
-                            ][4][3] = blockId;
+                            staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3] =
+                                blockId;
                         }
                         if (afternamedo !== -1) {
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
@@ -5215,18 +5049,11 @@ class Activity {
         };
 
         /**
-         * Calculate time such that no matter how long it takes to load the program, the loading
-         * animation will cycle at least once.
          * @param loadProject all params are from load project function
          */
         this.loadStartWrapper = async (func, arg1, arg2, arg3) => {
-            const time1 = new Date();
             await func(this, arg1, arg2, arg3);
-
-            const time2 = new Date();
-            const elapsedTime = time2.getTime() - time1.getTime();
-            const timeLeft = Math.max(6000 - elapsedTime);
-            setTimeout(this.showContents, timeLeft);
+            this.showContents();
         };
 
         /*
@@ -5234,13 +5061,19 @@ class Activity {
          * Shows contents of MB after loading screen.
          */
         this.showContents = () => {
-            document.getElementById("loading-image-container").style.display = "none";
-            document.getElementById("bottom-right-logo").style.display = "none";
-            document.getElementById("palette").style.display = "block";
-            // document.getElementById('canvas').style.display = 'none';
-            document.getElementById("hideContents").style.display = "block";
-            document.getElementById("buttoncontainerBOTTOM").style.display = "block";
-            document.getElementById("buttoncontainerTOP").style.display = "block";
+            clearInterval(window.intervalId);
+            document.getElementById("loadingText").textContent = _("Loading Complete!");
+
+            setTimeout(() => {
+                document.getElementById("loadingText").textContent = null;
+                document.getElementById("loading-image-container").style.display = "none";
+                document.getElementById("bottom-right-logo").style.display = "none";
+                document.getElementById("palette").style.display = "block";
+                // document.getElementById('canvas').style.display = 'none';
+                document.getElementById("hideContents").style.display = "block";
+                document.getElementById("buttoncontainerBOTTOM").style.display = "block";
+                document.getElementById("buttoncontainerTOP").style.display = "block";
+            }, 500);
         };
 
         this.justLoadStart = () => {
@@ -6023,8 +5856,8 @@ class Activity {
                                 let customName = "custom";
                                 if (myBlock.connections[1] !== null) {
                                     // eslint-disable-next-line max-len
-                                    customName = this.blocks.blockList[myBlock.connections[1]]
-                                        .value;
+                                    customName =
+                                        this.blocks.blockList[myBlock.connections[1]].value;
                                 }
                                 // eslint-disable-next-line no-console
                                 console.log(customName);
@@ -7162,8 +6995,13 @@ class Activity {
             // Load custom mode saved in local storage.
             const custommodeData = this.storage.custommode;
             if (custommodeData !== undefined) {
-                // FIX ME: customMode is loaded but not yet used
-                JSON.parse(custommodeData);
+                // Parse and update the custom musical mode with saved data.
+                try {
+                    const customModeDataObj = JSON.parse(custommodeData);
+                    Object.assign(MUSICALMODES["custom"], customModeDataObj);
+                } catch (e) {
+                    console.error("Error parsing custommode data:", e);
+                }
             }
 
             this.fileChooser.addEventListener("click", () => {
@@ -7384,21 +7222,6 @@ class Activity {
                     });
                 };
 
-                // Music Block Parser from abc to MB
-                abcReader.onload = event => {
-                    //get the abc data and replace the / so that the block does not break
-                    let abcData = event.target.result;
-                    abcData = abcData.replace(/\\/g, "");
-
-                    const tunebook = new ABCJS.parseOnly(abcData);
-                    // eslint-disable-next-line no-console
-                    console.log(tunebook);
-                    tunebook.forEach(tune => {
-                        //call parseABC to parse abcdata to MB json
-                        this.parseABC(tune);
-                    });
-                };
-
                 // Work-around in case the handler is called by the
                 // widget drag & drop code.
                 if (files[0] !== undefined) {
@@ -7415,7 +7238,6 @@ class Activity {
                         abcReader.readAsText(files[0]);
                         return;
                     }
-                    reader.readAsText(files[0]);
                     reader.readAsText(files[0]);
                     window.scroll(0, 0);
                 }
@@ -7522,7 +7344,7 @@ class Activity {
             // We use G (one sharp) and F (one flat) as prototypes for all
             // of the accidentals. When applied, these graphics are offset
             // vertically to rendering different sharps and flats and
-            // horizonally so as not to overlap.
+            // horizontally so as not to overlap.
             for (let i = 0; i < 7; i++) {
                 this.grandSharpBitmap[i] = this._createGrid(
                     "data:image/svg+xml;base64," + window.btoa(base64Encode(GRAND_G))
@@ -7854,15 +7676,19 @@ class Activity {
 
 const activity = new Activity();
 
-require(["domReady!"], doc => {
-    setTimeout(() => {
-        activity.setupDependencies();
-        activity.domReady(doc);
-    }, 5000);
-});
-
-define(MYDEFINES, () => {
-    activity.setupDependencies();
-    activity.doContextMenus();
-    activity.doPluginsAndPaletteCols();
+// Execute initialization once all RequireJS modules are loaded AND DOM is ready
+define(["domReady!"].concat(MYDEFINES), doc => {
+    const initialize = () => {
+        if (typeof createDefaultStack !== "undefined") {
+            activity.setupDependencies();
+            activity.domReady(doc);
+            activity.doContextMenus();
+            activity.doPluginsAndPaletteCols();
+        } else {
+            // Race condition in Firefox: non-AMD scripts might not have
+            // finished global assignment yet.
+            setTimeout(initialize, 10);
+        }
+    };
+    initialize();
 });
