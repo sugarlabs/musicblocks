@@ -175,6 +175,15 @@ class LanguageBox {
         this._language = "quz";
         this.hide();
     }
+    
+    /**
+     * @public
+     * @returns {void}
+     */
+    bn_onclick() {
+        this._language = "bn";
+        this.hide();
+    }
 
     /**
      * @public
@@ -226,6 +235,7 @@ class LanguageBox {
             he: "רענן את הדפדפן כדי לשנות את העדפת השפה שלך.",
             ayc: "Actualice su navegador para cambiar su preferencia de idioma.",
             quz: "Actualice su navegador para cambiar su preferencia de idioma.",
+            bn: "ভাষা পরিবর্তন করতে আপনার ব্রাউজার রিফ্রেশ করুন।",
             gug: "Actualice su navegador para cambiar su preferencia de idioma.",
             ur: "اپنی زبان کی ترجیح کو تبدیل کرنے کے لئے اپنے براؤزر کو تازہ دم کریں۔"
         };

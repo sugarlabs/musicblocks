@@ -107,6 +107,7 @@ class Toolbar {
                 ["ibo", _("igbo"), "innerHTML"],
                 ["ar", _("عربى"), "innerHTML"],
                 ["te", _("తెలుగు"), "innerHTML"],
+                ["bn", _("বাংলা"), "innerHTML"],
                 ["he", _("עִברִית"), "innerHTML"],
                 ["ur", _("اردو"), "innerHTML"]
             ];
@@ -242,6 +243,7 @@ class Toolbar {
                 ["ibo", _("igbo"), "innerHTML"],
                 ["ar", _("عربى"), "innerHTML"],
                 ["te", _("తెలుగు"), "innerHTML"],
+                ["bn", _("বাংলা"), "innerHTML"],
                 ["he", _("עִברִית"), "innerHTML"],
                 ["ur", _("اردو"), "innerHTML"]
             ];
@@ -1171,6 +1173,7 @@ class Toolbar {
             "ibo",
             "ar",
             "te",
+            "bn",
             "he",
             "ur"
         ];
