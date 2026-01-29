@@ -19,7 +19,6 @@
 
    GlobalTag
 */
-
 class GlobalTag {
     /* 
      this.tagNames = [
