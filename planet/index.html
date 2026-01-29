@@ -1,6 +1,6 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <title>Music Blocks</title>
@@ -18,28 +18,27 @@
 
     <!-- Stylesheets -->
     <link rel="preload" href="https://fonts.googleapis.com/icon?family=Material+Icons" as="style"
-        onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="fonts/material-icons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="css/activities.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="dist/css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="dist/css/keyboard.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="dist/css/windows.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="lib/materialize-iso.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="css/darkmode.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+          onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="fonts/material-icons.css" as="style"
+          onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/activities.css" as="style"
+          onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="dist/css/style.css" as="style"
+          onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="dist/css/keyboard.css" as="style"
+          onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="dist/css/windows.css" as="style"
+          onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="lib/materialize-iso.css" as="style"
+          onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/darkmode.css" as="style"
+          onload="this.onload=null;this.rel='stylesheet'">
+
     <link rel="prefetch" as="video" href="loading-animation.webm" type="video/webm">
     <link rel="prefetch" as="video" href="loading-animation.mp4" type="video/mp4">
     <link rel="prefetch" as="image" href="loading-animation-ja.svg">
 
-
-    <!-- <script src="js/utils/detectIE.js"></script> -->
-
-    <!-- <script src="sounds/samples/manifest.js"></script> -->
-
-    <!-- <script src="lib/mespeak.js"></script> -->
-
     <script src="lib/reqwest.js" defer></script>
-
-    <!-- <script src="lib/jquery-3.7.1.js"></script> -->
     <script src="lib/jquery-2.1.4.min.js"></script>
     <script src="lib/jquery-ui.js" defer></script>
     <script src="lib/materialize.min.js" defer></script>
@@ -52,36 +51,37 @@
     <script src="lib/wheelnav.js" defer></script>
     <script src="lib/abc.min.js" defer></script>
     <script src="lib/codejar/codejar.min.js" defer></script>
+
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js" defer></script>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <link rel="stylesheet"
+          href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
 
-    <!-- libgif.js (SuperGif) provides low-level GIF frame extraction.
-     Browsers expose only the first frame of a GIF; SuperGif lets us
-     step through frames so animated GIFs can be drawn onto our canvas. -->
     <script src="https://cdn.jsdelivr.net/gh/buzzfeed/libgif-js/libgif.js" defer></script>
-
-    <!-- gif-animator.js integrates SuperGif with Music Blocks. It manages
-     decoding and drawing GIF frames onto the turtle's overlay canvas.
-     Canvas refreshing is handled separately by CreateJS Ticker. -->
     <script src="js/gif-animator.js" defer></script>
+
     <script defer>
         document.addEventListener("DOMContentLoaded", function () {
             if (window.hljs) hljs.highlightAll();
         });
     </script>
-    <script src="lib/astring.min.js" defer></script>
 
+    <script src="lib/astring.min.js" defer></script>
     <script src="lib/acorn.min.js" defer></script>
 
     <link rel="prefetch" type="application/l10n" href="./localization.ini" />
 
+    <!-- RequireJS entry -->
     <script data-main="js/loader" src="lib/require.js" defer></script>
-    <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="fonts/material-icons.css">
     <link rel="preload" href="/fonts/material-icons.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="stylesheet" href="lib/materialize-iso.css">
     <link rel="stylesheet" href="css/themes.css">
+
     <script src="lib/easeljs.min.js" defer></script>
     <script src="lib/tweenjs.min.js" defer></script>
+</head>
+
     <script>
         let ast2blocklist_config;
         document.addEventListener("DOMContentLoaded", function () {

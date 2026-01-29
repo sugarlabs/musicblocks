@@ -583,17 +583,10 @@ document.addEventListener("DOMContentLoaded", init);
                 const texts = [_("Do, Re, Mi, Fa, Sol, La, Ti, Do"), _("Loading Music Blocks..."), _("Reading Music...")];
                 let index = 0;
 
-                const intervalId = setInterval(function () {
+                window.intervalId = setInterval(function () {
                     loadingText.textContent = texts[index];
                     index = (index + 1) % texts.length;
                 }, 1500);
-
-                // Stop changing text and finalize loading after 6 seconds
-                setTimeout(function () {
-                    clearInterval(intervalId);
-                    loadingText.textContent = _("Loading Complete!");
-                    loadingText.style.opacity = 1;
-                }, 6000);
             }, 3000);
         });
 
