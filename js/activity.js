@@ -382,8 +382,6 @@ class Activity {
             createHelpContent(this);
             window.scroll(0, 0);
 
-
-
             document.title = TITLESTRING;
             this.canvas = document.getElementById("myCanvas");
 
