@@ -239,6 +239,15 @@ class Blocks {
 
         this.selectedBlocks = [];
 
+    /**
+     * When the trash highlight animation completes we set this flag to
+     * indicate that a release over the trash should delete the active block.
+     * This avoids a timing/race condition on touch devices where the
+     * highlight becomes visible slightly after the release event.
+     */
+    this.trashReady = false;
+    this.trashReadyBlock = null;
+
         /**
          * We stage deletion of prototype action blocks on the palette so
          * as to avoid palette refresh race conditions.
