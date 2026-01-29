@@ -830,7 +830,11 @@ class Logo {
         const tur = this.activity.turtles.ithTurtle(turtle);
 
         if (tur.delayTimeout !== null) {
-            clearTimeout(tur.delayTimeout);
+            if (tur.usingToneTimer && typeof Tone !== "undefined") {
+                Tone.Transport.clear(tur.delayTimeout);
+            } else {
+                clearTimeout(tur.delayTimeout);
+            }
             tur.delayTimeout = null;
             this.runFromBlockNow(
                 this,
@@ -1299,10 +1303,15 @@ class Logo {
                 logo.stepQueue[turtle].push(blk);
             } else {
                 tur.delayParameters = { blk: blk, flow: isflow, arg: receivedArg };
-                tur.delayTimeout = setTimeout(
-                    () => logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg),
-                    delay
-                );
+                const callback = () =>
+                    logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg);
+                if (typeof Tone !== "undefined" && Tone.Transport.state === "started") {
+                    tur.usingToneTimer = true;
+                    tur.delayTimeout = Tone.Transport.scheduleOnce(callback, "+" + delay / 1000);
+                } else {
+                    tur.usingToneTimer = false;
+                    tur.delayTimeout = setTimeout(callback, delay);
+                }
             }
         }
     }

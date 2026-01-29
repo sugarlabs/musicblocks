@@ -180,6 +180,7 @@ class Turtle {
         this.doWait(0);
         this.endOfClampSignals = {};
         this.butNotThese = {};
+        this.usingToneTimer = false;
 
         this.embeddedGraphicsFinished = true;
 
