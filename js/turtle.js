@@ -885,8 +885,10 @@ Turtle.TurtleView = class {
     resizeDecoration(scale, width) {
         this._decorationBitmap.x = width - (30 * scale) / 2;
         this._decorationBitmap.y = (20 * scale) / 2; // Use 20 to match doTurtleShell
-        this._decorationBitmap.scaleX = this._decorationBitmap.scaleY = this._decorationBitmap.scale =
-            (this._decorationBaseScale * scale) / 2;
+        this._decorationBitmap.scaleX =
+            this._decorationBitmap.scaleY =
+            this._decorationBitmap.scale =
+                (this._decorationBaseScale * scale) / 2;
     }
 
     /**
@@ -967,8 +969,10 @@ Turtle.TurtleView = class {
 
                 this._decorationBitmap.x = width - (offset * startBlock.protoblock.scale) / 2;
                 this._decorationBitmap.y = (35 * startBlock.protoblock.scale) / 2;
-                this._decorationBitmap.scaleX = this._decorationBitmap.scaleY = this._decorationBitmap.scale =
-                    (0.5 * startBlock.protoblock.scale) / 2;
+                this._decorationBitmap.scaleX =
+                    this._decorationBitmap.scaleY =
+                    this._decorationBitmap.scale =
+                        (0.5 * startBlock.protoblock.scale) / 2;
                 startBlock.updateCache();
             }
 
