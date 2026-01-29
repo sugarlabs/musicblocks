@@ -101,7 +101,7 @@ describe("Logo Timing (Tone.Transport)", () => {
     test("uses Tone.Transport.scheduleOnce when Tone.Transport is started", () => {
         global.Tone.Transport.state = "started";
         logo.runFromBlockNow = jest.fn();
-        
+
         // Mock turtle wait time
         mockTurtle.waitTime = 1000;
         logo.turtleDelay = 500;
@@ -111,7 +111,7 @@ describe("Logo Timing (Tone.Transport)", () => {
         expect(global.Tone.Transport.scheduleOnce).toHaveBeenCalled();
         // Check delay calculation: (500 + 1000) / 1000 = 1.5s
         expect(global.Tone.Transport.scheduleOnce).toHaveBeenCalledWith(
-            expect.any(Function), 
+            expect.any(Function),
             "+1.5"
         );
         expect(mockTurtle.usingToneTimer).toBe(true);

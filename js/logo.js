@@ -681,9 +681,8 @@ class Logo {
                     ) {
                         logo.statusFields.push([blk, "color"]);
                     } else {
-                        logo.blockList[blk].value = logo.activity.turtles.getTurtle(
-                            turtle
-                        ).painter.color;
+                        logo.blockList[blk].value =
+                            logo.activity.turtles.getTurtle(turtle).painter.color;
                     }
                     break;
 
@@ -1303,8 +1302,7 @@ class Logo {
                 logo.stepQueue[turtle].push(blk);
             } else {
                 tur.delayParameters = { blk: blk, flow: isflow, arg: receivedArg };
-                const callback = () =>
-                    logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg);
+                const callback = () => logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg);
                 if (typeof Tone !== "undefined" && Tone.Transport.state === "started") {
                     tur.usingToneTimer = true;
                     tur.delayTimeout = Tone.Transport.scheduleOnce(callback, "+" + delay / 1000);
