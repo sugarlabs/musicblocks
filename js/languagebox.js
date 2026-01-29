@@ -175,7 +175,7 @@ class LanguageBox {
         this._language = "quz";
         this.hide();
     }
-    
+
     /**
      * @public
      * @returns {void}
