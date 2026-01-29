@@ -7150,5 +7150,30 @@ class Blocks {
                 );
             });
         };
+
+        /**
+         * Returns the index of the block at the given coordinates, or -1 if none.
+         * @param {number} x - x coordinate
+         * @param {number} y - y coordinate
+         * @returns {number}
+         */
+        this.getBlockAtCoordinate = function (x, y) {
+            for (let i = 0; i < this.blockList.length; i++) {
+                const block = this.blockList[i];
+                if (!block || block.trash) continue;
+
+                const blockX = block.container.x;
+                const blockY = block.container.y;
+                if (
+                    x >= blockX &&
+                    x <= blockX + block.width &&
+                    y >= blockY &&
+                    y <= blockY + block.height
+                ) {
+                    return i;
+                }
+            }
+            return -1;
+        };
     }
 }

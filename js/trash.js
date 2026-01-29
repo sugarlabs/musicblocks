@@ -204,6 +204,35 @@ class Trashcan {
                 this._makeBorderHighlight(true); // Make it active.
                 this.activity.refreshCanvas();
                 clearInterval(this._animationInterval); // Autostop animation.
+
+                // If the trash just became active, and there is an active/dragged
+                // block that is currently over the trash, immediately send it to
+                // the trash. This avoids a race on touch devices where the
+                // highlight finishes after the user's release and the block is
+                // only removed after a subsequent action.
+                try {
+                    if (
+                        this.activity &&
+                        this.activity.blocks &&
+                        typeof this.activity.blocks.activeBlock !== "undefined" &&
+                        this.activity.blocks.activeBlock !== null
+                    ) {
+                        const blkIndex = this.activity.blocks.activeBlock;
+                        const blk = this.activity.blocks.blockList[blkIndex];
+                        if (blk) {
+                            // compute center of the block to test overlap
+                            const bx = blk.container.x + blk.width / 2;
+                            const by = blk.container.y + blk.hitHeight / 2;
+                            if (this.overTrashcan(bx, by)) {
+                                this.activity.blocks.sendStackToTrash(blk);
+                            }
+                        }
+                    }
+                } catch (e) {
+                    // defensive: don't break animation flow on errors
+                    // eslint-disable-next-line no-console
+                    console.error(e);
+                }
                 return;
             }
 
