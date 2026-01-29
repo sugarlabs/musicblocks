@@ -2121,9 +2121,7 @@ class Block {
                     fileChooser.value = "";
                 }
             };
-            if (that.name === "media") {
-                reader.readAsDataURL(fileChooser.files[0]);
-            } else if (that.name === "audiofile") {
+            if (that.name === "media" || that.name === "audiofile") {
                 reader.readAsDataURL(fileChooser.files[0]);
             } else {
                 reader.readAsText(fileChooser.files[0]);
@@ -4181,7 +4179,6 @@ class Block {
 
         return new Date().getTime() - this._piemenuExitTime > 200;
     }
-
 
     /**
      * Checks and reinitializes widget windows if their labels are changed.
