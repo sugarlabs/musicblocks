@@ -17,9 +17,9 @@ body.dark {
 
 /* Help widget colors */
 .dark #helpBodyDiv {
-  background: #1d1d20;
+  background: #505050;
   color: var(--fg);
-}
+} 
 
 .dark #helpBodyDiv > .heading,
 .dark #helpBodyDiv p {
