@@ -567,7 +567,7 @@ let toTitleCase = str => {
     let tempStr = "";
     if (str.length > 1) tempStr = str.substring(1);
     return str.toUpperCase()[0] + tempStr;
-};
+}
 
 /**
  * Processes plugin data and updates the activity based on the provided JSON-encoded dictionary.
