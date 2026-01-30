@@ -108,6 +108,7 @@ class WidgetWindow {
             };
         }
         const closeButton = this._create("div", "wftButton close", this._drag);
+        closeButton.title = _("Close");
         closeButton.onclick = e => {
             this.onclose();
             e.preventDefault();
@@ -152,6 +153,7 @@ class WidgetWindow {
         this._nonclosebuttons.style.display = "flex";
         this._rollButton = this._create("div", "wftButton rollup", this._nonclosebuttons);
         const rollButton = this._rollButton;
+        rollButton.title = _("Minimize");
         rollButton.onclick = e => {
             if (this._rolled) {
                 this.unroll();
