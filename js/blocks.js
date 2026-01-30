@@ -6999,6 +6999,11 @@ class Blocks {
             this.activity.refreshCanvas();
             this.activity.trashcan.stopHighlightAnimation();
             document.getElementById("hideContents").click();
+
+            // Save state for undo after block deletion is completed
+            if (this.activity.undoManager) {
+                this.activity.undoManager.pushState();
+            }
         };
 
         /***

@@ -3202,6 +3202,11 @@ class Block {
                 // the move (workaround for issue #38 -- Blocks fly
                 // apart). Still need to get to the root cause.
                 this.blocks.adjustDocks(this.blocks.blockList.indexOf(this), true);
+
+                // Save state for undo after block movement is completed
+                if (this.activity.undoManager) {
+                    this.activity.undoManager.pushState();
+                }
             }
         } else if (SPECIALINPUTS.includes(this.name) || ["media", "loadFile"].includes(this.name)) {
             if (!haveClick) {
@@ -4657,6 +4662,11 @@ class Block {
 
         // We are done changing the label, so unlock.
         this._labelLock = false;
+
+        // Save state for undo after value change is completed
+        if (this.activity.undoManager) {
+            this.activity.undoManager.pushState();
+        }
 
         // Load the synth for the selected drum.
         if (["drumname", "effectsname", "voicename", "noisename"].includes(this.name)) {

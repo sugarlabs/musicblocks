@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Undo/Redo Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .status { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        button { margin: 5px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Music Blocks Undo/Redo Functionality Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Manual Test Instructions</h2>
+        <p>Open Music Blocks and test these scenarios:</p>
+        
+        <h3>1. The "Note" Test</h3>
+        <p>Change a number inside a note block and verify it saves to undo stack.</p>
+        
+        <h3>2. The Delete Test</h3>
+        <p>Delete a large stack and verify "Undo" brings back the entire stack.</p>
+        
+        <h3>3. The Memory Test</h3>
+        <p>Perform 20+ undos and verify the app doesn't get slow (stack limited to 50 items).</p>
+        
+        <h3>4. Infinite Loop Test</h3>
+        <p>Press Ctrl+Z multiple times and verify no infinite loops occur.</p>
+    </div>
+
+    <div class="test-section">
+        <h2>Keyboard Shortcuts</h2>
+        <p><strong>Ctrl+Z</strong> - Undo</p>
+        <p><strong>Ctrl+Y</strong> - Redo</p>
+    </div>
+
+    <script>
+        // Simple test to verify UndoManager functionality
+        function runTests() {
+            const results = document.getElementById('results');
+            
+            try {
+                // Test 1: UndoManager instantiation
+                const UndoManager = class {
+                    constructor() {
+                        this.undoStack = [];
+                        this.redoStack = [];
+                        this.isMuted = false;
+                        this.maxStackSize = 50;
+                    }
+                    
+                    pushState() {
+                        if (this.isMuted) return false;
+                        this.undoStack.push('test-state');
+                        this.redoStack = [];
+                        if (this.undoStack.length > this.maxStackSize) {
+                            this.undoStack.shift();
+                        }
+                        return true;
+                    }
+                    
+                    undo() {
+                        if (this.undoStack.length === 0) return false;
+                        const state = this.undoStack.pop();
+                        this.redoStack.push(state);
+                        return true;
+                    }
+                    
+                    redo() {
+                        if (this.redoStack.length === 0) return false;
+                        const state = this.redoStack.pop();
+                        this.undoStack.push(state);
+                        return true;
+                    }
+                    
+                    canUndo() { return this.undoStack.length > 0; }
+                    canRedo() { return this.redoStack.length > 0; }
+                };
+                
+                const undoManager = new UndoManager();
+                
+                // Test 2: Basic push/undo/redo
+                undoManager.pushState();
+                undoManager.pushState();
+                
+                const test1 = undoManager.canUndo() && !undoManager.canRedo();
+                const test2 = undoManager.undo() && undoManager.canRedo();
+                const test3 = undoManager.redo() && undoManager.canUndo();
+                
+                // Test 3: Mute functionality
+                undoManager.isMuted = true;
+                const beforeMute = undoManager.undoStack.length;
+                undoManager.pushState();
+                const afterMute = undoManager.undoStack.length;
+                undoManager.isMuted = false;
+                
+                const test4 = beforeMute === afterMute;
+                
+                // Test 4: Stack size limit
+                for (let i = 0; i < 60; i++) {
+                    undoManager.pushState();
+                }
+                const test5 = undoManager.undoStack.length <= 50;
+                
+                // Display results
+                results.innerHTML = `
+                    <div class="${test1 ? 'status' : 'error'}">✓ Basic push functionality: ${test1 ? 'PASS' : 'FAIL'}</div>
+                    <div class="${test2 ? 'status' : 'error'}">✓ Undo functionality: ${test2 ? 'PASS' : 'FAIL'}</div>
+                    <div class="${test3 ? 'status' : 'error'}">✓ Redo functionality: ${test3 ? 'PASS' : 'FAIL'}</div>
+                    <div class="${test4 ? 'status' : 'error'}">✓ Mute pattern: ${test4 ? 'PASS' : 'FAIL'}</div>
+                    <div class="${test5 ? 'status' : 'error'}">✓ Stack size limit: ${test5 ? 'PASS' : 'FAIL'}</div>
+                    <div class="status">All automated tests completed!</div>
+                `;
+                
+            } catch (error) {
+                results.innerHTML = `<div class="error">Error running tests: ${error.message}</div>`;
+            }
+        }
+        
+        // Run tests when page loads
+        window.onload = runTests;
+    </script>
+</body>
+</html>

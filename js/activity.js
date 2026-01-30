@@ -48,6 +48,10 @@
  */
 const LEADING = 0;
 const BLOCKSCALES = [1, 1.5, 2, 3, 4];
+
+// Import UndoManager
+// eslint-disable-next-line no-unused-vars
+const UndoManager = require('./UndoManager.js');
 const _THIS_IS_MUSIC_BLOCKS_ = true;
 const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 
@@ -310,6 +314,9 @@ class Activity {
         // Dirty flag for canvas rendering optimization
         // When true, the stage needs to be redrawn on the next animation frame
         this.stageDirty = false;
+
+        // Initialize UndoManager
+        this.undoManager = new UndoManager(this);
 
         this.themes = ["light", "dark"];
         try {
@@ -3154,6 +3161,8 @@ class Activity {
             const KEYCODE_DOWN = 40;
             const DEL = 46;
             const V = 86;
+            const Z = 90;
+            const Y = 89;
             const disableKeys =
                 document.getElementById("lilypondModal").style.display === "block" ||
                 this.searchWidget.style.visibility === "visible" ||
@@ -3422,6 +3431,24 @@ class Activity {
                             if (this.searchWidget.style.visibility === "visible") {
                                 this.textMsg("ESC " + _("Hide blocks"));
                                 this.searchWidget.style.visibility = "hidden";
+                            }
+                            break;
+                        case Z:
+                            // Ctrl+Z for undo
+                            if (event.ctrlKey || event.metaKey) {
+                                if (this.undoManager && this.undoManager.undo()) {
+                                    this.textMsg("Ctrl+Z " + _("Undo"));
+                                }
+                                event.preventDefault();
+                            }
+                            break;
+                        case Y:
+                            // Ctrl+Y for redo
+                            if (event.ctrlKey || event.metaKey) {
+                                if (this.undoManager && this.undoManager.redo()) {
+                                    this.textMsg("Ctrl+Y " + _("Redo"));
+                                }
+                                event.preventDefault();
                             }
                             break;
                         case RETURN:
