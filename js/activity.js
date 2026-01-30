@@ -7707,17 +7707,21 @@ class Activity {
 
 const activity = new Activity();
 
-require(["domReady!"], doc => {
-    setTimeout(() => {
-        activity.setupDependencies();
-        activity.domReady(doc);
-        // Initialize search functionality after activity is ready
-        activity.doSearch();
-    }, 5000);
-});
-
-define(MYDEFINES, () => {
-    activity.setupDependencies();
-    activity.doContextMenus();
-    activity.doPluginsAndPaletteCols();
+// Execute initialization once all RequireJS modules are loaded AND DOM is ready
+define(["domReady!"].concat(MYDEFINES), doc => {
+    const initialize = () => {
+        if (typeof createDefaultStack !== "undefined") {
+            activity.setupDependencies();
+            activity.domReady(doc);
+            activity.doContextMenus();
+            activity.doPluginsAndPaletteCols();
+            // Initialize search functionality after activity is ready
+            activity.doSearch();
+        } else {
+            // Race condition in Firefox: non-AMD scripts might not have
+            // finished global assignment yet.
+            setTimeout(initialize, 10);
+        }
+    };
+    initialize();
 });
