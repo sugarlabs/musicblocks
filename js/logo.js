@@ -465,8 +465,8 @@ class Logo {
             if (new RegExp("^[A-Za-z,. ]$").test(text[i])) new_text += text[i];
         }
 
-        if (this.meSpeak !== null) {
-            this.meSpeak.speak(new_text);
+        if (this._meSpeak) {
+            this._meSpeak.speak(new_text);
         }
     }
 
@@ -681,9 +681,8 @@ class Logo {
                     ) {
                         logo.statusFields.push([blk, "color"]);
                     } else {
-                        logo.blockList[blk].value = logo.activity.turtles.getTurtle(
-                            turtle
-                        ).painter.color;
+                        logo.blockList[blk].value =
+                            logo.activity.turtles.getTurtle(turtle).painter.color;
                     }
                     break;
 

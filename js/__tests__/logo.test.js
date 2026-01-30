@@ -373,18 +373,18 @@ describe("Logo Class", () => {
 
     describe("processSpeak", () => {
         test("filters text to only valid characters", () => {
-            // The code uses this.meSpeak (not this._meSpeak)
-            logo.meSpeak = { speak: jest.fn() };
+            // The code uses this._meSpeak
+            logo._meSpeak = { speak: jest.fn() };
             logo.processSpeak("Hello, World! 123");
 
-            expect(logo.meSpeak.speak).toHaveBeenCalledWith("Hello, World ");
+            expect(logo._meSpeak.speak).toHaveBeenCalledWith("Hello, World ");
         });
 
         test("handles empty string", () => {
-            logo.meSpeak = { speak: jest.fn() };
+            logo._meSpeak = { speak: jest.fn() };
             logo.processSpeak("");
 
-            expect(logo.meSpeak.speak).toHaveBeenCalledWith("");
+            expect(logo._meSpeak.speak).toHaveBeenCalledWith("");
         });
     });
 
