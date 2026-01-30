@@ -567,7 +567,7 @@ function toTitleCase (str) {
     let tempStr = "";
     if (str.length > 1) tempStr = str.substring(1);
     return str.toUpperCase()[0] + tempStr;
-};
+}
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports.toTitleCase = toTitleCase;
