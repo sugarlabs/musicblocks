@@ -1696,7 +1696,7 @@ const piemenuNoteValue = (block, noteValue) => {
 
     docById("wheelDiv").style.position = "absolute";
     setWheelSize(300);
-
+    const halfWheelSize = wheelSize / 2;
     const selectorWidth = 150;
     const left = Math.round(
         (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
