@@ -18,6 +18,19 @@
     transition: all 0.3s ease;
 }
 
+/* Dark Mode Theme Dropdown */
+.dark #themedropdown {
+    background-color: transparent !important;
+}
+
+.dark #themedropdown li {
+    background-color: transparent !important;
+}
+
+.dark #themedropdown li a {
+    background-color: transparent !important;
+}
+
 /* Dark Mode */
 
 .dark .blue {
@@ -171,4 +184,18 @@ body.dark {
 .dark #languagedropdown li a.selected-language {
   background-color: rgba(33, 150, 243, 0.25);
   border-left: 3px solid #64B5F6;
+}
+
+/* Dark Mode Tooltip Styling - Slightly lighter background for better contrast */
+.dark .material-tooltip {
+    background-color: #3a3a3a !important;
+    color: #ffffff !important;
+}
+
+.dark .material-tooltip .backdrop {
+    background-color: #3a3a3a !important;
+}
+
+.dark .material-tooltip span {
+    color: #ffffff !important;
 }
