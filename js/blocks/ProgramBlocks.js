@@ -65,6 +65,7 @@ function setupProgramBlocks(activity) {
 
         /**
          * Executes the flow of the LoadHeapFromAppBlock.
+         * Uses async fetch to avoid blocking the UI during network requests.
          * @param {string[]} args - The arguments passed to the block.
          * @param {Object} logo - The logo object.
          * @param {Object} turtle - The turtle object.
@@ -76,45 +77,39 @@ function setupProgramBlocks(activity) {
                 return;
             }
 
-            let data = [];
             const url = args[1];
             const name = args[0];
-            const xmlHttp = new XMLHttpRequest();
-            let oldHeap = [];
-            xmlHttp.open("GET", url, false);
-            xmlHttp.send();
+            const oldHeap = name in logo.turtleHeaps ? logo.turtleHeaps[turtle] : [];
 
-            if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
-                // eslint-disable-next-line no-console
-                console.debug(xmlHttp.responseText);
-                try {
-                    data = JSON.parse(xmlHttp.responseText);
-                } catch (e) {
+            // Use async fetch to avoid blocking the UI
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        // eslint-disable-next-line no-console
+                        console.debug("fetched the wrong page or network error...");
+                        activity.errorMsg(_("404: Page not found"));
+                        throw new Error("Network response was not ok");
+                    }
+                    return response.text();
+                })
+                .then(responseText => {
                     // eslint-disable-next-line no-console
-                    console.debug(e);
-                    activity.errorMsg(_("Error parsing JSON data:") + e);
-                }
-            } else if (xmlHttp.readyState === 4 && xmlHttp.status !== 200) {
-                // eslint-disable-next-line no-console
-                console.debug("fetched the wrong page or network error...");
-                activity.errorMsg(_("404: Page not found"));
-                return;
-            } else {
-                activity.errorMsg("xmlHttp.readyState: " + xmlHttp.readyState);
-                return;
-            }
-
-            if (name in logo.turtleHeaps) {
-                oldHeap = logo.turtleHeaps[turtle];
-            }
-
-            try {
-                logo.turtleHeaps[name] = data;
-            } catch (e) {
-                logo.turtleHeaps[name] = oldHeap;
-                // eslint-disable-next-line no-console
-                console.debug(e);
-            }
+                    console.debug(responseText);
+                    try {
+                        const data = JSON.parse(responseText);
+                        logo.turtleHeaps[name] = data;
+                    } catch (e) {
+                        // eslint-disable-next-line no-console
+                        console.debug(e);
+                        activity.errorMsg(_("Error parsing JSON data:") + e);
+                        logo.turtleHeaps[name] = oldHeap;
+                    }
+                })
+                .catch(error => {
+                    // eslint-disable-next-line no-console
+                    console.debug("Fetch error:", error);
+                    logo.turtleHeaps[name] = oldHeap;
+                });
         }
     }
 
