@@ -69,11 +69,11 @@ describe("Utility Functions (logic-only)", () => {
         global.Tone = require("./tonemock.js");
 
         const codeFiles = [
-            "../../../lib/require.js",
+            "../utils.js",
+            "../../logoconstants.js",
             "../platformstyle.js",
             "../musicutils.js",
             "../synthutils.js",
-            "../utils.js",
             "../../logo.js",
             "../../turtle-singer.js"
         ];
@@ -94,11 +94,25 @@ describe("Utility Functions (logic-only)", () => {
         });
 
         const wrapper = new Function(`
+            // Manual definitions for constants to ensure visibility in this scope
+            window.TARGETBPM = 90;
+            window.TONEBPM = 240;
+            window.DEFAULTVOLUME = 50;
+            window._ = window._ || function(str) { return str; };
+
+            // Mock require/define for modules that use AMD
+            window.require = window.requirejs = function(deps, cb) {
+                if (typeof cb === 'function') cb();
+            };
+            window.define = function() {};
+            window.define.amd = true;
+
             let metaTag = document.querySelector("meta[name=theme-color]");
             metaTag = document.createElement('meta');
             metaTag.name = 'theme-color';
             metaTag.content = "#4DA6FF";
             document.head?.appendChild(metaTag);
+
             ${wrapperCode}
             
             return {
