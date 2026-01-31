@@ -562,12 +562,13 @@ let fileBasename = file => {
  * @param {string} str - The input string.
  * @returns {string} The string with the first character in uppercase.
  */
-function toTitleCase (str) {
+function toTitleCase(str) {
     if (typeof str !== "string") return;
-    let tempStr = "";
-    if (str.length > 1) tempStr = str.substring(1);
-    return str.toUpperCase()[0] + tempStr;
-};
+
+    if (str.length === 0) return "";
+
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports.toTitleCase = toTitleCase;
@@ -1540,10 +1541,10 @@ let hexToRGB = hex => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
         ? {
-              r: parseInt(result[1], 16),
-              g: parseInt(result[2], 16),
-              b: parseInt(result[3], 16)
-          }
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        }
         : null;
 };
 
