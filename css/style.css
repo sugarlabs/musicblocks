@@ -5,8 +5,14 @@ input[type="range"] {
   width: 250px;
 }
 
-input[type="range"]:focus {
+/* Hide focus outline on mouse click, show on keyboard navigation */
+input[type="range"]:focus:not(:focus-visible) {
   outline: none;
+}
+
+input[type="range"]:focus-visible {
+  outline: 2px solid #4da3ff;
+  outline-offset: 2px;
 }
 
 input[type="range"]:not(.pitchSlider)::-webkit-slider-runnable-track {
@@ -101,13 +107,20 @@ input[type="range"]:focus::-ms-fill-upper {
 }
 
 .lego-brick {
-    display: inline-block;
-    background-color: #FF0000;
-    border: 1px solid #880000;
-    margin: 2px;
+  display: inline-block;
+  background-color: #FF0000;
+  border: 1px solid #880000;
+  margin: 2px;
 }
 
-.lego-size-1 { width: 20px; height: 10px; }
-.lego-size-2 { width: 40px; height: 10px; }
-/* ... more sizes ... */
+.lego-size-1 {
+  width: 20px;
+  height: 10px;
+}
 
+.lego-size-2 {
+  width: 40px;
+  height: 10px;
+}
+
+/* ... more sizes ... */
