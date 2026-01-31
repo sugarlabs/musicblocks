@@ -797,7 +797,9 @@ const createHelpContent = activity => {
             _("Build Your First Project"),
             _("Ready to create your first musical masterpiece?") +
                 " " +
-                _("This interactive tutorial will guide you step-by-step to create a melody, add rhythm, and make the turtle draw while playing music!") +
+                _(
+                    "This interactive tutorial will guide you step-by-step to create a melody, add rhythm, and make the turtle draw while playing music!"
+                ) +
                 " " +
                 _("Click the Start Tutorial button below to begin."),
             "data:image/svg+xml;base64," + window.btoa(base64Encode(MOUSEPALETTEICON))

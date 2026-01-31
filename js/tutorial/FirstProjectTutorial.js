@@ -335,7 +335,9 @@ class FirstProjectTutorial {
                     line-height: 1;
                 ">×</button>
             </div>
-            <h3 style="margin: 0 0 10px 0; font-size: 16px; font-weight: 600; color: #333;">${step.title}</h3>
+            <h3 style="margin: 0 0 10px 0; font-size: 16px; font-weight: 600; color: #333;">${
+                step.title
+            }</h3>
             <p style="margin: 0 0 14px 0; color: #505050; line-height: 1.5; font-size: 14px;">${
                 step.content
             }</p>
