@@ -1,4 +1,9 @@
 # These are supported funding model platforms
 
 github: sugarlabs
-custom: ['https://www.every.org/sugar-labs', 'https://www.paypal.com/us/fundraiser/charity/4357440', 'https://mygoodness.benevity.org/community/cause/840-843289298/donate' ]
+custom:
+    [
+        "https://www.every.org/sugar-labs",
+        "https://www.paypal.com/us/fundraiser/charity/4357440",
+        "https://mygoodness.benevity.org/community/cause/840-843289298/donate",
+    ]

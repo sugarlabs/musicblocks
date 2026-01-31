@@ -1,92 +1,92 @@
 {
-  "name": "Music Blocks",
-  "short_name": "Music Blocks",
-  "id": "com.sugarlabs.musicblocks",
-  "description": "Learn to program music with snap-together blocks.",
-  "icons": [
-      {
-          "src": "activity/activity-icon-color-0-75.png",
-          "sizes": "36x36",
-          "type": "image/png",
-          "density": "0.75"
-      },
-      {
-          "src": "activity/activity-icon-color-1-00.png",
-          "sizes": "48x48",
-          "type": "image/png",
-          "density": "1.0"
-      },
-      {
-          "src": "activity/activity-icon-color-1-50.png",
-          "sizes": "72x72",
-          "type": "image/png",
-          "density": "1.5"
-      },
-      {
-          "src": "activity/activity-icon-color-2-00.png",
-          "sizes": "96x96",
-          "type": "image/png",
-          "density": "2.0"
-      },
-      {
-          "src": "activity/activity-icon-color-3-00.png",
-          "sizes": "144x144",
-          "type": "image/png",
-          "density": "3.0"
-      },
-      {
-          "src": "activity/activity-icon-color-4-00.png",
-          "sizes": "192x192",
-          "type": "image/png",
-          "density": "4.0"
-      },
-      {
-          "src": "activity/activity-icon-color-512.png",
-          "type": "image/png",
-          "sizes": "512x512",
-          "purpose": "any"
-      },
-      {
-          "src": "activity/activity-icon-maskable.png",
-          "type": "image/png",
-          "sizes": "512x512",
-          "purpose": "maskable"
-      }
-  ],
-  "screenshots": [
-      {
-          "src": "/screenshots/screenshot-1.png",
-          "sizes": "1920x1080",
-          "type": "image/png",
-          "form_factor": "wide"
-      },
-      {
-          "src": "/screenshots/screenshot-mobile-1.png",
-          "sizes": "1182x2283",
-          "type": "image/png",
-          "form_factor": "narrow"
-      },
-      {
-          "src": "/screenshots/screenshot-mobile-2.png",
-          "sizes": "1182x2283",
-          "type": "image/png",
-          "form_factor": "narrow"
-      }
-  ],
-  "start_url": "https://musicblocks.sugarlabs.org/",
-  "scope": "https://musicblocks.sugarlabs.org/",
-  "background_color": "#F9F9F9",
-  "theme_color": "#2196F3",
-  "display": "standalone",
-  "orientation": "landscape",
-  "dir": "ltr",
-  "lang": "en",
-  "categories": ["code", "education"],
-  "launch_handler": {
-      "client_mode": "focus-existing"
-  },
-  "iarc_rating_id": "e10+",
-  "prefer_related_applications": false,
-  "related_applications": [],
-  "permissions": ["clipboardWrite", "storage", "unlimitedStorage"]
+    "name": "Music Blocks",
+    "short_name": "Music Blocks",
+    "id": "com.sugarlabs.musicblocks",
+    "description": "Learn to program music with snap-together blocks.",
+    "icons": [
+        {
+            "src": "activity/activity-icon-color-0-75.png",
+            "sizes": "36x36",
+            "type": "image/png",
+            "density": "0.75"
+        },
+        {
+            "src": "activity/activity-icon-color-1-00.png",
+            "sizes": "48x48",
+            "type": "image/png",
+            "density": "1.0"
+        },
+        {
+            "src": "activity/activity-icon-color-1-50.png",
+            "sizes": "72x72",
+            "type": "image/png",
+            "density": "1.5"
+        },
+        {
+            "src": "activity/activity-icon-color-2-00.png",
+            "sizes": "96x96",
+            "type": "image/png",
+            "density": "2.0"
+        },
+        {
+            "src": "activity/activity-icon-color-3-00.png",
+            "sizes": "144x144",
+            "type": "image/png",
+            "density": "3.0"
+        },
+        {
+            "src": "activity/activity-icon-color-4-00.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "density": "4.0"
+        },
+        {
+            "src": "activity/activity-icon-color-512.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "any"
+        },
+        {
+            "src": "activity/activity-icon-maskable.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/screenshots/screenshot-1.png",
+            "sizes": "1920x1080",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/screenshots/screenshot-mobile-1.png",
+            "sizes": "1182x2283",
+            "type": "image/png",
+            "form_factor": "narrow"
+        },
+        {
+            "src": "/screenshots/screenshot-mobile-2.png",
+            "sizes": "1182x2283",
+            "type": "image/png",
+            "form_factor": "narrow"
+        }
+    ],
+    "start_url": "https://musicblocks.sugarlabs.org/",
+    "scope": "https://musicblocks.sugarlabs.org/",
+    "background_color": "#F9F9F9",
+    "theme_color": "#2196F3",
+    "display": "standalone",
+    "orientation": "landscape",
+    "dir": "ltr",
+    "lang": "en",
+    "categories": ["code", "education"],
+    "launch_handler": {
+        "client_mode": "focus-existing"
+    },
+    "iarc_rating_id": "e10+",
+    "prefer_related_applications": false,
+    "related_applications": [],
+    "permissions": ["clipboardWrite", "storage", "unlimitedStorage"]
 }
