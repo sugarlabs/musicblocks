@@ -567,13 +567,73 @@ function toTitleCase (str) {
     let tempStr = "";
     if (str.length > 1) tempStr = str.substring(1);
     return str.toUpperCase()[0] + tempStr;
-};
+}
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports.toTitleCase = toTitleCase;
 }
 if (typeof window !== "undefined") {
     window.toTitleCase = toTitleCase;
+}
+
+/**
+ * Executes plugin-provided JavaScript.
+ *
+ * NOTE: Plugins are untrusted code; this helper centralizes execution.
+ * It uses Function() (not eval) and enforces strict-mode.
+ *
+ * @param {string} code - JavaScript source code.
+ * @param {string} [label] - For logging/debugging.
+ * @param {Object<string, any>} [scope] - Variables to provide to the plugin.
+ * @param {any} [thisArg] - Value of `this` inside the plugin.
+ * @param {string|null} [returnVarName] - If provided, returns the named variable after execution.
+ * @returns {any}
+ */
+function executePluginCode(
+    code,
+    label = "plugin",
+    scope = null,
+    thisArg = null,
+    returnVarName = null
+) {
+    if (typeof code !== "string") return undefined;
+
+    // Basic sanity limit (prevents huge payloads)
+    if (code.length > 500000) {
+        // eslint-disable-next-line no-console
+        console.warn("Plugin code too large:", label);
+        return undefined;
+    }
+
+    const argNames = scope && typeof scope === "object" ? Object.keys(scope) : [];
+    const argValues = argNames.map(k => scope[k]);
+
+    let body = '"use strict";\n' + code;
+    if (typeof returnVarName === "string" && returnVarName.length > 0) {
+        body +=
+            "\nreturn (typeof " +
+            returnVarName +
+            ' === "undefined") ? undefined : ' +
+            returnVarName +
+            ";";
+    }
+
+    try {
+        // eslint-disable-next-line no-new-func
+        const fn = new Function(...argNames, body);
+        return fn.apply(thisArg, argValues);
+    } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error("Plugin execution failed:", label, e);
+        return undefined;
+    }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports.executePluginCode = executePluginCode;
+}
+if (typeof window !== "undefined") {
+    window.executePluginCode = executePluginCode;
 }
 
 /**
@@ -610,13 +670,7 @@ const processPluginData = (activity, pluginData, pluginSource) => {
             return;
         }
 
-        try {
-            // eslint-disable-next-line no-eval
-            eval(code);
-        } catch (e) {
-            // eslint-disable-next-line no-console
-            console.error("Plugin execution failed:", label, e);
-        }
+        executePluginCode(code, label, { activity }, activity);
     };
 
     if (!isTrustedPluginSource(pluginSource)) {

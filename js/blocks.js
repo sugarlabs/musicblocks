@@ -23,7 +23,7 @@
    deleteTemperamentFromList, getDrumSynthName, getNoiseName,
    getNoiseSynthName, getTemperamentsList, getTextWidth,
    getVoiceSynthName, i18nSolfege, last, MathUtility, mixedNumber,
-   piemenuBlockContext, prepareMacroExports, ProtoBlock,
+    piemenuBlockContext, prepareMacroExports, ProtoBlock, executePluginCode,
    setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments
 */
 
@@ -7038,7 +7038,13 @@ class Blocks {
                     value = this.blockList[blk].protoblock.updateParameter(logo, turtle, blk);
                 } else {
                     if (name in logo.evalParameterDict) {
-                        eval(logo.evalParameterDict[name]);
+                        value = executePluginCode(
+                            logo.evalParameterDict[name],
+                            "PARAMETERPLUGINS:" + name,
+                            { logo, turtle, blk, block: this.blockList[blk], value },
+                            this,
+                            "value"
+                        );
                     } else {
                         return;
                     }
@@ -7083,7 +7089,12 @@ class Blocks {
                 this.blockList[blk].protoblock.setter(logo, value, turtle, blk);
             } else {
                 if (this.blockList[blk].name in logo.evalSetterDict) {
-                    eval(logo.evalSetterDict[this.blockList[blk].name]);
+                    executePluginCode(
+                        logo.evalSetterDict[this.blockList[blk].name],
+                        "SETTERPLUGINS:" + this.blockList[blk].name,
+                        { logo, blk, value, turtle, block: this.blockList[blk] },
+                        this
+                    );
                 } else {
                     throw new Error();
                 }

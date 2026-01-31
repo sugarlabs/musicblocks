@@ -18,7 +18,7 @@
    instrumentsEffects, Singer, Tone, CAMERAVALUE, doUseCamera,
    VIDEOVALUE, last, getIntervalDirection, getIntervalNumber,
    mixedNumber, rationalToFraction, doStopVideoCam, StatusMatrix,
-   getStatsFromNotation, delayExecution, DEFAULTVOICE
+    getStatsFromNotation, delayExecution, executePluginCode, DEFAULTVOICE
 */
 
 /*
@@ -701,7 +701,18 @@ class Logo {
                     if (logo.blockList[blk].name in logo.evalArgDict) {
                         // eslint-disable-next-line no-console
                         console.log("running eval on " + logo.blockList[blk].name);
-                        eval(logo.evalArgDict[logo.blockList[blk].name]);
+                        executePluginCode(
+                            logo.evalArgDict[logo.blockList[blk].name],
+                            "ARGPLUGINS:" + logo.blockList[blk].name,
+                            {
+                                logo,
+                                turtle,
+                                blk,
+                                block: logo.blockList[blk],
+                                receivedArg
+                            },
+                            logo
+                        );
                     } else {
                         // eslint-disable-next-line no-console
                         console.error("I do not know how to " + logo.blockList[blk].name);
@@ -1031,7 +1042,12 @@ class Logo {
         this.activity.saveLocally(); // Save the state before running.
 
         for (const arg in this.evalOnStartList) {
-            eval(this.evalOnStartList[arg]);
+            executePluginCode(
+                this.evalOnStartList[arg],
+                "ONSTART:" + arg,
+                { logo: this, activity: this.activity },
+                this
+            );
         }
 
         this.stopTurtle = false;
@@ -1451,7 +1467,21 @@ class Logo {
                 // eslint-disable-next-line no-console
                 console.log("running eval on " + logo.blockList[blk].name);
                 logo.pluginReturnValue = null;
-                eval(logo.evalFlowDict[logo.blockList[blk].name]);
+                executePluginCode(
+                    logo.evalFlowDict[logo.blockList[blk].name],
+                    "FLOWPLUGINS:" + logo.blockList[blk].name,
+                    {
+                        args,
+                        logo,
+                        turtle,
+                        blk,
+                        block: logo.blockList[blk],
+                        receivedArg,
+                        actionArgs,
+                        isflow
+                    },
+                    logo
+                );
                 // Clamp blocks will return the child flow.
                 res = logo.pluginReturnValue;
             } else {
