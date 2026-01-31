@@ -56,8 +56,6 @@ function setupRhythmActions(activity) {
              * trigger a _playnote_ event, then wait for the note to play. The note can be specified
              * by pitch or synth blocks. The osctime block specifies the duration in milleseconds
              * while the note block specifies duration as a beat value.
-             *
-             * @todo We should consider the use of the global timer in Tone.js for more accuracy.
              */
 
             const tur = activity.turtles.ithTurtle(turtle);
