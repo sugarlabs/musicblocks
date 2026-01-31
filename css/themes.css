@@ -60,7 +60,7 @@
 
 .dark #floatingWindows > .windowFrame > .wfWinBody .wfbWidget {
     color: #ccc !important;
-    background-color: #3f3f44 !important;
+    background-color: #505050 !important;
 }
 
 .dark .popupMsg {
