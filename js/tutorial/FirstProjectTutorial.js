@@ -321,21 +321,21 @@ class FirstProjectTutorial {
         // Create tooltip content
         this.tooltip.innerHTML = `
             <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-                <span style="background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;">
+                <span style="background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500;">
                     Step ${stepIndex + 1} of ${this.steps.length}
                 </span>
                 <button id="tutorial-close" style="
                     background: transparent;
                     border: none;
                     color: rgba(255,255,255,0.7);
-                    font-size: 20px;
+                    font-size: 18px;
                     cursor: pointer;
                     padding: 0;
                     line-height: 1;
                 ">×</button>
             </div>
-            <h3 style="margin: 0 0 12px 0; font-size: 20px; font-weight: 600;">${step.title}</h3>
-            <p style="margin: 0 0 16px 0; opacity: 0.9; line-height: 1.6; font-size: 15px;">${
+            <h3 style="margin: 0 0 12px 0; font-size: 17px; font-weight: 600;">${step.title}</h3>
+            <p style="margin: 0 0 16px 0; opacity: 0.9; line-height: 1.6; font-size: 14px;">${
                 step.content
             }</p>
             <div id="tutorial-instruction" style="
@@ -759,7 +759,12 @@ class FirstProjectTutorial {
 
         // Check if a newnote block is connected to start
         // The start block's connections[1] should be connected to something
-        if (startBlock.connections && startBlock.connections[1] !== null) {
+        if (
+            startBlock.connections &&
+            Array.isArray(startBlock.connections) &&
+            startBlock.connections.length > 1 &&
+            startBlock.connections[1] !== null
+        ) {
             const connectedId = startBlock.connections[1];
             const connectedBlock = blockList[connectedId];
             if (connectedBlock && connectedBlock.name === blockName) {
@@ -843,11 +848,13 @@ class FirstProjectTutorial {
         const playBtn = docById("play") || docById("runButton");
         if (playBtn) {
             const self = this;
-            const originalOnClick = playBtn.onclick;
-            playBtn.onclick = function (e) {
-                self._playPressed = true;
-                if (originalOnClick) originalOnClick.call(this, e);
-            };
+            playBtn.addEventListener(
+                "click",
+                () => {
+                    self._playPressed = true;
+                },
+                { once: true }
+            );
         }
     }
 
