@@ -237,15 +237,16 @@ class FirstProjectTutorial {
         this.tooltip.id = "tutorial-tooltip";
         this.tooltip.style.cssText = `
             position: fixed;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 16px;
-            padding: 24px;
-            max-width: 380px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 360px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
             z-index: 10000;
             font-family: 'Roboto', sans-serif;
-            color: white;
+            color: #505050;
             pointer-events: auto;
+            border: 1px solid #ddd;
         `;
 
         document.body.appendChild(this.overlay);
@@ -320,31 +321,32 @@ class FirstProjectTutorial {
 
         // Create tooltip content
         this.tooltip.innerHTML = `
-            <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-                <span style="background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500;">
+            <div style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                <span style="background: #f0f0f0; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; color: #666;">
                     Step ${stepIndex + 1} of ${this.steps.length}
                 </span>
                 <button id="tutorial-close" style="
                     background: transparent;
                     border: none;
-                    color: rgba(255,255,255,0.7);
-                    font-size: 18px;
+                    color: #999;
+                    font-size: 20px;
                     cursor: pointer;
                     padding: 0;
                     line-height: 1;
                 ">×</button>
             </div>
-            <h3 style="margin: 0 0 12px 0; font-size: 17px; font-weight: 600;">${step.title}</h3>
-            <p style="margin: 0 0 16px 0; opacity: 0.9; line-height: 1.6; font-size: 14px;">${
+            <h3 style="margin: 0 0 10px 0; font-size: 16px; font-weight: 600; color: #333;">${step.title}</h3>
+            <p style="margin: 0 0 14px 0; color: #505050; line-height: 1.5; font-size: 14px;">${
                 step.content
             }</p>
             <div id="tutorial-instruction" style="
-                background: rgba(0,0,0,0.2);
-                padding: 14px 18px;
-                border-radius: 10px;
-                margin-bottom: 20px;
+                background: #f5f5f5;
+                padding: 12px 16px;
+                border-radius: 8px;
+                margin-bottom: 16px;
                 font-weight: 500;
-                font-size: 14px;
+                font-size: 13px;
+                color: #333;
                 display: flex;
                 align-items: center;
                 gap: 10px;
@@ -360,30 +362,30 @@ class FirstProjectTutorial {
                         ? `
                     <button id="tutorial-prev" style="
                         flex: 1;
-                        padding: 12px 20px;
-                        background: rgba(255,255,255,0.2);
-                        border: none;
-                        border-radius: 10px;
+                        padding: 10px 16px;
+                        background: #f0f0f0;
+                        border: 1px solid #ddd;
+                        border-radius: 6px;
                         cursor: pointer;
-                        font-size: 14px;
+                        font-size: 13px;
                         font-weight: 500;
-                        color: white;
+                        color: #505050;
                     ">← Back</button>
                 `
                         : ""
                 }
                 <button id="tutorial-next" style="
                     flex: 2;
-                    padding: 12px 24px;
-                    background: ${isCompleted ? "#4CAF50" : "rgba(255,255,255,0.3)"};
+                    padding: 10px 20px;
+                    background: ${isCompleted ? "#4CAF50" : "#ccc"};
                     color: white;
                     border: none;
-                    border-radius: 10px;
+                    border-radius: 6px;
                     cursor: ${isCompleted ? "pointer" : "not-allowed"};
-                    font-size: 15px;
+                    font-size: 14px;
                     font-weight: 600;
-                    opacity: ${isCompleted ? "1" : "0.5"};
-                    transition: all 0.3s ease;
+                    opacity: ${isCompleted ? "1" : "0.7"};
+                    transition: all 0.2s ease;
                 " ${isCompleted ? "" : "disabled"}>${step.isLast ? "🎉 Finish" : "Next →"}</button>
             </div>
         `;

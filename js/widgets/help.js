@@ -402,47 +402,40 @@ class HelpWidget {
             body += `
                 <div id="tutorial-buttons-container" style="
                     display: flex;
-                    gap: 16px;
-                    margin-top: 24px;
+                    flex-direction: row;
+                    gap: 12px;
+                    margin-top: 20px;
                     justify-content: center;
-                    flex-wrap: wrap;
                 ">
                     <button id="start-tutorial-btn" style="
-                        padding: 16px 32px;
-                        background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+                        padding: 12px 24px;
+                        background: #4CAF50;
                         color: white;
                         border: none;
-                        border-radius: 12px;
-                        font-size: 16px;
-                        font-weight: 700;
-                        cursor: pointer;
-                        box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
-                        transition: all 0.3s ease;
-                        display: flex;
-                        align-items: center;
-                        gap: 8px;
-                    " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 12px 32px rgba(139, 92, 246, 0.5)';" 
-                       onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 8px 24px rgba(139, 92, 246, 0.4)';">
-                        🚀 Start Interactive Tutorial
-                    </button>
-                    <button id="skip-tutorial-btn" style="
-                        padding: 16px 24px;
-                        background: rgba(0, 0, 0, 0.1);
-                        color: #505050;
-                        border: 2px solid #ccc;
-                        border-radius: 12px;
+                        border-radius: 6px;
                         font-size: 14px;
                         font-weight: 600;
                         cursor: pointer;
-                        transition: all 0.3s ease;
-                    " onmouseover="this.style.background='rgba(0,0,0,0.15)'; this.style.borderColor='#999';" 
-                       onmouseout="this.style.background='rgba(0,0,0,0.1)'; this.style.borderColor='#ccc';">
-                        Skip Tutorial →
+                        transition: all 0.2s ease;
+                    " onmouseover="this.style.background='#45a049';" 
+                       onmouseout="this.style.background='#4CAF50';">
+                        ▶ Start Tutorial
+                    </button>
+                    <button id="skip-tutorial-btn" style="
+                        padding: 12px 24px;
+                        background: #e0e0e0;
+                        color: #505050;
+                        border: none;
+                        border-radius: 6px;
+                        font-size: 14px;
+                        font-weight: 500;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                    " onmouseover="this.style.background='#d0d0d0';" 
+                       onmouseout="this.style.background='#e0e0e0';">
+                        Skip →
                     </button>
                 </div>
-                <p style="text-align: center; margin-top: 16px; color: #888; font-size: 13px;">
-                    ✨ The interactive tutorial will guide you step-by-step with highlights and instructions!
-                </p>
             `;
         }
 
