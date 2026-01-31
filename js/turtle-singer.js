@@ -2488,6 +2488,11 @@ class Singer {
     }
 }
 
+// Attach Singer to global scope for runtime access
+if (typeof window !== "undefined") {
+    window.Singer = Singer;
+}
+
 if (typeof module !== "undefined" && module.exports) {
     module.exports = Singer;
 }
