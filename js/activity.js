@@ -69,7 +69,7 @@ let MYDEFINES = [
     "p5-sound-adapter",
     "p5.dom.min",
     // 'mespeak',
-    "Chart",
+    "Chart.js",
     "utils/utils",
     "activity/artwork",
     "widgets/status",
@@ -7684,6 +7684,11 @@ define(["domReady!"].concat(MYDEFINES), doc => {
             activity.domReady(doc);
             activity.doContextMenus();
             activity.doPluginsAndPaletteCols();
+
+            // Initialize search functionality after activity is ready
+            if (typeof activity.doSearch === "function") {
+                activity.doSearch();
+            }
         } else {
             // Race condition in Firefox: non-AMD scripts might not have
             // finished global assignment yet.

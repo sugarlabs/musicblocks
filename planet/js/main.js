@@ -1,30 +1,21 @@
 /**
  * @license
  * MusicBlocks v3.4.1
- * Copyright (C) 2018 Euan Ong
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 /*
    global
-
    Planet
 */
 
 window.p;
 window.makePlanet = async (isMusicBlocks, storage, translationFunction) => {
+    // FIX: Define toTitleCase globally before Planet initializes
+    window.toTitleCase = (str) => {
+        if (!str) return "";
+        return str.toLowerCase().replace(/\b\w/g, (s) => s.toUpperCase());
+    };
+
     window._ = translationFunction;
     window.p = new Planet(isMusicBlocks, storage);
     await window.p.init();
