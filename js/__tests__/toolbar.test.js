@@ -228,7 +228,7 @@ describe("Toolbar Class", () => {
             },
             stop: {
                 style: { color: "" },
-                addEventListener: jest.fn()
+                onclick: null
             },
             record: {
                 className: ""
@@ -253,10 +253,12 @@ describe("Toolbar Class", () => {
         expect(global.saveButtonAdvanced.disabled).toBe(true);
         expect(global.saveButton.className).toBe("grey-text inactiveLink");
         expect(elements.record.className).toBe("grey-text inactiveLink");
-        expect(elements.stop.addEventListener).toHaveBeenCalledWith("click", expect.any(Function));
 
-        const stopClickHandler = elements.stop.addEventListener.mock.calls[0][1];
-        stopClickHandler();
+        // Verify stop button onclick handler is set (not addEventListener to prevent memory leak)
+        expect(elements.stop.onclick).toBeInstanceOf(Function);
+
+        // Test the stop button handler
+        elements.stop.onclick();
 
         expect(mockActivity.hideMsgs).toHaveBeenCalled();
 
