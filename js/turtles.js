@@ -138,8 +138,9 @@ class Turtles {
             this.createArtwork(turtle, i, true);
         } else {
             // Search for companion and use that turtle's colors.
-            for (let j = 0; j < this.getTurtleCount(); j++) {
-                if (this.getTurtle(j).companionTurtle === this.getTurtleCount() - 1) {
+            const turtleCount = this.getTurtleCount();
+            for (let j = 0; j < turtleCount; j++) {
+                if (this.getTurtle(j).companionTurtle === turtleCount - 1) {
                     i = j % 10;
                     break;
                 }
@@ -230,7 +231,8 @@ class Turtles {
      * @returns {void}
      */
     markAllAsStopped() {
-        for (let i = 0; i < this.getTurtleCount(); i++) {
+        const turtleCount = this.getTurtleCount();
+        for (let i = 0; i < turtleCount; i++) {
             const turtle = this.getTurtle(i);
             turtle.running = false;
         }
@@ -571,7 +573,8 @@ Turtles.TurtlesModel = class {
      * @return {Boolean} - running
      */
     running() {
-        for (let i = 0; i < this.getTurtleCount(); i++) {
+        const turtleCount = this.getTurtleCount();
+        for (let i = 0; i < turtleCount; i++) {
             if (this.getTurtle(i).running) {
                 return true;
             }
@@ -592,7 +595,8 @@ Turtles.TurtlesModel = class {
      * @returns index number of companion turtle or i
      */
     companionTurtle(i) {
-        for (let t = 0; t < this.getTurtleCount(); t++) {
+        const turtleCount = this.getTurtleCount();
+        for (let t = 0; t < turtleCount; t++) {
             if (this.getTurtle(t).companionTurtle === i) {
                 return t;
             }
@@ -606,7 +610,8 @@ Turtles.TurtlesModel = class {
      */
     turtleCount() {
         let count = 0;
-        for (let t = 0; t < this.getTurtleCount(); t++) {
+        const totalTurtles = this.getTurtleCount();
+        for (let t = 0; t < totalTurtles; t++) {
             if (this.companionTurtle(t) === t && !this.getTurtle(t).inTrash) {
                 count += 1;
             }
@@ -921,7 +926,8 @@ Turtles.TurtlesView = class {
             turtlesStage.y = 55 + LEADING + 6;
             this._isShrunk = true;
 
-            for (let i = 0; i < this.getTurtleCount(); i++) {
+            const turtleCount = this.getTurtleCount();
+            for (let i = 0; i < turtleCount; i++) {
                 const turtle = this.getTurtle(i);
                 turtle.container.scaleX = CONTAINERSCALEFACTOR;
                 turtle.container.scaleY = CONTAINERSCALEFACTOR;
@@ -1097,7 +1103,8 @@ Turtles.TurtlesView = class {
             turtlesStage.y = 0;
             this._isShrunk = false;
 
-            for (let i = 0; i < this.getTurtleCount(); i++) {
+            const turtleCount = this.getTurtleCount();
+            for (let i = 0; i < turtleCount; i++) {
                 const turtle = this.getTurtle(i);
                 turtle.container.scaleX = 1;
                 turtle.container.scaleY = 1;
