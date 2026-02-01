@@ -799,8 +799,11 @@ class Toolbar {
             return;
         }
 
-        Record.classList.remove("hide");
-        Record.style.display = "block";
+        // Check beginner mode before showing buttons
+        if (!this.activity.beginnerMode) {
+            Record.classList.remove("hide");
+            Record.style.display = "block";
+        }
         Record.innerHTML = `<i class="material-icons main">${RECORDBUTTON}</i>`;
         
         // Remove any existing onclick handler
@@ -813,8 +816,11 @@ class Toolbar {
         };
         
         if (RecordDropdownArrow) {
-            RecordDropdownArrow.classList.remove("hide");
-            RecordDropdownArrow.style.display = "block";
+            // Check beginner mode before showing buttons
+            if (!this.activity.beginnerMode) {
+                RecordDropdownArrow.classList.remove("hide");
+                RecordDropdownArrow.style.display = "block";
+            }
             RecordDropdownArrow.innerHTML = `<i class="material-icons main" style="font-size: 28px;">arrow_drop_down</i>`;
             
             // Toggle arrow on click
