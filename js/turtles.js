@@ -1292,3 +1292,7 @@ Turtles.TurtlesView = class {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = Turtles;
 }
+
+if (typeof window !== "undefined") {
+    window.Turtles = Turtles;
+}
