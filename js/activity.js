@@ -1776,7 +1776,7 @@ class Activity {
                 recInside.classList.remove("blink");
                 // Prevent zero-byte files
                 if (!recordedChunks || recordedChunks.length === 0) {
-                    alert(_("No video was recorded. File not saved."));
+                    alert(_("Recorded file is empty. File not saved."));
                     flag = 0;
                     recording();
                     doRecordButton();
@@ -1878,23 +1878,6 @@ class Activity {
             }
 
             /**
-             * Handles stopping the recording.
-             */
-            function stopRecording() {
-                if (mediaRecorder && mediaRecorder.state === "recording") {
-                    mediaRecorder.stop();
-                    recInside.classList.remove("blink");
-                    // Clean up stream
-                    if (currentStream) {
-                        currentStream.getTracks().forEach(track => track.stop());
-                    }
-                    if (audioDestination && audioDestination.stream) {
-                        audioDestination.stream.getTracks().forEach(track => track.stop());
-                    }
-                }
-            }
-
-            /**
              * Handles the recording process.
              */
             function recording() {
@@ -1906,8 +1889,21 @@ class Activity {
                         this.removeEventListener("click", handler);
                         // Add stop handler
                         start.addEventListener("click", function stopHandler() {
-                            stopRecording();
-                            start.removeEventListener("click", stopHandler);
+                            if (mediaRecorder && mediaRecorder.state === "recording") {
+                                mediaRecorder.stop();
+                                recInside.classList.remove("blink");
+                                flag = 0;
+                                // Clean up stream
+                                if (currentStream) {
+                                    currentStream.getTracks().forEach(track => track.stop());
+                                }
+                                if (audioDestination && audioDestination.stream) {
+                                    audioDestination.stream.getTracks().forEach(track => track.stop());
+                                }
+                            }
+                            this.removeEventListener("click", stopHandler);
+                            // Re-enable recording for next time
+                            recording();
                         });
                     }
                     recInside.setAttribute("fill", "red");
