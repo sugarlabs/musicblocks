@@ -95,14 +95,14 @@ describe("Toolbar Class", () => {
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ true", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = true;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(134);
+        expect(global._).toHaveBeenCalledTimes(135);
         expect(global._).toHaveBeenNthCalledWith(1, "About Music Blocks");
     });
 
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ false", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = false;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(116);
+        expect(global._).toHaveBeenCalledTimes(117);
         expect(global._).toHaveBeenNthCalledWith(1, "About Turtle Blocks");
     });
 
@@ -886,8 +886,25 @@ describe("Toolbar Class", () => {
 
     test("renderLanguageSelectIcon sets onclick and updates language selection", () => {
         const languageSelectIcon = { onclick: null };
-        const languageBox = { setAttribute: jest.fn() };
-        global.docById.mockReturnValue(languageSelectIcon);
+        const languageBox = { enUS_onclick: jest.fn() };
+
+        // Mock elements for all language IDs with classList
+        const mockLangElement = {
+            onclick: null,
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn()
+            }
+        };
+
+        global.docById.mockImplementation(id => {
+            if (id === "languageSelectIcon") return languageSelectIcon;
+            // Return mock element with classList for any language ID
+            return mockLangElement;
+        });
+
+        global.localStorage.languagePreference = "enUS";
+
         toolbar.renderLanguageSelectIcon(languageBox);
         expect(languageSelectIcon.onclick).toBeInstanceOf(Function);
         languageSelectIcon.onclick();

@@ -1594,18 +1594,6 @@ class Activity {
                 this.blocksContainer.x = 0;
                 this.blocksContainer.y = 0;
 
-                Element.prototype.remove = () => {
-                    this.parentElement.removeChild(this);
-                };
-
-                NodeList.prototype.remove = HTMLCollection.prototype.remove = () => {
-                    for (let i = 0, len = this.length; i < len; i++) {
-                        if (this[i] && this[i].parentElement) {
-                            this[i].parentElement.removeChild(this[i]);
-                        }
-                    }
-                };
-
                 const table = document.getElementById("myTable");
                 if (table !== null) {
                     table.remove();
