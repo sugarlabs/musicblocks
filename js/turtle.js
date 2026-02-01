@@ -257,6 +257,7 @@ class Turtle {
         this.singer.tieCarryOver = 0;
         this.singer.tieFirstDrums = [];
         this.singer.drift = 0;
+        this.singer.maxLagCorrectionRatio = 0.25;
         this.singer.drumStyle = [];
         this.singer.voices = [];
         this.singer.backward = [];
@@ -981,3 +982,7 @@ Turtle.TurtleView = class {
         img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
     }
 };
+
+if (typeof window !== "undefined") {
+    window.Turtle = Turtle;
+}
