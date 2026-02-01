@@ -1878,6 +1878,23 @@ class Activity {
             }
 
             /**
+             * Handles stopping the recording.
+             */
+            function stopRecording() {
+                if (mediaRecorder && mediaRecorder.state === "recording") {
+                    mediaRecorder.stop();
+                    recInside.classList.remove("blink");
+                    // Clean up stream
+                    if (currentStream) {
+                        currentStream.getTracks().forEach(track => track.stop());
+                    }
+                    if (audioDestination && audioDestination.stream) {
+                        audioDestination.stream.getTracks().forEach(track => track.stop());
+                    }
+                }
+            }
+
+            /**
              * Handles the recording process.
              */
             function recording() {
@@ -1887,10 +1904,12 @@ class Activity {
                     mediaRecorder = createRecorder(stream, mimeType);
                     if (flag == 1) {
                         this.removeEventListener("click", handler);
+                        // Add stop handler
+                        start.addEventListener("click", function stopHandler() {
+                            stopRecording();
+                            start.removeEventListener("click", stopHandler);
+                        });
                     }
-                    const node = document.createElement("p");
-                    node.textContent = "Started recording";
-                    document.body.appendChild(node);
                     recInside.setAttribute("fill", "red");
                 });
             }
@@ -1899,22 +1918,6 @@ class Activity {
             if (flag == 0 && isExecuting) {
                 recording();
                 start.dispatchEvent(clickEvent);
-                flag = 0;
-                if (mediaRecorder && mediaRecorder.state !== "inactive") {
-                    mediaRecorder.stop();
-                }
-                if (currentStream) {
-                    currentStream.getTracks().forEach(track => track.stop());
-                    currentStream = null;
-                }
-                if (audioDestination && audioDestination.stream) {
-                    audioDestination.stream.getTracks().forEach(track => track.stop());
-                    audioDestination = null;
-                }
-                mediaRecorder = null;
-                that.textMsg(_("Recording stopped."));
-                start.addEventListener("click", stopRec);
-                flag = 0;
             }
         };
 
@@ -2052,6 +2055,11 @@ class Activity {
             // Regenerate palettes
             if (activity.regeneratePalettes) {
                 activity.regeneratePalettes();
+            }
+
+            // Update record button and dropdown visibility
+            if (activity.toolbar && typeof activity.toolbar.updateRecordButton === 'function') {
+                activity.toolbar.updateRecordButton(() => doRecordButton(activity));
             }
 
             // Force immediate canvas refresh

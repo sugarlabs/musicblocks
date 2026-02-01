@@ -297,21 +297,9 @@
                             <li>
                                 <a id="stop" class="left tooltipped"><i class="material-icons main">stop</i></a>
                             </li>
-                            <li>
-                                <a id="record" class="left tooltipped" data-tooltip="Record"></a>
-                            </li>
-                            <li class="record-mode-container" style="display: none;">
-                                <div class="record-dropdown">
-                                    <button id="recordModeBtn" class="record-mode-btn">
-                                        <span id="recordModeText">Record With Menus</span>
-                                        <span class="dropdown-arrow">▼</span>
-                                    </button>
-                                    <div id="recordModeMenu" class="record-dropdown-menu" style="display: none;">
-                                        
-                                        <div class="record-option" data-mode="screen">Record With Menus</div>
-                                        <div class="record-option" data-mode="canvas">Record Only Canvas</div>
-                                    </div>
-                                </div>
+                            <li style="display: flex; align-items: center;">
+                                <a id="record" class="left tooltipped" data-position="bottom" data-tooltip="Record"></a>
+                                <a id="recordDropdownArrow" class="left dropdown-trigger" data-activates="recorddropdown" style="margin-left: -5px; padding: 0; font-size: 28px;"></a>
                             </li>
                         </ul>
 
@@ -467,6 +455,11 @@
                     <li><a id="save-mxml"></a></li>
                     <li><a id="save-blockartwork-svg"></a></li>
                     <li><a id="save-blockartwork-png"></a></li>
+                </ul>
+
+                <ul id="recorddropdown" class="dropdown-content">
+                    <li><a id="record-with-menus">Record canvas and toolbars</a></li>
+                    <li><a id="record-canvas-only">Record canvas only</a></li>
                 </ul>
 
                 <ul id="languagedropdown" class="dropdown-content">

@@ -783,78 +783,97 @@ class Toolbar {
      */
     updateRecordButton(rec_onclick) {
         const Record = docById("record");
+        const RecordDropdownArrow = docById("recordDropdownArrow");
         const browser = fnBrowserDetect();
         const hideIn = ["firefox", "safari"];
 
+        console.log("updateRecordButton called, Record element:", Record);
+        console.log("rec_onclick function:", rec_onclick);
+
         if (hideIn.includes(browser)) {
             Record.classList.add("hide");
+            if (RecordDropdownArrow) RecordDropdownArrow.classList.add("hide");
+            return;
+        }
+
+        if (!Record) {
+            console.error("Record button element not found!");
             return;
         }
 
         Record.style.display = "block";
         Record.innerHTML = `<i class="material-icons main">${RECORDBUTTON}</i>`;
-        Record.onclick = () => rec_onclick(this.activity);
-
-        // Show record mode dropdown container
-        const modeContainer = document.querySelector(".record-mode-container");
-        if (modeContainer) {
-            modeContainer.style.display = "block";
-        }
-
-        // Initialize record mode dropdown
-        const modeBtn = docById("recordModeBtn");
-        const modeMenu = docById("recordModeMenu");
-        const modeText = docById("recordModeText");
-        const modeOptions = document.querySelectorAll(".record-option");
         
-        if (modeBtn && modeMenu && modeText) {
-            // Load saved preference
+        // Remove any existing onclick handler
+        Record.onclick = null;
+        
+        // Set the onclick handler
+        Record.onclick = function() {
+            console.log("Record button clicked!");
             const savedMode = localStorage.getItem("musicBlocksRecordMode") || "screen";
-            modeText.textContent = savedMode === "canvas" ? "Record Only Canvas" : "Record With Menus";
+            console.log("Current recording mode:", savedMode);
+            console.log("Calling rec_onclick...");
+            rec_onclick();
+        };
+        
+        console.log("Record button onclick set:", Record.onclick);
+        
+        if (RecordDropdownArrow) {
+            RecordDropdownArrow.style.display = "block";
+            RecordDropdownArrow.innerHTML = `<i class="material-icons main" style="font-size: 20px;">arrow_drop_down</i>`;
             
-            // Update selected option styling
-            modeOptions.forEach(option => {
-                if (option.getAttribute("data-mode") === savedMode) {
-                    option.classList.add("selected");
-                } else {
-                    option.classList.remove("selected");
+            // Toggle arrow on click
+            RecordDropdownArrow.addEventListener('click', function() {
+                setTimeout(() => {
+                    const dropdown = docById("recorddropdown");
+                    const arrowIcon = RecordDropdownArrow.querySelector('i');
+                    if (dropdown && dropdown.style.display !== 'none' && dropdown.offsetParent !== null) {
+                        arrowIcon.textContent = 'arrow_drop_up';
+                    } else {
+                        arrowIcon.textContent = 'arrow_drop_down';
+                    }
+                }, 50);
+            });
+            
+            // Reset arrow when clicking outside (close dropdown)
+            document.addEventListener('click', function(e) {
+                const dropdown = docById("recorddropdown");
+                const arrowIcon = RecordDropdownArrow.querySelector('i');
+                if (arrowIcon && !RecordDropdownArrow.contains(e.target) && !dropdown.contains(e.target)) {
+                    arrowIcon.textContent = 'arrow_drop_down';
                 }
             });
-            
-            // Toggle dropdown on button click
-            modeBtn.onclick = (e) => {
-                e.stopPropagation();
-                const isOpen = modeMenu.style.display === "block";
-                modeMenu.style.display = isOpen ? "none" : "block";
-                modeBtn.classList.toggle("active", !isOpen);
-            };
-            
-            // Handle option selection
-            modeOptions.forEach(option => {
-                option.onclick = () => {
-                    const selectedMode = option.getAttribute("data-mode");
-                    localStorage.setItem("musicBlocksRecordMode", selectedMode);
-                    modeText.textContent = option.textContent;
-                    
-                    // Update selected styling
-                    modeOptions.forEach(opt => opt.classList.remove("selected"));
-                    option.classList.add("selected");
-                    
-                    // Close menu
-                    modeMenu.style.display = "none";
-                    modeBtn.classList.remove("active");
-                    
-                    console.log("Recording mode changed to:", option.textContent);
-                };
-            });
-            
-            // Close dropdown when clicking outside
-            document.addEventListener("click", () => {
-                modeMenu.style.display = "none";
-                modeBtn.classList.remove("active");
-            });
         }
-
+        
+        // Set up click handlers for dropdown options  
+        const recordWithMenus = docById("record-with-menus");
+        const recordCanvasOnly = docById("record-canvas-only");
+        
+        if (recordWithMenus) {
+            recordWithMenus.onclick = (e) => {
+                e.preventDefault();
+                localStorage.setItem("musicBlocksRecordMode", "screen");
+                console.log("Recording mode set to: screen (With Menus)");
+                // Reset arrow after selection
+                const arrowIcon = RecordDropdownArrow.querySelector('i');
+                if (arrowIcon) arrowIcon.textContent = 'arrow_drop_down';
+            };
+        } else {
+            console.error("record-with-menus element not found");
+        }
+        
+        if (recordCanvasOnly) {
+            recordCanvasOnly.onclick = (e) => {
+                e.preventDefault();
+                localStorage.setItem("musicBlocksRecordMode", "canvas");
+                
+                // Reset arrow after selection
+                const arrowIcon = RecordDropdownArrow.querySelector('i');
+                if (arrowIcon) arrowIcon.textContent = 'arrow_drop_down';
+            };
+        } else {
+            console.error("record-canvas-only element not found");
+        }
     }
 
     /**
@@ -967,13 +986,32 @@ class Toolbar {
 
             // Update record button
             const recordButton = docById("record");
+            const recordDropdownArrow = docById("recordDropdownArrow");
+            const recordDropdown = docById("recorddropdown");
             if (recordButton) {
                 if (!this.activity.beginnerMode) {
                     recordButton.style.display = "block";
-                    this.updateRecordButton();
-                    recordButton.onclick = () => rec_onclick(this.activity);
+                    recordButton.classList.remove("hide");
+                    if (recordDropdownArrow) {
+                        recordDropdownArrow.style.display = "block";
+                        recordDropdownArrow.classList.remove("hide");
+                    }
+                    if (recordDropdown) {
+                        recordDropdown.classList.remove("hide");
+                        // Let Materialize handle the display, don't force it
+                    }
+                    this.updateRecordButton(rec_onclick);
                 } else {
                     recordButton.style.display = "none";
+                    recordButton.classList.add("hide");
+                    if (recordDropdownArrow) {
+                        recordDropdownArrow.style.display = "none";
+                        recordDropdownArrow.classList.add("hide");
+                    }
+                    if (recordDropdown) {
+                        recordDropdown.style.display = "none";
+                        recordDropdown.classList.add("hide");
+                    }
                 }
             }
 
