@@ -886,8 +886,25 @@ describe("Toolbar Class", () => {
 
     test("renderLanguageSelectIcon sets onclick and updates language selection", () => {
         const languageSelectIcon = { onclick: null };
-        const languageBox = { setAttribute: jest.fn() };
-        global.docById.mockReturnValue(languageSelectIcon);
+        const languageBox = { enUS_onclick: jest.fn() };
+
+        // Mock elements for all language IDs with classList
+        const mockLangElement = {
+            onclick: null,
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn()
+            }
+        };
+
+        global.docById.mockImplementation(id => {
+            if (id === "languageSelectIcon") return languageSelectIcon;
+            // Return mock element with classList for any language ID
+            return mockLangElement;
+        });
+
+        global.localStorage.languagePreference = "enUS";
+
         toolbar.renderLanguageSelectIcon(languageBox);
         expect(languageSelectIcon.onclick).toBeInstanceOf(Function);
         languageSelectIcon.onclick();

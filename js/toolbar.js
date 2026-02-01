@@ -1178,9 +1178,81 @@ class Toolbar {
             "ur"
         ];
 
-        languageSelectIcon.onclick = () => {
+        /**
+         * Updates the selected-language class to highlight the currently selected language.
+         * @param {string} selectedLang - The language code to highlight.
+         */
+        const updateSelectedLanguageHighlight = selectedLang => {
+            // Remove existing selection from all language items
             languages.forEach(lang => {
-                docById(lang).onclick = () => languageBox[`${lang}_onclick`](this.activity);
+                const langElem = docById(lang);
+                if (langElem) {
+                    langElem.classList.remove("selected-language");
+                }
+            });
+
+            // Handle special cases for language preference storage values and browser language codes
+            let langToHighlight = selectedLang;
+
+            // Map browser language codes to dropdown IDs
+            const browserLangMap = {
+                "en-US": "enUS",
+                "en-GB": "enUK",
+                "en-UK": "enUK",
+                "zh-CN": "zhCN",
+                "zh": "zhCN"
+            };
+
+            // Check if it's a browser language code that needs mapping
+            if (selectedLang && browserLangMap[selectedLang]) {
+                langToHighlight = browserLangMap[selectedLang];
+            }
+
+            // Handle Japanese variants (ja-kanji, ja-kana stored vs ja/kana displayed)
+            if (selectedLang && selectedLang.startsWith("ja")) {
+                if (selectedLang === "ja-kana" || localStorage.kanaPreference === "kana") {
+                    langToHighlight = "kana";
+                } else {
+                    langToHighlight = "ja";
+                }
+            }
+
+            // Handle zh_CN to zhCN mapping (stored preference format)
+            if (selectedLang === "zh_CN") {
+                langToHighlight = "zhCN";
+            }
+
+            // Fallback: if language starts with "en" but not mapped, default to enUS
+            if (
+                selectedLang &&
+                selectedLang.startsWith("en") &&
+                !languages.includes(langToHighlight)
+            ) {
+                langToHighlight = "enUS";
+            }
+
+            const selectedElem = docById(langToHighlight);
+            if (selectedElem) {
+                selectedElem.classList.add("selected-language");
+            }
+        };
+
+        languageSelectIcon.onclick = () => {
+            // Get current language preference
+            const currentLang = localStorage.languagePreference || navigator.language;
+
+            // Highlight the currently selected language
+            updateSelectedLanguageHighlight(currentLang);
+
+            // Set up click handlers for each language
+            languages.forEach(lang => {
+                docById(lang).onclick = () => {
+                    // Update highlight to newly selected language
+                    updateSelectedLanguageHighlight(lang);
+
+                    // Call the original language change handler
+                    languageBox[`${lang}_onclick`](this.activity);
+                };
             });
         };
     }
