@@ -787,9 +787,6 @@ class Toolbar {
         const browser = fnBrowserDetect();
         const hideIn = ["firefox", "safari"];
 
-        console.log("updateRecordButton called, Record element:", Record);
-        console.log("rec_onclick function:", rec_onclick);
-
         if (hideIn.includes(browser)) {
             Record.classList.add("hide");
             if (RecordDropdownArrow) RecordDropdownArrow.classList.add("hide");
@@ -797,10 +794,10 @@ class Toolbar {
         }
 
         if (!Record) {
-            console.error("Record button element not found!");
             return;
         }
 
+        Record.classList.remove("hide");
         Record.style.display = "block";
         Record.innerHTML = `<i class="material-icons main">${RECORDBUTTON}</i>`;
         
@@ -809,18 +806,14 @@ class Toolbar {
         
         // Set the onclick handler
         Record.onclick = function() {
-            console.log("Record button clicked!");
             const savedMode = localStorage.getItem("musicBlocksRecordMode") || "screen";
-            console.log("Current recording mode:", savedMode);
-            console.log("Calling rec_onclick...");
             rec_onclick();
         };
         
-        console.log("Record button onclick set:", Record.onclick);
-        
         if (RecordDropdownArrow) {
+            RecordDropdownArrow.classList.remove("hide");
             RecordDropdownArrow.style.display = "block";
-            RecordDropdownArrow.innerHTML = `<i class="material-icons main" style="font-size: 20px;">arrow_drop_down</i>`;
+            RecordDropdownArrow.innerHTML = `<i class="material-icons main" style="font-size: 28px;">arrow_drop_down</i>`;
             
             // Toggle arrow on click
             RecordDropdownArrow.addEventListener('click', function() {
@@ -853,13 +846,10 @@ class Toolbar {
             recordWithMenus.onclick = (e) => {
                 e.preventDefault();
                 localStorage.setItem("musicBlocksRecordMode", "screen");
-                console.log("Recording mode set to: screen (With Menus)");
                 // Reset arrow after selection
                 const arrowIcon = RecordDropdownArrow.querySelector('i');
                 if (arrowIcon) arrowIcon.textContent = 'arrow_drop_down';
             };
-        } else {
-            console.error("record-with-menus element not found");
         }
         
         if (recordCanvasOnly) {
@@ -871,8 +861,6 @@ class Toolbar {
                 const arrowIcon = RecordDropdownArrow.querySelector('i');
                 if (arrowIcon) arrowIcon.textContent = 'arrow_drop_down';
             };
-        } else {
-            console.error("record-canvas-only element not found");
         }
     }
 
@@ -991,26 +979,26 @@ class Toolbar {
             if (recordButton) {
                 if (!this.activity.beginnerMode) {
                     recordButton.style.display = "block";
-                    recordButton.classList.remove("hide");
+                    if (recordButton.classList) recordButton.classList.remove("hide");
                     if (recordDropdownArrow) {
                         recordDropdownArrow.style.display = "block";
-                        recordDropdownArrow.classList.remove("hide");
+                        if (recordDropdownArrow.classList) recordDropdownArrow.classList.remove("hide");
                     }
                     if (recordDropdown) {
-                        recordDropdown.classList.remove("hide");
+                        if (recordDropdown.classList) recordDropdown.classList.remove("hide");
                         // Let Materialize handle the display, don't force it
                     }
                     this.updateRecordButton(rec_onclick);
                 } else {
                     recordButton.style.display = "none";
-                    recordButton.classList.add("hide");
+                    if (recordButton.classList) recordButton.classList.add("hide");
                     if (recordDropdownArrow) {
                         recordDropdownArrow.style.display = "none";
-                        recordDropdownArrow.classList.add("hide");
+                        if (recordDropdownArrow.classList) recordDropdownArrow.classList.add("hide");
                     }
                     if (recordDropdown) {
                         recordDropdown.style.display = "none";
-                        recordDropdown.classList.add("hide");
+                        if (recordDropdown.classList) recordDropdown.classList.add("hide");
                     }
                 }
             }
