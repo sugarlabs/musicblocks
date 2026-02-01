@@ -620,12 +620,87 @@ class ReflectionMatrix {
     }
 
     /**
+     * Escapes HTML special characters so untrusted input cannot inject tags/attributes.
+     * IMPORTANT: This must run before markdown-to-HTML conversion so that any raw
+     * HTML (even malformed) is rendered as plain text.
+     * @param {string} text
+     * @returns {string}
+     */
+    escapeHTML(text) {
+        return String(text)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/\"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+
+    /**
+     * Removes unsafe URL schemes from rendered anchor tags.
+     * Blocks javascript:, data:, vbscript: (including mixed case or whitespace/control chars).
+     * @param {string} html
+     * @returns {string}
+     */
+    sanitizeLinks(html) {
+        const template = document.createElement("template");
+        template.innerHTML = String(html);
+
+        const anchors = template.content.querySelectorAll("a[href]");
+        anchors.forEach(a => {
+            const href = a.getAttribute("href");
+            if (!href) return;
+
+            // Normalize to reliably detect scheme obfuscation like "java\nscript:".
+            // Avoid control-character regexes (ESLint no-control-regex).
+            const hrefLower = String(href).trim().toLowerCase();
+            let normalized = "";
+            for (let i = 0; i < hrefLower.length; i++) {
+                const ch = hrefLower[i];
+                const code = hrefLower.charCodeAt(i);
+
+                // Drop ASCII control chars, DEL, and common whitespace.
+                if (code <= 0x20 || code === 0x7f) continue;
+                // Drop non-ASCII whitespace and a few tricky zero-width characters.
+                if (/\s/.test(ch) || code === 0x00a0 || code === 0x200b || code === 0xfeff) {
+                    continue;
+                }
+
+                normalized += ch;
+            }
+
+            if (
+                normalized.startsWith("javascript:") ||
+                normalized.startsWith("data:") ||
+                normalized.startsWith("vbscript:")
+            ) {
+                a.removeAttribute("href");
+                a.removeAttribute("target");
+                a.removeAttribute("rel");
+            }
+        });
+
+        return template.innerHTML;
+    }
+
+    /**
      * Converts Markdown text to HTML.
      * @param {string} md - The Markdown text.
      * @returns {string} - The converted HTML text.
      */
     mdToHTML(md) {
-        let html = md;
+        // Treat ALL input as untrusted (bot responses, plugins, project data).
+        // Escape first, then apply markdown conversion, then sanitize rendered links.
+        let html = this.escapeHTML(md);
+
+        // Preserve fenced code blocks before other conversions so their content isn't
+        // affected by bold/italic/link regexes or line-break handling.
+        const codeBlocks = [];
+        html = html.replace(/```([\s\S]*?)```/gim, (_m, code) => {
+            const idx = codeBlocks.length;
+            // Content is already HTML-escaped; keep it verbatim inside <pre><code>.
+            codeBlocks.push(`<pre><code>${code}</code></pre>`);
+            return `@@MB_CODEBLOCK_${idx}@@`;
+        });
 
         // Headings
         html = html.replace(/^###### (.*$)/gim, "<h6>$1</h6>");
@@ -639,12 +714,79 @@ class ReflectionMatrix {
         html = html.replace(/\*\*(.*?)\*\*/gim, "<b>$1</b>");
         html = html.replace(/\*(.*?)\*/gim, "<i>$1</i>");
 
+        // Inline code
+        html = html.replace(/`([^`]+)`/gim, "<code>$1</code>");
+
         // Links
-        html = html.replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2' target='_blank'>$1</a>");
+        html = html.replace(
+            /\[(.*?)\]\((.*?)\)/gim,
+            "<a href='$2' target='_blank' rel='noopener noreferrer'>$1</a>"
+        );
 
-        // Line breaks
-        html = html.replace(/\n/gim, "<br>");
+        // Lists + line breaks: handle per-line so we don't inject <br> inside <ul>/<ol> or code blocks.
+        const lines = html.split(/\r?\n/);
+        let rendered = "";
+        let inUL = false;
+        let inOL = false;
 
-        return html.trim();
+        const closeLists = () => {
+            if (inUL) {
+                rendered += "</ul>";
+                inUL = false;
+            }
+            if (inOL) {
+                rendered += "</ol>";
+                inOL = false;
+            }
+        };
+
+        lines.forEach(line => {
+            const ulMatch = line.match(/^\s*[-*+]\s+(.*)$/);
+            const olMatch = line.match(/^\s*\d+\.\s+(.*)$/);
+
+            if (ulMatch) {
+                if (inOL) {
+                    rendered += "</ol>";
+                    inOL = false;
+                }
+                if (!inUL) {
+                    rendered += "<ul>";
+                    inUL = true;
+                }
+                rendered += `<li>${ulMatch[1]}</li>`;
+                return;
+            }
+
+            if (olMatch) {
+                if (inUL) {
+                    rendered += "</ul>";
+                    inUL = false;
+                }
+                if (!inOL) {
+                    rendered += "<ol>";
+                    inOL = true;
+                }
+                rendered += `<li>${olMatch[1]}</li>`;
+                return;
+            }
+
+            closeLists();
+            if (line === "") {
+                rendered += "<br>";
+            } else {
+                rendered += line + "<br>";
+            }
+        });
+
+        closeLists();
+
+        // Restore code blocks.
+        rendered = rendered.replace(
+            /@@MB_CODEBLOCK_(\d+)@@/g,
+            (_m, idx) => codeBlocks[Number(idx)]
+        );
+
+        rendered = this.sanitizeLinks(rendered);
+        return rendered.replace(/(<br>)+$/g, "").trim();
     }
 }
