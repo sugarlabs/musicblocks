@@ -27,7 +27,7 @@ class CacheManager {
      * @param {number} options.maxCacheSize - Maximum number of projects to cache (default: 100)
      */
     constructor(options = {}) {
-        this.dbName = options.dbName || 'MusicBlocksPlanetCache';
+        this.dbName = options.dbName || "MusicBlocksPlanetCache";
         this.dbVersion = 1;
         this.db = null;
 
@@ -38,9 +38,9 @@ class CacheManager {
 
         // Store names
         this.STORES = {
-            METADATA: 'projectMetadata',
-            PROJECTS: 'projectData',
-            THUMBNAILS: 'projectThumbnails'
+            METADATA: "projectMetadata",
+            PROJECTS: "projectData",
+            THUMBNAILS: "projectThumbnails"
         };
 
         this.isInitialized = false;
@@ -61,11 +61,11 @@ class CacheManager {
             await this.clearExpired();
 
             // eslint-disable-next-line no-console
-            console.debug('[CacheManager] Initialized successfully');
+            console.debug("[CacheManager] Initialized successfully");
             return true;
         } catch (error) {
             // eslint-disable-next-line no-console
-            console.error('[CacheManager] Initialization failed:', error);
+            console.error("[CacheManager] Initialization failed:", error);
             return false;
         }
     }
@@ -78,7 +78,7 @@ class CacheManager {
     _openDatabase() {
         return new Promise((resolve, reject) => {
             if (!window.indexedDB) {
-                reject(new Error('IndexedDB not supported'));
+                reject(new Error("IndexedDB not supported"));
                 return;
             }
 
@@ -92,27 +92,33 @@ class CacheManager {
                 resolve(request.result);
             };
 
-            request.onupgradeneeded = (event) => {
+            request.onupgradeneeded = event => {
                 const db = event.target.result;
 
                 // Create metadata store
                 if (!db.objectStoreNames.contains(this.STORES.METADATA)) {
-                    const metadataStore = db.createObjectStore(this.STORES.METADATA, { keyPath: 'id' });
-                    metadataStore.createIndex('expiry', 'expiry', { unique: false });
-                    metadataStore.createIndex('lastAccessed', 'lastAccessed', { unique: false });
+                    const metadataStore = db.createObjectStore(this.STORES.METADATA, {
+                        keyPath: "id"
+                    });
+                    metadataStore.createIndex("expiry", "expiry", { unique: false });
+                    metadataStore.createIndex("lastAccessed", "lastAccessed", { unique: false });
                 }
 
                 // Create projects store
                 if (!db.objectStoreNames.contains(this.STORES.PROJECTS)) {
-                    const projectsStore = db.createObjectStore(this.STORES.PROJECTS, { keyPath: 'id' });
-                    projectsStore.createIndex('expiry', 'expiry', { unique: false });
-                    projectsStore.createIndex('lastAccessed', 'lastAccessed', { unique: false });
+                    const projectsStore = db.createObjectStore(this.STORES.PROJECTS, {
+                        keyPath: "id"
+                    });
+                    projectsStore.createIndex("expiry", "expiry", { unique: false });
+                    projectsStore.createIndex("lastAccessed", "lastAccessed", { unique: false });
                 }
 
                 // Create thumbnails store
                 if (!db.objectStoreNames.contains(this.STORES.THUMBNAILS)) {
-                    const thumbnailsStore = db.createObjectStore(this.STORES.THUMBNAILS, { keyPath: 'id' });
-                    thumbnailsStore.createIndex('expiry', 'expiry', { unique: false });
+                    const thumbnailsStore = db.createObjectStore(this.STORES.THUMBNAILS, {
+                        keyPath: "id"
+                    });
+                    thumbnailsStore.createIndex("expiry", "expiry", { unique: false });
                 }
             };
         });
@@ -138,7 +144,7 @@ class CacheManager {
             return null;
         } catch (error) {
             // eslint-disable-next-line no-console
-            console.debug('[CacheManager] Error getting metadata:', error);
+            console.debug("[CacheManager] Error getting metadata:", error);
             return null;
         }
     }
@@ -166,7 +172,7 @@ class CacheManager {
             return true;
         } catch (error) {
             // eslint-disable-next-line no-console
-            console.debug('[CacheManager] Error caching metadata:', error);
+            console.debug("[CacheManager] Error caching metadata:", error);
             return false;
         }
     }
@@ -190,7 +196,7 @@ class CacheManager {
             return null;
         } catch (error) {
             // eslint-disable-next-line no-console
-            console.debug('[CacheManager] Error getting project:', error);
+            console.debug("[CacheManager] Error getting project:", error);
             return null;
         }
     }
@@ -218,7 +224,7 @@ class CacheManager {
             return true;
         } catch (error) {
             // eslint-disable-next-line no-console
-            console.debug('[CacheManager] Error caching project:', error);
+            console.debug("[CacheManager] Error caching project:", error);
             return false;
         }
     }
@@ -301,15 +307,15 @@ class CacheManager {
      */
     async _clearExpiredFromStore(storeName, now) {
         return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([storeName], 'readwrite');
+            const transaction = this.db.transaction([storeName], "readwrite");
             const store = transaction.objectStore(storeName);
-            const index = store.index('expiry');
+            const index = store.index("expiry");
             const range = IDBKeyRange.upperBound(now);
 
             let cleared = 0;
             const request = index.openCursor(range);
 
-            request.onsuccess = (event) => {
+            request.onsuccess = event => {
                 const cursor = event.target.result;
                 if (cursor) {
                     cursor.delete();
@@ -329,7 +335,7 @@ class CacheManager {
      */
     async _enforceMaxSize(storeName) {
         return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([storeName], 'readwrite');
+            const transaction = this.db.transaction([storeName], "readwrite");
             const store = transaction.objectStore(storeName);
             const countRequest = store.count();
 
@@ -343,11 +349,11 @@ class CacheManager {
 
                 // Remove oldest entries
                 const toRemove = count - this.maxCacheSize;
-                const index = store.index('lastAccessed');
+                const index = store.index("lastAccessed");
                 const request = index.openCursor();
                 let removed = 0;
 
-                request.onsuccess = (event) => {
+                request.onsuccess = event => {
                     const cursor = event.target.result;
                     if (cursor && removed < toRemove) {
                         cursor.delete();
@@ -368,7 +374,7 @@ class CacheManager {
      */
     _getFromStore(storeName, key) {
         return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([storeName], 'readonly');
+            const transaction = this.db.transaction([storeName], "readonly");
             const store = transaction.objectStore(storeName);
             const request = store.get(key);
 
@@ -383,7 +389,7 @@ class CacheManager {
      */
     _putToStore(storeName, data) {
         return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([storeName], 'readwrite');
+            const transaction = this.db.transaction([storeName], "readwrite");
             const store = transaction.objectStore(storeName);
             const request = store.put(data);
 
@@ -426,7 +432,7 @@ class CacheManager {
         try {
             for (const storeName of Object.values(this.STORES)) {
                 await new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction([storeName], 'readwrite');
+                    const transaction = this.db.transaction([storeName], "readwrite");
                     const store = transaction.objectStore(storeName);
                     const request = store.clear();
 
@@ -436,11 +442,11 @@ class CacheManager {
             }
 
             // eslint-disable-next-line no-console
-            console.debug('[CacheManager] All cache cleared');
+            console.debug("[CacheManager] All cache cleared");
             return true;
         } catch (error) {
             // eslint-disable-next-line no-console
-            console.error('[CacheManager] Error clearing cache:', error);
+            console.error("[CacheManager] Error clearing cache:", error);
             return false;
         }
     }
@@ -459,7 +465,7 @@ class CacheManager {
         for (const [name, storeName] of Object.entries(this.STORES)) {
             try {
                 stats[name.toLowerCase()] = await new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction([storeName], 'readonly');
+                    const transaction = this.db.transaction([storeName], "readonly");
                     const store = transaction.objectStore(storeName);
                     const request = store.count();
 

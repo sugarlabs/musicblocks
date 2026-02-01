@@ -58,9 +58,9 @@ class RequestManager {
      * @returns {string} - Unique request key
      */
     generateRequestKey(data) {
-        const action = data.action || 'unknown';
+        const action = data.action || "unknown";
         const params = { ...data };
-        delete params['api-key'];
+        delete params["api-key"];
         return `${action}:${JSON.stringify(params)}`;
     }
 
@@ -176,7 +176,7 @@ class RequestManager {
             const result = await this._promisifyRequest(requestFn);
 
             // Check if the result indicates a failure that should be retried
-            if (result && result.success === false && result.error === 'ERROR_CONNECTION_FAILURE') {
+            if (result && result.success === false && result.error === "ERROR_CONNECTION_FAILURE") {
                 if (attempt < this.maxRetries) {
                     this.stats.retries++;
 
@@ -184,7 +184,11 @@ class RequestManager {
                     const delay = this.baseRetryDelay * Math.pow(2, attempt);
 
                     // eslint-disable-next-line no-console
-                    console.debug(`[RequestManager] Retry attempt ${attempt + 1}/${this.maxRetries} after ${delay}ms`);
+                    console.debug(
+                        `[RequestManager] Retry attempt ${attempt + 1}/${
+                            this.maxRetries
+                        } after ${delay}ms`
+                    );
 
                     await this._delay(delay);
                     return this._executeWithRetry(requestFn, attempt + 1, result);
@@ -204,7 +208,11 @@ class RequestManager {
                 const delay = this.baseRetryDelay * Math.pow(2, attempt);
 
                 // eslint-disable-next-line no-console
-                console.debug(`[RequestManager] Retry attempt ${attempt + 1}/${this.maxRetries} after ${delay}ms (error: ${error.message})`);
+                console.debug(
+                    `[RequestManager] Retry attempt ${attempt + 1}/${
+                        this.maxRetries
+                    } after ${delay}ms (error: ${error.message})`
+                );
 
                 await this._delay(delay);
                 return this._executeWithRetry(requestFn, attempt + 1, lastFailure);
@@ -212,7 +220,7 @@ class RequestManager {
 
             this.stats.failures++;
             // Return the last failure or a generic error response
-            return lastFailure || { success: false, error: 'MAX_RETRIES_EXCEEDED' };
+            return lastFailure || { success: false, error: "MAX_RETRIES_EXCEEDED" };
         }
     }
 
@@ -223,7 +231,7 @@ class RequestManager {
     _promisifyRequest(requestFn) {
         return new Promise((resolve, reject) => {
             try {
-                requestFn((result) => {
+                requestFn(result => {
                     resolve(result);
                 });
             } catch (error) {

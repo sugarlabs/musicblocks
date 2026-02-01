@@ -31,15 +31,15 @@ class ServerInterface {
 
         // Initialize RequestManager for rate limiting and retry logic
         this.requestManager = new RequestManager({
-            minDelay: 500,      // 500ms between requests
-            maxRetries: 3,      // Retry up to 3 times
+            minDelay: 500, // 500ms between requests
+            maxRetries: 3, // Retry up to 3 times
             baseRetryDelay: 1000, // Start with 1s delay for retries
-            maxConcurrent: 3    // Max 3 concurrent requests
+            maxConcurrent: 3 // Max 3 concurrent requests
         });
 
         // Initialize CacheManager for offline caching
         this.cacheManager = new CacheManager({
-            dbName: 'MusicBlocksPlanetCache',
+            dbName: "MusicBlocksPlanetCache",
             metadataExpiry: 24 * 60 * 60 * 1000, // 24 hours
             projectExpiry: 7 * 24 * 60 * 60 * 1000, // 7 days
             maxCacheSize: 100
@@ -91,7 +91,7 @@ class ServerInterface {
         data["api-key"] = this.APIKey;
 
         try {
-            const result = await this.requestManager.throttledRequest(data, (resolve) => {
+            const result = await this.requestManager.throttledRequest(data, resolve => {
                 jQuery
                     .ajax({
                         type: "POST",
@@ -109,7 +109,7 @@ class ServerInterface {
             callback(result);
         } catch (error) {
             // eslint-disable-next-line no-console
-            console.error('[ServerInterface] Request failed after retries:', error);
+            console.error("[ServerInterface] Request failed after retries:", error);
             callback(this.ConnectionFailureData);
         }
     }
@@ -155,7 +155,7 @@ class ServerInterface {
 
         if (cached) {
             // eslint-disable-next-line no-console
-            console.debug('[ServerInterface] Returning cached metadata for:', ProjectID);
+            console.debug("[ServerInterface] Returning cached metadata for:", ProjectID);
             callback({ success: true, data: cached });
             return;
         }
@@ -163,7 +163,7 @@ class ServerInterface {
         // Fetch from server
         const obj = { action: "getProjectDetails", ProjectID: ProjectID };
 
-        this.throttledRequest(obj, async (result) => {
+        this.throttledRequest(obj, async result => {
             // Cache successful responses
             if (result && result.success && result.data) {
                 await this.cacheManager.cacheMetadata(ProjectID, result.data);
@@ -196,7 +196,7 @@ class ServerInterface {
 
         if (cached) {
             // eslint-disable-next-line no-console
-            console.debug('[ServerInterface] Returning cached project:', ProjectID);
+            console.debug("[ServerInterface] Returning cached project:", ProjectID);
             callback({ success: true, data: cached });
             return;
         }
@@ -204,7 +204,7 @@ class ServerInterface {
         // Fetch from server
         const obj = { action: "downloadProject", ProjectID: ProjectID };
 
-        this.throttledRequest(obj, async (result) => {
+        this.throttledRequest(obj, async result => {
             // Cache successful responses
             if (result && result.success && result.data) {
                 await this.cacheManager.cacheProject(ProjectID, result.data);
@@ -273,6 +273,6 @@ class ServerInterface {
     async init() {
         await this.initCache();
         // eslint-disable-next-line no-console
-        console.debug('[ServerInterface] Initialized with rate limiting and caching');
+        console.debug("[ServerInterface] Initialized with rate limiting and caching");
     }
 }
