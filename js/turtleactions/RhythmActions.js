@@ -118,7 +118,7 @@ function setupRhythmActions(activity) {
             const noteBeatValue = blkName === "newnote" ? 1 / value : value;
 
             tur.singer.inNoteBlock.push(blk);
-            tur.singer.multipleVoices = tur.singer.inNoteBlock.length > 1 ? true : false;
+            tur.singer.multipleVoices = tur.singer.inNoteBlock.length > 1;
 
             // Adjust the note value based on the beatFactor
             tur.singer.noteValue[last(tur.singer.inNoteBlock)] =
@@ -319,18 +319,11 @@ function setupRhythmActions(activity) {
 
                     Singer.processNote(
                         activity,
-                        noteValue,
-                        activity.blocks.blockList[saveBlk].name === "osctime",
+                        tur.singer.tieNoteExtras[7], // rawDurationValue
+                        tur.singer.tieNoteExtras[6], // isOsc
                         saveBlk,
                         turtle
                     );
-                    const bpmFactor =
-                        TONEBPM / tur.singer.bpm.length > 0
-                            ? last(tur.singer.bpm)
-                            : Singer.masterBPM;
-
-                    // Wait until this note is played before continuing
-                    tur.doWait(bpmFactor / noteValue);
 
                     tur.singer.inNoteBlock.pop();
 

@@ -309,17 +309,17 @@ class Singer {
                 noteObj[1],
                 steps > 0
                     ? getStepSizeUp(
-                          tur.singer.keySignature,
-                          noteObj[0],
-                          steps,
-                          logo.synth.inTemperament
-                      )
+                        tur.singer.keySignature,
+                        noteObj[0],
+                        steps,
+                        logo.synth.inTemperament
+                    )
                     : getStepSizeDown(
-                          tur.singer.keySignature,
-                          noteObj[0],
-                          steps,
-                          logo.synth.inTemperament
-                      ),
+                        tur.singer.keySignature,
+                        noteObj[0],
+                        steps,
+                        logo.synth.inTemperament
+                    ),
                 tur.singer.keySignature,
                 tur.singer.movable,
                 null,
@@ -1461,7 +1461,7 @@ class Singer {
         } else if (tur.singer.crescendoDelta.length > 0) {
             if (
                 last(tur.singer.synthVolume[DEFAULTVOICE]) ===
-                    last(tur.singer.crescendoInitialVolume[DEFAULTVOICE]) &&
+                last(tur.singer.crescendoInitialVolume[DEFAULTVOICE]) &&
                 tur.singer.justCounting.length === 0
             ) {
                 activity.logo.notation.notationBeginCrescendo(
@@ -1694,22 +1694,16 @@ class Singer {
                         tur.singer.tie = false;
                         tieDelay = 0;
 
-                        /** @todo FIXME: consider osctime block in tie */
+                        // tieNoteExtras: [blk, oscList, noteBeat, noteBeatValues, noteDrums, graphics, isOsc, rawDurationValue]
                         Singer.processNote(
                             activity,
-                            tur.singer.tieCarryOver,
-                            false,
+                            tur.singer.tieNoteExtras[7], // rawDurationValue
+                            tur.singer.tieNoteExtras[6], // isOsc
                             saveBlk,
                             turtle
                         );
 
                         tur.singer.inNoteBlock.pop();
-
-                        if (!tur.singer.suppressOutput) {
-                            tur.doWait(
-                                Math.max(bpmFactor / tur.singer.tieCarryOver - turtleLag, 0)
-                            );
-                        }
 
                         tieDelay = tur.singer.tieCarryOver;
                         tur.singer.tieCarryOver = 0;
@@ -1756,7 +1750,9 @@ class Singer {
                         tur.singer.noteBeat[saveBlk],
                         tur.singer.noteBeatValues[saveBlk],
                         tur.singer.noteDrums[saveBlk],
-                        []
+                        [],
+                        isOsc,
+                        noteValue // rawDurationValue
                     ];
 
                     // We play any drums in the first tied note along with the drums in the second tied note
@@ -1830,7 +1826,7 @@ class Singer {
                         }
                     }
                     // eslint-disable-next-line no-console
-                    console.log("Note in note " + blk + " delay " + future);
+                    // TODO: debug future scheduling for nested notes
                 }
             }
             let forceSilence = false;
@@ -1924,7 +1920,7 @@ class Singer {
                             if (
                                 i === j ||
                                 tur.singer.noteOctaves[thisBlk][i] !==
-                                    tur.singer.noteOctaves[thisBlk][j]
+                                tur.singer.noteOctaves[thisBlk][j]
                             ) {
                                 continue;
                             }
@@ -2064,9 +2060,9 @@ class Singer {
                     const notesFrequency = isCustomTemperament(activity.logo.synth.inTemperament)
                         ? activity.logo.synth.getCustomFrequency(notes)
                         : activity.logo.synth.getFrequency(
-                              notes,
-                              activity.logo.synth.changeInTemperament
-                          );
+                            notes,
+                            activity.logo.synth.changeInTemperament
+                        );
                     const startingPitch = activity.logo.synth.startingPitch;
                     const frequency = pitchToFrequency(
                         startingPitch.substring(0, startingPitch.length - 1),
@@ -2171,8 +2167,8 @@ class Singer {
                                     if (notes.length > 1) {
                                         activity.errorMsg(
                                             last(tur.singer.oscList[thisBlk]) +
-                                                ": " +
-                                                _("synth cannot play chords."),
+                                            ": " +
+                                            _("synth cannot play chords."),
                                             blk
                                         );
                                     }
