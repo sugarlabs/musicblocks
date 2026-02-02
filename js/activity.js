@@ -6262,7 +6262,7 @@ class Activity {
 
             $j("#helpfulSearch").autocomplete("instance")._renderItem = (ul, item) => {
                 return $j("<li></li>")
-                    .data("item.autocomplete", item)
+                    .data("ui-autocomplete-item", item)
                     .append(
                         '<img src="' +
                         item.artwork +
