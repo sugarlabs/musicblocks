@@ -670,7 +670,11 @@ class Toolbar {
                     const saveHTML = docById("save-html-beg");
                     console.debug(saveHTML);
                     saveHTML.onclick = () => {
-                        html_onclick(this.activity);
+                        if (typeof SaveHTMLWidget !== "undefined") {
+                            SaveHTMLWidget.open(this.activity);
+                        } else {
+                            html_onclick(this.activity);
+                        }
                     };
 
                     const savePNG = docById("save-png-beg");
@@ -705,7 +709,11 @@ class Toolbar {
                 //console.debug(saveHTML);
 
                 saveHTML.onclick = () => {
-                    html_onclick(this.activity);
+                    if (typeof SaveHTMLWidget !== "undefined") {
+                            SaveHTMLWidget.open(this.activity);
+                        } else {
+                            html_onclick(this.activity);
+                        }
                 };
                 const saveSVG = docById("save-svg");
                 const savePNG = docById("save-png");

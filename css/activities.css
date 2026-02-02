@@ -2147,3 +2147,64 @@ table {
         box-sizing: border-box; 
     }
 }
+
+#saveHtmlBody {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-width: 420px;
+    color: #505050;
+}
+#saveHtmlBody .save-row label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+#saveHtmlBody input[type="text"],
+#saveHtmlBody textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: #fff;
+    color: inherit;
+    box-sizing: border-box;
+}
+#saveHtmlBody .image-row img {
+    max-width: 100%;
+    border-radius: 4px;
+    background: #f6f6f6;
+}
+#saveHtmlBody .buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+#saveHtmlBody .btn.primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #2196f3;
+    color: #fff;
+    border: none;
+    padding: 1rem 1rem;
+    border-radius: 6px;
+    text-align: center;
+    cursor: pointer;
+}
+#saveHtmlBody .btn.flat {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid transparent;
+    padding: 1rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+@media (max-width: 600px) {
+    #saveHtmlBody {
+        max-width: 320px;
+    }
+}
