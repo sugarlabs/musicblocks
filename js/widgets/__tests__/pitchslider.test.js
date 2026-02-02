@@ -82,7 +82,7 @@ const createMockWidgetWindow = () => {
     };
 };
 
-const PitchSlider = require("./pitchslider.js");
+const PitchSlider = require("../pitchslider.js");
 
 describe("PitchSlider Widget", () => {
     let activityMock;

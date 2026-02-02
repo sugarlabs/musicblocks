@@ -1051,10 +1051,12 @@ table {
 }
 
 #right-arrow {
+  right: 25px;
   background: url("../header-icons/right-arrow.png");
 }
 
 #left-arrow {
+  left: 10px;
   background: url("../header-icons/left-arrow.png");
 }
 
@@ -1965,6 +1967,7 @@ table {
 #errorText {
   border: 2px solid red;
   background-color: pink;
+  color: #000000;
 }
 
 .contentWrapper {
@@ -2142,7 +2145,7 @@ table {
 
 #right-arrow {
     left: auto !important;  /* Unset the old fixed pixel value */
-    right: 10px !important; /* Stick to the right edge */
+    right: 25px !important; /* Stick to the right edge */
 }
 
 /* --- Desktop View (Screens wider than 900px) --- */
@@ -2173,7 +2176,8 @@ table {
 
     /* Fix the inner text box width so it doesn't overflow */
     #helpBodyDiv {
-        width: 100% !important;
+        width: calc(100% - 110px) !important;
+        margin: 0 auto !important;
         left: 0 !important;
         padding: 0 10px;
         box-sizing: border-box; 
