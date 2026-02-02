@@ -353,16 +353,12 @@ const platformThemes = {
     // custom: {Your styling},
 };
 
-for (const theme in platformThemes) {
-    if (themePreference === theme) {
-        window.platformColor = platformThemes[theme];
-        break;
-    } else {
-        window.platformColor = platformThemes["light"];
-    }
-}
+window.platformColor = platformThemes[themePreference] || platformThemes.light;
 
-document.querySelector("meta[name=theme-color]").content = platformColor.header;
+const metaThemeColor = document.querySelector("meta[name=theme-color]");
+if (metaThemeColor) {
+    metaThemeColor.content = platformColor.header;
+}
 
 /**
  * @public
