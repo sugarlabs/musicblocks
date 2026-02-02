@@ -2257,13 +2257,19 @@ class Block {
                 }
             }
         }
-        //Update visibility of standard vs highlight bitmaps first
+
+        // Update visibility of standard vs highlight bitmaps first
         this.unhighlight();
 
-        //Delete the old cache.
+        // Delete the old cache.
         // We must delete it so the engine is forced to calculate the new size.
         if (this.container.cacheID) {
             this.container.uncache();
+        }
+
+        // Immediate palette update to ensure sidebar expansion happens without delay
+        if (this.activity.palettes && typeof this.activity.palettes.updatePalettes === 'function') {
+            this.activity.palettes.updatePalettes();
         }
 
         //Create a NEW cache.

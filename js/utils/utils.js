@@ -1723,4 +1723,20 @@ if (typeof module !== "undefined" && module.exports) {
         hexToRGB,
         hex2rgb
     };
+} else {
+    // Browser environment - attach to window object
+    window._ = _;
+    window.last = last;
+    window.fileExt = fileExt;
+    window.fileBasename = fileBasename;
+    window.toTitleCase = toTitleCase;
+    window.safeSVG = safeSVG;
+    window.toFixed2 = toFixed2;
+    window.mixedNumber = mixedNumber;
+    window.nearestBeat = nearestBeat;
+    window.oneHundredToFraction = oneHundredToFraction;
+    window.rationalToFraction = rationalToFraction;
+    window.rgbToHex = rgbToHex;
+    window.hexToRGB = hexToRGB;
+    window.hex2rgb = hex2rgb;
 }
