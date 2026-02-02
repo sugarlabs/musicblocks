@@ -1705,6 +1705,18 @@ class Singer {
 
                         tur.singer.inNoteBlock.pop();
 
+                        if (!tur.singer.suppressOutput) {
+                            const rawDuration = tur.singer.tieNoteExtras[7];
+                            const wasOsc = tur.singer.tieNoteExtras[6];
+
+                            const waitSeconds = wasOsc
+                                ? rawDuration / 1000
+                                : bpmFactor / rawDuration;
+
+                            tur.singer.turtleTime += waitSeconds;
+                            tur.doWait(Math.max(waitSeconds - turtleLag, 0));
+                        }
+
                         tieDelay = tur.singer.tieCarryOver;
                         tur.singer.tieCarryOver = 0;
                         tur.singer.tie = true;
@@ -1826,7 +1838,6 @@ class Singer {
                         }
                     }
                     // eslint-disable-next-line no-console
-                    // TODO: debug future scheduling for nested notes
                 }
             }
             let forceSilence = false;
