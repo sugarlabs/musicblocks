@@ -129,6 +129,7 @@ $(document).ready(() => {
     $("#publisher").modal();
     $("#deleter").modal();
     $("#projectviewer").modal();
+    $("#version-history-modal").modal();
     // eslint-disable-next-line no-unused-vars
     document.getElementById("global-search").addEventListener("input", evt => {
         document.getElementById("search-close").style.display =

@@ -13,7 +13,7 @@
    global
 
    setCookie, getCookie, StringHelper, ProjectStorage, ServerInterface,
-   Converter, SaveInterface, LocalPlanet, GlobalPlanet
+   Converter, SaveInterface, LocalPlanet, GlobalPlanet, VersionControl
 */
 /*
    exported
@@ -26,6 +26,7 @@ class Planet {
         this.LocalPlanet = null;
         this.GlobalPlanet = null;
         this.ProjectStorage = null;
+        this.VersionControl = null;
         this.ServerInterface = null;
         this.Converter = null;
         this.SaveInterface = null;
@@ -118,6 +119,18 @@ class Planet {
         document.getElementById("planet-new-project").addEventListener("click", evt => {
             this.loadNewProject();
         });
+
+        if (typeof VersionControl !== 'undefined') {
+            this.VersionControl = new VersionControl(this);
+            this.VersionControl.init();
+
+            const versionHistoryBtn = document.getElementById("version-history-btn");
+            if (versionHistoryBtn) {
+                versionHistoryBtn.addEventListener("click", evt => {
+                    this.VersionControl.openVersionHistory();
+                });
+            }
+        }
 
         this.ServerInterface.getTagManifest(
             function (data) {
