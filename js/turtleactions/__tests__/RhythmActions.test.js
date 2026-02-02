@@ -295,7 +295,15 @@ describe("setupRhythmActions", () => {
     });
 
     describe("doTie", () => {
+        // Store original implementations to restore after tests
+        let originalGetMouseFromTurtle;
+        let originalIsRun;
+
         beforeEach(() => {
+            // Store original values before each test
+            originalGetMouseFromTurtle = global.Mouse.getMouseFromTurtle;
+            originalIsRun = global.MusicBlocks.isRun;
+
             targetTurtle.singer.tie = false;
             targetTurtle.singer.tieNotePitches = [];
             targetTurtle.singer.tieNoteExtras = [];
@@ -309,6 +317,17 @@ describe("setupRhythmActions", () => {
                 notationStaging: { 0: [] }
             };
             activity.blocks.blockList = { 1: { name: "note" } };
+        });
+
+        afterEach(() => {
+            // Restore MusicBlocks.isRun to its default value
+            global.MusicBlocks.isRun = originalIsRun;
+
+            // Restore Mouse.getMouseFromTurtle to its original implementation
+            global.Mouse.getMouseFromTurtle = originalGetMouseFromTurtle;
+
+            // Clear Jest mocks to avoid state leakage across tests
+            jest.clearAllMocks();
         });
 
         it("initializes tie state correctly", () => {
@@ -349,7 +368,7 @@ describe("setupRhythmActions", () => {
             });
 
             Singer.RhythmActions.doTie(0, 1);
-            
+
             // Simulate some tie data that should be cleaned up
             targetTurtle.singer.tieNotePitches = [["C", 4, 0, 0]];
             targetTurtle.singer.tieNoteExtras = [1, [], [], [], []];
@@ -370,13 +389,13 @@ describe("setupRhythmActions", () => {
 
             // Mock doWait on turtle
             targetTurtle.doWait = jest.fn();
-            
+
             // Add saveBlk to blockList so listener can access blockList[saveBlk].name
             activity.blocks.blockList[5] = { name: "note" };
 
             // Call doTie first - this initializes state and captures the listener
             Singer.RhythmActions.doTie(0, 1);
-            
+
             // Now set up the tieCarryOver state AFTER doTie (since doTie resets tieCarryOver to 0)
             // The listener uses tur.singer.tieCarryOver which is a reference
             targetTurtle.singer.inNoteBlock = [];
@@ -384,11 +403,11 @@ describe("setupRhythmActions", () => {
             targetTurtle.singer.tieCarryOver = 2;
             targetTurtle.singer.tieNotePitches = [["C", 4, 0, 261.63]];
             targetTurtle.singer.tieNoteExtras = [
-                5,           // saveBlk
-                ["sine"],    // oscList
-                1,           // noteBeat
-                [1],         // noteBeatValues
-                [],          // noteDrums
+                5, // saveBlk
+                ["sine"], // oscList
+                1, // noteBeat
+                [1], // noteBeatValues
+                [] // noteDrums
             ];
             targetTurtle.singer.bpm = [120];
 
@@ -409,12 +428,12 @@ describe("setupRhythmActions", () => {
 
             // Add saveBlk to blockList so listener can access blockList[saveBlk].name
             activity.blocks.blockList[5] = { name: "note" };
-            
+
             targetTurtle.doWait = jest.fn();
 
             // Call doTie first
             Singer.RhythmActions.doTie(0, 1);
-            
+
             // Set up state AFTER doTie (since doTie resets tieCarryOver to 0)
             targetTurtle.singer.inNoteBlock = [2];
             targetTurtle.singer.notePitches = { 2: ["C", "E"] };
@@ -436,7 +455,12 @@ describe("setupRhythmActions", () => {
             Singer.RhythmActions.doTie(0, undefined);
 
             expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
-            expect(activity.logo.setTurtleListener).toHaveBeenCalled();
+            // Assert exact arguments passed to setTurtleListener
+            expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+                0, // turtle index
+                "_tie_0", // listener name
+                expect.any(Function) // callback
+            );
         });
     });
 });
