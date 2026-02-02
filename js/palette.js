@@ -872,6 +872,10 @@ class Palette {
         docById(
             "palette"
         ).childNodes[0].style.borderRight = `1px solid ${platformColor.selectorSelected}`;
+        if (this._outsideClickListener) {
+            document.removeEventListener("click", this._outsideClickListener);
+            this._outsideClickListener = null;
+        }
         this._hideMenuItems();
     }
 
@@ -944,21 +948,14 @@ class Palette {
 
         this._showMenuItems();
 
-        // Close palette menu on outside click
-        if (this._outsideClickListener) {
-            document.removeEventListener("click", this._outsideClickListener);
-            this._outsideClickListener = null;
+        if (!this._outsideClickListener) {
+            this._outsideClickListener = event => {
+                if (this.menuContainer && this.menuContainer.contains(event.target)) {
+                    return;
+                }
+                this.hideMenu();
+            };
         }
-
-        this._outsideClickListener = event => {
-            if (this.menuContainer && this.menuContainer.contains(event.target)) {
-                return;
-            }
-
-            document.removeEventListener("click", this._outsideClickListener);
-            this._outsideClickListener = null;
-            this.hideMenu();
-        };
 
         document.addEventListener("click", this._outsideClickListener);
     }
