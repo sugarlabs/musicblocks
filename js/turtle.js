@@ -982,3 +982,7 @@ Turtle.TurtleView = class {
         img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
     }
 };
+
+if (typeof window !== "undefined") {
+    window.Turtle = Turtle;
+}

@@ -226,9 +226,7 @@ class PitchStaircase {
             return;
         }
 
-        /**
-         * @todo look to see if the same frequency is already in the list.
-         */
+        const newFrequency = parseFloat(frequency) / inputNum;
         const obj = frequencyToPitch(newFrequency);
         let foundStep = false;
         let repeatStep = false;
@@ -236,23 +234,7 @@ class PitchStaircase {
         let i;
 
         for (i = 0; i < this.Stairs.length; i++) {
-            if (
-                this.Stairs[i][2] < newFrequency &&
-                Math.abs(this.Stairs[i][2] - newFrequency) >= 0.001
-            ) {
-                this.Stairs.splice(i, 0, [
-                    obj[0],
-                    obj[1],
-                    newFrequency,
-                    this.Stairs[n][3] * parseFloat(inputNum2),
-                    this.Stairs[n][4] * parseFloat(inputNum1),
-                    this.Stairs[n][2],
-                    this.Stairs[n][6]
-                ]);
-                foundStep = true;
-                break;
-            }
-
+            // Check if the frequency is effectively the same (within epsilon)
             if (Math.abs(this.Stairs[i][2] - newFrequency) < 0.001) {
                 this.Stairs.splice(i, 1, [
                     obj[0],
@@ -266,6 +248,20 @@ class PitchStaircase {
                 foundStep = true;
                 repeatStep = true;
                 isStepDeleted = false;
+                break;
+            }
+
+            if (this.Stairs[i][2] < newFrequency) {
+                this.Stairs.splice(i, 0, [
+                    obj[0],
+                    obj[1],
+                    newFrequency,
+                    this.Stairs[n][3] * parseFloat(inputNum2),
+                    this.Stairs[n][4] * parseFloat(inputNum1),
+                    this.Stairs[n][2],
+                    this.Stairs[n][6]
+                ]);
+                foundStep = true;
                 break;
             }
         }
