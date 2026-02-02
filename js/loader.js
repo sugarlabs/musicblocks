@@ -37,6 +37,7 @@ requirejs.config({
         "utils": "../js/utils",
         "widgets": "../js/widgets",
         "activity": "../js",
+        "WorkspaceStorage": "../js/WorkspaceStorage",
         "easel": "../lib/easeljs",
         "twewn": "../lib/tweenjs",
         "prefixfree": "../bower_components/prefixfree/prefixfree.min",

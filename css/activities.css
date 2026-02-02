@@ -2147,3 +2147,15 @@ table {
         box-sizing: border-box; 
     }
 }
+/* Network Status Indicator */
+#network-status i {
+    transition: color 0.3s ease;
+}
+
+#network-status.online i {
+    color: #4CAF50 !important;
+}
+
+#network-status.offline i {
+    color: #F44336 !important;
+}
