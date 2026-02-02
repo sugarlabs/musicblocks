@@ -20,7 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const RhythmRuler = require("./rhythmruler.js");
+const RhythmRuler = require("../rhythmruler.js");
 
 // --- Global Mocks (Fake the Browser Environment) ---
 

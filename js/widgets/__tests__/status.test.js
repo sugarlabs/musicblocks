@@ -69,7 +69,7 @@ global.window = {
     }
 };
 
-const StatusMatrix = require("./status.js");
+const StatusMatrix = require("../status.js");
 
 describe("StatusMatrix Widget", () => {
     let mockActivity;
