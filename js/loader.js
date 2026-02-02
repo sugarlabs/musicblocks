@@ -152,8 +152,6 @@ requirejs.config({
 requirejs(
     ["i18next", "i18nextHttpBackend", "jquery", "materialize", "jquery-ui"],
     function (i18next, i18nextHttpBackend, $, M) {
-
-
         if (typeof M !== "undefined") {
             window.M = M;
         }
@@ -279,8 +277,6 @@ requirejs(
                     }
                 });
 
-
-
                 const CORE_BOOTSTRAP_MODULES = [
                     "easeljs.min",
                     "tweenjs.min",
@@ -302,8 +298,6 @@ requirejs(
                 requirejs(
                     CORE_BOOTSTRAP_MODULES,
                     function () {
-
-
                         // Verify critical globals are initialized
                         const verificationErrors = [];
 
@@ -346,14 +340,12 @@ requirejs(
                             );
                             alert(
                                 "Failed to initialize Music Blocks core modules. Please refresh the page.\n\nMissing: " +
-                                verificationErrors.join(", ")
+                                    verificationErrors.join(", ")
                             );
                             throw new Error(
                                 "Core bootstrap failed: " + verificationErrors.join(", ")
                             );
                         }
-
-
 
                         requirejs(
                             ["activity/activity"],
@@ -370,7 +362,7 @@ requirejs(
                         console.error("Core bootstrap failed:", err);
                         alert(
                             "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: " +
-                            (err.message || err)
+                                (err.message || err)
                         );
                     }
                 );

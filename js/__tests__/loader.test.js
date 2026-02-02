@@ -8,7 +8,7 @@ describe("loader.js coverage", () => {
     beforeEach(() => {
         jest.resetModules();
 
-        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
         document.body.innerHTML = `
             <div data-i18n="title">Original Title</div>
