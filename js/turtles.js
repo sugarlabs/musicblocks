@@ -536,7 +536,7 @@ Turtles.TurtlesModel = class {
      * @returns {void}
      */
     addTurtleGraphicProps(turtle, blkInfoAvailable, infoDict) {
-        setTimeout(() => {
+        requestAnimationFrame(() => {
             if (blkInfoAvailable) {
                 if ("heading" in infoDict) {
                     turtle.painter.doSetHeading(infoDict["heading"]);
@@ -562,7 +562,7 @@ Turtles.TurtlesModel = class {
                     turtle.rename(infoDict["name"]);
                 }
             }
-        }, 2000);
+        });
     }
 
     /**
@@ -1291,4 +1291,8 @@ Turtles.TurtlesView = class {
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = Turtles;
+}
+
+if (typeof window !== "undefined") {
+    window.Turtles = Turtles;
 }
