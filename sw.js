@@ -1,7 +1,7 @@
 /*
   global
 
-  offlineFallbackPage, divInstall
+    offlineFallbackPage
 */
 
 // This is the "Offline page" service worker
@@ -101,15 +101,6 @@ self.addEventListener("fetch", function (event) {
             }
         )
     );
-});
-
-self.addEventListener("beforeinstallprompt", event => {
-    // eslint-disable-next-line no-console
-    console.log("done", "beforeinstallprompt", event);
-    // Stash the event so it can be triggered later.
-    window.deferredPrompt = event;
-    // Remove the "hidden" class from the install button container
-    divInstall.classList.toggle("hidden", false);
 });
 
 // This is an event that can be fired from your page to tell the SW to

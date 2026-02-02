@@ -21,9 +21,9 @@ imported in `js/activity.js`.
    ```
    This class will contain the code that defines the behavior of your widget.
 
-3. **Intialize the Class**
+3. **Initialize the Class**
    Define the block that will be used to launch your widget in `js/blocks/WidgetBlocks.`
-   Don't forget to initalize the class. (Look at the code towards the end of the file.)
+   Don't forget to initialize the class. (Look at the code towards the end of the file.)
 
    ```javascript
    new UniqueClass().setup(activity);

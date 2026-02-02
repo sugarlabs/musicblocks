@@ -73,7 +73,7 @@ class HelpWidget {
         // Which help page are we on?
 
         this._helpDiv.style.width = 100 + "%";
-        this._helpDiv.style.backgroundColor = "#e8e8e8";
+        // this._helpDiv.style.backgroundColor = "#e8e8e8";
 
         // this._helpDiv.style.maxHeight = "100%";
         // this._helpDiv.style.overflowY = "auto";
@@ -134,16 +134,14 @@ class HelpWidget {
             cell = docById("right-arrow");
 
             cell.onclick = () => {
+                if (page >= HELPCONTENT.length - 1) {
+                    return;
+                }
+
                 page = page + 1;
                 leftArrow.classList.remove("disabled");
-                if (page === HELPCONTENT.length) {
-                    page = 0;
-                }
-                if (page == 0) {
-                    this.widgetWindow.updateTitle(_("Take a tour"));
-                } else {
-                    this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
-                }
+
+                this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
                 this._showPage(page);
             };
         } else {
@@ -326,6 +324,11 @@ class HelpWidget {
         helpBody.innerHTML = "";
         const totalPages = HELPCONTENT.length;
         const pageCount = `${page + 1}/${totalPages}`;
+        const rightArrow = docById("right-arrow");
+        const leftArrow = docById("left-arrow");
+
+        rightArrow.classList.toggle("disabled", page === HELPCONTENT.length - 1);
+        leftArrow.classList.toggle("disabled", page === 0);
 
         // Previous HTML content is removed, and new one is generated.
         let body = "";
@@ -366,18 +369,16 @@ class HelpWidget {
             const cell = docById("right-arrow");
             const leftArrow = docById("left-arrow");
             cell.onclick = () => {
+                if (page >= HELPCONTENT.length - 1) {
+                    return;
+                }
+
                 page = page + 1;
                 leftArrow.classList.remove("disabled");
-                if (page === HELPCONTENT.length) {
-                    page = 0;
-                }
-                if (page == 0) {
-                    this.widgetWindow.updateTitle(_("Take a tour"));
-                } else {
-                    this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
-                }
-                this._showPage(page);
-            };
+
+                this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
+            this._showPage(page);
+        };
             if (page === 0) {
                 leftArrow.classList.add("disabled");
             }
@@ -453,7 +454,7 @@ class HelpWidget {
 
         //this._helpDiv.style.width = "500px";
         this._helpDiv.style.height = "70vh";
-        this._helpDiv.style.backgroundColor = "#e8e8e8";
+        // this._helpDiv.style.backgroundColor = "#e8e8e8";
 
         const helpDivHTML =
             '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
@@ -536,7 +537,7 @@ class HelpWidget {
 
             const helpBody = docById("helpBodyDiv");
             helpBody.style.height = "70vh";
-            helpBody.style.backgroundColor = "#e8e8e8";
+            // helpBody.style.backgroundColor = "#e8e8e8";
             if (message) {
                 let body = "";
                 if (message.length > 1) {
