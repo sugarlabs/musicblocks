@@ -1,7 +1,7 @@
 ---
 name: 🧪 Test Contribution
 about: Add or improve unit tests
-title: ""
+title: "[Test]"
 labels: "testing"
 assignees: ""
 ---

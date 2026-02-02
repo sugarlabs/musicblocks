@@ -673,8 +673,7 @@ function TemperamentWidget() {
 
             const playImage = docById("play_" + i);
 
-            // eslint-disable-next-line no-unused-vars
-            playImage.onmouseover = function (event) {
+            playImage.onmouseover = function () {
                 this.style.cursor = "pointer";
             };
 
@@ -782,8 +781,7 @@ function TemperamentWidget() {
         menuItems[0].style.background = "#c8C8C8";
         that.equalEdit();
 
-        // eslint-disable-next-line no-unused-vars
-        menuItems[0].onclick = function (event) {
+        menuItems[0].onclick = function () {
             menuItems[1].style.background = platformColor.selectorBackground;
             menuItems[2].style.background = platformColor.selectorBackground;
             menuItems[3].style.background = platformColor.selectorBackground;
@@ -791,8 +789,7 @@ function TemperamentWidget() {
             that.equalEdit();
         };
 
-        // eslint-disable-next-line no-unused-vars
-        menuItems[1].onclick = function (event) {
+        menuItems[1].onclick = function () {
             menuItems[0].style.background = platformColor.selectorBackground;
             menuItems[2].style.background = platformColor.selectorBackground;
             menuItems[3].style.background = platformColor.selectorBackground;
@@ -800,8 +797,7 @@ function TemperamentWidget() {
             that.ratioEdit();
         };
 
-        // eslint-disable-next-line no-unused-vars
-        menuItems[2].onclick = function (event) {
+        menuItems[2].onclick = function () {
             menuItems[0].style.background = platformColor.selectorBackground;
             menuItems[1].style.background = platformColor.selectorBackground;
             menuItems[3].style.background = platformColor.selectorBackground;
@@ -809,8 +805,7 @@ function TemperamentWidget() {
             that.arbitraryEdit();
         };
 
-        // eslint-disable-next-line no-unused-vars
-        menuItems[3].onclick = function (event) {
+        menuItems[3].onclick = function () {
             menuItems[0].style.background = platformColor.selectorBackground;
             menuItems[1].style.background = platformColor.selectorBackground;
             menuItems[2].style.background = platformColor.selectorBackground;
@@ -2325,8 +2320,7 @@ function TemperamentWidget() {
 
         this._circleOfNotes();
 
-        // eslint-disable-next-line no-unused-vars
-        noteCell.onclick = function (event) {
+        noteCell.onclick = function () {
             that.editMode = null;
             if (that.circleIsVisible) {
                 that._circleOfNotes();
@@ -2335,12 +2329,7 @@ function TemperamentWidget() {
             }
         };
 
-        widgetWindow.addButton(
-            "add2.svg",
-            ICONSIZE,
-            _("Add pitches")
-            // eslint-disable-next-line no-unused-vars
-        ).onclick = function (event) {
+        widgetWindow.addButton("add2.svg", ICONSIZE, _("Add pitches")).onclick = function () {
             that.edit();
         };
 

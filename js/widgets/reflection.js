@@ -575,7 +575,11 @@ class ReflectionMatrix {
      */
     saveReport(data) {
         const key = "musicblocks_analysis";
-        localStorage.setItem(key, data.response);
+        try {
+            localStorage.setItem(key, data.response);
+        } catch (e) {
+            console.warn("Could not save analysis report to localStorage:", e);
+        }
         console.log("Conversation saved in localStorage.");
     }
 

@@ -132,3 +132,6 @@ class ToneBlocksAPI {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = ToneBlocksAPI;
 }
+if (typeof window !== "undefined") {
+    window.ToneBlocksAPI = ToneBlocksAPI;
+}
