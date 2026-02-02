@@ -563,10 +563,10 @@ let fileBasename = file => {
  * @returns {string} The string with the first character in uppercase.
  */
 function toTitleCase(str) {
-    if (typeof str !== "string") return "";
+    if (typeof str !== "string") return;
     if (str.length === 0) return "";
     return str.charAt(0).toUpperCase() + str.slice(1);
-};
+}
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports.toTitleCase = toTitleCase;
