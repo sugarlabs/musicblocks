@@ -14,7 +14,7 @@
 /* global define, indexedDB, navigator, _ */
 
 define([], function () {
-    'use strict';
+    "use strict";
 
     /**
      * WorkspaceStorage handles persistent storage of the workspace using IndexedDB.
@@ -23,8 +23,8 @@ define([], function () {
     class WorkspaceStorage {
         constructor(activity) {
             this.activity = activity;
-            this.dbName = 'MusicBlocksWorkspace';
-            this.storeName = 'workspace';
+            this.dbName = "MusicBlocksWorkspace";
+            this.storeName = "workspace";
             this.db = null;
             this.isOnline = navigator.onLine;
             this.lastSaveTime = 0;
@@ -51,17 +51,17 @@ define([], function () {
 
                     request.onsuccess = event => {
                         this.db = event.target.result;
-                        console.debug('WorkspaceStorage initialized');
+                        console.debug("WorkspaceStorage initialized");
                         this._startAutoSave();
                         resolve();
                     };
 
                     request.onerror = event => {
-                        console.error('WorkspaceStorage init failed', event.target.error);
+                        console.error("WorkspaceStorage init failed", event.target.error);
                         reject(event.target.error);
                     };
                 } catch (e) {
-                    console.error('IndexedDB not supported or permission denied', e);
+                    console.error("IndexedDB not supported or permission denied", e);
                     reject(e);
                 }
             });
@@ -71,8 +71,8 @@ define([], function () {
          * Sets up listeners for network online/offline events.
          */
         _initNetworkDetection() {
-            window.addEventListener('online', () => this._handleNetworkChange(true));
-            window.addEventListener('offline', () => this._handleNetworkChange(false));
+            window.addEventListener("online", () => this._handleNetworkChange(true));
+            window.addEventListener("offline", () => this._handleNetworkChange(false));
             // Initialize UI after a short delay to ensure DOM is ready
             setTimeout(() => this._updateUIIndicator(), 1000);
         }
@@ -81,9 +81,9 @@ define([], function () {
             this.isOnline = online;
             this._updateUIIndicator();
             if (online) {
-                console.log('Device is online');
+                console.log("Device is online");
             } else {
-                console.log('Device is offline');
+                console.log("Device is offline");
             }
         }
 
@@ -91,21 +91,21 @@ define([], function () {
          * Updates the connectivity indicator in the UI.
          */
         _updateUIIndicator() {
-            const indicator = document.getElementById('network-status');
+            const indicator = document.getElementById("network-status");
             if (indicator) {
-                const icon = indicator.querySelector('i');
-                const translate = typeof _ !== 'undefined' ? _ : s => s;
-                const status = this.isOnline ? translate('Online') : translate('Offline');
+                const icon = indicator.querySelector("i");
+                const translate = typeof _ !== "undefined" ? _ : s => s;
+                const status = this.isOnline ? translate("Online") : translate("Offline");
                 if (this.isOnline) {
-                    indicator.classList.remove('offline');
-                    indicator.classList.add('online');
-                    if (icon) icon.textContent = 'cloud_done';
+                    indicator.classList.remove("offline");
+                    indicator.classList.add("online");
+                    if (icon) icon.textContent = "cloud_done";
                 } else {
-                    indicator.classList.remove('online');
-                    indicator.classList.add('offline');
-                    if (icon) icon.textContent = 'cloud_off';
+                    indicator.classList.remove("online");
+                    indicator.classList.add("offline");
+                    if (icon) icon.textContent = "cloud_off";
                 }
-                indicator.setAttribute('data-tooltip', status);
+                indicator.setAttribute("data-tooltip", status);
             }
         }
 
@@ -127,12 +127,12 @@ define([], function () {
 
             try {
                 const data = this.activity.prepareExport();
-                if (!data || data === '[]') return Promise.resolve();
+                if (!data || data === "[]") return Promise.resolve();
 
                 return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction([this.storeName], 'readwrite');
+                    const transaction = this.db.transaction([this.storeName], "readwrite");
                     const store = transaction.objectStore(this.storeName);
-                    const request = store.put(data, 'current_workspace');
+                    const request = store.put(data, "current_workspace");
 
                     request.onsuccess = () => {
                         this.lastSaveTime = Date.now();
@@ -141,7 +141,7 @@ define([], function () {
                     request.onerror = event => reject(event.target.error);
                 });
             } catch (e) {
-                console.error('Failed to save workspace', e);
+                console.error("Failed to save workspace", e);
                 return Promise.reject(e);
             }
         }
@@ -152,9 +152,9 @@ define([], function () {
         doLoadWorkspace() {
             if (!this.db) return Promise.resolve(null);
             return new Promise((resolve, reject) => {
-                const transaction = this.db.transaction([this.storeName], 'readonly');
+                const transaction = this.db.transaction([this.storeName], "readonly");
                 const store = transaction.objectStore(this.storeName);
-                const request = store.get('current_workspace');
+                const request = store.get("current_workspace");
 
                 request.onsuccess = () => resolve(request.result);
                 request.onerror = event => reject(event.target.error);
