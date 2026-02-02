@@ -357,7 +357,9 @@ requirejs(
 
                         requirejs(
                             ["activity/activity"],
-                            function () { },
+                            function () {
+                                // Activity loaded successfully
+                            },
                             function (err) {
                                 console.error("Failed to load activity/activity:", err);
                                 alert("Failed to load Music Blocks. Please refresh the page.");

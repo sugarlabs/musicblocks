@@ -745,7 +745,9 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     const setupAudioContext = async () => {
         try {
             await Tone.start();
-        } catch (e) { }
+        } catch (e) {
+            // Audio context might already be running or blocked by browser
+        }
     };
 
     const __selectionChangedSolfegeWithAudio = async () => {

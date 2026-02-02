@@ -311,7 +311,9 @@ class Activity {
             this.gifAnimator = new GIFAnimator();
         } else {
             this.gifAnimator = {
-                stopAll: () => { },
+                stopAll: () => {
+                    // No-op fallback
+                },
                 getActiveCount: () => 0
             };
         }
@@ -5595,7 +5597,9 @@ class Activity {
             this.update = true;
         };
 
-        this.__showAltoAccidentals = () => { };
+        this.__showAltoAccidentals = () => {
+            // No-op for Alto clef
+        };
 
         /*
          * Shows musical alto staff
