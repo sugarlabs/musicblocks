@@ -875,10 +875,10 @@ Turtles.TurtlesView = class {
             container.setAttribute(
                 "style",
                 "position: absolute; right:" +
-                    (document.body.clientWidth - x) +
-                    "px;  top: " +
-                    y +
-                    "px;"
+                (document.body.clientWidth - x) +
+                "px;  top: " +
+                y +
+                "px;"
             );
             docById("buttoncontainerTOP").appendChild(container);
             return container;
@@ -1291,6 +1291,12 @@ Turtles.TurtlesView = class {
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = Turtles;
+}
+
+if (typeof define === "function" && define.amd) {
+    define([], function () {
+        return Turtles;
+    });
 }
 
 if (typeof window !== "undefined") {
