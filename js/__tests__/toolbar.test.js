@@ -102,7 +102,7 @@ describe("Toolbar Class", () => {
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ false", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = false;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(119);
+        expect(global._).toHaveBeenCalledTimes(121);
         expect(global._).toHaveBeenNthCalledWith(1, "About Turtle Blocks");
     });
 
