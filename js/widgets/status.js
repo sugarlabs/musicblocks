@@ -109,7 +109,6 @@ class StatusMatrix {
             cell.className = "headcol";
         }
 
-        // console.debug("active turtles: " + turtles.turtleList.length);
 
         // One row per field, one column per mouse (plus the labels)
         let label;
@@ -120,7 +119,6 @@ class StatusMatrix {
             cell.style.fontSize =
                 Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
 
-            // console.debug(statusField[1]);
 
             switch (statusField[1]) {
                 case "plus":
@@ -148,7 +146,6 @@ class StatusMatrix {
                         label = this.activity.blocks.blockList[statusField[0]].protoblock
                             .staticLabels[0];
                     }
-                    // console.debug(label);
                     break;
                 case "outputtools":
                     label = this.activity.blocks.blockList[statusField[0]].privateData;
@@ -160,7 +157,6 @@ class StatusMatrix {
             }
             let str = label;
             str = label.charAt(0).toUpperCase() + label.slice(1);
-            // console.log(str);
             cell.innerHTML = `&nbsp;<b>${str}</b>`;
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
