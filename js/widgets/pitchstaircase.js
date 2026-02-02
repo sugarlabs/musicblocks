@@ -124,7 +124,7 @@ class PitchStaircase {
             stepCell.setAttribute("id", frequency);
             stepCell.style.width =
                 (PitchStaircase.INNERWINDOWWIDTH *
-                    (PitchStaircase.DEFAULTFREQUENCY / frequency) *
+                    parseFloat(PitchStaircase.DEFAULTFREQUENCY / frequency) *
                     this._cellScale) /
                     3 +
                 "px";
@@ -212,12 +212,11 @@ class PitchStaircase {
 
         const oldcell = event.target;
         const frequency = Number(oldcell.getAttribute("id"));
-        const newFrequency = parseFloat(frequency) / inputNum;
 
         // Look for the Stair with this frequency.
         let n;
         for (n = 0; n < this.Stairs.length; n++) {
-            if (Math.abs(this.Stairs[n][2] - frequency) < 0.001) {
+            if (this.Stairs[n][2] === frequency) {
                 break;
             }
         }
