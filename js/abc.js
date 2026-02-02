@@ -86,7 +86,7 @@ const processABCNotes = function (logo, turtle) {
         // Abc notes use is for sharp, es for flat,
         // , and ' for shifts in octave.
         // Also, notes must be lowercase.
-        // And the octave bounday is at C, not A.
+        // And the octave boundary is at C, not A.
 
         // Handle frequency conversion
         if (typeof note === "number") {
@@ -170,7 +170,7 @@ const processABCNotes = function (logo, turtle) {
                         const pickupDuration = logo.notation.notationStaging[turtle][i + 1];
                         logo.notationNotes[turtle] += `K: pickup=${pickupDuration}\n`;
                         i += 1;
-                    } // <- made a seperate block for this since js doesnt allow declaration of variables using let or const directly inside a case block
+                    } // <- made a separate block for this since JS doesn't allow declaration of variables using let or const directly inside a case block
                     break;
                 case "voice one":
                     logo.notationNotes[turtle] += "V:1\n";
@@ -285,19 +285,6 @@ const processABCNotes = function (logo, turtle) {
                     }
                     j++; // Jump to next note.
                     k++; // Increment notes in tuplet.
-                }
-
-                // FIXME: Debug for ABC
-                if (i + j - 1 < logo.notation.notationStaging[turtle].length - 1) {
-                    const nextObj = logo.notation.notationStaging[turtle][i + j];
-                    if (typeof nextObj === "string" && nextObj === ")") {
-                        // logo.notationNotes[turtle] += '';
-                        i += 1;
-                    } else {
-                        logo.notationNotes[turtle] += " ";
-                    }
-                } else {
-                    logo.notationNotes[turtle] += " ";
                 }
 
                 return j;
