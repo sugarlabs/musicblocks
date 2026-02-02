@@ -52,7 +52,7 @@
     <script src="lib/wheelnav.js" defer></script>
     <script src="lib/abc.min.js" defer></script>
     <script src="lib/codejar/codejar.min.js" defer></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js" defer></script>
+    <script src="lib/codejar/highlight.pack.js" defer></script>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
 
     <!-- libgif.js (SuperGif) provides low-level GIF frame extraction.
@@ -478,8 +478,10 @@
                     <li><a id="te"></a></li>
                     <li><a id="ibo"></a></li>
                     <li><a id="ar"></a></li>
+                    <li><a id="bn"></a></li>
                     <li><a id="he"></a></li>
                     <li><a id="ur"></a></li>
+                    
                 </ul>
 
                 <ul style="display: none;" id="themedropdown" class="dropdown-content">
@@ -512,7 +514,7 @@
             stage = new createjs.Stage(canvas);
 
             createjs.Ticker.framerate = 60;
-            createjs.Ticker.addEventListener("tick", stage);
+            // createjs.Ticker.addEventListener("tick", stage); // Managed by Activity class
         }
         document.addEventListener("DOMContentLoaded", init);
     </script>
@@ -592,17 +594,10 @@
                 const texts = [_("Do, Re, Mi, Fa, Sol, La, Ti, Do"), _("Loading Music Blocks..."), _("Reading Music...")];
                 let index = 0;
 
-                const intervalId = setInterval(function () {
+                window.intervalId = setInterval(function () {
                     loadingText.textContent = texts[index];
                     index = (index + 1) % texts.length;
                 }, 1500);
-
-                // Stop changing text and finalize loading after 6 seconds
-                setTimeout(function () {
-                    clearInterval(intervalId);
-                    loadingText.textContent = _("Loading Complete!");
-                    loadingText.style.opacity = 1;
-                }, 6000);
             }, 3000);
         });
 
