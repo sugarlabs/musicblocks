@@ -182,3 +182,6 @@ class PitchBlocksAPI {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = PitchBlocksAPI;
 }
+if (typeof window !== "undefined") {
+    window.PitchBlocksAPI = PitchBlocksAPI;
+}
