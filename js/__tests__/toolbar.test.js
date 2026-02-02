@@ -95,14 +95,14 @@ describe("Toolbar Class", () => {
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ true", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = true;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(135);
+        expect(global._).toHaveBeenCalledTimes(137);
         expect(global._).toHaveBeenNthCalledWith(1, "About Music Blocks");
     });
 
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ false", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = false;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(117);
+        expect(global._).toHaveBeenCalledTimes(119);
         expect(global._).toHaveBeenNthCalledWith(1, "About Turtle Blocks");
     });
 
@@ -934,5 +934,39 @@ describe("Toolbar Class", () => {
         expect(elements["aux-toolbar"].style.display).toBe("none");
         expect(elements.menu.innerHTML).toBe("menu");
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, false);
+    });
+
+    test("renderUndoIcon sets onclick and calls updateUI", () => {
+        const undoButton = { onclick: null };
+        global.docById.mockReturnValue(undoButton);
+        
+        const mockUndoRedoManager = {
+            undo: jest.fn(),
+            updateUI: jest.fn()
+        };
+
+        toolbar.renderUndoIcon(mockUndoRedoManager);
+        
+        expect(undoButton.onclick).toBeInstanceOf(Function);
+        undoButton.onclick();
+        expect(mockUndoRedoManager.undo).toHaveBeenCalled();
+        expect(mockUndoRedoManager.updateUI).toHaveBeenCalled();
+    });
+
+    test("renderRedoIcon sets onclick and calls updateUI", () => {
+        const redoButton = { onclick: null };
+        global.docById.mockReturnValue(redoButton);
+        
+        const mockUndoRedoManager = {
+            redo: jest.fn(),
+            updateUI: jest.fn()
+        };
+
+        toolbar.renderRedoIcon(mockUndoRedoManager);
+        
+        expect(redoButton.onclick).toBeInstanceOf(Function);
+        redoButton.onclick();
+        expect(mockUndoRedoManager.redo).toHaveBeenCalled();
+        expect(mockUndoRedoManager.updateUI).toHaveBeenCalled();
     });
 });
