@@ -12,6 +12,7 @@
  */
 
 /* global define, indexedDB, navigator, _ */
+// dummy comment to trigger CI
 
 define([], function () {
     "use strict";
