@@ -2966,8 +2966,27 @@ class Activity {
 
             const that = this;
             $j("#search").autocomplete({
-                source: that.searchSuggestions,
+                source: (request, response) => {
+                    const term = request.term.toLowerCase();
+                    const filtered = that.searchSuggestions.filter(
+                        item => item.label.toLowerCase().indexOf(term) !== -1
+                    );
+                    if (filtered.length === 0) {
+                        response([{
+                            label: _("No blocks found"),
+                            value: "",
+                            artwork: "",
+                            disabled: true
+                        }]);
+                    } else {
+                        response(filtered);
+                    }
+                },
                 select: (event, ui) => {
+                    if (ui.item.disabled) {
+                        event.preventDefault();
+                        return false;
+                    }
                     event.preventDefault();
                     that.searchWidget.value = ui.item.label;
                     that.searchWidget.idInput_custom = ui.item.value;
@@ -2981,6 +3000,17 @@ class Activity {
             });
 
             $j("#search").autocomplete("instance")._renderItem = (ul, item) => {
+                if (item.disabled) {
+                    return $j("<li class='ui-autocomplete-no-results'></li>")
+                        .text(item.label)
+                        .appendTo(
+                            ul.css({
+                                "z-index": 9999,
+                                "max-height": "200px",
+                                "overflow-y": "auto"
+                            })
+                        );
+                }
                 return $j("<li></li>")
                     .data("item.autocomplete", item)
                     .append(
