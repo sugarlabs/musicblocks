@@ -1538,6 +1538,20 @@ class Blocks {
          * @returns {void}
          */
         this.blockMoved = async thisBlock => {
+            // Save state for undo/redo functionality
+            if (this.activity.undoRedoManager && thisBlock != null) {
+                const block = this.blockList[thisBlock];
+                if (block) {
+                    this.activity.undoRedoManager.saveState('block_moved', {
+                        blockName: block.name,
+                        oldX: block.container.x,
+                        oldY: block.container.y,
+                        newX: block.container.x,
+                        newY: block.container.y
+                    });
+                }
+            }
+
             /**
              * When a block is moved, we have to check the following:
              * (0) Is it inside of a expandable block?
@@ -6931,6 +6945,13 @@ class Blocks {
          * @returns {void}
          */
         this.sendStackToTrash = myBlock => {
+            // Save state for undo/redo functionality
+            if (this.activity.undoRedoManager && myBlock != null) {
+                this.activity.undoRedoManager.saveState('block_deleted', {
+                    blockName: myBlock.name
+                });
+            }
+
             /** First, hide the palettes as they may need updating. */
             for (const name in this.activity.palettes.dict) {
                 this.activity.palettes.dict[name].hideMenu(true);

@@ -74,6 +74,8 @@ class Toolbar {
                 ["chooseKeyIcon", _("Set Pitch Preview")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
                 ["restoreIcon", _("Restore")],
+                ["undoIcon", _("Undo")],
+                ["redoIcon", _("Redo")],
                 ["beginnerMode", _("Switch to beginner mode")],
                 ["advancedMode", _("Switch to advanced mode")],
                 ["languageSelectIcon", _("Select language")],
@@ -143,6 +145,8 @@ class Toolbar {
                 _("Set Pitch Preview"),
                 _("JavaScript Editor"),
                 _("Restore"),
+                _("Undo"),
+                _("Redo"),
                 _("Switch to beginner mode"),
                 _("Switch to advanced mode"),
                 _("Select language"),
@@ -1282,6 +1286,40 @@ class Toolbar {
             docById("toggleAuxBtn").className -= "blue darken-1";
         }
     };
+
+    /**
+     * Renders the undo icon with the provided undo manager.
+     *
+     * @public
+     * @param {Object} undoRedoManager - The undo/redo manager instance.
+     * @returns {void}
+     */
+    renderUndoIcon(undoRedoManager) {
+        const undoIcon = docById("undoButton");
+        undoIcon.onclick = () => {
+            undoRedoManager.undo();
+        };
+        
+        // Initialize button state
+        undoRedoManager.updateUI();
+    }
+
+    /**
+     * Renders the redo icon with the provided undo manager.
+     *
+     * @public
+     * @param {Object} undoRedoManager - The undo/redo manager instance.
+     * @returns {void}
+     */
+    renderRedoIcon(undoRedoManager) {
+        const redoIcon = docById("redoButton");
+        redoIcon.onclick = () => {
+            undoRedoManager.redo();
+        };
+        
+        // Initialize button state
+        undoRedoManager.updateUI();
+    }
 }
 
 if (typeof module !== "undefined" && module.exports) {
