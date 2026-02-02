@@ -131,14 +131,12 @@ class GlobalCard {
         }
 
         // set title text
-        frag.getElementById(
-            `global-project-title-${this.id}`
-        ).textContent = this.ProjectData.ProjectName;
+        frag.getElementById(`global-project-title-${this.id}`).textContent =
+            this.ProjectData.ProjectName;
 
         // set number of likes
-        frag.getElementById(
-            `global-project-likes-${this.id}`
-        ).textContent = this.ProjectData.ProjectLikes.toString();
+        frag.getElementById(`global-project-likes-${this.id}`).textContent =
+            this.ProjectData.ProjectLikes.toString();
 
         // set view button listener
         // eslint-disable-next-line no-unused-vars
