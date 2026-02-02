@@ -132,14 +132,12 @@ class GlobalCard {
         }
 
         // set title text
-        frag.getElementById(
-            `global-project-title-${this.id}`
-        ).textContent = this.ProjectData.ProjectName;
+        frag.getElementById(`global-project-title-${this.id}`).textContent =
+            this.ProjectData.ProjectName;
 
         // set number of likes
-        frag.getElementById(
-            `global-project-likes-${this.id}`
-        ).textContent = this.ProjectData.ProjectLikes.toString();
+        frag.getElementById(`global-project-likes-${this.id}`).textContent =
+            this.ProjectData.ProjectLikes.toString();
 
         // set view button listener
         // eslint-disable-next-line no-unused-vars
@@ -261,10 +259,10 @@ function copyURLToClipboard() {
     });
 
     clipboard.on("error", e => {
-    // Non-blocking feedback instead of alert()
-    // eslint-disable-next-line no-console
-    console.warn("Failed to copy to clipboard:", e.action);
+        // Non-blocking feedback instead of alert()
+        // eslint-disable-next-line no-console
+        console.warn("Failed to copy to clipboard:", e.action);
 
-    e.clearSelection();
+        e.clearSelection();
     });
 }
