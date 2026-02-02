@@ -73,7 +73,8 @@ describe("Utility Functions (logic-only)", () => {
                 return {
                     getContext: jest.fn(() => ({ measureText: () => ({ width: 42 }) }))
                 };
-            })
+            }),
+            fetch: global.fetch
         };
 
         global.localStorage = {
@@ -84,14 +85,14 @@ describe("Utility Functions (logic-only)", () => {
             kanaPreference: ""
         };
 
-        global.XMLHttpRequest = class {
-            open() {}
-            setRequestHeader() {}
-            send() {
-                this.status = 200;
-                this.responseText = "Mock response";
-            }
-        };
+        global.fetch = jest.fn((url, options) => {
+            console.log("FETCH_CALLED:", url, JSON.stringify(options));
+            return Promise.resolve({
+                ok: true,
+                text: () => Promise.resolve("Mock response"),
+                statusText: "OK"
+            });
+        });
 
         global.self = {
             location: { href: "file:///" },
@@ -100,7 +101,7 @@ describe("Utility Functions (logic-only)", () => {
 
         const code = fs.readFileSync(path.join(__dirname, "../utils.js"), "utf8");
 
-        const wrapper = new Function(`
+        const wrapper = new Function("window", "fetch", `
             ${code}
             return {
                 toTitleCase: typeof toTitleCase !== "undefined" ? toTitleCase : undefined,
@@ -115,11 +116,13 @@ describe("Utility Functions (logic-only)", () => {
                 rationalToFraction: typeof rationalToFraction !== "undefined" ? rationalToFraction : undefined,
                 rgbToHex: typeof rgbToHex !== "undefined" ? rgbToHex : undefined,
                 hexToRGB: typeof hexToRGB !== "undefined" ? hexToRGB : undefined,
-                hex2rgb: typeof hex2rgb !== "undefined" ? hex2rgb : undefined
+                hex2rgb: typeof hex2rgb !== "undefined" ? hex2rgb : undefined,
+                httpGet: typeof httpGet !== "undefined" ? httpGet : undefined,
+                httpPost: typeof httpPost !== "undefined" ? httpPost : undefined
             };
         `);
 
-        const exported = wrapper();
+        const exported = wrapper(global.window, global.fetch);
 
         toTitleCase = exported.toTitleCase;
         fileExt = exported.fileExt;
@@ -134,6 +137,35 @@ describe("Utility Functions (logic-only)", () => {
         rgbToHex = exported.rgbToHex;
         hexToRGB = exported.hexToRGB;
         hex2rgb = exported.hex2rgb;
+        httpGet = exported.httpGet;
+        httpPost = exported.httpPost;
+    });
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    describe("httpGet()", () => {
+        it("should call fetch with correct arguments", async () => {
+            const result = await httpGet("test-project");
+            expect(global.fetch).toHaveBeenCalledWith("http://localhost/test-project", expect.objectContaining({
+                method: "GET",
+                headers: { "x-api-key": "3tgTzMXbbw6xEKX7" }
+            }));
+            expect(result).toBe("Mock response");
+        });
+    });
+
+    describe("httpPost()", () => {
+        it("should call fetch with correct arguments", async () => {
+            const result = await httpPost("test-project", "some-data");
+            expect(global.fetch).toHaveBeenCalledWith("http://localhost/test-project", expect.objectContaining({
+                method: "POST",
+                headers: { "x-api-key": "3tgTzMXbbw6xEKX7" },
+                body: "some-data"
+            }));
+            expect(result).toBe("Mock response");
+        });
     });
 
     describe("toTitleCase()", () => {
