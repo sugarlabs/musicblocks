@@ -1694,6 +1694,7 @@ class Activity {
             let mediaRecorder;
             var clickEvent = new Event("click");
             let flag = 0;
+            let stream = null;
 
             /**
              * Records the screen using the browser's media devices API.
@@ -1716,8 +1717,6 @@ class Activity {
                 });
             }
 
-            const that = this;
-
             /**
              * Saves the recorded chunks as a video file.
              * @param {Blob[]} recordedChunks - The recorded video chunks.
@@ -1734,7 +1733,6 @@ class Activity {
                     alert(_("File save canceled"));
                     flag = 0;
                     recording();
-                    doRecordButton();
                     return; // Exit without saving the file
                 }
 
@@ -1749,8 +1747,6 @@ class Activity {
                 flag = 0;
                 // eslint-disable-next-line no-use-before-define
                 recording();
-                doRecordButton();
-                that.textMsg(_("Click on stop saving"));
             }
             /**
              * Stops the recording process.
@@ -1758,9 +1754,6 @@ class Activity {
             function stopRec() {
                 flag = 0;
                 mediaRecorder.stop();
-                const node = document.createElement("p");
-                node.textContent = "Stopped recording";
-                document.body.appendChild(node);
             }
 
             /**
@@ -1771,13 +1764,11 @@ class Activity {
              */
             function createRecorder(stream, mimeType) {
                 flag = 1;
-                recInside.classList.add("blink");
-                start.removeEventListener("click", createRecorder, true);
                 let recordedChunks = [];
                 const mediaRecorder = new MediaRecorder(stream);
+
                 stream.oninactive = function () {
                     // eslint-disable-next-line no-console
-                    console.log("Recording is ready to save");
                     stopRec();
                     flag = 0;
                 };
@@ -1796,11 +1787,9 @@ class Activity {
                 };
 
                 mediaRecorder.start(200);
-                setTimeout(() => {
-                    // eslint-disable-next-line no-console
-                    console.log("Resizing for Record", that.canvas.height);
-                    that._onResize();
-                }, 500);
+                recInside.classList.add("blink");
+                recInside.setAttribute("fill", "red");
+                start.addEventListener("click", stopRec);
                 return mediaRecorder;
             }
 
@@ -1809,30 +1798,22 @@ class Activity {
              */
             function recording() {
                 start.addEventListener("click", async function handler() {
-                    const stream = await recordScreen();
+                    if (!stream || stream.active == false) {
+                        stream = await recordScreen();
+                    }
                     const mimeType = "video/webm";
                     mediaRecorder = createRecorder(stream, mimeType);
                     if (flag == 1) {
                         this.removeEventListener("click", handler);
                     }
-                    const node = document.createElement("p");
-                    node.textContent = "Started recording";
-                    document.body.appendChild(node);
-                    recInside.setAttribute("fill", "red");
                 });
             }
 
             // Start recording process if not already executing
-            if (flag == 0 && isExecuting) {
+            if (flag == 0) {
                 recording();
                 start.dispatchEvent(clickEvent);
                 flag = 1;
-            }
-
-            // Stop recording if already executing
-            if (flag == 1 && isExecuting) {
-                start.addEventListener("click", stopRec);
-                flag = 0;
             }
         };
 
