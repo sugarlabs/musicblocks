@@ -961,9 +961,13 @@ class Palette {
             }
 
             this.hideMenu();
+            document.removeEventListener("click", this._outsideClickListener);
+            this._outsideClickListener = null;
         };
-
-        document.addEventListener("click", this._outsideClickListener);
+        // Delay attachment to avoid capturing the opening click
+        setTimeout(() => {
+            document.addEventListener("click", this._outsideClickListener);
+        }, 0);
     }
 
     _hideMenuItems() {
