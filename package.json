@@ -22,14 +22,14 @@
     "dist": "electron-builder"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.5",
-    "@babel/eslint-parser": "^7.28.5",
-    "@babel/preset-env": "^7.28.5",
-    "cypress": "^14.0.2",
+    "@babel/core": "^7.29.0",
+    "@babel/eslint-parser": "^7.28.6",
+    "@babel/preset-env": "^7.29.0",
+    "cypress": "^15.9.0",
     "electron": "40.0.0",
     "electron-builder": "26.4.0",
-    "eslint": "^9.0.0",
-    "eslint-config-prettier": "^9.0.0",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^9.1.2",
     "gulp": "^5.0.1",
     "gulp-babel": "^8.0.0",
     "gulp-clean-css": "^4.3.0",
@@ -37,11 +37,11 @@
     "gulp-uglify": "^3.0.2",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.11"
   },
   "dependencies": {
     "@tonejs/midi": "^2.0.28",
-    "autoprefixer": "^10.4.16",
+    "autoprefixer": "^10.4.24",
     "compression": "^1.8.1",
     "cssnano": "^7.1.2",
     "express": "5.2.1",
@@ -51,11 +51,11 @@
     "gulp-sass": "^6.0.1",
     "gulp-sourcemaps": "^3.0.0",
     "http-server": "^14.1.1",
-    "i18next": "^25.3.2",
+    "i18next": "^25.8.0",
     "i18next-http-backend": "^3.0.2",
-    "node": "^24.2.0",
+    "node": "^24.13.0",
     "postcss": "^8.5.6",
-    "sass": "^1.97.2",
+    "sass": "^1.97.3",
     "tone": "^15.1.22"
   },
   "build": {
