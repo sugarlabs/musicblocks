@@ -6824,7 +6824,7 @@ class Blocks {
                 z -= 1;
             }
 
-            this.activity.refreshCanvas;
+            this.activity.refreshCanvas();
         };
 
         /**
