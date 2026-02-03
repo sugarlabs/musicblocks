@@ -38,7 +38,7 @@ define([], function () {
         init() {
             return new Promise((resolve, reject) => {
                 try {
-                    const request = indexedDB.open(this.dbName, 2);
+                    const request = indexedDB.open(this.dbName, 3);
 
                     request.onupgradeneeded = event => {
                         const db = event.target.result;
@@ -60,6 +60,14 @@ define([], function () {
                                 autoIncrement: true
                             });
                             syncStore.createIndex("timestamp", "timestamp", { unique: false });
+                        }
+
+                        // Create versions store for project history
+                        if (!db.objectStoreNames.contains("versions")) {
+                            const versionsStore = db.createObjectStore("versions", {
+                                keyPath: "id"
+                            });
+                            versionsStore.createIndex("timestamp", "timestamp", { unique: false });
                         }
                     };
 
@@ -242,6 +250,42 @@ define([], function () {
         async hasUnsyncedChanges() {
             const metadata = await this.getVersionMetadata();
             return metadata && !metadata.synced;
+        }
+
+        /**
+         * Gets all saved versions from history.
+         */
+        async getHistory() {
+            if (!this.db) return [];
+
+            return new Promise((resolve, reject) => {
+                const transaction = this.db.transaction(["versions"], "readonly");
+                const store = transaction.objectStore("versions");
+                const index = store.index("timestamp");
+                const request = index.getAll();
+
+                request.onsuccess = () => {
+                    // Return sorted by timestamp descending
+                    resolve(request.result.sort((a, b) => b.timestamp - a.timestamp));
+                };
+                request.onerror = event => reject(event.target.error);
+            });
+        }
+
+        /**
+         * Gets a specific version by ID.
+         */
+        async getVersion(id) {
+            if (!this.db) return null;
+
+            return new Promise((resolve, reject) => {
+                const transaction = this.db.transaction(["versions"], "readonly");
+                const store = transaction.objectStore("versions");
+                const request = store.get(id);
+
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = event => reject(event.target.error);
+            });
         }
     }
 

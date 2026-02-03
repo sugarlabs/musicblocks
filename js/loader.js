@@ -59,7 +59,9 @@ requirejs.config({
         // Phase 2: Offline Mode & Cloud Sync modules
         "WorkspaceStorage": "../js/WorkspaceStorage",
         "SyncManager": "../js/SyncManager",
-        "ConflictResolver": "../js/ConflictResolver"
+        "ConflictResolver": "../js/ConflictResolver",
+        // Phase 3: Version Control
+        "VersionControl": "../js/VersionControl"
     },
     packages: []
 });
