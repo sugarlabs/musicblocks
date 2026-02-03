@@ -17,19 +17,19 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-global.base64Encode = jest.fn((str) => str);
+global.base64Encode = jest.fn(str => str);
 global.createjs = {
     Container: jest.fn(() => ({
         children: [],
         addChild: jest.fn(),
         removeChild: jest.fn(),
-        visible: true,
+        visible: true
     })),
-    Bitmap: jest.fn(),
+    Bitmap: jest.fn()
 };
 
 global.window = {
-    btoa: jest.fn((str) => Buffer.from(str).toString("base64")),
+    btoa: jest.fn(str => Buffer.from(str).toString("base64"))
 };
 
 global.BOUNDARY = `
@@ -47,7 +47,7 @@ describe("Boundary Class", () => {
     beforeEach(() => {
         stage = {
             addChild: jest.fn(),
-            setChildIndex: jest.fn(),
+            setChildIndex: jest.fn()
         };
 
         boundary = new Boundary(stage);
@@ -77,7 +77,9 @@ describe("Boundary Class", () => {
 
         expect(boundary.offScreen(50, 50)).toBe(true);
         expect(boundary.offScreen(boundary.x + 1, boundary.y + 1)).toBe(false);
-        expect(boundary.offScreen(boundary.x + boundary.dx + 1, boundary.y + boundary.dy + 1)).toBe(true);
+        expect(boundary.offScreen(boundary.x + boundary.dx + 1, boundary.y + boundary.dy + 1)).toBe(
+            true
+        );
     });
 
     it("should hide and show the container", () => {

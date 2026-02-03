@@ -15,28 +15,31 @@
 
 if (navigator.userAgent.search("Firefox") !== -1) {
     // eslint-disable-next-line no-unused-vars
-    browser.browserAction.onClicked.addListener((tab) => {
+    browser.browserAction.onClicked.addListener(tab => {
         browser.tabs.create({ url: "index.html" });
     });
 
     // eslint-disable-next-line no-unused-vars
-    browser.runtime.onInstalled.addListener((details) => {
+    browser.runtime.onInstalled.addListener(details => {
         browser.tabs.create({ url: "index.html" });
     });
 } else {
     // eslint-disable-next-line no-unused-vars
-    chrome.browserAction.onClicked.addListener((tab) => {
+    chrome.browserAction.onClicked.addListener(tab => {
         window.open(chrome.runtime.getURL("index.html"));
     });
 
     // eslint-disable-next-line no-unused-vars
-    chrome.runtime.onInstalled.addListener((details) => {
+    chrome.runtime.onInstalled.addListener(details => {
         window.open(chrome.runtime.getURL("index.html"));
     });
 }
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         isFirefox: navigator.userAgent.search("Firefox") !== -1,
-        browserAction: navigator.userAgent.search("Firefox") !== -1 ? browser.browserAction : chrome.browserAction,
+        browserAction:
+            navigator.userAgent.search("Firefox") !== -1
+                ? browser.browserAction
+                : chrome.browserAction
     };
 }

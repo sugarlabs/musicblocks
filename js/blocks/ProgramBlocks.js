@@ -363,7 +363,6 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
-                
                 /**
                  * The name of the block.
                  * @type {string}
@@ -919,7 +918,9 @@ function setupProgramBlocks(activity) {
             super("runblock");
             this.setPalette("program", activity);
             this.setHelpString([
-                _("The Run block block runs a block. It accepts two types of arguments: block number or block name."),
+                _(
+                    "The Run block block runs a block. It accepts two types of arguments: block number or block name."
+                ),
                 "documentation",
                 ""
             ]);
@@ -1291,31 +1292,37 @@ function setupProgramBlocks(activity) {
                         i < activity.blocks.protoBlockDict[protoblk].dockTypes.length;
                         i++
                     ) {
-                        // FIXME: type check args
+                        // Type check and handle args
                         if (i < blockArgs.length) {
-                            if (typeof blockArgs[i] === "number") {
-                                if (
-                                    !["anyin", "numberin"].includes(
-                                        activity.blocks.protoBlockDict[protoblk].dockTypes[i]
-                                    )
-                                ) {
+                            const arg = blockArgs[i];
+                            const dockType = activity.blocks.protoBlockDict[protoblk].dockTypes[i];
+
+                            if (typeof arg === "number") {
+                                if (!["anyin", "numberin"].includes(dockType)) {
                                     activity.errorMsg(_("Warning: block argument type mismatch"));
                                 }
-                                newBlock.push([i, ["number", { value: blockArgs[i] }], 0, 0, [0]]);
-                            } else if (typeof blockArgs[i] === "string") {
-                                if (
-                                    !["anyin", "textin"].includes(
-                                        activity.blocks.protoBlockDict[protoblk].dockTypes[i]
-                                    )
-                                ) {
+                                newBlock.push([i, ["number", { value: arg }], 0, 0, [0]]);
+                                newBlock[0][4].push(i);
+                            } else if (typeof arg === "string") {
+                                if (!["anyin", "textin"].includes(dockType)) {
                                     activity.errorMsg(_("Warning: block argument type mismatch"));
                                 }
-                                newBlock.push([i, ["string", { value: blockArgs[i] }], 0, 0, [0]]);
+                                newBlock.push([i, ["string", { value: arg }], 0, 0, [0]]);
+                                newBlock[0][4].push(i);
+                            } else if (typeof arg === "boolean") {
+                                if (!["anyin", "booleanin"].includes(dockType)) {
+                                    activity.errorMsg(_("Warning: block argument type mismatch"));
+                                }
+                                newBlock.push([i, ["boolean", { value: arg }], 0, 0, [0]]);
+                                newBlock[0][4].push(i);
                             } else {
+                                activity.errorMsg(
+                                    _("Warning: block argument type unhandled: ") + typeof arg
+                                );
+                                // eslint-disable-next-line no-console
+                                console.warn("Unhandled argument type", arg);
                                 newBlock[0][4].push(null);
                             }
-
-                            newBlock[0][4].push(i);
                         } else {
                             newBlock[0][4].push(null);
                         }
@@ -1440,4 +1447,8 @@ function setupProgramBlocks(activity) {
     new SaveHeapBlock().setup(activity);
     new LoadHeapBlock().setup(activity);
     new SetHeapBlock().setup(activity);
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupProgramBlocks };
 }

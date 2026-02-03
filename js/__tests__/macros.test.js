@@ -19,7 +19,7 @@
 
 const blockIsMacro = require("../macros");
 const getMacroExpansion = require("../macros");
-global._ = jest.fn((str) => str);
+global._ = jest.fn(str => str);
 
 describe("blockIsMacro", () => {
     let mockActivity;
@@ -27,7 +27,7 @@ describe("blockIsMacro", () => {
     beforeEach(() => {
         mockActivity = { blocks: { protoBlockDict: Object.create(null) } };
     });
-    
+
     test("should return true if block is in BLOCKISMACRO list", () => {
         expect(Boolean(blockIsMacro(mockActivity, "actionhelp"))).toBe(true);
     });
@@ -47,7 +47,9 @@ describe("getMacroExpansion", () => {
     test("should return macro expansion from protoBlockDict if macroFunc exists", () => {
         const mockFunc = jest.fn(() => [["mockedExpansion"]]);
         mockActivity.blocks.protoBlockDict["customMacro"] = { macroFunc: mockFunc };
-        expect(getMacroExpansion(mockActivity, "customMacro", 10, 20)).toEqual([["mockedExpansion"]]);
+        expect(getMacroExpansion(mockActivity, "customMacro", 10, 20)).toEqual([
+            ["mockedExpansion"]
+        ]);
         expect(mockFunc).toHaveBeenCalledWith(10, 20);
     });
 
