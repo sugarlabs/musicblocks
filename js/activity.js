@@ -2944,13 +2944,8 @@ class Activity {
                             document.getElementById("search").contains(e.target))
                     ) {
                         //do nothing when clicked in the input field
-                    } else if (
-                        document.getElementById("ui-id-1") &&
-                        document.getElementById("ui-id-1").style.display === "block" &&
-                        (e.target === document.getElementById("ui-id-1") ||
-                            document.getElementById("ui-id-1").contains(e.target))
-                    ) {
-                        //do nothing when clicked on the menu
+                    } else if (e.target.closest(".ui-autocomplete")) {
+                        //do nothing when clicked on the menu (dynamic check for any autocomplete menu)
                     } else if (document.getElementsByTagName("tr")[2].contains(e.target)) {
                         //do nothing when clicked on the search row
                     } else {
