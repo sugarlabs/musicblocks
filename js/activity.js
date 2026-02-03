@@ -3422,7 +3422,7 @@ class Activity {
                                 this.searchWidget.style.visibility = "hidden";
                             }
                             break;
-                        case RETURN:
+                        case RETURN: {
                             // Check if any widget window is open
                             const hasOpenWidget = Object.values(
                                 window.widgetWindows.openWindows
@@ -3439,6 +3439,7 @@ class Activity {
                                 this._doFastButton();
                             }
                             break;
+                        }
                         default:
                             break;
                     }
