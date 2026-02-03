@@ -1542,13 +1542,20 @@ class Blocks {
             if (this.activity.undoRedoManager && thisBlock != null) {
                 const block = this.blockList[thisBlock];
                 if (block) {
-                    this.activity.undoRedoManager.saveState('block_moved', {
-                        blockName: block.name,
-                        oldX: block.container.x,
-                        oldY: block.container.y,
-                        newX: block.container.x,
-                        newY: block.container.y
-                    });
+                    // Only save if we have previous position data
+                    if (block._previousX !== undefined && block._previousY !== undefined) {
+                        this.activity.undoRedoManager.saveState('block_moved', {
+                            blockName: block.name,
+                            oldX: block._previousX,
+                            oldY: block._previousY,
+                            newX: block.container.x,
+                            newY: block.container.y
+                        });
+                    }
+                    
+                    // Update previous position for next move
+                    block._previousX = block.container.x;
+                    block._previousY = block.container.y;
                 }
             }
 
@@ -3155,6 +3162,13 @@ class Blocks {
                 );
             } else {
                 this.blockList.push(new Block(this.protoBlockDict[name], this));
+            }
+
+            // Initialize previous position tracking for undo/redo
+            const newBlock = last(this.blockList);
+            if (newBlock && newBlock.container) {
+                newBlock._previousX = newBlock.container.x;
+                newBlock._previousY = newBlock.container.y;
             }
 
             if (last(this.blockList) == null) {

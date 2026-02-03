@@ -66,6 +66,7 @@ class UndoRedoManager {
      */
     undo() {
         if (this.undoStack.length === 0) {
+            this.activity.textMsg(_("Nothing to undo"));
             return false;
         }
 
@@ -77,9 +78,11 @@ class UndoRedoManager {
         try {
             this.performUndo(state);
             this.updateUI();
+            this.activity.textMsg(_("Undo: ") + state.action);
             return true;
         } catch (error) {
             console.error("Undo failed:", error);
+            this.activity.textMsg(_("Undo failed: ") + error.message);
             // Restore state if undo failed
             this.undoStack.push(state);
             this.redoStack.pop();
@@ -94,6 +97,7 @@ class UndoRedoManager {
      */
     redo() {
         if (this.redoStack.length === 0) {
+            this.activity.textMsg(_("Nothing to redo"));
             return false;
         }
 
@@ -105,9 +109,11 @@ class UndoRedoManager {
         try {
             this.performRedo(state);
             this.updateUI();
+            this.activity.textMsg(_("Redo: ") + state.action);
             return true;
         } catch (error) {
             console.error("Redo failed:", error);
+            this.activity.textMsg(_("Redo failed: ") + error.message);
             // Restore state if redo failed
             this.redoStack.push(state);
             this.undoStack.pop();
@@ -191,9 +197,10 @@ class UndoRedoManager {
      * @param {Object} data - Block data
      */
     redoBlockAdded(data) {
-        // This would require recreating the block from saved data
-        // For now, we'll just log it
-        console.log("Redo block added:", data);
+        // For now, we can't easily recreate blocks, so we'll just log
+        // In a full implementation, this would recreate the block from saved data
+        console.log("Redo block added - not fully implemented:", data);
+        this.activity.textMsg("Redo not fully implemented for block addition");
     }
 
     /**
@@ -201,9 +208,24 @@ class UndoRedoManager {
      * @param {Object} data - Block data
      */
     undoBlockDeleted(data) {
-        // This would require restoring the block from saved data
-        // For now, we'll just log it
-        console.log("Undo block deleted:", data);
+        // Restore block from trash
+        if (this.activity.blocks.trash) {
+            const trashedBlock = this.activity.blocks.trash.find(b => b.name === data.blockName);
+            if (trashedBlock) {
+                // Remove from trash
+                const index = this.activity.blocks.trash.indexOf(trashedBlock);
+                this.activity.blocks.trash.splice(index, 1);
+                
+                // Add back to block list
+                this.activity.blocks.blockList.push(trashedBlock);
+                
+                // Restore visibility and position
+                trashedBlock.trash = false;
+                trashedBlock.container.visible = true;
+                
+                this.activity.refreshCanvas();
+            }
+        }
     }
 
     /**
