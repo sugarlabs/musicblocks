@@ -476,8 +476,7 @@ describe("saveWAV & saveABC methods", () => {
                     notationStaging: {},
                     notationDrumStaging: {}
                 },
-                runLogoCommands: mockRunLogoCommands,
-                recordingBuffer: { hasData: false }
+                runLogoCommands: mockRunLogoCommands
             },
             turtles: {
                 turtleList: [{ painter: { doClear: jest.fn() } }],

@@ -82,7 +82,6 @@ function setupIntervalsActions(activity) {
             if (octave < 0 && totalIntervals !== 0 && totalIntervals !== 12)
                 totalIntervals = 12 - totalIntervals;
 
-
             if (octave < -1 || totalIntervals === 0) octave = Math.abs(octave);
 
             while (octave > 0) {
