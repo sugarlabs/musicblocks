@@ -561,6 +561,10 @@ function Synth() {
     this.temperamentChanged = (temperament, startingPitch) => {
         let startPitch = startingPitch;
         const t = getTemperament(temperament);
+        if (!t) {
+            console.error("Temperament not found: " + temperament);
+            return;
+        }
         const len = startPitch.length;
         const number = pitchToNumber(
             startPitch.substring(0, len - 1),
@@ -583,92 +587,20 @@ function Synth() {
 
         this.noteFrequencies = {
             // note: [octave, Frequency]
-            [startingPitch.substring(0, len - 1)]: [Number(startingPitch.slice(-1)), frequency],
-            [getNoteFromInterval(startingPitch, "minor 2")[0]]: [
-                getNoteFromInterval(startingPitch, "minor 2")[1],
-                t["minor 2"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "augmented 1")[0]]: [
-                getNoteFromInterval(startingPitch, "augmented 1")[1],
-                t["augmented 1"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "major 2")[0]]: [
-                getNoteFromInterval(startingPitch, "major 2")[1],
-                t["major 2"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "minor 3")[0]]: [
-                getNoteFromInterval(startingPitch, "minor 3")[1],
-                t["minor 3"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "augmented 2")[0]]: [
-                getNoteFromInterval(startingPitch, "augmented 2")[1],
-                t["augmented 2"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "major 3")[0]]: [
-                getNoteFromInterval(startingPitch, "major 3")[1],
-                t["major 3"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "augmented 3")[0]]: [
-                getNoteFromInterval(startingPitch, "augmented 3")[1],
-                t["augmented 3"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "diminished 4")[0]]: [
-                getNoteFromInterval(startingPitch, "diminished 4")[1],
-                t["diminished 4"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "perfect 4")[0]]: [
-                getNoteFromInterval(startingPitch, "perfect 4")[1],
-                t["perfect 4"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "augmented 4")[0]]: [
-                getNoteFromInterval(startingPitch, "augmented 4")[1],
-                t["augmented 4"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "diminished 5")[0]]: [
-                getNoteFromInterval(startingPitch, "diminished 5")[1],
-                t["diminished 5"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "perfect 5")[0]]: [
-                getNoteFromInterval(startingPitch, "perfect 5")[1],
-                t["perfect 5"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "augmented 5")[0]]: [
-                getNoteFromInterval(startingPitch, "augmented 5")[1],
-                t["augmented 5"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "minor 6")[0]]: [
-                getNoteFromInterval(startingPitch, "minor 6")[1],
-                t["minor 6"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "major 6")[0]]: [
-                getNoteFromInterval(startingPitch, "major 6")[1],
-                t["major 6"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "augmented 6")[0]]: [
-                getNoteFromInterval(startingPitch, "augmented 6")[1],
-                t["augmented 6"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "minor 7")[0]]: [
-                getNoteFromInterval(startingPitch, "minor 7")[1],
-                t["minor 7"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "major 7")[0]]: [
-                getNoteFromInterval(startingPitch, "major 7")[1],
-                t["major 7"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "augmented 7")[0]]: [
-                getNoteFromInterval(startingPitch, "augmented 7")[1],
-                t["augmented 7"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "diminished 8")[0]]: [
-                getNoteFromInterval(startingPitch, "diminished 8")[1],
-                t["diminished 8"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "perfect 8")[0]]: [
-                getNoteFromInterval(startingPitch, "perfect 8")[1],
-                t["perfect 8"] * frequency
-            ]
+            [startingPitch.substring(0, len - 1)]: [Number(startingPitch.slice(-1)), frequency]
         };
+
+        for (const interval in t) {
+            if (
+                interval !== "pitchNumber" &&
+                interval !== "interval" &&
+                interval !== "octave" &&
+                typeof t[interval] === "number"
+            ) {
+                const noteInfo = getNoteFromInterval(startingPitch, interval);
+                this.noteFrequencies[noteInfo[0]] = [noteInfo[1], t[interval] * frequency];
+            }
+        }
 
         for (const key in this.noteFrequencies) {
             let note;
@@ -2773,13 +2705,12 @@ function Synth() {
                                         i < tempBlock._accidentalsWheel.navItems.length;
                                         i++
                                     ) {
-                                        tempBlock._accidentalsWheel.navItems[
-                                            i
-                                        ].navigateFunction = () => {
-                                            selectionState.accidental =
-                                                tempBlock._accidentalsWheel.navItems[i].title;
-                                            updateTargetNote();
-                                        };
+                                        tempBlock._accidentalsWheel.navItems[i].navigateFunction =
+                                            () => {
+                                                selectionState.accidental =
+                                                    tempBlock._accidentalsWheel.navItems[i].title;
+                                                updateTargetNote();
+                                            };
                                     }
                                 }
 
@@ -2790,16 +2721,15 @@ function Synth() {
                                         i < tempBlock._octavesWheel.navItems.length;
                                         i++
                                     ) {
-                                        tempBlock._octavesWheel.navItems[
-                                            i
-                                        ].navigateFunction = () => {
-                                            const octave =
-                                                tempBlock._octavesWheel.navItems[i].title;
-                                            if (octave && !isNaN(octave)) {
-                                                selectionState.octave = parseInt(octave);
-                                                updateTargetNote();
-                                            }
-                                        };
+                                        tempBlock._octavesWheel.navItems[i].navigateFunction =
+                                            () => {
+                                                const octave =
+                                                    tempBlock._octavesWheel.navItems[i].title;
+                                                if (octave && !isNaN(octave)) {
+                                                    selectionState.octave = parseInt(octave);
+                                                    updateTargetNote();
+                                                }
+                                            };
                                     }
                                 }
 

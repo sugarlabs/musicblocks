@@ -4124,6 +4124,11 @@ function getNote(
         temperament = "equal";
     }
 
+    const octaveLength =
+        TEMPERAMENT[temperament] && typeof TEMPERAMENT[temperament].pitchNumber === "number"
+            ? TEMPERAMENT[temperament].pitchNumber
+            : 12;
+
     let sharpFlat = false;
     let rememberFlat = false;
     let rememberSharp = false;
@@ -4311,7 +4316,7 @@ function getNote(
                 // All keys Gb -- B would be in octave three (since
                 // going down is closer than going up)
                 if (offset > 5) {
-                    transpositionFloor -= 12; // go down one octave
+                    transpositionFloor -= octaveLength; // go down one octave
                 }
             } else {
                 offset = 0;
@@ -4359,10 +4364,10 @@ function getNote(
                     case "dorian":
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 0) {
-                            transpositionFloor += 12;
+                            transpositionFloor += octaveLength;
                         }
 
-                        transpositionFloor -= 12;
+                        transpositionFloor -= octaveLength;
                         i += 6;
                         if (i > 6) {
                             i -= 7;
@@ -4373,7 +4378,7 @@ function getNote(
                     case "phrygian":
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 1) {
-                            transpositionFloor += 12;
+                            transpositionFloor += octaveLength;
                         }
 
                         i += 5;
@@ -4386,7 +4391,7 @@ function getNote(
                     case "lydian":
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 2) {
-                            transpositionFloor += 12;
+                            transpositionFloor += octaveLength;
                         }
 
                         i += 4;
@@ -4399,7 +4404,7 @@ function getNote(
                     case "mixolydian":
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 3) {
-                            transpositionFloor += 12;
+                            transpositionFloor += octaveLength;
                         }
 
                         i += 3;
@@ -4413,7 +4418,7 @@ function getNote(
                     case "aeolian":
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 4) {
-                            transpositionFloor += 12;
+                            transpositionFloor += octaveLength;
                         }
 
                         i += 2;
@@ -4426,7 +4431,7 @@ function getNote(
                     case "locrian":
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 5) {
-                            transpositionFloor += 12;
+                            transpositionFloor += octaveLength;
                         }
 
                         i += 1;
@@ -4446,11 +4451,11 @@ function getNote(
             let index;
             if (halfSteps.includes(solfegePart)) {
                 index = halfSteps.indexOf(solfegePart) + offset;
-                if (index > 11) {
-                    index -= 12;
+                if (index >= octaveLength) {
+                    index -= octaveLength;
                     octave += 1;
                 } else if (index < 0) {
-                    index += 12;
+                    index += octaveLength;
                     octave -= 1;
                 }
 
@@ -4476,11 +4481,11 @@ function getNote(
         if (transpositionFloor && transpositionFloor !== 0) {
             let deltaOctave, deltaNote;
             if (transpositionFloor < 0) {
-                deltaOctave = -Math.floor(-transpositionFloor / 12);
-                deltaNote = -(-transpositionFloor % 12);
+                deltaOctave = -Math.floor(-transpositionFloor / octaveLength);
+                deltaNote = -(-transpositionFloor % octaveLength);
             } else {
-                deltaOctave = Math.floor(transpositionFloor / 12);
-                deltaNote = transpositionFloor % 12;
+                deltaOctave = Math.floor(transpositionFloor / octaveLength);
+                deltaNote = transpositionFloor % octaveLength;
             }
 
             octave += deltaOctave;
@@ -4632,7 +4637,7 @@ function getNote(
         }
 
         let inOctave = octave;
-        const octaveLength = TEMPERAMENT[temperamentFloor]["pitchNumber"];
+        // octaveLength already defined at top of function
         let deltaOctave, deltaNote;
         if (transpositionFloor !== 0) {
             if (transpositionFloor < 0) {
@@ -4702,11 +4707,11 @@ function getNote(
         let deltaOctave, deltaNote;
         if (transpositionFloor && transpositionFloor !== 0) {
             if (transpositionFloor < 0) {
-                deltaOctave = -Math.floor(-transpositionFloor / 12);
-                deltaNote = -(-transpositionFloor % 12);
+                deltaOctave = -Math.floor(-transpositionFloor / octaveLength);
+                deltaNote = -(-transpositionFloor % octaveLength);
             } else {
-                deltaOctave = Math.floor(transpositionFloor / 12);
-                deltaNote = transposition % 12;
+                deltaOctave = Math.floor(transpositionFloor / octaveLength);
+                deltaNote = transposition % octaveLength;
             }
 
             octave += deltaOctave;
@@ -4724,7 +4729,7 @@ function getNote(
                 octave1 = octave - 1;
                 pitch = note + "" + octave1;
                 for (const interval in INTERVALVALUES) {
-                    if (12 + deltaNote === INTERVALVALUES[interval][0]) {
+                    if (octaveLength + deltaNote === INTERVALVALUES[interval][0]) {
                         note1 = getNoteFromInterval(pitch, interval);
                         break;
                     }
