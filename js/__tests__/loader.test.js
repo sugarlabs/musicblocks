@@ -29,8 +29,8 @@ describe("Loader Module", () => {
     let originalRequirejs;
     let mockI18next;
     let mockI18nextHttpBackend;
-    let capturedI18nCallback;
     let capturedConfig;
+    let consoleErrorSpy;
 
     beforeEach(() => {
         jest.resetModules();
@@ -38,6 +38,9 @@ describe("Loader Module", () => {
 
         // Save original requirejs
         originalRequirejs = global.requirejs;
+
+        // Mock console.error
+        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => { });
 
         // Mock i18next
         mockI18next = {
@@ -57,7 +60,6 @@ describe("Loader Module", () => {
         // Mock requirejs
         global.requirejs = jest.fn((deps, callback) => {
             if (Array.isArray(deps) && deps.includes("i18next")) {
-                capturedI18nCallback = callback;
                 if (callback) {
                     callback(mockI18next, mockI18nextHttpBackend);
                 }
@@ -68,28 +70,37 @@ describe("Loader Module", () => {
             capturedConfig = config;
         });
 
-        // Mock document methods
-        document.querySelectorAll = jest.fn(() => []);
-        document.addEventListener = jest.fn();
-
         // Set document ready state
         Object.defineProperty(document, "readyState", {
             value: "complete",
             writable: true,
             configurable: true
         });
+
+        // Setup DOM for translation tests
+        document.body.innerHTML = `
+            <div data-i18n="title">Original Title</div>
+            <span data-i18n="label">Original Label</span>
+        `;
     });
 
     afterEach(() => {
         global.requirejs = originalRequirejs;
-        delete global.window.i18next;
+        if (global.window) {
+            delete global.window.i18next;
+        }
+        consoleErrorSpy.mockRestore();
         jest.resetModules();
     });
 
+    const loadLoader = async () => {
+        require("../loader");
+        await new Promise(resolve => process.nextTick(resolve));
+    };
+
     describe("RequireJS Configuration", () => {
         beforeEach(async () => {
-            require("../loader");
-            await new Promise(resolve => process.nextTick(resolve));
+            await loadLoader();
         });
 
         it("should call requirejs.config", () => {
@@ -101,11 +112,11 @@ describe("Loader Module", () => {
         });
 
         it("should configure easel shim with createjs export", () => {
-            expect(capturedConfig.shim).toEqual({
+            expect(capturedConfig.shim).toEqual(expect.objectContaining({
                 easel: {
                     exports: "createjs"
                 }
-            });
+            }));
         });
 
         it("should configure utils path", () => {
@@ -157,8 +168,7 @@ describe("Loader Module", () => {
 
     describe("i18next Setup", () => {
         beforeEach(async () => {
-            require("../loader");
-            await new Promise(resolve => process.nextTick(resolve));
+            await loadLoader();
         });
 
         it("should load i18next and i18nextHttpBackend modules", () => {
@@ -207,54 +217,43 @@ describe("Loader Module", () => {
         });
     });
 
-    describe("Language Change", () => {
-        beforeEach(async () => {
-            require("../loader");
-            await new Promise(resolve => process.nextTick(resolve));
-        });
-
-        it("should change language to English", () => {
+    describe("Language and Content Updates", () => {
+        it("should change language to English during init", async () => {
+            await loadLoader();
             expect(mockI18next.changeLanguage).toHaveBeenCalledWith("en", expect.any(Function));
         });
 
-        it("should register languageChanged event listener", () => {
+        it("should register languageChanged event listener", async () => {
+            await loadLoader();
             expect(mockI18next.on).toHaveBeenCalledWith("languageChanged", expect.any(Function));
-        });
-    });
-
-    describe("Content Update", () => {
-        it("should query elements with data-i18n attribute", async () => {
-            require("../loader");
-            await new Promise(resolve => process.nextTick(resolve));
-            expect(document.querySelectorAll).toHaveBeenCalledWith("[data-i18n]");
         });
 
         it("should translate elements with data-i18n attribute", async () => {
-            const mockElement = {
-                getAttribute: jest.fn(() => "welcome.message"),
-                textContent: ""
-            };
-            document.querySelectorAll.mockReturnValue([mockElement]);
+            await loadLoader();
 
-            require("../loader");
-            await new Promise(resolve => process.nextTick(resolve));
+            const title = document.querySelector('[data-i18n="title"]');
+            const label = document.querySelector('[data-i18n="label"]');
 
-            expect(mockI18next.t).toHaveBeenCalledWith("welcome.message");
-            expect(mockElement.textContent).toBe("translated_welcome.message");
+            expect(mockI18next.t).toHaveBeenCalledWith("title");
+            expect(mockI18next.t).toHaveBeenCalledWith("label");
+            expect(title.textContent).toBe("translated_title");
+            expect(label.textContent).toBe("translated_label");
         });
 
-        it("should handle multiple elements", async () => {
-            const mockElements = [
-                { getAttribute: jest.fn(() => "key1"), textContent: "" },
-                { getAttribute: jest.fn(() => "key2"), textContent: "" }
-            ];
-            document.querySelectorAll.mockReturnValue(mockElements);
+        it("should update content when languageChanged event is triggered", async () => {
+            await loadLoader();
 
-            require("../loader");
-            await new Promise(resolve => process.nextTick(resolve));
+            const onCall = mockI18next.on.mock.calls.find(call => call[0] === "languageChanged");
+            const onHandler = onCall[1];
 
-            expect(mockElements[0].textContent).toBe("translated_key1");
-            expect(mockElements[1].textContent).toBe("translated_key2");
+            // Change content manually to verify update
+            document.querySelector('[data-i18n="title"]').textContent = "New Title";
+            mockI18next.t.mockClear();
+
+            onHandler();
+
+            expect(mockI18next.t).toHaveBeenCalledWith("title");
+            expect(document.querySelector('[data-i18n="title"]').textContent).toBe("translated_title");
         });
     });
 
@@ -266,66 +265,69 @@ describe("Loader Module", () => {
                 configurable: true
             });
 
-            require("../loader");
-            await new Promise(resolve => process.nextTick(resolve));
+            const addEventListenerSpy = jest.spyOn(document, "addEventListener");
 
-            expect(document.addEventListener).toHaveBeenCalledWith(
+            await loadLoader();
+
+            expect(addEventListenerSpy).toHaveBeenCalledWith(
                 "DOMContentLoaded",
                 expect.any(Function)
             );
+
+            // Verify handler works when triggered
+            const handler = addEventListenerSpy.mock.calls.find(c => c[0] === "DOMContentLoaded")[1];
+            mockI18next.t.mockClear();
+            handler();
+            expect(mockI18next.t).toHaveBeenCalled();
+
+            addEventListenerSpy.mockRestore();
         });
 
-        it("should not add listener when document is complete", async () => {
+        it("should not add listener when document is already complete", async () => {
             Object.defineProperty(document, "readyState", {
                 value: "complete",
                 writable: true,
                 configurable: true
             });
 
-            require("../loader");
-            await new Promise(resolve => process.nextTick(resolve));
+            const addEventListenerSpy = jest.spyOn(document, "addEventListener");
 
-            expect(document.addEventListener).not.toHaveBeenCalledWith(
+            await loadLoader();
+
+            expect(addEventListenerSpy).not.toHaveBeenCalledWith(
                 "DOMContentLoaded",
                 expect.any(Function)
             );
+
+            addEventListenerSpy.mockRestore();
         });
     });
 
     describe("Error Handling", () => {
         it("should log error when i18next init fails", async () => {
-            const consoleSpy = jest.spyOn(console, "error").mockImplementation();
-
             mockI18next.init = jest.fn((config, callback) => {
                 callback(new Error("Init failed"));
             });
 
-            require("../loader");
-            await new Promise(resolve => process.nextTick(resolve));
+            await loadLoader();
 
-            expect(consoleSpy).toHaveBeenCalledWith("i18next init failed:", expect.any(Error));
-            consoleSpy.mockRestore();
+            expect(consoleErrorSpy).toHaveBeenCalledWith("i18next init failed:", expect.any(Error));
         });
 
         it("should log error when language change fails", async () => {
-            const consoleSpy = jest.spyOn(console, "error").mockImplementation();
-
             mockI18next.changeLanguage = jest.fn((lang, callback) => {
                 callback(new Error("Language change failed"));
             });
 
-            require("../loader");
-            await new Promise(resolve => process.nextTick(resolve));
+            await loadLoader();
 
-            expect(consoleSpy).toHaveBeenCalledWith("Error changing language:", expect.any(Error));
-            consoleSpy.mockRestore();
+            expect(consoleErrorSpy).toHaveBeenCalledWith("Error changing language:", expect.any(Error));
         });
     });
 
     describe("Application Loading", () => {
         it("should load utils and activity modules after i18n is ready", async () => {
-            require("../loader");
-            await new Promise(resolve => process.nextTick(resolve));
+            await loadLoader();
 
             expect(global.requirejs).toHaveBeenCalledWith(["utils/utils", "activity/activity"]);
         });

@@ -104,3 +104,4 @@ input[type="range"]:focus::-ms-fill-upper {
   position: absolute;
   cursor: pointer;
 }
+html, body { overscroll-behavior-x: none; }
