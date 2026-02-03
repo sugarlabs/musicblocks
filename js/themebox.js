@@ -93,6 +93,44 @@ const themeConfigs = {
         stopIconcolor: "#ea174c",
         hitAreaGraphicsBeginFill: "#FFF",
         orange: "#e37a00"
+    },
+    highcontrast: {
+        textColor: "#FFFFFF",
+        blockText: "#FFFFFF",
+        dialogueBox: "#000000",
+        strokeColor: "#FFFFFF",
+        fillColor: "#000000",
+        blueButton: "#00FFFF",
+        blueButtonHover: "#00CCCC",
+        cancelButton: "#FFFFFF",
+        cancelButtonHover: "#CCCCCC",
+        hoverColor: "#666666",
+        widgetButton: "#00FFFF",
+        widgetButtonSelect: "#FFFFFF",
+        widgetBackground: "#000000",
+        disconnected: "#666666",
+        header: "#00FFFF",
+        aux: "#00CCCC",
+        sub: "#00FFFF",
+        rule: "#FFFFFF",
+        ruleColor: "#FFFFFF",
+        trashColor: "#FFFFFF",
+        trashBorder: "#FFFFFF",
+        trashActive: "#FF0000",
+        background: "#000000",
+        paletteSelected: "#111111",
+        paletteBackground: "#000000",
+        paletteLabelBackground: "#000080",
+        paletteLabelSelected: "#0000FF",
+        paletteText: "#FFFFFF",
+        rulerHighlight: "#FFFF00",
+        selectorBackground: "#00FFFF",
+        selectorSelected: "#00CCCC",
+        labelColor: "#FFFFFF",
+        rhythmcellcolor: "#333333",
+        stopIconcolor: "#FF0000",
+        hitAreaGraphicsBeginFill: "#000000",
+        orange: "#FF8800"
     }
 };
 
@@ -103,7 +141,7 @@ class ThemeBox {
     constructor(activity) {
         this.activity = activity;
         this._theme = activity.storage.themePreference || "light";
-        this._themes = ["light", "dark"];
+        this._themes = ["light", "dark", "highcontrast"];
     }
 
     /**
@@ -121,6 +159,11 @@ class ThemeBox {
      */
     dark_onclick() {
         this._theme = "dark";
+        this.setPreference();
+    }
+
+    highcontrast_onclick() {
+        this._theme = "highcontrast";
         this.setPreference();
     }
 

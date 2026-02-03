@@ -3,138 +3,138 @@
 .dark {
     background-color: #303030;
     color: #e0e0e0;
-  }
-  
-  .dark .nav-extended {
+}
+
+.dark .nav-extended {
     background-color: #2f6b2f !important;
     border-bottom: 1px solid #444444;
-  }
-  
-  .dark .nav-wrapper .brand-logo,
-  .dark .nav-wrapper a,
-  .dark .tabs .tab a {
+}
+
+.dark .nav-wrapper .brand-logo,
+.dark .nav-wrapper a,
+.dark .tabs .tab a {
     color: #ffffff !important;
-  }
-  
-  .dark .tabs .tab a.active {
+}
+
+.dark .tabs .tab a.active {
     color: #a8d5a8 !important;
     border-bottom: 2px solid #a8d5a8;
-  }
-  
-  .dark #backToTopBtn {
+}
+
+.dark #backToTopBtn {
     background-color: #2f6b2f !important;
     color: #ffffff !important;
-  }
-  
-  .dark .modal {
+}
+
+.dark .modal {
     background-color: #424242;
     color: #e0e0e0;
-  }
-  
-  .dark .modal-footer {
+}
+
+.dark .modal-footer {
     background-color: #383838;
-  }
-  
-  .dark .dropdown-content {
+}
+
+.dark .dropdown-content {
     background-color: #424242 !important;
     color: #ffffff !important;
     border: 1px solid #444444;
-  }
-  
-  .dark .dropdown-content li > a:hover {
+}
+
+.dark .dropdown-content li > a:hover {
     background-color: #383838 !important;
     color: #ffffff !important;
-  }
-  
-  .dark #view-more-chips {
+}
+
+.dark #view-more-chips {
     color: #e0e0e0 !important;
-  }
-  .dark #local-projects .card {
+}
+.dark #local-projects .card {
     background-color: #2a2a2a;
     color: #e0e0e0;
     border: 1px solid #252525;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-  }
-  
-  .dark #local-projects .card .card-title {
+}
+
+.dark #local-projects .card .card-title {
     color: #e0e0e0 !important;
-  }
-  
-  .dark #local-projects .card .card-content {
+}
+
+.dark #local-projects .card .card-content {
     color: #bdbdbd;
-  }
-  s .dark #local-projects .card:hover {
+}
+s .dark #local-projects .card:hover {
     background-color: #242424;
     box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.5);
-  }
-  
-  .dark #local-projects .card .btn {
+}
+
+.dark #local-projects .card .btn {
     background-color: #2f6b2f;
     color: #ffffff;
-  }
-  
-  .dark #local-projects .card .btn:hover {
+}
+
+.dark #local-projects .card .btn:hover {
     background-color: #388e3c;
-  }
-  
-  .dark #global-projects .card {
+}
+
+.dark #global-projects .card {
     background-color: #2a2a2a;
     color: #e0e0e0;
     border: 1px solid #252525;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-  }
-  
-  .dark #global-projects .card .card-title {
+}
+
+.dark #global-projects .card .card-title {
     color: #e0e0e0 !important;
-  }
-  
-  .dark #global-projects .card .card-content {
+}
+
+.dark #global-projects .card .card-content {
     color: #bdbdbd;
-  }
-  
-  .dark #global-projects .card:hover {
+}
+
+.dark #global-projects .card:hover {
     background-color: #242424;
     box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.5);
-  }
-  
-  .dark #global-projects .card .btn {
+}
+
+.dark #global-projects .card .btn {
     background-color: #2f6b2f;
     color: #ffffff;
-  }
-  
-  .dark #global-projects .card .btn:hover {
+}
+
+.dark #global-projects .card .btn:hover {
     background-color: #388e3c;
-  }
-  
-  .dark .modal-footer .btn-flat {
+}
+
+.dark .modal-footer .btn-flat {
     color: #ffffff !important;
     background-color: transparent !important;
     transition: background-color 0.3s ease, color 0.3s ease;
     font-weight: bold;
-  }
-  
-  .dark .modal-footer .btn-flat:hover {
+}
+
+.dark .modal-footer .btn-flat:hover {
     background-color: #a8d5a8 !important;
     color: #303030 !important;
-  }
-  .dark .close-button {
+}
+.dark .close-button {
     color: #e0e0e0;
     font-size: 1.5rem;
     transition: color 0.3s ease;
-  }
-  
-  .dark .close-button:hover {
+}
+
+.dark .close-button:hover {
     color: #a8d5a8;
-  }
-  
-  .dark .select-wrapper {
+}
+
+.dark .select-wrapper {
     position: relative;
     height: 3rem;
     line-height: 3rem;
     margin-top: 0.5rem;
-  }
-  
-  .dark .select-wrapper input.select-dropdown {
+}
+
+.dark .select-wrapper input.select-dropdown {
     color: #ffffff !important;
     font-size: 1rem;
     line-height: normal;
@@ -143,9 +143,9 @@
     box-sizing: border-box;
     background-color: #424242 !important;
     border: 1px solid #444444 !important;
-  }
-  
-  .dark .select-wrapper:after {
+}
+
+.dark .select-wrapper:after {
     content: "\25BC";
     position: absolute;
     top: 50%;
@@ -154,22 +154,227 @@
     color: #ffffff !important;
     font-size: 0.8rem;
     pointer-events: none;
-  }
-  
-  .dark .dropdown-content {
+}
+
+.dark .dropdown-content {
     background-color: #424242 !important;
     border: 1px solid #444444;
     color: #ffffff !important;
-  }
-  
-  .dark .dropdown-content li > a {
+}
+
+.dark .dropdown-content li > a {
     color: #ffffff !important;
     padding: 0.5rem 1rem;
-  }
-  
-  .dark .dropdown-content li > a:hover {
+}
+
+.dark .dropdown-content li > a:hover {
     background-color: #383838 !important;
     color: #a8d5a8 !important;
-  }
-  
-  /* Your Custom theme for planet page goes below if you don't want to change the existing theme*/
+}
+
+/* High Contrast Mode */
+
+.highcontrast {
+    background-color: #000080;
+    color: #ffff00;
+}
+
+.highcontrast .nav-extended {
+    background-color: #000000 !important;
+    border-bottom: 2px solid #ffff00;
+}
+
+.highcontrast .nav-wrapper .brand-logo,
+.highcontrast .nav-wrapper a,
+.highcontrast .tabs .tab a {
+    color: #ffff00 !important;
+}
+
+.highcontrast .tabs .tab a.active {
+    color: #ffffff !important;
+    border-bottom: 2px solid #ffff00;
+}
+
+.highcontrast #backToTopBtn {
+    background-color: #000000 !important;
+    color: #ffff00 !important;
+    border: 2px solid #ffff00;
+}
+
+.highcontrast .modal {
+    background-color: #000000;
+    color: #ffff00;
+    border: 2px solid #ffff00;
+}
+
+.highcontrast .modal-footer {
+    background-color: #000000;
+}
+
+.highcontrast .dropdown-content {
+    background-color: #000000 !important;
+    color: #ffff00 !important;
+    border: 2px solid #ffff00;
+}
+
+.highcontrast .dropdown-content li > a:hover {
+    background-color: #000080 !important;
+    color: #ffff00 !important;
+}
+
+/* High contrast icon styles */
+.highcontrast .material-icons {
+    color: #ffffff !important;
+    text-shadow: none !important;
+    font-size: 55px !important;
+}
+
+/* High contrast hover box outlines */
+.highcontrast .tooltip,
+.highcontrast .hover-box {
+    border: 2px solid #ffff00 !important;
+    box-shadow: 0 0 10px #ffff00 !important;
+}
+
+.highcontrast #view-more-chips {
+    color: #ffff00 !important;
+}
+.highcontrast #local-projects .card {
+    background-color: #000000;
+    color: #ffff00;
+    border: 2px solid #ffff00;
+    box-shadow: 0px 4px 6px rgba(255, 255, 0, 0.3);
+}
+
+.highcontrast #local-projects .card .card-title {
+    color: #ffff00 !important;
+}
+
+.highcontrast #local-projects .card .card-content {
+    color: #ffff00;
+}
+s .highcontrast #local-projects .card:hover {
+    background-color: #000080;
+    box-shadow: 0px 6px 8px rgba(255, 255, 0, 0.5);
+}
+
+.highcontrast #local-projects .card .btn {
+    background-color: #000000;
+    color: #ffff00;
+    border: 2px solid #ffff00;
+}
+
+.highcontrast #local-projects .card .btn:hover {
+    background-color: #000080;
+}
+
+.highcontrast #global-projects .card {
+    background-color: #000000;
+    color: #ffff00;
+    border: 2px solid #ffff00;
+    box-shadow: 0px 4px 6px rgba(255, 255, 0, 0.3);
+}
+
+.highcontrast #global-projects .card .card-title {
+    color: #ffff00 !important;
+}
+
+.highcontrast #global-projects .card .card-content {
+    color: #ffff00;
+}
+
+.highcontrast #global-projects .card:hover {
+    background-color: #000080;
+    box-shadow: 0px 6px 8px rgba(255, 255, 0, 0.5);
+}
+
+.highcontrast #global-projects .card .btn {
+    background-color: #000000;
+    color: #ffff00;
+    border: 2px solid #ffff00;
+}
+
+.highcontrast #global-projects .card .btn:hover {
+    background-color: #000080;
+}
+
+.highcontrast .modal-footer .btn-flat {
+    color: #ffff00 !important;
+    background-color: transparent !important;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-weight: bold;
+    border: 2px solid #ffff00;
+}
+
+.highcontrast .modal-footer .btn-flat:hover {
+    background-color: #000080 !important;
+    color: #ffff00 !important;
+}
+.highcontrast .close-button {
+    color: #ffff00;
+    font-size: 1.5rem;
+    transition: color 0.3s ease;
+}
+
+.highcontrast .close-button:hover {
+    color: #ffffff;
+}
+
+.highcontrast .select-wrapper {
+    position: relative;
+    height: 3rem;
+    line-height: 3rem;
+    margin-top: 0.5rem;
+}
+
+.highcontrast .select-wrapper input.select-dropdown {
+    color: #ffff00 !important;
+    font-size: 1rem;
+    line-height: normal;
+    padding-left: 10px;
+    height: 3rem;
+    box-sizing: border-box;
+    background-color: #000000 !important;
+    border: 2px solid #ffff00 !important;
+}
+
+.highcontrast .select-wrapper:after {
+    content: "\25BC";
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    color: #ffff00 !important;
+    font-size: 0.8rem;
+    pointer-events: none;
+}
+
+.highcontrast .dropdown-content {
+    background-color: #000000 !important;
+    border: 2px solid #ffff00;
+    color: #ffff00 !important;
+}
+
+.highcontrast .dropdown-content li > a {
+    color: #ffff00 !important;
+    padding: 0.5rem 1rem;
+}
+
+.highcontrast .dropdown-content li > a:hover {
+    background-color: #000080 !important;
+    color: #ffff00 !important;
+}
+
+/* High contrast icon styles */
+.highcontrast .material-icons {
+    color: #ffffff !important;
+    text-shadow: none !important;
+    font-size: 55px !important;
+}
+
+/* High contrast hover box outlines */
+.highcontrast .tooltip,
+.highcontrast .hover-box {
+    border: 2px solid #ffff00 !important;
+    box-shadow: 0 0 10px #ffff00 !important;
+}

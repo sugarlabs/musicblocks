@@ -312,7 +312,7 @@ class Activity {
         // When true, the stage needs to be redrawn on the next animation frame
         this.stageDirty = false;
 
-        this.themes = ["light", "dark"];
+        this.themes = ["light", "dark", "highcontrast"];
         try {
             for (let i = 0; i < this.themes.length; i++) {
                 if (this.themes[i] === this.storage.themePreference) {

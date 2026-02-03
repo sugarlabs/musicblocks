@@ -1,35 +1,79 @@
 /* Light Mode Defaults */
 body {
-  --bg: #e8e8e8;
-  --fg: #666666;
-  --overlay-bg: rgba(255, 255, 255, 0.75);
+    --bg: #e8e8e8;
+    --fg: #666666;
+    --overlay-bg: rgba(255, 255, 255, 0.75);
 }
 
 /* Dark Mode Overrides */
 body.dark {
-  --bg: #1d1d20;
-  --fg: #e8e8e8;
-  --overlay-bg: rgba(15, 15, 16, 0.75);
+    --bg: #1d1d20;
+    --fg: #e8e8e8;
+    --overlay-bg: rgba(15, 15, 16, 0.75);
 
-  background: var(--bg);
-  color: var(--fg);
+    background: var(--bg);
+    color: var(--fg);
+}
+
+/* High Contrast Mode Overrides */
+body.highcontrast {
+    --bg: #000000;
+    --fg: #ffffff;
+    --overlay-bg: rgba(0, 0, 0, 0.9);
+
+    background: var(--bg);
+    color: var(--fg);
+}
+
+/* High contrast icon styles */
+.highcontrast .material-icons {
+    color: #ffffff !important;
+    text-shadow: none !important;
+    font-size: 55px !important;
+}
+
+/* High contrast hover box outlines */
+.highcontrast .tooltip,
+.highcontrast .hover-box {
+    border: 2px solid #ffff00 !important;
+    box-shadow: 0 0 10px #ffff00 !important;
+}
+
+.highcontrast #helpBodyDiv {
+    background: #000000;
+    color: var(--fg);
+    border: 1px solid #ffffff;
+}
+
+.highcontrast #helpBodyDiv > .heading,
+.highcontrast #helpBodyDiv p {
+    color: var(--fg);
+}
+
+.highcontrast #floatingWindows .wfWinBody {
+    background-color: var(--bg) !important;
+}
+
+.highcontrast #floatingWindows .windowFrame {
+    background-color: var(--bg) !important;
+    border: 1px solid #ffffff;
 }
 
 /* Help widget colors */
 .dark #helpBodyDiv {
-  background: #505050;
-  color: var(--fg);
-} 
+    background: #505050;
+    color: var(--fg);
+}
 
 .dark #helpBodyDiv > .heading,
 .dark #helpBodyDiv p {
-  color: var(--fg);
+    color: var(--fg);
 }
 /* Fix white side bars in Help / Tour widget */
 .dark #floatingWindows .wfWinBody {
-  background-color: var(--bg) !important;
+    background-color: var(--bg) !important;
 }
 
 .dark #floatingWindows .windowFrame {
-  background-color: var(--bg) !important;
+    background-color: var(--bg) !important;
 }
