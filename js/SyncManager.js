@@ -158,12 +158,18 @@ define([], function () {
 
             try {
                 const currentProject = await this.activity.planet.openCurrentProject();
-                if (currentProject && currentProject.data) {
-                    return {
-                        data: currentProject.data,
-                        timestamp: currentProject.updated || currentProject.created,
-                        id: currentProject.id
-                    };
+                if (currentProject) {
+                    // Handle both wrapped object and plain data (array)
+                    const data = currentProject.data || (Array.isArray(currentProject) ? JSON.stringify(currentProject) : currentProject);
+                    const timestamp = currentProject.updated || currentProject.created || (this.activity.planet.getTimeLastSaved ? this.activity.planet.getTimeLastSaved() : Date.now());
+
+                    if (data) {
+                        return {
+                            data: data,
+                            timestamp: timestamp,
+                            id: currentProject.id || "current"
+                        };
+                    }
                 }
             } catch (error) {
                 console.debug("No cloud workspace found or error:", error);
@@ -278,6 +284,7 @@ define([], function () {
             const statusElement = document.getElementById("sync-status");
             if (!statusElement) return;
 
+            statusElement.style.display = "flex";
             const translate = typeof _ !== "undefined" ? _ : s => s;
 
             // Remove all status classes
