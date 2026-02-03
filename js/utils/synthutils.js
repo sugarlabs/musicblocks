@@ -3361,11 +3361,11 @@ function Synth() {
     this.createCentsSlider = function () {
         const widgetBody = this.widgetWindow.getWidgetBody();
 
-        // Store the current content to restore later
-        this.previousContent = widgetBody.innerHTML;
-
-        // Clear the widget body
-        widgetBody.innerHTML = "";
+        // Store the current content nodes to restore later
+        this.previousContent = [];
+        while (widgetBody.firstChild) {
+            this.previousContent.push(widgetBody.removeChild(widgetBody.firstChild));
+        }
 
         // Create the cents adjustment interface
         const centsInterface = document.createElement("div");
@@ -3495,8 +3495,18 @@ function Synth() {
      */
     this.removeCentsSlider = function () {
         if (this.sliderDiv && this.sliderDiv.parentNode) {
-            // Restore the previous content
-            this.widgetWindow.getWidgetBody().innerHTML = this.previousContent;
+            // Clear the widget body
+            const widgetBody = this.widgetWindow.getWidgetBody();
+            while (widgetBody.firstChild) {
+                widgetBody.removeChild(widgetBody.firstChild);
+            }
+            
+            // Restore the previous content nodes
+            if (this.previousContent && this.previousContent.length > 0) {
+                for (var i = 0; i < this.previousContent.length; i++) {
+                    widgetBody.appendChild(this.previousContent[i]);
+                }
+            }
             this.previousContent = null;
         }
         this.sliderVisible = false;
