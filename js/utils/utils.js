@@ -626,9 +626,8 @@ let fileBasename = file => {
  */
 function toTitleCase(str) {
     if (typeof str !== "string") return;
-    let tempStr = "";
-    if (str.length > 1) tempStr = str.substring(1);
-    return str.toUpperCase()[0] + tempStr;
+    if (str.length === 0) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 if (typeof module !== "undefined" && module.exports) {
@@ -672,6 +671,8 @@ const processPluginData = (activity, pluginData, pluginSource) => {
             return;
         }
 
+        // NOTE: This eval is required for the Plugin system to load dynamic block definitions.
+        // The content comes from plugin JSON files which satisfy the isTrustedPluginSource check.
         try {
             // eslint-disable-next-line no-eval
             eval(code);
@@ -1665,7 +1666,6 @@ let closeBlkWidgets = name => {
 
 /**
  * Safely resolves a dot-notation string path to an object property globally.
- * Tries safe resolution first, falls back to eval if needed for nested class properties.
  * @param {string} path - The dot-notation path (e.g., "MyClass.Model").
  * @returns {Object|undefined} The resolved object or undefined.
  */
@@ -1683,28 +1683,11 @@ const resolveObject = path => {
             return obj[prop];
         }, globalObj);
 
-        // If reduction succeeded but result is undefined, try eval as fallback
-        // This handles cases where nested class properties aren't enumerable
-        if (result === undefined) {
-            try {
-                // eslint-disable-next-line no-eval
-                return eval(path);
-            } catch (evalError) {
-                return undefined;
-            }
-        }
-
         return result;
     } catch (e) {
-        // Last resort: try eval
-        try {
-            // eslint-disable-next-line no-eval
-            return eval(path);
-        } catch (evalError) {
-            // eslint-disable-next-line no-console
-            console.warn("Failed to resolve object path: " + path, e);
-            return undefined;
-        }
+        // eslint-disable-next-line no-console
+        console.warn("Failed to resolve object path: " + path, e);
+        return undefined;
     }
 };
 
