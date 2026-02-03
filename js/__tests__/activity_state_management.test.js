@@ -45,7 +45,7 @@ describe("Activity State Management Functions", () => {
             // Mock turtles with coordinate conversion functions
             turtles: {
                 screenX2turtleX: screenX => screenX * 2, // Mock conversion
-                screenY2turtleY: screenY => screenY * 2  // Mock conversion
+                screenY2turtleY: screenY => screenY * 2 // Mock conversion
             },
 
             // ================================
@@ -57,7 +57,7 @@ describe("Activity State Management Functions", () => {
              * Retrieves the scale of the stage.
              * Source: activity.js lines 2599-2601
              */
-            getStageScale: function() {
+            getStageScale: function () {
                 return this.turtleBlocksScale;
             },
 
@@ -65,7 +65,7 @@ describe("Activity State Management Functions", () => {
              * Retrieves the X coordinate of the stage.
              * Source: activity.js lines 2607-2609
              */
-            getStageX: function() {
+            getStageX: function () {
                 return this.turtles.screenX2turtleX(this.stageX / this.turtleBlocksScale);
             },
 
@@ -73,7 +73,7 @@ describe("Activity State Management Functions", () => {
              * Retrieves the Y coordinate of the stage.
              * Source: activity.js lines 2615-2619
              */
-            getStageY: function() {
+            getStageY: function () {
                 return this.turtles.screenY2turtleY(
                     (this.stageY - this.toolbarHeight) / this.turtleBlocksScale
                 );
@@ -83,7 +83,7 @@ describe("Activity State Management Functions", () => {
              * Retrieves the mouse down state of the stage.
              * Source: activity.js lines 2625-2627
              */
-            getStageMouseDown: function() {
+            getStageMouseDown: function () {
                 return this.stageMouseDown;
             },
 
@@ -91,7 +91,7 @@ describe("Activity State Management Functions", () => {
              * Returns currentKeyCode
              * Source: activity.js lines 3447-3449
              */
-            getCurrentKeyCode: function() {
+            getCurrentKeyCode: function () {
                 return this.currentKeyCode;
             },
 
@@ -99,7 +99,7 @@ describe("Activity State Management Functions", () => {
              * Clears current key code to 0 and current key to empty string
              * Source: activity.js lines 3454-3457
              */
-            clearCurrentKeyCode: function() {
+            clearCurrentKeyCode: function () {
                 this.currentKey = "";
                 this.currentKeyCode = 0;
             }
@@ -353,7 +353,7 @@ describe("setSmallerLargerStatus", () => {
              * Sets the status of smaller/larger block icons.
              * Source: activity.js lines 2150-2178
              */
-            setSmallerLargerStatus: async function() {
+            setSmallerLargerStatus: async function () {
                 if (BLOCKSCALES[this.blockscale] < DEFAULTBLOCKSCALE) {
                     await mockChangeImage(
                         this.smallerContainer.children[0],
