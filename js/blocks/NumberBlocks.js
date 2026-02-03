@@ -24,11 +24,7 @@ function setupNumberBlocks(activity) {
         constructor() {
             super("int");
             this.setPalette("number", activity);
-            this.setHelpString([
-                _("The Int block returns an integer."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Int block returns an integer."), "documentation", ""]);
 
             this.formBlock({
                 name: _("int"),
@@ -41,7 +37,8 @@ function setupNumberBlocks(activity) {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "int"]);
             } else {
@@ -89,7 +86,8 @@ function setupNumberBlocks(activity) {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "mod"]);
             } else {
@@ -101,7 +99,7 @@ function setupNumberBlocks(activity) {
                     return 0;
                 } else {
                     let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                    if (typeof(a) === "string") {
+                    if (typeof a === "string") {
                         try {
                             a = parseInt(a);
                         } catch (e) {
@@ -111,7 +109,7 @@ function setupNumberBlocks(activity) {
                         }
                     }
                     let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                    if (typeof(b) === "string") {
+                    if (typeof b === "string") {
                         try {
                             b = parseInt(b);
                         } catch (e) {
@@ -158,7 +156,8 @@ function setupNumberBlocks(activity) {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "power"]);
             } else {
@@ -192,11 +191,7 @@ function setupNumberBlocks(activity) {
         constructor() {
             super("sqrt");
             this.setPalette("number", activity);
-            this.setHelpString([
-                _("The Sqrt block returns the square root."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Sqrt block returns the square root."), "documentation", ""]);
 
             this.formBlock({
                 name: _("sqrt"),
@@ -212,7 +207,8 @@ function setupNumberBlocks(activity) {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, activity.blocks.blockList[blk].name]);
             } else {
@@ -263,7 +259,8 @@ function setupNumberBlocks(activity) {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, activity.blocks.blockList[blk].name]);
             } else {
@@ -292,7 +289,9 @@ function setupNumberBlocks(activity) {
             super("distance");
             this.setPalette("number", activity);
             this.setHelpString([
-                _("The Distance block returns the distance between two points. For example, between the mouse and the center of the screen."),
+                _(
+                    "The Distance block returns the distance between two points. For example, between the mouse and the center of the screen."
+                ),
                 "documentation",
                 ""
             ]);
@@ -322,7 +321,8 @@ function setupNumberBlocks(activity) {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "distance"]);
             } else {
@@ -380,7 +380,8 @@ function setupNumberBlocks(activity) {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "divide"]);
             } else {
@@ -396,7 +397,7 @@ function setupNumberBlocks(activity) {
                     }
                 } else {
                     let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                    if (typeof(a) === "string") {
+                    if (typeof a === "string") {
                         try {
                             a = parseInt(a);
                         } catch (e) {
@@ -406,7 +407,7 @@ function setupNumberBlocks(activity) {
                         }
                     }
                     let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                    if (typeof(b) === "string") {
+                    if (typeof b === "string") {
                         try {
                             b = parseInt(b);
                         } catch (e) {
@@ -437,11 +438,7 @@ function setupNumberBlocks(activity) {
             this.setPalette("number", activity);
             this.beginnerBlock(true);
 
-            this.setHelpString([
-                _("The Multiply block is used to multiply."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Multiply block is used to multiply."), "documentation", ""]);
 
             this.fontsize = 14;
             this.formBlock({
@@ -459,7 +456,8 @@ function setupNumberBlocks(activity) {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "multiply"]);
             } else {
@@ -484,29 +482,28 @@ function setupNumberBlocks(activity) {
                     const cblk0 = activity.blocks.blockList[blk].connections[0];
 
                     let a, b;
-                    if (
-                        cblk0 !== null &&
-                        activity.blocks.blockList[cblk0].name === "pitch"
-                    ) {
+                    if (cblk0 !== null && activity.blocks.blockList[cblk0].name === "pitch") {
                         const noteBlock = activity.blocks.blockList[cblk0].connections[1];
 
-                        a = typeof activity.blocks.blockList[cblk1].value === "string" ?
-                            calcOctave(
-                                tur.singer.currentOctave,
-                                activity.blocks.blockList[cblk1].value,
-                                tur.singer.lastNotePlayed,
-                                activity.blocks.blockList[noteBlock].value
-                            ) :
-                            logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                        a =
+                            typeof activity.blocks.blockList[cblk1].value === "string"
+                                ? calcOctave(
+                                      tur.singer.currentOctave,
+                                      activity.blocks.blockList[cblk1].value,
+                                      tur.singer.lastNotePlayed,
+                                      activity.blocks.blockList[noteBlock].value
+                                  )
+                                : logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
 
-                        b = typeof activity.blocks.blockList[cblk2].value === "string" ?
-                            calcOctave(
-                                tur.singer.currentOctave,
-                                activity.blocks.blockList[cblk2].value,
-                                tur.singer.lastNotePlayed,
-                                activity.blocks.blockList[noteBlock].value
-                            ) :
-                            logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                        b =
+                            typeof activity.blocks.blockList[cblk2].value === "string"
+                                ? calcOctave(
+                                      tur.singer.currentOctave,
+                                      activity.blocks.blockList[cblk2].value,
+                                      tur.singer.lastNotePlayed,
+                                      activity.blocks.blockList[noteBlock].value
+                                  )
+                                : logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                         try {
                             return MathUtility.doMultiply(a, b);
                         } catch (e) {
@@ -516,7 +513,7 @@ function setupNumberBlocks(activity) {
                         }
                     } else {
                         a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                        if (typeof(a) === "string") {
+                        if (typeof a === "string") {
                             try {
                                 a = parseInt(a);
                             } catch (e) {
@@ -526,7 +523,7 @@ function setupNumberBlocks(activity) {
                             }
                         }
                         b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                        if (typeof(b) === "string") {
+                        if (typeof b === "string") {
                             try {
                                 b = parseInt(b);
                             } catch (e) {
@@ -570,7 +567,8 @@ function setupNumberBlocks(activity) {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "neg"]);
             } else {
@@ -579,7 +577,7 @@ function setupNumberBlocks(activity) {
                 if (cblk !== null) {
                     let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
 
-                    if (typeof(a) === "string") {
+                    if (typeof a === "string") {
                         try {
                             a = parseInt(a);
                         } catch (e) {
@@ -608,11 +606,7 @@ function setupNumberBlocks(activity) {
             this.setPalette("number", activity);
             this.beginnerBlock(true);
 
-            this.setHelpString([
-                _("The Minus block is used to subtract."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Minus block is used to subtract."), "documentation", ""]);
 
             this.fontsize = 14;
             this.formBlock({
@@ -630,7 +624,8 @@ function setupNumberBlocks(activity) {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "minus"]);
             } else {
@@ -655,32 +650,31 @@ function setupNumberBlocks(activity) {
                     const cblk0 = activity.blocks.blockList[blk].connections[0];
 
                     let a, b;
-                    if (
-                        cblk0 !== null &&
-                        activity.blocks.blockList[cblk0].name === "pitch"
-                    ) {
+                    if (cblk0 !== null && activity.blocks.blockList[cblk0].name === "pitch") {
                         const noteBlock = activity.blocks.blockList[cblk0].connections[1];
 
-                        a = typeof activity.blocks.blockList[cblk1].value === "string" ?
-                            calcOctave(
-                                tur.singer.currentOctave,
-                                activity.blocks.blockList[cblk1].value,
-                                tur.singer.lastNotePlayed,
-                                activity.blocks.blockList[noteBlock].value
-                            ) :
-                            logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                        a =
+                            typeof activity.blocks.blockList[cblk1].value === "string"
+                                ? calcOctave(
+                                      tur.singer.currentOctave,
+                                      activity.blocks.blockList[cblk1].value,
+                                      tur.singer.lastNotePlayed,
+                                      activity.blocks.blockList[noteBlock].value
+                                  )
+                                : logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
 
-                        b = typeof activity.blocks.blockList[cblk2].value === "string" ?
-                            calcOctave(
-                                tur.singer.currentOctave,
-                                activity.blocks.blockList[cblk2].value,
-                                tur.singer.lastNotePlayed,
-                                activity.blocks.blockList[noteBlock].value
-                            ) :
-                            logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                        b =
+                            typeof activity.blocks.blockList[cblk2].value === "string"
+                                ? calcOctave(
+                                      tur.singer.currentOctave,
+                                      activity.blocks.blockList[cblk2].value,
+                                      tur.singer.lastNotePlayed,
+                                      activity.blocks.blockList[noteBlock].value
+                                  )
+                                : logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                     } else {
                         a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                        if (typeof(a) === "string") {
+                        if (typeof a === "string") {
                             try {
                                 a = parseInt(a);
                             } catch (e) {
@@ -690,7 +684,7 @@ function setupNumberBlocks(activity) {
                             }
                         }
                         b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                        if (typeof(b) === "string") {
+                        if (typeof b === "string") {
                             try {
                                 b = parseInt(b);
                             } catch (e) {
@@ -719,11 +713,7 @@ function setupNumberBlocks(activity) {
             this.setPalette("number", activity);
             this.beginnerBlock(true);
 
-            this.setHelpString([
-                _("The Plus block is used to add."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Plus block is used to add."), "documentation", ""]);
 
             this.fontsize = 14;
             this.formBlock({
@@ -746,7 +736,8 @@ function setupNumberBlocks(activity) {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "plus"]);
             } else {
@@ -774,7 +765,6 @@ function setupNumberBlocks(activity) {
 
                     let a, b;
                     if (cblk0 !== null && activity.blocks.blockList[cblk0].name === "pitch") {
-                        
                         if (activity.blocks.blockList[cblk2].name === "accidentalname") {
                             let scaledegree;
                             if (activity.blocks.blockList[cblk1].name === "namedbox") {
@@ -792,34 +782,36 @@ function setupNumberBlocks(activity) {
                         } else {
                             const noteBlock = activity.blocks.blockList[cblk0].connections[1];
 
-                            a = typeof activity.blocks.blockList[cblk1].value === "string" ?
-                                calcOctave(
-                                    tur.singer.currentOctave,
-                                    activity.blocks.blockList[cblk1].value,
-                                    tur.singer.lastNotePlayed,
-                                    activity.blocks.blockList[noteBlock].value
-                                ) :
-                                logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                            a =
+                                typeof activity.blocks.blockList[cblk1].value === "string"
+                                    ? calcOctave(
+                                          tur.singer.currentOctave,
+                                          activity.blocks.blockList[cblk1].value,
+                                          tur.singer.lastNotePlayed,
+                                          activity.blocks.blockList[noteBlock].value
+                                      )
+                                    : logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
 
-                            b = typeof activity.blocks.blockList[cblk2].value === "string" ?
-                                calcOctave(
-                                    tur.singer.currentOctave,
-                                    activity.blocks.blockList[cblk2].value,
-                                    tur.singer.lastNotePlayed,
-                                    activity.blocks.blockList[noteBlock].value
-                                ) :
-                                logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                            b =
+                                typeof activity.blocks.blockList[cblk2].value === "string"
+                                    ? calcOctave(
+                                          tur.singer.currentOctave,
+                                          activity.blocks.blockList[cblk2].value,
+                                          tur.singer.lastNotePlayed,
+                                          activity.blocks.blockList[noteBlock].value
+                                      )
+                                    : logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                         }
                     } else {
                         a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                         b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                     }
-                    
+
                     if (!isNaN(a) && !isNaN(b)) {
                         return MathUtility.doPlus(a, b);
                     } else {
                         try {
-                            return(MathUtility.doPlus(a, b));
+                            return MathUtility.doPlus(a, b);
                         } catch (e) {
                             activity.errorMsg(NOINPUTERRORMSG, blk);
                             // eslint-disable-next-line no-console
@@ -827,11 +819,11 @@ function setupNumberBlocks(activity) {
                             // eslint-disable-next-line no-console
                             console.debug(e);
                             if (!isNaN(a)) {
-                                return(a);
+                                return a;
                             } else if (!isNaN(b)) {
-                                return(b);
+                                return b;
                             }
-                            return (0);
+                            return 0;
                         }
                     }
                 }
@@ -937,7 +929,7 @@ function setupNumberBlocks(activity) {
             const cblk0 = activity.blocks.blockList[blk].connections[0];
             const cblk1 = activity.blocks.blockList[blk].connections[1];
             const cblk2 = activity.blocks.blockList[blk].connections[2];
-            
+
             if (cblk1 === null || cblk2 === null) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
@@ -982,11 +974,7 @@ function setupNumberBlocks(activity) {
             this.setPalette("number", activity);
             this.beginnerBlock(true);
 
-            this.setHelpString([
-                _("The Number block holds a number."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Number block holds a number."), "documentation", ""]);
         }
 
         arg(logo, turtle, blk) {

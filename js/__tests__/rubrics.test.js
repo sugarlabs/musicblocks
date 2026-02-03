@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-global._ = (str) => str;
+global._ = str => str;
 const {
     TACAT,
     TAPAL,
@@ -42,11 +42,10 @@ jest.mock("../utils/musicutils", () => ({
     getTemperament: jest.fn(() => [])
 }));
 jest.mock("../utils/utils.js", () => ({
-    _: jest.fn((str) => str)
+    _: jest.fn(str => str)
 }));
 
 describe("rubrics.js test suite", () => {
-    
     describe("analyzeProject", () => {
         it("should return an array of scores", () => {
             const activity = {
@@ -115,18 +114,16 @@ describe("rubrics.js test suite", () => {
                     runLogoCommands: jest.fn()
                 },
                 turtles: {
-                    turtleList: [
-                        { painter: { doClear: jest.fn() } }
-                    ],
+                    turtleList: [{ painter: { doClear: jest.fn() } }],
                     getTurtleCount: jest.fn(() => 1),
-                    getTurtle: jest.fn((id) => ({
+                    getTurtle: jest.fn(id => ({
                         painter: { doClear: jest.fn() }
                     }))
                 }
             };
 
             runAnalytics(activity);
-            
+
             expect(activity.logo.runningLilypond).toBe(true);
             expect(activity.logo.collectingStats).toBe(true);
             expect(activity.logo.runLogoCommands).toHaveBeenCalled();
@@ -145,11 +142,17 @@ describe("rubrics.js test suite", () => {
                     },
                     synth: {
                         inTemperament: false,
-                        _getFrequency: jest.fn((note) => note.length * 100)
+                        _getFrequency: jest.fn(note => note.length * 100)
                     }
                 },
                 blocks: {
-                    blockList: [{ name: "rest2", trash: false, protoblock: { palette: { name: "ornaments" } } }]
+                    blockList: [
+                        {
+                            name: "rest2",
+                            trash: false,
+                            protoblock: { palette: { name: "ornaments" } }
+                        }
+                    ]
                 }
             };
 
@@ -161,5 +164,4 @@ describe("rubrics.js test suite", () => {
             expect(stats).toHaveProperty("ornaments", 1);
         });
     });
-
 });

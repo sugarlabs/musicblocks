@@ -95,6 +95,13 @@ class Painter {
         this._hollowState = false;
         this._penDown = true;
         this.wrap = null;
+
+        // Performance optimizations: DOM caching and RAF-based updates
+        this._cachedCanvas = null;
+        this._cachedCanvasWidth = 0;
+        this._cachedCanvasHeight = 0;
+        this._pendingCanvasUpdate = false;
+        this._rafId = null;
     }
 
     // ========= Setters, Getters =============================================
@@ -216,6 +223,48 @@ class Painter {
      */
     get penState() {
         return this._penDown;
+    }
+
+    /**
+     * Schedules a canvas update using requestAnimationFrame for optimal performance.
+     * Batches multiple update requests into a single frame to reduce overhead.
+     *
+     * @private
+     */
+    _scheduleCanvasUpdate() {
+        if (this._pendingCanvasUpdate) {
+            return; // Already scheduled
+        }
+
+        this._pendingCanvasUpdate = true;
+        this._rafId = requestAnimationFrame(() => {
+            this._pendingCanvasUpdate = false;
+            this._rafId = null;
+            this.activity.refreshCanvas();
+        });
+    }
+
+    /**
+     * Gets cached canvas dimensions, updating cache if canvas reference changed.
+     * Separates read operations to prevent layout thrashing.
+     *
+     * @private
+     * @returns {Object} Object with width and height properties
+     */
+    _getCanvasDimensions() {
+        const currentCanvas = this.turtle.ctx.canvas;
+
+        // Update cache if canvas reference changed or not yet cached
+        if (this._cachedCanvas !== currentCanvas) {
+            this._cachedCanvas = currentCanvas;
+            this._cachedCanvasWidth = currentCanvas.width;
+            this._cachedCanvasHeight = currentCanvas.height;
+        }
+
+        return {
+            width: this._cachedCanvasWidth,
+            height: this._cachedCanvasHeight
+        };
     }
 
     // ========= Utilities ====================================================
@@ -345,26 +394,40 @@ class Painter {
 
             if (linePart) {
                 this.turtle.ctx.lineCap = "butt";
-                if(linePart === "first"){
+                if (linePart === "first") {
                     this.turtle.ctx.beginPath();
-                    this.turtle.ctx.arc(ox, oy, (this.stroke/2), capAngleRadians, Math.PI + capAngleRadians, false);
+                    this.turtle.ctx.arc(
+                        ox,
+                        oy,
+                        this.stroke / 2,
+                        capAngleRadians,
+                        Math.PI + capAngleRadians,
+                        false
+                    );
                     this.turtle.ctx.fill();
                 }
-                
+
                 this.turtle.ctx.beginPath();
                 this.turtle.ctx.moveTo(ox, oy);
                 this.turtle.ctx.lineTo(nx, ny);
                 this.turtle.ctx.stroke();
-            
-                if(linePart === "last"){
+
+                if (linePart === "last") {
                     this.turtle.ctx.beginPath();
-                    this.turtle.ctx.arc(nx, ny, (this.stroke/2), capAngleRadians, Math.PI + capAngleRadians, true);
+                    this.turtle.ctx.arc(
+                        nx,
+                        ny,
+                        this.stroke / 2,
+                        capAngleRadians,
+                        Math.PI + capAngleRadians,
+                        true
+                    );
                     this.turtle.ctx.fill();
                 }
             } else {
                 this.turtle.ctx.lineTo(nx, ny);
             }
-            
+
             if (!this._svgPath) {
                 this._svgPath = true;
                 const oxScaled = ox * turtlesScale;
@@ -374,7 +437,7 @@ class Painter {
             const nxScaled = nx * turtlesScale;
             const nyScaled = ny * turtlesScale;
             this._svgOutput += nxScaled + "," + nyScaled + " ";
-            if(!linePart) this.turtle.ctx.stroke();
+            if (!linePart) this.turtle.ctx.stroke();
             if (!this._fillState) {
                 this.turtle.ctx.closePath();
             }
@@ -667,7 +730,7 @@ class Painter {
             this.doRight(adeg);
         }
 
-        this.activity.refreshCanvas();
+        this._scheduleCanvasUpdate();
     }
 
     /**
@@ -736,8 +799,10 @@ class Painter {
         let nx = ox + Number(steps) * Math.sin(angleRadians);
         let ny = oy + Number(steps) * Math.cos(angleRadians);
 
-        const w = this.turtle.ctx.canvas.width;
-        const h = this.turtle.ctx.canvas.height;
+        // Batch read operations: get canvas dimensions once
+        const dimensions = this._getCanvasDimensions();
+        const w = dimensions.width;
+        const h = dimensions.height;
 
         const out = this._outOfBounds(
             turtles.turtleX2screenX(nx),
@@ -750,7 +815,7 @@ class Painter {
 
         if (this._fillState || !wrap || !out) {
             this._move(ox, oy, nx, ny, true, linePart);
-            this.activity.refreshCanvas();
+            this._scheduleCanvasUpdate();
         } else {
             const stepUnit = 5;
             let xIncrease, yIncrease;
@@ -797,7 +862,12 @@ class Painter {
                 steps -= stepUnit;
             }
 
-            this.activity.refreshCanvas();
+            this._scheduleCanvasUpdate();
+        }
+        // Update media positions
+        const view = this.turtle._view;
+        if (view && typeof view._updateMediaPositions === "function") {
+            view._updateMediaPositions();
         }
     }
 
@@ -846,7 +916,11 @@ class Painter {
         const ny = Number(y);
 
         this._move(ox, oy, nx, ny, true);
-        this.activity.refreshCanvas();
+        this._scheduleCanvasUpdate();
+        const view = this.turtle._view;
+        if (view && typeof view._updateMediaPositions === "function") {
+            view._updateMediaPositions();
+        }
     }
 
     /**
@@ -1143,8 +1217,17 @@ class Painter {
      * Clears the media layer
      */
     doClearMedia() {
+        if (!this.turtle.media || this.turtle.media.length === 0) {
+            return;
+        }
+        const gifAnimator = this.activity.gifAnimator;
         // Clear all media
         for (let i = 0; i < this.turtle.media.length; i++) {
+            const item = this.turtle.media[i];
+            if (item.type === "gif" && gifAnimator) {
+                //Stop GIF animation
+                item.stop();
+            }
             // Could be in the image Container or the Stage
             this.turtle.imageContainer.removeChild(this.turtle.media[i]);
             this.turtles.stage.removeChild(this.turtle.media[i]);
@@ -1201,8 +1284,7 @@ class Painter {
 
                 this.turtle.doTurtleShell(
                     55,
-                    "data:image/svg+xml;base64," +
-                        window.btoa(base64Encode(artwork))
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(artwork))
                 );
                 this.turtle.skinChanged = false;
             }
@@ -1252,7 +1334,7 @@ class Painter {
             );
         }
         this.turtle.penstrokes.image = this.turtle.canvas;
-        this.activity.refreshCanvas();
+        this._scheduleCanvasUpdate();
     }
 
     /**
@@ -1325,20 +1407,14 @@ class Painter {
                 this.turtle.ctx.lineWidth = turtle.painter.stroke;
                 this.turtle.ctx.lineCap = "round";
                 this.turtle.ctx.beginPath();
-                this.turtle.ctx.moveTo(
-                    turtle.container.x + dx,
-                    turtle.container.y + dy
-                );
-                this.turtle.ctx.lineTo(
-                    turtle.container.x,
-                    turtle.container.y
-                );
+                this.turtle.ctx.moveTo(turtle.container.x + dx, turtle.container.y + dy);
+                this.turtle.ctx.lineTo(turtle.container.x, turtle.container.y);
                 this.turtle.ctx.stroke();
                 this.turtle.ctx.closePath();
             }
         }
 
-        this.activity.refreshCanvas();
+        this._scheduleCanvasUpdate();
     }
 
     /**
