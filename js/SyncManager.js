@@ -160,8 +160,17 @@ define([], function () {
                 const currentProject = await this.activity.planet.openCurrentProject();
                 if (currentProject) {
                     // Handle both wrapped object and plain data (array)
-                    const data = currentProject.data || (Array.isArray(currentProject) ? JSON.stringify(currentProject) : currentProject);
-                    const timestamp = currentProject.updated || currentProject.created || (this.activity.planet.getTimeLastSaved ? this.activity.planet.getTimeLastSaved() : Date.now());
+                    const data =
+                        currentProject.data ||
+                        (Array.isArray(currentProject)
+                            ? JSON.stringify(currentProject)
+                            : currentProject);
+                    const timestamp =
+                        currentProject.updated ||
+                        currentProject.created ||
+                        (this.activity.planet.getTimeLastSaved
+                            ? this.activity.planet.getTimeLastSaved()
+                            : Date.now());
 
                     if (data) {
                         return {

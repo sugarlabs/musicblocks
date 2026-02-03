@@ -199,7 +199,7 @@ class PlanetInterface {
          * Function to save the current project locally.
          * Prepares project data for export, generates SVG data, and saves the project data locally.
          */
-        this.saveLocally = (data) => {
+        this.saveLocally = data => {
             if (typeof this.activity.stage.update === "function") {
                 this.activity.stage.update();
             }
