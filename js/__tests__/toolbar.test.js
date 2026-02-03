@@ -95,7 +95,7 @@ describe("Toolbar Class", () => {
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ true", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = true;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(137);
+        expect(global._).toHaveBeenCalledTimes(139);
         expect(global._).toHaveBeenNthCalledWith(1, "About Music Blocks");
     });
 

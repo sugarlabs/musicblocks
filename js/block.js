@@ -2984,6 +2984,12 @@ class Block {
                 y: event.stageY / that.activity.getStageScale()
             };
 
+            // Save initial position for undo/redo
+            if (that.activity.undoRedoManager) {
+                that._undoStartX = that.container.x;
+                that._undoStartY = that.container.y;
+            }
+
             that.offset = {
                 x: Math.round(that.container.x - that.original.x),
                 y: Math.round(that.container.y - that.original.y)
@@ -3203,6 +3209,25 @@ class Block {
                 // the move (workaround for issue #38 -- Blocks fly
                 // apart). Still need to get to the root cause.
                 this.blocks.adjustDocks(this.blocks.blockList.indexOf(this), true);
+
+                // Save state for undo/redo functionality AFTER adjustDocks
+                if (this.activity.undoRedoManager && this._undoStartX !== undefined && this._undoStartY !== undefined) {
+                    // Get the final position after all adjustments
+                    const currentX = this.container.x;
+                    const currentY = this.container.y;
+                    
+                    this.activity.undoRedoManager.saveState('block_moved', {
+                        blockName: this.name,
+                        oldX: this._undoStartX,
+                        oldY: this._undoStartY,
+                        newX: currentX,
+                        newY: currentY
+                    });
+                    
+                    // Clear the start position
+                    this._undoStartX = undefined;
+                    this._undoStartY = undefined;
+                }
             }
         } else if (SPECIALINPUTS.includes(this.name) || ["media", "loadFile"].includes(this.name)) {
             if (!haveClick) {

@@ -51,12 +51,14 @@ class UndoRedoManager {
         };
 
         this.undoStack.push(state);
-        this.redoStack = []; // Clear redo stack when new action is performed
 
         // Limit stack size
         if (this.undoStack.length > MAX_UNDO_REDO_STACK_SIZE) {
             this.undoStack.shift();
         }
+
+        // Clear redo stack when new action is performed
+        this.redoStack = [];
 
         this.updateUI();
     }
@@ -246,9 +248,27 @@ class UndoRedoManager {
     undoBlockMoved(data) {
         const block = this.activity.blocks.blockList.find(b => b.name === data.blockName);
         if (block) {
+            // Update position using both container and block properties
             block.container.x = data.oldX;
             block.container.y = data.oldY;
+            
+            // Also update block's own position properties if they exist
+            if (block.x !== undefined) block.x = data.oldX;
+            if (block.y !== undefined) block.y = data.oldY;
+            
+            // Cache the container before updating
+            block.container.cache();
+            
+            // Force update of the container
+            block.container.updateCache();
+            
+            // Refresh the canvas
             this.activity.refreshCanvas();
+            
+            // Also update the stage
+            if (this.activity.stage) {
+                this.activity.stage.update();
+            }
         }
     }
 
