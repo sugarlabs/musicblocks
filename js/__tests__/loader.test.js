@@ -40,7 +40,7 @@ describe("Loader Module", () => {
         originalRequirejs = global.requirejs;
 
         // Mock console.error
-        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
         // Mock i18next
         mockI18next = {
