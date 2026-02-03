@@ -40,7 +40,7 @@ describe("Loader Module", () => {
         originalRequirejs = global.requirejs;
 
         // Mock console.error
-        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
         // Mock i18next
         mockI18next = {
@@ -112,11 +112,13 @@ describe("Loader Module", () => {
         });
 
         it("should configure easel shim with createjs export", () => {
-            expect(capturedConfig.shim).toEqual(expect.objectContaining({
-                easel: {
-                    exports: "createjs"
-                }
-            }));
+            expect(capturedConfig.shim).toEqual(
+                expect.objectContaining({
+                    easel: {
+                        exports: "createjs"
+                    }
+                })
+            );
         });
 
         it("should configure utils path", () => {
@@ -253,7 +255,9 @@ describe("Loader Module", () => {
             onHandler();
 
             expect(mockI18next.t).toHaveBeenCalledWith("title");
-            expect(document.querySelector('[data-i18n="title"]').textContent).toBe("translated_title");
+            expect(document.querySelector('[data-i18n="title"]').textContent).toBe(
+                "translated_title"
+            );
         });
     });
 
@@ -275,7 +279,9 @@ describe("Loader Module", () => {
             );
 
             // Verify handler works when triggered
-            const handler = addEventListenerSpy.mock.calls.find(c => c[0] === "DOMContentLoaded")[1];
+            const handler = addEventListenerSpy.mock.calls.find(
+                c => c[0] === "DOMContentLoaded"
+            )[1];
             mockI18next.t.mockClear();
             handler();
             expect(mockI18next.t).toHaveBeenCalled();
@@ -321,7 +327,10 @@ describe("Loader Module", () => {
 
             await loadLoader();
 
-            expect(consoleErrorSpy).toHaveBeenCalledWith("Error changing language:", expect.any(Error));
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
+                "Error changing language:",
+                expect.any(Error)
+            );
         });
     });
 
