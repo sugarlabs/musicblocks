@@ -12,7 +12,7 @@
 /*
    global
 
-   _
+   _, toTitleCase
 */
 /*
    exported
