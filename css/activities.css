@@ -1094,9 +1094,20 @@ table {
 #left-arrow {
   position: absolute;
   background-size: 40px;
-  top: 195px;
+  top: 50%;
+  transform: translateY(-50%);
   height: 40px;
   width: 40px;
+  z-index: 1000;
+}
+
+#left-arrow {
+  left: 10px;
+}
+
+#right-arrow {
+  right: 10px;
+  left: auto;
 }
 
 .hover:hover {
@@ -1111,6 +1122,14 @@ table {
     width: 30px;
     background-size: 30px;
   }
+
+  #left-arrow {
+    left: 8px;
+  }
+
+  #right-arrow {
+    right: 8px;
+  }
 }
 
 @media (max-width: 450px) {
@@ -1121,6 +1140,14 @@ table {
     width: 25px;
     background-size: 25px;
   }
+
+  #left-arrow {
+    left: 5px;
+  }
+
+  #right-arrow {
+    right: 5px;
+  }
 }
 
 @media (max-width: 320px) {
@@ -1130,6 +1157,14 @@ table {
     height: 20px;
     width: 20px;
     background-size: 20px;
+  }
+
+  #left-arrow {
+    left: 3px;
+  }
+
+  #right-arrow {
+    right: 3px;
   }
 }
 
@@ -1195,13 +1230,14 @@ table {
 
 #helpBodyDiv {
   position: relative;
-  margin: 0 auto !important;
-  left: 0 !important;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
   border: 0 !important;
   overflow-x: hidden;
   overflow-y: auto;
-  width: calc(100% - 130px) !important;
-  max-width: 350px;
+  width: 350px;
+  background: #e8e8e8 !important;
   padding: 1rem 1rem 0 1rem;
   display: flex;
   flex-direction: column;
