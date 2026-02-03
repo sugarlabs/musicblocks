@@ -40,7 +40,7 @@ define([], function () {
                 try {
                     const request = indexedDB.open(this.dbName, 2);
 
-                    request.onupgradeneeded = (event) => {
+                    request.onupgradeneeded = event => {
                         const db = event.target.result;
 
                         // Create workspace store
@@ -56,19 +56,21 @@ define([], function () {
 
                         // Create sync queue store
                         if (!db.objectStoreNames.contains("syncQueue")) {
-                            const syncStore = db.createObjectStore("syncQueue", { autoIncrement: true });
+                            const syncStore = db.createObjectStore("syncQueue", {
+                                autoIncrement: true
+                            });
                             syncStore.createIndex("timestamp", "timestamp", { unique: false });
                         }
                     };
 
-                    request.onsuccess = (event) => {
+                    request.onsuccess = event => {
                         this.db = event.target.result;
                         console.debug("WorkspaceStorage initialized with versioning");
                         this._startAutoSave();
                         resolve();
                     };
 
-                    request.onerror = (event) => {
+                    request.onerror = event => {
                         console.error("WorkspaceStorage init failed", event.target.error);
                         reject(event.target.error);
                     };
@@ -112,7 +114,7 @@ define([], function () {
             const indicator = document.getElementById("network-status");
             if (indicator) {
                 const icon = indicator.querySelector("i");
-                const translate = typeof _ !== "undefined" ? _ : (s) => s;
+                const translate = typeof _ !== "undefined" ? _ : s => s;
                 const status = this.isOnline ? translate("Online") : translate("Offline");
 
                 if (this.isOnline) {
@@ -171,7 +173,7 @@ define([], function () {
                         this.lastSaveTime = timestamp;
                         resolve();
                     };
-                    transaction.onerror = (event) => reject(event.target.error);
+                    transaction.onerror = event => reject(event.target.error);
                 });
 
                 // Queue for sync if online
@@ -198,7 +200,7 @@ define([], function () {
                 const request = store.get("current_workspace");
 
                 request.onsuccess = () => resolve(request.result);
-                request.onerror = (event) => reject(event.target.error);
+                request.onerror = event => reject(event.target.error);
             });
         }
 
@@ -214,7 +216,7 @@ define([], function () {
                 const request = store.get("current_version");
 
                 request.onsuccess = () => resolve(request.result);
-                request.onerror = (event) => reject(event.target.error);
+                request.onerror = event => reject(event.target.error);
             });
         }
 

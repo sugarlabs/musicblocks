@@ -54,7 +54,7 @@ define([], function () {
          * Creates the conflict resolution dialog UI.
          */
         _createDialog() {
-            const translate = typeof _ !== "undefined" ? _ : (s) => s;
+            const translate = typeof _ !== "undefined" ? _ : s => s;
 
             this.dialog = document.createElement("div");
             this.dialog.id = "conflict-dialog";
@@ -72,7 +72,9 @@ define([], function () {
                     
                     <div class="conflict-body">
                         <p class="conflict-message">
-                            ${translate("Your workspace has been modified both locally and in the cloud. Please choose which version to keep:")}
+                            ${translate(
+                                "Your workspace has been modified both locally and in the cloud. Please choose which version to keep:"
+                            )}
                         </p>
                         
                         <div class="conflict-options">
@@ -82,8 +84,12 @@ define([], function () {
                                     <h3>${translate("Local Version")}</h3>
                                 </div>
                                 <div class="option-details">
-                                    <p><strong>${translate("Last modified")}:</strong> ${localTime}</p>
-                                    <p class="option-description">${translate("Keep your local changes and upload them to the cloud")}</p>
+                                    <p><strong>${translate(
+                                        "Last modified"
+                                    )}:</strong> ${localTime}</p>
+                                    <p class="option-description">${translate(
+                                        "Keep your local changes and upload them to the cloud"
+                                    )}</p>
                                 </div>
                                 <button class="conflict-btn local-btn" id="keep-local-btn">
                                     <i class="material-icons">computer</i>
@@ -97,8 +103,12 @@ define([], function () {
                                     <h3>${translate("Cloud Version")}</h3>
                                 </div>
                                 <div class="option-details">
-                                    <p><strong>${translate("Last modified")}:</strong> ${cloudTime}</p>
-                                    <p class="option-description">${translate("Download the cloud version and overwrite your local changes")}</p>
+                                    <p><strong>${translate(
+                                        "Last modified"
+                                    )}:</strong> ${cloudTime}</p>
+                                    <p class="option-description">${translate(
+                                        "Download the cloud version and overwrite your local changes"
+                                    )}</p>
                                 </div>
                                 <button class="conflict-btn cloud-btn" id="keep-cloud-btn">
                                     <i class="material-icons">cloud_download</i>
@@ -109,7 +119,9 @@ define([], function () {
                         
                         <div class="conflict-warning">
                             <i class="material-icons">info</i>
-                            <p>${translate("Warning: The version you don't choose will be lost. Make sure to download a backup before proceeding if needed.")}</p>
+                            <p>${translate(
+                                "Warning: The version you don't choose will be lost. Make sure to download a backup before proceeding if needed."
+                            )}</p>
                         </div>
                     </div>
                     
@@ -137,7 +149,7 @@ define([], function () {
             });
 
             // Close on overlay click
-            this.dialog.addEventListener("click", (e) => {
+            this.dialog.addEventListener("click", e => {
                 if (e.target === this.dialog) {
                     this.hide();
                 }
@@ -149,15 +161,18 @@ define([], function () {
          */
         async _onResolve(choice) {
             const buttons = this.dialog.querySelectorAll("button");
-            buttons.forEach(btn => btn.disabled = true);
+            buttons.forEach(btn => (btn.disabled = true));
 
             // Show loading state
-            const chosenBtn = choice === "local"
-                ? document.getElementById("keep-local-btn")
-                : document.getElementById("keep-cloud-btn");
+            const chosenBtn =
+                choice === "local"
+                    ? document.getElementById("keep-local-btn")
+                    : document.getElementById("keep-cloud-btn");
 
             const originalText = chosenBtn.innerHTML;
-            chosenBtn.innerHTML = `<i class="material-icons rotating">sync</i> ${typeof _ !== "undefined" ? _("Resolving...") : "Resolving..."}`;
+            chosenBtn.innerHTML = `<i class="material-icons rotating">sync</i> ${
+                typeof _ !== "undefined" ? _("Resolving...") : "Resolving..."
+            }`;
 
             try {
                 await this.syncManager.resolveConflict(choice, this.localMetadata, this.cloudData);
@@ -165,7 +180,7 @@ define([], function () {
             } catch (error) {
                 alert("Failed to resolve conflict: " + error.message);
                 chosenBtn.innerHTML = originalText;
-                buttons.forEach(btn => btn.disabled = false);
+                buttons.forEach(btn => (btn.disabled = false));
             }
         }
     }

@@ -139,7 +139,6 @@ define([], function () {
 
                 this.lastSyncTime = Date.now();
                 this._updateSyncStatus("synced");
-
             } catch (error) {
                 console.error("Sync failed:", error);
                 this._updateSyncStatus("error");
@@ -279,7 +278,7 @@ define([], function () {
             const statusElement = document.getElementById("sync-status");
             if (!statusElement) return;
 
-            const translate = typeof _ !== "undefined" ? _ : (s) => s;
+            const translate = typeof _ !== "undefined" ? _ : s => s;
 
             // Remove all status classes
             statusElement.classList.remove("syncing", "synced", "error", "conflict");
