@@ -30,9 +30,15 @@ class DummyFlowBlock {
         this.displayName = displayName || name;
         createdBlocks[name] = this;
     }
-    setPalette(palette, activity) { return this; }
-    beginnerBlock(flag) { return this; }
-    setHelpString(helpArr) { return this; }
+    setPalette(palette, activity) {
+        return this;
+    }
+    beginnerBlock(flag) {
+        return this;
+    }
+    setHelpString(helpArr) {
+        return this;
+    }
     formBlock(config) {
         this.config = config;
         return this;
@@ -41,8 +47,10 @@ class DummyFlowBlock {
         this.macro = fn;
         return this;
     }
-    setup(activity) { return this; }
-    flow() { }
+    setup(activity) {
+        return this;
+    }
+    flow() {}
 }
 
 class DummyValueBlock {
@@ -52,9 +60,15 @@ class DummyValueBlock {
         createdBlocks[name] = this;
         this.extraWidth = 0;
     }
-    setPalette(palette, activity) { return this; }
-    beginnerBlock(flag) { return this; }
-    setHelpString(helpArr) { return this; }
+    setPalette(palette, activity) {
+        return this;
+    }
+    beginnerBlock(flag) {
+        return this;
+    }
+    setHelpString(helpArr) {
+        return this;
+    }
     formBlock(config) {
         this.config = config;
         return this;
@@ -63,7 +77,9 @@ class DummyValueBlock {
         this.macro = fn;
         return this;
     }
-    setup(activity) { return this; }
+    setup(activity) {
+        return this;
+    }
 }
 
 class DummyLeftBlock {
@@ -72,9 +88,15 @@ class DummyLeftBlock {
         this.displayName = displayName || name;
         createdBlocks[name] = this;
     }
-    setPalette(palette, activity) { return this; }
-    beginnerBlock(flag) { return this; }
-    setHelpString(helpArr) { return this; }
+    setPalette(palette, activity) {
+        return this;
+    }
+    beginnerBlock(flag) {
+        return this;
+    }
+    setHelpString(helpArr) {
+        return this;
+    }
     formBlock(config) {
         this.config = config;
         return this;
@@ -83,13 +105,15 @@ class DummyLeftBlock {
         this.macro = fn;
         return this;
     }
-    setup(activity) { return this; }
+    setup(activity) {
+        return this;
+    }
 }
 
 global.FlowBlock = DummyFlowBlock;
 global.ValueBlock = DummyValueBlock;
 global.LeftBlock = DummyLeftBlock;
-global._ = jest.fn((str) => str);
+global._ = jest.fn(str => str);
 
 global.NOINPUTERRORMSG = "No input provided";
 global.NOBOXERRORMSG = "No box error";
@@ -108,7 +132,9 @@ describe("setupBoxesBlocks", () => {
                 blockList: {}
             },
             blockSetter: jest.fn((logo, cblk, value, turtle) => {
-                const key = activity.blocks.blockList[cblk].privateData || activity.blocks.blockList[cblk].value;
+                const key =
+                    activity.blocks.blockList[cblk].privateData ||
+                    activity.blocks.blockList[cblk].value;
                 logo.boxes[key] = value;
             }),
             beginnerMode: false
@@ -156,9 +182,14 @@ describe("setupBoxesBlocks", () => {
 
         test("should catch error and call errorMsg when blockSetter throws", () => {
             activity.blocks.blockList[200] = { name: "other", value: "unused" };
-            activity.blocks.blockSetter = jest.fn(() => { throw new Error("fail"); });
+            activity.blocks.blockSetter = jest.fn(() => {
+                throw new Error("fail");
+            });
             incrementBlock.flow([10, 2], logo, "turtle0", blkId);
-            expect(activity.errorMsg).toHaveBeenCalledWith("Block does not support incrementing.", 200);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Block does not support incrementing.",
+                200
+            );
         });
     });
 
@@ -324,7 +355,9 @@ describe("setupBoxesBlocks", () => {
         const testBlk = 160;
         beforeEach(() => {
             box2Block = createdBlocks["box2"];
-            box2Block.macro = jest.fn((x, y) => [[0, ["namedbox", { value: "box2" }], x, y, [null]]]);
+            box2Block.macro = jest.fn((x, y) => [
+                [0, ["namedbox", { value: "box2" }], x, y, [null]]
+            ]);
         });
 
         test("should create a macro returning expected configuration", () => {
@@ -359,7 +392,9 @@ describe("setupBoxesBlocks", () => {
         const testBlk = 180;
         beforeEach(() => {
             box1Block = createdBlocks["box1"];
-            box1Block.macro = jest.fn((x, y) => [[0, ["namedbox", { value: "box1" }], x, y, [null]]]);
+            box1Block.macro = jest.fn((x, y) => [
+                [0, ["namedbox", { value: "box1" }], x, y, [null]]
+            ]);
         });
 
         test("should create a macro returning expected configuration", () => {

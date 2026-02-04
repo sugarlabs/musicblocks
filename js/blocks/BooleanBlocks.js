@@ -779,7 +779,6 @@ function setupBooleanBlocks(activity) {
      * @extends {BooleanBlock}
      */
 
-
     class EqualBlock extends BooleanBlock {
         /**
          * Constructs an EqualBlock.
@@ -886,7 +885,6 @@ function setupBooleanBlocks(activity) {
      * @extends {BooleanBlock}
      */
 
-
     class NotEqualToBlock extends BooleanBlock {
         /**
          * Constructs an NotEqualToBlock.
@@ -906,7 +904,9 @@ function setupBooleanBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Not-equal-to block returns True if the two numbers are not equal to each other."),
+                _(
+                    "The Not-equal-to block returns True if the two numbers are not equal to each other."
+                ),
                 "documentation",
                 ""
             ]);

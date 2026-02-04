@@ -30,15 +30,16 @@ global.Midi = jest.fn().mockImplementation(() => ({
 
 global.jQuery = jest.fn(() => ({
     on: jest.fn(),
-    trigger: jest.fn(),
+    trigger: jest.fn()
 }));
 global.jQuery.noConflict = jest.fn(() => global.jQuery);
-global._ = jest.fn((str) => str);
+global._ = jest.fn(str => str);
 global._THIS_IS_TURTLE_BLOCKS_ = true;
 global.TITLESTRING = "Music Blocks";
-global.GUIDEURL = "../guide/guide.html";
-global.fileExt = jest.fn((file) => {
-    if (!file) { // This covers both null and undefined
+global.GUIDEURL = "Docs/guide/guide.html";
+global.fileExt = jest.fn(file => {
+    if (!file) {
+        // This covers both null & undefined
         return "";
     }
     const parts = file.split(".");
@@ -49,20 +50,20 @@ global.fileExt = jest.fn((file) => {
 });
 global.window = {
     isElectron: false,
-    prompt: jest.fn(),
+    prompt: jest.fn()
 };
 global.document = {
     createElement: jest.fn(() => ({
         setAttribute: jest.fn(),
-        click: jest.fn(),
+        click: jest.fn()
     })),
     body: {
         appendChild: jest.fn(),
-        removeChild: jest.fn(),
-    },
+        removeChild: jest.fn()
+    }
 };
-global.docById = jest.fn((id) => document.getElementById(id));;
-global.docByClass = jest.fn((classname) => document.getElementsByClassName(classname));
+global.docById = jest.fn(id => document.getElementById(id));
+global.docByClass = jest.fn(classname => document.getElementsByClassName(classname));
 global.mockRunLogoCommands = jest.fn();
 global.mockDownload = jest.fn();
 
@@ -79,8 +80,8 @@ describe("SaveInterface", () => {
         mockActivity = {
             beginnerMode: false,
             PlanetInterface: {
-                getCurrentProjectName: jest.fn(() => "My Project"),
-            },
+                getCurrentProjectName: jest.fn(() => "My Project")
+            }
         };
         saveInterface = new SaveInterface(mockActivity);
     });
@@ -106,7 +107,7 @@ describe("download", () => {
         const mockActivity = {
             beginnerMode: false,
             PlanetInterface: {
-                getCurrentProjectName: jest.fn(() => "My Project"),
+                getCurrentProjectName: jest.fn(() => "My Project")
             }
         };
         instance = new SaveInterface(mockActivity);
@@ -114,7 +115,7 @@ describe("download", () => {
         mockDownloadURL = jest.spyOn(instance, "downloadURL"); // Spy on downloadURL
         Object.defineProperty(window, "prompt", {
             writable: true,
-            value: jest.fn(() => "My Project.abc"),
+            value: jest.fn(() => "My Project.abc")
         });
     });
 
@@ -150,7 +151,7 @@ describe("download", () => {
         jest.spyOn(document, "createElement").mockImplementation(() => {
             return {
                 setAttribute: jest.fn(),
-                click: clickMock,
+                click: clickMock
             };
         });
 
@@ -171,20 +172,24 @@ describe("save HTML methods", () => {
 
     beforeEach(() => {
         activity = {
-            htmlSaveTemplate: "<html><body><h1>{{ project_name }}</h1><p>{{ project_description }}</p><img src='{{ project_image }}'/><div>{{ data }}</div></body></html>",
+            htmlSaveTemplate:
+                "<html><body><h1>{{ project_name }}</h1><p>{{ project_description }}</p><img src='{{ project_image }}'/><div>{{ data }}</div></body></html>",
             prepareExport: jest.fn(() => "Mock Exported Data"),
             PlanetInterface: {
                 getCurrentProjectDescription: jest.fn(() => "Mock Description"),
                 getCurrentProjectName: jest.fn(() => "Mock Project"),
-                getCurrentProjectImage: jest.fn(() => "mock-image.png"),
-            },
+                getCurrentProjectImage: jest.fn(() => "mock-image.png")
+            }
         };
     });
 
     it("should replace placeholders with actual project data", () => {
         let file = activity.htmlSaveTemplate;
         file = file
-            .replace(/{{ project_description }}/g, activity.PlanetInterface.getCurrentProjectDescription())
+            .replace(
+                /{{ project_description }}/g,
+                activity.PlanetInterface.getCurrentProjectDescription()
+            )
             .replace(/{{ project_name }}/g, activity.PlanetInterface.getCurrentProjectName())
             .replace(/{{ data }}/g, activity.prepareExport())
             .replace(/{{ project_image }}/g, activity.PlanetInterface.getCurrentProjectImage());
@@ -201,14 +206,18 @@ describe("save HTML methods", () => {
         const activity = {
             save: {
                 prepareHTML: mockPrepareHTML,
-                download: mockDownload,
+                download: mockDownload
             }
         };
 
         instance.saveHTML(activity);
 
         expect(mockPrepareHTML).toHaveBeenCalled();
-        expect(mockDownload).toHaveBeenCalledWith("html", "data:text/plain;charset=utf-8,%3Chtml%3EMock%20HTML%3C%2Fhtml%3E", null);
+        expect(mockDownload).toHaveBeenCalledWith(
+            "html",
+            "data:text/plain;charset=utf-8,%3Chtml%3EMock%20HTML%3C%2Fhtml%3E",
+            null
+        );
     });
 
     jest.useFakeTimers();
@@ -219,10 +228,10 @@ describe("save HTML methods", () => {
         const activity = {
             save: {
                 prepareHTML: mockPrepareHTML,
-                downloadURL: mockDownloadURL,
+                downloadURL: mockDownloadURL
             },
             PlanetInterface: {
-                getCurrentProjectName: mockGetProjectName,
+                getCurrentProjectName: mockGetProjectName
             }
         };
 
@@ -231,7 +240,10 @@ describe("save HTML methods", () => {
 
         expect(mockPrepareHTML).toHaveBeenCalled();
         expect(mockGetProjectName).toHaveBeenCalled();
-        expect(mockDownloadURL).toHaveBeenCalledWith("MockProject.html", "data:text/plain;charset=utf-8,%3Chtml%3EMock%20HTML%3C%2Fhtml%3E");
+        expect(mockDownloadURL).toHaveBeenCalledWith(
+            "MockProject.html",
+            "data:text/plain;charset=utf-8,%3Chtml%3EMock%20HTML%3C%2Fhtml%3E"
+        );
     });
 });
 
@@ -246,7 +258,6 @@ describe("saveMIDI Method", () => {
         activity = {
             logo: mockLogo
         };
-
     });
 
     it("should set runningMIDI to true and run logo commands", () => {
@@ -258,7 +269,6 @@ describe("saveMIDI Method", () => {
 });
 
 describe("afterSaveMIDI", () => {
-
     beforeEach(() => {
         global.activity = {
             logo: {
@@ -296,7 +306,6 @@ describe("afterSaveMIDI", () => {
             "snare drum": 38,
             "kick drum": 36
         }));
-
     });
 
     afterEach(() => {
@@ -341,7 +350,7 @@ describe("save artwork methods", () => {
             <canvas id="overlayCanvas"></canvas>
         `;
 
-        docById.mockImplementation((id) => document.getElementById(id));
+        docById.mockImplementation(id => document.getElementById(id));
     });
 
     it("should call doSVG and download the SVG file", () => {
@@ -349,7 +358,7 @@ describe("save artwork methods", () => {
         global.doSVG = mockDoSVG;
         const activity = {
             save: {
-                download: mockDownload,
+                download: mockDownload
             },
             canvas: { width: 500, height: 500 },
             logo: "mockLogo",
@@ -365,7 +374,11 @@ describe("save artwork methods", () => {
             activity.canvas.height,
             1.0
         );
-        expect(mockDownload).toHaveBeenCalledWith("svg", "data:image/svg+xml;utf8,<svg>Mock SVG</svg>", null);
+        expect(mockDownload).toHaveBeenCalledWith(
+            "svg",
+            "data:image/svg+xml;utf8,<svg>Mock SVG</svg>",
+            null
+        );
     });
 
     it("should call toDataURL and download the PNG file", () => {
@@ -373,7 +386,7 @@ describe("save artwork methods", () => {
         global.docById = jest.fn(() => mockCanvas);
         const activity = {
             save: {
-                download: mockDownload,
+                download: mockDownload
             }
         };
         instance.savePNG(activity);
@@ -386,21 +399,25 @@ describe("save artwork methods", () => {
         const mockPrintBlockSVG = jest.fn(() => "<svg>Mock SVG</svg>");
         const activity = {
             save: {
-                download: mockDownload,
+                download: mockDownload
             },
             printBlockSVG: mockPrintBlockSVG
         };
         instance.saveBlockArtwork(activity);
 
         expect(mockPrintBlockSVG).toHaveBeenCalled();
-        expect(mockDownload).toHaveBeenCalledWith("svg", "data:image/svg+xml;utf8,<svg>Mock SVG</svg>", null);
+        expect(mockDownload).toHaveBeenCalledWith(
+            "svg",
+            "data:image/svg+xml;utf8,<svg>Mock SVG</svg>",
+            null
+        );
     });
 
     it("should call printBlockPNG and download the PNG file", async () => {
         const mockPrintBlockPNG = jest.fn(() => Promise.resolve("data:image/png;base64,mockdata"));
         const activity = {
             save: {
-                download: mockDownload,
+                download: mockDownload
             },
             printBlockPNG: mockPrintBlockPNG
         };
@@ -413,7 +430,7 @@ describe("save artwork methods", () => {
 
 describe("saveWAV & saveABC methods", () => {
     beforeEach(() => {
-        global._ = jest.fn((key) => key);
+        global._ = jest.fn(key => key);
         global.ABCHEADER = "X:1\nT:Music Blocks composition\nC:Mr. Mouse\nL:1/16\nM:C\n";
     });
 
@@ -427,11 +444,11 @@ describe("saveWAV & saveABC methods", () => {
                 recording: false,
                 synth: {
                     setupRecorder: mockSetupRecorder,
-                    recorder: { start: mockStartRecording },
+                    recorder: { start: mockStartRecording }
                 },
-                runLogoCommands: mockRunLogoCommands,
+                runLogoCommands: mockRunLogoCommands
             },
-            textMsg: mockTextMsg,
+            textMsg: mockTextMsg
         };
 
         instance.saveWAV(activity);
@@ -445,12 +462,16 @@ describe("saveWAV & saveABC methods", () => {
     });
 
     it("should prepare and run ABC notation commands", () => {
-
         const activity = {
             logo: {
                 runningAbc: false,
                 notationOutput: "",
                 notationNotes: {},
+                recordingBuffer: {
+                    hasData: false,
+                    notationOutput: "",
+                    notationNotes: {}
+                },
                 notation: {
                     notationStaging: {},
                     notationDrumStaging: {}
@@ -460,7 +481,7 @@ describe("saveWAV & saveABC methods", () => {
             turtles: {
                 turtleList: [{ painter: { doClear: jest.fn() } }],
                 getTurtleCount: jest.fn(() => 1),
-                getTurtle: function(index) {
+                getTurtle: function (index) {
                     return this.turtleList[index];
                 }
             }
@@ -521,11 +542,13 @@ describe("saveLilypond Methods", () => {
         `;
 
         // Mock document functions
-        global.docById = jest.fn((id) => document.getElementById(id));
-        jest.spyOn(document, "getElementById").mockImplementation((id) => document.querySelector(`#${id}`));
+        global.docById = jest.fn(id => document.getElementById(id));
+        jest.spyOn(document, "getElementById").mockImplementation(id =>
+            document.querySelector(`#${id}`)
+        );
         document.execCommand = jest.fn();
         global.platform = { FF: false };
-        global.jQuery = jest.fn((selector) => {
+        global.jQuery = jest.fn(selector => {
             if (selector === window) {
                 return { on: jest.fn() };
             }
@@ -534,7 +557,7 @@ describe("saveLilypond Methods", () => {
                 val: jest.fn().mockReturnThis(),
                 select: jest.fn(),
                 remove: jest.fn(),
-                on: jest.fn(),
+                on: jest.fn()
             };
         });
         global.jQuery.noConflict = jest.fn().mockImplementation(() => global.jQuery);
@@ -542,15 +565,15 @@ describe("saveLilypond Methods", () => {
         // Mock activity objects
         activity = {
             PlanetInterface: {
-                getCurrentProjectName: jest.fn(() => "Test Project"),
+                getCurrentProjectName: jest.fn(() => "Test Project")
             },
             storage: {
                 getItem: jest.fn(() => JSON.stringify("Custom Author")),
-                setItem: jest.fn(),
+                setItem: jest.fn()
             },
             save: {
                 saveLYFile: jest.fn(),
-                download: jest.fn(),
+                download: jest.fn()
             },
             logo: {
                 runningLilypond: false,
@@ -559,14 +582,20 @@ describe("saveLilypond Methods", () => {
                 guitarOutputEnd: "",
                 notationOutput: "",
                 notationNotes: {},
+                recordingBuffer: {
+                    hasData: false,
+                    notationOutput: "",
+                    notationNotes: {}
+                },
                 notation: {
                     notationStaging: [],
-                    notationDrumStaging: [],
+                    notationDrumStaging: []
                 },
-                runLogoCommands: jest.fn(),
+                runLogoCommands: jest.fn()
             },
             textMsg: jest.fn(),
-            download: jest.fn(),
+            errorMsg: jest.fn(),
+            download: jest.fn()
         };
 
         // Mock secondary activity object (for different test scenarios)
@@ -575,7 +604,7 @@ describe("saveLilypond Methods", () => {
             turtles: {
                 turtleList: [{ painter: { doClear: jest.fn() } }],
                 getTurtleCount: jest.fn(() => 1),
-                getTurtle: function(index) {
+                getTurtle: function (index) {
                     return this.turtleList[index];
                 }
             }
@@ -592,7 +621,7 @@ describe("saveLilypond Methods", () => {
         mockDocById = jest.fn();
 
         window.Converter = {
-            ly2pdf: jest.fn(),
+            ly2pdf: jest.fn()
         };
 
         lydata = "Lilypond Data";
@@ -603,7 +632,6 @@ describe("saveLilypond Methods", () => {
     });
 
     it("should open the Lilypond modal and populate fields", () => {
-
         instance.saveLilypond(activity);
 
         expect(docById("lilypondModal").style.display).toBe("block");
@@ -613,7 +641,6 @@ describe("saveLilypond Methods", () => {
     });
 
     it("should close the modal when close button is clicked", () => {
-
         instance.saveLilypond(activity);
 
         const closeButton = docByClass("close")[0];
@@ -624,7 +651,6 @@ describe("saveLilypond Methods", () => {
     });
 
     it("should call saveLYFile when save button is clicked", () => {
-
         instance.saveLilypond(activity);
 
         const saveButton = docById("submitLilypond");
@@ -649,14 +675,14 @@ describe("saveLilypond Methods", () => {
 
     it("should handle MIDI and guitar output settings correctly", () => {
         // Simulate MIDI and guitar checkboxes being checked
-        mockDocById.mockImplementation((id) => {
+        mockDocById.mockImplementation(id => {
             const mockElements = {
                 fileName: { value: "testFile" },
                 title: { value: "My Project" },
                 author: { value: "Mr. Mouse" },
                 MIDICheck: { checked: true },
                 guitarCheck: { checked: true },
-                lilypondModal: { style: { display: "block" } },
+                lilypondModal: { style: { display: "block" } }
             };
             return mockElements[id];
         });
@@ -678,7 +704,10 @@ describe("saveLilypond Methods", () => {
     it("should call saveLilypondOutput and afterSaveLilypondLY", () => {
         instance.afterSaveLilypond("ignored.ly");
         expect(mockSaveLilypondOutput).toHaveBeenCalledWith(instance.activity);
-        expect(instance.afterSaveLilypondLY).toHaveBeenCalledWith("Lilypond Data", "TestProject.ly");
+        expect(instance.afterSaveLilypondLY).toHaveBeenCalledWith(
+            "Lilypond Data",
+            "TestProject.ly"
+        );
         expect(instance.notationConvert).toBe("");
     });
 
@@ -699,7 +728,7 @@ describe("saveLilypond Methods", () => {
         expect(activity.save.download).toHaveBeenCalledWith("pdf", dataurl, filename);
     });
 
-    it('should reset cursor to "default" and log an error on failure', () => {
+    it('should reset cursor to "default" and call errorMsg on failure', () => {
         const errorMessage = "Conversion failed";
 
         window.Converter.ly2pdf.mockImplementation((lydata, callback) => {
@@ -713,6 +742,10 @@ describe("saveLilypond Methods", () => {
 
         expect(document.body.style.cursor).toBe("default");
         expect(console.debug).toHaveBeenCalledWith("Error: " + errorMessage);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Failed to convert Lilypond to PDF. Please try saving as .ly file instead.",
+            5000
+        );
         // Verify activity.save.download is not called
         expect(activity.save.download).not.toHaveBeenCalled();
     });
@@ -727,14 +760,11 @@ describe("MXML Methods", () => {
         const mockPainter2 = { doClear: jest.fn() };
 
         mockTurtles = {
-            turtleList: [
-                { painter: mockPainter1 },
-                { painter: mockPainter2 }
-            ],
-            getTurtleCount: function() {
+            turtleList: [{ painter: mockPainter1 }, { painter: mockPainter2 }],
+            getTurtleCount: function () {
                 return this.turtleList.length;
             },
-            getTurtle: function(index) {
+            getTurtle: function (index) {
                 return this.turtleList[index];
             }
         };
@@ -774,10 +804,8 @@ describe("MXML Methods", () => {
         expect(activity.logo.notation.notationStaging[1]).toEqual([]);
         expect(activity.logo.notation.notationDrumStaging[0]).toEqual([]);
         expect(activity.logo.notation.notationDrumStaging[1]).toEqual([]);
-        expect(mockTurtles.turtleList[0].painter.doClear)
-            .toHaveBeenCalledWith(true, true, true);
-        expect(mockTurtles.turtleList[1].painter.doClear)
-            .toHaveBeenCalledWith(true, true, true);
+        expect(mockTurtles.turtleList[0].painter.doClear).toHaveBeenCalledWith(true, true, true);
+        expect(mockTurtles.turtleList[1].painter.doClear).toHaveBeenCalledWith(true, true, true);
 
         // Verify logo commands run
         expect(activity.logo.runLogoCommands).toHaveBeenCalled();
@@ -789,12 +817,9 @@ describe("MXML Methods", () => {
 
         expect(global.saveMxmlOutput).toHaveBeenCalledWith(activity.logo);
 
-        const expectedData = "data:text;utf8," + encodeURIComponent("<score>Mock MXML Data</score>");
-        expect(instance.download).toHaveBeenCalledWith(
-            "xml",
-            expectedData,
-            filename
-        );
+        const expectedData =
+            "data:text;utf8," + encodeURIComponent("<score>Mock MXML Data</score>");
+        expect(instance.download).toHaveBeenCalledWith("xml", expectedData, filename);
 
         expect(activity.logo.runningMxml).toBe(false);
     });
@@ -808,5 +833,4 @@ describe("MXML Methods", () => {
             "empty.xml"
         );
     });
-
 });

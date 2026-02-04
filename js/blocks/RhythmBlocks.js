@@ -244,7 +244,7 @@ function setupRhythmBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = (event) => {
+            const __listener = event => {
                 if (!tur.singer.suppressOutput) {
                     tur.singer.swingTarget.pop();
                     tur.singer.swing.pop();
@@ -310,7 +310,7 @@ function setupRhythmBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = (event) => {
+            const __listener = event => {
                 if (!tur.singer.suppressOutput) {
                     tur.singer.swingTarget.pop();
                     tur.singer.swing.pop();
@@ -453,7 +453,7 @@ function setupRhythmBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = (event) => {
+            const __listener = event => {
                 tur.singer.skipFactor -= arg;
             };
 
@@ -629,7 +629,7 @@ function setupRhythmBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = (event) => {
+            const __listener = event => {
                 const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
                 tur.singer.beatFactor *= currentDotFactor;
                 tur.singer.dotCount -= arg >= 0 ? arg : 1 / arg;
@@ -762,7 +762,7 @@ function setupRhythmBlocks(activity) {
                 name:
                     this.lang === "ja"
                         ? //.TRANS: Japanese only: note value block for drum
-                        _("note value drum")
+                          _("note value drum")
                         : _("note value") + " " + _("drum"),
                 args: 1,
                 canCollapse: true
@@ -1250,4 +1250,8 @@ function setupRhythmBlocks(activity) {
     new NewNoteBlock().setup(activity);
     new DefineFrequencyBlock().setup(activity);
     new OctaveSpaceBlock().setup(activity);
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupRhythmBlocks };
 }

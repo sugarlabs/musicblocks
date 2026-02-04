@@ -4,7 +4,7 @@
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
-// License as published by the Free Software Foundatioff; either
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
 //
 // You should have received a copy of the GNU Affero General Public
@@ -177,7 +177,7 @@ class Logo {
         this.inTempo = false;
         this.inPitchSlider = false;
         this.inMusicKeyboard = false;
-        this._currentDrumlock = null;
+        this._currentDrumBlock = null;
         this.inTimbre = false;
         this.inArpeggio = false;
         this.insideModeWidget = false;
@@ -216,6 +216,16 @@ class Logo {
         this.runningMIDI = false;
         this._checkingCompletionState = false;
         this.recording = false;
+
+        // Buffer for recording musical output (Issue #2330)
+        // This allows saving Lilypond/ABC notation from interactive sessions
+        this.recordingBuffer = {
+            hasData: false,
+            notationOutput: "",
+            notationNotes: {},
+            notationStaging: {},
+            notationDrumStaging: {}
+        };
 
         this.temperamentSelected = [];
         this.customTemperamentDefined = false;
@@ -507,8 +517,7 @@ class Logo {
         } else if (
             typeof arg1 === "object" &&
             blk !== null &&
-            this.blockList[this.blockList[blk].connections[2]]
-                .name === "loadFile"
+            this.blockList[this.blockList[blk].connections[2]].name === "loadFile"
         ) {
             if (arg1) {
                 requiredTurtle.doShowText(arg0, arg1[1]);
@@ -569,10 +578,7 @@ class Logo {
 
         let nextBlock = null;
         if (!tur.singer.inDuplicate && tur.singer.backward.length > 0) {
-            const c =
-                this.blockList[last(tur.singer.backward)].name === "backward"
-                    ? 1
-                    : 2;
+            const c = this.blockList[last(tur.singer.backward)].name === "backward" ? 1 : 2;
             if (
                 this.activity.blocks.sameGeneration(
                     this.blockList[last(tur.singer.backward)].connections[c],
@@ -623,16 +629,17 @@ class Logo {
         }
 
         if (typeof logo.blockList[blk].protoblock.arg === "function") {
-            return (logo.blockList[blk].value = logo.blockList[
-                blk
-            ].protoblock.arg(logo, turtle, blk, receivedArg));
+            return (logo.blockList[blk].value = logo.blockList[blk].protoblock.arg(
+                logo,
+                turtle,
+                blk,
+                receivedArg
+            ));
         }
 
         if (logo.blockList[blk].name === "intervalname") {
             if (typeof logo.blockList[blk].value === "string") {
-                tur.singer.noteDirection = getIntervalDirection(
-                    logo.blockList[blk].value
-                );
+                tur.singer.noteDirection = getIntervalDirection(logo.blockList[blk].value);
                 return getIntervalNumber(logo.blockList[blk].value);
             } else return 0;
         } else if (logo.blockList[blk].isValueBlock()) {
@@ -646,9 +653,7 @@ class Logo {
                 case "dectofrac":
                     if (
                         logo.inStatusMatrix &&
-                        logo.blockList[
-                            logo.blockList[blk].connections[0]
-                        ].name === "print"
+                        logo.blockList[logo.blockList[blk].connections[0]].name === "print"
                     ) {
                         logo.statusFields.push([blk, "dectofrac"]);
                     } else {
@@ -672,14 +677,13 @@ class Logo {
                 case "hue":
                     if (
                         logo.inStatusMatrix &&
-                        logo.blockList[
-                            logo.blockList[blk].connections[0]
-                        ].name === "print"
+                        logo.blockList[logo.blockList[blk].connections[0]].name === "print"
                     ) {
                         logo.statusFields.push([blk, "color"]);
                     } else {
-                        logo.blockList[blk].value =
-                            logo.activity.turtles.getTurtle(turtle).painter.color;
+                        logo.blockList[blk].value = logo.activity.turtles.getTurtle(
+                            turtle
+                        ).painter.color;
                     }
                     break;
 
@@ -806,7 +810,6 @@ class Logo {
     }
 
     notationMIDI(note, drum, duration, turtle, bpm, instrument) {
-
         if (!this._midiData[turtle]) {
             this._midiData[turtle] = [];
         }
@@ -918,7 +921,9 @@ class Logo {
 
         this.activity.turtles
             .ithTurtle(turtle)
-            .initTurtle(this.runningLilypond || this.runningAbc || this.runningMxml || this.runningMIDI);
+            .initTurtle(
+                this.runningLilypond || this.runningAbc || this.runningMxml || this.runningMIDI
+            );
     }
 
     /**
@@ -1135,21 +1140,14 @@ class Logo {
                 if (!this.blockList[this.activity.blocks.stackList[blk]].trash) {
                     startBlocks.push(this.activity.blocks.stackList[blk]);
                 }
-            } else if (
-                this.blockList[this.activity.blocks.stackList[blk]].name ===
-                "action"
-            ) {
+            } else if (this.blockList[this.activity.blocks.stackList[blk]].name === "action") {
                 // Does the action stack have a name?
-                const c = this.blockList[this.activity.blocks.stackList[blk]]
-                    .connections[1];
+                const c = this.blockList[this.activity.blocks.stackList[blk]].connections[1];
                 // Is there a block in the action clamp?
-                const b = this.blockList[this.activity.blocks.stackList[blk]]
-                    .connections[2];
+                const b = this.blockList[this.activity.blocks.stackList[blk]].connections[2];
                 if (c != null && b != null) {
                     // Don't use an action block in the trash
-                    if (
-                        !this.blockList[this.activity.blocks.stackList[blk]].trash
-                    ) {
+                    if (!this.blockList[this.activity.blocks.stackList[blk]].trash) {
                         // We need to calculate the value of block c.
                         // this.actions[this.blockList[c].value] = b;
                         const name = this.parseArg(this, 0, c, null);
@@ -1222,9 +1220,7 @@ class Logo {
             // Look for status and oscilloscope blocks.
             for (let b = 0; b < startBlocks.length; b++) {
                 if (
-                    ["status", "oscilloscope"].includes(
-                        this.blockList[startBlocks[b]].name
-                    ) &&
+                    ["status", "oscilloscope"].includes(this.blockList[startBlocks[b]].name) &&
                     !this.blockList[startBlocks[b]].trash
                 ) {
                     const turtle = 0;
@@ -1250,11 +1246,7 @@ class Logo {
 
                 // If there are multiple start blocks, run them all.
                 for (let b = 0; b < startBlocks.length; b++) {
-                    if (
-                        !["status", "oscilloscope"].includes(
-                            this.blockList[startBlocks[b]].name
-                        )
-                    ) {
+                    if (!["status", "oscilloscope"].includes(this.blockList[startBlocks[b]].name)) {
                         const turtle = this.blockList[startBlocks[b]].value;
                         const tur = this.activity.turtles.ithTurtle(turtle);
 
@@ -1362,12 +1354,8 @@ class Logo {
                 if (
                     logo.activity.turtles.ithTurtle(turtle).singer.inNoteBlock.length > 0 &&
                     logo.blockList[blk].connections[i] !== undefined &&
-                    logo.blockList[
-                        logo.blockList[blk].connections[i]
-                    ] !== undefined &&
-                    logo.blockList[
-                        logo.blockList[blk].connections[i]
-                    ].name === "currentpitch"
+                    logo.blockList[logo.blockList[blk].connections[i]] !== undefined &&
+                    logo.blockList[logo.blockList[blk].connections[i]].name === "currentpitch"
                 ) {
                     // Re-eval this arg after note block ends to
                     // ensure that the current pitch is uptodate.
@@ -1391,10 +1379,7 @@ class Logo {
             // it can be null (i.e., end of a flow).
             if (tur.singer.backward.length > 0) {
                 // We only run backwards in the "first generation" children.
-                const c =
-                    logo.blockList[last(tur.singer.backward)].name === "backward"
-                        ? 1
-                        : 2;
+                const c = logo.blockList[last(tur.singer.backward)].name === "backward" ? 1 : 2;
 
                 if (
                     !logo.activity.blocks.sameGeneration(
@@ -1413,8 +1398,7 @@ class Logo {
                     } else {
                         if (
                             !logo.activity.blocks.sameGeneration(
-                                logo.blockList[last(tur.singer.backward)]
-                                    .connections[c],
+                                logo.blockList[last(tur.singer.backward)].connections[c],
                                 nextFlow
                             )
                         ) {
@@ -1448,7 +1432,10 @@ class Logo {
         if (logo.activity.blocks.visible) {
             if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
                 // Unhighlight any previously highlighted block
-                if (logo._currentlyHighlightedBlock !== null && logo._currentlyHighlightedBlock !== blk) {
+                if (
+                    logo._currentlyHighlightedBlock !== null &&
+                    logo._currentlyHighlightedBlock !== blk
+                ) {
                     logo.activity.blocks.unhighlight(logo._currentlyHighlightedBlock);
                 }
                 // Highlight the current block
@@ -1485,7 +1472,6 @@ class Logo {
                 if (cfc !== undefined) childFlowCount = cfc;
                 if (ret) return ret;
             }
-
         } else {
             if (
                 // If it's an arg block, print its value.
@@ -1494,12 +1480,27 @@ class Logo {
                     logo.blockList[blk].protoblock.dockTypes[0]
                 )
             ) {
-                args.push(logo.parseArg(logo, turtle, blk, logo.receievedArg));
+                args.push(logo.parseArg(logo, turtle, blk, logo.receivedArg));
+
+                // Use label prefix for screen dimension blocks to clarify the display is informational
+                // Labels wrapped with _() for internationalization
+                const blockLabels = {
+                    width: _("width"),
+                    height: _("height"),
+                    rightpos: _("right (screen)"),
+                    leftpos: _("left (screen)"),
+                    toppos: _("top (screen)"),
+                    bottompos: _("bottom (screen)")
+                };
+                const blockName = logo.blockList[blk].name;
+                const label = blockLabels[blockName];
 
                 if (logo.blockList[blk].value == null) {
                     logo.activity.textMsg("null block value");
                 } else {
-                    logo.activity.textMsg(logo.blockList[blk].value.toString());
+                    const value = logo.blockList[blk].value.toString();
+                    const displayText = label ? label + ": " + value : value;
+                    logo.activity.textMsg(displayText);
                 }
             } else {
                 logo.activity.errorMsg(
@@ -1537,10 +1538,7 @@ class Logo {
         // If there is a child flow, queue it.
         if (childFlow != null) {
             let queueBlock;
-            if (
-                logo.blockList[blk].name === "doArg" ||
-                logo.blockList[blk].name === "nameddoArg"
-            ) {
+            if (logo.blockList[blk].name === "doArg" || logo.blockList[blk].name === "nameddoArg") {
                 queueBlock = new Queue(childFlow, childFlowCount, blk, actionArgs);
             } else {
                 queueBlock = new Queue(childFlow, childFlowCount, blk, receivedArg);
@@ -1598,10 +1596,8 @@ class Logo {
             }
 
             if (
-                (tur.singer.backward.length > 0 &&
-                    logo.blockList[blk].connections[0] == null) ||
-                (tur.singer.backward.length === 0 &&
-                    last(logo.blockList[blk].connections) == null)
+                (tur.singer.backward.length > 0 && logo.blockList[blk].connections[0] == null) ||
+                (tur.singer.backward.length === 0 && last(logo.blockList[blk].connections) == null)
             ) {
                 if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
                     // If we are at the end of the child flow, queue
@@ -1720,11 +1716,35 @@ class Logo {
                     } else if (logo.runningMIDI) {
                         logo.activity.save.afterSaveMIDI();
                         logo.runningMIDI = false;
-                    }
-                    else if (tur.singer.suppressOutput) {
+                    } else if (tur.singer.suppressOutput) {
                         // console.debug("finishing compiling");
                         if (!logo.recording) {
                             logo.activity.errorMsg(_("Playback is ready."));
+                        }
+                    } else {
+                        // Record notation data into buffer for later save (Issue #2330)
+                        // This allows saving Lilypond/ABC from interactive sessions
+                        if (logo.notationOutput && logo.notationOutput.length > 0) {
+                            logo.recordingBuffer.hasData = true;
+                            logo.recordingBuffer.notationOutput = logo.notationOutput;
+                            logo.recordingBuffer.notationNotes = JSON.parse(
+                                JSON.stringify(logo.notationNotes)
+                            );
+                            // Copy notation staging data
+                            logo.recordingBuffer.notationStaging = {};
+                            logo.recordingBuffer.notationDrumStaging = {};
+                            for (let t = 0; t < logo.activity.turtles.getTurtleCount(); t++) {
+                                if (logo.notation.notationStaging[t]) {
+                                    logo.recordingBuffer.notationStaging[t] = [
+                                        ...logo.notation.notationStaging[t]
+                                    ];
+                                }
+                                if (logo.notation.notationDrumStaging[t]) {
+                                    logo.recordingBuffer.notationDrumStaging[t] = [
+                                        ...logo.notation.notationDrumStaging[t]
+                                    ];
+                                }
+                            }
                         }
                     }
 
@@ -1766,23 +1786,8 @@ class Logo {
 
         const tur = this.activity.turtles.ithTurtle(turtle);
 
-        if(Object.keys) {
-            if(Object.keys(tur.singer.embeddedGraphics).length === 0) return;
+        if (Object.keys(tur.singer.embeddedGraphics).length === 0) return;
 
-        } else{
-            const isEmpty = true;
-            for(const key in tur.singer.embeddedGraphics) {
-                if(tur.singer.embeddedGraphics.hasOwnProperty(key)){
-                    isEmpty = false;
-                    break;
-                }
-            }
-
-            if(isEmpty) return;
-
-        }
-
-        
         if (!(blk in tur.singer.embeddedGraphics)) return;
 
         if (tur.singer.embeddedGraphics[blk].length === 0) return;
@@ -1813,7 +1818,7 @@ class Logo {
                     );
                     break;
             }
-            const _penSwitch = (name) => {
+            const _penSwitch = name => {
                 switch (name) {
                     case "penup":
                         tur.painter.doPenUp();
@@ -1867,13 +1872,9 @@ class Logo {
         };
 
         const __right = (turtle, b, waitTime, stepTime, sign) => {
-            const arg = this.parseArg(
-                this,
-                turtle,
-                this.blockList[b].connections[1],
-                b,
-                this.receivedArg
-            ) * sign;
+            const arg =
+                this.parseArg(this, turtle, this.blockList[b].connections[1], b, this.receivedArg) *
+                sign;
             if (suppressOutput) {
                 const savedPenState = tur.painter.penState;
                 tur.painter.penState = false;
@@ -1913,13 +1914,9 @@ class Logo {
         };
 
         const __forward = (turtle, b, waitTime, stepTime, sign) => {
-            const arg = this.parseArg(
-                this,
-                turtle,
-                this.blockList[b].connections[1],
-                b,
-                this.receivedArg
-            ) * sign;
+            const arg =
+                this.parseArg(this, turtle, this.blockList[b].connections[1], b, this.receivedArg) *
+                sign;
             if (suppressOutput) {
                 const savedPenState = tur.painter.penState;
                 tur.painter.penState = false;
@@ -1929,16 +1926,13 @@ class Logo {
                 for (let t = 0; t < NOTEDIV / tur.singer.dispatchFactor; t++) {
                     const deltaTime = waitTime + t * stepTime * tur.singer.dispatchFactor;
                     const deltaArg = arg / (NOTEDIV / tur.singer.dispatchFactor);
-                    if(t === 0) {
+                    if (t === 0) {
                         setTimeout(() => tur.painter.doForward(deltaArg, "first"), deltaTime);
-                    }
-                    else if(t === (Math.ceil(NOTEDIV / tur.singer.dispatchFactor) - 1)) {
+                    } else if (t === Math.ceil(NOTEDIV / tur.singer.dispatchFactor) - 1) {
                         setTimeout(() => tur.painter.doForward(deltaArg, "last"), deltaTime);
-                    }
-                    else {
+                    } else {
                         setTimeout(() => tur.painter.doForward(deltaArg, "middle"), deltaTime);
                     }
-                    
                 }
             }
         };
@@ -2331,7 +2325,7 @@ class Logo {
                     break;
 
                 case "clear":
-                    __clear(turtle, waitTime);
+                    __clear();
                     break;
 
                 case "fill":
@@ -2416,4 +2410,36 @@ class Logo {
         await delayExecution(beatValue * 1000);
         tur.embeddedGraphicsFinished = true;
     }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        Queue,
+        Logo,
+        DEFAULTVOLUME,
+        PREVIEWVOLUME,
+        DEFAULTDELAY,
+        OSCVOLUMEADJUSTMENT,
+        TONEBPM,
+        TARGETBPM,
+        TURTLESTEP,
+        NOTEDIV,
+        NOMICERRORMSG,
+        NANERRORMSG,
+        NOSTRINGERRORMSG,
+        NOBOXERRORMSG,
+        NOACTIONERRORMSG,
+        NOINPUTERRORMSG,
+        NOSQRTERRORMSG,
+        ZERODIVIDEERRORMSG,
+        EMPTYHEAPERRORMSG,
+        POSNUMBER,
+        NOTATIONNOTE,
+        NOTATIONDURATION,
+        NOTATIONDOTCOUNT,
+        NOTATIONTUPLETVALUE,
+        NOTATIONROUNDDOWN,
+        NOTATIONINSIDECHORD,
+        NOTATIONSTACCATO
+    };
 }

@@ -330,7 +330,7 @@ class ASTUtils {
     }
 
     /**
-     * Returns the Abstract Syntax Tree for the bare minimum method defintion code
+     * Returns the Abstract Syntax Tree for the bare minimum method definition code
      *
      * @static
      * @param {String} methodName - method name

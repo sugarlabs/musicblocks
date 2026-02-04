@@ -91,11 +91,7 @@ class ProtoBlock {
             return;
         }
         const c = new createjs.Container();
-        const text = new createjs.Text(
-            this.staticLabels[0],
-            this.fontSize + "px Sans",
-            "#000000"
-        );
+        const text = new createjs.Text(this.staticLabels[0], this.fontSize + "px Sans", "#000000");
         c.addChild(text);
         const b = c.getBounds();
         this.textWidth = b.width;
@@ -134,13 +130,7 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
         svg.setExpand(10 + this.extraWidth, 0, 0, 0);
-        return [
-            svg.basicBlock(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.getHeight()
-        ];
+        return [svg.basicBlock(), svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     }
 
     // E.g., hidden (used at end of clamp)
@@ -218,13 +208,7 @@ class ProtoBlock {
         }
 
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
-        return [
-            svg.basicBlock(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.getHeight()
-        ];
+        return [svg.basicBlock(), svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     }
 
     // E.g., collapsed
@@ -253,13 +237,7 @@ class ProtoBlock {
         }
 
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
-        return [
-            svg.basicBlock(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.getHeight()
-        ];
+        return [svg.basicBlock(), svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     }
 
     /**
@@ -290,13 +268,7 @@ class ProtoBlock {
         }
 
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
-        return [
-            svg.basicBlock(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.getHeight()
-        ];
+        return [svg.basicBlock(), svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     }
 
     /**
@@ -329,13 +301,7 @@ class ProtoBlock {
         }
 
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
-        return [
-            svg.basicBlock(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.getHeight()
-        ];
+        return [svg.basicBlock(), svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     }
 
     /**
@@ -367,9 +333,7 @@ class ProtoBlock {
         svg.setSlot(true);
 
         if (expandY) {
-            svg.setExpand(
-                30 + this.extraWidth,
-                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
+            svg.setExpand(30 + this.extraWidth, ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
@@ -378,13 +342,7 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.basicBlock(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.getHeight()
-        ];
+        return [svg.basicBlock(), svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     }
 
     /**
@@ -417,9 +375,7 @@ class ProtoBlock {
         svg.setSlot(true);
 
         if (expandY) {
-            svg.setExpand(
-                30 + this.extraWidth,
-                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
+            svg.setExpand(30 + this.extraWidth, ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
@@ -428,13 +384,7 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.basicBlock(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.getHeight()
-        ];
+        return [svg.basicBlock(), svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     }
 
     /**
@@ -468,9 +418,7 @@ class ProtoBlock {
         svg.setSlot(true);
 
         if (expandY) {
-            svg.setExpand(
-                30 + this.extraWidth,
-                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
+            svg.setExpand(30 + this.extraWidth, ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
@@ -479,13 +427,7 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.basicBlock(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.getHeight()
-        ];
+        return [svg.basicBlock(), svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     }
 
     /**
@@ -520,13 +462,7 @@ class ProtoBlock {
         }
 
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
-        return [
-            svg.basicBlock(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.getHeight()
-        ];
+        return [svg.basicBlock(), svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     }
 
     /**
@@ -560,9 +496,7 @@ class ProtoBlock {
         svg.setTab(false);
 
         if (expandY) {
-            svg.setExpand(
-                30 + this.extraWidth,
-                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
+            svg.setExpand(30 + this.extraWidth, ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
@@ -571,13 +505,7 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.basicBlock(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.getHeight()
-        ];
+        return [svg.basicBlock(), svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     }
 
     /**
@@ -610,9 +538,7 @@ class ProtoBlock {
         svg.setTab(false);
 
         if (expandY) {
-            svg.setExpand(
-                30 + this.extraWidth,
-                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
+            svg.setExpand(30 + this.extraWidth, ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
@@ -621,15 +547,9 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.basicBlock(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.getHeight()
-        ];
+        return [svg.basicBlock(), svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     }
-    
+
     /**
      * Configures a four-argument math block.
      * E.g., distance . Distance block will calculate geometrical distance between two points
@@ -663,9 +583,7 @@ class ProtoBlock {
         svg.setTab(false);
 
         if (expandY) {
-            svg.setExpand(
-                30 + this.extraWidth,
-                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
+            svg.setExpand(30 + this.extraWidth, ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
@@ -674,13 +592,7 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.basicBlock(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.getHeight()
-        ];
+        return [svg.basicBlock(), svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     }
 
     /**
@@ -711,18 +623,12 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.basicBox(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.getHeight()
-        ];
+        return [svg.basicBox(), svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     }
 
     /**
      * Sets up a media block. Media blocks invoke a chooser and a thumbnail
-     * image is overlayed to represent the data associated with the block.
+     * image is overlaid to represent the data associated with the block.
      */
     mediaBlock() {
         this.style = "value";
@@ -747,13 +653,7 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.basicBox(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.getHeight()
-        ];
+        return [svg.basicBox(), svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     }
 
     /**
@@ -797,13 +697,7 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.basicClamp(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.docks[1][1]
-        ];
+        return [svg.basicClamp(), svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[1][1]];
     }
 
     /**
@@ -844,13 +738,7 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.basicClamp(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.docks[1][1]
-        ];
+        return [svg.basicClamp(), svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[1][1]];
     }
 
     /**
@@ -893,13 +781,7 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.basicClamp(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.docks[2][1]
-        ];
+        return [svg.basicClamp(), svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[2][1]];
     }
 
     /**
@@ -943,13 +825,7 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.basicClamp(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.docks[3][1]
-        ];
+        return [svg.basicClamp(), svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[3][1]];
     }
 
     /**
@@ -992,13 +868,7 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.basicClamp(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.docks[4][1]
-        ];
+        return [svg.basicClamp(), svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[4][1]];
     }
 
     /**
@@ -1232,13 +1102,7 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.basicClamp(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.docks[2][1]
-        ];
+        return [svg.basicClamp(), svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[2][1]];
     }
 
     /**
@@ -1267,7 +1131,7 @@ class ProtoBlock {
      * @param {number} topSlots - The number of top slots.
      * @returns {Array} - Array containing SVG elements and block dimensions.
      */
-    doubleFlowClampBooleanArgBlockGenerator(bottomSlots,topSlots) {
+    doubleFlowClampBooleanArgBlockGenerator(bottomSlots, topSlots) {
         const svg = new SVG();
         svg.setScale(this.scale);
         svg.setTab(true);
@@ -1293,13 +1157,7 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.basicClamp(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.docks[2][1]
-        ];
+        return [svg.basicClamp(), svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[2][1]];
     }
 
     /**
@@ -1340,13 +1198,7 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.basicClamp(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.docks[1][1]
-        ];
+        return [svg.basicClamp(), svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[1][1]];
     }
 
     /**
@@ -1386,13 +1238,7 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.basicClamp(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.docks[1][1]
-        ];
+        return [svg.basicClamp(), svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[1][1]];
     }
 
     /**
@@ -1437,13 +1283,7 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.basicClamp(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.docks[2][1]
-        ];
+        return [svg.basicClamp(), svg.docks, svg.getWidth(), svg.getHeight(), svg.docks[2][1]];
     }
 
     /**
@@ -1471,13 +1311,7 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.booleanNot(true),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.getHeight()
-        ];
+        return [svg.booleanNot(true), svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     }
 
     /**
@@ -1509,7 +1343,7 @@ class ProtoBlock {
 
         svg.setInnies([true]);
         return [
-            svg.booleanNot(true),  // OneArg
+            svg.booleanNot(true), // OneArg
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -1544,13 +1378,7 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.booleanNot(false),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.getHeight()
-        ];
+        return [svg.booleanNot(false), svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     }
 
     /**
@@ -1581,13 +1409,7 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.booleanAndOr(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.getHeight()
-        ];
+        return [svg.booleanAndOr(), svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     }
 
     /**
@@ -1616,9 +1438,7 @@ class ProtoBlock {
         svg.setScale(this.scale);
 
         if (expandY) {
-            svg.setExpand(
-                10 + this.extraWidth,
-                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
+            svg.setExpand(10 + this.extraWidth, ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
         } else {
             svg.setExpand(10 + this.extraWidth, 0, 0, 0);
         }
@@ -1627,13 +1447,7 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.booleanCompare(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.getHeight()
-        ];
+        return [svg.booleanCompare(), svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     }
 
     /**
@@ -1664,13 +1478,7 @@ class ProtoBlock {
             svg.setFontSize(this.fontsize);
         }
 
-        return [
-            svg.basicBox(),
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.getHeight()
-        ];
+        return [svg.basicBox(), svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     }
 }
 
@@ -1679,7 +1487,7 @@ class ProtoBlock {
  * @param {*} item - The item to check.
  * @returns {boolean} - True if the item is an object, otherwise false.
  */
-const isObject = (item) => {
+const isObject = item => {
     return item && typeof item === "object" && !Array.isArray(item);
 };
 
@@ -1826,8 +1634,7 @@ class BaseBlock extends ProtoBlock {
         if (this._style.flows.labels.length > 0) {
             if (this._style.flows.type === "arg") this.style = "argclamp";
             else if (this._style.flows.type === "value") this.style = "value";
-            else if (this._style.flows.labels.length == 2)
-                this.style = "doubleclamp";
+            else if (this._style.flows.labels.length == 2) this.style = "doubleclamp";
             else this.style = "clamp";
             this.expandable = true;
         } else {
@@ -1838,8 +1645,7 @@ class BaseBlock extends ProtoBlock {
             } else if (this._style.args === 2) this.style = "twoarg";
         }
 
-        if (this._style.flows.type === "value" && this._style.args === 2)
-            this.expandable = true;
+        if (this._style.flows.type === "value" && this._style.args === 2) this.expandable = true;
 
         this.args = this._style.flows.labels.length + this._style.args;
         if (this.size !== 0) {
@@ -1860,33 +1666,26 @@ class BaseBlock extends ProtoBlock {
         this._style.argLabels.forEach(i => this.staticLabels.push(i));
         this._style.flows.labels.forEach(i => this.staticLabels.push(i));
 
-        if (this._style.flows.left)
-            this.dockTypes.push(this._style.outType || "numberout");
+        if (this._style.flows.left) this.dockTypes.push(this._style.outType || "numberout");
         if (this._style.flows.top)
-            this.dockTypes.push(
-                this._style.flows.top === "cap" ? "unavailable" : "out"
-            );
+            this.dockTypes.push(this._style.flows.top === "cap" ? "unavailable" : "out");
         if (typeof this._style.args === "number")
             for (let i = 0; i < this._style.args; i++) {
                 this.dockTypes.push(this._style.argTypes[i] || "numberin");
-                if (i < this._style.defaults.length)
-                    this.defaults.push(this._style.defaults[i]);
+                if (i < this._style.defaults.length) this.defaults.push(this._style.defaults[i]);
             }
         if (this._style.flows.type === "arg")
             for (let i = 0; i < this._style.flows.labels.length; i++)
                 this.dockTypes.push(this._style.flows.types[i] || "numberin");
-        for (let i = 0; i < this._style.flows.labels.length; i++)
-            this.dockTypes.push("in");
+        for (let i = 0; i < this._style.flows.labels.length; i++) this.dockTypes.push("in");
         if (this._style.flows.bottom)
-            this.dockTypes.push(
-                this._style.flows.bottom === "tail" ? "unavailable" : "in"
-            );
+            this.dockTypes.push(this._style.flows.bottom === "tail" ? "unavailable" : "in");
 
         /**
          * Generates SVG artwork and dock layout for the block.
          * @returns {Array} An array containing the SVG artwork, dock layout, width, height, and click height.
          */
-        this.generator = function() {
+        this.generator = function () {
             const svg = new SVG();
             svg.setScale(this.scale);
 
@@ -1899,24 +1698,17 @@ class BaseBlock extends ProtoBlock {
 
             let pad = this._style.flows.type === "value" ? 60 : 20;
             if (!this._style.flows.type) pad += 10;
-            if (this._style.outType === "booleanout" && this._style.args === 2)
-                pad -= 30;
+            if (this._style.outType === "booleanout" && this._style.args === 2) pad -= 30;
             else if (this._style.argTypes[0] === "booleanin") pad -= 5;
             if (this.size !== 0)
                 svg.setExpand(
                     pad + this.extraWidth,
                     this.image ? 23 : 0,
                     0,
-                    this._style.outType === "booleanout" && !this._style.args
-                        ? 4
-                        : 0
+                    this._style.outType === "booleanout" && !this._style.args ? 4 : 0
                 );
 
-            for (
-                let i = arguments.length;
-                i < this._style.flows.labels.length;
-                i++
-            )
+            for (let i = arguments.length; i < this._style.flows.labels.length; i++)
                 svg.setClampSlots(i, 1);
             svg.setClampCount(this._style.flows.labels.length);
 
@@ -1924,26 +1716,19 @@ class BaseBlock extends ProtoBlock {
                 if (this._style.flows.type == undefined) {
                     svg.setExpand(
                         30 + this.extraWidth,
-                        ((arguments[arguments.length - i - 1] - 1) *
-                            STANDARDBLOCKHEIGHT) /
-                            2,
+                        ((arguments[arguments.length - i - 1] - 1) * STANDARDBLOCKHEIGHT) / 2,
                         0,
                         0
                     );
                 } else if (this._style.flows.type == "value") {
                     svg.setExpand(
                         60 + this.extraWidth,
-                        ((arguments[arguments.length - i - 1] - 1) *
-                            STANDARDBLOCKHEIGHT) /
-                            2,
+                        ((arguments[arguments.length - i - 1] - 1) * STANDARDBLOCKHEIGHT) / 2,
                         0,
                         0
                     );
                 } else {
-                    svg.setClampSlots(
-                        i,
-                        arguments[arguments.length - i - 1] || 1
-                    );
+                    svg.setClampSlots(i, arguments[arguments.length - i - 1] || 1);
                 }
             }
 
@@ -1983,37 +1768,27 @@ class BaseBlock extends ProtoBlock {
                 svg.docks[1][1] = svg.docks[0][1];
             }
             let clickHeight;
-            this.isLeftClamp = this.style === "clamp" &&
+            this.isLeftClamp =
+                this.style === "clamp" &&
                 this._style.flows.left == true &&
                 this._style.args === 0 &&
-                this._style.flows.type == "flow" ;
+                this._style.flows.type == "flow";
 
             if (this._style.flows.top || this._style.flows.bottom)
-                clickHeight =
-                    svg.docks[
-                        svg.docks.length - this._style.flows.labels.length - 1
-                    ][1];
+                clickHeight = svg.docks[svg.docks.length - this._style.flows.labels.length - 1][1];
             else if (this.isLeftClamp)
-                clickHeight =               // special Case with no .top and .bottom .
-                    svg.docks[
-                        svg.docks.length - this._style.flows.labels.length
-                    ][1];
+                clickHeight = svg.docks[svg.docks.length - this._style.flows.labels.length][1];
+            // special Case with no .top and .bottom .
             else clickHeight = svg.getHeight();
             if (this.size === 0) return [artwork, svg.docks, 0, 0, 0];
 
             // Special case for one argument boolean output blocks e.g found mouse
-            
-            if(this._style.flows.left === "bool") {
+
+            if (this._style.flows.left === "bool") {
                 artwork = svg.booleanNot(true); // OneArg
             }
 
-            return [
-                artwork,
-                svg.docks,
-                svg.getWidth(),
-                svg.getHeight(),
-                clickHeight
-            ];
+            return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), clickHeight];
         };
     }
 
@@ -2079,10 +1854,10 @@ class BaseBlock extends ProtoBlock {
 
         // Get the basic block shape
         const block = svg.basicBlock();
-        
+
         // Add the note symbol as SVG based on the block name
         let noteSymbol;
-        switch(this.name) {
+        switch (this.name) {
             case "wholeNote":
                 noteSymbol = `<g transform="translate(-312.0000,-493.37592) scale(1.1)">
                     <g transform="translate(7.9606,5.6125499)" style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1">
@@ -2123,13 +1898,7 @@ class BaseBlock extends ProtoBlock {
         // Insert the note symbol after the text
         const blockWithNote = block.replace("</svg>", `${noteSymbol}</svg>`);
 
-        return [
-            blockWithNote,
-            svg.docks,
-            svg.getWidth(),
-            svg.getHeight(),
-            svg.getHeight()
-        ];
+        return [blockWithNote, svg.docks, svg.getWidth(), svg.getHeight(), svg.getHeight()];
     }
 
     /**
@@ -2318,7 +2087,7 @@ class StackClampBlock extends BaseBlock {
          * @type {number}
          */
         this.extraWidth = 40;
-        
+
         this.formBlock({
             flows: {
                 top: "cap",

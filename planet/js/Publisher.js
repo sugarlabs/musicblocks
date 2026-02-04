@@ -316,38 +316,9 @@ class Publisher {
         for (let i = 0; i < tb.length; i++) {
             const block = tb[i];
 
-            let name = null;
-
-            if (typeof block[1] === "string") {
-                name = block[1];
-            } else if (Array.isArray(block[1])) {
-                name = block[1][0];
-            } else if (typeof block[1] === "number") {
-                break;
-            }
-
-            if (name === null) continue;
-
-            // Best-effort resolution: if running inside the iframe and the parent
-            // window exposes the Activity palette API, map proto name to the
-            // human-friendly display name. This ensures Publisher sends meaningful
-            // keywords for search when integrated with Music Blocks.
-            try {
-                if (
-                    typeof window !== "undefined" &&
-                    window.parent &&
-                    window.parent.activity &&
-                    window.parent.activity.blocks &&
-                    window.parent.activity.blocks.palettes
-                ) {
-                    const p = window.parent.activity.blocks.palettes.getProtoNameAndPalette(name);
-                    if (p && p[2]) name = p[2];
-                }
-            } catch (e) {
-                // ignore and use raw name
-            }
-
-            words.add(name);
+            if (typeof block[1] === "string") words.add(block[1]);
+            else if (Array.isArray(block[1])) words.add(block[1][0]);
+            else if (typeof block[1] === "number") break;
         }
 
         let s = "";

@@ -429,7 +429,7 @@ function setupOrnamentBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = (event) => {
+            const __listener = event => {
                 if (tur.singer.justCounting.length === 0) {
                     logo.notation.notationEndSlur(turtle);
                 }

@@ -20,15 +20,15 @@
     <link rel="preload" href="https://fonts.googleapis.com/icon?family=Material+Icons" as="style"
         onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="fonts/material-icons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="css/activities.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/activities.css?v=fixed" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/keyboard.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/windows.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="lib/materialize-iso.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="css/darkmode.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" as="video" href="loading-animation.webm" type="video/webm">
-    <link rel="preload" as="video" href="loading-animation.mp4" type="video/mp4">
-    <link rel="preload" as="image" href="loading-animation-ja.svg">
+    <link rel="prefetch" as="video" href="loading-animation.webm" type="video/webm">
+    <link rel="prefetch" as="video" href="loading-animation.mp4" type="video/mp4">
+    <link rel="prefetch" as="image" href="loading-animation-ja.svg">
 
 
     <!-- <script src="js/utils/detectIE.js"></script> -->
@@ -52,12 +52,22 @@
     <script src="lib/wheelnav.js" defer></script>
     <script src="lib/abc.min.js" defer></script>
     <script src="lib/codejar/codejar.min.js" defer></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="lib/codejar/highlight.pack.js" defer></script>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
-    <script>
-        hljs.highlightAll();
-        <code class="language-javascript">
-        </code>
+
+    <!-- libgif.js (SuperGif) provides low-level GIF frame extraction.
+     Browsers expose only the first frame of a GIF; SuperGif lets us
+     step through frames so animated GIFs can be drawn onto our canvas. -->
+    <script src="https://cdn.jsdelivr.net/gh/buzzfeed/libgif-js/libgif.js" defer></script>
+
+    <!-- gif-animator.js integrates SuperGif with Music Blocks. It manages
+     decoding and drawing GIF frames onto the turtle's overlay canvas.
+     Canvas refreshing is handled separately by CreateJS Ticker. -->
+    <script src="js/gif-animator.js" defer></script>
+    <script defer>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (window.hljs) hljs.highlightAll();
+        });
     </script>
     <script src="lib/astring.min.js" defer></script>
 
@@ -69,18 +79,20 @@
     <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
     <link rel="preload" href="/fonts/material-icons.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="stylesheet" href="lib/materialize-iso.css">
-    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/themes.css?v=fixed">
     <script src="lib/easeljs.min.js" defer></script>
     <script src="lib/tweenjs.min.js" defer></script>
     <script>
         let ast2blocklist_config;
-        fetch("js/js-export/ast2blocks.min.json")
-            .then(response => response.json())
-            .then(data => { ast2blocklist_config = data })
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("js/js-export/ast2blocks.min.json")
+                .then(response => response.json())
+                .then(data => { ast2blocklist_config = data });
+        });
     </script>
 </head>
 
-<body id="body" onload="init();" data-title="index" style="background: #f9f9f9;">
+<body id="body" data-title="index" style="background: #f9f9f9;">
     <!-- Fallback for browsers that don't support preload -->
     <noscript>
         JavaScript is required to view this page.
@@ -89,7 +101,8 @@
         <div id="loading-image-container"
             style="position: fixed; top: 0; left: 0; width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #FFFFFF; z-index: 9999; contain: paint;">
             <div id="loading-media" style="width: 100%; padding: 0 20px; box-sizing: border-box;"></div>
-            <div class="loading-text" id="loadingText" style="margin-top: 2rem; min-height: 1.5em; font-size: 1.2rem;">
+            <div class="loading-text" id="loadingText"
+                style="color:#333; margin-top: 2rem; min-height: 1.5em; font-size: 1.2rem;">
             </div>
             <a href="https://www.sugarlabs.org/" target="_blank" id="link-to-sugarLabs"
                 style="position: fixed; bottom: 20px; right: 20px;">
@@ -214,10 +227,11 @@
                 <div id="helpElem" tabindex="-1"></div>
 
                 <div id="wheelDiv" class="wheelNav"
-                    style="background-size: contain;background-image: url(./images/gray.svg)" tabindex="-1"></div>
+                    style=" display: none; background-size: contain;background-image: url(./images/gray.svg)"
+                    tabindex="-1"></div>
 
                 <div id="wheelDiv2" class="wheelNav"
-                    style="background-size: contain;background-image: url(./images/gray.svg);visibility: hidden"
+                    style="display: none; background-size: contain;background-image: url(./images/gray.svg);visibility: hidden"
                     tabindex="-1">
                 </div>
 
@@ -270,7 +284,7 @@
             </dialog>
             <div class="materialize-iso" tabindex="-1">
                 <nav id="toolbars" class="nav-wrapper">
-                <div class="blue nav-wrapper" tabindex="-1">
+                    <div class="blue nav-wrapper" tabindex="-1">
                         <div id="mb-logo" class="logo left tooltipped"
                             style="display: flex; align-items: center; line-height: 0; height: 100%; padding-right: 0;"
                             data-position="bottom">
@@ -286,59 +300,60 @@
                                 <a id="stop" class="left tooltipped"><i class="material-icons main">stop</i></a>
                             </li>
                             <li>
-                            <a id="record" class="left tooltipped" data-tooltip="Record"></a>
+                                <a id="record" class="left tooltipped" data-tooltip="Record"></a>
                             </li>
                         </ul>
 
                         <ul class="main right">
                             <li>
                                 <a id="FullScreen" class="FullScreen tooltipped dropdown-trigger" data-position="bottom"
-                                onclick="setIcon()">
-                                <i class="material-icons" id="FullScrIcon">fullscreen</i>
-                            </a>
+                                    onclick="setIcon()">
+                                    <i class="material-icons" id="FullScrIcon">fullscreen</i>
+                                </a>
                             </li>
                             <li>
-                                <a id="newFile" class="tooltipped dropdown-trigger" data-position="left"
-                                data-activates="newdropdown">
-                                <i class="material-icons md-48">note_add</i>
-                            </a>
+                                <a id="newFile" class="tooltipped dropdown-trigger" data-position="bottom"
+                                    data-activates="newdropdown">
+                                    <i class="material-icons md-48">note_add</i>
+                                </a>
                             </li>
                             <li>
-                            <a id="load" class="tooltipped" data-position="bottom">
-                                <i class="material-icons md-48">folder</i>
-                            </a>
+                                <a id="load" class="tooltipped" data-position="bottom">
+                                    <i class="material-icons md-48">folder</i>
+                                </a>
                             </li>
                             <li>
-                            <a id="saveButton"  class="tooltipped dropdown-trigger" data-position="left"
-                                data-activates="saveddropdownbeg">
-                                <i id="save1" class="material-icons md-48">save_alt</i>
-                            </a>
+                                <a id="saveButton" class="tooltipped dropdown-trigger" data-position="bottom"
+                                    data-activates="saveddropdownbeg">
+                                    <i id="save1" class="material-icons md-48">save_alt</i>
+                                </a>
                             </li>
                             <li>
-                            <a id="saveButtonAdvanced" style="display: none;"  class="tooltipped dropdown-trigger"
-                                data-position="left" data-activates="saveddropdown">
-                                <i id="save2" class="material-icons md-48">save_alt</i>
-                            </a>
+                                <a id="saveButtonAdvanced" style="display: none;" class="tooltipped dropdown-trigger"
+                                    data-position="bottom" data-activates="saveddropdown">
+                                    <i id="save2" class="material-icons md-48">save_alt</i>
+                                </a>
                             </li>
                             <li>
-                            <a id="planetIcon" class="tooltipped" data-position="bottom">
-                                <i class="material-icons md-48">public</i>
-                            </a>
+                                <a id="planetIcon" class="tooltipped" data-position="bottom">
+                                    <i class="material-icons md-48">public</i>
+                                </a>
                             </li>
                             <li>
-                            <a style="display: none;" id="planetIconDisabled" class="tooltipped" data-position="bottom">
-                                <i style="color: #a5acba;" class="material-icons md-48">public</i>
-                            </a>
+                                <a style="display: none;" id="planetIconDisabled" class="tooltipped"
+                                    data-position="bottom">
+                                    <i style="color: #a5acba;" class="material-icons md-48">public</i>
+                                </a>
                             </li>
                             <li>
-                            <a id="toggleAuxBtn" class="tooltipped" data-position="left">
-                                <i id="menu" class="animated-icon material-icons md-48">menu</i>
-                            </a>
+                                <a id="toggleAuxBtn" class="tooltipped" data-position="bottom">
+                                    <i id="menu" class="animated-icon material-icons md-48">menu</i>
+                                </a>
                             </li>
                             <li>
-                            <a id="helpIcon" class="tooltipped" data-position="bottom">
-                                <i class="material-icons md-48">help</i>
-                            </a>
+                                <a id="helpIcon" class="tooltipped" data-position="bottom">
+                                    <i class="material-icons md-48">help</i>
+                                </a>
                             </li>
                         </ul>
                     </div>
@@ -346,20 +361,20 @@
                         <div class="blue darken-1 nav-wrapper" tabindex="-1">
                             <ul class="aux left">
                                 <li>
-                                <a id="runSlowlyIcon" class="tooltipped" data-position="bottom" data-delay="10">
-                                    <i class="material-icons md-48">play_circle_outline</i>
-                                </a>
+                                    <a id="runSlowlyIcon" class="tooltipped" data-position="bottom" data-delay="10">
+                                        <i class="material-icons md-48">play_circle_outline</i>
+                                    </a>
                                 </li>
                                 <li>
-                                <a id="runStepByStepIcon" class="tooltipped" data-position="bottom" data-delay="10">
-                                    <i class="material-icons md-48">video_library</i>
-                                </a>
+                                    <a id="runStepByStepIcon" class="tooltipped" data-position="bottom" data-delay="10">
+                                        <i class="material-icons md-48">video_library</i>
+                                    </a>
                                 </li>
                             </ul>
                             <ul class="aux right">
                                 <li>
-                                <a id="displayStatsIcon" class="tooltipped" data-position="bottom" data-delay="10"><i
-                                        class="material-icons md-48">poll</i></a>
+                                    <a id="displayStatsIcon" class="tooltipped" data-position="bottom"
+                                        data-delay="10"><i class="material-icons md-48">poll</i></a>
                                 </li>
                                 <li>
                                     <a id="loadPluginIcon" class="tooltipped" data-position="bottom" data-delay="10"><i
@@ -378,7 +393,7 @@
                                         data-position="bottom"><i class="material-icons md-48">lock</i></a>
                                 </li>
                                 <li>
-                                    <a id="themeSelectIcon" class="tooltipped dropdown-trigger" data-position="left"
+                                    <a id="themeSelectIcon" class="tooltipped dropdown-trigger" data-position="bottom"
                                         data-activates="themedropdown" data-tooltip="Select Theme"><i
                                             class="material-icons md-48">brightness_7</i></a>
                                 </li>
@@ -391,7 +406,7 @@
                                             class="material-icons md-48">wrap_text</i></a>
                                 </li>
                                 <li>
-                                    <a id="chooseKeyIcon" class="tooltipped" data-position="left"><i
+                                    <a id="chooseKeyIcon" class="tooltipped" data-position="bottom"><i
                                             class="material-icons md-48">music_note</i></a>
                                 </li>
                                 <li>
@@ -404,7 +419,8 @@
                                 </li>
 
                                 <li>
-                                <a id="restoreIcon" class="tooltipped" data-position="bottom" data-tooltip="Restore"><i
+                                    <a id="restoreIcon" class="tooltipped" data-position="bottom"
+                                        data-tooltip="Restore"><i
                                             class="material-icons md-48">restore_from_trash</i></a>
                                     <div id="trashList"></div>
                                 </li>
@@ -417,9 +433,9 @@
                                             class="material-icons md-48">star_border</i></a>
                                 </li>
                                 <li>
-                                    <a id="languageSelectIcon" class="tooltipped dropdown-trigger" data-position="left"
-                                        data-activates="languagedropdown" data-tooltip="Select Language"><i
-                                            class="material-icons md-48">translate</i></a>
+                                    <a id="languageSelectIcon" class="tooltipped dropdown-trigger"
+                                        data-position="bottom" data-activates="languagedropdown"
+                                        data-tooltip="Select Language"><i class="material-icons md-48">translate</i></a>
                                 </li>
                             </ul>
                         </div>
@@ -462,8 +478,10 @@
                     <li><a id="te"></a></li>
                     <li><a id="ibo"></a></li>
                     <li><a id="ar"></a></li>
+                    <li><a id="bn"></a></li>
                     <li><a id="he"></a></li>
                     <li><a id="ur"></a></li>
+
                 </ul>
 
                 <ul style="display: none;" id="themedropdown" class="dropdown-content">
@@ -490,13 +508,15 @@
 
     <!-- Initialize Scripts -->
     <script>
-        let canvas, stage, lang;
+        let canvas, stage;
         function init() {
             canvas = document.getElementById("canvas");
             stage = new createjs.Stage(canvas);
-            stage.update();
-            // createjs.Ticker.addEventListener("tick", stage);
+
+            createjs.Ticker.framerate = 60;
+            // createjs.Ticker.addEventListener("tick", stage); // Managed by Activity class
         }
+        document.addEventListener("DOMContentLoaded", init);
     </script>
 
     <script>
@@ -517,6 +537,20 @@
                     });
             }
         }
+    </script>
+    <script>
+        let deferredPrompt;
+
+        window.addEventListener("beforeinstallprompt", (event) => {
+            event.preventDefault(); // Prevent automatic browser prompt
+            deferredPrompt = event;
+
+            // Show your install button here
+            const divInstall = document.getElementById("installButton");
+            if (divInstall) {
+                divInstall.classList.remove("hidden");
+            }
+        });
     </script>
     <script>
         $(document).ready(function () {
@@ -544,8 +578,8 @@
                 }
 
                 const container = document.getElementById("loading-media");
-                const content = lang.startsWith("ja")                    
-                ? `<img src="loading-animation-ja.svg" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
+                const content = lang.startsWith("ja")
+                    ? `<img src="loading-animation-ja.svg" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
                     : `<video loop autoplay muted playsinline fetchpriority="high" style="width: 90%; height: 100%; object-fit: contain;">
                         <source src="loading-animation.webm" type="video/webm">
                         <source src="loading-animation.mp4" type="video/mp4">
@@ -560,17 +594,10 @@
                 const texts = [_("Do, Re, Mi, Fa, Sol, La, Ti, Do"), _("Loading Music Blocks..."), _("Reading Music...")];
                 let index = 0;
 
-                const intervalId = setInterval(function () {
+                window.intervalId = setInterval(function () {
                     loadingText.textContent = texts[index];
                     index = (index + 1) % texts.length;
                 }, 1500);
-
-                // Stop changing text and finalize loading after 6 seconds
-                setTimeout(function () {
-                    clearInterval(intervalId);
-                    loadingText.textContent = _("Loading Complete!");
-                    loadingText.style.opacity = 1;
-                }, 6000);
             }, 3000);
         });
 
@@ -755,19 +782,6 @@
                     body.classList.add("play-only");
                     showPersistentNotification();
 
-                    if (buttonContainer) {
-                        buttonContainer.style.display = "flex";
-                        buttonContainer.style.justifyContent = "flex-end";
-                        buttonContainer.style.alignItems = "center";
-                    }
-                    if (homeButton) {
-                        homeButton.style.display = "flex";
-                        homeButton.style.position = "fixed";
-                        homeButton.style.right = "15px";
-                        homeButton.style.bottom = "15px";
-                        homeButton.style.zIndex = "10000";
-                    }
-
                     // Hide certain elements
                     hideElementById("Show/hide blocks");
                     hideElementById("Expand/collapse blocks");
@@ -779,9 +793,6 @@
                     // Disable play-only mode
                     body.classList.remove("play-only");
                     removePersistentNotification();
-
-                    if (homeButton) homeButton.style = "";
-                    if (buttonContainer) buttonContainer.style = "";
 
                     showElementById("Show/hide blocks");
                     showElementById("Expand/collapse blocks");
@@ -796,6 +807,7 @@
 
             window.addEventListener("resize", togglePlayOnlyMode);
         });
+
     </script>
 
 </body>

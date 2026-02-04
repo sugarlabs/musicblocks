@@ -81,8 +81,7 @@ class ModeWidget {
             if (this._playingStatus()) {
                 this._playing = false;
 
-                this._playButton.innerHTML =
-                    `&nbsp;&nbsp;<img 
+                this._playButton.innerHTML = `&nbsp;&nbsp;<img 
                         src="header-icons/play-button.svg" 
                         title="${_("Play all")}" 
                         alt="${_("Play all")}" 
@@ -93,8 +92,7 @@ class ModeWidget {
             } else {
                 this._playing = true;
 
-                this._playButton.innerHTML =
-                    `&nbsp;&nbsp;<img 
+                this._playButton.innerHTML = `&nbsp;&nbsp;<img 
                         src="header-icons/stop-button.svg" 
                         title="${_("Stop")}" 
                         alt="${_("Stop")}" 
@@ -175,8 +173,7 @@ class ModeWidget {
      */
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
-        cell.innerHTML =
-            `&nbsp;&nbsp;<img 
+        cell.innerHTML = `&nbsp;&nbsp;<img 
                 src="header-icons/${icon}" 
                 title="${label}" 
                 alt="${label}" 
@@ -633,8 +630,7 @@ class ModeWidget {
                     if (note_key !== null) {
                         note_key.src = highlightImgs[0];
                     }
-                    this._playButton.innerHTML =
-                        `&nbsp;&nbsp;<img 
+                    this._playButton.innerHTML = `&nbsp;&nbsp;<img 
                             src="header-icons/play-button.svg" 
                             title="${_("Play all")}" 
                             alt="${_("Play all")}" 
@@ -702,8 +698,7 @@ class ModeWidget {
                 setTimeout(() => {
                     // Did we just play the last note?
                     this._playing = false;
-                    this._playButton.innerHTML =
-                        `&nbsp;&nbsp;<img 
+                    this._playButton.innerHTML = `&nbsp;&nbsp;<img 
                             src="header-icons/play-button.svg" 
                             title="${_("Play all")}" 
                             alt="${_("Play all")}" 
@@ -1012,9 +1007,18 @@ class ModeWidget {
 
         // And save a stack of pitchnumbers to be used with the define mode
         newStack = [
-            [0, ["definemode", {
-                collapsed: true
-            }], 150, 150, [null, 1, 3, 2]],
+            [
+                0,
+                [
+                    "definemode",
+                    {
+                        collapsed: true
+                    }
+                ],
+                150,
+                150,
+                [null, 1, 3, 2]
+            ],
             [
                 1,
                 [

@@ -854,7 +854,9 @@ function setupExtrasBlocks(activity) {
             super("debugger", _("debugger"));
             this.setPalette("extras", activity);
             this.setHelpString([
-                _("The Debug block adds a debug point in your code. When reached, execution will pause and you can inspect variables."),
+                _(
+                    "The Debug block adds a debug point in your code. When reached, execution will pause and you can inspect variables."
+                ),
                 "documentation",
                 "",
                 "debugger"
@@ -914,4 +916,3 @@ function setupExtrasBlocks(activity) {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = { setupExtrasBlocks };
 }
-

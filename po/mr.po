@@ -3,9 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-17 00:31-0400\n"
-"PO-Revision-Date: 2011-09-11 12:18+0200\n"
-"Last-Translator: <sarveshcharpe27@gmail.com>\n"
-"Last-Translator:<sarveshcharpe273@gmail.com>\n"
+"PO-Revision-Date: 2025-12-10 18:51+0530\n"
+"Last-Translator: Harihara Vardhan <hariharavardhan1234@gmail.com>\n"
 "Language-Team: LANGUAGE <walter@sugarlabs.org>\n"
 "Language: Marathi\n"
 "MIME-Version: 1.0\n"
@@ -38,7 +37,7 @@ msgstr ""
 #: js/SaveInterface.js:93
 #: js/languagebox.js:208
 msgid "Refresh your browser to change your language preference."
-msgstr "अपनी भाषा बदलने के लिए अपने ब्राउज़र को रीफ़्रेश करें"
+msgstr "भाषा बदलण्यासाठी तुमचा ब्राउझर रिफ्रेश करा"
 
 #: js/languagebox.js:229
 msgid "Music Blocks is already set to this language."
@@ -105,11 +104,11 @@ msgstr "क्रिया"
 #: js/utils/synthutils.js:204
 #. TRANS: animal sound effect
 msgid "duck"
-msgstr "बत्तख"
+msgstr "बदक"
 
 #: js/themebox.js:66
 msgid "Music Blocks is already set to this theme."
-msgstr ""
+msgstr "म्युझिक ब्लॉक्स आधीच या थीमवर सेट आहे."
 
 #: js/SaveInterface.js:59
 #: js/SaveInterface.js:61
@@ -247,19 +246,19 @@ msgstr "ब्लॉक्स शोधा"
 
 #: js/activity.js:1358
 msgid "Are you sure you want to clear the workspace?"
-msgstr ""
+msgstr "तुम्हाला नक्कीWorkspace साफ करायचे आहे का?"
 
 #: js/activity.js:1577
 msgid "Enter file name"
-msgstr ""
+msgstr "फाईल नाव प्रविष्ट करा"
 
 #: js/activity.js:1579
 msgid "File save canceled"
-msgstr ""
+msgstr "फाईल जतन करणे रद्द केले"
 
 #: js/activity.js:1598
 msgid "Click on stop saving"
-msgstr ""
+msgstr "जतन करणे थांबवा वर क्लिक करा"
 
 #: js/activity.js:1882
 msgid "Catching mice"
@@ -317,7 +316,7 @@ msgstr "पैमाने की डिग्री"
 #: js/activity.js:2606
 #: js/palette.js:681
 msgid "voice name"
-msgstr "आवाज का नाम"
+msgstr "आवाजाचे नाव"
 
 #: js/activity.js:2609
 #: js/palette.js:678
@@ -490,7 +489,7 @@ msgstr "मिटवा"
 #: js/widgets/phrasemaker.js:4722
 #: plugins/rodi.rtp:191
 msgid "Play"
-msgstr "चलायें"
+msgstr "वाजवा"
 
 #: js/activity.js:3080
 #: js/toolbar.js:50
@@ -588,7 +587,7 @@ msgstr "ब्लॉक छुपाएं"
 #: js/activity.js:3657
 #: js/activity.js:3672
 msgid "Trash can is empty."
-msgstr ""
+msgstr "कचरापेटी रिकामी आहे."
 
 #: js/activity.js:3679
 #: js/activity.js:3760
@@ -597,11 +596,11 @@ msgstr "आइटम को ट्रैश से पुनर्स्था�
 
 #: js/activity.js:3818
 msgid "Restore last item"
-msgstr ""
+msgstr "शेवटची वस्तू पुनर्संचयित करा"
 
 #: js/activity.js:3819
 msgid "Restore all items"
-msgstr ""
+msgstr "सर्व वस्तू पुनर्संचयित करा"
 
 #: js/activity.js:5016
 msgid "Click the run button to run the project."
@@ -1074,7 +1073,7 @@ msgstr "नमूना"
 #: js/lilypond.js:948
 #: js/rubrics.js:526
 msgid "mouse"
-msgstr "चूहा"
+msgstr "उंदीर"
 
 #: js/lilypond.js:606
 msgid "brown rat"
@@ -1176,7 +1175,7 @@ msgstr "प्रवाह"
 #: js/turtledefs.js:240
 #: planet/js/GlobalTag.js:48
 #. TRANS: On the Planet, we use labels to tag projects.
-msgid "Sensors"
+msgid "sensors"
 msgstr "संवेदी"
 
 #: js/rubrics.js:532
@@ -1185,7 +1184,7 @@ msgstr "संवेदी"
 #: js/blocks/MediaBlocks.js:930
 #: planet/js/GlobalTag.js:46
 #. TRANS: On the Planet, we use labels to tag projects.
-msgid "Media"
+msgid "media"
 msgstr "मीडिया"
 
 #: js/rubrics.js:533
@@ -1360,21 +1359,21 @@ msgstr "आडवे स्क्रोलिंग अक्षम करा"
 #: js/toolbar.js:268
 #: js/turtledefs.js:642
 msgid "Change theme"
-msgstr ""
+msgstr "थीम बदला"
 
 #: js/toolbar.js:71
 #: js/toolbar.js:137
 #: js/toolbar.js:208
 #: js/toolbar.js:269
 msgid "Light Mode"
-msgstr ""
+msgstr "लाईट मोड"
 
 #: js/toolbar.js:72
 #: js/toolbar.js:138
 #: js/toolbar.js:209
 #: js/toolbar.js:270
 msgid "Dark Mode"
-msgstr ""
+msgstr "डार्क मोड"
 
 #: js/toolbar.js:73
 #: js/toolbar.js:139
@@ -1478,7 +1477,7 @@ msgstr "ब्लॉक कला SVG म्हणून जतन करा"
 #: js/toolbar.js:222
 #: js/toolbar.js:283
 msgid "Save block artwork as PNG"
-msgstr ""
+msgstr "ब्लॉक कलाकृती PNG म्हणून जतन करा"
 
 #: js/toolbar.js:91
 #: js/toolbar.js:154
@@ -1494,95 +1493,95 @@ msgstr "पुष्टी करा"
 #: js/toolbar.js:224
 #: js/toolbar.js:285
 msgid "English (United States)"
-msgstr "इंग्रजी (संयुक्त राज्ये)"
+msgstr ""
 
 #: js/toolbar.js:93
 #: js/toolbar.js:165
 #: js/toolbar.js:225
 #: js/toolbar.js:286
 msgid "English (United Kingdom)"
-msgstr "इंग्रजी (युनायटेड किंगडम)"
+msgstr ""
 
 #: js/toolbar.js:94
 #: js/toolbar.js:166
 #: js/toolbar.js:226
 #: js/toolbar.js:287
 msgid "日本語"
-msgstr "जपानी"
+msgstr ""
 
 #: js/toolbar.js:95
 msgid "한국어"
-msgstr "कोरियन"
+msgstr ""
 
 #: js/toolbar.js:96
 #: js/toolbar.js:168
 #: js/toolbar.js:228
 #: js/toolbar.js:289
 msgid "español"
-msgstr "स्पॅनिश"
+msgstr ""
 
 #: js/toolbar.js:97
 #: js/toolbar.js:169
 #: js/toolbar.js:229
 #: js/toolbar.js:290
 msgid "português"
-msgstr "पोर्तुगीज"
+msgstr ""
 
 #: js/toolbar.js:98
 #: js/toolbar.js:170
 #: js/toolbar.js:230
 #: js/toolbar.js:291
 msgid "にほんご"
-msgstr "जपानी"
+msgstr ""
 
 #: js/toolbar.js:99
 #: js/toolbar.js:171
 #: js/toolbar.js:231
 #: js/toolbar.js:292
 msgid "中文"
-msgstr "चिनी"
+msgstr ""
 
 #: js/toolbar.js:100
 #: js/toolbar.js:172
 #: js/toolbar.js:232
 #: js/toolbar.js:293
 msgid "ภาษาไทย"
-msgstr "थाई"
+msgstr ""
 
 #: js/toolbar.js:101
 #: js/toolbar.js:173
 #: js/toolbar.js:233
 #: js/toolbar.js:294
 msgid "aymara"
-msgstr "आयमारा"
+msgstr ""
 
 #: js/toolbar.js:102
 #: js/toolbar.js:174
 #: js/toolbar.js:234
 #: js/toolbar.js:295
 msgid "quechua"
-msgstr "क्वेचुआ"
+msgstr ""
 
 #: js/toolbar.js:103
 #: js/toolbar.js:175
 #: js/toolbar.js:235
 #: js/toolbar.js:296
 msgid "guarani"
-msgstr "गुआरानी"
+msgstr ""
 
 #: js/toolbar.js:104
 #: js/toolbar.js:176
 #: js/toolbar.js:236
 #: js/toolbar.js:297
 msgid "हिंदी"
-msgstr "हिंदी"
+msgstr ""
 
 #: js/toolbar.js:105
 #: js/toolbar.js:178
 #: js/toolbar.js:237
 #: js/toolbar.js:299
 msgid "igbo"
-msgstr "इग्बो"
+msgstr ""
 
 #: js/toolbar.js:106
 #: js/toolbar.js:179
@@ -2045,11 +2044,11 @@ msgstr "ब्लॉक कलाकृती SVG फाइल म्हणू�
 
 #: js/turtledefs.js:571
 msgid "Save sheet music as ABC, Lilypond or MusicXML"
-msgstr ""
+msgstr "शिट संगीत ABC, Lilypond किंवा MusicXML म्हणून जतन करा"
 
 #: js/turtledefs.js:573
 msgid "Save block artwork as SVG or PNG"
-msgstr ""
+msgstr "ब्लॉक कलाकृती SVG किंवा PNG म्हणून जतन करा"
 
 #: js/turtledefs.js:580
 msgid "Load samples from server"
@@ -2064,12 +2063,12 @@ msgid "Expand/collapse option toolbar"
 msgstr "साधनपट्टी दाखवायसाठी / लपवायसाठी पर्याय"
 
 #: js/turtledefs.js:587
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxiliary toolbar."
 msgstr "या बटणावर क्लिक करून सहाय्यक टूलबार विस्तारित किंवा संकुचित करा."
 
 #: js/turtledefs.js:593
 msgid "Displays help messages for the main and auxiliary toolbar, right-click contextual menu for blocks and canvas, and palettes."
-msgstr ""
+msgstr "मुख्य आणि सहाय्यक टूलबारसाठी मदत संदेश, ब्लॉक्स आणि कॅनव्हाससाठी उजवे-क्लिक संदर्भीय मेनू आणि पॅलेट प्रदर्शित करतो."
 
 #: js/turtledefs.js:599
 msgid "Click to run the project in slow mode."
@@ -2085,7 +2084,7 @@ msgstr "आपल्या संगीत प्रकल्पाबद्द�
 
 #: js/turtledefs.js:618
 msgid "Load a selected plugin."
-msgstr ""
+msgstr "निवडलेले प्लगइन लोड करा."
 
 #: js/turtledefs.js:626
 msgid "Delete a selected plugin."
@@ -2101,11 +2100,11 @@ msgstr "आपण कॅनव्हासवर ब्लॉक्स स्क
 
 #: js/turtledefs.js:643
 msgid "Switch between dark and light mode."
-msgstr ""
+msgstr "डार्क आणि लाईट मोडमध्ये स्विच करा."
 
 #: js/turtledefs.js:649
 msgid "Click to add another project into the current one."
-msgstr ""
+msgstr "सध्याच्या प्रकल्पात दुसरा प्रकल्प जोडण्यासाठी क्लिक करा."
 
 #: js/turtledefs.js:654
 msgid "Wrap Turtle"
@@ -2117,11 +2116,11 @@ msgstr "टर्टल लपेटणे चालू किंवा बं�
 
 #: js/turtledefs.js:663
 msgid "Click to set the current pitch."
-msgstr ""
+msgstr "वर्तमान पिच सेट करण्यासाठी क्लिक करा."
 
 #: js/turtledefs.js:670
 msgid "Converts Music Block programs to JavaScript."
-msgstr ""
+msgstr "म्युझिक ब्लॉक प्रोग्रामना JavaScript मध्ये रूपांतरित करते."
 
 #: js/turtledefs.js:677
 msgid "Restore blocks from the trash."
@@ -2141,11 +2140,11 @@ msgstr "आपली भाषा प्राधान्य निवडा."
 
 #: js/turtledefs.js:696
 msgid "Contextual Menu for Blocks"
-msgstr ""
+msgstr "ब्लॉक्ससाठी संदर्भीय मेनू"
 
 #: js/turtledefs.js:697
 msgid "Right-click on a block to access common actions."
-msgstr ""
+msgstr "सामान्य क्रियांत प्रवेश करण्यासाठी ब्लॉकवर उजवे क्लिक करा."
 
 #: js/turtledefs.js:702
 #: planet/js/StringHelper.js:46
@@ -2174,11 +2173,11 @@ msgstr "आपण 'd' टाइप करून 'do' ब्लॉक आणि '
 
 #: js/turtledefs.js:729
 msgid "Contextual Menu for Canvas"
-msgstr ""
+msgstr "कॅनव्हाससाठी संदर्भीय मेनू"
 
 #: js/turtledefs.js:730
 msgid "Right-click on the canvas to perform additional canvas-related tasks."
-msgstr ""
+msgstr "अतिरिक्त कॅनव्हास-संबंधित कार्ये करण्यासाठी कॅनव्हासवर उजवे क्लिक करा."
 
 #: js/turtledefs.js:736
 #: js/turtles.js:940
@@ -2188,11 +2187,11 @@ msgstr "जाल"
 
 #: js/turtledefs.js:737
 msgid "Turn on/off lines for cartesian or polar grids."
-msgstr ""
+msgstr "कार्टेशियन किंवा ध्रुवीय ग्रिडसाठी रेषा चालू/बंद करा."
 
 #: js/turtledefs.js:739
 msgid "Turn on/off music staffs."
-msgstr ""
+msgstr "संगीत स्टाफ चालू/बंद करा."
 
 #: js/turtledefs.js:744
 #: js/turtles.js:959
@@ -2245,11 +2244,11 @@ msgstr "ब्लॉकचा आकार वाढवा"
 
 #: js/turtledefs.js:789
 msgid "Select"
-msgstr ""
+msgstr "निवडा"
 
 #: js/turtledefs.js:790
 msgid "Left-click and drag on workspace to select multiple blocks."
-msgstr ""
+msgstr "एकाधिक ब्लॉक्स निवडण्यासाठी वर्कस्पेसवर डावे क्लिक करा आणि ड्रॅग करा."
 
 #: js/turtledefs.js:797
 msgid "Palette buttons"
@@ -2321,7 +2320,7 @@ msgstr "संगीत ब्लॉक्स GitHub रिपॉझिटरी
 
 #: js/turtledefs.js:854
 msgid "Congratulations!"
-msgstr ""
+msgstr "अभिनंदन!"
 
 #: js/turtledefs.js:855
 msgid "You have finished the tour. Please enjoy Music Blocks!"
@@ -2915,7 +2914,7 @@ msgstr "गिटार."
 #: js/utils/synthutils.js:84
 #. TRANS: sitar musical instrument
 msgid "sitar"
-msgstr ""
+msgstr "सतार"
 
 #: js/utils/musicutils.js:1113
 #: js/utils/synthutils.js:88
@@ -3943,37 +3942,37 @@ msgstr "स्टॅकॅटो"
 
 #: js/blocks/ProgramBlocks.js:33
 msgid "The Load-heap-from-app block loads the heap from a web page."
-msgstr ""
+msgstr "Load-heap-from-app ब्लॉक वेब पृष्ठावरून हीप लोड करतो."
 
 #: js/blocks/ProgramBlocks.js:44
 #. TRANS: load the heap contents from a URL
 msgid "load heap from App"
-msgstr ""
+msgstr "ॲपवरून हीप लोड करा"
 
 #: js/blocks/ProgramBlocks.js:95
 msgid "Error parsing JSON data:"
-msgstr ""
+msgstr "JSON डेटा पार्स करण्यात त्रुटी:"
 
 #: js/blocks/ProgramBlocks.js:100
 msgid "404: Page not found"
-msgstr ""
+msgstr "404: पृष्ठ सापडले नाही"
 
 #: js/blocks/ProgramBlocks.js:133
 msgid "The Save-heap-to-app block saves the heap to a web page."
-msgstr ""
+msgstr "Save-heap-to-app ब्लॉक वेब पृष्ठावर हीप जतन करतो."
 
 #: js/blocks/ProgramBlocks.js:144
 #. TRANS: save the heap contents to a URL
 msgid "save heap to App"
-msgstr ""
+msgstr "ॲपवर हीप जतन करा"
 
 #: js/blocks/ProgramBlocks.js:189
 msgid "Cannot find a valid heap for"
-msgstr ""
+msgstr "यासाठी वैध हीप सापडत नाही"
 
 #: js/blocks/ProgramBlocks.js:206
 msgid "The Load-heap block loads the heap from a file."
-msgstr ""
+msgstr "Load-heap ब्लॉक फाईलवरून हीप लोड करतो."
 
 #: js/blocks/ProgramBlocks.js:217
 #. TRANS: load the heap from a file
@@ -3982,67 +3981,67 @@ msgstr "लोड ढीग"
 
 #: js/blocks/ProgramBlocks.js:270
 msgid "The file you selected does not contain a valid heap."
-msgstr ""
+msgstr "तुम्ही निवडलेल्या फाईलमध्ये वैध हीप नाही."
 
 #: js/blocks/ProgramBlocks.js:275
 msgid "The loadHeap block needs a loadFile block."
-msgstr ""
+msgstr "loadHeap ब्लॉकला loadFile ब्लॉकची आवश्यकता आहे."
 
 #: js/blocks/ProgramBlocks.js:291
 msgid "The Set-heap block loads the heap."
-msgstr ""
+msgstr "Set-heap ब्लॉक हीप लोड करतो."
 
 #: js/blocks/ProgramBlocks.js:340
 msgid "The block you selected does not contain a valid heap."
-msgstr ""
+msgstr "तुम्ही निवडलेल्या ब्लॉक मध्ये वैध हीप नाही."
 
 #: js/blocks/ProgramBlocks.js:343
 msgid "The Set heap block needs a heap."
-msgstr ""
+msgstr "Set heap ब्लॉकला हीपची आवश्यकता आहे."
 
 #: js/blocks/ProgramBlocks.js:360
 msgid "The Load-dictionary block loads a dictionary from a file."
-msgstr ""
+msgstr "Load-dictionary ब्लॉक फाईलवरून शब्दकोश लोड करतो."
 
 #: js/blocks/ProgramBlocks.js:372
 #. TRANS: load a dictionary from a file
 msgid "load dictionary"
-msgstr ""
+msgstr "शब्दकोश लोड करा"
 
 #: js/blocks/ProgramBlocks.js:390
 #: js/blocks/ProgramBlocks.js:658
 #: js/blocks/ToneBlocks.js:1025
 msgid "file"
-msgstr ""
+msgstr "फाईल"
 
 #: js/blocks/ProgramBlocks.js:444
 msgid "The file you selected does not contain a valid dictionary."
-msgstr ""
+msgstr "तुम्ही निवडलेल्या फाईलमध्ये वैध शब्दकोश नाही."
 
 #: js/blocks/ProgramBlocks.js:449
 msgid "The load dictionary block needs a load file block."
-msgstr ""
+msgstr "load dictionary ब्लॉकला load file ब्लॉकची आवश्यकता आहे."
 
 #: js/blocks/ProgramBlocks.js:466
 msgid "The Set-dictionary block loads a dictionary."
-msgstr ""
+msgstr "Set-dictionary ब्लॉक शब्दकोश लोड करतो."
 
 #: js/blocks/ProgramBlocks.js:477
 #. TRANS: load a dictionary from a JSON
 msgid "set dictionary"
-msgstr ""
+msgstr "शब्दकोश सेट करा"
 
 #: js/blocks/ProgramBlocks.js:546
 msgid "The block you selected does not contain a valid dictionary."
-msgstr ""
+msgstr "तुम्ही निवडलेल्या ब्लॉक मध्ये वैध शब्दकोश नाही."
 
 #: js/blocks/ProgramBlocks.js:550
 msgid "The set dictionary block needs a dictionary."
-msgstr ""
+msgstr "set dictionary ब्लॉकला शब्दकोशची आवश्यकता आहे."
 
 #: js/blocks/ProgramBlocks.js:567
 msgid "The Save-heap block saves the heap to a file."
-msgstr ""
+msgstr "Save-heap ब्लॉक फाईलवर हीप जतन करतो."
 
 #: js/blocks/ProgramBlocks.js:578
 #. TRANS: save the heap to a file
@@ -4051,43 +4050,43 @@ msgstr "ढीग जतन करा"
 
 #: js/blocks/ProgramBlocks.js:629
 msgid "The Save-dictionary block saves a dictionary to a file."
-msgstr ""
+msgstr "Save-dictionary ब्लॉक फाईलवर शब्दकोश जतन करतो."
 
 #: js/blocks/ProgramBlocks.js:640
 #. TRANS: save a dictionary to a file
 msgid "save dictionary"
-msgstr ""
+msgstr "शब्दकोश जतन करा"
 
 #: js/blocks/ProgramBlocks.js:720
 msgid "The Open palette block opens a palette."
-msgstr ""
+msgstr "Open palette ब्लॉक पॅलेट उघडतो."
 
 #: js/blocks/ProgramBlocks.js:727
 msgid "open palette"
-msgstr ""
+msgstr "पॅलेट उघडा"
 
 #: js/blocks/ProgramBlocks.js:785
 msgid "The Delete block block removes a block."
-msgstr ""
+msgstr "ब्लॉक हटवा"
 
 #: js/blocks/ProgramBlocks.js:797
 #. TRANS: Move this block to the trash.
 msgid "delete block"
-msgstr ""
+msgstr "ब्लॉक हटवा"
 
 #: js/blocks/ProgramBlocks.js:861
 msgid "The Move block block moves a block."
-msgstr ""
+msgstr "Move block ब्लॉक ब्लॉक हलवतो."
 
 #: js/blocks/ProgramBlocks.js:869
 #. TRANS: Move the position of a block on the screen.
 msgid "move block"
-msgstr ""
+msgstr "ब्लॉक हलवा"
 
 #: js/blocks/ProgramBlocks.js:881
 #: js/blocks/ProgramBlocks.js:1048
 msgid "block number"
-msgstr ""
+msgstr "ब्लॉक क्रमांक"
 
 #: js/blocks/ProgramBlocks.js:881
 #: js/blocks/EnsembleBlocks.js:393
@@ -4116,11 +4115,11 @@ msgstr "y"
 #: js/blocks/ProgramBlocks.js:935
 #. TRANS: Run program beginning at this block.
 msgid "run block"
-msgstr ""
+msgstr "ब्लॉक चालवा"
 
 #: js/blocks/ProgramBlocks.js:1025
 msgid "The Dock block block connections two blocks."
-msgstr ""
+msgstr "Dock block दोन ब्लॉक्स जोडतो."
 
 #: js/blocks/ProgramBlocks.js:1036
 #. TRANS: We can connect a block to another block.
@@ -4489,12 +4488,12 @@ msgstr "डुप्लिकेट फॅक्टर"
 #: js/blocks/MeterBlocks.js:34
 #. TRANS: musical meter (time signature), e.g., 4:4
 msgid "current meter"
-msgstr ""
+msgstr "वर्तमान मीटर"
 
 #: js/blocks/MeterBlocks.js:85
 #. TRANS: number of beats per minute
 msgid "beat factor"
-msgstr ""
+msgstr "बीट फॅक्टर"
 
 #: js/blocks/MeterBlocks.js:161
 msgid "The Beats per minute block returns the current beats per minute."
@@ -4505,7 +4504,7 @@ msgstr "बीट्स पर मिनिट ब्लॉक सध्या�
 #. TRANS: number of beats played per minute
 #. TRANS: in Japanese: "１分当たりの拍の数"
 msgid "beats per minute2"
-msgstr ""
+msgstr "बीट्स प्रति मिनिट2"
 
 #: js/blocks/MeterBlocks.js:170
 #: js/blocks/MeterBlocks.js:1057
@@ -4518,7 +4517,7 @@ msgstr "बीट्स प्रति मिनिट"
 #: js/blocks/MeterBlocks.js:234
 #. TRANS: count of current musical measure in meter
 msgid "measure count"
-msgstr ""
+msgstr "मोजणी संख्या"
 
 #: js/blocks/MeterBlocks.js:242
 msgid "The Measure count block returns the current measure."
@@ -4606,7 +4605,7 @@ msgstr "बीट"
 #: js/blocks/ActionBlocks.js:959
 #: js/blocks/ActionBlocks.js:1048
 msgid "do1"
-msgstr ""
+msgstr "do1"
 
 #: js/blocks/MeterBlocks.js:814
 msgid "on every beat do"
@@ -4805,7 +4804,7 @@ msgstr "सेट पिच नंबर ऑफसेट ब्लॉकचा �
 #: js/blocks/MediaBlocks.js:746
 #. TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
 msgid "name2"
-msgstr ""
+msgstr "नाव2"
 
 #: js/blocks/PitchBlocks.js:679
 #. TRANS: convert piano key number (1-88) to pitch
@@ -4981,7 +4980,7 @@ msgstr "अॅक्सिडेंटल ओव्हरराइड"
 #: js/widgets/phrasemaker.js:1123
 #. TRANS: a measure of frequency: one cycle per second
 msgid "hertz"
-msgstr ""
+msgstr "हर्ट्झ"
 
 #: js/blocks/PitchBlocks.js:1581
 msgid "The Hertz block (in combination with a Number block) will play a sound at the specified frequency."
@@ -5857,7 +5856,7 @@ msgstr "वाय ब्लॉक कासवाची उभ्या स्�
 
 #: js/blocks/GraphicsBlocks.js:149
 msgid "y3"
-msgstr ""
+msgstr "x3"
 
 #: js/blocks/GraphicsBlocks.js:219
 msgid "The X block returns the horizontal position of the mouse."
@@ -5869,11 +5868,11 @@ msgstr "एक्स ब्लॉक कासवाची आडवी स्�
 
 #: js/blocks/GraphicsBlocks.js:235
 msgid "x3"
-msgstr ""
+msgstr "x3"
 
 #: js/blocks/GraphicsBlocks.js:295
 msgid "scroll xy"
-msgstr ""
+msgstr "स्क्रोल xy"
 
 #: js/blocks/GraphicsBlocks.js:303
 msgid "The Scroll XY block moves the canvas."
@@ -5881,11 +5880,11 @@ msgstr "स्क्रोल एक्सवाय ब्लॉक कॅनव
 
 #: js/blocks/GraphicsBlocks.js:313
 msgid "x2"
-msgstr ""
+msgstr "x2"
 
 #: js/blocks/GraphicsBlocks.js:313
 msgid "y2"
-msgstr ""
+msgstr "y2"
 
 #: js/blocks/GraphicsBlocks.js:417
 msgid "The Control-point 2 block sets the second control point for the Bezier curve."
@@ -5900,14 +5899,14 @@ msgstr "कंट्रोल पॉइंट २"
 #: js/blocks/GraphicsBlocks.js:525
 #: js/blocks/GraphicsBlocks.js:741
 msgid "x1"
-msgstr ""
+msgstr "x1"
 
 #: js/blocks/GraphicsBlocks.js:427
 #: js/blocks/GraphicsBlocks.js:478
 #: js/blocks/GraphicsBlocks.js:525
 #: js/blocks/GraphicsBlocks.js:741
 msgid "y1"
-msgstr ""
+msgstr "y1"
 
 #: js/blocks/GraphicsBlocks.js:468
 msgid "The Control-point 1 block sets the first control point for the Bezier curve."
@@ -5923,7 +5922,7 @@ msgstr "बेजियर ब्लॉक बेजियर कर्व क�
 
 #: js/blocks/GraphicsBlocks.js:522
 msgid "bezier"
-msgstr ""
+msgstr "बेझियर"
 
 #: js/blocks/GraphicsBlocks.js:583
 msgid "The Arc block moves the turtle in an arc."
@@ -5946,14 +5945,14 @@ msgstr "त्रिज्या"
 #: js/blocks/GraphicsBlocks.js:1001
 #: js/blocks/GraphicsBlocks.js:1084
 msgid "Value must be within -5000 to 5000 when Wrap Mode is off."
-msgstr ""
+msgstr "रॅप मोड बंद असताना मूल्य -5000 ते 5000 च्या दरम्यान असावे."
 
 #: js/blocks/GraphicsBlocks.js:613
 #: js/blocks/GraphicsBlocks.js:760
 #: js/blocks/GraphicsBlocks.js:1003
 #: js/blocks/GraphicsBlocks.js:1086
 msgid "Value must be within -20000 to 20000 when Wrap Mode is on."
-msgstr ""
+msgstr "रॅप मोड चालू असताना मूल्य -20000 ते 20000 च्या दरम्यान असावे."
 
 #: js/blocks/GraphicsBlocks.js:651
 msgid "set heading"
@@ -5985,7 +5984,7 @@ msgstr "राइट ब्लॉक कासवाला उजवीकडे
 
 #: js/blocks/GraphicsBlocks.js:826
 msgid "right1"
-msgstr ""
+msgstr "right1"
 
 #: js/blocks/GraphicsBlocks.js:826
 #: plugins/rodi.rtp:77
@@ -6004,7 +6003,7 @@ msgstr "लेफ्ट ब्लॉक कासवाला डावीकड
 
 #: js/blocks/GraphicsBlocks.js:906
 msgid "left1"
-msgstr ""
+msgstr "left1"
 
 #: js/blocks/GraphicsBlocks.js:906
 #: plugins/rodi.rtp:79
@@ -6046,12 +6045,12 @@ msgstr "फॉरवर्ड ब्लॉक कासवाला पुढे
 #: js/blocks/GraphicsBlocks.js:1145
 #: js/blocks/GraphicsBlocks.js:1163
 msgid "wrap"
-msgstr ""
+msgstr "रॅप"
 
 #: js/blocks/MediaBlocks.js:35
 #. TRANS: right side of the screen
 msgid "right (screen)"
-msgstr ""
+msgstr "उजवी (स्क्रीन)"
 
 #: js/blocks/MediaBlocks.js:45
 #: js/blocks/MediaBlocks.js:56
@@ -6061,7 +6060,7 @@ msgstr "राइट ब्लॉक कॅनव्हासच्या उज
 #: js/blocks/MediaBlocks.js:97
 #. TRANS: left side of the screen
 msgid "left (screen)"
-msgstr ""
+msgstr "डावी (स्क्रीन)"
 
 #: js/blocks/MediaBlocks.js:107
 #: js/blocks/MediaBlocks.js:118
@@ -6070,7 +6069,7 @@ msgstr "लेफ्ट ब्लॉक कॅनव्हासच्या ड
 
 #: js/blocks/MediaBlocks.js:158
 msgid "top (screen)"
-msgstr ""
+msgstr "वर (स्क्रीन)"
 
 #: js/blocks/MediaBlocks.js:168
 #: js/blocks/MediaBlocks.js:179
@@ -6079,7 +6078,7 @@ msgstr "टॉप ब्लॉक कॅनव्हासच्या वरच
 
 #: js/blocks/MediaBlocks.js:219
 msgid "bottom (screen)"
-msgstr ""
+msgstr "खाली (स्क्रीन)"
 
 #: js/blocks/MediaBlocks.js:229
 #: js/blocks/MediaBlocks.js:240
@@ -6088,7 +6087,7 @@ msgstr "बॉटम ब्लॉक कॅनव्हासच्या खा
 
 #: js/blocks/MediaBlocks.js:282
 msgid "width"
-msgstr ""
+msgstr "रुंदी"
 
 #: js/blocks/MediaBlocks.js:291
 msgid "The Width block returns the width of the canvas."
@@ -6096,7 +6095,7 @@ msgstr "विथ ब्लॉक कॅनव्हासची रुंदी
 
 #: js/blocks/MediaBlocks.js:325
 msgid "height"
-msgstr ""
+msgstr "उंची"
 
 #: js/blocks/MediaBlocks.js:334
 msgid "The Height block returns the height of the canvas."
@@ -6119,7 +6118,7 @@ msgstr "इरेज मीडिया ब्लॉक मजकूर आण�
 #: js/blocks/MediaBlocks.js:439
 #. TRANS: play an audio recording
 msgid "play back"
-msgstr ""
+msgstr "प्ले बॅक"
 
 #: js/blocks/MediaBlocks.js:487
 msgid "speak"
@@ -6131,7 +6130,7 @@ msgstr "स्पीक ब्लॉक मजकूर-ते-बोलणे �
 
 #: js/blocks/MediaBlocks.js:546
 msgid "camera"
-msgstr ""
+msgstr "कॅमेरा"
 
 #: js/blocks/MediaBlocks.js:551
 msgid "The Camera block connects a webcam to the Show block."
@@ -6139,7 +6138,7 @@ msgstr "कॅमेरा ब्लॉक शो ब्लॉकला वे�
 
 #: js/blocks/MediaBlocks.js:574
 msgid "video"
-msgstr ""
+msgstr "व्हिडिओ"
 
 #: js/blocks/MediaBlocks.js:579
 msgid "The Video block selects video for use with the Show block."
@@ -6166,17 +6165,17 @@ msgstr "स्टॉप मीडिया ब्लॉक ऑडिओ कि�
 #: js/widgets/temperament.js:1446
 #: js/widgets/timbre.js:1834
 msgid "frequency"
-msgstr ""
+msgstr "वारंवारता"
 
 #: js/blocks/MediaBlocks.js:692
 #: plugins/rodi.rtp:193
 msgid "duration (MS)"
-msgstr ""
+msgstr "कालावधी (एमएस)"
 
 #: js/blocks/MediaBlocks.js:728
 #. TRANS: translate a note into hertz, e.g., A4 -> 440HZ
 msgid "note to frequency"
-msgstr ""
+msgstr "नोट ते वारंवारता"
 
 #: js/blocks/MediaBlocks.js:736
 msgid "The To frequency block converts a pitch name and octave to Hertz."
@@ -6207,11 +6206,11 @@ msgstr "शो ब्लॉक कॅनव्हासवर मजकूर �
 #: js/blocks/MediaBlocks.js:888
 #. TRANS: show1 is show as in display an image or text on the screen.
 msgid "show1"
-msgstr ""
+msgstr "show1"
 
 #: js/blocks/MediaBlocks.js:891
 msgid "obj"
-msgstr ""
+msgstr "obj"
 
 #: js/blocks/MediaBlocks.js:938
 msgid "The Media block is used to import an image."
@@ -6337,16 +6336,16 @@ msgstr "होलो लाइन ब्लॉक खोखळ्या के�
 #: js/blocks/PenBlocks.js:583
 #. TRANS: draw a line logo has a hollow space down its center
 msgid "hollow line"
-msgstr ""
+msgstr "पोकळ रेषा"
 
 #: js/blocks/PenBlocks.js:652
 msgid "The Fill block fills in a shape with a color."
-msgstr ""
+msgstr "फिल ब्लॉक रंगाने आकार भरतो."
 
 #: js/blocks/PenBlocks.js:661
 #. TRANS: fill in as a solid color
 msgid "fill"
-msgstr ""
+msgstr "कलर भरा"
 
 #: js/blocks/PenBlocks.js:738
 #. TRANS: raise up the pen so logo it does not draw when it is moved
@@ -6355,7 +6354,7 @@ msgstr "लोखणी वर करा"
 
 #: js/blocks/PenBlocks.js:745
 msgid "The Pen-up block raises the pen so that it does not draw."
-msgstr ""
+msgstr "पेन-अप ब्लॉक पेन वर उचलतो जेणेकरून तो काढत नाही."
 
 #: js/blocks/PenBlocks.js:779
 #. TRANS: put down the pen so logo it draws when it is moved
@@ -6364,7 +6363,7 @@ msgstr "लोखणी खाली ठेवा"
 
 #: js/blocks/PenBlocks.js:787
 msgid "The Pen-down block lowers the pen so that it draws."
-msgstr ""
+msgstr "पेन-डाऊन ब्लॉक पेन खाली आणतो जेणेकरून तो काढू शकतो."
 
 #: js/blocks/PenBlocks.js:821
 #. TRANS: set the width of the line drawn by the pen
@@ -6373,24 +6372,24 @@ msgstr "लोखणीचे आकार संच करा"
 
 #: js/blocks/PenBlocks.js:831
 msgid "The Set-pen-size block changes the size of the pen."
-msgstr ""
+msgstr "सेट-पेन-साइस ब्लॉक पेनचा आकार बदलतो."
 
 #: js/blocks/PenBlocks.js:890
 #. TRANS: set degree of translucence of the pen color
 msgid "set translucency"
-msgstr ""
+msgstr "पारदर्शकता सेट करा"
 
 #: js/blocks/PenBlocks.js:898
 msgid "The Set translucency block changes the opacity of the pen."
-msgstr ""
+msgstr "सेट पारदर्शकता ब्लॉक पेनची अपारदर्शकता बदलतो."
 
 #: js/blocks/PenBlocks.js:958
 msgid "set hue"
-msgstr ""
+msgstr "रंगछटा सेट करा"
 
 #: js/blocks/PenBlocks.js:966
 msgid "The Set hue block changes the color of the pen."
-msgstr ""
+msgstr "सेट ह्यू ब्लॉक पेनचा रंग बदलतो."
 
 #: js/blocks/PenBlocks.js:1024
 msgid "set shade"
@@ -6398,7 +6397,7 @@ msgstr "रंगाचा दर्जा निश्चीत करा"
 
 #: js/blocks/PenBlocks.js:1034
 msgid "The Set-shade block changes the pen color from dark to light."
-msgstr ""
+msgstr "सेट-शेड ब्लॉक पेनचा रंग गडद ते फिकट बदलतो."
 
 #: js/blocks/PenBlocks.js:1088
 #. TRANS: set the level of vividness of the pen color
@@ -6407,7 +6406,7 @@ msgstr "राखाडी संच करा"
 
 #: js/blocks/PenBlocks.js:1096
 msgid "The Set grey block changes the vividness of the pen color."
-msgstr ""
+msgstr "सेट ग्रे ब्लॉक पेन रंगाची स्पष्टता बदलतो."
 
 #: js/blocks/PenBlocks.js:1149
 msgid "set color"
@@ -6415,7 +6414,7 @@ msgstr "रंग संच करणे"
 
 #: js/blocks/PenBlocks.js:1159
 msgid "The Set-color block changes the pen color."
-msgstr ""
+msgstr "सेट-कलर ब्लॉक पेनचा रंग बदलतो."
 
 #: js/blocks/SensorsBlocks.js:36
 msgid "The Input block prompts for keyboard input."
@@ -7062,7 +7061,7 @@ msgstr "मेट्रोनोम"
 
 #: js/widgets/musickeyboard.js:1574
 msgid "Note value"
-msgstr ""
+msgstr "नोटचे मूल्य"
 
 #: js/widgets/musickeyboard.js:3209
 msgid "New action blocks generated."

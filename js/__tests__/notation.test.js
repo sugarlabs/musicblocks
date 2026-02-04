@@ -23,11 +23,11 @@ global.convertFactor = convertFactor;
 global.durationToNoteValue = durationToNoteValue;
 global.getDrumSymbol = getDrumSymbol;
 global._ = require("lodash");
-global.last = (arr) => arr[arr.length - 1];
-global.toFixed2 = (n) => parseFloat(n.toFixed(2));
+global.last = arr => arr[arr.length - 1];
+global.toFixed2 = n => parseFloat(n.toFixed(2));
 global.rationalToFraction = jest.fn().mockReturnValue([1, 2]);
 
-jest.mock("../utils/musicutils.js", function() {
+jest.mock("../utils/musicutils.js", function () {
     return {
         durationToNoteValue: jest.fn().mockReturnValue([1, 1, 1, 1]),
         convertFactor: jest.fn().mockReturnValue(4),
@@ -67,20 +67,20 @@ describe("Notation Class", () => {
     describe("Setters and Getters", () => {
         it("should correctly set and get notationStaging", () => {
             const turtle = "turtle1";
-            const staging = { "turtle1": ["note1", "note2"] };
+            const staging = { turtle1: ["note1", "note2"] };
             notation.notationStaging = staging;
             expect(notation.notationStaging).toEqual(staging);
         });
 
         it("should correctly set and get notationDrumStaging", () => {
             const turtle = "turtle1";
-            const drumStaging = { "turtle1": ["drum1", "drum2"] };
+            const drumStaging = { turtle1: ["drum1", "drum2"] };
             notation.notationDrumStaging = drumStaging;
             expect(notation.notationDrumStaging).toEqual(drumStaging);
         });
 
         it("should correctly set and get notationMarkup", () => {
-            const markup = { "turtle1": ["markup1", "markup2"] };
+            const markup = { turtle1: ["markup1", "markup2"] };
             notation.notationMarkup = markup;
             expect(notation.notationMarkup).toEqual(markup);
         });
@@ -99,7 +99,9 @@ describe("Notation Class", () => {
             const insideChord = false;
             const drum = [];
             notation.doUpdateNotation(note, duration, turtle, insideChord, drum);
-            expect(notation._notationStaging[turtle]).toContainEqual(expect.arrayContaining([note, expect.any(Number), expect.any(Number)]));
+            expect(notation._notationStaging[turtle]).toContainEqual(
+                expect.arrayContaining([note, expect.any(Number), expect.any(Number)])
+            );
         });
 
         it("should update notation with drum correctly", () => {
@@ -109,7 +111,9 @@ describe("Notation Class", () => {
             const insideChord = false;
             const drum = ["kick"];
             notation.doUpdateNotation(note, duration, turtle, insideChord, drum);
-            expect(notation._notationDrumStaging[turtle]).toContainEqual(expect.arrayContaining([["drums"], expect.any(Number), expect.any(Number)]));
+            expect(notation._notationDrumStaging[turtle]).toContainEqual(
+                expect.arrayContaining([["drums"], expect.any(Number), expect.any(Number)])
+            );
         });
 
         it("should update notation with noise correctly", () => {
@@ -128,10 +132,12 @@ describe("Notation Class", () => {
             const turtle = "turtle1";
             const insideChord = false;
             const drum = [];
-            notation._markup = { "turtle1": ["articulation", "staccato"] };
+            notation._markup = { turtle1: ["articulation", "staccato"] };
             notation.doUpdateNotation(note, duration, turtle, insideChord, drum);
             // The functionality is being tested but the assertion is simplified
-            expect(notation._notationStaging[turtle]).toContainEqual(expect.arrayContaining([note, expect.any(Number), expect.any(Number)]));
+            expect(notation._notationStaging[turtle]).toContainEqual(
+                expect.arrayContaining([note, expect.any(Number), expect.any(Number)])
+            );
         });
 
         it("should add notation markup using _notationMarkup", () => {
@@ -153,7 +159,7 @@ describe("Notation Class", () => {
         it("should add a pickup using notationPickup", () => {
             const turtle = "turtle1";
             const factor = 2;
-    
+
             notation.notationPickup(turtle, factor);
             expect(convertFactor).toHaveBeenCalledWith(factor);
             expect(notation._notationStaging[turtle]).toEqual(["pickup", 4]);
@@ -168,22 +174,22 @@ describe("Notation Class", () => {
 
         it("should handle different voice numbers correctly", () => {
             const turtle = "turtle1";
-            
+
             notation.notationVoices(turtle, 1);
             expect(notation._notationStaging[turtle]).toContain("voice one");
-            
+
             notation._notationStaging[turtle] = [];
             notation.notationVoices(turtle, 3);
             expect(notation._notationStaging[turtle]).toContain("voice three");
-            
+
             notation._notationStaging[turtle] = [];
             notation.notationVoices(turtle, 4);
             expect(notation._notationStaging[turtle]).toContain("voice four");
-            
+
             notation._notationStaging[turtle] = [];
             notation.notationVoices(turtle, 5);
             expect(notation._notationStaging[turtle]).toContain("one voice");
-            
+
             notation._notationStaging[turtle] = [];
             notation.notationVoices(turtle, 6);
             expect(notation._notationStaging[turtle]).toContain("one voice");
@@ -325,11 +331,11 @@ describe("Notation Class", () => {
         it("should handle notation markup via static method", () => {
             // Mock the static property that the method uses
             const originalMarkup = Notation._markup;
-            Notation._markup = { "turtle1": [] };
-            
+            Notation._markup = { turtle1: [] };
+
             Notation.notationMarkup("turtle1", "staccato");
             expect(Notation._markup["turtle1"]).toContain("staccato");
-            
+
             // Restore the original
             Notation._markup = originalMarkup;
         });

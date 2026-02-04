@@ -285,19 +285,34 @@ function setupDrumBlocks(activity) {
 
         // Create instances of PlayDrumMacroBlock and set up drum macros for the activity
         const drumConfigs = [
-            ["duck"], ["cat"], ["cricket"], ["dog"], ["bottle"], ["bubbles"],
-            ["chine", "chime", true], ["clang"], ["clap"], ["slap"], ["crash"], ["splash"],
-            ["cowbell", "cow bell", true], ["ridebell", "ride bell", true],
-            ["fingercymbals", "finger cymbals", true], ["trianglebell", "triangle bell", true],
-            ["hihat", "hi hat", true], ["darbuka", "darbuka drum", true],
-            ["cup", "cup drum", true], ["floortom", "floor tom", true, "floor tom tom"],
-            ["tom", "tom tom", true], ["kick", "kick drum", true], ["snare", "snare drum", true]
+            ["duck"],
+            ["cat"],
+            ["cricket"],
+            ["dog"],
+            ["bottle"],
+            ["bubbles"],
+            ["chine", "chime", true],
+            ["clang"],
+            ["clap"],
+            ["slap"],
+            ["crash"],
+            ["splash"],
+            ["cowbell", "cow bell", true],
+            ["ridebell", "ride bell", true],
+            ["fingercymbals", "finger cymbals", true],
+            ["trianglebell", "triangle bell", true],
+            ["hihat", "hi hat", true],
+            ["darbuka", "darbuka drum", true],
+            ["cup", "cup drum", true],
+            ["floortom", "floor tom", true, "floor tom tom"],
+            ["tom", "tom tom", true],
+            ["kick", "kick drum", true],
+            ["snare", "snare drum", true]
         ];
 
         drumConfigs.forEach(config => {
             new PlayDrumMacroBlock(...config).setup(activity);
         });
-
     }
     /**
      * Class representing a MapDrumBlock, extending FlowClampBlock.

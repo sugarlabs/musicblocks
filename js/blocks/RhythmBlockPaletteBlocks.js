@@ -47,9 +47,9 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 name:
                     this.lang === "ja"
                         ? //.TRANS: rhythm block
-                        _("rhythm1")
+                          _("rhythm1")
                         : //.TRANS: an arrangement of notes based on duration
-                        _("rhythm"),
+                          _("rhythm"),
 
                 /**
                  * @type {number}
@@ -112,7 +112,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
             if (logo.inMatrix || logo.tuplet) {
                 if (logo.inMatrix) {
                     logo.phraseMaker.addColBlock(blk, arg0);
-                    
+
                     // Add individual entries for each beat to avoid extra × blocks
                     for (let i = 0; i < arg0; i++) {
                         logo.tupletRhythms.push(["individual", 1, noteBeatValue]);
@@ -167,10 +167,9 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 }
 
                 const bpmFactor =
-                    TONEBPM / tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
+                    TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 
-                const beatValue =
-                    bpmFactor == null ? 1 : bpmFactor / noteBeatValue;
+                const beatValue = bpmFactor == null ? 1 : bpmFactor / noteBeatValue;
 
                 /**
                  * Plays a note in the rhythm.
@@ -235,7 +234,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 name:
                     this.lang === "ja"
                         ? //.TRANS: translate "rhythm1" as rhythm
-                        _("rhythm1")
+                          _("rhythm1")
                         : _("rhythm"),
 
                 /**
@@ -554,7 +553,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = (event) => {
+            const __listener = event => {
                 if (logo.inMatrix) {
                     logo.tuplet = false;
                     logo.addingNotesToTuplet = false;
@@ -703,7 +702,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = (event) => {
+            const __listener = event => {
                 const tur = activity.turtles.ithTurtle(turtle);
 
                 logo.tuplet = false;
@@ -980,7 +979,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 tur.singer.inNoteBlock.push(blk);
 
                 const bpmFactor =
-                    TONEBPM / tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
+                    TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 
                 const beatValue = bpmFactor / noteBeatValue / arg0;
 
@@ -1038,7 +1037,8 @@ function setupRhythmBlockPaletteBlocks(activity) {
 function isAppleBrowser() {
     const userAgent = navigator.userAgent;
     const isMac = userAgent.includes("Macintosh");
-    const isIPad = userAgent.includes("iPad") || (userAgent.includes("Macintosh") && "ontouchend" in document); // Detects iPad in desktop mode
+    const isIPad =
+        userAgent.includes("iPad") || (userAgent.includes("Macintosh") && "ontouchend" in document); // Detects iPad in desktop mode
     const isSafari = userAgent.includes("Safari") && !userAgent.includes("Chrome");
     const isChrome = userAgent.includes("Chrome");
     return (isMac || isIPad) && (isSafari || isChrome);

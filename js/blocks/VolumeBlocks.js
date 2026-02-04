@@ -462,7 +462,7 @@ function setupVolumeBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = (event) => {
+            const __listener = event => {
                 tur.singer.synthVolume[synth].pop();
                 // Restore previous volume
                 if (
@@ -752,7 +752,7 @@ function setupVolumeBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = (event) => {
+            const __listener = event => {
                 Singer.masterVolume.pop();
                 // Restore previous volume
                 if (tur.singer.justCounting.length === 0 && Singer.masterVolume.length > 0) {
