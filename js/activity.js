@@ -1681,6 +1681,12 @@ class Activity {
                 return; // Exit the function if execution is already in progress
             }
 
+            if (!activity || typeof activity._doRecordButton !== 'function') {
+                console.warn('doRecordButton called without valid activity context');
+                isExecuting = false;
+                return;
+            }
+
             isExecuting = true; // Set the flag to indicate execution has started
             activity._doRecordButton();
         };
@@ -1739,7 +1745,7 @@ class Activity {
             }
             async function recordScreenWithTools() {
                 flag = 1;
-                return await navigator.mediaDevices.getDisplayMedia({
+                const stream = await navigator.mediaDevices.getDisplayMedia({
                     preferCurrentTab: "True",
                     systemAudio: "include",
                     audio: "True",
@@ -1752,6 +1758,8 @@ class Activity {
                     },
                     preferredVideoCodecs: "auto"
                 });
+                currentStream = stream;
+                return stream;
             }
 
             
@@ -1768,7 +1776,7 @@ class Activity {
                     alert(_("Recorded file is empty. File not saved."));
                     flag = 0;
                     recording();
-                    doRecordButton();
+                    doRecordButton(that);
                     return;
                 }
                 const blob = new Blob(recordedChunks, {
@@ -1778,7 +1786,7 @@ class Activity {
                     alert(_("Recorded file is empty. File not saved."));
                     flag = 0;
                     recording();
-                    doRecordButton();
+                    doRecordButton(that);
                     return;
                 }
                 // Clean up stream after recording
@@ -1797,7 +1805,7 @@ class Activity {
                     alert(_("File save canceled"));
                     flag = 0;
                     recording();
-                    doRecordButton();
+                    doRecordButton(that);
                     return; // Exit without saving the file
                 }
                 const downloadLink = document.createElement("a");
@@ -1810,7 +1818,7 @@ class Activity {
                 flag = 0;
                 // Allow multiple recordings
                 recording();
-                doRecordButton();
+                doRecordButton(that);
                 that.textMsg(_("Recording stopped. File saved."));
             }
             /**
@@ -1818,7 +1826,9 @@ class Activity {
              */
             function stopRec() {
                 flag = 0;
-                mediaRecorder.stop();
+                if (mediaRecorder && mediaRecorder.state !== "inactive") {
+                    mediaRecorder.stop();
+                }
                 const node = document.createElement("p");
                 node.textContent = "Stopped recording";
                 document.body.appendChild(node);
@@ -1836,7 +1846,7 @@ class Activity {
                 that.textMsg(_("Recording started. Click stop to finish."));
                 start.removeEventListener("click", createRecorder, true);
                 let recordedChunks = [];
-                const mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder = new MediaRecorder(stream);
                 stream.oninactive = function () {
                     // eslint-disable-next-line no-console
                     console.log("Recording is ready to save");
