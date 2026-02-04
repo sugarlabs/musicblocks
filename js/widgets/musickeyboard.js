@@ -461,30 +461,7 @@ function MusicKeyboard(activity) {
                 }
 
                 this._createTable();
-                if (this.widgetWindow._maximized) {
-                    this.widgetWindow.getWidgetBody().style.position = "absolute";
-                    this.widgetWindow.getWidgetBody().style.height = "calc(100vh - 64px)";
-                    this.widgetWindow.getWidgetBody().style.width = "200vh";
-                    const outerDiv = docById("mkbOuterDiv");
-                    outerDiv.style.maxHeight = "725px";
-                    docById("mkbOuterDiv").style.height = "calc(100vh - 64px)";
-                    docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
-                    docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
-                    docById("mkbInnerDiv").style.width = "95.5vw";
-                    docById("mkbInnerDiv").style.height = "75%";
-                    const innerDiv = docById("mkbInnerDiv");
-                    innerDiv.scrollLeft = innerDiv.scrollWidth;
-                    this.widgetWindow.getWidgetBody().style.left = "60px";
-                } else {
-                    const outerDiv = docById("mkbOuterDiv");
-                    outerDiv.style.maxHeight = "400px";
-                    this.widgetWindow.getWidgetBody().style.position = "relative";
-                    this.widgetWindow.getWidgetBody().style.left = "0px";
-                    this.widgetWindow.getWidgetBody().style.height = "550px";
-                    this.widgetWindow.getWidgetBody().style.width = "1000px";
-                    docById("mkbOuterDiv").style.width = w + "px";
-                    docById("mkbInnerDiv").style.height = "100%";
-                }
+                this._updateWidgetWindowSize();
                 this.endTime = noteEndTime;
                 startTimeNotes = 0;
                 delete startTime[id];
@@ -596,29 +573,7 @@ function MusicKeyboard(activity) {
                 blockNumber: this.blockNumberMapper[element.id]
             });
             this._createTable();
-
-            if (this.widgetWindow._maximized) {
-                this.widgetWindow.getWidgetBody().style.position = "absolute";
-                this.widgetWindow.getWidgetBody().style.height = "calc(100vh - 64px)";
-                this.widgetWindow.getWidgetBody().style.width = "200vh";
-                const outerDiv = docById("mkbOuterDiv");
-                outerDiv.style.maxHeight = "725px";
-                docById("mkbOuterDiv").style.height = "calc(100vh - 64px)";
-                docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
-                docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
-                docById("mkbInnerDiv").style.width = "95.5vw";
-                docById("mkbInnerDiv").style.height = "75%";
-                this.widgetWindow.getWidgetBody().style.left = "60px";
-            } else {
-                const outerDiv = docById("mkbOuterDiv");
-                outerDiv.style.maxHeight = "400px";
-                this.widgetWindow.getWidgetBody().style.position = "relative";
-                this.widgetWindow.getWidgetBody().style.left = "0px";
-                this.widgetWindow.getWidgetBody().style.height = "550px";
-                this.widgetWindow.getWidgetBody().style.width = "1000px";
-                docById("mkbOuterDiv").style.width = w + "px";
-                docById("mkbInnerDiv").style.height = "100%";
-            }
+            this._updateWidgetWindowSize();
         };
 
         element.onmouseup = function () {
@@ -667,28 +622,8 @@ function MusicKeyboard(activity) {
          * Event handler for maximizing/minimizing the widget window.
          */
         this.widgetWindow.onmaximize = function () {
-            if (widgetWindow._maximized) {
-                widgetWindow.getWidgetBody().style.position = "absolute";
-                widgetWindow.getWidgetBody().style.height = "calc(100vh - 64px)";
-                widgetWindow.getWidgetBody().style.width = "200vh";
-                docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
-                const outerDiv = docById("mkbOuterDiv");
-                outerDiv.style.maxHeight = "725px";
-                docById("mkbOuterDiv").style.height = "calc(100vh - 64px)";
-                docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
-                widgetWindow.getWidgetBody().style.left = "60px";
-                docById("mkbInnerDiv").style.height = "75%";
-            } else {
-                const outerDiv = docById("mkbOuterDiv");
-                outerDiv.style.maxHeight = "400px";
-                widgetWindow.getWidgetBody().style.position = "relative";
-                widgetWindow.getWidgetBody().style.left = "0px";
-                widgetWindow.getWidgetBody().style.height = "550px";
-                widgetWindow.getWidgetBody().style.width = "1000px";
-                docById("mkbOuterDiv").style.width = w + "px";
-                docById("mkbInnerDiv").style.height = "100%";
-            }
-        };
+            this._updateWidgetWindowSize();
+        }.bind(this);
 
         /**
          * Event handler for closing the widget window.
@@ -762,23 +697,7 @@ function MusicKeyboard(activity) {
             selectedNotes = [];
             // if (!that.keyboardShown) {
             this._createTable();
-            if (widgetWindow._maximized) {
-                const outerDiv = docById("mkbOuterDiv");
-                outerDiv.style.maxHeight = "725px";
-                docById("mkbOuterDiv").style.height = "calc(100vh - 64px)";
-                docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
-                docById("mkbInnerDiv").style.height = "75%";
-                widgetWindow.getWidgetBody().style.left = "60px";
-            } else {
-                const outerDiv = docById("mkbOuterDiv");
-                outerDiv.style.maxHeight = "400px";
-                widgetWindow.getWidgetBody().style.position = "relative";
-                widgetWindow.getWidgetBody().style.left = "0px";
-                widgetWindow.getWidgetBody().style.height = "550px";
-                widgetWindow.getWidgetBody().style.width = "1000px";
-                docById("mkbOuterDiv").style.width = w + "px";
-                docById("mkbInnerDiv").style.height = "100%";
-            }
+            this._updateWidgetWindowSize();
             // }
         };
 
@@ -1084,6 +1003,7 @@ function MusicKeyboard(activity) {
                 } else {
                     this._createKeyboard();
                 }
+                this._updateWidgetWindowSize();
             }
         }, time * 1000);
     };
@@ -1551,6 +1471,36 @@ function MusicKeyboard(activity) {
     };
 
     /**
+     * Update the widget window size based on whether it is maximized or not.
+     */
+    this._updateWidgetWindowSize = function () {
+        if (this.widgetWindow._maximized) {
+            this.widgetWindow.getWidgetBody().style.position = "absolute";
+            this.widgetWindow.getWidgetBody().style.height = "calc(100vh - 64px)";
+            this.widgetWindow.getWidgetBody().style.width = "200vh";
+            const outerDiv = docById("mkbOuterDiv");
+            outerDiv.style.maxHeight = "725px";
+            docById("mkbOuterDiv").style.height = "calc(100vh - 64px)";
+            docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
+            docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
+            docById("mkbInnerDiv").style.width = "95.5vw";
+            docById("mkbInnerDiv").style.height = "75%";
+            const innerDiv = docById("mkbInnerDiv");
+            innerDiv.scrollLeft = innerDiv.scrollWidth;
+            this.widgetWindow.getWidgetBody().style.left = "60px";
+        } else {
+            const outerDiv = docById("mkbOuterDiv");
+            outerDiv.style.maxHeight = "400px";
+            this.widgetWindow.getWidgetBody().style.position = "relative";
+            this.widgetWindow.getWidgetBody().style.left = "0px";
+            this.widgetWindow.getWidgetBody().style.height = "550px";
+            this.widgetWindow.getWidgetBody().style.width = "1000px";
+            docById("mkbOuterDiv").style.width = w + "px";
+            docById("mkbInnerDiv").style.height = "100%";
+        }
+    };
+
+    /**
      * Calculates the width of a note based on its value.
      * @param {number} noteValue - The value of the note.
      * @returns {number} The width of the note.
@@ -1727,6 +1677,7 @@ function MusicKeyboard(activity) {
         const innerDiv = docById("mkbInnerDiv");
         innerDiv.scrollLeft = innerDiv.scrollWidth; // Force to the right.
         this.makeClickable();
+        this._updateWidgetWindowSize();
     };
 
     /**

@@ -550,15 +550,31 @@ class JSEditor {
         this._editor.appendChild(editorconsole);
 
         const highlight = editor => {
-            // Configure highlight.js for JavaScript
-            hljs.configure({
-                languages: ["javascript"]
-            });
+            // Apply syntax highlighting if highlight.js is available
+            if (window.hljs) {
+                try {
+                    // Remove any existing highlighting classes to ensure clean re-highlighting
+                    editor.removeAttribute("data-highlighted");
 
-            // Apply highlight.js syntax highlighting for JavaScript
-            hljs.highlightElement(editor);
+                    // Configure highlight.js for JavaScript
+                    hljs.configure({
+                        languages: ["javascript"]
+                    });
 
-            // Add error highlighting
+                    // Try modern API first (v11+), fallback to legacy API (v9-10)
+                    if (typeof hljs.highlightElement === "function") {
+                        hljs.highlightElement(editor);
+                    } else if (typeof hljs.highlightBlock === "function") {
+                        // Legacy API for older highlight.js versions
+                        hljs.highlightBlock(editor);
+                    }
+                } catch (e) {
+                    // Silently handle highlighting errors to prevent editor crashes
+                    console.warn("Syntax highlighting failed:", e);
+                }
+            }
+
+            // Always add error highlighting (works independently of hljs)
             this._highlightErrors(editor);
         };
 

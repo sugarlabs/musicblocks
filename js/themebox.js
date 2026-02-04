@@ -257,13 +257,21 @@ class ThemeBox {
         window.location.reload();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     setPreference() {
         if (localStorage.getItem("themePreference") === this._theme) {
             this.activity.textMsg(_("Music Blocks is already set to this theme."));
         } else {
             // Save preference to localStorage
             this.activity.storage.themePreference = this._theme;
-            localStorage.setItem("themePreference", this._theme);
+            try {
+                localStorage.setItem("themePreference", this._theme);
+            } catch (e) {
+                console.warn("Could not save theme preference:", e);
+            }
 
             // Apply theme instantly instead of reloading
             this.applyThemeInstantly();

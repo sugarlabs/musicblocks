@@ -1344,7 +1344,7 @@ msgstr "syry"
 #: planet/js/GlobalTag.js:48
 #. TRANS: On the Planet, we use labels to tag projects.
 #. TRANS: sensores
-msgid "Sensors"
+msgid "sensors"
 msgstr ""
 
 #: js/rubrics.js:532
@@ -1354,7 +1354,7 @@ msgstr ""
 #: planet/js/GlobalTag.js:46
 #. TRANS: On the Planet, we use labels to tag projects.
 #. TRANS: medios
-msgid "Media"
+msgid "media"
 msgstr ""
 
 #: js/rubrics.js:533

@@ -1182,7 +1182,7 @@ msgstr "flujo"
 #: js/turtledefs.js:240
 #: planet/js/GlobalTag.js:48
 #. TRANS: On the Planet, we use labels to tag projects.
-msgid "Sensors"
+msgid "sensors"
 msgstr "sensores"
 
 #: js/rubrics.js:532
@@ -1191,7 +1191,7 @@ msgstr "sensores"
 #: js/blocks/MediaBlocks.js:930
 #: planet/js/GlobalTag.js:46
 #. TRANS: On the Planet, we use labels to tag projects.
-msgid "Media"
+msgid "media"
 msgstr "medios"
 
 #: js/rubrics.js:533

@@ -211,6 +211,11 @@ describe("setupDrumActions", () => {
             expect(targetTurtle.singer.drumStyle).toContain("drum2");
         });
 
+        it("uses default drum for unknown drum name", () => {
+            Singer.DrumActions[actionName]("unknownDrum", 0, 1);
+            expect(targetTurtle.singer.drumStyle).toContain(DEFAULTDRUM);
+        });
+
         it("handles rhythm ruler", () => {
             activity.logo.inRhythmRuler = true;
             Singer.DrumActions[actionName]("d1", 0, 1);

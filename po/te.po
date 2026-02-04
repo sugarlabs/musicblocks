@@ -1179,7 +1179,7 @@ msgstr "ఫ్లో"
 #: js/turtledefs.js:240
 #: planet/js/GlobalTag.js:48
 #. TRANS: On the Planet, we use labels to tag projects.
-msgid "Sensors"
+msgid "sensors"
 msgstr "సెన్సార్లు"
 
 #: js/rubrics.js:532
@@ -1188,7 +1188,7 @@ msgstr "సెన్సార్లు"
 #: js/blocks/MediaBlocks.js:930
 #: planet/js/GlobalTag.js:46
 #. TRANS: On the Planet, we use labels to tag projects.
-msgid "Media"
+msgid "media"
 msgstr "మీడియా"
 
 #: js/rubrics.js:533
