@@ -907,6 +907,24 @@ Turtles.TurtlesView = class {
         };
 
         /**
+         * Setup right-click context menu on canvas background.
+         * Shows the helpful wheel with options like Grid, Clean, Collapse, etc.
+         */
+        const setupContextMenu = () => {
+            // Add right-click handler to the main activity canvas
+            const canvas = activity.canvas;
+            if (canvas) {
+                canvas.addEventListener("contextmenu", event => {
+                    // Prevent default browser context menu
+                    event.preventDefault();
+
+                    // Show the helpful wheel menu
+                    activity._displayHelpfulWheel(event);
+                });
+            }
+        };
+
+        /**
          * Toggles visibility of menu and grids.
          * Scales down all 'turtles' in turtleList.
          * Removes the stage and adds it back at the top.
@@ -1256,6 +1274,9 @@ Turtles.TurtlesView = class {
         if (!this._locked) {
             __makeBoundary();
         }
+
+        // Setup right-click context menu for the canvas background
+        setupContextMenu();
 
         // Debounce or throttle the resize event based on device capability
         let resizeTimeout;
