@@ -599,6 +599,16 @@ const processPluginData = (activity, pluginData, pluginSource) => {
         );
     };
 
+    const vettedPlugins = ["maths", "weather", "accelerometer", "facebook", "nutrition", "rodi"];
+
+    const isVettedPlugin = source => {
+        if (!source) return false;
+        // Known plugins from the local plugins folder are considered vetted
+        return vettedPlugins.some(plugin => source.includes(`plugins/${plugin}.`));
+    };
+
+    let userConfirmed = isVettedPlugin(pluginSource);
+
     const safeEval = (code, label = "plugin") => {
         if (typeof code !== "string") return;
 
@@ -607,6 +617,27 @@ const processPluginData = (activity, pluginData, pluginSource) => {
             // eslint-disable-next-line no-console
             console.warn("Plugin code too large:", label);
             return;
+        }
+
+        if (!userConfirmed) {
+            userConfirmed = confirm(
+                _("Security Warning") +
+                    "\n\n" +
+                    _(
+                        "The plugin contains code that will be executed in your browser. This plugin has not been vetted by the Music Blocks team and may contain unsafe code."
+                    ) +
+                    "\n\n" +
+                    _("Do you want to allow this plugin to run?") +
+                    "\n\n" +
+                    _("Source: ") +
+                    (pluginSource || _("unknown"))
+            );
+
+            if (!userConfirmed) {
+                // eslint-disable-next-line no-console
+                console.warn("User declined unvetted plugin execution:", label);
+                return;
+            }
         }
 
         // NOTE: This eval is required for the Plugin system to load dynamic block definitions.
