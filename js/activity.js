@@ -37,7 +37,8 @@
    SPECIALINPUTS, STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
    TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, Turtles, TURTLESVG,
    updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_F,
-   SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator
+   SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
+   MUSICALMODES
  */
 
 /*
@@ -1250,6 +1251,20 @@ class Activity {
             this.sendAllToTrash(true, true);
         };
 
+        const extractSVGInner = svgString => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(svgString, "image/svg+xml");
+            const svgEl = doc.querySelector("svg");
+            if (!svgEl) return "";
+
+            // Remove drop shadow filters safely
+            svgEl.querySelectorAll("[filter]").forEach(el => {
+                el.removeAttribute("filter");
+            });
+
+            return svgEl.innerHTML;
+        };
+
         /**
          * @returns {SVG} returns SVG of blocks
          */
@@ -1273,11 +1288,9 @@ class Activity {
                     yMax = this.blocks.blockList[i].container.y + this.blocks.blockList[i].height;
                 }
 
-                if (this.blocks.blockList[i].collapsed) {
-                    parts = this.blocks.blockCollapseArt[i].split("><");
-                } else {
-                    parts = this.blocks.blockArt[i].split("><");
-                }
+                const rawSVG = this.blocks.blockList[i].collapsed
+                    ? this.blocks.blockCollapseArt[i]
+                    : this.blocks.blockArt[i];
 
                 if (this.blocks.blockList[i].isCollapsible()) {
                     svg += "<g>";
@@ -1289,7 +1302,13 @@ class Activity {
                     ", " +
                     this.blocks.blockList[i].container.y +
                     ')">';
-                if (SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
+
+                if (!SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
+                    svg += extractSVGInner(rawSVG);
+                } else {
+                    // Keep existing fragile logic for now
+                    parts = rawSVG.split("><");
+
                     for (let p = 1; p < parts.length; p++) {
                         // FIXME: This is fragile.
                         if (p === 1) {
@@ -1305,23 +1324,6 @@ class Activity {
                             } else {
                                 svg += parts[p] + ">" + this.blocks.blockList[i].value + "<";
                             }
-                        } else if (p === parts.length - 2) {
-                            svg += parts[p] + ">";
-                        } else if (p === parts.length - 1) {
-                            // skip final </svg>
-                        } else {
-                            svg += parts[p] + "><";
-                        }
-                    }
-                } else {
-                    for (let p = 1; p < parts.length; p++) {
-                        // FIXME: This is fragile.
-                        if (p === 1) {
-                            svg += "<" + parts[p] + "><";
-                        } else if (p === 2) {
-                            // skip filter
-                        } else if (p === 3) {
-                            svg += parts[p].replace("filter:url(#dropshadow);", "") + "><";
                         } else if (p === parts.length - 2) {
                             svg += parts[p] + ">";
                         } else if (p === parts.length - 1) {
@@ -1592,18 +1594,6 @@ class Activity {
 
                 this.blocksContainer.x = 0;
                 this.blocksContainer.y = 0;
-
-                Element.prototype.remove = () => {
-                    this.parentElement.removeChild(this);
-                };
-
-                NodeList.prototype.remove = HTMLCollection.prototype.remove = () => {
-                    for (let i = 0, len = this.length; i < len; i++) {
-                        if (this[i] && this[i].parentElement) {
-                            this[i].parentElement.removeChild(this[i]);
-                        }
-                    }
-                };
 
                 const table = document.getElementById("myTable");
                 if (table !== null) {
@@ -7042,8 +7032,13 @@ class Activity {
             // Load custom mode saved in local storage.
             const custommodeData = this.storage.custommode;
             if (custommodeData !== undefined) {
-                // FIX ME: customMode is loaded but not yet used
-                JSON.parse(custommodeData);
+                // Parse and update the custom musical mode with saved data.
+                try {
+                    const customModeDataObj = JSON.parse(custommodeData);
+                    Object.assign(MUSICALMODES["custom"], customModeDataObj);
+                } catch (e) {
+                    console.error("Error parsing custommode data:", e);
+                }
             }
 
             this.fileChooser.addEventListener("click", () => {
@@ -7264,21 +7259,6 @@ class Activity {
                     });
                 };
 
-                // Music Block Parser from abc to MB
-                abcReader.onload = event => {
-                    //get the abc data and replace the / so that the block does not break
-                    let abcData = event.target.result;
-                    abcData = abcData.replace(/\\/g, "");
-
-                    const tunebook = new ABCJS.parseOnly(abcData);
-                    // eslint-disable-next-line no-console
-                    console.log(tunebook);
-                    tunebook.forEach(tune => {
-                        //call parseABC to parse abcdata to MB json
-                        this.parseABC(tune);
-                    });
-                };
-
                 // Work-around in case the handler is called by the
                 // widget drag & drop code.
                 if (files[0] !== undefined) {
@@ -7295,7 +7275,6 @@ class Activity {
                         abcReader.readAsText(files[0]);
                         return;
                     }
-                    reader.readAsText(files[0]);
                     reader.readAsText(files[0]);
                     window.scroll(0, 0);
                 }
@@ -7734,21 +7713,19 @@ class Activity {
 
 const activity = new Activity();
 
-require(["domReady!"], doc => {
-    doBrowserCheck();
-    if (jQuery.browser.mozilla) {
-        setTimeout(() => {
+// Execute initialization once all RequireJS modules are loaded AND DOM is ready
+define(["domReady!"].concat(MYDEFINES), doc => {
+    const initialize = () => {
+        if (typeof createDefaultStack !== "undefined") {
             activity.setupDependencies();
             activity.domReady(doc);
-        }, 5000);
-    } else {
-        activity.setupDependencies();
-        activity.domReady(doc);
-    }
-});
-
-define(MYDEFINES, () => {
-    activity.setupDependencies();
-    activity.doContextMenus();
-    activity.doPluginsAndPaletteCols();
+            activity.doContextMenus();
+            activity.doPluginsAndPaletteCols();
+        } else {
+            // Race condition in Firefox: non-AMD scripts might not have
+            // finished global assignment yet.
+            setTimeout(initialize, 10);
+        }
+    };
+    initialize();
 });

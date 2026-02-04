@@ -104,7 +104,6 @@ class LocalCard {
     render() {
         const Planet = this.Planet;
 
-        // TODO: Have a TB placeholder image specific to TB projects
         const html = this.renderData.replace(new RegExp("{ID}", "g"), this.id);
         const frag = document.createRange().createContextualFragment(html);
 

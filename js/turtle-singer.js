@@ -153,6 +153,10 @@ class Singer {
         this.tieFirstDrums = [];
         this.synthVolume = {};
         this.drift = 0;
+        // Maximum fraction of note duration that can be used for lag correction per note.
+        // This prevents notes from being rushed when catching up to the master clock.
+        // Value of 0.25 means at most 25% of a note's duration can be skipped for catch-up.
+        this.maxLagCorrectionRatio = 0.25;
         this.drumStyle = [];
         this.voices = [];
         this.backward = [];
@@ -1569,8 +1573,18 @@ class Singer {
             const elapsedTime = (new Date().getTime() - activity.logo.firstNoteTime) / 1000;
 
             // When we are "drifting", we don't bother with lag.
-            const turtleLag =
-                tur.singer.drift === 0 ? Math.max(elapsedTime - tur.singer.turtleTime, 0) : 0;
+            // When not drifting, we limit the lag correction to prevent notes from being rushed.
+            // This ensures that note sequences play correctly even when the system is behind.
+            let turtleLag = 0;
+            if (tur.singer.drift === 0) {
+                const rawLag = Math.max(elapsedTime - tur.singer.turtleTime, 0);
+                // Calculate the maximum lag correction allowed for this note
+                // based on the note's duration to prevent rushing
+                const noteDuration = bpmFactor / noteBeatValue;
+                const maxLagCorrection = noteDuration * tur.singer.maxLagCorrectionRatio;
+                // Apply gradual lag correction: correct at most maxLagCorrection per note
+                turtleLag = Math.min(rawLag, maxLagCorrection);
+            }
 
             // Delay running graphics from second note in tie.
             let tieDelay = tur.singer.tie ? tur.singer.tieCarryOver : 0;
@@ -1680,11 +1694,11 @@ class Singer {
                         tur.singer.tie = false;
                         tieDelay = 0;
 
-                        /** @todo FIXME: consider osctime block in tie */
+                        // tieNoteExtras: [blk, oscList, noteBeat, noteBeatValues, noteDrums, graphics, isOsc, rawDurationValue]
                         Singer.processNote(
                             activity,
-                            tur.singer.tieCarryOver,
-                            false,
+                            tur.singer.tieNoteExtras[7], // rawDurationValue
+                            tur.singer.tieNoteExtras[6], // isOsc
                             saveBlk,
                             turtle
                         );
@@ -1692,9 +1706,15 @@ class Singer {
                         tur.singer.inNoteBlock.pop();
 
                         if (!tur.singer.suppressOutput) {
-                            tur.doWait(
-                                Math.max(bpmFactor / tur.singer.tieCarryOver - turtleLag, 0)
-                            );
+                            const rawDuration = tur.singer.tieNoteExtras[7];
+                            const wasOsc = tur.singer.tieNoteExtras[6];
+
+                            const waitSeconds = wasOsc
+                                ? rawDuration / 1000
+                                : bpmFactor / rawDuration;
+
+                            tur.singer.turtleTime += waitSeconds;
+                            tur.doWait(Math.max(waitSeconds - turtleLag, 0));
                         }
 
                         tieDelay = tur.singer.tieCarryOver;
@@ -1742,7 +1762,9 @@ class Singer {
                         tur.singer.noteBeat[saveBlk],
                         tur.singer.noteBeatValues[saveBlk],
                         tur.singer.noteDrums[saveBlk],
-                        []
+                        [],
+                        isOsc,
+                        noteValue // rawDurationValue
                     ];
 
                     // We play any drums in the first tied note along with the drums in the second tied note
@@ -1816,7 +1838,6 @@ class Singer {
                         }
                     }
                     // eslint-disable-next-line no-console
-                    console.log("Note in note " + blk + " delay " + future);
                 }
             }
             let forceSilence = false;
