@@ -2988,6 +2988,13 @@ class Block {
                 x: Math.round(that.container.x - that.original.x),
                 y: Math.round(that.container.y - that.original.y)
             };
+
+            // Save initial position for undo/redo functionality
+            // IMPORTANT: Only save if not already in undo/redo operation
+            if (that.activity.undoRedoManager && !that.activity.isUndoRedoInProgress) {
+                that._undoStartX = that.container.x;
+                that._undoStartY = that.container.y;
+            }
         });
 
         /**
@@ -3202,7 +3209,30 @@ class Block {
                 // Just in case the blocks are not properly docked after
                 // the move (workaround for issue #38 -- Blocks fly
                 // apart). Still need to get to the root cause.
-                this.blocks.adjustDocks(this.blocks.blockList.indexOf(this), true);
+                // IMPORTANT: Do not run adjustDocks during undo/redo operations
+                // as it can override the restored positions
+                if (!this.activity.isUndoRedoInProgress) {
+                    this.blocks.adjustDocks(this.blocks.blockList.indexOf(this), true);
+                }
+
+                // Save state for undo/redo functionality after all adjustments
+                if (this.activity.undoRedoManager && this._undoStartX !== undefined && this._undoStartY !== undefined && !this.activity.isUndoRedoInProgress) {
+                    // Get the final position after all adjustments
+                    const currentX = this.container.x;
+                    const currentY = this.container.y;
+                    
+                    this.activity.undoRedoManager.saveState('block_moved', {
+                        blockName: this.name,
+                        oldX: this._undoStartX,
+                        oldY: this._undoStartY,
+                        newX: currentX,
+                        newY: currentY
+                    });
+                    
+                    // Clear the start position
+                    this._undoStartX = undefined;
+                    this._undoStartY = undefined;
+                }
             }
         } else if (SPECIALINPUTS.includes(this.name) || ["media", "loadFile"].includes(this.name)) {
             if (!haveClick) {
