@@ -100,9 +100,90 @@ class Queue {
 class Logo {
     /**
      * @constructor
+     * @param {Object|LogoDependencies} activityOrDeps - Either an Activity object (old pattern)
+     *                                                    or a LogoDependencies object (new pattern)
+     *
+     * @example
+     * // Old pattern (still supported)
+     * const logo = new Logo(activity);
+     *
+     * @example
+     * // New pattern (explicit dependencies)
+     * const deps = new LogoDependencies({
+     *     blocks: activity.blocks,
+     *     turtles: activity.turtles,
+     *     // ... other dependencies
+     * });
+     * const logo = new Logo(deps);
      */
-    constructor(activity) {
-        this.activity = activity;
+    constructor(activityOrDeps) {
+        // Support both old Activity pattern and new LogoDependencies pattern
+        // Check if this is a LogoDependencies instance by looking for the characteristic structure
+        const isExplicitDeps =
+            activityOrDeps &&
+            activityOrDeps.blocks &&
+            activityOrDeps.turtles &&
+            activityOrDeps.stage &&
+            activityOrDeps.errorHandler;
+
+        if (isExplicitDeps) {
+            // New pattern: explicit dependencies
+            this.deps = activityOrDeps;
+            // For backward compatibility, also set activity to point to deps
+            // This allows gradual migration of code
+            const deps = this.deps; // Capture for closure
+            this.activity = {
+                blocks: deps.blocks,
+                turtles: deps.turtles,
+                stage: deps.stage,
+                errorMsg: deps.errorHandler,
+                hideMsgs: deps.messageHandler.hide,
+                saveLocally: deps.storage.saveLocally,
+                get showBlocksAfterRun() {
+                    return deps.config.showBlocksAfterRun;
+                },
+                set showBlocksAfterRun(value) {
+                    deps.config.showBlocksAfterRun = value;
+                },
+                onStopTurtle: deps.callbacks.onStopTurtle,
+                onRunTurtle: deps.callbacks.onRunTurtle,
+                meSpeak: deps.meSpeak,
+                logo: this // Self-reference for compatibility
+            };
+        } else {
+            // Old pattern: Activity facade
+            this.activity = activityOrDeps;
+            // Create deps as a view over activity for future migration
+            this.deps = {
+                blocks: this.activity.blocks,
+                turtles: this.activity.turtles,
+                stage: this.activity.stage,
+                errorHandler: (msg, blk) => this.activity.errorMsg(msg, blk),
+                messageHandler: {
+                    hide: () => this.activity.hideMsgs()
+                },
+                storage: {
+                    saveLocally: () => this.activity.saveLocally()
+                },
+                config: {
+                    get showBlocksAfterRun() {
+                        return this.activity.showBlocksAfterRun;
+                    },
+                    set showBlocksAfterRun(value) {
+                        this.activity.showBlocksAfterRun = value;
+                    }
+                },
+                callbacks: {
+                    get onStopTurtle() {
+                        return this.activity.onStopTurtle;
+                    },
+                    get onRunTurtle() {
+                        return this.activity.onRunTurtle;
+                    }
+                },
+                meSpeak: this.activity.meSpeak
+            };
+        }
         this.blockList = this.activity.blocks.blockList;
         this._onStopTurtle = this.activity.onStopTurtle;
         this._onRunTurtle = this.activity.onRunTurtle;
@@ -681,9 +762,8 @@ class Logo {
                     ) {
                         logo.statusFields.push([blk, "color"]);
                     } else {
-                        logo.blockList[blk].value = logo.activity.turtles.getTurtle(
-                            turtle
-                        ).painter.color;
+                        logo.blockList[blk].value =
+                            logo.activity.turtles.getTurtle(turtle).painter.color;
                     }
                     break;
 
