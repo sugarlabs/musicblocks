@@ -98,9 +98,53 @@ describe("setupIntervalsActions", () => {
         setupIntervalsActions(activity);
     });
 
-    test("GetModename resolves modes", () => {
-        expect(Singer.IntervalsActions.GetModename("major")).toBe("major");
-        expect(Singer.IntervalsActions.GetModename("minor")).toBe("minor");
+    describe("GetModename", () => {
+        test("returns exact mode key from MUSICALMODES", () => {
+            expect(Singer.IntervalsActions.GetModename("major")).toBe("major");
+            expect(Singer.IntervalsActions.GetModename("minor")).toBe("minor");
+        });
+
+        test("returns 'major' as fallback when no match is found", () => {
+            expect(Singer.IntervalsActions.GetModename("nonexistent")).toBe("major");
+            expect(Singer.IntervalsActions.GetModename("invalidMode")).toBe("major");
+        });
+
+        test("handles invalid input gracefully", () => {
+            expect(Singer.IntervalsActions.GetModename(null)).toBe("major");
+            expect(Singer.IntervalsActions.GetModename(undefined)).toBe("major");
+            expect(Singer.IntervalsActions.GetModename("")).toBe("major");
+            expect(Singer.IntervalsActions.GetModename(123)).toBe("major");
+        });
+
+        test("matches localized mode name via _() function", () => {
+            // Mock _() to return a localized version
+            global._ = x => (x === "minor" ? "moll" : x);
+
+            // When searching for localized name, it should find the original key
+            expect(Singer.IntervalsActions.GetModename("moll")).toBe("minor");
+
+            // Reset the mock
+            global._ = x => x;
+        });
+
+        test("prefers exact key match over localized match", () => {
+            // Create a fresh MUSICALMODES where "moll" comes before a mode that localizes to "moll"
+            const originalModes = global.MUSICALMODES;
+            global.MUSICALMODES = {
+                moll: [2, 1, 2, 2, 1, 3, 1],
+                minor: [2, 1, 2, 2, 1, 2, 2]
+            };
+
+            // Mock _() to translate "minor" to "moll"
+            global._ = x => (x === "minor" ? "moll" : x);
+
+            // "moll" should match the exact key "moll" since it's checked in the condition first
+            expect(Singer.IntervalsActions.GetModename("moll")).toBe("moll");
+
+            // Restore original
+            global.MUSICALMODES = originalModes;
+            global._ = x => x;
+        });
     });
 
     test("GetIntervalNumber base case", () => {

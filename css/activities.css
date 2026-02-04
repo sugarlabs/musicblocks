@@ -20,16 +20,16 @@
 
 body:not(.dark) #helpfulSearch,
 body:not(.dark) .ui-autocomplete {
-    background-color: #fff !important;
-    color: #000 !important;
+  background-color: #fff !important;
+  color: #000 !important;
 }
 
 body:not(.dark) .ui-autocomplete li:hover {
-    background-color: #ddd !important;
+  background-color: #ddd !important;
 }
 
 body:not(.dark) #helpfulSearchDiv {
-    background-color: #f9f9f9 !important;
+  background-color: #f9f9f9 !important;
 }
 
 #newdropdown {
@@ -47,6 +47,20 @@ body:not(.dark) #helpfulSearchDiv {
   text-align: center;
   width: fit-content;
   margin: 0 auto;
+}
+
+#newdropdown li:hover {
+  background-color: transparent !important;
+}
+
+/* confirm and cancel buttons align horizontally (for newproject dropdown)*/
+#newdropdown .button-row {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 16px;
 }
 
 .new-project-title {
@@ -208,7 +222,7 @@ body:not(.dark) #helpfulSearchDiv {
   margin-top: 60px;
 }
 
-#helpfulSearchDiv{
+#helpfulSearchDiv {
   display: block !important;
   position: absolute;
   background-color: #f0f0f0;
@@ -218,7 +232,7 @@ body:not(.dark) #helpfulSearchDiv {
   z-index: 1;
 }
 
-#helpfulSearch{
+#helpfulSearch {
   padding: 2px;
   border: 2px solid grey;
   width: 220px;
@@ -284,13 +298,14 @@ body:not(.dark) #helpfulSearchDiv {
   vertical-align: middle;
 }
 
-#restoreLastIcon, #restoreAllIcon {
+#restoreLastIcon,
+#restoreAllIcon {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 48px;
   height: 48px;
-  cursor: pointer; 
+  cursor: pointer;
 }
 
 
@@ -425,7 +440,7 @@ body:not(.dark) #helpfulSearchDiv {
   display: block;
 }
 
-#popdown-palette.show ~ .canvasHolder {
+#popdown-palette.show~.canvasHolder {
   filter: blur(10px);
   -webkit-filter: blur(10px);
 }
@@ -1089,6 +1104,7 @@ table {
 }
 
 @media (max-width: 600px) {
+
   #right-arrow,
   #left-arrow {
     height: 30px;
@@ -1098,6 +1114,7 @@ table {
 }
 
 @media (max-width: 450px) {
+
   #right-arrow,
   #left-arrow {
     height: 25px;
@@ -1107,6 +1124,7 @@ table {
 }
 
 @media (max-width: 320px) {
+
   #right-arrow,
   #left-arrow {
     height: 20px;
@@ -1820,7 +1838,7 @@ input.timbreName {
   z-index: 10000;
 }
 
-.wheelNav > svg {
+.wheelNav>svg {
   width: 100%;
   height: 100%;
 }
@@ -1835,7 +1853,7 @@ input.timbreName {
   position: fixed;
 }
 
-#chooseKeyDiv > svg {
+#chooseKeyDiv>svg {
   width: 100%;
   height: 100%;
   transition: width 2s linear 1s;
@@ -1966,12 +1984,14 @@ table {
 .disable_highlighting {
   user-select: none;
 }
+
 #palette.flex-palette {
   display: flex !important;
   flex-direction: row !important;
 }
 
 @media (max-width: 390px) {
+
   #right-arrow,
   #left-arrow {
     position: relative;
@@ -1985,23 +2005,28 @@ table {
     clear: both;
   }
 }
-.logo-container{
+
+.logo-container {
   position: absolute;
-  bottom: 1px; /* Distance from the bottom */
-  right: 23px;  /* Distance from the right */
+  bottom: 1px;
+  /* Distance from the bottom */
+  right: 23px;
+  /* Distance from the right */
   padding: 0px;
   border-radius: 5px;
   cursor: pointer;
 }
-#link-to-sugarLabs:link ,
-#link-to-sugarLabs:visited ,
-#link-to-sugarLabs:hover ,
-#link-to-sugarLabs:active  {
+
+#link-to-sugarLabs:link,
+#link-to-sugarLabs:visited,
+#link-to-sugarLabs:hover,
+#link-to-sugarLabs:active {
   color: #000;
 }
+
 .color-change {
-  fill : #033CD2;
-  stroke : #78E600;
+  fill: #033CD2;
+  stroke: #78E600;
   stroke-width: 3;
 }
 
@@ -2010,7 +2035,7 @@ table {
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #1E88E5; 
+  background-color: #1E88E5;
   color: white;
   padding: 15px 20px;
   border-radius: 8px;
@@ -2025,7 +2050,7 @@ table {
 
 
 
-.chatInterface{
+.chatInterface {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -2077,14 +2102,22 @@ table {
 
 
 .lego-brick {
-    display: inline-block;
-    background-color: #FF0000;
-    border: 1px solid #880000;
-    margin: 2px;
+  display: inline-block;
+  background-color: #FF0000;
+  border: 1px solid #880000;
+  margin: 2px;
 }
 
-.lego-size-1 { width: 20px; height: 10px; }
-.lego-size-2 { width: 40px; height: 10px; }
+.lego-size-1 {
+  width: 20px;
+  height: 10px;
+}
+
+.lego-size-2 {
+  width: 40px;
+  height: 10px;
+}
+
 /* ... more sizes ... */
 /* ======================================================
    FIX: Responsive Tour Arrows (Mobile vs Desktop)
@@ -2093,57 +2126,62 @@ table {
 
 #left-arrow,
 #right-arrow {
-    /* 1. Center Vertically */
-    top: 50% !important; 
-    transform: translateY(-50%);
-    
-    /* 2. Ensure visibility */
-    z-index: 2000;
-    position: absolute;
+  /* 1. Center Vertically */
+  top: 50% !important;
+  transform: translateY(-50%);
+
+  /* 2. Ensure visibility */
+  z-index: 2000;
+  position: absolute;
 }
 
 /* --- Mobile / Default View --- */
 #left-arrow {
-    left: 10px !important;
+  left: 10px !important;
 }
 
 #right-arrow {
-    left: auto !important;  /* Unset the old fixed pixel value */
-    right: 25px !important; /* Stick to the right edge */
+  left: auto !important;
+  /* Unset the old fixed pixel value */
+  right: 25px !important;
+  /* Stick to the right edge */
 }
 
 /* --- Desktop View (Screens wider than 900px) --- */
 @media screen and (min-width: 900px) {
-    #left-arrow {
-        left: 20px !important; /* More space from the edge on desktop */
-    }
-    
-    #right-arrow {
-        right: 20px !important;
-    }
+  #left-arrow {
+    left: 20px !important;
+    /* More space from the edge on desktop */
+  }
+
+  #right-arrow {
+    right: 20px !important;
+  }
 }
+
 /* ======================================================
    FIX: Center the Welcome Modal on Mobile
    ====================================================== */
 @media screen and (max-width: 600px) {
-    #helpDiv {
-        /* 1. Fit the screen width */
-        width: 90% !important;
-        
-        /* 2. Center Horizontally */
-        left: 50% !important;
-        transform: translateX(-50%); /* Moves it back by half its width to center it */
-        
-        /* 3. Reset Top position if needed */
-        top: 15% !important;
-    }
+  #helpDiv {
+    /* 1. Fit the screen width */
+    width: 90% !important;
 
-    /* Fix the inner text box width so it doesn't overflow */
-    #helpBodyDiv {
-        width: calc(100% - 110px) !important;
-        margin: 0 auto !important;
-        left: 0 !important;
-        padding: 0 10px;
-        box-sizing: border-box; 
-    }
+    /* 2. Center Horizontally */
+    left: 50% !important;
+    transform: translateX(-50%);
+    /* Moves it back by half its width to center it */
+
+    /* 3. Reset Top position if needed */
+    top: 15% !important;
+  }
+
+  /* Fix the inner text box width so it doesn't overflow */
+  #helpBodyDiv {
+    width: calc(100% - 110px) !important;
+    margin: 0 auto !important;
+    left: 0 !important;
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
 }

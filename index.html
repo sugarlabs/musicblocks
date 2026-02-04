@@ -20,7 +20,7 @@
     <link rel="preload" href="https://fonts.googleapis.com/icon?family=Material+Icons" as="style"
         onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="fonts/material-icons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="css/activities.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/activities.css?v=fixed" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/keyboard.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/windows.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -79,7 +79,7 @@
     <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
     <link rel="preload" href="/fonts/material-icons.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="stylesheet" href="lib/materialize-iso.css">
-    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/themes.css?v=fixed">
     <script src="lib/easeljs.min.js" defer></script>
     <script src="lib/tweenjs.min.js" defer></script>
     <script>
@@ -481,7 +481,7 @@
                     <li><a id="bn"></a></li>
                     <li><a id="he"></a></li>
                     <li><a id="ur"></a></li>
-                    
+
                 </ul>
 
                 <ul style="display: none;" id="themedropdown" class="dropdown-content">
@@ -782,19 +782,6 @@
                     body.classList.add("play-only");
                     showPersistentNotification();
 
-                    if (buttonContainer) {
-                        buttonContainer.style.display = "flex";
-                        buttonContainer.style.justifyContent = "flex-end";
-                        buttonContainer.style.alignItems = "center";
-                    }
-                    if (homeButton) {
-                        homeButton.style.display = "flex";
-                        homeButton.style.position = "fixed";
-                        homeButton.style.right = "15px";
-                        homeButton.style.bottom = "15px";
-                        homeButton.style.zIndex = "10000";
-                    }
-
                     // Hide certain elements
                     hideElementById("Show/hide blocks");
                     hideElementById("Expand/collapse blocks");
@@ -806,9 +793,6 @@
                     // Disable play-only mode
                     body.classList.remove("play-only");
                     removePersistentNotification();
-
-                    if (homeButton) homeButton.style = "";
-                    if (buttonContainer) buttonContainer.style = "";
 
                     showElementById("Show/hide blocks");
                     showElementById("Expand/collapse blocks");
