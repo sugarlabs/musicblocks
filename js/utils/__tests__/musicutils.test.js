@@ -1482,6 +1482,45 @@ describe("toFraction", () => {
     it("should return array with numerator and denomrator from floating point number", () => {
         expect(toFraction(0.0)).toEqual([0, 2]);
     });
+
+    it("should handle common musical note fractions correctly", () => {
+        expect(toFraction(0.5)).toEqual([1, 2]);
+        expect(toFraction(0.25)).toEqual([1, 4]);
+        expect(toFraction(0.125)).toEqual([1, 8]);
+    });
+
+    it("should handle whole numbers by flipping numerator and denominator", () => {
+        expect(toFraction(2)).toEqual([2, 1]);
+        expect(toFraction(4)).toEqual([4, 1]);
+        expect(toFraction(8)).toEqual([8, 1]);
+    });
+
+    it("should handle thirds correctly", () => {
+        const result = toFraction(1 / 3);
+        expect(result[0]).toBe(1);
+        expect(result[1]).toBe(3);
+    });
+
+    it("should handle dotted note values (1.5 = 3/2)", () => {
+        expect(toFraction(1.5)).toEqual([3, 2]);
+        expect(toFraction(0.75)).toEqual([3, 4]);
+    });
+
+    it("should handle value equal to 1", () => {
+        expect(toFraction(1)).toEqual([1, 1]);
+    });
+
+    it("should handle very small positive decimals", () => {
+        const result = toFraction(0.0625);
+        expect(result[0]).toBe(1);
+        expect(result[1]).toBe(16);
+    });
+
+    it("should handle sixths correctly", () => {
+        const result = toFraction(1 / 6);
+        expect(result[0]).toBe(1);
+        expect(result[1]).toBe(6);
+    });
 });
 
 describe("calcNoteValueToDisplay", () => {
