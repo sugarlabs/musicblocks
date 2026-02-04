@@ -99,7 +99,9 @@ const {
     getNoteFromInterval,
     numberToPitch,
     GetNotesForInterval,
-    base64Encode
+    base64Encode,
+    getStepSizeUp,
+    getStepSizeDown
 } = require("../musicutils");
 
 describe("musicutils", () => {
@@ -2227,5 +2229,17 @@ describe("_calculate_pitch_number", () => {
         const valC4 = _calculate_pitch_number(activity, "C4", tur);
         const valC5 = _calculate_pitch_number(activity, "C5", tur);
         expect(valC5).toBeGreaterThan(valC4);
+    });
+});
+
+describe("getStepSizeUp", () => {
+    it("should return the correct step size for C in C major going up", () => {
+        const result = getStepSizeUp("C major", "C", 0, "equal");
+        expect(result).toBe(2);
+    });
+
+    it("should return 0 for an invalid temperament", () => {
+        const result = getStepSizeUp("C major", "C", 0, "invalid");
+        expect(result).toBe(0);
     });
 });
