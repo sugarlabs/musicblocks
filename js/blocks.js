@@ -1838,10 +1838,7 @@ class Blocks {
                 if (connection == null) {
                     if (this.blockList[newBlock].isArgClamp()) {
                         /** If it is an arg clamp, we may have to adjust the slot size. */
-                        if (
-                            this.blockList[newBlock].isArgumentLikeBlock() &&
-                            newConnection === 1
-                        ) {
+                        if (this.blockList[newBlock].isArgumentLikeBlock() && newConnection === 1) {
                             /** pass */
                         } else if (
                             ["doArg", "nameddoArg"].includes(this.blockList[newBlock].name) &&
@@ -1884,10 +1881,7 @@ class Blocks {
                      */
                     insertAfterDefault = false;
                     if (this.blockList[newBlock].isArgClamp()) {
-                        if (
-                            this.blockList[newBlock].isArgumentLikeBlock() &&
-                            newConnection === 1
-                        ) {
+                        if (this.blockList[newBlock].isArgumentLikeBlock() && newConnection === 1) {
                             /**
                              * If it is the action name then treat it like
                              * a standard replacement.
