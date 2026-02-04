@@ -242,11 +242,10 @@ class Publisher {
             submitobj.ProjectID = id;
             submitobj.ProjectName = title.value;
             submitobj.ProjectDescription = description.value;
-            //TODO: Convert these into real block names once integrated into MB
-            //let obj = palettes.getProtoNameAndPalette("MIDI");
-            //console.log(obj[0]);
-            //console.log(obj[1]);
-            //console.log(obj[2]);
+            // parseProject() now resolves proto block names to display names when running
+            // inside Music Blocks iframe by accessing window.parent.activity.blocks.palettes.
+            // This improves project searchability by using human-friendly names (e.g., "pitch"
+            // display name) instead of proto identifiers in ProjectSearchKeywords.
             submitobj.ProjectSearchKeywords = this.parseProject(this.ProjectTable[id].ProjectData);
             submitobj.ProjectData = Planet.ProjectStorage.encodeTB(
                 this.ProjectTable[id].ProjectData
