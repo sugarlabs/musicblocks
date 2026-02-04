@@ -104,6 +104,7 @@ let MYDEFINES = [
     "activity/pastebox",
     "prefixfree.min",
     "Tone",
+    "activity/undo-redo",
     "activity/js-export/samples/sample",
     "activity/js-export/export",
     "activity/js-export/interface",
@@ -293,6 +294,9 @@ class Activity {
         // Flag to indicate whether user is selecting
         this.isSelecting = false;
 
+        // Global flag to prevent automatic docking during undo/redo
+        this.isUndoRedoInProgress = false;
+
         // Flag to indicate the selection mode is on
         this.selectionModeOn = false;
 
@@ -381,6 +385,9 @@ class Activity {
             createDefaultStack();
             createHelpContent(this);
             window.scroll(0, 0);
+
+            // Initialize UndoRedoManager after other components are ready
+            this.undoRedoManager = new UndoRedoManager(this);
 
             /*
             try {
@@ -3244,6 +3251,16 @@ class Activity {
                 }
             } else if (event.ctrlKey) {
                 switch (event.keyCode) {
+                    case 90: // Ctrl+Z for undo
+                        if (this.undoRedoManager) {
+                            this.undoRedoManager.undo();
+                        }
+                        break;
+                    case 89: // Ctrl+Y for redo
+                        if (this.undoRedoManager) {
+                            this.undoRedoManager.redo();
+                        }
+                        break;
                     case V:
                         // this.textMsg("Ctl-V " + _("Paste"));
                         this.pasteBox.createBox(this.turtleBlocksScale, 200, 200);
@@ -6933,6 +6950,8 @@ class Activity {
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
             this.toolbar.renderMenuIcon(showHideAuxMenu);
             this.toolbar.renderHelpIcon(showHelp);
+            this.toolbar.renderUndoIcon();
+            this.toolbar.renderRedoIcon();
             this.toolbar.renderModeSelectIcon(
                 doSwitchMode,
                 doRecordButton,

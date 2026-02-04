@@ -60,6 +60,8 @@ class Toolbar {
                 ["planetIconDisabled", _("Offline. Sharing is unavailable")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
                 ["helpIcon", _("Help")],
+                ["undoIcon", _("Undo")],
+                ["redoIcon", _("Redo")],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -877,6 +879,48 @@ class Toolbar {
         helpIcon.onclick = () => {
             onclick(this.activity);
         };
+    }
+
+    /**
+     * Renders the undo icon with the provided onclick handler.
+     *
+     * @public
+     * @returns {void}
+     */
+    renderUndoIcon() {
+        const undoIcon = docById("undoIcon");
+
+        undoIcon.onclick = () => {
+            if (this.activity.undoRedoManager) {
+                this.activity.undoRedoManager.undo();
+            }
+        };
+
+        // Set initial state
+        if (this.activity.undoRedoManager) {
+            this.activity.undoRedoManager.updateUI();
+        }
+    }
+
+    /**
+     * Renders the redo icon with the provided onclick handler.
+     *
+     * @public
+     * @returns {void}
+     */
+    renderRedoIcon() {
+        const redoIcon = docById("redoIcon");
+
+        redoIcon.onclick = () => {
+            if (this.activity.undoRedoManager) {
+                this.activity.undoRedoManager.redo();
+            }
+        };
+
+        // Set initial state
+        if (this.activity.undoRedoManager) {
+            this.activity.undoRedoManager.updateUI();
+        }
     }
 
     /**
