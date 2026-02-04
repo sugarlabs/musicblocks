@@ -1694,11 +1694,11 @@ class Singer {
                         tur.singer.tie = false;
                         tieDelay = 0;
 
-                        /** @todo FIXME: consider osctime block in tie */
+                        // tieNoteExtras: [blk, oscList, noteBeat, noteBeatValues, noteDrums, graphics, isOsc, rawDurationValue]
                         Singer.processNote(
                             activity,
-                            tur.singer.tieCarryOver,
-                            false,
+                            tur.singer.tieNoteExtras[7], // rawDurationValue
+                            tur.singer.tieNoteExtras[6], // isOsc
                             saveBlk,
                             turtle
                         );
@@ -1706,9 +1706,15 @@ class Singer {
                         tur.singer.inNoteBlock.pop();
 
                         if (!tur.singer.suppressOutput) {
-                            tur.doWait(
-                                Math.max(bpmFactor / tur.singer.tieCarryOver - turtleLag, 0)
-                            );
+                            const rawDuration = tur.singer.tieNoteExtras[7];
+                            const wasOsc = tur.singer.tieNoteExtras[6];
+
+                            const waitSeconds = wasOsc
+                                ? rawDuration / 1000
+                                : bpmFactor / rawDuration;
+
+                            tur.singer.turtleTime += waitSeconds;
+                            tur.doWait(Math.max(waitSeconds - turtleLag, 0));
                         }
 
                         tieDelay = tur.singer.tieCarryOver;
@@ -1756,7 +1762,9 @@ class Singer {
                         tur.singer.noteBeat[saveBlk],
                         tur.singer.noteBeatValues[saveBlk],
                         tur.singer.noteDrums[saveBlk],
-                        []
+                        [],
+                        isOsc,
+                        noteValue // rawDurationValue
                     ];
 
                     // We play any drums in the first tied note along with the drums in the second tied note
@@ -1830,7 +1838,6 @@ class Singer {
                         }
                     }
                     // eslint-disable-next-line no-console
-                    console.log("Note in note " + blk + " delay " + future);
                 }
             }
             let forceSilence = false;
