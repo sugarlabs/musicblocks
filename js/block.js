@@ -127,6 +127,13 @@ const COLLAPSIBLES = [
 const NOHIT = ["hidden", "hiddennoflow"];
 
 /**
+ * List of blocks that behave like argument blocks even though they are not
+ * strictly classified as arg/value blocks.
+ * @type {string[]}
+ */
+const ARG_LIKE_BLOCKS = ["doArg", "calcArg", "namedcalcArg", "makeblock"];
+
+/**
  * List of special input types.
  * @type {string[]}
  */
@@ -1928,6 +1935,17 @@ class Block {
      */
     isArgBlock() {
         return this.protoblock.style === "value" || this.protoblock.style === "arg";
+    }
+
+    /**
+     * Checks if the block behaves like an argument block.
+     * Some blocks (e.g., doArg, calcArg, namedcalcArg, makeblock) are not styled
+     * strictly as arg/value blocks but are treated as argument blocks in
+     * certain contexts.
+     * @returns {boolean} - True if the block is argument-like, false otherwise.
+     */
+    isArgumentLikeBlock() {
+        return this.isArgBlock() || ARG_LIKE_BLOCKS.includes(this.name);
     }
 
     /**

@@ -638,7 +638,7 @@ class Blocks {
 
             /** Which connection do we start with? */
             let ci;
-            if (["doArg", "calcArg", "makeblock"].includes(myBlock.name)) {
+            if (myBlock.isArgumentLikeBlock()) {
                 ci = 2;
             } else {
                 ci = 1;
@@ -1839,9 +1839,7 @@ class Blocks {
                     if (this.blockList[newBlock].isArgClamp()) {
                         /** If it is an arg clamp, we may have to adjust the slot size. */
                         if (
-                            ["doArg", "calcArg", "makeblock"].indexOf(
-                                this.blockList[newBlock].name
-                            ) !== -1 &&
+                            this.blockList[newBlock].isArgumentLikeBlock() &&
                             newConnection === 1
                         ) {
                             /** pass */
@@ -1858,11 +1856,7 @@ class Blocks {
                             const slotList = this.blockList[newBlock].argClampSlots;
                             let si = newConnection - 1;
                             /** Which slot is this block in? */
-                            if (
-                                ["doArg", "calcArg", "makeblock"].includes(
-                                    this.blockList[newBlock].name
-                                )
-                            ) {
+                            if (this.blockList[newBlock].isArgumentLikeBlock()) {
                                 si = newConnection - 2;
                             }
 
@@ -1891,9 +1885,7 @@ class Blocks {
                     insertAfterDefault = false;
                     if (this.blockList[newBlock].isArgClamp()) {
                         if (
-                            ["doArg", "calcArg", "makeblock"].indexOf(
-                                this.blockList[newBlock].name
-                            ) !== -1 &&
+                            this.blockList[newBlock].isArgumentLikeBlock() &&
                             newConnection === 1
                         ) {
                             /**
@@ -1929,11 +1921,7 @@ class Blocks {
                             /** Which slot is this block in? */
                             const ci = this.blockList[newBlock].connections.indexOf(connection);
                             let si = ci - 1;
-                            if (
-                                ["doArg", "calcArg", "makeblock"].includes(
-                                    this.blockList[newBlock].name
-                                )
-                            ) {
+                            if (this.blockList[newBlock].isArgumentLikeBlock()) {
                                 si = ci - 2;
                             }
 
@@ -2184,11 +2172,7 @@ class Blocks {
 
             /** If it is an arg block, where is it coming from? */
             /** FIXME: improve mechanism for testing block types. */
-            if (
-                (myBlock.isArgBlock() ||
-                    ["calcArg", "namedcalcArg", "makeblock"].includes(myBlock.name)) &&
-                newBlock != null
-            ) {
+            if (myBlock.isArgumentLikeBlock() && newBlock != null) {
                 /** We care about twoarg blocks with connections to the first arg; */
                 if (this.blockList[newBlock].isTwoArgBlock()) {
                     if (this.blockList[newBlock].connections[1] === thisBlock) {
