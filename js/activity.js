@@ -1253,6 +1253,20 @@ class Activity {
             this.sendAllToTrash(true, true);
         };
 
+        const extractSVGInner = svgString => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(svgString, "image/svg+xml");
+            const svgEl = doc.querySelector("svg");
+            if (!svgEl) return "";
+
+            // Remove drop shadow filters safely
+            svgEl.querySelectorAll("[filter]").forEach(el => {
+                el.removeAttribute("filter");
+            });
+
+            return svgEl.innerHTML;
+        };
+
         /**
          * @returns {SVG} returns SVG of blocks
          */
@@ -1276,11 +1290,9 @@ class Activity {
                     yMax = this.blocks.blockList[i].container.y + this.blocks.blockList[i].height;
                 }
 
-                if (this.blocks.blockList[i].collapsed) {
-                    parts = this.blocks.blockCollapseArt[i].split("><");
-                } else {
-                    parts = this.blocks.blockArt[i].split("><");
-                }
+                const rawSVG = this.blocks.blockList[i].collapsed
+                    ? this.blocks.blockCollapseArt[i]
+                    : this.blocks.blockArt[i];
 
                 if (this.blocks.blockList[i].isCollapsible()) {
                     svg += "<g>";
@@ -1292,7 +1304,13 @@ class Activity {
                     ", " +
                     this.blocks.blockList[i].container.y +
                     ')">';
-                if (SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
+
+                if (!SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
+                    svg += extractSVGInner(rawSVG);
+                } else {
+                    // Keep existing fragile logic for now
+                    parts = rawSVG.split("><");
+
                     for (let p = 1; p < parts.length; p++) {
                         // FIXME: This is fragile.
                         if (p === 1) {
@@ -1308,23 +1326,6 @@ class Activity {
                             } else {
                                 svg += parts[p] + ">" + this.blocks.blockList[i].value + "<";
                             }
-                        } else if (p === parts.length - 2) {
-                            svg += parts[p] + ">";
-                        } else if (p === parts.length - 1) {
-                            // skip final </svg>
-                        } else {
-                            svg += parts[p] + "><";
-                        }
-                    }
-                } else {
-                    for (let p = 1; p < parts.length; p++) {
-                        // FIXME: This is fragile.
-                        if (p === 1) {
-                            svg += "<" + parts[p] + "><";
-                        } else if (p === 2) {
-                            // skip filter
-                        } else if (p === 3) {
-                            svg += parts[p].replace("filter:url(#dropshadow);", "") + "><";
                         } else if (p === parts.length - 2) {
                             svg += parts[p] + ">";
                         } else if (p === parts.length - 1) {
