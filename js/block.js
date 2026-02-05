@@ -127,6 +127,13 @@ const COLLAPSIBLES = [
 const NOHIT = ["hidden", "hiddennoflow"];
 
 /**
+ * List of blocks that behave like argument blocks even though they are not
+ * strictly classified as arg/value blocks.
+ * @type {string[]}
+ */
+const ARG_LIKE_BLOCKS = ["doArg", "calcArg", "namedcalcArg", "makeblock"];
+
+/**
  * List of special input types.
  * @type {string[]}
  */
@@ -797,10 +804,14 @@ class Block {
              * @returns {void}
              */
             const _postProcess = that => {
-                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
-                    scale / 3;
-                that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale =
-                    scale / 3;
+                that.collapseButtonBitmap.scaleX =
+                    that.collapseButtonBitmap.scaleY =
+                    that.collapseButtonBitmap.scale =
+                        scale / 3;
+                that.expandButtonBitmap.scaleX =
+                    that.expandButtonBitmap.scaleY =
+                    that.expandButtonBitmap.scale =
+                        scale / 3;
                 that.updateCache();
                 that._calculateBlockHitArea();
             };
@@ -1510,8 +1521,10 @@ class Block {
             const image = new Image();
             image.onload = () => {
                 that.collapseButtonBitmap = new createjs.Bitmap(image);
-                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
-                    that.protoblock.scale / 3;
+                that.collapseButtonBitmap.scaleX =
+                    that.collapseButtonBitmap.scaleY =
+                    that.collapseButtonBitmap.scale =
+                        that.protoblock.scale / 3;
                 that.container.addChild(that.collapseButtonBitmap);
                 that.collapseButtonBitmap.x = 2 * that.protoblock.scale;
                 if (that.isInlineCollapsible()) {
@@ -1538,8 +1551,10 @@ class Block {
             const image = new Image();
             image.onload = () => {
                 that.expandButtonBitmap = new createjs.Bitmap(image);
-                that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale =
-                    that.protoblock.scale / 3;
+                that.expandButtonBitmap.scaleX =
+                    that.expandButtonBitmap.scaleY =
+                    that.expandButtonBitmap.scale =
+                        that.protoblock.scale / 3;
 
                 that.container.addChild(that.expandButtonBitmap);
                 that.expandButtonBitmap.visible = that.collapsed;
@@ -1928,6 +1943,17 @@ class Block {
      */
     isArgBlock() {
         return this.protoblock.style === "value" || this.protoblock.style === "arg";
+    }
+
+    /**
+     * Checks if the block behaves like an argument block.
+     * Some blocks (e.g., doArg, calcArg, namedcalcArg, makeblock) are not styled
+     * strictly as arg/value blocks but are treated as argument blocks in
+     * certain contexts.
+     * @returns {boolean} - True if the block is argument-like, false otherwise.
+     */
+    isArgumentLikeBlock() {
+        return this.isArgBlock() || ARG_LIKE_BLOCKS.includes(this.name);
     }
 
     /**
@@ -2747,11 +2773,15 @@ class Block {
      */
     _positionMedia(bitmap, width, height, blockScale) {
         if (width > height) {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale =
-                ((MEDIASAFEAREA[2] / width) * blockScale) / 2;
+            bitmap.scaleX =
+                bitmap.scaleY =
+                bitmap.scale =
+                    ((MEDIASAFEAREA[2] / width) * blockScale) / 2;
         } else {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale =
-                ((MEDIASAFEAREA[3] / height) * blockScale) / 2;
+            bitmap.scaleX =
+                bitmap.scaleY =
+                bitmap.scale =
+                    ((MEDIASAFEAREA[3] / height) * blockScale) / 2;
         }
         bitmap.x = ((MEDIASAFEAREA[0] - 10) * blockScale) / 2;
         bitmap.y = (MEDIASAFEAREA[1] * blockScale) / 2;
@@ -4181,7 +4211,6 @@ class Block {
 
         return new Date().getTime() - this._piemenuExitTime > 200;
     }
-
 
     /**
      * Checks and reinitializes widget windows if their labels are changed.
