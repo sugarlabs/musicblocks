@@ -20,6 +20,7 @@ const replace = require("gulp-replace");
 const minifyCSS = require("gulp-clean-css");
 const gulp = require("gulp");
 const prettier = require("gulp-prettier");
+const pkg = require("./package.json");
 
 // File paths
 const files = {
@@ -84,6 +85,13 @@ const validate = () => {
     return gulp.src(files.jsPath).pipe(prettier.check({ singleQuote: true, trailingComma: "all" }));
 };
 
+// Inject version from package.json into loader.js
+const injectVersion = () => {
+    return src("js/loader.js")
+        .pipe(replace(/const version = ["'].*["']; \/\/ INJECT_VERSION/g, `const version = "${pkg.version}"; // INJECT_VERSION`))
+        .pipe(dest("js"));
+};
+
 // Watch task: watch SASS , CSS and JS files for changes
 // If any change, run sass, css and js tasks simultaneously
 const watchTask = () => {
@@ -97,6 +105,7 @@ const watchTask = () => {
 // Runs the sass ,css and js tasks simultaneously
 // then runs prettify, cacheBust, validate, then starts watch (long-running)
 exports.default = series(
+    injectVersion,
     parallel(jsTask, cssTask, sassTask),
     prettify,
     cacheBustTask,

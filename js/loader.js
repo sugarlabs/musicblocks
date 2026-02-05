@@ -69,7 +69,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
         });
     }
 
-    function initializeI18next() {
+    function initializeI18next(version) {
         return new Promise(resolve => {
             i18next.use(i18nextHttpBackend).init(
                 {
@@ -81,7 +81,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                         escapeValue: false
                     },
                     backend: {
-                        loadPath: "locales/{{lng}}.json?v=" + Date.now()
+                        loadPath: "locales/{{lng}}.json?v=" + version
                     }
                 },
                 function (err) {
@@ -96,7 +96,9 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
     }
 
     async function main() {
-        await initializeI18next();
+        const version = "3.4.1"; // INJECT_VERSION
+
+        await initializeI18next(version);
 
         const lang = "en";
 

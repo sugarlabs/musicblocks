@@ -228,17 +228,20 @@ function windowWidth() {
  * @throws {string} Throws an error if the HTTP status code is greater than 299.
  * @returns {string} The response text from the server.
  */
-let httpGet = async projectName => {
-    const url = projectName === null ? window.server : window.server + projectName;
-    const response = await fetch(url, {
-        method: "GET",
-        headers: {
-            "x-api-key": API_KEY
-        }
-    });
+let httpGet = projectName => {
+    let xmlHttp = null;
+    xmlHttp = new XMLHttpRequest();
+    if (projectName === null) {
+        xmlHttp.open("GET", window.server, false);
+        xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
+    } else {
+        xmlHttp.open("GET", window.server + projectName, false);
+        xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
+    }
 
-    if (!response.ok) {
-        throw new Error("Error from server: " + response.statusText);
+    xmlHttp.send();
+    if (xmlHttp.status > 299) {
+        throw "Error from server";
     }
 
     return xmlHttp.responseText;
@@ -250,21 +253,14 @@ let httpGet = async projectName => {
  * @param {string} data - The data to be sent in the POST request.
  * @returns {string} The response text from the server.
  */
-let httpPost = async (projectName, data) => {
-    const response = await fetch(window.server + projectName, {
-        method: "POST",
-        headers: {
-            "x-api-key": API_KEY,
-            "Content-Type": "application/json"
-        },
-        body: data
-    });
-
-    if (!response.ok) {
-        throw new Error("Error from server: " + response.statusText);
-    }
-
-    return await response.text();
+let httpPost = (projectName, data) => {
+    let xmlHttp = null;
+    xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("POST", window.server + projectName, false);
+    xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
+    xmlHttp.send(data);
+    return xmlHttp.responseText;
+    // return 'https://apps.facebook.com/turtleblocks/?file=' + projectName;
 };
 
 /**
@@ -275,41 +271,36 @@ let httpPost = async (projectName, data) => {
  * @param {function} [userCallback] - An optional user-defined callback function.
  */
 function HttpRequest(url, loadCallback, userCallback) {
-    this.url = url;
+    // userCallback is an optional callback-handler.
+    const req = (this.request = new XMLHttpRequest());
     this.handler = loadCallback;
-    this.userCallback = userCallback;
+    this.url = url;
     this.localmode = Boolean(self.location.href.search(/^file:/i) === 0);
+    this.userCallback = userCallback;
 
     const objref = this;
+    try {
+        req.open("GET", url);
 
-    fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            return response.text();
-        })
-        .then(data => {
-            // Mocking the XMLHttpRequest logic where the handler is called
-            // assuming the handler expects 'this.request' to be populated or relevant
-            // Since we don't have XHR, we might need to adjust handler expectations.
-            // For now, invoking handler as callback.
-            objref.handler(data);
-        })
-        .catch(error => {
-            if (self.console) {
-                // eslint-disable-next-line no-console
-                console.debug("Failed to load resource from " + url + ": Network error.");
-                // eslint-disable-next-line no-console
-                console.debug(error);
-            }
+        req.onreadystatechange = () => {
+            objref.handler();
+        };
 
-            if (typeof userCallback === "function") {
-                userCallback(false, "network error");
-            }
+        req.send("");
+    } catch (e) {
+        if (self.console) {
+            // eslint-disable-next-line no-console
+            console.debug("Failed to load resource from " + url + ": Network error.");
+            // eslint-disable-next-line no-console
+            console.debug(e);
+        }
 
-            this.handler = this.userCallback = null;
-        });
+        if (typeof userCallback === "function") {
+            userCallback(false, "network error");
+        }
+
+        this.request = this.handler = this.userCallback = null;
+    }
 }
 
 /**
@@ -571,19 +562,12 @@ let fileBasename = file => {
  * @param {string} str - The input string.
  * @returns {string} The string with the first character in uppercase.
  */
-function toTitleCase (str) {
+let toTitleCase = str => {
     if (typeof str !== "string") return;
     let tempStr = "";
     if (str.length > 1) tempStr = str.substring(1);
     return str.toUpperCase()[0] + tempStr;
 };
-
-if (typeof module !== "undefined" && module.exports) {
-    module.exports.toTitleCase = toTitleCase;
-}
-if (typeof window !== "undefined") {
-    window.toTitleCase = toTitleCase;
-}
 
 /**
  * Processes plugin data and updates the activity based on the provided JSON-encoded dictionary.
