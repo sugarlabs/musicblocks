@@ -204,6 +204,8 @@ class Toolbar {
                 ["planetIconDisabled", _("Offline. Sharing is unavailable")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
                 ["helpIcon", _("Help")],
+                ["undoIcon", _("Undo")],
+                ["redoIcon", _("Redo")],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],

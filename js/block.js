@@ -3209,29 +3209,25 @@ class Block {
                 // Just in case the blocks are not properly docked after
                 // the move (workaround for issue #38 -- Blocks fly
                 // apart). Still need to get to the root cause.
-                // IMPORTANT: Do not run adjustDocks during undo/redo operations
-                // as it can override the restored positions
-                if (!this.activity.isUndoRedoInProgress) {
-                    this.blocks.adjustDocks(this.blocks.blockList.indexOf(this), true);
-                }
+                this.blocks.adjustDocks(this.blocks.blockList.indexOf(this), true);
 
                 // Save state for undo/redo functionality after all adjustments
-                if (this.activity.undoRedoManager && this._undoStartX !== undefined && this._undoStartY !== undefined && !this.activity.isUndoRedoInProgress) {
+                if (that.activity.undoRedoManager && that._undoStartX !== undefined && that._undoStartY !== undefined && !that.activity.isUndoRedoInProgress) {
                     // Get the final position after all adjustments
-                    const currentX = this.container.x;
-                    const currentY = this.container.y;
+                    const currentX = that.container.x;
+                    const currentY = that.container.y;
                     
-                    this.activity.undoRedoManager.saveState('block_moved', {
-                        blockName: this.name,
-                        oldX: this._undoStartX,
-                        oldY: this._undoStartY,
+                    that.activity.undoRedoManager.saveState('block_moved', {
+                        blockName: that.name,
+                        oldX: that._undoStartX,
+                        oldY: that._undoStartY,
                         newX: currentX,
                         newY: currentY
                     });
                     
                     // Clear the start position
-                    this._undoStartX = undefined;
-                    this._undoStartY = undefined;
+                    that._undoStartX = undefined;
+                    that._undoStartY = undefined;
                 }
             }
         } else if (SPECIALINPUTS.includes(this.name) || ["media", "loadFile"].includes(this.name)) {

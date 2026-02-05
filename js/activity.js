@@ -104,7 +104,6 @@ let MYDEFINES = [
     "activity/pastebox",
     "prefixfree.min",
     "Tone",
-    "activity/undo-redo",
     "activity/js-export/samples/sample",
     "activity/js-export/export",
     "activity/js-export/interface",
@@ -297,7 +296,7 @@ class Activity {
         // Global flag to prevent automatic docking during undo/redo
         this.isUndoRedoInProgress = false;
 
-        // Flag to indicate the selection mode is on
+        // Flag to indicate that selection mode is on
         this.selectionModeOn = false;
 
         // Flag to check if the helpful search widget is active or not (for "click" event handler purpose)
@@ -3248,6 +3247,18 @@ class Activity {
                             this.blocksContainer.x -= this.canvas.width / 10;
                             this.stage.update();
                         }
+                        break;
+                }
+            } else if (event.shiftKey && !disableKeys) {
+                switch (event.keyCode) {
+                    case SPACE:
+                        event.preventDefault();
+                        if (this.turtleContainer.scaleX === 1) {
+                            this.turtles.setStageScale(0.5);
+                        } else {
+                            this.turtles.setStageScale(1);
+                        }
+                        break;
                 }
             } else if (event.ctrlKey) {
                 switch (event.keyCode) {
@@ -3261,8 +3272,8 @@ class Activity {
                             this.undoRedoManager.redo();
                         }
                         break;
-                    case V:
-                        // this.textMsg("Ctl-V " + _("Paste"));
+                    case 86: // Ctrl+V for paste
+                        // this.textMsg("Ctl-V " + _("Paste")));
                         this.pasteBox.createBox(this.turtleBlocksScale, 200, 200);
                         this.pasteBox.show();
                         document.getElementById("paste").style.left =
@@ -3272,17 +3283,6 @@ class Activity {
                         document.getElementById("paste").focus();
                         document.getElementById("paste").style.visibility = "visible";
                         this.update = true;
-                        break;
-                }
-            } else if (event.shiftKey && !disableKeys) {
-                switch (event.keyCode) {
-                    case SPACE:
-                        event.preventDefault();
-                        if (this.turtleContainer.scaleX === 1) {
-                            this.turtles.setStageScale(0.5);
-                        } else {
-                            this.turtles.setStageScale(1);
-                        }
                         break;
                 }
             } else {
