@@ -481,7 +481,7 @@
                     <li><a id="bn"></a></li>
                     <li><a id="he"></a></li>
                     <li><a id="ur"></a></li>
-                    
+
                 </ul>
 
                 <ul style="display: none;" id="themedropdown" class="dropdown-content">
@@ -520,21 +520,37 @@
     </script>
 
     <script>
+        // Register service worker only in production (not on localhost)
         if ("serviceWorker" in navigator) {
-            if (navigator.serviceWorker.controller) {
-                console.debug(
-                    "[PWA Builder] active service worker found, no need to register"
-                );
+            // Detect if running on localhost for development
+            const isLocalDev = window.location.hostname === "localhost" ||
+                window.location.hostname === "127.0.0.1";
+
+            if (!isLocalDev) {
+                // Production: Register service worker for offline mode
+                if (navigator.serviceWorker.controller) {
+                    console.debug(
+                        "[PWA Builder] Active service worker found, no need to register"
+                    );
+                } else {
+                    // Register the service worker
+                    navigator.serviceWorker
+                        .register("/sw.js")
+                        .then(function (reg) {
+                            console.debug(
+                                "[PWA Builder] Service worker registered for scope: " +
+                                reg.scope
+                            );
+                        })
+                        .catch(function (err) {
+                            console.error("[PWA Builder] Service worker registration failed:", err);
+                        });
+                }
             } else {
-                // Register the service worker
-                navigator.serviceWorker
-                    .register("/sw.js")
-                    .then(function (reg) {
-                        console.debug(
-                            "[PWA Builder] Service worker has been registered for scope: " +
-                            reg.scope
-                        );
-                    });
+                // Development: Skip service worker for instant updates
+                console.log(
+                    "🔥 [DEV MODE] Service worker disabled on localhost for instant code updates"
+                );
             }
         }
     </script>
