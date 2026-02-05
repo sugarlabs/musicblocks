@@ -1111,6 +1111,11 @@ table {
     width: 30px;
     background-size: 30px;
   }
+
+  .top-wrapper {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
 }
 
 @media (max-width: 450px) {
@@ -1121,6 +1126,11 @@ table {
     width: 25px;
     background-size: 25px;
   }
+
+  .top-wrapper {
+    padding-left: 35px;
+    padding-right: 35px;
+  }
 }
 
 @media (max-width: 320px) {
@@ -1130,6 +1140,11 @@ table {
     height: 20px;
     width: 20px;
     background-size: 20px;
+  }
+
+  .top-wrapper {
+    padding-left: 30px;
+    padding-right: 30px;
   }
 }
 
@@ -1146,6 +1161,9 @@ table {
   font-size: 1.1em;
   text-align: center;
   height: 55px;
+  padding-left: 50px;  /* Prevent overlap with back button */
+  padding-right: 50px; /* Prevent overlap with close button and maintain symmetry */
+  box-sizing: border-box;
 }
 
 .close-button {
