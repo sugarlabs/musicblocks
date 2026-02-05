@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Widget Windows - Responsive Testing Demo</title>
+    
+    <!-- Link to the new responsive CSS -->
+    <link rel="stylesheet" href="dist/css/windows.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .demo-header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .demo-header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .demo-header p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            background: #2196f3;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #666;
+        }
+        
+        .btn-secondary:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .info-bar {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .info-bar strong {
+            color: #1976d2;
+        }
+        
+        .viewport-info {
+            display: inline-block;
+            background: #fff3cd;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-left: 10px;
+            border: 2px solid #ffc107;
+        }
+        
+        /* Demo background canvas */
+        .demo-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: #f5f5f5;
+        }
+        
+        @media (max-width: 600px) {
+            .demo-header {
+                margin-bottom: 10px;
+            }
+            
+            .demo-header h1 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-header">
+        <h1>🎵 Widget Windows - Responsive Testing</h1>
+        <p>Open different widgets to test the new responsive design across various screen sizes.</p>
+        
+        <div class="info-bar">
+            <strong>📏 Current Viewport:</strong>
+            <span class="viewport-info" id="viewportInfo">Loading...</span>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" onclick="openWidget('Rhythm')">Open Rhythm Widget</button>
+            <button class="btn" onclick="openWidget('Pitch Time Matrix')">Open Pitch Matrix</button>
+            <button class="btn" onclick="openWidget('Tempo')">Open Tempo Widget</button>
+            <button class="btn" onclick="openWidget('Status')">Open Status Widget</button>
+            <button class="btn" onclick="openWidget('Mode')">Open Mode Widget</button>
+            <button class="btn btn-secondary" onclick="closeAllWidgets()">Close All</button>
+        </div>
+        
+        <div class="info-bar">
+            <strong>✨ Testing Tips:</strong>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>Resize browser window to test breakpoints (600px, 768px, 1024px)</li>
+                <li>Check touch target sizes on mobile (should be ≥ 44px × 44px)</li>
+                <li>Verify smooth scaling with fluid typography</li>
+                <li>Test keyboard navigation (Tab key) and focus indicators</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Floating Windows Container -->
+    <div id="floatingWindows"></div>
+    
+    <script>
+        let widgetCounter = 0;
+        
+        // Update viewport info
+        function updateViewportInfo() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const info = document.getElementById('viewportInfo');
+            
+            let breakpoint = '';
+            if (width > 1024) {
+                breakpoint = 'Desktop';
+            } else if (width > 600 && width <= 1024) {
+                breakpoint = 'Tablet';
+            } else if (width > 360 && width <= 600) {
+                breakpoint = 'Mobile';
+            } else {
+                breakpoint = 'Small Mobile';
+            }
+            
+            info.textContent = `${width}px × ${height}px (${breakpoint})`;
+        }
+        
+        // Open widget function
+        function openWidget(widgetName) {
+            widgetCounter++;
+            const windowId = `widget-${widgetCounter}`;
+            
+            const floatingWindows = document.getElementById('floatingWindows');
+            
+            const windowFrame = document.createElement('div');
+            windowFrame.className = 'windowFrame';
+            windowFrame.id = windowId;
+            windowFrame.style.left = `${50 + (widgetCounter * 30)}px`;
+            windowFrame.style.top = `${100 + (widgetCounter * 30)}px`;
+            
+            windowFrame.innerHTML = `
+                <div class="wfTopBar">
+                    <button class="wftButton close" onclick="closeWidget('${windowId}')"></button>
+                    <div class="wftTitle">${widgetName}</div>
+                    <button class="wftButton rollup"></button>
+                </div>
+                <div class="wfWinBody">
+                    <div class="wfbToolbar">
+                        <div class="wfbtItem">🎵</div>
+                        <div class="wfbtItem">🎹</div>
+                        <div class="wfbtItem">🎸</div>
+                        <div class="wfbtItem">🥁</div>
+                        <div class="wfbtItem">🎺</div>
+                    </div>
+                    <div class="wfbWidget">
+                        <div style="padding: 20px;">
+                            <h3 style="margin-bottom: 15px; color: #333;">${widgetName} Widget</h3>
+                            <p style="color: #666; line-height: 1.6; margin-bottom: 15px;">
+                                This is a demo of the <strong>${widgetName}</strong> widget with the new responsive design.
+                            </p>
+                            <p style="color: #666; line-height: 1.6; margin-bottom: 15px;">
+                                <strong>Test Points:</strong><br>
+                                • Resize the browser window<br>
+                                • Check touch target sizes (buttons should be ≥ 44px on mobile)<br>
+                                • Verify smooth font scaling<br>
+                                • Test on different devices
+                            </p>
+                            <div style="background: #f5f5f5; padding: 15px; border-radius: 6px; margin-top: 20px;">
+                                <strong>Responsive Features:</strong><br>
+                                <ul style="margin-left: 20px; margin-top: 10px; color: #555;">
+                                    <li>Consolidated media queries (1 main breakpoint)</li>
+                                    <li>CSS custom properties for theming</li>
+                                    <li>Fluid typography with clamp()</li>
+                                    <li>WCAG-compliant touch targets</li>
+                                    <li>Enhanced tablet support</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            floatingWindows.appendChild(windowFrame);
+        }
+        
+        // Close widget function
+        function closeWidget(windowId) {
+            const widget = document.getElementById(windowId);
+            if (widget) {
+                widget.remove();
+            }
+        }
+        
+        // Close all widgets
+        function closeAllWidgets() {
+            const floatingWindows = document.getElementById('floatingWindows');
+            floatingWindows.innerHTML = '';
+            widgetCounter = 0;
+        }
+        
+        // Initialize
+        updateViewportInfo();
+        window.addEventListener('resize', updateViewportInfo);
+        
+        // Open a demo widget on load
+        setTimeout(() => {
+            openWidget('Rhythm');
+        }, 500);
+    </script>
+</body>
+</html>
