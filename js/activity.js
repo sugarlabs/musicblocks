@@ -3831,6 +3831,15 @@ class Activity {
                             }
                         }
                     }
+
+                    // Re-add the action to the palette
+                    const actionName = actionArg.value;
+                    this.blocks.newNameddoBlock(
+                        actionName,
+                        this.blocks.actionHasReturn(blockId),
+                        this.blocks.actionHasArgs(blockId)
+                    );
+                    this.palettes.updatePalettes("action");
                 }
             }
             activity.textMsg(_("Item restored from the trash."), 3000);
