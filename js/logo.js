@@ -2430,6 +2430,8 @@ class Logo {
      */
     safePluginExecute(code, logo, turtle, blk, value) {
         if (typeof code !== "string") return;
+        // The security policy is to only execute code from vetted or user-confirmed plugins.
+        // This is primarily handled at plugin load time in processPluginData.
         try {
             // eslint-disable-next-line no-eval
             eval(code);

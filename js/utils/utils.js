@@ -599,15 +599,41 @@ const processPluginData = (activity, pluginData, pluginSource) => {
         );
     };
 
-    const vettedPlugins = ["maths", "weather", "accelerometer", "facebook", "nutrition", "rodi"];
-
     const isVettedPlugin = source => {
         if (!source) return false;
-        // Known plugins from the local plugins folder are considered vetted
-        return vettedPlugins.some(plugin => source.includes(`plugins/${plugin}.`));
+        // Plugins from the local plugins folder are considered vetted (provenance)
+        if (source.startsWith("plugins/") || source.startsWith("./plugins/")) {
+            return true;
+        }
+        // Known plugins from local storage are also trusted as they were approved previously
+        if (source === "localStorage:plugins") {
+            return true;
+        }
+        return false;
     };
 
     let userConfirmed = isVettedPlugin(pluginSource);
+
+    if (!userConfirmed) {
+        userConfirmed = confirm(
+            _("Security Warning") +
+            "\n\n" +
+            _(
+                "This plugin contains code that will be executed in your browser. It has not been loaded from the built-in plugins directory and may contain unsafe code."
+            ) +
+            "\n\n" +
+            _("Do you want to allow this plugin to run?") +
+            "\n\n" +
+            _("Source: ") +
+            (pluginSource || _("unknown"))
+        );
+
+        if (!userConfirmed) {
+            // eslint-disable-next-line no-console
+            console.warn("User declined unvetted plugin execution:", pluginSource);
+            return null;
+        }
+    }
 
     const safeEval = (code, label = "plugin") => {
         if (typeof code !== "string") return;
@@ -617,27 +643,6 @@ const processPluginData = (activity, pluginData, pluginSource) => {
             // eslint-disable-next-line no-console
             console.warn("Plugin code too large:", label);
             return;
-        }
-
-        if (!userConfirmed) {
-            userConfirmed = confirm(
-                _("Security Warning") +
-                    "\n\n" +
-                    _(
-                        "The plugin contains code that will be executed in your browser. This plugin has not been vetted by the Music Blocks team and may contain unsafe code."
-                    ) +
-                    "\n\n" +
-                    _("Do you want to allow this plugin to run?") +
-                    "\n\n" +
-                    _("Source: ") +
-                    (pluginSource || _("unknown"))
-            );
-
-            if (!userConfirmed) {
-                // eslint-disable-next-line no-console
-                console.warn("User declined unvetted plugin execution:", label);
-                return;
-            }
         }
 
         // NOTE: This eval is required for the Plugin system to load dynamic block definitions.
@@ -1572,10 +1577,10 @@ let hexToRGB = hex => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
         ? {
-              r: parseInt(result[1], 16),
-              g: parseInt(result[2], 16),
-              b: parseInt(result[3], 16)
-          }
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        }
         : null;
 };
 
