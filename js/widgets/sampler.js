@@ -607,6 +607,7 @@ function SampleWidget() {
         // );
 
         let generating = false;
+        let audioPreview = null;
 
         this._promptBtn.onclick = () => {
             this.widgetWindow.clearScreen();
@@ -737,9 +738,20 @@ function SampleWidget() {
             preview.innerHTML = "Preview";
             preview.disabled = true;
             preview.onclick = function () {
+                if (audioPreview) {
+                    audioPreview.pause();
+                    audioPreview.currentTime = 0;
+                    audioPreview = null;
+                }
+
                 const audioURL = `http://13.61.94.100:8000/preview`;
-                const audio = new Audio(audioURL);
-                audio.play();
+                audioPreview = new Audio(audioURL);
+                audioPreview.play();
+
+                // Removed the refernce after audio finishes playing
+                audioPreview.onended = function () {
+                    audioPreview = null;
+                };
             };
 
             const save = document.createElement("button");
