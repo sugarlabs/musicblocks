@@ -1292,31 +1292,37 @@ function setupProgramBlocks(activity) {
                         i < activity.blocks.protoBlockDict[protoblk].dockTypes.length;
                         i++
                     ) {
-                        // FIXME: type check args
+                        // Type check and handle args
                         if (i < blockArgs.length) {
-                            if (typeof blockArgs[i] === "number") {
-                                if (
-                                    !["anyin", "numberin"].includes(
-                                        activity.blocks.protoBlockDict[protoblk].dockTypes[i]
-                                    )
-                                ) {
+                            const arg = blockArgs[i];
+                            const dockType = activity.blocks.protoBlockDict[protoblk].dockTypes[i];
+
+                            if (typeof arg === "number") {
+                                if (!["anyin", "numberin"].includes(dockType)) {
                                     activity.errorMsg(_("Warning: block argument type mismatch"));
                                 }
-                                newBlock.push([i, ["number", { value: blockArgs[i] }], 0, 0, [0]]);
-                            } else if (typeof blockArgs[i] === "string") {
-                                if (
-                                    !["anyin", "textin"].includes(
-                                        activity.blocks.protoBlockDict[protoblk].dockTypes[i]
-                                    )
-                                ) {
+                                newBlock.push([i, ["number", { value: arg }], 0, 0, [0]]);
+                                newBlock[0][4].push(i);
+                            } else if (typeof arg === "string") {
+                                if (!["anyin", "textin"].includes(dockType)) {
                                     activity.errorMsg(_("Warning: block argument type mismatch"));
                                 }
-                                newBlock.push([i, ["string", { value: blockArgs[i] }], 0, 0, [0]]);
+                                newBlock.push([i, ["string", { value: arg }], 0, 0, [0]]);
+                                newBlock[0][4].push(i);
+                            } else if (typeof arg === "boolean") {
+                                if (!["anyin", "booleanin"].includes(dockType)) {
+                                    activity.errorMsg(_("Warning: block argument type mismatch"));
+                                }
+                                newBlock.push([i, ["boolean", { value: arg }], 0, 0, [0]]);
+                                newBlock[0][4].push(i);
                             } else {
+                                activity.errorMsg(
+                                    _("Warning: block argument type unhandled: ") + typeof arg
+                                );
+                                // eslint-disable-next-line no-console
+                                console.warn("Unhandled argument type", arg);
                                 newBlock[0][4].push(null);
                             }
-
-                            newBlock[0][4].push(i);
                         } else {
                             newBlock[0][4].push(null);
                         }
@@ -1398,10 +1404,10 @@ function setupProgramBlocks(activity) {
             function ValidURL(str) {
                 const pattern = new RegExp(
                     "^(https?:\\/\\/)?" + // protocol
-                    "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
-                    "((\\d{1,3}\\.) {3}\\d{1,3}))" + // OR ip (v4) address
-                    "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-                    "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+                        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+                        "((\\d{1,3}\\.) {3}\\d{1,3}))" + // OR ip (v4) address
+                        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+                        "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
                         "(\\#[-a-z\\d_]*)?$",
                     "i"
                 ); // fragment locator
@@ -1441,4 +1447,8 @@ function setupProgramBlocks(activity) {
     new SaveHeapBlock().setup(activity);
     new LoadHeapBlock().setup(activity);
     new SetHeapBlock().setup(activity);
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupProgramBlocks };
 }

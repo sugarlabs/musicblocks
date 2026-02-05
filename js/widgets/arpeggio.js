@@ -792,8 +792,6 @@ class Arpeggio {
             }
         }
 
-        // eslint-disable-next-line no-console
-        console.log(chordValues);
         setCustomChord(chordValues);
 
         // Also, save as an arpeggio block.

@@ -740,6 +740,7 @@ describe("frequencyToPitch", () => {
     beforeEach(() => {
         global.A0 = 27.5;
         global.C8 = 4186.01;
+        global.C10 = 16744.04;
         global.TWELVEHUNDRETHROOT2 = Math.pow(2, 1 / 1200);
         global.PITCHES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
     });
@@ -748,10 +749,29 @@ describe("frequencyToPitch", () => {
         expect(frequencyToPitch(20)).toEqual(["A", 0, 0]);
         expect(frequencyToPitch(27.4)).toEqual(["A", 0, 0]);
     });
-    it("should handle frequencies above C8", () => {
-        expect(frequencyToPitch(4200)).toEqual(["C", 8, 0]);
-        expect(frequencyToPitch(5000)).toEqual(["C", 8, 0]);
+
+    // 1. Verify the loop actually reaches the new upper octaves (C9)
+    it("should correctly map frequencies in the extended C9 range", () => {
+        // C9 is approx 8372 Hz. This proves the loop goes past 8.
+        const c9 = frequencyToPitch(8372);
+        expect(c9).toEqual(["C", 9, 0]);
     });
+
+    // 2. Verify standard notes didn't break (Regression Check)
+    it("should correctly map standard notes (Regression Check)", () => {
+        // A0 (Lowest note)
+        expect(frequencyToPitch(27.5)).toEqual(["A", 0, 0]);
+        // A4 (Standard Concert Pitch)
+        expect(frequencyToPitch(440)).toEqual(["A", 4, 0]);
+        // C4 (Middle C)
+        expect(frequencyToPitch(261.63)).toEqual(["C", 4, 0]);
+    });
+
+    it("should handle frequencies above C10", () => {
+        expect(frequencyToPitch(17000)).toEqual(["C", 10, 0]);
+        expect(frequencyToPitch(20000)).toEqual(["C", 10, 0]);
+    });
+
     it("should handle frequencies with cents deviation", () => {
         const result = frequencyToPitch(442);
         expect(result[0]).toBe("A");
@@ -760,6 +780,7 @@ describe("frequencyToPitch", () => {
         expect(result2[0]).toBe("A");
         expect(result2[2]).toBeLessThan(0);
     });
+
     it("should map intermediate frequencies to nearest note", () => {
         const intermediateFreq = A0 * Math.pow(2, 1 / 3);
         const result = frequencyToPitch(intermediateFreq);
@@ -1090,19 +1111,19 @@ describe("numberToPitch", () => {
                 ]
             },
             "just intonation": {
-                "pitchNumber": 12,
-                "0": [1, "C", 4],
-                "1": [16 / 15, "D♭", 4],
-                "2": [9 / 8, "D", 4],
-                "3": [6 / 5, "E♭", 4],
-                "4": [5 / 4, "E", 4],
-                "5": [4 / 3, "F", 4],
-                "6": [45 / 32, "G♭", 4],
-                "7": [3 / 2, "G", 4],
-                "8": [8 / 5, "A♭", 4],
-                "9": [5 / 3, "A", 4],
-                "10": [9 / 5, "B♭", 4],
-                "11": [15 / 8, "B", 4]
+                pitchNumber: 12,
+                0: [1, "C", 4],
+                1: [16 / 15, "D♭", 4],
+                2: [9 / 8, "D", 4],
+                3: [6 / 5, "E♭", 4],
+                4: [5 / 4, "E", 4],
+                5: [4 / 3, "F", 4],
+                6: [45 / 32, "G♭", 4],
+                7: [3 / 2, "G", 4],
+                8: [8 / 5, "A♭", 4],
+                9: [5 / 3, "A", 4],
+                10: [9 / 5, "B♭", 4],
+                11: [15 / 8, "B", 4]
             }
         };
         global.isCustomTemperament = jest.fn(temp => {
@@ -1150,7 +1171,7 @@ describe("GetNotesForInterval", () => {
         const tur = {
             singer: {
                 noteStatus: null,
-                notePitches: { "1": ["C♯", "E♭"] },
+                notePitches: { 1: ["C♯", "E♭"] },
                 inNoteBlock: [1]
             }
         };
@@ -2079,5 +2100,132 @@ describe("scaleDegreeToPitchMapping", () => {
     });
 });
 
-// TODO: Implement `pitchinfo` and `_calculate_pitch_number` methods.
-// These are pending as they are related with the Activity class and DOM.
+describe("getPitchInfo", () => {
+    let activity, tur;
+
+    beforeEach(() => {
+        activity = {
+            errorMsg: jest.fn(),
+            logo: {
+                synth: {
+                    _getFrequency: jest.fn(),
+                    changeInTemperament: false
+                }
+            }
+        };
+
+        tur = {
+            singer: {
+                lastNotePlayed: null,
+                inNoteBlock: {},
+                notePitches: {},
+                noteOctaves: {},
+                keySignature: "C major",
+                movable: false,
+                pitchNumberOffset: 0
+            }
+        };
+    });
+
+    it("returns correct pitch for 'alphabet'", () => {
+        expect(getPitchInfo(activity, "alphabet", "C4", tur)).toBe("C");
+    });
+
+    it("returns correct alphabet class", () => {
+        expect(getPitchInfo(activity, "alphabet class", "C4", tur)).toBe("C");
+        expect(getPitchInfo(activity, "letter class", "D#4", tur)).toBe("E");
+    });
+
+    it("returns correct solfege syllable (fixed do)", () => {
+        tur.singer.movable = false;
+        expect(getPitchInfo(activity, "solfege syllable", "C4", tur)).toBe("do");
+    });
+
+    it("returns correct solfege syllable (movable do)", () => {
+        tur.singer.movable = true;
+        tur.singer.keySignature = "G major";
+        // In G major, G is Do.
+        expect(getPitchInfo(activity, "solfege syllable", "G4", tur)).toBe("do");
+    });
+
+    it("returns correct pitch class", () => {
+        const pClass = getPitchInfo(activity, "pitch class", "C4", tur);
+        expect(typeof pClass).toBe("number");
+    });
+
+    it("returns correct scalar class", () => {
+        const sClass = getPitchInfo(activity, "scalar class", "C4", tur);
+        // Expect '1' for C in C Major
+        expect(sClass).toBe("1");
+    });
+
+    it("returns correct scale degree", () => {
+        const deg = getPitchInfo(activity, "scale degree", "C4", tur);
+        expect(deg).toMatch(/^1/);
+    });
+
+    it("returns correct nth degree", () => {
+        // C in C major is index 0
+        expect(getPitchInfo(activity, "nth degree", "C4", tur)).toBe(0);
+    });
+
+    it("returns correct staff y", () => {
+        const y = getPitchInfo(activity, "staff y", "C4", tur);
+        // 0 * ... + 0 = 0
+        expect(y).toBe(0);
+    });
+
+    it("returns pitch in hertz", () => {
+        activity.logo.synth._getFrequency.mockReturnValue(261.63);
+        const freq = getPitchInfo(activity, "pitch in hertz", "C4", tur);
+        expect(freq).toBe(261.63);
+    });
+
+    it("returns color", () => {
+        const color = getPitchInfo(activity, "pitch to color", "C4", tur);
+        expect(typeof color).toBe("number");
+    });
+
+    it("returns shade", () => {
+        // octave * 12.5 -> 4 * 12.5 = 50
+        const shade = getPitchInfo(activity, "pitch to shade", "C4", tur);
+        expect(shade).toBe(50);
+    });
+
+    it("handles invalid type", () => {
+        expect(getPitchInfo(activity, "unknown type", "C4", tur)).toBe("__INVALID_INPUT__");
+    });
+});
+
+describe("_calculate_pitch_number", () => {
+    let activity, tur;
+
+    beforeEach(() => {
+        activity = {
+            errorMsg: jest.fn()
+        };
+
+        tur = {
+            singer: {
+                lastNotePlayed: null,
+                inNoteBlock: {},
+                notePitches: {},
+                noteOctaves: {},
+                keySignature: "C major",
+                movable: false,
+                pitchNumberOffset: 0
+            }
+        };
+    });
+
+    it("calculates pitch number for a standard note string", () => {
+        const val = _calculate_pitch_number(activity, "C4", tur);
+        expect(typeof val).toBe("number");
+    });
+
+    it("calculates pitch number relative to another note", () => {
+        const valC4 = _calculate_pitch_number(activity, "C4", tur);
+        const valC5 = _calculate_pitch_number(activity, "C5", tur);
+        expect(valC5).toBeGreaterThan(valC4);
+    });
+});

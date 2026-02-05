@@ -143,7 +143,7 @@ let format = (str, data) => {
             x = x[v];
         });
 
-        return x;
+        return x === undefined ? "" : x;
     });
 
     return str.replace(/{_([a-zA-Z0-9]+)}/g, (match, item) => {
@@ -562,12 +562,18 @@ let fileBasename = file => {
  * @param {string} str - The input string.
  * @returns {string} The string with the first character in uppercase.
  */
-let toTitleCase = str => {
+function toTitleCase(str) {
     if (typeof str !== "string") return;
-    let tempStr = "";
-    if (str.length > 1) tempStr = str.substring(1);
-    return str.toUpperCase()[0] + tempStr;
-};
+    if (str.length === 0) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports.toTitleCase = toTitleCase;
+}
+if (typeof window !== "undefined") {
+    window.toTitleCase = toTitleCase;
+}
 
 /**
  * Processes plugin data and updates the activity based on the provided JSON-encoded dictionary.
@@ -575,11 +581,51 @@ let toTitleCase = str => {
  * @param {string} pluginData - The JSON-encoded plugin data.
  * @returns {object|null} The processed plugin data object or null if parsing fails.
  */
-const processPluginData = (activity, pluginData) => {
+const processPluginData = (activity, pluginData, pluginSource) => {
     // Plugins are JSON-encoded dictionaries.
     if (pluginData === undefined) {
         return null;
     }
+
+    const isTrustedPluginSource = src => {
+        if (!src) return false;
+
+        // allow only local paths
+        return (
+            src.startsWith("./") ||
+            src.startsWith("../") ||
+            src.startsWith("/") ||
+            (!src.includes("http://") && !src.includes("https://"))
+        );
+    };
+
+    const safeEval = (code, label = "plugin") => {
+        if (typeof code !== "string") return;
+
+        // basic sanity limit (prevents huge payloads)
+        if (code.length > 500000) {
+            // eslint-disable-next-line no-console
+            console.warn("Plugin code too large:", label);
+            return;
+        }
+
+        // NOTE: This eval is required for the Plugin system to load dynamic block definitions.
+        // The content comes from plugin JSON files which satisfy the isTrustedPluginSource check.
+        try {
+            // eslint-disable-next-line no-eval
+            eval(code);
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error("Plugin execution failed:", label, e);
+        }
+    };
+
+    if (!isTrustedPluginSource(pluginSource)) {
+        // eslint-disable-next-line no-console
+        console.warn("Blocked untrusted plugin source:", pluginSource);
+        return null;
+    }
+
     let obj;
     try {
         obj = JSON.parse(pluginData);
@@ -719,18 +765,13 @@ const processPluginData = (activity, pluginData) => {
         for (const block in obj["BLOCKPLUGINS"]) {
             // eslint-disable-next-line no-console
             console.debug("adding plugin block " + block);
-            try {
-                eval(obj["BLOCKPLUGINS"][block]);
-            } catch (e) {
-                // eslint-disable-next-line no-console
-                console.debug("Failed to load plugin for " + block + ": " + e);
-            }
+            safeEval(obj["BLOCKPLUGINS"][block], "BLOCKPLUGINS:" + block);
         }
     }
 
     // Create the globals.
     if ("GLOBALS" in obj) {
-        eval(obj["GLOBALS"]);
+        safeEval(obj["GLOBALS"], "GLOBALS");
     }
 
     if ("PARAMETERPLUGINS" in obj) {
@@ -742,7 +783,7 @@ const processPluginData = (activity, pluginData) => {
     // Code to execute when plugin is loaded
     if ("ONLOAD" in obj) {
         for (const arg in obj["ONLOAD"]) {
-            eval(obj["ONLOAD"][arg]);
+            safeEval(obj["ONLOAD"][arg], "ONLOAD:" + arg);
         }
     }
 
@@ -799,7 +840,7 @@ const processPluginData = (activity, pluginData) => {
  * @param {string} rawData - Raw plugin data to process.
  * @returns {object|null} The processed plugin data object or null if parsing fails.
  */
-const processRawPluginData = (activity, rawData) => {
+const processRawPluginData = (activity, rawData, pluginSource) => {
     const lineData = rawData.split("\n");
     let cleanData = "";
 
@@ -821,7 +862,7 @@ const processRawPluginData = (activity, rawData) => {
     // try/catch while debugging your plugin.
     let obj;
     try {
-        obj = processPluginData(activity, cleanData.replace(/\n/g, ""));
+        obj = processPluginData(activity, cleanData.replace(/\n/g, ""), pluginSource);
     } catch (e) {
         obj = null;
         // eslint-disable-next-line no-console
@@ -1562,6 +1603,33 @@ let closeBlkWidgets = name => {
 };
 
 /**
+ * Safely resolves a dot-notation string path to an object property globally.
+ * @param {string} path - The dot-notation path (e.g., "MyClass.Model").
+ * @returns {Object|undefined} The resolved object or undefined.
+ */
+const resolveObject = path => {
+    if (!path || typeof path !== "string") return undefined;
+
+    // Support both browser and Node.js environments
+    const globalObj = typeof window !== "undefined" ? window : global;
+
+    try {
+        const result = path.split(".").reduce((obj, prop) => {
+            if (obj === null || obj === undefined) {
+                return undefined;
+            }
+            return obj[prop];
+        }, globalObj);
+
+        return result;
+    } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn("Failed to resolve object path: " + path, e);
+        return undefined;
+    }
+};
+
+/**
  * Imports methods and variables of model and view objects to the controller object.
  *
  * @param {Object} obj - The component object (controller) to which members of its model and view are imported.
@@ -1617,15 +1685,15 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
     const cname = obj.constructor.name; // class name of component object
 
     if (className !== "" && className !== undefined) {
-        addMembers(obj, eval(className));
+        addMembers(obj, resolveObject(className));
         return;
     }
 
     // Add members of Model (class type has to be controller's name + "Model")
-    addMembers(obj, eval(cname + "." + cname + "Model"), modelArgs);
+    addMembers(obj, resolveObject(cname + "." + cname + "Model"), modelArgs);
 
     // Add members of View (class type has to be controller's name + "View")
-    addMembers(obj, eval(cname + "." + cname + "View"), viewArgs);
+    addMembers(obj, resolveObject(cname + "." + cname + "View"), viewArgs);
 };
 
 if (typeof module !== "undefined" && module.exports) {
