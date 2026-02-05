@@ -226,7 +226,6 @@ s .dark #local-projects .card:hover {
 .highcontrast .material-icons {
     color: #ffffff !important;
     text-shadow: none !important;
-    font-size: 55px !important;
 }
 
 /* High contrast hover box outlines */
@@ -369,7 +368,6 @@ s .highcontrast #local-projects .card:hover {
 .highcontrast .material-icons {
     color: #ffffff !important;
     text-shadow: none !important;
-    font-size: 55px !important;
 }
 
 /* High contrast hover box outlines */

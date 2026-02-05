@@ -31,6 +31,36 @@
     background-color: transparent !important;
 }
 
+/* High Contrast Mode Theme Dropdown - Override ALL styles */
+.highcontrast #themedropdown {
+    background-color: #000000 !important;
+    border: 1px solid #ffffff !important;
+}
+
+.highcontrast #themedropdown li {
+    background-color: transparent !important;
+}
+
+.highcontrast #themedropdown li a {
+    background-color: transparent !important;
+    color: #00ffff !important;
+}
+
+.highcontrast #themedropdown li a:hover,
+.highcontrast #themedropdown a:hover,
+.highcontrast #themedropdown li:hover,
+.highcontrast #themedropdown.dropdown-content li > a:hover,
+.highcontrast.dropdown-content li > a:hover {
+    background-color: transparent !important;
+    color: #00ffff !important;
+}
+
+/* Override Materialize CSS hover styles with maximum specificity */
+body.highcontrast #themedropdown.dropdown-content li > a:hover {
+    background-color: transparent !important;
+    color: #00ffff !important;
+}
+
 /* Dark Mode */
 
 .dark .blue {
@@ -248,10 +278,6 @@ body.highcontrast {
     border: 1px solid #ffffff;
 }
 
-.highcontrast .ui-autocomplete li:hover {
-    background-color: #333333 !important;
-}
-
 .highcontrast #helpfulSearchDiv {
     background-color: transparent !important;
 }
@@ -275,10 +301,6 @@ body.highcontrast {
     color: #00ffff;
 }
 
-.highcontrast .dropdown-content li > a:hover {
-    background-color: #333333;
-}
-
 .highcontrast .dropdown-content {
     background-color: #000000;
     border: 1px solid #ffffff;
@@ -298,21 +320,12 @@ body.highcontrast {
     background-color: #000000;
 }
 
-.highcontrast #newdropdown li {
-    background-color: #000000;
-}
-
-.highcontrast #newdropdown li:hover {
-    background-color: transparent !important;
-}
-
 .highcontrast #confirmation-message {
     color: #ffffff;
 }
 
 .highcontrast .material-tooltip {
     background-color: #000000 !important;
-    color: #ffffff !important;
     border: 1px solid #ffffff;
 }
 
