@@ -852,7 +852,9 @@ Turtle.TurtleView = class {
 
             const startBlock = this._startBlock;
             if (startBlock != null) {
-                startBlock.container.removeChild(this._decorationBitmap);
+                if (this._decorationBitmap != null) {
+                    startBlock.container.removeChild(this._decorationBitmap);
+                }
                 this._decorationBitmap = new createjs.Bitmap(myImage);
                 startBlock.container.addChild(this._decorationBitmap);
                 this._decorationBitmap.name = "decoration";
