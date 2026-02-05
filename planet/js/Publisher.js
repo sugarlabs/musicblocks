@@ -242,11 +242,6 @@ class Publisher {
             submitobj.ProjectID = id;
             submitobj.ProjectName = title.value;
             submitobj.ProjectDescription = description.value;
-            //TODO: Convert these into real block names once integrated into MB
-            //let obj = palettes.getProtoNameAndPalette("MIDI");
-            //console.log(obj[0]);
-            //console.log(obj[1]);
-            //console.log(obj[2]);
             submitobj.ProjectSearchKeywords = this.parseProject(this.ProjectTable[id].ProjectData);
             submitobj.ProjectData = Planet.ProjectStorage.encodeTB(
                 this.ProjectTable[id].ProjectData
