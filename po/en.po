@@ -14808,3 +14808,8 @@ msgstr ""
 #~ msgid "Spanish"
 #~ msgstr ""
 
+#: js/widgets/help.js:410
+
+msgid "Start by dragging a block from the left panel and connect it to the Start block."
+msgstr "Start by dragging a block from the left panel and connect it to the Start block."
+

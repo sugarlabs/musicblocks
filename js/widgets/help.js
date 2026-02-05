@@ -53,7 +53,39 @@ class HelpWidget {
             this.isOpen = false;
             document.onkeydown = activity.__keyPressed;
             widgetWindow.destroy();
+            // Trigger the hint only if they were on the first page of the tour
+            if (this.index === 0) {
+                const hintText = _(
+                    "Start by dragging a block from the left panel and connect it to the Start block."
+                );
+
+                const hint = document.createElement("div");
+                hint.id = "tour-end-hint";
+                hint.style.cssText = `
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2196F3;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 9999;
+            transition: opacity 1s;
+        `;
+                hint.innerText = hintText;
+
+                document.body.appendChild(hint);
+
+                setTimeout(() => {
+                    hint.style.opacity = "0";
+                    setTimeout(() => hint.remove(), 1000);
+                }, 5000);
+            }
         };
+
         // Position the widget and make it visible.
         this._helpDiv = document.createElement("div");
 
