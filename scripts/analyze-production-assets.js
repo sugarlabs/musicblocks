@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 Sugar Labs
+ */
+
 const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");

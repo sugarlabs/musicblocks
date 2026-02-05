@@ -17,17 +17,23 @@ This document explores a **lightweight investigation** of production build optim
 - RequireJS / AMD loading is the primary module system, which constrains conventional bundling approaches that expect ES modules or CommonJS.
 
 ## Analysis: Current State & Offline Impact
-Audit of current assets (as of Feb 2026):
-- **Core Logic (`js/`):** 208 files, ~6.4MB unminified.
-- **Libraries (`lib/`):** 39 files, ~6.4MB (some already minified).
-- **Total Request Count:** 247+ JS files on a full load.
 
-Offline reliability depends on fewer, predictable assets. 
-- **Service workers** work better with bundled or hashed outputs.
-- **AMD + raw assets** increase cache complexity because versioning individual files is difficult without a manifest or hashing.
-- **Startup time** is affected by the waterfall of script loading in RequireJS, where hundreds of requests must be resolved and executed.
+### Baseline Metrics (as of Feb 2026)
+To provide a comparison reference for future optimizations:
+- **Total JavaScript Request Count:** ~248 files (209 Application, 39 Libraries).
+- **Total JavaScript Size (Uncompressed):** ~12.94 MB.
+- **Application Logic (`js/`):** 209 files, 6.42 MB.
+- **Libraries (`lib/`):** 39 files, 6.52 MB.
+- **Loading Model:** Sequential AMD loading, resulting in a deep waterfall of requests.
 
-## Proposed Strategy (Groundwork)
+### Service Worker & Offline Caching
+The current `sw.js` implementation follows a **stale-while-revalidate** pattern with significant constraints for offline reliability:
+1. **Limited Pre-caching:** Only `index.html` is explicitly pre-cached. All other assets are cached dynamically upon first request.
+2. **Fragmentation:** Caching 200+ individual JS files increases the risk of partial cache states (where some files are cached and others are not), leading to runtime errors in offline mode.
+3. **Implicit Dependencies:** If the service worker fails to intercept a single AMD dependency (e.g., due to a network blip), the entire module fails to load.
+4. **Cache Invalidation:** Without content hashing, ensuring users receive the latest version of a file depends on the browser's fetch behavior and the SW's revalidation logic, which can be inconsistent.
+
+### Proposed Strategy (Groundwork)
 This strategy focuses on low-risk, future-oriented thinking:
 
 ### 1. Selective Minification
@@ -41,6 +47,21 @@ Instead of bundling everything into one file (which breaks RequireJS's dynamic l
 
 ### 3. Hashing/Versioning
 Introduce a simple hashing mechanism for production assets to ensure service workers can reliably identify when an asset has changed.
+
+### Running the Asset Analysis Script
+
+From the repository root:
+
+```bash
+node scripts/analyze-production-assets.js
+```
+
+This script recursively scans the `js/` and `lib/` directories to report:
+- Total JavaScript file count
+- Aggregate size
+- Estimated minification savings
+
+No build step or configuration is required.
 
 ## Scope & Constraints
 - **Documentation first:** This document serves as the primary outcome of this phase.
