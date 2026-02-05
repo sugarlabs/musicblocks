@@ -40,17 +40,6 @@ app.use(
 
 const PORT = 3000;
 app.listen(PORT, "127.0.0.1", () => {
-    console.log(`\n${"=".repeat(60)}`);
-    console.log(`🎵 Music Blocks running at http://127.0.0.1:${PORT}/`);
-    console.log(`${"=".repeat(60)}`);
-    console.log(`📦 Compression: ENABLED`);
-    console.log(`🔥 Environment: ${isDev ? "DEVELOPMENT" : "PRODUCTION"}`);
-    console.log(
-        `💾 Caching: ${isDev ? "DISABLED (maxAge: 0, no-cache headers)" : "ENABLED (maxAge: 1h)"}`
-    );
-    if (isDev) {
-        console.log(`⚡ Hot Reload: Ready (changes reflect on refresh)`);
-        console.log(`\n💡 TIP: Changes will appear instantly on browser refresh!`);
-    }
-    console.log(`${"=".repeat(60)}\n`);
+    console.log(`Music Blocks running at http://127.0.0.1:${PORT}/`);
+    console.log("Compression enabled");
 });
