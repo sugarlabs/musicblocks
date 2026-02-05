@@ -1,9 +1,9 @@
 /**
  * MusicBlocks v3.6.2
  *
- * @author [Your Name]
+ * @author Ashutosh Kumar
  *
- * @copyright 2026 [Your Name]
+ * @copyright 2026 Ashutosh Kumar
  *
  * @license
  * This program is free software: you can redistribute it and/or modify
