@@ -1473,7 +1473,40 @@ function setupWidgetBlocks(activity) {
             logo.inMatrix = true;
 
             if (logo.phraseMaker === null) {
-                logo.phraseMaker = new PhraseMaker();
+                logo.phraseMaker = new PhraseMaker({
+                    _,
+                    platformColor,
+                    docById,
+                    MATRIXSOLFEHEIGHT,
+                    toFraction,
+                    Singer,
+                    SOLFEGECONVERSIONTABLE,
+                    slicePath,
+                    wheelnav,
+                    delayExecution,
+                    DEFAULTVOICE,
+                    getDrumName,
+                    MATRIXSOLFEWIDTH,
+                    getDrumIcon,
+                    noteIsSolfege,
+                    isCustomTemperament,
+                    i18nSolfege,
+                    getNote,
+                    DEFAULTDRUM,
+                    last,
+                    DRUMS,
+                    SHARP,
+                    FLAT,
+                    PREVIEWVOLUME,
+                    DEFAULTVOLUME,
+                    noteToFrequency,
+                    LCD,
+                    calcNoteValueToDisplay,
+                    NOTESYMBOLS,
+                    EIGHTHNOTEWIDTH,
+                    docBySelector,
+                    getTemperament
+                });
             }
             logo.phraseMaker.blockNo = blk;
 
