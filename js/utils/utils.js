@@ -617,15 +617,15 @@ const processPluginData = (activity, pluginData, pluginSource) => {
     if (!userConfirmed) {
         userConfirmed = confirm(
             _("Security Warning") +
-            "\n\n" +
-            _(
-                "This plugin contains code that will be executed in your browser. It has not been loaded from the built-in plugins directory and may contain unsafe code."
-            ) +
-            "\n\n" +
-            _("Do you want to allow this plugin to run?") +
-            "\n\n" +
-            _("Source: ") +
-            (pluginSource || _("unknown"))
+                "\n\n" +
+                _(
+                    "This plugin contains code that will be executed in your browser. It has not been loaded from the built-in plugins directory and may contain unsafe code."
+                ) +
+                "\n\n" +
+                _("Do you want to allow this plugin to run?") +
+                "\n\n" +
+                _("Source: ") +
+                (pluginSource || _("unknown"))
         );
 
         if (!userConfirmed) {
@@ -1577,10 +1577,10 @@ let hexToRGB = hex => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
         ? {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        }
+              r: parseInt(result[1], 16),
+              g: parseInt(result[2], 16),
+              b: parseInt(result[3], 16)
+          }
         : null;
 };
 
