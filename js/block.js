@@ -127,6 +127,13 @@ const COLLAPSIBLES = [
 const NOHIT = ["hidden", "hiddennoflow"];
 
 /**
+ * List of blocks that behave like argument blocks even though they are not
+ * strictly classified as arg/value blocks.
+ * @type {string[]}
+ */
+const ARG_LIKE_BLOCKS = ["doArg", "calcArg", "namedcalcArg", "makeblock"];
+
+/**
  * List of special input types.
  * @type {string[]}
  */
@@ -797,10 +804,14 @@ class Block {
              * @returns {void}
              */
             const _postProcess = that => {
-                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
-                    scale / 3;
-                that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale =
-                    scale / 3;
+                that.collapseButtonBitmap.scaleX =
+                    that.collapseButtonBitmap.scaleY =
+                    that.collapseButtonBitmap.scale =
+                        scale / 3;
+                that.expandButtonBitmap.scaleX =
+                    that.expandButtonBitmap.scaleY =
+                    that.expandButtonBitmap.scale =
+                        scale / 3;
                 that.updateCache();
                 that._calculateBlockHitArea();
             };
@@ -1510,8 +1521,10 @@ class Block {
             const image = new Image();
             image.onload = () => {
                 that.collapseButtonBitmap = new createjs.Bitmap(image);
-                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
-                    that.protoblock.scale / 3;
+                that.collapseButtonBitmap.scaleX =
+                    that.collapseButtonBitmap.scaleY =
+                    that.collapseButtonBitmap.scale =
+                        that.protoblock.scale / 3;
                 that.container.addChild(that.collapseButtonBitmap);
                 that.collapseButtonBitmap.x = 2 * that.protoblock.scale;
                 if (that.isInlineCollapsible()) {
@@ -1538,8 +1551,10 @@ class Block {
             const image = new Image();
             image.onload = () => {
                 that.expandButtonBitmap = new createjs.Bitmap(image);
-                that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale =
-                    that.protoblock.scale / 3;
+                that.expandButtonBitmap.scaleX =
+                    that.expandButtonBitmap.scaleY =
+                    that.expandButtonBitmap.scale =
+                        that.protoblock.scale / 3;
 
                 that.container.addChild(that.expandButtonBitmap);
                 that.expandButtonBitmap.visible = that.collapsed;
@@ -1928,6 +1943,17 @@ class Block {
      */
     isArgBlock() {
         return this.protoblock.style === "value" || this.protoblock.style === "arg";
+    }
+
+    /**
+     * Checks if the block behaves like an argument block.
+     * Some blocks (e.g., doArg, calcArg, namedcalcArg, makeblock) are not styled
+     * strictly as arg/value blocks but are treated as argument blocks in
+     * certain contexts.
+     * @returns {boolean} - True if the block is argument-like, false otherwise.
+     */
+    isArgumentLikeBlock() {
+        return this.isArgBlock() || ARG_LIKE_BLOCKS.includes(this.name);
     }
 
     /**
@@ -2747,11 +2773,15 @@ class Block {
      */
     _positionMedia(bitmap, width, height, blockScale) {
         if (width > height) {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale =
-                ((MEDIASAFEAREA[2] / width) * blockScale) / 2;
+            bitmap.scaleX =
+                bitmap.scaleY =
+                bitmap.scale =
+                    ((MEDIASAFEAREA[2] / width) * blockScale) / 2;
         } else {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale =
-                ((MEDIASAFEAREA[3] / height) * blockScale) / 2;
+            bitmap.scaleX =
+                bitmap.scaleY =
+                bitmap.scale =
+                    ((MEDIASAFEAREA[3] / height) * blockScale) / 2;
         }
         bitmap.x = ((MEDIASAFEAREA[0] - 10) * blockScale) / 2;
         bitmap.y = (MEDIASAFEAREA[1] * blockScale) / 2;
@@ -4180,116 +4210,6 @@ class Block {
         }
 
         return new Date().getTime() - this._piemenuExitTime > 200;
-    }
-
-    /**
-     * Checks if the block's input is a number value.
-     * @private
-     * @param {number} c - The index of the connection.
-     * @returns {boolean} - True if the input is a number value, false otherwise.
-     */
-    _noteValueNumber(c) {
-        // Is this a number block being used as a note value
-        // denominator argument?
-        const dblk = this.connections[0];
-        // Are we connected to a divide block?
-        if (
-            this.name === "number" &&
-            dblk !== null &&
-            this.blocks.blockList[dblk].name === "divide"
-        ) {
-            // Are we the denominator (c == 2) or numerator (c == 1)?
-            if (
-                this.blocks.blockList[dblk].connections[c] === this.blocks.blockList.indexOf(this)
-            ) {
-                // Is the divide block connected to a note value block?
-                const cblk = this.blocks.blockList[dblk].connections[0];
-                if (cblk !== null) {
-                    // Is it the first or second arg?
-                    switch (this.blocks.blockList[cblk].name) {
-                        case "newnote":
-                        case "pickup":
-                        case "tuplet4":
-                        case "newstaccato":
-                        case "newslur":
-                        case "elapsednotes2":
-                            return this.blocks.blockList[cblk].connections[1] === dblk;
-                        case "meter":
-                            this._check_meter_block = cblk;
-                        // eslint-disable-next-line no-fallthrough
-                        case "setbpm2":
-                        case "setmasterbpm2":
-                        case "stuplet":
-                        case "rhythm2":
-                        case "newswing2":
-                        case "vibrato":
-                        case "neighbor":
-                        case "neighbor2":
-                            return this.blocks.blockList[cblk].connections[2] === dblk;
-                        default:
-                            return false;
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Gets the value of the number block being used as a note value.
-     * @private
-     * @returns {number} - The value of the number block being used as a note value.
-     */
-    _noteValueValue() {
-        // Return the number block value being used as a note value
-        // denominator argument.
-        const dblk = this.connections[0];
-        // We are connected to a divide block.
-        // Is the divide block connected to a note value block?
-        let cblk = this.blocks.blockList[dblk].connections[0];
-        if (cblk !== null) {
-            // Is it the first or second arg?
-            switch (this.blocks.blockList[cblk].name) {
-                case "newnote":
-                case "pickup":
-                case "tuplet4":
-                case "newstaccato":
-                case "newslur":
-                case "elapsednotes2":
-                    if (this.blocks.blockList[cblk].connections[1] === dblk) {
-                        cblk = this.blocks.blockList[dblk].connections[2];
-                        return this.blocks.blockList[cblk].value;
-                    } else {
-                        return 1;
-                    }
-                case "meter":
-                    this._check_meter_block = cblk;
-                // eslint-disable-next-line no-fallthrough
-                case "setbpm2":
-                case "setmasterbpm2":
-                case "stuplet":
-                case "rhythm2":
-                case "newswing2":
-                case "vibrato":
-                case "neighbor":
-                case "neighbor2":
-                    if (this.blocks.blockList[cblk].connections[2] === dblk) {
-                        if (this.blocks.blockList[cblk].connections[1] === dblk) {
-                            cblk = this.blocks.blockList[dblk].connections[2];
-                            return this.blocks.blockList[cblk].value;
-                        } else {
-                            return 1;
-                        }
-                    } else {
-                        return 1;
-                    }
-                default:
-                    return 1;
-            }
-        }
-
-        return 1;
     }
 
     /**
