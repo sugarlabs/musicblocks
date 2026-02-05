@@ -321,4 +321,21 @@ describe("MusicBlocks Class", () => {
     test("should get MASTERVOLUME", () => {
         expect(musicBlocks.MASTERVOLUME).toBe(1.0);
     });
+
+    describe("BLK static getter", () => {
+        beforeEach(() => {
+            MusicBlocks._blockNo = 0;
+        });
+
+        test("should return incrementing block numbers", () => {
+            expect(MusicBlocks.BLK).toBe("B0");
+            expect(MusicBlocks.BLK).toBe("B1");
+            expect(MusicBlocks.BLK).toBe("B2");
+        });
+
+        test("should handle reset to -1", () => {
+            MusicBlocks._blockNo = -1;
+            expect(MusicBlocks.BLK).toBe("B-1");
+        });
+    });
 });
