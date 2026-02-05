@@ -150,6 +150,17 @@ function setupActionBlocks(activity) {
         }
 
         /**
+         * Gets the current window location URL.
+         *
+         * @memberof ReturnToURLBlock
+         * @method
+         * @returns {string} The current window location URL.
+         */
+        getURL() {
+            return window.location.href;
+        }
+
+        /**
          * Handles the flow of the Return to URL block.
          *
          * @memberof ReturnToURLBlock
@@ -157,7 +168,7 @@ function setupActionBlocks(activity) {
          * @param {Array} args - The arguments for the flow.
          */
         flow(args) {
-            const URL = window.location.href;
+            const URL = this.getURL();
             let urlParts;
             let outurl;
 
