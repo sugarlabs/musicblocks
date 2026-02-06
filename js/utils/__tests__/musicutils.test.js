@@ -1400,32 +1400,32 @@ describe("getModeLength", () => {
 describe("nthDegreeToPitch", () => {
     it("should return the correct note for the 2nd scale degree in C major", () => {
         const result = nthDegreeToPitch("C major", 2);
-        expect(result).toBe("E");
+        expect(result).toEqual(["D", 0]);
     });
 
     it("should handle a scale degree larger than the scale length (wrapping case)", () => {
         const result = nthDegreeToPitch("C major", 8);
-        expect(result).toBe("D");
+        expect(result).toEqual(["C", 1]);
     });
 
-    it("should return the root note for scale degree 0 in C major", () => {
+    it("should return the note below the root for scale degree 0 in C major (downward wrapping)", () => {
         const result = nthDegreeToPitch("C major", 0);
-        expect(result).toBe("C");
+        expect(result).toEqual(["B", -1]);
     });
 
     it("should return the correct note for the 5th scale degree in A minor", () => {
         const result = nthDegreeToPitch("A minor", 5);
-        expect(result).toBe("F");
+        expect(result).toEqual(["E", 0]);
     });
 
     it("should handle negative scale degrees (reverse wrapping)", () => {
         const result = nthDegreeToPitch("C major", -1);
-        expect(result).toBeUndefined();
+        expect(result).toEqual(["A", -1]);
     });
 
-    it("should return undefined for a scale degree when the scale is empty", () => {
+    it("should fallback to C major for a scale degree when the key signature is unknown", () => {
         const result = nthDegreeToPitch("Unknown", 2); //default keysignature will be C major
-        expect(result).toBe("E");
+        expect(result).toEqual(["D", 0]);
     });
 });
 

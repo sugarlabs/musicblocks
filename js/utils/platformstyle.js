@@ -353,13 +353,22 @@ const platformThemes = {
     // custom: {Your styling},
 };
 
-for (const theme in platformThemes) {
-    if (themePreference === theme) {
-        window.platformColor = platformThemes[theme];
-        break;
-    } else {
-        window.platformColor = platformThemes["light"];
+// Detect system theme preference
+const getSystemThemePreference = () => {
+    if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        return "dark";
     }
+    return "light";
+};
+
+// Use stored preference, or fallback to system preference
+const activeTheme = themePreference || getSystemThemePreference();
+
+// Set platformColor based on active theme
+if (platformThemes[activeTheme]) {
+    window.platformColor = platformThemes[activeTheme];
+} else {
+    window.platformColor = platformThemes["light"];
 }
 
 document.querySelector("meta[name=theme-color]").content = platformColor.header;
