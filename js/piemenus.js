@@ -61,6 +61,10 @@
    piemenuDissectNumber
 */
 
+/**
+ * Dynamically adjusts the wheel (pie menu) size based on screen dimensions.
+ * Responsive sizing for different screen sizes (mobile, tablet, desktop).
+ */
 const setWheelSize = (i = 400) => {
     const wheelDiv = document.getElementById("wheelDiv");
     const screenWidth = window.innerWidth;
@@ -84,6 +88,11 @@ const setWheelSize = (i = 400) => {
     wheelDiv.style.height = wheelDiv.style.width;
 };
 
+/**
+ * Retrieves the optimal pie menu size based on canvas dimensions.
+ * Uses the minimum of width and height to ensure the menu fits within the viewport.
+ * block - The block instance associated with the pie menu.
+ */
 const getPieMenuSize = block => {
     const canvas = block.blocks.turtles._canvas;
     return Math.min(canvas.width, canvas.height);
@@ -93,7 +102,13 @@ const getPieMenuSize = block => {
 setWheelSize();
 window.addEventListener("resize", setWheelSize);
 
-// Helper function to enable scroll-to-rotate for pie menus
+/**
+ * Enables scroll-to-rotate functionality for pie menus.
+ * Allows users to scroll the mouse wheel to rotate through menu items.
+ * Handles throttling and wrapping to prevent excessive event processing.
+ * wheel - The wheelnav instance representing the pie menu.
+ * itemCount - Total number of items in the pie menu.
+ */
 const enableWheelScroll = (wheel, itemCount) => {
     const wheelDiv = document.getElementById("wheelDiv");
     if (!wheelDiv || !wheel) return;
@@ -156,6 +171,18 @@ const enableWheelScroll = (wheel, itemCount) => {
     wheelDiv.addEventListener("wheel", scrollHandler, { passive: false });
 };
 
+/**
+ * Creates and displays a pie menu for selecting musical pitches.
+ * Handles pitch selection with optional accidentals (sharps, flats) and octave adjustment.
+ * Integrates with the wheelnav library for interactive wheel-based UI.
+ *  block - The block instance requesting the pitch selection menu.
+ *  noteLabels - Display labels for the notes (e.g., ['C', 'D', 'E']).
+ *  noteValues - Internal values corresponding to note labels.
+ *  accidentals - Whether to include accidental (sharp/flat) selection.
+ *  note - The currently selected note value.
+ *  accidental - The currently selected accidental symbol.
+ *  custom - Whether this is a custom note selection.
+ */
 const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accidental, custom) => {
     let prevPitch = null;
     // wheelNav pie menu for pitch selection
@@ -844,6 +871,15 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     };
 };
 
+/**
+ * Creates a pie menu for selecting custom notes from user-defined note collections.
+ * Allows users to select both a custom note set and a specific note within that set.
+ * block - The block instance requesting the custom notes selection menu.
+ * noteLabels - Display labels for the custom note sets.
+ * customLabels - Labels for each note in custom sets.
+ * selectedCustom - Index of the currently selected custom note set.
+ * selectedNote - The currently selected custom note value.
+ */
 const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, selectedNote) => {
     // pie menu for customNote selection
     if (block.blocks.stageClick) {
@@ -1171,6 +1207,14 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     block._exitWheel.navItems[0].navigateFunction = __exitMenu;
 };
 
+/**
+ * Creates a pie menu for selecting scale degree pitches (nth modal pitch).
+ * Handles modal pitch selection with automatic rounding for non-integer values.
+ * Useful for selecting degrees in music scales without accidentals.
+ * block - The block instance requesting the scale degree selection menu.
+ * noteValues - Scale degree note values (e.g., [1, 2, 3, 4, 5, 6, 7]).
+ * note - The currently selected scale degree (automatically rounded if decimal).
+ */
 const piemenuNthModalPitch = (block, noteValues, note) => {
     // wheelNav pie menu for scale degree pitch selection
 
@@ -1424,6 +1468,14 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
     };
 };
 
+/**
+ * Creates a pie menu for selecting accidentals (sharps, flats, naturals, double sharps/flats).
+ * Displays musical accidental symbols for pitch modification.
+ * block - The block instance requesting the accidental selection menu.
+ * accidentalLabels - Display labels for accidentals (e.g., ['\u266f', '\u266e', '\u266d']).
+ * accidentalValues - Internal values for accidentals.
+ * accidental - The currently selected accidental symbol.
+ */
 const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidental) => {
     // wheelNav pie menu for accidental selection
 
@@ -1558,6 +1610,12 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
     };
 };
 
+/**
+ * Creates a pie menu for selecting note duration values (whole, half, quarter, eighth, etc.).
+ * Displays rhythmic note values with visual representations and fraction labels.
+ * block - The block instance requesting the note value selection menu.
+ * noteValue - The currently selected note value (as a fraction denominator).
+ */
 const piemenuNoteValue = (block, noteValue) => {
     // input form and  wheelNav pie menu for note value selection
 
@@ -1799,6 +1857,13 @@ const piemenuNoteValue = (block, noteValue) => {
     };
 };
 
+/**
+ * Creates a pie menu for selecting numeric values.
+ * Allows users to input or select numbers via an interactive wheel menu.
+ * block - The block instance requesting the number selection menu.
+ * wheelValues - Array of selectable numeric values.
+ * selectedValue - The currently selected numeric value.
+ */
 const piemenuNumber = (block, wheelValues, selectedValue) => {
     // input form and  wheelNav pie menu for number selection
     if (block.blocks.stageClick) {
@@ -2097,6 +2162,14 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     }
 };
 
+/**
+ * Creates a pie menu for color selection with support for different color modes.
+ * Displays colors in a wheel format with preview capability.
+ * block - The block instance requesting the color selection menu.
+ * wheelValues - Array of color values (RGB numbers or color names).
+ * selectedValue - The currently selected color value.
+ * mode - Optional color mode specification (e.g., 'RGB', 'HSV').
+ */
 const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     // input form and  wheelNav pie menu for setcolor selection
 
@@ -2269,6 +2342,18 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     };
 };
 
+/**
+ * Creates a generic pie menu with custom labels, values, and colors.
+ * Base function for creating flexible pie menus with configurable items.
+ * @param {Block} block - The block instance requesting the menu.
+ * @param {string[]} menuLabels - Display labels for each menu item.
+ * @param {string[]|number[]} menuValues - Internal values corresponding to menu labels.
+ * @param {string|number} selectedValue - The currently selected menu value.
+ * @param {object} colors - Color configuration object for the menu (fillcolors, strokecolors, etc.).
+ * @returns {void}
+ * @example
+ * piemenuBasic(block, ['Option1', 'Option2'], ['val1', 'val2'], 'val1', platformColor.piemenuBasic);
+ */
 const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     // basic wheelNav pie menu
 
@@ -2411,6 +2496,14 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     };
 };
 
+/**
+ * Creates a pie menu for boolean (true/false) selection.
+ * Displays two options with visual distinction.
+ * block - The block instance requesting the boolean selection menu.
+ * booleanLabels - Display labels for true/false options (e.g., ['true', 'false']).
+ * booleanValues - Boolean values [true, false].
+ * boolean - The currently selected boolean value.
+ */
 const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
     // wheelNav pie menu for boolean selection
 
@@ -2515,6 +2608,12 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
     };
 };
 
+/**
+ * Creates a pie menu for chord selection.
+ * Displays available chords categorized by type (major, minor, seventh, etc.).
+ * block - The block instance requesting the chord selection menu.
+ * selectedChord - The currently selected chord name.
+ */
 const piemenuChords = (block, selectedChord) => {
     // wheelNav pie menu for chord selection
 
@@ -2646,6 +2745,16 @@ const piemenuChords = (block, selectedChord) => {
     };
 };
 
+/**
+ * Creates a pie menu for voice/instrument selection.
+ * Allows selection from multiple voice categories (piano, voice, percussion, etc.).
+ * block - The block instance requesting the voice selection menu.
+ * voiceLabels - Display labels for voice options.
+ * voiceValues - Internal names for voice values.
+ * categories - Voice categories for grouping (e.g., ['Piano', 'Strings']).
+ * voice - The currently selected voice value.
+ * rotate - Whether to rotate the wheel view.
+ */
 const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotate) => {
     // wheelNav pie menu for voice selection
 
@@ -2824,6 +2933,12 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
     };
 };
 
+/**
+ * Creates a pie menu for interval selection.
+ * Displays musical intervals (unison, second, third, fourth, etc.).
+ * block - The block instance requesting the interval selection menu.
+ * selectedInterval - The currently selected interval name or size.
+ */
 const piemenuIntervals = (block, selectedInterval) => {
     // pie menu for interval selection
 
@@ -3049,6 +3164,12 @@ const piemenuIntervals = (block, selectedInterval) => {
     block._exitWheel.navItems[0].navigateFunction = __exitMenu;
 };
 
+/**
+ * Creates a pie menu for musical mode selection.
+ * Displays different musical modes (major, minor, dorian, phrygian, lydian, mixolydian, etc.).
+ * block - The block instance requesting the mode selection menu.
+ * selectedMode - The currently selected mode name.
+ */
 const piemenuModes = (block, selectedMode) => {
     // pie menu for mode selection
 
