@@ -2345,14 +2345,11 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
 /**
  * Creates a generic pie menu with custom labels, values, and colors.
  * Base function for creating flexible pie menus with configurable items.
- * @param {Block} block - The block instance requesting the menu.
- * @param {string[]} menuLabels - Display labels for each menu item.
- * @param {string[]|number[]} menuValues - Internal values corresponding to menu labels.
- * @param {string|number} selectedValue - The currently selected menu value.
- * @param {object} colors - Color configuration object for the menu (fillcolors, strokecolors, etc.).
- * @returns {void}
- * @example
- * piemenuBasic(block, ['Option1', 'Option2'], ['val1', 'val2'], 'val1', platformColor.piemenuBasic);
+ * block - The block instance requesting the menu.
+ * menuLabels - Display labels for each menu item.
+ * menuValues - Internal values corresponding to menu labels.
+ * selectedValue - The currently selected menu value.
+ * colors - Color configuration object for the menu (fillcolors, strokecolors, etc.).
  */
 const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     // basic wheelNav pie menu
