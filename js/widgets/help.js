@@ -12,7 +12,7 @@
 
 /* global
 
-   _, docById, getMacroExpansion, HELPCONTENT,
+   _, docById, getMacroExpansion, HELPCONTENT, FirstProjectTutorial,
 */
 /*
      Globals locations
@@ -33,14 +33,17 @@ class HelpWidget {
 
     /**
      * @param {Activity} activity
+     * @param {boolean} useActiveBlock - Show help for the active block
+     * @param {number} startPage - Optional starting page index (0-indexed)
      */
-    constructor(activity, useActiveBlock) {
+    constructor(activity, useActiveBlock, startPage = 0) {
         this.activity = activity;
         this.beginnerBlocks = [];
         this.advancedBlocks = [];
         this.appendedBlockList = [];
         this.index = 0;
         this.isOpen = true;
+        this.startPage = startPage;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help", false);
         //widgetWindow.getWidgetBody().style.overflowY = "auto";
@@ -58,10 +61,37 @@ class HelpWidget {
         this._helpDiv = document.createElement("div");
 
         // Give the DOM time to create the div.
-        setTimeout(() => this._setup(useActiveBlock, 0), 0);
+        setTimeout(() => this._setup(useActiveBlock, this.startPage), 0);
 
         // Position center
         setTimeout(this.widgetWindow.sendToCenter, 50);
+    }
+
+    /**
+     * Static method to get the index of the First Project Tutorial card
+     * @returns {number} The index of the tutorial card
+     */
+    static getFirstProjectTutorialIndex() {
+        // The tutorial card is added after the "About" card in Music Blocks
+        // We search for it by title
+        if (typeof HELPCONTENT !== "undefined") {
+            for (let i = 0; i < HELPCONTENT.length; i++) {
+                if (HELPCONTENT[i][0].includes("Build Your First Project")) {
+                    return i;
+                }
+            }
+        }
+        // Default fallback - the tutorial card is typically around index 37
+        return 37;
+    }
+
+    /**
+     * Static method to open help widget directly at the First Project Tutorial
+     * @param {Activity} activity
+     */
+    static openFirstProjectTutorial(activity) {
+        const tutorialIndex = HelpWidget.getFirstProjectTutorialIndex();
+        return new HelpWidget(activity, false, tutorialIndex);
     }
 
     /**
@@ -146,8 +176,9 @@ class HelpWidget {
             };
         } else {
             if (this.activity.blocks.activeBlock.name !== null) {
-                const label = this.activity.blocks.blockList[this.activity.blocks.activeBlock]
-                    .protoblock.staticLabels[0];
+                const label =
+                    this.activity.blocks.blockList[this.activity.blocks.activeBlock].protoblock
+                        .staticLabels[0];
                 if (page == 0) {
                     this.widgetWindow.updateTitle(_("Take a tour"));
                 } else {
@@ -200,8 +231,9 @@ class HelpWidget {
                 // svg file, and an optional macro name for generating
                 // the help output.
 
-                const message = this.activity.blocks.blockList[this.activity.blocks.activeBlock]
-                    .protoblock.helpString;
+                const message =
+                    this.activity.blocks.blockList[this.activity.blocks.activeBlock].protoblock
+                        .helpString;
 
                 if (message) {
                     const helpBody = docById("helpBodyDiv");
@@ -330,6 +362,13 @@ class HelpWidget {
         rightArrow.classList.toggle("disabled", page === HELPCONTENT.length - 1);
         leftArrow.classList.toggle("disabled", page === 0);
 
+        // Check if this is the First Project Tutorial card
+        const pageTitle = HELPCONTENT[page][0];
+        const isFirstProjectTutorial =
+            pageTitle.includes("Build Your First Project") ||
+            pageTitle.includes("First Project") ||
+            pageTitle.toLowerCase().includes("build your first");
+
         // Previous HTML content is removed, and new one is generated.
         let body = "";
         if (
@@ -339,7 +378,8 @@ class HelpWidget {
                 _("Guide"),
                 _("About"),
                 _("Congratulations.")
-            ].includes(HELPCONTENT[page][0])
+            ].includes(HELPCONTENT[page][0]) ||
+            isFirstProjectTutorial
         ) {
             // body = body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"></p>';
             body = `<figure>&nbsp;<img src=" ${HELPCONTENT[page][2]}"></figure>`;
@@ -357,6 +397,48 @@ class HelpWidget {
             const link = HELPCONTENT[page][3];
             // console.debug(page + " " + link);
             body += `<p><a href="${link}" target="_blank">${HELPCONTENT[page][4]}</a></p>`;
+        }
+
+        // Add Start Tutorial and Skip buttons for the First Project Tutorial card
+        if (isFirstProjectTutorial) {
+            body += `
+                <div id="tutorial-buttons-container" style="
+                    display: flex;
+                    flex-direction: row;
+                    gap: 12px;
+                    margin-top: 20px;
+                    justify-content: center;
+                ">
+                    <button id="start-tutorial-btn" style="
+                        padding: 12px 24px;
+                        background: #4CAF50;
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        font-size: 14px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                    " onmouseover="this.style.background='#45a049';" 
+                       onmouseout="this.style.background='#4CAF50';">
+                        ▶ Start Tutorial
+                    </button>
+                    <button id="skip-tutorial-btn" style="
+                        padding: 12px 24px;
+                        background: #e0e0e0;
+                        color: #505050;
+                        border: none;
+                        border-radius: 6px;
+                        font-size: 14px;
+                        font-weight: 500;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                    " onmouseover="this.style.background='#d0d0d0';" 
+                       onmouseout="this.style.background='#e0e0e0';">
+                        Skip →
+                    </button>
+                </div>
+            `;
         }
 
         if ([_("Congratulations.")].includes(HELPCONTENT[page][0])) {
@@ -377,8 +459,8 @@ class HelpWidget {
                 leftArrow.classList.remove("disabled");
 
                 this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
-            this._showPage(page);
-        };
+                this._showPage(page);
+            };
             if (page === 0) {
                 leftArrow.classList.add("disabled");
             }
@@ -401,6 +483,39 @@ class HelpWidget {
 
         helpBody.style.color = "#505050";
         helpBody.insertAdjacentHTML("afterbegin", body);
+
+        // Setup tutorial button handlers if on First Project Tutorial page
+        if (isFirstProjectTutorial) {
+            const startBtn = docById("start-tutorial-btn");
+            const skipBtn = docById("skip-tutorial-btn");
+
+            if (startBtn) {
+                startBtn.onclick = () => {
+                    // Close the help widget
+                    this.widgetWindow.close();
+
+                    // Start the interactive tutorial
+                    if (typeof FirstProjectTutorial !== "undefined") {
+                        const tutorial = new FirstProjectTutorial(this.activity);
+                        tutorial.start();
+                    } else {
+                        console.error("FirstProjectTutorial is not loaded");
+                    }
+                };
+            }
+
+            if (skipBtn) {
+                skipBtn.onclick = () => {
+                    // Go to the next page (skip the tutorial)
+                    page = page + 1;
+                    if (page >= HELPCONTENT.length) {
+                        page = 0;
+                    }
+                    this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
+                    this._showPage(page);
+                };
+            }
+        }
 
         this.widgetWindow.takeFocus();
     }
