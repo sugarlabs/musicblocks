@@ -658,8 +658,8 @@ class Painter {
             this.turtle.x = x;
             this.turtle.y = y;
         } else {
-            this.turtle.x = this.screenX2turtles.turtleX(x);
-            this.turtle.y = this.screenY2turtles.turtleY(y);
+            this.turtle.x = turtles.screenX2turtleX(x);
+            this.turtle.y = turtles.screenY2turtleY(y);
         }
     }
 
@@ -996,7 +996,7 @@ class Painter {
     }
 
     /**
-     * Draws a bezier curve.
+     * Moves turtle to ending point in a bezier curve.
      *
      * @param x2 - the x-coordinate of the ending point
      * @param y2 - the y-coordinate of the ending point
@@ -1007,8 +1007,6 @@ class Painter {
         const cp2x = this.cp2x;
         const cp2y = this.cp2y;
 
-        // FIXME: Add SVG output
-
         let fx, fy;
         let ax, ay, bx, by, cx, cy, dx, dy;
         let dxi, dyi, dxf, dyf;
@@ -1017,8 +1015,6 @@ class Painter {
         const turtlesScale = turtles.scale;
 
         if (this._penDown && this._hollowState) {
-            // Convert from turtle coordinates to screen coordinates
-            /* eslint-disable no-unused-vars */
             fx = turtles.turtleX2screenX(x2);
             fy = turtles.turtleY2screenY(y2);
             const ix = turtles.turtleX2screenX(this.turtle.x);
@@ -1028,104 +1024,111 @@ class Painter {
             const cx2 = turtles.turtleX2screenX(cp2x);
             const cy2 = turtles.turtleY2screenY(cp2y);
 
-            // Close the current SVG path
             this.closeSVG();
+            this._svgPath = true;
 
-            // Save the current stroke width
             const savedStroke = this.stroke;
             this.stroke = 1;
             this.turtle.ctx.lineWidth = this.stroke;
             this.turtle.ctx.lineCap = "round";
 
-            // Draw a hollow line
             const step = savedStroke < 3 ? 0.5 : (savedStroke - 2) / 2;
             const steps = Math.max(Math.floor(savedStroke, 1));
 
-            /* We need both the initial and final headings */
-            // The initial heading is the angle between (cp1x, cp1y) and (this.turtle.x, this.turtle.y)
             let degreesInitial = Math.atan2(cp1x - this.turtle.x, cp1y - this.turtle.y);
             degreesInitial = (180 * degreesInitial) / Math.PI;
             if (degreesInitial < 0) {
                 degreesInitial += 360;
             }
 
-            // The final heading is the angle between (cp2x, cp2y) and (fx, fy)
             let degreesFinal = Math.atan2(x2 - cp2x, y2 - cp2y);
             degreesFinal = (180 * degreesFinal) / Math.PI;
             if (degreesFinal < 0) {
                 degreesFinal += 360;
             }
 
-            // We also need to calculate the deltas for the 'caps' at each end
             const capAngleRadiansInitial = ((degreesInitial - 90) * Math.PI) / 180.0;
-            dxi = step * Math.sin(capAngleRadiansInitial);
-            dyi = -step * Math.cos(capAngleRadiansInitial);
+            const dxi = step * Math.sin(capAngleRadiansInitial);
+            const dyi = -step * Math.cos(capAngleRadiansInitial);
             const capAngleRadiansFinal = ((degreesFinal - 90) * Math.PI) / 180.0;
-            dxf = step * Math.sin(capAngleRadiansFinal);
-            dyf = -step * Math.cos(capAngleRadiansFinal);
+            const dxf = step * Math.sin(capAngleRadiansFinal);
+            const dyf = -step * Math.cos(capAngleRadiansFinal);
 
-            // The four 'corners'
-            ax = ix - dxi;
-            ay = iy - dyi;
-            const axScaled = ax * turtlesScale;
-            const ayScaled = ay * turtlesScale;
-            bx = fx - dxf;
-            by = fy - dyf;
-            const bxScaled = bx * turtlesScale;
-            const byScaled = by * turtlesScale;
-            cx = fx + dxf;
-            cy = fy + dyf;
-            const cxScaled = cx * turtlesScale;
-            const cyScaled = cy * turtlesScale;
-            dx = ix + dxi;
-            dy = iy + dyi;
+            const ax = ix - dxi;
+            const ay = iy - dyi;
+            const bx = fx - dxf;
+            const by = fy - dyf;
+            const cx = fx + dxf;
+            const cy = fy + dyf;
+            const dx = ix + dxi;
+            const dy = iy + dyi;
+
             const dxScaled = dx * turtlesScale;
             const dyScaled = dy * turtlesScale;
+            const cxScaled = cx * turtlesScale;
+            const cyScaled = cy * turtlesScale;
+            const bxScaled = bx * turtlesScale;
+            const byScaled = by * turtlesScale;
+            const axScaled = ax * turtlesScale;
+            const ayScaled = ay * turtlesScale;
 
-            // Control points scaled for SVG output
-            // const cx1Scaled = (cx1 + dxi) * turtlesScale;
-            // const cy1Scaled = (cy1 + dyi) * turtlesScale;
-            // const cx2Scaled = (cx2 + dxf) * turtlesScale;
-            // const cy2Scaled = (cy2 + dyf) * turtlesScale;
+            // Start the SVG path at the first corner
+            this._svgOutput += '<path d="M ' + dxScaled + "," + dyScaled + " ";
 
-            this._svgPath = true;
+            this.turtle.ctx.beginPath();
+            this.turtle.ctx.moveTo(dx, dy);
 
-            // Initial arc
-            let oAngleRadians = ((180 + degreesInitial) / 180) * Math.PI;
-            let arccx = ix;
-            let arccy = iy;
+            // Side 1: Forward Bezier
+            this.turtle.ctx.bezierCurveTo(cx1 + dxi, cy1 + dyi, cx2 + dxf, cy2 + dyf, cx, cy);
+            this._svgOutput +=
+                "C " +
+                (cx1 + dxi) * turtlesScale +
+                "," +
+                (cy1 + dyi) * turtlesScale +
+                " " +
+                (cx2 + dxf) * turtlesScale +
+                "," +
+                (cy2 + dyf) * turtlesScale +
+                " " +
+                cxScaled +
+                "," +
+                cyScaled +
+                " ";
+
+            // End cap arc
+            let oAngleRadians = (degreesFinal / 180) * Math.PI;
             let sa = oAngleRadians - Math.PI;
             let ea = oAngleRadians;
-            this.turtle.ctx.arc(arccx, arccy, step, sa, ea, false);
-            this._svgArc(
-                steps,
-                arccx * turtlesScale,
-                arccy * turtlesScale,
-                step * turtlesScale,
-                sa,
-                ea
-            );
+            this.turtle.ctx.arc(fx, fy, step, sa, ea, false);
+            this._svgArc(steps, fx * turtlesScale, fy * turtlesScale, step * turtlesScale, sa, ea);
+            this._svgOutput += bxScaled + "," + byScaled + " ";
 
-            // Final arc
-            oAngleRadians = (degreesFinal / 180) * Math.PI;
-            arccx = fx;
-            arccy = fy;
+            // Side 2: Return Bezier
+            this.turtle.ctx.bezierCurveTo(cx2 - dxf, cy2 - dyf, cx1 - dxi, cy1 - dyi, ax, ay);
+            this._svgOutput +=
+                "C " +
+                (cx2 - dxf) * turtlesScale +
+                "," +
+                (cy2 - dyf) * turtlesScale +
+                " " +
+                (cx1 - dxi) * turtlesScale +
+                "," +
+                (cy1 - dyi) * turtlesScale +
+                " " +
+                axScaled +
+                "," +
+                ayScaled +
+                " ";
+
+            // Start cap arc
+            oAngleRadians = ((180 + degreesInitial) / 180) * Math.PI;
             sa = oAngleRadians - Math.PI;
             ea = oAngleRadians;
-            this.turtle.ctx.arc(arccx, arccy, step, sa, ea, false);
-            this._svgArc(
-                steps,
-                arccx * turtlesScale,
-                arccy * turtlesScale,
-                step * turtlesScale,
-                sa,
-                ea
-            );
+            this.turtle.ctx.arc(ix, iy, step, sa, ea, false);
+            this._svgArc(steps, ix * turtlesScale, iy * turtlesScale, step * turtlesScale, sa, ea);
+            this._svgOutput += dxScaled + "," + dyScaled + " ";
 
-            fx = turtles.turtleX2screenX(x2);
-            fy = turtles.turtleY2screenY(y2);
-            const fxScaled = fx * turtlesScale;
-            const fyScaled = fy * turtlesScale;
+            this.closeSVG();
 
             this.turtle.ctx.stroke();
             this.turtle.ctx.closePath();
@@ -1135,7 +1138,6 @@ class Painter {
             this.turtle.ctx.lineWidth = this.stroke;
             this.turtle.ctx.lineCap = "round";
             this.turtle.ctx.moveTo(fx, fy);
-            this._svgOutput += "M " + fxScaled + "," + fyScaled + " ";
             this.turtle.x = x2;
             this.turtle.y = y2;
             /* eslint-enable no-unused-vars */
@@ -1143,8 +1145,6 @@ class Painter {
             this._processColor();
             this.turtle.ctx.lineWidth = this.stroke;
             this.turtle.ctx.lineCap = "round";
-            this.turtle.ctx.beginPath();
-            this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
 
             // Convert from turtle coordinates to screen coordinates
             fx = turtles.turtleX2screenX(x2);
@@ -1154,10 +1154,9 @@ class Painter {
             const cx2 = turtles.turtleX2screenX(cp2x);
             const cy2 = turtles.turtleY2screenY(cp2y);
 
-            this.turtle.ctx.bezierCurveTo(cx1 + dxi, cy1 + dyi, cx2 + dxf, cy2 + dyf, cx, cy);
-            this.turtle.ctx.bezierCurveTo(cx2 - dxf, cy2 - dyf, cx1 - dxi, cy1 - dyi, ax, ay);
             this.turtle.ctx.bezierCurveTo(cx1, cy1, cx2, cy2, fx, fy);
 
+            // SVG output for bezier
             if (!this._svgPath) {
                 this._svgPath = true;
                 const ix = turtles.turtleX2screenX(this.turtle.x);
@@ -1167,28 +1166,20 @@ class Painter {
                 this._svgOutput += '<path d="M ' + ixScaled + "," + iyScaled + " ";
             }
 
-            const cx1Scaled = cx1 * turtlesScale;
-            const cy1Scaled = cy1 * turtlesScale;
-            const cx2Scaled = cx2 * turtlesScale;
-            const cy2Scaled = cy2 * turtlesScale;
-            const fxScaled = fx * turtlesScale;
-            const fyScaled = fy * turtlesScale;
-
-            // Curve to: ControlPointX1, ControlPointY1 >> ControlPointX2, ControlPointY2 >> X, Y
             this._svgOutput +=
                 "C " +
-                cx1Scaled +
+                cx1 * turtlesScale +
                 "," +
-                cy1Scaled +
+                cy1 * turtlesScale +
                 " " +
-                cx2Scaled +
+                cx2 * turtlesScale +
                 "," +
-                cy2Scaled +
+                cy2 * turtlesScale +
                 " " +
-                fxScaled +
+                fx * turtlesScale +
                 "," +
-                fyScaled;
-            this.closeSVG();
+                fy * turtlesScale +
+                " ";
 
             this.turtle.x = x2;
             this.turtle.y = y2;
