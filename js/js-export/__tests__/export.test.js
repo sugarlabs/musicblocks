@@ -321,4 +321,101 @@ describe("MusicBlocks Class", () => {
     test("should get MASTERVOLUME", () => {
         expect(musicBlocks.MASTERVOLUME).toBe(1.0);
     });
+
+    describe("BLK static getter", () => {
+        beforeEach(() => {
+            MusicBlocks._blockNo = 0;
+        });
+
+        test("should return incrementing block numbers", () => {
+            expect(MusicBlocks.BLK).toBe("B0");
+            expect(MusicBlocks.BLK).toBe("B1");
+            expect(MusicBlocks.BLK).toBe("B2");
+        });
+
+        test("should handle reset to -1", () => {
+            MusicBlocks._blockNo = -1;
+            expect(MusicBlocks.BLK).toBe("B-1");
+        });
+    });
+});
+
+describe("MusicBlocks.init", () => {
+    beforeEach(() => {
+        Mouse.MouseList = [];
+        Mouse.TurtleMouseMap = {};
+        Mouse.AddedTurtles = [];
+        MusicBlocks._methodList = {};
+        MusicBlocks._blockNo = 0;
+        MusicBlocks.isRun = false;
+    });
+
+    test("should set isRun to false when stopping", () => {
+        MusicBlocks.isRun = true;
+        MusicBlocks.init(false);
+        expect(MusicBlocks.isRun).toBe(false);
+    });
+
+    test("should clear _methodList when stopping", () => {
+        MusicBlocks._methodList = { TestClass: ["method1"] };
+        MusicBlocks.init(false);
+        expect(MusicBlocks._methodList).toEqual({});
+    });
+
+    test("should reset _blockNo to -1 when stopping", () => {
+        MusicBlocks._blockNo = 10;
+        MusicBlocks.init(false);
+        expect(MusicBlocks._blockNo).toBe(-1);
+    });
+
+    test("should clear MouseList when stopping", () => {
+        Mouse.MouseList = [{ id: 1 }, { id: 2 }];
+        MusicBlocks.init(false);
+        expect(Mouse.MouseList).toEqual([]);
+    });
+
+    test("should clear TurtleMouseMap when stopping", () => {
+        Mouse.TurtleMouseMap = { 1: { id: 1 } };
+        MusicBlocks.init(false);
+        expect(Mouse.TurtleMouseMap).toEqual({});
+    });
+
+    test("should cleanup AddedTurtles by hiding and trashing them", () => {
+        const mockTurtle = {
+            container: { visible: true },
+            inTrash: false
+        };
+        Mouse.AddedTurtles = [mockTurtle];
+        globalActivity.turtles.getIndexOfTurtle.mockReturnValue(0);
+
+        MusicBlocks.init(false);
+
+        expect(mockTurtle.container.visible).toBe(false);
+        expect(mockTurtle.inTrash).toBe(true);
+        expect(globalActivity.turtles.removeTurtle).toHaveBeenCalledWith(0);
+    });
+
+    test("should cleanup multiple AddedTurtles", () => {
+        const mockTurtle1 = { container: { visible: true }, inTrash: false };
+        const mockTurtle2 = { container: { visible: true }, inTrash: false };
+        Mouse.AddedTurtles = [mockTurtle1, mockTurtle2];
+        globalActivity.turtles.getIndexOfTurtle.mockReturnValueOnce(0).mockReturnValueOnce(1);
+
+        MusicBlocks.init(false);
+
+        expect(mockTurtle1.inTrash).toBe(true);
+        expect(mockTurtle2.inTrash).toBe(true);
+        expect(globalActivity.turtles.removeTurtle).toHaveBeenCalledTimes(2);
+    });
+
+    test("should handle empty AddedTurtles without error", () => {
+        Mouse.AddedTurtles = [];
+        expect(() => MusicBlocks.init(false)).not.toThrow();
+    });
+
+    test("should preserve isRun as false when already false", () => {
+        MusicBlocks.isRun = false;
+        MusicBlocks.init(false);
+        expect(MusicBlocks.isRun).toBe(false);
+    });
 });

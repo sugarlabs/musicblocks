@@ -17,7 +17,7 @@
 /* exported Toolbar */
 
 let WRAP = true;
-const $j = jQuery.noConflict();
+const $j = window.jQuery;
 let play_button_debounce_timeout = null;
 class Toolbar {
     /**

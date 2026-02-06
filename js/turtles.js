@@ -848,7 +848,7 @@ Turtles.TurtlesView = class {
             container.setAttribute("class", "tooltipped");
             container.setAttribute("data-tooltip", object.label);
             container.setAttribute("data-position", "bottom");
-            jQuery.noConflict()(".tooltipped").tooltip({
+            window.jQuery(".tooltipped").tooltip({
                 html: true,
                 delay: 100
             });
@@ -1138,7 +1138,7 @@ Turtles.TurtlesView = class {
         const __makeAllButtons = () => {
             let second = false;
             if (docById("buttoncontainerTOP")) {
-                jQuery.noConflict()(".tooltipped").tooltip("close");
+                window.jQuery(".tooltipped").tooltip("close");
                 docById("buttoncontainerTOP").parentElement.removeChild(
                     docById("buttoncontainerTOP")
                 );
@@ -1155,7 +1155,7 @@ Turtles.TurtlesView = class {
             jQuery
                 .noConflict()(".tooltipped")
                 .each(function () {
-                    jQuery.noConflict()(this).tooltip({
+                    window.jQuery(this).tooltip({
                         html: true,
                         delay: 100
                     });
