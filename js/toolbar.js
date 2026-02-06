@@ -850,10 +850,38 @@ class Toolbar {
         const recordWithMenus = docById("record-with-menus");
         const recordCanvasOnly = docById("record-canvas-only");
         
+        // Function to update highlighting based on current mode
+        const updateModeHighlight = () => {
+            const currentMode = localStorage.getItem("musicBlocksRecordMode") || "screen";
+            
+            // Remove highlight from both
+            if (recordWithMenus) {
+                recordWithMenus.style.backgroundColor = "";
+                recordWithMenus.style.fontWeight = "";
+            }
+            if (recordCanvasOnly) {
+                recordCanvasOnly.style.backgroundColor = "";
+                recordCanvasOnly.style.fontWeight = "";
+            }
+            
+            // Add highlight to current mode
+            if (currentMode === "screen" && recordWithMenus) {
+                recordWithMenus.style.backgroundColor = "#e3f2fd";
+                recordWithMenus.style.fontWeight = "bold";
+            } else if (currentMode === "canvas" && recordCanvasOnly) {
+                recordCanvasOnly.style.backgroundColor = "#e3f2fd";
+                recordCanvasOnly.style.fontWeight = "bold";
+            }
+        };
+        
+        // Initialize highlighting on page load
+        updateModeHighlight();
+        
         if (recordWithMenus) {
             recordWithMenus.onclick = (e) => {
                 e.preventDefault();
                 localStorage.setItem("musicBlocksRecordMode", "screen");
+                updateModeHighlight();
                 // Reset arrow after selection
                 const arrowIcon = RecordDropdownArrow.querySelector('i');
                 if (arrowIcon) arrowIcon.textContent = 'arrow_drop_down';
@@ -864,6 +892,7 @@ class Toolbar {
             recordCanvasOnly.onclick = (e) => {
                 e.preventDefault();
                 localStorage.setItem("musicBlocksRecordMode", "canvas");
+                updateModeHighlight();
                 
                 // Reset arrow after selection
                 const arrowIcon = RecordDropdownArrow.querySelector('i');
