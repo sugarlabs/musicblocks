@@ -98,9 +98,53 @@ describe("setupIntervalsActions", () => {
         setupIntervalsActions(activity);
     });
 
-    test("GetModename resolves modes", () => {
-        expect(Singer.IntervalsActions.GetModename("major")).toBe("major");
-        expect(Singer.IntervalsActions.GetModename("minor")).toBe("minor");
+    describe("GetModename", () => {
+        test("returns exact mode key from MUSICALMODES", () => {
+            expect(Singer.IntervalsActions.GetModename("major")).toBe("major");
+            expect(Singer.IntervalsActions.GetModename("minor")).toBe("minor");
+        });
+
+        test("returns 'major' as fallback when no match is found", () => {
+            expect(Singer.IntervalsActions.GetModename("nonexistent")).toBe("major");
+            expect(Singer.IntervalsActions.GetModename("invalidMode")).toBe("major");
+        });
+
+        test("handles invalid input gracefully", () => {
+            expect(Singer.IntervalsActions.GetModename(null)).toBe("major");
+            expect(Singer.IntervalsActions.GetModename(undefined)).toBe("major");
+            expect(Singer.IntervalsActions.GetModename("")).toBe("major");
+            expect(Singer.IntervalsActions.GetModename(123)).toBe("major");
+        });
+
+        test("matches localized mode name via _() function", () => {
+            // Mock _() to return a localized version
+            global._ = x => (x === "minor" ? "moll" : x);
+
+            // When searching for localized name, it should find the original key
+            expect(Singer.IntervalsActions.GetModename("moll")).toBe("minor");
+
+            // Reset the mock
+            global._ = x => x;
+        });
+
+        test("prefers exact key match over localized match", () => {
+            // Create a fresh MUSICALMODES where "moll" comes before a mode that localizes to "moll"
+            const originalModes = global.MUSICALMODES;
+            global.MUSICALMODES = {
+                moll: [2, 1, 2, 2, 1, 3, 1],
+                minor: [2, 1, 2, 2, 1, 2, 2]
+            };
+
+            // Mock _() to translate "minor" to "moll"
+            global._ = x => (x === "minor" ? "moll" : x);
+
+            // "moll" should match the exact key "moll" since it's checked in the condition first
+            expect(Singer.IntervalsActions.GetModename("moll")).toBe("moll");
+
+            // Restore original
+            global.MUSICALMODES = originalModes;
+            global._ = x => x;
+        });
     });
 
     test("GetIntervalNumber base case", () => {
@@ -205,6 +249,22 @@ describe("setupIntervalsActions", () => {
         expect(turtle.singer.chordIntervals.length).toBe(0);
     });
 
+    test("setChordInterval error on null", () => {
+        Singer.IntervalsActions.setChordInterval(null, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
+        expect(turtle.singer.chordIntervals).toContainEqual([1, 0]);
+    });
+
+    test("setChordInterval MusicBlocks.isRun adds to mouse listeners", () => {
+        const mockMouse = { MB: { listeners: [] } };
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+
+        Singer.IntervalsActions.setChordInterval([2, 1], 0, undefined);
+
+        expect(mockMouse.MB.listeners).toContain("_chord_interval_0");
+    });
+
     test("setSemitoneInterval zero ignored", () => {
         Singer.IntervalsActions.setSemitoneInterval(0, 0);
         expect(turtle.singer.semitoneIntervals.length).toBe(0);
@@ -219,6 +279,25 @@ describe("setupIntervalsActions", () => {
         expect(turtle.singer.semitoneIntervals.length).toBe(0);
     });
 
+    test("setSemitoneInterval error on null", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        Singer.IntervalsActions.setSemitoneInterval(null, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
+        // Default value of 1 should be used
+        expect(turtle.singer.semitoneIntervals.length).toBe(1);
+    });
+
+    test("setSemitoneInterval MusicBlocks.isRun adds to mouse listeners", () => {
+        const mockMouse = { MB: { listeners: [] } };
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+
+        Singer.IntervalsActions.setSemitoneInterval(3, 0, undefined);
+
+        expect(mockMouse.MB.listeners).toContain("_semitone_interval_0");
+    });
+
     test("setRatioInterval push + pop", () => {
         let listener;
         logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
@@ -226,6 +305,23 @@ describe("setupIntervalsActions", () => {
         expect(turtle.singer.ratioIntervals.length).toBe(1);
         listener();
         expect(turtle.singer.ratioIntervals.length).toBe(0);
+    });
+
+    test("setRatioInterval error on null", () => {
+        Singer.IntervalsActions.setRatioInterval(null, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
+        // Default value of 1 should be used
+        expect(turtle.singer.ratioIntervals).toContain(1);
+    });
+
+    test("setRatioInterval MusicBlocks.isRun adds to mouse listeners", () => {
+        const mockMouse = { MB: { listeners: [] } };
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+
+        Singer.IntervalsActions.setRatioInterval(2.0, 0, undefined);
+
+        expect(mockMouse.MB.listeners).toContain("_ratio_interval_0");
     });
 
     test("defineMode success path", () => {
