@@ -314,8 +314,22 @@ class Activity {
 
         this.themes = ["light", "dark"];
         try {
+            // Detect system theme preference (using same logic as ThemeBox)
+            const getSystemTheme = () => {
+                if (
+                    window.matchMedia &&
+                    window.matchMedia("(prefers-color-scheme: dark)").matches
+                ) {
+                    return "dark";
+                }
+                return "light";
+            };
+
+            // Use stored preference, fallback to system preference
+            const activeTheme = this.storage.themePreference || getSystemTheme();
+
             for (let i = 0; i < this.themes.length; i++) {
-                if (this.themes[i] === this.storage.themePreference) {
+                if (this.themes[i] === activeTheme) {
                     body.classList.add(this.themes[i]);
                 } else {
                     body.classList.remove(this.themes[i]);
