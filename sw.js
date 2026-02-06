@@ -97,6 +97,16 @@ self.addEventListener("fetch", function (event) {
                 } catch (error) {
                     // eslint-disable-next-line no-console
                     console.log("[PWA Builder] Network request failed and no cache." + error);
+
+                    if (typeof offlineFallbackPage !== "undefined" && offlineFallbackPage) {
+                        const fallbackResponse = await caches.match(offlineFallbackPage);
+                        if (fallbackResponse) return fallbackResponse;
+                    }
+
+                    return new Response("Service Unavailable", {
+                        status: 503,
+                        statusText: "offline"
+                    });
                 }
             }
         )
@@ -106,6 +116,12 @@ self.addEventListener("fetch", function (event) {
 // This is an event that can be fired from your page to tell the SW to
 // update the offline page
 self.addEventListener("refreshOffline", function () {
+    if (typeof offlineFallbackPage === "undefined" || !offlineFallbackPage) {
+        // eslint-disable-next-line no-console
+        console.log("[PWA Builder] refreshOffline skipped: offlineFallbackPage is not defined");
+        return;
+    }
+
     const offlinePageRequest = new Request(offlineFallbackPage);
 
     return fetch(offlineFallbackPage).then(function (response) {
@@ -116,5 +132,8 @@ self.addEventListener("refreshOffline", function () {
             );
             return cache.put(offlinePageRequest, response);
         });
+    }).catch(function (error) {
+        // eslint-disable-next-line no-console
+        console.log("[PWA Builder] refreshOffline failed: " + error);
     });
 });
