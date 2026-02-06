@@ -1473,7 +1473,7 @@ function setupWidgetBlocks(activity) {
             logo.inMatrix = true;
 
             if (logo.phraseMaker === null) {
-                logo.phraseMaker = new PhraseMaker({
+                logo.phraseMaker = new PhraseMaker(activity, {
                     _,
                     platformColor,
                     docById,
@@ -1537,7 +1537,7 @@ function setupWidgetBlocks(activity) {
                     // Process queued up rhythms.
                     logo.phraseMaker.blockNo = blk;
                     logo.phraseMaker.sorted = false;
-                    logo.phraseMaker.init(activity);
+                    logo.phraseMaker.init();
 
                     for (let i = 0; i < logo.tupletRhythms.length; i++) {
                         // We have two cases: (1) notes in a tuplet;
