@@ -48,7 +48,8 @@
   nthDegreeToPitch, getInterval, calcNoteValueToDisplay,
   durationToNoteValue, noteToFrequency, getSolfege, splitScaleDegree,
   getNumNote, calcOctave, calcOctaveInterval, isInt,
-  convertFromSolfege, getPitchInfo, MATRIXBUTTONCOLOR, i18nSolfege,
+  convertFromSolfege, getPitchInfo, getPitchInfoWithActivity,
+  MATRIXBUTTONCOLOR, i18nSolfege,
   convertFactor, getReverseDrumMidi, getOctaveRatio, setOctaveRatio, getTemperamentsList,
   addTemperamentToList, getTemperament, deleteTemperamentFromList,
   addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
@@ -4296,10 +4297,10 @@ function getNote(
                     // eslint-disable-next-line no-console
                     console.debug(
                         "WARNING: Key " +
-                            myKeySignature +
-                            " not found in " +
-                            thisScale +
-                            ". Using default of C"
+                        myKeySignature +
+                        " not found in " +
+                        thisScale +
+                        ". Using default of C"
                     );
                     offset = 0;
                     thisScale = NOTESSHARP;
@@ -4755,7 +4756,7 @@ function getNote(
  * @param {Object} tur - The tur parameters containing singer information.
  * @returns {number} The calculated pitch number.
  */
-const _calculate_pitch_number = (activity, np, tur) => {
+const _calculate_pitch_number_with_activity = (activity, np, tur) => {
     let obj;
     if (tur.singer.lastNotePlayed !== null) {
         if (typeof np === "string") {
@@ -4791,6 +4792,44 @@ const _calculate_pitch_number = (activity, np, tur) => {
         }
     }
     return pitchToNumber(obj[0], obj[1], tur.singer.keySignature) - tur.singer.pitchNumberOffset;
+};
+
+/**
+ * Calculate the numeric pitch index based on note name and octave.
+ * Following MIDI convention where C4 = 60.
+ * @function
+ * @param {string} noteName - The note name (e.g. "C", "C#", "Db").
+ * @param {number} octave - The octave number.
+ * @returns {number|null} The pitch number or null if invalid.
+ */
+const _calculate_pitch_number = (noteName, octave) => {
+    if (typeof noteName !== "string" || isNaN(octave)) {
+        return null;
+    }
+
+    let normalizedPitch = noteName.replace("#", SHARP).replace("b", FLAT);
+
+    // Normalize enharmonics using existing mappings
+    if (normalizedPitch in EQUIVALENTFLATS) {
+        normalizedPitch = EQUIVALENTFLATS[normalizedPitch];
+    } else if (normalizedPitch in EQUIVALENTSHARPS) {
+        normalizedPitch = EQUIVALENTSHARPS[normalizedPitch];
+    } else if (normalizedPitch in EQUIVALENTNATURALS) {
+        normalizedPitch = EQUIVALENTNATURALS[normalizedPitch];
+    }
+
+    let pitchIndex = -1;
+    if (PITCHES.includes(normalizedPitch)) {
+        pitchIndex = PITCHES.indexOf(normalizedPitch);
+    } else if (PITCHES2.includes(normalizedPitch)) {
+        pitchIndex = PITCHES2.indexOf(normalizedPitch);
+    } else {
+        return null;
+    }
+
+    // MIDI C4 is 60. PITCHES starts at C.
+    // So C0 is 12, C1 is 24, ..., C4 is 60.
+    return (octave + 1) * 12 + pitchIndex;
 };
 
 /**
@@ -6121,7 +6160,7 @@ const convertFactor = factor => {
  * @param {*} tur - The tur object.
  * @returns {*} The pitch information based on the specified type.
  */
-const getPitchInfo = (activity, type, currentNote, tur) => {
+const getPitchInfoWithActivity = (activity, type, currentNote, tur) => {
     // A variety of conversions.
     let pitch;
     let octave;
@@ -6206,7 +6245,7 @@ const getPitchInfo = (activity, type, currentNote, tur) => {
                     (octave - 4) * YSTAFFOCTAVEHEIGHT
                 );
             case "pitch number":
-                return _calculate_pitch_number(activity, pitch, tur);
+                return _calculate_pitch_number_with_activity(activity, pitch, tur);
             case "pitch in hertz":
                 // This function ignores cents.
                 return activity.logo.synth._getFrequency(
@@ -6232,6 +6271,41 @@ const getPitchInfo = (activity, type, currentNote, tur) => {
         console.debug("Waiting for note to play");
     }
 };
+/**
+ * Get pitch information (name, octave, and pitch number) for a given note.
+ * @function
+ * @param {string|number} noteOrPitch - The note string (e.g. "C4") OR pitch number.
+ * @returns {Object|null} { name, octave, pitchNumber } or null if invalid.
+ */
+const getPitchInfo = noteOrPitch => {
+    let name, octave, pitchNumber;
+
+    if (typeof noteOrPitch === "number") {
+        const obj = numberToPitch(noteOrPitch);
+        name = obj[0];
+        octave = obj[1];
+        pitchNumber = noteOrPitch;
+    } else if (typeof noteOrPitch === "string") {
+        const lastChar = noteOrPitch.charAt(noteOrPitch.length - 1);
+        if ("0123456789".includes(lastChar)) {
+            name = noteOrPitch.slice(0, noteOrPitch.length - 1);
+            octave = parseInt(lastChar);
+        } else {
+            name = noteOrPitch;
+            octave = 4; // Default octave
+        }
+        pitchNumber = _calculate_pitch_number(name, octave);
+    } else {
+        return null;
+    }
+
+    if (pitchNumber === null) {
+        return null;
+    }
+
+    return { name, octave, pitchNumber };
+};
+
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         updateTemperaments,
@@ -6242,6 +6316,7 @@ if (typeof module !== "undefined" && module.exports) {
         nthDegreeToPitch,
         getInterval,
         _calculate_pitch_number,
+        _calculate_pitch_number_with_activity,
         _getStepSize,
         reducedFraction,
         toFraction,
@@ -6261,6 +6336,7 @@ if (typeof module !== "undefined" && module.exports) {
         convertFromSolfege,
         convertFactor,
         getPitchInfo,
+        getPitchInfoWithActivity,
         noteToFrequency,
         TEMPERAMENT,
         setOctaveRatio,

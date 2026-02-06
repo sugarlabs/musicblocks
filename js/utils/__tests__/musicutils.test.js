@@ -31,6 +31,7 @@ const {
     getModeLength,
     nthDegreeToPitch,
     getInterval,
+    _calculate_pitch_number_with_activity,
     _calculate_pitch_number,
     _getStepSize,
     reducedFraction,
@@ -50,6 +51,7 @@ const {
     isInt,
     convertFromSolfege,
     convertFactor,
+    getPitchInfoWithActivity,
     getPitchInfo,
     noteToFrequency,
     setOctaveRatio,
@@ -1662,7 +1664,7 @@ describe("noteIsSolfege", () => {
     });
 });
 
-describe("getSolfege", () => {});
+describe("getSolfege", () => { });
 
 describe("getSolfege", () => {
     const SHARP = "♯";
@@ -2100,7 +2102,7 @@ describe("scaleDegreeToPitchMapping", () => {
     });
 });
 
-describe("getPitchInfo", () => {
+describe("getPitchInfoWithActivity", () => {
     let activity, tur;
 
     beforeEach(() => {
@@ -2128,76 +2130,76 @@ describe("getPitchInfo", () => {
     });
 
     it("returns correct pitch for 'alphabet'", () => {
-        expect(getPitchInfo(activity, "alphabet", "C4", tur)).toBe("C");
+        expect(getPitchInfoWithActivity(activity, "alphabet", "C4", tur)).toBe("C");
     });
 
     it("returns correct alphabet class", () => {
-        expect(getPitchInfo(activity, "alphabet class", "C4", tur)).toBe("C");
-        expect(getPitchInfo(activity, "letter class", "D#4", tur)).toBe("E");
+        expect(getPitchInfoWithActivity(activity, "alphabet class", "C4", tur)).toBe("C");
+        expect(getPitchInfoWithActivity(activity, "letter class", "D#4", tur)).toBe("E");
     });
 
     it("returns correct solfege syllable (fixed do)", () => {
         tur.singer.movable = false;
-        expect(getPitchInfo(activity, "solfege syllable", "C4", tur)).toBe("do");
+        expect(getPitchInfoWithActivity(activity, "solfege syllable", "C4", tur)).toBe("do");
     });
 
     it("returns correct solfege syllable (movable do)", () => {
         tur.singer.movable = true;
         tur.singer.keySignature = "G major";
         // In G major, G is Do.
-        expect(getPitchInfo(activity, "solfege syllable", "G4", tur)).toBe("do");
+        expect(getPitchInfoWithActivity(activity, "solfege syllable", "G4", tur)).toBe("do");
     });
 
     it("returns correct pitch class", () => {
-        const pClass = getPitchInfo(activity, "pitch class", "C4", tur);
+        const pClass = getPitchInfoWithActivity(activity, "pitch class", "C4", tur);
         expect(typeof pClass).toBe("number");
     });
 
     it("returns correct scalar class", () => {
-        const sClass = getPitchInfo(activity, "scalar class", "C4", tur);
+        const sClass = getPitchInfoWithActivity(activity, "scalar class", "C4", tur);
         // Expect '1' for C in C Major
         expect(sClass).toBe("1");
     });
 
     it("returns correct scale degree", () => {
-        const deg = getPitchInfo(activity, "scale degree", "C4", tur);
+        const deg = getPitchInfoWithActivity(activity, "scale degree", "C4", tur);
         expect(deg).toMatch(/^1/);
     });
 
     it("returns correct nth degree", () => {
         // C in C major is index 0
-        expect(getPitchInfo(activity, "nth degree", "C4", tur)).toBe(0);
+        expect(getPitchInfoWithActivity(activity, "nth degree", "C4", tur)).toBe(0);
     });
 
     it("returns correct staff y", () => {
-        const y = getPitchInfo(activity, "staff y", "C4", tur);
+        const y = getPitchInfoWithActivity(activity, "staff y", "C4", tur);
         // 0 * ... + 0 = 0
         expect(y).toBe(0);
     });
 
     it("returns pitch in hertz", () => {
         activity.logo.synth._getFrequency.mockReturnValue(261.63);
-        const freq = getPitchInfo(activity, "pitch in hertz", "C4", tur);
+        const freq = getPitchInfoWithActivity(activity, "pitch in hertz", "C4", tur);
         expect(freq).toBe(261.63);
     });
 
     it("returns color", () => {
-        const color = getPitchInfo(activity, "pitch to color", "C4", tur);
+        const color = getPitchInfoWithActivity(activity, "pitch to color", "C4", tur);
         expect(typeof color).toBe("number");
     });
 
     it("returns shade", () => {
         // octave * 12.5 -> 4 * 12.5 = 50
-        const shade = getPitchInfo(activity, "pitch to shade", "C4", tur);
+        const shade = getPitchInfoWithActivity(activity, "pitch to shade", "C4", tur);
         expect(shade).toBe(50);
     });
 
     it("handles invalid type", () => {
-        expect(getPitchInfo(activity, "unknown type", "C4", tur)).toBe("__INVALID_INPUT__");
+        expect(getPitchInfoWithActivity(activity, "unknown type", "C4", tur)).toBe("__INVALID_INPUT__");
     });
 });
 
-describe("_calculate_pitch_number", () => {
+describe("_calculate_pitch_number_with_activity", () => {
     let activity, tur;
 
     beforeEach(() => {
@@ -2219,13 +2221,67 @@ describe("_calculate_pitch_number", () => {
     });
 
     it("calculates pitch number for a standard note string", () => {
-        const val = _calculate_pitch_number(activity, "C4", tur);
+        const val = _calculate_pitch_number_with_activity(activity, "C4", tur);
         expect(typeof val).toBe("number");
     });
 
     it("calculates pitch number relative to another note", () => {
-        const valC4 = _calculate_pitch_number(activity, "C4", tur);
-        const valC5 = _calculate_pitch_number(activity, "C5", tur);
+        const valC4 = _calculate_pitch_number_with_activity(activity, "C4", tur);
+        const valC5 = _calculate_pitch_number_with_activity(activity, "C5", tur);
         expect(valC5).toBeGreaterThan(valC4);
+    });
+});
+
+describe("_calculate_pitch_number (standalone)", () => {
+    it("should return correct pitch number for standard notes", () => {
+        expect(_calculate_pitch_number("C", 4)).toBe(60);
+        expect(_calculate_pitch_number("A", 4)).toBe(69);
+        expect(_calculate_pitch_number("C", 5)).toBe(72);
+    });
+
+    it("should handle sharp and flat symbols", () => {
+        expect(_calculate_pitch_number("C#", 4)).toBe(61);
+        expect(_calculate_pitch_number("Db", 4)).toBe(61);
+        expect(_calculate_pitch_number("F#", 4)).toBe(66);
+    });
+
+    it("should return null for invalid inputs", () => {
+        expect(_calculate_pitch_number("Z", 4)).toBeNull();
+        expect(_calculate_pitch_number(123, 4)).toBeNull();
+        expect(_calculate_pitch_number("C", "four")).toBeNull();
+    });
+});
+
+describe("getPitchInfo (standalone)", () => {
+    it("should return correct info for note strings", () => {
+        const info = getPitchInfo("C4");
+        expect(info).toEqual({
+            name: "C",
+            octave: 4,
+            pitchNumber: 60
+        });
+    });
+
+    it("should return correct info for pitch numbers", () => {
+        const info = getPitchInfo(69);
+        expect(info).toEqual({
+            name: "A",
+            octave: 4,
+            pitchNumber: 69
+        });
+    });
+
+    it("should handle accidentals in strings", () => {
+        const info = getPitchInfo("Eb5");
+        expect(info).toEqual({
+            name: "Eb",
+            octave: 5,
+            pitchNumber: 75
+        });
+    });
+
+    it("should return null for invalid inputs", () => {
+        expect(getPitchInfo("Z4")).toBeNull();
+        expect(getPitchInfo({})).toBeNull();
     });
 });
