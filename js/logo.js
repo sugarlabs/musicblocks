@@ -184,6 +184,13 @@ class Logo {
                 meSpeak: this.activity.meSpeak
             };
         }
+
+        // Bind commonly-used dependencies locally for readability
+        // This reduces verbosity while maintaining explicit dependency injection
+        this.blocks = this.deps.blocks;
+        this.turtles = this.deps.turtles;
+        this.stage = this.deps.stage;
+
         this.blockList = this.activity.blocks.blockList;
         this._onStopTurtle = this.activity.onStopTurtle;
         this._onRunTurtle = this.activity.onRunTurtle;

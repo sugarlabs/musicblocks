@@ -178,9 +178,30 @@ constructor(activityOrDeps) {
 }
 ```
 
-### Phase 4: Update Internal References
 
-Replace `this.activity.*` with `this.deps.*` throughout Logo class
+### Phase 4: Bind Dependencies Locally for Readability
+
+To reduce verbosity while maintaining explicit dependency injection, bind commonly-used dependencies as local properties in the constructor:
+
+```javascript
+constructor(activityOrDeps) {
+    // ... dependency injection setup ...
+    
+    // Bind commonly-used dependencies locally for readability
+    // This reduces verbosity while maintaining explicit dependency injection
+    this.blocks = this.deps.blocks;
+    this.turtles = this.deps.turtles;
+    this.stage = this.deps.stage;
+}
+```
+
+This allows using `this.blocks.doSomething()` instead of `this.deps.blocks.doSomething()` throughout the class, while still preserving:
+- **Explicit dependency tracking**: All dependencies are declared in the constructor
+- **Grep-ability**: Can search for `this.blocks` to find all usages
+- **Auditability**: Clear what external dependencies the class uses
+- **No behavior change**: Functionally equivalent to `this.deps.*` access
+
+**Note**: Both `this.deps.*` (maximum audit clarity) and locally bound references (improved readability) are acceptable patterns. Choose based on the specific needs of each subsystem.
 
 ### Phase 5: Add Tests
 
