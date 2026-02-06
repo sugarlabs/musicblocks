@@ -171,6 +171,20 @@ describe("MusicBlocks Class", () => {
         expect(musicBlocks.turtle.doWait).toHaveBeenCalledWith(0);
     });
 
+    test("should handle ENDMOUSE and remove mouse from list", async () => {
+        Mouse.MouseList = [mouse];
+        Mouse.AddedTurtles = [];
+        await musicBlocks.ENDMOUSE;
+        expect(Mouse.MouseList).not.toContain(mouse);
+    });
+
+    test("should call init(false) when last mouse ends", async () => {
+        Mouse.MouseList = [mouse];
+        Mouse.AddedTurtles = [];
+        await musicBlocks.ENDMOUSE;
+        expect(MusicBlocks.isRun).toBe(false);
+    });
+
     test("should print a message", () => {
         musicBlocks.print("test message");
         expect(JSEditor.logConsole).toHaveBeenCalled();
