@@ -2279,6 +2279,10 @@ describe("getStepSizeDown", () => {
 
     it("should return 0 for an invalid temperament", () => {
         const result = getStepSizeDown("C major", "D", 0, "invalid");
+        expect(result).toBe(0);
+    });
+});
+
 describe("getStepSizeUp", () => {
     it("should return the correct step size for C in C major going up", () => {
         const result = getStepSizeUp("C major", "C", 0, "equal");
