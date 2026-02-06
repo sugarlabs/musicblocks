@@ -1156,15 +1156,18 @@ class Painter {
 
             this.turtle.ctx.bezierCurveTo(cx1, cy1, cx2, cy2, fx, fy);
 
-            // SVG output for bezier
-            if (!this._svgPath) {
-                this._svgPath = true;
-                const ix = turtles.turtleX2screenX(this.turtle.x);
-                const iy = turtles.turtleY2screenY(this.turtle.y);
-                const ixScaled = ix * turtlesScale;
-                const iyScaled = iy * turtlesScale;
-                this._svgOutput += '<path d="M ' + ixScaled + "," + iyScaled + " ";
-            }
+            // capture start BEFORE drawing
+            const startX = this.turtle.x;
+            const startY = this.turtle.y;
+
+            // start point in screen coords
+            const ix = turtles.turtleX2screenX(this.turtle.x);
+            const iy = turtles.turtleY2screenY(this.turtle.y);
+
+            // SVG must always start exactly where canvas path starts
+            this.closeSVG();
+            this._svgPath = true;
+            this._svgOutput += '<path d="M ' + ix * turtlesScale + "," + iy * turtlesScale + " ";
 
             this._svgOutput +=
                 "C " +
@@ -1199,7 +1202,7 @@ class Painter {
         this.turtle.container.y = fy;
 
         // The new heading is the angle between (cp2x, cp2y) and (x2, y2)
-        let degrees = Math.atan2(x2 - cp2x, y2 - cp2y);
+        let degrees = Math.atan2(y2 - cp2y, x2 - cp2x);
         degrees = (180 * degrees) / Math.PI;
         this.doSetHeading(degrees);
     }
