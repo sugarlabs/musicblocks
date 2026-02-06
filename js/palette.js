@@ -349,7 +349,7 @@ class Palettes {
         if (this.mobile) {
             return;
         }
-        // In order to open the search widget and palette menu simulataneously
+        // In order to open the search widget and palette menu simultaneously
         // this.activity.hideSearchWidget(true);
         this.dict[name].showMenu(true);
         this.activePalette = name; // used to delete plugins
@@ -872,6 +872,10 @@ class Palette {
         docById(
             "palette"
         ).childNodes[0].style.borderRight = `1px solid ${platformColor.selectorSelected}`;
+        if (this._outsideClickListener) {
+            document.removeEventListener("click", this._outsideClickListener);
+            this._outsideClickListener = null;
+        }
         this._hideMenuItems();
     }
 
@@ -945,20 +949,22 @@ class Palette {
         this._showMenuItems();
 
         // Close palette menu on outside click
+        // Remove any existing outside-click listener
         if (this._outsideClickListener) {
-            // Remove any existing listener before attaching a new one
             document.removeEventListener("click", this._outsideClickListener);
+            this._outsideClickListener = null;
         }
 
         this._outsideClickListener = event => {
-            if (!this.menuContainer.contains(event.target)) {
-                this.hideMenu(); // Calls your existing hideMenu() → _hideMenuItems()
-                document.removeEventListener("click", this._outsideClickListener);
-                this._outsideClickListener = null;
+            if (this.menuContainer && this.menuContainer.contains(event.target)) {
+                return;
             }
-        };
 
-        // Delay listener to avoid capturing the click that opened the menu
+            this.hideMenu();
+            document.removeEventListener("click", this._outsideClickListener);
+            this._outsideClickListener = null;
+        };
+        // Delay attachment to avoid capturing the opening click
         setTimeout(() => {
             document.addEventListener("click", this._outsideClickListener);
         }, 0);
@@ -1003,7 +1009,7 @@ class Palette {
             img.onmouseover = () => (document.body.style.cursor = "pointer");
             img.onmouseleave = () => (document.body.style.cursor = "default");
 
-            // Image Drag initiates a browser defined drag, which needs to be stoped.
+            // Image Drag initiates a browser defined drag, which needs to be stopped.
             img.ondragstart = () => false;
 
             const down = event => {

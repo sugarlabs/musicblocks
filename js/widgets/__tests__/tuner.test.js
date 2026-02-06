@@ -65,7 +65,7 @@ global.document = {
     })
 };
 
-const { TunerDisplay, TunerUtils } = require("./tuner.js");
+const { TunerDisplay, TunerUtils } = require("../tuner.js");
 
 describe("Tuner Widget", () => {
     describe("Module Export", () => {
