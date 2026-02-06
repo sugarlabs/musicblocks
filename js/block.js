@@ -22,7 +22,7 @@
    DISABLEDFILLCOLOR, DISABLEDSTROKECOLOR, docById, DOUBLEFLAT,
    DOUBLESHARP, DRUMNAMES, EASTINDIANSOLFNOTES, EFFECTSNAMES,
    EXPANDBUTTON, FILTERTYPES, FLAT, getDrumName, getDrumSynthName,
-   getModeNumbers, getNoiseName, getTemperament, getTemperamentKeys,
+   getModeNumbers, getNoiseName, getVoiceName, getTemperament, getTemperamentKeys,
    getTemperamentsList, getTextWidth, hideDOMLabel, HIGHLIGHTSTROKECOLORS,
    i18nSolfege, INVERTMODES, isCustomTemperament, last, MEDIASAFEAREA,
    NATURAL, NOISENAMES, NSYMBOLS, NUMBERBLOCKDEFAULT, OSCTYPES,
@@ -797,10 +797,14 @@ class Block {
              * @returns {void}
              */
             const _postProcess = that => {
-                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
-                    scale / 3;
-                that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale =
-                    scale / 3;
+                that.collapseButtonBitmap.scaleX =
+                    that.collapseButtonBitmap.scaleY =
+                    that.collapseButtonBitmap.scale =
+                        scale / 3;
+                that.expandButtonBitmap.scaleX =
+                    that.expandButtonBitmap.scaleY =
+                    that.expandButtonBitmap.scale =
+                        scale / 3;
                 that.updateCache();
                 that._calculateBlockHitArea();
             };
@@ -1013,6 +1017,89 @@ class Block {
             this.container.removeChild(this.expandButtonBitmap);
             this.container.removeChild(this.collapseBlockBitmap);
             this.container.removeChild(this.highlightCollapseBlockBitmap);
+        }
+
+        // Update text labels for value blocks (needed for language hot-swap)
+        if (this.text !== null && SPECIALINPUTS.includes(this.name)) {
+            let label, obj, attr;
+
+            if (this.name === "solfege") {
+                obj = splitSolfege(this.value);
+                label = i18nSolfege(obj[0]);
+                attr = obj[1];
+                if (attr !== "♮") {
+                    label += attr;
+                }
+            } else if (this.name === "eastindiansolfege") {
+                obj = splitSolfege(this.value);
+                label = WESTERN2EISOLFEGENAMES[obj[0]];
+                attr = obj[1];
+                if (attr !== "♮") {
+                    label += attr;
+                }
+            } else if (this.name === "scaledegree2") {
+                obj = splitScaleDegree(this.value);
+                label = obj[0];
+                attr = obj[1];
+                if (attr !== "♮") {
+                    label += attr;
+                }
+            } else if (this.name === "drumname") {
+                label = getDrumName(this.value);
+            } else if (this.name === "voicename") {
+                label = getVoiceName(this.value);
+            } else if (this.name === "noisename") {
+                label = getNoiseName(this.value);
+            } else if (
+                this.name === "modename" ||
+                this.name === "chordname" ||
+                this.name === "invertmode" ||
+                this.name === "intervalname" ||
+                this.name === "temperamentname" ||
+                this.name === "filtertype" ||
+                this.name === "oscillatortype" ||
+                this.name === "wrapmode"
+            ) {
+                label = _(this.value);
+            } else if (this.name === "accidentalname") {
+                // Accidental names have format like "sharp ♯" - translate the first part
+                const parts = this.value.split(" ");
+                if (parts.length > 1) {
+                    label = _(parts[0]) + " " + parts.slice(1).join(" ");
+                } else {
+                    label = _(this.value);
+                }
+            } else if (this.name === "outputtools") {
+                label = this.overrideName;
+            } else if (this.name === "grid") {
+                label = _(this.value);
+            } else {
+                if (this.value !== null) {
+                    label = this.value.toString();
+                } else {
+                    label = "???";
+                }
+            }
+
+            if (
+                !WIDENAMES.includes(this.name) &&
+                getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH
+            ) {
+                label = label.substr(0, STRINGLEN) + "...";
+            }
+
+            this.text.text = label;
+        }
+
+        // Update collapsed block labels (needed for language hot-swap)
+        if (this.collapsed && this.collapseText !== null) {
+            if (this.name === "newnote") {
+                this._newNoteLabel();
+            } else if (this.name === "interval") {
+                this._intervalLabel();
+            } else if (this.name === "osctime") {
+                this._oscTimeLabel();
+            }
         }
 
         // Then we generate new artwork.
@@ -1394,8 +1481,29 @@ class Block {
                 }
             } else if (this.name === "drumname") {
                 label = getDrumName(this.value);
+            } else if (this.name === "voicename") {
+                label = getVoiceName(this.value);
             } else if (this.name === "noisename") {
                 label = getNoiseName(this.value);
+            } else if (
+                this.name === "modename" ||
+                this.name === "chordname" ||
+                this.name === "invertmode" ||
+                this.name === "intervalname" ||
+                this.name === "temperamentname" ||
+                this.name === "filtertype" ||
+                this.name === "oscillatortype" ||
+                this.name === "wrapmode"
+            ) {
+                label = _(this.value);
+            } else if (this.name === "accidentalname") {
+                // Accidental names have format like "sharp ♯" - translate the first part
+                const parts = this.value.split(" ");
+                if (parts.length > 1) {
+                    label = _(parts[0]) + " " + parts.slice(1).join(" ");
+                } else {
+                    label = _(this.value);
+                }
             } else if (this.name === "outputtools") {
                 label = this.overrideName;
             } else if (this.name === "grid") {
@@ -1510,8 +1618,10 @@ class Block {
             const image = new Image();
             image.onload = () => {
                 that.collapseButtonBitmap = new createjs.Bitmap(image);
-                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
-                    that.protoblock.scale / 3;
+                that.collapseButtonBitmap.scaleX =
+                    that.collapseButtonBitmap.scaleY =
+                    that.collapseButtonBitmap.scale =
+                        that.protoblock.scale / 3;
                 that.container.addChild(that.collapseButtonBitmap);
                 that.collapseButtonBitmap.x = 2 * that.protoblock.scale;
                 if (that.isInlineCollapsible()) {
@@ -1538,8 +1648,10 @@ class Block {
             const image = new Image();
             image.onload = () => {
                 that.expandButtonBitmap = new createjs.Bitmap(image);
-                that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale =
-                    that.protoblock.scale / 3;
+                that.expandButtonBitmap.scaleX =
+                    that.expandButtonBitmap.scaleY =
+                    that.expandButtonBitmap.scale =
+                        that.protoblock.scale / 3;
 
                 that.container.addChild(that.expandButtonBitmap);
                 that.expandButtonBitmap.visible = that.collapsed;
@@ -2747,11 +2859,15 @@ class Block {
      */
     _positionMedia(bitmap, width, height, blockScale) {
         if (width > height) {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale =
-                ((MEDIASAFEAREA[2] / width) * blockScale) / 2;
+            bitmap.scaleX =
+                bitmap.scaleY =
+                bitmap.scale =
+                    ((MEDIASAFEAREA[2] / width) * blockScale) / 2;
         } else {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale =
-                ((MEDIASAFEAREA[3] / height) * blockScale) / 2;
+            bitmap.scaleX =
+                bitmap.scaleY =
+                bitmap.scale =
+                    ((MEDIASAFEAREA[3] / height) * blockScale) / 2;
         }
         bitmap.x = ((MEDIASAFEAREA[0] - 10) * blockScale) / 2;
         bitmap.y = (MEDIASAFEAREA[1] * blockScale) / 2;
@@ -4181,7 +4297,6 @@ class Block {
 
         return new Date().getTime() - this._piemenuExitTime > 200;
     }
-
 
     /**
      * Checks and reinitializes widget windows if their labels are changed.
