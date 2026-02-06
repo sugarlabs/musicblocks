@@ -39,10 +39,48 @@
 
     <script src="lib/reqwest.js" defer></script>
 
-    <!-- <script src="lib/jquery-3.7.1.js"></script> -->
-    <script src="lib/jquery-2.1.4.min.js"></script>
-    <script src="lib/jquery-ui.js" defer></script>
-    <script src="lib/materialize.min.js" defer></script>
+    <script src="lib/jquery-3.7.1.min.js"></script>
+    <script src="lib/jquery-ui.js"></script>
+    <script src="lib/materialize.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script>
+        jQuery(document).ready(function () {
+            if (jQuery.ui && jQuery.ui.autocomplete) {
+                jQuery.fn.materializeAutocomplete = jQuery.fn.autocomplete;
+                jQuery.widget.bridge("autocomplete", jQuery.ui.autocomplete);
+            }
+        });
+    </script>
+    <script>
+        jQuery(document).ready(function () {
+            const fixAutocompletePosition = function () {
+                const $search = jQuery('#search');
+                if ($search.length && $search.data('ui-autocomplete')) {
+                    const instance = $search.autocomplete('instance');
+                    if (instance) {
+                        const originalRenderMenu = instance._renderMenu;
+                        instance._renderMenu = function (ul, items) {
+                            originalRenderMenu.call(this, ul, items);
+                            setTimeout(() => {
+                                const searchInput = document.querySelector('#search');
+                                const dropdown = ul[0];
+                                if (searchInput && dropdown) {
+                                    const rect = searchInput.getBoundingClientRect();
+                                    dropdown.style.position = 'fixed';
+                                    dropdown.style.left = rect.left + 'px';
+                                    dropdown.style.top = (rect.bottom + 2) + 'px';
+                                    dropdown.style.width = rect.width + 'px';
+                                }
+                            }, 0);
+                        };
+                    }
+                } else {
+                    setTimeout(fixAutocompletePosition, 500);
+                }
+            };
+            setTimeout(fixAutocompletePosition, 1000);
+        });
+    </script>
     <script src="lib/webL10n.js" defer></script>
     <script src="lib/Tone.js" defer></script>
     <script src="lib/midi.js" defer></script>
@@ -481,7 +519,7 @@
                     <li><a id="bn"></a></li>
                     <li><a id="he"></a></li>
                     <li><a id="ur"></a></li>
-                    
+
                 </ul>
 
                 <ul style="display: none;" id="themedropdown" class="dropdown-content">
@@ -782,19 +820,6 @@
                     body.classList.add("play-only");
                     showPersistentNotification();
 
-                    if (buttonContainer) {
-                        buttonContainer.style.display = "flex";
-                        buttonContainer.style.justifyContent = "flex-end";
-                        buttonContainer.style.alignItems = "center";
-                    }
-                    if (homeButton) {
-                        homeButton.style.display = "flex";
-                        homeButton.style.position = "fixed";
-                        homeButton.style.right = "15px";
-                        homeButton.style.bottom = "15px";
-                        homeButton.style.zIndex = "10000";
-                    }
-
                     // Hide certain elements
                     hideElementById("Show/hide blocks");
                     hideElementById("Expand/collapse blocks");
@@ -806,9 +831,6 @@
                     // Disable play-only mode
                     body.classList.remove("play-only");
                     removePersistentNotification();
-
-                    if (homeButton) homeButton.style = "";
-                    if (buttonContainer) buttonContainer.style = "";
 
                     showElementById("Show/hide blocks");
                     showElementById("Expand/collapse blocks");

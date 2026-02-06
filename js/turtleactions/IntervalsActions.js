@@ -432,7 +432,7 @@ function setupIntervalsActions(activity) {
             }
 
             const tur = activity.turtles.ithTurtle(turtle);
-            tur.singer.ratioIntervals.push(value);
+            tur.singer.ratioIntervals.push(arg);
             const listenerName = "_ratio_interval_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
