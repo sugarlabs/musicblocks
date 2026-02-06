@@ -3018,6 +3018,13 @@ class Block {
                 x: Math.round(that.container.x - that.original.x),
                 y: Math.round(that.container.y - that.original.y)
             };
+
+            // Save initial position for undo/redo functionality
+            // IMPORTANT: Only save if not already in undo/redo operation
+            if (that.activity.undoRedoManager && !that.activity.isUndoRedoInProgress) {
+                that._undoStartX = that.container.x;
+                that._undoStartY = that.container.y;
+            }
         });
 
         /**
@@ -3233,6 +3240,25 @@ class Block {
                 // the move (workaround for issue #38 -- Blocks fly
                 // apart). Still need to get to the root cause.
                 this.blocks.adjustDocks(this.blocks.blockList.indexOf(this), true);
+
+                // Save state for undo/redo functionality after all adjustments
+                if (that.activity.undoRedoManager && that._undoStartX !== undefined && that._undoStartY !== undefined && !that.activity.isUndoRedoInProgress) {
+                    // Get the final position after all adjustments
+                    const currentX = that.container.x;
+                    const currentY = that.container.y;
+                    
+                    that.activity.undoRedoManager.saveState('block_moved', {
+                        blockName: that.name,
+                        oldX: that._undoStartX,
+                        oldY: that._undoStartY,
+                        newX: currentX,
+                        newY: currentY
+                    });
+                    
+                    // Clear the start position
+                    that._undoStartX = undefined;
+                    that._undoStartY = undefined;
+                }
             }
         } else if (SPECIALINPUTS.includes(this.name) || ["media", "loadFile"].includes(this.name)) {
             if (!haveClick) {
