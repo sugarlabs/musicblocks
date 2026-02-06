@@ -1,4 +1,4 @@
-name: Auto-convert PO to JSON and commit
+name: Convert PO to JSON and verify changes
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - 'po/**/*.po'
 
 jobs:
-  convert-and-commit:
+  convert-and-verify:
     runs-on: ubuntu-latest
 
     steps:
@@ -30,7 +30,7 @@ jobs:
           echo "$(cat changed_po_files.txt)" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Run conversion script
+      - name: Convert PO files to JSON
         if: steps.find_po.outputs.po_files != ''
         run: |
           mkdir -p locales
@@ -39,18 +39,13 @@ jobs:
             python3 convert_po_to_json.py "$po_file" "locales"
           done < changed_po_files.txt
 
-      - name: Commit and push updated JSON
+      - name: Verify JSON conversion changes
         if: steps.find_po.outputs.po_files != ''
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
-          git add locales/*.json
-
-          if git diff --cached --quiet; then
-            echo "✅ No JSON changes to commit."
+          if ! git diff --quiet locales/; then
+            echo "❌ Generated translation JSON files have changes that need to be committed."
+            echo "Please run the PO-to-JSON conversion locally and commit the generated files in locales/."
+            exit 1
           else
-            git commit -m "chore(i18n): auto-update JSON files from updated PO files"
-            git push origin ${{ github.ref }}
-            echo "🚀 Pushed updated JSON files."
+            echo "✅ Translation JSON files are verified and up to date."
           fi
