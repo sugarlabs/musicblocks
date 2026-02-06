@@ -131,7 +131,7 @@ class SaveInterface {
             "</script>";
 
         this.timeLastSaved = -100;
-        const $j = jQuery.noConflict();
+        const $j = window.jQuery;
         $j(window).on("beforeunload", event => {
             let saveButton = "#saveButtonAdvanced";
             if (this.activity.beginnerMode) {
