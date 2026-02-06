@@ -15,18 +15,7 @@
    global _, platformColor
 */
 
-/* exported ThemeBox, themeConfigs, getSystemThemePreference */
-
-/**
- * Detect system/browser color scheme preference
- * @returns {string} "dark" or "light"
- */
-function getSystemThemePreference() {
-    if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        return "dark";
-    }
-    return "light";
-}
+/* exported ThemeBox, themeConfigs */
 
 const themeConfigs = {
     dark: {
