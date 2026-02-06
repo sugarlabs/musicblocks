@@ -420,6 +420,8 @@ function setupIntervalsBlocks(activity) {
             const saveCanvasAlpha = tur.painter.canvasAlpha;
             const saveOrientation = tur.orientation;
             const savePenState = tur.painter.penState;
+            const previousButNotThese = tur.butNotThese;
+            tur.butNotThese = JSON.parse(JSON.stringify(tur.butNotThese));
 
             tur.singer.suppressOutput = true;
             tur.singer.justCounting.push(true);
@@ -473,8 +475,7 @@ function setupIntervalsBlocks(activity) {
             tur.singer.justMeasuring.pop();
             tur.singer.suppressOutput = saveSuppressStatus;
 
-            // Handle cascading
-            tur.butNotThese = {};
+            tur.butNotThese = previousButNotThese;
 
             return distance;
         }
@@ -537,6 +538,8 @@ function setupIntervalsBlocks(activity) {
             const saveCanvasAlpha = tur.painter.canvasAlpha;
             const saveOrientation = tur.orientation;
             const savePenState = tur.painter.penState;
+            const previousButNotThese = tur.butNotThese;
+            tur.butNotThese = JSON.parse(JSON.stringify(tur.butNotThese));
 
             tur.singer.suppressOutput = true;
 
@@ -591,8 +594,7 @@ function setupIntervalsBlocks(activity) {
             tur.singer.justMeasuring.pop();
             tur.singer.suppressOutput = saveSuppressStatus;
 
-            // FIXME: we need to handle cascading.
-            tur.butNotThese = {};
+            tur.butNotThese = previousButNotThese;
             return distance;
         }
     }
@@ -667,31 +669,8 @@ function setupIntervalsBlocks(activity) {
             this.setPalette("intervals", activity);
             // Values for the piemenu (circle menu) representing semi-tone intervals.
             this.piemenuValuesC1 = [
-                -12,
-                -11,
-                -10,
-                -9,
-                -8,
-                -7,
-                -6,
-                -5,
-                -4,
-                -3,
-                -2,
-                -1,
-                0,
-                1,
-                2,
-                3,
-                4,
-                5,
-                6,
-                7,
-                8,
-                9,
-                10,
-                11,
-                12
+                -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                11, 12
             ];
             this.setHelpString([
                 _(
@@ -817,45 +796,77 @@ function setupIntervalsBlocks(activity) {
 
             tur.singer.inDuplicate = true;
 
+            /**
+             * Acquires the connectionStoreLock with proper waiting.
+             * Uses a polling mechanism to wait for the lock to be released.
+             * @param {number} maxRetries - Maximum number of retry attempts
+             * @param {number} retryInterval - Milliseconds between retries
+             * @returns {Promise<boolean>} - Resolves to true when lock is acquired
+             */
+            const __acquireLock = (maxRetries = 100, retryInterval = 10) => {
+                return new Promise(resolve => {
+                    let retries = 0;
+                    const tryAcquire = () => {
+                        if (!logo.connectionStoreLock) {
+                            logo.connectionStoreLock = true;
+                            resolve(true);
+                        } else if (retries < maxRetries) {
+                            retries++;
+                            setTimeout(tryAcquire, retryInterval);
+                        } else {
+                            // Force acquire after max retries to prevent deadlock
+                            console.warn(
+                                "connectionStoreLock: Max retries reached, forcing lock acquisition"
+                            );
+                            logo.connectionStoreLock = true;
+                            resolve(true);
+                        }
+                    };
+                    tryAcquire();
+                });
+            };
+
             // eslint-disable-next-line no-unused-vars
-            const __listener = event => {
+            const __listener = async event => {
                 tur.singer.inDuplicate = false;
                 tur.singer.duplicateFactor /= factor;
                 tur.singer.arpeggio = [];
-                // Check for a race condition.
-                // FIXME: Do something about the race condition.
-                if (logo.connectionStoreLock) {
-                    // eslint-disable-next-line no-console
-                    console.debug("LOCKED");
-                }
 
-                logo.connectionStoreLock = true;
+                // Acquire lock with proper waiting
+                await __acquireLock();
 
-                // The last turtle should restore the broken connections.
-                if (__lookForOtherTurtles(blk, turtle) === null) {
-                    const n = logo.connectionStore[turtle][blk].length;
-                    for (let i = 0; i < n; i++) {
-                        const obj = logo.connectionStore[turtle][blk].pop();
-                        activity.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
-                        if (obj[2] != null) {
-                            activity.blocks.blockList[obj[2]].connections[0] = obj[0];
+                try {
+                    // The last turtle should restore the broken connections.
+                    if (__lookForOtherTurtles(blk, turtle) === null) {
+                        const n = logo.connectionStore[turtle][blk].length;
+                        for (let i = 0; i < n; i++) {
+                            const obj = logo.connectionStore[turtle][blk].pop();
+                            activity.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
+                            if (obj[2] != null) {
+                                activity.blocks.blockList[obj[2]].connections[0] = obj[0];
+                            }
                         }
+                    } else {
+                        delete logo.connectionStore[turtle][blk];
                     }
-                } else {
-                    delete logo.connectionStore[turtle][blk];
+                } finally {
+                    logo.connectionStoreLock = false;
                 }
-                logo.connectionStoreLock = false;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
 
-            // Test for race condition.
-            // FIXME: Do something about the race condition.
-            if (logo.connectionStoreLock) {
-                // eslint-disable-next-line no-console
-                console.debug("LOCKED");
+            // Acquire lock synchronously for the main flow
+            // Note: This section runs synchronously, so we use a simple spin-wait
+            // with a maximum iteration count to prevent infinite loops
+            let lockAttempts = 0;
+            const maxLockAttempts = 1000;
+            while (logo.connectionStoreLock && lockAttempts < maxLockAttempts) {
+                lockAttempts++;
             }
-
+            if (lockAttempts >= maxLockAttempts) {
+                console.warn("connectionStoreLock: Max attempts reached in ArpeggioBlock flow");
+            }
             logo.connectionStoreLock = true;
 
             // Check to see if another turtle has already disconnected these blocks

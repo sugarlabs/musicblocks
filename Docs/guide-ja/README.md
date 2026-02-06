@@ -818,8 +818,8 @@ can be used inside the *ピッチ・タイム行列* block.
 
 The *Set ドラム* block is used to map the enclosed pitches into ドラム
 sounds. ドラム sounds are played in a monopitch using the specified ドラム
-sample. In the example above, a `kick ドラム` will be substitued for
-each occurance of a `レ` `4`.
+sample. In the example above, a `kick ドラム` will be substituted for
+each occurrence of a `レ` `4`.
 
 ![alt tag](./drum8.svg "ピッチ・ドラム・グラフ 1")
 

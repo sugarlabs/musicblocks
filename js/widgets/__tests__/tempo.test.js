@@ -20,7 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const Tempo = require("./tempo.js");
+const Tempo = require("../tempo.js");
 
 // --- 1. Global Mocks (Fake the Browser Environment) ---
 global._ = msg => msg; // Mock translation function

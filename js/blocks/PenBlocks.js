@@ -1237,3 +1237,6 @@ function setupPenBlocks(activity) {
     new SetGreyBlock().setup(activity);
     new SetColorBlock().setup(activity);
 }
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupPenBlocks };
+}

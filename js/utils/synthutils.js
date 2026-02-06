@@ -226,61 +226,79 @@ const EFFECTSNAMES = ["duck", "dog", "cricket", "cat", "bubbles", "splash", "bot
  * @constant
  * @type {Array<string>}
  */
-const SOUNDSAMPLESDEFINES = [
-    "samples/violin",
-    "samples/cello",
-    "samples/flute",
-    "samples/guitar",
-    "samples/clarinet",
-    "samples/saxophone",
-    "samples/tuba",
-    "samples/trumpet",
-    "samples/bass",
-    "samples/bottle",
-    "samples/clap",
-    "samples/darbuka",
-    "samples/hihat",
-    "samples/splash",
-    "samples/bubbles",
-    "samples/cowbell",
-    "samples/dog",
-    "samples/kick",
-    "samples/tom",
-    "samples/cat",
-    "samples/crash",
-    "samples/duck",
-    "samples/ridebell",
-    "samples/triangle",
-    "samples/chime",
-    "samples/cricket",
-    "samples/fingercymbal",
-    "samples/slap",
-    "samples/clang",
-    "samples/cup",
-    "samples/floortom",
-    "samples/bassdrum",
-    "samples/snare",
-    "samples/piano",
-    "samples/acguit",
-    "samples/banjo",
-    "samples/bassoon",
-    "samples/celeste",
-    "samples/raindrop",
-    "samples/koto",
-    "samples/gong",
-    "samples/dulcimer",
-    "samples/electricguitar",
-    "samples/xylophone",
-    "samples/vibraphone",
-    "samples/japanese_drum",
-    "samples/viola",
-    "samples/oboe",
-    "samples/trombone",
-    "samples/doublebass",
-    "samples/sitar",
-    "samples/harmonium",
-    "samples/mandolin"
-];
+/**
+ * Object containing file paths and global variable names for different sound samples.
+ * @constant
+ * @type {Object}
+ */
+const SAMPLE_INFO = {
+    voice: {
+        "piano": { path: "samples/piano", global: "PIANO_SAMPLE" },
+        "violin": { path: "samples/violin", global: "VIOLIN_SAMPLE" },
+        "viola": { path: "samples/viola", global: "VIOLA_SAMPLE" },
+        "double bass": { path: "samples/doublebass", global: "DOUBLEBASS_SAMPLE" },
+        "cello": { path: "samples/cello", global: "CELLO_SAMPLE" },
+        "flute": { path: "samples/flute", global: "FLUTE_SAMPLE" },
+        "clarinet": { path: "samples/clarinet", global: "CLARINET_SAMPLE" },
+        "saxophone": { path: "samples/saxophone", global: "SAXOPHONE_SAMPLE" },
+        "trumpet": { path: "samples/trumpet", global: "TRUMPET_SAMPLE" },
+        "oboe": { path: "samples/oboe", global: "OBOE_SAMPLE" },
+        "trombone": { path: "samples/trombone", global: "TROMBONE_SAMPLE" },
+        "tuba": { path: "samples/tuba", global: "TUBA_SAMPLE" },
+        "guitar": { path: "samples/guitar", global: "GUITAR_SAMPLE" },
+        "acoustic guitar": { path: "samples/acguit", global: "ACOUSTIC_GUITAR_SAMPLE" },
+        "bass": { path: "samples/bass", global: "BASS_SAMPLE" },
+        "banjo": { path: "samples/banjo", global: "BANJO_SAMPLE" },
+        "koto": { path: "samples/koto", global: "KOTO_SAMPLE" },
+        "dulcimer": { path: "samples/dulcimer", global: "DULCIMER_SAMPLE" },
+        "electric guitar": { path: "samples/electricguitar", global: "ELECTRICGUITAR_SAMPLE" },
+        "bassoon": { path: "samples/bassoon", global: "BASSOON_SAMPLE" },
+        "celeste": { path: "samples/celeste", global: "CELESTE_SAMPLE" },
+        "vibraphone": { path: "samples/vibraphone", global: "VIBRAPHONE_SAMPLE" },
+        "xylophone": { path: "samples/xylophone", global: "XYLOPHONE_SAMPLE" },
+        "sitar": { path: "samples/sitar", global: "SITAR_SAMPLE" },
+        "harmonium": { path: "samples/harmonium", global: "HARMONIUM_SAMPLE" },
+        "mandolin": { path: "samples/mandolin", global: "MANDOLIN_SAMPLE" }
+    },
+    drum: {
+        "bottle": { path: "samples/bottle", global: "BOTTLE_SAMPLE" },
+        "clap": { path: "samples/clap", global: "CLAP_SAMPLE" },
+        "darbuka drum": { path: "samples/darbuka", global: "DARBUKA_SAMPLE" },
+        "hi hat": { path: "samples/hihat", global: "HIHAT_SAMPLE" },
+        "splash": { path: "samples/splash", global: "SPLASH_SAMPLE" },
+        "bubbles": { path: "samples/bubbles", global: "BUBBLES_SAMPLE" },
+        "raindrop": { path: "samples/raindrop", global: "RAINDROP_SAMPLE" },
+        "cow bell": { path: "samples/cowbell", global: "COWBELL_SAMPLE" },
+        "dog": { path: "samples/dog", global: "DOG_SAMPLE" },
+        "kick drum": { path: "samples/kick", global: "KICK_SAMPLE" },
+        "tom tom": { path: "samples/tom", global: "TOM_SAMPLE" },
+        "cat": { path: "samples/cat", global: "CAT_SAMPLE" },
+        "crash": { path: "samples/crash", global: "CRASH_SAMPLE" },
+        "duck": { path: "samples/duck", global: "DUCK_SAMPLE" },
+        "ride bell": { path: "samples/ridebell", global: "RIDEBELL_SAMPLE" },
+        "triangle bell": { path: "samples/triangle", global: "TRIANGLE_SAMPLE" },
+        "chime": { path: "samples/chime", global: "CHIME_SAMPLE" },
+        "gong": { path: "samples/gong", global: "GONG_SAMPLE" },
+        "cricket": { path: "samples/cricket", global: "CRICKET_SAMPLE" },
+        "finger cymbals": { path: "samples/fingercymbal", global: "FINGERCYMBAL_SAMPLE" },
+        "slap": { path: "samples/slap", global: "SLAP_SAMPLE" },
+        "japanese drum": { path: "samples/japanese_drum", global: "JAPANESE_DRUM_SAMPLE" },
+        "clang": { path: "samples/clang", global: "CLANG_SAMPLE" },
+        "cup drum": { path: "samples/cup", global: "CUP_SAMPLE" },
+        "floor tom": { path: "samples/floortom", global: "FLOORTOM_SAMPLE" },
+        "bass drum": { path: "samples/bassdrum", global: "BASSDRUM_SAMPLE" },
+        "snare drum": { path: "samples/snare", global: "SNARE_SAMPLE" }
+    }
+};
+
+/**
+ * Array of file paths for different sound samples.
+ * @constant
+ * @type {Array<string>}
+ */
+const SOUNDSAMPLESDEFINES = Object.values(SAMPLE_INFO.voice)
+    .map(s => s.path)
+    .concat(Object.values(SAMPLE_INFO.drum).map(s => s.path));
 
 // Some samples have a default volume other than 50 (See #1697)
 /**
@@ -517,6 +535,21 @@ function Synth() {
      * @type {Object.<string, [number, number]>}
      */
     this.noteFrequencies = {};
+    /**
+     * Tuner microphone input.
+     * @type {Tone.UserMedia|null}
+     */
+    this.tunerMic = null;
+    /**
+     * Tuner analyser for pitch detection.
+     * @type {Tone.Analyser|null}
+     */
+    this.tunerAnalyser = null;
+    /**
+     * Pitch detection function.
+     * @type {function|null}
+     */
+    this.detectPitch = null;
 
     /**
      * Function to initialize a new Tone.js instance.
@@ -839,80 +872,16 @@ function Synth() {
      * @function
      */
     this.loadSamples = () => {
-        this.samplesManifest = {
-            voice: [
-                { name: "piano", data: PIANO_SAMPLE },
-                { name: "violin", data: VIOLIN_SAMPLE },
-                { name: "viola", data: VIOLA_SAMPLE },
-                { name: "double bass", data: DOUBLEBASS_SAMPLE },
-                { name: "cello", data: CELLO_SAMPLE },
-                { name: "flute", data: FLUTE_SAMPLE },
-                { name: "clarinet", data: CLARINET_SAMPLE },
-                { name: "saxophone", data: SAXOPHONE_SAMPLE },
-                { name: "trumpet", data: TRUMPET_SAMPLE },
-                { name: "oboe", data: OBOE_SAMPLE },
-                { name: "trombone", data: TROMBONE_SAMPLE },
-                { name: "tuba", data: TUBA_SAMPLE },
-                { name: "guitar", data: GUITAR_SAMPLE },
-                { name: "acoustic guitar", data: ACOUSTIC_GUITAR_SAMPLE },
-                { name: "bass", data: BASS_SAMPLE },
-                { name: "banjo", data: BANJO_SAMPLE },
-                { name: "koto", data: KOTO_SAMPLE },
-                { name: "dulcimer", data: DULCIMER_SAMPLE },
-                { name: "electric guitar", data: ELECTRICGUITAR_SAMPLE },
-                { name: "bassoon", data: BASSOON_SAMPLE },
-                { name: "celeste", data: CELESTE_SAMPLE },
-                { name: "vibraphone", data: VIBRAPHONE_SAMPLE },
-                { name: "xylophone", data: XYLOPHONE_SAMPLE },
-                { name: "sitar", data: SITAR_SAMPLE },
-                { name: "harmonium", data: HARMONIUM_SAMPLE },
-                { name: "mandolin", data: MANDOLIN_SAMPLE }
-            ],
-            drum: [
-                { name: "bottle", data: BOTTLE_SAMPLE },
-                { name: "clap", data: CLAP_SAMPLE },
-                { name: "darbuka drum", data: DARBUKA_SAMPLE },
-                { name: "hi hat", data: HIHAT_SAMPLE },
-                { name: "splash", data: SPLASH_SAMPLE },
-                { name: "bubbles", data: BUBBLES_SAMPLE },
-                { name: "raindrop", data: RAINDROP_SAMPLE },
-                { name: "cow bell", data: COWBELL_SAMPLE },
-                { name: "dog", data: DOG_SAMPLE },
-                { name: "kick drum", data: KICK_SAMPLE },
-                { name: "tom tom", data: TOM_SAMPLE },
-                { name: "cat", data: CAT_SAMPLE },
-                { name: "crash", data: CRASH_SAMPLE },
-                { name: "duck", data: DUCK_SAMPLE },
-                { name: "ride bell", data: RIDEBELL_SAMPLE },
-                { name: "triangle bell", data: TRIANGLE_SAMPLE },
-                { name: "chime", data: CHIME_SAMPLE },
-                { name: "gong", data: GONG_SAMPLE },
-                { name: "cricket", data: CRICKET_SAMPLE },
-                { name: "finger cymbals", data: FINGERCYMBAL_SAMPLE },
-                { name: "slap", data: SLAP_SAMPLE },
-                { name: "japanese drum", data: JAPANESE_DRUM_SAMPLE },
-                // {'name': 'japanese bell', 'data': JAPANESE_BELL_SAMPLE},
-                { name: "clang", data: CLANG_SAMPLE },
-                { name: "cup drum", data: CUP_SAMPLE },
-                { name: "floor tom", data: FLOORTOM_SAMPLE },
-                { name: "bass drum", data: BASSDRUM_SAMPLE },
-                { name: "snare drum", data: SNARE_SAMPLE }
-            ]
-        };
-        /*eslint-enable no-undef*/
-        const data = () => {
-            return null;
-        };
-        this.samplesManifest.voice.push({ name: "empty", data: data });
-
         /*eslint-disable no-prototype-builtins*/
         if (this.samples === null) {
-            this.samples = {};
-            for (const type in this.samplesManifest) {
-                if (this.samplesManifest.hasOwnProperty(type)) {
-                    this.samples[type] = {};
+            this.samples = { voice: {}, drum: {} };
+            // Pre-populate with null to indicate they exist as valid instruments but are not loaded
+            for (const type in SAMPLE_INFO) {
+                for (const name in SAMPLE_INFO[type]) {
+                    this.samples[type][name] = null;
                 }
             }
+            this.samples.voice["empty"] = () => null;
         }
     };
 
@@ -921,21 +890,140 @@ function Synth() {
      * @function
      * @memberof Synth
      */
+    /**
+     * Loads a specific sample into the Synth instance asynchronously.
+     * @function
+     * @memberof Synth
+     * @param {string} sampleName - The name of the sample to load.
+     * @returns {Promise<void>} - A promise that resolves when the sample is loaded.
+     */
     this._loadSample = sampleName => {
-        // let accounted = false;
-        for (const type in this.samplesManifest) {
-            if (this.samplesManifest.hasOwnProperty(type)) {
-                for (const sample in this.samplesManifest[type]) {
-                    if (this.samplesManifest[type].hasOwnProperty(sample)) {
-                        const name = this.samplesManifest[type][sample].name;
-                        if (sampleName === name) {
-                            // Load data returned from samples function.
-                            this.samples[type][name] = this.samplesManifest[type][sample].data();
-                            // accounted = true;
+        return new Promise((resolve, reject) => {
+            let found = false;
+            let sampleType = null;
+            let sampleInfo = null;
+
+            // Find the sample info
+            for (const type in SAMPLE_INFO) {
+                if (SAMPLE_INFO[type][sampleName]) {
+                    sampleType = type;
+                    sampleInfo = SAMPLE_INFO[type][sampleName];
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                // If not found in SAMPLE_INFO, it might be a built-in or custom synth, so we resolve immediately
+                resolve();
+                return;
+            }
+
+            if (this.samples[sampleType][sampleName] !== null) {
+                // Already loaded
+                resolve();
+                return;
+            }
+
+            // Load the sample module using require
+            require([sampleInfo.path], () => {
+                try {
+                    // eslint-disable-next-line no-undef
+                    const sampleData = window[sampleInfo.global];
+                    if (sampleData) {
+                        this.samples[sampleType][sampleName] = sampleData();
+                        resolve();
+                    } else {
+                        console.error(
+                            `Global variable ${sampleInfo.global} not found for sample ${sampleName}`
+                        );
+                        reject(`Sample global not found: ${sampleName}`);
+                    }
+                } catch (e) {
+                    console.error(`Error processing sample ${sampleName}:`, e);
+                    reject(e);
+                }
+            });
+        });
+    };
+
+    /**
+     * Preloads samples used in a project by scanning blocks for instrument names.
+     * This should be called when a project is loaded to avoid playback delays.
+     * @function
+     * @memberof Synth
+     * @param {Array} blockList - The list of blocks from the project.
+     * @returns {Promise<void>} - A promise that resolves when all samples are preloaded.
+     */
+    this.preloadProjectSamples = async blockList => {
+        if (!blockList || !Array.isArray(blockList)) {
+            return;
+        }
+
+        const instrumentsToLoad = new Set();
+
+        // Known instrument block names
+        const instrumentBlockNames = ["settimbre", "setinstrument", "timbre", "instrument"];
+
+        // Scan blocks for instrument references
+        for (const block of blockList) {
+            if (!Array.isArray(block) || block.length < 2) continue;
+
+            const blockName = block[1];
+
+            // Check if this is an instrument-setting block
+            if (instrumentBlockNames.includes(blockName)) {
+                // The instrument name is usually in a connected block
+                // Check the connections for potential instrument names
+                const connections = block[4];
+                if (Array.isArray(connections)) {
+                    for (const connIdx of connections) {
+                        if (connIdx !== null && blockList[connIdx]) {
+                            const connBlock = blockList[connIdx];
+                            // Check if it's a text/value block with an instrument name
+                            if (Array.isArray(connBlock) && connBlock.length > 1) {
+                                const value = connBlock[1];
+                                // Check if this value is a known instrument
+                                if (typeof value === "string") {
+                                    // Check voice samples
+                                    if (SAMPLE_INFO.voice && SAMPLE_INFO.voice[value]) {
+                                        instrumentsToLoad.add(value);
+                                    }
+                                    // Check drum samples
+                                    if (SAMPLE_INFO.drum && SAMPLE_INFO.drum[value]) {
+                                        instrumentsToLoad.add(value);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
+
+            // Also check if the block name itself is an instrument
+            if (typeof blockName === "string") {
+                if (SAMPLE_INFO.voice && SAMPLE_INFO.voice[blockName]) {
+                    instrumentsToLoad.add(blockName);
+                }
+                if (SAMPLE_INFO.drum && SAMPLE_INFO.drum[blockName]) {
+                    instrumentsToLoad.add(blockName);
+                }
+            }
+        }
+
+        // Preload all found instruments in parallel
+        if (instrumentsToLoad.size > 0) {
+            console.debug(
+                `Preloading ${instrumentsToLoad.size} instruments:`,
+                Array.from(instrumentsToLoad)
+            );
+            const loadPromises = Array.from(instrumentsToLoad).map(name =>
+                this._loadSample(name).catch(err => {
+                    console.warn(`Failed to preload sample ${name}:`, err);
+                })
+            );
+            await Promise.all(loadPromises);
+            console.debug("Project samples preloaded successfully");
         }
     };
 
@@ -946,9 +1034,12 @@ function Synth() {
      */
     this.samplesQueue = []; // Samples that need to be loaded at start.
 
+    // Removed eager loading of all samples
+    this.loadSamples(); // Just initialize the structure
+    /*
     require(SOUNDSAMPLESDEFINES, () => {
         this.loadSamples();
-
+ 
         for (let i = 0; i < this.samplesQueue.length; i++) {
             this.__createSynth(
                 0,
@@ -958,6 +1049,7 @@ function Synth() {
             );
         }
     });
+    */
 
     /**
      * Sets up the recorder for the Synth instance.
@@ -1421,8 +1513,43 @@ function Synth() {
      */
     this.__createSynth = (turtle, instrumentName, sourceName, params) => {
         // Ensure the structure is initialized
+        if (this.samples === null) {
+            this.loadSamples();
+        }
 
-        this._loadSample(sourceName);
+        // Check if it's an audio sample that needs loading
+        let sampleType = null;
+        if (sourceName in SAMPLE_INFO.voice) sampleType = "voice";
+        else if (sourceName in SAMPLE_INFO.drum) sampleType = "drum";
+
+        // If it's a sample...
+        if (sampleType) {
+            // If already loaded, proceed synchronously
+            if (this.samples[sampleType][sourceName] !== null) {
+                this.___createSynth(turtle, instrumentName, sourceName, params);
+                return Promise.resolve();
+            }
+
+            // If not loaded, load asynchronously (lazy loading)
+            return this._loadSample(sourceName)
+                .then(() => {
+                    this.___createSynth(turtle, instrumentName, sourceName, params);
+                })
+                .catch(err => {
+                    console.error(`Failed to load ${sourceName}:`, err);
+                });
+        }
+
+        // Not a sample (built-in, custom synth, etc.) - create synchronously
+        this.___createSynth(turtle, instrumentName, sourceName, params);
+        return Promise.resolve();
+    };
+
+    /**
+     * Internal implementation of createSynth, called after sample is ensured loaded.
+     */
+    this.___createSynth = (turtle, instrumentName, sourceName, params) => {
+        // this._loadSample(sourceName); // Already loaded by __createSynth wrapper
         if (sourceName in this.samples.voice || sourceName in this.samples.drum) {
             if (!instruments[turtle][instrumentName]) {
                 instruments[turtle][instrumentName] = this._createSampleSynth(
@@ -1499,16 +1626,8 @@ function Synth() {
      * @param {Object} params - Additional parameters for synth configuration.
      */
     this.createSynth = (turtle, instrumentName, sourceName, params) => {
-        // We may have a race condition with the samples loader.
-        if (this.samples === null) {
-            this.samplesQueue.push([instrumentName, sourceName, params]);
-
-            require(SOUNDSAMPLESDEFINES, () => {
-                this.loadSamples();
-            });
-        } else {
-            this.__createSynth(turtle, instrumentName, sourceName, params);
-        }
+        // Just call __createSynth which handles on-demand loading
+        return this.__createSynth(turtle, instrumentName, sourceName, params);
     };
 
     /**
@@ -1519,14 +1638,14 @@ function Synth() {
      * @param {string} sourceName - The name of the source.
      * @returns {Tone.Instrument|null} - The loaded synth or null if not loaded.
      */
-    this.loadSynth = (turtle, sourceName) => {
+    this.loadSynth = async (turtle, sourceName) => {
         /* eslint-disable */
         if (sourceName.substring(0, 13) === "customsample_") {
             console.debug("loading custom " + sourceName);
         } else {
             console.debug("loading " + sourceName);
         }
-        this.createSynth(turtle, sourceName, sourceName, null);
+        await this.createSynth(turtle, sourceName, sourceName, null);
         this.setVolume(turtle, sourceName, last(Singer.masterVolume));
 
         if (sourceName in instruments[turtle]) {
@@ -2275,8 +2394,8 @@ function Synth() {
         this.tunerMic = new Tone.UserMedia();
         await this.tunerMic.open();
 
-        const analyser = new Tone.Analyser("waveform", 2048);
-        this.tunerMic.connect(analyser);
+        this.tunerAnalyser = new Tone.Analyser("waveform", 2048);
+        this.tunerMic.connect(this.tunerAnalyser);
 
         const YIN = (sampleRate, bufferSize = 2048, threshold = 0.1) => {
             // Low-Pass Filter to remove high-frequency noise
@@ -2353,13 +2472,13 @@ function Synth() {
             };
         };
 
-        const detectPitch = YIN(Tone.context.sampleRate);
+        this.detectPitch = YIN(Tone.context.sampleRate);
         let tunerMode = "chromatic"; // Add mode state
         let targetPitch = { note: "A4", frequency: 440 }; // Default target pitch
 
         const updatePitch = () => {
-            const buffer = analyser.getValue();
-            const pitch = detectPitch(buffer);
+            const buffer = this.tunerAnalyser.getValue();
+            const pitch = this.detectPitch(buffer);
 
             if (pitch > 0) {
                 let note, cents;
@@ -2669,13 +2788,12 @@ function Synth() {
                                         i < tempBlock._accidentalsWheel.navItems.length;
                                         i++
                                     ) {
-                                        tempBlock._accidentalsWheel.navItems[
-                                            i
-                                        ].navigateFunction = () => {
-                                            selectionState.accidental =
-                                                tempBlock._accidentalsWheel.navItems[i].title;
-                                            updateTargetNote();
-                                        };
+                                        tempBlock._accidentalsWheel.navItems[i].navigateFunction =
+                                            () => {
+                                                selectionState.accidental =
+                                                    tempBlock._accidentalsWheel.navItems[i].title;
+                                                updateTargetNote();
+                                            };
                                     }
                                 }
 
@@ -2686,16 +2804,15 @@ function Synth() {
                                         i < tempBlock._octavesWheel.navItems.length;
                                         i++
                                     ) {
-                                        tempBlock._octavesWheel.navItems[
-                                            i
-                                        ].navigateFunction = () => {
-                                            const octave =
-                                                tempBlock._octavesWheel.navItems[i].title;
-                                            if (octave && !isNaN(octave)) {
-                                                selectionState.octave = parseInt(octave);
-                                                updateTargetNote();
-                                            }
-                                        };
+                                        tempBlock._octavesWheel.navItems[i].navigateFunction =
+                                            () => {
+                                                const octave =
+                                                    tempBlock._octavesWheel.navItems[i].title;
+                                                if (octave && !isNaN(octave)) {
+                                                    selectionState.octave = parseInt(octave);
+                                                    updateTargetNote();
+                                                }
+                                            };
                                     }
                                 }
 
@@ -3169,12 +3286,13 @@ function Synth() {
      * @returns {number} The detected frequency in Hz
      */
     this.getTunerFrequency = () => {
-        if (!this.tunerAnalyser) return 440; // Default to A4 if no analyser
+        if (!this.tunerAnalyser || !this.detectPitch) return 440; // Default to A4 if no analyser
 
         const buffer = this.tunerAnalyser.getValue();
-        // TODO: Implement actual pitch detection algorithm
-        // For now, return a default value
-        return 440;
+        const pitch = this.detectPitch(buffer);
+
+        // Return detected pitch or default to A4
+        return pitch > 0 ? pitch : 440;
     };
 
     // Test function to verify tuner accuracy
