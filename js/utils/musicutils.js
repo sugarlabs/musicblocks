@@ -4820,16 +4820,16 @@ const _calculate_pitch_number = (noteName, octave) => {
 
     let pitchIndex = -1;
     if (PITCHES.includes(normalizedPitch)) {
-        pitchIndex = PITCHES.indexOf(normalizedPitch);
+        pitchIndex = PITCHES.indexOf(normalizedPitch.toUpperCase());
     } else if (PITCHES2.includes(normalizedPitch)) {
-        pitchIndex = PITCHES2.indexOf(normalizedPitch);
+        pitchIndex = PITCHES2.indexOf(normalizedPitch.toUpperCase());
     } else {
         return null;
     }
 
-    // MIDI C4 is 60. PITCHES starts at C.
-    // So C0 is 12, C1 is 24, ..., C4 is 60.
-    return (octave + 1) * 12 + pitchIndex;
+    // MusicBlocks starts at A0 = 0.
+    // octave * 12 + pitchIndex - 9 (index of A)
+    return octave * 12 + pitchIndex - 9;
 };
 
 /**

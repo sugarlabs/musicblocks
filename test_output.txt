@@ -1,0 +1,356 @@
+
+> musicblocks@3.4.1 test
+> jest js/blocks/__tests__/PitchBlocks.test.js
+
+FAIL js/blocks/__tests__/PitchBlocks.test.js
+  setupPitchBlocks
+    ✓ setupPitchBlocks initializes blocks (2 ms)
+    Synth Blocks
+      ✓ square block flow calls Singer.playSynthBlock (1 ms)
+      ✓ triangle block flow calls Singer.playSynthBlock
+      ✓ sine block flow calls Singer.playSynthBlock
+      ✓ sawtooth block flow calls Singer.playSynthBlock
+    RegisterBlock
+      ✓ flow (1 ms)
+    CustomNoteBlock
+      ✓ flow
+    Invert Blocks
+      ✓ Invert2Block listener coverage (1 ms)
+    TranspositionFactorBlock
+      ✓ arg and updateParameter
+    UpdateParameter Coverage
+      ✓ ConsonantStepSize blocks (1 ms)
+      ✓ DeltaPitchBlock updateParameter & arg
+      ✓ Generic check for all blocks updateParameter (1 ms)
+    Transposition Blocks
+      ✓ SetRatioTranspositionBlock (1 ms)
+      ✓ SetTranspositionBlock
+      ✓ SetScalarTranspositionBlock
+    MIDI
+      ✓ MidiBlock
+    OneOfPitchBlock
+      ✓ arg returns element
+    Value Blocks Success/Error
+      ✓ MyPitchBlock arg / setter (1 ms)
+    HertzBlock All Branches
+      ✓ hertz block flow detailed
+    SetPitchNumberOffsetBlock
+      ✓ flow (1 ms)
+    Number2PitchBlock & Octave
+      ✓ arg coverage
+    OutputToolsBlocks Extensive
+      ✕ arg all branches
+    StaffYToPitch
+      ✓ arg with all connection combinations
+    PitchBlock Complex Branches
+      ✓ flow (1 ms)
+    Macro Execution
+      ✓ calls makeMacro on all blocks that have it (1 ms)
+    Existence
+      ✓ should create all expected blocks (1 ms)
+    Comprehensive Block Coverage
+      Interval Blocks
+        ✓ downsixth block flow
+        ✓ downthird block flow (1 ms)
+        ✓ seventh block flow
+        ✓ sixth block flow
+        ✓ fifth block flow
+        ✓ fourth block flow (1 ms)
+        ✓ third block flow
+        ✓ second block flow
+        ✓ unison block flow (1 ms)
+      Accidental Blocks
+        ✓ AccidentalBlock flow
+        ✓ FlatBlock flow
+        ✓ SharpBlock flow (1 ms)
+        ✓ AccidentalNameBlock arg
+      Scale and Modal Blocks
+        ✓ ScaleDegreeBlock flow
+        ✓ ScaleDegree2Block arg (2 ms)
+        ✓ NthModalPitchBlock flow (1 ms)
+      Solfege and Note Name Blocks
+        ✓ SolfegeBlock arg
+        ✓ EastIndianSolfegeBlock arg
+        ✓ NoteNameBlock arg (1 ms)
+      Pitch Number and Conversion Blocks
+        ✓ PitchNumberBlock flow
+        ✓ Number2OctaveBlock arg
+        ✓ StaffYToPitch comprehensive (1 ms)
+      Retrograde and Invert Blocks
+        ✓ Retrograde1Block flow
+        ✓ Retrograde2Block flow
+        ✓ RetrogradeBlock flow
+        ✓ Invert1Block flow (1 ms)
+      Special Pitch Blocks
+        ✓ FiftyCentsBlock flow
+        ✓ OctaveBlock flow
+        ✓ StepPitchBlock flow (1 ms)
+      Current Pitch and Hertz Blocks
+        ✓ PitchInHertzBlock comprehensive
+        ✓ CurrentPitchBlock comprehensive (1 ms)
+      OutputTools Comprehensive
+        ✕ OutputToolsBlocks all branches
+      Error Handling and Edge Cases
+        ✓ handles invalid inputs gracefully (1 ms)
+        ✓ handles missing connections
+      Widget Integration
+        ✓ handles matrix integration
+        ✓ handles lego widget integration (1 ms)
+        ✓ handles pitch staircase integration
+        ✓ handles pitch slider integration
+      Parameter Updates and Status
+        ✓ updateParameter methods work correctly (1 ms)
+        ✓ status matrix integration
+      Setter Methods
+        ✓ MyPitchBlock setter (1 ms)
+      Complex Flow Scenarios
+        ✓ nested block connections
+        ✓ multiple turtle scenarios
+
+  ● setupPitchBlocks › OutputToolsBlocks Extensive › arg all branches
+
+    ReferenceError: getPitchInfoWithActivity is not defined
+
+      616 |                     }
+      617 |                 }
+    > 618 |                 return getPitchInfoWithActivity(
+          |                 ^
+      619 |                     activity,
+      620 |                     activity.blocks.blockList[blk].privateData,
+      621 |                     notePlayed,
+
+      at OutputToolsBlocks.arg (js/blocks/PitchBlocks.js:618:17)
+      at arg (js/blocks/__tests__/PitchBlocks.test.js:628:23)
+          at Array.forEach (<anonymous>)
+      at Object.forEach (js/blocks/__tests__/PitchBlocks.test.js:626:30)
+
+  ● setupPitchBlocks › Comprehensive Block Coverage › OutputTools Comprehensive › OutputToolsBlocks all branches
+
+    ReferenceError: getPitchInfoWithActivity is not defined
+
+      616 |                     }
+      617 |                 }
+    > 618 |                 return getPitchInfoWithActivity(
+          |                 ^
+      619 |                     activity,
+      620 |                     activity.blocks.blockList[blk].privateData,
+      621 |                     notePlayed,
+
+      at OutputToolsBlocks.arg (js/blocks/PitchBlocks.js:618:17)
+      at arg (js/blocks/__tests__/PitchBlocks.test.js:1091:31)
+          at Array.forEach (<anonymous>)
+      at Object.forEach (js/blocks/__tests__/PitchBlocks.test.js:1089:56)
+
+Failed to collect coverage from /Users/urlampranita/musical_blocks/musicblocks/js/block.js
+ERROR: unknown: Missing semicolon. (52432:65)
+
+  52430 | undefinedcov_1x8cjeyk8f().b[460][0]++;
+  52431 | undefinedcov_1x8cjeyk8f().s[1710]++;
+> 52432 | undefinedswitch (this.blocks.blockList[this.connections[0]].name) {
+        |                                                                  ^
+  52433 |                                                                   case "setturtlecolor":
+  52434 |                                                                     /* istanbul ignore next */
+  52435 |                                                                     cov_1x8cjeyk8f().b[461][0]++;
+STACK: SyntaxError: unknown: Missing semicolon. (52432:65)
+
+  52430 | undefinedcov_1x8cjeyk8f().b[460][0]++;
+  52431 | undefinedcov_1x8cjeyk8f().s[1710]++;
+> 52432 | undefinedswitch (this.blocks.blockList[this.connections[0]].name) {
+        |                                                                  ^
+  52433 |                                                                   case "setturtlecolor":
+  52434 |                                                                     /* istanbul ignore next */
+  52435 |                                                                     cov_1x8cjeyk8f().b[461][0]++;
+    at constructor (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:365:19)
+    at Parser.raise (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:6599:19)
+    at Parser.semicolon (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:6895:10)
+    at Parser.parseExpressionStatement (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:13285:10)
+    at Parser.parseStatementContent (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12899:19)
+    at Parser.parseStatementLike (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12767:17)
+    at Parser.parseStatementListItem (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12747:17)
+    at Parser.parseBlockOrModuleBlockBody (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:13316:61)
+    at Parser.parseBlockBody (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:13309:10)
+    at Parser.parseBlock (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:13297:10)
+    at Parser.parseStatementContent (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12858:21)
+    at Parser.parseStatementLike (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12767:17)
+    at Parser.parseStatementOrSloppyAnnexBFunctionDeclaration (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12757:17)
+    at Parser.parseIfStatement (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:13130:28)
+    at Parser.parseStatementContent (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12796:21)
+    at Parser.parseStatementLike (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12767:17)
+    at Parser.parseStatementListItem (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12747:17)
+    at Parser.parseBlockOrModuleBlockBody (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:13316:61)
+    at Parser.parseBlockBody (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:13309:10)
+    at Parser.parseBlock (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:13297:10)
+    at Parser.parseStatementContent (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12858:21)
+    at Parser.parseStatementLike (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12767:17)
+    at Parser.parseStatementOrSloppyAnnexBFunctionDeclaration (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12757:17)
+    at Parser.parseIfStatement (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:13131:42)
+    at Parser.parseStatementContent (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12796:21)
+    at Parser.parseStatementLike (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12767:17)
+    at Parser.parseStatementListItem (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12747:17)
+    at Parser.parseBlockOrModuleBlockBody (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:13316:61)
+    at Parser.parseBlockBody (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:13309:10)
+    at Parser.parseBlock (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:13297:10)
+    at Parser.parseStatementContent (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12858:21)
+    at Parser.parseStatementLike (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12767:17)
+    at Parser.parseStatementOrSloppyAnnexBFunctionDeclaration (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12757:17)
+    at Parser.parseIfStatement (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:13131:42)
+    at Parser.parseStatementContent (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12796:21)
+    at Parser.parseStatementLike (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12767:17)
+    at Parser.parseStatementListItem (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12747:17)
+    at Parser.parseBlockOrModuleBlockBody (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:13316:61)
+    at Parser.parseBlockBody (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:13309:10)
+    at Parser.parseBlock (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:13297:10)
+    at Parser.parseStatementContent (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12858:21)
+    at Parser.parseStatementLike (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12767:17)
+    at Parser.parseStatementOrSloppyAnnexBFunctionDeclaration (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12757:17)
+    at Parser.parseIfStatement (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:13131:42)
+    at Parser.parseStatementContent (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12796:21)
+    at Parser.parseStatementLike (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12767:17)
+    at Parser.parseStatementListItem (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:12747:17)
+    at Parser.parseBlockOrModuleBlockBody (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:13316:61)
+    at Parser.parseBlockBody (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:13309:10)
+    at Parser.parseBlock (/Users/urlampranita/musical_blocks/musicblocks/node_modules/@babel/parser/lib/index.js:13297:10)
+
+=============================== Coverage summary ===============================
+Statements   : 1.33% ( 630/47224 )
+Branches     : 1.35% ( 249/18428 )
+Functions    : 2.16% ( 98/4519 )
+Lines        : 1.35% ( 621/45664 )
+================================================================================
+------------------------------|---------|----------|---------|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+File                          | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                                                                                                                         
+------------------------------|---------|----------|---------|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+All files                     |    1.33 |     1.35 |    2.16 |    1.35 |                                                                                                                                                                           
+ js                           |       0 |        0 |       0 |       0 |                                                                                                                                                                           
+  SaveInterface.js            |       0 |        0 |       0 |       0 | 35-879                                                                                                                                                                    
+  abc.js                      |       0 |        0 |       0 |       0 | 23-431                                                                                                                                                                    
+  activity.js                 |       0 |        0 |       0 |       0 | 50-7709                                                                                                                                                                   
+  artwork.js                  |       0 |        0 |       0 |       0 | 63-804                                                                                                                                                                    
+  background.js               |       0 |        0 |       0 |       0 | 16-38                                                                                                                                                                     
+  base64Utils.js              |       0 |        0 |       0 |       0 | 31-50                                                                                                                                                                     
+  basicblocks.js              |       0 |        0 |       0 |       0 | 40-121                                                                                                                                                                    
+  blockfactory.js             |       0 |        0 |       0 |       0 | 40-1818                                                                                                                                                                   
+  blocks.js                   |       0 |        0 |       0 |       0 | 60-7179                                                                                                                                                                   
+  boundary.js                 |       0 |        0 |       0 |       0 | 28-125                                                                                                                                                                    
+  gif-animator.js             |       0 |        0 |       0 |       0 | 30-247                                                                                                                                                                    
+  languagebox.js              |       0 |        0 |       0 |       0 | 25-255                                                                                                                                                                    
+  lilypond.js                 |       0 |        0 |       0 |       0 | 41-999                                                                                                                                                                    
+  loader.js                   |       0 |        0 |       0 |       0 | 14-123                                                                                                                                                                    
+  logo.js                     |       0 |        0 |       0 |       0 | 37-2416                                                                                                                                                                   
+  macros.js                   |       0 |        0 |       0 |       0 | 50-1762                                                                                                                                                                   
+  midi.js                     |       0 |        0 |       0 |       0 | 16-452                                                                                                                                                                    
+  mxml.js                     |       0 |        0 |       0 |       0 | 15-263                                                                                                                                                                    
+  notation.js                 |       0 |        0 |       0 |       0 | 48-506                                                                                                                                                                    
+  p5-adapter.js               |       0 |        0 |       0 |       0 | 2-27                                                                                                                                                                      
+  p5-sound-adapter.js         |       0 |        0 |       0 |       0 | 2-55                                                                                                                                                                      
+  palette.js                  |       0 |        0 |       0 |       0 | 28-1640                                                                                                                                                                   
+  pastebox.js                 |       0 |        0 |       0 |       0 | 13-159                                                                                                                                                                    
+  piemenus.js                 |       0 |        0 |       0 |       0 | 64-4262                                                                                                                                                                   
+  planetInterface.js          |       0 |        0 |       0 |       0 | 30-335                                                                                                                                                                    
+  protoblocks.js              |       0 |        0 |       0 |       0 | 40-2103                                                                                                                                                                   
+  rubrics.js                  |       0 |        0 |       0 |       0 | 41-884                                                                                                                                                                    
+  themebox.js                 |       0 |        0 |       0 |       0 | 20-283                                                                                                                                                                    
+  toolbar.js                  |       0 |        0 |       0 |       0 | 19-1288                                                                                                                                                                   
+  trash.js                    |       0 |        0 |       0 |       0 | 22-274                                                                                                                                                                    
+  turtle-painter.js           |       0 |        0 |       0 |       0 | 38-1555                                                                                                                                                                   
+  turtle-singer.js            |       0 |        0 |       0 |       0 | 70-2499                                                                                                                                                                   
+  turtle.js                   |       0 |        0 |       0 |       0 | 56-987                                                                                                                                                                    
+  turtledefs.js               |       0 |        0 |       0 |       0 | 38-796                                                                                                                                                                    
+  turtles.js                  |       0 |        0 |       0 |       0 | 32-1297                                                                                                                                                                   
+ js/blocks                    |    8.52 |      8.7 |    8.29 |    8.73 |                                                                                                                                                                           
+  ActionBlocks.js             |       0 |        0 |       0 |       0 | 38-1559                                                                                                                                                                   
+  BooleanBlocks.js            |       0 |        0 |       0 |       0 | 30-1054                                                                                                                                                                   
+  BoxesBlocks.js              |       0 |        0 |       0 |       0 | 32-858                                                                                                                                                                    
+  DictBlocks.js               |       0 |        0 |       0 |       0 | 30-460                                                                                                                                                                    
+  DrumBlocks.js               |       0 |        0 |       0 |       0 | 32-612                                                                                                                                                                    
+  EnsembleBlocks.js           |       0 |        0 |       0 |       0 | 30-1379                                                                                                                                                                   
+  ExtrasBlocks.js             |       0 |        0 |       0 |       0 | 33-917                                                                                                                                                                    
+  FlowBlocks.js               |       0 |        0 |       0 |       0 | 32-1263                                                                                                                                                                   
+  GraphicsBlocks.js           |       0 |        0 |       0 |       0 | 46-1291                                                                                                                                                                   
+  HeapBlocks.js               |       0 |        0 |       0 |       0 | 31-737                                                                                                                                                                    
+  IntervalsBlocks.js          |       0 |        0 |       0 |       0 | 45-1565                                                                                                                                                                   
+  MediaBlocks.js              |       0 |        0 |       0 |       0 | 35-1019                                                                                                                                                                   
+  MeterBlocks.js              |       0 |        0 |       0 |       0 | 34-1469                                                                                                                                                                   
+  NumberBlocks.js             |       0 |        0 |       0 |       0 | 25-1008                                                                                                                                                                   
+  OrnamentBlocks.js           |       0 |        0 |       0 |       0 | 32-749                                                                                                                                                                    
+  PenBlocks.js                |       0 |        0 |       0 |       0 | 30-1241                                                                                                                                                                   
+  PitchBlocks.js              |   79.44 |    65.18 |    74.8 |   82.57 | 320,489-615,718-719,781-785,804,811-820,841,845-852,972-981,1003,1153-1155,1206-1208,1509-1510,1515,1552,1592,1648,1657-1663,1670-1686,1938,1962,1964,2030-2031,2065-2066 
+  ProgramBlocks.js            |       0 |        0 |       0 |       0 | 30-1453                                                                                                                                                                   
+  RhythmBlockPaletteBlocks.js |       0 |        0 |       0 |       0 | 22-1048                                                                                                                                                                   
+  RhythmBlocks.js             |       0 |        0 |       0 |       0 | 33-1256                                                                                                                                                                   
+  SensorsBlocks.js            |       0 |        0 |       0 |       0 | 32-1035                                                                                                                                                                   
+  ToneBlocks.js               |       0 |        0 |       0 |       0 | 34-1177                                                                                                                                                                   
+  VolumeBlocks.js             |       0 |        0 |       0 |       0 | 35-955                                                                                                                                                                    
+  WidgetBlocks.js             |       0 |        0 |       0 |       0 | 86-1878                                                                                                                                                                   
+ js/js-export                 |       0 |        0 |       0 |       0 |                                                                                                                                                                           
+  ASTutils.js                 |       0 |        0 |       0 |       0 | 36-769                                                                                                                                                                    
+  ast2blocklist.js            |       0 |        0 |       0 |       0 | 33-715                                                                                                                                                                    
+  constraints.js              |       0 |        0 |     100 |       0 | 23-1195                                                                                                                                                                   
+  export.js                   |       0 |        0 |       0 |       0 | 29-450                                                                                                                                                                    
+  generate.js                 |       0 |        0 |       0 |       0 | 36-386                                                                                                                                                                    
+  interface.js                |       0 |        0 |       0 |       0 | 33-1811                                                                                                                                                                   
+  minify.js                   |       0 |      100 |     100 |       0 | 1-7                                                                                                                                                                       
+ js/js-export/API             |       0 |        0 |       0 |       0 |                                                                                                                                                                           
+  DictBlocksAPI.js            |       0 |        0 |       0 |       0 | 31-58                                                                                                                                                                     
+  DrumBlocksAPI.js            |       0 |        0 |       0 |       0 | 31-58                                                                                                                                                                     
+  GraphicsBlocksAPI.js        |       0 |        0 |       0 |       0 | 31-93                                                                                                                                                                     
+  IntervalsBlocksAPI.js       |       0 |        0 |       0 |       0 | 31-65                                                                                                                                                                     
+  MeterBlocksAPI.js           |       0 |        0 |       0 |       0 | 31-81                                                                                                                                                                     
+  OrnamentBlocksAPI.js        |       0 |        0 |       0 |       0 | 31-55                                                                                                                                                                     
+  PenBlocksAPI.js             |       0 |        0 |       0 |       0 | 31-108                                                                                                                                                                    
+  PitchBlocksAPI.js           |       0 |        0 |       0 |       0 | 37-186                                                                                                                                                                    
+  RhythmBlocksAPI.js          |       0 |        0 |       0 |       0 | 37-120                                                                                                                                                                    
+  ToneBlocksAPI.js            |       0 |        0 |       0 |       0 | 37-136                                                                                                                                                                    
+  VolumeBlocksAPI.js          |       0 |        0 |       0 |       0 | 31-65                                                                                                                                                                     
+ js/js-export/samples         |       0 |      100 |     100 |       0 |                                                                                                                                                                           
+  sample.js                   |       0 |      100 |     100 |       0 | 19-299                                                                                                                                                                    
+ js/turtleactions             |       0 |        0 |       0 |       0 |                                                                                                                                                                           
+  DictActions.js              |       0 |        0 |       0 |       0 | 52-267                                                                                                                                                                    
+  DrumActions.js              |       0 |        0 |       0 |       0 | 52-234                                                                                                                                                                    
+  IntervalsActions.js         |       0 |        0 |       0 |       0 | 49-476                                                                                                                                                                    
+  MeterActions.js             |       0 |        0 |       0 |       0 | 46-379                                                                                                                                                                    
+  OrnamentActions.js          |       0 |        0 |       0 |       0 | 36-133                                                                                                                                                                    
+  PitchActions.js             |       0 |        0 |       0 |       0 | 58-652                                                                                                                                                                    
+  RhythmActions.js            |       0 |        0 |       0 |       0 | 40-472                                                                                                                                                                    
+  ToneActions.js              |       0 |        0 |       0 |       0 | 47-490                                                                                                                                                                    
+  VolumeActions.js            |       0 |        0 |       0 |       0 | 49-314                                                                                                                                                                    
+ js/utils                     |       0 |        0 |       0 |       0 |                                                                                                                                                                           
+  mathutils.js                |       0 |        0 |       0 |       0 | 59-330                                                                                                                                                                    
+  munsell.js                  |       0 |        0 |       0 |       0 | 31-6862                                                                                                                                                                   
+  musicutils.js               |       0 |        0 |       0 |       0 | 68-6310                                                                                                                                                                   
+  platformstyle.js            |       0 |        0 |       0 |       0 | 22-383                                                                                                                                                                    
+  synthutils.js               |       0 |        0 |       0 |       0 | 55-3524                                                                                                                                                                   
+  utils.js                    |       0 |        0 |       0 |       0 | 52-1700                                                                                                                                                                   
+ js/utils/__tests__           |       0 |      100 |       0 |       0 |                                                                                                                                                                           
+  tonemock.js                 |       0 |      100 |       0 |       0 | 22-189                                                                                                                                                                    
+ js/widgets                   |       0 |        0 |       0 |       0 |                                                                                                                                                                           
+  aidebugger.js               |       0 |        0 |       0 |       0 | 20-1210                                                                                                                                                                   
+  aiwidget.js                 |       0 |        0 |       0 |       0 | 26-1251                                                                                                                                                                   
+  arpeggio.js                 |       0 |        0 |       0 |       0 | 33-812                                                                                                                                                                    
+  help.js                     |       0 |        0 |       0 |       0 | 32-653                                                                                                                                                                    
+  jseditor.js                 |       0 |        0 |       0 |       0 | 34-999                                                                                                                                                                    
+  legobricks.js               |       0 |        0 |       0 |       0 | 16-3066                                                                                                                                                                   
+  meterwidget.js              |       0 |        0 |       0 |       0 | 61-660                                                                                                                                                                    
+  modewidget.js               |       0 |        0 |       0 |       0 | 32-1202                                                                                                                                                                   
+  musickeyboard.js            |       0 |        0 |       0 |       0 | 49-3502                                                                                                                                                                   
+  oscilloscope.js             |       0 |        0 |       0 |       0 | 41-256                                                                                                                                                                    
+  phrasemaker.js              |       0 |        0 |       0 |       0 | 51-5499                                                                                                                                                                   
+  pitchdrummatrix.js          |       0 |        0 |       0 |       0 | 51-1068                                                                                                                                                                   
+  pitchslider.js              |       0 |        0 |       0 |       0 | 26-228                                                                                                                                                                    
+  pitchstaircase.js           |       0 |        0 |       0 |       0 | 33-683                                                                                                                                                                    
+  reflection.js               |       0 |        0 |       0 |       0 | 20-648                                                                                                                                                                    
+  rhythmruler.js              |       0 |        0 |       0 |       0 | 67-2773                                                                                                                                                                   
+  sampler.js                  |       0 |        0 |       0 |       0 | 27-2386                                                                                                                                                                   
+  statistics.js               |       0 |        0 |       0 |       0 | 27-102                                                                                                                                                                    
+  status.js                   |       0 |        0 |       0 |       0 | 20-348                                                                                                                                                                    
+  temperament.js              |       0 |        0 |       0 |       0 | 38-2336                                                                                                                                                                   
+  tempo.js                    |       0 |        0 |       0 |       0 | 30-442                                                                                                                                                                    
+  timbre.js                   |       0 |        0 |       0 |       0 | 40-2599                                                                                                                                                                   
+  tuner.js                    |       0 |        0 |       0 |       0 | 6-215                                                                                                                                                                     
+  widgetWindows.js            |       0 |        0 |       0 |       0 | 20-705                                                                                                                                                                    
+------------------------------|---------|----------|---------|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 67 passed, 69 total
+Snapshots:   0 total
+Time:        2.842 s
+Ran all test suites matching /js\/blocks\/__tests__\/PitchBlocks.test.js/i.

@@ -2234,15 +2234,15 @@ describe("_calculate_pitch_number_with_activity", () => {
 
 describe("_calculate_pitch_number (standalone)", () => {
     it("should return correct pitch number for standard notes", () => {
-        expect(_calculate_pitch_number("C", 4)).toBe(60);
-        expect(_calculate_pitch_number("A", 4)).toBe(69);
-        expect(_calculate_pitch_number("C", 5)).toBe(72);
+        expect(_calculate_pitch_number("C", 4)).toBe(39);
+        expect(_calculate_pitch_number("A", 4)).toBe(48);
+        expect(_calculate_pitch_number("C", 5)).toBe(51);
     });
 
     it("should handle sharp and flat symbols", () => {
-        expect(_calculate_pitch_number("C#", 4)).toBe(61);
-        expect(_calculate_pitch_number("Db", 4)).toBe(61);
-        expect(_calculate_pitch_number("F#", 4)).toBe(66);
+        expect(_calculate_pitch_number("C#", 4)).toBe(40);
+        expect(_calculate_pitch_number("Db", 4)).toBe(40);
+        expect(_calculate_pitch_number("F#", 4)).toBe(45);
     });
 
     it("should return null for invalid inputs", () => {
@@ -2258,16 +2258,16 @@ describe("getPitchInfo (standalone)", () => {
         expect(info).toEqual({
             name: "C",
             octave: 4,
-            pitchNumber: 60
+            pitchNumber: 39
         });
     });
 
     it("should return correct info for pitch numbers", () => {
-        const info = getPitchInfo(69);
+        const info = getPitchInfo(48);
         expect(info).toEqual({
             name: "A",
             octave: 4,
-            pitchNumber: 69
+            pitchNumber: 48
         });
     });
 
@@ -2276,7 +2276,7 @@ describe("getPitchInfo (standalone)", () => {
         expect(info).toEqual({
             name: "Eb",
             octave: 5,
-            pitchNumber: 75
+            pitchNumber: 54
         });
     });
 

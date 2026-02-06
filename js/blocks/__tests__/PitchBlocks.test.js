@@ -64,7 +64,7 @@ describe("setupPitchBlocks", () => {
         arg() {
             return null;
         }
-        setter() {}
+        setter() { }
     }
     class DummyFlowBlock extends DummyBlock {
         flow() {
@@ -76,7 +76,7 @@ describe("setupPitchBlocks", () => {
             return this;
         }
     }
-    class DummyLeftBlock extends DummyBlock {}
+    class DummyLeftBlock extends DummyBlock { }
 
     beforeEach(() => {
         createdBlocks = {};
@@ -179,7 +179,11 @@ describe("setupPitchBlocks", () => {
         global.getNote = jest.fn(() => ["C", 4]);
         global.pitchToNumber = jest.fn((p, o) => 60);
         global.buildScale = jest.fn(() => [["C", "D", "E", "F", "G", "A", "B"], []]);
-        global.getPitchInfo = jest.fn((activity, data, note, tur) => note);
+        global.getPitchInfo = jest.fn((noteOrPitch) => {
+            if (typeof noteOrPitch === "string") return { name: noteOrPitch.slice(0, -1), octave: parseInt(noteOrPitch.slice(-1)), pitchNumber: 60 };
+            return { name: "C", octave: 4, pitchNumber: noteOrPitch };
+        });
+        global.getPitchInfoWithActivity = jest.fn((activity, data, note, tur) => note);
         global.keySignatureToMode = jest.fn(key => {
             if (key === "Cb") return ["Cb", "major"];
             if (key === "C#") return ["C#", "major"];
@@ -431,7 +435,7 @@ describe("setupPitchBlocks", () => {
     describe("Transposition Blocks", () => {
         it("SetRatioTranspositionBlock", () => {
             const block = createdBlocks["setratio"];
-            const spy = jest.spyOn(console, "log").mockImplementation(() => {});
+            const spy = jest.spyOn(console, "log").mockImplementation(() => { });
 
             activity.blocks.blockList[10].connections[1] = 20;
 
@@ -597,7 +601,7 @@ describe("setupPitchBlocks", () => {
 
             block.arg(logo, 0, 10, null);
 
-            const spy = jest.spyOn(console, "error").mockImplementation(() => {});
+            const spy = jest.spyOn(console, "error").mockImplementation(() => { });
             global.Singer.PitchActions.numToPitch.mockImplementation(() => {
                 throw new Error("Generic");
             });
