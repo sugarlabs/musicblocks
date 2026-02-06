@@ -626,13 +626,13 @@ class ReflectionMatrix {
      */
     escapeHTML(text) {
         const escapeMap = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#x27;'
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#x27;"
         };
-        return text.replace(/[&<>"']/g, (char) => escapeMap[char]);
+        return text.replace(/[&<>"']/g, char => escapeMap[char]);
     }
 
     /**
@@ -643,21 +643,21 @@ class ReflectionMatrix {
      */
     sanitizeHTML(htmlString) {
         const parser = new DOMParser();
-        const doc = parser.parseFromString(htmlString, 'text/html');
+        const doc = parser.parseFromString(htmlString, "text/html");
 
         // Sanitize links
-        const links = doc.getElementsByTagName('a');
+        const links = doc.getElementsByTagName("a");
         for (let i = 0; i < links.length; i++) {
             const link = links[i];
-            const href = link.getAttribute('href');
+            const href = link.getAttribute("href");
 
             // If no href, or it's unsafe, remove the attribute
             if (!href || this.isUnsafeUrl(href)) {
-                link.removeAttribute('href');
+                link.removeAttribute("href");
             } else {
                 // Enforce security attributes for external links
-                link.setAttribute('target', '_blank');
-                link.setAttribute('rel', 'noopener noreferrer');
+                link.setAttribute("target", "_blank");
+                link.setAttribute("rel", "noopener noreferrer");
             }
         }
 
@@ -671,12 +671,12 @@ class ReflectionMatrix {
      */
     isUnsafeUrl(url) {
         const trimmed = url.trim().toLowerCase();
-        const unsafeSchemes = ['javascript:', 'data:', 'vbscript:'];
+        const unsafeSchemes = ["javascript:", "data:", "vbscript:"];
         // Check if it starts with any unsafe scheme
         // Note: DOMParser handles HTML entity decoding, so we check the raw attribute safely here
         // But for extra safety against control characters, we rely on the fact that
         // we are operating on the parsed DOM attribute.
-        return unsafeSchemes.some(scheme => trimmed.replace(/\s+/g, '').startsWith(scheme));
+        return unsafeSchemes.some(scheme => trimmed.replace(/\s+/g, "").startsWith(scheme));
     }
 
     /**
