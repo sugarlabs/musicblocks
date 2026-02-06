@@ -1203,3 +1203,7 @@ class ModeWidget {
         }
     }
 }
+
+if (typeof module !== "undefined") {
+    module.exports = ModeWidget;
+}
