@@ -2271,6 +2271,18 @@ describe("_calculate_pitch_number", () => {
     });
 });
 
+describe("getStepSizeDown", () => {
+    it("should return the correct step size for D in C major going down", () => {
+        const result = getStepSizeDown("C major", "D", 0, "equal");
+        expect(result).toBe(-2);
+    });
+
+    it("should return 0 for an invalid temperament", () => {
+        const result = getStepSizeDown("C major", "D", 0, "invalid");
+        expect(result).toBe(0);
+    });
+});
+
 describe("getStepSizeUp", () => {
     it("should return the correct step size for C in C major going up", () => {
         const result = getStepSizeUp("C major", "C", 0, "equal");
