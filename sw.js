@@ -124,16 +124,18 @@ self.addEventListener("refreshOffline", function () {
 
     const offlinePageRequest = new Request(offlineFallbackPage);
 
-    return fetch(offlineFallbackPage).then(function (response) {
-        return caches.open(CACHE).then(function (cache) {
+    return fetch(offlineFallbackPage)
+        .then(function (response) {
+            return caches.open(CACHE).then(function (cache) {
+                // eslint-disable-next-line no-console
+                console.log(
+                    "[PWA Builder] Offline page updated from refreshOffline event: " + response.url
+                );
+                return cache.put(offlinePageRequest, response);
+            });
+        })
+        .catch(function (error) {
             // eslint-disable-next-line no-console
-            console.log(
-                "[PWA Builder] Offline page updated from refreshOffline event: " + response.url
-            );
-            return cache.put(offlinePageRequest, response);
+            console.log("[PWA Builder] refreshOffline failed: " + error);
         });
-    }).catch(function (error) {
-        // eslint-disable-next-line no-console
-        console.log("[PWA Builder] refreshOffline failed: " + error);
-    });
 });
