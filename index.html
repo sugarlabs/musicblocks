@@ -28,7 +28,27 @@
     <link rel="preload" href="css/darkmode.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="prefetch" as="video" href="loading-animation.webm" type="video/webm">
     <link rel="prefetch" as="video" href="loading-animation.mp4" type="video/mp4">
-    <link rel="prefetch" as="image" href="loading-animation-ja.svg">
+    <!-- Unused loading-animation-ja image prefetch during MB initialization #5490 -->
+    <!-- <link rel="prefetch" as="image" href="loading-animation-ja.svg"> -->
+    <script>
+        (function() {
+            try {
+                var lang = navigator.language;
+                if (localStorage.getItem('languagePreference')) {
+                    lang = localStorage.getItem('languagePreference');
+                }
+                if (lang && lang.startsWith('ja')) {
+                    var link = document.createElement('link');
+                    link.rel = 'preload';
+                    link.as = 'image';
+                    link.href = 'loading-animation-ja.svg';
+                    document.head.appendChild(link);
+                }
+            } catch (e) {
+                console.warn('Error checking language for prefetch', e);
+            }
+        })();
+    </script>
 
 
     <!-- <script src="js/utils/detectIE.js"></script> -->
