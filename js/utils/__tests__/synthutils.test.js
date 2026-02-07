@@ -65,13 +65,12 @@ describe("Utility Functions (logic-only)", () => {
         global.TextDecoder = TextDecoder;
         global.MediaRecorder = jest.fn();
         global.AudioBuffer = jest.fn();
-        global.module = module;
         global.Tone = require("./tonemock.js");
 
         const codeFiles = [
-            "../../../lib/require.js",
             "../platformstyle.js",
             "../musicutils.js",
+            "../../logoconstants.js",
             "../synthutils.js",
             "../utils.js",
             "../../logo.js",
@@ -99,6 +98,17 @@ describe("Utility Functions (logic-only)", () => {
             metaTag.name = 'theme-color';
             metaTag.content = "#4DA6FF";
             document.head?.appendChild(metaTag);
+            
+            // Dummy define for AMD modules
+            window.define = function(deps, callback) {
+                if (typeof deps === 'function') deps();
+                else if (typeof callback === 'function') callback();
+            };
+            window.define.amd = {};
+            window.require = function(deps, callback) {
+                if (typeof callback === 'function') callback();
+            };
+
             ${wrapperCode}
             
             return {

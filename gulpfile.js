@@ -43,6 +43,40 @@ const cssTask = () => {
         .pipe(gulp.dest("dist/css"));
 };
 
+// Core task: concatenates and uglifies core JS files to core.min.js
+const coreTask = () => {
+    return src([
+        "js/utils/platformstyle.js",
+        "js/utils/utils.js",
+        "js/utils/musicutils.js",
+        "js/utils/synthutils.js",
+        "js/utils/mathutils.js",
+        "js/logoconstants.js",
+        "js/gif-animator.js",
+        "js/artwork.js",
+        "js/turtledefs.js",
+        "js/block.js",
+        "js/blocks.js",
+        "js/turtle-singer.js",
+        "js/turtle-painter.js",
+        "js/turtle.js",
+        "js/turtles.js",
+        "js/notation.js",
+        "js/trash.js",
+        "js/palette.js",
+        "js/protoblocks.js",
+        "js/logo.js"
+    ])
+        .pipe(concat("core.min.js"))
+        .pipe(
+            babel({
+                presets: ["@babel/env"]
+            })
+        )
+        .pipe(uglify())
+        .pipe(dest("dist"));
+};
+
 // JS task: concatenates and uglifies JS files to app.min.js
 const jsTask = () => {
     return src([files.jsPath])
@@ -93,11 +127,13 @@ const watchTask = () => {
     );
 };
 
+exports.coreTask = coreTask;
+
 // Export the default Gulp task so it can be run
 // Runs the sass ,css and js tasks simultaneously
 // then runs prettify, cacheBust, validate, then starts watch (long-running)
 exports.default = series(
-    parallel(jsTask, cssTask, sassTask),
+    parallel(coreTask, jsTask, cssTask, sassTask),
     prettify,
     cacheBustTask,
     validate,

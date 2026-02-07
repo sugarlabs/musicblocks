@@ -7164,3 +7164,17 @@ class Blocks {
         };
     }
 }
+// Export Blocks
+if (typeof define === "function" && define.amd) {
+    define([], function () {
+        return Blocks;
+    });
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Blocks;
+}
+
+if (typeof window !== "undefined") {
+    window.Blocks = Blocks;
+}

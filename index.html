@@ -113,6 +113,18 @@
 
     <link rel="prefetch" type="application/l10n" href="./localization.ini" />
 
+    <script>
+        window._THIS_IS_MUSIC_BLOCKS_ = true;
+        window._THIS_IS_TURTLE_BLOCKS_ = false;
+
+        window.i18next = {
+            language: "en",
+            t: function (key) {
+                return key;
+            }
+        };
+    </script>
+    <script src="dist/core.min.js"></script>
     <script data-main="js/loader" src="lib/require.js" defer></script>
     <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
     <link rel="preload" href="/fonts/material-icons.woff2" as="font" type="font/woff2" crossorigin="anonymous">
@@ -547,12 +559,24 @@
     <!-- Initialize Scripts -->
     <script>
         let canvas, stage;
-        function init() {
+        function init(retryCount = 0) {
+            if (typeof createjs === "undefined") {
+                if (retryCount < 20) {
+                    console.warn(
+                        "createjs not loaded yet, retrying init... (" +
+                        (retryCount + 1) +
+                        ")"
+                    );
+                    setTimeout(() => init(retryCount + 1), 100);
+                } else {
+                    console.error("Failed to load createjs after multiple retries.");
+                }
+                return;
+            }
             canvas = document.getElementById("canvas");
             stage = new createjs.Stage(canvas);
 
             createjs.Ticker.framerate = 60;
-            // createjs.Ticker.addEventListener("tick", stage); // Managed by Activity class
         }
         document.addEventListener("DOMContentLoaded", init);
     </script>
