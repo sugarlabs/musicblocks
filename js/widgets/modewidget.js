@@ -105,17 +105,11 @@ class ModeWidget {
             }
         };
 
-        this.widgetWindow.addButton(
-            "export-chunk.svg",
-            ModeWidget.ICONSIZE,
-            _("Save")
-        ).onclick = this._save.bind(this);
+        this.widgetWindow.addButton("export-chunk.svg", ModeWidget.ICONSIZE, _("Save")).onclick =
+            this._save.bind(this);
 
-        this.widgetWindow.addButton(
-            "erase-button.svg",
-            ModeWidget.ICONSIZE,
-            _("Clear")
-        ).onclick = this._clear.bind(this);
+        this.widgetWindow.addButton("erase-button.svg", ModeWidget.ICONSIZE, _("Clear")).onclick =
+            this._clear.bind(this);
 
         this.widgetWindow.addButton(
             "rotate-left.svg",
@@ -129,17 +123,11 @@ class ModeWidget {
             _("Rotate clockwise")
         ).onclick = this._rotateRight.bind(this);
 
-        this.widgetWindow.addButton(
-            "invert.svg",
-            ModeWidget.ICONSIZE,
-            _("Invert")
-        ).onclick = this._invert.bind(this);
+        this.widgetWindow.addButton("invert.svg", ModeWidget.ICONSIZE, _("Invert")).onclick =
+            this._invert.bind(this);
 
-        this.widgetWindow.addButton(
-            "restore-button.svg",
-            ModeWidget.ICONSIZE,
-            _("Undo")
-        ).onclick = this._undo.bind(this);
+        this.widgetWindow.addButton("restore-button.svg", ModeWidget.ICONSIZE, _("Undo")).onclick =
+            this._undo.bind(this);
 
         this._piemenuMode();
 

@@ -681,21 +681,7 @@ function setupMediaBlocks(activity) {
             // Set palette and activity for the block
             this.setPalette("media", activity);
             this.piemenuValuesC1 = [
-                220,
-                247,
-                262,
-                294,
-                330,
-                349,
-                392,
-                440,
-                494,
-                523,
-                587,
-                659,
-                698,
-                784,
-                880
+                220, 247, 262, 294, 330, 349, 392, 440, 494, 523, 587, 659, 698, 784, 880
             ];
             this.setHelpString();
 

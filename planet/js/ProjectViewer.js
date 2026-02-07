@@ -159,9 +159,8 @@ class ProjectViewer {
             document.getElementById("report-error").style.display = "block";
             return;
         } else if (text.length > 1000) {
-            document.getElementById(
-                "report-error"
-            ).textContent = this.ReportDescriptionTooLongError;
+            document.getElementById("report-error").textContent =
+                this.ReportDescriptionTooLongError;
             document.getElementById("report-error").style.display = "block";
             return;
         } else {

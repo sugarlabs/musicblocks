@@ -1,5 +1,4 @@
-How to add a new sample sound
-=============================
+# How to add a new sample sound
 
 ### Checklist for sound sample:
 
@@ -11,67 +10,67 @@ How to add a new sample sound
 
 ### Steps for adding the sample:
 
-* Find a sample under a free/libre open-source (FOSS) license.
+-   Find a sample under a free/libre open-source (FOSS) license.
 
-* `base64` encode the sample data
+-   `base64` encode the sample data
 
-  ```
-  base64 piano.wav > piano.b64encoded
-  ```
+    ```
+    base64 piano.wav > piano.b64encoded
+    ```
 
-* Embedded the sample data into a .js file as per:
+-   Embedded the sample data into a .js file as per:
 
-   ```
-   piano.js
+    ```
+    piano.js
 
-   PIANO_SAMPLE = function () {
-    return "data:audio/wav;base64,BASE64ENCODEDSAMPLEDATA";
-   };
-   ```
+    PIANO_SAMPLE = function () {
+     return "data:audio/wav;base64,BASE64ENCODEDSAMPLEDATA";
+    };
+    ```
 
 Be sure to remove the newlines in your sample data: it should all be
 on one line.
 
-* Include a comment in the code regarding the sample source and license.
-  // Piano sample from
-  // https://github.com/sugarlabs/tamtam/blob/master/common/Resources/Sounds/piano
-  // License: GPL-v2
+-   Include a comment in the code regarding the sample source and license.
+    // Piano sample from
+    // https://github.com/sugarlabs/tamtam/blob/master/common/Resources/Sounds/piano
+    // License: GPL-v2
 
-* Add you new sample to `js/utils/synthutils.js`
+-   Add you new sample to `js/utils/synthutils.js`
 
-   ```
-   var VOICENAMES = [
-    //.TRANS: musical instrument
-    [_('piano'), 'piano', 'images/voices.svg', 'string'],
+    ```
+    var VOICENAMES = [
+     //.TRANS: musical instrument
+     [_('piano'), 'piano', 'images/voices.svg', 'string'],
 
-   var SOUNDSAMPLESDEFINES = [
-    "samples/piano",
+    var SOUNDSAMPLESDEFINES = [
+     "samples/piano",
 
-   const DEFAULTSYNTHVOLUME = {
-    "piano": 100, 
+    const DEFAULTSYNTHVOLUME = {
+     "piano": 100,
 
-   const SAMPLECENTERNO = {
-    'piano': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
+    const SAMPLECENTERNO = {
+     'piano': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
 
-   this.loadSamples = function () {
-       this.samplesManifest = {
-           'voice': [
-               {'name': 'piano', 'data': PIANO_SAMPLE},
-   ```
+    this.loadSamples = function () {
+        this.samplesManifest = {
+            'voice': [
+                {'name': 'piano', 'data': PIANO_SAMPLE},
+    ```
 
-* Add your new sample name to the list of string that need translation
-in `js/utils/musicutils.js`
+-   Add your new sample name to the list of string that need translation
+    in `js/utils/musicutils.js`
 
-   ```
-   // Musical terms that need translations
-   const SELECTORSTRINGS = [
-       _('piano'),
-   ```
+    ```
+    // Musical terms that need translations
+    const SELECTORSTRINGS = [
+        _('piano'),
+    ```
 
--   Ensure that your new instrument is recognized in the interface in `js/js-export/interface.js`
+*   Ensure that your new instrument is recognized in the interface in `js/js-export/interface.js`
 
     ```javascript
     else if (props["constraints"]["type"] === "synth") {
        const instruments = [
            "piano",
-    ````
+    ```
