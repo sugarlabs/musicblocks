@@ -681,9 +681,8 @@ class Logo {
                     ) {
                         logo.statusFields.push([blk, "color"]);
                     } else {
-                        logo.blockList[blk].value = logo.activity.turtles.getTurtle(
-                            turtle
-                        ).painter.color;
+                        logo.blockList[blk].value =
+                            logo.activity.turtles.getTurtle(turtle).painter.color;
                     }
                     break;
 
@@ -699,8 +698,6 @@ class Logo {
                 default:
                     // Is it a plugin?
                     if (logo.blockList[blk].name in logo.evalArgDict) {
-                        // eslint-disable-next-line no-console
-                        console.log("running eval on " + logo.blockList[blk].name);
                         eval(logo.evalArgDict[logo.blockList[blk].name]);
                     } else {
                         // eslint-disable-next-line no-console
@@ -1448,8 +1445,6 @@ class Logo {
             let res = null;
             // Is it a plugin?
             if (logo.blockList[blk].name in logo.evalFlowDict) {
-                // eslint-disable-next-line no-console
-                console.log("running eval on " + logo.blockList[blk].name);
                 logo.pluginReturnValue = null;
                 eval(logo.evalFlowDict[logo.blockList[blk].name]);
                 // Clamp blocks will return the child flow.
