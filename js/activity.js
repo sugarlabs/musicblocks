@@ -32,7 +32,7 @@
    PALETTESTROKECOLORS, PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
    Palettes, PasteBox, PlanetInterface, platform, platformColor,
    piemenuKey, POLAR, preparePluginExports, processMacroData,
-   processPluginData, processRawPluginData, require, SaveInterface,
+   processPluginData, processRawPluginData, require, SaveInterface, UndoRedoManager,
    SHOWBLOCKSBUTTON, SMALLERBUTTON, SMALLERDISABLEBUTTON, SOPRANO,
    SPECIALINPUTS, STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
    TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, Turtles, TURTLESVG,
@@ -98,6 +98,7 @@ let MYDEFINES = [
     "activity/rubrics",
     "activity/macros",
     "activity/SaveInterface",
+    "activity/undo-redo",
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
@@ -3275,6 +3276,20 @@ class Activity {
                 }
             } else if (event.ctrlKey) {
                 switch (event.keyCode) {
+                    case 90: // Ctrl+Z - Undo
+                        event.preventDefault();
+                        this.textMsg("Ctrl+Z " + _("Undo"));
+                        if (this.undoRedoManager) {
+                            this.undoRedoManager.undo();
+                        }
+                        break;
+                    case 89: // Ctrl+Y - Redo
+                        event.preventDefault();
+                        this.textMsg("Ctrl+Y " + _("Redo"));
+                        if (this.undoRedoManager) {
+                            this.undoRedoManager.redo();
+                        }
+                        break;
                     case V:
                         // this.textMsg("Ctl-V " + _("Paste"));
                         this.pasteBox.createBox(this.turtleBlocksScale, 200, 200);
@@ -6965,6 +6980,7 @@ class Activity {
             }
 
             this.save = new SaveInterface(this);
+            this.undoRedoManager = new UndoRedoManager(this);
 
             this.toolbar = new Toolbar();
             this.toolbar.init(this);
@@ -7003,6 +7019,11 @@ class Activity {
             this.toolbar.renderThemeSelectIcon(this.themeBox, this.themes);
             this.toolbar.renderMergeIcon(_doMergeLoad);
             this.toolbar.renderRestoreIcon(restoreTrash);
+            
+            // Initialize Undo/Redo buttons
+            this.toolbar.renderUndoIcon(this.undoRedoManager);
+            this.toolbar.renderRedoIcon(this.undoRedoManager);
+            
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.toolbar.renderChooseKeyIcon(chooseKeyMenu);
             }
