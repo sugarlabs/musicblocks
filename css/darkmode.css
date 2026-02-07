@@ -35,6 +35,24 @@ body.dark {
   background-color: var(--bg) !important;
 }
 
+/* Save HTML Body */
+.dark #saveHtmlBody {
+    color: var(--fg);
+}
+
+.dark #saveHtmlBody input[type="text"],
+.dark #saveHtmlBody textarea {
+    background: #2b2b2b;
+    border: 1px solid #444;
+    color: var(--fg);
+}
+
+.dark #saveHtmlBody .image-row img {
+    background: #2a2a2a;
+}
+
+.dark #saveHtmlBody .btn.primary {
+    background: #1976d2;
 
 /* Trash view colors for dark mode */
 .dark .trash-view {

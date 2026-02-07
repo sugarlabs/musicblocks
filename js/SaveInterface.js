@@ -266,7 +266,25 @@ class SaveInterface {
     saveHTML(activity) {
         const html =
             "data:text/plain;charset=utf-8," + encodeURIComponent(activity.save.prepareHTML());
-        activity.save.download("html", html, null);
+        const filename =
+            activity.PlanetInterface !== undefined
+                ? activity.PlanetInterface.getCurrentProjectName() + ".html"
+                : ("My Project").replace(" ", "") + ".html";
+        if (activity && activity.save && typeof activity.save.downloadURL === "function") {
+            activity.save.downloadURL(filename, html);
+            return;
+        }
+        if (activity && activity.save && typeof activity.save.download === "function") {
+            const downloadFilename = activity.PlanetInterface !== undefined ? filename : null;
+            activity.save.download("html", html, downloadFilename);
+            return;
+        }
+        const a = document.createElement("a");
+        a.setAttribute("href", html);
+        a.setAttribute("download", filename);
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     }
 
     /**
@@ -285,14 +303,24 @@ class SaveInterface {
         setTimeout(() => {
             const html =
                 "data:text/plain;charset=utf-8," + encodeURIComponent(activity.save.prepareHTML());
-            if (activity.PlanetInterface !== undefined) {
-                activity.save.downloadURL(
-                    activity.PlanetInterface.getCurrentProjectName() + ".html",
-                    html
-                );
-            } else {
-                activity.save.downloadURL(_("My Project").replace(" ", "_") + ".html", html);
+            const filename =
+                activity.PlanetInterface !== undefined
+                    ? activity.PlanetInterface.getCurrentProjectName() + ".html"
+                    : ("My Project").replace(" ", "") + ".html";
+            if (activity && activity.save && typeof activity.save.downloadURL === "function") {
+                activity.save.downloadURL(filename, html);
+                return;
             }
+            if (activity && activity.save && typeof activity.save.download === "function") {
+                activity.save.download("html", html, filename);
+                return;
+            }
+            const a = document.createElement("a");
+            a.setAttribute("href", html);
+            a.setAttribute("download", filename);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }, 500);
     }
 
