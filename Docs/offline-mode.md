@@ -47,4 +47,3 @@ By default, the Service Worker is disabled on `localhost` to allow for instant c
 2.  Run: `localStorage.setItem("ENABLE_SW_LOCAL", "true")`.
 3.  Reload the page.
 4.  To disable: `localStorage.removeItem("ENABLE_SW_LOCAL")`.
-
