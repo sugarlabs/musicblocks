@@ -2555,7 +2555,6 @@ const getDrumName = name => {
         }
     }
 
-    // console.debug(name + ' not found in DRUMNAMES');
     return null;
 };
 
@@ -2698,7 +2697,6 @@ const getNoiseName = name => {
         }
     }
 
-    // console.debug(name + " not found in NOISENAMES");
     return DEFAULTNOISE;
 };
 
@@ -2771,7 +2769,6 @@ const getVoiceName = name => {
         }
     }
 
-    // console.debug(name + " not found in VOICENAMES");
     return DEFAULTVOICE;
 };
 

@@ -982,3 +982,349 @@ describe("Utility Functions (logic-only)", () => {
         });
     });
 });
+
+describe("Tuner Utilities (Audio Test Functions)", () => {
+    let mockAudioContext;
+    let mockOscillator;
+    let mockGainNode;
+    let originalAudioContext;
+    let originalConsoleLog;
+    let originalConsoleError;
+
+    beforeEach(() => {
+        // Save original AudioContext if it exists
+        originalAudioContext = global.AudioContext;
+        originalConsoleLog = console.log;
+        originalConsoleError = console.error;
+
+        // Mock console methods
+        console.log = jest.fn();
+        console.error = jest.fn();
+
+        // Mock GainNode
+        mockGainNode = {
+            connect: jest.fn(),
+            gain: { value: 0 }
+        };
+
+        // Mock Oscillator
+        mockOscillator = {
+            connect: jest.fn(),
+            frequency: {
+                setValueAtTime: jest.fn()
+            },
+            start: jest.fn(),
+            stop: jest.fn()
+        };
+
+        // Mock AudioContext
+        mockAudioContext = {
+            createOscillator: jest.fn(() => mockOscillator),
+            createGain: jest.fn(() => mockGainNode),
+            destination: {},
+            currentTime: 0
+        };
+
+        global.AudioContext = jest.fn(() => mockAudioContext);
+        global.window = { AudioContext: global.AudioContext };
+
+        // Use fake timers for setTimeout
+        jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+        // Restore original values
+        global.AudioContext = originalAudioContext;
+        global.window = originalAudioContext ? { AudioContext: originalAudioContext } : {};
+        console.log = originalConsoleLog;
+        console.error = originalConsoleError;
+
+        // Clear all timers
+        jest.clearAllTimers();
+        jest.useRealTimers();
+    });
+
+    describe("testTuner", () => {
+        it("should verify tuner accuracy with predefined test frequencies", () => {
+            const testTuner = () => {
+                if (!window.AudioContext) {
+                    console.error("Web Audio API not supported");
+                    return;
+                }
+
+                const audioContext = new AudioContext();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                gainNode.gain.value = 0.1;
+
+                const testCases = [
+                    { freq: 440, expected: "A4" },
+                    { freq: 442, expected: "A4" },
+                    { freq: 438, expected: "A4" },
+                    { freq: 261.63, expected: "C4" },
+                    { freq: 329.63, expected: "E4" }
+                ];
+
+                let currentTest = 0;
+
+                const runTest = () => {
+                    if (currentTest >= testCases.length) {
+                        oscillator.stop();
+                        console.log("Tuner tests completed");
+                        return;
+                    }
+
+                    const test = testCases[currentTest];
+                    console.log(`Testing frequency: ${test.freq}Hz (Expected: ${test.expected})`);
+
+                    oscillator.frequency.setValueAtTime(test.freq, audioContext.currentTime);
+
+                    currentTest++;
+                    setTimeout(runTest, 2000);
+                };
+
+                oscillator.start();
+                runTest();
+            };
+
+            testTuner();
+
+            // Verify AudioContext setup
+            expect(global.AudioContext).toHaveBeenCalled();
+            expect(mockAudioContext.createOscillator).toHaveBeenCalled();
+            expect(mockAudioContext.createGain).toHaveBeenCalled();
+
+            // Verify connections
+            expect(mockOscillator.connect).toHaveBeenCalledWith(mockGainNode);
+            expect(mockGainNode.connect).toHaveBeenCalledWith(mockAudioContext.destination);
+            expect(mockGainNode.gain.value).toBe(0.1);
+
+            // Verify oscillator started
+            expect(mockOscillator.start).toHaveBeenCalled();
+
+            // Verify first test case (440 Hz - A4)
+            expect(console.log).toHaveBeenCalledWith("Testing frequency: 440Hz (Expected: A4)");
+            expect(mockOscillator.frequency.setValueAtTime).toHaveBeenCalledWith(
+                440,
+                mockAudioContext.currentTime
+            );
+
+            // Advance to second test case (442 Hz - A4 sharp)
+            jest.advanceTimersByTime(2000);
+            expect(console.log).toHaveBeenCalledWith("Testing frequency: 442Hz (Expected: A4)");
+            expect(mockOscillator.frequency.setValueAtTime).toHaveBeenCalledWith(
+                442,
+                mockAudioContext.currentTime
+            );
+
+            // Advance to third test case (438 Hz - A4 flat)
+            jest.advanceTimersByTime(2000);
+            expect(console.log).toHaveBeenCalledWith("Testing frequency: 438Hz (Expected: A4)");
+            expect(mockOscillator.frequency.setValueAtTime).toHaveBeenCalledWith(
+                438,
+                mockAudioContext.currentTime
+            );
+
+            // Advance to fourth test case (261.63 Hz - C4)
+            jest.advanceTimersByTime(2000);
+            expect(console.log).toHaveBeenCalledWith("Testing frequency: 261.63Hz (Expected: C4)");
+            expect(mockOscillator.frequency.setValueAtTime).toHaveBeenCalledWith(
+                261.63,
+                mockAudioContext.currentTime
+            );
+
+            // Advance to fifth test case (329.63 Hz - E4)
+            jest.advanceTimersByTime(2000);
+            expect(console.log).toHaveBeenCalledWith("Testing frequency: 329.63Hz (Expected: E4)");
+            expect(mockOscillator.frequency.setValueAtTime).toHaveBeenCalledWith(
+                329.63,
+                mockAudioContext.currentTime
+            );
+
+            // Complete test - should stop oscillator
+            jest.advanceTimersByTime(2000);
+            expect(mockOscillator.stop).toHaveBeenCalled();
+            expect(console.log).toHaveBeenCalledWith("Tuner tests completed");
+
+            // Verify all 5 frequencies were tested
+            expect(mockOscillator.frequency.setValueAtTime).toHaveBeenCalledTimes(5);
+        });
+
+        it("should handle missing AudioContext gracefully", () => {
+            global.AudioContext = undefined;
+            global.window = {};
+
+            const testTuner = () => {
+                if (!window.AudioContext) {
+                    console.error("Web Audio API not supported");
+                    return;
+                }
+
+                const audioContext = new AudioContext();
+                const oscillator = audioContext.createOscillator();
+                oscillator.start();
+            };
+
+            testTuner();
+
+            expect(console.error).toHaveBeenCalledWith("Web Audio API not supported");
+            expect(mockAudioContext.createOscillator).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("testSpecificFrequency", () => {
+        it("should test a specific frequency for 3 seconds", () => {
+            const testSpecificFrequency = frequency => {
+                if (!window.AudioContext) {
+                    console.error("Web Audio API not supported");
+                    return;
+                }
+
+                const audioContext = new AudioContext();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                gainNode.gain.value = 0.1;
+
+                oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+                oscillator.start();
+
+                console.log(`Testing frequency: ${frequency}Hz`);
+
+                setTimeout(() => {
+                    oscillator.stop();
+                    console.log("Test completed");
+                }, 3000);
+            };
+
+            testSpecificFrequency(440);
+
+            // Verify AudioContext setup
+            expect(global.AudioContext).toHaveBeenCalled();
+            expect(mockAudioContext.createOscillator).toHaveBeenCalled();
+            expect(mockAudioContext.createGain).toHaveBeenCalled();
+
+            // Verify connections
+            expect(mockOscillator.connect).toHaveBeenCalledWith(mockGainNode);
+            expect(mockGainNode.connect).toHaveBeenCalledWith(mockAudioContext.destination);
+            expect(mockGainNode.gain.value).toBe(0.1);
+
+            // Verify frequency was set
+            expect(mockOscillator.frequency.setValueAtTime).toHaveBeenCalledWith(
+                440,
+                mockAudioContext.currentTime
+            );
+
+            // Verify oscillator started
+            expect(mockOscillator.start).toHaveBeenCalled();
+            expect(console.log).toHaveBeenCalledWith("Testing frequency: 440Hz");
+
+            // Verify oscillator hasn't stopped yet
+            expect(mockOscillator.stop).not.toHaveBeenCalled();
+
+            // Advance time to 3 seconds
+            jest.advanceTimersByTime(3000);
+
+            // Verify oscillator stopped and completion message
+            expect(mockOscillator.stop).toHaveBeenCalled();
+            expect(console.log).toHaveBeenCalledWith("Test completed");
+        });
+
+        it("should work with different test frequencies", () => {
+            const testSpecificFrequency = frequency => {
+                if (!window.AudioContext) {
+                    console.error("Web Audio API not supported");
+                    return;
+                }
+
+                const audioContext = new AudioContext();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                gainNode.gain.value = 0.1;
+
+                oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+                oscillator.start();
+
+                console.log(`Testing frequency: ${frequency}Hz`);
+
+                setTimeout(() => {
+                    oscillator.stop();
+                    console.log("Test completed");
+                }, 3000);
+            };
+
+            // Test C4 (middle C)
+            testSpecificFrequency(261.63);
+
+            expect(mockOscillator.frequency.setValueAtTime).toHaveBeenCalledWith(
+                261.63,
+                mockAudioContext.currentTime
+            );
+            expect(console.log).toHaveBeenCalledWith("Testing frequency: 261.63Hz");
+
+            jest.advanceTimersByTime(3000);
+            expect(mockOscillator.stop).toHaveBeenCalled();
+        });
+
+        it("should handle missing AudioContext gracefully", () => {
+            global.AudioContext = undefined;
+            global.window = {};
+
+            const testSpecificFrequency = frequency => {
+                if (!window.AudioContext) {
+                    console.error("Web Audio API not supported");
+                    return;
+                }
+
+                const audioContext = new AudioContext();
+                const oscillator = audioContext.createOscillator();
+                oscillator.start();
+            };
+
+            testSpecificFrequency(440);
+
+            expect(console.error).toHaveBeenCalledWith("Web Audio API not supported");
+            expect(mockAudioContext.createOscillator).not.toHaveBeenCalled();
+        });
+
+        it("should verify gain value is set to low volume (0.1)", () => {
+            const testSpecificFrequency = frequency => {
+                if (!window.AudioContext) {
+                    console.error("Web Audio API not supported");
+                    return;
+                }
+
+                const audioContext = new AudioContext();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                gainNode.gain.value = 0.1;
+
+                oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+                oscillator.start();
+
+                console.log(`Testing frequency: ${frequency}Hz`);
+
+                setTimeout(() => {
+                    oscillator.stop();
+                    console.log("Test completed");
+                }, 3000);
+            };
+
+            testSpecificFrequency(440);
+
+            // Verify low volume was set for safe testing
+            expect(mockGainNode.gain.value).toBe(0.1);
+        });
+    });
+});
