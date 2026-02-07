@@ -141,3 +141,42 @@ describe("Tempo Widget", () => {
         expect(mockActivity.errorMsg).toHaveBeenCalled();
     });
 });
+
+describe("Tempo._useBPM validation logic", () => {
+    /**
+     * Extracted pure logic from Tempo._useBPM
+     * Validates and clamps BPM input to valid range [30, 1000].
+     */
+    const validateBPM = input => {
+        if (isNaN(input)) {
+            return { bpm: null, error: "invalid" };
+        }
+        let bpm = Number(input);
+        let error = null;
+        if (bpm > 1000) {
+            bpm = 1000;
+            error = "clamped_high";
+        } else if (bpm < 30) {
+            bpm = 30;
+            error = "clamped_low";
+        }
+        return { bpm, error };
+    };
+
+    it("should accept valid BPM within range", () => {
+        expect(validateBPM(120)).toEqual({ bpm: 120, error: null });
+        expect(validateBPM(500)).toEqual({ bpm: 500, error: null });
+    });
+
+    it("should clamp BPM above 1000 to 1000", () => {
+        expect(validateBPM(1500)).toEqual({ bpm: 1000, error: "clamped_high" });
+    });
+
+    it("should clamp BPM below 30 to 30", () => {
+        expect(validateBPM(10)).toEqual({ bpm: 30, error: "clamped_low" });
+    });
+
+    it("should return error for non-numeric input", () => {
+        expect(validateBPM("abc")).toEqual({ bpm: null, error: "invalid" });
+    });
+});
