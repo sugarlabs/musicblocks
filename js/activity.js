@@ -1745,19 +1745,26 @@ class Activity {
             }
             async function recordScreenWithTools() {
                 flag = 1;
-                return await navigator.mediaDevices.getDisplayMedia({
-                    preferCurrentTab: "True",
-                    systemAudio: "include",
-                    audio: "True",
-                    video: { mediaSource: "tab" },
-                    bandwidthProfile: {
-                        video: {
-                            clientTrackSwitchOffControl: "auto",
-                            contentPreferencesMode: "auto"
-                        }
-                    },
-                    preferredVideoCodecs: "auto"
-                });
+                
+                try {
+                    return await navigator.mediaDevices.getDisplayMedia({
+                        preferCurrentTab: "True",
+                        systemAudio: "include",
+                        audio: "True",
+                        video: { mediaSource: "tab" },
+                        bandwidthProfile: {
+                            video: {
+                                clientTrackSwitchOffControl: "auto",
+                                contentPreferencesMode: "auto"
+                            }
+                        },
+                        preferredVideoCodecs: "auto"
+                    });
+                } catch (error) {
+                    console.error("Screen capture failed:", error);
+                    flag = 0;
+                    throw error;
+                }
             }
 
             
@@ -1877,31 +1884,40 @@ class Activity {
              */
             function recording() {
                 start.addEventListener("click", async function handler() {
-                    const stream = await recordScreen();
-                    const mimeType = "video/webm";
-                    mediaRecorder = createRecorder(stream, mimeType);
-                    if (flag == 1) {
-                        this.removeEventListener("click", handler);
-                        // Add stop handler
-                        start.addEventListener("click", function stopHandler() {
-                            if (mediaRecorder && mediaRecorder.state === "recording") {
-                                mediaRecorder.stop();                                mediaRecorder = new MediaRecorder(stream);  // ✅ Correct - no "const"
-                                recInside.classList.remove("blink");
-                                flag = 0;
-                                // Clean up stream
-                                if (currentStream) {
-                                    currentStream.getTracks().forEach(track => track.stop());
+                    try {
+                        const stream = await recordScreen();
+                        const mimeType = "video/webm";
+                        mediaRecorder = createRecorder(stream, mimeType);
+                        if (flag == 1) {
+                            this.removeEventListener("click", handler);
+                            // Add stop handler
+                            start.addEventListener("click", function stopHandler() {
+                                if (mediaRecorder && mediaRecorder.state === "recording") {
+                                    mediaRecorder.stop();
+                                    mediaRecorder = new MediaRecorder(stream);  
+                                    recInside.classList.remove("blink");
+                                    flag = 0;
+                                    // Clean up stream
+                                    if (currentStream) {
+                                        currentStream.getTracks().forEach(track => track.stop());
+                                    }
+                                    if (audioDestination && audioDestination.stream) {
+                                        audioDestination.stream.getTracks().forEach(track => track.stop());
+                                    }
                                 }
-                                if (audioDestination && audioDestination.stream) {
-                                    audioDestination.stream.getTracks().forEach(track => track.stop());
-                                }
-                            }
-                            this.removeEventListener("click", stopHandler);
-                            // Re-enable recording for next time
-                            recording();
-                        });
+                                this.removeEventListener("click", stopHandler);
+                                // Re-enable recording for next time
+                                recording();
+                            });
+                        }
+                        recInside.setAttribute("fill", "red");
+                    } catch (error) {
+                        console.error("Recording failed:", error);
+                        that.textMsg(_("Recording failed: ") + error.message);
+                        flag = 0;
+                        // Re-enable recording button
+                        recording();
                     }
-                    recInside.setAttribute("fill", "red");
                 });
             }
 
