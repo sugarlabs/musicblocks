@@ -10,6 +10,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 //
+// trigger CI
 // Note: This code is inspired by the Python Turtle Blocks project
 // (https://github.com/walterbender/turtleart), but implemented from
 // scratch. -- Walter Bender, October 2014.
@@ -157,7 +158,8 @@ let MYDEFINES = [
     "activity/blocks/EnsembleBlocks",
     "widgets/widgetWindows",
     "widgets/statistics",
-    "widgets/jseditor"
+    "widgets/jseditor",
+    "WorkspaceStorage"
 ];
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -7021,6 +7023,29 @@ class Activity {
             }
 
             this.save = new SaveInterface(this);
+
+            // Persistent Workspace Storage
+            try {
+                this.workspaceStorage = new WorkspaceStorage(this);
+                await this.workspaceStorage.init();
+
+                // Try to load last workspace
+                const lastWorkspace = await this.workspaceStorage.doLoadWorkspace();
+                if (lastWorkspace && lastWorkspace !== "[]" && this.blocks.blockList.length <= 1) {
+                    try {
+                        const obj = JSON.parse(lastWorkspace);
+                        this.blocks.loadNewBlocks(obj);
+                        this.refreshCanvas();
+                    } catch (e) {
+                        console.error("Failed to restore last workspace", e);
+                    }
+                }
+            } catch (e) {
+                console.warn(
+                    "WorkspaceStorage failed to initialize. Persistence will be disabled.",
+                    e
+                );
+            }
 
             this.toolbar = new Toolbar();
             this.toolbar.init(this);

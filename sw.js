@@ -8,8 +8,28 @@
 
 const CACHE = "pwabuilder-precache";
 const precacheFiles = [
-    /* Add an array of files to precache for your app */
-    "./index.html"
+    "./index.html",
+    "./js/WorkspaceStorage.js",
+    "./css/activities.css",
+    "./js/activity.js",
+    "./js/loader.js",
+    "./lib/require.js",
+    "./lib/jquery-3.7.1.min.js",
+    "./lib/jquery-ui.js",
+    "./lib/materialize.min.js",
+    "./lib/webL10n.js",
+    "./lib/Tone.js",
+    "./lib/midi.js",
+    "./lib/jquery.ruler.js",
+    "./lib/modernizr-2.6.2.min.js",
+    "./lib/raphael.min.js",
+    "./lib/wheelnav.js",
+    "./lib/abc.min.js",
+    "./lib/codejar/codejar.min.js",
+    "./lib/codejar/highlight.pack.js",
+    "./lib/i18next.min",
+    "./lib/i18nextHttpBackend.min",
+    "./images/logo.svg"
 ];
 
 self.addEventListener("install", function (event) {
