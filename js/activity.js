@@ -1108,8 +1108,10 @@ class Activity {
                 const numColumns =
                     screenWidth <= 320 ? 1 : Math.floor(screenWidth / minColumnWidth);
 
+        
                 const baseColumnSpacing = screenWidth / numColumns;
                 const columnSpacing = baseColumnSpacing * 1.2;
+
 
                 const initialY = Math.floor(toppos * this.turtleBlocksScale);
                 const baseVerticalSpacing = Math.floor(20 * this.turtleBlocksScale);
@@ -1265,20 +1267,6 @@ class Activity {
             this.sendAllToTrash(true, true);
         };
 
-        const extractSVGInner = svgString => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(svgString, "image/svg+xml");
-            const svgEl = doc.querySelector("svg");
-            if (!svgEl) return "";
-
-            // Remove drop shadow filters safely
-            svgEl.querySelectorAll("[filter]").forEach(el => {
-                el.removeAttribute("filter");
-            });
-
-            return svgEl.innerHTML;
-        };
-
         /**
          * @returns {SVG} returns SVG of blocks
          */
@@ -1302,9 +1290,11 @@ class Activity {
                     yMax = this.blocks.blockList[i].container.y + this.blocks.blockList[i].height;
                 }
 
-                const rawSVG = this.blocks.blockList[i].collapsed
-                    ? this.blocks.blockCollapseArt[i]
-                    : this.blocks.blockArt[i];
+                if (this.blocks.blockList[i].collapsed) {
+                    parts = this.blocks.blockCollapseArt[i].split("><");
+                } else {
+                    parts = this.blocks.blockArt[i].split("><");
+                }
 
                 if (this.blocks.blockList[i].isCollapsible()) {
                     svg += "<g>";
@@ -1316,13 +1306,7 @@ class Activity {
                     ", " +
                     this.blocks.blockList[i].container.y +
                     ')">';
-
-                if (!SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
-                    svg += extractSVGInner(rawSVG);
-                } else {
-                    // Keep existing fragile logic for now
-                    parts = rawSVG.split("><");
-
+                if (SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
                     for (let p = 1; p < parts.length; p++) {
                         // FIXME: This is fragile.
                         if (p === 1) {
@@ -1338,6 +1322,23 @@ class Activity {
                             } else {
                                 svg += parts[p] + ">" + this.blocks.blockList[i].value + "<";
                             }
+                        } else if (p === parts.length - 2) {
+                            svg += parts[p] + ">";
+                        } else if (p === parts.length - 1) {
+                            // skip final </svg>
+                        } else {
+                            svg += parts[p] + "><";
+                        }
+                    }
+                } else {
+                    for (let p = 1; p < parts.length; p++) {
+                        // FIXME: This is fragile.
+                        if (p === 1) {
+                            svg += "<" + parts[p] + "><";
+                        } else if (p === 2) {
+                            // skip filter
+                        } else if (p === 3) {
+                            svg += parts[p].replace("filter:url(#dropshadow);", "") + "><";
                         } else if (p === parts.length - 2) {
                             svg += parts[p] + ">";
                         } else if (p === parts.length - 1) {
@@ -1694,6 +1695,12 @@ class Activity {
                 return; // Exit the function if execution is already in progress
             }
 
+            if (!activity || typeof activity._doRecordButton !== 'function') {
+                console.warn('doRecordButton called without valid activity context');
+                isExecuting = false;
+                return;
+            }
+
             isExecuting = true; // Set the flag to indicate execution has started
             activity._doRecordButton();
         };
@@ -1703,34 +1710,78 @@ class Activity {
          * @private
          */
         this._doRecordButton = () => {
+            const that = this;
             const start = document.getElementById("record"),
                 recInside = document.getElementById("rec_inside");
             let mediaRecorder;
             var clickEvent = new Event("click");
             let flag = 0;
+            let currentStream = null;
+            let audioDestination = null;
 
             /**
              * Records the screen using the browser's media devices API.
              * @returns {Promise<MediaStream>} A promise resolving to the recorded media stream.
              */
-            async function recordScreen() {
-                flag = 1;
-                return await navigator.mediaDevices.getDisplayMedia({
-                    preferCurrentTab: "True",
-                    systemAudio: "include",
-                    audio: "True",
-                    video: { mediaSource: "tab" },
-                    bandwidthProfile: {
-                        video: {
-                            clientTrackSwitchOffControl: "auto",
-                            contentPreferencesMode: "auto"
-                        }
-                    },
-                    preferredVideoCodecs: "auto"
-                });
+            
+            async function recordScreen(){
+                const mode = localStorage.getItem("musicBlocksRecordMode");
+                
+                if (mode === "canvas") {
+                    return await recordCanvasOnly();
+                }
+                else {
+                    return await recordScreenWithTools();
+                }
             }
 
-            const that = this;
+            async function recordCanvasOnly() {
+                flag =1;
+                const canvas = document.getElementById("myCanvas");
+                if (!canvas) {
+                    throw new Error("Canvas element not found");
+                }
+                
+                const canvasStream = canvas.captureStream(30);
+
+                const Tone = that.logo.synth.tone;
+                if (Tone && Tone.context) {
+                    const dest = Tone.context.createMediaStreamDestination();
+                    Tone.Destination.connect(dest);
+                    audioDestination = dest;
+                    const audioTrack = dest.stream.getAudioTracks()[0];
+                    if (audioTrack){
+                        canvasStream.addTrack(audioTrack);
+                    }
+                }
+                currentStream = canvasStream;
+                return canvasStream;
+            }
+            async function recordScreenWithTools() {
+                flag = 1;
+                
+                try {
+                    return await navigator.mediaDevices.getDisplayMedia({
+                        preferCurrentTab: "True",
+                        systemAudio: "include",
+                        audio: "True",
+                        video: { mediaSource: "tab" },
+                        bandwidthProfile: {
+                            video: {
+                                clientTrackSwitchOffControl: "auto",
+                                contentPreferencesMode: "auto"
+                            }
+                        },
+                        preferredVideoCodecs: "auto"
+                    });
+                } catch (error) {
+                    console.error("Screen capture failed:", error);
+                    flag = 0;
+                    throw error;
+                }
+            }
+
+            
 
             /**
              * Saves the recorded chunks as a video file.
@@ -1739,10 +1790,35 @@ class Activity {
             function saveFile(recordedChunks) {
                 flag = 1;
                 recInside.classList.remove("blink");
+                // Prevent zero-byte files
+                if (!recordedChunks || recordedChunks.length === 0) {
+                    alert(_("Recorded file is empty. File not saved."));
+                    flag = 0;
+                    recording();
+                    doRecordButton();
+                    return;
+                }
                 const blob = new Blob(recordedChunks, {
                     type: "video/webm"
                 });
-
+                if (blob.size === 0) {
+                    alert(_("Recorded file is empty. File not saved."));
+                    flag = 0;
+                    recording();
+                    doRecordButton();
+                    return;
+                }
+                // Clean up stream after recording
+                if (currentStream) {
+                    currentStream.getTracks().forEach(track => track.stop());
+                    currentStream = null;
+                }
+                if (audioDestination && audioDestination.stream) {
+                    audioDestination.stream.getTracks().forEach(track => track.stop());
+                    audioDestination = null;
+                }
+                mediaRecorder = null;
+                // Prompt to save file
                 const filename = window.prompt(_("Enter file name"));
                 if (filename === null || filename.trim() === "") {
                     alert(_("File save canceled"));
@@ -1751,20 +1827,18 @@ class Activity {
                     doRecordButton();
                     return; // Exit without saving the file
                 }
-
                 const downloadLink = document.createElement("a");
                 downloadLink.href = URL.createObjectURL(blob);
                 downloadLink.download = `${filename}.webm`;
-
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
                 URL.revokeObjectURL(blob);
                 document.body.removeChild(downloadLink);
                 flag = 0;
-                // eslint-disable-next-line no-use-before-define
+                // Allow multiple recordings
                 recording();
                 doRecordButton();
-                that.textMsg(_("Click on stop saving"));
+                that.textMsg(_("Recording stopped. File saved."));
             }
             /**
              * Stops the recording process.
@@ -1786,6 +1860,7 @@ class Activity {
             function createRecorder(stream, mimeType) {
                 flag = 1;
                 recInside.classList.add("blink");
+                that.textMsg(_("Recording started. Click stop to finish."));
                 start.removeEventListener("click", createRecorder, true);
                 let recordedChunks = [];
                 const mediaRecorder = new MediaRecorder(stream);
@@ -1823,16 +1898,40 @@ class Activity {
              */
             function recording() {
                 start.addEventListener("click", async function handler() {
-                    const stream = await recordScreen();
-                    const mimeType = "video/webm";
-                    mediaRecorder = createRecorder(stream, mimeType);
-                    if (flag == 1) {
-                        this.removeEventListener("click", handler);
+                    try {
+                        const stream = await recordScreen();
+                        const mimeType = "video/webm";
+                        mediaRecorder = createRecorder(stream, mimeType);
+                        if (flag == 1) {
+                            this.removeEventListener("click", handler);
+                            // Add stop handler
+                            start.addEventListener("click", function stopHandler() {
+                                if (mediaRecorder && mediaRecorder.state === "recording") {
+                                    mediaRecorder.stop();
+                                    mediaRecorder = new MediaRecorder(stream);  
+                                    recInside.classList.remove("blink");
+                                    flag = 0;
+                                    // Clean up stream
+                                    if (currentStream) {
+                                        currentStream.getTracks().forEach(track => track.stop());
+                                    }
+                                    if (audioDestination && audioDestination.stream) {
+                                        audioDestination.stream.getTracks().forEach(track => track.stop());
+                                    }
+                                }
+                                this.removeEventListener("click", stopHandler);
+                                // Re-enable recording for next time
+                                recording();
+                            });
+                        }
+                        recInside.setAttribute("fill", "red");
+                    } catch (error) {
+                        console.error("Recording failed:", error);
+                        that.textMsg(_("Recording failed: ") + error.message);
+                        flag = 0;
+                        // Re-enable recording button
+                        recording();
                     }
-                    const node = document.createElement("p");
-                    node.textContent = "Started recording";
-                    document.body.appendChild(node);
-                    recInside.setAttribute("fill", "red");
                 });
             }
 
@@ -1840,13 +1939,6 @@ class Activity {
             if (flag == 0 && isExecuting) {
                 recording();
                 start.dispatchEvent(clickEvent);
-                flag = 1;
-            }
-
-            // Stop recording if already executing
-            if (flag == 1 && isExecuting) {
-                start.addEventListener("click", stopRec);
-                flag = 0;
             }
         };
 
@@ -1983,6 +2075,11 @@ class Activity {
             // Regenerate palettes
             if (activity.regeneratePalettes) {
                 activity.regeneratePalettes();
+            }
+
+            // Update record button and dropdown visibility
+            if (activity.toolbar && typeof activity.toolbar.updateRecordButton === 'function') {
+                activity.toolbar.updateRecordButton(() => doRecordButton(activity));
             }
 
             // Force immediate canvas refresh
@@ -7048,7 +7145,7 @@ class Activity {
             this.toolbar.renderHelpIcon(showHelp);
             this.toolbar.renderModeSelectIcon(
                 doSwitchMode,
-                doRecordButton,
+                () => doRecordButton(this),
                 doAnalytics,
                 doOpenPlugin,
                 deletePlugin,

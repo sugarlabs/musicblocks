@@ -20,8 +20,8 @@
     <link rel="preload" href="https://fonts.googleapis.com/icon?family=Material+Icons" as="style"
         onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="fonts/material-icons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="css/activities.css?v=fixed" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="dist/css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/activities.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="dist/css/style.css?v=2" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/keyboard.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/windows.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="lib/materialize-iso.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -337,8 +337,9 @@
                             <li>
                                 <a id="stop" class="left tooltipped"><i class="material-icons main">stop</i></a>
                             </li>
-                            <li>
-                                <a id="record" class="left tooltipped" data-tooltip="Record"></a>
+                            <li style="display: flex; align-items: center;">
+                                <a id="record" class="left tooltipped" data-position="bottom" data-tooltip="Record"></a>
+                                <a id="recordDropdownArrow" class="left dropdown-trigger" data-activates="recorddropdown" style="margin-left: -5px; padding: 0; font-size: 28px;"></a>
                             </li>
                         </ul>
 
@@ -496,6 +497,11 @@
                     <li><a id="save-mxml"></a></li>
                     <li><a id="save-blockartwork-svg"></a></li>
                     <li><a id="save-blockartwork-png"></a></li>
+                </ul>
+
+                <ul id="recorddropdown" class="dropdown-content">
+                    <li><a id="record-with-menus">Record canvas and toolbars</a></li>
+                    <li><a id="record-canvas-only">Record canvas only</a></li>
                 </ul>
 
                 <ul id="languagedropdown" class="dropdown-content">
