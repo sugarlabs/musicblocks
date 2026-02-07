@@ -85,18 +85,12 @@ function setupProgramBlocks(activity) {
             xmlHttp.send();
 
             if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
-                // eslint-disable-next-line no-console
-                console.debug(xmlHttp.responseText);
                 try {
                     data = JSON.parse(xmlHttp.responseText);
                 } catch (e) {
-                    // eslint-disable-next-line no-console
-                    console.debug(e);
                     activity.errorMsg(_("Error parsing JSON data:") + e);
                 }
             } else if (xmlHttp.readyState === 4 && xmlHttp.status !== 200) {
-                // eslint-disable-next-line no-console
-                console.debug("fetched the wrong page or network error...");
                 activity.errorMsg(_("404: Page not found"));
                 return;
             } else {
@@ -112,8 +106,6 @@ function setupProgramBlocks(activity) {
                 logo.turtleHeaps[name] = data;
             } catch (e) {
                 logo.turtleHeaps[name] = oldHeap;
-                // eslint-disable-next-line no-console
-                console.debug(e);
             }
         }
     }
@@ -993,8 +985,6 @@ function setupProgramBlocks(activity) {
             if (activity.blocks.blockList[args[0]].name === "start") {
                 const thisTurtle = activity.blocks.blockList[args[0]].value;
                 const tur = activity.turtles.ithTurtle(thisTurtle);
-                // eslint-disable-next-line no-console
-                console.debug("run start " + thisTurtle);
 
                 logo.initTurtle(thisTurtle);
                 tur.queue = [];
@@ -1057,29 +1047,21 @@ function setupProgramBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             if (args.length < 3) {
-                // eslint-disable-next-line no-console
-                console.debug(args.length + " < 3");
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
             if (args[0] < 0 || args[0] > activity.blocks.blockList.length - 1) {
-                // eslint-disable-next-line no-console
-                console.debug(args[0] + " > " + activity.blocks.blockList.length - 1);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
             if (args[0] === args[2]) {
-                // eslint-disable-next-line no-console
-                console.debug(args[0] + " == " + args[2]);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
             if (args[2] < 0 || args[2] > activity.blocks.blockList.length - 1) {
-                // eslint-disable-next-line no-console
-                console.debug(args[2] + " > " + activity.blocks.blockList.length - 1);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
@@ -1091,8 +1073,6 @@ function setupProgramBlocks(activity) {
                 args[1] < 1 ||
                 args[1] > activity.blocks.blockList[args[0]].connections.length - 1
             ) {
-                // eslint-disable-next-line no-console
-                console.debug(args[1] + " out of bounds");
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
@@ -1260,21 +1240,15 @@ function setupProgramBlocks(activity) {
                     [8, "hidden", 0, 0, [0, null]]
                 ];
                 activity.blocks.loadNewBlocks(newNote);
-                // eslint-disable-next-line no-console
-                console.debug("BLOCKNUMBER " + blockNumber);
                 return blockNumber;
             } else if (name === _("start")) {
                 const newBlock = [[0, "start", x, y, [null, null, null]]];
                 activity.blocks.loadNewBlocks(newBlock);
-                // eslint-disable-next-line no-console
-                console.debug("BLOCKNUMBER " + blockNumber);
                 return blockNumber;
             } else if (name === _("silence")) {
                 // FIXME: others too
                 const newBlock = [[0, "rest2", x, y, [null, null]]];
                 activity.blocks.loadNewBlocks(newBlock);
-                // eslint-disable-next-line no-console
-                console.debug("BLOCKNUMBER " + blockNumber);
                 return blockNumber;
             } else {
                 const obj = activity.blocks.palettes.getProtoNameAndPalette(name);
@@ -1282,8 +1256,6 @@ function setupProgramBlocks(activity) {
                 const protoName = obj[2];
                 if (protoblk === null) {
                     activity.errorMsg(_("Cannot find block") + " " + name);
-                    // eslint-disable-next-line no-console
-                    console.debug("Cannot find block " + name);
                     return 0;
                 } else {
                     const newBlock = [[0, protoName, x, y, [null]]];
@@ -1329,8 +1301,6 @@ function setupProgramBlocks(activity) {
                     }
 
                     activity.blocks.loadNewBlocks(newBlock);
-                    // eslint-disable-next-line no-console
-                    console.debug("BLOCKNUMBER " + blockNumber);
                     return blockNumber;
                 }
             }
