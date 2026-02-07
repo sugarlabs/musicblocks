@@ -138,3 +138,59 @@ describe("platformstyle", () => {
         expect(global.showMaterialHighlight).not.toHaveBeenCalled();
     });
 });
+
+/**
+ * @author Alok Dangre
+ * @copyright 2026 Alok Dangre
+ */
+describe("platform detection computed properties", () => {
+    /**
+     * Pure logic for computing androidWebkit and FFOS flags.
+     */
+    const computePlatformFlags = userAgent => {
+        const android = /Android/i.test(userAgent);
+        const FF = /Firefox/i.test(userAgent);
+        const mobile = /Mobi/i.test(userAgent);
+        const tablet = /Tablet/i.test(userAgent);
+
+        return {
+            android,
+            FF,
+            mobile,
+            tablet,
+            androidWebkit: android && !FF,
+            FFOS: FF && (mobile || tablet) && !android
+        };
+    };
+
+    it("should detect androidWebkit for Android Chrome", () => {
+        const result = computePlatformFlags("Mozilla/5.0 Android Chrome/90");
+        expect(result.androidWebkit).toBe(true);
+        expect(result.FFOS).toBe(false);
+    });
+
+    it("should not set androidWebkit for Android Firefox", () => {
+        const result = computePlatformFlags("Mozilla/5.0 Android Firefox/88");
+        expect(result.androidWebkit).toBe(false);
+        expect(result.FFOS).toBe(false);
+    });
+
+    it("should detect FFOS for Firefox mobile non-Android", () => {
+        const result = computePlatformFlags("Mozilla/5.0 Firefox Mobi");
+        expect(result.FFOS).toBe(true);
+        expect(result.androidWebkit).toBe(false);
+    });
+
+    it("should not detect FFOS for desktop Firefox", () => {
+        const result = computePlatformFlags("Mozilla/5.0 Firefox/88.0");
+        expect(result.FFOS).toBe(false);
+    });
+
+    it("should handle empty user agent", () => {
+        const result = computePlatformFlags("");
+        expect(result.android).toBe(false);
+        expect(result.FF).toBe(false);
+        expect(result.androidWebkit).toBe(false);
+        expect(result.FFOS).toBe(false);
+    });
+});
