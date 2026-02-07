@@ -661,3 +661,7 @@ class MeterWidget {
         }
     }
 }
+
+if (typeof module !== "undefined") {
+    module.exports = MeterWidget;
+}

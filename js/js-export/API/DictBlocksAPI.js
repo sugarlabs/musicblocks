@@ -54,3 +54,6 @@ class DictBlocksAPI {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = DictBlocksAPI;
 }
+if (typeof window !== "undefined") {
+    window.DictBlocksAPI = DictBlocksAPI;
+}

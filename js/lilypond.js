@@ -58,7 +58,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
         // Lilypond notes use is for sharp, es for flat,
         // , and ' for shifts in octave.
         // Also, notes must be lowercase.
-        // And the octave bounday is at C, not A.
+        // And the octave boundary is at C, not A.
 
         // Convert frequencies here.
         if (typeof note === "number") {

@@ -344,3 +344,6 @@ class StatusMatrix {
         this.activity.logo.updatingStatusMatrix = false;
     }
 }
+if (typeof module !== "undefined") {
+    module.exports = StatusMatrix;
+}
