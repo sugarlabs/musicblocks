@@ -2549,9 +2549,9 @@ const getDrumName = name => {
 
     for (let drum = 0; drum < DRUMNAMES.length; drum++) {
         if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase()) {
-            return DRUMNAMES[drum][0];
+            return _(DRUMNAMES[drum][0]);
         } else if (DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
-            return DRUMNAMES[drum][1];
+            return _(DRUMNAMES[drum][0]);
         }
     }
 
@@ -2689,17 +2689,13 @@ const getNoiseName = name => {
     }
 
     for (let i = 0; i < NOISENAMES.length; i++) {
-        if (NOISENAMES[i][1] === name) {
-            if (NOISENAMES[i][0] != "") {
-                return NOISENAMES[i][0];
-            } else {
-                return NOISENAMES[i][1];
-            }
+        if (NOISENAMES[i][1].toLowerCase() === name.toLowerCase()) {
+            return _(NOISENAMES[i][0]);
         }
     }
 
     // console.debug(name + " not found in NOISENAMES");
-    return DEFAULTNOISE;
+    return null;
 };
 
 /**
@@ -2762,17 +2758,13 @@ const getVoiceName = name => {
     }
 
     for (let i = 0; i < VOICENAMES.length; i++) {
-        if (VOICENAMES[i][0] === name) {
-            if (VOICENAMES[i][0] != "") {
-                return VOICENAMES[i][0];
-            } else if (VOICENAMES[i][1] === name) {
-                return VOICENAMES[i][1];
-            }
+        if (VOICENAMES[i][0] === name || VOICENAMES[i][1] === name) {
+            return _(VOICENAMES[i][0]);
         }
     }
 
     // console.debug(name + " not found in VOICENAMES");
-    return DEFAULTVOICE;
+    return _(DEFAULTVOICE);
 };
 
 /**

@@ -24,7 +24,14 @@ const mockActivity = {
         languagePreference: "enUS",
         kanaPreference: null
     },
-    textMsg: jest.fn()
+    textMsg: jest.fn(),
+    toolbar: { init: jest.fn() },
+    regeneratePalettes: jest.fn(),
+    blocks: {
+        blockList: [],
+        updateBlockPositions: jest.fn()
+    },
+    refreshCanvas: jest.fn()
 };
 
 Object.defineProperty(global, "localStorage", {
@@ -39,6 +46,19 @@ document.querySelectorAll = jest.fn(() => []);
 
 global._ = jest.fn(str => str);
 
+// Mock i18next globally
+global.i18next = {
+    changeLanguage: jest.fn((lang, cb) => {
+        if (cb) cb(null);
+    }),
+    t: jest.fn(str => str),
+    language: "en"
+};
+
+// Mock window.history.pushState
+if (!window.history) window.history = {};
+window.history.pushState = jest.fn();
+
 describe("LanguageBox Class", () => {
     let languageBox;
 
@@ -47,11 +67,11 @@ describe("LanguageBox Class", () => {
         languageBox = new LanguageBox(mockActivity);
     });
 
-    it("should reload the window when OnClick is called", () => {
-        const reloadSpy = jest.spyOn(languageBox, "reload").mockImplementation(() => {});
+    it("should call hotSwapLanguage when OnClick is called", () => {
+        const hotSwapSpy = jest.spyOn(languageBox, "hotSwapLanguage").mockImplementation(() => {});
         languageBox.OnClick();
-        expect(reloadSpy).toHaveBeenCalled();
-        reloadSpy.mockRestore();
+        expect(hotSwapSpy).toHaveBeenCalled();
+        hotSwapSpy.mockRestore();
     });
 
     it("should display 'already set' message when the selected language is the same", () => {
@@ -66,39 +86,74 @@ describe("LanguageBox Class", () => {
         );
     });
 
-    it("should display the refresh message when a new language is selected", () => {
+    it("should call hotSwapLanguage when a new language is selected", () => {
         localStorage.getItem.mockReturnValue("ja");
-        mockActivity.textMsg.mockImplementation();
+        const hotSwapSpy = jest.spyOn(languageBox, "hotSwapLanguage").mockImplementation(() => {});
 
         languageBox._language = "enUS";
         languageBox.hide();
 
-        expect(mockActivity.textMsg).toHaveBeenCalledWith(
-            expect.stringContaining("Refresh your browser to change your language preference.")
-        );
+        expect(hotSwapSpy).toHaveBeenCalled();
+        hotSwapSpy.mockRestore();
     });
 
-    it("should display the correct message when hide is called for 'ja'", () => {
+    it("should call hotSwapLanguage when hide is called for 'ja'", () => {
         localStorage.getItem.mockReturnValue("enUS");
-        mockActivity.textMsg.mockImplementation();
+        const hotSwapSpy = jest.spyOn(languageBox, "hotSwapLanguage").mockImplementation(() => {});
 
         languageBox._language = "ja";
         languageBox.hide();
 
-        expect(mockActivity.textMsg).toHaveBeenCalledWith(
-            expect.stringContaining("言語を変えるには、ブラウザをこうしんしてください。")
-        );
+        expect(hotSwapSpy).toHaveBeenCalled();
+        hotSwapSpy.mockRestore();
     });
 
-    it("should attach click listeners to language links when hide is called", () => {
-        const mockLinks = [{ addEventListener: jest.fn() }, { addEventListener: jest.fn() }];
-        document.querySelectorAll.mockReturnValue(mockLinks);
+    it("should call i18next.changeLanguage when hotSwapLanguage is called", () => {
+        languageBox._language = "es";
+        languageBox.hotSwapLanguage();
 
+        expect(global.i18next.changeLanguage).toHaveBeenCalledWith("es", expect.any(Function));
+    });
+
+    it("should normalize Japanese language for i18next", () => {
+        languageBox._language = "ja-kanji";
+        languageBox.hotSwapLanguage();
+
+        expect(global.i18next.changeLanguage).toHaveBeenCalledWith("ja", expect.any(Function));
+    });
+
+    it("should refresh toolbar after language change", () => {
+        languageBox._language = "es";
+        languageBox.hotSwapLanguage();
+
+        expect(mockActivity.toolbar.init).toHaveBeenCalledWith(mockActivity);
+    });
+
+    it("should regenerate palettes after language change", () => {
+        languageBox._language = "es";
+        languageBox.hotSwapLanguage();
+
+        expect(mockActivity.regeneratePalettes).toHaveBeenCalled();
+    });
+
+    it("should refresh canvas after language change", () => {
+        languageBox._language = "es";
+        languageBox.hotSwapLanguage();
+
+        expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+    });
+
+    it("should save preference and call hotSwapLanguage when hide is called with a new language", () => {
+        localStorage.getItem.mockReturnValue("en");
+        const hotSwapSpy = jest.spyOn(languageBox, "hotSwapLanguage").mockImplementation(() => {});
+
+        languageBox._language = "es";
         languageBox.hide();
 
-        mockLinks.forEach(link => {
-            expect(link.addEventListener).toHaveBeenCalledWith("click", expect.any(Function));
-        });
+        expect(mockActivity.storage.languagePreference).toBe("es");
+        expect(localStorage.setItem).toHaveBeenCalledWith("languagePreference", "es");
+        expect(hotSwapSpy).toHaveBeenCalled();
+        hotSwapSpy.mockRestore();
     });
 
     // Test each language selection method
@@ -270,17 +325,18 @@ describe("LanguageBox Class", () => {
 
     // Test Japanese kana preference
     describe("Japanese kana handling", () => {
-        it("should display kana message when Japanese language is selected with kana preference", () => {
+        it("should call hotSwapLanguage when Japanese language is selected with kana preference", () => {
             localStorage.getItem.mockReturnValue("enUS");
             mockActivity.storage.kanaPreference = "kana";
-            mockActivity.textMsg.mockImplementation();
+            const hotSwapSpy = jest
+                .spyOn(languageBox, "hotSwapLanguage")
+                .mockImplementation(() => {});
 
             languageBox._language = "ja";
             languageBox.hide();
 
-            expect(mockActivity.textMsg).toHaveBeenCalledWith(
-                expect.stringContaining("げんごを かえるには、ブラウザを こうしんしてください。")
-            );
+            expect(hotSwapSpy).toHaveBeenCalled();
+            hotSwapSpy.mockRestore();
         });
     });
 });
