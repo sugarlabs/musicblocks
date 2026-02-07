@@ -3621,13 +3621,20 @@ const piemenuBlockContext = block => {
         docById("contextWheelDiv").style.display = "none";
     };
 
-    document.body.addEventListener("click", event => {
+    // Named function for proper cleanup
+    const hideContextWheelOnClick = event => {
         const wheelElement = document.getElementById("contextWheelDiv");
         const displayStyle = window.getComputedStyle(wheelElement).display;
         if (displayStyle === "block") {
             wheelElement.style.display = "none";
+            // Remove listener after hiding to prevent memory leak
+            document.body.removeEventListener("click", hideContextWheelOnClick);
         }
-    });
+    };
+
+    // Remove any existing listener before adding a new one
+    document.body.removeEventListener("click", hideContextWheelOnClick);
+    document.body.addEventListener("click", hideContextWheelOnClick);
 
     if (
         ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].includes(
