@@ -264,3 +264,52 @@ describe("Utility Functions (logic-only)", () => {
         });
     });
 });
+
+/**
+ * @author Alok Dangre
+ * @copyright 2026 Alok Dangre
+ */
+describe("format() function logic", () => {
+    /**
+     * Extracted pure logic from utils.js format function.
+     * Replaces {key} placeholders with values from data object.
+     */
+    const format = (str, data) => {
+        str = str.replace(/{([a-zA-Z0-9.]*)}/g, (match, name) => {
+            let x = data;
+            name.split(".").forEach(v => {
+                if (x === undefined) {
+                    return;
+                }
+                x = x[v];
+            });
+            return x === undefined ? "" : x;
+        });
+        return str;
+    };
+
+    it("should replace simple placeholders", () => {
+        const result = format("Hello {name}!", { name: "World" });
+        expect(result).toBe("Hello World!");
+    });
+
+    it("should replace multiple placeholders", () => {
+        const result = format("{greeting} {name}!", { greeting: "Hi", name: "User" });
+        expect(result).toBe("Hi User!");
+    });
+
+    it("should handle nested property access", () => {
+        const result = format("Name: {user.name}", { user: { name: "Alice" } });
+        expect(result).toBe("Name: Alice");
+    });
+
+    it("should replace undefined values with empty string", () => {
+        const result = format("Value: {missing}", { other: "data" });
+        expect(result).toBe("Value: ");
+    });
+
+    it("should handle empty data object", () => {
+        const result = format("Static text", {});
+        expect(result).toBe("Static text");
+    });
+});
