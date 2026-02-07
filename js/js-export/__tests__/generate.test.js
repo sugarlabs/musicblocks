@@ -304,8 +304,22 @@ describe("JSGenerate Class", () => {
         expect(warnSpy).toHaveBeenCalledWith('CANNOT PROCESS "badClamp" BLOCK');
         warnSpy.mockRestore();
     });
-
     test("should print complex stack trees with nested args and flows", () => {
+        JSGenerate.startTrees = [
+            [
+                ["block1", ["arg1", "subArg"], null],
+                ["block2", null, [["flow1Block", null, null]], [["flow2Block", null, null]]]
+            ]
+        ];
+        JSGenerate.actionTrees = [[["actionBlock", null, null]]];
+
+        JSGenerate.printStacksTree();
+        expect(console.log).toHaveBeenCalledWith(
+            expect.stringContaining("(arg1, subArg)"),
+            "background: mediumslateblue",
+            "background; none",
+            "color: dodgerblue"
+        );
         expect(console.log).toHaveBeenCalledWith(
             expect.stringContaining("** NEXTFLOW **"),
             "color: green"
@@ -315,7 +329,6 @@ describe("JSGenerate Class", () => {
             "background: green; color: white; font-weight: bold"
         );
     });
-
     test("should handle astring generation errors", () => {
         JSGenerate.AST = { type: "Program", body: [] };
         astring.generate
