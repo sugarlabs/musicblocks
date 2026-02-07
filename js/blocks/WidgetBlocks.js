@@ -1473,7 +1473,40 @@ function setupWidgetBlocks(activity) {
             logo.inMatrix = true;
 
             if (logo.phraseMaker === null) {
-                logo.phraseMaker = new PhraseMaker();
+                logo.phraseMaker = new PhraseMaker(activity, {
+                    _,
+                    platformColor,
+                    docById,
+                    MATRIXSOLFEHEIGHT,
+                    toFraction,
+                    Singer,
+                    SOLFEGECONVERSIONTABLE,
+                    slicePath,
+                    wheelnav,
+                    delayExecution,
+                    DEFAULTVOICE,
+                    getDrumName,
+                    MATRIXSOLFEWIDTH,
+                    getDrumIcon,
+                    noteIsSolfege,
+                    isCustomTemperament,
+                    i18nSolfege,
+                    getNote,
+                    DEFAULTDRUM,
+                    last,
+                    DRUMS,
+                    SHARP,
+                    FLAT,
+                    PREVIEWVOLUME,
+                    DEFAULTVOLUME,
+                    noteToFrequency,
+                    LCD,
+                    calcNoteValueToDisplay,
+                    NOTESYMBOLS,
+                    EIGHTHNOTEWIDTH,
+                    docBySelector,
+                    getTemperament
+                });
             }
             logo.phraseMaker.blockNo = blk;
 
@@ -1504,7 +1537,7 @@ function setupWidgetBlocks(activity) {
                     // Process queued up rhythms.
                     logo.phraseMaker.blockNo = blk;
                     logo.phraseMaker.sorted = false;
-                    logo.phraseMaker.init(activity);
+                    logo.phraseMaker.init();
 
                     for (let i = 0; i < logo.tupletRhythms.length; i++) {
                         // We have two cases: (1) notes in a tuplet;
