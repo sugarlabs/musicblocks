@@ -4,3 +4,4 @@ dist/
 build/
 *.min.js
 *.svg
+package-lock.json
