@@ -171,6 +171,20 @@ describe("MusicBlocks Class", () => {
         expect(musicBlocks.turtle.doWait).toHaveBeenCalledWith(0);
     });
 
+    test("should handle ENDMOUSE and remove mouse from list", async () => {
+        Mouse.MouseList = [mouse];
+        Mouse.AddedTurtles = [];
+        await musicBlocks.ENDMOUSE;
+        expect(Mouse.MouseList).not.toContain(mouse);
+    });
+
+    test("should call init(false) when last mouse ends", async () => {
+        Mouse.MouseList = [mouse];
+        Mouse.AddedTurtles = [];
+        await musicBlocks.ENDMOUSE;
+        expect(MusicBlocks.isRun).toBe(false);
+    });
+
     test("should print a message", () => {
         musicBlocks.print("test message");
         expect(JSEditor.logConsole).toHaveBeenCalled();
@@ -227,9 +241,25 @@ describe("MusicBlocks Class", () => {
         expect(musicBlocks.NOTEVALUE).toBe(1);
     });
 
-    test("should set PICKUP", () => {
-        musicBlocks.PICKUP = 2;
-        expect(Singer.MeterActions.setPickup).toHaveBeenCalledWith(2, musicBlocks.turIndex);
+    describe("PICKUP setter", () => {
+        beforeEach(() => {
+            Singer.MeterActions.setPickup.mockClear();
+        });
+
+        test("should set PICKUP with positive value", () => {
+            musicBlocks.PICKUP = 2;
+            expect(Singer.MeterActions.setPickup).toHaveBeenCalledWith(2, musicBlocks.turIndex);
+        });
+
+        test("should clamp negative PICKUP value to 0", () => {
+            musicBlocks.PICKUP = -5;
+            expect(Singer.MeterActions.setPickup).toHaveBeenCalledWith(0, musicBlocks.turIndex);
+        });
+
+        test("should allow PICKUP value of 0", () => {
+            musicBlocks.PICKUP = 0;
+            expect(Singer.MeterActions.setPickup).toHaveBeenCalledWith(0, musicBlocks.turIndex);
+        });
     });
 
     test("should get WHOLENOTESPLAYED", () => {
@@ -320,5 +350,59 @@ describe("MusicBlocks Class", () => {
 
     test("should get MASTERVOLUME", () => {
         expect(musicBlocks.MASTERVOLUME).toBe(1.0);
+    });
+
+    describe("runCommand", () => {
+        beforeEach(() => {
+            musicBlocks.turtle.waitTime = 0;
+            musicBlocks.turtle.doWait = jest.fn();
+            MusicBlocks._methodList = {};
+        });
+
+        test("should execute _anonymous command with callback", async () => {
+            const callback = jest.fn();
+            await musicBlocks.runCommand("_anonymous", callback);
+            expect(callback).toHaveBeenCalled();
+        });
+
+        test("should handle _anonymous command with undefined args", async () => {
+            const result = await musicBlocks.runCommand("_anonymous", undefined);
+            expect(result).toBeUndefined();
+        });
+
+        test("should call method from _methodList with args", async () => {
+            const mockMethod = jest.fn().mockReturnValue("result");
+            global.TestActions = { testMethod: mockMethod };
+            MusicBlocks._methodList["TestActions"] = ["testMethod"];
+
+            await musicBlocks.runCommand("testMethod", ["arg1", "arg2"]);
+            expect(mockMethod).toHaveBeenCalledWith("arg1", "arg2");
+        });
+
+        test("should call method with no args when args is empty array", async () => {
+            const mockMethod = jest.fn().mockReturnValue(42);
+            global.TestActions = { noArgMethod: mockMethod };
+            MusicBlocks._methodList["TestActions"] = ["noArgMethod"];
+
+            const result = await musicBlocks.runCommand("noArgMethod", []);
+            expect(mockMethod).toHaveBeenCalledWith();
+            expect(result).toBe(42);
+        });
+
+        test("should reset turtle waitTime to 0 after command", async () => {
+            musicBlocks.turtle.waitTime = 500;
+            await musicBlocks.runCommand("_anonymous", undefined);
+            expect(musicBlocks.turtle.doWait).toHaveBeenCalledWith(0);
+        });
+
+        test("should use Painter when className is Painter", async () => {
+            const mockPainterMethod = jest.fn().mockReturnValue("painted");
+            musicBlocks.turtle.painter = { draw: mockPainterMethod };
+            MusicBlocks._methodList["Painter"] = ["draw"];
+
+            const result = await musicBlocks.runCommand("draw", []);
+            expect(mockPainterMethod).toHaveBeenCalled();
+            expect(result).toBe("painted");
+        });
     });
 });

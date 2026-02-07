@@ -60,7 +60,11 @@ The development server fails to start because port 3000 is already in use.
 Solution:
 Start the server on a different port:
 
-npm start -- --port=3001
+PORT=3001 npm start
+
+Or for development mode:
+
+PORT=3001 npm run dev
 
 Then open http://localhost:3001 in your browser.
 

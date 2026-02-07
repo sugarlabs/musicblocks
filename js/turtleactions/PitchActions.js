@@ -230,7 +230,7 @@ function setupPitchActions(activity) {
 
             scaleDegree = isNegativeArg ? modeLength - scaleDegree : scaleDegree;
 
-            const note = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
+            const [note, offset] = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
             let semitones = ref;
             semitones += NOTESFLAT.includes(note)
                 ? NOTESFLAT.indexOf(note) - ref

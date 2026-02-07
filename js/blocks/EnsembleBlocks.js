@@ -633,15 +633,11 @@ function setupEnsembleBlocks(activity) {
             this.hidden = this.deprecated = true;
         }
 
-        /**
-         * @todo FIXME
-         */
         arg(logo, turtle, blk, receivedArg) {
             const thisTurtle = _blockFindTurtle(activity, turtle, blk, receivedArg);
 
             if (thisTurtle) {
-                const tur = activity.turtles.ithTurtle(thisTurtle);
-                return tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1];
+                return thisTurtle.singer.notesPlayed[0] / thisTurtle.singer.notesPlayed[1];
             }
 
             const tur = activity.turtles.ithTurtle(turtle);
@@ -905,9 +901,8 @@ function setupEnsembleBlocks(activity) {
                     activity.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
                 }
             } else {
-                activity.turtles.ithTurtle(turtle).singer.turtleTime = activity.turtles.ithTurtle(
-                    targetTurtle
-                ).singer.turtleTime;
+                activity.turtles.ithTurtle(turtle).singer.turtleTime =
+                    activity.turtles.ithTurtle(targetTurtle).singer.turtleTime;
             }
         }
     }
