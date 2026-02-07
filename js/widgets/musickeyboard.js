@@ -1263,15 +1263,17 @@ function MusicKeyboard(activity) {
             return a.frequency - b.frequency;
         });
 
-        const unique = [];
+        // Use Set for O(1) lookup instead of Array.includes() O(n)
+        const unique = new Set();
         this.remove = [];
 
         sortedList = sortedList.filter(item => {
-            if (!unique.includes(item.noteName + item.noteOctave)) {
-                unique.push(item.noteName + item.noteOctave);
+            const key = item.noteName + item.noteOctave;
+            if (!unique.has(key)) {
+                unique.add(key);
                 return true;
             } else if (item.noteName === "drum") {
-                unique.push(item.noteName + item.noteOctave);
+                unique.add(key);
                 return true;
             }
 
@@ -1812,18 +1814,16 @@ function MusicKeyboard(activity) {
         this._menuWheel.navItems[3].navigateFunction = () => {
             if (!flag) {
                 for (let i = 12; i < 19; i++) {
-                    docById(
-                        "wheelnav-wheelDivptm-title-3"
-                    ).children[0].textContent = this.newNoteValue;
+                    docById("wheelnav-wheelDivptm-title-3").children[0].textContent =
+                        this.newNoteValue;
                     this._tabsWheel.navItems[i].navItem.show();
                 }
 
                 flag = 1;
             } else {
                 for (let i = 12; i < 19; i++) {
-                    docById(
-                        "wheelnav-wheelDivptm-title-3"
-                    ).children[0].textContent = this.newNoteValue;
+                    docById("wheelnav-wheelDivptm-title-3").children[0].textContent =
+                        this.newNoteValue;
                     this._tabsWheel.navItems[i].navItem.hide();
                 }
 
@@ -2254,11 +2254,13 @@ function MusicKeyboard(activity) {
             return aValue - bValue;
         });
 
-        const unique = [];
+        // Use Set for O(1) lookup instead of Array.includes() O(n)
+        const unique = new Set();
         this.remove = [];
         this.layout = this.layout.filter((item, pos) => {
-            if (!unique.includes(item.noteName + item.noteOctave)) {
-                unique.push(item.noteName + item.noteOctave);
+            const key = item.noteName + item.noteOctave;
+            if (!unique.has(key)) {
+                unique.add(key);
                 return true;
             }
 
@@ -2465,14 +2467,14 @@ function MusicKeyboard(activity) {
         index = this.layout.length - index - 1;
         const block = this.layout[index].blockNumber;
 
-        let noteValue = this.activity.blocks.blockList[
-            this.activity.blocks.blockList[block].connections[1]
-        ].value;
+        let noteValue =
+            this.activity.blocks.blockList[this.activity.blocks.blockList[block].connections[1]]
+                .value;
 
         if (condition === "pitchblocks") {
-            const octaveValue = this.activity.blocks.blockList[
-                this.activity.blocks.blockList[block].connections[2]
-            ].value;
+            const octaveValue =
+                this.activity.blocks.blockList[this.activity.blocks.blockList[block].connections[2]]
+                    .value;
             let accidentalsValue = 2;
 
             for (let i = 0; i < accidentals.length; i++) {
@@ -2503,8 +2505,8 @@ function MusicKeyboard(activity) {
          * Handles the hertz selection change for the pitch wheel.
          */
         const __hertzSelectionChanged = () => {
-            const blockValue = this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex]
-                .title;
+            const blockValue =
+                this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
             const argBlock = this.activity.blocks.blockList[block].connections[1];
             this.activity.blocks.blockList[argBlock].text.text = blockValue;
             this.activity.blocks.blockList[argBlock].value = parseInt(blockValue);
@@ -2543,8 +2545,9 @@ function MusicKeyboard(activity) {
             if (condition === "pitchblocks") {
                 i = noteLabelsI18n.indexOf(label);
                 labelValue = noteLabels[i];
-                attr = this._accidentalsWheel.navItems[this._accidentalsWheel.selectedNavItemIndex]
-                    .title;
+                attr =
+                    this._accidentalsWheel.navItems[this._accidentalsWheel.selectedNavItemIndex]
+                        .title;
                 if (attr !== "♮") {
                     label += attr;
                 }
@@ -2605,9 +2608,8 @@ function MusicKeyboard(activity) {
             const i = noteLabelsI18n.indexOf(label);
             let labelValue = noteLabels[i];
 
-            const attr = this._accidentalsWheel.navItems[
-                this._accidentalsWheel.selectedNavItemIndex
-            ].title;
+            const attr =
+                this._accidentalsWheel.navItems[this._accidentalsWheel.selectedNavItemIndex].title;
             if (attr !== "♮") {
                 labelValue += attr;
             }
@@ -3223,10 +3225,9 @@ function MusicKeyboard(activity) {
                                         [
                                             "number",
                                             {
-                                                value:
-                                                    note.noteOctave[j][
-                                                        note.noteOctave[j].length - 1
-                                                    ]
+                                                value: note.noteOctave[j][
+                                                    note.noteOctave[j].length - 1
+                                                ]
                                             }
                                         ],
                                         0,
@@ -3251,10 +3252,9 @@ function MusicKeyboard(activity) {
                                         [
                                             "number",
                                             {
-                                                value:
-                                                    note.noteOctave[j][
-                                                        note.noteOctave[j].length - 1
-                                                    ]
+                                                value: note.noteOctave[j][
+                                                    note.noteOctave[j].length - 1
+                                                ]
                                             }
                                         ],
                                         0,
