@@ -1253,20 +1253,6 @@ class Activity {
             this.sendAllToTrash(true, true);
         };
 
-        const extractSVGInner = svgString => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(svgString, "image/svg+xml");
-            const svgEl = doc.querySelector("svg");
-            if (!svgEl) return "";
-
-            // Remove drop shadow filters safely
-            svgEl.querySelectorAll("[filter]").forEach(el => {
-                el.removeAttribute("filter");
-            });
-
-            return svgEl.innerHTML;
-        };
-
         /**
          * @returns {SVG} returns SVG of blocks
          */
@@ -1290,9 +1276,11 @@ class Activity {
                     yMax = this.blocks.blockList[i].container.y + this.blocks.blockList[i].height;
                 }
 
-                const rawSVG = this.blocks.blockList[i].collapsed
-                    ? this.blocks.blockCollapseArt[i]
-                    : this.blocks.blockArt[i];
+                if (this.blocks.blockList[i].collapsed) {
+                    parts = this.blocks.blockCollapseArt[i].split("><");
+                } else {
+                    parts = this.blocks.blockArt[i].split("><");
+                }
 
                 if (this.blocks.blockList[i].isCollapsible()) {
                     svg += "<g>";
@@ -1304,13 +1292,7 @@ class Activity {
                     ", " +
                     this.blocks.blockList[i].container.y +
                     ')">';
-
-                if (!SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
-                    svg += extractSVGInner(rawSVG);
-                } else {
-                    // Keep existing fragile logic for now
-                    parts = rawSVG.split("><");
-
+                if (SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
                     for (let p = 1; p < parts.length; p++) {
                         // FIXME: This is fragile.
                         if (p === 1) {
@@ -1326,6 +1308,23 @@ class Activity {
                             } else {
                                 svg += parts[p] + ">" + this.blocks.blockList[i].value + "<";
                             }
+                        } else if (p === parts.length - 2) {
+                            svg += parts[p] + ">";
+                        } else if (p === parts.length - 1) {
+                            // skip final </svg>
+                        } else {
+                            svg += parts[p] + "><";
+                        }
+                    }
+                } else {
+                    for (let p = 1; p < parts.length; p++) {
+                        // FIXME: This is fragile.
+                        if (p === 1) {
+                            svg += "<" + parts[p] + "><";
+                        } else if (p === 2) {
+                            // skip filter
+                        } else if (p === 3) {
+                            svg += parts[p].replace("filter:url(#dropshadow);", "") + "><";
                         } else if (p === parts.length - 2) {
                             svg += parts[p] + ">";
                         } else if (p === parts.length - 1) {
@@ -1746,7 +1745,7 @@ class Activity {
             }
             async function recordScreenWithTools() {
                 flag = 1;
-                const stream = await navigator.mediaDevices.getDisplayMedia({
+                return await navigator.mediaDevices.getDisplayMedia({
                     preferCurrentTab: "True",
                     systemAudio: "include",
                     audio: "True",
@@ -1759,8 +1758,6 @@ class Activity {
                     },
                     preferredVideoCodecs: "auto"
                 });
-                currentStream = stream;
-                return stream;
             }
 
             
@@ -1777,7 +1774,7 @@ class Activity {
                     alert(_("Recorded file is empty. File not saved."));
                     flag = 0;
                     recording();
-                    doRecordButton(that);
+                    doRecordButton();
                     return;
                 }
                 const blob = new Blob(recordedChunks, {
@@ -1787,7 +1784,7 @@ class Activity {
                     alert(_("Recorded file is empty. File not saved."));
                     flag = 0;
                     recording();
-                    doRecordButton(that);
+                    doRecordButton();
                     return;
                 }
                 // Clean up stream after recording
@@ -1806,7 +1803,7 @@ class Activity {
                     alert(_("File save canceled"));
                     flag = 0;
                     recording();
-                    doRecordButton(that);
+                    doRecordButton();
                     return; // Exit without saving the file
                 }
                 const downloadLink = document.createElement("a");
@@ -1819,7 +1816,7 @@ class Activity {
                 flag = 0;
                 // Allow multiple recordings
                 recording();
-                doRecordButton(that);
+                doRecordButton();
                 that.textMsg(_("Recording stopped. File saved."));
             }
             /**
@@ -1827,9 +1824,7 @@ class Activity {
              */
             function stopRec() {
                 flag = 0;
-                if (mediaRecorder && mediaRecorder.state !== "inactive") {
-                    mediaRecorder.stop();
-                }
+                mediaRecorder.stop();
                 const node = document.createElement("p");
                 node.textContent = "Stopped recording";
                 document.body.appendChild(node);
@@ -1847,7 +1842,7 @@ class Activity {
                 that.textMsg(_("Recording started. Click stop to finish."));
                 start.removeEventListener("click", createRecorder, true);
                 let recordedChunks = [];
-                mediaRecorder = new MediaRecorder(stream);
+                const mediaRecorder = new MediaRecorder(stream);
                 stream.oninactive = function () {
                     // eslint-disable-next-line no-console
                     console.log("Recording is ready to save");
@@ -1890,7 +1885,7 @@ class Activity {
                         // Add stop handler
                         start.addEventListener("click", function stopHandler() {
                             if (mediaRecorder && mediaRecorder.state === "recording") {
-                                mediaRecorder.stop();
+                                mediaRecorder.stop();                                mediaRecorder = new MediaRecorder(stream);  // ✅ Correct - no "const"
                                 recInside.classList.remove("blink");
                                 flag = 0;
                                 // Clean up stream
@@ -7021,7 +7016,7 @@ class Activity {
             this.toolbar.renderHelpIcon(showHelp);
             this.toolbar.renderModeSelectIcon(
                 doSwitchMode,
-                doRecordButton,
+                () => doRecordButton(this),
                 doAnalytics,
                 doOpenPlugin,
                 deletePlugin,
