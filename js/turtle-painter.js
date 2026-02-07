@@ -606,16 +606,7 @@ class Painter {
             const nsteps = Math.max(Math.floor((radius * Math.abs(diff)) / 2), 2);
             const steps = Math.max(Math.floor(savedStroke, 1));
 
-            this._svgArc(
-                nsteps,
-                cx,
-                cy,
-                radius + step,
-                sa,
-                ea,
-                anticlockwise,
-                true
-            );
+            this._svgArc(nsteps, cx, cy, radius + step, sa, ea, anticlockwise, true);
 
             capAngleRadians = ((this.turtle.orientation + 90) * Math.PI) / 180.0;
             dx = step * Math.sin(capAngleRadians);
@@ -625,40 +616,13 @@ class Painter {
             const cy1 = ny;
             const sa1 = ea;
             const ea1 = ea + Math.PI;
-            this._svgArc(
-                steps,
-                cx1,
-                cy1,
-                step,
-                sa1,
-                ea1,
-                anticlockwise,
-                true
-            );
-            this._svgArc(
-                nsteps,
-                cx,
-                cy,
-                radius - step,
-                ea,
-                sa,
-                !anticlockwise,
-                true
-            );
+            this._svgArc(steps, cx1, cy1, step, sa1, ea1, anticlockwise, true);
+            this._svgArc(nsteps, cx, cy, radius - step, ea, sa, !anticlockwise, true);
             const cx2 = ox;
             const cy2 = oy;
             const sa2 = sa - Math.PI;
             const ea2 = sa;
-            this._svgArc(
-                steps,
-                cx2,
-                cy2,
-                step,
-                sa2,
-                ea2,
-                anticlockwise,
-                true
-            );
+            this._svgArc(steps, cx2, cy2, step, sa2, ea2, anticlockwise, true);
             this.closeSVG();
 
             this.turtle.ctx.stroke();
@@ -1068,7 +1032,6 @@ class Painter {
             const cx2 = turtles.turtleX2screenX(cp2x);
             const cy2 = turtles.turtleY2screenY(cp2y);
 
-
             const savedStroke = this.stroke;
             this.stroke = 1;
             this.turtle.ctx.lineWidth = this.stroke;
@@ -1123,10 +1086,14 @@ class Painter {
             this.turtle.ctx.moveTo(dx, dy);
 
             const nstepsCurve1 = this._estimateBezierSteps(
-                dx, dy,
-                cx1 + dxi, cy1 + dyi,
-                cx2 + dxf, cy2 + dyf,
-                cx, cy
+                dx,
+                dy,
+                cx1 + dxi,
+                cy1 + dyi,
+                cx2 + dxf,
+                cy2 + dyf,
+                cx,
+                cy
             );
 
             // Side 1: Forward Bezier
@@ -1151,10 +1118,14 @@ class Painter {
             this._svgOutput += bxScaled + "," + byScaled + " ";
 
             const nstepsCurve2 = this._estimateBezierSteps(
-                bx, by,
-                cx2 - dxf, cy2 - dyf,
-                cx1 - dxi, cy1 - dyi,
-                ax, ay
+                bx,
+                by,
+                cx2 - dxf,
+                cy2 - dyf,
+                cx1 - dxi,
+                cy1 - dyi,
+                ax,
+                ay
             );
 
             // Side 2: Return Bezier
@@ -1219,15 +1190,11 @@ class Painter {
             // SVG must always start exactly where canvas path starts
             if (!this._svgPath) {
                 this._svgPath = true;
-                this._svgOutput += '<path d="M ' + ix * turtlesScale + "," + iy * turtlesScale + " ";
+                this._svgOutput +=
+                    '<path d="M ' + ix * turtlesScale + "," + iy * turtlesScale + " ";
             }
 
-            const nstepsCurve = this._estimateBezierSteps(
-                ix, iy,
-                cx1, cy1,
-                cx2, cy2,
-                fx, fy
-            );
+            const nstepsCurve = this._estimateBezierSteps(ix, iy, cx1, cy1, cx2, cy2, fx, fy);
 
             this._svgBezier(nstepsCurve, ix, iy, cx1, cy1, cx2, cy2, fx, fy, true);
 
@@ -1236,7 +1203,6 @@ class Painter {
 
             // draw it
             this.turtle.ctx.stroke();
-
         } else {
             this.turtle.x = x2;
             this.turtle.y = y2;
