@@ -1877,3 +1877,7 @@ function setupWidgetBlocks(activity) {
     // Instantiate and set up the StatusBlock
     new StatusBlock().setup(activity);
 }
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupWidgetBlocks };
+}
