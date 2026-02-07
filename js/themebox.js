@@ -140,7 +140,7 @@ class ThemeBox {
      */
     constructor(activity) {
         this.activity = activity;
-        this._theme = activity.storage.themePreference || "light";
+        this._theme = activity.storage.themePreference || getSystemThemePreference();
         this._themes = ["light", "dark", "highcontrast"];
     }
 

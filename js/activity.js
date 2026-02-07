@@ -314,8 +314,22 @@ class Activity {
 
         this.themes = ["light", "dark", "highcontrast"];
         try {
+            // Detect system theme preference (using same logic as ThemeBox)
+            const getSystemTheme = () => {
+                if (
+                    window.matchMedia &&
+                    window.matchMedia("(prefers-color-scheme: dark)").matches
+                ) {
+                    return "dark";
+                }
+                return "light";
+            };
+
+            // Use stored preference, fallback to system preference
+            const activeTheme = this.storage.themePreference || getSystemTheme();
+
             for (let i = 0; i < this.themes.length; i++) {
-                if (this.themes[i] === this.storage.themePreference) {
+                if (this.themes[i] === activeTheme) {
                     body.classList.add(this.themes[i]);
                 } else {
                     body.classList.remove(this.themes[i]);
@@ -2963,45 +2977,62 @@ class Activity {
          * Uses JQuery to add autocompleted search suggestions
          */
         this.doSearch = () => {
-            const $j = jQuery.noConflict();
+            const $j = window.jQuery;
+            if (this.searchSuggestions.length === 0) {
+                this.prepSearchWidget();
+            }
 
             const that = this;
-            $j("#search").autocomplete({
-                source: that.searchSuggestions,
-                select: (event, ui) => {
-                    event.preventDefault();
-                    that.searchWidget.value = ui.item.label;
-                    that.searchWidget.idInput_custom = ui.item.value;
-                    that.searchWidget.protoblk = ui.item.specialDict;
-                    that.doSearch();
-                    if (event.keyCode === 13) this.searchWidget.style.visibility = "visible";
-                },
-                focus: event => {
-                    event.preventDefault();
-                }
-            });
+            const $search = $j("#search");
 
-            $j("#search").autocomplete("instance")._renderItem = (ul, item) => {
-                return $j("<li></li>")
-                    .data("item.autocomplete", item)
-                    .append(
-                        '<img src="' +
-                            item.artwork +
-                            '" height="20px">' +
-                            "<a> " +
-                            item.label +
-                            "</a>"
-                    )
-                    .appendTo(
-                        ul.css({
-                            "z-index": 9999,
-                            "max-height": "200px",
-                            "overflow-y": "auto"
-                        })
-                    );
-            };
+            if (!$search.data("autocomplete-init")) {
+                $search.autocomplete({
+                    source: that.searchSuggestions,
+                    appendTo: "body",
+                    select: (event, ui) => {
+                        event.preventDefault();
+                        that.searchWidget.value = ui.item.label;
+                        that.searchWidget.idInput_custom = ui.item.value;
+                        that.searchWidget.protoblk = ui.item.specialDict;
+                        that.doSearch();
+                        if (event.keyCode === 13) this.searchWidget.style.visibility = "visible";
+                    },
+                    focus: event => {
+                        event.preventDefault();
+                    }
+                });
+
+                const instance = $search.autocomplete("instance");
+                if (instance) {
+                    instance._renderItem = (ul, item) => {
+                        return $j("<li></li>")
+                            .append(
+                                '<img src="' +
+                                    (item.artwork || "") +
+                                    '" height="20px">' +
+                                    "<a> " +
+                                    item.label +
+                                    "</a>"
+                            )
+                            .appendTo(
+                                ul.css({
+                                    "z-index": 35000,
+                                    "max-height": "200px",
+                                    "overflow-y": "auto"
+                                })
+                            );
+                    };
+                }
+                $search.data("autocomplete-init", true);
+            }
+
             const searchInput = this.searchWidget.idInput_custom;
-            if (!searchInput || searchInput.length <= 0) return;
+            if (!searchInput || searchInput.length <= 0) {
+                if (this.searchWidget.value && this.searchWidget.value.length > 0) {
+                    $search.autocomplete("search", this.searchWidget.value);
+                }
+                return;
+            }
 
             const protoblk = this.searchWidget.protoblk;
             const paletteName = protoblk.palette.name;
@@ -3472,7 +3503,7 @@ class Activity {
                 return;
             }
 
-            const $j = jQuery.noConflict();
+            const $j = window.jQuery;
             let w = 0,
                 h = 0;
             if (typeof platform !== "undefined" && !platform.androidWebkit) {
@@ -3831,6 +3862,15 @@ class Activity {
                             }
                         }
                     }
+
+                    // Re-add the action to the palette
+                    const actionName = actionArg.value;
+                    this.blocks.newNameddoBlock(
+                        actionName,
+                        this.blocks.actionHasReturn(blockId),
+                        this.blocks.actionHasArgs(blockId)
+                    );
+                    this.palettes.updatePalettes("action");
                 }
             }
             activity.textMsg(_("Item restored from the trash."), 3000);
@@ -6203,7 +6243,7 @@ class Activity {
          */
         this.showHelpfulSearchWidget = () => {
             // Bring widget to top.
-            const $j = jQuery.noConflict();
+            const $j = window.jQuery;
             if ($j("#helpfulSearch")) {
                 try {
                     $j("#helpfulSearch").autocomplete("destroy");
@@ -6234,39 +6274,56 @@ class Activity {
          * Uses JQuery to add autocompleted search suggestions
          */
         this.doHelpfulSearch = () => {
-            const $j = jQuery.noConflict();
+            const $j = window.jQuery;
+            if (this.searchSuggestions.length === 0) {
+                this.prepSearchWidget();
+            }
 
             const that = this;
-            $j("#helpfulSearch").autocomplete({
-                source: that.searchSuggestions,
-                select: (event, ui) => {
-                    event.preventDefault();
-                    that.helpfulSearchWidget.value = ui.item.label;
-                    that.helpfulSearchWidget.idInput_custom = ui.item.value;
-                    that.helpfulSearchWidget.protoblk = ui.item.specialDict;
-                    that.doHelpfulSearch();
-                },
-                focus: event => {
-                    event.preventDefault();
-                }
-            });
+            const $helpfulSearch = $j("#helpfulSearch");
 
-            $j("#helpfulSearch").autocomplete("instance")._renderItem = (ul, item) => {
-                return $j("<li></li>")
-                    .data("item.autocomplete", item)
-                    .append(
-                        '<img src="' +
-                            item.artwork +
-                            '" height = "20px">' +
-                            "<a>" +
-                            " " +
-                            item.label +
-                            "</a>"
-                    )
-                    .appendTo(ul.css("z-index", 9999));
-            };
+            if (!$helpfulSearch.data("autocomplete-init")) {
+                $helpfulSearch.autocomplete({
+                    source: that.searchSuggestions,
+                    appendTo: "body",
+                    select: (event, ui) => {
+                        event.preventDefault();
+                        that.helpfulSearchWidget.value = ui.item.label;
+                        that.helpfulSearchWidget.idInput_custom = ui.item.value;
+                        that.helpfulSearchWidget.protoblk = ui.item.specialDict;
+                        that.doHelpfulSearch();
+                    },
+                    focus: event => {
+                        event.preventDefault();
+                    }
+                });
+
+                const instance = $helpfulSearch.autocomplete("instance");
+                if (instance) {
+                    instance._renderItem = (ul, item) => {
+                        return $j("<li></li>")
+                            .append(
+                                '<img src="' +
+                                    (item.artwork || "") +
+                                    '" height = "20px">' +
+                                    "<a>" +
+                                    " " +
+                                    item.label +
+                                    "</a>"
+                            )
+                            .appendTo(ul.css("z-index", 35000));
+                    };
+                }
+                $helpfulSearch.data("autocomplete-init", true);
+            }
+
             const searchInput = this.helpfulSearchWidget.idInput_custom;
-            if (!searchInput || searchInput.length <= 0) return;
+            if (!searchInput || searchInput.length <= 0) {
+                if (this.helpfulSearchWidget.value && this.helpfulSearchWidget.value.length > 0) {
+                    $helpfulSearch.autocomplete("search", this.helpfulSearchWidget.value);
+                }
+                return;
+            }
 
             const protoblk = this.helpfulSearchWidget.protoblk;
             const paletteName = protoblk.palette.name;
@@ -6347,7 +6404,7 @@ class Activity {
             container.setAttribute("class", "tooltipped");
             container.setAttribute("data-tooltip", label);
             container.setAttribute("data-position", "top");
-            jQuery.noConflict()(".tooltipped").tooltip({
+            window.jQuery(".tooltipped").tooltip({
                 html: true,
                 delay: 100
             });
