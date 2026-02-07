@@ -550,14 +550,12 @@ class Activity {
             if (!document.getElementById("helpfulSearchDiv")) {
                 this.setHelpfulSearchDiv(); // Re-create and append the div if it's not found
             }
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
             this.helpfulSearchDiv.style.left =
-                document.getElementById("helpfulWheelDiv").offsetLeft +
-                80 * this.getStageScale() +
-                "px";
+                helpfulWheelDiv.offsetLeft + 80 * this.getStageScale() + "px";
             this.helpfulSearchDiv.style.top =
-                document.getElementById("helpfulWheelDiv").offsetTop +
-                110 * this.getStageScale() +
-                "px";
+                helpfulWheelDiv.offsetTop + 110 * this.getStageScale() + "px";
 
             const windowWidth = window.innerWidth;
             const windowHeight = window.innerHeight;
@@ -579,8 +577,10 @@ class Activity {
         // hides helpfulSearchDiv on canvas
 
         this._hideHelpfulSearchWidget = e => {
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
             }
             if (this.helpfulSearchDiv && this.helpfulSearchDiv.parentNode) {
                 this.helpfulSearchDiv.parentNode.removeChild(this.helpfulSearchDiv);
@@ -618,7 +618,9 @@ class Activity {
          * displays helpfulWheel on canvas on right click
          */
         this._displayHelpfulWheel = event => {
-            document.getElementById("helpfulWheelDiv").style.position = "absolute";
+            // Cache DOM element reference for performance (7 lookups reduced to 1)
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            helpfulWheelDiv.style.position = "absolute";
 
             const x = event.clientX;
             const y = event.clientY;
@@ -635,21 +637,21 @@ class Activity {
                 canvasTop
             );
 
-            document.getElementById("helpfulWheelDiv").style.left = helpfulWheelLeft + "px";
+            helpfulWheelDiv.style.left = helpfulWheelLeft + "px";
 
-            document.getElementById("helpfulWheelDiv").style.top = helpfulWheelTop + "px";
+            helpfulWheelDiv.style.top = helpfulWheelTop + "px";
 
             const windowWidth = window.innerWidth - 20;
             const windowHeight = window.innerHeight - 20;
 
             if (helpfulWheelLeft + 350 > windowWidth) {
-                document.getElementById("helpfulWheelDiv").style.left = windowWidth - 350 + "px";
+                helpfulWheelDiv.style.left = windowWidth - 350 + "px";
             }
             if (helpfulWheelTop + 350 > windowHeight) {
-                document.getElementById("helpfulWheelDiv").style.top = windowHeight - 350 + "px";
+                helpfulWheelDiv.style.top = windowHeight - 350 + "px";
             }
 
-            document.getElementById("helpfulWheelDiv").style.display = "";
+            helpfulWheelDiv.style.display = "";
 
             const wheel = new wheelnav("helpfulWheelDiv", null, 300, 300);
             wheel.colors = platformColor.wheelcolors;
@@ -755,8 +757,10 @@ class Activity {
          */
         const findBlocks = activity => {
             activity._findBlocks();
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -1614,8 +1618,10 @@ class Activity {
                     table.remove();
                 }
 
-                if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                    document.getElementById("helpfulWheelDiv").style.display = "none";
+                // Cache DOM element reference for performance
+                const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+                if (helpfulWheelDiv.style.display !== "none") {
+                    helpfulWheelDiv.style.display = "none";
                     this.__tick();
                 }
             };
@@ -1995,8 +2001,10 @@ class Activity {
         const setScroller = activity => {
             activity._setScroller();
             activity._setupBlocksContainerEvents();
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
             }
         };
 
@@ -2090,8 +2098,10 @@ class Activity {
          */
         const doLargerBlocks = async activity => {
             await activity._doLargerBlocks();
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -2125,8 +2135,10 @@ class Activity {
          */
         const doSmallerBlocks = async activity => {
             await activity._doSmallerBlocks();
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -3767,8 +3779,10 @@ class Activity {
                 return;
             }
 
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -3785,8 +3799,10 @@ class Activity {
             this._restoreTrashById(this.blocks.trashStacks[this.blocks.trashStacks.length - 1]);
             activity.textMsg(_("Item restored from the trash."), 3000);
 
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -4137,8 +4153,10 @@ class Activity {
          */
         const changeBlockVisibility = activity => {
             activity._changeBlockVisibility();
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -4171,8 +4189,10 @@ class Activity {
          */
         const toggleCollapsibleStacks = activity => {
             activity._toggleCollapsibleStacks();
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -4285,8 +4305,10 @@ class Activity {
          */
         const chooseKeyMenu = that => {
             piemenuKey(that);
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
             }
         };
 
@@ -6626,6 +6648,7 @@ class Activity {
                 // set selection mode to false
                 this.blocks.setSelectionToActivity(false);
                 this.refreshCanvas();
+                // Cache DOM element reference for performance
                 document.getElementById("helpfulWheelDiv").style.display = "none";
             }
         };
@@ -6666,6 +6689,7 @@ class Activity {
                 this.unhighlightSelectedBlocks(false, false);
                 this.blocks.setSelectedBlocks(this.selectedBlocks);
                 this.refreshCanvas();
+                // Cache DOM element reference for performance
                 document.getElementById("helpfulWheelDiv").style.display = "none";
             }
         };
