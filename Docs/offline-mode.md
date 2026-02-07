@@ -14,9 +14,9 @@ The current state of the workspace (all blocks on the canvas) is automatically s
 Music Blocks monitors the device's connectivity status.
 - **Online Status**: Standard operation with access to Planet (cloud) features.
 - **Offline Status**: Access to cloud features is disabled, but core block coding and local execution remain fully functional.
-- **UI Indicator**: A small indicator in the top-right corner shows the current connectivity status.
-  - 🟢 Green: Online
-  - 🔴 Red: Offline
+- **UI Indicator**: The Planet icon in the toolbar indicates connectivity.
+  - **Active (Natural Color)**: Online.
+  - **Disabled (Grey)**: Offline. Core coding is functional, but Planet/sharing features are unavailable.
 
 ### 3. Service Worker
 The Service Worker (integrated from previous phases) ensures that the application's assets (JS, CSS, images) are cached locally, allowing the application to load even without an internet connection.

@@ -12,7 +12,6 @@
  */
 
 /* global define, indexedDB, navigator, _ */
-// dummy comment to trigger CI
 
 define([], function () {
     "use strict";
@@ -89,24 +88,30 @@ define([], function () {
         }
 
         /**
-         * Updates the connectivity indicator in the UI.
+         * Updates the connectivity indicator in the UI by toggling the Planet icon.
          */
         _updateUIIndicator() {
-            const indicator = document.getElementById("network-status");
-            if (indicator) {
-                const icon = indicator.querySelector("i");
-                const translate = typeof _ !== "undefined" ? _ : s => s;
+            const planetIcon = document.getElementById("planetIcon");
+            const planetIconDisabled = document.getElementById("planetIconDisabled");
+            const translate = typeof _ !== "undefined" ? _ : s => s;
+
+            // Close existing tooltips to ensure they refresh with the new state
+            if (typeof jQuery !== "undefined" && jQuery.fn && jQuery.fn.tooltip) {
+                jQuery(".tooltipped").tooltip("close");
+            }
+
+            if (this.isOnline) {
+                if (planetIcon) planetIcon.style.display = "block";
+                if (planetIconDisabled) planetIconDisabled.style.display = "none";
+            } else {
+                if (planetIcon) planetIcon.style.display = "none";
+                if (planetIconDisabled) planetIconDisabled.style.display = "block";
+            }
+
+            // Notify user about connectivity change
+            if (this.activity && typeof this.activity.textMsg === "function") {
                 const status = this.isOnline ? translate("Online") : translate("Offline");
-                if (this.isOnline) {
-                    indicator.classList.remove("offline");
-                    indicator.classList.add("online");
-                    if (icon) icon.textContent = "cloud_done";
-                } else {
-                    indicator.classList.remove("online");
-                    indicator.classList.add("offline");
-                    if (icon) icon.textContent = "cloud_off";
-                }
-                indicator.setAttribute("data-tooltip", status);
+                this.activity.textMsg(status, 3000);
             }
         }
 
