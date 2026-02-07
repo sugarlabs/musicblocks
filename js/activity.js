@@ -38,7 +38,7 @@
    TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, Turtles, TURTLESVG,
    updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_F,
    SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
-   MUSICALMODES
+   MUSICALMODES, waitForReadiness
  */
 
 /*
@@ -7733,7 +7733,24 @@ define(["domReady!"].concat(MYDEFINES), doc => {
         } else {
             // Race condition in Firefox: non-AMD scripts might not have
             // finished global assignment yet.
-            setTimeout(initialize, 10);
+            // Use readiness-based initialization for Firefox for better performance
+            if (typeof jQuery !== "undefined" && jQuery.browser && jQuery.browser.mozilla) {
+                waitForReadiness(
+                    () => {
+                        activity.setupDependencies();
+                        activity.domReady(doc);
+                        activity.doContextMenus();
+                        activity.doPluginsAndPaletteCols();
+                    },
+                    {
+                        maxWait: 10000,
+                        minWait: 500,
+                        checkInterval: 100
+                    }
+                );
+            } else {
+                setTimeout(initialize, 10);
+            }
         }
     };
     initialize();
