@@ -139,10 +139,6 @@ describe("platformstyle", () => {
     });
 });
 
-/**
- * @author Alok Dangre
- * @copyright 2026 Alok Dangre
- */
 describe("platform detection computed properties", () => {
     /**
      * Pure logic for computing androidWebkit and FFOS flags.
