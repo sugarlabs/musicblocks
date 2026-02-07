@@ -227,8 +227,9 @@ describe("Toolbar Class", () => {
                 addEventListener: jest.fn()
             },
             stop: {
-                style: { color: "" },
-                addEventListener: jest.fn()
+                style: { color: "", pointerEvents: "" },
+                addEventListener: jest.fn(),
+                classList: { add: jest.fn(), remove: jest.fn() }
             },
             record: {
                 className: ""
@@ -249,22 +250,20 @@ describe("Toolbar Class", () => {
         elements.play.onclick();
 
         expect(mockOnClick).toHaveBeenCalledWith(mockActivity);
-        expect(elements.stop.style.color).toBe(toolbar.stopIconColorWhenPlaying);
+        // Stop button state is now managed by onRunTurtle/onStopTurtle in activity.js
         expect(global.saveButtonAdvanced.disabled).toBe(true);
         expect(global.saveButton.className).toBe("grey-text inactiveLink");
         expect(elements.record.className).toBe("grey-text inactiveLink");
-        expect(elements.stop.addEventListener).toHaveBeenCalledWith("click", expect.any(Function));
-
-        const stopClickHandler = elements.stop.addEventListener.mock.calls[0][1];
-        stopClickHandler();
-
-        expect(mockActivity.hideMsgs).toHaveBeenCalled();
 
         delete global.play_button_debounce_timeout;
     });
 
     test("renderStopIcon sets onclick and updates stop button behavior", () => {
-        const stopIcon = { onclick: null, style: { color: "" } };
+        const stopIcon = {
+            onclick: null,
+            style: { color: "", pointerEvents: "" },
+            classList: { add: jest.fn(), remove: jest.fn() }
+        };
         const recordButton = { className: "recording" };
 
         global.docById.mockImplementation(id =>
@@ -277,7 +276,7 @@ describe("Toolbar Class", () => {
         stopIcon.onclick();
 
         expect(mockOnClick).toHaveBeenCalled();
-        expect(stopIcon.style.color).toBe("white");
+        // Stop button state is now managed by onStopTurtle in activity.js
         expect(global.saveButton.disabled).toBe(false);
         expect(global.saveButtonAdvanced.disabled).toBe(false);
         expect(global.saveButton.className).toBe("");
