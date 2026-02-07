@@ -38,3 +38,13 @@ The Service Worker (integrated from previous phases) ensures that the applicatio
 -   **Database Name**: `MusicBlocksWorkspace`
 -   **Object Store**: `workspace`
 -   **Integration**: Initialized in `Activity.init` (in `js/activity.js`).
+
+## Local Development & Testing
+
+By default, the Service Worker is disabled on `localhost` to allow for instant code updates. To test the full offline experience (including service worker caching) locally:
+
+1.  Open Chrome DevTools Console.
+2.  Run: `localStorage.setItem("ENABLE_SW_LOCAL", "true")`.
+3.  Reload the page.
+4.  To disable: `localStorage.removeItem("ENABLE_SW_LOCAL")`.
+
