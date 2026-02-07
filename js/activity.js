@@ -3865,6 +3865,7 @@ class Activity {
                     document.removeEventListener("click", trashViewClickHandler);
                     trashViewClickHandler = null;
                 }
+            };
             document.addEventListener("click", trashViewClickHandler);
         }
 
