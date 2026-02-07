@@ -7784,6 +7784,7 @@ define(["domReady!"].concat(MYDEFINES), doc => {
         if (typeof createDefaultStack !== "undefined") {
             activity.setupDependencies();
             activity.domReady(doc);
+            activity.doSearch();
             activity.doContextMenus();
             activity.doPluginsAndPaletteCols();
         } else {
