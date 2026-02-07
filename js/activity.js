@@ -7022,6 +7022,14 @@ class Activity {
 
             this.save = new SaveInterface(this);
 
+            // Initialize AI Model Abstraction Layer
+            if (typeof window.AIModelRegistry !== "undefined") {
+                this.aiRegistry = window.AIModelRegistry;
+                if (typeof window.MockAIModelAdapter !== "undefined") {
+                    this.aiRegistry.register(new window.MockAIModelAdapter());
+                }
+            }
+
             this.toolbar = new Toolbar();
             this.toolbar.init(this);
 

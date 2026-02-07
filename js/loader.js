@@ -42,6 +42,7 @@ requirejs.config({
         "prefixfree": "../bower_components/prefixfree/prefixfree.min",
         "samples": "../sounds/samples",
         "planet": "../js/planet",
+        "ai": "../js/ai",
         "tonejsMidi": "../node_modules/@tonejs/midi/dist/Midi",
         "p5.min": "../lib/p5.min",
         "p5.sound.min": "../lib/p5.sound.min",
