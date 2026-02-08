@@ -121,6 +121,7 @@ function AIDebuggerWidget() {
         widgetWindow.getWidgetBody().style.height = CHATHEIGHT + "px";
 
         widgetWindow.onclose = () => {
+            this._hideTypingIndicator();
             widgetWindow.destroy();
             this.activity.isInputON = false;
         };
@@ -453,6 +454,10 @@ function AIDebuggerWidget() {
      * @private
      */
     this._hideTypingIndicator = function () {
+        if (!this.chatLog) {
+            return;
+        }
+
         const typingIndicator = this.chatLog.querySelector(".typing-indicator");
         if (typingIndicator) {
             const animationId = typingIndicator.getAttribute("data-animation-id");
