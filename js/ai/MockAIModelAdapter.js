@@ -13,10 +13,7 @@
  * MockAIModelAdapter.js
  * A basic mock implementation of AIModelAdapter for demonstration and testing.
  */
-define([
-    "./AIModelAdapter",
-    "./AIModelRegistry"
-], function (AIModelAdapter, AIModelRegistry) {
+define(["./AIModelAdapter", "./AIModelRegistry"], function (AIModelAdapter, AIModelRegistry) {
     const Registry = AIModelRegistry || window.AIModelRegistry;
     class MockAIModelAdapter extends (AIModelAdapter || window.AIModelAdapter) {
         constructor() {

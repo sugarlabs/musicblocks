@@ -14,10 +14,7 @@
  * A more advanced mock implementation that simulates specific AI behaviors
  * such as melody suggestions and block debugging.
  */
-define([
-    "./AIModelAdapter",
-    "./AIModelRegistry"
-], function (AIModelAdapter, AIModelRegistry) {
+define(["./AIModelAdapter", "./AIModelRegistry"], function (AIModelAdapter, AIModelRegistry) {
     const Registry = AIModelRegistry || window.AIModelRegistry;
     class ExampleAIAdapter extends (AIModelAdapter || window.AIModelAdapter) {
         constructor() {

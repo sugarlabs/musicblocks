@@ -20,7 +20,7 @@ require("../../ai/MockAIModelAdapter.js");
 describe("AI Abstraction Layer End-to-End Mock Tests", () => {
     test("Activity.aiRegistry should be initialized", () => {
         // Mock Activity class
-        window.Activity = class { };
+        window.Activity = class {};
         window.Activity.aiRegistry = window.AIModelRegistry;
 
         expect(window.Activity.aiRegistry).toBeDefined();
@@ -57,7 +57,9 @@ describe("AI Abstraction Layer End-to-End Mock Tests", () => {
         const originalActive = window.AIModelRegistry.activeAdapter;
         window.AIModelRegistry.activeAdapter = null;
 
-        await expect(window.AIModelRegistry.request({})).rejects.toThrow("No active AI adapter configured.");
+        await expect(window.AIModelRegistry.request({})).rejects.toThrow(
+            "No active AI adapter configured."
+        );
 
         window.AIModelRegistry.activeAdapter = originalActive;
     });
