@@ -1365,6 +1365,10 @@ const LCD = (a, b) => {
 
 /**
  * Adds two rational numbers represented as arrays [numerator, denominator].
+ *
+ * This helper is used internally where rational arithmetic is required
+ * to avoid floating-point precision issues (e.g., turtle singer logic).
+ *
  * @param {Array} a - The first rational number.
  * @param {Array} b - The second rational number.
  * @returns {Array} The sum of the two rational numbers in the form [numerator, denominator].
