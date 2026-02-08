@@ -174,9 +174,71 @@ requirejs(
             }
         );
 
-        function updateContent() {
+        let translatableElements = null;
+
+        function normalizeLanguage(lang) {
+            if (typeof lang !== "string" || lang.trim() === "") {
+                return "en";
+            }
+
+            const normalized = lang.trim();
+            const aliases = {
+                enUS: "en",
+                enUK: "en_GB",
+                "en-US": "en",
+                "en-GB": "en_GB",
+                "en-UK": "en_GB",
+                "ja-kana": "ja",
+                "ja-kanji": "ja",
+                "zh-CN": "zh_CN",
+                "zh-TW": "zh_TW"
+            };
+
+            if (aliases[normalized]) {
+                return aliases[normalized];
+            }
+
+            if (normalized.startsWith("ja")) {
+                return "ja";
+            }
+
+            if (normalized.includes("-")) {
+                const [primary, region] = normalized.split("-");
+                if (primary === "zh" && region) {
+                    return `zh_${region.toUpperCase()}`;
+                }
+                return primary;
+            }
+
+            return normalized;
+        }
+
+        function resolveLanguage() {
+            let preferredLanguage;
+            try {
+                preferredLanguage = window.localStorage
+                    ? window.localStorage.languagePreference
+                    : undefined;
+            } catch (e) {
+                preferredLanguage = undefined;
+            }
+
+            const browserLanguage =
+                typeof navigator !== "undefined" ? navigator.language : undefined;
+
+            return normalizeLanguage(preferredLanguage || browserLanguage || "en");
+        }
+
+        function getTranslatableElements(forceRefresh = false) {
+            if (forceRefresh || translatableElements === null) {
+                translatableElements = Array.from(document.querySelectorAll("[data-i18n]"));
+            }
+            return translatableElements;
+        }
+
+        function updateContent(forceRefresh = false) {
             if (!i18next.isInitialized) return;
-            const elements = document.querySelectorAll("[data-i18n]");
+            const elements = getTranslatableElements(forceRefresh);
             elements.forEach(element => {
                 const key = element.getAttribute("data-i18n");
                 element.textContent = i18next.t(key);
@@ -195,7 +257,7 @@ requirejs(
                             escapeValue: false
                         },
                         backend: {
-                            loadPath: "locales/{{lng}}.json?v=" + Date.now()
+                            loadPath: "locales/{{lng}}.json"
                         }
                     },
                     function (err) {
@@ -217,7 +279,7 @@ requirejs(
                     M.AutoInit();
                 }
 
-                const lang = "en";
+                const lang = resolveLanguage();
                 i18next.changeLanguage(lang, function (err) {
                     if (err) {
                         console.error("Error changing language:", err);
@@ -226,9 +288,9 @@ requirejs(
                 });
 
                 if (document.readyState === "loading") {
-                    document.addEventListener("DOMContentLoaded", updateContent);
+                    document.addEventListener("DOMContentLoaded", () => updateContent(true));
                 } else {
-                    updateContent();
+                    updateContent(true);
                 }
 
                 i18next.on("languageChanged", updateContent);

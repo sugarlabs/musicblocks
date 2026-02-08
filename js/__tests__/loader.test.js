@@ -40,6 +40,7 @@ describe("loader.js coverage", () => {
             Stage: jest.fn(),
             Ticker: { framerate: 60, addEventListener: jest.fn() }
         };
+        global.window.localStorage.clear();
     });
 
     afterEach(() => {
@@ -111,6 +112,7 @@ describe("loader.js coverage", () => {
             expect.objectContaining({ lng: "en" }),
             expect.any(Function)
         );
+        expect(mockI18next.init.mock.calls[0][0].backend.loadPath).toBe("locales/{{lng}}.json");
         expect(window.i18next).toBe(mockI18next);
 
         expect(mockI18next.changeLanguage).toHaveBeenCalledWith("en", expect.any(Function));
@@ -168,6 +170,25 @@ describe("loader.js coverage", () => {
         mockI18next.t.mockClear();
         eventHandler();
         expect(mockI18next.t).toHaveBeenCalled();
+    });
+
+    test("Resolves localStorage language preference before changing language", async () => {
+        global.window.localStorage.languagePreference = "enUK";
+        await loadScript();
+
+        expect(mockI18next.changeLanguage).toHaveBeenCalledWith("en_GB", expect.any(Function));
+    });
+
+    test("Caches translatable elements across repeated content updates", async () => {
+        const querySpy = jest.spyOn(document, "querySelectorAll");
+        await loadScript();
+
+        const onCall = mockI18next.on.mock.calls.find(call => call[0] === "languageChanged");
+        const onHandler = onCall[1];
+        onHandler();
+
+        expect(querySpy).toHaveBeenCalledTimes(1);
+        querySpy.mockRestore();
     });
 
     test("Triggering languageChanged event updates content", async () => {
