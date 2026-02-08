@@ -2168,6 +2168,22 @@ describe("getPitchInfo", () => {
         };
     });
 
+    it("does not create a global `cents` variable for frequency inputs", () => {
+        const hadCents = Object.prototype.hasOwnProperty.call(global, "cents");
+        const previousCents = global.cents;
+
+        delete global.cents;
+
+        expect(() => getPitchInfo(activity, "alphabet", 440, tur)).not.toThrow();
+        expect(Object.prototype.hasOwnProperty.call(global, "cents")).toBe(false);
+
+        if (hadCents) {
+            global.cents = previousCents;
+        } else {
+            delete global.cents;
+        }
+    });
+
     it("returns correct pitch for 'alphabet'", () => {
         expect(getPitchInfo(activity, "alphabet", "C4", tur)).toBe("C");
     });

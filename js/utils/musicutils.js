@@ -6133,7 +6133,6 @@ const getPitchInfo = (activity, type, currentNote, tur) => {
         obj = frequencyToPitch(currentNote);
         pitch = obj[0];
         octave = obj[1];
-        cents = obj[2];
     } else {
         // Turn the note into pitch and octave.
         pitch = currentNote.substr(0, currentNote.length - 1);
