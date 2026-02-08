@@ -546,38 +546,11 @@
             deferredPrompt = event;
 
             // Show your install button here
-            const btn = document.createElement('button');
-            btn.innerHTML = '📱 Install Music Blocks';
-            btn.style.cssText = `
-            position:fixed;bottom:20px;right:20px;z-index:9999;
-            padding:12px 24px;background:#4CAF50;color:white;
-            border:none;border-radius:25px;font-size:16px;cursor:pointer;
-            box-shadow:0 4px 12px rgba(0,0,0,0.3);
-            `;
-  btn.onclick = async () => {
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    console.log('PWA install:', outcome);
-    if (outcome === 'accepted') {
-        btn.remove();
-        const divInstall = document.getElementById("installButton");
-            if (divInstall) divInstall.classList.add("hidden");
-        }
-    deferredPrompt = null;
-  };
-  document.body.appendChild(btn);
             const divInstall = document.getElementById("installButton");
             if (divInstall) {
                 divInstall.classList.remove("hidden");
-                divInstall.onclick = btn.onclick;
             }
         });
-        window.addEventListener('appinstalled', () => {
-    deferredPrompt = null;
-    document.querySelector('.pwa-btn')?.remove();
-    const divInstall = document.getElementById("installButton");
-    if (divInstall) divInstall.classList.add("hidden");
-       });
     </script>
     <script>
         $(document).ready(function () {
@@ -854,13 +827,5 @@
     </script>
 
 </body>
-<style>
-.pwa-btn {
-  position: fixed; bottom: 20px; right: 20px; z-index: 9999;
-  padding: 12px 24px; background: #4CAF50; color: white;
-  border: none; border-radius: 25px; font-size: 16px; cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: none;
-}
-.pwa-btn:hover { background: #45a049; }
-</style>
+
 </html>
