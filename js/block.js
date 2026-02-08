@@ -1003,19 +1003,19 @@ class Block {
      */
     regenerateArtwork(collapse) {
         // First we need to remove the old artwork.
-        if (this.bitmap != null) {
+        if (this.bitmap !== null) {
             this.container.removeChild(this.bitmap);
         }
 
-        if (this.highlightBitmap != null) {
+        if (this.highlightBitmap !== null) {
             this.container.removeChild(this.highlightBitmap);
         }
 
-        if (this.disconnectedBitmap != null) {
+        if (this.disconnectedBitmap !== null) {
             this.container.removeChild(this.disconnectedBitmap);
         }
 
-        if (this.disconnectedHighlightBitmap != null) {
+        if (this.disconnectedHighlightBitmap !== null) {
             this.container.removeChild(this.disconnectedHighlightBitmap);
         }
 
@@ -1048,7 +1048,7 @@ class Block {
          * @param {object} that - Reference to the current object.
          */
         const __processHighlightBitmap = (bitmap, that) => {
-            if (that.highlightBitmap != null) {
+            if (that.highlightBitmap !== null) {
                 that.container.removeChild(that.highlightBitmap);
             }
 
@@ -1097,7 +1097,7 @@ class Block {
                         that.updateCache();
                     }
 
-                    if (that.postProcess != null) {
+                    if (that.postProcess !== null) {
                         that.postProcess(that.postProcessArg);
                         that.postProcess = null;
                     }
@@ -1113,7 +1113,7 @@ class Block {
          * @param {object} that - Reference to the current object.
          */
         const __processDisconnectedHighlightBitmap = (bitmap, that) => {
-            if (that.disconnectedHighlightBitmap != null) {
+            if (that.disconnectedHighlightBitmap !== null) {
                 that.container.removeChild(that.disconnectedHighlightBitmap);
             }
 
@@ -1153,7 +1153,7 @@ class Block {
          * @param {object} that - Reference to the current object.
          */
         const __processDisconnectedBitmap = (bitmap, that) => {
-            if (that.disconnectedBitmap != null) {
+            if (that.disconnectedBitmap !== null) {
                 that.container.removeChild(that.disconnectedBitmap);
             }
 
@@ -1196,7 +1196,7 @@ class Block {
          * @param {object} that - Reference to the current object.
          */
         const __processBitmap = (bitmap, that) => {
-            if (that.bitmap != null) {
+            if (that.bitmap !== null) {
                 that.container.removeChild(that.bitmap);
             }
 
@@ -1304,7 +1304,7 @@ class Block {
         let proto, obj, label, attr;
         // Value blocks get a modifiable text label.
         if (SPECIALINPUTS.includes(this.name)) {
-            if (this.value == null) {
+            if (this.value === null) {
                 switch (this.name) {
                     case "text":
                         this.value = "---";
@@ -2128,7 +2128,7 @@ class Block {
      */
     _doOpenMedia(thisBlock) {
         const that = this;
-        const fileChooser = that.name == "media" ? docById("myMedia") : docById("audio");
+        const fileChooser = that.name === "media" ? docById("myMedia") : docById("audio");
 
         const __readerAction = () => {
             window.scroll(0, 0);
@@ -2680,7 +2680,7 @@ class Block {
         }
 
         // Reposition the blocks below.
-        if (this.connections[3] != null) {
+        if (this.connections[3] !== null) {
             // The last connection is flow. The second to last
             // connection is child flow.  FIX ME: This will not work
             // if there is more than one arg, e.g. n > 4.
@@ -2865,7 +2865,7 @@ class Block {
             }
             // We might be able to check which button was clicked.
             if ("nativeEvent" in event) {
-                if ("button" in event.nativeEvent && event.nativeEvent.button == 2) {
+                if ("button" in event.nativeEvent && event.nativeEvent.button === 2) {
                     that.blocks.stageClick = true;
                     _getStatic("wheelDiv").style.display = "none";
                     that.blocks.activeBlock = thisBlock;
@@ -3001,7 +3001,7 @@ class Block {
             that.blocks.raiseStackToTop(thisBlock);
 
             // And possibly the collapse button.
-            if (that.collapseContainer != null) {
+            if (that.collapseContainer !== null) {
                 that.activity.blocksContainer.setChildIndex(
                     that.collapseContainer,
                     that.activity.blocksContainer.children.length - 1
@@ -3043,7 +3043,7 @@ class Block {
 
             // Do not allow a stack of blocks to be dragged if the stack contains a silence block.
             let block = that.blocks.blockList[that.connections[1]];
-            while (block != undefined) {
+            while (block !== undefined) {
                 if (block?.name === "rest2") {
                     this.activity.errorMsg(_("Silence block cannot be removed."), block);
                     return;
@@ -3090,13 +3090,13 @@ class Block {
                 that.blocks.moveAllBlocksExcept(that, 0, -10);
             else if (event.stageY < 60) that.blocks.moveAllBlocksExcept(that, 0, 10);
 
-            if (that.blocks.longPressTimeout != null) {
+            if (that.blocks.longPressTimeout !== null) {
                 clearTimeout(that.blocks.longPressTimeout);
                 that.blocks.longPressTimeout = null;
                 that.blocks.clearLongPress();
             }
 
-            if (!moved && that.label != null) {
+            if (!moved && that.label !== null) {
                 that.label.style.display = "none";
             }
 
@@ -3200,7 +3200,7 @@ class Block {
             this.activity.trashcan.hide();
         }
 
-        if (this.blocks.longPressTimeout != null) {
+        if (this.blocks.longPressTimeout !== null) {
             clearTimeout(this.blocks.longPressTimeout);
             this.blocks.longPressTimeout = null;
             this.blocks.clearLongPress();
@@ -3474,7 +3474,7 @@ class Block {
         }
 
         // A place in the DOM to put modifiable labels (textareas).
-        if (this.label != null) {
+        if (this.label !== null) {
             labelValue = this.label.value;
         } else {
             labelValue = this.value;
@@ -3583,7 +3583,7 @@ class Block {
             }
         } else if (this.name === "notename") {
             const NOTENOTES = ["B", "A", "G", "F", "E", "D", "C"];
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedNote = this.value[0];
                 if (this.value.length === 1) {
                     selectedAttr = "♮";
@@ -3605,7 +3605,7 @@ class Block {
                 piemenuPitches(this, NOTENOTES, NOTENOTES, SOLFATTRS, selectedNote, selectedAttr);
             }
         } else if (this.name === "modename") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedMode = this.value;
             } else {
                 selectedMode = DEFAULTMODE;
@@ -3613,7 +3613,7 @@ class Block {
 
             piemenuModes(this, selectedMode);
         } else if (this.name === "chordname") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedChord = this.value;
             } else {
                 selectedChord = DEFAULTCHORD;
@@ -3621,7 +3621,7 @@ class Block {
 
             piemenuChords(this, selectedChord);
         } else if (this.name === "accidentalname") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedAccidental = this.value;
             } else {
                 selectedAccidental = DEFAULTACCIDENTAL;
@@ -3631,7 +3631,7 @@ class Block {
                 piemenuAccidentals(this, ACCIDENTALLABELS, ACCIDENTALNAMES, selectedAccidental);
             }
         } else if (this.name === "intervalname") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedInterval = this.value;
             } else {
                 selectedInterval = DEFAULTINTERVAL;
@@ -3641,7 +3641,7 @@ class Block {
                 piemenuIntervals(this, selectedInterval);
             }
         } else if (this.name === "invertmode") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedInvert = this.value;
             } else {
                 selectedInvert = DEFAULTINVERT;
@@ -3659,7 +3659,7 @@ class Block {
                 piemenuBasic(this, invertLabels, invertValues, selectedInvert);
             }
         } else if (this.name === "drumname") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedDrum = this.value;
             } else {
                 selectedDrum = DEFAULTDRUM;
@@ -3690,7 +3690,7 @@ class Block {
 
             piemenuVoices(this, drumLabels, drumValues, categories, selectedDrum);
         } else if (this.name === "effectsname") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedDrum = this.value;
             } else {
                 selectedEffect = DEFAULTEFFECT;
@@ -3721,7 +3721,7 @@ class Block {
 
             piemenuVoices(this, effectLabels, effectValues, effectcategories, selectedEffect);
         } else if (this.name === "filtertype") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedType = this.value;
             } else {
                 selectedType = DEFAULTFILTERTYPE;
@@ -3742,7 +3742,7 @@ class Block {
                 platformColor.piemenuBasic
             );
         } else if (this.name === "oscillatortype") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedType = this.value;
             } else {
                 selectedType = DEFAULTOSCILLATORTYPE;
@@ -3757,7 +3757,7 @@ class Block {
 
             piemenuBasic(this, oscLabels, oscValues, selectedType, platformColor.piemenuBasic);
         } else if (this.name === "voicename") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedVoice = this.value;
             } else {
                 selectedVoice = DEFAULTVOICE;
@@ -3791,7 +3791,7 @@ class Block {
 
             piemenuVoices(this, voiceLabels, voiceValues, categories, selectedVoice);
         } else if (this.name === "noisename") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedNoise = this.value;
             } else {
                 selectedNoise = DEFAULTNOISE;
@@ -3820,7 +3820,7 @@ class Block {
 
             piemenuVoices(this, noiseLabels, noiseValues, categories, selectedNoise, 90);
         } else if (this.name === "temperamentname") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedTemperament = this.value;
             } else {
                 selectedTemperament = DEFAULTTEMPERAMENT;
@@ -3852,7 +3852,7 @@ class Block {
                 platformColor.piemenuBasic
             );
         } else if (this.name === "boolean") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedValue = this.value;
             } else {
                 selectedValue = true;
@@ -3914,7 +3914,7 @@ class Block {
             }
             piemenuBasic(this, labels, values, selectedValue, platformColor.piemenuBasic);
         } else if (this.name === "wrapmode") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedWrap = this.value;
             } else {
                 selectedWrap = "on";
@@ -4172,7 +4172,7 @@ class Block {
                 Math.round((20 * this.blocks.blockScale * this.protoblock.scale) / 2) + "px";
             this.label.style.display = "";
             this.label.focus();
-            if (this.labelattr != null) {
+            if (this.labelattr !== null) {
                 this.labelattr.style.display = "";
             }
 
@@ -4276,7 +4276,7 @@ class Block {
 
         if (closeInput) {
             this.label.style.display = "none";
-            if (this.labelattr != null) {
+            if (this.labelattr !== null) {
                 this.labelattr.style.display = "none";
             }
             docById("wheelDiv").style.display = "none";
@@ -4290,7 +4290,7 @@ class Block {
         const oldValue = this.value;
         let newValue = this.label.value;
 
-        if (this.labelattr != null) {
+        if (this.labelattr !== null) {
             const attrValue = this.labelattr.value;
             switch (attrValue) {
                 case "𝄪":
@@ -4389,7 +4389,7 @@ class Block {
                 cblk2 !== null &&
                 newValue < 0 &&
                 (this.blocks.blockList[cblk1].name === "newnote" ||
-                    this.blocks.blockList[cblk2].name == "newnote")
+                    this.blocks.blockList[cblk2].name === "newnote")
             ) {
                 this.label.value = 0;
                 this.value = 0;
@@ -4405,7 +4405,7 @@ class Block {
             }
 
             if (
-                cblk1 != null &&
+                cblk1 !== null &&
                 this.blocks.blockList[cblk1].name === "pitch" &&
                 (this.value > 8 || this.value < 1)
             ) {
