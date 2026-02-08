@@ -8,9 +8,7 @@ describe("AI Registry Integration", () => {
         // Mock window object
         global.window = {};
 
-        // Load the files. In a real Jest environment with standard Music Blocks setup,
-        // we might need to mock or handle the IIFE exports.
-        // For this test, we'll manually execute the script content or simulate it.
+        // Initialize environment for testing IIFE-wrapped classes
 
         // --- Simulate AIModelAdapter.js ---
         (function (window) {

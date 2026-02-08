@@ -38,7 +38,7 @@
 
             if (prompt.includes("melody") || prompt.includes("suggest")) {
                 return {
-                    text: "Here is a suggested melody: [C4, E4, G4, C5]. This is a simple C Major arpeggio that works well as a starter.",
+                    text: "Suggested melody: [C4, E4, G4, C5] (C Major arpeggio).",
                     type: "melody_suggestion",
                     data: ["C4", "E4", "G4", "C5"],
                     model: "example-v1"
@@ -47,7 +47,7 @@
 
             if (prompt.includes("debug") || prompt.includes("fix") || prompt.includes("error")) {
                 return {
-                    text: "I analyzed your blocks. It seems you have a 'repeat' block without a count value. Setting the count to 4 should fix the 'infinite loop' Warning.",
+                    text: "Potential issue: Missing repeat count value in block hierarchy.",
                     type: "debug_advice",
                     advice: "Ensure all repeat blocks have a numerical value attached.",
                     model: "example-v1"
@@ -55,7 +55,7 @@
             }
 
             return {
-                text: "ExampleAIAdapter received your request. I can help with melody suggestions or block debugging! Try asking for a melody.",
+                text: "Example adapter response. Try 'melody' or 'debug' prompts.",
                 usage: {
                     prompt_tokens: 15,
                     completion_tokens: 25
