@@ -6,7 +6,9 @@
 
 // This is the "Offline page" service worker
 
-const CACHE = "pwabuilder-precache";
+const CACHE_PREFIX = "pwabuilder-precache";
+const CACHE_VERSION = "v2";
+const CACHE = `${CACHE_PREFIX}-${CACHE_VERSION}`;
 const precacheFiles = [
     /* Add an array of files to precache for your app */
     "./index.html"
@@ -32,8 +34,22 @@ self.addEventListener("install", function (event) {
 // Allow sw to control of current page
 self.addEventListener("activate", function (event) {
     // eslint-disable-next-line no-console
-    console.log("[PWA Builder] Claiming clients for current page");
-    event.waitUntil(self.clients.claim());
+    console.log("[PWA Builder] Claiming clients for current page and cleaning old caches");
+    event.waitUntil(
+        caches.keys().then(function (cacheNames) {
+            const staleCaches = cacheNames.filter(function (cacheName) {
+                return cacheName.startsWith(CACHE_PREFIX) && cacheName !== CACHE;
+            });
+
+            return Promise.all(
+                staleCaches.map(function (cacheName) {
+                    return caches.delete(cacheName);
+                })
+            ).then(function () {
+                return self.clients.claim();
+            });
+        })
+    );
 });
 
 function updateCache(request, response) {
@@ -61,10 +77,53 @@ function fromCache(request) {
     });
 }
 
+async function getOfflineFallbackResponse(error) {
+    // eslint-disable-next-line no-console
+    console.log("[PWA Builder] Network request failed and no cache." + error);
+
+    if (typeof offlineFallbackPage !== "undefined") {
+        const fallbackResponse = await caches.match(offlineFallbackPage);
+        if (fallbackResponse) return fallbackResponse;
+    }
+
+    return new Response("Service Unavailable", {
+        status: 503,
+        statusText: "offline"
+    });
+}
+
 // If any fetch fails, it will look for the request in the cache and
 // serve it from there first
 self.addEventListener("fetch", function (event) {
-    if (event.request.method !== "GET") return;
+    if (event.request.method !== "GET" || !event.request.url.startsWith("http")) return;
+
+    const isNavigationRequest =
+        event.request.mode === "navigate" || event.request.destination === "document";
+
+    if (isNavigationRequest) {
+        event.respondWith(
+            (async function () {
+                try {
+                    const response = await fetch(event.request);
+                    if (response.ok) {
+                        event.waitUntil(updateCache(event.request, response.clone()));
+                    }
+                    return response;
+                } catch (error) {
+                    try {
+                        return await fromCache(event.request);
+                    } catch (cacheError) {
+                        const cachedIndex = await caches.match("./index.html");
+                        if (cachedIndex) {
+                            return cachedIndex;
+                        }
+                        return getOfflineFallbackResponse(error);
+                    }
+                }
+            })()
+        );
+        return;
+    }
 
     event.respondWith(
         fromCache(event.request).then(
@@ -95,18 +154,7 @@ self.addEventListener("fetch", function (event) {
                     }
                     return response;
                 } catch (error) {
-                    // eslint-disable-next-line no-console
-                    console.log("[PWA Builder] Network request failed and no cache." + error);
-
-                    if (typeof offlineFallbackPage !== "undefined") {
-                        const fallbackResponse = await caches.match(offlineFallbackPage);
-                        if (fallbackResponse) return fallbackResponse;
-                    }
-
-                    return new Response("Service Unavailable", {
-                        status: 503,
-                        statusText: "offline"
-                    });
+                    return getOfflineFallbackResponse(error);
                 }
             }
         )
