@@ -3550,12 +3550,11 @@ class Activity {
          * Detects width/height changes and closes any menus before actual resize.
          * Repositions containers/palette/home buttons
          */
+        this._isValidViewportDimensions = (width, height) => {
+            return Number.isFinite(width) && Number.isFinite(height) && width > 0 && height > 0;
+        };
+
         this._onResize = force => {
-            if (!force) {
-                if (this.saveLocally !== null) {
-                    this.saveLocally();
-                }
-            }
             if (!this.stage) {
                 return;
             }
@@ -3569,6 +3568,17 @@ class Activity {
             } else {
                 w = window.outerWidth;
                 h = window.outerHeight;
+            }
+
+            if (
+                document.visibilityState === "hidden" ||
+                !this._isValidViewportDimensions(w, h)
+            ) {
+                return;
+            }
+
+            if (!force && typeof this.saveLocally === "function") {
+                this.saveLocally();
             }
 
             this._clientWidth = document.body.clientWidth;
@@ -3749,11 +3759,20 @@ class Activity {
         const canvasHolder = document.getElementById("canvasHolder");
         const defaultWidth = 1600;
         const defaultHeight = 900;
+        const isValidViewportDimensions = this._isValidViewportDimensions;
 
         function handleResize() {
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            if (
+                document.visibilityState === "hidden" ||
+                !isValidViewportDimensions(windowWidth, windowHeight)
+            ) {
+                return;
+            }
+
             const isMaximized =
-                window.innerWidth === window.screen.width &&
-                window.innerHeight === window.screen.height;
+                windowWidth === window.screen.width && windowHeight === window.screen.height;
             if (isMaximized) {
                 container.style.width = defaultWidth + "px";
                 container.style.height = defaultHeight + "px";
@@ -3764,8 +3783,6 @@ class Activity {
                 canvasHolder.width = defaultWidth;
                 canvasHolder.height = defaultHeight;
             } else {
-                const windowWidth = window.innerWidth;
-                const windowHeight = window.innerHeight;
                 container.style.width = windowWidth + "px";
                 container.style.height = windowHeight + "px";
                 canvas.width = windowWidth;
@@ -3781,8 +3798,15 @@ class Activity {
 
         let resizeTimeout;
         this._handleWindowResize = () => {
+            if (document.visibilityState === "hidden") {
+                return;
+            }
+
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
+                if (document.visibilityState === "hidden") {
+                    return;
+                }
                 handleResize();
                 this._setupPaletteMenu();
             }, 100);
@@ -6604,6 +6628,12 @@ class Activity {
                 console.error(e);
             }
 
+            const canvasWidth = this.canvas ? this.canvas.width : 0;
+            const canvasHeight = this.canvas ? this.canvas.height : 0;
+            if (!this._isValidViewportDimensions(canvasWidth, canvasHeight)) {
+                return;
+            }
+
             const img = new Image();
             const svgData = doSVG(
                 this.canvas,
@@ -6611,7 +6641,7 @@ class Activity {
                 this.turtles,
                 320,
                 240,
-                320 / this.canvas.width
+                320 / canvasWidth
             );
 
             img.onload = () => {
