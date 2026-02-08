@@ -1,0 +1,28 @@
+javascript:
+    - changed-files:
+          - any-glob-to-any-file:
+                - "**/*.js"
+                - "**/*.mjs"
+                - "**/*.cjs"
+
+dependencies:
+    - changed-files:
+          - any-glob-to-any-file:
+                - "package.json"
+                - "package-lock.json"
+                - "yarn.lock"
+                - "pnpm-lock.yaml"
+
+Issue-Documentation:
+    - changed-files:
+          - any-glob-to-any-file:
+                - "Docs/**"
+                - "**/*.md"
+
+Issue-Testing:
+    - changed-files:
+          - any-glob-to-any-file:
+                - "js/__tests__/**"
+                - "test/**"
+                - "tests/**"
+                - "cypress/**"
