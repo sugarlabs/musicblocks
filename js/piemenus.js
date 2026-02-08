@@ -61,6 +61,11 @@
    piemenuDissectNumber
 */
 
+/**
+ * Sets the pie menu container size based on the viewport width.
+ * Uses the base diameter and scales down for smaller screens.
+ * [i=400] Base diameter in pixels.
+ */
 const setWheelSize = (i = 400) => {
     const wheelDiv = document.getElementById("wheelDiv");
     const screenWidth = window.innerWidth;
@@ -84,6 +89,11 @@ const setWheelSize = (i = 400) => {
     wheelDiv.style.height = wheelDiv.style.width;
 };
 
+/**
+ * Computes an appropriate pie menu size based on the turtle canvas bounds.
+ * @param {Object} block - Block instance owning the pie menu.
+ * returnsMinimum of canvas width and height.
+ */
 const getPieMenuSize = block => {
     const canvas = block.blocks.turtles._canvas;
     return Math.min(canvas.width, canvas.height);
@@ -93,7 +103,11 @@ const getPieMenuSize = block => {
 setWheelSize();
 window.addEventListener("resize", setWheelSize);
 
-// Helper function to enable scroll-to-rotate for pie menus
+/**
+ * Enables mouse-wheel scrolling to rotate a wheelnav instance without triggering previews.
+ * wheel - wheelnav instance to rotate.
+ * itemCount - Total number of selectable items in the wheel.
+ */
 const enableWheelScroll = (wheel, itemCount) => {
     const wheelDiv = document.getElementById("wheelDiv");
     if (!wheelDiv || !wheel) return;
@@ -156,6 +170,16 @@ const enableWheelScroll = (wheel, itemCount) => {
     wheelDiv.addEventListener("wheel", scrollHandler, { passive: false });
 };
 
+/**
+ * Builds the pitch selection pie menu with optional accidentals and octave wheel.
+ * block - Block instance invoking the menu.
+ * noteLabels - Labels shown in the pitch wheel.
+ * noteValues - Values mapped to labels.
+ * accidentals - Accidental labels/values for the inner wheel.
+ * note - Current selected note value.
+ * accidental - Current selected accidental.
+ * [custom=false] - Whether to use the custom-note layout.
+ */
 const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accidental, custom) => {
     let prevPitch = null;
     // wheelNav pie menu for pitch selection
@@ -840,6 +864,14 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     };
 };
 
+/**
+ * Builds the custom temperament pie menu with optional octave wheel.
+ * block - Block instance invoking the menu.
+ * noteLabels - Custom note label map keyed by temperament.
+ * customLabels - Identifiers for available custom sets.
+ * selectedCustom - Currently selected custom set key.
+ * selectedNote - Currently selected note within the set.
+ */
 const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, selectedNote) => {
     // pie menu for customNote selection
     if (block.blocks.stageClick) {
@@ -1167,6 +1199,12 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     block._exitWheel.navItems[0].navigateFunction = __exitMenu;
 };
 
+/**
+ * Builds the scale-degree (nth modal pitch) pie menu.
+ * block - Block instance invoking the menu.
+ * noteValues - Scale degree values to display.
+ * note - Current selected degree (rounded if fractional).
+ */
 const piemenuNthModalPitch = (block, noteValues, note) => {
     // wheelNav pie menu for scale degree pitch selection
 
@@ -1420,6 +1458,13 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
     };
 };
 
+/**
+ * Builds the accidental selection pie menu.
+ * block - Block instance invoking the menu.
+ * accidentalLabels - Display labels for accidentals.
+ * accidentalValues - Values mapped to labels.
+ * accidental - Currently selected accidental.
+ */
 const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidental) => {
     // wheelNav pie menu for accidental selection
 
@@ -1554,6 +1599,11 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
     };
 };
 
+/**
+ * Builds the note duration pie menu and its sub-wheel options.
+ * block - Block instance invoking the menu.
+ * noteValue - Currently selected duration value.
+ */
 const piemenuNoteValue = (block, noteValue) => {
     // input form and  wheelNav pie menu for note value selection
 
@@ -1795,6 +1845,12 @@ const piemenuNoteValue = (block, noteValue) => {
     };
 };
 
+/**
+ * Builds the numeric value pie menu and synchronizes the selected value.
+ * block - Block instance invoking the menu.
+ * wheelValues - Values to show on the wheel.
+ * selectedValue - Currently selected value.
+ */
 const piemenuNumber = (block, wheelValues, selectedValue) => {
     // input form and  wheelNav pie menu for number selection
     if (block.blocks.stageClick) {
@@ -2093,6 +2149,13 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     }
 };
 
+/**
+ * Builds the color-selection pie menu for turtle and paint blocks.
+ * block - Block instance invoking the menu.
+ * wheelValues - Numeric values mapped to colors.
+ * selectedValue - Currently selected value.
+ * mode - Color mode (e.g. setcolor, setturtlecolor, sethue).
+ */
 const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     // input form and  wheelNav pie menu for setcolor selection
 
@@ -2265,6 +2328,14 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     };
 };
 
+/**
+ * Builds a generic pie menu with arbitrary labels and values.
+ * block - Block instance invoking the menu.
+ * menuLabels - Labels rendered on the wheel.
+ * menuValues - Values corresponding to each label.
+ * selectedValue - Currently selected value.
+ * [colors] - Optional override colors for the wheel.
+ */
 const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     // basic wheelNav pie menu
 
@@ -2407,6 +2478,13 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     };
 };
 
+/**
+ * Builds the boolean selection pie menu.
+ * block - Block instance invoking the menu.
+ * booleanLabels - Display labels for each option.
+ * booleanValues - Values mapped to each label.
+ * boolean - Currently selected value.
+ */
 const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
     // wheelNav pie menu for boolean selection
 
@@ -2511,6 +2589,11 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
     };
 };
 
+/**
+ * Builds the chord selection pie menu.
+ * block - Block instance invoking the menu.
+ * selectedChord - Currently selected chord label.
+ */
 const piemenuChords = (block, selectedChord) => {
     // wheelNav pie menu for chord selection
 
@@ -2642,6 +2725,15 @@ const piemenuChords = (block, selectedChord) => {
     };
 };
 
+/**
+ * Builds the voice/instrument selection pie menu.
+ * block - Block instance invoking the menu.
+ * voiceLabels - Labels shown in the wheel.
+ * voiceValues - Values mapped to labels.
+ * categories - Category indices for color grouping.
+ * voice - Currently selected voice value.
+ * [rotate] - Optional title rotation angle.
+ */
 const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotate) => {
     // wheelNav pie menu for voice selection
 
@@ -2820,6 +2912,11 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
     };
 };
 
+/**
+ * Builds the interval selection pie menu.
+ * block - Block instance invoking the menu.
+ * selectedInterval - Currently selected interval value.
+ */
 const piemenuIntervals = (block, selectedInterval) => {
     // pie menu for interval selection
 
@@ -3045,6 +3142,11 @@ const piemenuIntervals = (block, selectedInterval) => {
     block._exitWheel.navItems[0].navigateFunction = __exitMenu;
 };
 
+/**
+ * Builds the musical mode selection pie menu.
+ * block - Block instance invoking the menu.
+ * selectedMode - Currently selected mode value.
+ */
 const piemenuModes = (block, selectedMode) => {
     // pie menu for mode selection
 
