@@ -683,8 +683,6 @@
 
         function setIcon() {
             var iconCode = document.querySelector('#FullScrIcon');
-
-            // CHANGE 1:
             // Determine fullscreen state using the browser fullscreen API
             // instead of relying on a manual counter. This keeps the icon
             // in sync when fullscreen is exited via ESC or browser controls.
@@ -705,8 +703,6 @@
 
         function handleFullscreenChange() {
             var iconCode = document.querySelector('#FullScrIcon');
-
-            // CHANGE 2:
             // Update fullscreen icon based on actual fullscreen state.
             // This removes the need for a separate state variable and
             // prevents incorrect icon state when fullscreen is toggled
