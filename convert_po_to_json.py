@@ -17,7 +17,7 @@ import os
 import json
 import re
 import sys
-from typing import Dict, Optional
+from typing import Dict
 
 def parse_po_file(po_file: str) -> Dict[str, str]:
     """
@@ -74,6 +74,9 @@ def parse_po_file(po_file: str) -> Dict[str, str]:
             e.encoding, e.object, e.start, e.end,
             f"Invalid encoding in {po_file}. Expected UTF-8."
         )
+    except OSError as e:
+        # Propagate file access and other OS-related errors unchanged
+        raise
     except Exception as e:
         raise ValueError(f"Error parsing {po_file}: {str(e)}")
     

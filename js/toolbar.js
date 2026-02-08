@@ -17,7 +17,7 @@
 /* exported Toolbar */
 
 let WRAP = true;
-const $j = jQuery.noConflict();
+const $j = window.jQuery;
 let play_button_debounce_timeout = null;
 class Toolbar {
     /**
@@ -1029,6 +1029,11 @@ class Toolbar {
                 localStorage.setItem("beginnerMode", this.activity.beginnerMode.toString());
             } catch (e) {
                 console.error(e);
+            }
+
+            // Disable horizontal scrolling when switching to beginner mode
+            if (this.activity.beginnerMode && this.activity.scrollBlockContainer) {
+                setScroller(this.activity);
             }
 
             updateUIForMode();
