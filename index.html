@@ -548,6 +548,13 @@
     <script>
         let canvas, stage;
         function init() {
+            // Defensive check: ensure createjs is loaded before using it
+            if (typeof createjs === "undefined") {
+                // Retry after a short delay if createjs isn't ready yet
+                setTimeout(init, 50);
+                return;
+            }
+
             canvas = document.getElementById("canvas");
             stage = new createjs.Stage(canvas);
 
@@ -608,7 +615,12 @@
     </script>
     <script>
         $(document).ready(function () {
-            doSearch();
+            // Defensive check for doSearch global (now an Activity member)
+            if (typeof doSearch === "function") {
+                doSearch();
+            } else if (window.activity && typeof window.activity.doSearch === "function") {
+                window.activity.doSearch();
+            }
         });
     </script>
 
