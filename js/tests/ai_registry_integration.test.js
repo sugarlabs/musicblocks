@@ -15,9 +15,15 @@ describe("AI Registry Integration", () => {
         // --- Simulate AIModelAdapter.js ---
         (function (window) {
             class AIModelAdapter {
-                constructor(name) { this.name = name; }
-                async request() { throw new Error("Method 'request()' must be implemented."); }
-                isAvailable() { return false; }
+                constructor(name) {
+                    this.name = name;
+                }
+                async request() {
+                    throw new Error("Method 'request()' must be implemented.");
+                }
+                isAvailable() {
+                    return false;
+                }
             }
             window.AIModelAdapter = AIModelAdapter;
         })(global.window);
@@ -36,7 +42,9 @@ describe("AI Registry Integration", () => {
                 setActiveAdapter(name) {
                     if (this.adapters.has(name)) this.activeAdapter = name;
                 }
-                getActive() { return this.adapters.get(this.activeAdapter) || null; }
+                getActive() {
+                    return this.adapters.get(this.activeAdapter) || null;
+                }
                 async request(request) {
                     const adapter = this.getActive();
                     if (!adapter) throw new Error("No active AI adapter configured.");
@@ -49,11 +57,15 @@ describe("AI Registry Integration", () => {
         // --- Simulate MockAIModelAdapter.js ---
         (function (window) {
             class MockAIModelAdapter extends window.AIModelAdapter {
-                constructor() { super("mock-ai"); }
+                constructor() {
+                    super("mock-ai");
+                }
                 async request(request) {
                     return { text: "mock response", model: "mock-v1" };
                 }
-                isAvailable() { return true; }
+                isAvailable() {
+                    return true;
+                }
             }
             window.MockAIModelAdapter = MockAIModelAdapter;
             window.AIModelRegistry.register(new MockAIModelAdapter());
@@ -62,7 +74,9 @@ describe("AI Registry Integration", () => {
         // --- Simulate ExampleAIAdapter.js ---
         (function (window) {
             class ExampleAIAdapter extends window.AIModelAdapter {
-                constructor() { super("example-ai"); }
+                constructor() {
+                    super("example-ai");
+                }
                 async request(request) {
                     const prompt = (request.prompt || "").toLowerCase();
                     if (prompt.includes("melody")) {

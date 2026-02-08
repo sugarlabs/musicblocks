@@ -81,5 +81,5 @@
     window.AIModelRegistry = new AIModelRegistry();
 
     // Developer helper for console use
-    window.setActiveAI = (name) => window.AIModelRegistry.setActiveAdapter(name);
+    window.setActiveAI = name => window.AIModelRegistry.setActiveAdapter(name);
 })(window);
