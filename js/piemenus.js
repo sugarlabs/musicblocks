@@ -594,7 +594,6 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
 
             // Ensure synth is initialized before proceeding
             if (!that.activity.logo.synth) {
-                console.debug("Creating synth in logo");
                 that.activity.logo.synth = new Synth();
             }
 
@@ -707,7 +706,6 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                     that.activity.logo.synth.createDefaultSynth(0);
                     await that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
                 } catch (e) {
-                    console.debug("Error initializing synth:", e);
                     return;
                 }
             }
@@ -722,7 +720,6 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                 that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
                 that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
             } catch (e) {
-                console.debug("Error setting volume:", e);
                 return;
             }
 
@@ -740,8 +737,6 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                         false
                     );
                 } catch (e) {
-                    console.debug("Error triggering note:", e);
-                } finally {
                     // Ensure trigger lock is released after a delay
                     setTimeout(() => {
                         that._triggerLock = false;
@@ -882,9 +877,10 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     const setupAudioContext = async () => {
         try {
             await Tone.start();
-            console.debug("Audio context started");
         } catch (e) {
-            console.debug("Error starting audio context:", e);
+            // Tone.start() may fail if the user has not interacted with the page yet
+            // or if the audio context is already running. We can safely ignore this.
+            console.debug("Tone.start() skipped or failed", e);
         }
     };
 

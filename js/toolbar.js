@@ -1057,6 +1057,11 @@ class Toolbar {
                 console.error(e);
             }
 
+            // Disable horizontal scrolling when switching to beginner mode
+            if (this.activity.beginnerMode && this.activity.scrollBlockContainer) {
+                setScroller(this.activity);
+            }
+
             updateUIForMode();
 
             // Reinitialize tooltips after mode switch

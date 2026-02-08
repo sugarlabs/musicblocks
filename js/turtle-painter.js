@@ -1259,7 +1259,7 @@ class Painter {
             turtles.gy = this.turtle.ctx.canvas.height;
         }
 
-        const i = turtles.getIndexOfTurtle(this) % 10;
+        const i = turtles.getIndexOfTurtle(this.turtle) % 10;
         if (resetPen) {
             this.color = i * 10;
             this.value = DEFAULTVALUE;

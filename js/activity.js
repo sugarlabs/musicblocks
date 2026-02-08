@@ -306,7 +306,10 @@ class Activity {
         this.loadAnimationIntervalId = null;
 
         // Initialize GIF animator
-        this.gifAnimator = new GIFAnimator();
+        // Check if GIFAnimator is available before using it
+        if (typeof GIFAnimator !== "undefined") {
+            this.gifAnimator = new GIFAnimator();
+        }
 
         // Dirty flag for canvas rendering optimization
         // When true, the stage needs to be redrawn on the next animation frame
@@ -5683,7 +5686,9 @@ class Activity {
             this.update = true;
         };
 
-        this.__showAltoAccidentals = () => {};
+        this.__showAltoAccidentals = () => {
+            // No-op for Alto clef
+        };
 
         /*
          * Shows musical alto staff

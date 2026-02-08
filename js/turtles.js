@@ -1322,6 +1322,12 @@ if (typeof module !== "undefined" && module.exports) {
     module.exports = Turtles;
 }
 
+if (typeof define === "function" && define.amd) {
+    define([], function () {
+        return Turtles;
+    });
+}
+
 if (typeof window !== "undefined") {
     window.Turtles = Turtles;
 }
