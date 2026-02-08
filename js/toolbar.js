@@ -17,7 +17,7 @@
 /* exported Toolbar */
 
 let WRAP = true;
-const $j = jQuery.noConflict();
+const $j = window.jQuery;
 let play_button_debounce_timeout = null;
 class Toolbar {
     /**
@@ -475,28 +475,28 @@ class Toolbar {
         confirmationMessage.textContent = _("Are you sure you want to create a new project?");
         newDropdown.appendChild(confirmationMessage);
 
-        const confirmationButtonLi = document.createElement("li");
+        const buttonRowLi = document.createElement("li");
+        buttonRowLi.classList.add("button-row");
+
         const confirmationButton = document.createElement("div");
         confirmationButton.classList.add("confirm-button");
         confirmationButton.id = "new-project";
         confirmationButton.textContent = _("Confirm");
-        confirmationButtonLi.appendChild(confirmationButton);
-        newDropdown.appendChild(confirmationButtonLi);
+
+        const cancelButton = document.createElement("div");
+        cancelButton.classList.add("cancel-button");
+        cancelButton.id = "cancel-project";
+        cancelButton.textContent = _("Cancel");
+
+        buttonRowLi.appendChild(confirmationButton);
+        buttonRowLi.appendChild(cancelButton);
+        newDropdown.appendChild(buttonRowLi);
 
         modalContainer.style.display = "flex";
         confirmationButton.onclick = () => {
             modalContainer.style.display = "none";
             onclick(this.activity);
         };
-
-        //Cancel Button
-        const cancelButtonLi = document.createElement("li");
-        const cancelButton = document.createElement("div");
-        cancelButton.classList.add("cancel-button");
-        cancelButton.id = "cancel-project";
-        cancelButton.textContent = _("Cancel");
-        cancelButtonLi.appendChild(cancelButton);
-        newDropdown.appendChild(cancelButtonLi);
         cancelButton.onclick = () => {
             modalContainer.style.display = "none";
         };
@@ -1029,6 +1029,11 @@ class Toolbar {
                 localStorage.setItem("beginnerMode", this.activity.beginnerMode.toString());
             } catch (e) {
                 console.error(e);
+            }
+
+            // Disable horizontal scrolling when switching to beginner mode
+            if (this.activity.beginnerMode && this.activity.scrollBlockContainer) {
+                setScroller(this.activity);
             }
 
             updateUIForMode();

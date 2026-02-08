@@ -61,9 +61,11 @@
    piemenuDissectNumber
 */
 
-const setWheelSize = i => {
+const setWheelSize = (i = 400) => {
     const wheelDiv = document.getElementById("wheelDiv");
     const screenWidth = window.innerWidth;
+
+    if (!wheelDiv) return;
 
     wheelDiv.style.position = "absolute";
     wheelDiv.style.zIndex = "20000"; // Set z-index higher than floating windows (10000)
@@ -305,11 +307,12 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
-    setWheelSize(300);
-    const halfWheelSize = wheelSize / 2;
+    const displaySize = 400;
+    setWheelSize(displaySize);
+    const halfWheelSize = displaySize / 2;
     docById("wheelDiv").style.left =
         Math.min(
-            block.blocks.turtles._canvas.width - wheelSize,
+            block.blocks.turtles._canvas.width - displaySize,
             Math.max(
                 0,
                 Math.round(
@@ -320,7 +323,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
         ) + "px";
     docById("wheelDiv").style.top =
         Math.min(
-            block.blocks.turtles._canvas.height - wheelSize,
+            block.blocks.turtles._canvas.height - displaySize,
             Math.max(
                 0,
                 Math.round(
@@ -717,16 +720,19 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     };
 
     const __selectionChangedAccidental = () => {
-        selection["note"] = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+        const i = that._pitchWheel.selectedNavItemIndex;
+        selection["note"] = noteLabels[i];
+        const selectedNoteValue = noteValues[i];
+
         selection["attr"] =
             that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
 
         if (selection["attr"] === "♮") {
             that.text.text = selection["note"];
-            that.value = selection["note"];
+            that.value = selectedNoteValue;
         } else {
-            that.value = selection["note"] + selection["attr"];
-            that.text.text = that.value;
+            that.value = selectedNoteValue + selection["attr"];
+            that.text.text = selection["note"] + selection["attr"];
         }
 
         that.container.setChildIndex(that.text, that.container.children.length - 1);
@@ -772,20 +778,31 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     };
 
     for (let i = 0; i < noteValues.length; i++) {
-        block._pitchWheel.navItems[i].navigateFunction = __previewWrapper;
+        block._pitchWheel.navItems[i].navigateFunction = async () => {
+            __selectionChangedSolfege();
+            await __previewWrapper();
+        };
     }
 
     if (!custom) {
         for (let i = 0; i < accidentals.length; i++) {
-            block._accidentalsWheel.navItems[i].navigateFunction = __previewWrapper;
+            block._accidentalsWheel.navItems[i].navigateFunction = async () => {
+                __selectionChangedAccidental();
+                await __previewWrapper();
+            };
         }
     }
 
     if (hasOctaveWheel) {
         for (let i = 0; i < 8; i++) {
-            block._octavesWheel.navItems[i].navigateFunction = __previewWrapper;
+            block._octavesWheel.navItems[i].navigateFunction = async () => {
+                __selectionChangedOctave();
+                await __previewWrapper();
+            };
         }
     }
+
+    enableWheelScroll(block._pitchWheel, noteLabels.length);
 
     // Hide the widget when the exit button is clicked.
     block._exitWheel.navItems[0].navigateFunction = () => {
@@ -797,14 +814,17 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                 : "";
 
         // Update the block's displayed text with the note and accidental
+        const i = that._pitchWheel.selectedNavItemIndex;
+        const selectedNoteValue = noteValues[i];
+
         if (selectedAccidental === "♮" || selectedAccidental === "") {
             // Natural or no accidental: display only the note
             that.text.text = selectedNote;
-            that.value = selectedNote;
+            that.value = selectedNoteValue;
         } else {
             // Combine note and accidental for display
             that.text.text = selectedNote + selectedAccidental;
-            that.value = selectedNote + selectedAccidental;
+            that.value = selectedNoteValue + selectedAccidental;
         }
 
         // Ensure proper layering of the text element
@@ -1334,14 +1354,18 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
         /* We're using a default of C major ==> -7 to -1 should be one octave lower
            than the reference, 0-6 in the same octave and 7 should be once octave higher
         */
-        let deltaOctave = 0;
-        if (noteLabels[i] == 7) {
-            deltaOctave = 1;
-        } else if (noteLabels[i] < 0) {
-            deltaOctave = -1;
+        let deltaOctave;
+        let note;
+
+        // Use C major as of now; fix block to use current keySignature once that feature is in place
+        const keySignature =
+            block.activity.KeySignatureEnv[0] + " " + block.activity.KeySignatureEnv[1];
+        if (noteValues[i] >= 0) {
+            [note, deltaOctave] = nthDegreeToPitch(keySignature, noteValues[i]);
+        } else {
+            [note, deltaOctave] = nthDegreeToPitch(keySignature, 7 + noteValues[i]);
         }
 
-        // prevPitch = i;
         let octave = Number(
             that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
         );
@@ -1350,17 +1374,6 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
             octave = 1;
         } else if (octave > 8) {
             octave = 8;
-        }
-
-        let note;
-
-        // Use C major as of now; fix block to use current keySignature once that feature is in place
-        const keySignature =
-            block.activity.KeySignatureEnv[0] + " " + block.activity.KeySignatureEnv[1];
-        if (noteValues[i] >= 0) {
-            note = nthDegreeToPitch(keySignature, noteValues[i]);
-        } else {
-            note = nthDegreeToPitch(keySignature, 7 + noteValues[i]);
         }
 
         const tur = that.activity.turtles.ithTurtle(0);

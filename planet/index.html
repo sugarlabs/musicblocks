@@ -21,13 +21,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!--Import jQuery before materialize.js-->
-    <script type="text/javascript" src="libs/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="libs/jquery-3.7.1.min.js"></script>
     <script type="text/javascript" src="libs/materialize.min.js"></script>
     <script type="text/javascript" src="libs/localforage.min.js"></script>
 
     <script type="text/javascript" src="js/helper.js"></script>
     <script type="text/javascript" src="js/StringHelper.js"></script>
     <script type="text/javascript" src="js/ProjectStorage.js"></script>
+    <script type="text/javascript" src="js/RequestManager.js"></script>
+    <script type="text/javascript" src="js/CacheManager.js"></script>
     <script type="text/javascript" src="js/ServerInterface.js"></script>
     <script type="text/javascript" src="js/Converter.js"></script>
     <script type="text/javascript" src="js/SaveInterface.js"></script>
@@ -36,7 +38,7 @@
     <script type="text/javascript" src="js/Publisher.js"></script>
     <script type="text/javascript" src="js/LocalPlanet.js"></script>
 
-    <script type="text/javascript" src="js/utils.js?v=4"></script>
+    <script type="text/javascript" src="../js/utils/utils.js"></script>
     <script type="text/javascript" src="js/GlobalTag.js"></script>
     <script type="text/javascript" src="js/GlobalCard.js"></script>
     <script type="text/javascript" src="js/ProjectViewer.js"></script>
@@ -47,22 +49,16 @@
 </head>
 <script>
     document.addEventListener("scroll", function () {
-        var navbar = document.querySelector(".nav-extended");
-        if (navbar) {
-            if (document.body.scrollTop > 210 || document.documentElement.scrollTop > 210) {
+          vbar = document.querySelector(".nav-extended");
+              ) {
+                      body.scrollTop > 210 || document.documentElement.scrollTop > 210) {
                 navbar.classList.remove("lighten-1");
+            }            e               na vbar.classList.add("lighten-1");
             }
-            else {
-                navbar.classList.add("lighten-1");
-            }
-        }
-    });
-    // Function to scroll to the top of the page
+                  // Function     l to     of the page
     function scrollToTop() {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
+       dow.scrollTo({
+                            behavior               });
     }   
 </script>
 

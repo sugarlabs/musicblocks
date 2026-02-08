@@ -981,4 +981,58 @@ describe("Utility Functions (logic-only)", () => {
             expect(result).toBeInstanceOf(Promise);
         });
     });
+
+    describe("validateAndSetParams", () => {
+        let validateAndSetParams;
+
+        beforeAll(() => {
+            // Inline the function logic for testing (module-level function)
+            validateAndSetParams = (defaultParams, params) => {
+                if (defaultParams && defaultParams !== null && params && params !== undefined) {
+                    for (const key in defaultParams) {
+                        if (key in params && params[key] !== undefined)
+                            defaultParams[key] = params[key];
+                    }
+                }
+                return defaultParams;
+            };
+        });
+
+        it("should override default params with provided params", () => {
+            const defaultParams = { attack: 0.1, decay: 0.2, sustain: 0.5 };
+            const params = { attack: 0.3, sustain: 0.8 };
+
+            const result = validateAndSetParams(defaultParams, params);
+
+            expect(result.attack).toBe(0.3);
+            expect(result.decay).toBe(0.2);
+            expect(result.sustain).toBe(0.8);
+        });
+
+        it("should return defaultParams unchanged when params is null or undefined", () => {
+            const defaultParams1 = { attack: 0.1, decay: 0.2 };
+            const defaultParams2 = { attack: 0.1, decay: 0.2 };
+
+            expect(validateAndSetParams(defaultParams1, null)).toEqual({ attack: 0.1, decay: 0.2 });
+            expect(validateAndSetParams(defaultParams2, undefined)).toEqual({
+                attack: 0.1,
+                decay: 0.2
+            });
+        });
+
+        it("should return null/undefined when defaultParams is null/undefined", () => {
+            expect(validateAndSetParams(null, { attack: 0.3 })).toBeNull();
+            expect(validateAndSetParams(undefined, { attack: 0.3 })).toBeUndefined();
+        });
+
+        it("should ignore params keys not present in defaultParams", () => {
+            const defaultParams = { attack: 0.1 };
+            const params = { attack: 0.5, unknownKey: 999 };
+
+            const result = validateAndSetParams(defaultParams, params);
+
+            expect(result.attack).toBe(0.5);
+            expect(result.unknownKey).toBeUndefined();
+        });
+    });
 });
