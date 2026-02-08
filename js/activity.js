@@ -6829,15 +6829,16 @@ class Activity {
             // createjs.Ticker.addEventListener('tick', this.stage);
             // createjs.Ticker.addEventListener('tick', that.__tick);
 
+            // Named event handlers for proper cleanup
             let mouseEvents = 0;
-            document.addEventListener("mousemove", () => {
+            this.handleMouseMove = () => {
                 mouseEvents++;
                 if (mouseEvents % 4 === 0) {
                     that.__tick();
                 }
-            });
+            };
 
-            document.addEventListener("click", e => {
+            this.handleDocumentClick = e => {
                 if (!this.hasMouseMoved) {
                     if (this.selectionModeOn) {
                         this.deselectSelectedBlocks();
@@ -6845,7 +6846,11 @@ class Activity {
                         this._hideHelpfulSearchWidget(e);
                     }
                 }
-            });
+            };
+
+            // Use managed addEventListener for automatic cleanup
+            this.addEventListener(document, "mousemove", this.handleMouseMove);
+            this.addEventListener(document, "click", this.handleDocumentClick);
 
             this._createMsgContainer(
                 "#ffffff",
@@ -7483,10 +7488,14 @@ class Activity {
             document.addEventListener("DOMMouseScroll", scrollEvent, false);
             */
 
+            // Named event handler for proper cleanup
             const activity = this;
-            document.onkeydown = () => {
+            this.handleKeyDown = event => {
                 activity.__keyPressed(event);
             };
+
+            // Use managed addEventListener instead of onkeydown assignment
+            this.addEventListener(document, "keydown", this.handleKeyDown);
 
             if (this.planet !== undefined) {
                 this.planet.planet.setAnalyzeProject(doAnalyzeProject);
