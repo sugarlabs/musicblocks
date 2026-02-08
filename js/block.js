@@ -22,7 +22,7 @@
    DISABLEDFILLCOLOR, DISABLEDSTROKECOLOR, docById, DOUBLEFLAT,
    DOUBLESHARP, DRUMNAMES, EASTINDIANSOLFNOTES, EFFECTSNAMES,
    EXPANDBUTTON, FILTERTYPES, FLAT, getDrumName, getDrumSynthName,
-   getModeNumbers, getNoiseName, getVoiceName, getTemperament, getTemperamentKeys,
+   getModeNumbers, getNoiseName, getTemperament, getTemperamentKeys,
    getTemperamentsList, getTextWidth, hideDOMLabel, HIGHLIGHTSTROKECOLORS,
    i18nSolfege, INVERTMODES, isCustomTemperament, last, MEDIASAFEAREA,
    NATURAL, NOISENAMES, NSYMBOLS, NUMBERBLOCKDEFAULT, OSCTYPES,
@@ -1019,89 +1019,6 @@ class Block {
             this.container.removeChild(this.highlightCollapseBlockBitmap);
         }
 
-        // Update text labels for value blocks (needed for language hot-swap)
-        if (this.text !== null && SPECIALINPUTS.includes(this.name)) {
-            let label, obj, attr;
-
-            if (this.name === "solfege") {
-                obj = splitSolfege(this.value);
-                label = i18nSolfege(obj[0]);
-                attr = obj[1];
-                if (attr !== "♮") {
-                    label += attr;
-                }
-            } else if (this.name === "eastindiansolfege") {
-                obj = splitSolfege(this.value);
-                label = WESTERN2EISOLFEGENAMES[obj[0]];
-                attr = obj[1];
-                if (attr !== "♮") {
-                    label += attr;
-                }
-            } else if (this.name === "scaledegree2") {
-                obj = splitScaleDegree(this.value);
-                label = obj[0];
-                attr = obj[1];
-                if (attr !== "♮") {
-                    label += attr;
-                }
-            } else if (this.name === "drumname") {
-                label = getDrumName(this.value);
-            } else if (this.name === "voicename") {
-                label = getVoiceName(this.value);
-            } else if (this.name === "noisename") {
-                label = getNoiseName(this.value);
-            } else if (
-                this.name === "modename" ||
-                this.name === "chordname" ||
-                this.name === "invertmode" ||
-                this.name === "intervalname" ||
-                this.name === "temperamentname" ||
-                this.name === "filtertype" ||
-                this.name === "oscillatortype" ||
-                this.name === "wrapmode"
-            ) {
-                label = _(this.value);
-            } else if (this.name === "accidentalname") {
-                // Accidental names have format like "sharp ♯" - translate the first part
-                const parts = this.value.split(" ");
-                if (parts.length > 1) {
-                    label = _(parts[0]) + " " + parts.slice(1).join(" ");
-                } else {
-                    label = _(this.value);
-                }
-            } else if (this.name === "outputtools") {
-                label = this.overrideName;
-            } else if (this.name === "grid") {
-                label = _(this.value);
-            } else {
-                if (this.value !== null) {
-                    label = this.value.toString();
-                } else {
-                    label = "???";
-                }
-            }
-
-            if (
-                !WIDENAMES.includes(this.name) &&
-                getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH
-            ) {
-                label = label.substr(0, STRINGLEN) + "...";
-            }
-
-            this.text.text = label;
-        }
-
-        // Update collapsed block labels (needed for language hot-swap)
-        if (this.collapsed && this.collapseText !== null) {
-            if (this.name === "newnote") {
-                this._newNoteLabel();
-            } else if (this.name === "interval") {
-                this._intervalLabel();
-            } else if (this.name === "osctime") {
-                this._oscTimeLabel();
-            }
-        }
-
         // Then we generate new artwork.
         this.generateArtwork(false);
     }
@@ -1481,29 +1398,8 @@ class Block {
                 }
             } else if (this.name === "drumname") {
                 label = getDrumName(this.value);
-            } else if (this.name === "voicename") {
-                label = getVoiceName(this.value);
             } else if (this.name === "noisename") {
                 label = getNoiseName(this.value);
-            } else if (
-                this.name === "modename" ||
-                this.name === "chordname" ||
-                this.name === "invertmode" ||
-                this.name === "intervalname" ||
-                this.name === "temperamentname" ||
-                this.name === "filtertype" ||
-                this.name === "oscillatortype" ||
-                this.name === "wrapmode"
-            ) {
-                label = _(this.value);
-            } else if (this.name === "accidentalname") {
-                // Accidental names have format like "sharp ♯" - translate the first part
-                const parts = this.value.split(" ");
-                if (parts.length > 1) {
-                    label = _(parts[0]) + " " + parts.slice(1).join(" ");
-                } else {
-                    label = _(this.value);
-                }
             } else if (this.name === "outputtools") {
                 label = this.overrideName;
             } else if (this.name === "grid") {

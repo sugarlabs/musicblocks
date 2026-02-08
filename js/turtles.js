@@ -1001,11 +1001,11 @@ Turtles.TurtlesView = class {
                 this._expandButton.style.visibility = "visible";
                 this._collapseButton.style.visibility = "hidden";
                 this.activity.helpfulWheelItems.forEach(ele => {
-                    if (ele.label === _("Expand") || ele.label === "Expand") {
+                    if (ele.label === "Expand") {
                         ele.display = true;
-                    } else if (ele.label === _("Collapse") || ele.label === "Collapse") {
+                    } else if (ele.label === "Collapse") {
                         ele.display = false;
-                    } else if (ele.label === _("Grid") || ele.label === "Grid") {
+                    } else if (ele.label === "Grid") {
                         ele.display = false;
                     }
                 });
@@ -1026,11 +1026,11 @@ Turtles.TurtlesView = class {
             this._collapseButton.style.visibility = "hidden";
             this.gridButton.style.visibility = "hidden";
             this.activity.helpfulWheelItems.forEach(ele => {
-                if (ele.label === _("Expand") || ele.label === "Expand") {
+                if (ele.label === "Expand") {
                     ele.display = true;
-                } else if (ele.label === _("Collapse") || ele.label === "Collapse") {
+                } else if (ele.label === "Collapse") {
                     ele.display = false;
-                } else if (ele.label === _("Grid") || ele.label === "Grid") {
+                } else if (ele.label === "Grid") {
                     ele.display = false;
                 }
             });
@@ -1081,11 +1081,11 @@ Turtles.TurtlesView = class {
             this._collapseButton.style.visibility = "visible";
             this._expandButton.style.visibility = "hidden";
             this.activity.helpfulWheelItems.forEach(ele => {
-                if (ele.label === _("Expand") || ele.label === "Expand") {
+                if (ele.label === "Expand") {
                     ele.display = false;
-                } else if (ele.label === _("Collapse") || ele.label === "Collapse") {
+                } else if (ele.label === "Collapse") {
                     ele.display = true;
-                } else if (ele.label === _("Grid") || ele.label === "Grid") {
+                } else if (ele.label === "Grid") {
                     ele.display = true;
                 }
             });
