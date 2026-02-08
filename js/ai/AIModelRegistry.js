@@ -14,7 +14,7 @@
  * Singleton registry for AI model adapters.
  * Orchestrates multiple adapters and provides a unified interface for requests.
  */
-(function (window) {
+define([], function () {
     class AIModelRegistry {
         constructor() {
             this.adapters = new Map();
@@ -78,8 +78,11 @@
     }
 
     // Export a singleton instance to global namespace
-    window.AIModelRegistry = new AIModelRegistry();
+    const registry = new AIModelRegistry();
+    window.AIModelRegistry = registry;
 
     // Developer helper for console use
     window.setActiveAI = name => window.AIModelRegistry.setActiveAdapter(name);
-})(window);
+
+    return registry;
+});
