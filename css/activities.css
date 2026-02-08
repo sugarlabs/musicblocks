@@ -15,6 +15,11 @@
 @import url("play-only-mode.css");
 
 *:focus {
+  outline: 3px solid #1a73e8;
+  outline-offset: 2px;
+}
+
+*:focus:not(:focus-visible) {
   outline: none;
 }
 

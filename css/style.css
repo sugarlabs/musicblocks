@@ -10,6 +10,11 @@ input[type="range"] {
 }
 
 input[type="range"]:focus {
+  outline: 3px solid #1a73e8;
+  outline-offset: 2px;
+}
+
+input[type="range"]:focus:not(:focus-visible) {
   outline: none;
 }
 
@@ -114,4 +119,3 @@ input[type="range"]:focus::-ms-fill-upper {
 .lego-size-1 { width: 20px; height: 10px; }
 .lego-size-2 { width: 40px; height: 10px; }
 /* ... more sizes ... */
-

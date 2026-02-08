@@ -4,6 +4,10 @@ input[type="range"] {
   width: 250px;
 }
 input[type="range"]:focus {
+  outline: 3px solid #1a73e8;
+  outline-offset: 2px;
+}
+input[type="range"]:focus:not(:focus-visible) {
   outline: 0;
 }
 input[type="range"]:not(.pitchSlider)::-webkit-slider-runnable-track {
