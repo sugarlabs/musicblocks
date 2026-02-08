@@ -49,16 +49,22 @@
 </head>
 <script>
     document.addEventListener("scroll", function () {
-          vbar = document.querySelector(".nav-extended");
-              ) {
-                      body.scrollTop > 210 || document.documentElement.scrollTop > 210) {
+        var navbar = document.querySelector(".nav-extended");
+        if (navbar) {
+            if (document.body.scrollTop > 210 || document.documentElement.scrollTop > 210) {
                 navbar.classList.remove("lighten-1");
-            }            e               na vbar.classList.add("lighten-1");
             }
-                  // Function     l to     of the page
+            else {
+                navbar.classList.add("lighten-1");
+            }
+        }
+    });
+    // Function to scroll to the top of the page
     function scrollToTop() {
-       dow.scrollTo({
-                            behavior               });
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
     }   
 </script>
 
