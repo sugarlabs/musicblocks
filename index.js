@@ -14,7 +14,7 @@ app.use(
 
 app.use(
     express.static(path.join(__dirname), {
-        maxAge: "1h"
+        maxAge: 0
     })
 );
 
