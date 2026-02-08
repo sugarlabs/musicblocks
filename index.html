@@ -608,7 +608,26 @@
     </script>
     <script>
         $(document).ready(function () {
-            doSearch();
+            const maxAttempts = 100;
+            let attempts = 0;
+
+            const initializeSearch = () => {
+                if (
+                    window.activity &&
+                    typeof window.activity.doSearch === "function" &&
+                    window.activity.searchWidget
+                ) {
+                    window.activity.doSearch();
+                    return;
+                }
+
+                if (attempts < maxAttempts) {
+                    attempts += 1;
+                    setTimeout(initializeSearch, 100);
+                }
+            };
+
+            initializeSearch();
         });
     </script>
 
