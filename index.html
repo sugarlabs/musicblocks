@@ -551,6 +551,17 @@
                 divInstall.classList.remove("hidden");
             }
         });
+        if (divInstall) {
+            divInstall.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`User response: ${outcome}`);
+                    deferredPrompt = null;
+                    divInstall.classList.add("hidden");
+                }
+            });
+        }
     </script>
     <script>
         $(document).ready(function () {
@@ -825,7 +836,7 @@
         });
 
     </script>
-
+<button id="installButton" class="hidden">Install Music Blocks</button>
 </body>
 
 </html>
