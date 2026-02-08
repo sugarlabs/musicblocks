@@ -420,9 +420,11 @@ class RhythmRuler {
             }
 
             // Look for any old entries that we may have missed.
+            // Use Set for O(1) lookup instead of Array.includes() O(n)
+            const drumsSet = new Set(drums);
             for (let i = 0; i < this._dissectHistory.length; i++) {
                 const drum = this._dissectHistory[i][1];
-                if (!drums.includes(drum)) {
+                if (!drumsSet.has(drum)) {
                     const history = JSON.parse(JSON.stringify(this._dissectHistory[i][0]));
                     dissectHistory.push([history, drum]);
                 }
@@ -2723,9 +2725,11 @@ class RhythmRuler {
         }
 
         // Look for any old entries that we may have missed.
+        // Use Set for O(1) lookup instead of Array.includes() O(n)
+        const drumsSet = new Set(drums);
         for (let i = 0; i < this._dissectHistory.length; i++) {
             drum = this._dissectHistory[i][1];
-            if (!drums.includes(drum)) {
+            if (!drumsSet.has(drum)) {
                 history = JSON.parse(JSON.stringify(this._dissectHistory[i][0]));
                 dissectHistory.push([history, drum]);
             }
