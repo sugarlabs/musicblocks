@@ -117,7 +117,14 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
         i18next.on("languageChanged", updateContent);
 
         // Load app only after i18n is ready
-        requirejs(["utils/utils", "activity/activity"]);
+        requirejs([
+            "utils/utils",
+            "activity/activity",
+            "ai/AIModelAdapter",
+            "ai/AIModelRegistry",
+            "ai/MockAIModelAdapter",
+            "ai/ExampleAIAdapter",
+        ]);
     }
 
     main();
