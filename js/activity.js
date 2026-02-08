@@ -1722,13 +1722,40 @@ class Activity {
             }
 
             async function recordCanvasOnly() {
-                flag =1;
+                flag = 1;
                 const canvas = document.getElementById("myCanvas");
                 if (!canvas) {
                     throw new Error("Canvas element not found");
                 }
-                
-                const canvasStream = canvas.captureStream(30);
+
+                // Get the toolbar height (if present)
+                let toolbarHeight = 0;
+                const toolbar = document.getElementById("toolbars");
+                if (toolbar && toolbar.offsetHeight) {
+                    toolbarHeight = toolbar.offsetHeight;
+                }
+
+                // Crop the canvas to exclude the toolbar space
+                const cropY = toolbarHeight;
+                const cropHeight = canvas.height - cropY;
+                const cropWidth = canvas.width;
+
+                const offscreenCanvas = document.createElement("canvas");
+                offscreenCanvas.width = cropWidth;
+                offscreenCanvas.height = cropHeight;
+                const offscreenCtx = offscreenCanvas.getContext("2d");
+
+                // Animation loop to keep offscreen canvas updated
+                let recordingActive = true;
+                function updateOffscreen() {
+                    if (!recordingActive) return;
+                    offscreenCtx.clearRect(0, 0, cropWidth, cropHeight);
+                    offscreenCtx.drawImage(canvas, 0, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+                    requestAnimationFrame(updateOffscreen);
+                }
+                updateOffscreen();
+
+                const canvasStream = offscreenCanvas.captureStream(30);
 
                 const Tone = that.logo.synth.tone;
                 if (Tone && Tone.context) {
@@ -1736,11 +1763,15 @@ class Activity {
                     Tone.Destination.connect(dest);
                     audioDestination = dest;
                     const audioTrack = dest.stream.getAudioTracks()[0];
-                    if (audioTrack){
+                    if (audioTrack) {
                         canvasStream.addTrack(audioTrack);
                     }
                 }
                 currentStream = canvasStream;
+                // When recording stops, stop updating offscreen
+                canvasStream.getVideoTracks()[0].addEventListener('ended', () => {
+                    recordingActive = false;
+                });
                 return canvasStream;
             }
             async function recordScreenWithTools() {
@@ -1831,7 +1862,10 @@ class Activity {
              */
             function stopRec() {
                 flag = 0;
-                mediaRecorder.stop();
+
+                if (mediaRecorder && typeof mediaRecorder.stop === 'function') {
+                    mediaRecorder.stop();
+                }
                 const node = document.createElement("p");
                 node.textContent = "Stopped recording";
                 document.body.appendChild(node);
@@ -1849,7 +1883,7 @@ class Activity {
                 that.textMsg(_("Recording started. Click stop to finish."));
                 start.removeEventListener("click", createRecorder, true);
                 let recordedChunks = [];
-                const mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder = new MediaRecorder(stream);
                 stream.oninactive = function () {
                     // eslint-disable-next-line no-console
                     console.log("Recording is ready to save");
