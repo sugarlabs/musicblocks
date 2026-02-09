@@ -306,9 +306,12 @@ class Activity {
         this.loadAnimationIntervalId = null;
 
         // Initialize GIF animator
-        // Check if GIFAnimator is available before using it
         if (typeof GIFAnimator !== "undefined") {
             this.gifAnimator = new GIFAnimator();
+        } else {
+            // eslint-disable-next-line no-console
+            console.debug("GIFAnimator not yet available in constructor");
+            this.gifAnimator = null;
         }
 
         // Dirty flag for canvas rendering optimization
@@ -485,6 +488,11 @@ class Activity {
             this.helpfulWheelItems = [];
 
             this.setHelpfulSearchDiv();
+
+            // Late initialization of GIF animator if it was missed in constructor
+            if (!this.gifAnimator && typeof GIFAnimator !== "undefined") {
+                this.gifAnimator = new GIFAnimator();
+            }
         };
 
         /*
@@ -7786,7 +7794,15 @@ const activity = new Activity();
 // Execute initialization once all RequireJS modules are loaded AND DOM is ready
 define(["domReady!"].concat(MYDEFINES), doc => {
     const initialize = () => {
-        if (typeof createDefaultStack !== "undefined") {
+        // Defensive check for multiple critical globals that may be delayed
+        // due to 'defer' execution timing variances.
+        const globalsReady = typeof createDefaultStack !== "undefined" &&
+                           typeof createjs !== "undefined" &&
+                           typeof Tone !== "undefined" &&
+                           typeof GIFAnimator !== "undefined" &&
+                           typeof SuperGif !== "undefined";
+
+        if (globalsReady) {
             activity.setupDependencies();
             activity.domReady(doc);
             activity.doContextMenus();
@@ -7810,7 +7826,7 @@ define(["domReady!"].concat(MYDEFINES), doc => {
                     }
                 );
             } else {
-                setTimeout(initialize, 10);
+                setTimeout(initialize, 50); // Increased delay slightly
             }
         }
     };
