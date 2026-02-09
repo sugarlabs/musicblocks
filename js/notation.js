@@ -502,6 +502,12 @@ class Notation {
         this._pickupPoint[turtle] = null;
     }
 }
-if (typeof module !== "undefined" && module.exports) {
-    module.exports = Notation;
+// Export as AMD module
+if (typeof define === "function" && define.amd) {
+    define("activity/notation", ["utils/utils"], function () {
+        return Notation;
+    });
+}
+if (typeof window !== "undefined") {
+    window.Notation = Notation;
 }

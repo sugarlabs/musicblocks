@@ -1603,10 +1603,10 @@ let hexToRGB = hex => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
         ? {
-              r: parseInt(result[1], 16),
-              g: parseInt(result[2], 16),
-              b: parseInt(result[3], 16)
-          }
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        }
         : null;
 };
 
@@ -1758,21 +1758,64 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
     addMembers(obj, resolveObject(cname + "." + cname + "View"), viewArgs);
 };
 
-if (typeof module !== "undefined" && module.exports) {
-    module.exports = {
-        _,
-        last,
-        fileExt,
-        fileBasename,
-        toTitleCase,
-        safeSVG,
-        toFixed2,
-        mixedNumber,
-        nearestBeat,
-        oneHundredToFraction,
-        rationalToFraction,
-        rgbToHex,
-        hexToRGB,
-        hex2rgb
-    };
+// Export as AMD module
+if (typeof define === "function" && define.amd) {
+    define("utils/utils", ["utils/platformstyle"], function () {
+        return {
+            _,
+            last,
+            fileExt,
+            fileBasename,
+            toTitleCase,
+            safeSVG,
+            toFixed2,
+            mixedNumber,
+            nearestBeat,
+            oneHundredToFraction,
+            rationalToFraction,
+            rgbToHex,
+            hexToRGB,
+            hex2rgb,
+            getTextWidth,
+            docById,
+            delayExecution,
+            hideDOMLabel,
+            changeImage,
+            format,
+            fnBrowserDetect,
+            canvasPixelRatio,
+            windowHeight,
+            windowWidth,
+            httpGet,
+            httpPost,
+            HttpRequest,
+            doBrowserCheck,
+            waitForReadiness,
+            doSVG,
+            isSVGEmpty,
+            processPluginData,
+            importMembers,
+            rationalSum
+        };
+    });
+}
+if (typeof window !== "undefined") {
+    window._ = _;
+    window.last = last;
+    window.fileExt = fileExt;
+    window.fileBasename = fileBasename;
+    window.toTitleCase = toTitleCase;
+    window.safeSVG = safeSVG;
+    window.toFixed2 = toFixed2;
+    window.mixedNumber = mixedNumber;
+    window.nearestBeat = nearestBeat;
+    window.oneHundredToFraction = oneHundredToFraction;
+    window.rationalToFraction = rationalToFraction;
+    window.rgbToHex = rgbToHex;
+    window.hexToRGB = hexToRGB;
+    window.hex2rgb = hex2rgb;
+    window.getTextWidth = getTextWidth;
+    window.docById = docById;
+    window.delayExecution = delayExecution;
+    window.hideDOMLabel = hideDOMLabel;
 }

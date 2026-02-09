@@ -888,7 +888,7 @@ Turtle.TurtleView = class {
         this._decorationBitmap.scaleX =
             this._decorationBitmap.scaleY =
             this._decorationBitmap.scale =
-                (this._decorationBaseScale * scale) / 2;
+            (this._decorationBaseScale * scale) / 2;
     }
 
     /**
@@ -972,7 +972,7 @@ Turtle.TurtleView = class {
                 this._decorationBitmap.scaleX =
                     this._decorationBitmap.scaleY =
                     this._decorationBitmap.scale =
-                        (0.5 * startBlock.protoblock.scale) / 2;
+                    (0.5 * startBlock.protoblock.scale) / 2;
                 startBlock.updateCache();
             }
 
@@ -983,6 +983,12 @@ Turtle.TurtleView = class {
     }
 };
 
+// Export as AMD module
+if (typeof define === "function" && define.amd) {
+    define("activity/turtle", ["activity/turtle-painter", "activity/turtle-singer"], function () {
+        return Turtle;
+    });
+}
 if (typeof window !== "undefined") {
     window.Turtle = Turtle;
 }
