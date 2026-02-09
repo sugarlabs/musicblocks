@@ -537,6 +537,7 @@ Turtles.TurtlesModel = class {
             bitmap.regY = 27;
             turtle.container.addChild(bitmap);
             turtle._bitmap = bitmap;
+            turtle._createCache();
             turtle.updateCache();
             this.activity.refreshCanvas();
         };
