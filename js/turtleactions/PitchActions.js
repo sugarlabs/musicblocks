@@ -302,13 +302,38 @@ function setupPitchActions(activity) {
             const cents = obj[2];
 
             Singer.processPitch(activity, note, octave, cents, turtle, blk);
-            if (tur.singer.inNoteBlock.length > 0) {
-                if (activity.logo.runningLilypond) {
-                    activity.logo.notation.notationMarkup(
-                        turtle,
-                        hertz // FIXME: what if hertz was transformed?
-                    );
+            if (tur.singer.inNoteBlock.length > 0 && activity.logo.runningLilypond) {
+                let markupHertz = hertz;
+
+                const thisNoteBlock = last(tur.singer.inNoteBlock);
+                const pitches = tur.singer.notePitches?.[thisNoteBlock];
+                const octaves = tur.singer.noteOctaves?.[thisNoteBlock];
+                const centsList = tur.singer.noteCents?.[thisNoteBlock];
+                const hertzList = tur.singer.noteHertz?.[thisNoteBlock];
+
+                if (pitches && pitches.length > 0) {
+                    const i = pitches.length - 1;
+                    const transformedPitch = pitches[i];
+                    const transformedOctave = octaves?.[i];
+                    const transformedCents = centsList?.[i] || 0;
+                    const transformedHertz = hertzList?.[i];
+
+                    if (typeof transformedHertz === "number" && transformedHertz > 0) {
+                        markupHertz = transformedHertz;
+                    } else if (
+                        transformedPitch !== "rest" &&
+                        typeof transformedOctave === "number"
+                    ) {
+                        markupHertz = pitchToFrequency(
+                            transformedPitch,
+                            transformedOctave,
+                            transformedCents,
+                            tur.singer.keySignature
+                        );
+                    }
                 }
+
+                activity.logo.notation.notationMarkup(turtle, markupHertz);
             }
             return;
         }

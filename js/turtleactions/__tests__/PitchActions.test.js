@@ -31,6 +31,7 @@ Object.assign(global, {
     getStepSizeDown: musicUtils.getStepSizeDown,
     calcOctave: musicUtils.calcOctave,
     getNote: musicUtils.getNote,
+    pitchToFrequency: musicUtils.pitchToFrequency,
     nthDegreeToPitch: musicUtils.nthDegreeToPitch,
     keySignatureToMode: musicUtils.keySignatureToMode,
     frequencyToPitch: musicUtils.frequencyToPitch,
@@ -81,7 +82,11 @@ describe("Tests for Singer.PitchActions setup", () => {
                 transpositionRatios: [],
                 invertList: [],
                 keySignature: "C",
-                currentOctave: 4
+                currentOctave: 4,
+                notePitches: {},
+                noteOctaves: {},
+                noteCents: {},
+                noteHertz: {}
             }
         };
         activity = {
@@ -248,6 +253,26 @@ describe("Tests for Singer.PitchActions setup", () => {
         activity.logo.runningLilypond = true;
         Singer.PitchActions.playHertz(440, 0, blkId);
         expect(spyMark).not.toHaveBeenCalled();
+        spyMark.mockRestore();
+    });
+
+    test("playHertz notationMarkup uses transformed note data when available", () => {
+        const spyMark = jest.spyOn(activity.logo.notation, "notationMarkup");
+        const spyProcess = jest.spyOn(Singer, "processPitch").mockImplementation(() => {
+            turtle.singer.notePitches[1] = ["A"];
+            turtle.singer.noteOctaves[1] = [4];
+            turtle.singer.noteCents[1] = [0];
+            turtle.singer.noteHertz[1] = [0];
+        });
+
+        turtle.singer.inNoteBlock = [1];
+        activity.logo.runningLilypond = true;
+
+        Singer.PitchActions.playHertz(392, 0, blkId);
+
+        expect(spyMark).toHaveBeenCalledWith(0, expect.closeTo(440, 6));
+
+        spyProcess.mockRestore();
         spyMark.mockRestore();
     });
 
