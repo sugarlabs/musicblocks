@@ -1728,35 +1728,58 @@ class Activity {
                     throw new Error("Canvas element not found");
                 }
 
-                // Get the toolbar height (if present)
-                let toolbarHeight = 0;
+                // Get the toolbar height to exclude from recording
                 const toolbar = document.getElementById("toolbars");
-                if (toolbar && toolbar.offsetHeight) {
-                    toolbarHeight = toolbar.offsetHeight;
-                }
+                const toolbarHeight = toolbar ? toolbar.offsetHeight : 0;
+                
+                // Get canvas dimensions
+                const canvasRect = canvas.getBoundingClientRect();
+                
+                // Get the actual canvas dimensions
+                const canvasWidth = canvas.width;
+                const canvasHeight = canvas.height;
+                
+                // Calculate the visible area (excluding toolbar)
+                const visibleHeight = canvasHeight - toolbarHeight;
 
-                // Crop the canvas to exclude the toolbar space
-                const cropY = toolbarHeight;
-                const cropHeight = canvas.height - cropY;
-                const cropWidth = canvas.width;
+                // Create a clean recording canvas
+                const recordCanvas = document.createElement("canvas");
+                recordCanvas.width = canvasWidth;
+                recordCanvas.height = canvasHeight;
+                const recordCtx = recordCanvas.getContext("2d");
 
-                const offscreenCanvas = document.createElement("canvas");
-                offscreenCanvas.width = cropWidth;
-                offscreenCanvas.height = cropHeight;
-                const offscreenCtx = offscreenCanvas.getContext("2d");
+                // Set background to match the canvas (white/light gray)
+                recordCtx.fillStyle = "#f5f5f5"; // Adjust this color to match your canvas background
+                let animationFrameId;
+                
+                // Function to continuously copy canvas content
+                const copyFrame = () => {
+                    // Fill background
+                    recordCtx.fillRect(0, 0, canvasWidth, canvasHeight);
+                    
+                    // Draw only the visible portion of the canvas (skip the toolbar area)
+                    recordCtx.drawImage(
+                        canvas,
+                        0, toolbarHeight,           // Source x, y (skip toolbar)
+                        canvasWidth, visibleHeight, // Source width, height
+                        0, 0,                       // Destination x, y
+                        canvasWidth, visibleHeight  // Destination width, height
+                        );
+                        
+                    // Continue if still recording
+                    if (flag === 1) {
+                        animationFrameId = requestAnimationFrame(copyFrame);
+                    }
+                };
+                
+                // Start copying frames
+                copyFrame();
 
-                // Animation loop to keep offscreen canvas updated
-                let recordingActive = true;
-                function updateOffscreen() {
-                    if (!recordingActive) return;
-                    offscreenCtx.clearRect(0, 0, cropWidth, cropHeight);
-                    offscreenCtx.drawImage(canvas, 0, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
-                    requestAnimationFrame(updateOffscreen);
-                }
-                updateOffscreen();
 
-                const canvasStream = offscreenCanvas.captureStream(30);
+                // Capture the canvas stream directly at 30fps
+                const canvasStream = recordCanvas.captureStream(30);
 
+                // Add audio track if available
                 const Tone = that.logo.synth.tone;
                 if (Tone && Tone.context) {
                     const dest = Tone.context.createMediaStreamDestination();
@@ -1768,10 +1791,14 @@ class Activity {
                     }
                 }
                 currentStream = canvasStream;
-                // When recording stops, stop updating offscreen
-                canvasStream.getVideoTracks()[0].addEventListener('ended', () => {
-                    recordingActive = false;
+
+                // Clean up animation frame when recording stops
+                canvasStream.getTracks()[0].addEventListener('ended', () => {
+                    if (animationFrameId) {
+                        cancelAnimationFrame(animationFrameId);
+                    }
                 });
+
                 return canvasStream;
             }
             async function recordScreenWithTools() {
@@ -1865,6 +1892,11 @@ class Activity {
 
                 if (mediaRecorder && typeof mediaRecorder.stop === 'function') {
                     mediaRecorder.stop();
+                }
+
+                // Clean up the recording canvas stream
+                if (currentStream) {
+                    currentStream.getTracks().forEach(track => track.stop());
                 }
                 const node = document.createElement("p");
                 node.textContent = "Stopped recording";
