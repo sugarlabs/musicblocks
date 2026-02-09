@@ -2060,7 +2060,7 @@ class Activity {
             const changeText = () => {
                 const randomLoadMessage =
                     messages.load_messages[
-                        Math.floor(Math.random() * messages.load_messages.length)
+                    Math.floor(Math.random() * messages.load_messages.length)
                     ];
                 document.getElementById("messageText").innerHTML = randomLoadMessage + "...";
                 counter++;
@@ -2848,6 +2848,12 @@ class Activity {
             this.searchSuggestions = [];
             this.deprecatedBlockNames = [];
 
+            // Guard: blocks may not be initialized yet during early loading
+            if (!this.blocks || !this.blocks.protoBlockDict) {
+                console.debug("prepSearchWidget: blocks not yet initialized, skipping");
+                return;
+            }
+
             for (const i in this.blocks.protoBlockDict) {
                 const block = this.blocks.protoBlockDict[i];
                 const blockLabel = block.staticLabels.join(" ");
@@ -3034,6 +3040,12 @@ class Activity {
          * Uses JQuery to add autocompleted search suggestions
          */
         this.doSearch = () => {
+            // Guard: ensure searchWidget exists before proceeding
+            if (!this.searchWidget) {
+                console.debug("doSearch: searchWidget not yet initialized, skipping");
+                return;
+            }
+
             const $j = window.jQuery;
             if (this.searchSuggestions.length === 0) {
                 this.prepSearchWidget();
@@ -3065,11 +3077,11 @@ class Activity {
                         return $j("<li></li>")
                             .append(
                                 '<img src="' +
-                                    (item.artwork || "") +
-                                    '" height="20px">' +
-                                    "<a> " +
-                                    item.label +
-                                    "</a>"
+                                (item.artwork || "") +
+                                '" height="20px">' +
+                                "<a> " +
+                                item.label +
+                                "</a>"
                             )
                             .appendTo(
                                 ul.css({
@@ -4440,8 +4452,8 @@ class Activity {
                         console.log(
                             "%cMusic Blocks",
                             "font-size: 24px; font-weight: bold; font-family: sans-serif; padding:20px 0 0 110px; background: url(" +
-                                imgUrl +
-                                ") no-repeat;"
+                            imgUrl +
+                            ") no-repeat;"
                         );
                         // eslint-disable-next-line no-console
                         console.log(
@@ -4513,10 +4525,10 @@ class Activity {
                 typeof flags !== "undefined"
                     ? flags
                     : {
-                          run: false,
-                          show: false,
-                          collapse: false
-                      };
+                        run: false,
+                        show: false,
+                        collapse: false
+                    };
             this.loading = true;
             document.body.style.cursor = "wait";
             this.doLoadAnimation();
@@ -4879,9 +4891,8 @@ class Activity {
                                 [
                                     "nameddo",
                                     {
-                                        value: `V: ${parseInt(lineId) + 1} Line ${
-                                            staffBlocksMap[lineId]?.baseBlocks?.length + 1
-                                        }`
+                                        value: `V: ${parseInt(lineId) + 1} Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1
+                                            }`
                                     }
                                 ],
                                 0,
@@ -4890,12 +4901,12 @@ class Activity {
                                     staffBlocksMap[lineId].baseBlocks.length === 0
                                         ? null
                                         : staffBlocksMap[lineId].baseBlocks[
-                                              staffBlocksMap[lineId].baseBlocks.length - 1
-                                          ][0][
-                                              staffBlocksMap[lineId].baseBlocks[
-                                                  staffBlocksMap[lineId].baseBlocks.length - 1
-                                              ][0].length - 4
-                                          ][0],
+                                        staffBlocksMap[lineId].baseBlocks.length - 1
+                                        ][0][
+                                        staffBlocksMap[lineId].baseBlocks[
+                                            staffBlocksMap[lineId].baseBlocks.length - 1
+                                        ][0].length - 4
+                                        ][0],
                                     null
                                 ]
                             ],
@@ -4911,9 +4922,8 @@ class Activity {
                                 [
                                     "text",
                                     {
-                                        value: `V: ${parseInt(lineId) + 1} Line ${
-                                            staffBlocksMap[lineId]?.baseBlocks?.length + 1
-                                        }`
+                                        value: `V: ${parseInt(lineId) + 1} Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1
+                                            }`
                                     }
                                 ],
                                 0,
@@ -4948,14 +4958,14 @@ class Activity {
                     staffBlocksMap[staffIndex].startBlock.length - 3
                 ][4][2] =
                     staffBlocksMap[staffIndex].baseBlocks[0][0][
-                        staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4
+                    staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4
                     ][0];
                 // Update the first namedo block with settimbre
                 staffBlocksMap[staffIndex].baseBlocks[0][0][
                     staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4
                 ][4][0] =
                     staffBlocksMap[staffIndex].startBlock[
-                        staffBlocksMap[staffIndex].startBlock.length - 3
+                    staffBlocksMap[staffIndex].startBlock.length - 3
                     ][0];
                 const repeatblockids = staffBlocksMap[staffIndex].repeatArray;
                 for (const repeatId of repeatblockids) {
@@ -4967,7 +4977,7 @@ class Activity {
                             0,
                             [
                                 staffBlocksMap[staffIndex].startBlock[
-                                    staffBlocksMap[staffIndex].startBlock.length - 3
+                                staffBlocksMap[staffIndex].startBlock.length - 3
                                 ][0] /*setribmre*/,
                                 blockId + 1,
                                 staffBlocksMap[staffIndex].nameddoArray[staffIndex][0],
@@ -4976,8 +4986,8 @@ class Activity {
                                 ] === null
                                     ? null
                                     : staffBlocksMap[staffIndex].nameddoArray[staffIndex][
-                                          repeatId.end + 1
-                                      ]
+                                    repeatId.end + 1
+                                    ]
                             ]
                         ]);
                         staffBlocksMap[staffIndex].repeatBlock.push([
@@ -5011,7 +5021,7 @@ class Activity {
                             const secondnammedo = _searchIndexForMusicBlock(
                                 staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0],
                                 staffBlocksMap[staffIndex].nameddoArray[staffIndex][
-                                    repeatId.end + 1
+                                repeatId.end + 1
                                 ]
                             );
 
@@ -5034,13 +5044,13 @@ class Activity {
                         const prevnameddo = _searchIndexForMusicBlock(
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start - 1][0],
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                currentnammeddo
+                            currentnammeddo
                             ][4][0]
                         );
                         const afternamedo = _searchIndexForMusicBlock(
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                currentnammeddo
+                            currentnammeddo
                             ][4][1]
                         );
                         let prevrepeatnameddo = -1;
@@ -5048,17 +5058,17 @@ class Activity {
                             prevrepeatnameddo = _searchIndexForMusicBlock(
                                 staffBlocksMap[staffIndex].repeatBlock,
                                 staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                    currentnammeddo
+                                currentnammeddo
                                 ][4][0]
                             );
                         }
                         const prevBlockId =
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                currentnammeddo
+                            currentnammeddo
                             ][4][0];
                         const currentBlockId =
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                currentnammeddo
+                            currentnammeddo
                             ][0];
 
                         // Needs null checking optmizie
@@ -5072,7 +5082,7 @@ class Activity {
                             0,
                             [
                                 staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                    currentnammeddo
+                                currentnammeddo
                                 ][4][0],
                                 blockId + 1,
                                 currentBlockId,
@@ -5151,14 +5161,32 @@ class Activity {
             document.getElementById("loadingText").textContent = _("Loading Complete!");
 
             setTimeout(() => {
-                document.getElementById("loadingText").textContent = null;
-                document.getElementById("loading-image-container").style.display = "none";
-                document.getElementById("bottom-right-logo").style.display = "none";
-                document.getElementById("palette").style.display = "block";
+                const loadingText = document.getElementById("loadingText");
+                if (loadingText) loadingText.textContent = null;
+
+                const loadingImageContainer = document.getElementById("loading-image-container");
+                if (loadingImageContainer) loadingImageContainer.style.display = "none";
+
+                // Try hiding load-container instead if it exists
+                const loadContainer = document.getElementById("load-container");
+                if (loadContainer) loadContainer.style.display = "none";
+
+                const bottomRightLogo = document.getElementById("bottom-right-logo");
+                if (bottomRightLogo) bottomRightLogo.style.display = "none";
+
+                const palette = document.getElementById("palette");
+                if (palette) palette.style.display = "block";
+
                 // document.getElementById('canvas').style.display = 'none';
-                document.getElementById("hideContents").style.display = "block";
-                document.getElementById("buttoncontainerBOTTOM").style.display = "block";
-                document.getElementById("buttoncontainerTOP").style.display = "block";
+
+                const hideContents = document.getElementById("hideContents");
+                if (hideContents) hideContents.style.display = "block";
+
+                const btnBottom = document.getElementById("buttoncontainerBOTTOM");
+                if (btnBottom) btnBottom.style.display = "block";
+
+                const btnTop = document.getElementById("buttoncontainerTOP");
+                if (btnTop) btnTop.style.display = "block";
             }, 500);
         };
 
@@ -6363,12 +6391,12 @@ class Activity {
                         return $j("<li></li>")
                             .append(
                                 '<img src="' +
-                                    (item.artwork || "") +
-                                    '" height = "20px">' +
-                                    "<a>" +
-                                    " " +
-                                    item.label +
-                                    "</a>"
+                                (item.artwork || "") +
+                                '" height = "20px">' +
+                                "<a>" +
+                                " " +
+                                item.label +
+                                "</a>"
                             )
                             .appendTo(ul.css("z-index", 35000));
                     };
@@ -6492,10 +6520,10 @@ class Activity {
             container.setAttribute(
                 "style",
                 "position: absolute; right:" +
-                    (document.body.clientWidth - x) +
-                    "px;  top: " +
-                    y +
-                    "px;"
+                (document.body.clientWidth - x) +
+                "px;  top: " +
+                y +
+                "px;"
             );
             document.getElementById("buttoncontainerBOTTOM").appendChild(container);
             return container;

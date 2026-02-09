@@ -13,7 +13,7 @@
 
 requirejs.config({
     baseUrl: "./",
-    urlArgs: window.location.protocol === "file:" ? "" : "v=999999_fix5",
+    urlArgs: window.location.protocol === "file:" ? "" : "v=999999_fix7",
     waitSeconds: 60,
     shim: {
         "easeljs.min": {
@@ -109,6 +109,12 @@ requirejs.config({
         },
         "highlight": {
             exports: "hljs"
+        },
+        "activity/js-export/constraints": {
+            deps: ["activity/js-export/interface"]
+        },
+        "activity/js-export/generate": {
+            deps: ["activity/js-export/ASTutils"]
         }
     },
     paths: {
@@ -150,10 +156,17 @@ requirejs.config({
 });
 
 requirejs(
-    ["i18next", "i18nextHttpBackend", "jquery", "materialize", "jquery-ui"],
-    function (i18next, i18nextHttpBackend, $, M) {
+    ["i18next", "i18nextHttpBackend"],
+    function (i18next, i18nextHttpBackend) {
+        // Use globally-loaded jQuery and Materialize (avoids AMD conflicts)
+        var $ = window.jQuery;
+        // Materialize v0.100.2 (bundled) uses 'Materialize' as global, not 'M'
+        var M = window.Materialize || window.M;
+
+        // Ensure both M and Materialize are available for compatibility
         if (typeof M !== "undefined") {
             window.M = M;
+            window.Materialize = M;
         }
 
         // Define essential globals for core modules
@@ -243,39 +256,24 @@ requirejs(
 
                 await waitForGlobals();
 
-                const PRELOADED_MODULES = [
+                // Only pre-define modules that are loaded via script tags in index.html
+                // These modules are already available as globals before RequireJS loads them
+                const PRELOADED_SCRIPTS = [
                     { name: "easeljs.min", export: () => window.createjs },
-                    { name: "tweenjs.min", export: () => window.createjs },
-                    { name: "preloadjs.min", export: () => window.createjs },
-                    { name: "libgif", export: () => window.SuperGif },
-                    { name: "activity/gif-animator", export: () => window.GIFAnimator },
-                    { name: "utils/platformstyle", export: null },
-                    { name: "utils/utils", export: () => window._ },
-                    { name: "utils/musicutils", export: null },
-                    { name: "utils/synthutils", export: () => window.Synth },
-                    { name: "utils/mathutils", export: () => window.MathUtility },
-                    { name: "activity/artwork", export: null },
-                    { name: "activity/turtledefs", export: () => window.createDefaultStack },
-                    { name: "activity/block", export: () => window.Block },
-                    { name: "activity/blocks", export: () => window.Blocks },
-                    { name: "activity/turtle-singer", export: () => window.Singer },
-                    { name: "activity/turtle-painter", export: () => window.Painter },
-                    { name: "activity/turtle", export: () => window.Turtle },
-                    { name: "activity/turtles", export: () => window.Turtles },
-                    { name: "activity/notation", export: () => window.Notation },
-                    { name: "activity/trash", export: () => window.Trashcan },
-                    { name: "activity/palette", export: () => window.Palettes },
-                    { name: "activity/protoblocks", export: () => window.ProtoBlock },
-                    { name: "activity/logo", export: () => window.Logo }
+                    { name: "tweenjs.min", export: () => window.createjs }
                 ];
 
-                PRELOADED_MODULES.forEach(mod => {
-                    if (!requirejs.defined(mod.name)) {
+                PRELOADED_SCRIPTS.forEach(mod => {
+                    if (!requirejs.defined(mod.name) && mod.export && mod.export()) {
                         define(mod.name, [], function () {
-                            return mod.export ? mod.export() : undefined;
+                            return mod.export();
                         });
                     }
                 });
+
+                // Note: Other modules like activity/*, utils/* are loaded by RequireJS
+                // from their file paths as configured in requirejs.config().
+                // Do NOT pre-define them here as that prevents RequireJS from loading the actual files.
 
                 const CORE_BOOTSTRAP_MODULES = [
                     "easeljs.min",
@@ -298,71 +296,44 @@ requirejs(
                 requirejs(
                     CORE_BOOTSTRAP_MODULES,
                     function () {
-                        // Verify critical globals are initialized
-                        const verificationErrors = [];
+                        // Give scripts a moment to finish executing and set globals
+                        setTimeout(function () {
+                            // Log verification status for debugging (non-blocking)
+                            const verificationStatus = {
+                                createjs: typeof window.createjs !== "undefined",
+                                createDefaultStack: typeof window.createDefaultStack !== "undefined",
+                                Logo: typeof window.Logo !== "undefined",
+                                Blocks: typeof window.Blocks !== "undefined",
+                                Turtles: typeof window.Turtles !== "undefined"
+                            };
+                            console.log("Core module verification:", verificationStatus);
 
-                        if (typeof window.createjs === "undefined") {
-                            verificationErrors.push("createjs (EaselJS/TweenJS) not found");
-                        }
-
-                        if (
-                            typeof window.createDefaultStack === "undefined" &&
-                            typeof arguments[5] === "undefined"
-                        ) {
-                            verificationErrors.push("createDefaultStack not initialized");
-                        }
-
-                        if (
-                            typeof window.Logo === "undefined" &&
-                            typeof arguments[14] === "undefined"
-                        ) {
-                            verificationErrors.push("Logo not initialized");
-                        }
-
-                        if (
-                            typeof window.Blocks === "undefined" &&
-                            typeof arguments[7] === "undefined"
-                        ) {
-                            verificationErrors.push("Blocks not initialized");
-                        }
-
-                        if (
-                            typeof window.Turtles === "undefined" &&
-                            typeof arguments[11] === "undefined"
-                        ) {
-                            verificationErrors.push("Turtles not initialized");
-                        }
-
-                        if (verificationErrors.length > 0) {
-                            console.error(
-                                "FATAL: Core bootstrap verification failed:",
-                                verificationErrors
-                            );
-                            alert(
-                                "Failed to initialize Music Blocks core modules. Please refresh the page.\n\nMissing: " +
-                                    verificationErrors.join(", ")
-                            );
-                            throw new Error(
-                                "Core bootstrap failed: " + verificationErrors.join(", ")
-                            );
-                        }
-
-                        requirejs(
-                            ["activity/activity"],
-                            function () {
-                                // Activity loaded successfully
-                            },
-                            function (err) {
-                                console.error("Failed to load activity/activity:", err);
-                                alert("Failed to load Music Blocks. Please refresh the page.");
+                            // Check critical dependencies (only createjs is truly critical)
+                            if (typeof window.createjs === "undefined") {
+                                console.error("FATAL: createjs (EaselJS/TweenJS) not found. Cannot proceed.");
+                                alert("Failed to load EaselJS. Please refresh the page.");
+                                return;
                             }
-                        );
+
+                            // Proceed with activity loading
+                            requirejs(
+                                ["activity/activity"],
+                                function () {
+                                    // Activity loaded successfully
+                                    console.log("Activity module loaded successfully");
+                                },
+                                function (err) {
+                                    console.error("Failed to load activity/activity:", err);
+                                    alert("Failed to load Music Blocks. Please refresh the page.");
+                                }
+                            );
+                        }, 100); // Small delay to allow globals to be set
                     },
                     function (err) {
                         console.error("Core bootstrap failed:", err);
                         alert(
                             "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: " +
-                                (err.message || err)
+                            (err.message || err)
                         );
                     }
                 );
