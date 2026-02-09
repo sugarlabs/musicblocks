@@ -7020,6 +7020,11 @@ class Activity {
             this.pasteBox = new PasteBox(this);
             this.languageBox = new LanguageBox(this);
             this.themeBox = new ThemeBox(this);
+            // Initialize theme state on page load if method exists
+            if (this.themeBox && typeof this.themeBox.initializeTheme === 'function') {
+                this.themeBox.initializeTheme();
+            }
+
 
             // Show help on startup if first-time user.
             if (this.firstTimeUser) {
