@@ -17,7 +17,7 @@
 /* exported Toolbar */
 
 let WRAP = true;
-const $j = jQuery.noConflict();
+const $j = window.jQuery;
 let play_button_debounce_timeout = null;
 class Toolbar {
     /**
@@ -107,6 +107,7 @@ class Toolbar {
                 ["ibo", _("igbo"), "innerHTML"],
                 ["ar", _("عربى"), "innerHTML"],
                 ["te", _("తెలుగు"), "innerHTML"],
+                ["bn", _("বাংলা"), "innerHTML"],
                 ["he", _("עִברִית"), "innerHTML"],
                 ["ur", _("اردو"), "innerHTML"]
             ];
@@ -242,6 +243,7 @@ class Toolbar {
                 ["ibo", _("igbo"), "innerHTML"],
                 ["ar", _("عربى"), "innerHTML"],
                 ["te", _("తెలుగు"), "innerHTML"],
+                ["bn", _("বাংলা"), "innerHTML"],
                 ["he", _("עִברִית"), "innerHTML"],
                 ["ur", _("اردو"), "innerHTML"]
             ];
@@ -341,6 +343,10 @@ class Toolbar {
                 delay: 100
             });
         }
+
+        $j(".tooltipped").on("click", function () {
+            $j(this).tooltip("close");
+        });
 
         $j(".materialize-iso, .dropdown-trigger").dropdown({
             constrainWidth: false,
@@ -469,28 +475,28 @@ class Toolbar {
         confirmationMessage.textContent = _("Are you sure you want to create a new project?");
         newDropdown.appendChild(confirmationMessage);
 
-        const confirmationButtonLi = document.createElement("li");
+        const buttonRowLi = document.createElement("li");
+        buttonRowLi.classList.add("button-row");
+
         const confirmationButton = document.createElement("div");
         confirmationButton.classList.add("confirm-button");
         confirmationButton.id = "new-project";
         confirmationButton.textContent = _("Confirm");
-        confirmationButtonLi.appendChild(confirmationButton);
-        newDropdown.appendChild(confirmationButtonLi);
+
+        const cancelButton = document.createElement("div");
+        cancelButton.classList.add("cancel-button");
+        cancelButton.id = "cancel-project";
+        cancelButton.textContent = _("Cancel");
+
+        buttonRowLi.appendChild(confirmationButton);
+        buttonRowLi.appendChild(cancelButton);
+        newDropdown.appendChild(buttonRowLi);
 
         modalContainer.style.display = "flex";
         confirmationButton.onclick = () => {
             modalContainer.style.display = "none";
             onclick(this.activity);
         };
-
-        //Cancel Button
-        const cancelButtonLi = document.createElement("li");
-        const cancelButton = document.createElement("div");
-        cancelButton.classList.add("cancel-button");
-        cancelButton.id = "cancel-project";
-        cancelButton.textContent = _("Cancel");
-        cancelButtonLi.appendChild(cancelButton);
-        newDropdown.appendChild(cancelButtonLi);
         cancelButton.onclick = () => {
             modalContainer.style.display = "none";
         };
@@ -823,7 +829,7 @@ class Toolbar {
         const menuIcon = docById("menu");
         const auxToolbar = docById("aux-toolbar");
         menuIcon.onclick = () => {
-            var searchBar = docById("search");
+            const searchBar = docById("search");
             searchBar.classList.toggle("open");
             if (auxToolbar.style.display == "" || auxToolbar.style.display == "none") {
                 onclick(this.activity, false);
@@ -1025,6 +1031,11 @@ class Toolbar {
                 console.error(e);
             }
 
+            // Disable horizontal scrolling when switching to beginner mode
+            if (this.activity.beginnerMode && this.activity.scrollBlockContainer) {
+                setScroller(this.activity);
+            }
+
             updateUIForMode();
 
             // Reinitialize tooltips after mode switch
@@ -1167,13 +1178,86 @@ class Toolbar {
             "ibo",
             "ar",
             "te",
+            "bn",
             "he",
             "ur"
         ];
 
-        languageSelectIcon.onclick = () => {
+        /**
+         * Updates the selected-language class to highlight the currently selected language.
+         * @param {string} selectedLang - The language code to highlight.
+         */
+        const updateSelectedLanguageHighlight = selectedLang => {
+            // Remove existing selection from all language items
             languages.forEach(lang => {
-                docById(lang).onclick = () => languageBox[`${lang}_onclick`](this.activity);
+                const langElem = docById(lang);
+                if (langElem) {
+                    langElem.classList.remove("selected-language");
+                }
+            });
+
+            // Handle special cases for language preference storage values and browser language codes
+            let langToHighlight = selectedLang;
+
+            // Map browser language codes to dropdown IDs
+            const browserLangMap = {
+                "en-US": "enUS",
+                "en-GB": "enUK",
+                "en-UK": "enUK",
+                "zh-CN": "zhCN",
+                "zh": "zhCN"
+            };
+
+            // Check if it's a browser language code that needs mapping
+            if (selectedLang && browserLangMap[selectedLang]) {
+                langToHighlight = browserLangMap[selectedLang];
+            }
+
+            // Handle Japanese variants (ja-kanji, ja-kana stored vs ja/kana displayed)
+            if (selectedLang && selectedLang.startsWith("ja")) {
+                if (selectedLang === "ja-kana" || localStorage.kanaPreference === "kana") {
+                    langToHighlight = "kana";
+                } else {
+                    langToHighlight = "ja";
+                }
+            }
+
+            // Handle zh_CN to zhCN mapping (stored preference format)
+            if (selectedLang === "zh_CN") {
+                langToHighlight = "zhCN";
+            }
+
+            // Fallback: if language starts with "en" but not mapped, default to enUS
+            if (
+                selectedLang &&
+                selectedLang.startsWith("en") &&
+                !languages.includes(langToHighlight)
+            ) {
+                langToHighlight = "enUS";
+            }
+
+            const selectedElem = docById(langToHighlight);
+            if (selectedElem) {
+                selectedElem.classList.add("selected-language");
+            }
+        };
+
+        languageSelectIcon.onclick = () => {
+            // Get current language preference
+            const currentLang = localStorage.languagePreference || navigator.language;
+
+            // Highlight the currently selected language
+            updateSelectedLanguageHighlight(currentLang);
+
+            // Set up click handlers for each language
+            languages.forEach(lang => {
+                docById(lang).onclick = () => {
+                    // Update highlight to newly selected language
+                    updateSelectedLanguageHighlight(lang);
+
+                    // Call the original language change handler
+                    languageBox[`${lang}_onclick`](this.activity);
+                };
             });
         };
     }

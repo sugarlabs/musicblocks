@@ -101,3 +101,101 @@ describe("munsell", () => {
         });
     });
 });
+
+describe("interpColor edge cases", () => {
+    /**
+     * Extended tests for color interpolation edge cases.
+     */
+    it("should handle mid-point interpolation correctly", () => {
+        const result = interpColor("#000000", "#ffffff", 0.5);
+        expect(result).toBe("rgba(127, 127, 127, 1)");
+    });
+
+    it("should return first color for p = 1", () => {
+        expect(interpColor("#ff0000", "#00ff00", 1)).toBe("#ff0000");
+    });
+
+    it("should return second color for p = 0", () => {
+        expect(interpColor("#ff0000", "#00ff00", 0)).toBe("#00ff00");
+    });
+
+    it("should interpolate red channel correctly", () => {
+        const result = interpColor("#ff0000", "#000000", 0.5);
+        expect(result).toBe("rgba(127, 0, 0, 1)");
+    });
+
+    it("should interpolate green channel correctly", () => {
+        const result = interpColor("#00ff00", "#000000", 0.5);
+        expect(result).toBe("rgba(0, 127, 0, 1)");
+    });
+
+    it("should interpolate blue channel correctly", () => {
+        const result = interpColor("#0000ff", "#000000", 0.5);
+        expect(result).toBe("rgba(0, 0, 127, 1)");
+    });
+
+    it("should handle grayscale interpolation", () => {
+        const result = interpColor("#808080", "#404040", 0.5);
+        expect(result).toBe("rgba(96, 96, 96, 1)");
+    });
+
+    it("should handle interpolation with p close to 0", () => {
+        const result = interpColor("#ffffff", "#000000", 0.1);
+        expect(result).toBe("rgba(25, 25, 25, 1)");
+    });
+
+    it("should handle interpolation with p close to 1", () => {
+        const result = interpColor("#ffffff", "#000000", 0.9);
+        expect(result).toBe("rgba(229, 229, 229, 1)");
+    });
+
+    it("should use second color when first is undefined", () => {
+        const result = interpColor(undefined, "#ff0000", 0.5);
+        expect(result).toBe("rgba(255, 0, 0, 1)");
+    });
+
+    it("should use first color when second is undefined", () => {
+        const result = interpColor("#00ff00", undefined, 0.5);
+        expect(result).toBe("rgba(0, 255, 0, 1)");
+    });
+});
+
+describe("getMunsellColor edge cases", () => {
+    /**
+     * Extended tests for Munsell color retrieval edge cases.
+     */
+    it("should handle zero values for all parameters", () => {
+        const color = getMunsellColor(0, 0, 0);
+        expect(color).toMatch(/^(#[0-9a-fA-F]{6}|rgba\(\d+, \d+, \d+, \d+\.?\d*\))$/);
+    });
+
+    it("should handle maximum values for all parameters", () => {
+        const color = getMunsellColor(100, 100, 100);
+        expect(color).toBeDefined();
+    });
+
+    it("should handle negative hue by wrapping", () => {
+        const color = getMunsellColor(-10, 50, 50);
+        expect(color).toBeDefined();
+    });
+
+    it("should handle hue values above 100", () => {
+        const color = getMunsellColor(150, 50, 50);
+        expect(color).toBeDefined();
+    });
+
+    it("should handle mid-range values", () => {
+        const color = getMunsellColor(50, 50, 50);
+        expect(color).toMatch(/^(#[0-9a-fA-F]{6}|rgba\(\d+, \d+, \d+, \d+\.?\d*\))$/);
+    });
+
+    it("should handle value at boundary 10", () => {
+        const color = getMunsellColor(50, 10, 50);
+        expect(color).toBeDefined();
+    });
+
+    it("should handle chroma at boundary 0", () => {
+        const color = getMunsellColor(50, 50, 0);
+        expect(color).toBeDefined();
+    });
+});

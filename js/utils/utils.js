@@ -39,7 +39,7 @@
    oneHundredToFraction, prepareMacroExports, preparePluginExports,
    processMacroData, processRawPluginData, rationalSum, rgbToHex,
    safeSVG, toFixed2, toTitleCase, windowHeight, windowWidth,
-   fnBrowserDetect
+    fnBrowserDetect, waitForReadiness
 */
 
 /**
@@ -143,7 +143,7 @@ let format = (str, data) => {
             x = x[v];
         });
 
-        return x;
+        return x === undefined ? "" : x;
     });
 
     return str.replace(/{_([a-zA-Z0-9]+)}/g, (match, item) => {
@@ -341,6 +341,68 @@ function doBrowserCheck() {
     }
 
     jQuery.browser = browser;
+}
+
+/**
+ * Wait for critical dependencies to be ready before calling callback.
+ * Uses polling with exponential backoff and maximum timeout.
+ * This replaces the arbitrary 5-second delay for Firefox with actual readiness checks.
+ *
+ * @param {Function} callback - The function to call when ready
+ * @param {Object} options - Configuration options
+ * @param {number} options.maxWait - Maximum wait time in ms (default: 10000)
+ * @param {number} options.minWait - Minimum wait time in ms (default: 500)
+ * @param {number} options.checkInterval - Initial check interval in ms (default: 100)
+ */
+function waitForReadiness(callback, options = {}) {
+    const { maxWait = 10000, minWait = 500, checkInterval = 100 } = options;
+    const startTime = Date.now();
+
+    /**
+     * Check if critical dependencies and DOM elements are ready
+     * @returns {boolean} True if all critical dependencies are loaded
+     */
+    const isReady = () => {
+        // Check if critical JavaScript libraries are loaded
+        const createjsLoaded = typeof createjs !== "undefined" && createjs.Stage;
+        const howlerLoaded = typeof Howler !== "undefined";
+        const jqueryLoaded = typeof jQuery !== "undefined";
+
+        // Check if critical DOM elements exist
+        const canvas = document.getElementById("myCanvas");
+        const loader = document.getElementById("loader");
+        const toolbars = document.getElementById("toolbars");
+        const domReady = canvas && loader && toolbars;
+
+        return createjsLoaded && howlerLoaded && jqueryLoaded && domReady;
+    };
+
+    /**
+     * Polling function that checks readiness and calls callback when ready
+     */
+    const check = () => {
+        const elapsed = Date.now() - startTime;
+
+        if (elapsed >= minWait && isReady()) {
+            // Ready! Initialize the app
+            // eslint-disable-next-line no-console
+            console.log(`[Firefox] Initialized in ${elapsed}ms (readiness-based)`);
+            callback();
+        } else if (elapsed >= maxWait) {
+            // Timeout - initialize anyway as fallback
+            // eslint-disable-next-line no-console
+            console.warn(
+                `[Firefox] Initialization timed out after ${maxWait}ms, proceeding anyway`
+            );
+            callback();
+        } else {
+            // Not ready yet, check again on next animation frame
+            requestAnimationFrame(check);
+        }
+    };
+
+    // Start the readiness check loop
+    requestAnimationFrame(check);
 }
 
 // Check for Internet Explorer
@@ -562,12 +624,18 @@ let fileBasename = file => {
  * @param {string} str - The input string.
  * @returns {string} The string with the first character in uppercase.
  */
-let toTitleCase = str => {
+function toTitleCase(str) {
     if (typeof str !== "string") return;
-    let tempStr = "";
-    if (str.length > 1) tempStr = str.substring(1);
-    return str.toUpperCase()[0] + tempStr;
-};
+    if (str.length === 0) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports.toTitleCase = toTitleCase;
+}
+if (typeof window !== "undefined") {
+    window.toTitleCase = toTitleCase;
+}
 
 /**
  * Processes plugin data and updates the activity based on the provided JSON-encoded dictionary.
@@ -603,6 +671,8 @@ const processPluginData = (activity, pluginData, pluginSource) => {
             return;
         }
 
+        // NOTE: This eval is required for the Plugin system to load dynamic block definitions.
+        // The content comes from plugin JSON files which satisfy the isTrustedPluginSource check.
         try {
             // eslint-disable-next-line no-eval
             eval(code);
@@ -1595,6 +1665,33 @@ let closeBlkWidgets = name => {
 };
 
 /**
+ * Safely resolves a dot-notation string path to an object property globally.
+ * @param {string} path - The dot-notation path (e.g., "MyClass.Model").
+ * @returns {Object|undefined} The resolved object or undefined.
+ */
+const resolveObject = path => {
+    if (!path || typeof path !== "string") return undefined;
+
+    // Support both browser and Node.js environments
+    const globalObj = typeof window !== "undefined" ? window : global;
+
+    try {
+        const result = path.split(".").reduce((obj, prop) => {
+            if (obj === null || obj === undefined) {
+                return undefined;
+            }
+            return obj[prop];
+        }, globalObj);
+
+        return result;
+    } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn("Failed to resolve object path: " + path, e);
+        return undefined;
+    }
+};
+
+/**
  * Imports methods and variables of model and view objects to the controller object.
  *
  * @param {Object} obj - The component object (controller) to which members of its model and view are imported.
@@ -1650,15 +1747,15 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
     const cname = obj.constructor.name; // class name of component object
 
     if (className !== "" && className !== undefined) {
-        addMembers(obj, eval(className));
+        addMembers(obj, resolveObject(className));
         return;
     }
 
     // Add members of Model (class type has to be controller's name + "Model")
-    addMembers(obj, eval(cname + "." + cname + "Model"), modelArgs);
+    addMembers(obj, resolveObject(cname + "." + cname + "Model"), modelArgs);
 
     // Add members of View (class type has to be controller's name + "View")
-    addMembers(obj, eval(cname + "." + cname + "View"), viewArgs);
+    addMembers(obj, resolveObject(cname + "." + cname + "View"), viewArgs);
 };
 
 if (typeof module !== "undefined" && module.exports) {
