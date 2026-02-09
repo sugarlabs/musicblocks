@@ -273,12 +273,15 @@ class ThemeBox {
                     }
                 }
             };
-            
+
             // Apply immediately if already loaded, otherwise wait for load event
-            if (planetIframe.contentDocument && planetIframe.contentDocument.readyState === 'complete') {
+            if (
+                planetIframe.contentDocument &&
+                planetIframe.contentDocument.readyState === "complete"
+            ) {
                 applyPlanetTheme();
             } else {
-                planetIframe.addEventListener('load', applyPlanetTheme, { once: true });
+                planetIframe.addEventListener("load", applyPlanetTheme, { once: true });
             }
         }
     }

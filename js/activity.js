@@ -7021,10 +7021,9 @@ class Activity {
             this.languageBox = new LanguageBox(this);
             this.themeBox = new ThemeBox(this);
             // Initialize theme state on page load if method exists
-            if (this.themeBox && typeof this.themeBox.initializeTheme === 'function') {
+            if (this.themeBox && typeof this.themeBox.initializeTheme === "function") {
                 this.themeBox.initializeTheme();
             }
-
 
             // Show help on startup if first-time user.
             if (this.firstTimeUser) {
@@ -7801,11 +7800,12 @@ define(["domReady!"].concat(MYDEFINES), doc => {
     const initialize = () => {
         // Defensive check for multiple critical globals that may be delayed
         // due to 'defer' execution timing variances.
-        const globalsReady = typeof createDefaultStack !== "undefined" &&
-                           typeof createjs !== "undefined" &&
-                           typeof Tone !== "undefined" &&
-                           typeof GIFAnimator !== "undefined" &&
-                           typeof SuperGif !== "undefined";
+        const globalsReady =
+            typeof createDefaultStack !== "undefined" &&
+            typeof createjs !== "undefined" &&
+            typeof Tone !== "undefined" &&
+            typeof GIFAnimator !== "undefined" &&
+            typeof SuperGif !== "undefined";
 
         if (globalsReady) {
             activity.setupDependencies();
