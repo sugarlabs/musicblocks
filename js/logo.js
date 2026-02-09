@@ -2469,7 +2469,7 @@ class Logo {
 
 // Export Logo
 if (typeof define === "function" && define.amd) {
-    define([], function () {
+    define("activity/logo", [], function () {
         return Logo;
     });
 }

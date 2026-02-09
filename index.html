@@ -39,77 +39,73 @@
 
     <script src="lib/reqwest.js" defer></script>
 
-    <script src="lib/jquery-3.7.1.min.js"></script>
-    <script src="lib/jquery-ui.js"></script>
-    <script src="lib/materialize.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     <script>
-        jQuery(document).ready(function () {
-            if (jQuery.ui && jQuery.ui.autocomplete) {
-                jQuery.fn.materializeAutocomplete = jQuery.fn.autocomplete;
-                jQuery.widget.bridge("autocomplete", jQuery.ui.autocomplete);
+        // Use require() to ensure jQuery and Materialize are loaded before initialization
+        window.addEventListener('load', function () {
+            if (typeof require === "function") {
+                require(['jquery', 'materialize', 'jquery-ui'], function ($, M) {
+                    $(document).ready(function () {
+                        if ($.ui && $.ui.autocomplete) {
+                            $.fn.materializeAutocomplete = $.fn.autocomplete;
+                            $.widget.bridge("autocomplete", $.ui.autocomplete);
+                        }
+                    });
+                });
             }
         });
     </script>
     <script>
-        jQuery(document).ready(function () {
-            const fixAutocompletePosition = function () {
-                const $search = jQuery('#search');
-                if ($search.length && $search.data('ui-autocomplete')) {
-                    const instance = $search.autocomplete('instance');
-                    if (instance) {
-                        const originalRenderMenu = instance._renderMenu;
-                        instance._renderMenu = function (ul, items) {
-                            originalRenderMenu.call(this, ul, items);
-                            setTimeout(() => {
-                                const searchInput = document.querySelector('#search');
-                                const dropdown = ul[0];
-                                if (searchInput && dropdown) {
-                                    const rect = searchInput.getBoundingClientRect();
-                                    dropdown.style.position = 'fixed';
-                                    dropdown.style.left = rect.left + 'px';
-                                    dropdown.style.top = (rect.bottom + 2) + 'px';
-                                    dropdown.style.width = rect.width + 'px';
+        window.addEventListener('load', function () {
+            if (typeof require === "function") {
+                require(['jquery', 'jquery-ui'], function ($) {
+                    $(document).ready(function () {
+                        const fixAutocompletePosition = function () {
+                            const $search = $('#search');
+                            if ($search.length && $search.data('ui-autocomplete')) {
+                                const instance = $search.autocomplete('instance');
+                                if (instance) {
+                                    const originalRenderMenu = instance._renderMenu;
+                                    instance._renderMenu = function (ul, items) {
+                                        originalRenderMenu.call(this, ul, items);
+                                        setTimeout(() => {
+                                            const searchInput = document.querySelector('#search');
+                                            const dropdown = ul[0];
+                                            if (searchInput && dropdown) {
+                                                const rect = searchInput.getBoundingClientRect();
+                                                dropdown.style.position = 'fixed';
+                                                dropdown.style.left = rect.left + 'px';
+                                                dropdown.style.top = (rect.bottom + 2) + 'px';
+                                                dropdown.style.width = rect.width + 'px';
+                                            }
+                                        }, 0);
+                                    };
                                 }
-                            }, 0);
+                            } else {
+                                setTimeout(fixAutocompletePosition, 500);
+                            }
                         };
-                    }
-                } else {
-                    setTimeout(fixAutocompletePosition, 500);
-                }
-            };
-            setTimeout(fixAutocompletePosition, 1000);
+                        setTimeout(fixAutocompletePosition, 1000);
+                    });
+                });
+            }
         });
     </script>
-    <script src="lib/webL10n.js" defer></script>
-    <script src="lib/Tone.js" defer></script>
-    <script src="lib/midi.js" defer></script>
-    <script src="lib/jquery.ruler.js" defer></script>
-    <script src="lib/modernizr-2.6.2.min.js" defer></script>
-    <script src="lib/raphael.min.js" defer></script>
-    <script src="lib/wheelnav.js" defer></script>
-    <script src="lib/abc.min.js" defer></script>
-    <script src="lib/codejar/codejar.min.js" defer></script>
-    <script src="lib/codejar/highlight.pack.js" defer></script>
+    <!-- Removed redundant library scripts (loaded via RequireJS) -->
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
 
-    <!-- libgif.js (SuperGif) provides low-level GIF frame extraction.
-     Browsers expose only the first frame of a GIF; SuperGif lets us
-     step through frames so animated GIFs can be drawn onto our canvas. -->
-    <script src="https://cdn.jsdelivr.net/gh/buzzfeed/libgif-js/libgif.js" defer></script>
+    <!-- libgif (SuperGif) is loaded via RequireJS -->
 
-    <!-- gif-animator.js integrates SuperGif with Music Blocks. It manages
-     decoding and drawing GIF frames onto the turtle's overlay canvas.
-     Canvas refreshing is handled separately by CreateJS Ticker. -->
-    <script src="js/gif-animator.js" defer></script>
+    <!-- gif-animator.js is loaded via RequireJS in loader.js, not here -->
     <script defer>
-        document.addEventListener("DOMContentLoaded", function () {
-            if (window.hljs) hljs.highlightAll();
+        window.addEventListener('load', function () {
+            if (typeof require === "function") {
+                require(['highlight'], function (hljs) {
+                    hljs.highlightAll();
+                });
+            }
         });
     </script>
-    <script src="lib/astring.min.js" defer></script>
-
-    <script src="lib/acorn.min.js" defer></script>
 
     <link rel="prefetch" type="application/l10n" href="./localization.ini" />
 
@@ -118,8 +114,7 @@
     <link rel="preload" href="/fonts/material-icons.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="stylesheet" href="lib/materialize-iso.css">
     <link rel="stylesheet" href="css/themes.css?v=fixed">
-    <script src="lib/easeljs.min.js" defer></script>
-    <script src="lib/tweenjs.min.js" defer></script>
+    <!-- easeljs and tweenjs are loaded via RequireJS -->
     <script>
         let ast2blocklist_config;
         document.addEventListener("DOMContentLoaded", function () {

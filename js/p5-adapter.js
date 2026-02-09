@@ -1,5 +1,5 @@
 /* global define, window */
-define(["p5.min"], function (p5) {
+define("p5-adapter", ["p5.min"], function (p5) {
     console.log("p5-adapter: p5 loaded");
     if (!window.p5 && p5) {
         window.p5 = p5;

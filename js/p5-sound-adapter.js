@@ -1,5 +1,5 @@
 /* global define, window */
-define(["p5.sound.min"], function () {
+define("p5-sound-adapter", ["p5.sound.min"], function () {
     console.log("p5-sound-adapter: p5.sound loaded");
 
     // Restore AudioContext if it was overwritten

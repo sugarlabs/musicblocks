@@ -11,6 +11,18 @@
 
 /* global requirejs */
 
+// DEBUG: Catch RequireJS errors to identify anonymous define() sources
+requirejs.onError = function (err) {
+    console.error("=== RequireJS Error ===");
+    console.error("Type:", err.requireType);
+    console.error("Modules:", err.requireModules);
+    console.error("Original Error:", err);
+    if (err.requireType === "mismatch") {
+        console.error("MISMATCH DETECTED - Check for anonymous define() in:", err.requireModules);
+    }
+    throw err;
+};
+
 requirejs.config({
     baseUrl: "./",
     urlArgs: window.location.protocol === "file:" ? "" : "v=999999_fix5",
@@ -37,11 +49,15 @@ requirejs.config({
         "p5.min": {
             exports: "p5"
         },
+        // p5-adapter: Wraps p5.min, saves Tone.js and AudioContext before p5.sound loads
+        // This prevents p5.sound from hijacking Music Blocks' audio infrastructure
         "p5-adapter": {
-            deps: ["p5.min"]
+            deps: ["p5.min"]  // p5 must load before adapter
         },
+        // p5.sound: Must load AFTER p5-adapter to preserve Tone.js and AudioContext
+        // p5-adapter saves original Tone.js before p5.sound can overwrite it
         "p5.sound.min": {
-            deps: ["p5-adapter"]
+            deps: ["p5-adapter"]  // Ensures p5 loads first, then adapter, then p5.sound
         },
         "p5.dom.min": {
             deps: ["p5.min"]
@@ -94,9 +110,20 @@ requirejs.config({
             deps: ["utils/utils", "activity/logo", "activity/blocks", "activity/turtles"],
             exports: "Activity"
         },
+        // Materialize: Bundles Velocity and Hammer internally. 
+        // We've extracted these as named defines in lib/materialize.min.js
+        // to satisfy RequireJS architecture rules.
         "materialize": {
-            deps: ["jquery"],
+            deps: ["jquery", "velocity", "hammerjs"],
             exports: "M"
+        },
+        "velocity": {
+            deps: ["jquery"],
+            exports: "jQuery.Velocity"
+        },
+        "hammerjs": {
+            deps: ["jquery"],
+            exports: "Hammer"
         },
         "jquery-ui": {
             deps: ["jquery"]
@@ -104,11 +131,32 @@ requirejs.config({
         "abc": {
             exports: "ABCJS"
         },
+        // libgif (SuperGif): External CDN library for GIF frame extraction
+        // Loaded from CDN, exports SuperGif to window
         "libgif": {
             exports: "SuperGif"
         },
         "highlight": {
             exports: "hljs"
+        },
+        "midi": {
+            exports: "Midi"
+        },
+        "raphael": {
+            exports: "Raphael"
+        },
+        "wheelnav": {
+            deps: ["raphael"],
+            exports: "wheelnav"
+        },
+        "jquery.ruler": {
+            deps: ["jquery"]
+        },
+        "astring": {
+            exports: "astring"
+        },
+        "acorn": {
+            exports: "acorn"
         }
     },
     paths: {
@@ -133,10 +181,21 @@ requirejs.config({
         "jquery": "lib/jquery-3.7.1.min",
         "jquery-ui": "lib/jquery-ui",
         "materialize": "lib/materialize.min",
+        "velocity": "lib/materialize.min",
+        "hammerjs": "lib/materialize.min",
         "abc": "lib/abc.min",
         "libgif": "https://cdn.jsdelivr.net/gh/buzzfeed/libgif-js/libgif",
         "Tone": "lib/Tone",
-        "highlight": "//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min",
+        "highlight": "lib/codejar/highlight.pack",
+        "midi": "lib/midi",
+        "webL10n": "lib/webL10n",
+        "jquery.ruler": "lib/jquery.ruler",
+        "modernizr": "lib/modernizr-2.6.2.min",
+        "raphael": "lib/raphael.min",
+        "wheelnav": "lib/wheelnav",
+        "codejar": "lib/codejar/codejar.min",
+        "astring": "lib/astring.min",
+        "acorn": "lib/acorn.min",
         "i18next": [
             "lib/i18next.min",
             "https://cdn.jsdelivr.net/npm/i18next@23.11.5/dist/umd/i18next.min"
@@ -149,11 +208,26 @@ requirejs.config({
     packages: []
 });
 
+
 requirejs(
-    ["i18next", "i18nextHttpBackend", "jquery", "materialize", "jquery-ui"],
+    // CORE BOOTSTRAP: These libraries are now exclusively managed by RequireJS.
+    // Script tags for these were removed from index.html to prevent duplicate loading
+    // and "Mismatched anonymous define()" errors.
+    [
+        "i18next",
+        "i18nextHttpBackend",
+        "jquery",
+        "materialize",
+        "jquery-ui"
+    ],
     function (i18next, i18nextHttpBackend, $, M) {
+        // Materialize exports M
         if (typeof M !== "undefined") {
             window.M = M;
+        }
+        // Ensure jQuery is global for legacy plugins
+        if (typeof $ !== "undefined") {
+            window.jQuery = window.$ = $;
         }
 
         // Define essential globals for core modules
@@ -243,44 +317,16 @@ requirejs(
 
                 await waitForGlobals();
 
-                const PRELOADED_MODULES = [
-                    { name: "easeljs.min", export: () => window.createjs },
-                    { name: "tweenjs.min", export: () => window.createjs },
-                    { name: "preloadjs.min", export: () => window.createjs },
-                    { name: "libgif", export: () => window.SuperGif },
-                    { name: "activity/gif-animator", export: () => window.GIFAnimator },
-                    { name: "utils/platformstyle", export: null },
-                    { name: "utils/utils", export: () => window._ },
-                    { name: "utils/musicutils", export: null },
-                    { name: "utils/synthutils", export: () => window.Synth },
-                    { name: "utils/mathutils", export: () => window.MathUtility },
-                    { name: "activity/artwork", export: null },
-                    { name: "activity/turtledefs", export: () => window.createDefaultStack },
-                    { name: "activity/block", export: () => window.Block },
-                    { name: "activity/blocks", export: () => window.Blocks },
-                    { name: "activity/turtle-singer", export: () => window.Singer },
-                    { name: "activity/turtle-painter", export: () => window.Painter },
-                    { name: "activity/turtle", export: () => window.Turtle },
-                    { name: "activity/turtles", export: () => window.Turtles },
-                    { name: "activity/notation", export: () => window.Notation },
-                    { name: "activity/trash", export: () => window.Trashcan },
-                    { name: "activity/palette", export: () => window.Palettes },
-                    { name: "activity/protoblocks", export: () => window.ProtoBlock },
-                    { name: "activity/logo", export: () => window.Logo }
-                ];
-
-                PRELOADED_MODULES.forEach(mod => {
-                    if (!requirejs.defined(mod.name)) {
-                        define(mod.name, [], function () {
-                            return mod.export ? mod.export() : undefined;
-                        });
-                    }
-                });
-
+                // No manual define hacks - we use proper AMD modules now
                 const CORE_BOOTSTRAP_MODULES = [
                     "easeljs.min",
                     "tweenjs.min",
                     "preloadjs.min",
+                    "libgif",
+                    "Tone",
+                    "midi",
+                    "abc",
+                    "highlight",
                     "utils/platformstyle",
                     "utils/utils",
                     "activity/turtledefs",
@@ -307,28 +353,28 @@ requirejs(
 
                         if (
                             typeof window.createDefaultStack === "undefined" &&
-                            typeof arguments[5] === "undefined"
+                            typeof arguments[10] === "undefined"
                         ) {
                             verificationErrors.push("createDefaultStack not initialized");
                         }
 
                         if (
                             typeof window.Logo === "undefined" &&
-                            typeof arguments[14] === "undefined"
+                            typeof arguments[19] === "undefined"
                         ) {
                             verificationErrors.push("Logo not initialized");
                         }
 
                         if (
                             typeof window.Blocks === "undefined" &&
-                            typeof arguments[7] === "undefined"
+                            typeof arguments[12] === "undefined"
                         ) {
                             verificationErrors.push("Blocks not initialized");
                         }
 
                         if (
                             typeof window.Turtles === "undefined" &&
-                            typeof arguments[11] === "undefined"
+                            typeof arguments[16] === "undefined"
                         ) {
                             verificationErrors.push("Turtles not initialized");
                         }
@@ -340,7 +386,7 @@ requirejs(
                             );
                             alert(
                                 "Failed to initialize Music Blocks core modules. Please refresh the page.\n\nMissing: " +
-                                    verificationErrors.join(", ")
+                                verificationErrors.join(", ")
                             );
                             throw new Error(
                                 "Core bootstrap failed: " + verificationErrors.join(", ")
@@ -362,7 +408,7 @@ requirejs(
                         console.error("Core bootstrap failed:", err);
                         alert(
                             "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: " +
-                                (err.message || err)
+                            (err.message || err)
                         );
                     }
                 );

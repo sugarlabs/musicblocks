@@ -807,7 +807,7 @@ if (typeof module !== "undefined" && module.exports) {
 }
 
 if (typeof define === "function" && define.amd) {
-    define([], function () {
+    define("activity/turtles", [], function () {
         return Turtles;
     });
 }
