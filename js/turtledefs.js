@@ -424,9 +424,9 @@ const createHelpContent = activity => {
                 _(
                     "Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."
                 ) +
-                    _("The current version is") +
-                    " " +
-                    VERSION,
+                _("The current version is") +
+                " " +
+                VERSION,
                 "data:image/svg+xml;base64," + window.btoa(base64Encode(LOGO))
             ],
             [
@@ -447,19 +447,19 @@ const createHelpContent = activity => {
                 _(
                     "Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way."
                 ) +
-                    " " +
-                    _("The current version is") +
-                    " " +
-                    VERSION,
+                " " +
+                _("The current version is") +
+                " " +
+                VERSION,
                 "data:image/svg+xml;base64," + window.btoa(base64Encode(LOGO))
             ],
             [
                 _("Meet Mr. Mouse!"),
                 _("Mr Mouse is our Music Blocks conductor.") +
-                    " " +
-                    _("Mr Mouse encourages you to explore Music Blocks.") +
-                    " " +
-                    _("Let us start our tour!"),
+                " " +
+                _("Mr Mouse encourages you to explore Music Blocks.") +
+                " " +
+                _("Let us start our tour!"),
                 "data:image/svg+xml;base64," + window.btoa(base64Encode(MOUSEPALETTEICON))
             ],
             [
@@ -514,34 +514,34 @@ const createHelpContent = activity => {
             HELPCONTENT.push([
                 _("Save"),
                 _("Save project") +
-                    ": " +
-                    _("Save your project to a file.") +
-                    "<br/><br/>" +
-                    _("Save turtle artwork as SVG") +
-                    ": " +
-                    _("Save graphics from your project to as SVG.") +
-                    "<br/><br/>" +
-                    _("Save turtle artwork as PNG") +
-                    ": " +
-                    _("Save graphics from your project as PNG.") +
-                    "<br/><br/>" +
-                    _("Save block artwork as SVG") +
-                    ": " +
-                    _("Save block artwork as an SVG file."),
+                ": " +
+                _("Save your project to a file.") +
+                "<br/><br/>" +
+                _("Save turtle artwork as SVG") +
+                ": " +
+                _("Save graphics from your project to as SVG.") +
+                "<br/><br/>" +
+                _("Save turtle artwork as PNG") +
+                ": " +
+                _("Save graphics from your project as PNG.") +
+                "<br/><br/>" +
+                _("Save block artwork as SVG") +
+                ": " +
+                _("Save block artwork as an SVG file."),
                 "data:image/svg+xml;base64," + window.btoa(base64Encode(SAVEBUTTON))
             ]);
         } else {
             HELPCONTENT.push([
                 _("Save project"),
                 _("Save project as HTML") +
-                    "<br/>" +
-                    _("Save project as MIDI") +
-                    "<br/>" +
-                    _("Save music as WAV") +
-                    "<br/>" +
-                    _("Save sheet music as ABC, Lilypond or MusicXML") +
-                    "<br/>" +
-                    _("Save block artwork as SVG or PNG"),
+                "<br/>" +
+                _("Save project as MIDI") +
+                "<br/>" +
+                _("Save music as WAV") +
+                "<br/>" +
+                _("Save sheet music as ABC, Lilypond or MusicXML") +
+                "<br/>" +
+                _("Save block artwork as SVG or PNG"),
                 "data:image/svg+xml;base64," + window.btoa(base64Encode(SAVEBUTTON))
             ]);
         }
@@ -674,8 +674,8 @@ const createHelpContent = activity => {
     HELPCONTENT.push([
         _("Grid"),
         _("Turn on/off lines for cartesian or polar grids.") +
-            "<br/>" +
-            _("Turn on/off music staffs."),
+        "<br/>" +
+        _("Turn on/off music staffs."),
         "data:image/svg+xml;base64," + window.btoa(base64Encode(CARTESIANBUTTON))
     ]);
     HELPCONTENT.push([
@@ -726,10 +726,10 @@ const createHelpContent = activity => {
             _(
                 "This toolbar contains the palette buttons including Rhythm Pitch Tone Action and more."
             ) +
-                " " +
-                _(
-                    "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-                ),
+            " " +
+            _(
+                "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+            ),
             "data:image/svg+xml;base64," + window.btoa(base64Encode(RHYTHMPALETTEHELPICON))
         ]);
     }
@@ -746,16 +746,16 @@ const createHelpContent = activity => {
             _(
                 "Turtle Blocks is an open source collection of tools for exploring musical concepts."
             ) +
-                " " +
-                _(
-                    "A full list of contributors can be found in the Turtle Blocks GitHub repository."
-                ) +
-                " " +
-                _("Turtle Blocks is licensed under the AGPL.") +
-                " " +
-                _("The current version is") +
-                " " +
-                VERSION,
+            " " +
+            _(
+                "A full list of contributors can be found in the Turtle Blocks GitHub repository."
+            ) +
+            " " +
+            _("Turtle Blocks is licensed under the AGPL.") +
+            " " +
+            _("The current version is") +
+            " " +
+            VERSION,
             "data:image/svg+xml;base64," + window.btoa(base64Encode(LOGO)),
             "https://github.com/sugarlabs/turtleblocksjs",
             _("Turtle Blocks GitHub repository")
@@ -771,16 +771,16 @@ const createHelpContent = activity => {
             _(
                 "Music Blocks is an open source collection of tools for exploring musical concepts."
             ) +
-                " " +
-                _(
-                    "A full list of contributors can be found in the Music Blocks GitHub repository."
-                ) +
-                " " +
-                _("Music Blocks is licensed under the AGPL.") +
-                " " +
-                _("The current version is") +
-                " " +
-                VERSION,
+            " " +
+            _(
+                "A full list of contributors can be found in the Music Blocks GitHub repository."
+            ) +
+            " " +
+            _("Music Blocks is licensed under the AGPL.") +
+            " " +
+            _("The current version is") +
+            " " +
+            VERSION,
             "data:image/svg+xml;base64," + window.btoa(base64Encode(LOGO)),
             "https://github.com/sugarlabs/musicblocks",
             _("Music Blocks GitHub repository")
@@ -798,7 +798,8 @@ if (typeof module !== "undefined" && module.exports) {
         LOGOJA1,
         NUMBERBLOCKDEFAULT,
         DEFAULTPALETTE,
-        TITLESTRING
+        TITLESTRING,
+        DATAOBJS
     };
 }
 if (typeof window !== "undefined") {
@@ -807,4 +808,19 @@ if (typeof window !== "undefined") {
     window.NUMBERBLOCKDEFAULT = NUMBERBLOCKDEFAULT;
     window.DEFAULTPALETTE = DEFAULTPALETTE;
     window.TITLESTRING = TITLESTRING;
+    window.DATAOBJS = DATAOBJS;
+}
+
+// Export as AMD module
+if (typeof define === "function" && define.amd) {
+    define("activity/turtledefs", ["utils/utils"], function () {
+        return {
+            createDefaultStack: createDefaultStack,
+            LOGOJA1: LOGOJA1,
+            NUMBERBLOCKDEFAULT: NUMBERBLOCKDEFAULT,
+            DEFAULTPALETTE: DEFAULTPALETTE,
+            TITLESTRING: TITLESTRING,
+            DATAOBJS: DATAOBJS
+        };
+    });
 }

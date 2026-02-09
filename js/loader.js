@@ -319,6 +319,7 @@ requirejs(
 
                 // No manual define hacks - we use proper AMD modules now
                 const CORE_BOOTSTRAP_MODULES = [
+                    "jquery",  // Must load first - many modules depend on it
                     "easeljs.min",
                     "tweenjs.min",
                     "preloadjs.min",
@@ -353,28 +354,28 @@ requirejs(
 
                         if (
                             typeof window.createDefaultStack === "undefined" &&
-                            typeof arguments[10] === "undefined"
+                            typeof arguments[11] === "undefined"
                         ) {
                             verificationErrors.push("createDefaultStack not initialized");
                         }
 
                         if (
                             typeof window.Logo === "undefined" &&
-                            typeof arguments[19] === "undefined"
+                            typeof arguments[20] === "undefined"
                         ) {
                             verificationErrors.push("Logo not initialized");
                         }
 
                         if (
                             typeof window.Blocks === "undefined" &&
-                            typeof arguments[12] === "undefined"
+                            typeof arguments[13] === "undefined"
                         ) {
                             verificationErrors.push("Blocks not initialized");
                         }
 
                         if (
                             typeof window.Turtles === "undefined" &&
-                            typeof arguments[16] === "undefined"
+                            typeof arguments[17] === "undefined"
                         ) {
                             verificationErrors.push("Turtles not initialized");
                         }
