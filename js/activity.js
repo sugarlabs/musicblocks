@@ -3014,12 +3014,16 @@ class Activity {
                         //do nothing when clicked in the input field
                     } else if (
                         document.getElementById("ui-id-1") &&
-                        document.getElementById("ui-id-1").style.display === "block" &&
                         (e.target === document.getElementById("ui-id-1") ||
                             document.getElementById("ui-id-1").contains(e.target))
                     ) {
-                        //do nothing when clicked on the menu
-                    } else if (document.getElementsByTagName("tr")[2].contains(e.target)) {
+                        //do nothing when clicked on the autocomplete menu
+                    } else if (e.target.closest(".ui-menu")) {
+                        //do nothing when clicked on any autocomplete menu element
+                    } else if (
+                        document.getElementsByTagName("tr")[2] &&
+                        document.getElementsByTagName("tr")[2].contains(e.target)
+                    ) {
                         //do nothing when clicked on the search row
                     } else {
                         // this will hide the search bar if someone clicks on menu items
@@ -7796,11 +7800,12 @@ define(["domReady!"].concat(MYDEFINES), doc => {
     const initialize = () => {
         // Defensive check for multiple critical globals that may be delayed
         // due to 'defer' execution timing variances.
-        const globalsReady = typeof createDefaultStack !== "undefined" &&
-                           typeof createjs !== "undefined" &&
-                           typeof Tone !== "undefined" &&
-                           typeof GIFAnimator !== "undefined" &&
-                           typeof SuperGif !== "undefined";
+        const globalsReady =
+            typeof createDefaultStack !== "undefined" &&
+            typeof createjs !== "undefined" &&
+            typeof Tone !== "undefined" &&
+            typeof GIFAnimator !== "undefined" &&
+            typeof SuperGif !== "undefined";
 
         if (globalsReady) {
             activity.setupDependencies();
