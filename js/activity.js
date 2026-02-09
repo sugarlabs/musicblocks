@@ -1094,10 +1094,8 @@ class Activity {
                 const numColumns =
                     screenWidth <= 320 ? 1 : Math.floor(screenWidth / minColumnWidth);
 
-        
                 const baseColumnSpacing = screenWidth / numColumns;
                 const columnSpacing = baseColumnSpacing * 1.2;
-
 
                 const initialY = Math.floor(toppos * this.turtleBlocksScale);
                 const baseVerticalSpacing = Math.floor(20 * this.turtleBlocksScale);
@@ -1681,8 +1679,8 @@ class Activity {
                 return; // Exit the function if execution is already in progress
             }
 
-            if (!activity || typeof activity._doRecordButton !== 'function') {
-                console.warn('doRecordButton called without valid activity context');
+            if (!activity || typeof activity._doRecordButton !== "function") {
+                console.warn("doRecordButton called without valid activity context");
                 isExecuting = false;
                 return;
             }
@@ -1709,14 +1707,13 @@ class Activity {
              * Records the screen using the browser's media devices API.
              * @returns {Promise<MediaStream>} A promise resolving to the recorded media stream.
              */
-            
-            async function recordScreen(){
+
+            async function recordScreen() {
                 const mode = localStorage.getItem("musicBlocksRecordMode");
-                
+
                 if (mode === "canvas") {
                     return await recordCanvasOnly();
-                }
-                else {
+                } else {
                     return await recordScreenWithTools();
                 }
             }
@@ -1731,14 +1728,14 @@ class Activity {
                 // Get the toolbar height to exclude from recording
                 const toolbar = document.getElementById("toolbars");
                 const toolbarHeight = toolbar ? toolbar.offsetHeight : 0;
-                
+
                 // Get canvas dimensions
                 const canvasRect = canvas.getBoundingClientRect();
-                
+
                 // Get the actual canvas dimensions
                 const canvasWidth = canvas.width;
                 const canvasHeight = canvas.height;
-                
+
                 // Calculate the visible area (excluding toolbar)
                 const visibleHeight = canvasHeight - toolbarHeight;
 
@@ -1751,30 +1748,33 @@ class Activity {
                 // Set background to match the canvas (white/light gray)
                 recordCtx.fillStyle = "#f5f5f5"; // Adjust this color to match your canvas background
                 let animationFrameId;
-                
+
                 // Function to continuously copy canvas content
                 const copyFrame = () => {
                     // Fill background
                     recordCtx.fillRect(0, 0, canvasWidth, canvasHeight);
-                    
+
                     // Draw only the visible portion of the canvas (skip the toolbar area)
                     recordCtx.drawImage(
                         canvas,
-                        0, toolbarHeight,           // Source x, y (skip toolbar)
-                        canvasWidth, visibleHeight, // Source width, height
-                        0, 0,                       // Destination x, y
-                        canvasWidth, visibleHeight  // Destination width, height
-                        );
-                        
+                        0,
+                        toolbarHeight, // Source x, y (skip toolbar)
+                        canvasWidth,
+                        visibleHeight, // Source width, height
+                        0,
+                        0, // Destination x, y
+                        canvasWidth,
+                        visibleHeight // Destination width, height
+                    );
+
                     // Continue if still recording
                     if (flag === 1) {
                         animationFrameId = requestAnimationFrame(copyFrame);
                     }
                 };
-                
+
                 // Start copying frames
                 copyFrame();
-
 
                 // Capture the canvas stream directly at 30fps
                 const canvasStream = recordCanvas.captureStream(30);
@@ -1793,7 +1793,7 @@ class Activity {
                 currentStream = canvasStream;
 
                 // Clean up animation frame when recording stops
-                canvasStream.getTracks()[0].addEventListener('ended', () => {
+                canvasStream.getTracks()[0].addEventListener("ended", () => {
                     if (animationFrameId) {
                         cancelAnimationFrame(animationFrameId);
                     }
@@ -1803,7 +1803,7 @@ class Activity {
             }
             async function recordScreenWithTools() {
                 flag = 1;
-                
+
                 try {
                     return await navigator.mediaDevices.getDisplayMedia({
                         preferCurrentTab: "True",
@@ -1824,8 +1824,6 @@ class Activity {
                     throw error;
                 }
             }
-
-            
 
             /**
              * Saves the recorded chunks as a video file.
@@ -1890,7 +1888,7 @@ class Activity {
             function stopRec() {
                 flag = 0;
 
-                if (mediaRecorder && typeof mediaRecorder.stop === 'function') {
+                if (mediaRecorder && typeof mediaRecorder.stop === "function") {
                     mediaRecorder.stop();
                 }
 
@@ -1960,7 +1958,7 @@ class Activity {
                             start.addEventListener("click", function stopHandler() {
                                 if (mediaRecorder && mediaRecorder.state === "recording") {
                                     mediaRecorder.stop();
-                                    mediaRecorder = new MediaRecorder(stream);  
+                                    mediaRecorder = new MediaRecorder(stream);
                                     recInside.classList.remove("blink");
                                     flag = 0;
                                     // Clean up stream
@@ -1968,7 +1966,9 @@ class Activity {
                                         currentStream.getTracks().forEach(track => track.stop());
                                     }
                                     if (audioDestination && audioDestination.stream) {
-                                        audioDestination.stream.getTracks().forEach(track => track.stop());
+                                        audioDestination.stream
+                                            .getTracks()
+                                            .forEach(track => track.stop());
                                     }
                                 }
                                 this.removeEventListener("click", stopHandler);
@@ -2130,7 +2130,7 @@ class Activity {
             }
 
             // Update record button and dropdown visibility
-            if (activity.toolbar && typeof activity.toolbar.updateRecordButton === 'function') {
+            if (activity.toolbar && typeof activity.toolbar.updateRecordButton === "function") {
                 activity.toolbar.updateRecordButton(() => doRecordButton(activity));
             }
 
