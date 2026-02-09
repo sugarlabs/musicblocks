@@ -550,7 +550,6 @@ Turtles.TurtlesModel = class {
      * @returns {void}
      */
     createHitArea(turtle) {
-
         const hitArea = new createjs.Shape();
         hitArea.graphics.beginFill("#FFF").drawEllipse(-27, -27, 55, 55);
         hitArea.x = 0;

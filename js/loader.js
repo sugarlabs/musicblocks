@@ -155,193 +155,192 @@ requirejs.config({
     packages: []
 });
 
-requirejs(
-    ["i18next", "i18nextHttpBackend"],
-    function (i18next, i18nextHttpBackend) {
-        // Use globally-loaded jQuery and Materialize (avoids AMD conflicts)
-        var $ = window.jQuery;
-        // Materialize v0.100.2 (bundled) uses 'Materialize' as global, not 'M'
-        var M = window.Materialize || window.M;
+requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBackend) {
+    // Use globally-loaded jQuery and Materialize (avoids AMD conflicts)
+    var $ = window.jQuery;
+    // Materialize v0.100.2 (bundled) uses 'Materialize' as global, not 'M'
+    var M = window.Materialize || window.M;
 
-        // Ensure both M and Materialize are available for compatibility
-        if (typeof M !== "undefined") {
-            window.M = M;
-            window.Materialize = M;
-        }
-
-        // Define essential globals for core modules
-        window._THIS_IS_MUSIC_BLOCKS_ = true;
-        window._THIS_IS_TURTLE_BLOCKS_ = false;
-
-        // Load highlight optionally
-        requirejs(
-            ["highlight"],
-            function (hljs) {
-                if (hljs) {
-                    window.hljs = hljs;
-                    hljs.highlightAll();
-                }
-            },
-            function (err) {
-                console.warn("Highlight.js failed to load, moving on...", err);
-            }
-        );
-
-        function updateContent() {
-            if (!i18next.isInitialized) return;
-            const elements = document.querySelectorAll("[data-i18n]");
-            elements.forEach(element => {
-                const key = element.getAttribute("data-i18n");
-                element.textContent = i18next.t(key);
-            });
-        }
-
-        function initializeI18next() {
-            return new Promise(resolve => {
-                i18next.use(i18nextHttpBackend).init(
-                    {
-                        lng: "en",
-                        fallbackLng: "en",
-                        keySeparator: false,
-                        nsSeparator: false,
-                        interpolation: {
-                            escapeValue: false
-                        },
-                        backend: {
-                            loadPath: "locales/{{lng}}.json?v=" + Date.now()
-                        }
-                    },
-                    function (err) {
-                        if (err) {
-                            console.error("i18next init failed:", err);
-                        }
-                        window.i18next = i18next;
-                        resolve(i18next);
-                    }
-                );
-            });
-        }
-
-        async function main() {
-            try {
-                await initializeI18next();
-
-                if (typeof M !== "undefined" && M.AutoInit) {
-                    M.AutoInit();
-                }
-
-                const lang = "en";
-                i18next.changeLanguage(lang, function (err) {
-                    if (err) {
-                        console.error("Error changing language:", err);
-                    }
-                    updateContent();
-                });
-
-                if (document.readyState === "loading") {
-                    document.addEventListener("DOMContentLoaded", updateContent);
-                } else {
-                    updateContent();
-                }
-
-                i18next.on("languageChanged", updateContent);
-
-                // Two-phase bootstrap: load core modules first, then application modules
-                const waitForGlobals = async (retryCount = 0) => {
-                    if (typeof window.createjs === "undefined" && retryCount < 50) {
-                        await new Promise(resolve => setTimeout(resolve, 100));
-                        return waitForGlobals(retryCount + 1);
-                    }
-                };
-
-                await waitForGlobals();
-
-                // Only pre-define modules that are loaded via script tags in index.html
-                // These modules are already available as globals before RequireJS loads them
-                const PRELOADED_SCRIPTS = [
-                    { name: "easeljs.min", export: () => window.createjs },
-                    { name: "tweenjs.min", export: () => window.createjs }
-                ];
-
-                PRELOADED_SCRIPTS.forEach(mod => {
-                    if (!requirejs.defined(mod.name) && mod.export && mod.export()) {
-                        define(mod.name, [], function () {
-                            return mod.export();
-                        });
-                    }
-                });
-
-                // Note: Other modules like activity/*, utils/* are loaded by RequireJS
-                // from their file paths as configured in requirejs.config().
-                // Do NOT pre-define them here as that prevents RequireJS from loading the actual files.
-
-                const CORE_BOOTSTRAP_MODULES = [
-                    "easeljs.min",
-                    "tweenjs.min",
-                    "preloadjs.min",
-                    "utils/platformstyle",
-                    "utils/utils",
-                    "activity/turtledefs",
-                    "activity/block",
-                    "activity/blocks",
-                    "activity/turtle-singer",
-                    "activity/turtle-painter",
-                    "activity/turtle",
-                    "activity/turtles",
-                    "utils/synthutils",
-                    "activity/notation",
-                    "activity/logo"
-                ];
-
-                requirejs(
-                    CORE_BOOTSTRAP_MODULES,
-                    function () {
-                        // Give scripts a moment to finish executing and set globals
-                        setTimeout(function () {
-                            // Log verification status for debugging (non-blocking)
-                            const verificationStatus = {
-                                createjs: typeof window.createjs !== "undefined",
-                                createDefaultStack: typeof window.createDefaultStack !== "undefined",
-                                Logo: typeof window.Logo !== "undefined",
-                                Blocks: typeof window.Blocks !== "undefined",
-                                Turtles: typeof window.Turtles !== "undefined"
-                            };
-                            console.log("Core module verification:", verificationStatus);
-
-                            // Check critical dependencies (only createjs is truly critical)
-                            if (typeof window.createjs === "undefined") {
-                                console.error("FATAL: createjs (EaselJS/TweenJS) not found. Cannot proceed.");
-                                alert("Failed to load EaselJS. Please refresh the page.");
-                                return;
-                            }
-
-                            // Proceed with activity loading
-                            requirejs(
-                                ["activity/activity"],
-                                function () {
-                                    // Activity loaded successfully
-                                    console.log("Activity module loaded successfully");
-                                },
-                                function (err) {
-                                    console.error("Failed to load activity/activity:", err);
-                                    alert("Failed to load Music Blocks. Please refresh the page.");
-                                }
-                            );
-                        }, 100); // Small delay to allow globals to be set
-                    },
-                    function (err) {
-                        console.error("Core bootstrap failed:", err);
-                        alert(
-                            "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: " +
-                            (err.message || err)
-                        );
-                    }
-                );
-            } catch (e) {
-                console.error("Error in main bootstrap:", e);
-            }
-        }
-
-        main().catch(err => console.error("Main execution failed:", err));
+    // Ensure both M and Materialize are available for compatibility
+    if (typeof M !== "undefined") {
+        window.M = M;
+        window.Materialize = M;
     }
-);
+
+    // Define essential globals for core modules
+    window._THIS_IS_MUSIC_BLOCKS_ = true;
+    window._THIS_IS_TURTLE_BLOCKS_ = false;
+
+    // Load highlight optionally
+    requirejs(
+        ["highlight"],
+        function (hljs) {
+            if (hljs) {
+                window.hljs = hljs;
+                hljs.highlightAll();
+            }
+        },
+        function (err) {
+            console.warn("Highlight.js failed to load, moving on...", err);
+        }
+    );
+
+    function updateContent() {
+        if (!i18next.isInitialized) return;
+        const elements = document.querySelectorAll("[data-i18n]");
+        elements.forEach(element => {
+            const key = element.getAttribute("data-i18n");
+            element.textContent = i18next.t(key);
+        });
+    }
+
+    function initializeI18next() {
+        return new Promise(resolve => {
+            i18next.use(i18nextHttpBackend).init(
+                {
+                    lng: "en",
+                    fallbackLng: "en",
+                    keySeparator: false,
+                    nsSeparator: false,
+                    interpolation: {
+                        escapeValue: false
+                    },
+                    backend: {
+                        loadPath: "locales/{{lng}}.json?v=" + Date.now()
+                    }
+                },
+                function (err) {
+                    if (err) {
+                        console.error("i18next init failed:", err);
+                    }
+                    window.i18next = i18next;
+                    resolve(i18next);
+                }
+            );
+        });
+    }
+
+    async function main() {
+        try {
+            await initializeI18next();
+
+            if (typeof M !== "undefined" && M.AutoInit) {
+                M.AutoInit();
+            }
+
+            const lang = "en";
+            i18next.changeLanguage(lang, function (err) {
+                if (err) {
+                    console.error("Error changing language:", err);
+                }
+                updateContent();
+            });
+
+            if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", updateContent);
+            } else {
+                updateContent();
+            }
+
+            i18next.on("languageChanged", updateContent);
+
+            // Two-phase bootstrap: load core modules first, then application modules
+            const waitForGlobals = async (retryCount = 0) => {
+                if (typeof window.createjs === "undefined" && retryCount < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    return waitForGlobals(retryCount + 1);
+                }
+            };
+
+            await waitForGlobals();
+
+            // Only pre-define modules that are loaded via script tags in index.html
+            // These modules are already available as globals before RequireJS loads them
+            const PRELOADED_SCRIPTS = [
+                { name: "easeljs.min", export: () => window.createjs },
+                { name: "tweenjs.min", export: () => window.createjs }
+            ];
+
+            PRELOADED_SCRIPTS.forEach(mod => {
+                if (!requirejs.defined(mod.name) && mod.export && mod.export()) {
+                    define(mod.name, [], function () {
+                        return mod.export();
+                    });
+                }
+            });
+
+            // Note: Other modules like activity/*, utils/* are loaded by RequireJS
+            // from their file paths as configured in requirejs.config().
+            // Do NOT pre-define them here as that prevents RequireJS from loading the actual files.
+
+            const CORE_BOOTSTRAP_MODULES = [
+                "easeljs.min",
+                "tweenjs.min",
+                "preloadjs.min",
+                "utils/platformstyle",
+                "utils/utils",
+                "activity/turtledefs",
+                "activity/block",
+                "activity/blocks",
+                "activity/turtle-singer",
+                "activity/turtle-painter",
+                "activity/turtle",
+                "activity/turtles",
+                "utils/synthutils",
+                "activity/notation",
+                "activity/logo"
+            ];
+
+            requirejs(
+                CORE_BOOTSTRAP_MODULES,
+                function () {
+                    // Give scripts a moment to finish executing and set globals
+                    setTimeout(function () {
+                        // Log verification status for debugging (non-blocking)
+                        const verificationStatus = {
+                            createjs: typeof window.createjs !== "undefined",
+                            createDefaultStack: typeof window.createDefaultStack !== "undefined",
+                            Logo: typeof window.Logo !== "undefined",
+                            Blocks: typeof window.Blocks !== "undefined",
+                            Turtles: typeof window.Turtles !== "undefined"
+                        };
+                        console.log("Core module verification:", verificationStatus);
+
+                        // Check critical dependencies (only createjs is truly critical)
+                        if (typeof window.createjs === "undefined") {
+                            console.error(
+                                "FATAL: createjs (EaselJS/TweenJS) not found. Cannot proceed."
+                            );
+                            alert("Failed to load EaselJS. Please refresh the page.");
+                            return;
+                        }
+
+                        // Proceed with activity loading
+                        requirejs(
+                            ["activity/activity"],
+                            function () {
+                                // Activity loaded successfully
+                                console.log("Activity module loaded successfully");
+                            },
+                            function (err) {
+                                console.error("Failed to load activity/activity:", err);
+                                alert("Failed to load Music Blocks. Please refresh the page.");
+                            }
+                        );
+                    }, 100); // Small delay to allow globals to be set
+                },
+                function (err) {
+                    console.error("Core bootstrap failed:", err);
+                    alert(
+                        "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: " +
+                            (err.message || err)
+                    );
+                }
+            );
+        } catch (e) {
+            console.error("Error in main bootstrap:", e);
+        }
+    }
+
+    main().catch(err => console.error("Main execution failed:", err));
+});
