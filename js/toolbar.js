@@ -317,7 +317,7 @@ class Toolbar {
             beginnerMode.style.display = "none";
         } else {
             advancedMode.style.display = "none";
-            beginnerMode.style.display = "display";
+            beginnerMode.style.display = "block";
         }
 
         for (let i = 0; i < strings.length; i++) {
