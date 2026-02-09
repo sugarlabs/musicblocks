@@ -843,35 +843,44 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div id="searchBar" tabindex="-1">
-                <input
-                    type="text"
-                    name="search"
-                    id="search"
-                    class="ui-autocomplete"
-                    placeholder="Search for Blocks"
-                    tabindex="-1"
-                />
-                <ul class="matches" id="searchResults"></ul>
-            </div>
-        </main>
+        <div id="searchBar" tabindex="-1">
+            <input type="text" name="search" id="search" class="ui-autocomplete" placeholder="Search for Blocks"
+                tabindex="-1">
+            <ul class="matches" id="searchResults"></ul>
+        </div>
+    </main>
 
-        <!-- Initialize Scripts -->
-        <script>
-            let canvas, stage;
-            function init() {
-                canvas = document.getElementById("canvas");
-                stage = new createjs.Stage(canvas);
-
-                createjs.Ticker.framerate = 60;
-                // createjs.Ticker.addEventListener("tick", stage); // Managed by Activity class
+    <!-- Initialize Scripts -->
+    <script>
+        let canvas, stage;
+        function init() {
+            // Defensive check: ensure createjs is loaded before using it
+            if (typeof createjs === "undefined") {
+                // Retry after a short delay if createjs isn't ready yet
+                setTimeout(init, 50);
+                return;
             }
-            document.addEventListener("DOMContentLoaded", init);
-        </script>
 
-        <script>
-            if ("serviceWorker" in navigator) {
+            canvas = document.getElementById("canvas");
+            stage = new createjs.Stage(canvas);
+
+            createjs.Ticker.framerate = 60;
+            // createjs.Ticker.addEventListener("tick", stage); // Managed by Activity class
+        }
+        document.addEventListener("DOMContentLoaded", init);
+    </script>
+
+    <script>
+        // Register service worker only in production (not on localhost)
+        if ("serviceWorker" in navigator) {
+            // Detect if running on localhost for development
+            const isLocalDev = window.location.hostname === "localhost" ||
+                window.location.hostname === "127.0.0.1";
+
+            if (!isLocalDev) {
+                // Production: Register service worker for offline mode
                 if (navigator.serviceWorker.controller) {
                     console.debug("[PWA Builder] active service worker found, no need to register");
                 } else {
@@ -884,18 +893,30 @@
                     });
                 }
             }
-        </script>
-        <script>
-            let deferredPrompt;
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            // Defensive check for doSearch global (now an Activity member)
+            if (typeof doSearch === "function") {
+                doSearch();
+            } else if (window.activity && typeof window.activity.doSearch === "function") {
+                window.activity.doSearch();
+            }
+        });
+    </script>
 
-            window.addEventListener("beforeinstallprompt", event => {
-                event.preventDefault(); // Prevent automatic browser prompt
-                deferredPrompt = event;
-
-                // Show your install button here
-                const divInstall = document.getElementById("installButton");
-                if (divInstall) {
-                    divInstall.classList.remove("hidden");
+    <!-- Loading Dialog Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let loadL10nSplashScreen = function () {
+                console.debug("The browser is set to " + navigator.language);
+                let lang = navigator.language;
+                if (localStorage.languagePreference) {
+                    console.debug(
+                        "Music Blocks is set to " + localStorage.languagePreference
+                    );
+                    lang = localStorage.languagePreference;
                 }
             });
         </script>
@@ -1017,23 +1038,89 @@
                     });
                 });
             });
+        });
 
-            let isDragging = false;
-        </script>
+        let isDragging = false;
+    </script>
 
-        <script>
-            var elem = document.documentElement;
-            function openFullscreen() {
-                if (elem.requestFullscreen) {
-                    elem.requestFullscreen();
-                    // For safari browser
-                } else if (elem.webkitRequestFullscreen) {
-                    elem.webkitRequestFullscreen();
-                    // For IE(supported above 10)
-                } else if (elem.msRequestFullscreen) {
-                    elem.msRequestFullscreen();
-                } else if (elem.mozRequestFullscreen) {
-                    elem.mozRequestFullscreen();
+    <script>
+        var elem = document.documentElement;
+
+        function openFullscreen() {
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            } else if (elem.mozRequestFullscreen) {
+                elem.mozRequestFullscreen();
+            }
+        }
+
+        function closeFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            } else if (document.mozExitFullscreen) {
+                document.mozExitFullscreen();
+            }
+        }
+
+        function setIcon() {
+            var iconCode = document.querySelector('#FullScrIcon');
+            // Determine fullscreen state using the browser fullscreen API
+            // instead of relying on a manual counter. This keeps the icon
+            // in sync when fullscreen is exited via ESC or browser controls.
+            var isFullscreen =
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
+
+            if (!isFullscreen) {
+                openFullscreen();
+                iconCode.textContent = '\ue5d1'; // fullscreen_exit icon
+            } else {
+                closeFullscreen();
+                iconCode.textContent = '\ue5d0'; // fullscreen icon
+            }
+        }
+
+        function handleFullscreenChange() {
+            var iconCode = document.querySelector('#FullScrIcon');
+            // Update fullscreen icon based on actual fullscreen state.
+            // This removes the need for a separate state variable and
+            // prevents incorrect icon state when fullscreen is toggled
+            // outside the button (e.g., ESC key).
+            var isFullscreen =
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
+
+            iconCode.textContent = isFullscreen ? '\ue5d1' : '\ue5d0';
+        }
+
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let persistentNotification = null;
+
+            function showPersistentNotification() {
+                if (!persistentNotification) {
+                    persistentNotification = document.createElement("div");
+                    persistentNotification.id = "persistentNotification";
+                    persistentNotification.innerHTML = "Play only mode enabled. For full Music Blocks experience, use a larger display.";
+                    document.body.appendChild(persistentNotification);
                 }
             }
 
@@ -1171,8 +1258,4 @@
 
                 togglePlayOnlyMode();
 
-                window.addEventListener("resize", togglePlayOnlyMode);
-            });
-        </script>
-    </body>
 </html>

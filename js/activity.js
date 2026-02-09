@@ -38,7 +38,7 @@
    TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, Turtles, TURTLESVG,
    updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_F,
    SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
-   MUSICALMODES
+   MUSICALMODES, waitForReadiness
  */
 
 /*
@@ -306,7 +306,13 @@ class Activity {
         this.loadAnimationIntervalId = null;
 
         // Initialize GIF animator
-        this.gifAnimator = new GIFAnimator();
+        if (typeof GIFAnimator !== "undefined") {
+            this.gifAnimator = new GIFAnimator();
+        } else {
+            // eslint-disable-next-line no-console
+            console.debug("GIFAnimator not yet available in constructor");
+            this.gifAnimator = null;
+        }
 
         // Dirty flag for canvas rendering optimization
         // When true, the stage needs to be redrawn on the next animation frame
@@ -482,6 +488,11 @@ class Activity {
             this.helpfulWheelItems = [];
 
             this.setHelpfulSearchDiv();
+
+            // Late initialization of GIF animator if it was missed in constructor
+            if (!this.gifAnimator && typeof GIFAnimator !== "undefined") {
+                this.gifAnimator = new GIFAnimator();
+            }
         };
 
         /*
@@ -2722,6 +2733,60 @@ class Activity {
             };
 
             img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svgData));
+        };
+
+        /**
+         * Initializes the Idle Watcher mechanism to throttle createjs.Ticker
+         * when the application is inactive and no music is playing.
+         * This significantly reduces CPU usage and improves battery life.
+         */
+        this._initIdleWatcher = () => {
+            const IDLE_THRESHOLD = 5000; // 5 seconds
+            const ACTIVE_FPS = 60;
+            const IDLE_FPS = 1;
+
+            let lastActivity = Date.now();
+            let isIdle = false;
+
+            // Wake up function - restores full framerate
+            const resetIdleTimer = () => {
+                lastActivity = Date.now();
+                if (isIdle) {
+                    isIdle = false;
+                    createjs.Ticker.framerate = ACTIVE_FPS;
+                    // Force immediate redraw for responsiveness
+                    if (this.stage) this.stage.update();
+                }
+            };
+
+            // Track user activity
+            window.addEventListener("mousemove", resetIdleTimer);
+            window.addEventListener("mousedown", resetIdleTimer);
+            window.addEventListener("keydown", resetIdleTimer);
+            window.addEventListener("touchstart", resetIdleTimer);
+            window.addEventListener("wheel", resetIdleTimer);
+
+            // Periodic check for idle state
+            setInterval(() => {
+                // Check if music/code is playing
+                const isMusicPlaying = this.logo?._alreadyRunning || false;
+
+                if (!isMusicPlaying && Date.now() - lastActivity > IDLE_THRESHOLD) {
+                    if (!isIdle) {
+                        isIdle = true;
+                        createjs.Ticker.framerate = IDLE_FPS;
+                        console.log("⚡ Idle mode: Throttling to 1 FPS to save battery");
+                    }
+                } else if (isIdle && isMusicPlaying) {
+                    // Music started playing - wake up immediately
+                    resetIdleTimer();
+                }
+            }, 1000);
+
+            // Expose activity instance for external checks
+            if (typeof window !== "undefined") {
+                window.activity = this;
+            }
         };
 
         /*
@@ -5629,7 +5694,9 @@ class Activity {
             this.update = true;
         };
 
-        this.__showAltoAccidentals = () => {};
+        this.__showAltoAccidentals = () => {
+            // No-op for Alto clef
+        };
 
         /*
          * Shows musical alto staff
@@ -6881,10 +6948,12 @@ class Activity {
             this.stage = new createjs.Stage(this.canvas);
             createjs.Touch.enable(this.stage);
 
-            // createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
-            // createjs.Ticker.framerate = 15;
-            // createjs.Ticker.addEventListener('tick', this.stage);
-            // createjs.Ticker.addEventListener('tick', that.__tick);
+            // Initialize Ticker with optimal framerate
+            createjs.Ticker.framerate = 60;
+
+            // ===== Idle Ticker Optimization =====
+            // Throttle rendering when user is inactive and no music is playing
+            this._initIdleWatcher();
 
             let mouseEvents = 0;
             document.addEventListener("mousemove", () => {
@@ -7725,7 +7794,15 @@ const activity = new Activity();
 // Execute initialization once all RequireJS modules are loaded AND DOM is ready
 define(["domReady!"].concat(MYDEFINES), doc => {
     const initialize = () => {
-        if (typeof createDefaultStack !== "undefined") {
+        // Defensive check for multiple critical globals that may be delayed
+        // due to 'defer' execution timing variances.
+        const globalsReady = typeof createDefaultStack !== "undefined" &&
+                           typeof createjs !== "undefined" &&
+                           typeof Tone !== "undefined" &&
+                           typeof GIFAnimator !== "undefined" &&
+                           typeof SuperGif !== "undefined";
+
+        if (globalsReady) {
             activity.setupDependencies();
             activity.domReady(doc);
             activity.doContextMenus();
@@ -7733,7 +7810,24 @@ define(["domReady!"].concat(MYDEFINES), doc => {
         } else {
             // Race condition in Firefox: non-AMD scripts might not have
             // finished global assignment yet.
-            setTimeout(initialize, 10);
+            // Use readiness-based initialization for Firefox for better performance
+            if (typeof jQuery !== "undefined" && jQuery.browser && jQuery.browser.mozilla) {
+                waitForReadiness(
+                    () => {
+                        activity.setupDependencies();
+                        activity.domReady(doc);
+                        activity.doContextMenus();
+                        activity.doPluginsAndPaletteCols();
+                    },
+                    {
+                        maxWait: 10000,
+                        minWait: 500,
+                        checkInterval: 100
+                    }
+                );
+            } else {
+                setTimeout(initialize, 50); // Increased delay slightly
+            }
         }
     };
     initialize();
