@@ -630,9 +630,6 @@ function toTitleCase(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-if (typeof module !== "undefined" && module.exports) {
-    module.exports.toTitleCase = toTitleCase;
-}
 if (typeof window !== "undefined") {
     window.toTitleCase = toTitleCase;
 }
@@ -1818,4 +1815,43 @@ if (typeof window !== "undefined") {
     window.docById = docById;
     window.delayExecution = delayExecution;
     window.hideDOMLabel = hideDOMLabel;
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        _,
+        last,
+        fileExt,
+        fileBasename,
+        toTitleCase,
+        safeSVG,
+        toFixed2,
+        mixedNumber,
+        nearestBeat,
+        oneHundredToFraction,
+        rationalToFraction,
+        rgbToHex,
+        hexToRGB,
+        hex2rgb,
+        getTextWidth,
+        docById,
+        delayExecution,
+        hideDOMLabel,
+        changeImage,
+        format,
+        fnBrowserDetect,
+        canvasPixelRatio,
+        windowHeight,
+        windowWidth,
+        httpGet,
+        httpPost,
+        HttpRequest,
+        doBrowserCheck,
+        waitForReadiness,
+        doSVG,
+        isSVGEmpty,
+        processPluginData,
+        importMembers,
+        rationalSum
+    };
 }

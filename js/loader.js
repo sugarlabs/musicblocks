@@ -364,7 +364,7 @@ requirejs(
 
                         if (
                             typeof window.Logo === "undefined" &&
-                            typeof arguments[20] === "undefined"
+                            typeof arguments[17] === "undefined"
                         ) {
                             verificationErrors.push("Logo not initialized");
                         }
@@ -378,7 +378,7 @@ requirejs(
 
                         if (
                             typeof window.Turtles === "undefined" &&
-                            typeof arguments[17] === "undefined"
+                            typeof arguments[21] === "undefined"
                         ) {
                             verificationErrors.push("Turtles not initialized");
                         }

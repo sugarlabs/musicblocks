@@ -511,3 +511,7 @@ if (typeof define === "function" && define.amd) {
 if (typeof window !== "undefined") {
     window.Notation = Notation;
 }
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Notation;
+}

@@ -49,7 +49,16 @@ describe("loader.js coverage", () => {
 
     const loadScript = async ({ initError = false, langError = false } = {}) => {
         mockRequireJS.mockImplementation((deps, callback) => {
-            if (deps.includes("highlight")) {
+            if (deps.includes("jquery") && deps.includes("activity/logo")) {
+                // Core Bootstrap Modules (Phase 1)
+                // Mock globals expected by verification
+                window.createDefaultStack = jest.fn();
+                window.Logo = jest.fn();
+                window.Blocks = jest.fn();
+                window.Turtles = jest.fn();
+                // Call callback with enough arguments to satisfy verification logic (min 22 args)
+                if (callback) callback(...new Array(25).fill({}));
+            } else if (deps.includes("highlight")) {
                 if (callback) callback(null);
             } else if (deps.includes("i18next")) {
                 mockI18next.init.mockImplementation((config, cb) => {
@@ -67,16 +76,8 @@ describe("loader.js coverage", () => {
                 if (callback) {
                     callback(mockI18next, mockI18nextHttpBackend);
                 }
-            } else if (deps.includes("easeljs.min")) {
-                // Phase 1 bootstrap
-                // Mock globals expected by verification
-                window.createDefaultStack = jest.fn();
-                window.Logo = jest.fn();
-                window.Blocks = jest.fn();
-                window.Turtles = jest.fn();
-                if (callback) callback();
             } else if (deps.includes("activity/activity")) {
-                // Phase 2 bootstrap
+                // Activity Loading (Phase 2)
                 if (callback) callback();
             }
             return null;
@@ -125,7 +126,14 @@ describe("loader.js coverage", () => {
 
         expect(mockI18next.on).toHaveBeenCalledWith("languageChanged", expect.any(Function));
 
-        // Verify Phase 2 was reached
+        // Verify Core Modules were loaded (Phase 1)
+        expect(mockRequireJS).toHaveBeenCalledWith(
+            expect.arrayContaining(["activity/logo", "activity/turtles"]),
+            expect.any(Function),
+            expect.any(Function)
+        );
+
+        // Verify Phase 2 was reached (activity/activity)
         expect(mockRequireJS).toHaveBeenCalledWith(
             ["activity/activity"],
             expect.any(Function),
