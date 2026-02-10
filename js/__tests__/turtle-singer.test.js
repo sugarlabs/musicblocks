@@ -20,6 +20,7 @@
 global.DEFAULTVOLUME = 100;
 global.TARGETBPM = 120;
 global.TONEBPM = 60;
+global._ = jest.fn(s => s);
 
 const Singer = require("../turtle-singer");
 
