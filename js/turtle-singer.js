@@ -2500,15 +2500,9 @@ if (typeof window !== "undefined") {
     window.Singer = Singer;
 }
 
-// Implement proper AMD define
+// Implement additive AMD define
 if (typeof define === "function" && define.amd) {
-    define("activity/turtle-singer", ["activity/logoconstants"], function (logoconstants) {
-        // Enforce deterministic initialization of static constants from AMD dependency
-        if (logoconstants) {
-            Singer.masterBPM = logoconstants.TARGETBPM;
-            Singer.defaultBPMFactor = logoconstants.TONEBPM / logoconstants.TARGETBPM;
-            Singer.masterVolume = [logoconstants.DEFAULTVOLUME];
-        }
+    define(["activity/logoconstants"], function () {
         return Singer;
     });
 }

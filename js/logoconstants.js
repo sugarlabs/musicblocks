@@ -110,18 +110,9 @@ if (typeof window !== "undefined") {
     window.NOTATIONSTACCATO = NOTATIONSTACCATO;
 }
 
-// Implement proper AMD define
+// Implement additive AMD define
 if (typeof define === "function" && define.amd) {
-    define("activity/logoconstants", ["utils/utils"], function (utils) {
-        // Explicitly handle dependencies (including _ if used)
-        const _dependency = (utils && utils._) || (typeof window !== "undefined" && window._);
-        if (
-            _dependency &&
-            typeof _dependency === "function" &&
-            logoconstants.INVALIDPITCH === "Not a valid pitch name"
-        ) {
-            logoconstants.INVALIDPITCH = _dependency("Not a valid pitch name");
-        }
+    define(function () {
         return logoconstants;
     });
 }
