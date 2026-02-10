@@ -100,7 +100,7 @@ const {
     numberToPitch,
     GetNotesForInterval,
     base64Encode,
-    MUSICALMODES
+    MUSICALMODES,
     getStepSizeUp,
     getStepSizeDown
 } = require("../musicutils");
