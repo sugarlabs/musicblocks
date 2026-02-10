@@ -2498,8 +2498,16 @@ class Singer {
 // AMD module definition
 if (typeof define === "function" && define.amd) {
     define("activity/turtle-singer", ["activity/logoconstants"], function (logoconstants) {
-        // logoconstants exposes TARGETBPM, TONEBPM, DEFAULTVOLUME to window
-        // Singer class uses them from the global scope
+        "use strict";
+
+        // Destructure constants from AMD module
+        const { TARGETBPM, TONEBPM, DEFAULTVOLUME } = logoconstants;
+
+        // Inject constants into Singer class static properties
+        Singer.masterBPM = TARGETBPM;
+        Singer.defaultBPMFactor = TONEBPM / TARGETBPM;
+        Singer.masterVolume = [DEFAULTVOLUME];
+
         return Singer;
     });
 }

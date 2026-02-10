@@ -17,7 +17,9 @@
 
 // AMD module definition
 if (typeof define === "function" && define.amd) {
-    define("activity/logoconstants", ["utils/utils"], function (utils) {
+    define("activity/logoconstants", [], function () {
+        "use strict";
+
         const DEFAULTVOLUME = 50;
         const PREVIEWVOLUME = 80;
         const DEFAULTDELAY = 500; // milliseconds
@@ -42,8 +44,8 @@ if (typeof define === "function" && define.amd) {
         const EMPTYHEAPERRORMSG = "empty heap.";
         const POSNUMBER = "Argument must be a positive number";
 
-        // Use explicit AMD dependency for translation
-        const INVALIDPITCH = utils._("Not a valid pitch name");
+        // NOTE: _() is expected to be available globally (shimmed or loaded by RequireJS)
+        const INVALIDPITCH = typeof _ === "function" ? _("Not a valid pitch name") : "Not a valid pitch name";
 
         const NOTATIONNOTE = 0;
         const NOTATIONDURATION = 1;
