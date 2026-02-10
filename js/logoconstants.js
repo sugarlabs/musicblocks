@@ -40,7 +40,8 @@ const EMPTYHEAPERRORMSG = "empty heap.";
 const POSNUMBER = "Argument must be a positive number";
 
 // NOTE: _() must be available globaly (shimmed or loaded)
-const INVALIDPITCH = typeof _ === "function" ? _("Not a valid pitch name") : "Not a valid pitch name";
+const INVALIDPITCH =
+    typeof _ === "function" ? _("Not a valid pitch name") : "Not a valid pitch name";
 
 const NOTATIONNOTE = 0;
 const NOTATIONDURATION = 1;
@@ -114,7 +115,11 @@ if (typeof define === "function" && define.amd) {
     define("activity/logoconstants", ["utils/utils"], function (utils) {
         // Explicitly handle dependencies (including _ if used)
         const _dependency = (utils && utils._) || (typeof window !== "undefined" && window._);
-        if (_dependency && typeof _dependency === "function" && logoconstants.INVALIDPITCH === "Not a valid pitch name") {
+        if (
+            _dependency &&
+            typeof _dependency === "function" &&
+            logoconstants.INVALIDPITCH === "Not a valid pitch name"
+        ) {
             logoconstants.INVALIDPITCH = _dependency("Not a valid pitch name");
         }
         return logoconstants;
