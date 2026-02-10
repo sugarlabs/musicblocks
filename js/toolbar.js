@@ -396,8 +396,6 @@ class Toolbar {
         function handleClick() {
             if (!isPlayIconRunning) {
                 playIcon.onclick = null;
-                // eslint-disable-next-line no-console
-                console.log("Wait for next 2 seconds to play the music");
             } else {
                 // eslint-disable-next-line no-use-before-define
                 playIcon.onclick = tempClick;
