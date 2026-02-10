@@ -888,7 +888,7 @@ Turtle.TurtleView = class {
         this._decorationBitmap.scaleX =
             this._decorationBitmap.scaleY =
             this._decorationBitmap.scale =
-            (this._decorationBaseScale * scale) / 2;
+                (this._decorationBaseScale * scale) / 2;
     }
 
     /**
@@ -972,7 +972,7 @@ Turtle.TurtleView = class {
                 this._decorationBitmap.scaleX =
                     this._decorationBitmap.scaleY =
                     this._decorationBitmap.scale =
-                    (0.5 * startBlock.protoblock.scale) / 2;
+                        (0.5 * startBlock.protoblock.scale) / 2;
                 startBlock.updateCache();
             }
 

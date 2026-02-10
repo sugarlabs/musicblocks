@@ -22,7 +22,6 @@
 
 /* global define */
 
-
 /**
  * Manages animated GIF playback on the canvas.
  */

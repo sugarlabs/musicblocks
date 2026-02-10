@@ -273,7 +273,7 @@ describe("afterSaveMIDI", () => {
         global.activity = {
             logo: {
                 _midiData: {
-                    "0": [
+                    0: [
                         {
                             note: ["G4"],
                             duration: 4,

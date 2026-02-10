@@ -52,12 +52,12 @@ requirejs.config({
         // p5-adapter: Wraps p5.min, saves Tone.js and AudioContext before p5.sound loads
         // This prevents p5.sound from hijacking Music Blocks' audio infrastructure
         "p5-adapter": {
-            deps: ["p5.min"]  // p5 must load before adapter
+            deps: ["p5.min"] // p5 must load before adapter
         },
         // p5.sound: Must load AFTER p5-adapter to preserve Tone.js and AudioContext
         // p5-adapter saves original Tone.js before p5.sound can overwrite it
         "p5.sound.min": {
-            deps: ["p5-adapter"]  // Ensures p5 loads first, then adapter, then p5.sound
+            deps: ["p5-adapter"] // Ensures p5 loads first, then adapter, then p5.sound
         },
         "p5.dom.min": {
             deps: ["p5.min"]
@@ -83,7 +83,7 @@ requirejs.config({
         },
         "activity/logoconstants": {
             deps: ["utils/utils"],
-            exports: "TARGETBPM"  // Exports TARGETBPM, TONEBPM, and other constants
+            exports: "TARGETBPM" // Exports TARGETBPM, TONEBPM, and other constants
         },
         "activity/turtle-painter": {
             exports: "Painter"
@@ -111,7 +111,7 @@ requirejs.config({
             deps: ["utils/utils", "activity/logo", "activity/blocks", "activity/turtles"],
             exports: "Activity"
         },
-        // Materialize: Bundles Velocity and Hammer internally. 
+        // Materialize: Bundles Velocity and Hammer internally.
         // We've extracted these as named defines in lib/materialize.min.js
         // to satisfy RequireJS architecture rules.
         "materialize": {
@@ -176,7 +176,7 @@ requirejs.config({
         "p5.min": "lib/p5.min",
         "p5.sound.min": "lib/p5.sound.min",
         "p5.dom.min": "lib/p5.dom.min",
-        "p5.dom": "lib/p5.dom.min",  // Alias for p5.dom without .min suffix
+        "p5.dom": "lib/p5.dom.min", // Alias for p5.dom without .min suffix
         "p5-adapter": "js/p5-adapter",
         "p5-sound-adapter": "js/p5-sound-adapter",
         "domReady": "lib/domReady",
@@ -210,18 +210,11 @@ requirejs.config({
     packages: []
 });
 
-
 requirejs(
     // CORE BOOTSTRAP: These libraries are now exclusively managed by RequireJS.
     // Script tags for these were removed from index.html to prevent duplicate loading
     // and "Mismatched anonymous define()" errors.
-    [
-        "i18next",
-        "i18nextHttpBackend",
-        "jquery",
-        "materialize",
-        "jquery-ui"
-    ],
+    ["i18next", "i18nextHttpBackend", "jquery", "materialize", "jquery-ui"],
     function (i18next, i18nextHttpBackend, $, M) {
         // Materialize exports M
         if (typeof M !== "undefined") {
@@ -321,7 +314,7 @@ requirejs(
 
                 // No manual define hacks - we use proper AMD modules now
                 const CORE_BOOTSTRAP_MODULES = [
-                    "jquery",  // Must load first - many modules depend on it
+                    "jquery", // Must load first - many modules depend on it
                     "easeljs.min",
                     "tweenjs.min",
                     "preloadjs.min",
@@ -337,7 +330,7 @@ requirejs(
                     "activity/blocks",
                     "utils/synthutils",
                     "activity/notation",
-                    "activity/logoconstants",  // Must load before turtle-singer (provides TARGETBPM, TONEBPM)
+                    "activity/logoconstants", // Must load before turtle-singer (provides TARGETBPM, TONEBPM)
                     "activity/logo",
                     "activity/turtle-singer",
                     "activity/turtle-painter",
@@ -390,7 +383,7 @@ requirejs(
                             );
                             alert(
                                 "Failed to initialize Music Blocks core modules. Please refresh the page.\n\nMissing: " +
-                                verificationErrors.join(", ")
+                                    verificationErrors.join(", ")
                             );
                             throw new Error(
                                 "Core bootstrap failed: " + verificationErrors.join(", ")
@@ -412,7 +405,7 @@ requirejs(
                         console.error("Core bootstrap failed:", err);
                         alert(
                             "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: " +
-                            (err.message || err)
+                                (err.message || err)
                         );
                     }
                 );

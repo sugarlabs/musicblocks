@@ -375,8 +375,8 @@ describe("saveLilypondOutput", () => {
             logo: {
                 notation: {
                     notationStaging: {
-                        "0": [[["G4"], 4, 0, null, 0, -1, false]],
-                        "1": [[["E4"], 4, 0, null, 0, -1, false]]
+                        0: [[["G4"], 4, 0, null, 0, -1, false]],
+                        1: [[["E4"], 4, 0, null, 0, -1, false]]
                     },
                     notationDrumStaging: {}
                 },
@@ -388,8 +388,8 @@ describe("saveLilypondOutput", () => {
             },
             turtles: {
                 turtleList: {
-                    "0": { name: "Turtle 0" },
-                    "1": { name: "Turtle 1" }
+                    0: { name: "Turtle 0" },
+                    1: { name: "Turtle 1" }
                 },
                 getTurtle: function (t) {
                     return this.turtleList[t];
@@ -412,7 +412,7 @@ describe("saveLilypondOutput", () => {
 
     test("should handle drum staging correctly", () => {
         activity.logo.notation.notationDrumStaging = {
-            "0": [[["C4"], 4, 0, null, 0, -1, false]]
+            0: [[["C4"], 4, 0, null, 0, -1, false]]
         };
         const result = saveLilypondOutput(activity);
         expect(result).toContain("\\drummode {");
@@ -420,7 +420,7 @@ describe("saveLilypondOutput", () => {
 
     test("should handle empty drum staging correctly", () => {
         activity.logo.notation.notationDrumStaging = {
-            "0": []
+            0: []
         };
         const result = saveLilypondOutput(activity);
         expect(result).not.toContain("\\drummode {");
@@ -434,9 +434,9 @@ describe("saveLilypondOutput", () => {
 
     test("should handle unique short instrument names correctly", () => {
         activity.turtles.turtleList = {
-            "0": { name: "Turtle 0" },
-            "1": { name: "Turtle 1" },
-            "2": { name: "Turtle 2" }
+            0: { name: "Turtle 0" },
+            1: { name: "Turtle 1" },
+            2: { name: "Turtle 2" }
         };
         const result = saveLilypondOutput(activity);
         expect(result).toContain('shortInstrumentName = "Tu"');
@@ -470,19 +470,19 @@ describe("saveLilypondOutput", () => {
 
     test("should fallback to RODENTS names if instrument name is empty", () => {
         activity.turtles.getTurtle = jest.fn(t => ({ name: "" }));
-        activity.turtles.turtleList = { "0": {} };
+        activity.turtles.turtleList = { 0: {} };
         saveLilypondOutput(activity);
         expect(activity.logo.notationOutput).toContain(RODENTS[0]);
     });
 
     test("should handle multiple turtles with different clefs correctly", () => {
         activity.logo.notationNotes = {
-            "0": "\\note0",
-            "1": "\\note1"
+            0: "\\note0",
+            1: "\\note1"
         };
         activity.logo.notation.notationStaging = {
-            "0": ["note"],
-            "1": ["note"]
+            0: ["note"],
+            1: ["note"]
         };
         clef = ["treble", "bass_8"];
         CLEFS = ["treble", "bass_8"];
@@ -531,8 +531,8 @@ describe("saveLilypondOutput", () => {
     test("should properly format guitar tab output", () => {
         activity.logo.guitarOutputHead = "% Guitar Output Head\n";
         activity.logo.guitarOutputEnd = "% Guitar Output End\n";
-        activity.logo.notationNotes = { "0": "\\note0" };
-        activity.logo.notation.notationStaging = { "0": ["note"] };
+        activity.logo.notationNotes = { 0: "\\note0" };
+        activity.logo.notation.notationStaging = { 0: ["note"] };
 
         const result = saveLilypondOutput(activity);
         expect(result).toContain("% Guitar Output Head");
@@ -546,14 +546,14 @@ describe("saveLilypondOutput", () => {
     });
     test("should handle instrument short name collisions (no spaces)", () => {
         activity.turtles.turtleList = {
-            "0": { name: "Trumpet" },
-            "1": { name: "Trombone" },
-            "2": { name: "Tuba" }
+            0: { name: "Trumpet" },
+            1: { name: "Trombone" },
+            2: { name: "Tuba" }
         };
         activity.logo.notation.notationStaging = {
-            "0": ["note"],
-            "1": ["note"],
-            "2": ["note"]
+            0: ["note"],
+            1: ["note"],
+            2: ["note"]
         };
         frequencyToPitch.mockReturnValue(["C", 4]);
 
@@ -564,25 +564,25 @@ describe("saveLilypondOutput", () => {
 
     test("should handle instrument short name collisions (with spaces)", () => {
         activity.turtles.turtleList = {
-            "0": { name: "Violin One" },
-            "1": { name: "Violin Two" }
+            0: { name: "Violin One" },
+            1: { name: "Violin Two" }
         };
-        activity.logo.notation.notationStaging = { "0": ["note"], "1": ["note"] };
+        activity.logo.notation.notationStaging = { 0: ["note"], 1: ["note"] };
         const result = saveLilypondOutput(activity);
         expect(result).toContain('shortInstrumentName = "Vi"');
         expect(result).toContain('shortInstrumentName = "Vio"');
     });
     test("should map special turtle names (start, numeric) to Rodent names", () => {
         activity.turtles.turtleList = {
-            "0": { name: "start" },
-            "1": { name: "start drum" },
-            "2": { name: "2" }
+            0: { name: "start" },
+            1: { name: "start drum" },
+            2: { name: "2" }
         };
 
         activity.logo.notation.notationStaging = {
-            "0": ["note"],
-            "1": ["note"],
-            "2": ["note"]
+            0: ["note"],
+            1: ["note"],
+            2: ["note"]
         };
 
         const result = saveLilypondOutput(activity);
@@ -593,7 +593,7 @@ describe("saveLilypondOutput", () => {
         frequencyToPitch.mockReturnValue(["C", 1]);
 
         activity.logo.notation.notationStaging = {
-            "0": [[["C1"], 4, 0, null, 0, -1, false]]
+            0: [[["C1"], 4, 0, null, 0, -1, false]]
         };
         const result = saveLilypondOutput(activity);
         expect(result).toContain('\\clef "bass_8"');
@@ -601,7 +601,7 @@ describe("saveLilypondOutput", () => {
     test("should select bass clef for mid-low notes", () => {
         frequencyToPitch.mockReturnValue(["C", 3]);
         activity.logo.notation.notationStaging = {
-            "0": [[["C3"], 4, 0, null, 0, -1, false]]
+            0: [[["C3"], 4, 0, null, 0, -1, false]]
         };
 
         const result = saveLilypondOutput(activity);
@@ -610,7 +610,7 @@ describe("saveLilypondOutput", () => {
 
     test("should handle rest notes in octave calculation", () => {
         activity.logo.notation.notationStaging = {
-            "0": [[["R"], 4, 0, null, 0, -1, false]]
+            0: [[["R"], 4, 0, null, 0, -1, false]]
         };
         const result = saveLilypondOutput(activity);
         expect(result).toBeDefined();
@@ -619,7 +619,7 @@ describe("saveLilypondOutput", () => {
     test("should handle numeric frequency in octave calculation", () => {
         frequencyToPitch.mockReturnValue(["A", 4]);
         activity.logo.notation.notationStaging = {
-            "0": [[[440], 4, 0, null, 0, -1, false]]
+            0: [[[440], 4, 0, null, 0, -1, false]]
         };
         const result = saveLilypondOutput(activity);
         expect(result).toBeDefined();
@@ -627,14 +627,14 @@ describe("saveLilypondOutput", () => {
     });
     test("should handle short name collision for names without spaces (longer loop)", () => {
         activity.turtles.turtleList = {
-            "0": { name: "Trumpet" },
-            "1": { name: "Trombone" },
-            "2": { name: "Triangle" }
+            0: { name: "Trumpet" },
+            1: { name: "Trombone" },
+            2: { name: "Triangle" }
         };
         activity.logo.notation.notationStaging = {
-            "0": ["note"],
-            "1": ["note"],
-            "2": ["note"]
+            0: ["note"],
+            1: ["note"],
+            2: ["note"]
         };
         const result = saveLilypondOutput(activity);
 

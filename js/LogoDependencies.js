@@ -117,13 +117,13 @@ class LogoDependencies {
          * Message handler - manages UI messages
          * @type {Object}
          */
-        this.messageHandler = messageHandler || { hide: () => { } };
+        this.messageHandler = messageHandler || { hide: () => {} };
 
         /**
          * Storage - handles persistence
          * @type {Object}
          */
-        this.storage = storage || { saveLocally: () => { } };
+        this.storage = storage || { saveLocally: () => {} };
 
         /**
          * Configuration - runtime settings
