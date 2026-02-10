@@ -176,6 +176,7 @@ requirejs.config({
         "p5.min": "lib/p5.min",
         "p5.sound.min": "lib/p5.sound.min",
         "p5.dom.min": "lib/p5.dom.min",
+        "p5.dom": "lib/p5.dom.min",  // Alias for p5.dom without .min suffix
         "p5-adapter": "js/p5-adapter",
         "p5-sound-adapter": "js/p5-sound-adapter",
         "domReady": "lib/domReady",
