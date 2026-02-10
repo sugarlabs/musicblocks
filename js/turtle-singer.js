@@ -43,6 +43,13 @@
 
 /* exported Singer */
 
+// AMD module definition
+if (typeof define === "function" && define.amd) {
+    define("activity/turtle-singer", ["activity/logoconstants"], function (LOGO_CONSTANTS) {
+        // Extract constants needed by Singer
+        const { TARGETBPM, TONEBPM, DEFAULTVOLUME } = LOGO_CONSTANTS;
+
+
 /**
  * Class pertaining to music related actions for each turtle.
  *
@@ -2492,6 +2499,17 @@ class Singer {
         }
 
         activity.stage.update();
+    }
+}
+
+
+        // Return Singer for AMD
+        return Singer;
+    });
+} else {
+    // Non-AMD environment - expose as global
+    if (typeof window !== "undefined") {
+        window.Singer = Singer;
     }
 }
 

@@ -81,8 +81,9 @@ requirejs.config({
             deps: ["activity/block"],
             exports: "Blocks"
         },
-        "activity/turtle-singer": {
-            exports: "Singer"
+        "activity/logoconstants": {
+            deps: ["utils/utils"],
+            exports: "TARGETBPM"  // Exports TARGETBPM, TONEBPM, and other constants
         },
         "activity/turtle-painter": {
             exports: "Painter"
@@ -333,13 +334,14 @@ requirejs(
                     "activity/turtledefs",
                     "activity/block",
                     "activity/blocks",
+                    "utils/synthutils",
+                    "activity/notation",
+                    "activity/logoconstants",  // Must load before turtle-singer (provides TARGETBPM, TONEBPM)
+                    "activity/logo",
                     "activity/turtle-singer",
                     "activity/turtle-painter",
                     "activity/turtle",
-                    "activity/turtles",
-                    "utils/synthutils",
-                    "activity/notation",
-                    "activity/logo"
+                    "activity/turtles"
                 ];
 
                 requirejs(
