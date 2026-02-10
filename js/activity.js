@@ -293,7 +293,10 @@ class Activity {
         // Flag to indicate whether user is selecting
         this.isSelecting = false;
 
-        // Flag to indicate the selection mode is on
+        // Global flag to prevent automatic docking during undo/redo
+        this.isUndoRedoInProgress = false;
+
+        // Flag to indicate that selection mode is on
         this.selectionModeOn = false;
 
         // Flag to check if the helpful search widget is active or not (for "click" event handler purpose)
@@ -401,6 +404,9 @@ class Activity {
             createDefaultStack();
             createHelpContent(this);
             window.scroll(0, 0);
+
+            // Initialize UndoRedoManager after other components are ready
+            this.undoRedoManager = new UndoRedoManager(this);
 
             /*
             try {
@@ -3337,20 +3343,6 @@ class Activity {
                             this.blocksContainer.x -= this.canvas.width / 10;
                             this.stage.update();
                         }
-                }
-            } else if (event.ctrlKey) {
-                switch (event.keyCode) {
-                    case V:
-                        // this.textMsg("Ctl-V " + _("Paste"));
-                        this.pasteBox.createBox(this.turtleBlocksScale, 200, 200);
-                        this.pasteBox.show();
-                        document.getElementById("paste").style.left =
-                            (this.pasteBox.getPos()[0] + 10) * this.turtleBlocksScale + "px";
-                        document.getElementById("paste").style.top =
-                            (this.pasteBox.getPos()[1] + 10) * this.turtleBlocksScale + "px";
-                        document.getElementById("paste").focus();
-                        document.getElementById("paste").style.visibility = "visible";
-                        this.update = true;
                         break;
                 }
             } else if (event.shiftKey && !disableKeys) {
@@ -3362,6 +3354,31 @@ class Activity {
                         } else {
                             this.turtles.setStageScale(1);
                         }
+                        break;
+                }
+            } else if (event.ctrlKey) {
+                switch (event.keyCode) {
+                    case 90: // Ctrl+Z for undo
+                        if (this.undoRedoManager) {
+                            this.undoRedoManager.undo();
+                        }
+                        break;
+                    case 89: // Ctrl+Y for redo
+                        if (this.undoRedoManager) {
+                            this.undoRedoManager.redo();
+                        }
+                        break;
+                    case 86: // Ctrl+V for paste
+                        // this.textMsg("Ctl-V " + _("Paste")));
+                        this.pasteBox.createBox(this.turtleBlocksScale, 200, 200);
+                        this.pasteBox.show();
+                        document.getElementById("paste").style.left =
+                            (this.pasteBox.getPos()[0] + 10) * this.turtleBlocksScale + "px";
+                        document.getElementById("paste").style.top =
+                            (this.pasteBox.getPos()[1] + 10) * this.turtleBlocksScale + "px";
+                        document.getElementById("paste").focus();
+                        document.getElementById("paste").style.visibility = "visible";
+                        this.update = true;
                         break;
                 }
             } else {
@@ -7059,6 +7076,8 @@ class Activity {
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
             this.toolbar.renderMenuIcon(showHideAuxMenu);
             this.toolbar.renderHelpIcon(showHelp);
+            this.toolbar.renderUndoIcon();
+            this.toolbar.renderRedoIcon();
             this.toolbar.renderModeSelectIcon(
                 doSwitchMode,
                 doRecordButton,
