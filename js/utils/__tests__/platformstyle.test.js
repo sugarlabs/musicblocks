@@ -94,10 +94,7 @@ describe("platformstyle", () => {
 
         loadModule();
 
-        const ua = global.window.navigator.userAgent;
-        const expectedFFOS =
-            /Firefox/i.test(ua) && (/Mobi/i.test(ua) || /Tablet/i.test(ua)) && !/Android/i.test(ua);
-        expect(global.window.platform.FFOS).toBe(expectedFFOS);
+        expect(global.window.platform.FFOS).toBe(true);
     });
 
     it("delegates to material highlight when not on FFOS", () => {
@@ -140,53 +137,65 @@ describe("platformstyle", () => {
 });
 
 describe("platform detection computed properties", () => {
-    /**
-     * Pure logic for computing androidWebkit and FFOS flags.
-     */
-    const computePlatformFlags = userAgent => {
-        const android = /Android/i.test(userAgent);
-        const FF = /Firefox/i.test(userAgent);
-        const mobile = /Mobi/i.test(userAgent);
-        const tablet = /Tablet/i.test(userAgent);
-
-        return {
-            android,
-            FF,
-            mobile,
-            tablet,
-            androidWebkit: android && !FF,
-            FFOS: FF && (mobile || tablet) && !android
-        };
+    const buildDom = () => {
+        const meta = document.createElement("meta");
+        meta.name = "theme-color";
+        document.head.appendChild(meta);
     };
 
+    const loadModuleWithUA = ua => {
+        Object.defineProperty(global.window.navigator, "userAgent", {
+            value: ua,
+            configurable: true,
+            writable: true
+        });
+        global.navigator = global.window.navigator;
+        const ls = global.window.localStorage || {};
+        global.localStorage = ls;
+        global.window.localStorage = ls;
+        global.window.navigator = global.navigator;
+        global.showMaterialHighlight = jest.fn(() => ({ highlight: true }));
+        buildDom();
+        jest.isolateModules(() => {
+            require("../platformstyle");
+        });
+    };
+
+    beforeEach(() => {
+        jest.resetModules();
+        document.head.innerHTML = "";
+        delete global.window.platform;
+        delete global.window.platformColor;
+    });
+
     it("should detect androidWebkit for Android Chrome", () => {
-        const result = computePlatformFlags("Mozilla/5.0 Android Chrome/90");
-        expect(result.androidWebkit).toBe(true);
-        expect(result.FFOS).toBe(false);
+        loadModuleWithUA("Mozilla/5.0 Android Chrome/90");
+        expect(global.window.platform.androidWebkit).toBe(true);
+        expect(global.window.platform.FFOS).toBe(false);
     });
 
     it("should not set androidWebkit for Android Firefox", () => {
-        const result = computePlatformFlags("Mozilla/5.0 Android Firefox/88");
-        expect(result.androidWebkit).toBe(false);
-        expect(result.FFOS).toBe(false);
+        loadModuleWithUA("Mozilla/5.0 Android Firefox/88");
+        expect(global.window.platform.androidWebkit).toBe(false);
+        expect(global.window.platform.FFOS).toBe(false);
     });
 
     it("should detect FFOS for Firefox mobile non-Android", () => {
-        const result = computePlatformFlags("Mozilla/5.0 Firefox Mobi");
-        expect(result.FFOS).toBe(true);
-        expect(result.androidWebkit).toBe(false);
+        loadModuleWithUA("Mozilla/5.0 Firefox Mobi");
+        expect(global.window.platform.FFOS).toBe(true);
+        expect(global.window.platform.androidWebkit).toBe(false);
     });
 
     it("should not detect FFOS for desktop Firefox", () => {
-        const result = computePlatformFlags("Mozilla/5.0 Firefox/88.0");
-        expect(result.FFOS).toBe(false);
+        loadModuleWithUA("Mozilla/5.0 Firefox/88.0");
+        expect(global.window.platform.FFOS).toBe(false);
     });
 
     it("should handle empty user agent", () => {
-        const result = computePlatformFlags("");
-        expect(result.android).toBe(false);
-        expect(result.FF).toBe(false);
-        expect(result.androidWebkit).toBe(false);
-        expect(result.FFOS).toBe(false);
+        loadModuleWithUA("");
+        expect(global.window.platform.android).toBe(false);
+        expect(global.window.platform.FF).toBe(false);
+        expect(global.window.platform.androidWebkit).toBe(false);
+        expect(global.window.platform.FFOS).toBe(false);
     });
 });
