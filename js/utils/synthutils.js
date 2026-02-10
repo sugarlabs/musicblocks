@@ -535,6 +535,21 @@ function Synth() {
      * @type {Object.<string, [number, number]>}
      */
     this.noteFrequencies = {};
+    /**
+     * Tuner microphone input.
+     * @type {Tone.UserMedia|null}
+     */
+    this.tunerMic = null;
+    /**
+     * Tuner analyser for pitch detection.
+     * @type {Tone.Analyser|null}
+     */
+    this.tunerAnalyser = null;
+    /**
+     * Pitch detection function.
+     * @type {function|null}
+     */
+    this.detectPitch = null;
 
     /**
      * Function to initialize a new Tone.js instance.
@@ -2379,8 +2394,8 @@ function Synth() {
         this.tunerMic = new Tone.UserMedia();
         await this.tunerMic.open();
 
-        const analyser = new Tone.Analyser("waveform", 2048);
-        this.tunerMic.connect(analyser);
+        this.tunerAnalyser = new Tone.Analyser("waveform", 2048);
+        this.tunerMic.connect(this.tunerAnalyser);
 
         const YIN = (sampleRate, bufferSize = 2048, threshold = 0.1) => {
             // Low-Pass Filter to remove high-frequency noise
@@ -2457,13 +2472,13 @@ function Synth() {
             };
         };
 
-        const detectPitch = YIN(Tone.context.sampleRate);
+        this.detectPitch = YIN(Tone.context.sampleRate);
         let tunerMode = "chromatic"; // Add mode state
         let targetPitch = { note: "A4", frequency: 440 }; // Default target pitch
 
         const updatePitch = () => {
-            const buffer = analyser.getValue();
-            const pitch = detectPitch(buffer);
+            const buffer = this.tunerAnalyser.getValue();
+            const pitch = this.detectPitch(buffer);
 
             if (pitch > 0) {
                 let note, cents;
@@ -2773,13 +2788,12 @@ function Synth() {
                                         i < tempBlock._accidentalsWheel.navItems.length;
                                         i++
                                     ) {
-                                        tempBlock._accidentalsWheel.navItems[
-                                            i
-                                        ].navigateFunction = () => {
-                                            selectionState.accidental =
-                                                tempBlock._accidentalsWheel.navItems[i].title;
-                                            updateTargetNote();
-                                        };
+                                        tempBlock._accidentalsWheel.navItems[i].navigateFunction =
+                                            () => {
+                                                selectionState.accidental =
+                                                    tempBlock._accidentalsWheel.navItems[i].title;
+                                                updateTargetNote();
+                                            };
                                     }
                                 }
 
@@ -2790,16 +2804,15 @@ function Synth() {
                                         i < tempBlock._octavesWheel.navItems.length;
                                         i++
                                     ) {
-                                        tempBlock._octavesWheel.navItems[
-                                            i
-                                        ].navigateFunction = () => {
-                                            const octave =
-                                                tempBlock._octavesWheel.navItems[i].title;
-                                            if (octave && !isNaN(octave)) {
-                                                selectionState.octave = parseInt(octave);
-                                                updateTargetNote();
-                                            }
-                                        };
+                                        tempBlock._octavesWheel.navItems[i].navigateFunction =
+                                            () => {
+                                                const octave =
+                                                    tempBlock._octavesWheel.navItems[i].title;
+                                                if (octave && !isNaN(octave)) {
+                                                    selectionState.octave = parseInt(octave);
+                                                    updateTargetNote();
+                                                }
+                                            };
                                     }
                                 }
 
@@ -3273,12 +3286,13 @@ function Synth() {
      * @returns {number} The detected frequency in Hz
      */
     this.getTunerFrequency = () => {
-        if (!this.tunerAnalyser) return 440; // Default to A4 if no analyser
+        if (!this.tunerAnalyser || !this.detectPitch) return 440; // Default to A4 if no analyser
 
         const buffer = this.tunerAnalyser.getValue();
-        // TODO: Implement actual pitch detection algorithm
-        // For now, return a default value
-        return 440;
+        const pitch = this.detectPitch(buffer);
+
+        // Return detected pitch or default to A4
+        return pitch > 0 ? pitch : 440;
     };
 
     // Test function to verify tuner accuracy

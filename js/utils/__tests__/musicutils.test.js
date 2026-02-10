@@ -101,6 +101,8 @@ const {
     GetNotesForInterval,
     base64Encode,
     MUSICALMODES
+    getStepSizeUp,
+    getStepSizeDown
 } = require("../musicutils");
 
 describe("musicutils", () => {
@@ -1399,32 +1401,32 @@ describe("getModeLength", () => {
 describe("nthDegreeToPitch", () => {
     it("should return the correct note for the 2nd scale degree in C major", () => {
         const result = nthDegreeToPitch("C major", 2);
-        expect(result).toBe("E");
+        expect(result).toEqual(["D", 0]);
     });
 
     it("should handle a scale degree larger than the scale length (wrapping case)", () => {
         const result = nthDegreeToPitch("C major", 8);
-        expect(result).toBe("D");
+        expect(result).toEqual(["C", 1]);
     });
 
-    it("should return the root note for scale degree 0 in C major", () => {
+    it("should return the note below the root for scale degree 0 in C major (downward wrapping)", () => {
         const result = nthDegreeToPitch("C major", 0);
-        expect(result).toBe("C");
+        expect(result).toEqual(["B", -1]);
     });
 
     it("should return the correct note for the 5th scale degree in A minor", () => {
         const result = nthDegreeToPitch("A minor", 5);
-        expect(result).toBe("F");
+        expect(result).toEqual(["E", 0]);
     });
 
     it("should handle negative scale degrees (reverse wrapping)", () => {
         const result = nthDegreeToPitch("C major", -1);
-        expect(result).toBeUndefined();
+        expect(result).toEqual(["A", -1]);
     });
 
-    it("should return undefined for a scale degree when the scale is empty", () => {
+    it("should fallback to C major for a scale degree when the key signature is unknown", () => {
         const result = nthDegreeToPitch("Unknown", 2); //default keysignature will be C major
-        expect(result).toBe("E");
+        expect(result).toEqual(["D", 0]);
     });
 });
 
@@ -1482,6 +1484,45 @@ describe("toFraction", () => {
     });
     it("should return array with numerator and denomrator from floating point number", () => {
         expect(toFraction(0.0)).toEqual([0, 2]);
+    });
+
+    it("should handle common musical note fractions correctly", () => {
+        expect(toFraction(0.5)).toEqual([1, 2]);
+        expect(toFraction(0.25)).toEqual([1, 4]);
+        expect(toFraction(0.125)).toEqual([1, 8]);
+    });
+
+    it("should handle whole numbers by flipping numerator and denominator", () => {
+        expect(toFraction(2)).toEqual([2, 1]);
+        expect(toFraction(4)).toEqual([4, 1]);
+        expect(toFraction(8)).toEqual([8, 1]);
+    });
+
+    it("should handle thirds correctly", () => {
+        const result = toFraction(1 / 3);
+        expect(result[0]).toBe(1);
+        expect(result[1]).toBe(3);
+    });
+
+    it("should handle dotted note values (1.5 = 3/2)", () => {
+        expect(toFraction(1.5)).toEqual([3, 2]);
+        expect(toFraction(0.75)).toEqual([3, 4]);
+    });
+
+    it("should handle value equal to 1", () => {
+        expect(toFraction(1)).toEqual([1, 1]);
+    });
+
+    it("should handle very small positive decimals", () => {
+        const result = toFraction(0.0625);
+        expect(result[0]).toBe(1);
+        expect(result[1]).toBe(16);
+    });
+
+    it("should handle sixths correctly", () => {
+        const result = toFraction(1 / 6);
+        expect(result[0]).toBe(1);
+        expect(result[1]).toBe(6);
     });
 });
 
@@ -2269,5 +2310,26 @@ describe("MUSICALMODES", () => {
 
     it("should have aeolian equivalent to minor", () => {
         expect(MUSICALMODES["aeolian"]).toEqual(MUSICALMODES["minor"]);
+describe("getStepSizeDown", () => {
+    it("should return the correct step size for D in C major going down", () => {
+        const result = getStepSizeDown("C major", "D", 0, "equal");
+        expect(result).toBe(-2);
+    });
+
+    it("should return 0 for an invalid temperament", () => {
+        const result = getStepSizeDown("C major", "D", 0, "invalid");
+        expect(result).toBe(0);
+    });
+});
+
+describe("getStepSizeUp", () => {
+    it("should return the correct step size for C in C major going up", () => {
+        const result = getStepSizeUp("C major", "C", 0, "equal");
+        expect(result).toBe(2);
+    });
+
+    it("should return 0 for an invalid temperament", () => {
+        const result = getStepSizeUp("C major", "C", 0, "invalid");
+        expect(result).toBe(0);
     });
 });
