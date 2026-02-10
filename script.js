@@ -29,6 +29,11 @@ $(document).ready(function () {
      */
     var modeText = document.getElementById("modeText");
 
+    // Defensive: avoid crashing if expected DOM nodes are missing.
+    if (!modeIcon || !modeText) {
+        return;
+    }
+
     // Set the mode icon and tooltip based on the user's selected mode.
     if (mode === null || mode === "true") {
         modeIcon.innerHTML = "star_border";

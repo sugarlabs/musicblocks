@@ -4,7 +4,7 @@
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
-// License as published by the Free Software Foundatioff; either
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
 //
 // You should have received a copy of the GNU Affero General Public
@@ -34,39 +34,7 @@
    NOTATIONSTACCATO
  */
 
-const DEFAULTVOLUME = 50;
-const PREVIEWVOLUME = 80;
-const DEFAULTDELAY = 500; // milliseconds
-// The oscillator runs hot. We must scale back its volume.
-const OSCVOLUMEADJUSTMENT = 1.5;
-
-const TONEBPM = 240; // seems to be the default
-const TARGETBPM = 90; // what we'd like to use for beats per minute
-const TURTLESTEP = -1; // run in step-by-step mode
-const NOTEDIV = 8; // number of steps to divide turtle graphics
-
-// These error messages don't need translation since they are
-// converted into artwork w/o text.
-const NOMICERRORMSG = "The microphone is not available.";
-const NANERRORMSG = "Not a number.";
-const NOSTRINGERRORMSG = "Not a string.";
-const NOBOXERRORMSG = "Cannot find box";
-const NOACTIONERRORMSG = "Cannot find action.";
-const NOINPUTERRORMSG = "Missing argument.";
-const NOSQRTERRORMSG = "Cannot take square root of negative number.";
-const ZERODIVIDEERRORMSG = "Cannot divide by zero.";
-const EMPTYHEAPERRORMSG = "empty heap.";
-const POSNUMBER = "Argument must be a positive number";
-
-const INVALIDPITCH = _("Not a valid pitch name");
-
-const NOTATIONNOTE = 0;
-const NOTATIONDURATION = 1;
-const NOTATIONDOTCOUNT = 2;
-const NOTATIONTUPLETVALUE = 3;
-const NOTATIONROUNDDOWN = 4;
-const NOTATIONINSIDECHORD = 5; // deprecated
-const NOTATIONSTACCATO = 6;
+// Constants moved to js/logoconstants.js to resolve circular dependency
 
 /**
  * @class
@@ -100,9 +68,97 @@ class Queue {
 class Logo {
     /**
      * @constructor
+     * @param {Object|LogoDependencies} activityOrDeps - Either an Activity object (old pattern)
+     *                                                    or a LogoDependencies object (new pattern)
+     *
+     * @example
+     * // Old pattern (still supported)
+     * const logo = new Logo(activity);
+     *
+     * @example
+     * // New pattern (explicit dependencies)
+     * const deps = new LogoDependencies({
+     *     blocks: activity.blocks,
+     *     turtles: activity.turtles,
+     *     // ... other dependencies
+     * });
+     * const logo = new Logo(deps);
      */
-    constructor(activity) {
-        this.activity = activity;
+    constructor(activityOrDeps) {
+        // Support both old Activity pattern and new LogoDependencies pattern
+        // Check if this is a LogoDependencies instance by looking for the characteristic structure
+        const isExplicitDeps =
+            activityOrDeps &&
+            activityOrDeps.blocks &&
+            activityOrDeps.turtles &&
+            activityOrDeps.stage &&
+            activityOrDeps.errorHandler;
+
+        if (isExplicitDeps) {
+            // New pattern: explicit dependencies
+            this.deps = activityOrDeps;
+            // For backward compatibility, also set activity to point to deps
+            // This allows gradual migration of code
+            const deps = this.deps; // Capture for closure
+            this.activity = {
+                blocks: deps.blocks,
+                turtles: deps.turtles,
+                stage: deps.stage,
+                errorMsg: deps.errorHandler,
+                hideMsgs: deps.messageHandler.hide,
+                saveLocally: deps.storage.saveLocally,
+                get showBlocksAfterRun() {
+                    return deps.config.showBlocksAfterRun;
+                },
+                set showBlocksAfterRun(value) {
+                    deps.config.showBlocksAfterRun = value;
+                },
+                onStopTurtle: deps.callbacks.onStopTurtle,
+                onRunTurtle: deps.callbacks.onRunTurtle,
+                meSpeak: deps.meSpeak,
+                logo: this // Self-reference for compatibility
+            };
+        } else {
+            // Old pattern: Activity facade
+            this.activity = activityOrDeps;
+            // Create deps as a view over activity for future migration
+            this.deps = {
+                blocks: this.activity.blocks,
+                turtles: this.activity.turtles,
+                stage: this.activity.stage,
+                errorHandler: (msg, blk) => this.activity.errorMsg(msg, blk),
+                messageHandler: {
+                    hide: () => this.activity.hideMsgs()
+                },
+                storage: {
+                    saveLocally: () => this.activity.saveLocally()
+                },
+                config: {
+                    get showBlocksAfterRun() {
+                        return this.activity.showBlocksAfterRun;
+                    },
+                    set showBlocksAfterRun(value) {
+                        this.activity.showBlocksAfterRun = value;
+                    }
+                },
+                callbacks: {
+                    get onStopTurtle() {
+                        return this.activity.onStopTurtle;
+                    },
+                    get onRunTurtle() {
+                        return this.activity.onRunTurtle;
+                    }
+                },
+                meSpeak: this.activity.meSpeak
+            };
+        }
+
+        // Bind commonly-used dependencies locally for readability
+        // This reduces verbosity while maintaining explicit dependency injection
+        this.blocks = this.deps.blocks;
+        this.turtles = this.deps.turtles;
+        this.stage = this.deps.stage;
+
         this.blockList = this.activity.blocks.blockList;
         this._onStopTurtle = this.activity.onStopTurtle;
         this._onRunTurtle = this.activity.onRunTurtle;
@@ -177,7 +233,7 @@ class Logo {
         this.inTempo = false;
         this.inPitchSlider = false;
         this.inMusicKeyboard = false;
-        this._currentDrumlock = null;
+        this._currentDrumBlock = null;
         this.inTimbre = false;
         this.inArpeggio = false;
         this.insideModeWidget = false;
@@ -681,9 +737,8 @@ class Logo {
                     ) {
                         logo.statusFields.push([blk, "color"]);
                     } else {
-                        logo.blockList[blk].value = logo.activity.turtles.getTurtle(
-                            turtle
-                        ).painter.color;
+                        logo.blockList[blk].value =
+                            logo.activity.turtles.getTurtle(turtle).painter.color;
                     }
                     break;
 
@@ -1480,12 +1535,27 @@ class Logo {
                     logo.blockList[blk].protoblock.dockTypes[0]
                 )
             ) {
-                args.push(logo.parseArg(logo, turtle, blk, logo.receievedArg));
+                args.push(logo.parseArg(logo, turtle, blk, logo.receivedArg));
+
+                // Use label prefix for screen dimension blocks to clarify the display is informational
+                // Labels wrapped with _() for internationalization
+                const blockLabels = {
+                    width: _("width"),
+                    height: _("height"),
+                    rightpos: _("right (screen)"),
+                    leftpos: _("left (screen)"),
+                    toppos: _("top (screen)"),
+                    bottompos: _("bottom (screen)")
+                };
+                const blockName = logo.blockList[blk].name;
+                const label = blockLabels[blockName];
 
                 if (logo.blockList[blk].value == null) {
                     logo.activity.textMsg("null block value");
                 } else {
-                    logo.activity.textMsg(logo.blockList[blk].value.toString());
+                    const value = logo.blockList[blk].value.toString();
+                    const displayText = label ? label + ": " + value : value;
+                    logo.activity.textMsg(displayText);
                 }
             } else {
                 logo.activity.errorMsg(
@@ -1771,19 +1841,7 @@ class Logo {
 
         const tur = this.activity.turtles.ithTurtle(turtle);
 
-        if (Object.keys) {
-            if (Object.keys(tur.singer.embeddedGraphics).length === 0) return;
-        } else {
-            const isEmpty = true;
-            for (const key in tur.singer.embeddedGraphics) {
-                if (tur.singer.embeddedGraphics.hasOwnProperty(key)) {
-                    isEmpty = false;
-                    break;
-                }
-            }
-
-            if (isEmpty) return;
-        }
+        if (Object.keys(tur.singer.embeddedGraphics).length === 0) return;
 
         if (!(blk in tur.singer.embeddedGraphics)) return;
 
@@ -2322,7 +2380,7 @@ class Logo {
                     break;
 
                 case "clear":
-                    __clear(turtle, waitTime);
+                    __clear();
                     break;
 
                 case "fill":
@@ -2407,4 +2465,62 @@ class Logo {
         await delayExecution(beatValue * 1000);
         tur.embeddedGraphicsFinished = true;
     }
+}
+
+// Export Logo
+if (typeof define === "function" && define.amd) {
+    define([], function () {
+        return Logo;
+    });
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    let exportsObj = { Logo, Queue };
+
+    // In Node.js / Jest environment, we need to include constants
+    if (typeof DEFAULTVOLUME === "undefined") {
+        try {
+            const constants = require("./logoconstants");
+            Object.assign(global, constants);
+            Object.assign(exportsObj, constants);
+        } catch (e) {
+            // Ignore
+        }
+    } else {
+        // If they are already global (e.g. via logoconstants.js loaded before)
+        exportsObj = Object.assign(exportsObj, {
+            DEFAULTVOLUME,
+            PREVIEWVOLUME,
+            DEFAULTDELAY,
+            OSCVOLUMEADJUSTMENT,
+            TONEBPM,
+            TARGETBPM,
+            TURTLESTEP,
+            NOTEDIV,
+            NOMICERRORMSG,
+            NANERRORMSG,
+            NOSTRINGERRORMSG,
+            NOBOXERRORMSG,
+            NOACTIONERRORMSG,
+            NOINPUTERRORMSG,
+            NOSQRTERRORMSG,
+            ZERODIVIDEERRORMSG,
+            EMPTYHEAPERRORMSG,
+            POSNUMBER,
+            NOTATIONNOTE,
+            NOTATIONDURATION,
+            NOTATIONDOTCOUNT,
+            NOTATIONTUPLETVALUE,
+            NOTATIONROUNDDOWN,
+            NOTATIONINSIDECHORD,
+            NOTATIONSTACCATO
+        });
+    }
+
+    module.exports = exportsObj;
+}
+
+if (typeof window !== "undefined") {
+    window.Logo = Logo;
+    window.Queue = Queue;
 }
