@@ -88,6 +88,7 @@ const logoconstants = (function () {
     };
 })();
 
+// Expose constants to window for backward compatibility
 if (typeof window !== "undefined") {
     window.DEFAULTVOLUME = logoconstants.DEFAULTVOLUME;
     window.PREVIEWVOLUME = logoconstants.PREVIEWVOLUME;
@@ -117,6 +118,7 @@ if (typeof window !== "undefined") {
     window.NOTATIONSTACCATO = logoconstants.NOTATIONSTACCATO;
 }
 
+// CommonJS export for Node.js tests
 if (typeof module !== "undefined" && module.exports) {
     module.exports = logoconstants;
 }
