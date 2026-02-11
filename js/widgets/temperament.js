@@ -2221,7 +2221,7 @@ function TemperamentWidget() {
             that._save();
         };
 
-        var noteCell = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Table"));
+        const noteCell = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Table"));
 
         let t = getTemperament(this.inTemperament);
         this.pitchNumber = t.pitchNumber;
