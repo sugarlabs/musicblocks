@@ -638,7 +638,7 @@ class Blocks {
 
             /** Which connection do we start with? */
             let ci;
-            if (["doArg", "calcArg", "makeblock"].includes(myBlock.name)) {
+            if (myBlock.isArgumentLikeBlock()) {
                 ci = 2;
             } else {
                 ci = 1;
@@ -1726,6 +1726,9 @@ class Blocks {
                     start = this.blockList[b].connections.length - 1;
                 }
 
+                const ILLEGAL_BOUNCE_DIST = 400; // squared distance (20px)
+                let bounced = false;
+
                 for (let i = start; i < this.blockList[b].connections.length; i++) {
                     /**
                      * When converting from Python projects to JS format,
@@ -1781,11 +1784,42 @@ class Blocks {
                             min = dist;
                         }
                     } else {
-                        /**
-                         * TODO: bounce away from illegal connection?
-                         * only if the distance was small
-                         * console.debug('cannot not connect these two block types');
-                         */
+                        // Bounce away from illegal connection if the distance was small.
+                        if (!myBlock.isDragging) {
+                            const x2 =
+                                this.blockList[b].container.x + this.blockList[b].docks[i][0];
+                            const y2 =
+                                this.blockList[b].container.y + this.blockList[b].docks[i][1];
+
+                            const dx = x2 - x1;
+                            const dy = y2 - y1;
+                            const dist = dx * dx + dy * dy;
+
+                            if (!bounced && dist < ILLEGAL_BOUNCE_DIST) {
+                                console.debug("cannot connect these two block types");
+
+                                const distance = Math.sqrt(dist) || 0.0001;
+                                const bounceFactor = 60;
+
+                                // Snap back first
+                                if (myBlock.lastGoodX !== undefined) {
+                                    myBlock.container.x = myBlock.lastGoodX;
+                                    myBlock.container.y = myBlock.lastGoodY;
+                                }
+
+                                // Directional push away from illegal dock based on block type
+                                if (myBlock.isArgBlock()) {
+                                    // Arg blocks bounce to the right
+                                    myBlock.container.x += bounceFactor;
+                                } else {
+                                    // Flow blocks bounce below and to the right
+                                    myBlock.container.x += bounceFactor * 0.7;
+                                    myBlock.container.y += bounceFactor;
+                                }
+
+                                bounced = true;
+                            }
+                        }
                     }
                 }
             }
@@ -1804,12 +1838,7 @@ class Blocks {
                 if (connection == null) {
                     if (this.blockList[newBlock].isArgClamp()) {
                         /** If it is an arg clamp, we may have to adjust the slot size. */
-                        if (
-                            ["doArg", "calcArg", "makeblock"].indexOf(
-                                this.blockList[newBlock].name
-                            ) !== -1 &&
-                            newConnection === 1
-                        ) {
+                        if (this.blockList[newBlock].isArgumentLikeBlock() && newConnection === 1) {
                             /** pass */
                         } else if (
                             ["doArg", "nameddoArg"].includes(this.blockList[newBlock].name) &&
@@ -1824,11 +1853,7 @@ class Blocks {
                             const slotList = this.blockList[newBlock].argClampSlots;
                             let si = newConnection - 1;
                             /** Which slot is this block in? */
-                            if (
-                                ["doArg", "calcArg", "makeblock"].includes(
-                                    this.blockList[newBlock].name
-                                )
-                            ) {
+                            if (this.blockList[newBlock].isArgumentLikeBlock()) {
                                 si = newConnection - 2;
                             }
 
@@ -1856,12 +1881,7 @@ class Blocks {
                      */
                     insertAfterDefault = false;
                     if (this.blockList[newBlock].isArgClamp()) {
-                        if (
-                            ["doArg", "calcArg", "makeblock"].indexOf(
-                                this.blockList[newBlock].name
-                            ) !== -1 &&
-                            newConnection === 1
-                        ) {
+                        if (this.blockList[newBlock].isArgumentLikeBlock() && newConnection === 1) {
                             /**
                              * If it is the action name then treat it like
                              * a standard replacement.
@@ -1895,11 +1915,7 @@ class Blocks {
                             /** Which slot is this block in? */
                             const ci = this.blockList[newBlock].connections.indexOf(connection);
                             let si = ci - 1;
-                            if (
-                                ["doArg", "calcArg", "makeblock"].includes(
-                                    this.blockList[newBlock].name
-                                )
-                            ) {
+                            if (this.blockList[newBlock].isArgumentLikeBlock()) {
                                 si = ci - 2;
                             }
 
@@ -2150,11 +2166,7 @@ class Blocks {
 
             /** If it is an arg block, where is it coming from? */
             /** FIXME: improve mechanism for testing block types. */
-            if (
-                (myBlock.isArgBlock() ||
-                    ["calcArg", "namedcalcArg", "makeblock"].includes(myBlock.name)) &&
-                newBlock != null
-            ) {
+            if (myBlock.isArgumentLikeBlock() && newBlock != null) {
                 /** We care about twoarg blocks with connections to the first arg; */
                 if (this.blockList[newBlock].isTwoArgBlock()) {
                     if (this.blockList[newBlock].connections[1] === thisBlock) {
@@ -6790,7 +6802,7 @@ class Blocks {
                 z -= 1;
             }
 
-            this.activity.refreshCanvas;
+            this.activity.refreshCanvas();
         };
 
         /**
@@ -7151,4 +7163,18 @@ class Blocks {
             });
         };
     }
+}
+// Export Blocks
+if (typeof define === "function" && define.amd) {
+    define([], function () {
+        return Blocks;
+    });
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Blocks;
+}
+
+if (typeof window !== "undefined") {
+    window.Blocks = Blocks;
 }
