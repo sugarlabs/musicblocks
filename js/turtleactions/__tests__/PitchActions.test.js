@@ -100,14 +100,14 @@ describe("Tests for Singer.PitchActions setup", () => {
                     /* record cleanup */
                 },
                 stopTurtle: false,
-                notation: { notationMarkup() { } }
+                notation: { notationMarkup() {} }
             },
             errorMsg() {
                 /* record error */
             }
         };
         setupPitchActions(activity);
-        Singer.processPitch.mockImplementation(() => { });
+        Singer.processPitch.mockImplementation(() => {});
     });
 
     test("playPitch → always calls processPitch", () => {

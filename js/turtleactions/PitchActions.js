@@ -662,13 +662,13 @@ function setupPitchActions(activity) {
 
                 return stepType === "up"
                     ? getStepSizeUp(
-                        tur.singer.keySignature,
-                        tur.singer.lastNotePlayed[0].slice(0, len - 1)
-                    )
+                          tur.singer.keySignature,
+                          tur.singer.lastNotePlayed[0].slice(0, len - 1)
+                      )
                     : getStepSizeDown(
-                        tur.singer.keySignature,
-                        tur.singer.lastNotePlayed[0].slice(0, len - 1)
-                    );
+                          tur.singer.keySignature,
+                          tur.singer.lastNotePlayed[0].slice(0, len - 1)
+                      );
             } else {
                 return stepType === "up"
                     ? getStepSizeUp(tur.singer.keySignature, "G")
