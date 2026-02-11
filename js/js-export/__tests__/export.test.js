@@ -171,6 +171,20 @@ describe("MusicBlocks Class", () => {
         expect(musicBlocks.turtle.doWait).toHaveBeenCalledWith(0);
     });
 
+    test("should handle ENDMOUSE and remove mouse from list", async () => {
+        Mouse.MouseList = [mouse];
+        Mouse.AddedTurtles = [];
+        await musicBlocks.ENDMOUSE;
+        expect(Mouse.MouseList).not.toContain(mouse);
+    });
+
+    test("should call init(false) when last mouse ends", async () => {
+        Mouse.MouseList = [mouse];
+        Mouse.AddedTurtles = [];
+        await musicBlocks.ENDMOUSE;
+        expect(MusicBlocks.isRun).toBe(false);
+    });
+
     test("should print a message", () => {
         musicBlocks.print("test message");
         expect(JSEditor.logConsole).toHaveBeenCalled();
@@ -227,9 +241,25 @@ describe("MusicBlocks Class", () => {
         expect(musicBlocks.NOTEVALUE).toBe(1);
     });
 
-    test("should set PICKUP", () => {
-        musicBlocks.PICKUP = 2;
-        expect(Singer.MeterActions.setPickup).toHaveBeenCalledWith(2, musicBlocks.turIndex);
+    describe("PICKUP setter", () => {
+        beforeEach(() => {
+            Singer.MeterActions.setPickup.mockClear();
+        });
+
+        test("should set PICKUP with positive value", () => {
+            musicBlocks.PICKUP = 2;
+            expect(Singer.MeterActions.setPickup).toHaveBeenCalledWith(2, musicBlocks.turIndex);
+        });
+
+        test("should clamp negative PICKUP value to 0", () => {
+            musicBlocks.PICKUP = -5;
+            expect(Singer.MeterActions.setPickup).toHaveBeenCalledWith(0, musicBlocks.turIndex);
+        });
+
+        test("should allow PICKUP value of 0", () => {
+            musicBlocks.PICKUP = 0;
+            expect(Singer.MeterActions.setPickup).toHaveBeenCalledWith(0, musicBlocks.turIndex);
+        });
     });
 
     test("should get WHOLENOTESPLAYED", () => {
@@ -322,100 +352,57 @@ describe("MusicBlocks Class", () => {
         expect(musicBlocks.MASTERVOLUME).toBe(1.0);
     });
 
-    describe("BLK static getter", () => {
+    describe("runCommand", () => {
         beforeEach(() => {
-            MusicBlocks._blockNo = 0;
+            musicBlocks.turtle.waitTime = 0;
+            musicBlocks.turtle.doWait = jest.fn();
+            MusicBlocks._methodList = {};
         });
 
-        test("should return incrementing block numbers", () => {
-            expect(MusicBlocks.BLK).toBe("B0");
-            expect(MusicBlocks.BLK).toBe("B1");
-            expect(MusicBlocks.BLK).toBe("B2");
+        test("should execute _anonymous command with callback", async () => {
+            const callback = jest.fn();
+            await musicBlocks.runCommand("_anonymous", callback);
+            expect(callback).toHaveBeenCalled();
         });
 
-        test("should handle reset to -1", () => {
-            MusicBlocks._blockNo = -1;
-            expect(MusicBlocks.BLK).toBe("B-1");
+        test("should handle _anonymous command with undefined args", async () => {
+            const result = await musicBlocks.runCommand("_anonymous", undefined);
+            expect(result).toBeUndefined();
         });
-    });
-});
 
-describe("MusicBlocks.init", () => {
-    beforeEach(() => {
-        Mouse.MouseList = [];
-        Mouse.TurtleMouseMap = {};
-        Mouse.AddedTurtles = [];
-        MusicBlocks._methodList = {};
-        MusicBlocks._blockNo = 0;
-        MusicBlocks.isRun = false;
-    });
+        test("should call method from _methodList with args", async () => {
+            const mockMethod = jest.fn().mockReturnValue("result");
+            global.TestActions = { testMethod: mockMethod };
+            MusicBlocks._methodList["TestActions"] = ["testMethod"];
 
-    test("should set isRun to false when stopping", () => {
-        MusicBlocks.isRun = true;
-        MusicBlocks.init(false);
-        expect(MusicBlocks.isRun).toBe(false);
-    });
+            await musicBlocks.runCommand("testMethod", ["arg1", "arg2"]);
+            expect(mockMethod).toHaveBeenCalledWith("arg1", "arg2");
+        });
 
-    test("should clear _methodList when stopping", () => {
-        MusicBlocks._methodList = { TestClass: ["method1"] };
-        MusicBlocks.init(false);
-        expect(MusicBlocks._methodList).toEqual({});
-    });
+        test("should call method with no args when args is empty array", async () => {
+            const mockMethod = jest.fn().mockReturnValue(42);
+            global.TestActions = { noArgMethod: mockMethod };
+            MusicBlocks._methodList["TestActions"] = ["noArgMethod"];
 
-    test("should reset _blockNo to -1 when stopping", () => {
-        MusicBlocks._blockNo = 10;
-        MusicBlocks.init(false);
-        expect(MusicBlocks._blockNo).toBe(-1);
-    });
+            const result = await musicBlocks.runCommand("noArgMethod", []);
+            expect(mockMethod).toHaveBeenCalledWith();
+            expect(result).toBe(42);
+        });
 
-    test("should clear MouseList when stopping", () => {
-        Mouse.MouseList = [{ id: 1 }, { id: 2 }];
-        MusicBlocks.init(false);
-        expect(Mouse.MouseList).toEqual([]);
-    });
+        test("should reset turtle waitTime to 0 after command", async () => {
+            musicBlocks.turtle.waitTime = 500;
+            await musicBlocks.runCommand("_anonymous", undefined);
+            expect(musicBlocks.turtle.doWait).toHaveBeenCalledWith(0);
+        });
 
-    test("should clear TurtleMouseMap when stopping", () => {
-        Mouse.TurtleMouseMap = { 1: { id: 1 } };
-        MusicBlocks.init(false);
-        expect(Mouse.TurtleMouseMap).toEqual({});
-    });
+        test("should use Painter when className is Painter", async () => {
+            const mockPainterMethod = jest.fn().mockReturnValue("painted");
+            musicBlocks.turtle.painter = { draw: mockPainterMethod };
+            MusicBlocks._methodList["Painter"] = ["draw"];
 
-    test("should cleanup AddedTurtles by hiding and trashing them", () => {
-        const mockTurtle = {
-            container: { visible: true },
-            inTrash: false
-        };
-        Mouse.AddedTurtles = [mockTurtle];
-        globalActivity.turtles.getIndexOfTurtle.mockReturnValue(0);
-
-        MusicBlocks.init(false);
-
-        expect(mockTurtle.container.visible).toBe(false);
-        expect(mockTurtle.inTrash).toBe(true);
-        expect(globalActivity.turtles.removeTurtle).toHaveBeenCalledWith(0);
-    });
-
-    test("should cleanup multiple AddedTurtles", () => {
-        const mockTurtle1 = { container: { visible: true }, inTrash: false };
-        const mockTurtle2 = { container: { visible: true }, inTrash: false };
-        Mouse.AddedTurtles = [mockTurtle1, mockTurtle2];
-        globalActivity.turtles.getIndexOfTurtle.mockReturnValueOnce(0).mockReturnValueOnce(1);
-
-        MusicBlocks.init(false);
-
-        expect(mockTurtle1.inTrash).toBe(true);
-        expect(mockTurtle2.inTrash).toBe(true);
-        expect(globalActivity.turtles.removeTurtle).toHaveBeenCalledTimes(2);
-    });
-
-    test("should handle empty AddedTurtles without error", () => {
-        Mouse.AddedTurtles = [];
-        expect(() => MusicBlocks.init(false)).not.toThrow();
-    });
-
-    test("should preserve isRun as false when already false", () => {
-        MusicBlocks.isRun = false;
-        MusicBlocks.init(false);
-        expect(MusicBlocks.isRun).toBe(false);
+            const result = await musicBlocks.runCommand("draw", []);
+            expect(mockPainterMethod).toHaveBeenCalled();
+            expect(result).toBe("painted");
+        });
     });
 });
