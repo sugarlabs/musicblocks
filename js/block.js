@@ -1412,7 +1412,7 @@ class Block {
             } else if (this.name === "grid") {
                 label = _(this.value);
             } else {
-                if (this.value !== null) {
+                if (this.value != null) {
                     label = this.value.toString();
                 } else {
                     label = "???";
@@ -1469,7 +1469,7 @@ class Block {
             const postProcess = that => {
                 that.loadComplete = true;
 
-                if (that.postProcess !== null) {
+                if (that.postProcess != null) {
                     that.postProcess(that.postProcessArg);
                     that.postProcess = null;
                 }
@@ -2128,7 +2128,7 @@ class Block {
      */
     _doOpenMedia(thisBlock) {
         const that = this;
-        const fileChooser = that.name == "media" ? docById("myMedia") : docById("audio");
+        const fileChooser = that.name === "media" ? docById("myMedia") : docById("audio");
 
         const __readerAction = () => {
             window.scroll(0, 0);
@@ -2865,7 +2865,7 @@ class Block {
             }
             // We might be able to check which button was clicked.
             if ("nativeEvent" in event) {
-                if ("button" in event.nativeEvent && event.nativeEvent.button == 2) {
+                if ("button" in event.nativeEvent && event.nativeEvent.button === 2) {
                     that.blocks.stageClick = true;
                     _getStatic("wheelDiv").style.display = "none";
                     that.blocks.activeBlock = thisBlock;
@@ -3043,7 +3043,7 @@ class Block {
 
             // Do not allow a stack of blocks to be dragged if the stack contains a silence block.
             let block = that.blocks.blockList[that.connections[1]];
-            while (block != undefined) {
+            while (block != null) {
                 if (block?.name === "rest2") {
                     this.activity.errorMsg(_("Silence block cannot be removed."), block);
                     return;
@@ -3565,7 +3565,7 @@ class Block {
                     selectedCustom = customLabels[0];
                 }
 
-                if (this.value !== null) {
+                if (this.value != null) {
                     selectedNote = this.value;
                 } else {
                     selectedNote = getTemperament(selectedCustom)["0"][1];
@@ -4024,7 +4024,7 @@ class Block {
                         for (let i = 0; i < this.blocks.blockList.length; i++) {
                             if (
                                 this.blocks.blockList[i].name === "settemperament" &&
-                                this.blocks.blockList[i].connections[0] !== null
+                                this.blocks.blockList[i].connections[0] != null
                             ) {
                                 const index = this.blocks.blockList[i].connections[1];
                                 temperament = this.blocks.blockList[index].value;
@@ -4377,7 +4377,7 @@ class Block {
             const cblk1 = this.connections[0];
             let cblk2;
 
-            if (cblk1 !== null) {
+            if (cblk1 != null) {
                 cblk2 = this.blocks.blockList[cblk1].connections[0];
             } else {
                 cblk2 = null;
@@ -4389,7 +4389,7 @@ class Block {
                 cblk2 !== null &&
                 newValue < 0 &&
                 (this.blocks.blockList[cblk1].name === "newnote" ||
-                    this.blocks.blockList[cblk2].name == "newnote")
+                    this.blocks.blockList[cblk2].name === "newnote")
             ) {
                 this.label.value = 0;
                 this.value = 0;
