@@ -2871,6 +2871,12 @@ class Activity {
             this.searchSuggestions = [];
             this.deprecatedBlockNames = [];
 
+            // Guard: blocks may not be initialized yet during early loading
+            if (!this.blocks || !this.blocks.protoBlockDict) {
+                console.debug("prepSearchWidget: blocks not yet initialized, skipping");
+                return;
+            }
+
             for (const i in this.blocks.protoBlockDict) {
                 const block = this.blocks.protoBlockDict[i];
                 const blockLabel = block.staticLabels.join(" ");
@@ -3057,6 +3063,12 @@ class Activity {
          * Uses JQuery to add autocompleted search suggestions
          */
         this.doSearch = () => {
+            // Guard: ensure searchWidget exists before proceeding
+            if (!this.searchWidget) {
+                console.debug("doSearch: searchWidget not yet initialized, skipping");
+                return;
+            }
+
             const $j = window.jQuery;
             if (this.searchSuggestions.length === 0) {
                 this.prepSearchWidget();
@@ -5186,14 +5198,32 @@ class Activity {
             document.getElementById("loadingText").textContent = _("Loading Complete!");
 
             setTimeout(() => {
-                document.getElementById("loadingText").textContent = null;
-                document.getElementById("loading-image-container").style.display = "none";
-                document.getElementById("bottom-right-logo").style.display = "none";
-                document.getElementById("palette").style.display = "block";
+                const loadingText = document.getElementById("loadingText");
+                if (loadingText) loadingText.textContent = null;
+
+                const loadingImageContainer = document.getElementById("loading-image-container");
+                if (loadingImageContainer) loadingImageContainer.style.display = "none";
+
+                // Try hiding load-container instead if it exists
+                const loadContainer = document.getElementById("load-container");
+                if (loadContainer) loadContainer.style.display = "none";
+
+                const bottomRightLogo = document.getElementById("bottom-right-logo");
+                if (bottomRightLogo) bottomRightLogo.style.display = "none";
+
+                const palette = document.getElementById("palette");
+                if (palette) palette.style.display = "block";
+
                 // document.getElementById('canvas').style.display = 'none';
-                document.getElementById("hideContents").style.display = "block";
-                document.getElementById("buttoncontainerBOTTOM").style.display = "block";
-                document.getElementById("buttoncontainerTOP").style.display = "block";
+
+                const hideContents = document.getElementById("hideContents");
+                if (hideContents) hideContents.style.display = "block";
+
+                const btnBottom = document.getElementById("buttoncontainerBOTTOM");
+                if (btnBottom) btnBottom.style.display = "block";
+
+                const btnTop = document.getElementById("buttoncontainerTOP");
+                if (btnTop) btnTop.style.display = "block";
             }, 500);
         };
 

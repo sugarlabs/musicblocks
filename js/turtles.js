@@ -514,6 +514,37 @@ Turtles.TurtlesModel = class {
     }
 
     /**
+     * Creates the artwork (visual representation) for a turtle.
+     *
+     * @param {Object} turtle - Turtle object
+     * @param {Number} i - Color index
+     * @param {Boolean} useTurtleArtwork - Whether to use turtle or metronome artwork
+     * @returns {void}
+     */
+    createArtwork(turtle, i, useTurtleArtwork) {
+        const artwork = useTurtleArtwork ? TURTLESVG : METRONOMESVG;
+        const fillColor = FILLCOLORS[i % FILLCOLORS.length];
+        const strokeColor = STROKECOLORS[i % STROKECOLORS.length];
+
+        const svgData = artwork
+            .replace(/fill_color/g, fillColor)
+            .replace(/stroke_color/g, strokeColor);
+
+        const img = new Image();
+        img.onload = () => {
+            const bitmap = new createjs.Bitmap(img);
+            bitmap.regX = 27;
+            bitmap.regY = 27;
+            turtle.container.addChild(bitmap);
+            turtle._bitmap = bitmap;
+            turtle._createCache();
+            turtle.updateCache();
+            this.activity.refreshCanvas();
+        };
+        img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(svgData)));
+    }
+
+    /**
      * Creates sensor area for Turtle body.
      *
      * @param {*} turtle - Turtle object
@@ -709,6 +740,25 @@ Turtles.TurtlesView = class {
         }
 
         this.makeBackground();
+    }
+
+    /**
+     * Makes background for canvas: updates the canvas background color.
+     *
+     * @param {Boolean} setCollapsed - whether to set the background in collapsed state
+     * @returns {void}
+     */
+    makeBackground(setCollapsed) {
+        // Update the canvas background color
+        const canvas = this.canvas;
+        if (canvas) {
+            canvas.style.backgroundColor = this._backgroundColor;
+        }
+
+        // Also update body background if available
+        if (typeof document !== "undefined") {
+            document.body.style.backgroundColor = this._backgroundColor;
+        }
     }
 
     /**
