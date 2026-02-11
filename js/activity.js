@@ -3333,7 +3333,7 @@ class Activity {
                             break;
                         case PAGE_DOWN:
                             this.textMsg("PAGE_DOWN " + _("Scrolling down."));
-                            this.blocksContainer.y -= this.canvas.height / 2;
+                            this.blocksContainer.y -= (this.canvas && this.canvas.height > 0 ? this.canvas.height : 900) / 2;
                             this.stage.update();
                             break;
                         case DEL:
