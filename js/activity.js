@@ -866,8 +866,21 @@ class Activity {
             activity._findBlocks();
         }
 
+        // Debounce timer for resize events
+        this._resizeTimeout = null;
+
         //if any window resize event occurs:
-        this._handleRepositionBlocksOnResize = () => repositionBlocks(this);
+        this._handleRepositionBlocksOnResize = () => {
+            // Clear existing timeout
+            if (this._resizeTimeout) {
+                clearTimeout(this._resizeTimeout);
+            }
+            
+            // Debounce resize event with 100ms delay
+            this._resizeTimeout = setTimeout(() => {
+                repositionBlocks(this);
+            }, 100);
+        };
         this.addEventListener(window, "resize", this._handleRepositionBlocksOnResize);
 
         /**
@@ -893,7 +906,7 @@ class Activity {
             const toppos = this.auxToolbar.style.display === "block" ? 90 + this.toolbarHeight : 90;
             const x = isNarrowScreen
                 ? Math.floor(screenWidth / 2)
-                : Math.floor(this.canvas.width / 4);
+                : Math.floor((this.canvas && this.canvas.width > 0 ? this.canvas.width : 1200) / 4);
             let y = Math.floor(toppos * this.turtleBlocksScale);
             const verticalSpacing = Math.floor(40 * this.turtleBlocksScale);
 
@@ -994,7 +1007,7 @@ class Activity {
                 } else {
                     toppos = 90;
                 }
-                const leftpos = Math.floor(this.canvas.width / 4);
+                const leftpos = Math.floor((this.canvas && this.canvas.width > 0 ? this.canvas.width : 1200) / 4);
 
                 this.palettes.updatePalettes();
                 let x = Math.floor(leftpos * this.turtleBlocksScale);
@@ -2642,8 +2655,8 @@ class Activity {
             container.addChild(bitmap);
             bitmap.cache(0, 0, 1200, 900);
 
-            bitmap.x = (this.canvas.width - 1200) / 2;
-            bitmap.y = (this.canvas.height - 900) / 2;
+            bitmap.x = ((this.canvas && this.canvas.width > 0 ? this.canvas.width : 1200) - 1200) / 2;
+            bitmap.y = ((this.canvas && this.canvas.height > 0 ? this.canvas.height : 900) - 900) / 2;
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 1;
             bitmap.visible = false;
             bitmap.updateCache();
@@ -2661,7 +2674,7 @@ class Activity {
         this._createMsgContainer = (fillColor, strokeColor, callback, y) => {
             const container = new createjs.Container();
             this.stage.addChild(container);
-            container.x = this.canvas.width / 2;
+            container.x = (this.canvas && this.canvas.width > 0 ? this.canvas.width : 1200) / 2;
             container.y = y;
             container.visible = false;
 
@@ -2728,7 +2741,7 @@ class Activity {
         this._makeErrorArtwork = name => {
             const container = new createjs.Container();
             this.stage.addChild(container);
-            container.x = this.canvas.width / 2;
+            container.x = (this.canvas && this.canvas.width > 0 ? this.canvas.width : 1200) / 2;
             container.y = 80;
             this.errorArtwork[name] = container;
             this.errorArtwork[name].name = name;
@@ -3245,7 +3258,7 @@ class Activity {
                             !this.beginnerMode &&
                             disableHorizScrollIcon.style.display == "block"
                         ) {
-                            this.blocksContainer.x += this.canvas.width / 10;
+                            this.blocksContainer.x += (this.canvas && this.canvas.width > 0 ? this.canvas.width : 1200) / 10;
                             this.stage.update();
                         }
                     // fall through
@@ -3255,7 +3268,7 @@ class Activity {
                             !this.beginnerMode &&
                             disableHorizScrollIcon.style.display == "block"
                         ) {
-                            this.blocksContainer.x -= this.canvas.width / 10;
+                            this.blocksContainer.x -= (this.canvas && this.canvas.width > 0 ? this.canvas.width : 1200) / 10;
                             this.stage.update();
                         }
                 }
@@ -3310,12 +3323,12 @@ class Activity {
                         case END:
                             this.textMsg("END " + _("Jumping to the bottom of the page."));
                             this.blocksContainer.y =
-                                -this.blocks.bottomMostBlock() + this.canvas.height / 2;
+                                -this.blocks.bottomMostBlock() + (this.canvas && this.canvas.height > 0 ? this.canvas.height : 900) / 2;
                             this.stage.update();
                             break;
                         case PAGE_UP:
                             this.textMsg("PAGE_UP " + _("Scrolling up."));
-                            this.blocksContainer.y += this.canvas.height / 2;
+                            this.blocksContainer.y += (this.canvas && this.canvas.height > 0 ? this.canvas.height : 900) / 2;
                             this.stage.update();
                             break;
                         case PAGE_DOWN:
@@ -3500,6 +3513,12 @@ class Activity {
                 h = window.outerHeight;
             }
 
+            // Safety check: Skip resize if dimensions are invalid (0x0)
+            if (w === 0 || h === 0) {
+                console.warn("Invalid viewport dimensions detected, skipping resize");
+                return;
+            }
+
             this._clientWidth = document.body.clientWidth;
             this._clientHeight = document.body.clientHeight;
             this._innerWidth = window.innerWidth;
@@ -3538,8 +3557,14 @@ class Activity {
             this.stage.scaleX = this.turtleBlocksScale;
             this.stage.scaleY = this.turtleBlocksScale;
 
-            this.stage.canvas.width = w;
-            this.stage.canvas.height = h;
+            // Safety check: Ensure canvas dimensions are valid before setting
+            if (w > 0 && h > 0) {
+                this.stage.canvas.width = w;
+                this.stage.canvas.height = h;
+            } else {
+                console.warn("Invalid canvas dimensions detected, skipping canvas resize");
+                return;
+            }
 
             this.turtles.doScale(w, h, this.turtleBlocksScale);
 
@@ -3549,99 +3574,106 @@ class Activity {
             // We need to reposition the palette buttons
             this._setupPaletteMenu();
 
-            // Reposition coordinate grids.
-            const newX = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-            const newY = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
-            this.cartesianBitmap.x = newX;
-            this.cartesianBitmap.y = newY;
-            this.polarBitmap.x = newX;
-            this.polarBitmap.y = newY;
-            this.trebleBitmap.x = newX;
-            this.trebleBitmap.y = newY;
-            this.grandBitmap.x = newX;
-            this.grandBitmap.y = newY;
-            this.sopranoBitmap.x = newX;
-            this.sopranoBitmap.y = newY;
-            this.altoBitmap.x = newX;
-            this.altoBitmap.y = newY;
-            this.tenorBitmap.x = newX;
-            this.tenorBitmap.y = newY;
-            this.bassBitmap.x = newX;
-            this.bassBitmap.y = newY;
-            // The accidental overlays
-            for (let i = 0; i < 7; i++) {
-                this.grandSharpBitmap[i].x = newX;
-                this.grandFlatBitmap[i].x = newX;
-                this.trebleSharpBitmap[i].x = newX;
-                this.trebleFlatBitmap[i].x = newX;
-                this.sopranoSharpBitmap[i].x = newX;
-                this.sopranoFlatBitmap[i].x = newX;
-                this.altoSharpBitmap[i].x = newX;
-                this.altoFlatBitmap[i].x = newX;
-                this.tenorSharpBitmap[i].x = newX;
-                this.tenorFlatBitmap[i].x = newX;
-                this.bassSharpBitmap[i].x = newX;
-                this.bassFlatBitmap[i].x = newX;
+            // Safety check: Prevent division by zero in coordinate calculations
+            if (this.canvas.width > 0 && this.canvas.height > 0 && this.turtleBlocksScale > 0) {
+                // Reposition coordinate grids.
+                const newX = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+                const newY = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+                this.cartesianBitmap.x = newX;
+                this.cartesianBitmap.y = newY;
+                this.polarBitmap.x = newX;
+                this.polarBitmap.y = newY;
+                this.trebleBitmap.x = newX;
+                this.trebleBitmap.y = newY;
+                this.grandBitmap.x = newX;
+                this.grandBitmap.y = newY;
+                this.sopranoBitmap.x = newX;
+                this.sopranoBitmap.y = newY;
+                this.altoBitmap.x = newX;
+                this.altoBitmap.y = newY;
+                this.tenorBitmap.x = newX;
+                this.tenorBitmap.y = newY;
+                this.bassBitmap.x = newX;
+                this.bassBitmap.y = newY;
             }
-            // Position the sharps and flats
-            this.grandSharpBitmap[0].y = newY;
-            this.grandSharpBitmap[1].y = this.canvas.height / (2 * this.turtleBlocksScale) - 412.5;
-            this.grandSharpBitmap[2].y = this.canvas.height / (2 * this.turtleBlocksScale) - 462.5;
-            this.grandSharpBitmap[3].y = this.canvas.height / (2 * this.turtleBlocksScale) - 425;
-            this.grandSharpBitmap[4].y = this.canvas.height / (2 * this.turtleBlocksScale) - 387.5;
-            this.grandSharpBitmap[5].y = this.canvas.height / (2 * this.turtleBlocksScale) - 437.5;
-            this.grandSharpBitmap[6].y = this.canvas.height / (2 * this.turtleBlocksScale) - 400;
-            this.grandFlatBitmap[0].y = newY;
-            this.grandFlatBitmap[1].y = this.canvas.height / (2 * this.turtleBlocksScale) - 487.5;
-            this.grandFlatBitmap[2].y = this.canvas.height / (2 * this.turtleBlocksScale) - 437.5;
-            this.grandFlatBitmap[3].y = this.canvas.height / (2 * this.turtleBlocksScale) - 475;
-            this.grandFlatBitmap[4].y = this.canvas.height / (2 * this.turtleBlocksScale) - 425;
-            this.grandFlatBitmap[5].y = this.canvas.height / (2 * this.turtleBlocksScale) - 462.5;
-            this.grandFlatBitmap[6].y = this.canvas.height / (2 * this.turtleBlocksScale) - 412.5;
+            
+            // Safety check: Continue only if dimensions are valid for accidental positioning
+            if (this.canvas.width > 0 && this.canvas.height > 0 && this.turtleBlocksScale > 0) {
+                // The accidental overlays
+                for (let i = 0; i < 7; i++) {
+                    this.grandSharpBitmap[i].x = newX;
+                    this.grandFlatBitmap[i].x = newX;
+                    this.trebleSharpBitmap[i].x = newX;
+                    this.trebleFlatBitmap[i].x = newX;
+                    this.sopranoSharpBitmap[i].x = newX;
+                    this.sopranoFlatBitmap[i].x = newX;
+                    this.altoSharpBitmap[i].x = newX;
+                    this.altoFlatBitmap[i].x = newX;
+                    this.tenorSharpBitmap[i].x = newX;
+                    this.tenorFlatBitmap[i].x = newX;
+                    this.bassSharpBitmap[i].x = newX;
+                    this.bassFlatBitmap[i].x = newX;
+                }
+                // Position the sharps and flats
+                this.grandSharpBitmap[0].y = newY;
+                this.grandSharpBitmap[1].y = this.canvas.height / (2 * this.turtleBlocksScale) - 412.5;
+                this.grandSharpBitmap[2].y = this.canvas.height / (2 * this.turtleBlocksScale) - 462.5;
+                this.grandSharpBitmap[3].y = this.canvas.height / (2 * this.turtleBlocksScale) - 425;
+                this.grandSharpBitmap[4].y = this.canvas.height / (2 * this.turtleBlocksScale) - 387.5;
+                this.grandSharpBitmap[5].y = this.canvas.height / (2 * this.turtleBlocksScale) - 437.5;
+                this.grandSharpBitmap[6].y = this.canvas.height / (2 * this.turtleBlocksScale) - 400;
+                this.grandFlatBitmap[0].y = newY;
+                this.grandFlatBitmap[1].y = this.canvas.height / (2 * this.turtleBlocksScale) - 487.5;
+                this.grandFlatBitmap[2].y = this.canvas.height / (2 * this.turtleBlocksScale) - 437.5;
+                this.grandFlatBitmap[3].y = this.canvas.height / (2 * this.turtleBlocksScale) - 475;
+                this.grandFlatBitmap[4].y = this.canvas.height / (2 * this.turtleBlocksScale) - 425;
+                this.grandFlatBitmap[5].y = this.canvas.height / (2 * this.turtleBlocksScale) - 462.5;
+                this.grandFlatBitmap[6].y = this.canvas.height / (2 * this.turtleBlocksScale) - 412.5;
 
-            for (let i = 0; i < 7; i++) {
-                this.trebleSharpBitmap[i].y = this.grandSharpBitmap[i].y;
-                this.trebleFlatBitmap[i].y = this.grandFlatBitmap[i].y;
-                this.sopranoSharpBitmap[i].y = this.grandSharpBitmap[i].y;
-                this.sopranoFlatBitmap[i].y = this.grandFlatBitmap[i].y;
-                this.altoSharpBitmap[i].y = this.grandSharpBitmap[i].y;
-                this.altoFlatBitmap[i].y = this.grandFlatBitmap[i].y;
-                this.tenorSharpBitmap[i].y = this.grandSharpBitmap[i].y;
-                this.tenorFlatBitmap[i].y = this.grandFlatBitmap[i].y;
-                this.bassSharpBitmap[i].y = this.grandSharpBitmap[i].y;
-                this.bassFlatBitmap[i].y = this.grandFlatBitmap[i].y;
-            }
+                for (let i = 0; i < 7; i++) {
+                    this.trebleSharpBitmap[i].y = this.grandSharpBitmap[i].y;
+                    this.trebleFlatBitmap[i].y = this.grandFlatBitmap[i].y;
+                    this.sopranoSharpBitmap[i].y = this.grandSharpBitmap[i].y;
+                    this.sopranoFlatBitmap[i].y = this.grandFlatBitmap[i].y;
+                    this.altoSharpBitmap[i].y = this.grandSharpBitmap[i].y;
+                    this.altoFlatBitmap[i].y = this.grandFlatBitmap[i].y;
+                    this.tenorSharpBitmap[i].y = this.grandSharpBitmap[i].y;
+                    this.tenorFlatBitmap[i].y = this.grandFlatBitmap[i].y;
+                    this.bassSharpBitmap[i].y = this.grandSharpBitmap[i].y;
+                    this.bassFlatBitmap[i].y = this.grandFlatBitmap[i].y;
+                }
 
-            // Some accidentals on the Soprano staff shift by an octave.
-            this.sopranoSharpBitmap[4].y -= 87.5;
-            this.sopranoSharpBitmap[6].y -= 87.5;
-            this.sopranoFlatBitmap[0].y -= 87.5;
-            this.sopranoFlatBitmap[2].y -= 87.5;
-            this.sopranoFlatBitmap[4].y -= 87.5;
-            this.sopranoFlatBitmap[6].y -= 87.5;
+                // Some accidentals on the Soprano staff shift by an octave.
+                this.sopranoSharpBitmap[4].y -= 87.5;
+                this.sopranoSharpBitmap[6].y -= 87.5;
+                this.sopranoFlatBitmap[0].y -= 87.5;
+                this.sopranoFlatBitmap[2].y -= 87.5;
+                this.sopranoFlatBitmap[4].y -= 87.5;
+                this.sopranoFlatBitmap[6].y -= 87.5;
 
-            for (let i = 0; i < 7; i++) {
-                this.sopranoSharpBitmap[i].y += 87.5;
-                this.sopranoFlatBitmap[i].y += 87.5;
-            }
+                for (let i = 0; i < 7; i++) {
+                    this.sopranoSharpBitmap[i].y += 87.5;
+                    this.sopranoFlatBitmap[i].y += 87.5;
+                }
 
-            for (let i = 0; i < 7; i++) {
-                this.altoSharpBitmap[i].y += 87.5;
-                this.altoFlatBitmap[i].y += 87.5;
-            }
+                for (let i = 0; i < 7; i++) {
+                    this.altoSharpBitmap[i].y += 87.5;
+                    this.altoFlatBitmap[i].y += 87.5;
+                }
 
-            // Some accidentals on the tenor staff shift by an octave.
-            this.tenorSharpBitmap[0].y += +87.5;
-            this.tenorSharpBitmap[2].y += 87.5;
+                // Some accidentals on the tenor staff shift by an octave.
+                this.tenorSharpBitmap[0].y += +87.5;
+                this.tenorSharpBitmap[2].y += 87.5;
 
-            for (let i = 0; i < 7; i++) {
-                this.tenorSharpBitmap[i].y += 87.5;
-                this.tenorFlatBitmap[i].y += 87.5;
-            }
+                for (let i = 0; i < 7; i++) {
+                    this.tenorSharpBitmap[i].y += 87.5;
+                    this.tenorFlatBitmap[i].y += 87.5;
+                }
 
-            for (let i = 0; i < 7; i++) {
-                this.bassSharpBitmap[i].y += 175;
-                this.bassFlatBitmap[i].y += 175;
+                for (let i = 0; i < 7; i++) {
+                    this.bassSharpBitmap[i].y += 175;
+                    this.bassFlatBitmap[i].y += 175;
+                }
             }
 
             this.update = true;

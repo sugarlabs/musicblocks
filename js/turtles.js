@@ -654,28 +654,49 @@ Turtles.TurtlesView = class {
 
         this.currentGrid = null; // currently selected grid
 
-        // Attach an event listener to the 'resize' event
+        // Debounce timer for resize events
+        this._resizeTimeout = null;
+
+        // Attach an event listener to the 'resize' event with safety checks
         window.addEventListener("resize", () => {
-            // Call the updateDimensions function when resizing occurs
-            var screenWidth =
-                window.innerWidth ||
-                document.documentElement.clientWidth ||
-                document.body.clientWidth;
-            var screenHeight =
-                window.innerHeight ||
-                document.documentElement.clientHeight ||
-                document.body.clientHeight;
+            // Clear existing timeout
+            if (this._resizeTimeout) {
+                clearTimeout(this._resizeTimeout);
+            }
+            
+            // Debounce resize event with 100ms delay
+            this._resizeTimeout = setTimeout(() => {
+                // Skip if canvas dimensions are invalid (e.g., when tab is hidden)
+                if (!this.canvas || this.canvas.width === 0 || this.canvas.height === 0) {
+                    return;
+                }
 
-            // Set a scaling factor to adjust the dimensions based on the screen size
-            var scale = Math.min(screenWidth / 1200, screenHeight / 900);
+                // Call the updateDimensions function when resizing occurs
+                var screenWidth =
+                    window.innerWidth ||
+                    document.documentElement.clientWidth ||
+                    document.body.clientWidth;
+                var screenHeight =
+                    window.innerHeight ||
+                    document.documentElement.clientHeight ||
+                    document.body.clientHeight;
 
-            // Calculate the new dimensions
-            var newWidth = Math.round(1200 * scale);
-            var newHeight = Math.round(900 * scale);
+                // Skip if screen dimensions are invalid
+                if (screenWidth === 0 || screenHeight === 0) {
+                    return;
+                }
 
-            // Update the dimensions
-            this._w = newWidth;
-            this._h = newHeight;
+                // Set a scaling factor to adjust the dimensions based on the screen size
+                var scale = Math.min(screenWidth / 1200, screenHeight / 900);
+
+                // Calculate the new dimensions
+                var newWidth = Math.round(1200 * scale);
+                var newHeight = Math.round(900 * scale);
+
+                // Update the dimensions
+                this._w = newWidth;
+                this._h = newHeight;
+            }, 100);
         });
     }
 
@@ -700,10 +721,17 @@ Turtles.TurtlesView = class {
      * @returns {void}
      */
     doScale(w, h, scale) {
+        // Safety check: Skip scaling if dimensions or scale are invalid
+        if (w <= 0 || h <= 0 || scale <= 0) {
+            console.warn("Invalid dimensions or scale detected in doScale, skipping operation", { w, h, scale });
+            return;
+        }
+
         if (this._locked) {
             this._queue = [w, h, scale];
         } else {
             this._scale = scale;
+            // Safety check: Prevent division by zero
             this._w = w / scale;
             this._h = h / scale;
         }
@@ -758,6 +786,10 @@ Turtles.TurtlesView = class {
      * @returns {Number} inverted y coordinate
      */
     _invertY(y) {
+        // Skip if canvas dimensions are invalid to prevent division by zero
+        if (!this.canvas || this.canvas.height === 0 || this._scale === 0) {
+            return y;
+        }
         return this.canvas.height / (2.0 * this._scale) - y;
     }
 
@@ -768,6 +800,10 @@ Turtles.TurtlesView = class {
      * @returns {Number} turtle x coordinate
      */
     screenX2turtleX(x) {
+        // Skip if canvas dimensions are invalid to prevent division by zero
+        if (!this.canvas || this.canvas.width === 0 || this._scale === 0) {
+            return x;
+        }
         return x - this.canvas.width / (2.0 * this._scale);
     }
 
@@ -788,6 +824,10 @@ Turtles.TurtlesView = class {
      * @returns {Number} screen x coordinate
      */
     turtleX2screenX(x) {
+        // Skip if canvas dimensions are invalid to prevent division by zero
+        if (!this.canvas || this.canvas.width === 0 || this._scale === 0) {
+            return x;
+        }
         return this.canvas.width / (2.0 * this._scale) + x;
     }
 
@@ -1171,6 +1211,16 @@ Turtles.TurtlesView = class {
             // Get the new canvas width and height after resizing
             const newCanvasWidth = window.innerWidth;
             const newCanvasHeight = window.innerHeight;
+
+            // Skip if dimensions are invalid (e.g., when tab is hidden or DevTools opened)
+            if (newCanvasWidth === 0 || newCanvasHeight === 0) {
+                return;
+            }
+
+            // Skip if canvas is not available or has invalid dimensions
+            if (!this.canvas || this.canvas.width === 0 || this.canvas.height === 0) {
+                return;
+            }
 
             // Update the canvas dimensions
             this._w = newCanvasWidth;

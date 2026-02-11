@@ -70,6 +70,10 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The updated parameter value.
          */
         updateParameter() {
+            // Safety check to prevent division by zero
+            if (!activity.turtles._canvas || activity.turtles._canvas.width === 0 || activity.turtles.scale === 0) {
+                return 0;
+            }
             return toFixed2(activity.turtles._canvas.width / (2.0 * activity.turtles.scale));
         }
 
@@ -78,6 +82,10 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The argument value.
          */
         arg() {
+            // Safety check to prevent division by zero
+            if (!activity.turtles._canvas || activity.turtles._canvas.width === 0 || activity.turtles.scale === 0) {
+                return 0;
+            }
             return activity.turtles._canvas.width / (2.0 * activity.turtles.scale);
         }
     }
@@ -132,6 +140,10 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The updated parameter value.
          */
         updateParameter() {
+            // Safety check to prevent division by zero
+            if (!activity.turtles._canvas || activity.turtles._canvas.width === 0 || activity.turtles.scale === 0) {
+                return 0;
+            }
             return toFixed2(-1 * (activity.turtles._canvas.width / (2.0 * activity.turtles.scale)));
         }
 
@@ -140,6 +152,10 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The argument value.
          */
         arg() {
+            // Safety check to prevent division by zero
+            if (!activity.turtles._canvas || activity.turtles._canvas.width === 0 || activity.turtles.scale === 0) {
+                return 0;
+            }
             return -1 * (activity.turtles._canvas.width / (2.0 * activity.turtles.scale));
         }
     }
@@ -193,6 +209,10 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The updated parameter value.
          */
         updateParameter() {
+            // Safety check to prevent division by zero
+            if (!activity.turtles._canvas || activity.turtles._canvas.height === 0 || activity.turtles.scale === 0) {
+                return 0;
+            }
             return toFixed2(activity.turtles._canvas.height / (2.0 * activity.turtles.scale));
         }
 
@@ -201,6 +221,10 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The argument value.
          */
         arg() {
+            // Safety check to prevent division by zero
+            if (!activity.turtles._canvas || activity.turtles._canvas.height === 0 || activity.turtles.scale === 0) {
+                return 0;
+            }
             return activity.turtles._canvas.height / (2.0 * activity.turtles.scale);
         }
     }
@@ -254,6 +278,10 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The updated parameter value.
          */
         updateParameter() {
+            // Safety check to prevent division by zero
+            if (!activity.turtles._canvas || activity.turtles._canvas.height === 0 || activity.turtles.scale === 0) {
+                return 0;
+            }
             return toFixed2(
                 -1 * (activity.turtles._canvas.height / (2.0 * activity.turtles.scale))
             );
@@ -264,6 +292,10 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The argument value.
          */
         arg() {
+            // Safety check to prevent division by zero
+            if (!activity.turtles._canvas || activity.turtles._canvas.height === 0 || activity.turtles.scale === 0) {
+                return 0;
+            }
             return -1 * (activity.turtles._canvas.height / (2.0 * activity.turtles.scale));
         }
     }
@@ -299,6 +331,10 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The updated parameter value.
          */
         updateParameter() {
+            // Safety check to prevent division by zero
+            if (!activity.turtles._canvas || activity.turtles._canvas.width === 0 || activity.turtles.scale === 0) {
+                return 0;
+            }
             return toFixed2(activity.turtles._canvas.width / activity.turtles.scale);
         }
 
@@ -307,6 +343,10 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The argument value.
          */
         arg() {
+            // Safety check to prevent division by zero
+            if (!activity.turtles._canvas || activity.turtles._canvas.width === 0 || activity.turtles.scale === 0) {
+                return 0;
+            }
             return activity.turtles._canvas.width / activity.turtles.scale;
         }
     }
@@ -342,6 +382,10 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The updated parameter value.
          */
         updateParameter() {
+            // Safety check to prevent division by zero
+            if (!activity.turtles._canvas || activity.turtles._canvas.height === 0 || activity.turtles.scale === 0) {
+                return 0;
+            }
             return toFixed2(activity.turtles._canvas.height / activity.turtles.scale);
         }
 
@@ -350,6 +394,10 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The argument value.
          */
         arg() {
+            // Safety check to prevent division by zero
+            if (!activity.turtles._canvas || activity.turtles._canvas.height === 0 || activity.turtles.scale === 0) {
+                return 0;
+            }
             return activity.turtles._canvas.height / activity.turtles.scale;
         }
     }
