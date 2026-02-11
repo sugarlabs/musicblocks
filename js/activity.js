@@ -3409,6 +3409,10 @@ class Activity {
                         this._doHardStopButton();
                     } else if (!disableKeys && !hasOpenWidget) {
                         event.preventDefault();
+                        const stopbtn = document.getElementById("stop");
+                        if (stopbtn) {
+                            stopbtn.style.color = platformColor.stopIconcolor;
+                        }
                         this._doFastButton();
                     }
                 } else if (!disableKeys) {
