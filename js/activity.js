@@ -3948,18 +3948,30 @@ class Activity {
             this._renderTrashView();
         });
 
+        // Store the click handler reference for proper cleanup
+        let trashViewClickHandler = null;
+
         // function to hide trashView from canvas
         function handleClickOutsideTrashView(trashView) {
+            // Remove existing listener to prevent duplicates
+            if (trashViewClickHandler) {
+                document.removeEventListener("click", trashViewClickHandler);
+            }
+
             let firstClick = true;
-            document.addEventListener("click", event => {
+            trashViewClickHandler = event => {
                 if (firstClick) {
                     firstClick = false;
                     return;
                 }
                 if (!trashView.contains(event.target) && event.target !== trashView) {
                     trashView.style.display = "none";
+                    // Clean up listener when trashView is hidden
+                    document.removeEventListener("click", trashViewClickHandler);
+                    trashViewClickHandler = null;
                 }
-            });
+            };
+            document.addEventListener("click", trashViewClickHandler);
         }
 
         this._renderTrashView = () => {
