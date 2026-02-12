@@ -3599,6 +3599,12 @@ class Activity {
                 return;
             }
 
+            // Skip resize when the tab is hidden — canvas reports 0×0
+            // and any layout work would corrupt positions.
+            if (document.hidden) {
+                return;
+            }
+
             const $j = window.jQuery;
             let w = 0,
                 h = 0;
@@ -3616,6 +3622,12 @@ class Activity {
             this._innerHeight = window.innerHeight;
             this._outerWidth = window.outerWidth;
             this._outerHeight = window.outerHeight;
+
+            // Guard against zero or invalid dimensions to prevent
+            // division-by-zero and ResizeObserver loop errors
+            if (w <= 0 || h <= 0) {
+                return;
+            }
 
             if (document.getElementById("labelDiv").classList.contains("hasKeyboard")) {
                 return;
@@ -3790,6 +3802,11 @@ class Activity {
         const defaultHeight = 900;
 
         function handleResize() {
+            // Skip resize when the tab is hidden to prevent 0×0 canvas
+            if (document.hidden) {
+                return;
+            }
+
             const isMaximized =
                 window.innerWidth === window.screen.width &&
                 window.innerHeight === window.screen.height;
@@ -3805,6 +3822,12 @@ class Activity {
             } else {
                 const windowWidth = window.innerWidth;
                 const windowHeight = window.innerHeight;
+
+                // Guard against zero or invalid dimensions
+                if (windowWidth <= 0 || windowHeight <= 0) {
+                    return;
+                }
+
                 container.style.width = windowWidth + "px";
                 container.style.height = windowHeight + "px";
                 canvas.width = windowWidth;
@@ -3824,11 +3847,28 @@ class Activity {
             resizeTimeout = setTimeout(() => {
                 handleResize();
                 this._setupPaletteMenu();
-            }, 100);
+            }, 200);
         };
         this.addEventListener(window, "resize", this._handleWindowResize);
         this._handleOrientationChangeResize = handleResize;
         this.addEventListener(window, "orientationchange", this._handleOrientationChangeResize);
+
+        // When the user returns to the Music Blocks tab after it was
+        // hidden, re-apply the correct dimensions.  While the tab was
+        // hidden the resize guards above intentionally skipped any
+        // layout work, so we need to catch up now.
+        this._handleVisibilityChange = () => {
+            if (!document.hidden && this.stage) {
+                // Use a short delay to let the browser finish
+                // exposing the tab and reporting real dimensions.
+                setTimeout(() => {
+                    handleResize();
+                    this._onResize(false);
+                }, 250);
+            }
+        };
+        this.addEventListener(document, "visibilitychange", this._handleVisibilityChange);
+
         const that = this;
         const resizeCanvas_ = () => {
             try {
@@ -7866,11 +7906,12 @@ define(["domReady!"].concat(MYDEFINES), doc => {
     const initialize = () => {
         // Defensive check for multiple critical globals that may be delayed
         // due to 'defer' execution timing variances.
-        const globalsReady = typeof createDefaultStack !== "undefined" &&
-                           typeof createjs !== "undefined" &&
-                           typeof Tone !== "undefined" &&
-                           typeof GIFAnimator !== "undefined" &&
-                           typeof SuperGif !== "undefined";
+        const globalsReady =
+            typeof createDefaultStack !== "undefined" &&
+            typeof createjs !== "undefined" &&
+            typeof Tone !== "undefined" &&
+            typeof GIFAnimator !== "undefined" &&
+            typeof SuperGif !== "undefined";
 
         if (globalsReady) {
             activity.setupDependencies();
