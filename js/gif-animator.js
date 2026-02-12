@@ -246,3 +246,7 @@ class GIFAnimator {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = GIFAnimator;
 }
+
+if (typeof window !== "undefined") {
+    window.GIFAnimator = GIFAnimator;
+}

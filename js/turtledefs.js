@@ -801,3 +801,10 @@ if (typeof module !== "undefined" && module.exports) {
         TITLESTRING
     };
 }
+if (typeof window !== "undefined") {
+    window.createDefaultStack = createDefaultStack;
+    window.LOGOJA1 = LOGOJA1;
+    window.NUMBERBLOCKDEFAULT = NUMBERBLOCKDEFAULT;
+    window.DEFAULTPALETTE = DEFAULTPALETTE;
+    window.TITLESTRING = TITLESTRING;
+}

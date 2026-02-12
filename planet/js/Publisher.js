@@ -242,11 +242,10 @@ class Publisher {
             submitobj.ProjectID = id;
             submitobj.ProjectName = title.value;
             submitobj.ProjectDescription = description.value;
-            //TODO: Convert these into real block names once integrated into MB
-            //let obj = palettes.getProtoNameAndPalette("MIDI");
-            //console.log(obj[0]);
-            //console.log(obj[1]);
-            //console.log(obj[2]);
+            // parseProject() now resolves proto block names to display names when running
+            // inside Music Blocks iframe by accessing window.parent.activity.blocks.palettes.
+            // This improves project searchability by using human-friendly names (e.g., "pitch"
+            // display name) instead of proto identifiers in ProjectSearchKeywords.
             submitobj.ProjectSearchKeywords = this.parseProject(this.ProjectTable[id].ProjectData);
             submitobj.ProjectData = Planet.ProjectStorage.encodeTB(
                 this.ProjectTable[id].ProjectData
@@ -291,6 +290,17 @@ class Publisher {
         }
     }
 
+    /**
+     * parseProject(tb)
+     * Convert project TB to a space-separated list of block names suitable for
+     * ProjectSearchKeywords. When possible (i.e., when running inside the main
+     * Music Blocks iframe) attempt to map proto names to human-friendly display
+     * names using the palettes API (getProtoNameAndPalette). If palettes are not
+     * available fall back to the raw proto names.
+     *
+     * @param {string} tb - JSON string of project blocks
+     * @returns {string} space-separated block names
+     */
     parseProject(tb) {
         try {
             tb = JSON.parse(tb);
@@ -305,9 +315,38 @@ class Publisher {
         for (let i = 0; i < tb.length; i++) {
             const block = tb[i];
 
-            if (typeof block[1] === "string") words.add(block[1]);
-            else if (Array.isArray(block[1])) words.add(block[1][0]);
-            else if (typeof block[1] === "number") break;
+            let name = null;
+
+            if (typeof block[1] === "string") {
+                name = block[1];
+            } else if (Array.isArray(block[1])) {
+                name = block[1][0];
+            } else if (typeof block[1] === "number") {
+                break;
+            }
+
+            if (name === null) continue;
+
+            // Best-effort resolution: if running inside the iframe and the parent
+            // window exposes the Activity palette API, map proto name to the
+            // human-friendly display name. This ensures Publisher sends meaningful
+            // keywords for search when integrated with Music Blocks.
+            try {
+                if (
+                    typeof window !== "undefined" &&
+                    window.parent &&
+                    window.parent.activity &&
+                    window.parent.activity.blocks &&
+                    window.parent.activity.blocks.palettes
+                ) {
+                    const p = window.parent.activity.blocks.palettes.getProtoNameAndPalette(name);
+                    if (p && p[2]) name = p[2];
+                }
+            } catch (e) {
+                // ignore and use raw name
+            }
+
+            words.add(name);
         }
 
         let s = "";
