@@ -106,6 +106,8 @@ const {
     numberToPitch,
     GetNotesForInterval,
     base64Encode,
+    NOTESTEP,
+    ACCIDENTALNAMES,
     NOTESFLAT
 } = require("../musicutils");
 
@@ -2575,5 +2577,28 @@ describe("getPitchInfo", () => {
         const infoFx10 = getPitchInfo("Fx10");
         expect(infoFx10.pitchNumber).toBe(139);
         expect(infoFx10.octave).toBe(10);
+    });
+
+    describe("NOTESTEP", () => {
+        it("should map natural notes to correct step values", () => {
+            expect(NOTESTEP["C"]).toBe(1);
+            expect(NOTESTEP["G"]).toBe(8);
+        });
+
+        it("should contain all seven natural notes", () => {
+            expect(Object.keys(NOTESTEP)).toEqual(["C", "D", "E", "F", "G", "A", "B"]);
+        });
+    });
+
+    describe("ACCIDENTALNAMES", () => {
+        it("should contain accidental entries with expected names", () => {
+            expect(ACCIDENTALNAMES.some(name => name.includes("natural"))).toBe(true);
+            expect(ACCIDENTALNAMES.some(name => name.includes("sharp"))).toBe(true);
+        });
+
+        it("should be an array with five accidentals", () => {
+            expect(Array.isArray(ACCIDENTALNAMES)).toBe(true);
+            expect(ACCIDENTALNAMES.length).toBe(5);
+        });
     });
 });
