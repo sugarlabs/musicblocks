@@ -2442,11 +2442,18 @@ class Singer {
                 tur.singer.embeddedGraphics[blk] = [];
 
                 // Ensure note value block unhighlights after note plays.
+                // Use a minimum delay to ensure highlight is visible even for very short notes
+                const minNoteHighlightDuration = 100; // Minimum 100ms for note highlights
+                const noteUnhighlightDelay = Math.max(minNoteHighlightDuration, beatValue * 1000);
                 setTimeout(() => {
                     if (activity.blocks.visible && blk in activity.blocks.blockList) {
                         activity.blocks.unhighlight(blk);
+                        // Update stage after unhighlighting
+                        if (activity.stage) {
+                            activity.stage.update();
+                        }
                     }
-                }, beatValue * 1000);
+                }, noteUnhighlightDelay);
             };
 
             if (last(tur.singer.inNoteBlock) !== null || noteInNote) {

@@ -1496,6 +1496,10 @@ class Logo {
                 // Highlight the current block
                 logo.activity.blocks.highlight(blk, false);
                 logo._currentlyHighlightedBlock = blk;
+                // Force stage update to ensure highlight is visible
+                if (logo.activity.stage) {
+                    logo.activity.stage.update();
+                }
             }
         }
 
@@ -1637,6 +1641,13 @@ class Logo {
                     logo._unhighlightStepQueue[turtle] = blk;
                 } else {
                     if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
+                        // Ensure minimum highlight duration for visibility (50ms minimum)
+                        // This makes the highlight visible even in fast execution mode
+                        const minHighlightDuration = 50;
+                        const unhighlightDelay = Math.max(
+                            minHighlightDuration,
+                            logo.turtleDelay + tur.waitTime
+                        );
                         setTimeout(() => {
                             if (logo.activity.blocks.visible) {
                                 logo.activity.blocks.unhighlight(blk);
@@ -1644,8 +1655,12 @@ class Logo {
                                 if (logo._currentlyHighlightedBlock === blk) {
                                     logo._currentlyHighlightedBlock = null;
                                 }
+                                // Update stage after unhighlighting
+                                if (logo.activity.stage) {
+                                    logo.activity.stage.update();
+                                }
                             }
-                        }, logo.turtleDelay + tur.waitTime);
+                        }, unhighlightDelay);
                     }
                 }
             }
