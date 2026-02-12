@@ -98,10 +98,25 @@
 .dark .ui-autocomplete {
     background-color: #1c1c1c !important;
     color: #fff !important;
+    border-color: #444 !important;
 }
 
-.dark .ui-autocomplete li:hover {
-    background-color: #225a91 !important;
+/* Ensure all text inside autocomplete items is white */
+.dark .ui-autocomplete .ui-menu-item,
+.dark .ui-autocomplete .ui-menu-item a,
+.dark .ui-autocomplete .ui-menu-item .ui-menu-item-wrapper {
+    color: #fff !important;
+    background-color: transparent !important;
+}
+
+/* Hover and keyboard-focus highlight — matches palette hoverColor */
+.dark .ui-autocomplete .ui-menu-item:hover,
+.dark .ui-autocomplete .ui-menu-item:hover a,
+.dark .ui-autocomplete .ui-menu-item:hover .ui-menu-item-wrapper,
+.dark .ui-autocomplete .ui-state-focus,
+.dark .ui-autocomplete .ui-state-active {
+    background-color: #808080 !important;
+    color: #fff !important;
 }
 
 .dark #helpfulSearchDiv {
