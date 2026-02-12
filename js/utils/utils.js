@@ -1083,14 +1083,6 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
     let streaming = false;
     const video = document.querySelector("#camVideo");
     const canvas = document.querySelector("#camCanvas");
-    navigator.getMedia =
-        navigator.getUserMedia ||
-        navigator.mozGetUserMedia ||
-        navigator.webkitGetUserMedia ||
-        navigator.msGetUserMedia;
-    if (navigator.getMedia === undefined) {
-        errorMsg("Your browser does not support the webcam");
-    }
 
     function draw() {
         canvas.width = w;
@@ -1101,24 +1093,23 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
     }
 
     if (!hasSetupCamera) {
-        navigator.getMedia(
-            { video: true, audio: false },
-            stream => {
-                if (navigator.mozGetUserMedia) {
-                    video.mozSrcObject = stream;
-                } else {
-                    video.srcObject = stream;
-                }
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            errorMsg("Your browser does not support the webcam");
+            return;
+        }
 
+        navigator.mediaDevices
+            .getUserMedia({ video: true, audio: false })
+            .then(stream => {
+                video.srcObject = stream;
                 video.play();
                 hasSetupCamera = true;
-            },
-            error => {
+            })
+            .catch(error => {
                 errorMsg("Could not connect to camera");
                 // eslint-disable-next-line no-console
                 console.debug(error);
-            }
-        );
+            });
     } else {
         streaming = true;
         video.play();
@@ -1209,7 +1200,7 @@ function displayMsg(/*blocks, text*/) {
  */
 function safeSVG(label) {
     if (typeof label === "string") {
-        return label.replace(/&/, "&amp;").replace(/</, "&lt;").replace(/>/, "&gt;");
+        return label.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     } else {
         return label;
     }
@@ -1404,16 +1395,15 @@ let rationalSum = (a, b) => {
     } else {
         objb1 = [b[1], 1];
     }
-
-    a[0] = obja0[0] * obja1[1];
-    a[1] = obja0[1] * obja1[0];
-    b[0] = objb0[0] * objb1[1];
-    b[1] = objb0[1] * objb1[0];
+    // Use local variables to avoid mutating the caller's arrays
+    const a0 = obja0[0] * obja1[1];
+    const a1 = obja0[1] * obja1[0];
+    const b0 = objb0[0] * objb1[1];
+    const b1 = objb0[1] * objb1[0];
 
     // Find the least common denomenator
-    const lcd = LCD(a[1], b[1]);
-    // const c0 = (a[0] * lcd) / a[1] + (b[0] * lcd) / b[1];
-    return [(a[0] * lcd) / a[1] + (b[0] * lcd) / b[1], lcd];
+    const lcd = LCD(a1, b1);
+    return [(a0 * lcd) / a1 + (b0 * lcd) / b1, lcd];
 };
 
 /**
