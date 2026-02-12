@@ -462,7 +462,6 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
 
             // Ensure synth is initialized before proceeding
             if (!that.activity.logo.synth) {
-                console.debug("Creating synth in logo");
                 that.activity.logo.synth = new Synth();
             }
 
@@ -575,7 +574,6 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                     that.activity.logo.synth.createDefaultSynth(0);
                     await that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
                 } catch (e) {
-                    console.debug("Error initializing synth:", e);
                     return;
                 }
             }
@@ -590,7 +588,6 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                 that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
                 that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
             } catch (e) {
-                console.debug("Error setting volume:", e);
                 return;
             }
 
@@ -608,8 +605,6 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                         false
                     );
                 } catch (e) {
-                    console.debug("Error triggering note:", e);
-                } finally {
                     // Ensure trigger lock is released after a delay
                     setTimeout(() => {
                         that._triggerLock = false;
@@ -750,9 +745,10 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     const setupAudioContext = async () => {
         try {
             await Tone.start();
-            console.debug("Audio context started");
         } catch (e) {
-            console.debug("Error starting audio context:", e);
+            // Tone.start() may fail if the user has not interacted with the page yet
+            // or if the audio context is already running. We can safely ignore this.
+            console.debug("Tone.start() skipped or failed", e);
         }
     };
 
@@ -1354,14 +1350,18 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
         /* We're using a default of C major ==> -7 to -1 should be one octave lower
            than the reference, 0-6 in the same octave and 7 should be once octave higher
         */
-        let deltaOctave = 0;
-        if (noteLabels[i] == 7) {
-            deltaOctave = 1;
-        } else if (noteLabels[i] < 0) {
-            deltaOctave = -1;
+        let deltaOctave;
+        let note;
+
+        // Use C major as of now; fix block to use current keySignature once that feature is in place
+        const keySignature =
+            block.activity.KeySignatureEnv[0] + " " + block.activity.KeySignatureEnv[1];
+        if (noteValues[i] >= 0) {
+            [note, deltaOctave] = nthDegreeToPitch(keySignature, noteValues[i]);
+        } else {
+            [note, deltaOctave] = nthDegreeToPitch(keySignature, 7 + noteValues[i]);
         }
 
-        // prevPitch = i;
         let octave = Number(
             that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
         );
@@ -1370,17 +1370,6 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
             octave = 1;
         } else if (octave > 8) {
             octave = 8;
-        }
-
-        let note;
-
-        // Use C major as of now; fix block to use current keySignature once that feature is in place
-        const keySignature =
-            block.activity.KeySignatureEnv[0] + " " + block.activity.KeySignatureEnv[1];
-        if (noteValues[i] >= 0) {
-            note = nthDegreeToPitch(keySignature, noteValues[i]);
-        } else {
-            note = nthDegreeToPitch(keySignature, 7 + noteValues[i]);
         }
 
         const tur = that.activity.turtles.ithTurtle(0);
@@ -3621,13 +3610,20 @@ const piemenuBlockContext = block => {
         docById("contextWheelDiv").style.display = "none";
     };
 
-    document.body.addEventListener("click", event => {
+    // Named function for proper cleanup
+    const hideContextWheelOnClick = event => {
         const wheelElement = document.getElementById("contextWheelDiv");
         const displayStyle = window.getComputedStyle(wheelElement).display;
         if (displayStyle === "block") {
             wheelElement.style.display = "none";
+            // Remove listener after hiding to prevent memory leak
+            document.body.removeEventListener("click", hideContextWheelOnClick);
         }
-    });
+    };
+
+    // Remove any existing listener before adding a new one
+    document.body.removeEventListener("click", hideContextWheelOnClick);
+    document.body.addEventListener("click", hideContextWheelOnClick);
 
     if (
         ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].includes(
