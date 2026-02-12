@@ -7666,8 +7666,10 @@ class Activity {
 
             this.prepSearchWidget();
 
-            // create functionality of 2D drag to select blocks in bulk
+            // initialize doSearch
+            this.doSearch();
 
+            // create functionality of 2D drag to select blocks in bulk
             this._create2Ddrag();
 
             /*
@@ -7866,11 +7868,12 @@ define(["domReady!"].concat(MYDEFINES), doc => {
     const initialize = () => {
         // Defensive check for multiple critical globals that may be delayed
         // due to 'defer' execution timing variances.
-        const globalsReady = typeof createDefaultStack !== "undefined" &&
-                           typeof createjs !== "undefined" &&
-                           typeof Tone !== "undefined" &&
-                           typeof GIFAnimator !== "undefined" &&
-                           typeof SuperGif !== "undefined";
+        const globalsReady =
+            typeof createDefaultStack !== "undefined" &&
+            typeof createjs !== "undefined" &&
+            typeof Tone !== "undefined" &&
+            typeof GIFAnimator !== "undefined" &&
+            typeof SuperGif !== "undefined";
 
         if (globalsReady) {
             activity.setupDependencies();
