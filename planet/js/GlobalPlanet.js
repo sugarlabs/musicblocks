@@ -132,7 +132,7 @@ class GlobalPlanet {
         const Planet = this.Planet;
 
         this.index = 0;
-        this.cards = [];
+        this._cleanupCards();
         document.getElementById("global-projects").innerHTML = "";
         this.showLoading();
         this.hideLoadMore();
@@ -196,7 +196,7 @@ class GlobalPlanet {
 
             this.oldSearchString = this.searchString;
             this.index = 0;
-            this.cards = [];
+            this._cleanupCards();
             document.getElementById("global-projects").innerHTML = "";
             this.showLoading();
             this.hideLoadMore();
@@ -208,6 +208,17 @@ class GlobalPlanet {
                 this.afterRefreshProjects.bind(this)
             );
         }
+    }
+
+    _cleanupCards() {
+        if (Array.isArray(this.cards)) {
+            this.cards.forEach(card => {
+                if (card && card.cleanup) {
+                    card.cleanup();
+                }
+            });
+        }
+        this.cards = [];
     }
 
     afterSearch() {
