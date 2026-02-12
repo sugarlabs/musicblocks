@@ -2311,7 +2311,7 @@ describe("MUSICALMODES", () => {
     it("should have aeolian equivalent to minor", () => {
         expect(MUSICALMODES["aeolian"]).toEqual(MUSICALMODES["minor"]);
     });
-    
+});
 describe("getStepSizeDown", () => {
     it("should return the correct step size for D in C major going down", () => {
         const result = getStepSizeDown("C major", "D", 0, "equal");
