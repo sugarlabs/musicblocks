@@ -108,8 +108,8 @@
         });
     </script>
     <script src="lib/astring.min.js" defer></script>
-
     <script src="lib/acorn.min.js" defer></script>
+    <script src="/env.js"></script>
 
     <link rel="prefetch" type="application/l10n" href="./localization.ini" />
 
@@ -568,10 +568,12 @@
         // Register service worker only in production (not on localhost)
         if ("serviceWorker" in navigator) {
             // Detect if running on localhost for development
+            const runtimeEnv = window.MB_ENV
             const isLocalDev = window.location.hostname === "localhost" ||
                 window.location.hostname === "127.0.0.1";
+                const isDevMode = runtimeEnv !== "production";
 
-            if (!isLocalDev) {
+            if (!isDevMode) {
                 // Production: Register service worker for offline mode
                 if (navigator.serviceWorker.controller) {
                     console.debug(
@@ -594,7 +596,7 @@
             } else {
                 // Development: Skip service worker for instant updates
                 console.log(
-                    "🔥 [DEV MODE] Service worker disabled on localhost for instant code updates"
+                    "🔥 [DEV MODE] Service worker disabled for instant code updates"
                 );
             }
         }
