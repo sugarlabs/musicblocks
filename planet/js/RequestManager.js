@@ -232,15 +232,19 @@ class RequestManager {
      * @returns {Promise}
      */
     _withTimeout(promise, timeoutMs = 30000) {
+        let timeoutId;
+
+        const timeoutPromise = new Promise((_, reject) => {
+            timeoutId = setTimeout(() => {
+                const error = new Error(`Request timeout after ${timeoutMs}ms`);
+                error.name = "TimeoutError";
+                reject(error);
+            }, timeoutMs);
+        });
+
         return Promise.race([
-            promise,
-            new Promise((_, reject) =>
-                setTimeout(() => {
-                    const error = new Error(`Request timeout after ${timeoutMs}ms`);
-                    error.name = "TimeoutError";
-                    reject(error);
-                }, timeoutMs)
-            )
+            promise.finally(() => clearTimeout(timeoutId)),
+            timeoutPromise
         ]);
     }
 
