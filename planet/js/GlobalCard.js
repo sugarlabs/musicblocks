@@ -246,6 +246,39 @@ class GlobalCard {
         this.id = id;
         this.ProjectData = this.Planet.GlobalPlanet.cache[id];
     }
+
+    /**
+     * Cleanup resources when card is removed from DOM.
+     * Prevents memory leaks by clearing timeouts and removing event listeners.
+     */
+    cleanup() {
+        // Clear any pending timeout from like action
+        if (this.likeTimeout) {
+            clearTimeout(this.likeTimeout);
+            this.likeTimeout = null;
+        }
+
+        // Remove all event listeners by cloning elements (removes listeners)
+        const elementIds = [
+            `global-project-more-details-${this.id}`,
+            `global-project-open-${this.id}`,
+            `global-project-image-${this.id}`,
+            `global-project-merge-${this.id}`,
+            `global-project-share-${this.id}`,
+            `global-checkboxrun-${this.id}`,
+            `global-checkboxshow-${this.id}`,
+            `global-checkboxcollapse-${this.id}`,
+            `global-like-icon-${this.id}`
+        ];
+
+        elementIds.forEach(id => {
+            const elem = document.getElementById(id);
+            if (elem && elem.parentNode) {
+                const clone = elem.cloneNode(true);
+                elem.parentNode.replaceChild(clone, elem);
+            }
+        });
+    }
 }
 
 function copyURLToClipboard() {

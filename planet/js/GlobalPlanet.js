@@ -132,6 +132,7 @@ class GlobalPlanet {
         const Planet = this.Planet;
 
         this.index = 0;
+        this._cleanupAllCards();
         this.cards = [];
         document.getElementById("global-projects").innerHTML = "";
         this.showLoading();
@@ -196,6 +197,7 @@ class GlobalPlanet {
 
             this.oldSearchString = this.searchString;
             this.index = 0;
+            this._cleanupAllCards();
             this.cards = [];
             document.getElementById("global-projects").innerHTML = "";
             this.showLoading();
@@ -398,6 +400,20 @@ class GlobalPlanet {
         const element = document.getElementById("global-projects");
         element.innerHTML = "";
         element.insertAdjacentHTML("afterbegin", this.noProjects);
+    }
+
+    /**
+     * Cleanup all card resources before they are removed from DOM.
+     * Prevents memory leaks by releasing event listeners and timeouts.
+     */
+    _cleanupAllCards() {
+        if (this.cards && this.cards.length > 0) {
+            this.cards.forEach(card => {
+                if (card && typeof card.cleanup === "function") {
+                    card.cleanup();
+                }
+            });
+        }
     }
 
     hideLoading() {
