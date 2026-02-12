@@ -135,7 +135,9 @@ class Singer {
         this.instrumentNames = [];
         this.inCrescendo = [];
         this.crescendoDelta = [];
-        this.crescendoInitialVolume = { DEFAULTVOICE: [DEFAULTVOLUME] };
+        this.crescendoInitialVolume = {
+            DEFAULTVOICE: [typeof DEFAULTVOLUME !== "undefined" ? DEFAULTVOLUME : 50]
+        };
         this.intervals = []; // relative interval (based on scale degree)
         this.semitoneIntervals = []; // absolute interval (based on semitones)
         this.chordIntervals = []; // combination of scale degree and semitones
@@ -212,9 +214,15 @@ class Singer {
 
     // ========= Class variables ==============================================
     // Parameters used by notes
-    static masterBPM = TARGETBPM;
-    static defaultBPMFactor = TONEBPM / TARGETBPM;
-    static masterVolume = [DEFAULTVOLUME];
+    // Note: These globals (TARGETBPM, TONEBPM, DEFAULTVOLUME) are defined in logo.js.
+    // We use safe defaults here because this file may load before logo.js due to
+    // the RequireJS dependency chain.
+    static masterBPM = typeof TARGETBPM !== "undefined" ? TARGETBPM : 120;
+    static defaultBPMFactor =
+        typeof TONEBPM !== "undefined" && typeof TARGETBPM !== "undefined"
+            ? TONEBPM / TARGETBPM
+            : 1;
+    static masterVolume = [typeof DEFAULTVOLUME !== "undefined" ? DEFAULTVOLUME : 50];
 
     // ========= Deprecated ===================================================
 
@@ -1694,11 +1702,11 @@ class Singer {
                         tur.singer.tie = false;
                         tieDelay = 0;
 
-                        /** @todo FIXME: consider osctime block in tie */
+                        // tieNoteExtras: [blk, oscList, noteBeat, noteBeatValues, noteDrums, graphics, isOsc, rawDurationValue]
                         Singer.processNote(
                             activity,
-                            tur.singer.tieCarryOver,
-                            false,
+                            tur.singer.tieNoteExtras[7], // rawDurationValue
+                            tur.singer.tieNoteExtras[6], // isOsc
                             saveBlk,
                             turtle
                         );
@@ -1706,9 +1714,15 @@ class Singer {
                         tur.singer.inNoteBlock.pop();
 
                         if (!tur.singer.suppressOutput) {
-                            tur.doWait(
-                                Math.max(bpmFactor / tur.singer.tieCarryOver - turtleLag, 0)
-                            );
+                            const rawDuration = tur.singer.tieNoteExtras[7];
+                            const wasOsc = tur.singer.tieNoteExtras[6];
+
+                            const waitSeconds = wasOsc
+                                ? rawDuration / 1000
+                                : bpmFactor / rawDuration;
+
+                            tur.singer.turtleTime += waitSeconds;
+                            tur.doWait(Math.max(waitSeconds - turtleLag, 0));
                         }
 
                         tieDelay = tur.singer.tieCarryOver;
@@ -1756,7 +1770,9 @@ class Singer {
                         tur.singer.noteBeat[saveBlk],
                         tur.singer.noteBeatValues[saveBlk],
                         tur.singer.noteDrums[saveBlk],
-                        []
+                        [],
+                        isOsc,
+                        noteValue // rawDurationValue
                     ];
 
                     // We play any drums in the first tied note along with the drums in the second tied note
@@ -1830,7 +1846,6 @@ class Singer {
                         }
                     }
                     // eslint-disable-next-line no-console
-                    console.log("Note in note " + blk + " delay " + future);
                 }
             }
             let forceSilence = false;
@@ -2490,4 +2505,9 @@ class Singer {
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = Singer;
+}
+
+// Export to global scope for browser (RequireJS shim)
+if (typeof window !== "undefined") {
+    window.Singer = Singer;
 }

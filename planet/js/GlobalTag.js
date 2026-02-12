@@ -12,14 +12,13 @@
 /*
    global
 
-   _
+   _, toTitleCase
 */
 /*
    exported
 
    GlobalTag
 */
-
 class GlobalTag {
     /* 
      this.tagNames = [

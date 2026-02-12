@@ -152,6 +152,10 @@
     background-color: #1c1c1c;
 }
 
+.dark #newdropdown li:hover {
+  background-color: transparent !important;
+}
+
 .dark #confirmation-message {
     color: #e2e2e2;
 }
