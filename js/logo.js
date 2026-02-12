@@ -218,6 +218,7 @@ class Logo {
 
         this.time = 0;
         this.firstNoteTime = null;
+        this.firstNoteAudioTime = null;
         this._turtleDelay = 0;
         this.sounds = [];
         this.cameraID = null;
@@ -1099,6 +1100,7 @@ class Logo {
         // Run the Logo commands here.
         this.time = new Date().getTime();
         this.firstNoteTime = null;
+        this.firstNoteAudioTime = null;
 
         // Ensure we have at least one turtle.
         if (this.activity.turtles.getTurtleCount() === 0) {
