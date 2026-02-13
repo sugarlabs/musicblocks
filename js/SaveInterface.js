@@ -131,7 +131,7 @@ class SaveInterface {
             "</script>";
 
         this.timeLastSaved = -100;
-        const $j = jQuery.noConflict();
+        const $j = window.jQuery;
         $j(window).on("beforeunload", event => {
             let saveButton = "#saveButtonAdvanced";
             if (this.activity.beginnerMode) {
@@ -166,17 +166,17 @@ class SaveInterface {
                 defaultfilename = this.activity.PlanetInterface.getCurrentProjectName();
             }
 
-            if (fileExt(defaultfilename) != extension) {
+            if (fileExt(defaultfilename) !== extension) {
                 defaultfilename += "." + extension;
             }
 
-            if (window.isElectron == true) {
+            if (window.isElectron === true) {
                 filename = defaultfilename;
             } else {
                 filename = prompt("Filename:", defaultfilename);
             }
         } else {
-            if (fileExt(defaultfilename) != extension) {
+            if (fileExt(defaultfilename) !== extension) {
                 defaultfilename += "." + extension;
             }
             filename = defaultfilename;
@@ -190,7 +190,7 @@ class SaveInterface {
             return;
         }
 
-        if (fileExt(filename) != extension) {
+        if (fileExt(filename) !== extension) {
             filename += "." + extension;
         }
 
@@ -590,7 +590,7 @@ class SaveInterface {
             filename = activity.PlanetInterface.getCurrentProjectName();
         }
 
-        if (fileExt(filename) != lyext) {
+        if (fileExt(filename) !== lyext) {
             filename += "." + lyext;
         }
 
@@ -618,7 +618,7 @@ class SaveInterface {
 
         // Load custom author saved in local storage.
         const customAuthorData = activity.storage.getItem("customAuthor");
-        if (customAuthorData != undefined) {
+        if (customAuthorData !== undefined) {
             docById("author").value = JSON.parse(customAuthorData);
         } else {
             //.TRANS: default project author when saving as Lilypond
@@ -664,7 +664,7 @@ class SaveInterface {
         const MIDICheck = docById("MIDICheck").checked;
         const guitarCheck = docById("guitarCheck").checked;
 
-        if (filename != null) {
+        if (filename !== null) {
             if (fileExt(filename) !== "ly") {
                 filename += ".ly";
             }
