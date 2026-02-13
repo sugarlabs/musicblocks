@@ -1760,9 +1760,7 @@ function Synth() {
                     }
 
                     if (paramsEffects.doDistortion) {
-                        distortion = new Tone.Distortion(
-                            paramsEffects.distortionAmount
-                        );
+                        distortion = new Tone.Distortion(paramsEffects.distortionAmount);
                         effectChain.push(distortion);
                         effectsToDispose.push(distortion);
                     }
