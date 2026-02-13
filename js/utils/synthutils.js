@@ -1741,8 +1741,6 @@ function Synth() {
                             paramsFilters[k].filterRolloff
                         );
                         temp_filters.push(filterVal);
-
-                        effectChain.push(temp_filters[k]);
                         chainNodes.push(filterVal);
                     }
                 }
