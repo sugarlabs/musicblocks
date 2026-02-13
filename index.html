@@ -1,92 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <title>Music Blocks</title>
 
-        <meta
-            name="description"
-            content="Learn to code through music with Music Blocks. Arrange colorful blocks to create everything from simple melodies to interactive games."
-        />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta id="theme-color" name="theme-color" content="#2196F3" />
+<head>
+    <meta charset="UTF-8">
+    <title>Music Blocks</title>
 
-        <!-- Icons & PWA -->
-        <link rel="icon" sizes="192x192" href="favicon.ico" />
-        <link rel="apple-touch-icon" href="/activity/activity-icon-color-512.png" />
-        <link rel="manifest" href="android_chrome_manifest.json" />
+    <meta name="description"
+        content="Learn to code through music with Music Blocks. Arrange colorful blocks to create everything from simple melodies to interactive games.">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta id="theme-color" name="theme-color" content="#2196F3">
 
-        <!-- Stylesheets -->
-        <link
-            rel="preload"
-            href="https://fonts.googleapis.com/icon?family=Material+Icons"
-            as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
-        />
-        <link
-            rel="preload"
-            href="fonts/material-icons.css"
-            as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
-        />
-        <link
-            rel="preload"
-            href="css/activities.css?v=fixed"
-            as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
-        />
-        <link
-            rel="preload"
-            href="dist/css/style.css"
-            as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
-        />
-        <link
-            rel="preload"
-            href="dist/css/keyboard.css"
-            as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
-        />
-        <link
-            rel="preload"
-            href="dist/css/windows.css"
-            as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
-        />
-        <link
-            rel="preload"
-            href="lib/materialize-iso.css"
-            as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
-        />
-        <link
-            rel="preload"
-            href="css/darkmode.css"
-            as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
-        />
-        <link rel="prefetch" as="video" href="loading-animation.webm" type="video/webm" />
-        <link rel="prefetch" as="video" href="loading-animation.mp4" type="video/mp4" />
-        <link rel="prefetch" as="image" href="loading-animation-ja.svg" />
+    <!-- Icons & PWA -->
+    <link rel="icon" sizes="192x192" href="favicon.ico">
+    <link rel="apple-touch-icon" href="/activity/activity-icon-color-512.png">
+    <link rel="manifest" href="android_chrome_manifest.json">
 
-        <!-- <script src="js/utils/detectIE.js"></script> -->
+    <!-- Stylesheets -->
+    <link rel="preload" href="https://fonts.googleapis.com/icon?family=Material+Icons" as="style"
+        onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="fonts/material-icons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/activities.css?v=fixed" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="dist/css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="dist/css/keyboard.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="dist/css/windows.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="lib/materialize-iso.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/darkmode.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="prefetch" as="video" href="loading-animation.webm" type="video/webm">
+    <link rel="prefetch" as="video" href="loading-animation.mp4" type="video/mp4">
 
-        <!-- <script src="sounds/samples/manifest.js"></script> -->
+    <!-- <script src="js/utils/detectIE.js"></script> -->
 
-        <!-- <script src="lib/mespeak.js"></script> -->
+    <!-- <script src="sounds/samples/manifest.js"></script> -->
 
-        <script src="lib/reqwest.js" defer></script>
+    <!-- <script src="lib/mespeak.js"></script> -->
 
-        <script src="lib/jquery-3.7.1.min.js"></script>
-        <script src="lib/jquery-ui.js"></script>
-        <script src="lib/materialize.min.js"></script>
-        <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
-        <script>
-            jQuery(document).ready(function () {
-                if (jQuery.ui && jQuery.ui.autocomplete) {
-                    jQuery.fn.materializeAutocomplete = jQuery.fn.autocomplete;
-                    jQuery.widget.bridge("autocomplete", jQuery.ui.autocomplete);
+    <script src="lib/reqwest.js" defer></script>
+
+    <script src="lib/jquery-3.7.1.min.js"></script>
+    <script src="lib/jquery-ui.js"></script>
+    <script src="lib/materialize.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script>
+        jQuery(document).ready(function () {
+            if (jQuery.ui && jQuery.ui.autocomplete) {
+                jQuery.fn.materializeAutocomplete = jQuery.fn.autocomplete;
+                jQuery.widget.bridge("autocomplete", jQuery.ui.autocomplete);
+            }
+        });
+    </script>
+    <script>
+        jQuery(document).ready(function () {
+            const fixAutocompletePosition = function () {
+                const $search = jQuery('#search');
+                if ($search.length && $search.data('ui-autocomplete')) {
+                    const instance = $search.autocomplete('instance');
+                    if (instance) {
+                        const originalRenderMenu = instance._renderMenu;
+                        instance._renderMenu = function (ul, items) {
+                            originalRenderMenu.call(this, ul, items);
+                            setTimeout(() => {
+                                const searchInput = document.querySelector('#search');
+                                const dropdown = ul[0];
+                                if (searchInput && dropdown) {
+                                    const rect = searchInput.getBoundingClientRect();
+                                    dropdown.style.position = 'fixed';
+                                    dropdown.style.left = rect.left + 'px';
+                                    dropdown.style.top = (rect.bottom + 2) + 'px';
+                                    dropdown.style.width = rect.width + 'px';
+                                }
+                            }, 0);
+                        };
+                    }
+                } else {
+                    setTimeout(fixAutocompletePosition, 500);
                 }
             });
         </script>
@@ -962,34 +949,49 @@
             });
         </script>
 
-        <script>
-            $(document).ready(function () {
-                // doSearch is a method on the Activity instance, not a global.
-                // Wait for globalActivity to be available before calling it.
-                function tryDoSearch() {
-                    const activity = globalActivity || window.activity;
-                    if (activity && typeof activity.doSearch === "function") {
-                        activity.doSearch();
-                    } else if (typeof doSearch === "function") {
-                        doSearch();
-                    } else {
-                        // Activity not loaded yet, retry later
-                        setTimeout(tryDoSearch, 500);
-                    }
-                }
-                tryDoSearch();
-            });
-        </script>
+                const container = document.getElementById("loading-media");
+                const content = lang.startsWith("ja")
+                    ? `<img src="loading-animation-ja.png" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
+                    : `<video loop autoplay muted playsinline fetchpriority="high" style="width: 90%; height: 100%; object-fit: contain;">
+                        <source src="loading-animation.webm" type="video/webm">
+                        <source src="loading-animation.mp4" type="video/mp4">
+                       </video>`;
+                container.innerHTML = `<div class="media-wrapper" style="width: 100%; aspect-ratio: 16/9; max-height: 500px; display: flex; justify-content: center; align-items: center;">${content}</div>`;
+            };
 
-        <!-- Loading Dialog Script -->
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                let loadL10nSplashScreen = function () {
-                    console.debug("The browser is set to " + navigator.language);
-                    let lang = navigator.language;
-                    if (localStorage.languagePreference) {
-                        console.debug("Music Blocks is set to " + localStorage.languagePreference);
-                        lang = localStorage.languagePreference;
+            loadL10nSplashScreen();
+
+            setTimeout(function () {
+                const loadingText = document.getElementById("loadingText");
+                const texts = [_("Do, Re, Mi, Fa, Sol, La, Ti, Do"), _("Loading Music Blocks..."), _("Reading Music...")];
+                let index = 0;
+
+                window.intervalId = setInterval(function () {
+                    loadingText.textContent = texts[index];
+                    index = (index + 1) % texts.length;
+                }, 1500);
+            }, 3000);
+        });
+
+    </script>
+
+    <script>
+        (function ($) {
+            $.fn.fixMe = function () {
+                return this.each(function () {
+                    let $this = $(this),
+                        $t_fixed;
+
+                    function init() {
+                        $this.wrap('<div class="container" />');
+                        $t_fixed = $this.clone();
+                        $t_fixed
+                            .find("tbody")
+                            .remove()
+                            .end()
+                            .addClass("fixed")
+                            .insertBefore($this);
+                        resizeFixed();
                     }
 
                     console.debug("Using " + lang);
