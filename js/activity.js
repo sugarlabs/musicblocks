@@ -5270,8 +5270,13 @@ class Activity {
          * Hides all message containers
          */
         this.hideMsgs = () => {
-            // FIXME: When running before everything is set up.
-            if (this.errorMsgText === null) {
+            // The containers may not be ready yet, so check before accessing.
+            if (
+                this.errorMsgText === null ||
+                this.msgText === null ||
+                this.errorText === undefined ||
+                this.printText === undefined
+            ) {
                 return;
             }
             this.errorMsgText.parent.visible = false;
