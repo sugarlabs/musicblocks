@@ -4364,6 +4364,7 @@ class Activity {
                         `refreshCanvas | Avg: ${(__refreshTotal / __refreshCount).toFixed(2)}ms | Max: ${__refreshMax.toFixed(2)}ms | Rate: ${__cps.toFixed(1)} calls/sec`
                     );
                     __refreshLastLogTime = __now;
+                    __refreshMax = 0;
                 }
                 // === PERFORMANCE INSTRUMENTATION END ===
                 return;
@@ -4394,6 +4395,7 @@ class Activity {
                     `refreshCanvas | Avg: ${(__refreshTotal / __refreshCount).toFixed(2)}ms | Max: ${__refreshMax.toFixed(2)}ms | Rate: ${__cps.toFixed(1)} calls/sec`
                 );
                 __refreshLastLogTime = __now;
+                __refreshMax = 0;
             }
             // === PERFORMANCE INSTRUMENTATION END ===
         };
