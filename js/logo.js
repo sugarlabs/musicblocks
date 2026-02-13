@@ -1187,7 +1187,8 @@ class Logo {
         this.activity.blocks.findStacks();
         this.actions = {};
 
-        for (let blk = 0; blk < this.activity.blocks.stackList.length; blk++) {
+        const stackListLength = this.activity.blocks.stackList.length;
+        for (let blk = 0; blk < stackListLength; blk++) {
             if (
                 ["start", "drum", "status", "oscilloscope"].includes(
                     this.blockList[this.activity.blocks.stackList[blk]].name
@@ -1274,8 +1275,9 @@ class Logo {
             this.runFromBlock(this, turtle, startHere, 0, env);
         } else if (startBlocks.length > 0) {
             let delayStart = 0;
+            const startBlocksLength = startBlocks.length;
             // Look for status and oscilloscope blocks.
-            for (let b = 0; b < startBlocks.length; b++) {
+            for (let b = 0; b < startBlocksLength; b++) {
                 if (
                     ["status", "oscilloscope"].includes(this.blockList[startBlocks[b]].name) &&
                     !this.blockList[startBlocks[b]].trash
@@ -1302,7 +1304,7 @@ class Logo {
                 }
 
                 // If there are multiple start blocks, run them all.
-                for (let b = 0; b < startBlocks.length; b++) {
+                for (let b = 0; b < startBlocksLength; b++) {
                     if (!["status", "oscilloscope"].includes(this.blockList[startBlocks[b]].name)) {
                         const turtle = this.blockList[startBlocks[b]].value;
                         const tur = this.activity.turtles.ithTurtle(turtle);
@@ -1708,7 +1710,8 @@ class Logo {
             if (!logo._prematureRestart) {
                 // Make sure any unissued signals are dispatched.
                 for (const b in tur.endOfClampSignals) {
-                    for (let i = 0; i < tur.endOfClampSignals[b].length; i++) {
+                    const signalsLength = tur.endOfClampSignals[b].length;
+                    for (let i = 0; i < signalsLength; i++) {
                         if (tur.endOfClampSignals[b][i] != null) {
                             if (
                                 tur.butNotThese[b] == null ||
@@ -2316,8 +2319,9 @@ class Logo {
             }
         };
 
+        const embeddedGraphicsLength = tur.singer.embeddedGraphics[blk].length;
         let extendedGraphicsCounter = 0;
-        for (let i = 0; i < tur.singer.embeddedGraphics[blk].length; i++) {
+        for (let i = 0; i < embeddedGraphicsLength; i++) {
             const b = tur.singer.embeddedGraphics[blk][i];
             switch (this.blockList[b].name) {
                 case "forward":
@@ -2360,7 +2364,7 @@ class Logo {
             tur.singer.dispatchFactor = NOTEDIV;
         }
 
-        for (let i = 0; i < tur.singer.embeddedGraphics[blk].length; i++) {
+        for (let i = 0; i < embeddedGraphicsLength; i++) {
             const b = tur.singer.embeddedGraphics[blk][i];
             const name = this.blockList[b].name;
 
