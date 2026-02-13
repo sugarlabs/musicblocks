@@ -3502,3 +3502,6 @@ function MusicKeyboard(activity) {
         navigator.requestMIDIAccess({ sysex: true }).then(onMIDISuccess, onMIDIFailure);
     };
 }
+if (typeof module !== "undefined") {
+    module.exports = MusicKeyboard;
+}
