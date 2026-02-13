@@ -387,15 +387,16 @@
                                 </a>
                             </li>
                             <li>
-                            <a id="helpIcon" class="tooltipped" data-position="bottom">
-                                <i class="material-icons md-48">help</i>
-                            </a>
-                            </li> 
-                            <li>                          
-                                <a id="installButton" class="tooltipped hidden" data-position="bottom" data-tooltip="Install App">
-                                    <i class="material-icons md-48">download</i>
+                                <a id="helpIcon" class="tooltipped" data-position="bottom">
+                                    <i class="material-icons md-48">help</i>
                                 </a>
-                            </li>                        
+                            </li>
+                            <li>
+                                <a id="installButton" class="tooltipped hidden" data-position="bottom"
+                                    data-tooltip="Install App" aria-label="Install App">
+                                    <i class="material-icons md-48">file_download</i>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     <div class="nav-wrapper" id="aux-toolbar" style="display: none;" tabindex="-1">
@@ -573,8 +574,10 @@
             // Detect if running on localhost for development
             const isLocalDev = window.location.hostname === "localhost" ||
                 window.location.hostname === "127.0.0.1";
+            // Localhost SW is disabled to avoid caching; set allowLocalPwa to test installs.
+            const allowLocalPwa = localStorage.getItem("allowLocalPwa") === "true";
 
-            if (!isLocalDev) {
+            if (!isLocalDev || allowLocalPwa) {
                 // Production: Register service worker for offline mode
                 if (navigator.serviceWorker.controller) {
                     console.debug(
@@ -598,6 +601,9 @@
                 // Development: Skip service worker for instant updates
                 console.log(
                     "🔥 [DEV MODE] Service worker disabled on localhost for instant code updates"
+                );
+                console.log(
+                    "Set localStorage.allowLocalPwa = 'true' to enable PWA install testing on localhost."
                 );
             }
         }
