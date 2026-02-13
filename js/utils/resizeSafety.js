@@ -11,14 +11,14 @@
 
 /**
  * Resize Safety Utilities
- * 
+ *
  * Prevents app crash/freeze caused by layout recalculation when canvas/container
  * dimensions temporarily become 0×0 during:
  * - DevTools open/close
  * - Rapid viewport resize
  * - Browser tab switch (visibility change)
  * - Background/foreground transitions
- * 
+ *
  * Issue: #5602
  */
 
@@ -31,7 +31,7 @@ define(function () {
      * - Division-by-zero errors
      * - ResizeObserver loop limit exceeded
      * - Main-thread freeze
-     * 
+     *
      * @param {number} width - Width to validate
      * @param {number} height - Height to validate
      * @returns {boolean} true if dimensions are safe for layout calculations
@@ -54,12 +54,12 @@ define(function () {
     /**
      * Creates a debounced version of a function.
      * Ensures the function is only called once after a series of rapid invocations.
-     * 
+     *
      * This prevents:
      * - Resize storms
      * - ResizeObserver feedback loops
      * - Layout thrashing
-     * 
+     *
      * @param {Function} func - Function to debounce
      * @param {number} delay - Delay in milliseconds (default: 100ms)
      * @returns {Function} Debounced function
