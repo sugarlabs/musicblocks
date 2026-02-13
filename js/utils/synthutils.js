@@ -1726,12 +1726,11 @@ function Synth() {
                     console.debug("Error triggering note:", e);
                 }
             } else {
-
                 // Remove the dry path so effects are routed serially, not in parallel
                 synth.disconnect(Tone.Destination);
                 const chainNodes = [];
 
-             if (paramsFilters !== null && paramsFilters !== undefined) {
+                if (paramsFilters !== null && paramsFilters !== undefined) {
                     numFilters = paramsFilters.length; // no. of filters
                     for (let k = 0; k < numFilters; k++) {
                         // filter rolloff has to be added
@@ -1762,10 +1761,7 @@ function Synth() {
                     }
 
                     if (paramsEffects.doDistortion) {
-
-                        distortion = new Tone.Distortion(
-                            paramsEffects.distortionAmount
-                        );
+                        distortion = new Tone.Distortion(paramsEffects.distortionAmount);
                         chainNodes.push(distortion);
                     }
 
@@ -2694,8 +2690,9 @@ function Synth() {
                                             setMasterVolume: () => {},
                                             trigger: (turtle, note, duration, instrument) => {
                                                 // Use the Web Audio API to play the preview note
-                                                const audioContext = new (window.AudioContext ||
-                                                    window.webkitAudioContext)();
+                                                const audioContext = new (
+                                                    window.AudioContext || window.webkitAudioContext
+                                                )();
                                                 const oscillator = audioContext.createOscillator();
                                                 const gainNode = audioContext.createGain();
 
