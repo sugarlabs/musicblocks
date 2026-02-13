@@ -704,11 +704,11 @@ Turtles.TurtlesView = class {
                 }
 
                 // Call the updateDimensions function when resizing occurs
-                var screenWidth =
+                const screenWidth =
                     window.innerWidth ||
                     document.documentElement.clientWidth ||
                     document.body.clientWidth;
-                var screenHeight =
+                const screenHeight =
                     window.innerHeight ||
                     document.documentElement.clientHeight ||
                     document.body.clientHeight;
@@ -719,11 +719,11 @@ Turtles.TurtlesView = class {
                 }
 
                 // Set a scaling factor to adjust the dimensions based on the screen size
-                var scale = Math.min(screenWidth / 1200, screenHeight / 900);
+                const scale = Math.min(screenWidth / 1200, screenHeight / 900);
 
                 // Calculate the new dimensions
-                var newWidth = Math.round(1200 * scale);
-                var newHeight = Math.round(900 * scale);
+                const newWidth = Math.round(1200 * scale);
+                const newHeight = Math.round(900 * scale);
 
                 // Update the dimensions
                 this._w = newWidth;

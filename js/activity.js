@@ -1730,7 +1730,7 @@ class Activity {
             const start = document.getElementById("record"),
                 recInside = document.getElementById("rec_inside");
             let mediaRecorder;
-            var clickEvent = new Event("click");
+            const clickEvent = new Event("click");
             let flag = 0;
 
             /**
