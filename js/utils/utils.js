@@ -1063,9 +1063,19 @@ let prepareMacroExports = (name, stack, macroDict) => {
     return JSON.stringify(macroDict);
 };
 
-// Some block-specific code
-// TODO: Move to camera plugin
-let hasSetupCamera = false;
+// Camera functionality module
+// Encapsulates camera-related operations for video/image capture
+const CameraManager = {
+    isSetup: false,
+
+    /**
+     * Resets the camera setup state
+     */
+    reset() {
+        this.isSetup = false;
+    }
+};
+
 /**
  * Uses the camera to capture images or video frames and displays them on the turtle's canvas.
  * @param {Array} args - Arguments passed to the function.
@@ -1124,7 +1134,7 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
     video.addEventListener(
         "canplay",
         () => {
-            // console.debug("canplay", streaming, hasSetupCamera);
+            // console.debug("canplay", streaming, CameraManager.isSetup);
             if (!streaming) {
                 video.setAttribute("width", w);
                 video.setAttribute("height", h);

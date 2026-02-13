@@ -382,8 +382,6 @@ class Activity {
         this.KeySignatureEnv = ["C", "major", false];
         try {
             if (this.storage.KeySignatureEnv !== undefined) {
-                // eslint-disable-next-line no-console
-                console.log(this.storage.KeySignatureEnv);
                 this.KeySignatureEnv = this.storage.KeySignatureEnv.split(",");
                 this.KeySignatureEnv[2] = this.KeySignatureEnv[2] === "true";
             }
@@ -7866,11 +7864,12 @@ define(["domReady!"].concat(MYDEFINES), doc => {
     const initialize = () => {
         // Defensive check for multiple critical globals that may be delayed
         // due to 'defer' execution timing variances.
-        const globalsReady = typeof createDefaultStack !== "undefined" &&
-                           typeof createjs !== "undefined" &&
-                           typeof Tone !== "undefined" &&
-                           typeof GIFAnimator !== "undefined" &&
-                           typeof SuperGif !== "undefined";
+        const globalsReady =
+            typeof createDefaultStack !== "undefined" &&
+            typeof createjs !== "undefined" &&
+            typeof Tone !== "undefined" &&
+            typeof GIFAnimator !== "undefined" &&
+            typeof SuperGif !== "undefined";
 
         if (globalsReady) {
             activity.setupDependencies();
