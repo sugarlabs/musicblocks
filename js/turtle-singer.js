@@ -1057,6 +1057,10 @@ class Singer {
                     // eslint-disable-next-line no-console
                 }
 
+                if (Math.abs(cents) < 1e-9) {
+                    cents = 0;
+                }
+
                 if (tur.singer.drumStyle.length > 0) {
                     const drumname = last(tur.singer.drumStyle);
                     tur.singer.pitchDrumTable[noteObj[0] + noteObj[1]] = drumname;
@@ -1574,6 +1578,9 @@ class Singer {
             // We start the music clock as the first note is being played
             if (activity.logo.firstNoteTime === null) {
                 activity.logo.firstNoteTime = new Date().getTime();
+                if (typeof Tone !== "undefined") {
+                    activity.logo.firstNoteAudioTime = Tone.now();
+                }
             }
 
             // Calculate a lag: In case this turtle has fallen behind,
@@ -1827,6 +1834,15 @@ class Singer {
             if (duration > 0) {
                 tur.singer.previousTurtleTime = tur.singer.turtleTime;
                 if (tur.singer.inNoteBlock.length === 1) {
+                    if (
+                        !tur.singer.suppressOutput &&
+                        activity.logo.firstNoteAudioTime !== null &&
+                        typeof Tone !== "undefined"
+                    ) {
+                        const audioElapsed = Tone.now() - activity.logo.firstNoteAudioTime;
+                        future = Math.max(tur.singer.previousTurtleTime - audioElapsed, 0);
+                    }
+
                     tur.singer.turtleTime += bpmFactor / duration;
                     if (!tur.singer.suppressOutput) {
                         tur.doWait(Math.max(bpmFactor / duration - turtleLag, 0));

@@ -909,8 +909,6 @@ class Blocks {
          * @returns {void}
          */
         this.adjustDocks = (blk, resetLoopCounter) => {
-            console.count("Blocks.adjustDocks");
-            const startTime = performance.now();
             const myBlock = this.blockList[blk];
 
             /** For when we come in from makeBlock */
@@ -942,12 +940,6 @@ class Blocks {
 
             /** Value blocks only have one dock. */
             if (myBlock.docks.length === 1) {
-                const duration = performance.now() - startTime;
-                if (duration > 10) {
-                    console.log(
-                        `Blocks.adjustDocks for block ${blk} took ${duration.toFixed(2)}ms`
-                    );
-                }
                 return;
             }
 
@@ -1062,10 +1054,6 @@ class Blocks {
                     /** Recurse on connected blocks. */
                     this.adjustDocks(cblk, true);
                 }
-            }
-            const duration = performance.now() - startTime;
-            if (duration > 10) {
-                console.log(`Blocks.adjustDocks for block ${blk} took ${duration.toFixed(2)}ms`);
             }
         };
 
@@ -2324,8 +2312,6 @@ class Blocks {
          * @returns {void}
          */
         this.checkBounds = () => {
-            console.count("Blocks.checkBounds");
-            const startTime = performance.now();
             let onScreen = true;
             for (const blk in this.blockList) {
                 if (this.blockList[blk].connections[0] == null) {
@@ -2342,15 +2328,6 @@ class Blocks {
             if (onScreen) {
                 this.activity.setHomeContainers(false);
                 this.boundary.hide();
-            }
-
-            const duration = performance.now() - startTime;
-            if (duration > 5) {
-                console.log(
-                    `Blocks.checkBounds took ${duration.toFixed(2)}ms for ${
-                        this.blockList.length
-                    } blocks`
-                );
             }
         };
 
@@ -3718,7 +3695,8 @@ class Blocks {
             }
 
             /** Make sure we don't make two actions with the same name. */
-            const actionNames = [];
+            // Use Set for O(1) lookup instead of Array.includes() O(n)
+            const actionNames = new Set();
             for (const blk in this.blockList) {
                 if (
                     (this.blockList[blk].name === "text" ||
@@ -3732,7 +3710,7 @@ class Blocks {
                         !this.blockList[c].trash
                     ) {
                         if (actionBlk !== c) {
-                            actionNames.push(this.blockList[blk].value);
+                            actionNames.add(this.blockList[blk].value);
                         }
                     }
                 }
@@ -3740,7 +3718,7 @@ class Blocks {
 
             let i = 1;
             let value = name;
-            while (actionNames.includes(value)) {
+            while (actionNames.has(value)) {
                 value = name + i.toString();
                 i += 1;
             }
@@ -3755,7 +3733,8 @@ class Blocks {
          * @returns value
          */
         this.findUniqueCustomName = name => {
-            const noteNames = [];
+            // Use Set for O(1) lookup instead of Array.includes() O(n)
+            const noteNames = new Set();
             for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "text" && !this.blockList[blk].trash) {
                     const c = this.blockList[blk].connections[0];
@@ -3764,14 +3743,14 @@ class Blocks {
                         this.blockList[c].name === "pitch" &&
                         !this.blockList[c].trash
                     ) {
-                        noteNames.push(this.blockList[blk].value);
+                        noteNames.add(this.blockList[blk].value);
                     }
                 }
             }
 
             let i = 1;
             let value = name;
-            while (noteNames.includes(value)) {
+            while (noteNames.has(value)) {
                 value = name + i.toString();
                 i += 1;
             }
@@ -3785,7 +3764,8 @@ class Blocks {
          * @returns value
          */
         this.findUniqueTemperamentName = name => {
-            const temperamentNames = [];
+            // Use Set for O(1) lookup instead of Array.includes() O(n)
+            const temperamentNames = new Set();
             for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "text" && !this.blockList[blk].trash) {
                     const c = this.blockList[blk].connections[0];
@@ -3794,14 +3774,14 @@ class Blocks {
                         this.blockList[c].name === "temperament1" &&
                         !this.blockList[c].trash
                     ) {
-                        temperamentNames.push(this.blockList[blk].value);
+                        temperamentNames.add(this.blockList[blk].value);
                     }
                 }
             }
 
             let i = 1;
             let value = name;
-            while (temperamentNames.includes(value)) {
+            while (temperamentNames.has(value)) {
                 value = name + i.toString();
                 i += 1;
             }
@@ -3843,6 +3823,8 @@ class Blocks {
                 return;
             }
 
+            // Collect blocks to update for batched cache update
+            const blocksToUpdate = [];
             for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "text") {
                     const c = this.blockList[blk].connections[0];
@@ -3850,15 +3832,24 @@ class Blocks {
                         if (this.blockList[blk].value === oldName) {
                             this.blockList[blk].value = newName;
                             this.blockList[blk].text.text = newName;
-                            try {
-                                this.blockList[blk].container.updateCache();
-                            } catch (e) {
-                                // eslint-disable-next-line no-console
-                                console.debug(e);
-                            }
+                            blocksToUpdate.push(this.blockList[blk]);
                         }
                     }
                 }
+            }
+
+            // Batch update caches using requestAnimationFrame
+            if (blocksToUpdate.length > 0) {
+                requestAnimationFrame(() => {
+                    for (const block of blocksToUpdate) {
+                        try {
+                            block.container.updateCache();
+                        } catch (e) {
+                            // eslint-disable-next-line no-console
+                            console.debug(e);
+                        }
+                    }
+                });
             }
         };
 
@@ -3874,6 +3865,8 @@ class Blocks {
                 return;
             }
 
+            // Collect blocks to update for batched cache update
+            const blocksToUpdate = [];
             for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "text") {
                     const c = this.blockList[blk].connections[0];
@@ -3881,12 +3874,7 @@ class Blocks {
                         if (this.blockList[blk].value === oldName) {
                             this.blockList[blk].value = newName;
                             this.blockList[blk].text.text = newName;
-                            try {
-                                this.blockList[blk].container.updateCache();
-                            } catch (e) {
-                                // eslint-disable-next-line no-console
-                                console.debug(e);
-                            }
+                            blocksToUpdate.push(this.blockList[blk]);
                         }
                     }
                 } else if (this.blockList[blk].name === "storein2") {
@@ -3900,14 +3888,23 @@ class Blocks {
                             this.blockList[blk].overrideName = newName;
                         }
                         this.blockList[blk].regenerateArtwork();
+                        blocksToUpdate.push(this.blockList[blk]);
+                    }
+                }
+            }
+
+            // Batch update caches using requestAnimationFrame
+            if (blocksToUpdate.length > 0) {
+                requestAnimationFrame(() => {
+                    for (const block of blocksToUpdate) {
                         try {
-                            this.blockList[blk].container.updateCache();
+                            block.container.updateCache();
                         } catch (e) {
                             // eslint-disable-next-line no-console
                             console.debug(e);
                         }
                     }
-                }
+                });
             }
         };
 
@@ -3923,6 +3920,8 @@ class Blocks {
                 return;
             }
 
+            // Collect blocks to update for batched cache update
+            const blocksToUpdate = [];
             for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "storein2") {
                     if (this.blockList[blk].privateData === oldName) {
@@ -3935,14 +3934,23 @@ class Blocks {
                             this.blockList[blk].overrideName = newName;
                         }
                         this.blockList[blk].regenerateArtwork();
+                        blocksToUpdate.push(this.blockList[blk]);
+                    }
+                }
+            }
+
+            // Batch update caches using requestAnimationFrame
+            if (blocksToUpdate.length > 0) {
+                requestAnimationFrame(() => {
+                    for (const block of blocksToUpdate) {
                         try {
-                            this.blockList[blk].container.updateCache();
+                            block.container.updateCache();
                         } catch (e) {
                             // eslint-disable-next-line no-console
                             console.debug(e);
                         }
                     }
-                }
+                });
             }
         };
 
@@ -3958,6 +3966,8 @@ class Blocks {
                 return;
             }
 
+            // Collect blocks to update for batched cache update
+            const blocksToUpdate = [];
             for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "namedbox") {
                     if (this.blockList[blk].privateData === oldName) {
@@ -3970,15 +3980,23 @@ class Blocks {
                             this.blockList[blk].overrideName = newName;
                         }
                         this.blockList[blk].regenerateArtwork();
-                        /** Update label... */
+                        blocksToUpdate.push(this.blockList[blk]);
+                    }
+                }
+            }
+
+            // Batch update caches using requestAnimationFrame
+            if (blocksToUpdate.length > 0) {
+                requestAnimationFrame(() => {
+                    for (const block of blocksToUpdate) {
                         try {
-                            this.blockList[blk].container.updateCache();
+                            block.container.updateCache();
                         } catch (e) {
                             // eslint-disable-next-line no-console
                             console.debug(e);
                         }
                     }
-                }
+                });
             }
         };
 
