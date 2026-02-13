@@ -32,24 +32,24 @@ describe("Activity Event Listener Management", () => {
             document: global.document,
             console: global.console,
             _: key => key, // Mock translation function
-            define: () => { },
-            require: () => { },
+            define: () => {},
+            require: () => {},
             performance: global.performance,
             setTimeout: setTimeout,
             createjs: {},
 
             // Mock classes instantiated in constructor
-            Turtles: class { },
-            Palettes: class { },
-            Blocks: class { },
-            Logo: class { },
-            LanguageBox: class { },
-            ThemeBox: class { },
-            SaveInterface: class { },
-            StatsWindow: class { },
-            Trashcan: class { },
-            PasteBox: class { },
-            HelpWidget: class { },
+            Turtles: class {},
+            Palettes: class {},
+            Blocks: class {},
+            Logo: class {},
+            LanguageBox: class {},
+            ThemeBox: class {},
+            SaveInterface: class {},
+            StatsWindow: class {},
+            Trashcan: class {},
+            PasteBox: class {},
+            HelpWidget: class {},
 
             // Globals
             globalActivity: null,
@@ -94,9 +94,9 @@ describe("Activity Event Listener Management", () => {
 
         // Mock prototypes to silence constructor noise
         const originalPrep = Activity.prototype.prepSearchWidget;
-        Activity.prototype.prepSearchWidget = () => { };
-        Activity.prototype._create2Ddrag = () => { };
-        Activity.prototype._createDrag = () => { };
+        Activity.prototype.prepSearchWidget = () => {};
+        Activity.prototype._create2Ddrag = () => {};
+        Activity.prototype._createDrag = () => {};
 
         activity = new Activity();
 
