@@ -352,7 +352,6 @@ describe("MusicBlocks Class", () => {
         expect(musicBlocks.MASTERVOLUME).toBe(1.0);
     });
 
-
     describe("ENDFLOWCOMMAND edge cases", () => {
         beforeEach(() => {
             musicBlocks.turtle.waitTime = 0;
@@ -468,7 +467,6 @@ describe("MusicBlocks Class", () => {
             const result = await musicBlocks.runCommand("draw", []);
             expect(mockPainterMethod).toHaveBeenCalled();
             expect(result).toBe("painted");
-
         });
     });
 });
