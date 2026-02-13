@@ -48,4 +48,41 @@ describe("base64Utils", () => {
     test("base64Decode should handle empty strings", () => {
         expect(base64Utils.base64Decode("")).toBe("");
     });
+
+    test("base64Encode should handle null and undefined gracefully", () => {
+        // TextEncoder.encode(null) coerces to "null"
+        expect(base64Utils.base64Encode(null)).toBe(base64Utils.base64Encode("null"));
+        // TextEncoder.encode(undefined) produces empty Uint8Array
+        expect(base64Utils.base64Encode(undefined)).toBe("");
+    });
+
+    test("base64Decode should not throw for null (coerced to valid base64)", () => {
+        // jsdom's atob coerces null to "null" which is valid base64
+        expect(() => base64Utils.base64Decode(null)).not.toThrow();
+    });
+
+    test("base64Decode should throw for undefined (invalid base64)", () => {
+        // atob("undefined") is not valid base64
+        expect(() => base64Utils.base64Decode(undefined)).toThrow();
+    });
+
+    test("base64Decode should throw on invalid base64 input", () => {
+        expect(() => base64Utils.base64Decode("!!!not-valid-base64!!!")).toThrow();
+    });
+
+    test("base64Encode should handle non-string input coerced by TextEncoder", () => {
+        // TextEncoder.encode coerces numbers to strings
+        expect(base64Utils.base64Encode(42)).toBe(base64Utils.base64Encode("42"));
+    });
+
+    test("base64Encode and base64Decode should handle special characters", () => {
+        const special = "héllo wörld! @#$%^&*()";
+        const encoded = base64Utils.base64Encode(special);
+        expect(base64Utils.base64Decode(encoded)).toBe(special);
+    });
+
+    test("base64Encode should handle whitespace-only strings", () => {
+        const result = base64Utils.base64Encode("   ");
+        expect(base64Utils.base64Decode(result)).toBe("   ");
+    });
 });
