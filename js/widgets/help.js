@@ -655,3 +655,6 @@ class HelpWidget {
         }
     }
 }
+if (typeof module !== "undefined") {
+    module.exports = HelpWidget;
+}

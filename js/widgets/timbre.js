@@ -2603,3 +2603,6 @@ class TimbreWidget {
         }
     };
 }
+if (typeof module !== "undefined") {
+    module.exports = TimbreWidget;
+}
