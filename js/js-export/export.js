@@ -38,7 +38,7 @@ class Mouse {
      * @param {Function} flow - flow function associated with the Mouse
      */
     constructor(flow) {
-        const numberOfTurtles = globalActivity.turtles.getTurtleCount() ;
+        const numberOfTurtles = globalActivity.turtles.getTurtleCount();
         if (Mouse.MouseList.length < numberOfTurtles) {
             this.turtle = globalActivity.turtles.getTurtle(Mouse.MouseList.length);
         } else {
@@ -117,7 +117,7 @@ class MusicBlocks {
             "VolumeBlocksAPI",
             "DrumBlocksAPI",
             "DictBlocksAPI"
-        ].forEach((className) => importMembers(this, className));
+        ].forEach(className => importMembers(this, className));
     }
 
     /**
@@ -156,7 +156,7 @@ class MusicBlocks {
                 "Singer.VolumeActions",
                 "Singer.DrumActions",
                 "Turtle.DictActions"
-            ].forEach((className) => {
+            ].forEach(className => {
                 MusicBlocks._methodList[className] = [];
 
                 if (className === "Painter") {
@@ -209,7 +209,10 @@ class MusicBlocks {
             for (const listener in mouse.turtle.listeners) {
                 if (globalActivity.logo.stage && mouse.turtle.listeners.hasOwnProperty(listener)) {
                     globalActivity.logo.stage.removeEventListener(
-                        listener, mouse.turtle.listeners[listener], false);
+                        listener,
+                        mouse.turtle.listeners[listener],
+                        false
+                    );
                 }
             }
             mouse.turtle.listeners = {};
@@ -218,7 +221,7 @@ class MusicBlocks {
         globalActivity.logo.prepSynths();
         globalActivity.logo.firstNoteTime = null;
 
-        Mouse.MouseList.forEach((mouse) => mouse.run());
+        Mouse.MouseList.forEach(mouse => mouse.run());
     }
 
     /**
@@ -229,7 +232,7 @@ class MusicBlocks {
      * @returns {Promise}
      */
     runCommand(command, args) {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
             let returnVal;
 
             if (command === "_anonymous") {
@@ -246,8 +249,9 @@ class MusicBlocks {
                 cname = cname === "Painter" ? this.turtle.painter : eval(cname);
 
                 returnVal =
-                 args === undefined || (Array.isArray(args) && args.length === 0) ? cname[command]() : cname[command](...args);
-
+                    args === undefined || (Array.isArray(args) && args.length === 0)
+                        ? cname[command]()
+                        : cname[command](...args);
             }
 
             const delay = this.turtle.waitTime;
@@ -261,7 +265,7 @@ class MusicBlocks {
      * @returns {Promise}
      */
     get ENDFLOW() {
-        return new Promise((resolve) => resolve());
+        return new Promise(resolve => resolve());
     }
 
     /**
@@ -270,7 +274,7 @@ class MusicBlocks {
      * @returns {Promise}
      */
     get ENDFLOWCOMMAND() {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
             const signal = this.listeners.pop();
             if (signal !== null && signal !== undefined) {
                 globalActivity.stage.dispatchEvent(signal);
@@ -287,7 +291,7 @@ class MusicBlocks {
      * @returns {Promise}
      */
     get ENDMOUSE() {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
             Mouse.MouseList.splice(Mouse.MouseList.indexOf(this.mouse), 1);
             if (Mouse.MouseList.length === 0) MusicBlocks.init(false);
 
@@ -299,7 +303,9 @@ class MusicBlocks {
 
     print(message) {
         JSEditor.logConsole(
-            `Mouse "${this.turtle.name}" (${globalActivity.turtles.getIndexOfTurtle(this.turtle)}): ${message}`
+            `Mouse "${this.turtle.name}" (${globalActivity.turtles.getIndexOfTurtle(
+                this.turtle
+            )}): ${message}`
         );
         if (message === undefined) {
             globalActivity.textMsg("undefined");
@@ -436,5 +442,10 @@ class MusicBlocks {
     }
 }
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = {Mouse, MusicBlocks};
+    module.exports = { Mouse, MusicBlocks };
+}
+
+if (typeof window !== "undefined") {
+    window.Mouse = Mouse;
+    window.MusicBlocks = MusicBlocks;
 }

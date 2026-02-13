@@ -1,0 +1,51 @@
+name: Convert PO to JSON and verify changes
+
+on:
+  push:
+    paths:
+      - 'po/**/*.po'
+
+jobs:
+  convert-and-verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Find changed .po files
+        id: find_po
+        run: |
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^po/.*\.po$' > changed_po_files.txt || true
+          cat changed_po_files.txt
+          echo "po_files<<EOF" >> $GITHUB_OUTPUT
+          echo "$(cat changed_po_files.txt)" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Convert PO files to JSON
+        if: steps.find_po.outputs.po_files != ''
+        run: |
+          mkdir -p locales
+          while IFS= read -r po_file; do
+            echo "▶ Converting $po_file"
+            python3 convert_po_to_json.py "$po_file" "locales"
+          done < changed_po_files.txt
+
+      - name: Verify JSON conversion changes
+        if: steps.find_po.outputs.po_files != ''
+        run: |
+          if ! git diff --quiet locales/; then
+            echo "❌ Generated translation JSON files have changes that need to be committed."
+            echo "Please run the PO-to-JSON conversion locally and commit the generated files in locales/."
+            exit 1
+          else
+            echo "✅ Translation JSON files are verified and up to date."
+          fi

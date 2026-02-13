@@ -1,7 +1,7 @@
 /*
   global
 
-  offlineFallbackPage, divInstall
+    offlineFallbackPage
 */
 
 // This is the "Offline page" service worker
@@ -55,7 +55,7 @@ function fromCache(request) {
             if (!matching || matching.status === 404) {
                 return Promise.reject("no-match");
             }
-            
+
             return matching;
         });
     });
@@ -97,34 +97,40 @@ self.addEventListener("fetch", function (event) {
                 } catch (error) {
                     // eslint-disable-next-line no-console
                     console.log("[PWA Builder] Network request failed and no cache." + error);
+
+                    if (typeof offlineFallbackPage !== "undefined") {
+                        const fallbackResponse = await caches.match(offlineFallbackPage);
+                        if (fallbackResponse) return fallbackResponse;
+                    }
+
+                    return new Response("Service Unavailable", {
+                        status: 503,
+                        statusText: "offline"
+                    });
                 }
             }
         )
     );
 });
 
-self.addEventListener("beforeinstallprompt", (event) => {
-    // eslint-disable-next-line no-console
-    console.log("done", "beforeinstallprompt", event);
-    // Stash the event so it can be triggered later.
-    window.deferredPrompt = event;
-    // Remove the "hidden" class from the install button container
-    divInstall.classList.toggle("hidden", false);
-});
-
 // This is an event that can be fired from your page to tell the SW to
 // update the offline page
 self.addEventListener("refreshOffline", function () {
+    if (typeof offlineFallbackPage !== "string" || offlineFallbackPage.trim().length === 0) {
+        // eslint-disable-next-line no-console
+        console.log("[PWA Builder] refreshOffline ignored: offlineFallbackPage is not set");
+        return Promise.resolve();
+    }
+
     const offlinePageRequest = new Request(offlineFallbackPage);
 
     return fetch(offlineFallbackPage).then(function (response) {
         return caches.open(CACHE).then(function (cache) {
             // eslint-disable-next-line no-console
-            console.log("[PWA Builder] Offline page updated from refreshOffline event: " + response.url);
+            console.log(
+                "[PWA Builder] Offline page updated from refreshOffline event: " + response.url
+            );
             return cache.put(offlinePageRequest, response);
         });
     });
 });
-
-
-

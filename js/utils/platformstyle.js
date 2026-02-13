@@ -21,7 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const themePreference = localStorage.themePreference || undefined;
 
-
 window.platform = {
     android: /Android/i.test(navigator.userAgent),
     FF: /Firefox/i.test(navigator.userAgent),
@@ -350,17 +349,26 @@ const platformThemes = {
         modePieMenusIfColorPush: "#4b8b0e",
         modePieMenusElseColorPush: "#66a62d",
         wheelcolors: ["#808080", "#909090", "#808080", "#909090", "#707070"]
-    },
+    }
     // custom: {Your styling},
 };
 
-for (const theme in platformThemes) {
-    if (themePreference === theme) {
-        window.platformColor = platformThemes[theme];
-        break;
-    } else {
-        window.platformColor = platformThemes["light"];
+// Detect system theme preference
+const getSystemThemePreference = () => {
+    if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        return "dark";
     }
+    return "light";
+};
+
+// Use stored preference, or fallback to system preference
+const activeTheme = themePreference || getSystemThemePreference();
+
+// Set platformColor based on active theme
+if (platformThemes[activeTheme]) {
+    window.platformColor = platformThemes[activeTheme];
+} else {
+    window.platformColor = platformThemes["light"];
 }
 
 document.querySelector("meta[name=theme-color]").content = platformColor.header;
@@ -379,3 +387,7 @@ let showButtonHighlight = (x, y, r, event, scale, stage) => {
     if (platform.FFOS) return {};
     return showMaterialHighlight(x, y, r, event, scale, stage);
 };
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { showButtonHighlight };
+}

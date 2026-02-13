@@ -17,12 +17,12 @@
  */
 
 const JSInterface = {
-    validateArgs: jest.fn(),
+    validateArgs: jest.fn()
 };
 
 global.JSInterface = JSInterface;
 global.MusicBlocks = {
-    BLK: "mockBlock",
+    BLK: "mockBlock"
 };
 
 const DrumBlocksAPI = require("../DrumBlocksAPI");
@@ -46,7 +46,11 @@ describe("DrumBlocksAPI", () => {
         drumBlocksAPI.playDrum("snare");
 
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("playDrum", ["snare"]);
-        expect(drumBlocksAPI.runCommand).toHaveBeenCalledWith("playDrum", ["snare", 0, global.MusicBlocks.BLK]);
+        expect(drumBlocksAPI.runCommand).toHaveBeenCalledWith("playDrum", [
+            "snare",
+            0,
+            global.MusicBlocks.BLK
+        ]);
     });
 
     test("setDrum calls runCommand and executes flow function", async () => {

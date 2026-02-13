@@ -18,14 +18,14 @@
  */
 
 const JSInterface = {
-    validateArgs: jest.fn(),
+    validateArgs: jest.fn()
 };
 global.JSInterface = JSInterface;
 
 const Singer = {
     VolumeActions: {
-        getSynthVolume: jest.fn(),
-    },
+        getSynthVolume: jest.fn()
+    }
 };
 global.Singer = Singer;
 
@@ -52,7 +52,11 @@ describe("VolumeBlocksAPI", () => {
         const result = await volumeBlocksAPI.doCrescendo(50, mockFlow);
 
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("doCrescendo", [50, mockFlow]);
-        expect(volumeBlocksAPI.runCommand).toHaveBeenCalledWith("doCrescendo", ["crescendo", 50, 0]);
+        expect(volumeBlocksAPI.runCommand).toHaveBeenCalledWith("doCrescendo", [
+            "crescendo",
+            50,
+            0
+        ]);
         expect(mockFlow).toHaveBeenCalled();
         expect(result).toBe("endFlow");
     });
@@ -64,7 +68,11 @@ describe("VolumeBlocksAPI", () => {
         const result = await volumeBlocksAPI.doDecrescendo(30, mockFlow);
 
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("doDecrescendo", [30, mockFlow]);
-        expect(volumeBlocksAPI.runCommand).toHaveBeenCalledWith("doCrescendo", ["decrescendo", 30, 0]);
+        expect(volumeBlocksAPI.runCommand).toHaveBeenCalledWith("doCrescendo", [
+            "decrescendo",
+            30,
+            0
+        ]);
         expect(mockFlow).toHaveBeenCalled();
         expect(result).toBe("endFlow");
     });
@@ -87,7 +95,11 @@ describe("VolumeBlocksAPI", () => {
         const result = volumeBlocksAPI.setSynthVolume("synth1", 100);
 
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("setSynthVolume", ["synth1", 100]);
-        expect(volumeBlocksAPI.runCommand).toHaveBeenCalledWith("setSynthVolume", ["synth1", 100, 0]);
+        expect(volumeBlocksAPI.runCommand).toHaveBeenCalledWith("setSynthVolume", [
+            "synth1",
+            100,
+            0
+        ]);
         expect(result).resolves.toBe("Command executed");
     });
 

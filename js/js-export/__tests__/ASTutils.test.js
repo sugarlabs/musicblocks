@@ -19,17 +19,17 @@
 
 const ASTUtils = require("../ASTutils");
 
-global.last = jest.fn((array) => array[array.length - 1]);
+global.last = jest.fn(array => array[array.length - 1]);
 global.JSInterface = {
     isSetter: jest.fn(),
     getSetterName: jest.fn(),
     isMethod: jest.fn(),
     isClampBlock: jest.fn(),
-    getMethodName: jest.fn((methodName) => methodName),
+    getMethodName: jest.fn(methodName => methodName),
     isGetter: jest.fn(),
-    getGetterName: jest.fn((getterName) => getterName),
+    getGetterName: jest.fn(getterName => getterName),
     methodReturns: jest.fn(),
-    rearrangeMethodArgs: jest.fn((methodName, args) => args),
+    rearrangeMethodArgs: jest.fn((methodName, args) => args)
 };
 ASTUtils.JSInterface = JSInterface;
 
@@ -482,28 +482,34 @@ describe("ASTUtils", () => {
         it("should return the AST for a literal argument", () => {
             const args = ["testArg"];
             const result = ASTUtils._getArgsAST(args);
-            expect(result).toEqual([{
-                type: "Literal",
-                value: "testArg"
-            }]);
+            expect(result).toEqual([
+                {
+                    type: "Literal",
+                    value: "testArg"
+                }
+            ]);
         });
 
         it("should return the AST for a boolean argument", () => {
             const args = ["bool_true"];
             const result = ASTUtils._getArgsAST(args);
-            expect(result).toEqual([{
-                type: "Literal",
-                value: true
-            }]);
+            expect(result).toEqual([
+                {
+                    type: "Literal",
+                    value: true
+                }
+            ]);
         });
 
         it("should return the AST for a box argument", () => {
             const args = ["box_testBox"];
             const result = ASTUtils._getArgsAST(args);
-            expect(result).toEqual([{
-                type: "Identifier",
-                name: "testBox"
-            }]);
+            expect(result).toEqual([
+                {
+                    type: "Identifier",
+                    name: "testBox"
+                }
+            ]);
         });
 
         it("should return the AST for a getter argument", () => {
@@ -521,14 +527,18 @@ describe("ASTUtils", () => {
             JSInterface.methodReturns.mockReturnValue(true);
 
             const result = ASTUtils._getArgsAST(args);
-            expect(result).toEqual([ASTUtils._getMethodCallAST("testMethod", ["testArg"], { statement: false })]);
+            expect(result).toEqual([
+                ASTUtils._getMethodCallAST("testMethod", ["testArg"], { statement: false })
+            ]);
         });
 
         it("should return the AST for a method call argument with methodReturns true", () => {
             const args = [{ 0: "testMethod", 1: ["testArg"] }];
             JSInterface.methodReturns = jest.fn().mockReturnValue(true);
             const result = ASTUtils._getArgsAST(args);
-            expect(result).toEqual([ASTUtils._getMethodCallAST("testMethod", ["testArg"], { statement: false })]);
+            expect(result).toEqual([
+                ASTUtils._getMethodCallAST("testMethod", ["testArg"], { statement: false })
+            ]);
         });
 
         it("should return the AST for a method call argument with methodReturns false", () => {
@@ -614,14 +624,18 @@ describe("ASTUtils", () => {
             JSInterface.isClampBlock.mockReturnValue(false);
 
             const result = ASTUtils._getBlockAST(flows);
-            expect(result).toEqual([ASTUtils._getIfAST(["testArg"], [["action1", ["arg1"]]], undefined, 0)]);
+            expect(result).toEqual([
+                ASTUtils._getIfAST(["testArg"], [["action1", ["arg1"]]], undefined, 0)
+            ]);
         });
 
         it("should return the AST for an if-else block", () => {
             const flows = [["ifthenelse", ["testArg"], ["ifFlow"], ["elseFlow"]]];
             const iteratorNum = 0;
             const result = ASTUtils._getBlockAST(flows, iteratorNum);
-            expect(result).toEqual([ASTUtils._getIfAST(["testArg"], ["ifFlow"], ["elseFlow"], iteratorNum)]);
+            expect(result).toEqual([
+                ASTUtils._getIfAST(["testArg"], ["ifFlow"], ["elseFlow"], iteratorNum)
+            ]);
         });
 
         it("should return the AST for a repeat block", () => {
@@ -642,50 +656,60 @@ describe("ASTUtils", () => {
             const flows = [["until", ["testArg"], ["flow"]]];
             const iteratorNum = 0;
             const result = ASTUtils._getBlockAST(flows, iteratorNum);
-            expect(result).toEqual([ASTUtils._getDoWhileLoopAST(["testArg"], ["flow"], iteratorNum)]);
+            expect(result).toEqual([
+                ASTUtils._getDoWhileLoopAST(["testArg"], ["flow"], iteratorNum)
+            ]);
         });
 
         it("should return the AST for a break block", () => {
             const flows = [["break"]];
             const result = ASTUtils._getBlockAST(flows);
-            expect(result).toEqual([{
-                type: "BreakStatement",
-                label: null
-            }]);
+            expect(result).toEqual([
+                {
+                    type: "BreakStatement",
+                    label: null
+                }
+            ]);
         });
 
         it("should return the AST for a switch block", () => {
             const flows = [["switch", ["testArg"], ["flow"]]];
             const iteratorNum = 0;
             const result = ASTUtils._getBlockAST(flows, iteratorNum);
-            expect(result).toEqual([{
-                type: "SwitchStatement",
-                discriminant: ASTUtils._getArgsAST(["testArg"])[0],
-                cases: ASTUtils._getBlockAST(["flow"], iteratorNum)
-            }]);
+            expect(result).toEqual([
+                {
+                    type: "SwitchStatement",
+                    discriminant: ASTUtils._getArgsAST(["testArg"])[0],
+                    cases: ASTUtils._getBlockAST(["flow"], iteratorNum)
+                }
+            ]);
         });
 
         it("should return the AST for a case block", () => {
             const flows = [["case", ["testArg"], ["flow"]]];
             const iteratorNum = 0;
             const result = ASTUtils._getBlockAST(flows, iteratorNum);
-            expect(result).toEqual([{
-                type: "SwitchCase",
-                test: ASTUtils._getArgsAST(["testArg"])[0],
-                consequent: [
-                    ...ASTUtils._getBlockAST(["flow"], iteratorNum),
-                    {
-                        type: "BreakStatement",
-                        label: null
-                    }
-                ]
-            }]);
+            expect(result).toEqual([
+                {
+                    type: "SwitchCase",
+                    test: ASTUtils._getArgsAST(["testArg"])[0],
+                    consequent: [
+                        ...ASTUtils._getBlockAST(["flow"], iteratorNum),
+                        {
+                            type: "BreakStatement",
+                            label: null
+                        }
+                    ]
+                }
+            ]);
         });
 
         it("should return the AST for an increment block", () => {
             const flows = [["increment", ["testIdentifier", "testArg"]]];
             const result = ASTUtils._getBlockAST(flows);
-            expect(result).toEqual([ASTUtils._getIncrementStmntAST(["testIdentifier", "testArg"], true)]);
+            expect(result).toEqual([
+                ASTUtils._getIncrementStmntAST(["testIdentifier", "testArg"], true)
+            ]);
         });
 
         it("should return the AST for an incrementOne block", () => {
@@ -703,45 +727,51 @@ describe("ASTUtils", () => {
         it("should return the AST for a storein block", () => {
             const flows = [["storein", ["testIdentifier", "testArg"]]];
             const result = ASTUtils._getBlockAST(flows);
-            expect(result).toEqual([{
-                type: "VariableDeclaration",
-                kind: "var",
-                declarations: [
-                    {
-                        type: "VariableDeclarator",
-                        id: {
-                            type: "Identifier",
-                            name: "testIdentifier"
-                        },
-                        init: ASTUtils._getArgsAST(["testArg"])[0]
-                    }
-                ]
-            }]);
+            expect(result).toEqual([
+                {
+                    type: "VariableDeclaration",
+                    kind: "var",
+                    declarations: [
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "testIdentifier"
+                            },
+                            init: ASTUtils._getArgsAST(["testArg"])[0]
+                        }
+                    ]
+                }
+            ]);
         });
 
         it("should return the AST for a storein2 block", () => {
             const flows = [["storein2_testIdentifier", ["testArg"]]];
             const result = ASTUtils._getBlockAST(flows);
-            expect(result).toEqual([{
-                type: "VariableDeclaration",
-                kind: "var",
-                declarations: [
-                    {
-                        type: "VariableDeclarator",
-                        id: {
-                            type: "Identifier",
-                            name: "testIdentifier"
-                        },
-                        init: ASTUtils._getArgsAST(["testArg"])[0]
-                    }
-                ]
-            }]);
+            expect(result).toEqual([
+                {
+                    type: "VariableDeclaration",
+                    kind: "var",
+                    declarations: [
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "testIdentifier"
+                            },
+                            init: ASTUtils._getArgsAST(["testArg"])[0]
+                        }
+                    ]
+                }
+            ]);
         });
 
         it("should return the AST for a nameddo block", () => {
             const flows = [["nameddo_testMethod", ["testArg"]]];
             const result = ASTUtils._getBlockAST(flows);
-            expect(result).toEqual([ASTUtils._getMethodCallAST("testMethod", ["testArg"], { action: true })]);
+            expect(result).toEqual([
+                ASTUtils._getMethodCallAST("testMethod", ["testArg"], { action: true })
+            ]);
         });
     });
 

@@ -155,7 +155,7 @@ class Turtles {
         ===================================================
         */
 
-        turtle.container.on("mousedown", (event) => {
+        turtle.container.on("mousedown", event => {
             const scale = this.scale;
             const offset = {
                 x: turtle.container.x - event.stageX / scale,
@@ -166,7 +166,7 @@ class Turtles {
             // console.debug("--> [CursorDown " + turtle.name + "]");
 
             turtle.container.removeAllEventListeners("pressmove");
-            turtle.container.on("pressmove", (event) => {
+            turtle.container.on("pressmove", event => {
                 if (this.isShrunk() || turtle.running) {
                     return;
                 }
@@ -404,8 +404,6 @@ Turtles.TurtlesModel = class {
 
         // List of all of the turtles, one for each start block
         this._turtleList = [];
-
-
     }
 
     /**
@@ -448,8 +446,7 @@ Turtles.TurtlesModel = class {
      * @param {Object} turtle
      */
     pushTurtle(turtle) {
-        if(!this._turtleList.includes(turtle))
-            this._turtleList.push(turtle);
+        if (!this._turtleList.includes(turtle)) this._turtleList.push(turtle);
     }
 
     /**
@@ -470,6 +467,15 @@ Turtles.TurtlesModel = class {
      */
     removeTurtle(index) {
         if (index >= 0 && index < this._turtleList.length) {
+            const turtle = this._turtleList[index];
+
+            // Clear any active intervals to prevent memory leaks
+            if (turtle.interval !== undefined) {
+                const intervalId = turtle.interval;
+                clearInterval(intervalId);
+                turtle.interval = undefined;
+            }
+
             this._turtleList.splice(index, 1);
         }
     }
@@ -508,6 +514,37 @@ Turtles.TurtlesModel = class {
     }
 
     /**
+     * Creates the artwork (visual representation) for a turtle.
+     *
+     * @param {Object} turtle - Turtle object
+     * @param {Number} i - Color index
+     * @param {Boolean} useTurtleArtwork - Whether to use turtle or metronome artwork
+     * @returns {void}
+     */
+    createArtwork(turtle, i, useTurtleArtwork) {
+        const artwork = useTurtleArtwork ? TURTLESVG : METRONOMESVG;
+        const fillColor = FILLCOLORS[i % FILLCOLORS.length];
+        const strokeColor = STROKECOLORS[i % STROKECOLORS.length];
+
+        const svgData = artwork
+            .replace(/fill_color/g, fillColor)
+            .replace(/stroke_color/g, strokeColor);
+
+        const img = new Image();
+        img.onload = () => {
+            const bitmap = new createjs.Bitmap(img);
+            bitmap.regX = 27;
+            bitmap.regY = 27;
+            turtle.container.addChild(bitmap);
+            turtle._bitmap = bitmap;
+            turtle._createCache();
+            turtle.updateCache();
+            this.activity.refreshCanvas();
+        };
+        img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(svgData)));
+    }
+
+    /**
      * Creates sensor area for Turtle body.
      *
      * @param {*} turtle - Turtle object
@@ -530,7 +567,7 @@ Turtles.TurtlesModel = class {
      * @returns {void}
      */
     addTurtleGraphicProps(turtle, blkInfoAvailable, infoDict) {
-        setTimeout(() => {
+        requestAnimationFrame(() => {
             if (blkInfoAvailable) {
                 if ("heading" in infoDict) {
                     turtle.painter.doSetHeading(infoDict["heading"]);
@@ -556,7 +593,7 @@ Turtles.TurtlesModel = class {
                     turtle.rename(infoDict["name"]);
                 }
             }
-        }, 2000);
+        });
     }
 
     /**
@@ -565,7 +602,7 @@ Turtles.TurtlesModel = class {
      * @return {Boolean} - running
      */
     running() {
-        for(let i = 0; i < this.getTurtleCount(); i++) {
+        for (let i = 0; i < this.getTurtleCount(); i++) {
             if (this.getTurtle(i).running) {
                 return true;
             }
@@ -633,7 +670,7 @@ Turtles.TurtlesView = class {
 
         this._expandedBoundary = null; // The boundary when the canvas is expanded
         this._collapsedBoundary = null; // The boundry when the canvas is collapsed
-        this._expandButton = null; // Button to expand the canvas 
+        this._expandButton = null; // Button to expand the canvas
         this._collapseButton = null; // Button to collapse the canvas
         this._clearButton = null; // Button to clear the canvas
         this.gridButton = null; // Button to select the grid style
@@ -651,16 +688,14 @@ Turtles.TurtlesView = class {
         // Attach an event listener to the 'resize' event
         window.addEventListener("resize", () => {
             // Call the updateDimensions function when resizing occurs
-            var screenWidth = (
+            var screenWidth =
                 window.innerWidth ||
                 document.documentElement.clientWidth ||
-                document.body.clientWidth
-            );
-            var screenHeight = (
+                document.body.clientWidth;
+            var screenHeight =
                 window.innerHeight ||
                 document.documentElement.clientHeight ||
-                document.body.clientHeight
-            );
+                document.body.clientHeight;
 
             // Set a scaling factor to adjust the dimensions based on the screen size
             var scale = Math.min(screenWidth / 1200, screenHeight / 900);
@@ -705,6 +740,25 @@ Turtles.TurtlesView = class {
         }
 
         this.makeBackground();
+    }
+
+    /**
+     * Makes background for canvas: updates the canvas background color.
+     *
+     * @param {Boolean} setCollapsed - whether to set the background in collapsed state
+     * @returns {void}
+     */
+    makeBackground(setCollapsed) {
+        // Update the canvas background color
+        const canvas = this.canvas;
+        if (canvas) {
+            canvas.style.backgroundColor = this._backgroundColor;
+        }
+
+        // Also update body background if available
+        if (typeof document !== "undefined") {
+            document.body.style.backgroundColor = this._backgroundColor;
+        }
     }
 
     /**
@@ -796,482 +850,18 @@ Turtles.TurtlesView = class {
     turtleY2screenY(y) {
         return this._invertY(y);
     }
-
-    /**
-     * Creates the artwork for the turtle (mouse) 's skin.
-     *
-     * @param {Object} turtle
-     * @param {Number} i
-     * @returns {void}
-     */
-    createArtwork(turtle, i, useTurtleArtwork) {
-        let artwork = useTurtleArtwork ? TURTLESVG : METRONOMESVG;
-        artwork = artwork
-            .replace(/fill_color/g, FILLCOLORS[i])
-            .replace(/stroke_color/g, STROKECOLORS[i]);
-
-        turtle.makeTurtleBitmap(artwork, this.activity, useTurtleArtwork);
-
-        turtle.painter.color = i * 10;
-        turtle.painter.canvasColor = getMunsellColor(
-            turtle.painter.color,
-            DEFAULTVALUE,
-            DEFAULTCHROMA
-        );
-    }
-
-    /**
-     * Makes background for canvas: clears containers, renders buttons.
-     *
-     * @param setCollapsed - specify whether the background should be collapsed
-     */
-    makeBackground(setCollapsed) {
-        const activity = this.activity;
-
-        const doCollapse = setCollapsed === undefined ? false : setCollapsed;
-
-        const borderContainer = this.borderContainer;
-
-        // Remove any old background containers
-        borderContainer.removeAllChildren();
-
-        const turtlesStage = this.stage;
-        // We put the buttons on the stage so they will be on top
-
-        const _makeButton = (svg, object, x, y) => {
-            const container = document.createElement("div");
-            container.setAttribute("id", "" + object.name);
-            container.setAttribute("class", "tooltipped");
-            container.setAttribute("data-tooltip", object.label);
-            container.setAttribute("data-position", "bottom");
-            jQuery.noConflict()(".tooltipped").tooltip({
-                html: true,
-                delay: 100
-            });
-
-            container.onmouseover = () => {
-                if (!activity.loading) {
-                    document.body.style.cursor = "pointer";
-                    container.style.transition = "0.1s ease-out";
-                    container.style.transform = "scale(1.15)";
-                }
-            };
-
-            container.onmouseout = () => {
-                if (!activity.loading) {
-                    document.body.style.cursor = "default";
-                    container.style.transition = "0.15s ease-out";
-                    container.style.transform = "scale(1)";
-                }
-            };
-            const img = new Image();
-            img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svg));
-
-            container.appendChild(img);
-            container.setAttribute(
-                "style",
-                "position: absolute; right:" +
-                (document.body.clientWidth - x) +
-                "px;  top: " +
-                y +
-                "px;"
-            );
-            docById("buttoncontainerTOP").appendChild(container);
-            return container;
-        };
-
-        /**
-         * Setup dragging of smaller canvas .
-         */
-        const dragCanvas = () => {
-            let offset;
-            turtlesStage.removeAllEventListeners("pressmove");
-            turtlesStage.removeAllEventListeners("mousedown");
-            turtlesStage.on("mousedown", (event) => {
-                offset = {
-                    y: event.stageY - turtlesStage.y,
-                    x: event.stageX - turtlesStage.x
-                };
-            });
-            turtlesStage.on("pressmove", (event) => {
-                const x = event.stageX - offset.x;
-                const y = event.stageY - offset.y;
-                turtlesStage.x = Math.max(0, Math.min((this._w * 3) / 4, x));
-                turtlesStage.y = Math.max(55, Math.min((this._h * 3) / 4, y));
-                activity.refreshCanvas();
-            });
-        };
-
-        /**
-         * Toggles visibility of menu and grids.
-         * Scales down all 'turtles' in turtleList.
-         * Removes the stage and adds it back at the top.
-         */
-        const __collapse = () => {
-            this.hideMenu();
-            this.activity.hideGrids();
-            this.setStageScale(0.25);
-            this._collapsedBoundary.visible = true;
-            this._expandedBoundary.visible = false;
-            turtlesStage.x = (this._w * 3) / 4 - 10;
-            turtlesStage.y = 55 + LEADING + 6;
-            this._isShrunk = true;
-
-            for (let i = 0; i < this.getTurtleCount(); i++) {
-                const turtle = this.getTurtle(i);
-                turtle.container.scaleX = CONTAINERSCALEFACTOR;
-                turtle.container.scaleY = CONTAINERSCALEFACTOR;
-                turtle.container.scale = CONTAINERSCALEFACTOR;
-            }
-
-            // remove the stage and add it back at the top
-            this.masterStage.removeChild(turtlesStage);
-            this.masterStage.addChild(turtlesStage);
-            dragCanvas();
-
-            this.activity.refreshCanvas();
-        };
-
-        /**
-         * Makes 'cartesian' button by initailising 'CARTESIANBUTTON' SVG.
-         * Assigns click listener function to doGrid() method.
-         */
-        const __makeGridButton = () => {
-            this.gridButton = _makeButton(
-                CARTESIANBUTTON,
-                {
-                    "name":"Grid",
-                    "label":_("Grid")
-                },
-                this._w - 10 - 3 * 55,
-                70 + LEADING + 6
-            );
-            const that = this;
-            this.gridButton.onclick  = () => {
-                piemenuGrid(that.activity);
-            };
-        };
-
-
-
-        const __makeClearButton = () => {
-            // Create the Clear button using the existing _makeButton helper
-            this._clearButton = _makeButton(
-                CLEARBUTTON,
-                {
-                    name: "Clear",
-                    label: _("Clear"),
-                },
-                this._w - 5 - 2 * 55,
-                70 + LEADING + 6
-            );
-
-            // Assign click listener to the Clear button
-            this._clearButton.onclick = () => {
-                this.activity._allClear();
-            };
-        };
-
-        /**
-         * Makes collapse button by initailising 'COLLAPSEBUTTON' SVG.
-         * Assigns click listener function to call __collapse() method.
-         */
-        const __makeCollapseButton = () => {
-            this._collapseButton = _makeButton(
-                COLLAPSEBUTTON,
-                {
-                    "name":"Collapse",
-                    "label":_("Collapse")
-                },
-                this._w - 55,
-                70 + LEADING + 6
-            );
-
-            this._collapseButton.onclick = () => {
-                // If the aux toolbar is open, close it.
-                const auxToolbar = docById("aux-toolbar");
-                if (auxToolbar.style.display === "block") {
-                    const menuIcon = docById("menu");
-                    auxToolbar.style.display = "none";
-                    menuIcon.innerHTML = "menu";
-                    docById("toggleAuxBtn").className -= "blue darken-1";
-                }
-                this._expandButton.style.visibility = "visible";
-                this._collapseButton.style.visibility = "hidden";
-                this.activity.helpfulWheelItems.forEach(ele => {
-                    if (ele.label === "Expand") {
-                        ele.display = true;
-                    } else if (ele.label === "Collapse") {
-                        ele.display = false;
-                    } else if (ele.label === "Grid") {
-                        ele.display = false;
-                    }
-                });
-                __collapse();
-            };
-        };
-
-
-        this.collapse = () => {
-            const auxToolbar = docById("aux-toolbar");
-            if (auxToolbar.style.display === "block") {
-                const menuIcon = docById("menu");
-                auxToolbar.style.display = "none";
-                menuIcon.innerHTML = "menu";
-                docById("toggleAuxBtn").className -= "blue darken-1";
-            }
-
-            this._expandButton.style.visibility = "visible";
-            this._collapseButton.style.visibility = "hidden";
-            this.gridButton.style.visibility = "hidden";
-            this.activity.helpfulWheelItems.forEach(ele => {
-                if (ele.label === "Expand") {
-                    ele.display = true;
-                } else if (ele.label === "Collapse") {
-                    ele.display = false;
-                } else if (ele.label === "Grid") {
-                    ele.display = false;
-                }
-            });
-            __collapse();
-
-            if (docById("helpfulWheelDiv").style.display !== "none") {
-                docById("helpfulWheelDiv").style.display = "none";
-                this.activity.__tick();
-            }
-        };
-
-        /**
-         * Makes expand button by initailising 'EXPANDBUTTON' SVG.
-         * Assigns click listener function to remove stage and add it at posiion 0.
-         */
-        const __makeExpandButton = () => {
-            this._expandButton = _makeButton(
-                EXPANDBUTTON,
-                {
-                    "name":"Expand",
-                    "label":_("Expand"),
-                },
-                this._w - 55,
-                70 + LEADING + 6
-            );
-            if (this._expandButton !== null) {
-                this._expandButton.style.visibility = "hidden";
-            }
-
-            this._expandButton.onclick = () => {
-                this.expand();
-            };
-        };
-
-
-        this.expand = () => {
-            // If the aux toolbar is open, close it.
-            const auxToolbar = docById("aux-toolbar");
-            if (auxToolbar.style.display === "block") {
-                const menuIcon = docById("menu");
-                auxToolbar.style.display = "none";
-                menuIcon.innerHTML = "menu";
-                docById("toggleAuxBtn").className -= "blue darken-1";
-            }
-            this.hideMenu();
-            this.setStageScale(1.0);
-            this._expandedBoundary.visible = true;
-            this.gridButton.style.visibility = "visible";
-            this._collapseButton.style.visibility = "visible";
-            this._expandButton.style.visibility = "hidden";
-            this.activity.helpfulWheelItems.forEach(ele => {
-                if (ele.label === "Expand") {
-                    ele.display = false;
-                } else if (ele.label === "Collapse") {
-                    ele.display = true;
-                } else if (ele.label === "Grid") {
-                    ele.display = true;
-                }
-            });
-            this._collapsedBoundary.visible = false;
-            turtlesStage.removeAllEventListeners("pressmove");
-            turtlesStage.removeAllEventListeners("mousedown");
-
-            turtlesStage.x = 0;
-            turtlesStage.y = 0;
-            this._isShrunk = false;
-
-            for (let i = 0; i < this.getTurtleCount(); i++) {
-                const turtle = this.getTurtle(i);
-                turtle.container.scaleX = 1;
-                turtle.container.scaleY = 1;
-                turtle.container.scale = 1;
-            }
-
-            this._clearButton.scaleX = 1;
-            this._clearButton.scaleY = 1;
-            this._clearButton.scale = 1;
-            this._clearButton.x = this._w - 5 - 2 * 55;
-
-            if (this.gridButton !== null) {
-                this.gridButton.scaleX = 1;
-                this.gridButton.scaleY = 1;
-                this.gridButton.scale = 1;
-                this.gridButton.x = this._w - 10 - 3 * 55;
-                this.gridButton.visible = true;
-            }
-
-            // Restore the previously selected grid
-            if (this.currentGrid !== null) {
-                this.activity.turtles.doGrid(0);
-            }
-            
-            // remove the stage and add it back in position 0
-            this.masterStage.removeChild(turtlesStage);
-            this.masterStage.addChildAt(turtlesStage, 0);
-
-            if (docById("helpfulWheelDiv").style.display !== "none") {
-                docById("helpfulWheelDiv").style.display = "none";
-                this.activity.__tick();
-            }
-        };
-
-        /**
-         * initializes all Buttons.
-         */
-        const __makeAllButtons = () => {
-            let second = false;
-            if (docById("buttoncontainerTOP")) {
-                jQuery.noConflict()(".tooltipped").tooltip("close");
-                docById("buttoncontainerTOP").parentElement.removeChild(
-                    docById("buttoncontainerTOP")
-                );
-                second = true;
-            }
-            const cont = document.createElement("div");
-            document.body.appendChild(cont);
-            cont.style.display = second ? "block" : "none";
-            cont.setAttribute("id", "buttoncontainerTOP");
-            __makeCollapseButton();
-            __makeExpandButton();
-            __makeClearButton();
-            __makeGridButton();
-            jQuery.noConflict()(".tooltipped").each(function(){
-                jQuery.noConflict()(this).tooltip(
-                    {
-                        html: true,
-                        delay: 100
-                    }
-                );
-            });
-            this._locked = false;
-        };
-
-        /**
-         * Makes second boundary for graphics (mouse) container by initialising 'MBOUNDARY' SVG.
-         */
-
-        const handleCanvasResize = () => {
-            // Get the new canvas width and height after resizing
-            const newCanvasWidth = window.innerWidth;
-            const newCanvasHeight = window.innerHeight;
-
-            // Update the canvas dimensions
-            this._w = newCanvasWidth;
-            this._h = newCanvasHeight;
-
-            // Calculate new SVG container dimensions
-            // const dx = newCanvasWidth - 20;
-            // const dy = newCanvasHeight - 55 - LEADING;
-        };
-
-        const __makeBoundary2 = () => {
-            const img = new Image();
-            img.onload = () => {
-                if (this._collapsedBoundary !== null) {
-                    this._collapsedBoundary.visible = false;
-                }
-
-                this._collapsedBoundary = new createjs.Bitmap(img);
-                this._collapsedBoundary.x = 0;
-                this._collapsedBoundary.y = 55 + LEADING;
-                borderContainer.addChild(this._collapsedBoundary);
-                this._collapsedBoundary.visible = false;
-            };
-
-            const dx = this._w - 20;
-            const dy = this._h - 55 - LEADING;
-            img.src =
-                "data:image/svg+xml;base64," +
-                window.btoa(
-                    base64Encode(
-                        MBOUNDARY.replace("HEIGHT", this._h)
-                            .replace("WIDTH", this._w)
-                            .replace("Y", 10)
-                            .replace("X", 10)
-                            .replace("DY", dy)
-                            .replace("DX", dx)
-                            .replace("stroke_color", platformColor.ruleColor)
-                            .replace("fill_color", this._backgroundColor)
-                            .replace("STROKE", 20)
-                    )
-                );
-            __makeAllButtons();
-        };
-        // Call the __makeBoundary2 function once the document is loaded
-        /**
-         * Makes boundary for graphics (mouse) container by initialising
-         * 'MBOUNDARY' SVG.
-         */
-        const __makeBoundary = () => {
-            this._locked = true;
-            const img = new Image();
-            img.onload = () => {
-                if (this._expandedBoundary !== null) {
-                    this._expandedBoundary.visible = false;
-                }
-
-                this._expandedBoundary = new createjs.Bitmap(img);
-                this._expandedBoundary.x = 0;
-                this._expandedBoundary.y = 55 + LEADING;
-                borderContainer.addChild(this._expandedBoundary);
-                __makeBoundary2();
-            };
-
-            const dx = this._w - 5;
-            const dy = this._h - 55 - LEADING;
-            img.src =
-                "data:image/svg+xml;base64," +
-                window.btoa(
-                    base64Encode(
-                        MBOUNDARY.replace("HEIGHT", this._h)
-                            .replace("WIDTH", this._w)
-                            .replace("Y", 10 / CONTAINERSCALEFACTOR)
-                            .replace("X", 10 / CONTAINERSCALEFACTOR)
-                            .replace("DY", dy)
-                            .replace("DX", dx)
-                            .replace("stroke_color", platformColor.ruleColor)
-                            .replace("fill_color", this._backgroundColor)
-                            .replace("STROKE", 20 / CONTAINERSCALEFACTOR)
-                    )
-                );
-        };
-
-        if (!this._locked) {
-            __makeBoundary();
-        }
-
-        // Debounce the resize event to prevent performance issues
-        let resizeTimeout;
-        window.addEventListener("resize", () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                handleCanvasResize();
-                __makeBoundary();
-                __makeBoundary2();
-            }, 150); // Wait 150ms after the last resize event to execute
-        });
-
-        return this;
-    }
 };
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = Turtles;
+}
+
+if (typeof define === "function" && define.amd) {
+    define([], function () {
+        return Turtles;
+    });
+}
+
+if (typeof window !== "undefined") {
+    window.Turtles = Turtles;
 }
