@@ -35,11 +35,6 @@ Object.defineProperty(global, "localStorage", {
     writable: true
 });
 
-delete global.window.location;
-global.window.location = {
-    reload: jest.fn()
-};
-
 document.querySelectorAll = jest.fn(() => []);
 
 global._ = jest.fn(str => str);
@@ -53,8 +48,10 @@ describe("LanguageBox Class", () => {
     });
 
     it("should reload the window when OnClick is called", () => {
+        const reloadSpy = jest.spyOn(languageBox, "reload").mockImplementation(() => {});
         languageBox.OnClick();
-        expect(global.window.location.reload).toHaveBeenCalled();
+        expect(reloadSpy).toHaveBeenCalled();
+        reloadSpy.mockRestore();
     });
 
     it("should display 'already set' message when the selected language is the same", () => {
