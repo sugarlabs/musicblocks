@@ -69,7 +69,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                         console.error("i18next init failed:", err);
                     }
                     window.i18next = i18next;
-                    resolve(i18next); 
+                    resolve(i18next);
                 }
             );
         });
