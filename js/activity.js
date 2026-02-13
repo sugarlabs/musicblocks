@@ -200,7 +200,6 @@ const doAnalyzeProject = function () {
     return analyzeProject(globalActivity);
 };
 
-/**
 // === PERFORMANCE INSTRUMENTATION START ===
 let __refreshTotal = 0;
 let __refreshCount = 0;
@@ -208,6 +207,8 @@ let __refreshMax = 0;
 let __refreshLastLogTime = performance.now();
 window.__ENABLE_REFRESH_PROFILING__ = true;
 // === PERFORMANCE INSTRUMENTATION END ===
+
+/**
  * Represents an activity in the application.
  */
 class Activity {
@@ -4434,6 +4435,7 @@ class Activity {
             }
             const __start = performance.now();
             // === PERFORMANCE INSTRUMENTATION END ===
+
             if (this.blockRefreshCanvas) {
                 // === PERFORMANCE INSTRUMENTATION START ===
                 const __duration = performance.now() - __start;
@@ -4469,26 +4471,27 @@ class Activity {
                 that.blockRefreshCanvas = false;
                 that.stageDirty = true;
             }, 5);
-        };
-        // === PERFORMANCE INSTRUMENTATION START ===
-        const __duration = performance.now() - __start;
-        __refreshTotal += __duration;
-        __refreshCount++;
-        __refreshMax = Math.max(__refreshMax, __duration);
 
-        if (__refreshCount % 25 === 0) {
-            const __now = performance.now();
-            const __elapsed = __now - __refreshLastLogTime;
-            const __cps = (25 / __elapsed) * 1000;
-            console.log(
-                `refreshCanvas | Avg: ${(__refreshTotal / __refreshCount).toFixed(
-                    2
-                )}ms | Max: ${__refreshMax.toFixed(2)}ms | Rate: ${__cps.toFixed(1)} calls/sec`
-            );
-            __refreshLastLogTime = __now;
-            __refreshMax = 0;
-        }
-        // === PERFORMANCE INSTRUMENTATION END ===
+            // === PERFORMANCE INSTRUMENTATION START ===
+            const __duration = performance.now() - __start;
+            __refreshTotal += __duration;
+            __refreshCount++;
+            __refreshMax = Math.max(__refreshMax, __duration);
+
+            if (__refreshCount % 25 === 0) {
+                const __now = performance.now();
+                const __elapsed = __now - __refreshLastLogTime;
+                const __cps = (25 / __elapsed) * 1000;
+                console.log(
+                    `refreshCanvas | Avg: ${(__refreshTotal / __refreshCount).toFixed(
+                        2
+                    )}ms | Max: ${__refreshMax.toFixed(2)}ms | Rate: ${__cps.toFixed(1)} calls/sec`
+                );
+                __refreshLastLogTime = __now;
+                __refreshMax = 0;
+            }
+            // === PERFORMANCE INSTRUMENTATION END ===
+        };
 
         /*
          * This sets the dirty flag so the stage re-renders on the next
