@@ -146,8 +146,9 @@ class HelpWidget {
             };
         } else {
             if (this.activity.blocks.activeBlock.name !== null) {
-                const label = this.activity.blocks.blockList[this.activity.blocks.activeBlock]
-                    .protoblock.staticLabels[0];
+                const label =
+                    this.activity.blocks.blockList[this.activity.blocks.activeBlock].protoblock
+                        .staticLabels[0];
                 if (page == 0) {
                     this.widgetWindow.updateTitle(_("Take a tour"));
                 } else {
@@ -200,8 +201,9 @@ class HelpWidget {
                 // svg file, and an optional macro name for generating
                 // the help output.
 
-                const message = this.activity.blocks.blockList[this.activity.blocks.activeBlock]
-                    .protoblock.helpString;
+                const message =
+                    this.activity.blocks.blockList[this.activity.blocks.activeBlock].protoblock
+                        .helpString;
 
                 if (message) {
                     const helpBody = docById("helpBodyDiv");
@@ -377,8 +379,8 @@ class HelpWidget {
                 leftArrow.classList.remove("disabled");
 
                 this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
-            this._showPage(page);
-        };
+                this._showPage(page);
+            };
             if (page === 0) {
                 leftArrow.classList.add("disabled");
             }
@@ -654,4 +656,7 @@ class HelpWidget {
             }
         }
     }
+}
+if (typeof module !== "undefined") {
+    module.exports = HelpWidget;
 }
