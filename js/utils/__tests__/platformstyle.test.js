@@ -18,125 +18,6 @@
  */
 
 describe("platformstyle", () => {
-    let showButtonHighlightRef;
-
-    const loadModule = () => {
-        jest.isolateModules(() => {
-            require("../platformstyle");
-        });
-        showButtonHighlightRef = require("../platformstyle").showButtonHighlight;
-    };
-
-    const buildDom = () => {
-        const meta = document.createElement("meta");
-        meta.name = "theme-color";
-        document.head.appendChild(meta);
-    };
-
-    beforeEach(() => {
-        jest.resetModules();
-        document.head.innerHTML = "";
-        global.showMaterialHighlight = jest.fn(() => ({ highlight: true }));
-        delete global.window.platform;
-        delete global.window.platformColor;
-    });
-
-    it("initializes platform color preference with default theme", () => {
-        Object.defineProperty(global.window.navigator, "userAgent", {
-            value: "Mozilla/5.0 (Macintosh; Intel Mac OS X)",
-            configurable: true,
-            writable: true
-        });
-        global.navigator = global.window.navigator;
-        global.localStorage = {};
-        global.window.navigator = global.navigator;
-        global.window.localStorage = global.localStorage;
-        buildDom();
-
-        loadModule();
-
-        expect(global.window.platformColor.header).toBe("#4DA6FF");
-        expect(document.querySelector("meta[name=theme-color]").content).toBe("#4DA6FF");
-        expect(global.window.platform.FFOS).toBe(false);
-    });
-
-    it("honors dark theme preference", () => {
-        Object.defineProperty(global.window.navigator, "userAgent", {
-            value: "Chrome/123",
-            configurable: true,
-            writable: true
-        });
-        global.navigator = global.window.navigator;
-        const ls = global.window.localStorage || {};
-        ls.themePreference = "dark";
-        global.localStorage = ls;
-        global.window.localStorage = ls;
-        global.window.navigator = global.navigator;
-        buildDom();
-
-        loadModule();
-
-        expect(global.window.platformColor.header).toBe("#1E88E5");
-        expect(document.querySelector("meta[name=theme-color]").content).toBe("#1E88E5");
-    });
-
-    it("skips material highlight when running on Firefox OS", () => {
-        Object.defineProperty(global.window.navigator, "userAgent", {
-            value: "Firefox Mobi",
-            configurable: true,
-            writable: true
-        });
-        global.navigator = global.window.navigator;
-        const ls = global.window.localStorage || {};
-        global.localStorage = ls;
-        global.window.localStorage = ls;
-        buildDom();
-
-        loadModule();
-
-        expect(global.window.platform.FFOS).toBe(true);
-    });
-
-    it("delegates to material highlight when not on FFOS", () => {
-        Object.defineProperty(global.window.navigator, "userAgent", {
-            value: "Chrome/123",
-            configurable: true,
-            writable: true
-        });
-        global.navigator = global.window.navigator;
-        buildDom();
-
-        loadModule();
-        const result = showButtonHighlightRef(1, 2, 3, { type: "click" }, 1, {});
-        expect(result).toEqual({ highlight: true });
-        expect(global.showMaterialHighlight).toHaveBeenCalledWith(
-            1,
-            2,
-            3,
-            { type: "click" },
-            1,
-            {}
-        );
-    });
-
-    it("returns empty highlight when FFOS", () => {
-        Object.defineProperty(global.window.navigator, "userAgent", {
-            value: "Firefox Mobi",
-            configurable: true,
-            writable: true
-        });
-        global.navigator = global.window.navigator;
-        buildDom();
-
-        loadModule();
-        global.window.platform.FFOS = true;
-        const result = showButtonHighlightRef(0, 0, 0, {}, 1, {});
-        expect(result).toEqual({});
-        expect(global.showMaterialHighlight).not.toHaveBeenCalled();
-    });
-});
-
-describe("platform detection computed properties", () => {
     const buildDom = () => {
         const meta = document.createElement("meta");
         meta.name = "theme-color";
@@ -153,9 +34,9 @@ describe("platform detection computed properties", () => {
         const ls = global.window.localStorage || {};
         global.localStorage = ls;
         global.window.localStorage = ls;
-        global.window.navigator = global.navigator;
         global.showMaterialHighlight = jest.fn(() => ({ highlight: true }));
         buildDom();
+
         jest.isolateModules(() => {
             require("../platformstyle");
         });
@@ -168,26 +49,39 @@ describe("platform detection computed properties", () => {
         delete global.window.platformColor;
     });
 
+    afterEach(() => {
+        jest.resetModules();
+    });
+
     it("should detect androidWebkit for Android Chrome", () => {
         loadModuleWithUA("Mozilla/5.0 Android Chrome/90");
+        expect(global.window.platform.android).toBe(true);
+        expect(global.window.platform.FF).toBe(false);
         expect(global.window.platform.androidWebkit).toBe(true);
         expect(global.window.platform.FFOS).toBe(false);
     });
 
     it("should not set androidWebkit for Android Firefox", () => {
         loadModuleWithUA("Mozilla/5.0 Android Firefox/88");
+        expect(global.window.platform.android).toBe(true);
+        expect(global.window.platform.FF).toBe(true);
         expect(global.window.platform.androidWebkit).toBe(false);
         expect(global.window.platform.FFOS).toBe(false);
     });
 
     it("should detect FFOS for Firefox mobile non-Android", () => {
         loadModuleWithUA("Mozilla/5.0 Firefox Mobi");
+        expect(global.window.platform.FF).toBe(true);
+        expect(global.window.platform.mobile).toBe(true);
+        expect(global.window.platform.android).toBe(false);
         expect(global.window.platform.FFOS).toBe(true);
         expect(global.window.platform.androidWebkit).toBe(false);
     });
 
     it("should not detect FFOS for desktop Firefox", () => {
         loadModuleWithUA("Mozilla/5.0 Firefox/88.0");
+        expect(global.window.platform.FF).toBe(true);
+        expect(global.window.platform.mobile).toBe(false);
         expect(global.window.platform.FFOS).toBe(false);
     });
 
@@ -195,7 +89,61 @@ describe("platform detection computed properties", () => {
         loadModuleWithUA("");
         expect(global.window.platform.android).toBe(false);
         expect(global.window.platform.FF).toBe(false);
+        expect(global.window.platform.mobile).toBe(false);
+        expect(global.window.platform.tablet).toBe(false);
         expect(global.window.platform.androidWebkit).toBe(false);
         expect(global.window.platform.FFOS).toBe(false);
+    });
+
+    it("delegates to showMaterialHighlight when not on FFOS", () => {
+        loadModuleWithUA("Chrome/123");
+        const { showButtonHighlight } = require("../platformstyle");
+        const result = showButtonHighlight(1, 2, 3, { type: "click" }, 1, {});
+        expect(result).toEqual({ highlight: true });
+        expect(global.showMaterialHighlight).toHaveBeenCalledWith(
+            1,
+            2,
+            3,
+            { type: "click" },
+            1,
+            {}
+        );
+    });
+
+    it("returns empty object from showButtonHighlight when on FFOS", () => {
+        loadModuleWithUA("Mozilla/5.0 Firefox Mobi");
+        const { showButtonHighlight } = require("../platformstyle");
+        const result = showButtonHighlight(0, 0, 0, {}, 1, {});
+        expect(result).toEqual({});
+        expect(global.showMaterialHighlight).not.toHaveBeenCalled();
+    });
+
+    it("initializes platformColor with light theme by default", () => {
+        loadModuleWithUA("Chrome/123");
+        expect(global.window.platformColor).toBeDefined();
+        expect(global.window.platformColor.header).toBe("#4DA6FF");
+        expect(document.querySelector("meta[name=theme-color]").content).toBe("#4DA6FF");
+    });
+
+    it("honors dark theme preference", () => {
+        Object.defineProperty(global.window.navigator, "userAgent", {
+            value: "Chrome/123",
+            configurable: true,
+            writable: true
+        });
+        global.navigator = global.window.navigator;
+        const ls = global.window.localStorage || {};
+        ls.themePreference = "dark";
+        global.localStorage = ls;
+        global.window.localStorage = ls;
+        global.showMaterialHighlight = jest.fn(() => ({ highlight: true }));
+        buildDom();
+
+        jest.isolateModules(() => {
+            require("../platformstyle");
+        });
+
+        expect(global.window.platformColor.header).toBe("#1E88E5");
+        expect(document.querySelector("meta[name=theme-color]").content).toBe("#1E88E5");
     });
 });
