@@ -5545,3 +5545,6 @@ class PhraseMaker {
         activity.textMsg(this._("New action block generated."), 3000);
     }
 }
+if (typeof module !== "undefined") {
+    module.exports = PhraseMaker;
+}
