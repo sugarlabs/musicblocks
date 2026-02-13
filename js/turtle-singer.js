@@ -1057,6 +1057,10 @@ class Singer {
                     // eslint-disable-next-line no-console
                 }
 
+                if (Math.abs(cents) < 1e-9) {
+                    cents = 0;
+                }
+
                 if (tur.singer.drumStyle.length > 0) {
                     const drumname = last(tur.singer.drumStyle);
                     tur.singer.pitchDrumTable[noteObj[0] + noteObj[1]] = drumname;
