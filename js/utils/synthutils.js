@@ -2138,6 +2138,8 @@ function Synth() {
     };
 
     this.rampTo = (turtle, instrumentName, oldVol, volume, rampTime) => {
+        // guard invalid UI/programmatic input (audio boundary safety)
+        volume = Math.max(0, Math.min(volume, 100));
         if (
             percussionInstruments.includes(instrumentName) ||
             stringInstruments.includes(instrumentName)
@@ -2157,7 +2159,8 @@ function Synth() {
             nv = volume;
         }
 
-        const db = Tone.gainToDb(nv / 100);
+        const gain = Math.max(0.0001, nv / 100);
+        const db = Tone.gainToDb(gain);
 
         let synth = instruments[turtle]["electronic synth"];
         if (instrumentName in instruments[turtle]) {
@@ -2205,6 +2208,8 @@ function Synth() {
      * @param {number} volume - The volume level (0 to 100).
      */
     this.setVolume = (turtle, instrumentName, volume) => {
+        // guard invalid UI/programmatic input (audio boundary safety)
+        volume = Math.max(0, Math.min(volume, 100));
         // We pass in volume as a number from 0 to 100.
         // As per #1697, we adjust the volume of some instruments.
         let nv;
@@ -2220,10 +2225,18 @@ function Synth() {
             nv = volume;
         }
 
-        // Convert volume to decibals
-        const db = Tone.gainToDb(nv / 100);
+        const gain = Math.max(0.0001, nv / 100);
+        const db = Tone.gainToDb(gain);
         if (instrumentName in instruments[turtle]) {
-            instruments[turtle][instrumentName].volume.value = db;
+            const synth = instruments[turtle][instrumentName];
+            // Do not schedule a ramp if volume didn't actually change to avoid "flutter" buzz
+            if (Math.abs(synth.volume.value - db) < 0.001) return;
+
+            // Use a tiny ramp (10ms) to prevent clicks
+            const now = Tone.now();
+            synth.volume.cancelScheduledValues(now);
+            synth.volume.setValueAtTime(synth.volume.value, now);
+            synth.volume.linearRampToValueAtTime(db, now + 0.01);
         }
     };
 
@@ -2246,7 +2259,10 @@ function Synth() {
                 this.trigger(0, "G4", 1 / 4, "electronic synth", null, null, false);
             }, 200);
         } else {
-            const db = Tone.gainToDb(volume / 100);
+            // guard invalid UI/programmatic input (audio boundary safety)
+            volume = Math.max(0, Math.min(volume, 100));
+            const gain = Math.max(0.0001, volume / 100);
+            const db = Tone.gainToDb(gain);
             Tone.Destination.volume.rampTo(db, 0.01);
         }
     };
