@@ -2165,35 +2165,25 @@ class Blocks {
             }
 
             /** If it is an arg block, where is it coming from? */
-            /** FIXME: improve mechanism for testing block types. */
             if (myBlock.isArgumentLikeBlock() && newBlock != null) {
-                /** We care about twoarg blocks with connections to the first arg; */
-                if (this.blockList[newBlock].isTwoArgBlock()) {
-                    if (this.blockList[newBlock].connections[1] === thisBlock) {
-                        if (!this._checkTwoArgBlocks.includes(newBlock)) {
-                            this._checkTwoArgBlocks.push(newBlock);
-                        }
-                    }
-                } else if (
-                    this.blockList[newBlock].isArgBlock() &&
-                    this.blockList[newBlock].isExpandableBlock()
-                ) {
-                    if (this.blockList[newBlock].connections[1] === thisBlock) {
-                        if (!this._checkTwoArgBlocks.includes(newBlock)) {
-                            this._checkTwoArgBlocks.push(newBlock);
-                        }
-                    }
-                }
+                const parentBlock = this.blockList[newBlock];
 
-                /** We also care about the second-to-last connection to an arg block. */
-                const n = this.blockList[newBlock].connections.length;
-                if (this.blockList[newBlock].connections[n - 2] === thisBlock) {
-                    /** Only flow blocks, but not ArgClamps */
-                    if (
-                        !this.blockList[newBlock].isArgClamp() &&
-                        this.blockList[newBlock].docks[n - 1][2] === "in"
-                    ) {
-                        checkArgBlocks.push(newBlock);
+                // Find which connection index this block is attached to
+                const connectionIndex = parentBlock.connections.indexOf(thisBlock);
+
+                // Guard against invalid index (can happen during drag/undo/intermediate states)
+                if (connectionIndex !== -1) {
+                    // Ask the parent block what type of layout update it needs for this connection
+                    const updateType = parentBlock.getLayoutUpdateType(connectionIndex);
+
+                    if (updateType === "ARG") {
+                        if (!this._checkTwoArgBlocks.includes(newBlock)) {
+                            this._checkTwoArgBlocks.push(newBlock);
+                        }
+                    } else if (updateType === "FLOW") {
+                        if (!checkArgBlocks.includes(newBlock)) {
+                            checkArgBlocks.push(newBlock);
+                        }
                     }
                 }
             }
