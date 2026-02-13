@@ -382,8 +382,6 @@ class Activity {
         this.KeySignatureEnv = ["C", "major", false];
         try {
             if (this.storage.KeySignatureEnv !== undefined) {
-                // eslint-disable-next-line no-console
-                console.log(this.storage.KeySignatureEnv);
                 this.KeySignatureEnv = this.storage.KeySignatureEnv.split(",");
                 this.KeySignatureEnv[2] = this.KeySignatureEnv[2] === "true";
             }
@@ -1331,32 +1329,47 @@ class Activity {
                 if (!SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
                     svg += extractSVGInner(rawSVG);
                 } else {
-                    // Keep existing fragile logic for now
-                    parts = rawSVG.split("><");
+                    // Safer SVG manipulation using DOM instead of string splitting
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(rawSVG, "image/svg+xml");
 
-                    for (let p = 1; p < parts.length; p++) {
-                        // FIXME: This is fragile.
-                        if (p === 1) {
-                            svg += "<" + parts[p] + "><";
-                        } else if (p === 2) {
-                            // skip filter
-                        } else if (p === 3) {
-                            svg += parts[p].replace("filter:url(#dropshadow);", "") + "><";
-                        } else if (p === 5) {
-                            // Add block value to SVG between tspans
-                            if (typeof this.blocks.blockList[i].value === "string") {
-                                svg += parts[p] + ">" + _(this.blocks.blockList[i].value) + "<";
-                            } else {
-                                svg += parts[p] + ">" + this.blocks.blockList[i].value + "<";
-                            }
-                        } else if (p === parts.length - 2) {
-                            svg += parts[p] + ">";
-                        } else if (p === parts.length - 1) {
-                            // skip final </svg>
-                        } else {
-                            svg += parts[p] + "><";
-                        }
+                    // remove dropshadow filter if present
+                    const filtered = doc.querySelector('[style*="filter:url(#dropshadow)"]');
+                    if (filtered) {
+                        filtered.style.filter = "";
                     }
+
+                    // Find correct tspan to inject value (matches previous behaviour)
+                    let target = null;
+
+                    // 1) Prefer empty tspan (most block SVGs reserve this for value)
+                    target = Array.from(doc.querySelectorAll("text tspan")).find(
+                        t => !t.textContent || t.textContent.trim() === ""
+                    );
+
+                    // 2) Otherwise fallback to last tspan
+                    if (!target) {
+                        const tspans = doc.querySelectorAll("text tspan");
+                        if (tspans.length) target = tspans[tspans.length - 1];
+                    }
+
+                    // 3) Final fallback to text node
+                    if (!target) {
+                        target = doc.querySelector("text");
+                    }
+
+                    if (target) {
+                        const val = this.blocks.blockList[i].value;
+                        target.textContent = typeof val === "string" ? _(val) : val;
+                    }
+
+                    // serialize without outer <svg> wrapper (matches previous behavior)
+                    let serialized = new XMLSerializer().serializeToString(doc.documentElement);
+
+                    // remove outer svg tags because original code skipped them
+                    serialized = serialized.replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "");
+
+                    svg += serialized;
                 }
 
                 svg += "</g>";
@@ -2856,6 +2869,12 @@ class Activity {
             this.searchSuggestions = [];
             this.deprecatedBlockNames = [];
 
+            // Guard: blocks may not be initialized yet during early loading
+            if (!this.blocks || !this.blocks.protoBlockDict) {
+                console.debug("prepSearchWidget: blocks not yet initialized, skipping");
+                return;
+            }
+
             for (const i in this.blocks.protoBlockDict) {
                 const block = this.blocks.protoBlockDict[i];
                 const blockLabel = block.staticLabels.join(" ");
@@ -3042,6 +3061,12 @@ class Activity {
          * Uses JQuery to add autocompleted search suggestions
          */
         this.doSearch = () => {
+            // Guard: ensure searchWidget exists before proceeding
+            if (!this.searchWidget) {
+                console.debug("doSearch: searchWidget not yet initialized, skipping");
+                return;
+            }
+
             const $j = window.jQuery;
             if (this.searchSuggestions.length === 0) {
                 this.prepSearchWidget();
@@ -3382,6 +3407,10 @@ class Activity {
                         this._doHardStopButton();
                     } else if (!disableKeys && !hasOpenWidget) {
                         event.preventDefault();
+                        const stopbtn = document.getElementById("stop");
+                        if (stopbtn) {
+                            stopbtn.style.color = platformColor.stopIconcolor;
+                        }
                         this._doFastButton();
                     }
                 } else if (!disableKeys) {
@@ -3948,18 +3977,30 @@ class Activity {
             this._renderTrashView();
         });
 
+        // Store the click handler reference for proper cleanup
+        let trashViewClickHandler = null;
+
         // function to hide trashView from canvas
         function handleClickOutsideTrashView(trashView) {
+            // Remove existing listener to prevent duplicates
+            if (trashViewClickHandler) {
+                document.removeEventListener("click", trashViewClickHandler);
+            }
+
             let firstClick = true;
-            document.addEventListener("click", event => {
+            trashViewClickHandler = event => {
                 if (firstClick) {
                     firstClick = false;
                     return;
                 }
                 if (!trashView.contains(event.target) && event.target !== trashView) {
                     trashView.style.display = "none";
+                    // Clean up listener when trashView is hidden
+                    document.removeEventListener("click", trashViewClickHandler);
+                    trashViewClickHandler = null;
                 }
-            });
+            };
+            document.addEventListener("click", trashViewClickHandler);
         }
 
         this._renderTrashView = () => {
@@ -5159,14 +5200,32 @@ class Activity {
             document.getElementById("loadingText").textContent = _("Loading Complete!");
 
             setTimeout(() => {
-                document.getElementById("loadingText").textContent = null;
-                document.getElementById("loading-image-container").style.display = "none";
-                document.getElementById("bottom-right-logo").style.display = "none";
-                document.getElementById("palette").style.display = "block";
+                const loadingText = document.getElementById("loadingText");
+                if (loadingText) loadingText.textContent = null;
+
+                const loadingImageContainer = document.getElementById("loading-image-container");
+                if (loadingImageContainer) loadingImageContainer.style.display = "none";
+
+                // Try hiding load-container instead if it exists
+                const loadContainer = document.getElementById("load-container");
+                if (loadContainer) loadContainer.style.display = "none";
+
+                const bottomRightLogo = document.getElementById("bottom-right-logo");
+                if (bottomRightLogo) bottomRightLogo.style.display = "none";
+
+                const palette = document.getElementById("palette");
+                if (palette) palette.style.display = "block";
+
                 // document.getElementById('canvas').style.display = 'none';
-                document.getElementById("hideContents").style.display = "block";
-                document.getElementById("buttoncontainerBOTTOM").style.display = "block";
-                document.getElementById("buttoncontainerTOP").style.display = "block";
+
+                const hideContents = document.getElementById("hideContents");
+                if (hideContents) hideContents.style.display = "block";
+
+                const btnBottom = document.getElementById("buttoncontainerBOTTOM");
+                if (btnBottom) btnBottom.style.display = "block";
+
+                const btnTop = document.getElementById("buttoncontainerTOP");
+                if (btnTop) btnTop.style.display = "block";
             }, 500);
         };
 
@@ -6955,15 +7014,16 @@ class Activity {
             // Throttle rendering when user is inactive and no music is playing
             this._initIdleWatcher();
 
+            // Named event handlers for proper cleanup
             let mouseEvents = 0;
-            document.addEventListener("mousemove", () => {
+            this.handleMouseMove = () => {
                 mouseEvents++;
                 if (mouseEvents % 4 === 0) {
                     that.__tick();
                 }
-            });
+            };
 
-            document.addEventListener("click", e => {
+            this.handleDocumentClick = e => {
                 if (!this.hasMouseMoved) {
                     if (this.selectionModeOn) {
                         this.deselectSelectedBlocks();
@@ -6971,7 +7031,11 @@ class Activity {
                         this._hideHelpfulSearchWidget(e);
                     }
                 }
-            });
+            };
+
+            // Use managed addEventListener for automatic cleanup
+            this.addEventListener(document, "mousemove", this.handleMouseMove);
+            this.addEventListener(document, "click", this.handleDocumentClick);
 
             this._createMsgContainer(
                 "#ffffff",
@@ -7609,10 +7673,14 @@ class Activity {
             document.addEventListener("DOMMouseScroll", scrollEvent, false);
             */
 
+            // Named event handler for proper cleanup
             const activity = this;
-            document.onkeydown = () => {
+            this.handleKeyDown = event => {
                 activity.__keyPressed(event);
             };
+
+            // Use managed addEventListener instead of onkeydown assignment
+            this.addEventListener(document, "keydown", this.handleKeyDown);
 
             if (this.planet !== undefined) {
                 this.planet.planet.setAnalyzeProject(doAnalyzeProject);
@@ -7796,11 +7864,12 @@ define(["domReady!"].concat(MYDEFINES), doc => {
     const initialize = () => {
         // Defensive check for multiple critical globals that may be delayed
         // due to 'defer' execution timing variances.
-        const globalsReady = typeof createDefaultStack !== "undefined" &&
-                           typeof createjs !== "undefined" &&
-                           typeof Tone !== "undefined" &&
-                           typeof GIFAnimator !== "undefined" &&
-                           typeof SuperGif !== "undefined";
+        const globalsReady =
+            typeof createDefaultStack !== "undefined" &&
+            typeof createjs !== "undefined" &&
+            typeof Tone !== "undefined" &&
+            typeof GIFAnimator !== "undefined" &&
+            typeof SuperGif !== "undefined";
 
         if (globalsReady) {
             activity.setupDependencies();

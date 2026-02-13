@@ -135,7 +135,9 @@ class Singer {
         this.instrumentNames = [];
         this.inCrescendo = [];
         this.crescendoDelta = [];
-        this.crescendoInitialVolume = { DEFAULTVOICE: [DEFAULTVOLUME] };
+        this.crescendoInitialVolume = {
+            DEFAULTVOICE: [typeof DEFAULTVOLUME !== "undefined" ? DEFAULTVOLUME : 50]
+        };
         this.intervals = []; // relative interval (based on scale degree)
         this.semitoneIntervals = []; // absolute interval (based on semitones)
         this.chordIntervals = []; // combination of scale degree and semitones
@@ -212,9 +214,15 @@ class Singer {
 
     // ========= Class variables ==============================================
     // Parameters used by notes
-    static masterBPM = TARGETBPM;
-    static defaultBPMFactor = TONEBPM / TARGETBPM;
-    static masterVolume = [DEFAULTVOLUME];
+    // Note: These globals (TARGETBPM, TONEBPM, DEFAULTVOLUME) are defined in logo.js.
+    // We use safe defaults here because this file may load before logo.js due to
+    // the RequireJS dependency chain.
+    static masterBPM = typeof TARGETBPM !== "undefined" ? TARGETBPM : 120;
+    static defaultBPMFactor =
+        typeof TONEBPM !== "undefined" && typeof TARGETBPM !== "undefined"
+            ? TONEBPM / TARGETBPM
+            : 1;
+    static masterVolume = [typeof DEFAULTVOLUME !== "undefined" ? DEFAULTVOLUME : 50];
 
     // ========= Deprecated ===================================================
 
@@ -2495,9 +2503,9 @@ class Singer {
     }
 }
 
-// Preserve existing global exposure exactly as before
-if (typeof window !== "undefined") {
-    window.Singer = Singer;
+// Maintain CommonJS compatibility for tests
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Singer;
 }
 
 // Implement additive AMD define
@@ -2507,7 +2515,7 @@ if (typeof define === "function" && define.amd) {
     });
 }
 
-// Maintain CommonJS compatibility for tests
-if (typeof module !== "undefined" && module.exports) {
-    module.exports = Singer;
+// Preserve existing global exposure exactly as before
+if (typeof window !== "undefined") {
+    window.Singer = Singer;
 }

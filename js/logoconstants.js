@@ -80,34 +80,9 @@ const logoconstants = {
     NOTATIONSTACCATO
 };
 
-// Preserve existing global exposure exactly as before
-if (typeof window !== "undefined") {
-    window.DEFAULTVOLUME = DEFAULTVOLUME;
-    window.PREVIEWVOLUME = PREVIEWVOLUME;
-    window.DEFAULTDELAY = DEFAULTDELAY;
-    window.OSCVOLUMEADJUSTMENT = OSCVOLUMEADJUSTMENT;
-    window.TONEBPM = TONEBPM;
-    window.TARGETBPM = TARGETBPM;
-    window.TURTLESTEP = TURTLESTEP;
-    window.NOTEDIV = NOTEDIV;
-    window.NOMICERRORMSG = NOMICERRORMSG;
-    window.NANERRORMSG = NANERRORMSG;
-    window.NOSTRINGERRORMSG = NOSTRINGERRORMSG;
-    window.NOBOXERRORMSG = NOBOXERRORMSG;
-    window.NOACTIONERRORMSG = NOACTIONERRORMSG;
-    window.NOINPUTERRORMSG = NOINPUTERRORMSG;
-    window.NOSQRTERRORMSG = NOSQRTERRORMSG;
-    window.ZERODIVIDEERRORMSG = ZERODIVIDEERRORMSG;
-    window.EMPTYHEAPERRORMSG = EMPTYHEAPERRORMSG;
-    window.POSNUMBER = POSNUMBER;
-    window.INVALIDPITCH = INVALIDPITCH;
-    window.NOTATIONNOTE = NOTATIONNOTE;
-    window.NOTATIONDURATION = NOTATIONDURATION;
-    window.NOTATIONDOTCOUNT = NOTATIONDOTCOUNT;
-    window.NOTATIONTUPLETVALUE = NOTATIONTUPLETVALUE;
-    window.NOTATIONROUNDDOWN = NOTATIONROUNDDOWN;
-    window.NOTATIONINSIDECHORD = NOTATIONINSIDECHORD;
-    window.NOTATIONSTACCATO = NOTATIONSTACCATO;
+// Maintain CommonJS compatibility for tests
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = logoconstants;
 }
 
 // Implement additive AMD define
@@ -117,7 +92,7 @@ if (typeof define === "function" && define.amd) {
     });
 }
 
-// Maintain CommonJS compatibility for tests
-if (typeof module !== "undefined" && module.exports) {
-    module.exports = logoconstants;
+// Preserve existing global exposure exactly as before
+if (typeof window !== "undefined") {
+    Object.assign(window, logoconstants);
 }

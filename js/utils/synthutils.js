@@ -1726,6 +1726,9 @@ function Synth() {
                     console.debug("Error triggering note:", e);
                 }
             } else {
+                const effectChain = [];
+                synth.disconnect();
+
                 if (paramsFilters !== null && paramsFilters !== undefined) {
                     numFilters = paramsFilters.length; // no. of filters
                     for (let k = 0; k < numFilters; k++) {
@@ -1736,7 +1739,7 @@ function Synth() {
                             paramsFilters[k].filterRolloff
                         );
                         temp_filters.push(filterVal);
-                        synth.chain(temp_filters[k], Tone.Destination);
+                        effectChain.push(temp_filters[k]);
                     }
                 }
 
@@ -1752,15 +1755,13 @@ function Synth() {
                             1 / paramsEffects.vibratoFrequency,
                             paramsEffects.vibratoIntensity
                         );
-                        synth.chain(vibrato, Tone.Destination);
+                        effectChain.push(vibrato);
                         effectsToDispose.push(vibrato);
                     }
 
                     if (paramsEffects.doDistortion) {
-                        distortion = new Tone.Distortion(
-                            paramsEffects.distortionAmount
-                        ).toDestination();
-                        synth.connect(distortion, Tone.Destination);
+                        distortion = new Tone.Distortion(paramsEffects.distortionAmount);
+                        effectChain.push(distortion);
                         effectsToDispose.push(distortion);
                     }
 
@@ -1768,10 +1769,8 @@ function Synth() {
                         tremolo = new Tone.Tremolo({
                             frequency: paramsEffects.tremoloFrequency,
                             depth: paramsEffects.tremoloDepth
-                        })
-                            .toDestination()
-                            .start();
-                        synth.chain(tremolo);
+                        }).start();
+                        effectChain.push(tremolo);
                         effectsToDispose.push(tremolo);
                     }
 
@@ -1780,8 +1779,8 @@ function Synth() {
                             frequency: paramsEffects.rate,
                             octaves: paramsEffects.octaves,
                             baseFrequency: paramsEffects.baseFrequency
-                        }).toDestination();
-                        synth.chain(phaser, Tone.Destination);
+                        });
+                        effectChain.push(phaser);
                         effectsToDispose.push(phaser);
                     }
 
@@ -1790,8 +1789,8 @@ function Synth() {
                             frequency: paramsEffects.chorusRate,
                             delayTime: paramsEffects.delayTime,
                             depth: paramsEffects.chorusDepth
-                        }).toDestination();
-                        synth.chain(chorus, Tone.Destination);
+                        });
+                        effectChain.push(chorus);
                         effectsToDispose.push(chorus);
                     }
 
@@ -1845,6 +1844,12 @@ function Synth() {
                         }, obj).start();
                         effectsToDispose.push(neighbor);
                     }
+                }
+
+                if (effectChain.length > 0) {
+                    synth.chain(...effectChain, Tone.Destination);
+                } else {
+                    synth.toDestination();
                 }
 
                 if (!paramsEffects.doNeighbor) {
@@ -3293,79 +3298,6 @@ function Synth() {
 
         // Return detected pitch or default to A4
         return pitch > 0 ? pitch : 440;
-    };
-
-    // Test function to verify tuner accuracy
-    this.testTuner = () => {
-        if (!window.AudioContext) {
-            console.error("Web Audio API not supported");
-            return;
-        }
-
-        const audioContext = new AudioContext();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        gainNode.gain.value = 0.1; // Low volume
-
-        // Test frequencies
-        const testCases = [
-            { freq: 440, expected: "A4" }, // A4 (in tune)
-            { freq: 442, expected: "A4" }, // A4 (sharp)
-            { freq: 438, expected: "A4" }, // A4 (flat)
-            { freq: 261.63, expected: "C4" }, // C4 (in tune)
-            { freq: 329.63, expected: "E4" } // E4 (in tune)
-        ];
-
-        let currentTest = 0;
-
-        const runTest = () => {
-            if (currentTest >= testCases.length) {
-                oscillator.stop();
-                console.log("Tuner tests completed");
-                return;
-            }
-
-            const test = testCases[currentTest];
-            console.log(`Testing frequency: ${test.freq}Hz (Expected: ${test.expected})`);
-
-            oscillator.frequency.setValueAtTime(test.freq, audioContext.currentTime);
-
-            currentTest++;
-            setTimeout(runTest, 2000); // Test each frequency for 2 seconds
-        };
-
-        oscillator.start();
-        runTest();
-    };
-
-    // Function to test specific frequencies
-    this.testSpecificFrequency = frequency => {
-        if (!window.AudioContext) {
-            console.error("Web Audio API not supported");
-            return;
-        }
-
-        const audioContext = new AudioContext();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        gainNode.gain.value = 0.1; // Low volume
-
-        oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-        oscillator.start();
-
-        console.log(`Testing frequency: ${frequency}Hz`);
-
-        // Stop after 3 seconds
-        setTimeout(() => {
-            oscillator.stop();
-            console.log("Test completed");
-        }, 3000);
     };
 
     /**
