@@ -1726,8 +1726,9 @@ function Synth() {
                     console.debug("Error triggering note:", e);
                 }
             } else {
-                const effectChain = [];
-                synth.disconnect();
+                // Remove the dry path so effects are routed serially, not in parallel
+                synth.disconnect(Tone.Destination);
+                const chainNodes = [];
 
                 if (paramsFilters !== null && paramsFilters !== undefined) {
                     numFilters = paramsFilters.length; // no. of filters
@@ -1739,7 +1740,7 @@ function Synth() {
                             paramsFilters[k].filterRolloff
                         );
                         temp_filters.push(filterVal);
-                        effectChain.push(temp_filters[k]);
+                        chainNodes.push(filterVal);
                     }
                 }
 
@@ -1755,14 +1756,13 @@ function Synth() {
                             1 / paramsEffects.vibratoFrequency,
                             paramsEffects.vibratoIntensity
                         );
-                        effectChain.push(vibrato);
+                        chainNodes.push(vibrato);
                         effectsToDispose.push(vibrato);
                     }
 
                     if (paramsEffects.doDistortion) {
                         distortion = new Tone.Distortion(paramsEffects.distortionAmount);
-                        effectChain.push(distortion);
-                        effectsToDispose.push(distortion);
+                        chainNodes.push(distortion);
                     }
 
                     if (paramsEffects.doTremolo) {
@@ -1770,7 +1770,8 @@ function Synth() {
                             frequency: paramsEffects.tremoloFrequency,
                             depth: paramsEffects.tremoloDepth
                         }).start();
-                        effectChain.push(tremolo);
+
+                        chainNodes.push(tremolo);
                         effectsToDispose.push(tremolo);
                     }
 
@@ -1780,7 +1781,8 @@ function Synth() {
                             octaves: paramsEffects.octaves,
                             baseFrequency: paramsEffects.baseFrequency
                         });
-                        effectChain.push(phaser);
+
+                        chainNodes.push(phaser);
                         effectsToDispose.push(phaser);
                     }
 
@@ -1790,7 +1792,8 @@ function Synth() {
                             delayTime: paramsEffects.delayTime,
                             depth: paramsEffects.chorusDepth
                         });
-                        effectChain.push(chorus);
+
+                        chainNodes.push(chorus);
                         effectsToDispose.push(chorus);
                     }
 
@@ -1846,11 +1849,7 @@ function Synth() {
                     }
                 }
 
-                if (effectChain.length > 0) {
-                    synth.chain(...effectChain, Tone.Destination);
-                } else {
-                    synth.toDestination();
-                }
+                synth.chain(...chainNodes, Tone.Destination);
 
                 if (!paramsEffects.doNeighbor) {
                     if (setNote !== undefined && setNote) {
