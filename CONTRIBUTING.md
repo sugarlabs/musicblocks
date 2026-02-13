@@ -64,6 +64,8 @@ npx prettier --check .    # Formatting
 npm test                  # Jest
 ```
 
+NOTE: Only run ```prettier``` on the files you have modified.
+
 If formatting fails, run `npx prettier --write .` to fix it.
 
 ### License Header
