@@ -352,7 +352,6 @@ describe("MusicBlocks Class", () => {
         expect(musicBlocks.MASTERVOLUME).toBe(1.0);
     });
 
-
     describe("MusicBlocks.run", () => {
         beforeEach(() => {
             Mouse.MouseList = [];
