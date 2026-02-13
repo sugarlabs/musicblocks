@@ -341,12 +341,119 @@ describe("Notation Class", () => {
         });
     });
 
-    describe("Edge Cases", () => {
-        it("should handle empty or invalid input for notationPickup", () => {
+    describe("doUpdateNotation Extended cases", () => {
+        it("should handle staccato singer state", () => {
             const turtle = "turtle1";
-            const factor = 0;
-            notation.notationPickup(turtle, factor);
-            expect(notation._notationStaging[turtle].length).toBe(0);
+            const mockSinger = notation.activity.turtles.ithTurtle(turtle).singer;
+            mockSinger.staccato = [1]; // Has staccato
+
+            notation.doUpdateNotation("C4", 4, turtle, false, []);
+
+            const lastNote = last(notation._notationStaging[turtle]);
+            expect(lastNote[6]).toBe(true); // staccato flag
+        });
+
+        it("should handle chords and process accumulated markup", () => {
+            const turtle = "turtle1";
+            const noteObj = { 0: "C4", 1: "E4", 2: "G4" };
+
+            // Seed some markup
+            notation._markup[turtle] = ["accent", 440]; // string and number (Hertz)
+
+            notation.doUpdateNotation(noteObj, 4, turtle, false, []);
+
+            // Check markup was processed
+            expect(notation._notationStaging[turtle]).toContain("markup");
+            expect(notation._notationStaging[turtle]).toContain("accent");
+            expect(notation._notationStaging[turtle]).toContain("markdown");
+            expect(notation._notationStaging[turtle]).toContain(440);
+
+            // Verify markup was cleared
+            expect(notation._markup[turtle]).toEqual([]);
+        });
+
+        it("should push R to drum staging when no drum is provided", () => {
+            const turtle = "turtle1";
+            notation.doUpdateNotation("C4", 4, turtle, false, []);
+            expect(last(notation._notationDrumStaging[turtle])[0]).toEqual(["R"]);
+        });
+
+        it("should correctly handle tuplet durations", () => {
+            const turtle = "turtle1";
+            // Mock durationToNoteValue to return tuplet format [1, 0, [factor, j], roundDown]
+            durationToNoteValue.mockReturnValue([1, 0, [3, 2], 4]);
+
+            notation.doUpdateNotation("C4", 1 / 6, turtle, false, []);
+
+            const lastNote = last(notation._notationStaging[turtle]);
+            expect(lastNote[1]).toBe(1); // note value
+            expect(lastNote[2]).toBe(0); // dots
+            expect(lastNote[3]).toEqual([3, 2]); // tuplet factor
+            expect(lastNote[4]).toBe(4); // roundDown
+        });
+    });
+
+    describe("Metrical and Sequential Logic", () => {
+        it("should reorder meter to be before pickup point", () => {
+            const turtle = "turtle1";
+            notation._notationStaging[turtle] = ["note1", "note2"];
+            notation._pickupPoint[turtle] = 0; // Pickup starts at the beginning
+
+            // In the current implementation, this test might FAIL or expose the bug
+            // because for (i in d) where d is 2 will not execute.
+            notation.notationMeter(turtle, 3, 4);
+
+            expect(notation._notationStaging[turtle][0]).toBe("meter");
+            expect(notation._notationStaging[turtle][1]).toBe(3);
+            expect(notation._notationStaging[turtle][2]).toBe(4);
+            expect(notation._notationStaging[turtle].slice(3)).toContain("note1");
+            expect(notation._notationStaging[turtle].slice(3)).toContain("note2");
+        });
+
+        it("should handle notationPickup for non-power-of-2 factors using rests", () => {
+            const turtle = "turtle1";
+            convertFactor.mockReturnValue(null); // Not a power of 2
+            rationalToFraction.mockReturnValue([3, 8]); // 3 eighth notes rest
+
+            notation.notationPickup(turtle, 0.375);
+
+            expect(rationalToFraction).toHaveBeenCalledWith(1 - 0.375);
+            expect(notation.activity.logo.updateNotation).toHaveBeenCalledTimes(3);
+            expect(notation._pickupPoint[turtle]).toBe(0); // Pointed at start
+        });
+    });
+
+    describe("Voice and Harmonic Edge Cases", () => {
+        it("should handle all notationVoices cases", () => {
+            const turtle = "turtle1";
+            const voices = [
+                [1, "voice one"],
+                [2, "voice two"],
+                [3, "voice three"],
+                [4, "voice four"],
+                [5, "one voice"],
+                [null, "one voice"]
+            ];
+
+            voices.forEach(([arg, expected]) => {
+                notation._notationStaging[turtle] = [];
+                notation.notationVoices(turtle, arg);
+                expect(notation._notationStaging[turtle]).toContain(expected);
+            });
+        });
+
+        it("should handle __notationHarmonic", () => {
+            const turtle = "turtle1";
+            notation.__notationHarmonic(turtle);
+            expect(notation._notationStaging[turtle]).toContain("harmonic");
+        });
+    });
+
+    describe("Static Notation Methods", () => {
+        it("should initialize markup array if missing in static notationMarkup", () => {
+            delete Notation._markup; // Ensure clean state
+            Notation.notationMarkup("newTurtle", "accent");
+            expect(Notation._markup["newTurtle"]).toEqual(["accent"]);
         });
     });
 });

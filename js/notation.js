@@ -220,6 +220,9 @@ class Notation {
      * @returns {void}
      */
     static notationMarkup(turtle, arg) {
+        if (!this._markup) {
+            this._markup = {};
+        }
         if (turtle in this._markup) {
             this._markup[turtle].push(arg);
         } else {
@@ -284,14 +287,14 @@ class Notation {
             const pickup = [];
 
             // eslint-disable-next-line
-            for (const i in d) {
+            for (let i = 0; i < d; i++) {
                 pickup.push(this._notationStaging[turtle].pop());
             }
 
             this._notationStaging[turtle].push("meter", count, value);
 
             // eslint-disable-next-line
-            for (const i in d) {
+            for (let i = 0; i < d; i++) {
                 this._notationStaging[turtle].push(pickup.pop());
             }
         } else {
@@ -363,7 +366,7 @@ class Notation {
      * @returns {void}
      */
     __notationHarmonic(turtle) {
-        this._notationStaging.push("harmonic");
+        this._notationStaging[turtle].push("harmonic");
         this._pickupPoint[turtle] = null;
     }
 
@@ -502,6 +505,8 @@ class Notation {
         this._pickupPoint[turtle] = null;
     }
 }
+Notation._markup = {};
+
 if (typeof module !== "undefined" && module.exports) {
     module.exports = Notation;
 }
