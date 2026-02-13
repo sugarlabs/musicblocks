@@ -3095,22 +3095,108 @@ class Activity {
                 const instance = $search.autocomplete("instance");
                 if (instance) {
                     instance._renderItem = (ul, item) => {
-                        return $j("<li></li>")
-                            .append(
-                                '<img src="' +
-                                    (item.artwork || "") +
-                                    '" height="20px">' +
-                                    "<a> " +
-                                    item.label +
-                                    "</a>"
-                            )
-                            .appendTo(
-                                ul.css({
-                                    "z-index": 35000,
-                                    "max-height": "200px",
-                                    "overflow-y": "auto"
-                                })
-                            );
+                        const li = $j("<li></li>");
+
+                        const img = document.createElement("img");
+                        img.src = item.artwork || "";
+                        img.height = 20;
+                        img.style.cursor = "grab";
+
+                        // Drag-and-drop: mirrors the palette drag pattern in
+                        // palette.js _showMenuItems(). Keep both in sync.
+                        img.ondragstart = () => false;
+
+                        const down = event => {
+                            // Stop jQuery UI autocomplete from handling this
+                            event.stopPropagation();
+                            event.stopImmediatePropagation();
+                            event.preventDefault();
+
+                            const posit = img.style.position;
+                            const zInd = img.style.zIndex;
+                            img.style.position = "absolute";
+                            img.style.zIndex = 10000;
+
+                            // Close the autocomplete dropdown
+                            $j("#search").autocomplete("close");
+
+                            document.body.appendChild(img);
+
+                            const moveAt = (pageX, pageY) => {
+                                img.style.left = pageX - img.offsetWidth / 2 + "px";
+                                img.style.top = pageY - img.offsetHeight / 2 + "px";
+                            };
+
+                            const onMouseMove = e => {
+                                e.preventDefault();
+                                let x, y;
+                                if (e.type === "touchmove") {
+                                    x = e.touches[0].clientX;
+                                    y = e.touches[0].clientY;
+                                } else {
+                                    x = e.pageX;
+                                    y = e.pageY;
+                                }
+                                moveAt(x, y);
+                            };
+                            onMouseMove(event);
+
+                            document.addEventListener("touchmove", onMouseMove, { passive: false });
+                            document.addEventListener("mousemove", onMouseMove);
+
+                            const up = () => {
+                                document.body.style.cursor = "default";
+                                document.removeEventListener("mousemove", onMouseMove);
+                                document.removeEventListener("touchmove", onMouseMove);
+
+                                const x = parseInt(img.style.left);
+                                const y = parseInt(img.style.top);
+
+                                img.style.position = posit;
+                                img.style.zIndex = zInd;
+                                if (img.parentNode === document.body) {
+                                    document.body.removeChild(img);
+                                }
+
+                                if (isNaN(x) && isNaN(y)) return;
+
+                                const protoblk = item.specialDict;
+                                const paletteName = protoblk.palette.name;
+                                const protoName = item.value;
+
+                                that.palettes.dict[paletteName].makeBlockFromSearch(
+                                    protoblk,
+                                    protoName,
+                                    newBlock => {
+                                        that.blocks.moveBlock(
+                                            newBlock,
+                                            (x || that.blocksContainer.x + 100) -
+                                                that.blocksContainer.x,
+                                            (y || that.blocksContainer.y + 100) -
+                                                that.blocksContainer.y
+                                        );
+                                    }
+                                );
+                            };
+
+                            document.addEventListener("mouseup", up, { once: true });
+                            document.addEventListener("touchend", up, { once: true });
+                        };
+
+                        // Capture phase fires BEFORE jQuery UI's event delegation
+                        img.addEventListener("mousedown", down, true);
+                        img.addEventListener("touchstart", down, { capture: true, passive: false });
+
+                        li.append(img);
+                        li.append("<a> " + item.label + "</a>");
+
+                        return li.appendTo(
+                            ul.css({
+                                "z-index": 35000,
+                                "max-height": "200px",
+                                "overflow-y": "auto"
+                            })
+                        );
                     };
                 }
                 $search.data("autocomplete-init", true);
