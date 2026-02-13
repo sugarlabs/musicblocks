@@ -206,6 +206,9 @@ const doAnalyzeProject = function () {
 // === PERFORMANCE INSTRUMENTATION START ===
 let __refreshTotal = 0;
 let __refreshCount = 0;
+let __refreshMax = 0;
+let __refreshLastLogTime = performance.now();
+window.__ENABLE_REFRESH_PROFILING__ = true;
 // === PERFORMANCE INSTRUMENTATION END ===
 class Activity {
     /**
@@ -4331,6 +4334,18 @@ class Activity {
          */
         this.refreshCanvas = () => {
             // === PERFORMANCE INSTRUMENTATION START ===
+            if (!window.__ENABLE_REFRESH_PROFILING__) {
+                if (this.blockRefreshCanvas) return;
+                this.blockRefreshCanvas = true;
+                this.stageDirty = true;
+                this.update = true;
+                const that = this;
+                setTimeout(() => {
+                    that.blockRefreshCanvas = false;
+                    that.stageDirty = true;
+                }, 5);
+                return;
+            }
             const __start = performance.now();
             // === PERFORMANCE INSTRUMENTATION END ===
 
@@ -4339,15 +4354,16 @@ class Activity {
                 const __duration = performance.now() - __start;
                 __refreshTotal += __duration;
                 __refreshCount++;
+                __refreshMax = Math.max(__refreshMax, __duration);
 
                 if (__refreshCount % 25 === 0) {
+                    const __now = performance.now();
+                    const __elapsed = __now - __refreshLastLogTime;
+                    const __cps = (25 / __elapsed) * 1000;
                     console.log(
-                        "Average refreshCanvas duration:",
-                        (__refreshTotal / __refreshCount).toFixed(2),
-                        "ms over",
-                        __refreshCount,
-                        "calls"
+                        `refreshCanvas | Avg: ${(__refreshTotal / __refreshCount).toFixed(2)}ms | Max: ${__refreshMax.toFixed(2)}ms | Rate: ${__cps.toFixed(1)} calls/sec`
                     );
+                    __refreshLastLogTime = __now;
                 }
                 // === PERFORMANCE INSTRUMENTATION END ===
                 return;
@@ -4368,15 +4384,16 @@ class Activity {
             const __duration = performance.now() - __start;
             __refreshTotal += __duration;
             __refreshCount++;
+            __refreshMax = Math.max(__refreshMax, __duration);
 
             if (__refreshCount % 25 === 0) {
+                const __now = performance.now();
+                const __elapsed = __now - __refreshLastLogTime;
+                const __cps = (25 / __elapsed) * 1000;
                 console.log(
-                    "Average refreshCanvas duration:",
-                    (__refreshTotal / __refreshCount).toFixed(2),
-                    "ms over",
-                    __refreshCount,
-                    "calls"
+                    `refreshCanvas | Avg: ${(__refreshTotal / __refreshCount).toFixed(2)}ms | Max: ${__refreshMax.toFixed(2)}ms | Rate: ${__cps.toFixed(1)} calls/sec`
                 );
+                __refreshLastLogTime = __now;
             }
             // === PERFORMANCE INSTRUMENTATION END ===
         };
