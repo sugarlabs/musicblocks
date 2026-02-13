@@ -2690,9 +2690,8 @@ function Synth() {
                                             setMasterVolume: () => {},
                                             trigger: (turtle, note, duration, instrument) => {
                                                 // Use the Web Audio API to play the preview note
-                                                const audioContext = new (
-                                                    window.AudioContext || window.webkitAudioContext
-                                                )();
+                                                const audioContext = new (window.AudioContext ||
+                                                    window.webkitAudioContext)();
                                                 const oscillator = audioContext.createOscillator();
                                                 const gainNode = audioContext.createGain();
 
