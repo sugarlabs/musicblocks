@@ -4326,6 +4326,7 @@ class Activity {
          * The actual render will happen on the next animation frame.
          */
         this.refreshCanvas = () => {
+            console.count("activity.refreshCanvas");
             if (this.blockRefreshCanvas) {
                 return;
             }
