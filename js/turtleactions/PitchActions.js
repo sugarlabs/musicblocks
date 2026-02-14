@@ -1,3 +1,4 @@
+
 /**
  * @file This contains the action methods of the Turtle's Singer
  * component's Pitch blocks.
@@ -300,6 +301,15 @@ function setupPitchActions(activity) {
             const note = obj[0];
             const octave = obj[1];
             const cents = obj[2];
+
+            let startLength = 0;
+            let blockId = null;
+            if (tur.singer.inNoteBlock.length > 0) {
+                blockId = last(tur.singer.inNoteBlock);
+                if (tur.singer.notePitches && tur.singer.notePitches[blockId]) {
+                    startLength = tur.singer.notePitches[blockId].length;
+                }
+            }
 
             Singer.processPitch(activity, note, octave, cents, turtle, blk);
             if (tur.singer.inNoteBlock.length > 0 && activity.logo.runningLilypond) {
