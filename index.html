@@ -458,8 +458,114 @@
                         <input onkeypress="doPaste()" type="submit" value="" tabindex="-1" />
                     </div>
 
-                    <div id="myProgress" tabindex="-1">
-                        <div id="myBar" tabindex="-1"></div>
+                <div id="myProgress" tabindex="-1">
+                    <div id="myBar" tabindex="-1"></div>
+                </div>
+            </footer>
+
+            <dialog id="lilypondModal" class="modal" tabindex="-1">
+                <!-- Modal content for Lilypond save dialog -->
+                <div class="modal-content" tabindex="-1">
+                    <span class="close">&times;</span>
+                    <div id="fileNameText"></div>
+                    <input type="text" id="fileName" tabindex="-1">
+                    <p></p>
+                    <div id="titleText"></div>
+                    <input type="text" id="title" tabindex="-1">
+                    <p></p>
+                    <div id="authorText"></div>
+                    <input type="text" id="author" tabindex="-1">
+                    <p></p>
+                    <div id="MIDIText"></div>
+                    <input type="checkbox" id="MIDICheck" tabindex="-1">
+                    <p></p>
+                    <div id="guitarText"></div>
+                    <input type="checkbox" id="guitarCheck" tabindex="-1">
+                    <p></p>
+                    <p><button class="confirm-button" id="submitLilypond"></button></p>
+                    <!-- <button id="submitPDF"></button></p> -->
+                </div>
+            </dialog>
+            <div class="materialize-iso" tabindex="-1">
+                <nav id="toolbars" class="nav-wrapper">
+                    <div class="blue nav-wrapper" tabindex="-1">
+                        <div id="mb-logo" class="logo left tooltipped"
+                            style="display: flex; align-items: center; line-height: 0; height: 100%; padding-right: 0;"
+                            data-position="bottom">
+                            <amp-img alt="MusicBlocks Logo" width="100%" src="images/logo.svg">
+                            </amp-img>
+                        </div>
+                        <ul class="main left">
+                            <li>
+                                <a id="play" class="left tooltipped"><i
+                                        class="material-icons main">play_circle_filled</i></a>
+                            </li>
+                            <li>
+                                <a id="stop" class="left tooltipped"><i class="material-icons main">stop</i></a>
+                            </li>
+                            <li>
+                                <a id="record" class="left tooltipped" data-tooltip="Record"></a>
+                            </li>
+                        </ul>
+
+                        <ul class="main right">
+                            <li>
+                                <a id="FullScreen" class="FullScreen tooltipped dropdown-trigger" data-position="bottom"
+                                    onclick="setIcon()">
+                                    <i class="material-icons" id="FullScrIcon">fullscreen</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="newFile" class="tooltipped dropdown-trigger" data-position="bottom"
+                                    data-activates="newdropdown">
+                                    <i class="material-icons md-48">note_add</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="load" class="tooltipped" data-position="bottom">
+                                    <i class="material-icons md-48">folder</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="saveButton" class="tooltipped dropdown-trigger" data-position="bottom"
+                                    data-activates="saveddropdownbeg">
+                                    <i id="save1" class="material-icons md-48">save_alt</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="saveButtonAdvanced" style="display: none;" class="tooltipped dropdown-trigger"
+                                    data-position="bottom" data-activates="saveddropdown">
+                                    <i id="save2" class="material-icons md-48">save_alt</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="planetIcon" class="tooltipped" data-position="bottom">
+                                    <i class="material-icons md-48">public</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a style="display: none;" id="planetIconDisabled" class="tooltipped"
+                                    data-position="bottom">
+                                    <i style="color: #a5acba;" class="material-icons md-48">public</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="toggleAuxBtn" class="tooltipped" data-position="bottom">
+                                    <i id="menu" class="animated-icon material-icons md-48">menu</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="helpIcon" class="tooltipped" data-position="bottom">
+                                    <i class="material-icons md-48">help</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="installButton" class="tooltipped hidden" data-position="bottom"
+                                    data-tooltip="Install App" aria-label="Install App">
+                                    <i class="material-icons md-48">file_download</i>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
                 </footer>
 
@@ -872,8 +978,10 @@
             // Detect if running on localhost for development
             const isLocalDev = window.location.hostname === "localhost" ||
                 window.location.hostname === "127.0.0.1";
+            // Localhost SW is disabled to avoid caching; set allowLocalPwa to test installs.
+            const allowLocalPwa = localStorage.getItem("allowLocalPwa") === "true";
 
-            if (!isLocalDev) {
+            if (!isLocalDev || allowLocalPwa) {
                 // Production: Register service worker for offline mode
                 if (navigator.serviceWorker.controller) {
                     console.debug("[PWA Builder] active service worker found, no need to register");
@@ -886,16 +994,51 @@
                         );
                     });
                 }
+            } else {
+                // Development: Skip service worker for instant updates
+                console.log(
+                    "🔥 [DEV MODE] Service worker disabled on localhost for instant code updates"
+                );
+                console.log(
+                    "Set localStorage.allowLocalPwa = 'true' to enable PWA install testing on localhost."
+                );
             }
-        });
+        }
     </script>
     <script>
-        $(document).ready(function () {
-            // Defensive check for doSearch global (now an Activity member)
-            if (typeof doSearch === "function") {
-                doSearch();
-            } else if (window.activity && typeof window.activity.doSearch === "function") {
-                window.activity.doSearch();
+        let deferredPrompt;
+
+        window.addEventListener("beforeinstallprompt", (event) => {
+            event.preventDefault(); // Prevent automatic browser prompt
+            deferredPrompt = event;
+
+            // Show the install button
+            const installButton = document.getElementById("installButton");
+            if (installButton) {
+                installButton.classList.remove("hidden");
+            }
+        });
+
+        // Handle install button click
+        document.addEventListener("DOMContentLoaded", function () {
+            const installButton = document.getElementById("installButton");
+            if (installButton) {
+                installButton.addEventListener("click", async function () {
+                    if (deferredPrompt) {
+                        // Show the install prompt
+                        deferredPrompt.prompt();
+                        
+                        // Wait for user choice
+                        const { outcome } = await deferredPrompt.userChoice;
+                        console.log(`User response to the install prompt: ${outcome}`);
+                        
+                        // Clear the deferredPrompt
+                        deferredPrompt = null;
+                        
+                        // Hide the button
+                        installButton.classList.add("hidden");
+                    }
+                });
             }
         });
     </script>
@@ -1104,6 +1247,12 @@
         document.addEventListener('mozfullscreenchange', handleFullscreenChange);
         document.addEventListener('MSFullscreenChange', handleFullscreenChange);
     </script>
+
+    <style>
+        #installButton.hidden {
+            display: none !important;
+        }
+    </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
