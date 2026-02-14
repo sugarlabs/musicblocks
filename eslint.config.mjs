@@ -67,5 +67,11 @@ export default [
             "no-useless-catch": "off",
             "no-loss-of-precision": "off"
         }
+    },
+    {
+        files: ["cypress/**/*.js"],
+        languageOptions: {
+            sourceType: "module"
+        }
     }
 ];
