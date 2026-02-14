@@ -18,7 +18,7 @@
 /*
    global
 
-   DEFAULTVOLUME, TARGETBPM, TONEBPM, frequencyToPitch, last,
+   DEFAULTVOLUME, TARGETBPM, TONEBPM, MIN_HIGHLIGHT_DURATION_MS, frequencyToPitch, last,
    pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp,
    getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
@@ -2441,10 +2441,11 @@ class Singer {
                 // After the note plays, clear the embedded graphics and notes queue.
                 tur.singer.embeddedGraphics[blk] = [];
 
-                // Ensure note value block unhighlights after note plays.
-                // Use a minimum delay to ensure highlight is visible even for very short notes
-                const minNoteHighlightDuration = 100; // Minimum 100ms for note highlights
-                const noteUnhighlightDelay = Math.max(minNoteHighlightDuration, beatValue * 1000);
+                // Ensure note value block unhighlights after note plays (minimum duration so highlight is visible).
+                const highlightDurationMs = Math.max(
+                    beatValue * 1000,
+                    MIN_HIGHLIGHT_DURATION_MS
+                );
                 setTimeout(() => {
                     if (activity.blocks.visible && blk in activity.blocks.blockList) {
                         activity.blocks.unhighlight(blk);
@@ -2453,7 +2454,7 @@ class Singer {
                             activity.stage.update();
                         }
                     }
-                }, noteUnhighlightDelay);
+                }, highlightDurationMs);
             };
 
             if (last(tur.singer.inNoteBlock) !== null || noteInNote) {

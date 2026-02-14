@@ -26,6 +26,7 @@
 
    Queue, Logo, DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY,
    OSCVOLUMEADJUSTMENT, TONEBPM, TARGETBPM, TURTLESTEP, NOTEDIV,
+   MIN_HIGHLIGHT_DURATION_MS,
    NOMICERRORMSG, NANERRORMSG, NOSTRINGERRORMSG, NOBOXERRORMSG,
    NOACTIONERRORMSG, NOINPUTERRORMSG, NOSQRTERRORMSG,
    ZERODIVIDEERRORMSG, EMPTYHEAPERRORMSG, INVALIDPITCH, POSNUMBER,
@@ -1641,12 +1642,9 @@ class Logo {
                     logo._unhighlightStepQueue[turtle] = blk;
                 } else {
                     if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
-                        // Ensure minimum highlight duration for visibility (50ms minimum)
-                        // This makes the highlight visible even in fast execution mode
-                        const minHighlightDuration = 50;
                         const unhighlightDelay = Math.max(
-                            minHighlightDuration,
-                            logo.turtleDelay + tur.waitTime
+                            logo.turtleDelay + tur.waitTime,
+                            MIN_HIGHLIGHT_DURATION_MS
                         );
                         setTimeout(() => {
                             if (logo.activity.blocks.visible) {
@@ -1683,6 +1681,10 @@ class Logo {
                         tur.unhighlightQueue.push(last(tur.parentFlowQueue));
                     } else if (tur.unhighlightQueue.length > 0) {
                         // The child flow is finally complete, so unhighlight.
+                        const unhighlightDelay = Math.max(
+                            logo.turtleDelay,
+                            MIN_HIGHLIGHT_DURATION_MS
+                        );
                         setTimeout(() => {
                             if (logo.activity.blocks.visible) {
                                 const unhighlightBlock = tur.unhighlightQueue.pop();
@@ -1694,7 +1696,7 @@ class Logo {
                             } else {
                                 tur.unhighlightQueue.pop();
                             }
-                        }, logo.turtleDelay);
+                        }, unhighlightDelay);
                     }
                 }
             }
