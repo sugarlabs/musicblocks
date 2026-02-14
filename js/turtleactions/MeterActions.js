@@ -53,7 +53,7 @@ function setupMeterActions(activity) {
     function _clearDefaultStrongBeats(singer) {
         if (singer.defaultStrongBeats) {
             singer.beatList = singer.beatList.filter(
-                (beat) => beat === "everybeat" || beat === "offbeat"
+                beat => beat === "everybeat" || beat === "offbeat"
             );
             singer.defaultStrongBeats = false;
         }
