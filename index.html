@@ -668,6 +668,7 @@
                 const container = document.getElementById("loading-media");
                 const content = lang.startsWith("ja")
                     ? `<img src="loading-animation-ja.png" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
+                ? `<img src="loading-animation-ja.svg" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
                     : `<video loop autoplay muted playsinline fetchpriority="high" style="width: 90%; height: 100%; object-fit: contain;">
                         <source src="loading-animation.webm" type="video/webm">
                         <source src="loading-animation.mp4" type="video/mp4">
@@ -807,6 +808,59 @@
                 document.mozFullScreenElement ||
                 document.msFullscreenElement;
 
+            if (!isFullscreen) {
+                openFullscreen();
+                iconCode.textContent = '\ue5d1'; // fullscreen_exit icon
+            } else {
+                closeFullscreen();
+                iconCode.textContent = '\ue5d0'; // fullscreen icon
+            }
+        }
+
+        function handleFullscreenChange() {
+            var iconCode = document.querySelector('#FullScrIcon');
+            // Update fullscreen icon based on actual fullscreen state.
+            // This removes the need for a separate state variable and
+            // prevents incorrect icon state when fullscreen is toggled
+            // outside the button (e.g., ESC key).
+            var isFullscreen =
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
+
+            iconCode.textContent = isFullscreen ? '\ue5d1' : '\ue5d0';
+        }
+
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+        function handleFullscreenChange() {
+            var iconCode = document.querySelector('#FullScrIcon');
+			var fsButton = document.querySelector('#FullScreen'); // Added for tooltip
+            count = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement ? 1 : 0;
+            iconCode.textContent = count ? '\ue5d1' : '\ue5d0';
+			// New logic for tooltip (using the same 'count' variable)
+            if (fsButton) {
+                var newTooltip = count ? _("Exit Fullscreen") : _("Full screen");
+                fsButton.setAttribute('data-tooltip', newTooltip);
+
+                // Refresh the Materialize tooltip instance
+                if (typeof M !== 'undefined' && M.Tooltip) {
+                    var instance = M.Tooltip.getInstance(fsButton);
+                    if (instance) instance.destroy();
+                    M.Tooltip.init(fsButton);
+                }
+            }
+        }
+    </script>
+
+    <style>
+        #installButton.hidden {
+            display: none !important;
+        }
     </style>
 
     <script>
@@ -879,35 +933,6 @@
 
             window.addEventListener("resize", togglePlayOnlyMode);
         });
-        // Combined logic: Handles Icon change AND Tooltip change
-        function handleFullscreenChange() {
-            var iconCode = document.querySelector('#FullScrIcon');
-            var fsButton = document.querySelector('#FullScreen');
-
-            var isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
-
-            // Update Icon
-            if (iconCode) {
-                iconCode.textContent = isFullscreen ? '\ue5d1' : '\ue5d0';
-            }
-
-            // Update Tooltip
-            if (fsButton) {
-                var newTooltip = isFullscreen ? _("Exit Fullscreen") : _("Full screen");
-                fsButton.setAttribute('data-tooltip', newTooltip);
-
-                if (typeof M !== 'undefined' && M.Tooltip) {
-                    var instance = M.Tooltip.getInstance(fsButton);
-                    if (instance) instance.destroy();
-                    M.Tooltip.init(fsButton);
-                }
-            }
-        }
-
-        document.addEventListener('fullscreenchange', handleFullscreenChange);
-        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
 
     </script>
 
