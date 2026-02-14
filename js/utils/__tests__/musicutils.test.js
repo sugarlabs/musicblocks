@@ -102,6 +102,7 @@ const {
     base64Encode,
     NOTESFLAT,
     NOTESSHARP,
+    MUSICALMODES,
     getStepSizeUp,
     getStepSizeDown
 } = require("../musicutils");
@@ -2337,6 +2338,47 @@ describe("NOTESSHARP", () => {
     it("should be an array of strings", () => {
         expect(Array.isArray(NOTESSHARP)).toBe(true);
         NOTESSHARP.forEach(note => expect(typeof note).toBe("string"));
+    });
+});
+
+describe("MUSICALMODES", () => {
+    it("should contain major mode with correct intervals", () => {
+        expect(MUSICALMODES["major"]).toEqual([2, 2, 1, 2, 2, 2, 1]);
+    });
+
+    it("should contain minor mode with correct intervals", () => {
+        expect(MUSICALMODES["minor"]).toEqual([2, 1, 2, 2, 1, 2, 2]);
+    });
+
+    it("should have chromatic mode with 12 semitones", () => {
+        expect(MUSICALMODES["chromatic"]).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+        expect(MUSICALMODES["chromatic"].length).toBe(12);
+    });
+
+    it("should have pentatonic modes with 5 notes", () => {
+        expect(MUSICALMODES["major pentatonic"].length).toBe(5);
+        expect(MUSICALMODES["minor pentatonic"].length).toBe(5);
+    });
+
+    it("should have all mode intervals sum to 12 semitones", () => {
+        const sum = arr => arr.reduce((a, b) => a + b, 0);
+        expect(sum(MUSICALMODES["major"])).toBe(12);
+        expect(sum(MUSICALMODES["minor"])).toBe(12);
+        expect(sum(MUSICALMODES["dorian"])).toBe(12);
+        expect(sum(MUSICALMODES["whole tone"])).toBe(12);
+    });
+
+    it("should contain custom mode for user definitions", () => {
+        expect(MUSICALMODES["custom"]).toBeDefined();
+        expect(Array.isArray(MUSICALMODES["custom"])).toBe(true);
+    });
+
+    it("should have ionian equivalent to major", () => {
+        expect(MUSICALMODES["ionian"]).toEqual(MUSICALMODES["major"]);
+    });
+
+    it("should have aeolian equivalent to minor", () => {
+        expect(MUSICALMODES["aeolian"]).toEqual(MUSICALMODES["minor"]);
     });
 });
 describe("getStepSizeDown", () => {
