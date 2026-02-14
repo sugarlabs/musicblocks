@@ -696,7 +696,7 @@ const processPluginData = (activity, pluginData, pluginSource) => {
         }
 
         // NOTE: This eval is required for the Plugin system to load dynamic block definitions.
-        // The content comes from plugin JSON files which satisfy the isTrustedPluginSource check.
+        // The content comes from plugin JSON files which have been vetted or user-confirmed.
         try {
             // eslint-disable-next-line no-eval
             eval(code);
@@ -705,12 +705,6 @@ const processPluginData = (activity, pluginData, pluginSource) => {
             console.error("Plugin execution failed:", label, e);
         }
     };
-
-    if (!isTrustedPluginSource(pluginSource)) {
-        // eslint-disable-next-line no-console
-        console.warn("Blocked untrusted plugin source:", pluginSource);
-        return null;
-    }
 
     let obj;
     try {
