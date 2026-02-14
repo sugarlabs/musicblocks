@@ -56,6 +56,20 @@ function setupMeterActions(activity) {
             tur.singer.beatsPerMeasure = beatCount <= 0 ? 4 : beatCount;
             tur.singer.noteValuePerBeat = noteValue <= 0 ? 4 : 1 / noteValue;
 
+            // Clear previous default strong beats before setting new ones
+            if (tur.singer.defaultStrongBeats) {
+                for (let i = 0; i < tur.singer.beatList.length; i++) {
+                    if (
+                        tur.singer.beatList[i] !== "everybeat" &&
+                        tur.singer.beatList[i] !== "offbeat"
+                    ) {
+                        tur.singer.beatList.splice(i, 1);
+                        i--;
+                    }
+                }
+                tur.singer.defaultStrongBeats = false;
+            }
+
             // setup default strong / weak beats until any strong beat block is used
             if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 4) {
                 tur.singer.beatList.push(1);
