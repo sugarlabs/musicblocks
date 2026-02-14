@@ -611,16 +611,6 @@
             }
         });
     </script>
-    <script>
-        $(document).ready(function () {
-            // Defensive check for doSearch global (now an Activity member)
-            if (typeof doSearch === "function") {
-                doSearch();
-            } else if (window.activity && typeof window.activity.doSearch === "function") {
-                window.activity.doSearch();
-            }
-        });
-    </script>
 
     <!-- Loading Dialog Script -->
     <script>

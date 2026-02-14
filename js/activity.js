@@ -7803,8 +7803,10 @@ class Activity {
 
             this.prepSearchWidget();
 
-            // create functionality of 2D drag to select blocks in bulk
+            // initialize doSearch
+            this.doSearch();
 
+            // create functionality of 2D drag to select blocks in bulk
             this._create2Ddrag();
 
             /*
