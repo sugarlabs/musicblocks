@@ -667,40 +667,64 @@ const processPluginData = (activity, pluginData, pluginSource) => {
         return null;
     }
 
-    const isTrustedPluginSource = src => {
-        if (!src) return false;
-
-        // allow only local paths
-        return (
-            src.startsWith("./") ||
-            src.startsWith("../") ||
-            src.startsWith("/") ||
-            (!src.includes("http://") && !src.includes("https://"))
-        );
+    const isVettedPlugin = source => {
+        if (!source) return false;
+        // Plugins from the local plugins folder are considered vetted (provenance)
+        if (source.startsWith("plugins/") || source.startsWith("./plugins/")) {
+            return true;
+        }
+        // Known plugins from local storage are also trusted as they were approved previously
+        if (source === "localStorage:plugins") {
+            return true;
+        }
+        return false;
     };
 
-    const safeEval = (code, label = "plugin") => {
-        if (typeof code !== "string") return;
+    // Use the vetted check to determine initial trust
+    let userConfirmed = isVettedPlugin(pluginSource);
 
-        // basic sanity limit (prevents huge payloads)
+    if (!userConfirmed) {
+        // eslint-disable-next-line no-alert
+        userConfirmed = confirm(
+            _("Security Warning") +
+                "\n\n" +
+                _(
+                    "This plugin contains code that will be executed in your browser. It has not been loaded from the built-in plugins directory and may contain unsafe code."
+                ) +
+                "\n\n" +
+                _("Do you want to allow this plugin to run?") +
+                "\n\n" +
+                _("Source: ") +
+                (pluginSource || _("unknown"))
+        );
+
+        if (!userConfirmed) {
+            // eslint-disable-next-line no-console
+            console.warn("User declined unvetted plugin execution:", pluginSource);
+            return null;
+        }
+    }
+
+    // safeEval is now restricted to vetted or confirmed plugins and used only for setup logic.
+    // Hot-path execution is handled via safePluginExecute in logo.js.
+    const safeEval = (code, label = "plugin") => {
+        if (typeof code !== "string" || !userConfirmed) return;
+
+        // Basic sanity limit
         if (code.length > 500000) {
             console.warn("Plugin code too large:", label);
             return;
         }
 
-        // NOTE: This eval is required for the Plugin system to load dynamic block definitions.
-        // The content comes from plugin JSON files which satisfy the isTrustedPluginSource check.
         try {
-            eval(code);
+            // We use new Function for setup-time evaluation of trusted logic.
+            // This is safer than eval() as it doesn't grant access to the local scope.
+            const setupFn = new Function("activity", "globalActivity", code);
+            setupFn(activity, activity);
         } catch (e) {
-            console.error("Plugin execution failed:", label, e);
+            console.error("Plugin setup failed:", label, e);
         }
     };
-
-    if (!isTrustedPluginSource(pluginSource)) {
-        console.warn("Blocked untrusted plugin source:", pluginSource);
-        return null;
-    }
 
     let obj;
     try {
@@ -793,17 +817,23 @@ const processPluginData = (activity, pluginData, pluginSource) => {
     if ("FLOWPLUGINS" in obj) {
         for (const flow in obj["FLOWPLUGINS"]) {
             try {
-                // SECURITY: Plugins are trusted code.
-                activity.logo.evalFlowDict[flow] = new Function(
-                    "logo",
-                    "turtle",
-                    "blk",
-                    "receivedArg",
-                    "actionArgs",
-                    "args",
-                    "isflow",
-                    obj["FLOWPLUGINS"][flow]
-                );
+                // Pre-compile trusted plugins for performance.
+                // UNTRUSTED plugins (if any made it past confirmation) are stored as strings
+                // and handled via whitelist in safePluginExecute.
+                if (isVettedPlugin(pluginSource)) {
+                    activity.logo.evalFlowDict[flow] = new Function(
+                        "logo",
+                        "turtle",
+                        "blk",
+                        "receivedArg",
+                        "actionArgs",
+                        "args",
+                        "isflow",
+                        obj["FLOWPLUGINS"][flow]
+                    );
+                } else {
+                    activity.logo.evalFlowDict[flow] = obj["FLOWPLUGINS"][flow];
+                }
             } catch (e) {
                 console.error("Failed to compile FLOWPLUGIN:", flow, e);
                 activity.logo.evalFlowDict[flow] = null;
@@ -815,20 +845,19 @@ const processPluginData = (activity, pluginData, pluginSource) => {
     if ("ARGPLUGINS" in obj) {
         for (const arg in obj["ARGPLUGINS"]) {
             try {
-                // Pre-compile the plugin code into a function to avoid eval() in parseArg
-                // NOTE: Plugins are trusted code.
-                // SECURITY: Only safe because ARGPLUGINS are trusted code.
-                // new Function is used intentionally to precompile plugin execution.
-                // Standard scope exposure: logo, turtle, blk, parentBlk, receivedArg, tur
-                activity.logo.evalArgDict[arg] = new Function(
-                    "logo",
-                    "turtle",
-                    "blk",
-                    "parentBlk",
-                    "receivedArg",
-                    "tur",
-                    obj["ARGPLUGINS"][arg]
-                );
+                if (isVettedPlugin(pluginSource)) {
+                    activity.logo.evalArgDict[arg] = new Function(
+                        "logo",
+                        "turtle",
+                        "blk",
+                        "parentBlk",
+                        "receivedArg",
+                        "tur",
+                        obj["ARGPLUGINS"][arg]
+                    );
+                } else {
+                    activity.logo.evalArgDict[arg] = obj["ARGPLUGINS"][arg];
+                }
             } catch (e) {
                 console.error("Failed to compile ARGPLUGIN:", arg, e);
                 activity.logo.evalArgDict[arg] = null;
@@ -854,14 +883,17 @@ const processPluginData = (activity, pluginData, pluginSource) => {
     if ("SETTERPLUGINS" in obj) {
         for (const setter in obj["SETTERPLUGINS"]) {
             try {
-                // SECURITY: Plugins are trusted code.
-                activity.logo.evalSetterDict[setter] = new Function(
-                    "logo",
-                    "blk",
-                    "value",
-                    "turtle",
-                    obj["SETTERPLUGINS"][setter]
-                );
+                if (isVettedPlugin(pluginSource)) {
+                    activity.logo.evalSetterDict[setter] = new Function(
+                        "logo",
+                        "blk",
+                        "value",
+                        "turtle",
+                        obj["SETTERPLUGINS"][setter]
+                    );
+                } else {
+                    activity.logo.evalSetterDict[setter] = obj["SETTERPLUGINS"][setter];
+                }
             } catch (e) {
                 console.error("Failed to compile SETTERPLUGIN:", setter, e);
                 activity.logo.evalSetterDict[setter] = null;
@@ -890,13 +922,16 @@ const processPluginData = (activity, pluginData, pluginSource) => {
     if ("PARAMETERPLUGINS" in obj) {
         for (const parameter in obj["PARAMETERPLUGINS"]) {
             try {
-                // SECURITY: Plugins are trusted code.
-                activity.logo.evalParameterDict[parameter] = new Function(
-                    "logo",
-                    "turtle",
-                    "blk",
-                    obj["PARAMETERPLUGINS"][parameter]
-                );
+                if (isVettedPlugin(pluginSource)) {
+                    activity.logo.evalParameterDict[parameter] = new Function(
+                        "logo",
+                        "turtle",
+                        "blk",
+                        obj["PARAMETERPLUGINS"][parameter]
+                    );
+                } else {
+                    activity.logo.evalParameterDict[parameter] = obj["PARAMETERPLUGINS"][parameter];
+                }
             } catch (e) {
                 console.error("Failed to compile PARAMETERPLUGIN:", parameter, e);
                 activity.logo.evalParameterDict[parameter] = null;

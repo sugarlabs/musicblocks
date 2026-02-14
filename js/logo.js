@@ -793,14 +793,15 @@ class Logo {
                 default:
                     // Is it a plugin?
                     if (blockName in logo.evalArgDict) {
-                        const pluginFn = logo.evalArgDict[blockName];
-                        if (typeof pluginFn === "function") {
-                            pluginFn(logo, turtle, blk, parentBlk, receivedArg, tur);
-                        } else {
-                            logo.activity.errorMsg(
-                                _("Plugin failed to load: %s").replace(/%s/g, blockName)
-                            );
-                        }
+                        this.safePluginExecute(
+                            logo.evalArgDict[blockName],
+                            logo,
+                            turtle,
+                            blk,
+                            parentBlk,
+                            receivedArg,
+                            tur
+                        );
                     } else {
                         console.error("I do not know how to " + blockName);
                     }
@@ -1175,10 +1176,7 @@ class Logo {
         this.activity.saveLocally(); // Save the state before running.
 
         for (const arg in this.evalOnStartList) {
-            const pluginFn = this.evalOnStartList[arg];
-            if (typeof pluginFn === "function") {
-                pluginFn(this);
-            }
+            this.safePluginExecute(this.evalOnStartList[arg], this);
         }
 
         this.stopTurtle = false;
@@ -1653,10 +1651,16 @@ class Logo {
             // Is it a plugin?
             if (currentBlock.name in logo.evalFlowDict) {
                 logo.pluginReturnValue = null;
-                const pluginFn = logo.evalFlowDict[currentBlock.name];
-                if (typeof pluginFn === "function") {
-                    pluginFn(logo, turtle, blk, receivedArg, actionArgs, args, isflow);
-                }
+                logo.safePluginExecute(
+                    logo.evalFlowDict[currentBlock.name],
+                    logo,
+                    turtle,
+                    blk,
+                    receivedArg,
+                    actionArgs,
+                    args,
+                    isflow
+                );
                 // Clamp blocks will return the child flow.
                 res = logo.pluginReturnValue;
             } else {
@@ -2679,6 +2683,91 @@ class Logo {
         // Mark the end time of this note's graphics operations.
         await this.deps.utils.delayExecution(beatValue * 1000);
         tur.embeddedGraphicsFinished = true;
+    }
+
+    /**
+     * Executes plugin code safely.
+     * @param code - The plugin code (function or string) to execute.
+     * @param logo - The logo object.
+     * @param turtle - The turtle index.
+     * @param blk - The block index.
+     * @param value - An optional value for setters or additional context.
+     * @param args - Additional arguments for different plugin types.
+     * @returns {*} - The result of the execution if applicable.
+     */
+    safePluginExecute(code, logo, turtle, blk, value, ...args) {
+        if (typeof code === "function") {
+            try {
+                return code(logo, turtle, blk, value, ...args);
+            } catch (e) {
+                // eslint-disable-next-line no-console
+                console.error("Plugin function execution failed: ", e);
+                return;
+            }
+        }
+
+        if (typeof code !== "string") {
+            return;
+        }
+
+        // Whitelist for common, safe math patterns used by plugins (e.g. maths.json)
+        // These are checked against the exact string format used in built-in plugins.
+        const mathPatterns = [
+            {
+                // Unary Math operations (Math.sin, etc.)
+                regex: /^const mathBlock = globalActivity\.logo\.blockList\[blk\];const conns = mathBlock\.connections;mathBlock\.value = Math\.(sin|cos|tan|asin|acos|atan|sqrt|log|exp|abs|ceil|floor|round)\(logo\.parseArg\(logo, turtle, conns\[1\]\)\);$/,
+                exec: match => {
+                    const op = match[1];
+                    const mathBlock = logo.blockList[blk];
+                    const conns = mathBlock.connections;
+                    mathBlock.value = Math[op](logo.parseArg(logo, turtle, conns[1], blk));
+                    return mathBlock.value;
+                }
+            },
+            {
+                // Binary Math operations (Math.pow)
+                regex: /^const mathBlock = globalActivity\.logo\.blockList\[blk\];const conns = mathBlock\.connections;var base = logo\.parseArg\(logo, turtle, conns\[1\]\);var exp  = logo\.parseArg\(logo, turtle, conns\[2\]\);mathBlock\.value = Math\.pow\(base, exp\);$/,
+                exec: () => {
+                    const mathBlock = logo.blockList[blk];
+                    const conns = mathBlock.connections;
+                    const base = logo.parseArg(logo, turtle, conns[1], blk);
+                    const exp = logo.parseArg(logo, turtle, conns[2], blk);
+                    mathBlock.value = Math.pow(base, exp);
+                    return mathBlock.value;
+                }
+            },
+            {
+                // Math Constants (Math.PI, Math.E)
+                regex: /^const mathBlock = globalActivity\.logo\.blockList\[blk\];const conns = mathBlock\.connections;mathBlock\.value = Math\.(PI|E);$/,
+                exec: match => {
+                    const constName = match[1];
+                    const mathBlock = logo.blockList[blk];
+                    mathBlock.value = Math[constName];
+                    return mathBlock.value;
+                }
+            },
+            {
+                // Parameter plugin patterns (simple assignment)
+                regex: /^logo\.blockList\[blk\]\.value = Math\.(PI|E);$/,
+                exec: match => {
+                    const constName = match[1];
+                    logo.blockList[blk].value = Math[constName];
+                    return logo.blockList[blk].value;
+                }
+            }
+        ];
+
+        for (const pattern of mathPatterns) {
+            const match = code.match(pattern.regex);
+            if (match) {
+                return pattern.exec(match);
+            }
+        }
+
+        // If not a function and not whitelisted, we block arbitrary string execution (eval).
+        // This is the core of the security fix for #5449.
+        // eslint-disable-next-line no-console
+        console.warn("Blocked arbitrary JavaScript execution in plugin:", code.substring(0, 100) + "...");
     }
 }
 

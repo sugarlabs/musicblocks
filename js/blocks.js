@@ -7214,9 +7214,15 @@ class Blocks {
                 if (typeof this.blockList[blk].protoblock.updateParameter === "function") {
                     value = this.blockList[blk].protoblock.updateParameter(logo, turtle, blk);
                 } else {
-                    const pluginFn = logo.evalParameterDict[name];
-                    if (typeof pluginFn === "function") {
-                        value = pluginFn(logo, turtle, blk);
+                    if (name in logo.evalParameterDict) {
+                        value = logo.safePluginExecute(
+                            logo.evalParameterDict[name],
+                            logo,
+                            turtle,
+                            blk,
+                            name
+                        );
+                    }
                     } else {
                         return;
                     }
@@ -7260,9 +7266,15 @@ class Blocks {
             if (typeof this.blockList[blk].protoblock.setter === "function") {
                 this.blockList[blk].protoblock.setter(logo, value, turtle, blk);
             } else {
-                const pluginFn = logo.evalSetterDict[this.blockList[blk].name];
-                if (typeof pluginFn === "function") {
-                    pluginFn(logo, blk, value, turtle);
+                if (this.blockList[blk].name in logo.evalSetterDict) {
+                    logo.safePluginExecute(
+                        logo.evalSetterDict[this.blockList[blk].name],
+                        logo,
+                        turtle,
+                        blk,
+                        value
+                    );
+                }
                 } else {
                     throw new Error();
                 }
