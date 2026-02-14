@@ -1,4 +1,3 @@
-
 /**
  * @file This contains the action methods of the Turtle's Singer
  * component's Pitch blocks.
