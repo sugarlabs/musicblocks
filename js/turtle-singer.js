@@ -44,6 +44,23 @@
 /* exported Singer */
 
 /**
+ * Gets the number of pitch intervals per octave for the current temperament.
+ * Defaults to 12 (standard Western tuning) if temperament is not found.
+ * @param {Object} activity - The activity object containing synth information.
+ * @returns {number} The number of intervals per octave.
+ */
+const getOctaveInterval = activity => {
+    let temperamentName = "equal";
+    if (activity && activity.logo && activity.logo.synth && activity.logo.synth.inTemperament) {
+        temperamentName = activity.logo.synth.inTemperament;
+    }
+    const temperament = getTemperament(temperamentName);
+    return temperament && typeof temperament.pitchNumber === "number"
+        ? temperament.pitchNumber
+        : 12;
+};
+
+/**
  * Class pertaining to music related actions for each turtle.
  *
  * @class
@@ -1013,7 +1030,7 @@ class Singer {
                 noteObj = getNote(
                     anote,
                     octave,
-                    atrans + tur.singer.register * SEMITONES,
+                    atrans + tur.singer.register * getOctaveInterval(activity),
                     tur.singer.keySignature,
                     tur.singer.movable,
                     direction,
@@ -1230,7 +1247,7 @@ class Singer {
                 const noteObj = getNote(
                     note,
                     octave,
-                    transposition + tur.singer.register * SEMITONES,
+                    transposition + tur.singer.register * getOctaveInterval(activity),
                     tur.singer.keySignature,
                     tur.singer.movable,
                     direction,
