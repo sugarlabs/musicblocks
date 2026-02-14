@@ -234,9 +234,7 @@ describe("Logo Class", () => {
             },
             onStopTurtle: jest.fn(),
             onRunTurtle: jest.fn(),
-            meSpeak: {
-                speak: jest.fn()
-            },
+
             errorMsg: jest.fn(),
             saveLocally: jest.fn(),
             hideMsgs: jest.fn(),
@@ -368,23 +366,6 @@ describe("Logo Class", () => {
             logo.clearNoteParams(mockTurtle, 0, ["kick", "snare"]);
 
             expect(mockTurtle.singer.noteDrums[0]).toEqual(["kick", "snare"]);
-        });
-    });
-
-    describe("processSpeak", () => {
-        test("filters text to only valid characters", () => {
-            // The code uses this._meSpeak
-            logo._meSpeak = { speak: jest.fn() };
-            logo.processSpeak("Hello, World! 123");
-
-            expect(logo._meSpeak.speak).toHaveBeenCalledWith("Hello, World ");
-        });
-
-        test("handles empty string", () => {
-            logo._meSpeak = { speak: jest.fn() };
-            logo.processSpeak("");
-
-            expect(logo._meSpeak.speak).toHaveBeenCalledWith("");
         });
     });
 
