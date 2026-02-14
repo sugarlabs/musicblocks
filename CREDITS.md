@@ -26,8 +26,8 @@ translations, and the new logo for the Japanese version. Their team
 worked very hard to help us improve the software. Special thanks to
 the educators and kids in Japan for their input.
 
-Related Websites
-----------------
+## Related Websites
+
 https://musicblocks.net/
 
 https://mapflc.com/lesson-plans/
@@ -40,16 +40,14 @@ works on this&mdash;thanks Chie!
 
 Much of the initial coding of the fork from Turtle Blocks was done by
 Yash Khandelwal as part of Google Summer of Code (GSoC) 2015. Hemant
-Kasat contributed to additional widgets as part of GSoC
-2016. Additional contributions are being made by Tayba Wasim, Dinuka
+Kasat contributed to additional widgets as part of GSoC 2016. Additional contributions are being made by Tayba Wasim, Dinuka
 Tharangi Jayaweera, Prachi Agrawal, Cristina Del Puerto, and Hrishi
 Patel as part of GSoC 2017.
 
 Many students contributed to the project as part of Google Code-in
 (2015&ndash;16, 2016&ndash;17, and 2017&ndash;2018).
 
-Libraries specific to Music Blocks
-----------------------------------
+## Libraries specific to Music Blocks
 
 [Tone.js](https://github.com/Tonejs/Tone.js/blob/master/README.md) Web audio framework for creating interactive music using Javascript
 

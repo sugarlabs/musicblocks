@@ -275,7 +275,7 @@ class GlobalPlanet {
                         this.addProjectToCache(tempid, d, callback);
                     }.bind(this)
                 );
-            }.bind(this)());
+            }).bind(this)();
         }
     }
 

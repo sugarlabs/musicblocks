@@ -28,10 +28,7 @@
                     }
                 ],
                 "name_property": "operator",
-                "argument_properties": [
-                    "left",
-                    "right"
-                ]
+                "argument_properties": ["left", "right"]
             },
             "name_map": {
                 "+": "plus",
@@ -60,9 +57,7 @@
                     }
                 ],
                 "name_property": "operator",
-                "argument_properties": [
-                    "argument"
-                ]
+                "argument_properties": ["argument"]
             },
             "name_map": {
                 "-": "neg",
@@ -107,10 +102,7 @@
                     }
                 ],
                 "name_property": "argument.callee.property.name",
-                "argument_properties": [
-                    "argument.arguments[1]",
-                    "argument.arguments[0]"
-                ]
+                "argument_properties": ["argument.arguments[1]", "argument.arguments[0]"]
             },
             "name_map": {
                 "getValue": "getDict"
@@ -142,9 +134,7 @@
                     }
                 ],
                 "name_property": "argument.callee.property.name",
-                "argument_properties": [
-                    "argument.arguments[0]"
-                ]
+                "argument_properties": ["argument.arguments[0]"]
             },
             "name_map": {
                 "getValue": "getDict2"
@@ -272,9 +262,7 @@
                     }
                 ],
                 "name_property": "callee.name",
-                "argument_properties": [
-                    "arguments[0]"
-                ]
+                "argument_properties": ["arguments[0]"]
             },
             "name_map": {
                 "getSynthVolume": "synthvolumefactor"
@@ -290,9 +278,7 @@
                     }
                 ],
                 "name_property": "callee.name",
-                "argument_properties": [
-                    "arguments[0]"
-                ]
+                "argument_properties": ["arguments[0]"]
             },
             "name_map": {
                 "numToOctave": "number2octave",
@@ -360,15 +346,9 @@
                     }
                 ],
                 "name_property": "declarations[0].id.name",
-                "argument_properties": [
-                    "declarations[0].init"
-                ]
+                "argument_properties": ["declarations[0].init"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "decrementOne",
@@ -401,15 +381,9 @@
                         "value": 1
                     }
                 ],
-                "argument_properties": [
-                    "expression.left"
-                ]
+                "argument_properties": ["expression.left"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "increment",
@@ -441,10 +415,7 @@
                         "value": "+"
                     }
                 ],
-                "argument_properties": [
-                    "expression.left",
-                    "expression.right.right"
-                ]
+                "argument_properties": ["expression.left", "expression.right.right"]
             },
             "blocklist_connections": [
                 "parent_or_previous_sibling",
@@ -487,12 +458,8 @@
                         "value": "setInstrument"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ],
-                "children_properties": [
-                    "expression.argument.arguments[1].body.body"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"],
+                "children_properties": ["expression.argument.arguments[1].body.body"]
             },
             "default_vspaces": {
                 "argument": 1
@@ -524,15 +491,9 @@
                         "value": "tie"
                     }
                 ],
-                "children_properties": [
-                    "expression.argument.arguments[0].body.body"
-                ]
+                "children_properties": ["expression.argument.arguments[0].body.body"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "first_child",
-                "next_sibling"
-            ],
+            "blocklist_connections": ["parent_or_previous_sibling", "first_child", "next_sibling"],
             "default_vspaces": {
                 "argument": 0
             }
@@ -575,9 +536,7 @@
                     "expression.argument.arguments[0]",
                     "expression.argument.arguments[1]"
                 ],
-                "children_properties": [
-                    "expression.argument.arguments[2].body.body"
-                ]
+                "children_properties": ["expression.argument.arguments[2].body.body"]
             },
             "blocklist_connections": [
                 "parent_or_previous_sibling",
@@ -670,15 +629,9 @@
                         "value": "playHertz"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "rest2",
@@ -707,10 +660,7 @@
                     }
                 ]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "next_sibling"]
         },
         {
             "name": "nameddo",
@@ -736,10 +686,7 @@
                 ],
                 "name_property": "expression.argument.callee.name"
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "next_sibling"]
         },
         {
             "name": "start",
@@ -755,15 +702,9 @@
                         "value": "NewExpression"
                     }
                 ],
-                "children_properties": [
-                    "expression.arguments[0].body.body"
-                ]
+                "children_properties": ["expression.arguments[0].body.body"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "first_child",
-                "next_sibling"
-            ],
+            "blocklist_connections": ["parent_or_previous_sibling", "first_child", "next_sibling"],
             "default_vspaces": {
                 "argument": 1
             }
@@ -787,12 +728,8 @@
                         "value": "ArrowFunctionExpression"
                     }
                 ],
-                "argument_properties": [
-                    "declarations[0].id"
-                ],
-                "children_properties": [
-                    "declarations[0].init.body.body"
-                ]
+                "argument_properties": ["declarations[0].id"],
+                "children_properties": ["declarations[0].init.body.body"]
             },
             "default_vspaces": {
                 "argument": 1
@@ -813,12 +750,8 @@
                         "value": "ForStatement"
                     }
                 ],
-                "argument_properties": [
-                    "test.right"
-                ],
-                "children_properties": [
-                    "body.body"
-                ]
+                "argument_properties": ["test.right"],
+                "children_properties": ["body.body"]
             },
             "default_vspaces": {
                 "argument": 1
@@ -838,15 +771,9 @@
                         "value": "1000"
                     }
                 ],
-                "children_properties": [
-                    "body.body"
-                ]
+                "children_properties": ["body.body"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "first_child",
-                "next_sibling"
-            ],
+            "blocklist_connections": ["parent_or_previous_sibling", "first_child", "next_sibling"],
             "default_vspaces": {
                 "argument": 1
             }
@@ -866,12 +793,8 @@
                         "value": "WhileStatement"
                     }
                 ],
-                "argument_properties": [
-                    "test"
-                ],
-                "children_properties": [
-                    "body.body"
-                ]
+                "argument_properties": ["test"],
+                "children_properties": ["body.body"]
             },
             "default_vspaces": {
                 "argument": 2
@@ -892,12 +815,8 @@
                         "value": "DoWhileStatement"
                     }
                 ],
-                "argument_properties": [
-                    "test"
-                ],
-                "children_properties": [
-                    "body.body"
-                ]
+                "argument_properties": ["test"],
+                "children_properties": ["body.body"]
             },
             "default_vspaces": {
                 "argument": 2
@@ -918,12 +837,8 @@
                         "value": "SwitchStatement"
                     }
                 ],
-                "argument_properties": [
-                    "discriminant"
-                ],
-                "children_properties": [
-                    "cases"
-                ]
+                "argument_properties": ["discriminant"],
+                "children_properties": ["cases"]
             },
             "default_vspaces": {
                 "argument": 1
@@ -943,15 +858,9 @@
                         "has_value": false
                     }
                 ],
-                "children_properties": [
-                    "consequent"
-                ]
+                "children_properties": ["consequent"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "first_child",
-                "next_sibling"
-            ],
+            "blocklist_connections": ["parent_or_previous_sibling", "first_child", "next_sibling"],
             "default_vspaces": {
                 "argument": 1
             }
@@ -975,12 +884,8 @@
                         "value": "Literal"
                     }
                 ],
-                "argument_properties": [
-                    "test"
-                ],
-                "children_properties": [
-                    "consequent"
-                ]
+                "argument_properties": ["test"],
+                "children_properties": ["consequent"]
             },
             "default_vspaces": {
                 "argument": 1
@@ -997,10 +902,7 @@
                     }
                 ]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "next_sibling"]
         },
         {
             "name": "if",
@@ -1021,12 +923,8 @@
                         "has_value": false
                     }
                 ],
-                "argument_properties": [
-                    "test"
-                ],
-                "children_properties": [
-                    "consequent.body"
-                ]
+                "argument_properties": ["test"],
+                "children_properties": ["consequent.body"]
             },
             "default_vspaces": {
                 "argument": 2
@@ -1051,13 +949,8 @@
                         "has_value": true
                     }
                 ],
-                "argument_properties": [
-                    "test"
-                ],
-                "children_properties": [
-                    "consequent.body",
-                    "alternate.body"
-                ]
+                "argument_properties": ["test"],
+                "children_properties": ["consequent.body", "alternate.body"]
             },
             "blocklist_connections": [
                 "parent_or_previous_sibling",
@@ -1261,15 +1154,9 @@
                         "value": "PICKUP"
                     }
                 ],
-                "argument_properties": [
-                    "expression.right"
-                ]
+                "argument_properties": ["expression.right"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "setbpm3",
@@ -1400,15 +1287,9 @@
                         "value": "onEveryNoteDo"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "everybeatdonew",
@@ -1441,15 +1322,9 @@
                         "value": "onEveryBeatDo"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "onbeatdo",
@@ -1531,15 +1406,9 @@
                         "value": "onWeakBeatDo"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "drift",
@@ -1567,15 +1436,9 @@
                         "value": "setNoClock"
                     }
                 ],
-                "children_properties": [
-                    "expression.argument.arguments[0].body.body"
-                ]
+                "children_properties": ["expression.argument.arguments[0].body.body"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "first_child",
-                "next_sibling"
-            ],
+            "blocklist_connections": ["parent_or_previous_sibling", "first_child", "next_sibling"],
             "default_vspaces": {
                 "argument": 1
             }
@@ -1611,15 +1474,9 @@
                         "value": "stepPitch"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "nthmodalpitch",
@@ -1701,15 +1558,9 @@
                         "value": "playPitchNumber"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "accidental",
@@ -1742,12 +1593,8 @@
                         "value": "setAccidental"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ],
-                "children_properties": [
-                    "expression.argument.arguments[1].body.body"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"],
+                "children_properties": ["expression.argument.arguments[1].body.body"]
             },
             "default_vspaces": {
                 "argument": 1
@@ -1784,12 +1631,8 @@
                         "value": "setScalarTranspose"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ],
-                "children_properties": [
-                    "expression.argument.arguments[1].body.body"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"],
+                "children_properties": ["expression.argument.arguments[1].body.body"]
             },
             "default_vspaces": {
                 "argument": 1
@@ -1826,15 +1669,9 @@
                         "value": "setRegister"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "invert1",
@@ -1878,9 +1715,7 @@
                     "expression.argument.arguments[1]",
                     "expression.argument.arguments[2]"
                 ],
-                "children_properties": [
-                    "expression.argument.arguments[3].body.body"
-                ]
+                "children_properties": ["expression.argument.arguments[3].body.body"]
             },
             "blocklist_connections": [
                 "parent_or_previous_sibling",
@@ -2023,12 +1858,8 @@
                         "value": "setSemitoneInterval"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ],
-                "children_properties": [
-                    "expression.argument.arguments[1].body.body"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"],
+                "children_properties": ["expression.argument.arguments[1].body.body"]
             },
             "default_vspaces": {
                 "argument": 1
@@ -2126,9 +1957,7 @@
                     "expression.argument.arguments[0]",
                     "expression.argument.arguments[1]"
                 ],
-                "children_properties": [
-                    "expression.argument.arguments[2].body.body"
-                ]
+                "children_properties": ["expression.argument.arguments[2].body.body"]
             },
             "blocklist_connections": [
                 "parent_or_previous_sibling",
@@ -2183,9 +2012,7 @@
                     "expression.argument.arguments[1]",
                     "expression.argument.arguments[2]"
                 ],
-                "children_properties": [
-                    "expression.argument.arguments[3].body.body"
-                ]
+                "children_properties": ["expression.argument.arguments[3].body.body"]
             },
             "blocklist_connections": [
                 "parent_or_previous_sibling",
@@ -2241,9 +2068,7 @@
                     "expression.argument.arguments[1]",
                     "expression.argument.arguments[2]"
                 ],
-                "children_properties": [
-                    "expression.argument.arguments[3].body.body"
-                ]
+                "children_properties": ["expression.argument.arguments[3].body.body"]
             },
             "blocklist_connections": [
                 "parent_or_previous_sibling",
@@ -2295,9 +2120,7 @@
                     "expression.argument.arguments[0]",
                     "expression.argument.arguments[1]"
                 ],
-                "children_properties": [
-                    "expression.argument.arguments[2].body.body"
-                ]
+                "children_properties": ["expression.argument.arguments[2].body.body"]
             },
             "blocklist_connections": [
                 "parent_or_previous_sibling",
@@ -2348,9 +2171,7 @@
                     "expression.argument.arguments[0]",
                     "expression.argument.arguments[1]"
                 ],
-                "children_properties": [
-                    "expression.argument.arguments[2].body.body"
-                ]
+                "children_properties": ["expression.argument.arguments[2].body.body"]
             },
             "blocklist_connections": [
                 "parent_or_previous_sibling",
@@ -2443,15 +2264,9 @@
                         "value": "MASTERVOLUME"
                     }
                 ],
-                "argument_properties": [
-                    "expression.right"
-                ]
+                "argument_properties": ["expression.right"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "setpanning",
@@ -2484,15 +2299,9 @@
                         "value": "PANNING"
                     }
                 ],
-                "argument_properties": [
-                    "expression.right"
-                ]
+                "argument_properties": ["expression.right"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "playdrum",
@@ -2525,15 +2334,9 @@
                         "value": "playDrum"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "setdrum",
@@ -2566,12 +2369,8 @@
                         "value": "setDrum"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ],
-                "children_properties": [
-                    "expression.argument.arguments[1].body.body"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"],
+                "children_properties": ["expression.argument.arguments[1].body.body"]
             },
             "default_vspaces": {
                 "argument": 1
@@ -2608,12 +2407,8 @@
                         "value": "mapPitchToDrum"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ],
-                "children_properties": [
-                    "expression.argument.arguments[1].body.body"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"],
+                "children_properties": ["expression.argument.arguments[1].body.body"]
             },
             "default_vspaces": {
                 "argument": 1
@@ -2650,15 +2445,9 @@
                         "value": "playDrum"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "setdrum",
@@ -2691,12 +2480,8 @@
                         "value": "setDrum"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ],
-                "children_properties": [
-                    "expression.argument.arguments[1].body.body"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"],
+                "children_properties": ["expression.argument.arguments[1].body.body"]
             },
             "default_vspaces": {
                 "argument": 1
@@ -2733,12 +2518,8 @@
                         "value": "mapPitchToDrum"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ],
-                "children_properties": [
-                    "expression.argument.arguments[1].body.body"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"],
+                "children_properties": ["expression.argument.arguments[1].body.body"]
             },
             "default_vspaces": {
                 "argument": 1
@@ -2775,15 +2556,9 @@
                         "value": "goForward"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "back",
@@ -2816,15 +2591,9 @@
                         "value": "goBackward"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "left",
@@ -2857,15 +2626,9 @@
                         "value": "turnLeft"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "right",
@@ -2898,15 +2661,9 @@
                         "value": "turnRight"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "setxy",
@@ -2988,15 +2745,9 @@
                         "value": "setHeading"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "arc",
@@ -3221,10 +2972,7 @@
                     }
                 ]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "next_sibling"]
         },
         {
             "name": "scrollxy",
@@ -3306,15 +3054,9 @@
                         "value": "setColor"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "setgrey",
@@ -3347,15 +3089,9 @@
                         "value": "setGrey"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "setshade",
@@ -3388,15 +3124,9 @@
                         "value": "setShade"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "sethue",
@@ -3429,15 +3159,9 @@
                         "value": "setHue"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "settranslucency",
@@ -3470,15 +3194,9 @@
                         "value": "setTranslucency"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "setpensize",
@@ -3511,15 +3229,9 @@
                         "value": "setPensize"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "penup",
@@ -3548,10 +3260,7 @@
                     }
                 ]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "next_sibling"]
         },
         {
             "name": "pendown",
@@ -3580,10 +3289,7 @@
                     }
                 ]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "next_sibling"]
         },
         {
             "name": "background",
@@ -3612,10 +3318,7 @@
                     }
                 ]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "next_sibling"]
         },
         {
             "name": "setfont",
@@ -3648,15 +3351,9 @@
                         "value": "setFont"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "print",
@@ -3689,15 +3386,9 @@
                         "value": "print"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name": "debugger",
@@ -3715,11 +3406,7 @@
                     }
                 ]
             },
-            "blocklist_connections": [
-                "parent_or_previous_sibling",
-                "argument",
-                "next_sibling"
-            ]
+            "blocklist_connections": ["parent_or_previous_sibling", "argument", "next_sibling"]
         },
         {
             "name_map": {
@@ -3762,12 +3449,8 @@
                         "value": "MemberExpression"
                     }
                 ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ],
-                "children_properties": [
-                    "expression.argument.arguments[1].body.body"
-                ]
+                "argument_properties": ["expression.argument.arguments[0]"],
+                "children_properties": ["expression.argument.arguments[1].body.body"]
             },
             "default_vspaces": {
                 "argument": 1
