@@ -1681,10 +1681,12 @@ class Activity {
                 }
             }
 
-            // When starting execution, keep the blocks visible so that
-            // runtime highlighting can be seen. Users can still hide
-            // blocks manually via the Show/hide blocks toggle.
             if (!this.turtles.running()) {
+                if (!this.turtles.isShrunk()) {
+                    this.blocks.hideBlocks();
+                    this.showBlocksAfterRun = true;
+                }
+
                 this.logo.runLogoCommands(null, env);
             } else {
                 if (currentDelay !== 0) {
