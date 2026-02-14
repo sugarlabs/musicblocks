@@ -602,7 +602,8 @@ Turtles.TurtlesModel = class {
      * @return {Boolean} - running
      */
     running() {
-        for (let i = 0; i < this.getTurtleCount(); i++) {
+        const turtleCount = this.getTurtleCount();
+        for (let i = 0; i < turtleCount; i++) {
             if (this.getTurtle(i).running) {
                 return true;
             }
@@ -623,7 +624,8 @@ Turtles.TurtlesModel = class {
      * @returns index number of companion turtle or i
      */
     companionTurtle(i) {
-        for (let t = 0; t < this.getTurtleCount(); t++) {
+        const turtleCount = this.getTurtleCount();
+        for (let t = 0; t < turtleCount; t++) {
             if (this.getTurtle(t).companionTurtle === i) {
                 return t;
             }
@@ -637,7 +639,8 @@ Turtles.TurtlesModel = class {
      */
     turtleCount() {
         let count = 0;
-        for (let t = 0; t < this.getTurtleCount(); t++) {
+        const totalTurtles = this.getTurtleCount();
+        for (let t = 0; t < totalTurtles; t++) {
             if (this.companionTurtle(t) === t && !this.getTurtle(t).inTrash) {
                 count += 1;
             }
