@@ -602,7 +602,8 @@ Turtles.TurtlesModel = class {
      * @return {Boolean} - running
      */
     running() {
-        for (let i = 0; i < this.getTurtleCount(); i++) {
+        const turtleCount = this.getTurtleCount();
+        for (let i = 0; i < turtleCount; i++) {
             if (this.getTurtle(i).running) {
                 return true;
             }
@@ -623,7 +624,8 @@ Turtles.TurtlesModel = class {
      * @returns index number of companion turtle or i
      */
     companionTurtle(i) {
-        for (let t = 0; t < this.getTurtleCount(); t++) {
+        const turtleCount = this.getTurtleCount();
+        for (let t = 0; t < turtleCount; t++) {
             if (this.getTurtle(t).companionTurtle === i) {
                 return t;
             }
@@ -637,7 +639,8 @@ Turtles.TurtlesModel = class {
      */
     turtleCount() {
         let count = 0;
-        for (let t = 0; t < this.getTurtleCount(); t++) {
+        const totalTurtles = this.getTurtleCount();
+        for (let t = 0; t < totalTurtles; t++) {
             if (this.companionTurtle(t) === t && !this.getTurtle(t).inTrash) {
                 count += 1;
             }
@@ -685,28 +688,50 @@ Turtles.TurtlesView = class {
 
         this.currentGrid = null; // currently selected grid
 
-        // Attach an event listener to the 'resize' event
+        // Debounce timer for resize events
+        this._resizeTimer = null;
+
+        // Attach a debounced event listener to the 'resize' event
+        // This prevents rapid-fire resize calculations that can cause
+        // crashes when toggling DevTools or switching tabs.
         window.addEventListener("resize", () => {
-            // Call the updateDimensions function when resizing occurs
-            var screenWidth =
-                window.innerWidth ||
-                document.documentElement.clientWidth ||
-                document.body.clientWidth;
-            var screenHeight =
-                window.innerHeight ||
-                document.documentElement.clientHeight ||
-                document.body.clientHeight;
+            if (this._resizeTimer) {
+                clearTimeout(this._resizeTimer);
+            }
 
-            // Set a scaling factor to adjust the dimensions based on the screen size
-            var scale = Math.min(screenWidth / 1200, screenHeight / 900);
+            this._resizeTimer = setTimeout(() => {
+                // Skip dimension updates when the tab is hidden
+                // (canvas reports 0x0 in background tabs)
+                if (document.hidden) {
+                    return;
+                }
 
-            // Calculate the new dimensions
-            var newWidth = Math.round(1200 * scale);
-            var newHeight = Math.round(900 * scale);
+                // Call the updateDimensions function when resizing occurs
+                var screenWidth =
+                    window.innerWidth ||
+                    document.documentElement.clientWidth ||
+                    document.body.clientWidth;
+                var screenHeight =
+                    window.innerHeight ||
+                    document.documentElement.clientHeight ||
+                    document.body.clientHeight;
 
-            // Update the dimensions
-            this._w = newWidth;
-            this._h = newHeight;
+                // Guard against zero or invalid dimensions
+                if (screenWidth <= 0 || screenHeight <= 0) {
+                    return;
+                }
+
+                // Set a scaling factor to adjust the dimensions based on the screen size
+                var scale = Math.min(screenWidth / 1200, screenHeight / 900);
+
+                // Calculate the new dimensions
+                var newWidth = Math.round(1200 * scale);
+                var newHeight = Math.round(900 * scale);
+
+                // Update the dimensions
+                this._w = newWidth;
+                this._h = newHeight;
+            }, 150);
         });
     }
 
@@ -731,6 +756,12 @@ Turtles.TurtlesView = class {
      * @returns {void}
      */
     doScale(w, h, scale) {
+        // Guard against zero/invalid dimensions to prevent division-by-zero
+        // and layout corruption when canvas is hidden or mid-resize
+        if (!w || !h || !scale || w <= 0 || h <= 0 || scale <= 0) {
+            return;
+        }
+
         if (this._locked) {
             this._queue = [w, h, scale];
         } else {
@@ -808,6 +839,10 @@ Turtles.TurtlesView = class {
      * @returns {Number} inverted y coordinate
      */
     _invertY(y) {
+        // Guard against zero canvas height / scale to prevent NaN/Infinity
+        if (!this.canvas || !this.canvas.height || !this._scale) {
+            return -y; // Fallback: simple inversion around origin
+        }
         return this.canvas.height / (2.0 * this._scale) - y;
     }
 
@@ -818,6 +853,10 @@ Turtles.TurtlesView = class {
      * @returns {Number} turtle x coordinate
      */
     screenX2turtleX(x) {
+        // Guard against zero canvas width / scale
+        if (!this.canvas || !this.canvas.width || !this._scale) {
+            return 0; // Safe fallback when dimensions are unavailable
+        }
         return x - this.canvas.width / (2.0 * this._scale);
     }
 
@@ -838,6 +877,10 @@ Turtles.TurtlesView = class {
      * @returns {Number} screen x coordinate
      */
     turtleX2screenX(x) {
+        // Guard against zero canvas width / scale
+        if (!this.canvas || !this.canvas.width || !this._scale) {
+            return x; // Fallback: return raw coordinate
+        }
         return this.canvas.width / (2.0 * this._scale) + x;
     }
 

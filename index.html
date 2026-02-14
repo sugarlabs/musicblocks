@@ -1,95 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <title>Music Blocks</title>
 
-        <meta
-            name="description"
-            content="Learn to code through music with Music Blocks. Arrange colorful blocks to create everything from simple melodies to interactive games."
-        />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta id="theme-color" name="theme-color" content="#2196F3" />
+<head>
+    <meta charset="UTF-8">
+    <title>Music Blocks</title>
 
-        <!-- Icons & PWA -->
-        <link rel="icon" sizes="192x192" href="favicon.ico" />
-        <link rel="apple-touch-icon" href="/activity/activity-icon-color-512.png" />
-        <link rel="manifest" href="android_chrome_manifest.json" />
+    <meta name="description"
+        content="Learn to code through music with Music Blocks. Arrange colorful blocks to create everything from simple melodies to interactive games.">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta id="theme-color" name="theme-color" content="#2196F3">
 
-        <!-- Stylesheets -->
-        <link
-            rel="preload"
-            href="https://fonts.googleapis.com/icon?family=Material+Icons"
-            as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
-        />
-        <link
-            rel="preload"
-            href="fonts/material-icons.css"
-            as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
-        />
-        <!-- IMPORTANT: This stylesheet is loaded with a version query string (?v=fixed).
-            If you change this URL (path OR query string), update `precacheFiles` in sw.js
-            to precache the exact same URL so it stays available offline. -->
-        <link
-            rel="preload"
-            href="css/activities.css?v=fixed"
-            as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
-        />
-        <link
-            rel="preload"
-            href="dist/css/style.css"
-            as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
-        />
-        <link
-            rel="preload"
-            href="dist/css/keyboard.css"
-            as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
-        />
-        <link
-            rel="preload"
-            href="dist/css/windows.css"
-            as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
-        />
-        <link
-            rel="preload"
-            href="lib/materialize-iso.css"
-            as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
-        />
-        <link
-            rel="preload"
-            href="css/darkmode.css"
-            as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
-        />
-        <link rel="prefetch" as="video" href="loading-animation.webm" type="video/webm" />
-        <link rel="prefetch" as="video" href="loading-animation.mp4" type="video/mp4" />
-        <link rel="prefetch" as="image" href="loading-animation-ja.svg" />
+    <!-- Icons & PWA -->
+    <link rel="icon" sizes="192x192" href="favicon.ico">
+    <link rel="apple-touch-icon" href="/activity/activity-icon-color-512.png">
+    <link rel="manifest" href="android_chrome_manifest.json">
 
-        <!-- <script src="js/utils/detectIE.js"></script> -->
+    <!-- Stylesheets -->
+    <link rel="preload" href="https://fonts.googleapis.com/icon?family=Material+Icons" as="style"
+        onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="fonts/material-icons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/activities.css?v=fixed" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="dist/css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="dist/css/keyboard.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="dist/css/windows.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="lib/materialize-iso.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/darkmode.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="prefetch" as="video" href="loading-animation.webm" type="video/webm">
+    <link rel="prefetch" as="video" href="loading-animation.mp4" type="video/mp4">
 
-        <!-- <script src="sounds/samples/manifest.js"></script> -->
+    <!-- <script src="js/utils/detectIE.js"></script> -->
 
-        <!-- <script src="lib/mespeak.js"></script> -->
+    <!-- <script src="sounds/samples/manifest.js"></script> -->
 
-        <script src="lib/reqwest.js" defer></script>
+    <!-- <script src="lib/mespeak.js"></script> -->
 
-        <script src="lib/jquery-3.7.1.min.js"></script>
-        <script src="lib/jquery-ui.js"></script>
-        <script src="lib/materialize.min.js"></script>
-        <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
-        <script>
-            jQuery(document).ready(function () {
-                if (jQuery.ui && jQuery.ui.autocomplete) {
-                    jQuery.fn.materializeAutocomplete = jQuery.fn.autocomplete;
-                    jQuery.widget.bridge("autocomplete", jQuery.ui.autocomplete);
+    <script src="lib/reqwest.js" defer></script>
+
+    <script src="lib/jquery-3.7.1.min.js"></script>
+    <script src="lib/jquery-ui.js"></script>
+    <script src="lib/materialize.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script>
+        jQuery(document).ready(function () {
+            if (jQuery.ui && jQuery.ui.autocomplete) {
+                jQuery.fn.materializeAutocomplete = jQuery.fn.autocomplete;
+                jQuery.widget.bridge("autocomplete", jQuery.ui.autocomplete);
+            }
+        });
+    </script>
+    <script>
+        jQuery(document).ready(function () {
+            const fixAutocompletePosition = function () {
+                const $search = jQuery('#search');
+                if ($search.length && $search.data('ui-autocomplete')) {
+                    const instance = $search.autocomplete('instance');
+                    if (instance) {
+                        const originalRenderMenu = instance._renderMenu;
+                        instance._renderMenu = function (ul, items) {
+                            originalRenderMenu.call(this, ul, items);
+                            setTimeout(() => {
+                                const searchInput = document.querySelector('#search');
+                                const dropdown = ul[0];
+                                if (searchInput && dropdown) {
+                                    const rect = searchInput.getBoundingClientRect();
+                                    dropdown.style.position = 'fixed';
+                                    dropdown.style.left = rect.left + 'px';
+                                    dropdown.style.top = (rect.bottom + 2) + 'px';
+                                    dropdown.style.width = rect.width + 'px';
+                                }
+                            }, 0);
+                        };
+                    }
+                } else {
+                    setTimeout(fixAutocompletePosition, 500);
                 }
             });
         </script>
@@ -505,8 +489,114 @@
                         <input onkeypress="doPaste()" type="submit" value="" tabindex="-1" />
                     </div>
 
-                    <div id="myProgress" tabindex="-1">
-                        <div id="myBar" tabindex="-1"></div>
+                <div id="myProgress" tabindex="-1">
+                    <div id="myBar" tabindex="-1"></div>
+                </div>
+            </footer>
+
+            <dialog id="lilypondModal" class="modal" tabindex="-1">
+                <!-- Modal content for Lilypond save dialog -->
+                <div class="modal-content" tabindex="-1">
+                    <span class="close">&times;</span>
+                    <div id="fileNameText"></div>
+                    <input type="text" id="fileName" tabindex="-1">
+                    <p></p>
+                    <div id="titleText"></div>
+                    <input type="text" id="title" tabindex="-1">
+                    <p></p>
+                    <div id="authorText"></div>
+                    <input type="text" id="author" tabindex="-1">
+                    <p></p>
+                    <div id="MIDIText"></div>
+                    <input type="checkbox" id="MIDICheck" tabindex="-1">
+                    <p></p>
+                    <div id="guitarText"></div>
+                    <input type="checkbox" id="guitarCheck" tabindex="-1">
+                    <p></p>
+                    <p><button class="confirm-button" id="submitLilypond"></button></p>
+                    <!-- <button id="submitPDF"></button></p> -->
+                </div>
+            </dialog>
+            <div class="materialize-iso" tabindex="-1">
+                <nav id="toolbars" class="nav-wrapper">
+                    <div class="blue nav-wrapper" tabindex="-1">
+                        <div id="mb-logo" class="logo left tooltipped"
+                            style="display: flex; align-items: center; line-height: 0; height: 100%; padding-right: 0;"
+                            data-position="bottom">
+                            <amp-img alt="MusicBlocks Logo" width="100%" src="images/logo.svg">
+                            </amp-img>
+                        </div>
+                        <ul class="main left">
+                            <li>
+                                <a id="play" class="left tooltipped"><i
+                                        class="material-icons main">play_circle_filled</i></a>
+                            </li>
+                            <li>
+                                <a id="stop" class="left tooltipped"><i class="material-icons main">stop</i></a>
+                            </li>
+                            <li>
+                                <a id="record" class="left tooltipped" data-tooltip="Record"></a>
+                            </li>
+                        </ul>
+
+                        <ul class="main right">
+                            <li>
+                                <a id="FullScreen" class="FullScreen tooltipped dropdown-trigger" data-position="bottom"
+                                    onclick="setIcon()">
+                                    <i class="material-icons" id="FullScrIcon">fullscreen</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="newFile" class="tooltipped dropdown-trigger" data-position="bottom"
+                                    data-activates="newdropdown">
+                                    <i class="material-icons md-48">note_add</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="load" class="tooltipped" data-position="bottom">
+                                    <i class="material-icons md-48">folder</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="saveButton" class="tooltipped dropdown-trigger" data-position="bottom"
+                                    data-activates="saveddropdownbeg">
+                                    <i id="save1" class="material-icons md-48">save_alt</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="saveButtonAdvanced" style="display: none;" class="tooltipped dropdown-trigger"
+                                    data-position="bottom" data-activates="saveddropdown">
+                                    <i id="save2" class="material-icons md-48">save_alt</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="planetIcon" class="tooltipped" data-position="bottom">
+                                    <i class="material-icons md-48">public</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a style="display: none;" id="planetIconDisabled" class="tooltipped"
+                                    data-position="bottom">
+                                    <i style="color: #a5acba;" class="material-icons md-48">public</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="toggleAuxBtn" class="tooltipped" data-position="bottom">
+                                    <i id="menu" class="animated-icon material-icons md-48">menu</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="helpIcon" class="tooltipped" data-position="bottom">
+                                    <i class="material-icons md-48">help</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="installButton" class="tooltipped hidden" data-position="bottom"
+                                    data-tooltip="Install App" aria-label="Install App">
+                                    <i class="material-icons md-48">file_download</i>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
                 </footer>
 
@@ -877,35 +967,89 @@
                 </div>
             </div>
 
-            <div id="searchBar" tabindex="-1">
-                <input
-                    type="text"
-                    name="search"
-                    id="search"
-                    class="ui-autocomplete"
-                    placeholder="Search for Blocks"
-                    tabindex="-1"
-                />
-                <ul class="matches" id="searchResults"></ul>
-            </div>
-        </main>
+            canvas = document.getElementById("canvas");
+            stage = new createjs.Stage(canvas);
 
-        <!-- Initialize Scripts -->
-        <script>
-            let canvas, stage;
-            function init() {
-                // Defensive check: ensure createjs is loaded before using it
-                if (typeof createjs === "undefined") {
-                    // Retry after a short delay if createjs isn't ready yet
-                    setTimeout(init, 50);
-                    return;
+            createjs.Ticker.framerate = 60;
+            // createjs.Ticker.addEventListener("tick", stage); // Managed by Activity class
+        }
+        document.addEventListener("DOMContentLoaded", init);
+    </script>
+
+    <script>
+        // Register service worker only in production (not on localhost)
+        if ("serviceWorker" in navigator) {
+            // Detect if running on localhost for development
+            const isLocalDev = window.location.hostname === "localhost" ||
+                window.location.hostname === "127.0.0.1";
+            // Localhost SW is disabled to avoid caching; set allowLocalPwa to test installs.
+            const allowLocalPwa = localStorage.getItem("allowLocalPwa") === "true";
+
+            if (!isLocalDev || allowLocalPwa) {
+                // Production: Register service worker for offline mode
+                if (navigator.serviceWorker.controller) {
+                    console.debug(
+                        "[PWA Builder] Active service worker found, no need to register"
+                    );
+                } else {
+                    // Register the service worker
+                    navigator.serviceWorker
+                        .register("/sw.js")
+                        .then(function (reg) {
+                            console.debug(
+                                "[PWA Builder] Service worker registered for scope: " +
+                                reg.scope
+                            );
+                        })
+                        .catch(function (err) {
+                            console.error("[PWA Builder] Service worker registration failed:", err);
+                        });
                 }
+            } else {
+                // Development: Skip service worker for instant updates
+                console.log(
+                    "🔥 [DEV MODE] Service worker disabled on localhost for instant code updates"
+                );
+                console.log(
+                    "Set localStorage.allowLocalPwa = 'true' to enable PWA install testing on localhost."
+                );
+            }
+        }
+    </script>
+    <script>
+        let deferredPrompt;
 
-                canvas = document.getElementById("canvas");
-                stage = new createjs.Stage(canvas);
+        window.addEventListener("beforeinstallprompt", (event) => {
+            event.preventDefault(); // Prevent automatic browser prompt
+            deferredPrompt = event;
 
-                createjs.Ticker.framerate = 60;
-                // createjs.Ticker.addEventListener("tick", stage); // Managed by Activity class
+            // Show the install button
+            const installButton = document.getElementById("installButton");
+            if (installButton) {
+                installButton.classList.remove("hidden");
+            }
+        });
+
+        // Handle install button click
+        document.addEventListener("DOMContentLoaded", function () {
+            const installButton = document.getElementById("installButton");
+            if (installButton) {
+                installButton.addEventListener("click", async function () {
+                    if (deferredPrompt) {
+                        // Show the install prompt
+                        deferredPrompt.prompt();
+                        
+                        // Wait for user choice
+                        const { outcome } = await deferredPrompt.userChoice;
+                        console.log(`User response to the install prompt: ${outcome}`);
+                        
+                        // Clear the deferredPrompt
+                        deferredPrompt = null;
+                        
+                        // Hide the button
+                        installButton.classList.add("hidden");
+                    }
+                });
             }
             document.addEventListener("DOMContentLoaded", init);
         </script>
@@ -985,16 +1129,10 @@
                         lang = localStorage.languagePreference;
                     }
 
-                    console.debug("Using " + lang);
-                    if (lang === undefined) {
-                        lang = "enUS";
-                        console.debug("Reverting to " + lang);
-                    }
-
-                    const container = document.getElementById("loading-media");
-                    const content = lang.startsWith("ja")
-                        ? `<img src="loading-animation-ja.svg" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
-                        : `<video loop autoplay muted playsinline fetchpriority="high" style="width: 90%; height: 100%; object-fit: contain;">
+                const container = document.getElementById("loading-media");
+                const content = lang.startsWith("ja")
+                    ? `<img src="loading-animation-ja.png" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
+                    : `<video loop autoplay muted playsinline fetchpriority="high" style="width: 90%; height: 100%; object-fit: contain;">
                         <source src="loading-animation.webm" type="video/webm">
                         <source src="loading-animation.mp4" type="video/mp4">
                        </video>`;
@@ -1086,22 +1224,95 @@
                     });
                 });
             });
+        });
 
-            let isDragging = false;
-        </script>
+        let isDragging = false;
+    </script>
 
-        <script>
-            var elem = document.documentElement;
+    <script>
+        var elem = document.documentElement;
 
-            function openFullscreen() {
-                if (elem.requestFullscreen) {
-                    elem.requestFullscreen();
-                } else if (elem.webkitRequestFullscreen) {
-                    elem.webkitRequestFullscreen();
-                } else if (elem.msRequestFullscreen) {
-                    elem.msRequestFullscreen();
-                } else if (elem.mozRequestFullscreen) {
-                    elem.mozRequestFullscreen();
+        function openFullscreen() {
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            } else if (elem.mozRequestFullscreen) {
+                elem.mozRequestFullscreen();
+            }
+        }
+
+        function closeFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            } else if (document.mozExitFullscreen) {
+                document.mozExitFullscreen();
+            }
+        }
+
+        function setIcon() {
+            var iconCode = document.querySelector('#FullScrIcon');
+            // Determine fullscreen state using the browser fullscreen API
+            // instead of relying on a manual counter. This keeps the icon
+            // in sync when fullscreen is exited via ESC or browser controls.
+            var isFullscreen =
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
+
+            if (!isFullscreen) {
+                openFullscreen();
+                iconCode.textContent = '\ue5d1'; // fullscreen_exit icon
+            } else {
+                closeFullscreen();
+                iconCode.textContent = '\ue5d0'; // fullscreen icon
+            }
+        }
+
+        function handleFullscreenChange() {
+            var iconCode = document.querySelector('#FullScrIcon');
+            // Update fullscreen icon based on actual fullscreen state.
+            // This removes the need for a separate state variable and
+            // prevents incorrect icon state when fullscreen is toggled
+            // outside the button (e.g., ESC key).
+            var isFullscreen =
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
+
+            iconCode.textContent = isFullscreen ? '\ue5d1' : '\ue5d0';
+        }
+
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+    </script>
+
+    <style>
+        #installButton.hidden {
+            display: none !important;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let persistentNotification = null;
+
+            function showPersistentNotification() {
+                if (!persistentNotification) {
+                    persistentNotification = document.createElement("div");
+                    persistentNotification.id = "persistentNotification";
+                    persistentNotification.innerHTML = "Play only mode enabled. For full Music Blocks experience, use a larger display.";
+                    document.body.appendChild(persistentNotification);
                 }
             }
 
