@@ -9,8 +9,27 @@
 const CACHE = "pwabuilder-precache";
 const precacheFiles = [
     /* Add an array of files to precache for your app */
-    "./index.html"
+    "./index.html",
+    // Precache the exact URL used by the app (includes query param)
+    "./css/activities.css?v=fixed"
 ];
+
+function getPrecacheUrlSet() {
+    // Normalize to absolute URLs so we can match requests precisely.
+    // IMPORTANT: We intentionally do NOT strip query params here.
+    const base =
+        self.registration && self.registration.scope
+            ? self.registration.scope
+            : self.location.origin + "/";
+    return new Set(precacheFiles.map(path => new URL(path, base).toString()));
+}
+
+function isPrecachedRequest(request) {
+    if (!request || request.method !== "GET") return false;
+    const url = new URL(request.url);
+    url.hash = "";
+    return getPrecacheUrlSet().has(url.toString());
+}
 
 self.addEventListener("install", function (event) {
     // eslint-disable-next-line no-console
@@ -146,6 +165,22 @@ function fromCache(request) {
 // serve it from there first
 self.addEventListener("fetch", function (event) {
     if (event.request.method !== "GET") return;
+
+    // Always serve explicit precache entries from cache (cache-first).
+    // This keeps strict runtime caching rules intact while guaranteeing
+    // offline availability for app-shell assets, including URLs with query params.
+    if (isPrecachedRequest(event.request)) {
+        event.respondWith(
+            fromCache(event.request).catch(async function () {
+                const response = await fetch(event.request);
+                if (shouldCacheResponse(event.request, response)) {
+                    event.waitUntil(updateCache(event.request, response.clone()));
+                }
+                return response;
+            })
+        );
+        return;
+    }
 
     // Only cache a strict allowlist of same-origin static assets.
     // For all other GETs, fall back to default network behavior to avoid
