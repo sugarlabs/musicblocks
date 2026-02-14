@@ -1276,6 +1276,20 @@ class Activity {
             this.sendAllToTrash(true, true);
         };
 
+        const extractSVGInner = svgString => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(svgString, "image/svg+xml");
+            const svgEl = doc.querySelector("svg");
+            if (!svgEl) return "";
+
+            // Remove drop shadow filters safely
+            svgEl.querySelectorAll("[filter]").forEach(el => {
+                el.removeAttribute("filter");
+            });
+
+            return svgEl.innerHTML;
+        };
+
         /**
          * @returns {SVG} returns SVG of blocks
          */

@@ -100,4 +100,23 @@ input[type="range"]:focus::-ms-fill-upper {
   background: #90c100;
 }
 
+#ClearButton {
+  right: 100px;
+  top: 132px;
+  background-color: white;
+  border: 2px solid red;
+  border-radius: 15px;
+  width: 200px;
+  height: 40px;
+  z-index: 100;
+  visibility: hidden;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+.clearPop {
+  position: absolute;
+  cursor: pointer;
+}
+
 html, body { overscroll-behavior-x: none; }
