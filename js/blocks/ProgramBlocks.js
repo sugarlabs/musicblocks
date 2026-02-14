@@ -79,7 +79,7 @@ function setupProgramBlocks(activity) {
 
             const url = args[1];
             const name = args[0];
-            const oldHeap = name in logo.turtleHeaps ? logo.turtleHeaps[turtle] : [];
+            const oldHeap = name in logo.turtleHeaps ? logo.turtleHeaps[name] : [];
 
             // Use async fetch to avoid blocking the UI
             fetch(url)
