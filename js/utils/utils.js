@@ -1102,7 +1102,7 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
         turtles.getTurtle(turtle).doShowImage(args[0], data);
     }
 
-    if (!hasSetupCamera) {
+    if (!CameraManager.isSetup) {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             errorMsg("Your browser does not support the webcam");
             return;
@@ -1113,7 +1113,7 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
             .then(stream => {
                 video.srcObject = stream;
                 video.play();
-                hasSetupCamera = true;
+                CameraManager.isSetup = true;
             })
             .catch(error => {
                 errorMsg("Could not connect to camera");
