@@ -638,7 +638,7 @@ class Blocks {
 
             /** Which connection do we start with? */
             let ci;
-            if (["doArg", "calcArg", "makeblock"].includes(myBlock.name)) {
+            if (myBlock.isArgumentLikeBlock()) {
                 ci = 2;
             } else {
                 ci = 1;
@@ -1838,12 +1838,7 @@ class Blocks {
                 if (connection == null) {
                     if (this.blockList[newBlock].isArgClamp()) {
                         /** If it is an arg clamp, we may have to adjust the slot size. */
-                        if (
-                            ["doArg", "calcArg", "makeblock"].indexOf(
-                                this.blockList[newBlock].name
-                            ) !== -1 &&
-                            newConnection === 1
-                        ) {
+                        if (this.blockList[newBlock].isArgumentLikeBlock() && newConnection === 1) {
                             /** pass */
                         } else if (
                             ["doArg", "nameddoArg"].includes(this.blockList[newBlock].name) &&
@@ -1858,11 +1853,7 @@ class Blocks {
                             const slotList = this.blockList[newBlock].argClampSlots;
                             let si = newConnection - 1;
                             /** Which slot is this block in? */
-                            if (
-                                ["doArg", "calcArg", "makeblock"].includes(
-                                    this.blockList[newBlock].name
-                                )
-                            ) {
+                            if (this.blockList[newBlock].isArgumentLikeBlock()) {
                                 si = newConnection - 2;
                             }
 
@@ -1890,12 +1881,7 @@ class Blocks {
                      */
                     insertAfterDefault = false;
                     if (this.blockList[newBlock].isArgClamp()) {
-                        if (
-                            ["doArg", "calcArg", "makeblock"].indexOf(
-                                this.blockList[newBlock].name
-                            ) !== -1 &&
-                            newConnection === 1
-                        ) {
+                        if (this.blockList[newBlock].isArgumentLikeBlock() && newConnection === 1) {
                             /**
                              * If it is the action name then treat it like
                              * a standard replacement.
@@ -1929,11 +1915,7 @@ class Blocks {
                             /** Which slot is this block in? */
                             const ci = this.blockList[newBlock].connections.indexOf(connection);
                             let si = ci - 1;
-                            if (
-                                ["doArg", "calcArg", "makeblock"].includes(
-                                    this.blockList[newBlock].name
-                                )
-                            ) {
+                            if (this.blockList[newBlock].isArgumentLikeBlock()) {
                                 si = ci - 2;
                             }
 
@@ -2183,39 +2165,25 @@ class Blocks {
             }
 
             /** If it is an arg block, where is it coming from? */
-            /** FIXME: improve mechanism for testing block types. */
-            if (
-                (myBlock.isArgBlock() ||
-                    ["calcArg", "namedcalcArg", "makeblock"].includes(myBlock.name)) &&
-                newBlock != null
-            ) {
-                /** We care about twoarg blocks with connections to the first arg; */
-                if (this.blockList[newBlock].isTwoArgBlock()) {
-                    if (this.blockList[newBlock].connections[1] === thisBlock) {
-                        if (!this._checkTwoArgBlocks.includes(newBlock)) {
-                            this._checkTwoArgBlocks.push(newBlock);
-                        }
-                    }
-                } else if (
-                    this.blockList[newBlock].isArgBlock() &&
-                    this.blockList[newBlock].isExpandableBlock()
-                ) {
-                    if (this.blockList[newBlock].connections[1] === thisBlock) {
-                        if (!this._checkTwoArgBlocks.includes(newBlock)) {
-                            this._checkTwoArgBlocks.push(newBlock);
-                        }
-                    }
-                }
+            if (myBlock.isArgumentLikeBlock() && newBlock != null) {
+                const parentBlock = this.blockList[newBlock];
 
-                /** We also care about the second-to-last connection to an arg block. */
-                const n = this.blockList[newBlock].connections.length;
-                if (this.blockList[newBlock].connections[n - 2] === thisBlock) {
-                    /** Only flow blocks, but not ArgClamps */
-                    if (
-                        !this.blockList[newBlock].isArgClamp() &&
-                        this.blockList[newBlock].docks[n - 1][2] === "in"
-                    ) {
-                        checkArgBlocks.push(newBlock);
+                // Find which connection index this block is attached to
+                const connectionIndex = parentBlock.connections.indexOf(thisBlock);
+
+                // Guard against invalid index (can happen during drag/undo/intermediate states)
+                if (connectionIndex !== -1) {
+                    // Ask the parent block what type of layout update it needs for this connection
+                    const updateType = parentBlock.getLayoutUpdateType(connectionIndex);
+
+                    if (updateType === "ARG") {
+                        if (!this._checkTwoArgBlocks.includes(newBlock)) {
+                            this._checkTwoArgBlocks.push(newBlock);
+                        }
+                    } else if (updateType === "FLOW") {
+                        if (!checkArgBlocks.includes(newBlock)) {
+                            checkArgBlocks.push(newBlock);
+                        }
                     }
                 }
             }
@@ -3717,7 +3685,8 @@ class Blocks {
             }
 
             /** Make sure we don't make two actions with the same name. */
-            const actionNames = [];
+            // Use Set for O(1) lookup instead of Array.includes() O(n)
+            const actionNames = new Set();
             for (const blk in this.blockList) {
                 if (
                     (this.blockList[blk].name === "text" ||
@@ -3731,7 +3700,7 @@ class Blocks {
                         !this.blockList[c].trash
                     ) {
                         if (actionBlk !== c) {
-                            actionNames.push(this.blockList[blk].value);
+                            actionNames.add(this.blockList[blk].value);
                         }
                     }
                 }
@@ -3739,7 +3708,7 @@ class Blocks {
 
             let i = 1;
             let value = name;
-            while (actionNames.includes(value)) {
+            while (actionNames.has(value)) {
                 value = name + i.toString();
                 i += 1;
             }
@@ -3754,7 +3723,8 @@ class Blocks {
          * @returns value
          */
         this.findUniqueCustomName = name => {
-            const noteNames = [];
+            // Use Set for O(1) lookup instead of Array.includes() O(n)
+            const noteNames = new Set();
             for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "text" && !this.blockList[blk].trash) {
                     const c = this.blockList[blk].connections[0];
@@ -3763,14 +3733,14 @@ class Blocks {
                         this.blockList[c].name === "pitch" &&
                         !this.blockList[c].trash
                     ) {
-                        noteNames.push(this.blockList[blk].value);
+                        noteNames.add(this.blockList[blk].value);
                     }
                 }
             }
 
             let i = 1;
             let value = name;
-            while (noteNames.includes(value)) {
+            while (noteNames.has(value)) {
                 value = name + i.toString();
                 i += 1;
             }
@@ -3784,7 +3754,8 @@ class Blocks {
          * @returns value
          */
         this.findUniqueTemperamentName = name => {
-            const temperamentNames = [];
+            // Use Set for O(1) lookup instead of Array.includes() O(n)
+            const temperamentNames = new Set();
             for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "text" && !this.blockList[blk].trash) {
                     const c = this.blockList[blk].connections[0];
@@ -3793,14 +3764,14 @@ class Blocks {
                         this.blockList[c].name === "temperament1" &&
                         !this.blockList[c].trash
                     ) {
-                        temperamentNames.push(this.blockList[blk].value);
+                        temperamentNames.add(this.blockList[blk].value);
                     }
                 }
             }
 
             let i = 1;
             let value = name;
-            while (temperamentNames.includes(value)) {
+            while (temperamentNames.has(value)) {
                 value = name + i.toString();
                 i += 1;
             }
@@ -3842,6 +3813,8 @@ class Blocks {
                 return;
             }
 
+            // Collect blocks to update for batched cache update
+            const blocksToUpdate = [];
             for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "text") {
                     const c = this.blockList[blk].connections[0];
@@ -3849,15 +3822,24 @@ class Blocks {
                         if (this.blockList[blk].value === oldName) {
                             this.blockList[blk].value = newName;
                             this.blockList[blk].text.text = newName;
-                            try {
-                                this.blockList[blk].container.updateCache();
-                            } catch (e) {
-                                // eslint-disable-next-line no-console
-                                console.debug(e);
-                            }
+                            blocksToUpdate.push(this.blockList[blk]);
                         }
                     }
                 }
+            }
+
+            // Batch update caches using requestAnimationFrame
+            if (blocksToUpdate.length > 0) {
+                requestAnimationFrame(() => {
+                    for (const block of blocksToUpdate) {
+                        try {
+                            block.container.updateCache();
+                        } catch (e) {
+                            // eslint-disable-next-line no-console
+                            console.debug(e);
+                        }
+                    }
+                });
             }
         };
 
@@ -3873,6 +3855,8 @@ class Blocks {
                 return;
             }
 
+            // Collect blocks to update for batched cache update
+            const blocksToUpdate = [];
             for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "text") {
                     const c = this.blockList[blk].connections[0];
@@ -3880,12 +3864,7 @@ class Blocks {
                         if (this.blockList[blk].value === oldName) {
                             this.blockList[blk].value = newName;
                             this.blockList[blk].text.text = newName;
-                            try {
-                                this.blockList[blk].container.updateCache();
-                            } catch (e) {
-                                // eslint-disable-next-line no-console
-                                console.debug(e);
-                            }
+                            blocksToUpdate.push(this.blockList[blk]);
                         }
                     }
                 } else if (this.blockList[blk].name === "storein2") {
@@ -3899,14 +3878,23 @@ class Blocks {
                             this.blockList[blk].overrideName = newName;
                         }
                         this.blockList[blk].regenerateArtwork();
+                        blocksToUpdate.push(this.blockList[blk]);
+                    }
+                }
+            }
+
+            // Batch update caches using requestAnimationFrame
+            if (blocksToUpdate.length > 0) {
+                requestAnimationFrame(() => {
+                    for (const block of blocksToUpdate) {
                         try {
-                            this.blockList[blk].container.updateCache();
+                            block.container.updateCache();
                         } catch (e) {
                             // eslint-disable-next-line no-console
                             console.debug(e);
                         }
                     }
-                }
+                });
             }
         };
 
@@ -3922,6 +3910,8 @@ class Blocks {
                 return;
             }
 
+            // Collect blocks to update for batched cache update
+            const blocksToUpdate = [];
             for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "storein2") {
                     if (this.blockList[blk].privateData === oldName) {
@@ -3934,14 +3924,23 @@ class Blocks {
                             this.blockList[blk].overrideName = newName;
                         }
                         this.blockList[blk].regenerateArtwork();
+                        blocksToUpdate.push(this.blockList[blk]);
+                    }
+                }
+            }
+
+            // Batch update caches using requestAnimationFrame
+            if (blocksToUpdate.length > 0) {
+                requestAnimationFrame(() => {
+                    for (const block of blocksToUpdate) {
                         try {
-                            this.blockList[blk].container.updateCache();
+                            block.container.updateCache();
                         } catch (e) {
                             // eslint-disable-next-line no-console
                             console.debug(e);
                         }
                     }
-                }
+                });
             }
         };
 
@@ -3957,6 +3956,8 @@ class Blocks {
                 return;
             }
 
+            // Collect blocks to update for batched cache update
+            const blocksToUpdate = [];
             for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "namedbox") {
                     if (this.blockList[blk].privateData === oldName) {
@@ -3969,15 +3970,23 @@ class Blocks {
                             this.blockList[blk].overrideName = newName;
                         }
                         this.blockList[blk].regenerateArtwork();
-                        /** Update label... */
+                        blocksToUpdate.push(this.blockList[blk]);
+                    }
+                }
+            }
+
+            // Batch update caches using requestAnimationFrame
+            if (blocksToUpdate.length > 0) {
+                requestAnimationFrame(() => {
+                    for (const block of blocksToUpdate) {
                         try {
-                            this.blockList[blk].container.updateCache();
+                            block.container.updateCache();
                         } catch (e) {
                             // eslint-disable-next-line no-console
                             console.debug(e);
                         }
                     }
-                }
+                });
             }
         };
 
@@ -6824,7 +6833,7 @@ class Blocks {
                 z -= 1;
             }
 
-            this.activity.refreshCanvas;
+            this.activity.refreshCanvas();
         };
 
         /**
@@ -7185,4 +7194,18 @@ class Blocks {
             });
         };
     }
+}
+// Export Blocks
+if (typeof define === "function" && define.amd) {
+    define([], function () {
+        return Blocks;
+    });
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Blocks;
+}
+
+if (typeof window !== "undefined") {
+    window.Blocks = Blocks;
 }
