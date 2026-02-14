@@ -867,6 +867,9 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             that._octavesWheel.removeWheel();
         }
     };
+    addExitButtonOverlay(() => {
+        block._exitWheel.navItems[0].navigateFunction();
+    });
 };
 
 const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, selectedNote) => {
@@ -1194,6 +1197,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     }
 
     block._exitWheel.navItems[0].navigateFunction = __exitMenu;
+    addExitButtonOverlay(__exitMenu);
 };
 
 const piemenuNthModalPitch = (block, noteValues, note) => {
@@ -1447,6 +1451,9 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
         that._exitWheel.removeWheel();
         that._octavesWheel.removeWheel();
     };
+    addExitButtonOverlay(() => {
+        block._exitWheel.navItems[0].navigateFunction();
+    });
 };
 
 const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidental) => {
@@ -1581,6 +1588,7 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
     block._exitWheel.navItems[0].navigateFunction = () => {
         __exitMenu();
     };
+    addExitButtonOverlay(__exitMenu);
 };
 
 const piemenuNoteValue = (block, noteValue) => {
@@ -1822,6 +1830,7 @@ const piemenuNoteValue = (block, noteValue) => {
     block._exitWheel.navItems[0].navigateFunction = () => {
         __exitMenu();
     };
+    addExitButtonOverlay(__exitMenu);
 };
 
 const piemenuNumber = (block, wheelValues, selectedValue) => {
@@ -2008,6 +2017,8 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
 
     block.label.style.display = "";
     block.label.focus();
+    let isProgrammaticChange = false;
+
     // Hide the widget when the selection is made.
     for (let i = 0; i < wheelLabels.length; i++) {
         block._numberWheel.navItems[i].navigateFunction = () => {
@@ -2290,6 +2301,7 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     block._exitWheel.navItems[0].navigateFunction = () => {
         __exitMenu();
     };
+    addExitButtonOverlay(__exitMenu);
 };
 
 const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
@@ -2432,6 +2444,7 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     block._exitWheel.navItems[0].navigateFunction = () => {
         __exitMenu();
     };
+    addExitButtonOverlay(__exitMenu);
 };
 
 const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
@@ -2667,6 +2680,7 @@ const piemenuChords = (block, selectedChord) => {
     block._exitWheel.navItems[0].navigateFunction = () => {
         __exitMenu();
     };
+    addExitButtonOverlay(__exitMenu);
 };
 
 const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotate) => {
@@ -2845,6 +2859,10 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
     };
+    addExitButtonOverlay(() => {
+        that._piemenuExitTime = new Date().getTime();
+        docById("wheelDiv").style.display = "none";
+    });
 };
 
 const piemenuIntervals = (block, selectedInterval) => {
@@ -3070,6 +3088,7 @@ const piemenuIntervals = (block, selectedInterval) => {
     }
 
     block._exitWheel.navItems[0].navigateFunction = __exitMenu;
+    addExitButtonOverlay(__exitMenu);
 };
 
 const piemenuModes = (block, selectedMode) => {
@@ -3490,6 +3509,7 @@ const piemenuModes = (block, selectedMode) => {
 
     block._exitWheel.navItems[0].navigateFunction = __exitMenu;
     block._exitWheel.navItems[1].navigateFunction = __prepScale;
+    addExitButtonOverlay(__exitMenu);
 };
 
 /*
@@ -3783,6 +3803,7 @@ const piemenuGrid = activity => {
     activity.turtles._exitWheel.navItems[0].navigateFunction = () => {
         hidePiemenu(activity);
     };
+    addExitButtonOverlay(() => hidePiemenu(activity), "wheelDivptm");
 
     if (docById("helpfulWheelDiv").style.display !== "none") {
         docById("helpfulWheelDiv").style.display = "none";
@@ -4014,6 +4035,7 @@ const piemenuKey = activity => {
     };
 
     exitWheel.navItems[0].navigateFunction = __exitMenu;
+    addExitButtonOverlay(__exitMenu);
 
     const __playNote = note => {
         const obj = getNote(
