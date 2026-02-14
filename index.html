@@ -30,10 +30,9 @@
             as="style"
             onload="this.onload=null;this.rel='stylesheet'"
         />
-        <!-- IMPORTANT: This file is loaded with a query param (?v=fixed).
-            If you change the query string here, update `precacheFiles` in sw.js
-            to include the exact URL (including the ?v=... part) so the
-            service worker continues to serve it offline. -->
+        <!-- IMPORTANT: This stylesheet is loaded with a version query string (?v=fixed).
+            If you change this URL (path OR query string), update `precacheFiles` in sw.js
+            to precache the exact same URL so it stays available offline. -->
         <link
             rel="preload"
             href="css/activities.css?v=fixed"
