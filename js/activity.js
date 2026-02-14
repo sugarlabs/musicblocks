@@ -400,22 +400,6 @@ class Activity {
             createHelpContent(this);
             window.scroll(0, 0);
 
-            /*
-            try {
-                meSpeak.loadConfig('lib/mespeak_config.json');
-                lang = document.webL10n.getLanguage();
-
-                if (['es', 'ca', 'de', 'el', 'eo', 'fi', 'fr', 'hu', 'it', 'kn', 'la', 'lv', 'nl', 'pl', 'pt', 'ro', 'sk', 'sv', 'tr', 'zh'].indexOf(lang) !== -1) {
-                    meSpeak.loadVoice('lib/voices/' + lang + '.json');
-                } else {
-                    meSpeak.loadVoice('lib/voices/en/en.json');
-                }
-            } catch (e) {
-                // eslint-disable-next-line no-console
-                console.debug(e);
-            }
-            */
-
             document.title = TITLESTRING;
             this.canvas = document.getElementById("myCanvas");
 
