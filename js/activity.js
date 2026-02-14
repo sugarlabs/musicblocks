@@ -6248,10 +6248,48 @@ class Activity {
             activity._doOpenPlugin();
         };
 
+        this._loadBuiltInPlugin = name => {
+            const url = "plugins/" + name + ".json";
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            const that = this;
+            xhr.onload = () => {
+                if (xhr.status === 200) {
+                    const obj = processRawPluginData(that, xhr.responseText, url);
+                    // Save plugins to local storage.
+                    if (obj !== null) {
+                        that.storage.plugins = preparePluginExports(that, obj);
+                    }
+                    // Refresh the palettes.
+                    setTimeout(() => {
+                        if (that.palettes.visible) {
+                            that.palettes.hide();
+                        }
+                    }, 1000);
+                } else {
+                    // eslint-disable-next-line no-console
+                    console.error("Could not load built-in plugin: " + name);
+                }
+            };
+            xhr.send();
+        };
+
         this._doOpenPlugin = () => {
             this.toolbar.closeAuxToolbar(showHideAuxMenu);
-            this.pluginChooser.focus();
-            this.pluginChooser.click();
+            const name = prompt(
+                _(
+                    "Enter built-in plugin name (e.g., maths, weather, accelerometer, facebook, nutrition, rodi) or leave blank to upload a file:"
+                )
+            );
+            if (name === null) {
+                return; // User cancelled the operation
+            }
+            if (name.trim() !== "") {
+                this._loadBuiltInPlugin(name.trim().toLowerCase());
+            } else {
+                this.pluginChooser.focus();
+                this.pluginChooser.click();
+            }
         };
 
         /*
@@ -7590,7 +7628,9 @@ class Activity {
                             const obj = processRawPluginData(
                                 that,
                                 reader.result,
-                                pluginFile && pluginFile.name ? pluginFile.name : "local-file"
+                                pluginFile && pluginFile.name
+                                    ? "file:" + pluginFile.name
+                                    : "file:local-file"
                             );
                             // Save plugins to local storage.
                             if (obj !== null) {

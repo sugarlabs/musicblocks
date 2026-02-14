@@ -7081,7 +7081,13 @@ class Blocks {
                     value = this.blockList[blk].protoblock.updateParameter(logo, turtle, blk);
                 } else {
                     if (name in logo.evalParameterDict) {
-                        eval(logo.evalParameterDict[name]);
+                        logo.safePluginExecute(
+                            logo.evalParameterDict[name],
+                            logo,
+                            turtle,
+                            blk,
+                            name
+                        );
                     } else {
                         return;
                     }
@@ -7126,7 +7132,13 @@ class Blocks {
                 this.blockList[blk].protoblock.setter(logo, value, turtle, blk);
             } else {
                 if (this.blockList[blk].name in logo.evalSetterDict) {
-                    eval(logo.evalSetterDict[this.blockList[blk].name]);
+                    logo.safePluginExecute(
+                        logo.evalSetterDict[this.blockList[blk].name],
+                        logo,
+                        turtle,
+                        blk,
+                        value
+                    );
                 } else {
                     throw new Error();
                 }

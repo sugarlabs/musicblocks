@@ -865,9 +865,8 @@ class Palette {
     }
 
     hideMenu() {
-        docById(
-            "palette"
-        ).childNodes[0].style.borderRight = `1px solid ${platformColor.selectorSelected}`;
+        docById("palette").childNodes[0].style.borderRight =
+            `1px solid ${platformColor.selectorSelected}`;
         if (this._outsideClickListener) {
             document.removeEventListener("click", this._outsideClickListener);
             this._outsideClickListener = null;
@@ -995,7 +994,7 @@ class Palette {
                 if (["media", "camera", "video"].includes(b.blkname)) {
                     // Use artwork.js strings as images for:
                     // cameraPALETTE, videoPALETTE, mediaPALETTE
-                    img = makePaletteIcons(eval(b.blkname + "PALETTE"));
+                    img = makePaletteIcons(window[b.blkname + "PALETTE"]);
                 } else {
                     // or use the plugin image...
                     img = makePaletteIcons(this.activity.pluginsImages[b.blkname]);
