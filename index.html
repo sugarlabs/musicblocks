@@ -630,14 +630,14 @@
                     if (deferredPrompt) {
                         // Show the install prompt
                         deferredPrompt.prompt();
-                        
+
                         // Wait for user choice
                         const { outcome } = await deferredPrompt.userChoice;
                         console.log(`User response to the install prompt: ${outcome}`);
-                        
+
                         // Clear the deferredPrompt
                         deferredPrompt = null;
-                        
+
                         // Hide the button
                         installButton.classList.add("hidden");
                     }
@@ -835,11 +835,24 @@
         document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
         document.addEventListener('mozfullscreenchange', handleFullscreenChange);
         document.addEventListener('MSFullscreenChange', handleFullscreenChange);
-    </script>
 
-    <style>
-        #installButton.hidden {
-            display: none !important;
+        function handleFullscreenChange() {
+            var iconCode = document.querySelector('#FullScrIcon');
+			var fsButton = document.querySelector('#FullScreen'); // Added for tooltip
+            count = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement ? 1 : 0;
+            iconCode.textContent = count ? '\ue5d1' : '\ue5d0';
+			// New logic for tooltip (using the same 'count' variable)
+            if (fsButton) {
+                var newTooltip = count ? _("Exit Fullscreen") : _("Full screen");
+                fsButton.setAttribute('data-tooltip', newTooltip);
+
+                // Refresh the Materialize tooltip instance
+                if (typeof M !== 'undefined' && M.Tooltip) {
+                    var instance = M.Tooltip.getInstance(fsButton);
+                    if (instance) instance.destroy();
+                    M.Tooltip.init(fsButton);
+                }
+            }
         }
     </style>
 
