@@ -1473,7 +1473,43 @@ function setupWidgetBlocks(activity) {
             logo.inMatrix = true;
 
             if (logo.phraseMaker === null) {
-                logo.phraseMaker = new PhraseMaker();
+                // Create explicit dependency object for PhraseMaker
+                const phraseMakerDeps = {
+                    activity: activity,
+                    _: _,
+                    platformColor: platformColor,
+                    docById: docById,
+                    docBySelector: docBySelector,
+                    MATRIXSOLFEHEIGHT: MATRIXSOLFEHEIGHT,
+                    MATRIXSOLFEWIDTH: MATRIXSOLFEWIDTH,
+                    toFraction: toFraction,
+                    Singer: Singer,
+                    SOLFEGECONVERSIONTABLE: SOLFEGECONVERSIONTABLE,
+                    slicePath: slicePath,
+                    wheelnav: wheelnav,
+                    delayExecution: delayExecution,
+                    DEFAULTVOICE: DEFAULTVOICE,
+                    getDrumName: getDrumName,
+                    getDrumIcon: getDrumIcon,
+                    noteIsSolfege: noteIsSolfege,
+                    isCustomTemperament: isCustomTemperament,
+                    i18nSolfege: i18nSolfege,
+                    getNote: getNote,
+                    DEFAULTDRUM: DEFAULTDRUM,
+                    last: last,
+                    DRUMS: DRUMS,
+                    SHARP: SHARP,
+                    FLAT: FLAT,
+                    PREVIEWVOLUME: PREVIEWVOLUME,
+                    DEFAULTVOLUME: DEFAULTVOLUME,
+                    noteToFrequency: noteToFrequency,
+                    LCD: LCD,
+                    calcNoteValueToDisplay: calcNoteValueToDisplay,
+                    NOTESYMBOLS: NOTESYMBOLS,
+                    EIGHTHNOTEWIDTH: EIGHTHNOTEWIDTH,
+                    getTemperament: getTemperament
+                };
+                logo.phraseMaker = new PhraseMaker(phraseMakerDeps);
             }
             logo.phraseMaker.blockNo = blk;
 
@@ -1876,4 +1912,8 @@ function setupWidgetBlocks(activity) {
     new AIDebugger().setup(activity);
     // Instantiate and set up the StatusBlock
     new StatusBlock().setup(activity);
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupWidgetBlocks };
 }

@@ -135,7 +135,9 @@ class Singer {
         this.instrumentNames = [];
         this.inCrescendo = [];
         this.crescendoDelta = [];
-        this.crescendoInitialVolume = { DEFAULTVOICE: [DEFAULTVOLUME] };
+        this.crescendoInitialVolume = {
+            DEFAULTVOICE: [typeof DEFAULTVOLUME !== "undefined" ? DEFAULTVOLUME : 50]
+        };
         this.intervals = []; // relative interval (based on scale degree)
         this.semitoneIntervals = []; // absolute interval (based on semitones)
         this.chordIntervals = []; // combination of scale degree and semitones
@@ -153,6 +155,10 @@ class Singer {
         this.tieFirstDrums = [];
         this.synthVolume = {};
         this.drift = 0;
+        // Maximum fraction of note duration that can be used for lag correction per note.
+        // This prevents notes from being rushed when catching up to the master clock.
+        // Value of 0.25 means at most 25% of a note's duration can be skipped for catch-up.
+        this.maxLagCorrectionRatio = 0.25;
         this.drumStyle = [];
         this.voices = [];
         this.backward = [];
@@ -208,9 +214,15 @@ class Singer {
 
     // ========= Class variables ==============================================
     // Parameters used by notes
-    static masterBPM = TARGETBPM;
-    static defaultBPMFactor = TONEBPM / TARGETBPM;
-    static masterVolume = [DEFAULTVOLUME];
+    // Note: These globals (TARGETBPM, TONEBPM, DEFAULTVOLUME) are defined in logo.js.
+    // We use safe defaults here because this file may load before logo.js due to
+    // the RequireJS dependency chain.
+    static masterBPM = typeof TARGETBPM !== "undefined" ? TARGETBPM : 120;
+    static defaultBPMFactor =
+        typeof TONEBPM !== "undefined" && typeof TARGETBPM !== "undefined"
+            ? TONEBPM / TARGETBPM
+            : 1;
+    static masterVolume = [typeof DEFAULTVOLUME !== "undefined" ? DEFAULTVOLUME : 50];
 
     // ========= Deprecated ===================================================
 
@@ -648,18 +660,6 @@ class Singer {
         tur.painter.doPenUp();
         tur.painter.doSetXY(saveState.x, saveState.y);
         tur.painter.doSetHeading(saveState.orientation);
-        tur.painter.doSetXY(saveX, saveY);
-        tur.painter.color = saveColor;
-        tur.painter.value = saveValue;
-        tur.painter.chroma = saveChroma;
-        tur.painter.stroke = saveStroke;
-        tur.painter.canvasAlpha = saveCanvasAlpha;
-        tur.painter.doSetHeading(saveOrientation);
-        tur.painter.penState = savePenState;
-        tur.singer.suppressOutput = saveSuppressStatus;
-        tur.singer.previousTurtleTime = savePrevTurtleTime;
-        tur.singer.turtleTime = saveTurtleTime;
-        tur.singer.whichNoteToCount = saveWhichNoteToCount;
         tur.singer.justCounting.pop();
         tur.butNotThese = {};
 
@@ -1043,6 +1043,10 @@ class Singer {
                 if (noteObj[2] !== 0 && cents === 0) {
                     cents = noteObj[2];
                     // eslint-disable-next-line no-console
+                }
+
+                if (Math.abs(cents) < 1e-9) {
+                    cents = 0;
                 }
 
                 if (tur.singer.drumStyle.length > 0) {
@@ -1562,6 +1566,9 @@ class Singer {
             // We start the music clock as the first note is being played
             if (activity.logo.firstNoteTime === null) {
                 activity.logo.firstNoteTime = new Date().getTime();
+                if (typeof Tone !== "undefined") {
+                    activity.logo.firstNoteAudioTime = Tone.now();
+                }
             }
 
             // Calculate a lag: In case this turtle has fallen behind,
@@ -1569,8 +1576,18 @@ class Singer {
             const elapsedTime = (new Date().getTime() - activity.logo.firstNoteTime) / 1000;
 
             // When we are "drifting", we don't bother with lag.
-            const turtleLag =
-                tur.singer.drift === 0 ? Math.max(elapsedTime - tur.singer.turtleTime, 0) : 0;
+            // When not drifting, we limit the lag correction to prevent notes from being rushed.
+            // This ensures that note sequences play correctly even when the system is behind.
+            let turtleLag = 0;
+            if (tur.singer.drift === 0) {
+                const rawLag = Math.max(elapsedTime - tur.singer.turtleTime, 0);
+                // Calculate the maximum lag correction allowed for this note
+                // based on the note's duration to prevent rushing
+                const noteDuration = bpmFactor / noteBeatValue;
+                const maxLagCorrection = noteDuration * tur.singer.maxLagCorrectionRatio;
+                // Apply gradual lag correction: correct at most maxLagCorrection per note
+                turtleLag = Math.min(rawLag, maxLagCorrection);
+            }
 
             // Delay running graphics from second note in tie.
             let tieDelay = tur.singer.tie ? tur.singer.tieCarryOver : 0;
@@ -1680,11 +1697,11 @@ class Singer {
                         tur.singer.tie = false;
                         tieDelay = 0;
 
-                        /** @todo FIXME: consider osctime block in tie */
+                        // tieNoteExtras: [blk, oscList, noteBeat, noteBeatValues, noteDrums, graphics, isOsc, rawDurationValue]
                         Singer.processNote(
                             activity,
-                            tur.singer.tieCarryOver,
-                            false,
+                            tur.singer.tieNoteExtras[7], // rawDurationValue
+                            tur.singer.tieNoteExtras[6], // isOsc
                             saveBlk,
                             turtle
                         );
@@ -1692,9 +1709,15 @@ class Singer {
                         tur.singer.inNoteBlock.pop();
 
                         if (!tur.singer.suppressOutput) {
-                            tur.doWait(
-                                Math.max(bpmFactor / tur.singer.tieCarryOver - turtleLag, 0)
-                            );
+                            const rawDuration = tur.singer.tieNoteExtras[7];
+                            const wasOsc = tur.singer.tieNoteExtras[6];
+
+                            const waitSeconds = wasOsc
+                                ? rawDuration / 1000
+                                : bpmFactor / rawDuration;
+
+                            tur.singer.turtleTime += waitSeconds;
+                            tur.doWait(Math.max(waitSeconds - turtleLag, 0));
                         }
 
                         tieDelay = tur.singer.tieCarryOver;
@@ -1742,7 +1765,9 @@ class Singer {
                         tur.singer.noteBeat[saveBlk],
                         tur.singer.noteBeatValues[saveBlk],
                         tur.singer.noteDrums[saveBlk],
-                        []
+                        [],
+                        isOsc,
+                        noteValue // rawDurationValue
                     ];
 
                     // We play any drums in the first tied note along with the drums in the second tied note
@@ -1797,6 +1822,15 @@ class Singer {
             if (duration > 0) {
                 tur.singer.previousTurtleTime = tur.singer.turtleTime;
                 if (tur.singer.inNoteBlock.length === 1) {
+                    if (
+                        !tur.singer.suppressOutput &&
+                        activity.logo.firstNoteAudioTime !== null &&
+                        typeof Tone !== "undefined"
+                    ) {
+                        const audioElapsed = Tone.now() - activity.logo.firstNoteAudioTime;
+                        future = Math.max(tur.singer.previousTurtleTime - audioElapsed, 0);
+                    }
+
                     tur.singer.turtleTime += bpmFactor / duration;
                     if (!tur.singer.suppressOutput) {
                         tur.doWait(Math.max(bpmFactor / duration - turtleLag, 0));
@@ -1816,7 +1850,6 @@ class Singer {
                         }
                     }
                     // eslint-disable-next-line no-console
-                    console.log("Note in note " + blk + " delay " + future);
                 }
             }
             let forceSilence = false;
@@ -2476,4 +2509,9 @@ class Singer {
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = Singer;
+}
+
+// Export to global scope for browser (RequireJS shim)
+if (typeof window !== "undefined") {
+    window.Singer = Singer;
 }

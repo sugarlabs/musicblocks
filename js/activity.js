@@ -37,7 +37,8 @@
    SPECIALINPUTS, STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
    TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, Turtles, TURTLESVG,
    updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_F,
-   SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator
+   SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
+   MUSICALMODES, waitForReadiness
  */
 
 /*
@@ -65,7 +66,7 @@ let MYDEFINES = [
     "preloadjs.min",
     "howler",
     "p5.min",
-    "p5.sound.min",
+    "p5-sound-adapter",
     "p5.dom.min",
     // 'mespeak',
     "Chart",
@@ -305,7 +306,13 @@ class Activity {
         this.loadAnimationIntervalId = null;
 
         // Initialize GIF animator
-        this.gifAnimator = new GIFAnimator();
+        if (typeof GIFAnimator !== "undefined") {
+            this.gifAnimator = new GIFAnimator();
+        } else {
+            // eslint-disable-next-line no-console
+            console.debug("GIFAnimator not yet available in constructor");
+            this.gifAnimator = null;
+        }
 
         // Dirty flag for canvas rendering optimization
         // When true, the stage needs to be redrawn on the next animation frame
@@ -313,8 +320,22 @@ class Activity {
 
         this.themes = ["light", "dark"];
         try {
+            // Detect system theme preference (using same logic as ThemeBox)
+            const getSystemTheme = () => {
+                if (
+                    window.matchMedia &&
+                    window.matchMedia("(prefers-color-scheme: dark)").matches
+                ) {
+                    return "dark";
+                }
+                return "light";
+            };
+
+            // Use stored preference, fallback to system preference
+            const activeTheme = this.storage.themePreference || getSystemTheme();
+
             for (let i = 0; i < this.themes.length; i++) {
-                if (this.themes[i] === this.storage.themePreference) {
+                if (this.themes[i] === activeTheme) {
                     body.classList.add(this.themes[i]);
                 } else {
                     body.classList.remove(this.themes[i]);
@@ -361,8 +382,6 @@ class Activity {
         this.KeySignatureEnv = ["C", "major", false];
         try {
             if (this.storage.KeySignatureEnv !== undefined) {
-                // eslint-disable-next-line no-console
-                console.log(this.storage.KeySignatureEnv);
                 this.KeySignatureEnv = this.storage.KeySignatureEnv.split(",");
                 this.KeySignatureEnv[2] = this.KeySignatureEnv[2] === "true";
             }
@@ -467,6 +486,11 @@ class Activity {
             this.helpfulWheelItems = [];
 
             this.setHelpfulSearchDiv();
+
+            // Late initialization of GIF animator if it was missed in constructor
+            if (!this.gifAnimator && typeof GIFAnimator !== "undefined") {
+                this.gifAnimator = new GIFAnimator();
+            }
         };
 
         /*
@@ -866,7 +890,8 @@ class Activity {
         }
 
         //if any window resize event occurs:
-        this.addEventListener(window, "resize", () => repositionBlocks(this));
+        this._handleRepositionBlocksOnResize = () => repositionBlocks(this);
+        this.addEventListener(window, "resize", this._handleRepositionBlocksOnResize);
 
         /**
          * Finds and organizes blocks within the workspace.
@@ -1249,6 +1274,20 @@ class Activity {
             this.sendAllToTrash(true, true);
         };
 
+        const extractSVGInner = svgString => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(svgString, "image/svg+xml");
+            const svgEl = doc.querySelector("svg");
+            if (!svgEl) return "";
+
+            // Remove drop shadow filters safely
+            svgEl.querySelectorAll("[filter]").forEach(el => {
+                el.removeAttribute("filter");
+            });
+
+            return svgEl.innerHTML;
+        };
+
         /**
          * @returns {SVG} returns SVG of blocks
          */
@@ -1272,11 +1311,9 @@ class Activity {
                     yMax = this.blocks.blockList[i].container.y + this.blocks.blockList[i].height;
                 }
 
-                if (this.blocks.blockList[i].collapsed) {
-                    parts = this.blocks.blockCollapseArt[i].split("><");
-                } else {
-                    parts = this.blocks.blockArt[i].split("><");
-                }
+                const rawSVG = this.blocks.blockList[i].collapsed
+                    ? this.blocks.blockCollapseArt[i]
+                    : this.blocks.blockArt[i];
 
                 if (this.blocks.blockList[i].isCollapsible()) {
                     svg += "<g>";
@@ -1288,47 +1325,51 @@ class Activity {
                     ", " +
                     this.blocks.blockList[i].container.y +
                     ')">';
-                if (SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
-                    for (let p = 1; p < parts.length; p++) {
-                        // FIXME: This is fragile.
-                        if (p === 1) {
-                            svg += "<" + parts[p] + "><";
-                        } else if (p === 2) {
-                            // skip filter
-                        } else if (p === 3) {
-                            svg += parts[p].replace("filter:url(#dropshadow);", "") + "><";
-                        } else if (p === 5) {
-                            // Add block value to SVG between tspans
-                            if (typeof this.blocks.blockList[i].value === "string") {
-                                svg += parts[p] + ">" + _(this.blocks.blockList[i].value) + "<";
-                            } else {
-                                svg += parts[p] + ">" + this.blocks.blockList[i].value + "<";
-                            }
-                        } else if (p === parts.length - 2) {
-                            svg += parts[p] + ">";
-                        } else if (p === parts.length - 1) {
-                            // skip final </svg>
-                        } else {
-                            svg += parts[p] + "><";
-                        }
-                    }
+
+                if (!SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
+                    svg += extractSVGInner(rawSVG);
                 } else {
-                    for (let p = 1; p < parts.length; p++) {
-                        // FIXME: This is fragile.
-                        if (p === 1) {
-                            svg += "<" + parts[p] + "><";
-                        } else if (p === 2) {
-                            // skip filter
-                        } else if (p === 3) {
-                            svg += parts[p].replace("filter:url(#dropshadow);", "") + "><";
-                        } else if (p === parts.length - 2) {
-                            svg += parts[p] + ">";
-                        } else if (p === parts.length - 1) {
-                            // skip final </svg>
-                        } else {
-                            svg += parts[p] + "><";
-                        }
+                    // Safer SVG manipulation using DOM instead of string splitting
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(rawSVG, "image/svg+xml");
+
+                    // remove dropshadow filter if present
+                    const filtered = doc.querySelector('[style*="filter:url(#dropshadow)"]');
+                    if (filtered) {
+                        filtered.style.filter = "";
                     }
+
+                    // Find correct tspan to inject value (matches previous behaviour)
+                    let target = null;
+
+                    // 1) Prefer empty tspan (most block SVGs reserve this for value)
+                    target = Array.from(doc.querySelectorAll("text tspan")).find(
+                        t => !t.textContent || t.textContent.trim() === ""
+                    );
+
+                    // 2) Otherwise fallback to last tspan
+                    if (!target) {
+                        const tspans = doc.querySelectorAll("text tspan");
+                        if (tspans.length) target = tspans[tspans.length - 1];
+                    }
+
+                    // 3) Final fallback to text node
+                    if (!target) {
+                        target = doc.querySelector("text");
+                    }
+
+                    if (target) {
+                        const val = this.blocks.blockList[i].value;
+                        target.textContent = typeof val === "string" ? _(val) : val;
+                    }
+
+                    // serialize without outer <svg> wrapper (matches previous behavior)
+                    let serialized = new XMLSerializer().serializeToString(doc.documentElement);
+
+                    // remove outer svg tags because original code skipped them
+                    serialized = serialized.replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "");
+
+                    svg += serialized;
                 }
 
                 svg += "</g>";
@@ -1591,18 +1632,6 @@ class Activity {
 
                 this.blocksContainer.x = 0;
                 this.blocksContainer.y = 0;
-
-                Element.prototype.remove = () => {
-                    this.parentElement.removeChild(this);
-                };
-
-                NodeList.prototype.remove = HTMLCollection.prototype.remove = () => {
-                    for (let i = 0, len = this.length; i < len; i++) {
-                        if (this[i] && this[i].parentElement) {
-                            this[i].parentElement.removeChild(this[i]);
-                        }
-                    }
-                };
 
                 const table = document.getElementById("myTable");
                 if (table !== null) {
@@ -1899,9 +1928,8 @@ class Activity {
                 // Queue and take first step.
                 if (!this.turtles.running()) {
                     this.logo.runLogoCommands();
-                    document.getElementById(
-                        "stop"
-                    ).style.color = this.toolbar.stopIconColorWhenPlaying;
+                    document.getElementById("stop").style.color =
+                        this.toolbar.stopIconColorWhenPlaying;
                 }
                 this.logo.step();
             } else {
@@ -1969,7 +1997,6 @@ class Activity {
                 activity.save.savePNG.bind(activity.save),
                 activity.save.saveWAV.bind(activity.save),
                 activity.save.saveLilypond.bind(activity.save),
-                activity.save.saveLilypond.bind(afterSaveLilypond),
                 activity.save.afterSaveLilypondLY.bind(activity.save),
                 activity.save.saveAbc.bind(activity.save),
                 activity.save.saveMxml.bind(activity.save),
@@ -2221,9 +2248,8 @@ class Activity {
                     i < this.palettes.dict[this.palettes.activePalette].protoList.length;
                     i++
                 ) {
-                    const name = this.palettes.dict[this.palettes.activePalette].protoList[i][
-                        "name"
-                    ];
+                    const name =
+                        this.palettes.dict[this.palettes.activePalette].protoList[i]["name"];
                     if (name in obj["FLOWPLUGINS"]) {
                         // eslint-disable-next-line no-console
                         console.log("deleting " + name);
@@ -2722,6 +2748,60 @@ class Activity {
             img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svgData));
         };
 
+        /**
+         * Initializes the Idle Watcher mechanism to throttle createjs.Ticker
+         * when the application is inactive and no music is playing.
+         * This significantly reduces CPU usage and improves battery life.
+         */
+        this._initIdleWatcher = () => {
+            const IDLE_THRESHOLD = 5000; // 5 seconds
+            const ACTIVE_FPS = 60;
+            const IDLE_FPS = 1;
+
+            let lastActivity = Date.now();
+            let isIdle = false;
+
+            // Wake up function - restores full framerate
+            const resetIdleTimer = () => {
+                lastActivity = Date.now();
+                if (isIdle) {
+                    isIdle = false;
+                    createjs.Ticker.framerate = ACTIVE_FPS;
+                    // Force immediate redraw for responsiveness
+                    if (this.stage) this.stage.update();
+                }
+            };
+
+            // Track user activity
+            window.addEventListener("mousemove", resetIdleTimer);
+            window.addEventListener("mousedown", resetIdleTimer);
+            window.addEventListener("keydown", resetIdleTimer);
+            window.addEventListener("touchstart", resetIdleTimer);
+            window.addEventListener("wheel", resetIdleTimer);
+
+            // Periodic check for idle state
+            setInterval(() => {
+                // Check if music/code is playing
+                const isMusicPlaying = this.logo?._alreadyRunning || false;
+
+                if (!isMusicPlaying && Date.now() - lastActivity > IDLE_THRESHOLD) {
+                    if (!isIdle) {
+                        isIdle = true;
+                        createjs.Ticker.framerate = IDLE_FPS;
+                        console.log("⚡ Idle mode: Throttling to 1 FPS to save battery");
+                    }
+                } else if (isIdle && isMusicPlaying) {
+                    // Music started playing - wake up immediately
+                    resetIdleTimer();
+                }
+            }, 1000);
+
+            // Expose activity instance for external checks
+            if (typeof window !== "undefined") {
+                window.activity = this;
+            }
+        };
+
         /*
          * Creates and renders error message containers with appropriate artwork.
          * Some error messages have special artwork.
@@ -2788,6 +2868,12 @@ class Activity {
 
             this.searchSuggestions = [];
             this.deprecatedBlockNames = [];
+
+            // Guard: blocks may not be initialized yet during early loading
+            if (!this.blocks || !this.blocks.protoBlockDict) {
+                console.debug("prepSearchWidget: blocks not yet initialized, skipping");
+                return;
+            }
 
             for (const i in this.blocks.protoBlockDict) {
                 const block = this.blocks.protoBlockDict[i];
@@ -2975,45 +3061,154 @@ class Activity {
          * Uses JQuery to add autocompleted search suggestions
          */
         this.doSearch = () => {
-            const $j = jQuery.noConflict();
+            // Guard: ensure searchWidget exists before proceeding
+            if (!this.searchWidget) {
+                console.debug("doSearch: searchWidget not yet initialized, skipping");
+                return;
+            }
+
+            const $j = window.jQuery;
+            if (this.searchSuggestions.length === 0) {
+                this.prepSearchWidget();
+            }
 
             const that = this;
-            $j("#search").autocomplete({
-                source: that.searchSuggestions,
-                select: (event, ui) => {
-                    event.preventDefault();
-                    that.searchWidget.value = ui.item.label;
-                    that.searchWidget.idInput_custom = ui.item.value;
-                    that.searchWidget.protoblk = ui.item.specialDict;
-                    that.doSearch();
-                    if (event.keyCode === 13) this.searchWidget.style.visibility = "visible";
-                },
-                focus: event => {
-                    event.preventDefault();
-                }
-            });
+            const $search = $j("#search");
 
-            $j("#search").autocomplete("instance")._renderItem = (ul, item) => {
-                return $j("<li></li>")
-                    .data("item.autocomplete", item)
-                    .append(
-                        '<img src="' +
-                            item.artwork +
-                            '" height="20px">' +
-                            "<a> " +
-                            item.label +
-                            "</a>"
-                    )
-                    .appendTo(
-                        ul.css({
-                            "z-index": 9999,
-                            "max-height": "200px",
-                            "overflow-y": "auto"
-                        })
-                    );
-            };
+            if (!$search.data("autocomplete-init")) {
+                $search.autocomplete({
+                    source: that.searchSuggestions,
+                    appendTo: "body",
+                    select: (event, ui) => {
+                        event.preventDefault();
+                        that.searchWidget.value = ui.item.label;
+                        that.searchWidget.idInput_custom = ui.item.value;
+                        that.searchWidget.protoblk = ui.item.specialDict;
+                        that.doSearch();
+                        if (event.keyCode === 13) this.searchWidget.style.visibility = "visible";
+                    },
+                    focus: event => {
+                        event.preventDefault();
+                    }
+                });
+
+                const instance = $search.autocomplete("instance");
+                if (instance) {
+                    instance._renderItem = (ul, item) => {
+                        const li = $j("<li></li>");
+
+                        const img = document.createElement("img");
+                        img.src = item.artwork || "";
+                        img.height = 20;
+                        img.style.cursor = "grab";
+
+                        // Drag-and-drop: mirrors the palette drag pattern in
+                        // palette.js _showMenuItems(). Keep both in sync.
+                        img.ondragstart = () => false;
+
+                        const down = event => {
+                            // Stop jQuery UI autocomplete from handling this
+                            event.stopPropagation();
+                            event.stopImmediatePropagation();
+                            event.preventDefault();
+
+                            const posit = img.style.position;
+                            const zInd = img.style.zIndex;
+                            img.style.position = "absolute";
+                            img.style.zIndex = 10000;
+
+                            // Close the autocomplete dropdown
+                            $j("#search").autocomplete("close");
+
+                            document.body.appendChild(img);
+
+                            const moveAt = (pageX, pageY) => {
+                                img.style.left = pageX - img.offsetWidth / 2 + "px";
+                                img.style.top = pageY - img.offsetHeight / 2 + "px";
+                            };
+
+                            const onMouseMove = e => {
+                                e.preventDefault();
+                                let x, y;
+                                if (e.type === "touchmove") {
+                                    x = e.touches[0].clientX;
+                                    y = e.touches[0].clientY;
+                                } else {
+                                    x = e.pageX;
+                                    y = e.pageY;
+                                }
+                                moveAt(x, y);
+                            };
+                            onMouseMove(event);
+
+                            document.addEventListener("touchmove", onMouseMove, { passive: false });
+                            document.addEventListener("mousemove", onMouseMove);
+
+                            const up = () => {
+                                document.body.style.cursor = "default";
+                                document.removeEventListener("mousemove", onMouseMove);
+                                document.removeEventListener("touchmove", onMouseMove);
+
+                                const x = parseInt(img.style.left);
+                                const y = parseInt(img.style.top);
+
+                                img.style.position = posit;
+                                img.style.zIndex = zInd;
+                                if (img.parentNode === document.body) {
+                                    document.body.removeChild(img);
+                                }
+
+                                if (isNaN(x) && isNaN(y)) return;
+
+                                const protoblk = item.specialDict;
+                                const paletteName = protoblk.palette.name;
+                                const protoName = item.value;
+
+                                that.palettes.dict[paletteName].makeBlockFromSearch(
+                                    protoblk,
+                                    protoName,
+                                    newBlock => {
+                                        that.blocks.moveBlock(
+                                            newBlock,
+                                            (x || that.blocksContainer.x + 100) -
+                                                that.blocksContainer.x,
+                                            (y || that.blocksContainer.y + 100) -
+                                                that.blocksContainer.y
+                                        );
+                                    }
+                                );
+                            };
+
+                            document.addEventListener("mouseup", up, { once: true });
+                            document.addEventListener("touchend", up, { once: true });
+                        };
+
+                        // Capture phase fires BEFORE jQuery UI's event delegation
+                        img.addEventListener("mousedown", down, true);
+                        img.addEventListener("touchstart", down, { capture: true, passive: false });
+
+                        li.append(img);
+                        li.append("<a> " + item.label + "</a>");
+
+                        return li.appendTo(
+                            ul.css({
+                                "z-index": 35000,
+                                "max-height": "200px",
+                                "overflow-y": "auto"
+                            })
+                        );
+                    };
+                }
+                $search.data("autocomplete-init", true);
+            }
+
             const searchInput = this.searchWidget.idInput_custom;
-            if (!searchInput || searchInput.length <= 0) return;
+            if (!searchInput || searchInput.length <= 0) {
+                if (this.searchWidget.value && this.searchWidget.value.length > 0) {
+                    $search.autocomplete("search", this.searchWidget.value);
+                }
+                return;
+            }
 
             const protoblk = this.searchWidget.protoblk;
             const paletteName = protoblk.palette.name;
@@ -3298,6 +3493,10 @@ class Activity {
                         this._doHardStopButton();
                     } else if (!disableKeys && !hasOpenWidget) {
                         event.preventDefault();
+                        const stopbtn = document.getElementById("stop");
+                        if (stopbtn) {
+                            stopbtn.style.color = platformColor.stopIconcolor;
+                        }
                         this._doFastButton();
                     }
                 } else if (!disableKeys) {
@@ -3484,7 +3683,13 @@ class Activity {
                 return;
             }
 
-            const $j = jQuery.noConflict();
+            // Skip resize when the tab is hidden — canvas reports 0×0
+            // and any layout work would corrupt positions.
+            if (document.hidden) {
+                return;
+            }
+
+            const $j = window.jQuery;
             let w = 0,
                 h = 0;
             if (typeof platform !== "undefined" && !platform.androidWebkit) {
@@ -3501,6 +3706,12 @@ class Activity {
             this._innerHeight = window.innerHeight;
             this._outerWidth = window.outerWidth;
             this._outerHeight = window.outerHeight;
+
+            // Guard against zero or invalid dimensions to prevent
+            // division-by-zero and ResizeObserver loop errors
+            if (w <= 0 || h <= 0) {
+                return;
+            }
 
             if (document.getElementById("labelDiv").classList.contains("hasKeyboard")) {
                 return;
@@ -3675,6 +3886,11 @@ class Activity {
         const defaultHeight = 900;
 
         function handleResize() {
+            // Skip resize when the tab is hidden to prevent 0×0 canvas
+            if (document.hidden) {
+                return;
+            }
+
             const isMaximized =
                 window.innerWidth === window.screen.width &&
                 window.innerHeight === window.screen.height;
@@ -3690,6 +3906,12 @@ class Activity {
             } else {
                 const windowWidth = window.innerWidth;
                 const windowHeight = window.innerHeight;
+
+                // Guard against zero or invalid dimensions
+                if (windowWidth <= 0 || windowHeight <= 0) {
+                    return;
+                }
+
                 container.style.width = windowWidth + "px";
                 container.style.height = windowHeight + "px";
                 canvas.width = windowWidth;
@@ -3704,14 +3926,33 @@ class Activity {
         }
 
         let resizeTimeout;
-        this.addEventListener(window, "resize", () => {
+        this._handleWindowResize = () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
                 handleResize();
                 this._setupPaletteMenu();
-            }, 100);
-        });
-        this.addEventListener(window, "orientationchange", handleResize);
+            }, 200);
+        };
+        this.addEventListener(window, "resize", this._handleWindowResize);
+        this._handleOrientationChangeResize = handleResize;
+        this.addEventListener(window, "orientationchange", this._handleOrientationChangeResize);
+
+        // When the user returns to the Music Blocks tab after it was
+        // hidden, re-apply the correct dimensions.  While the tab was
+        // hidden the resize guards above intentionally skipped any
+        // layout work, so we need to catch up now.
+        this._handleVisibilityChange = () => {
+            if (!document.hidden && this.stage) {
+                // Use a short delay to let the browser finish
+                // exposing the tab and reporting real dimensions.
+                setTimeout(() => {
+                    handleResize();
+                    this._onResize(false);
+                }, 250);
+            }
+        };
+        this.addEventListener(document, "visibilitychange", this._handleVisibilityChange);
+
         const that = this;
         const resizeCanvas_ = () => {
             try {
@@ -3724,7 +3965,12 @@ class Activity {
         };
 
         resizeCanvas_();
-        this.addEventListener(window, "orientationchange", resizeCanvas_);
+        this._handleOrientationChangeResizeCanvas = resizeCanvas_;
+        this.addEventListener(
+            window,
+            "orientationchange",
+            this._handleOrientationChangeResizeCanvas
+        );
 
         /*
          * Restore last stack pushed to trashStack back onto canvas.
@@ -3836,6 +4082,15 @@ class Activity {
                             }
                         }
                     }
+
+                    // Re-add the action to the palette
+                    const actionName = actionArg.value;
+                    this.blocks.newNameddoBlock(
+                        actionName,
+                        this.blocks.actionHasReturn(blockId),
+                        this.blocks.actionHasArgs(blockId)
+                    );
+                    this.palettes.updatePalettes("action");
                 }
             }
             activity.textMsg(_("Item restored from the trash."), 3000);
@@ -3848,18 +4103,30 @@ class Activity {
             this._renderTrashView();
         });
 
+        // Store the click handler reference for proper cleanup
+        let trashViewClickHandler = null;
+
         // function to hide trashView from canvas
         function handleClickOutsideTrashView(trashView) {
+            // Remove existing listener to prevent duplicates
+            if (trashViewClickHandler) {
+                document.removeEventListener("click", trashViewClickHandler);
+            }
+
             let firstClick = true;
-            document.addEventListener("click", event => {
+            trashViewClickHandler = event => {
                 if (firstClick) {
                     firstClick = false;
                     return;
                 }
                 if (!trashView.contains(event.target) && event.target !== trashView) {
                     trashView.style.display = "none";
+                    // Clean up listener when trashView is hidden
+                    document.removeEventListener("click", trashViewClickHandler);
+                    trashViewClickHandler = null;
                 }
-            });
+            };
+            document.addEventListener("click", trashViewClickHandler);
         }
 
         this._renderTrashView = () => {
@@ -4930,9 +5197,8 @@ class Activity {
                             }
                         }
                         staffBlocksMap[staffIndex].baseBlocks[0][0][firstnammedo][4][0] = blockId;
-                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
-                            endnammedo
-                        ][4][1] = null;
+                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][endnammedo][4][1] =
+                            null;
 
                         blockId += 2;
                     } else {
@@ -5000,9 +5266,8 @@ class Activity {
                                 prevnameddo
                             ][4][1] = blockId;
                         } else {
-                            staffBlocksMap[staffIndex].repeatBlock[
-                                prevrepeatnameddo
-                            ][4][3] = blockId;
+                            staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3] =
+                                blockId;
                         }
                         if (afternamedo !== -1) {
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
@@ -5045,18 +5310,11 @@ class Activity {
         };
 
         /**
-         * Calculate time such that no matter how long it takes to load the program, the loading
-         * animation will cycle at least once.
          * @param loadProject all params are from load project function
          */
         this.loadStartWrapper = async (func, arg1, arg2, arg3) => {
-            const time1 = new Date();
             await func(this, arg1, arg2, arg3);
-
-            const time2 = new Date();
-            const elapsedTime = time2.getTime() - time1.getTime();
-            const timeLeft = Math.max(6000 - elapsedTime);
-            setTimeout(this.showContents, timeLeft);
+            this.showContents();
         };
 
         /*
@@ -5064,13 +5322,37 @@ class Activity {
          * Shows contents of MB after loading screen.
          */
         this.showContents = () => {
-            document.getElementById("loading-image-container").style.display = "none";
-            document.getElementById("bottom-right-logo").style.display = "none";
-            document.getElementById("palette").style.display = "block";
-            // document.getElementById('canvas').style.display = 'none';
-            document.getElementById("hideContents").style.display = "block";
-            document.getElementById("buttoncontainerBOTTOM").style.display = "block";
-            document.getElementById("buttoncontainerTOP").style.display = "block";
+            clearInterval(window.intervalId);
+            document.getElementById("loadingText").textContent = _("Loading Complete!");
+
+            setTimeout(() => {
+                const loadingText = document.getElementById("loadingText");
+                if (loadingText) loadingText.textContent = null;
+
+                const loadingImageContainer = document.getElementById("loading-image-container");
+                if (loadingImageContainer) loadingImageContainer.style.display = "none";
+
+                // Try hiding load-container instead if it exists
+                const loadContainer = document.getElementById("load-container");
+                if (loadContainer) loadContainer.style.display = "none";
+
+                const bottomRightLogo = document.getElementById("bottom-right-logo");
+                if (bottomRightLogo) bottomRightLogo.style.display = "none";
+
+                const palette = document.getElementById("palette");
+                if (palette) palette.style.display = "block";
+
+                // document.getElementById('canvas').style.display = 'none';
+
+                const hideContents = document.getElementById("hideContents");
+                if (hideContents) hideContents.style.display = "block";
+
+                const btnBottom = document.getElementById("buttoncontainerBOTTOM");
+                if (btnBottom) btnBottom.style.display = "block";
+
+                const btnTop = document.getElementById("buttoncontainerTOP");
+                if (btnTop) btnTop.style.display = "block";
+            }, 500);
         };
 
         this.justLoadStart = () => {
@@ -5112,8 +5394,13 @@ class Activity {
          * Hides all message containers
          */
         this.hideMsgs = () => {
-            // FIXME: When running before everything is set up.
-            if (this.errorMsgText === null) {
+            // The containers may not be ready yet, so check before accessing.
+            if (
+                this.errorMsgText === null ||
+                this.msgText === null ||
+                this.errorText === undefined ||
+                this.printText === undefined
+            ) {
                 return;
             }
             this.errorMsgText.parent.visible = false;
@@ -5597,7 +5884,9 @@ class Activity {
             this.update = true;
         };
 
-        this.__showAltoAccidentals = () => {};
+        this.__showAltoAccidentals = () => {
+            // No-op for Alto clef
+        };
 
         /*
          * Shows musical alto staff
@@ -5853,8 +6142,8 @@ class Activity {
                                 let customName = "custom";
                                 if (myBlock.connections[1] !== null) {
                                     // eslint-disable-next-line max-len
-                                    customName = this.blocks.blockList[myBlock.connections[1]]
-                                        .value;
+                                    customName =
+                                        this.blocks.blockList[myBlock.connections[1]].value;
                                 }
                                 // eslint-disable-next-line no-console
                                 console.log(customName);
@@ -6211,7 +6500,7 @@ class Activity {
          */
         this.showHelpfulSearchWidget = () => {
             // Bring widget to top.
-            const $j = jQuery.noConflict();
+            const $j = window.jQuery;
             if ($j("#helpfulSearch")) {
                 try {
                     $j("#helpfulSearch").autocomplete("destroy");
@@ -6242,39 +6531,56 @@ class Activity {
          * Uses JQuery to add autocompleted search suggestions
          */
         this.doHelpfulSearch = () => {
-            const $j = jQuery.noConflict();
+            const $j = window.jQuery;
+            if (this.searchSuggestions.length === 0) {
+                this.prepSearchWidget();
+            }
 
             const that = this;
-            $j("#helpfulSearch").autocomplete({
-                source: that.searchSuggestions,
-                select: (event, ui) => {
-                    event.preventDefault();
-                    that.helpfulSearchWidget.value = ui.item.label;
-                    that.helpfulSearchWidget.idInput_custom = ui.item.value;
-                    that.helpfulSearchWidget.protoblk = ui.item.specialDict;
-                    that.doHelpfulSearch();
-                },
-                focus: event => {
-                    event.preventDefault();
-                }
-            });
+            const $helpfulSearch = $j("#helpfulSearch");
 
-            $j("#helpfulSearch").autocomplete("instance")._renderItem = (ul, item) => {
-                return $j("<li></li>")
-                    .data("item.autocomplete", item)
-                    .append(
-                        '<img src="' +
-                            item.artwork +
-                            '" height = "20px">' +
-                            "<a>" +
-                            " " +
-                            item.label +
-                            "</a>"
-                    )
-                    .appendTo(ul.css("z-index", 9999));
-            };
+            if (!$helpfulSearch.data("autocomplete-init")) {
+                $helpfulSearch.autocomplete({
+                    source: that.searchSuggestions,
+                    appendTo: "body",
+                    select: (event, ui) => {
+                        event.preventDefault();
+                        that.helpfulSearchWidget.value = ui.item.label;
+                        that.helpfulSearchWidget.idInput_custom = ui.item.value;
+                        that.helpfulSearchWidget.protoblk = ui.item.specialDict;
+                        that.doHelpfulSearch();
+                    },
+                    focus: event => {
+                        event.preventDefault();
+                    }
+                });
+
+                const instance = $helpfulSearch.autocomplete("instance");
+                if (instance) {
+                    instance._renderItem = (ul, item) => {
+                        return $j("<li></li>")
+                            .append(
+                                '<img src="' +
+                                    (item.artwork || "") +
+                                    '" height = "20px">' +
+                                    "<a>" +
+                                    " " +
+                                    item.label +
+                                    "</a>"
+                            )
+                            .appendTo(ul.css("z-index", 35000));
+                    };
+                }
+                $helpfulSearch.data("autocomplete-init", true);
+            }
+
             const searchInput = this.helpfulSearchWidget.idInput_custom;
-            if (!searchInput || searchInput.length <= 0) return;
+            if (!searchInput || searchInput.length <= 0) {
+                if (this.helpfulSearchWidget.value && this.helpfulSearchWidget.value.length > 0) {
+                    $helpfulSearch.autocomplete("search", this.helpfulSearchWidget.value);
+                }
+                return;
+            }
 
             const protoblk = this.helpfulSearchWidget.protoblk;
             const paletteName = protoblk.palette.name;
@@ -6355,7 +6661,7 @@ class Activity {
             container.setAttribute("class", "tooltipped");
             container.setAttribute("data-tooltip", label);
             container.setAttribute("data-position", "top");
-            jQuery.noConflict()(".tooltipped").tooltip({
+            window.jQuery(".tooltipped").tooltip({
                 html: true,
                 delay: 100
             });
@@ -6832,20 +7138,23 @@ class Activity {
             this.stage = new createjs.Stage(this.canvas);
             createjs.Touch.enable(this.stage);
 
-            // createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
-            // createjs.Ticker.framerate = 15;
-            // createjs.Ticker.addEventListener('tick', this.stage);
-            // createjs.Ticker.addEventListener('tick', that.__tick);
+            // Initialize Ticker with optimal framerate
+            createjs.Ticker.framerate = 60;
 
+            // ===== Idle Ticker Optimization =====
+            // Throttle rendering when user is inactive and no music is playing
+            this._initIdleWatcher();
+
+            // Named event handlers for proper cleanup
             let mouseEvents = 0;
-            document.addEventListener("mousemove", () => {
+            this.handleMouseMove = () => {
                 mouseEvents++;
                 if (mouseEvents % 4 === 0) {
                     that.__tick();
                 }
-            });
+            };
 
-            document.addEventListener("click", e => {
+            this.handleDocumentClick = e => {
                 if (!this.hasMouseMoved) {
                     if (this.selectionModeOn) {
                         this.deselectSelectedBlocks();
@@ -6853,7 +7162,11 @@ class Activity {
                         this._hideHelpfulSearchWidget(e);
                     }
                 }
-            });
+            };
+
+            // Use managed addEventListener for automatic cleanup
+            this.addEventListener(document, "mousemove", this.handleMouseMove);
+            this.addEventListener(document, "click", this.handleDocumentClick);
 
             this._createMsgContainer(
                 "#ffffff",
@@ -6992,8 +7305,13 @@ class Activity {
             // Load custom mode saved in local storage.
             const custommodeData = this.storage.custommode;
             if (custommodeData !== undefined) {
-                // FIX ME: customMode is loaded but not yet used
-                JSON.parse(custommodeData);
+                // Parse and update the custom musical mode with saved data.
+                try {
+                    const customModeDataObj = JSON.parse(custommodeData);
+                    Object.assign(MUSICALMODES["custom"], customModeDataObj);
+                } catch (e) {
+                    console.error("Error parsing custommode data:", e);
+                }
             }
 
             this.fileChooser.addEventListener("click", () => {
@@ -7214,21 +7532,6 @@ class Activity {
                     });
                 };
 
-                // Music Block Parser from abc to MB
-                abcReader.onload = event => {
-                    //get the abc data and replace the / so that the block does not break
-                    let abcData = event.target.result;
-                    abcData = abcData.replace(/\\/g, "");
-
-                    const tunebook = new ABCJS.parseOnly(abcData);
-                    // eslint-disable-next-line no-console
-                    console.log(tunebook);
-                    tunebook.forEach(tune => {
-                        //call parseABC to parse abcdata to MB json
-                        this.parseABC(tune);
-                    });
-                };
-
                 // Work-around in case the handler is called by the
                 // widget drag & drop code.
                 if (files[0] !== undefined) {
@@ -7245,7 +7548,6 @@ class Activity {
                         abcReader.readAsText(files[0]);
                         return;
                     }
-                    reader.readAsText(files[0]);
                     reader.readAsText(files[0]);
                     window.scroll(0, 0);
                 }
@@ -7502,10 +7804,14 @@ class Activity {
             document.addEventListener("DOMMouseScroll", scrollEvent, false);
             */
 
+            // Named event handler for proper cleanup
             const activity = this;
-            document.onkeydown = () => {
+            this.handleKeyDown = event => {
                 activity.__keyPressed(event);
             };
+
+            // Use managed addEventListener instead of onkeydown assignment
+            this.addEventListener(document, "keydown", this.handleKeyDown);
 
             if (this.planet !== undefined) {
                 this.planet.planet.setAnalyzeProject(doAnalyzeProject);
@@ -7684,15 +7990,45 @@ class Activity {
 
 const activity = new Activity();
 
-require(["domReady!"], doc => {
-    setTimeout(() => {
-        activity.setupDependencies();
-        activity.domReady(doc);
-    }, 5000);
-});
+// Execute initialization once all RequireJS modules are loaded AND DOM is ready
+define(["domReady!"].concat(MYDEFINES), doc => {
+    const initialize = () => {
+        // Defensive check for multiple critical globals that may be delayed
+        // due to 'defer' execution timing variances.
+        const globalsReady =
+            typeof createDefaultStack !== "undefined" &&
+            typeof createjs !== "undefined" &&
+            typeof Tone !== "undefined" &&
+            typeof GIFAnimator !== "undefined" &&
+            typeof SuperGif !== "undefined";
 
-define(MYDEFINES, () => {
-    activity.setupDependencies();
-    activity.doContextMenus();
-    activity.doPluginsAndPaletteCols();
+        if (globalsReady) {
+            activity.setupDependencies();
+            activity.domReady(doc);
+            activity.doContextMenus();
+            activity.doPluginsAndPaletteCols();
+        } else {
+            // Race condition in Firefox: non-AMD scripts might not have
+            // finished global assignment yet.
+            // Use readiness-based initialization for Firefox for better performance
+            if (typeof jQuery !== "undefined" && jQuery.browser && jQuery.browser.mozilla) {
+                waitForReadiness(
+                    () => {
+                        activity.setupDependencies();
+                        activity.domReady(doc);
+                        activity.doContextMenus();
+                        activity.doPluginsAndPaletteCols();
+                    },
+                    {
+                        maxWait: 10000,
+                        minWait: 500,
+                        checkInterval: 100
+                    }
+                );
+            } else {
+                setTimeout(initialize, 50); // Increased delay slightly
+            }
+        }
+    };
+    initialize();
 });

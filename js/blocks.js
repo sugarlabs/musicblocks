@@ -69,6 +69,77 @@ const VIDEOVALUE = "##__VIDEO__##";
 const NOTEBLOCKS = ["newnote", "osctime"];
 const PITCHBLOCKS = ["pitch", "steppitch", "hertz", "pitchnumber", "nthmodalpitch", "playdrum"];
 
+const ALLOWED_CONNECTIONS = new Set([
+    "vspaceout:vspacein",
+    "vspacein:vspaceout",
+    "in:out",
+    "out:in",
+    "in:vspaceout",
+    "vspaceout:in",
+    "out:vspacein",
+    "vspacein:out",
+    "numberin:numberout",
+    "numberin:anyout",
+    "numberout:numberin",
+    "anyout:numberin",
+    "textin:textout",
+    "textin:anyout",
+    "textout:textin",
+    "anyout:textin",
+    "booleanout:booleanin",
+    "booleanin:booleanout",
+    "mediain:mediaout",
+    "mediaout:mediain",
+    "mediain:textout",
+    "textout:mediain",
+    "filein:fileout",
+    "fileout:filein",
+    "casein:caseout",
+    "caseout:casein",
+    "vspaceout:casein",
+    "casein:vspaceout",
+    "vspacein:caseout",
+    "caseout:vspacein",
+    "solfegein:anyout",
+    "solfegein:solfegeout",
+    "solfegein:textout",
+    "solfegein:noteout",
+    "solfegein:scaledegreeout",
+    "solfegein:numberout",
+    "anyout:solfegein",
+    "solfegeout:solfegein",
+    "textout:solfegein",
+    "noteout:solfegein",
+    "scaledegreeout:solfegein",
+    "numberout:solfegein",
+    "notein:solfegeout",
+    "notein:scaledegreeout",
+    "notein:textout",
+    "notein:noteout",
+    "solfegeout:notein",
+    "scaledegreeout:notein",
+    "textout:notein",
+    "noteout:notein",
+    "pitchout:anyin",
+    "gridout:anyin",
+    "anyin:textout",
+    "anyin:mediaout",
+    "anyin:numberout",
+    "anyin:anyout",
+    "anyin:fileout",
+    "anyin:solfegeout",
+    "anyin:scaledegreeout",
+    "anyin:noteout",
+    "textout:anyin",
+    "mediaout:anyin",
+    "numberout:anyin",
+    "anyout:anyin",
+    "fileout:anyin",
+    "solfegeout:anyin",
+    "scaledegreeout:anyin",
+    "noteout:anyin"
+]);
+
 /**
  * Blocks holds the list of blocks and most of the block-associated
  * methods, since most block manipulations are inter-block.
@@ -562,7 +633,7 @@ class Blocks {
 
             /** Which connection do we start with? */
             let ci;
-            if (["doArg", "calcArg", "makeblock"].includes(myBlock.name)) {
+            if (myBlock.isArgumentLikeBlock()) {
                 ci = 2;
             } else {
                 ci = 1;
@@ -925,14 +996,14 @@ class Blocks {
                     // eslint-disable-next-line no-console
                     console.debug(
                         "Did not find match for " +
-                            myBlock.name +
-                            " (" +
-                            blk +
-                            ") and " +
-                            this.blockList[cblk].name +
-                            " (" +
-                            cblk +
-                            ")"
+                        myBlock.name +
+                        " (" +
+                        blk +
+                        ") and " +
+                        this.blockList[cblk].name +
+                        " (" +
+                        cblk +
+                        ")"
                     );
                     // eslint-disable-next-line no-console
                     console.debug(myBlock.connections);
@@ -1650,6 +1721,9 @@ class Blocks {
                     start = this.blockList[b].connections.length - 1;
                 }
 
+                const ILLEGAL_BOUNCE_DIST = 400; // squared distance (20px)
+                let bounced = false;
+
                 for (let i = start; i < this.blockList[b].connections.length; i++) {
                     /**
                      * When converting from Python projects to JS format,
@@ -1705,11 +1779,42 @@ class Blocks {
                             min = dist;
                         }
                     } else {
-                        /**
-                         * TODO: bounce away from illegal connection?
-                         * only if the distance was small
-                         * console.debug('cannot not connect these two block types');
-                         */
+                        // Bounce away from illegal connection if the distance was small.
+                        if (!myBlock.isDragging) {
+                            const x2 =
+                                this.blockList[b].container.x + this.blockList[b].docks[i][0];
+                            const y2 =
+                                this.blockList[b].container.y + this.blockList[b].docks[i][1];
+
+                            const dx = x2 - x1;
+                            const dy = y2 - y1;
+                            const dist = dx * dx + dy * dy;
+
+                            if (!bounced && dist < ILLEGAL_BOUNCE_DIST) {
+                                console.debug("cannot connect these two block types");
+
+                                const distance = Math.sqrt(dist) || 0.0001;
+                                const bounceFactor = 60;
+
+                                // Snap back first
+                                if (myBlock.lastGoodX !== undefined) {
+                                    myBlock.container.x = myBlock.lastGoodX;
+                                    myBlock.container.y = myBlock.lastGoodY;
+                                }
+
+                                // Directional push away from illegal dock based on block type
+                                if (myBlock.isArgBlock()) {
+                                    // Arg blocks bounce to the right
+                                    myBlock.container.x += bounceFactor;
+                                } else {
+                                    // Flow blocks bounce below and to the right
+                                    myBlock.container.x += bounceFactor * 0.7;
+                                    myBlock.container.y += bounceFactor;
+                                }
+
+                                bounced = true;
+                            }
+                        }
                     }
                 }
             }
@@ -1728,12 +1833,7 @@ class Blocks {
                 if (connection == null) {
                     if (this.blockList[newBlock].isArgClamp()) {
                         /** If it is an arg clamp, we may have to adjust the slot size. */
-                        if (
-                            ["doArg", "calcArg", "makeblock"].indexOf(
-                                this.blockList[newBlock].name
-                            ) !== -1 &&
-                            newConnection === 1
-                        ) {
+                        if (this.blockList[newBlock].isArgumentLikeBlock() && newConnection === 1) {
                             /** pass */
                         } else if (
                             ["doArg", "nameddoArg"].includes(this.blockList[newBlock].name) &&
@@ -1748,11 +1848,7 @@ class Blocks {
                             const slotList = this.blockList[newBlock].argClampSlots;
                             let si = newConnection - 1;
                             /** Which slot is this block in? */
-                            if (
-                                ["doArg", "calcArg", "makeblock"].includes(
-                                    this.blockList[newBlock].name
-                                )
-                            ) {
+                            if (this.blockList[newBlock].isArgumentLikeBlock()) {
                                 si = newConnection - 2;
                             }
 
@@ -1780,12 +1876,7 @@ class Blocks {
                      */
                     insertAfterDefault = false;
                     if (this.blockList[newBlock].isArgClamp()) {
-                        if (
-                            ["doArg", "calcArg", "makeblock"].indexOf(
-                                this.blockList[newBlock].name
-                            ) !== -1 &&
-                            newConnection === 1
-                        ) {
+                        if (this.blockList[newBlock].isArgumentLikeBlock() && newConnection === 1) {
                             /**
                              * If it is the action name then treat it like
                              * a standard replacement.
@@ -1819,11 +1910,7 @@ class Blocks {
                             /** Which slot is this block in? */
                             const ci = this.blockList[newBlock].connections.indexOf(connection);
                             let si = ci - 1;
-                            if (
-                                ["doArg", "calcArg", "makeblock"].includes(
-                                    this.blockList[newBlock].name
-                                )
-                            ) {
+                            if (this.blockList[newBlock].isArgumentLikeBlock()) {
                                 si = ci - 2;
                             }
 
@@ -1929,7 +2016,7 @@ class Blocks {
                                     if (
                                         protoblock.name === "nameddo" &&
                                         protoblock.staticLabels[0] ===
-                                            this.blockList[connection].value
+                                        this.blockList[connection].value
                                     ) {
                                         await delayExecution(50);
                                         blockPalette.remove(
@@ -2073,39 +2160,25 @@ class Blocks {
             }
 
             /** If it is an arg block, where is it coming from? */
-            /** FIXME: improve mechanism for testing block types. */
-            if (
-                (myBlock.isArgBlock() ||
-                    ["calcArg", "namedcalcArg", "makeblock"].includes(myBlock.name)) &&
-                newBlock != null
-            ) {
-                /** We care about twoarg blocks with connections to the first arg; */
-                if (this.blockList[newBlock].isTwoArgBlock()) {
-                    if (this.blockList[newBlock].connections[1] === thisBlock) {
-                        if (!this._checkTwoArgBlocks.includes(newBlock)) {
-                            this._checkTwoArgBlocks.push(newBlock);
-                        }
-                    }
-                } else if (
-                    this.blockList[newBlock].isArgBlock() &&
-                    this.blockList[newBlock].isExpandableBlock()
-                ) {
-                    if (this.blockList[newBlock].connections[1] === thisBlock) {
-                        if (!this._checkTwoArgBlocks.includes(newBlock)) {
-                            this._checkTwoArgBlocks.push(newBlock);
-                        }
-                    }
-                }
+            if (myBlock.isArgumentLikeBlock() && newBlock != null) {
+                const parentBlock = this.blockList[newBlock];
 
-                /** We also care about the second-to-last connection to an arg block. */
-                const n = this.blockList[newBlock].connections.length;
-                if (this.blockList[newBlock].connections[n - 2] === thisBlock) {
-                    /** Only flow blocks, but not ArgClamps */
-                    if (
-                        !this.blockList[newBlock].isArgClamp() &&
-                        this.blockList[newBlock].docks[n - 1][2] === "in"
-                    ) {
-                        checkArgBlocks.push(newBlock);
+                // Find which connection index this block is attached to
+                const connectionIndex = parentBlock.connections.indexOf(thisBlock);
+
+                // Guard against invalid index (can happen during drag/undo/intermediate states)
+                if (connectionIndex !== -1) {
+                    // Ask the parent block what type of layout update it needs for this connection
+                    const updateType = parentBlock.getLayoutUpdateType(connectionIndex);
+
+                    if (updateType === "ARG") {
+                        if (!this._checkTwoArgBlocks.includes(newBlock)) {
+                            this._checkTwoArgBlocks.push(newBlock);
+                        }
+                    } else if (updateType === "FLOW") {
+                        if (!checkArgBlocks.includes(newBlock)) {
+                            checkArgBlocks.push(newBlock);
+                        }
                     }
                 }
             }
@@ -2177,160 +2250,7 @@ class Blocks {
          */
         this._testConnectionType = (type1, type2) => {
             /** Can these two blocks dock? */
-            if (type1 === "vspaceout" && type2 === "vspacein") {
-                return true;
-            }
-            if (type1 === "vspacein" && type2 === "vspaceout") {
-                return true;
-            }
-
-            if (type1 === "in" && type2 === "out") {
-                return true;
-            }
-            if (type1 === "out" && type2 === "in") {
-                return true;
-            }
-            if (type1 === "in" && type2 === "vspaceout") {
-                return true;
-            }
-            if (type1 === "vspaceout" && type2 === "in") {
-                return true;
-            }
-            if (type1 === "out" && type2 === "vspacein") {
-                return true;
-            }
-            if (type1 === "vspacein" && type2 === "out") {
-                return true;
-            }
-            if (type1 === "numberin" && ["numberout", "anyout"].includes(type2)) {
-                return true;
-            }
-            if (["numberout", "anyout"].includes(type1) && type2 === "numberin") {
-                return true;
-            }
-            if (type1 === "textin" && ["textout", "anyout"].includes(type2)) {
-                return true;
-            }
-            if (["textout", "anyout"].includes(type1) && type2 === "textin") {
-                return true;
-            }
-            if (type1 === "booleanout" && type2 === "booleanin") {
-                return true;
-            }
-            if (type1 === "booleanin" && type2 === "booleanout") {
-                return true;
-            }
-            if (type1 === "mediain" && type2 === "mediaout") {
-                return true;
-            }
-            if (type1 === "mediaout" && type2 === "mediain") {
-                return true;
-            }
-            if (type1 === "mediain" && type2 === "textout") {
-                return true;
-            }
-            if (type2 === "mediain" && type1 === "textout") {
-                return true;
-            }
-            if (type1 === "filein" && type2 === "fileout") {
-                return true;
-            }
-            if (type1 === "fileout" && type2 === "filein") {
-                return true;
-            }
-            if (type1 === "casein" && type2 === "caseout") {
-                return true;
-            }
-            if (type1 === "caseout" && type2 === "casein") {
-                return true;
-            }
-            if (type1 === "vspaceout" && type2 === "casein") {
-                return true;
-            }
-            if (type1 === "casein" && type2 === "vspaceout") {
-                return true;
-            }
-            if (type1 === "vspacein" && type2 === "caseout") {
-                return true;
-            }
-            if (type1 === "caseout" && type2 === "vspacein") {
-                return true;
-            }
-            if (
-                type1 === "solfegein" &&
-                [
-                    "anyout",
-                    "solfegeout",
-                    "textout",
-                    "noteout",
-                    "scaledegreeout",
-                    "numberout"
-                ].includes(type2)
-            ) {
-                return true;
-            }
-            if (
-                type2 === "solfegein" &&
-                [
-                    "anyout",
-                    "solfegeout",
-                    "textout",
-                    "noteout",
-                    "scaledegreeout",
-                    "numberout"
-                ].includes(type1)
-            ) {
-                return true;
-            }
-            if (
-                type1 === "notein" &&
-                ["solfegeout", "scaledegreeout", "textout", "noteout"].includes(type2)
-            ) {
-                return true;
-            }
-            if (type1 === "pitchout" && type2 === "anyin") {
-                return true;
-            }
-            if (type1 === "gridout" && type2 === "anyin") {
-                return true;
-            }
-            if (
-                type2 === "notein" &&
-                ["solfegeout", "scaledegreeout", "textout", "noteout"].includes(type1)
-            ) {
-                return true;
-            }
-            if (
-                type1 === "anyin" &&
-                [
-                    "textout",
-                    "mediaout",
-                    "numberout",
-                    "anyout",
-                    "fileout",
-                    "solfegeout",
-                    "scaledegreeout",
-                    "noteout"
-                ].includes(type2)
-            ) {
-                return true;
-            }
-            if (
-                type2 === "anyin" &&
-                [
-                    "textout",
-                    "mediaout",
-                    "numberout",
-                    "anyout",
-                    "fileout",
-                    "solfegeout",
-                    "scaledegreeout",
-                    "noteout"
-                ].includes(type1)
-            ) {
-                return true;
-            }
-            return false;
+            return ALLOWED_CONNECTIONS.has(type1 + ":" + type2);
         };
 
         /**
@@ -2698,14 +2618,14 @@ class Blocks {
                 // eslint-disable-next-line no-console
                 console.debug(
                     "WARNING: CORRUPTED BLOCK DATA. Block " +
-                        myBlock.name +
-                        " (" +
-                        blk +
-                        ") is connected to the same block " +
-                        this.blockList[myBlock.connections[0]].name +
-                        " (" +
-                        myBlock.connections[0] +
-                        ") twice."
+                    myBlock.name +
+                    " (" +
+                    blk +
+                    ") is connected to the same block " +
+                    this.blockList[myBlock.connections[0]].name +
+                    " (" +
+                    myBlock.connections[0] +
+                    ") twice."
                 );
                 return blk;
             }
@@ -3439,7 +3359,7 @@ class Blocks {
 
                 postProcessArg = [thisBlock, arg];
             } else if (name === "newnote") {
-                postProcess = () => {};
+                postProcess = () => { };
                 postProcessArg = [thisBlock, null];
             } else {
                 postProcess = null;
@@ -3753,8 +3673,9 @@ class Blocks {
             }
 
             /** Make sure we don't make two actions with the same name. */
-            const actionNames = [];
-            for (const [blk, block] of this.blockList.entries()) {
+            // Use Set for O(1) lookup instead of Array.includes() O(n)
+            const actionNames = new Set();
+            for (const block of this.blockList) {
                 if ((block.name === "text" || block.name === "string") && !block.trash) {
                     const c = block.connections[0];
                     if (
@@ -3763,7 +3684,7 @@ class Blocks {
                         !this.blockList[c].trash
                     ) {
                         if (actionBlk !== c) {
-                            actionNames.push(block.value);
+                            actionNames.add(block.value);
                         }
                     }
                 }
@@ -3771,7 +3692,7 @@ class Blocks {
 
             let i = 1;
             let value = name;
-            while (actionNames.includes(value)) {
+            while (actionNames.has(value)) {
                 value = name + i.toString();
                 i += 1;
             }
@@ -3786,7 +3707,8 @@ class Blocks {
          * @returns value
          */
         this.findUniqueCustomName = name => {
-            const noteNames = [];
+            // Use Set for O(1) lookup instead of Array.includes() O(n)
+            const noteNames = new Set();
             for (const block of this.blockList) {
                 if (block.name === "text" && !block.trash) {
                     const c = block.connections[0];
@@ -3795,14 +3717,14 @@ class Blocks {
                         this.blockList[c].name === "pitch" &&
                         !this.blockList[c].trash
                     ) {
-                        noteNames.push(block.value);
+                        noteNames.add(block.value);
                     }
                 }
             }
 
             let i = 1;
             let value = name;
-            while (noteNames.includes(value)) {
+            while (noteNames.has(value)) {
                 value = name + i.toString();
                 i += 1;
             }
@@ -3816,7 +3738,8 @@ class Blocks {
          * @returns value
          */
         this.findUniqueTemperamentName = name => {
-            const temperamentNames = [];
+            // Use Set for O(1) lookup instead of Array.includes() O(n)
+            const temperamentNames = new Set();
             for (const block of this.blockList) {
                 if (block.name === "text" && !block.trash) {
                     const c = block.connections[0];
@@ -3825,14 +3748,14 @@ class Blocks {
                         this.blockList[c].name === "temperament1" &&
                         !this.blockList[c].trash
                     ) {
-                        temperamentNames.push(block.value);
+                        temperamentNames.add(block.value);
                     }
                 }
             }
 
             let i = 1;
             let value = name;
-            while (temperamentNames.includes(value)) {
+            while (temperamentNames.has(value)) {
                 value = name + i.toString();
                 i += 1;
             }
@@ -3874,6 +3797,8 @@ class Blocks {
                 return;
             }
 
+            // Collect blocks to update for batched cache update
+            const blocksToUpdate = [];
             for (const block of this.blockList) {
                 if (block.name === "text") {
                     const c = block.connections[0];
@@ -3881,15 +3806,24 @@ class Blocks {
                         if (block.value === oldName) {
                             block.value = newName;
                             block.text.text = newName;
-                            try {
-                                block.container.updateCache();
-                            } catch (e) {
-                                // eslint-disable-next-line no-console
-                                console.debug(e);
-                            }
+                            blocksToUpdate.push(block);
                         }
                     }
                 }
+            }
+
+            // Batch update caches using requestAnimationFrame
+            if (blocksToUpdate.length > 0) {
+                requestAnimationFrame(() => {
+                    for (const block of blocksToUpdate) {
+                        try {
+                            block.container.updateCache();
+                        } catch (e) {
+                            // eslint-disable-next-line no-console
+                            console.debug(e);
+                        }
+                    }
+                });
             }
         };
 
@@ -3905,6 +3839,8 @@ class Blocks {
                 return;
             }
 
+            // Collect blocks to update for batched cache update
+            const blocksToUpdate = [];
             for (const block of this.blockList) {
                 if (block.name === "text") {
                     const c = block.connections[0];
@@ -3912,12 +3848,7 @@ class Blocks {
                         if (block.value === oldName) {
                             block.value = newName;
                             block.text.text = newName;
-                            try {
-                                block.container.updateCache();
-                            } catch (e) {
-                                // eslint-disable-next-line no-console
-                                console.debug(e);
-                            }
+                            blocksToUpdate.push(block);
                         }
                     }
                 } else if (block.name === "storein2") {
@@ -3931,6 +3862,15 @@ class Blocks {
                             block.overrideName = newName;
                         }
                         block.regenerateArtwork();
+                        blocksToUpdate.push(block);
+                    }
+                }
+            }
+
+            // Batch update caches using requestAnimationFrame
+            if (blocksToUpdate.length > 0) {
+                requestAnimationFrame(() => {
+                    for (const block of blocksToUpdate) {
                         try {
                             block.container.updateCache();
                         } catch (e) {
@@ -3938,7 +3878,7 @@ class Blocks {
                             console.debug(e);
                         }
                     }
-                }
+                });
             }
         };
 
@@ -3954,6 +3894,8 @@ class Blocks {
                 return;
             }
 
+            // Collect blocks to update for batched cache update
+            const blocksToUpdate = [];
             for (const block of this.blockList) {
                 if (block.name === "storein2") {
                     if (block.privateData === oldName) {
@@ -3966,6 +3908,15 @@ class Blocks {
                             block.overrideName = newName;
                         }
                         block.regenerateArtwork();
+                        blocksToUpdate.push(block);
+                    }
+                }
+            }
+
+            // Batch update caches using requestAnimationFrame
+            if (blocksToUpdate.length > 0) {
+                requestAnimationFrame(() => {
+                    for (const block of blocksToUpdate) {
                         try {
                             block.container.updateCache();
                         } catch (e) {
@@ -3973,7 +3924,7 @@ class Blocks {
                             console.debug(e);
                         }
                     }
-                }
+                });
             }
         };
 
@@ -3989,6 +3940,8 @@ class Blocks {
                 return;
             }
 
+            // Collect blocks to update for batched cache update
+            const blocksToUpdate = [];
             for (const block of this.blockList) {
                 if (block.name === "namedbox") {
                     if (block.privateData === oldName) {
@@ -4002,6 +3955,15 @@ class Blocks {
                         }
                         block.regenerateArtwork();
                         /** Update label... */
+                        blocksToUpdate.push(block);
+                    }
+                }
+            }
+
+            // Batch update caches using requestAnimationFrame
+            if (blocksToUpdate.length > 0) {
+                requestAnimationFrame(() => {
+                    for (const block of blocksToUpdate) {
                         try {
                             block.container.updateCache();
                         } catch (e) {
@@ -4009,7 +3971,7 @@ class Blocks {
                             console.debug(e);
                         }
                     }
-                }
+                });
             }
         };
 
@@ -4112,7 +4074,7 @@ class Blocks {
                 const block = actionsPalette.protoList[blockId];
                 if (
                     ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(block.name) !==
-                        -1 /** && block.defaults[0] !== _('action') */ &&
+                    -1 /** && block.defaults[0] !== _('action') */ &&
                     block.defaults[0] === oldName
                 ) {
                     block.defaults[0] = newName;
@@ -5656,10 +5618,10 @@ class Blocks {
                                 // eslint-disable-next-line no-console
                                 console.debug(
                                     "last connection of " +
-                                        name +
-                                        " is " +
-                                        nextName +
-                                        ": adding hidden block"
+                                    name +
+                                    " is " +
+                                    nextName +
+                                    ": adding hidden block"
                                 );
                                 /** If the next block is not a hidden block, add one. */
                                 blockObjs[b][4][len - 1] = blockObjsLength + extraBlocksLength;
@@ -5794,10 +5756,10 @@ class Blocks {
                                 // eslint-disable-next-line no-console
                                 console.debug(
                                     "last connection of " +
-                                        name +
-                                        " is " +
-                                        nextName +
-                                        ": adding hidden block"
+                                    name +
+                                    " is " +
+                                    nextName +
+                                    ": adding hidden block"
                                 );
                                 /** If the next block is not a hidden block, add one. */
                                 blockObjs[b][4][2] = blockObjsLength + extraBlocksLength;
@@ -6558,7 +6520,7 @@ class Blocks {
                                     if (this.protoBlockDict[blockObjs[c][1][0]] !== undefined) {
                                         if (
                                             this.protoBlockDict[blockObjs[c][1][0]].dockTypes[
-                                                cc
+                                            cc
                                             ] !== "in"
                                         ) {
                                             flowBlock = false;
@@ -6574,7 +6536,7 @@ class Blocks {
                                         if (this.protoBlockDict[blockObjs[c][1]] !== undefined) {
                                             if (
                                                 this.protoBlockDict[blockObjs[c][1]].dockTypes[
-                                                    cc
+                                                cc
                                                 ] !== "out"
                                             ) {
                                                 flowBlock = false;
@@ -6856,7 +6818,7 @@ class Blocks {
                 z -= 1;
             }
 
-            this.activity.refreshCanvas;
+            this.activity.refreshCanvas();
         };
 
         /**
@@ -7217,4 +7179,18 @@ class Blocks {
             });
         };
     }
+}
+// Export Blocks
+if (typeof define === "function" && define.amd) {
+    define([], function () {
+        return Blocks;
+    });
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Blocks;
+}
+
+if (typeof window !== "undefined") {
+    window.Blocks = Blocks;
 }

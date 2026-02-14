@@ -99,7 +99,10 @@ const {
     getNoteFromInterval,
     numberToPitch,
     GetNotesForInterval,
-    base64Encode
+    base64Encode,
+    MUSICALMODES,
+    getStepSizeUp,
+    getStepSizeDown
 } = require("../musicutils");
 
 describe("musicutils", () => {
@@ -1111,19 +1114,19 @@ describe("numberToPitch", () => {
                 ]
             },
             "just intonation": {
-                "pitchNumber": 12,
-                "0": [1, "C", 4],
-                "1": [16 / 15, "D♭", 4],
-                "2": [9 / 8, "D", 4],
-                "3": [6 / 5, "E♭", 4],
-                "4": [5 / 4, "E", 4],
-                "5": [4 / 3, "F", 4],
-                "6": [45 / 32, "G♭", 4],
-                "7": [3 / 2, "G", 4],
-                "8": [8 / 5, "A♭", 4],
-                "9": [5 / 3, "A", 4],
-                "10": [9 / 5, "B♭", 4],
-                "11": [15 / 8, "B", 4]
+                pitchNumber: 12,
+                0: [1, "C", 4],
+                1: [16 / 15, "D♭", 4],
+                2: [9 / 8, "D", 4],
+                3: [6 / 5, "E♭", 4],
+                4: [5 / 4, "E", 4],
+                5: [4 / 3, "F", 4],
+                6: [45 / 32, "G♭", 4],
+                7: [3 / 2, "G", 4],
+                8: [8 / 5, "A♭", 4],
+                9: [5 / 3, "A", 4],
+                10: [9 / 5, "B♭", 4],
+                11: [15 / 8, "B", 4]
             }
         };
         global.isCustomTemperament = jest.fn(temp => {
@@ -1171,7 +1174,7 @@ describe("GetNotesForInterval", () => {
         const tur = {
             singer: {
                 noteStatus: null,
-                notePitches: { "1": ["C♯", "E♭"] },
+                notePitches: { 1: ["C♯", "E♭"] },
                 inNoteBlock: [1]
             }
         };
@@ -1398,32 +1401,32 @@ describe("getModeLength", () => {
 describe("nthDegreeToPitch", () => {
     it("should return the correct note for the 2nd scale degree in C major", () => {
         const result = nthDegreeToPitch("C major", 2);
-        expect(result).toBe("E");
+        expect(result).toEqual(["D", 0]);
     });
 
     it("should handle a scale degree larger than the scale length (wrapping case)", () => {
         const result = nthDegreeToPitch("C major", 8);
-        expect(result).toBe("D");
+        expect(result).toEqual(["C", 1]);
     });
 
-    it("should return the root note for scale degree 0 in C major", () => {
+    it("should return the note below the root for scale degree 0 in C major (downward wrapping)", () => {
         const result = nthDegreeToPitch("C major", 0);
-        expect(result).toBe("C");
+        expect(result).toEqual(["B", -1]);
     });
 
     it("should return the correct note for the 5th scale degree in A minor", () => {
         const result = nthDegreeToPitch("A minor", 5);
-        expect(result).toBe("F");
+        expect(result).toEqual(["E", 0]);
     });
 
     it("should handle negative scale degrees (reverse wrapping)", () => {
         const result = nthDegreeToPitch("C major", -1);
-        expect(result).toBeUndefined();
+        expect(result).toEqual(["A", -1]);
     });
 
-    it("should return undefined for a scale degree when the scale is empty", () => {
+    it("should fallback to C major for a scale degree when the key signature is unknown", () => {
         const result = nthDegreeToPitch("Unknown", 2); //default keysignature will be C major
-        expect(result).toBe("E");
+        expect(result).toEqual(["D", 0]);
     });
 });
 
@@ -1481,6 +1484,45 @@ describe("toFraction", () => {
     });
     it("should return array with numerator and denomrator from floating point number", () => {
         expect(toFraction(0.0)).toEqual([0, 2]);
+    });
+
+    it("should handle common musical note fractions correctly", () => {
+        expect(toFraction(0.5)).toEqual([1, 2]);
+        expect(toFraction(0.25)).toEqual([1, 4]);
+        expect(toFraction(0.125)).toEqual([1, 8]);
+    });
+
+    it("should handle whole numbers by flipping numerator and denominator", () => {
+        expect(toFraction(2)).toEqual([2, 1]);
+        expect(toFraction(4)).toEqual([4, 1]);
+        expect(toFraction(8)).toEqual([8, 1]);
+    });
+
+    it("should handle thirds correctly", () => {
+        const result = toFraction(1 / 3);
+        expect(result[0]).toBe(1);
+        expect(result[1]).toBe(3);
+    });
+
+    it("should handle dotted note values (1.5 = 3/2)", () => {
+        expect(toFraction(1.5)).toEqual([3, 2]);
+        expect(toFraction(0.75)).toEqual([3, 4]);
+    });
+
+    it("should handle value equal to 1", () => {
+        expect(toFraction(1)).toEqual([1, 1]);
+    });
+
+    it("should handle very small positive decimals", () => {
+        const result = toFraction(0.0625);
+        expect(result[0]).toBe(1);
+        expect(result[1]).toBe(16);
+    });
+
+    it("should handle sixths correctly", () => {
+        const result = toFraction(1 / 6);
+        expect(result[0]).toBe(1);
+        expect(result[1]).toBe(6);
     });
 });
 
@@ -2100,5 +2142,196 @@ describe("scaleDegreeToPitchMapping", () => {
     });
 });
 
-// TODO: Implement `pitchinfo` and `_calculate_pitch_number` methods.
-// These are pending as they are related with the Activity class and DOM.
+describe("getPitchInfo", () => {
+    let activity, tur;
+
+    beforeEach(() => {
+        activity = {
+            errorMsg: jest.fn(),
+            logo: {
+                synth: {
+                    _getFrequency: jest.fn(),
+                    changeInTemperament: false
+                }
+            }
+        };
+
+        tur = {
+            singer: {
+                lastNotePlayed: null,
+                inNoteBlock: {},
+                notePitches: {},
+                noteOctaves: {},
+                keySignature: "C major",
+                movable: false,
+                pitchNumberOffset: 0
+            }
+        };
+    });
+
+    it("returns correct pitch for 'alphabet'", () => {
+        expect(getPitchInfo(activity, "alphabet", "C4", tur)).toBe("C");
+    });
+
+    it("returns correct alphabet class", () => {
+        expect(getPitchInfo(activity, "alphabet class", "C4", tur)).toBe("C");
+        expect(getPitchInfo(activity, "letter class", "D#4", tur)).toBe("E");
+    });
+
+    it("returns correct solfege syllable (fixed do)", () => {
+        tur.singer.movable = false;
+        expect(getPitchInfo(activity, "solfege syllable", "C4", tur)).toBe("do");
+    });
+
+    it("returns correct solfege syllable (movable do)", () => {
+        tur.singer.movable = true;
+        tur.singer.keySignature = "G major";
+        // In G major, G is Do.
+        expect(getPitchInfo(activity, "solfege syllable", "G4", tur)).toBe("do");
+    });
+
+    it("returns correct pitch class", () => {
+        const pClass = getPitchInfo(activity, "pitch class", "C4", tur);
+        expect(typeof pClass).toBe("number");
+    });
+
+    it("returns correct scalar class", () => {
+        const sClass = getPitchInfo(activity, "scalar class", "C4", tur);
+        // Expect '1' for C in C Major
+        expect(sClass).toBe("1");
+    });
+
+    it("returns correct scale degree", () => {
+        const deg = getPitchInfo(activity, "scale degree", "C4", tur);
+        expect(deg).toMatch(/^1/);
+    });
+
+    it("returns correct nth degree", () => {
+        // C in C major is index 0
+        expect(getPitchInfo(activity, "nth degree", "C4", tur)).toBe(0);
+    });
+
+    it("returns correct staff y", () => {
+        const y = getPitchInfo(activity, "staff y", "C4", tur);
+        // 0 * ... + 0 = 0
+        expect(y).toBe(0);
+    });
+
+    it("returns pitch in hertz", () => {
+        activity.logo.synth._getFrequency.mockReturnValue(261.63);
+        const freq = getPitchInfo(activity, "pitch in hertz", "C4", tur);
+        expect(freq).toBe(261.63);
+    });
+
+    it("returns color", () => {
+        const color = getPitchInfo(activity, "pitch to color", "C4", tur);
+        expect(typeof color).toBe("number");
+    });
+
+    it("returns shade", () => {
+        // octave * 12.5 -> 4 * 12.5 = 50
+        const shade = getPitchInfo(activity, "pitch to shade", "C4", tur);
+        expect(shade).toBe(50);
+    });
+
+    it("handles invalid type", () => {
+        expect(getPitchInfo(activity, "unknown type", "C4", tur)).toBe("__INVALID_INPUT__");
+    });
+});
+
+describe("_calculate_pitch_number", () => {
+    let activity, tur;
+
+    beforeEach(() => {
+        activity = {
+            errorMsg: jest.fn()
+        };
+
+        tur = {
+            singer: {
+                lastNotePlayed: null,
+                inNoteBlock: {},
+                notePitches: {},
+                noteOctaves: {},
+                keySignature: "C major",
+                movable: false,
+                pitchNumberOffset: 0
+            }
+        };
+    });
+
+    it("calculates pitch number for a standard note string", () => {
+        const val = _calculate_pitch_number(activity, "C4", tur);
+        expect(typeof val).toBe("number");
+    });
+
+    it("calculates pitch number relative to another note", () => {
+        const valC4 = _calculate_pitch_number(activity, "C4", tur);
+        const valC5 = _calculate_pitch_number(activity, "C5", tur);
+        expect(valC5).toBeGreaterThan(valC4);
+    });
+});
+
+describe("MUSICALMODES", () => {
+    it("should contain major mode with correct intervals", () => {
+        expect(MUSICALMODES["major"]).toEqual([2, 2, 1, 2, 2, 2, 1]);
+    });
+
+    it("should contain minor mode with correct intervals", () => {
+        expect(MUSICALMODES["minor"]).toEqual([2, 1, 2, 2, 1, 2, 2]);
+    });
+
+    it("should have chromatic mode with 12 semitones", () => {
+        expect(MUSICALMODES["chromatic"]).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+        expect(MUSICALMODES["chromatic"].length).toBe(12);
+    });
+
+    it("should have pentatonic modes with 5 notes", () => {
+        expect(MUSICALMODES["major pentatonic"].length).toBe(5);
+        expect(MUSICALMODES["minor pentatonic"].length).toBe(5);
+    });
+
+    it("should have all mode intervals sum to 12 semitones", () => {
+        const sum = arr => arr.reduce((a, b) => a + b, 0);
+        expect(sum(MUSICALMODES["major"])).toBe(12);
+        expect(sum(MUSICALMODES["minor"])).toBe(12);
+        expect(sum(MUSICALMODES["dorian"])).toBe(12);
+        expect(sum(MUSICALMODES["whole tone"])).toBe(12);
+    });
+
+    it("should contain custom mode for user definitions", () => {
+        expect(MUSICALMODES["custom"]).toBeDefined();
+        expect(Array.isArray(MUSICALMODES["custom"])).toBe(true);
+    });
+
+    it("should have ionian equivalent to major", () => {
+        expect(MUSICALMODES["ionian"]).toEqual(MUSICALMODES["major"]);
+    });
+
+    it("should have aeolian equivalent to minor", () => {
+        expect(MUSICALMODES["aeolian"]).toEqual(MUSICALMODES["minor"]);
+    });
+});
+describe("getStepSizeDown", () => {
+    it("should return the correct step size for D in C major going down", () => {
+        const result = getStepSizeDown("C major", "D", 0, "equal");
+        expect(result).toBe(-2);
+    });
+
+    it("should return 0 for an invalid temperament", () => {
+        const result = getStepSizeDown("C major", "D", 0, "invalid");
+        expect(result).toBe(0);
+    });
+});
+
+describe("getStepSizeUp", () => {
+    it("should return the correct step size for C in C major going up", () => {
+        const result = getStepSizeUp("C major", "C", 0, "equal");
+        expect(result).toBe(2);
+    });
+
+    it("should return 0 for an invalid temperament", () => {
+        const result = getStepSizeUp("C major", "C", 0, "invalid");
+        expect(result).toBe(0);
+    });
+});
