@@ -32,6 +32,33 @@ const themeConfigs = {
         widgetButton: "#225A91",
         widgetButtonSelect: "#979797",
         widgetBackground: "#454545",
+        paletteColors: {
+            widgets: ["#2E7D32", "#1B5E20", "#1B5E20", "#81C784"],
+            pitch: ["#2E7D32", "#1B5E20", "#1B5E20", "#81C784"],
+            rhythm: ["#BF360C", "#8C2A0B", "#8C2A0B", "#FF8A65"],
+            meter: ["#BF360C", "#8C2A0B", "#8C2A0B", "#FF8A65"],
+            tone: ["#00838F", "#005662", "#005662", "#4DD0E1"],
+            ornament: ["#00838F", "#005662", "#005662", "#4DD0E1"],
+            intervals: ["#2E7D32", "#1B5E20", "#1B5E20", "#81C784"],
+            volume: ["#00838F", "#005662", "#005662", "#4DD0E1"],
+            drum: ["#00838F", "#005662", "#005662", "#4DD0E1"],
+            graphics: ["#3949AB", "#283593", "#283593", "#7986CB"],
+            turtle: ["#3949AB", "#283593", "#283593", "#7986CB"],
+            pen: ["#3949AB", "#283593", "#283593", "#7986CB"],
+            boxes: ["#E65100", "#BF360C", "#BF360C", "#FFB74D"],
+            action: ["#FF8F00", "#FF6F00", "#FF6F00", "#FFE082"],
+            media: ["#C62828", "#8E0000", "#8E0000", "#FF8A80"],
+            number: ["#AD1457", "#880E4F", "#880E4F", "#F48FB1"],
+            boolean: ["#7B1FA2", "#4A0072", "#4A0072", "#CE93D8"],
+            flow: ["#5D4037", "#3E2723", "#3E2723", "#BCAAA4"],
+            sensors: ["#827717", "#4B830D", "#4B830D", "#E6EE9C"],
+            extras: ["#424242", "#212121", "#212121", "#9E9E9E"],
+            program: ["#424242", "#212121", "#212121", "#9E9E9E"],
+            myblocks: ["#FF8F00", "#FF6F00", "#FF6F00", "#FFE082"],
+            heap: ["#5D4037", "#3E2723", "#3E2723", "#BCAAA4"],
+            dictionary: ["#5D4037", "#3E2723", "#3E2723", "#BCAAA4"],
+            ensemble: ["#3949AB", "#283593", "#283593", "#7986CB"]
+        },
         disconnected: "#5C5C5C",
         header: "#1E88E5",
         aux: "#1976D2",
@@ -70,6 +97,33 @@ const themeConfigs = {
         widgetBackground: "#ccc",
         widgetButton: "#8cc6ff",
         widgetButtonSelect: "#C8C8C8",
+        paletteColors: {
+            widgets: ["#7CD622", "#57AD02", "#57AD02", "#B4EB7D"],
+            pitch: ["#7CD622", "#57AD02", "#57AD02", "#B4EB7D"],
+            rhythm: ["#FF8700", "#E86B0E", "#E86B0E", "#FEC092"],
+            meter: ["#FE994F", "#E86B0E", "#E86B0E", "#FEC092"],
+            tone: ["#3EDCDD", "#1DBCBD", "#1DBCBD", "#A1EEEF"],
+            ornament: ["#3EDCDD", "#1DBCBD", "#1DBCBD", "#A1EEEF"],
+            intervals: ["#7CD622", "#57AD02", "#57AD02", "#B4EB7D"],
+            volume: ["#3EDCDD", "#1DBCBD", "#1DBCBD", "#A1EEEF"],
+            drum: ["#3EDCDD", "#1DBCBD", "#1DBCBD", "#A1EEEF"],
+            graphics: ["#92A9FF", "#5370DC", "#5370DC", "#CDD8FF"],
+            turtle: ["#92A9FF", "#5370DC", "#5370DC", "#CDD8FF"],
+            pen: ["#92A9FF", "#5370DC", "#5370DC", "#CDD8FF"],
+            boxes: ["#FFB900", "#d18600", "#d18600", "#FFD092"],
+            action: ["#F3C800", "#DAAF30", "#DAAF30", "#FFE391"],
+            media: ["#FF664B", "#EA4326", "#EA4326", "#FFB9E2"],
+            number: ["#FF6EA1", "#FF2C76", "#FF2C76", "#FFCDDF"],
+            boolean: ["#D97DF5", "#B653D3", "#B653D3", "#EDC6A3"],
+            flow: ["#D98A43", "#B7651A", "#B7651A", "#ECC6A4"],
+            sensors: ["#AABB00", "#748400", "#748400", "#FFE391"],
+            extras: ["#C4C4C4", "#A0A0A0", "#A0A0A0", "#D0D0D0"],
+            program: ["#C4C4C4", "#A0A0A0", "#A0A0A0", "#D0D0D0"],
+            myblocks: ["#FFBF00", "#DAAF30", "#DAAF30", "#FFE391"],
+            heap: ["#D98A43", "#B7651A", "#B7651A", "#ECC6A4"],
+            dictionary: ["#D98A43", "#B7651A", "#B7651A", "#ECC6A4"],
+            ensemble: ["#92A9FF", "#5370DC", "#5370DC", "#CDD8FF"]
+        },
         disconnected: "#C4C4C4",
         header: "#4DA6FF",
         aux: "#1A8CFF",
@@ -108,6 +162,33 @@ const themeConfigs = {
         widgetButton: "#00FFFF",
         widgetButtonSelect: "#FFFFFF",
         widgetBackground: "#000000",
+        paletteColors: {
+            widgets: ["#00FF00", "#00CC00", "#00CC00", "#66FF66"],
+            pitch: ["#00FF00", "#00CC00", "#00CC00", "#66FF66"],
+            rhythm: ["#FF0000", "#CC0000", "#CC0000", "#FF6666"],
+            meter: ["#FF0000", "#CC0000", "#CC0000", "#FF6666"],
+            tone: ["#00FFFF", "#00CCCC", "#00CCCC", "#66FFFF"],
+            ornament: ["#00FFFF", "#00CCCC", "#00CCCC", "#66FFFF"],
+            intervals: ["#00FF00", "#00CC00", "#00CC00", "#66FF66"],
+            volume: ["#00FFFF", "#00CCCC", "#00CCCC", "#66FFFF"],
+            drum: ["#00FFFF", "#00CCCC", "#00CCCC", "#66FFFF"],
+            graphics: ["#FF00FF", "#CC00CC", "#CC00CC", "#FF66FF"],
+            turtle: ["#FF00FF", "#CC00CC", "#CC00CC", "#FF66FF"],
+            pen: ["#FF00FF", "#CC00CC", "#CC00CC", "#FF66FF"],
+            boxes: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
+            action: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
+            media: ["#FF0000", "#CC0000", "#CC0000", "#FF6666"],
+            number: ["#FF00FF", "#CC00CC", "#CC00CC", "#FF66FF"],
+            boolean: ["#FF00FF", "#CC00CC", "#CC00CC", "#FF66FF"],
+            flow: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
+            sensors: ["#00FF00", "#00CC00", "#00CC00", "#66FF66"],
+            extras: ["#FFFFFF", "#CCCCCC", "#CCCCCC", "#FFFFFF"],
+            program: ["#FFFFFF", "#CCCCCC", "#CCCCCC", "#FFFFFF"],
+            myblocks: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
+            heap: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
+            dictionary: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
+            ensemble: ["#FF00FF", "#CC00CC", "#CC00CC", "#FF66FF"]
+        },
         disconnected: "#666666",
         header: "#00FFFF",
         aux: "#00CCCC",
@@ -188,6 +269,16 @@ class ThemeBox {
             Object.assign(window.platformColor, themeConfigs[this._theme]);
         }
 
+        // Update palette colors in global variables used by blocks
+        if (window.platformColor.paletteColors) {
+            for (const p in window.platformColor.paletteColors) {
+                PALETTEFILLCOLORS[p] = window.platformColor.paletteColors[p][0];
+                PALETTESTROKECOLORS[p] = window.platformColor.paletteColors[p][1];
+                PALETTEHIGHLIGHTCOLORS[p] = window.platformColor.paletteColors[p][2];
+                HIGHLIGHTSTROKECOLORS[p] = window.platformColor.paletteColors[p][1];
+            }
+        }
+
         // Update theme-color meta tag
         const themeColorMeta = document.querySelector("meta[name=theme-color]");
         if (themeColorMeta && window.platformColor) {
@@ -207,6 +298,19 @@ class ThemeBox {
             this.activity.turtles._backgroundColor = window.platformColor.background;
             this.activity.turtles.makeBackground();
             this.activity.refreshCanvas();
+        }
+
+        // Refresh all blocks to update their colors
+        if (this.activity.blocks) {
+            for (const blockId in this.activity.blocks.blockList) {
+                const block = this.activity.blocks.blockList[blockId];
+                if (block && block.protoblock && block.protoblock.palette) {
+                    // Redraw block to update colors
+                    if (typeof block.regenerateArtwork === "function") {
+                        block.regenerateArtwork(false);
+                    }
+                }
+            }
         }
 
         // Update toolbar icon for current theme

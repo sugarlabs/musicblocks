@@ -19,6 +19,12 @@
 
 global._ = jest.fn(str => str);
 
+// Mock global palette color variables
+global.PALETTEFILLCOLORS = {};
+global.PALETTESTROKECOLORS = {};
+global.PALETTEHIGHLIGHTCOLORS = {};
+global.HIGHLIGHTSTROKECOLORS = {};
+
 // Mock window.platformColor
 window.platformColor = {
     header: "#4DA6FF",
