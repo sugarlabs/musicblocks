@@ -1175,7 +1175,7 @@ class Activity {
          * @constructor
          */
         this.setHomeContainers = homeState => {
-            if (this.homeButtonContainer === null) {
+            if (this.homeButtonContainer === null || this.homeButtonContainer === undefined) {
                 return;
             }
 

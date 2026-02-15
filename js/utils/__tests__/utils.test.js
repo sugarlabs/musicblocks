@@ -65,10 +65,6 @@ describe("Utility Functions (logic-only)", () => {
                     getContext: jest.fn(() => ({ measureText: () => ({ width: 42 }) }))
                 };
             }),
-            webL10n: {
-                get: jest.fn(str => str),
-                getLanguage: jest.fn(() => "en")
-            },
             body: { innerHTML: "" },
             createElement: jest.fn(() => {
                 return {
