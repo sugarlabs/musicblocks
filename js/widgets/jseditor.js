@@ -848,8 +848,6 @@ class JSEditor {
         } else {
             // console.error("EDITOR MISSING!");
         }
-        // eslint-disable-next-line
-        console.log("%c" + message, `color: ${color}`);
     }
 
     static clearConsole() {
