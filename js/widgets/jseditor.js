@@ -836,10 +836,15 @@ class JSEditor {
      */
     static logConsole(message, color) {
         if (color === undefined) color = "midnightblue";
-        if (docById("editorConsole")) {
-            if (docById("editorConsole").innerHTML !== "")
-                docById("editorConsole").innerHTML += "</br>";
-            docById("editorConsole").innerHTML += `<span style="color: ${color}">${message}</span>`;
+        const consoleEl = docById("editorConsole");
+        if (consoleEl) {
+            if (consoleEl.childNodes.length > 0) {
+                consoleEl.appendChild(document.createElement("br"));
+            }
+            const line = document.createElement("span");
+            line.style.color = color;
+            line.textContent = message;
+            consoleEl.appendChild(line);
         } else {
             // console.error("EDITOR MISSING!");
         }
@@ -848,8 +853,9 @@ class JSEditor {
     }
 
     static clearConsole() {
-        if (docById("editorConsole")) {
-            docById("editorConsole").innerHTML = "";
+        const consoleEl = docById("editorConsole");
+        if (consoleEl) {
+            consoleEl.textContent = "";
         }
     }
 
@@ -1161,4 +1167,8 @@ class JSEditor {
 
         JSEditor.logConsole("Status window opened.", "green");
     }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { JSEditor };
 }
