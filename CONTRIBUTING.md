@@ -1,7 +1,7 @@
 ## <a name="CONTRIBUTING"></a>Contributing
 
 We welcome contributions of all kinds — whether it’s code,
-documentation, music, lesson plans, artwork, or ideas.  Music Blocks
+documentation, music, lesson plans, artwork, or ideas. Music Blocks
 is a community-driven project, and every meaningful contribution helps
 improve the platform for learners and educators around the world.
 
@@ -10,7 +10,6 @@ development environment using the guide linked above, then explore
 open issues or discussions to find a place to contribute.
 
 - [How to set up a local server](README.md#how-to-set-up-a-local-server)
-
 
 ### Special Notes
 
@@ -53,7 +52,6 @@ following resources:
 Programmers, please follow these general [guidelines for
 contributions](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md).
 
-
 ### Before You Push
 
 Run these commands locally before submitting a PR:
@@ -64,7 +62,19 @@ npx prettier --check .    # Formatting
 npm test                  # Jest
 ```
 
+NOTE: Only run ```prettier``` on the files you have modified.
+
 If formatting fails, run `npx prettier --write .` to fix it.
+
+### After your PR is merged
+
+Please note that production deployments of Music Blocks are **manual**.
+
+This means that even after your pull request is merged, your changes may not immediately appear. Your update will become visible after the next official release is deployed.
+
+If your changes are not visible right away, it does **not** indicate a problem with your PR or implementation.
+
+This note is included to prevent contributors from spending time debugging caching or deployment issues unnecessarily.
 
 ### License Header
 
@@ -129,55 +139,55 @@ Feel free. But, please don't spam :p.
 ### Keep in Mind
 
 1. Your contributions need not necessarily have to address any
-discovered issue. If you encounter any, feel free to add a fix through
-a PR, or create a new issue ticket.
+   discovered issue. If you encounter any, feel free to add a fix through
+   a PR, or create a new issue ticket.
 
 2. Use [labels](https://github.com/sugarlabs/musicblocks/labels) on
-your issues and PRs.
+   your issues and PRs.
 
 3. Please do not spam with many PRs consisting of little changes.
 
 4. If you are addressing a bulk change, divide your commits across
-multiple PRs, and send them one at a time. The fewer the number of
-files addressed per PR, the better.
+   multiple PRs, and send them one at a time. The fewer the number of
+   files addressed per PR, the better.
 
 5. Communicate effectively. Go straight to the point. You don't need
-to address anyone using '_sir_'. Don't write unnecessary comments;
-don't be over-apologetic. There is no superiority hierarchy. Every
-single contribution is welcome, as long as it doesn't spam or distract
-the flow.
+   to address anyone using '_sir_'. Don't write unnecessary comments;
+   don't be over-apologetic. There is no superiority hierarchy. Every
+   single contribution is welcome, as long as it doesn't spam or distract
+   the flow.
 
 6. Write useful, brief commit messages. Add commit descriptions if
-necessary. PR name should speak about what it is addressing and not
-the issue. In case a PR fixes an issue, use `fixes #ticketno` or
-`closes #ticketno` in the PR's comment. Briefly explain what your PR
-is doing.
+   necessary. PR name should speak about what it is addressing and not
+   the issue. In case a PR fixes an issue, use `fixes #ticketno` or
+   `closes #ticketno` in the PR's comment. Briefly explain what your PR
+   is doing.
 
 7. Always test your changes extensively before creating a PR. There's
-no sense in merging broken code. If a PR is a _work in progress
-(WIP)_, convert it to draft. It'll let the maintainers know it isn't
-ready for merging.
+   no sense in merging broken code. If a PR is a _work in progress
+   (WIP)_, convert it to draft. It'll let the maintainers know it isn't
+   ready for merging.
 
 8. Read and revise the concepts about programming constructs you're
-dealing with. You must be clear about the behavior of the language or
-compiler/transpiler. See [JavaScript
-docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript).
+   dealing with. You must be clear about the behavior of the language or
+   compiler/transpiler. See [JavaScript
+   docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript).
 
 9. If you have a question, do a _web search_ first. If you don't find
-any satisfactory answer, then ask it in a comment. If it is a general
-question about Music Blocks, please use the new
-[discussions](https://github.com/sugarlabs/musicblocks/discussions)
-tab on top the the repository, or the _Sugar-dev Devel
-<[sugar-devel@lists.sugarlabs.org](mailto:sugar-devel@lists.sugarlabs.org)>_
-mailing list. Don't ask silly questions (unless you don't know it is
-silly ;p) before searching it on the web.
+   any satisfactory answer, then ask it in a comment. If it is a general
+   question about Music Blocks, please use the new
+   [discussions](https://github.com/sugarlabs/musicblocks/discussions)
+   tab on top the the repository, or the _Sugar-dev Devel
+   <[sugar-devel@lists.sugarlabs.org](mailto:sugar-devel@lists.sugarlabs.org)>_
+   mailing list. Don't ask silly questions (unless you don't know it is
+   silly ;p) before searching it on the web.
 
 10. Work on things that matter. Follow three milestones: `Port Ready`,
-`Migration`, and `Future`.  Those tagged `Port Ready` are
-priority. Those tagged with `Migration` will be taken care of during
-or after the foundation rebuild. Feel free to participate in the
-conversation, adding valuable comments. Those tagged with `Future`
-need not be addressed presently.
+    `Migration`, and `Future`. Those tagged `Port Ready` are
+    priority. Those tagged with `Migration` will be taken care of during
+    or after the foundation rebuild. Feel free to participate in the
+    conversation, adding valuable comments. Those tagged with `Future`
+    need not be addressed presently.
 
 _Please note there is no need to ask permission to work on an
 issue. You should check for pull requests linked to an issue you are
