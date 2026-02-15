@@ -164,6 +164,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
     const MUSICBLOCKS_EXTRAS = [
         "widgets/modewidget",
         "widgets/meterwidget",
+        "widgets/PhraseMakerUtils",
         "widgets/phrasemaker",
         "widgets/arpeggio",
         "widgets/aiwidget",
