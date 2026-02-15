@@ -1,4 +1,4 @@
-name: Run Cypress E2E Tests on PR
+name: E2E Test
 
 on:
   pull_request:
