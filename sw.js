@@ -55,7 +55,7 @@ function fromCache(request) {
             if (!matching || matching.status === 404) {
                 return Promise.reject("no-match");
             }
-            
+
             return matching;
         });
     });
@@ -103,7 +103,7 @@ self.addEventListener("fetch", function (event) {
     );
 });
 
-self.addEventListener("beforeinstallprompt", (event) => {
+self.addEventListener("beforeinstallprompt", event => {
     // eslint-disable-next-line no-console
     console.log("done", "beforeinstallprompt", event);
     // Stash the event so it can be triggered later.
@@ -120,11 +120,10 @@ self.addEventListener("refreshOffline", function () {
     return fetch(offlineFallbackPage).then(function (response) {
         return caches.open(CACHE).then(function (cache) {
             // eslint-disable-next-line no-console
-            console.log("[PWA Builder] Offline page updated from refreshOffline event: " + response.url);
+            console.log(
+                "[PWA Builder] Offline page updated from refreshOffline event: " + response.url
+            );
             return cache.put(offlinePageRequest, response);
         });
     });
 });
-
-
-
