@@ -99,7 +99,7 @@ var meSpeakFlashFallback = new (function () {
             if (
                 d &&
                 !(
-                    typeof navigator.mimeTypes !== undefined &&
+                    typeof navigator.mimeTypes !== "undefined" &&
                     navigator.mimeTypes[sfm] &&
                     !navigator.mimeTypes[sfm].enabledPlugin
                 )
