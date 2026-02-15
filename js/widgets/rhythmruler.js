@@ -437,6 +437,21 @@ class RhythmRuler {
             this._playingAll = false;
             this.activity.hideMsgs();
 
+            // Close the dissect number pie menu if it's open
+            const wheelDiv = docById("wheelDiv");
+            if (wheelDiv) {
+                wheelDiv.style.display = "none";
+            }
+            // Clean up wheel references
+            if (this._numberWheel) {
+                this._numberWheel.removeWheel();
+                this._numberWheel = null;
+            }
+            if (this._exitWheel) {
+                this._exitWheel.removeWheel();
+                this._exitWheel = null;
+            }
+
             this.widgetWindow.destroy();
         };
 
