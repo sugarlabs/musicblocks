@@ -114,7 +114,7 @@ function setupPitchActions(activity) {
             // At this point, lastNotePlayed is a tuple of the
             // pitchname-octave and the notevalue, e.g., ["C3", 8]
             // We only care about the pitchname and octave.
-            if (typeof(lastNotePlayed[0]) === "number") {
+            if (typeof lastNotePlayed[0] === "number") {
                 // Convert freq tp o pitch.
                 lastNotePlayed = frequencyToPitch(lastNotePlayed[0]);
                 pitchName = lastNotePlayed[0];
@@ -123,12 +123,19 @@ function setupPitchActions(activity) {
             } else {
                 pitchName = lastNotePlayed[0].slice(0, lastNotePlayed[0].length - 1);
                 octave = parseInt(
-                    lastNotePlayed[0].slice(lastNotePlayed[0].length - 1, lastNotePlayed[0].length));
+                    lastNotePlayed[0].slice(lastNotePlayed[0].length - 1, lastNotePlayed[0].length)
+                );
             }
             if (tur.singer.inverted) {
                 // If the last note is inverted then inverting it
                 // again to get the original note
-                const delta_temp = Singer.calculateInvert(activity.logo, turtle, pitchName, octave, cents);
+                const delta_temp = Singer.calculateInvert(
+                    activity.logo,
+                    turtle,
+                    pitchName,
+                    octave,
+                    cents
+                );
                 const transposition_temp = 2 * delta_temp;
                 const invertedNote = getNote(
                     pitchName,
@@ -223,12 +230,11 @@ function setupPitchActions(activity) {
 
             scaleDegree = isNegativeArg ? modeLength - scaleDegree : scaleDegree;
 
-            const note = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
+            const [note, offset] = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
             let semitones = ref;
-            semitones +=
-                NOTESFLAT.includes(note)
-                    ? NOTESFLAT.indexOf(note) - ref
-                    : NOTESSHARP.indexOf(note) - ref;
+            semitones += NOTESFLAT.includes(note)
+                ? NOTESFLAT.indexOf(note) - ref
+                : NOTESSHARP.indexOf(note) - ref;
             /** calculates changes in reference octave which occur a semitone before the reference key */
             const deltaOctave = Math.floor(number / modeLength);
             /** calculates changes in octave when crossing B */
@@ -295,13 +301,42 @@ function setupPitchActions(activity) {
             const octave = obj[1];
             const cents = obj[2];
 
+            let startLength = 0;
+            let blockId = null;
+            if (tur.singer.inNoteBlock.length > 0) {
+                blockId = last(tur.singer.inNoteBlock);
+                if (tur.singer.notePitches && tur.singer.notePitches[blockId]) {
+                    startLength = tur.singer.notePitches[blockId].length;
+                }
+            }
+
             Singer.processPitch(activity, note, octave, cents, turtle, blk);
             if (tur.singer.inNoteBlock.length > 0) {
                 if (activity.logo.runningLilypond) {
-                    activity.logo.notation.notationMarkup(
-                        turtle,
-                        hertz  // FIXME: what if hertz was transformed?
-                    );
+                    let transformedHertz = hertz;
+                    // processPitch applies all pitch transformations (transpose, scalar, invert, etc.)
+                    // and stores the resulting pitch in the note block buffers.
+                    // The original hertz input may not match the rendered pitch, so
+                    // Lilypond export must use the transformed pitch instead of raw input.
+                    if (
+                        blockId !== null &&
+                        tur.singer.notePitches &&
+                        tur.singer.noteOctaves &&
+                        tur.singer.noteCents &&
+                        tur.singer.notePitches[blockId] &&
+                        tur.singer.noteOctaves[blockId] &&
+                        tur.singer.noteCents[blockId] &&
+                        tur.singer.notePitches[blockId].length > startLength
+                    ) {
+                        const p = tur.singer.notePitches[blockId][startLength];
+                        const o = tur.singer.noteOctaves[blockId][startLength];
+                        const c = tur.singer.noteCents[blockId][startLength];
+                        transformedHertz = pitchToFrequency(p, o, c, tur.singer.keySignature);
+
+                        if (c !== 0) {
+                            activity.logo.notation.notationMarkup(turtle, transformedHertz);
+                        }
+                    }
                 }
             }
             return;
@@ -574,7 +609,7 @@ function setupPitchActions(activity) {
                     let scalarDelta = 0;
                     let i = 0;
 
-                    const _calculate = (type) => {
+                    const _calculate = type => {
                         i++;
                         const nhalf =
                             type === "up"
@@ -627,13 +662,13 @@ function setupPitchActions(activity) {
 
                 return stepType === "up"
                     ? getStepSizeUp(
-                        tur.singer.keySignature,
-                        tur.singer.lastNotePlayed[0].slice(0, len - 1)
-                    )
+                          tur.singer.keySignature,
+                          tur.singer.lastNotePlayed[0].slice(0, len - 1)
+                      )
                     : getStepSizeDown(
-                        tur.singer.keySignature,
-                        tur.singer.lastNotePlayed[0].slice(0, len - 1)
-                    );
+                          tur.singer.keySignature,
+                          tur.singer.lastNotePlayed[0].slice(0, len - 1)
+                      );
             } else {
                 return stepType === "up"
                     ? getStepSizeUp(tur.singer.keySignature, "G")

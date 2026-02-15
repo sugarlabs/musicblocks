@@ -129,7 +129,7 @@ class MeterWidget {
          * @private
          */
         this._beatValue = 1 / 4;
-        
+
         /**
          * The cell scale.
          *
@@ -138,7 +138,7 @@ class MeterWidget {
          */
         const w = window.innerWidth;
         this._cellScale = w / 1200;
-        
+
         /**
          * The widget window.
          *
@@ -157,7 +157,7 @@ class MeterWidget {
         // For the button callbacks
         this.meterDiv = document.createElement("table");
         widgetWindow.getWidgetBody().append(this.meterDiv);
-        
+
         /**
          * Callback for the widget window close event.
          *
@@ -168,7 +168,7 @@ class MeterWidget {
             this.activity.hideMsgs();
             widgetWindow.destroy();
         };
-        
+
         /**
          * Callback for the widget window maximize event.
          *
@@ -189,8 +189,7 @@ class MeterWidget {
             } else {
                 this._click_lock = true;
                 if (this.__getPlayingStatus()) {
-                    playBtn.innerHTML =
-                        `&nbsp;&nbsp;<img 
+                    playBtn.innerHTML = `&nbsp;&nbsp;<img 
                             src="header-icons/play-button.svg" 
                             title="${_("Play all")}" 
                             alt="${_("Play all")}" 
@@ -200,8 +199,7 @@ class MeterWidget {
                         >&nbsp;&nbsp;`;
                     this._playing = false;
                 } else {
-                    playBtn.innerHTML =
-                        `&nbsp;&nbsp;<img 
+                    playBtn.innerHTML = `&nbsp;&nbsp;<img 
                             src="header-icons/stop-button.svg" 
                             title="${_("Stop")}" 
                             alt="${_("Stop")}" 
@@ -221,13 +219,10 @@ class MeterWidget {
             }, 1000);
         };
 
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            MeterWidget.ICONSIZE,
-            _("Save")
-        ).onclick = () => {
-            this._save();
-        };
+        widgetWindow.addButton("export-chunk.svg", MeterWidget.ICONSIZE, _("Save")).onclick =
+            () => {
+                this._save();
+            };
 
         // The pie menu goes here.
         const meterTableDiv = this.meterDiv;
@@ -254,13 +249,13 @@ class MeterWidget {
 
         const divInput = document.createElement("div");
         divInput.className = "wfbtItem";
-        divInput.innerHTML =
-            `<input style="float: left;" value="${v1}" type="number" id="beatValue" min="1" max="16" >`;
+        divInput.innerHTML = `<input style="float: left;" value="${v1}" type="number" id="beatValue" min="1" max="16" >`;
 
         const divInput2 = document.createElement("div");
         divInput2.className = "wfbtItem";
-        divInput2.innerHTML =
-            `<input style="float: left;" value="${1 / this._beatValue}" type="number" id="beatValue" min="1" max="35">`;
+        divInput2.innerHTML = `<input style="float: left;" value="${
+            1 / this._beatValue
+        }" type="number" id="beatValue" min="1" max="35">`;
 
         widgetWindow._toolbar.appendChild(divInput);
         widgetWindow._toolbar.appendChild(divInput2);
@@ -296,7 +291,7 @@ class MeterWidget {
         widgetWindow.sendToCenter();
         this._scale.call(this.widgetWindow);
     }
-    
+
     /**
      * Private method to scale the widget.
      *
@@ -332,7 +327,14 @@ class MeterWidget {
      * @returns {void}
      */
     __playDrum(drum) {
-        this.activity.logo.synth.trigger(0, "C4", Singer.defaultBPMFactor * this._beatValue, drum, null, null);
+        this.activity.logo.synth.trigger(
+            0,
+            "C4",
+            Singer.defaultBPMFactor * this._beatValue,
+            drum,
+            null,
+            null
+        );
     }
 
     /**
@@ -416,8 +418,7 @@ class MeterWidget {
      */
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
-        cell.innerHTML =
-            `&nbsp;&nbsp;<img 
+        cell.innerHTML = `&nbsp;&nbsp;<img 
                 src="header-icons/${icon}" 
                 title="${label}" 
                 alt="${label}" 
@@ -656,4 +657,8 @@ class MeterWidget {
             this._beatWheel.navItems[3].navItem.show();
         }
     }
+}
+
+if (typeof module !== "undefined") {
+    module.exports = MeterWidget;
 }

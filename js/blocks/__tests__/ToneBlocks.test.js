@@ -20,7 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-global._ = (s) => s;
+global._ = s => s;
 global.NOINPUTERRORMSG = "No input error";
 global.DEFAULTOSCILLATORTYPE = "defaultOsc";
 global.OSCTYPES = {
@@ -83,7 +83,7 @@ global.ValueBlock = DummyValueBlock;
 global.FlowClampBlock = DummyFlowClampBlock;
 global.LeftBlock = DummyLeftBlock;
 
-global.last = (arr) => (arr && arr.length ? arr[arr.length - 1] : undefined);
+global.last = arr => (arr && arr.length ? arr[arr.length - 1] : undefined);
 
 global.Singer = {
     ToneActions: {
@@ -115,7 +115,7 @@ const createMockActivity = () => {
         blockTypes: [],
         blockInstances: {},
         turtles: {
-            ithTurtle: jest.fn((t) => {
+            ithTurtle: jest.fn(t => {
                 if (!turtleStore[t]) {
                     turtleStore[t] = {
                         singer: {
@@ -190,7 +190,7 @@ describe("setupToneBlocks", () => {
         setupToneBlocks(activity);
     });
 
-    const getBlock = (type) => activity.blockInstances[type];
+    const getBlock = type => activity.blockInstances[type];
 
     describe("OscillatorBlock", () => {
         it("should create synth if no oscillator exists", () => {

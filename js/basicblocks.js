@@ -11,7 +11,7 @@
 
 // Definition of basic blocks common to all branches
 
-// Some names changed between the Python verison and the
+// Some names changed between the Python version and the
 // JS version so look up name in the conversion dictionary.
 
 /*
@@ -81,7 +81,7 @@ const BACKWARDCOMPATIBILIYDICT = {
  * @param  {Object} blocks
  * @returns {void}
  */
-const initBasicProtoBlocks = (activity) => {
+const initBasicProtoBlocks = activity => {
     activity.blocks.palettes = activity.palettes;
     setupRhythmBlockPaletteBlocks(activity);
     setupRhythmBlocks(activity);
@@ -120,7 +120,6 @@ const initBasicProtoBlocks = (activity) => {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         initBasicProtoBlocks,
-        BACKWARDCOMPATIBILIYDICT,
+        BACKWARDCOMPATIBILIYDICT
     };
 }
-
