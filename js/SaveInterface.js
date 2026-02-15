@@ -796,33 +796,36 @@ class SaveInterface {
             tmp.val(lydata);
             tmp.select();
             tmp[0].setSelectionRange(0, lydata.length);
-            const copied = document.execCommand("copy");
-            tmp.remove();
-            if (!copied) {
-                throw new Error("execCommand copy failed");
+            let copied = false;
+            try {
+                copied = document.execCommand("copy");
+            } catch (e) {
+                copied = false;
             }
+            tmp.remove();
+            return copied;
         };
 
         if (navigator.clipboard && window.isSecureContext) {
             navigator.clipboard
                 .writeText(lydata)
                 .then(showCopiedMessage)
-                .catch(() => {
-                    try {
-                        legacyCopy();
+                .catch(err => {
+                    const copied = legacyCopy();
+                    if (copied) {
                         showCopiedMessage();
-                    } catch (e) {
+                    } else {
                         // eslint-disable-next-line no-console
-                        console.debug("Clipboard copy failed:", e);
+                        console.debug("Clipboard copy failed:", err);
                     }
                 });
         } else {
-            try {
-                legacyCopy();
+            const copied = legacyCopy();
+            if (copied) {
                 showCopiedMessage();
-            } catch (e) {
+            } else {
                 // eslint-disable-next-line no-console
-                console.debug("Clipboard copy failed:", e);
+                console.debug("Clipboard copy failed");
             }
         }
         this.download("ly", "data:text;utf8," + encodeURIComponent(lydata), filename);

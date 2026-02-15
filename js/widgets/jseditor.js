@@ -1168,3 +1168,7 @@ class JSEditor {
         JSEditor.logConsole("Status window opened.", "green");
     }
 }
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { JSEditor };
+}
