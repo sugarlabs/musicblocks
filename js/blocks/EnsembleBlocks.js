@@ -90,19 +90,19 @@ function setupEnsembleBlocks(activity) {
                 "ensemble",
                 _THIS_IS_MUSIC_BLOCKS_
                     ? [
-                        _(
-                            "The Mouse index heap block returns a value in the heap at a specified location for a specified mouse."
-                        ),
-                        "documentation",
-                        ""
-                    ]
+                          _(
+                              "The Mouse index heap block returns a value in the heap at a specified location for a specified mouse."
+                          ),
+                          "documentation",
+                          ""
+                      ]
                     : [
-                        _(
-                            "The Turtle index heap block returns a value in the heap at a specified location for a specified turtle."
-                        ),
-                        "documentation",
-                        ""
-                    ]
+                          _(
+                              "The Turtle index heap block returns a value in the heap at a specified location for a specified turtle."
+                          ),
+                          "documentation",
+                          ""
+                      ]
             );
 
             const formOptions = {
@@ -251,7 +251,6 @@ function setupEnsembleBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
-
             if (args[0] === null) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
