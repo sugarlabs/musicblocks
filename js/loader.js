@@ -301,7 +301,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 function () {
                     // Give scripts a moment to finish executing and set globals
                     setTimeout(function () {
-                        // Log verification status for debugging (non-blocking)
+                        // Verify core dependencies are loaded
                         const verificationStatus = {
                             createjs: typeof window.createjs !== "undefined",
                             createDefaultStack: typeof window.createDefaultStack !== "undefined",
@@ -309,7 +309,6 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                             Blocks: typeof window.Blocks !== "undefined",
                             Turtles: typeof window.Turtles !== "undefined"
                         };
-                        console.log("Core module verification:", verificationStatus);
 
                         // Check critical dependencies (only createjs is truly critical)
                         if (typeof window.createjs === "undefined") {
@@ -325,7 +324,6 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                             ["activity/activity"],
                             function () {
                                 // Activity loaded successfully
-                                console.log("Activity module loaded successfully");
                             },
                             function (err) {
                                 console.error("Failed to load activity/activity:", err);

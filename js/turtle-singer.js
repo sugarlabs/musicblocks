@@ -660,18 +660,6 @@ class Singer {
         tur.painter.doPenUp();
         tur.painter.doSetXY(saveState.x, saveState.y);
         tur.painter.doSetHeading(saveState.orientation);
-        tur.painter.doSetXY(saveX, saveY);
-        tur.painter.color = saveColor;
-        tur.painter.value = saveValue;
-        tur.painter.chroma = saveChroma;
-        tur.painter.stroke = saveStroke;
-        tur.painter.canvasAlpha = saveCanvasAlpha;
-        tur.painter.doSetHeading(saveOrientation);
-        tur.painter.penState = savePenState;
-        tur.singer.suppressOutput = saveSuppressStatus;
-        tur.singer.previousTurtleTime = savePrevTurtleTime;
-        tur.singer.turtleTime = saveTurtleTime;
-        tur.singer.whichNoteToCount = saveWhichNoteToCount;
         tur.singer.justCounting.pop();
         tur.butNotThese = {};
 
@@ -1055,6 +1043,10 @@ class Singer {
                 if (noteObj[2] !== 0 && cents === 0) {
                     cents = noteObj[2];
                     // eslint-disable-next-line no-console
+                }
+
+                if (Math.abs(cents) < 1e-9) {
+                    cents = 0;
                 }
 
                 if (tur.singer.drumStyle.length > 0) {
@@ -1574,6 +1566,9 @@ class Singer {
             // We start the music clock as the first note is being played
             if (activity.logo.firstNoteTime === null) {
                 activity.logo.firstNoteTime = new Date().getTime();
+                if (typeof Tone !== "undefined") {
+                    activity.logo.firstNoteAudioTime = Tone.now();
+                }
             }
 
             // Calculate a lag: In case this turtle has fallen behind,
@@ -1827,6 +1822,15 @@ class Singer {
             if (duration > 0) {
                 tur.singer.previousTurtleTime = tur.singer.turtleTime;
                 if (tur.singer.inNoteBlock.length === 1) {
+                    if (
+                        !tur.singer.suppressOutput &&
+                        activity.logo.firstNoteAudioTime !== null &&
+                        typeof Tone !== "undefined"
+                    ) {
+                        const audioElapsed = Tone.now() - activity.logo.firstNoteAudioTime;
+                        future = Math.max(tur.singer.previousTurtleTime - audioElapsed, 0);
+                    }
+
                     tur.singer.turtleTime += bpmFactor / duration;
                     if (!tur.singer.suppressOutput) {
                         tur.doWait(Math.max(bpmFactor / duration - turtleLag, 0));
@@ -2104,8 +2108,10 @@ class Singer {
                                 pitchNumber *
                                 (Math.log10(ratio[k]) / Math.log10(getOctaveRatio()))
                             ).toFixed(0);
-                            numerator[k] = rationalToFraction(ratio[k])[0];
-                            denominator[k] = rationalToFraction(ratio[k])[1];
+                            // Cache rationalToFraction result to avoid duplicate calls
+                            const fraction = rationalToFraction(ratio[k]);
+                            numerator[k] = fraction[0];
+                            denominator[k] = fraction[1];
                         }
                     }
 
