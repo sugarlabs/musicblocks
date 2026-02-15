@@ -269,90 +269,7 @@ class PhraseMaker {
      * Adjusts the dimensions and overflow settings of window frames and widget bodies.
      */
     stylePhraseMaker() {
-        /**
-         * Width of the screen.
-         * @type {number}
-         */
-        const screenWidth = window.innerWidth;
-
-        /**
-         * Height of the screen.
-         * @type {number}
-         */
-        const screenHeight = window.innerHeight;
-
-        /**
-         * Container element for floating windows.
-         * @type {HTMLElement}
-         */
-        const floatingWindowsDiv = document.getElementById("floatingWindows");
-
-        /**
-         * Collection of window frame elements.
-         * @type {NodeListOf<Element>}
-         */
-        const windowFrameElements = floatingWindowsDiv.querySelectorAll(".windowFrame");
-
-        for (let i = 0; i < windowFrameElements.length; i++) {
-            /**
-             * Current window frame element.
-             * @type {Element}
-             */
-            const windowFrame = windowFrameElements[i];
-
-            /**
-             * Widget body element within the window frame.
-             * @type {Element}
-             */
-            const wfWinBody = windowFrame.querySelector(".wfWinBody");
-
-            /**
-             * Widget element within the window frame.
-             * @type {Element}
-             */
-            const wfbWidget = windowFrame.querySelector(".wfbWidget");
-
-            /**
-             * Total width of the window frame.
-             * @type {number}
-             */
-            const totalWidth = parseFloat(window.getComputedStyle(windowFrame).width);
-
-            /**
-             * Total height of the window frame.
-             * @type {number}
-             */
-            const totalHeight = parseFloat(window.getComputedStyle(windowFrame).height);
-
-            /**
-             * Maximum allowed width for the window frame.
-             * @type {number}
-             */
-            const maxWidth = screenWidth * 0.8;
-
-            /**
-             * Maximum allowed height for the window frame.
-             * @type {number}
-             */
-            const maxHeight = screenHeight * 0.8;
-
-            if (totalWidth > screenWidth || totalHeight > screenHeight) {
-                windowFrame.style.height = Math.min(totalHeight, maxHeight) + "px";
-                windowFrame.style.width = Math.min(totalWidth, maxWidth) + "px";
-                wfbWidget.style.overflowY = totalHeight > maxHeight ? "auto" : "hidden";
-                wfbWidget.style.overflowX = totalWidth > maxWidth ? "auto" : "hidden";
-                wfbWidget.style.width = "-webkit-fill-available";
-                wfbWidget.style.height = "-webkit-fill-available";
-                wfbWidget.style.position = "absolute";
-                wfbWidget.style.left = "55px";
-                wfWinBody.style.position = "absolute";
-                wfWinBody.style.overflowY = totalHeight > maxHeight ? "auto" : "hidden";
-                wfWinBody.style.overflowX = totalWidth > maxWidth ? "auto" : "hidden";
-                wfWinBody.style.width = "-webkit-fill-available";
-                wfWinBody.style.height = "-webkit-fill-available";
-                wfWinBody.style.background = "#cccccc";
-            }
-        }
+        PhraseMakerUI.stylePhraseMaker(this);
     }
 
     /**
@@ -3014,7 +2931,7 @@ class PhraseMaker {
      * @returns {number} The calculated width of the note cell.
      */
     _noteWidth(noteValue) {
-        return Math.max(Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this._cellScale), 15);
+        return PhraseMakerUI.calculateNoteWidth(this, noteValue);
     }
 
     /**
@@ -4447,20 +4364,7 @@ class PhraseMaker {
      * @private
      */
     _resetMatrix() {
-        let row = this._noteValueRow;
-        let cell;
-        for (let i = 0; i < row.cells.length; i++) {
-            cell = row.cells[i];
-            cell.style.backgroundColor = this.platformColor.rhythmcellcolor;
-        }
-
-        if (this._matrixHasTuplets) {
-            row = this._tupletNoteValueRow;
-            for (let i = 0; i < row.cells.length; i++) {
-                cell = row.cells[i];
-                cell.style.backgroundColor = this.platformColor.tupletBackground;
-            }
-        }
+        PhraseMakerUI.resetMatrix(this);
     }
 
     /**
