@@ -1854,13 +1854,39 @@ function Synth() {
 
                 if (!paramsEffects.doNeighbor) {
                     if (setNote !== undefined && setNote) {
-                        if (synth.oscillator !== undefined) {
-                            synth.setNote(notes);
-                        } else if (synth.voices !== undefined) {
-                            for (let i = 0; i < synth.voices.length; i++) {
-                                synth.voices[i].setNote(notes);
+                        // For glissando: use frequency ramping for smooth pitch glide
+                        const scheduleTimeMs = future * 1000;
+
+                        setTimeout(() => {
+                            try {
+                                // Convert note to frequency for ramping
+                                const targetFreq = Tone.Frequency(notes).toFrequency();
+
+                                // Use frequency.rampTo for smooth glissando with portamento time
+                                if (synth.frequency !== undefined) {
+                                    // MonoSynth/Synth: has direct frequency property
+                                    synth.frequency.rampTo(
+                                        targetFreq,
+                                        paramsEffects?.portamento || 0.05
+                                    );
+                                } else if (
+                                    synth.oscillator !== undefined &&
+                                    synth.oscillator.frequency !== undefined
+                                ) {
+                                    // Some synths have oscillator.frequency
+                                    synth.oscillator.frequency.rampTo(
+                                        targetFreq,
+                                        paramsEffects?.portamento || 0.05
+                                    );
+                                } else {
+                                    console.warn(
+                                        `[Glissando] Synth doesn't support frequency ramping. Use sine/sawtooth/triangle/square instruments for glissando.`
+                                    );
+                                }
+                            } catch (e) {
+                                console.debug("Error in glissando:", e);
                             }
-                        }
+                        }, scheduleTimeMs);
                     } else {
                         try {
                             await Tone.ToneAudioBuffer.loaded();
@@ -2058,8 +2084,9 @@ function Synth() {
                         tempNotes = notes[0];
                     }
 
+                    // For glissando (setNote=true), pass the unwrapped synth to access frequency properties
                     await this._performNotes(
-                        tempSynth.toDestination(),
+                        setNote ? tempSynth : tempSynth.toDestination(),
                         tempNotes,
                         beatValue,
                         paramsEffects,
@@ -2073,8 +2100,9 @@ function Synth() {
                     break;
                 case 0: // default synth
                 default:
+                    // For glissando (setNote=true), pass the unwrapped synth to access frequency properties
                     await this._performNotes(
-                        tempSynth.toDestination(),
+                        setNote ? tempSynth : tempSynth.toDestination(),
                         tempNotes,
                         beatValue,
                         paramsEffects,

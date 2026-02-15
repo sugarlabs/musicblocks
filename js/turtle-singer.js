@@ -145,6 +145,8 @@ class Singer {
         this.staccato = [];
         this.glide = [];
         this.glideOverride = 0;
+        this.notesInGlide = 0; // Track number of notes processed in current glissando
+        this.glideTimeOffset = 0; // Cumulative time offset for scheduling pitch changes in glissando
         this.swing = [];
         this.swingTarget = [];
         this.swingCarryOver = 0;
@@ -2251,6 +2253,7 @@ class Singer {
                                                 // If we are in a glide, use setNote after the first note
                                                 if (tur.singer.glide.length > 0) {
                                                     if (tur.singer.glideOverride === 0) {
+                                                        // Normal glide note (not using override duration)
                                                         activity.logo.synth.trigger(
                                                             turtle,
                                                             notes[d],
@@ -2262,20 +2265,43 @@ class Singer {
                                                             future
                                                         );
                                                     } else {
-                                                        // trigger first note for entire duration of the glissando
-                                                        const beatValueOverride =
-                                                            bpmFactor / tur.singer.glideOverride;
-                                                        activity.logo.synth.trigger(
-                                                            turtle,
-                                                            notes[d],
-                                                            beatValueOverride,
-                                                            last(tur.singer.instrumentNames),
-                                                            paramsEffects,
-                                                            filters,
-                                                            false,
-                                                            future
-                                                        );
-                                                        tur.singer.glideOverride = 0;
+                                                        // First note in glissando: trigger for entire duration
+                                                        // Subsequent notes will use setNote for smooth pitch transition
+                                                        if (tur.singer.notesInGlide === 0) {
+                                                            const beatValueOverride =
+                                                                bpmFactor /
+                                                                tur.singer.glideOverride;
+                                                            activity.logo.synth.trigger(
+                                                                turtle,
+                                                                notes[d],
+                                                                beatValueOverride,
+                                                                last(tur.singer.instrumentNames),
+                                                                paramsEffects,
+                                                                filters,
+                                                                false,
+                                                                future
+                                                            );
+                                                            tur.singer.notesInGlide++;
+                                                            // Set offset for next note to current note's duration
+                                                            tur.singer.glideTimeOffset = beatValue;
+                                                        } else {
+                                                            // Subsequent notes: use setNote for smooth glissando at the accumulated time offset
+                                                            const pitchChangeTime =
+                                                                future + tur.singer.glideTimeOffset;
+                                                            activity.logo.synth.trigger(
+                                                                turtle,
+                                                                notes[d],
+                                                                beatValue,
+                                                                last(tur.singer.instrumentNames),
+                                                                paramsEffects,
+                                                                filters,
+                                                                true,
+                                                                pitchChangeTime
+                                                            );
+                                                            tur.singer.notesInGlide++;
+                                                            // Accumulate time offset for next note
+                                                            tur.singer.glideTimeOffset += beatValue;
+                                                        }
                                                     }
                                                 } else {
                                                     activity.logo.synth.trigger(

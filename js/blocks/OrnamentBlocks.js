@@ -379,12 +379,11 @@ function setupOrnamentBlocks(activity) {
                 [4, "vspace", 0, 0, [0, null]],
                 [5, "hidden", 0, 0, [0, null]]
             ]);
-
             /**
-             * Sets the block as hidden.
+             * Sets the block as not hidden so it appears in the palette.
              * @type {boolean}
              */
-            this.hidden = true;
+            this.hidden = false;
         }
 
         /**
@@ -396,10 +395,9 @@ function setupOrnamentBlocks(activity) {
          * @returns {number[]} - The result of the block execution.
          */
         flow(args, logo, turtle, blk) {
-            // TODO: Duration should be the sum of all the notes (like
-            // in a tie). If we set the synth portamento and use
-            // setNote for all but the first note, it should produce a
-            // glissando.
+            // Implementation: Duration is now the sum of all notes (calculated by noteCounter).
+            // Synth portamento is set via paramsEffects, and setNote is used for subsequent
+            // notes after the first one to produce a smooth glissando effect.
             if (args[1] === undefined) {
                 // Nothing to do.
                 return;
@@ -433,6 +431,10 @@ function setupOrnamentBlocks(activity) {
                 }
 
                 tur.singer.glide.pop();
+                // Reset glide state after glide block completes
+                tur.singer.glideOverride = 0;
+                tur.singer.notesInGlide = 0;
+                tur.singer.glideTimeOffset = 0;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);

@@ -248,6 +248,8 @@ class Turtle {
         this.singer.staccato = [];
         this.singer.glide = [];
         this.singer.glideOverride = 0;
+        this.singer.notesInGlide = 0;
+        this.singer.glideTimeOffset = 0;
         this.singer.swing = [];
         this.singer.swingTarget = [];
         this.singer.swingCarryOver = 0;
