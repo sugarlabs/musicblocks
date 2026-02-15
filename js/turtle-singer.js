@@ -210,6 +210,38 @@ class Singer {
         this.dispatchFactor = 1; // scale factor for turtle graphics embedded in notes
 
         this.inverted = false; // tracks if the notes being played are inverted
+
+        // Voice Manager: Track active audio sources for proper cleanup
+        this.activeVoices = new Set();
+    }
+
+    /**
+     * Kills all active audio voices for this turtle.
+     * Called during stop/halt to prevent "zombie audio" that continues playing.
+     * Uses try/catch to handle nodes that may have already stopped.
+     *
+     * @returns {void}
+     */
+    killAllVoices() {
+        this.activeVoices.forEach(audioNode => {
+            try {
+                // Stop Tone.Player instances (drums/samples)
+                if (audioNode.stop && typeof audioNode.stop === "function") {
+                    audioNode.stop();
+                }
+                // Release all voices for PolySynth/Sampler instances
+                else if (audioNode.releaseAll && typeof audioNode.releaseAll === "function") {
+                    audioNode.releaseAll();
+                }
+                // Disconnect as fallback
+                else if (audioNode.disconnect && typeof audioNode.disconnect === "function") {
+                    audioNode.disconnect();
+                }
+            } catch (e) {
+                // Ignore errors from already-stopped nodes
+            }
+        });
+        this.activeVoices.clear();
     }
 
     // ========= Class variables ==============================================
