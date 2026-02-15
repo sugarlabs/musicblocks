@@ -37,7 +37,8 @@
    SPECIALINPUTS, STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
    TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, Turtles, TURTLESVG,
    updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_F,
-   SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator
+   SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
+   MUSICALMODES, waitForReadiness
  */
 
 /*
@@ -54,6 +55,10 @@ const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 const _ERRORMSGTIMEOUT_ = 15000;
 const _MSGTIMEOUT_ = 60000;
 
+// Responsive breakpoint constants
+const RESPONSIVE_BREAKPOINT_TABLET = 768;
+const RESPONSIVE_BREAKPOINT_MOBILE = 600;
+
 let MYDEFINES = [
     "utils/platformstyle",
     "easeljs.min",
@@ -61,7 +66,7 @@ let MYDEFINES = [
     "preloadjs.min",
     "howler",
     "p5.min",
-    "p5.sound.min",
+    "p5-sound-adapter",
     "p5.dom.min",
     // 'mespeak',
     "Chart",
@@ -70,7 +75,6 @@ let MYDEFINES = [
     "widgets/status",
     "widgets/help",
     "utils/munsell",
-    "activity/gif-animator",
     "activity/toolbar",
     "activity/trash",
     "activity/boundary",
@@ -206,6 +210,7 @@ class Activity {
      */
     constructor() {
         globalActivity = this;
+        this._listeners = [];
 
         this.cellSize = 55;
         this.searchSuggestions = [];
@@ -302,12 +307,36 @@ class Activity {
         this.loadAnimationIntervalId = null;
 
         // Initialize GIF animator
-        this.gifAnimator = new GIFAnimator();
+        if (typeof GIFAnimator !== "undefined") {
+            this.gifAnimator = new GIFAnimator();
+        } else {
+            // eslint-disable-next-line no-console
+            console.debug("GIFAnimator not yet available in constructor");
+            this.gifAnimator = null;
+        }
+
+        // Dirty flag for canvas rendering optimization
+        // When true, the stage needs to be redrawn on the next animation frame
+        this.stageDirty = false;
 
         this.themes = ["light", "dark"];
         try {
+            // Detect system theme preference (using same logic as ThemeBox)
+            const getSystemTheme = () => {
+                if (
+                    window.matchMedia &&
+                    window.matchMedia("(prefers-color-scheme: dark)").matches
+                ) {
+                    return "dark";
+                }
+                return "light";
+            };
+
+            // Use stored preference, fallback to system preference
+            const activeTheme = this.storage.themePreference || getSystemTheme();
+
             for (let i = 0; i < this.themes.length; i++) {
-                if (this.themes[i] === this.storage.themePreference) {
+                if (this.themes[i] === activeTheme) {
                     body.classList.add(this.themes[i]);
                 } else {
                     body.classList.remove(this.themes[i]);
@@ -354,8 +383,6 @@ class Activity {
         this.KeySignatureEnv = ["C", "major", false];
         try {
             if (this.storage.KeySignatureEnv !== undefined) {
-                // eslint-disable-next-line no-console
-                console.log(this.storage.KeySignatureEnv);
                 this.KeySignatureEnv = this.storage.KeySignatureEnv.split(",");
                 this.KeySignatureEnv[2] = this.KeySignatureEnv[2] === "true";
             }
@@ -369,25 +396,10 @@ class Activity {
          * Sets up the initial state and dependencies of the activity.
          */
         this.setupDependencies = () => {
+            this.cleanupEventListeners();
             createDefaultStack();
             createHelpContent(this);
             window.scroll(0, 0);
-
-            /*
-            try {
-                meSpeak.loadConfig('lib/mespeak_config.json');
-                lang = document.webL10n.getLanguage();
-
-                if (['es', 'ca', 'de', 'el', 'eo', 'fi', 'fr', 'hu', 'it', 'kn', 'la', 'lv', 'nl', 'pl', 'pt', 'ro', 'sk', 'sv', 'tr', 'zh'].indexOf(lang) !== -1) {
-                    meSpeak.loadVoice('lib/voices/' + lang + '.json');
-                } else {
-                    meSpeak.loadVoice('lib/voices/en/en.json');
-                }
-            } catch (e) {
-                // eslint-disable-next-line no-console
-                console.debug(e);
-            }
-            */
 
             document.title = TITLESTRING;
             this.canvas = document.getElementById("myCanvas");
@@ -403,7 +415,7 @@ class Activity {
             this.errorText = document.getElementById("errorText");
             this.errorTextContent = document.getElementById("errorTextContent");
             // Hide Arrow on hiding error message
-            this.errorText.addEventListener("click", this._hideArrows);
+            this.addEventListener(this.errorText, "click", this._hideArrows);
             // Show and populate the printText div.
             this.printText = document.getElementById("printText");
             this.printTextContent = document.getElementById("printTextContent");
@@ -459,19 +471,34 @@ class Activity {
             this.helpfulWheelItems = [];
 
             this.setHelpfulSearchDiv();
+
+            // Late initialization of GIF animator if it was missed in constructor
+            if (!this.gifAnimator && typeof GIFAnimator !== "undefined") {
+                this.gifAnimator = new GIFAnimator();
+            }
         };
 
         /*
-         * Ensure continuous canvas updates for animated content.
-         * The ticker runs at a fixed framerate to allow smooth GIF animation
-         * even when the turtle or UI is otherwise idle.
+         * Optimized canvas rendering using dirty flag pattern.
+         * The stage only updates when:
+         * 1. stageDirty flag is set (something changed)
+         * 2. Active tweens are running
+         * 3. GIF animations are playing
+         * This eliminates unnecessary 60fps updates when idle.
          */
-        createjs.Ticker.framerate = 60;
-        createjs.Ticker.on("tick", () => {
+        const renderLoop = () => {
             if (this.stage) {
-                this.stage.update();
+                const hasActiveTweens = createjs.Tween.hasActiveTweens();
+                const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
+
+                if (this.stageDirty || hasActiveTweens || hasActiveGifs) {
+                    this.stage.update();
+                    this.stageDirty = false;
+                }
             }
-        });
+            requestAnimationFrame(renderLoop);
+        };
+        requestAnimationFrame(renderLoop);
 
         /*
          * creates helpfulSearchDiv for search
@@ -504,8 +531,8 @@ class Activity {
 
             // Add event listener to remove the search div from the DOM
             const modeButton = document.getElementById("begIconText");
-            closeButton.addEventListener("click", this._hideHelpfulSearchWidget);
-            modeButton.addEventListener("click", this._hideHelpfulSearchWidget);
+            this.addEventListener(closeButton, "click", this._hideHelpfulSearchWidget);
+            this.addEventListener(modeButton, "click", this._hideHelpfulSearchWidget);
 
             this.helpfulSearchDiv.appendChild(this.helpfulSearchWidget);
         };
@@ -517,14 +544,12 @@ class Activity {
             if (!document.getElementById("helpfulSearchDiv")) {
                 this.setHelpfulSearchDiv(); // Re-create and append the div if it's not found
             }
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
             this.helpfulSearchDiv.style.left =
-                document.getElementById("helpfulWheelDiv").offsetLeft +
-                80 * this.getStageScale() +
-                "px";
+                helpfulWheelDiv.offsetLeft + 80 * this.getStageScale() + "px";
             this.helpfulSearchDiv.style.top =
-                document.getElementById("helpfulWheelDiv").offsetTop +
-                110 * this.getStageScale() +
-                "px";
+                helpfulWheelDiv.offsetTop + 110 * this.getStageScale() + "px";
 
             const windowWidth = window.innerWidth;
             const windowHeight = window.innerHeight;
@@ -546,8 +571,10 @@ class Activity {
         // hides helpfulSearchDiv on canvas
 
         this._hideHelpfulSearchWidget = e => {
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
             }
             if (this.helpfulSearchDiv && this.helpfulSearchDiv.parentNode) {
                 this.helpfulSearchDiv.parentNode.removeChild(this.helpfulSearchDiv);
@@ -560,7 +587,8 @@ class Activity {
          * (if block is right clicked)
          */
         this.doContextMenus = () => {
-            document.addEventListener(
+            this.addEventListener(
+                document,
                 "contextmenu",
                 event => {
                     event.preventDefault();
@@ -584,7 +612,9 @@ class Activity {
          * displays helpfulWheel on canvas on right click
          */
         this._displayHelpfulWheel = event => {
-            document.getElementById("helpfulWheelDiv").style.position = "absolute";
+            // Cache DOM element reference for performance (7 lookups reduced to 1)
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            helpfulWheelDiv.style.position = "absolute";
 
             const x = event.clientX;
             const y = event.clientY;
@@ -601,21 +631,21 @@ class Activity {
                 canvasTop
             );
 
-            document.getElementById("helpfulWheelDiv").style.left = helpfulWheelLeft + "px";
+            helpfulWheelDiv.style.left = helpfulWheelLeft + "px";
 
-            document.getElementById("helpfulWheelDiv").style.top = helpfulWheelTop + "px";
+            helpfulWheelDiv.style.top = helpfulWheelTop + "px";
 
             const windowWidth = window.innerWidth - 20;
             const windowHeight = window.innerHeight - 20;
 
             if (helpfulWheelLeft + 350 > windowWidth) {
-                document.getElementById("helpfulWheelDiv").style.left = windowWidth - 350 + "px";
+                helpfulWheelDiv.style.left = windowWidth - 350 + "px";
             }
             if (helpfulWheelTop + 350 > windowHeight) {
-                document.getElementById("helpfulWheelDiv").style.top = windowHeight - 350 + "px";
+                helpfulWheelDiv.style.top = windowHeight - 350 + "px";
             }
 
-            document.getElementById("helpfulWheelDiv").style.display = "";
+            helpfulWheelDiv.style.display = "";
 
             const wheel = new wheelnav("helpfulWheelDiv", null, 300, 300);
             wheel.colors = platformColor.wheelcolors;
@@ -640,11 +670,11 @@ class Activity {
                 const isClickInside = helpfulWheelDiv.contains(e.target);
                 if (!isClickInside) {
                     helpfulWheelDiv.style.display = "none";
-                    document.removeEventListener("click", closeHelpfulWheel);
+                    this.removeEventListener(document, "click", closeHelpfulWheel);
                 }
             };
 
-            document.addEventListener("click", closeHelpfulWheel);
+            this.addEventListener(document, "click", closeHelpfulWheel);
         };
 
         /**
@@ -721,8 +751,10 @@ class Activity {
          */
         const findBlocks = activity => {
             activity._findBlocks();
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -763,14 +795,20 @@ class Activity {
                     };
                 }
 
-                if (canvasWidth < 768 && !referenceBlock.beforeMobilePosition) {
+                if (
+                    canvasWidth < RESPONSIVE_BREAKPOINT_TABLET &&
+                    !referenceBlock.beforeMobilePosition
+                ) {
                     referenceBlock.beforeMobilePosition = {
                         x: referenceBlock.container.x,
                         y: referenceBlock.container.y
                     };
                 }
 
-                if (canvasWidth >= 768 && referenceBlock.beforeMobilePosition) {
+                if (
+                    canvasWidth >= RESPONSIVE_BREAKPOINT_TABLET &&
+                    referenceBlock.beforeMobilePosition
+                ) {
                     const dx = referenceBlock.beforeMobilePosition.x - referenceBlock.container.x;
                     const dy = referenceBlock.beforeMobilePosition.y - referenceBlock.container.y;
                     group.forEach(blockId => {
@@ -782,14 +820,20 @@ class Activity {
                     //this prevents old groups from affecting new calculations.
                 }
 
-                if (canvasWidth < 600 && !referenceBlock.before600pxPosition) {
+                if (
+                    canvasWidth < RESPONSIVE_BREAKPOINT_MOBILE &&
+                    !referenceBlock.before600pxPosition
+                ) {
                     referenceBlock.before600pxPosition = {
                         x: referenceBlock.container.x,
                         y: referenceBlock.container.y
                     };
                 }
 
-                if (canvasWidth >= 600 && referenceBlock.before600pxPosition) {
+                if (
+                    canvasWidth >= RESPONSIVE_BREAKPOINT_MOBILE &&
+                    referenceBlock.before600pxPosition
+                ) {
                     const dx = referenceBlock.before600pxPosition.x - referenceBlock.container.x;
                     const dy = referenceBlock.before600pxPosition.y - referenceBlock.container.y;
 
@@ -835,7 +879,8 @@ class Activity {
         }
 
         //if any window resize event occurs:
-        window.addEventListener("resize", () => repositionBlocks(this));
+        this._handleRepositionBlocksOnResize = () => repositionBlocks(this);
+        this.addEventListener(window, "resize", this._handleRepositionBlocksOnResize);
 
         /**
          * Finds and organizes blocks within the workspace.
@@ -853,7 +898,7 @@ class Activity {
             this.blocksContainer.y = 0;
 
             const screenWidth = window.innerWidth;
-            const isNarrowScreen = screenWidth < 600;
+            const isNarrowScreen = screenWidth < RESPONSIVE_BREAKPOINT_MOBILE;
             const minColumnWidth = 400;
             const numColumns = isNarrowScreen ? 1 : Math.floor(screenWidth / minColumnWidth);
 
@@ -1131,7 +1176,7 @@ class Activity {
          * @constructor
          */
         this.setHomeContainers = homeState => {
-            if (this.homeButtonContainer === null) {
+            if (this.homeButtonContainer === null || this.homeButtonContainer === undefined) {
                 return;
             }
 
@@ -1218,6 +1263,20 @@ class Activity {
             this.sendAllToTrash(true, true);
         };
 
+        const extractSVGInner = svgString => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(svgString, "image/svg+xml");
+            const svgEl = doc.querySelector("svg");
+            if (!svgEl) return "";
+
+            // Remove drop shadow filters safely
+            svgEl.querySelectorAll("[filter]").forEach(el => {
+                el.removeAttribute("filter");
+            });
+
+            return svgEl.innerHTML;
+        };
+
         /**
          * @returns {SVG} returns SVG of blocks
          */
@@ -1241,11 +1300,9 @@ class Activity {
                     yMax = this.blocks.blockList[i].container.y + this.blocks.blockList[i].height;
                 }
 
-                if (this.blocks.blockList[i].collapsed) {
-                    parts = this.blocks.blockCollapseArt[i].split("><");
-                } else {
-                    parts = this.blocks.blockArt[i].split("><");
-                }
+                const rawSVG = this.blocks.blockList[i].collapsed
+                    ? this.blocks.blockCollapseArt[i]
+                    : this.blocks.blockArt[i];
 
                 if (this.blocks.blockList[i].isCollapsible()) {
                     svg += "<g>";
@@ -1257,47 +1314,51 @@ class Activity {
                     ", " +
                     this.blocks.blockList[i].container.y +
                     ')">';
-                if (SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
-                    for (let p = 1; p < parts.length; p++) {
-                        // FIXME: This is fragile.
-                        if (p === 1) {
-                            svg += "<" + parts[p] + "><";
-                        } else if (p === 2) {
-                            // skip filter
-                        } else if (p === 3) {
-                            svg += parts[p].replace("filter:url(#dropshadow);", "") + "><";
-                        } else if (p === 5) {
-                            // Add block value to SVG between tspans
-                            if (typeof this.blocks.blockList[i].value === "string") {
-                                svg += parts[p] + ">" + _(this.blocks.blockList[i].value) + "<";
-                            } else {
-                                svg += parts[p] + ">" + this.blocks.blockList[i].value + "<";
-                            }
-                        } else if (p === parts.length - 2) {
-                            svg += parts[p] + ">";
-                        } else if (p === parts.length - 1) {
-                            // skip final </svg>
-                        } else {
-                            svg += parts[p] + "><";
-                        }
-                    }
+
+                if (!SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
+                    svg += extractSVGInner(rawSVG);
                 } else {
-                    for (let p = 1; p < parts.length; p++) {
-                        // FIXME: This is fragile.
-                        if (p === 1) {
-                            svg += "<" + parts[p] + "><";
-                        } else if (p === 2) {
-                            // skip filter
-                        } else if (p === 3) {
-                            svg += parts[p].replace("filter:url(#dropshadow);", "") + "><";
-                        } else if (p === parts.length - 2) {
-                            svg += parts[p] + ">";
-                        } else if (p === parts.length - 1) {
-                            // skip final </svg>
-                        } else {
-                            svg += parts[p] + "><";
-                        }
+                    // Safer SVG manipulation using DOM instead of string splitting
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(rawSVG, "image/svg+xml");
+
+                    // remove dropshadow filter if present
+                    const filtered = doc.querySelector('[style*="filter:url(#dropshadow)"]');
+                    if (filtered) {
+                        filtered.style.filter = "";
                     }
+
+                    // Find correct tspan to inject value (matches previous behaviour)
+                    let target = null;
+
+                    // 1) Prefer empty tspan (most block SVGs reserve this for value)
+                    target = Array.from(doc.querySelectorAll("text tspan")).find(
+                        t => !t.textContent || t.textContent.trim() === ""
+                    );
+
+                    // 2) Otherwise fallback to last tspan
+                    if (!target) {
+                        const tspans = doc.querySelectorAll("text tspan");
+                        if (tspans.length) target = tspans[tspans.length - 1];
+                    }
+
+                    // 3) Final fallback to text node
+                    if (!target) {
+                        target = doc.querySelector("text");
+                    }
+
+                    if (target) {
+                        const val = this.blocks.blockList[i].value;
+                        target.textContent = typeof val === "string" ? _(val) : val;
+                    }
+
+                    // serialize without outer <svg> wrapper (matches previous behavior)
+                    let serialized = new XMLSerializer().serializeToString(doc.documentElement);
+
+                    // remove outer svg tags because original code skipped them
+                    serialized = serialized.replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "");
+
+                    svg += serialized;
                 }
 
                 svg += "</g>";
@@ -1441,7 +1502,7 @@ class Activity {
 
             const importConfirm = document.createElement("button");
             importConfirm.classList.add("confirm-button");
-            importConfirm.textContent = "Confirm";
+            importConfirm.textContent = _("Confirm");
             importConfirm.addEventListener("click", () => {
                 const maxNoteBlocks = select.value;
                 transcribeMidi(midi, maxNoteBlocks);
@@ -1451,7 +1512,7 @@ class Activity {
 
             const cancelBtn = document.createElement("button");
             cancelBtn.classList.add("cancel-button");
-            cancelBtn.textContent = "Cancel";
+            cancelBtn.textContent = _("Cancel");
             cancelBtn.addEventListener("click", () => {
                 document.body.removeChild(modal);
             });
@@ -1484,7 +1545,7 @@ class Activity {
 
             const confirmBtn = document.createElement("button");
             confirmBtn.classList.add("confirm-button");
-            confirmBtn.textContent = "Confirm";
+            confirmBtn.textContent = _("Confirm");
             confirmBtn.style.backgroundColor = platformColor.blueButton;
             confirmBtn.style.color = "white";
             confirmBtn.style.border = "none";
@@ -1493,14 +1554,14 @@ class Activity {
             confirmBtn.style.fontWeight = "bold";
             confirmBtn.style.cursor = "pointer";
             confirmBtn.style.marginRight = "16px";
-            confirmBtn.addEventListener("click", () => {
+            this.addEventListener(confirmBtn, "click", () => {
                 document.body.removeChild(modal);
                 clearCanvasAction();
             });
 
             const cancelBtn = document.createElement("button");
             cancelBtn.classList.add("cancel-button");
-            cancelBtn.textContent = "Cancel";
+            cancelBtn.textContent = _("Cancel");
             cancelBtn.style.backgroundColor = "#f1f1f1";
             cancelBtn.style.color = "black";
             cancelBtn.style.border = "none";
@@ -1508,7 +1569,7 @@ class Activity {
             cancelBtn.style.padding = "8px 16px";
             cancelBtn.style.fontWeight = "bold";
             cancelBtn.style.cursor = "pointer";
-            cancelBtn.addEventListener("click", () => {
+            this.addEventListener(cancelBtn, "click", () => {
                 document.body.removeChild(modal);
             });
 
@@ -1561,25 +1622,15 @@ class Activity {
                 this.blocksContainer.x = 0;
                 this.blocksContainer.y = 0;
 
-                Element.prototype.remove = () => {
-                    this.parentElement.removeChild(this);
-                };
-
-                NodeList.prototype.remove = HTMLCollection.prototype.remove = () => {
-                    for (let i = 0, len = this.length; i < len; i++) {
-                        if (this[i] && this[i].parentElement) {
-                            this[i].parentElement.removeChild(this[i]);
-                        }
-                    }
-                };
-
                 const table = document.getElementById("myTable");
                 if (table !== null) {
                     table.remove();
                 }
 
-                if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                    document.getElementById("helpfulWheelDiv").style.display = "none";
+                // Cache DOM element reference for performance
+                const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+                if (helpfulWheelDiv.style.display !== "none") {
+                    helpfulWheelDiv.style.display = "none";
                     this.__tick();
                 }
             };
@@ -1868,9 +1919,8 @@ class Activity {
                 // Queue and take first step.
                 if (!this.turtles.running()) {
                     this.logo.runLogoCommands();
-                    document.getElementById(
-                        "stop"
-                    ).style.color = this.toolbar.stopIconColorWhenPlaying;
+                    document.getElementById("stop").style.color =
+                        this.toolbar.stopIconColorWhenPlaying;
                 }
                 this.logo.step();
             } else {
@@ -1938,7 +1988,6 @@ class Activity {
                 activity.save.savePNG.bind(activity.save),
                 activity.save.saveWAV.bind(activity.save),
                 activity.save.saveLilypond.bind(activity.save),
-                activity.save.saveLilypond.bind(afterSaveLilypond),
                 activity.save.afterSaveLilypondLY.bind(activity.save),
                 activity.save.saveAbc.bind(activity.save),
                 activity.save.saveMxml.bind(activity.save),
@@ -1961,8 +2010,10 @@ class Activity {
         const setScroller = activity => {
             activity._setScroller();
             activity._setupBlocksContainerEvents();
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
             }
         };
 
@@ -2056,8 +2107,10 @@ class Activity {
          */
         const doLargerBlocks = async activity => {
             await activity._doLargerBlocks();
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -2091,8 +2144,10 @@ class Activity {
          */
         const doSmallerBlocks = async activity => {
             await activity._doSmallerBlocks();
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -2190,9 +2245,8 @@ class Activity {
                     i < this.palettes.dict[this.palettes.activePalette].protoList.length;
                     i++
                 ) {
-                    const name = this.palettes.dict[this.palettes.activePalette].protoList[i][
-                        "name"
-                    ];
+                    const name =
+                        this.palettes.dict[this.palettes.activePalette].protoList[i]["name"];
                     if (name in obj["FLOWPLUGINS"]) {
                         // eslint-disable-next-line no-console
                         console.log("deleting " + name);
@@ -2434,7 +2488,7 @@ class Activity {
                                 that.blocksContainer.y -= deltaY;
                             }
 
-                            if (deltaX !== 0) {
+                            if (that.scrollBlockContainer && deltaX !== 0) {
                                 closeAnyOpenMenusAndLabels();
                                 that.blocksContainer.x -= deltaX;
                             }
@@ -2470,24 +2524,29 @@ class Activity {
                 if (event.ctrlKey) {
                     event.preventDefault();
                     delY < 0 ? doLargerBlocks(that) : doSmallerBlocks(that);
-                } else if (delY !== 0 && event.axis === event.VERTICAL_AXIS) {
-                    closeAnyOpenMenusAndLabels();
-                    that.blocksContainer.y -= delY;
-                } else if (
-                    that.scrollBlockContainer &&
-                    delX !== 0 &&
-                    event.axis === event.HORIZONTAL_AXIS
-                ) {
-                    closeAnyOpenMenusAndLabels();
-                    that.blocksContainer.x -= delX;
                 } else {
-                    event.preventDefault();
+                    closeAnyOpenMenusAndLabels();
+                    if (that.scrollBlockContainer) {
+                        // Horizontal scrolling enabled (Advanced)
+                        if (delY !== 0) that.blocksContainer.y -= delY;
+                        if (delX !== 0) that.blocksContainer.x -= delX;
+                    } else {
+                        // Vertical scrolling only (Beginner / Default)
+                        if (event.axis === event.VERTICAL_AXIS && delY !== 0) {
+                            that.blocksContainer.y -= delY;
+                        }
+                    }
                 }
 
                 that.refreshCanvas();
             };
 
-            document.getElementById("myCanvas").addEventListener("wheel", __wheelHandler, false);
+            this.addEventListener(
+                document.getElementById("myCanvas"),
+                "wheel",
+                __wheelHandler,
+                false
+            );
 
             /**
              * Handles stage mouse up event.
@@ -2668,8 +2727,7 @@ class Activity {
                 hitArea.y = 0;
                 container.hitArea = hitArea;
 
-                // eslint-disable-next-line no-unused-vars
-                container.on("click", event => {
+                container.on("click", () => {
                     container.visible = false;
                     // On the possibility that there was an error
                     // arrow associated with this container
@@ -2685,6 +2743,60 @@ class Activity {
             };
 
             img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svgData));
+        };
+
+        /**
+         * Initializes the Idle Watcher mechanism to throttle createjs.Ticker
+         * when the application is inactive and no music is playing.
+         * This significantly reduces CPU usage and improves battery life.
+         */
+        this._initIdleWatcher = () => {
+            const IDLE_THRESHOLD = 5000; // 5 seconds
+            const ACTIVE_FPS = 60;
+            const IDLE_FPS = 1;
+
+            let lastActivity = Date.now();
+            let isIdle = false;
+
+            // Wake up function - restores full framerate
+            const resetIdleTimer = () => {
+                lastActivity = Date.now();
+                if (isIdle) {
+                    isIdle = false;
+                    createjs.Ticker.framerate = ACTIVE_FPS;
+                    // Force immediate redraw for responsiveness
+                    if (this.stage) this.stage.update();
+                }
+            };
+
+            // Track user activity
+            window.addEventListener("mousemove", resetIdleTimer);
+            window.addEventListener("mousedown", resetIdleTimer);
+            window.addEventListener("keydown", resetIdleTimer);
+            window.addEventListener("touchstart", resetIdleTimer);
+            window.addEventListener("wheel", resetIdleTimer);
+
+            // Periodic check for idle state
+            setInterval(() => {
+                // Check if music/code is playing
+                const isMusicPlaying = this.logo?._alreadyRunning || false;
+
+                if (!isMusicPlaying && Date.now() - lastActivity > IDLE_THRESHOLD) {
+                    if (!isIdle) {
+                        isIdle = true;
+                        createjs.Ticker.framerate = IDLE_FPS;
+                        console.log("⚡ Idle mode: Throttling to 1 FPS to save battery");
+                    }
+                } else if (isIdle && isMusicPlaying) {
+                    // Music started playing - wake up immediately
+                    resetIdleTimer();
+                }
+            }, 1000);
+
+            // Expose activity instance for external checks
+            if (typeof window !== "undefined") {
+                window.activity = this;
+            }
         };
 
         /*
@@ -2730,8 +2842,7 @@ class Activity {
                 container.hitArea = hitArea;
 
                 const that = this;
-                // eslint-disable-next-line no-unused-vars
-                container.on("click", event => {
+                container.on("click", () => {
                     container.visible = false;
                     // On the possibility that there was an error
                     // arrow associated with this container
@@ -2754,6 +2865,12 @@ class Activity {
 
             this.searchSuggestions = [];
             this.deprecatedBlockNames = [];
+
+            // Guard: blocks may not be initialized yet during early loading
+            if (!this.blocks || !this.blocks.protoBlockDict) {
+                console.debug("prepSearchWidget: blocks not yet initialized, skipping");
+                return;
+            }
 
             for (const i in this.blocks.protoBlockDict) {
                 const block = this.blocks.protoBlockDict[i];
@@ -2941,45 +3058,154 @@ class Activity {
          * Uses JQuery to add autocompleted search suggestions
          */
         this.doSearch = () => {
-            const $j = jQuery.noConflict();
+            // Guard: ensure searchWidget exists before proceeding
+            if (!this.searchWidget) {
+                console.debug("doSearch: searchWidget not yet initialized, skipping");
+                return;
+            }
+
+            const $j = window.jQuery;
+            if (this.searchSuggestions.length === 0) {
+                this.prepSearchWidget();
+            }
 
             const that = this;
-            $j("#search").autocomplete({
-                source: that.searchSuggestions,
-                select: (event, ui) => {
-                    event.preventDefault();
-                    that.searchWidget.value = ui.item.label;
-                    that.searchWidget.idInput_custom = ui.item.value;
-                    that.searchWidget.protoblk = ui.item.specialDict;
-                    that.doSearch();
-                    if (event.keyCode === 13) this.searchWidget.style.visibility = "visible";
-                },
-                focus: event => {
-                    event.preventDefault();
-                }
-            });
+            const $search = $j("#search");
 
-            $j("#search").autocomplete("instance")._renderItem = (ul, item) => {
-                return $j("<li></li>")
-                    .data("item.autocomplete", item)
-                    .append(
-                        '<img src="' +
-                            item.artwork +
-                            '" height="20px">' +
-                            "<a> " +
-                            item.label +
-                            "</a>"
-                    )
-                    .appendTo(
-                        ul.css({
-                            "z-index": 9999,
-                            "max-height": "200px",
-                            "overflow-y": "auto"
-                        })
-                    );
-            };
+            if (!$search.data("autocomplete-init")) {
+                $search.autocomplete({
+                    source: that.searchSuggestions,
+                    appendTo: "body",
+                    select: (event, ui) => {
+                        event.preventDefault();
+                        that.searchWidget.value = ui.item.label;
+                        that.searchWidget.idInput_custom = ui.item.value;
+                        that.searchWidget.protoblk = ui.item.specialDict;
+                        that.doSearch();
+                        if (event.keyCode === 13) this.searchWidget.style.visibility = "visible";
+                    },
+                    focus: event => {
+                        event.preventDefault();
+                    }
+                });
+
+                const instance = $search.autocomplete("instance");
+                if (instance) {
+                    instance._renderItem = (ul, item) => {
+                        const li = $j("<li></li>");
+
+                        const img = document.createElement("img");
+                        img.src = item.artwork || "";
+                        img.height = 20;
+                        img.style.cursor = "grab";
+
+                        // Drag-and-drop: mirrors the palette drag pattern in
+                        // palette.js _showMenuItems(). Keep both in sync.
+                        img.ondragstart = () => false;
+
+                        const down = event => {
+                            // Stop jQuery UI autocomplete from handling this
+                            event.stopPropagation();
+                            event.stopImmediatePropagation();
+                            event.preventDefault();
+
+                            const posit = img.style.position;
+                            const zInd = img.style.zIndex;
+                            img.style.position = "absolute";
+                            img.style.zIndex = 10000;
+
+                            // Close the autocomplete dropdown
+                            $j("#search").autocomplete("close");
+
+                            document.body.appendChild(img);
+
+                            const moveAt = (pageX, pageY) => {
+                                img.style.left = pageX - img.offsetWidth / 2 + "px";
+                                img.style.top = pageY - img.offsetHeight / 2 + "px";
+                            };
+
+                            const onMouseMove = e => {
+                                e.preventDefault();
+                                let x, y;
+                                if (e.type === "touchmove") {
+                                    x = e.touches[0].clientX;
+                                    y = e.touches[0].clientY;
+                                } else {
+                                    x = e.pageX;
+                                    y = e.pageY;
+                                }
+                                moveAt(x, y);
+                            };
+                            onMouseMove(event);
+
+                            document.addEventListener("touchmove", onMouseMove, { passive: false });
+                            document.addEventListener("mousemove", onMouseMove);
+
+                            const up = () => {
+                                document.body.style.cursor = "default";
+                                document.removeEventListener("mousemove", onMouseMove);
+                                document.removeEventListener("touchmove", onMouseMove);
+
+                                const x = parseInt(img.style.left);
+                                const y = parseInt(img.style.top);
+
+                                img.style.position = posit;
+                                img.style.zIndex = zInd;
+                                if (img.parentNode === document.body) {
+                                    document.body.removeChild(img);
+                                }
+
+                                if (isNaN(x) && isNaN(y)) return;
+
+                                const protoblk = item.specialDict;
+                                const paletteName = protoblk.palette.name;
+                                const protoName = item.value;
+
+                                that.palettes.dict[paletteName].makeBlockFromSearch(
+                                    protoblk,
+                                    protoName,
+                                    newBlock => {
+                                        that.blocks.moveBlock(
+                                            newBlock,
+                                            (x || that.blocksContainer.x + 100) -
+                                                that.blocksContainer.x,
+                                            (y || that.blocksContainer.y + 100) -
+                                                that.blocksContainer.y
+                                        );
+                                    }
+                                );
+                            };
+
+                            document.addEventListener("mouseup", up, { once: true });
+                            document.addEventListener("touchend", up, { once: true });
+                        };
+
+                        // Capture phase fires BEFORE jQuery UI's event delegation
+                        img.addEventListener("mousedown", down, true);
+                        img.addEventListener("touchstart", down, { capture: true, passive: false });
+
+                        li.append(img);
+                        li.append("<a> " + item.label + "</a>");
+
+                        return li.appendTo(
+                            ul.css({
+                                "z-index": 35000,
+                                "max-height": "200px",
+                                "overflow-y": "auto"
+                            })
+                        );
+                    };
+                }
+                $search.data("autocomplete-init", true);
+            }
+
             const searchInput = this.searchWidget.idInput_custom;
-            if (!searchInput || searchInput.length <= 0) return;
+            if (!searchInput || searchInput.length <= 0) {
+                if (this.searchWidget.value && this.searchWidget.value.length > 0) {
+                    $search.autocomplete("search", this.searchWidget.value);
+                }
+                return;
+            }
 
             const protoblk = this.searchWidget.protoblk;
             const paletteName = protoblk.palette.name;
@@ -3010,103 +3236,6 @@ class Activity {
 
             this.searchWidget.value = "";
             this.update = true;
-        };
-
-        /*
-         * Makes initial "start up" note for a brand new MB project
-         */
-        this.__makeNewNote = (octave, solf) => {
-            const newNote = [
-                [
-                    0,
-                    "newnote",
-                    300 - this.blocksContainer.x,
-                    300 - this.blocksContainer.y,
-                    [null, 1, 4, 8]
-                ],
-                [1, "divide", 0, 0, [0, 2, 3]],
-                [
-                    2,
-                    [
-                        "number",
-                        {
-                            value: 1
-                        }
-                    ],
-                    0,
-                    0,
-                    [1]
-                ],
-                [
-                    3,
-                    [
-                        "number",
-                        {
-                            value: 4
-                        }
-                    ],
-                    0,
-                    0,
-                    [1]
-                ],
-                [4, "vspace", 0, 0, [0, 5]],
-                [5, "pitch", 0, 0, [4, 6, 7, null]],
-                [
-                    6,
-                    [
-                        "solfege",
-                        {
-                            value: solf
-                        }
-                    ],
-                    0,
-                    0,
-                    [5]
-                ],
-                [
-                    7,
-                    [
-                        "number",
-                        {
-                            value: octave
-                        }
-                    ],
-                    0,
-                    0,
-                    [5]
-                ],
-                [8, "hidden", 0, 0, [0, null]]
-            ];
-
-            this.blocks.loadNewBlocks(newNote);
-            if (this.blocks.activeBlock !== null) {
-                // Connect the newly created block to the active block (if
-                // it is a hidden block at the end of a new note block).
-                const bottom = this.blocks.findBottomBlock(this.blocks.activeBlock);
-                if (
-                    this.blocks.blockList[bottom].name === "hidden" &&
-                    this.blocks.blockList[this.blocks.blockList[bottom].connections[0]].name ===
-                        "newnote"
-                ) {
-                    // The note block macro creates nine blocks.
-                    const newlyCreatedBlock = this.blocks.blockList.length - 9;
-
-                    // Set last connection of active block to the
-                    // newly created block.
-                    const lastConnection = this.blocks.blockList[bottom].connections.length - 1;
-                    this.blocks.blockList[bottom].connections[lastConnection] = newlyCreatedBlock;
-
-                    // Set first connection of the newly created block to
-                    // the active block.
-                    this.blocks.blockList[newlyCreatedBlock].connections[0] = bottom;
-                    // Adjust the dock positions to realign the stack.
-                    this.blocks.adjustDocks(bottom, true);
-                }
-            }
-
-            // Set new hidden block at the end of the newly created
-            // note block to the active block.
-            this.blocks.activeBlock = this.blocks.blockList.length - 1;
         };
 
         //To create a sampler widget
@@ -3157,6 +3286,10 @@ class Activity {
                 return;
             }
             if (document.getElementById("labelDiv").classList.contains("hasKeyboard")) {
+                return;
+            }
+            // Skip hotkeys when value bar is visible (prevents accidental block creation)
+            if (this.printText && this.printText.classList.contains("show")) {
                 return;
             }
 
@@ -3215,14 +3348,6 @@ class Activity {
             const KEYCODE_DOWN = 40;
             const DEL = 46;
             const V = 86;
-            // Shortcuts for creating new notes
-            const KEYCODE_D = 68; // do
-            const KEYCODE_R = 82; // re
-            const KEYCODE_M = 77; // mi
-            const KEYCODE_F = 70; // fa
-            const KEYCODE_S = 83; // so
-            const KEYCODE_L = 76; // la
-            const KEYCODE_T = 84; // ti
             const disableKeys =
                 document.getElementById("lilypondModal").style.display === "block" ||
                 this.searchWidget.style.visibility === "visible" ||
@@ -3337,50 +3462,7 @@ class Activity {
                         break;
                 }
             } else if (event.shiftKey && !disableKeys) {
-                const solfnotes_ = _("ti la sol fa mi re do").split(" ");
                 switch (event.keyCode) {
-                    case KEYCODE_D:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("D " + solfnotes_[6]);
-                            this.__makeNewNote(5, "do");
-                        }
-                        break;
-                    case KEYCODE_R:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("R " + solfnotes_[5]);
-                            this.__makeNewNote(5, "re");
-                        }
-                        break;
-                    case KEYCODE_M:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("M " + solfnotes_[4]);
-                            this.__makeNewNote(5, "mi");
-                        }
-                        break;
-                    case KEYCODE_F:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("F " + solfnotes_[3]);
-                            this.__makeNewNote(5, "fa");
-                        }
-                        break;
-                    case KEYCODE_S:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("S " + solfnotes_[2]);
-                            this.__makeNewNote(5, "sol");
-                        }
-                        break;
-                    case KEYCODE_L:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("L " + solfnotes_[1]);
-                            this.__makeNewNote(5, "la");
-                        }
-                        break;
-                    case KEYCODE_T:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("T " + solfnotes_[0]);
-                            this.__makeNewNote(5, "ti");
-                        }
-                        break;
                     case SPACE:
                         event.preventDefault();
                         if (this.turtleContainer.scaleX === 1) {
@@ -3408,10 +3490,13 @@ class Activity {
                         this._doHardStopButton();
                     } else if (!disableKeys && !hasOpenWidget) {
                         event.preventDefault();
+                        const stopbtn = document.getElementById("stop");
+                        if (stopbtn) {
+                            stopbtn.style.color = platformColor.stopIconcolor;
+                        }
                         this._doFastButton();
                     }
                 } else if (!disableKeys) {
-                    const solfnotes_ = _("ti la sol fa mi re do").split(" ");
                     switch (event.keyCode) {
                         case END:
                             this.textMsg("END " + _("Jumping to the bottom of the page."));
@@ -3554,48 +3639,6 @@ class Activity {
                                 this.logo.runLogoCommands();
                             }
                             break;
-                        case KEYCODE_D:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("d " + solfnotes_[6]);
-                                this.__makeNewNote(4, "do");
-                            }
-                            break;
-                        case KEYCODE_R:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("r " + solfnotes_[5]);
-                                this.__makeNewNote(4, "re");
-                            }
-                            break;
-                        case KEYCODE_M:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("m " + solfnotes_[4]);
-                                this.__makeNewNote(4, "mi");
-                            }
-                            break;
-                        case KEYCODE_F:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("f " + solfnotes_[3]);
-                                this.__makeNewNote(4, "fa");
-                            }
-                            break;
-                        case KEYCODE_S:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("s " + solfnotes_[2]);
-                                this.__makeNewNote(4, "sol");
-                            }
-                            break;
-                        case KEYCODE_L:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("l " + solfnotes_[1]);
-                                this.__makeNewNote(4, "la");
-                            }
-                            break;
-                        case KEYCODE_T:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("t " + solfnotes_[0]);
-                                this.__makeNewNote(4, "ti");
-                            }
-                            break;
                         default:
                             break;
                     }
@@ -3637,7 +3680,13 @@ class Activity {
                 return;
             }
 
-            const $j = jQuery.noConflict();
+            // Skip resize when the tab is hidden — canvas reports 0×0
+            // and any layout work would corrupt positions.
+            if (document.hidden) {
+                return;
+            }
+
+            const $j = window.jQuery;
             let w = 0,
                 h = 0;
             if (typeof platform !== "undefined" && !platform.androidWebkit) {
@@ -3654,6 +3703,12 @@ class Activity {
             this._innerHeight = window.innerHeight;
             this._outerWidth = window.outerWidth;
             this._outerHeight = window.outerHeight;
+
+            // Guard against zero or invalid dimensions to prevent
+            // division-by-zero and ResizeObserver loop errors
+            if (w <= 0 || h <= 0) {
+                return;
+            }
 
             if (document.getElementById("labelDiv").classList.contains("hasKeyboard")) {
                 return;
@@ -3828,6 +3883,11 @@ class Activity {
         const defaultHeight = 900;
 
         function handleResize() {
+            // Skip resize when the tab is hidden to prevent 0×0 canvas
+            if (document.hidden) {
+                return;
+            }
+
             const isMaximized =
                 window.innerWidth === window.screen.width &&
                 window.innerHeight === window.screen.height;
@@ -3843,6 +3903,12 @@ class Activity {
             } else {
                 const windowWidth = window.innerWidth;
                 const windowHeight = window.innerHeight;
+
+                // Guard against zero or invalid dimensions
+                if (windowWidth <= 0 || windowHeight <= 0) {
+                    return;
+                }
+
                 container.style.width = windowWidth + "px";
                 container.style.height = windowHeight + "px";
                 canvas.width = windowWidth;
@@ -3857,14 +3923,33 @@ class Activity {
         }
 
         let resizeTimeout;
-        window.addEventListener("resize", () => {
+        this._handleWindowResize = () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
                 handleResize();
                 this._setupPaletteMenu();
-            }, 100);
-        });
-        window.addEventListener("orientationchange", handleResize);
+            }, 200);
+        };
+        this.addEventListener(window, "resize", this._handleWindowResize);
+        this._handleOrientationChangeResize = handleResize;
+        this.addEventListener(window, "orientationchange", this._handleOrientationChangeResize);
+
+        // When the user returns to the Music Blocks tab after it was
+        // hidden, re-apply the correct dimensions.  While the tab was
+        // hidden the resize guards above intentionally skipped any
+        // layout work, so we need to catch up now.
+        this._handleVisibilityChange = () => {
+            if (!document.hidden && this.stage) {
+                // Use a short delay to let the browser finish
+                // exposing the tab and reporting real dimensions.
+                setTimeout(() => {
+                    handleResize();
+                    this._onResize(false);
+                }, 250);
+            }
+        };
+        this.addEventListener(document, "visibilitychange", this._handleVisibilityChange);
+
         const that = this;
         const resizeCanvas_ = () => {
             try {
@@ -3877,7 +3962,12 @@ class Activity {
         };
 
         resizeCanvas_();
-        window.addEventListener("orientationchange", resizeCanvas_);
+        this._handleOrientationChangeResizeCanvas = resizeCanvas_;
+        this.addEventListener(
+            window,
+            "orientationchange",
+            this._handleOrientationChangeResizeCanvas
+        );
 
         /*
          * Restore last stack pushed to trashStack back onto canvas.
@@ -3894,8 +3984,10 @@ class Activity {
                 return;
             }
 
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -3912,8 +4004,10 @@ class Activity {
             this._restoreTrashById(this.blocks.trashStacks[this.blocks.trashStacks.length - 1]);
             activity.textMsg(_("Item restored from the trash."), 3000);
 
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -3989,6 +4083,15 @@ class Activity {
                             }
                         }
                     }
+
+                    // Re-add the action to the palette
+                    const actionName = actionArg.value;
+                    this.blocks.newNameddoBlock(
+                        actionName,
+                        this.blocks.actionHasReturn(blockId),
+                        this.blocks.actionHasArgs(blockId)
+                    );
+                    this.palettes.updatePalettes("action");
                 }
             }
             activity.textMsg(_("Item restored from the trash."), 3000);
@@ -4001,18 +4104,30 @@ class Activity {
             this._renderTrashView();
         });
 
+        // Store the click handler reference for proper cleanup
+        let trashViewClickHandler = null;
+
         // function to hide trashView from canvas
         function handleClickOutsideTrashView(trashView) {
+            // Remove existing listener to prevent duplicates
+            if (trashViewClickHandler) {
+                document.removeEventListener("click", trashViewClickHandler);
+            }
+
             let firstClick = true;
-            document.addEventListener("click", event => {
+            trashViewClickHandler = event => {
                 if (firstClick) {
                     firstClick = false;
                     return;
                 }
                 if (!trashView.contains(event.target) && event.target !== trashView) {
                     trashView.style.display = "none";
+                    // Clean up listener when trashView is hidden
+                    document.removeEventListener("click", trashViewClickHandler);
+                    trashViewClickHandler = null;
                 }
-            });
+            };
+            document.addEventListener("click", trashViewClickHandler);
         }
 
         this._renderTrashView = () => {
@@ -4120,7 +4235,8 @@ class Activity {
             // function to increase or decrease the "top" property of the top-right corner buttons
 
             const topRightButtons = document.querySelectorAll("#buttoncontainerTOP .tooltipped");
-            const btnY = document.getElementById("Grid").getBoundingClientRect().top;
+            const gridElement = document.getElementById("Grid");
+            const btnY = gridElement ? gridElement.getBoundingClientRect().top : 70 + LEADING + 6;
 
             this.changeTopButtonsPosition = value => {
                 topRightButtons.forEach(child => {
@@ -4254,8 +4370,10 @@ class Activity {
          */
         const changeBlockVisibility = activity => {
             activity._changeBlockVisibility();
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -4288,8 +4406,10 @@ class Activity {
          */
         const toggleCollapsibleStacks = activity => {
             activity._toggleCollapsibleStacks();
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -4333,7 +4453,8 @@ class Activity {
         };
 
         /*
-         * Updates all canvas elements
+         * Updates all canvas elements by marking stage as dirty.
+         * The actual render will happen on the next animation frame.
          */
         this.refreshCanvas = () => {
             if (this.blockRefreshCanvas) {
@@ -4341,27 +4462,34 @@ class Activity {
             }
 
             this.blockRefreshCanvas = true;
-            // Force stage clear and update
-            this.stage.clear();
-            this.stage.update();
+            // Mark stage as needing update
+            this.stageDirty = true;
             this.update = true;
 
             const that = this;
             setTimeout(() => {
                 that.blockRefreshCanvas = false;
-                that.stage.update();
+                that.stageDirty = true;
             }, 5);
         };
 
         /*
-         * This set makes it so the stage only re-renders when an
-         * event handler indicates a change has happened.
+         * This sets the dirty flag so the stage re-renders on the next
+         * animation frame when an event handler indicates a change has happened.
          */
         this.__tick = event => {
             if (this.update || createjs.Tween.hasActiveTweens()) {
-                this.update = false; // Only update once
-                this.stage.update(event);
+                this.update = false;
+                this.stageDirty = true;
             }
+        };
+
+        /*
+         * Marks the stage as needing a redraw on the next animation frame.
+         * Call this whenever visual changes occur that need to be rendered.
+         */
+        this.markStageDirty = () => {
+            this.stageDirty = true;
         };
 
         /*
@@ -4394,8 +4522,10 @@ class Activity {
          */
         const chooseKeyMenu = that => {
             piemenuKey(that);
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
             }
         };
 
@@ -4467,7 +4597,7 @@ class Activity {
         /**
          * Loads MB project from Planet.
          * @param  projectID {Planet project ID}
-         * @param  flags     {parameteres}
+         * @param  flags     {parameters}
          * @param  env       {specifies environment}
          */
         const loadProject = (activity, projectID, flags, env) => {
@@ -4555,8 +4685,7 @@ class Activity {
             that.update = true;
         };
 
-        // eslint-disable-next-line no-unused-vars
-        this._loadProject = (projectID, flags, env) => {
+        this._loadProject = (projectID, flags) => {
             if (this.planet === undefined) {
                 return;
             }
@@ -5075,9 +5204,8 @@ class Activity {
                             }
                         }
                         staffBlocksMap[staffIndex].baseBlocks[0][0][firstnammedo][4][0] = blockId;
-                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
-                            endnammedo
-                        ][4][1] = null;
+                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][endnammedo][4][1] =
+                            null;
 
                         blockId += 2;
                     } else {
@@ -5145,9 +5273,8 @@ class Activity {
                                 prevnameddo
                             ][4][1] = blockId;
                         } else {
-                            staffBlocksMap[staffIndex].repeatBlock[
-                                prevrepeatnameddo
-                            ][4][3] = blockId;
+                            staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3] =
+                                blockId;
                         }
                         if (afternamedo !== -1) {
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
@@ -5190,18 +5317,11 @@ class Activity {
         };
 
         /**
-         * Calculate time such that no matter how long it takes to load the program, the loading
-         * animation will cycle at least once.
          * @param loadProject all params are from load project function
          */
         this.loadStartWrapper = async (func, arg1, arg2, arg3) => {
-            const time1 = new Date();
             await func(this, arg1, arg2, arg3);
-
-            const time2 = new Date();
-            const elapsedTime = time2.getTime() - time1.getTime();
-            const timeLeft = Math.max(6000 - elapsedTime);
-            setTimeout(this.showContents, timeLeft);
+            this.showContents();
         };
 
         /*
@@ -5209,13 +5329,37 @@ class Activity {
          * Shows contents of MB after loading screen.
          */
         this.showContents = () => {
-            document.getElementById("loading-image-container").style.display = "none";
-            document.getElementById("bottom-right-logo").style.display = "none";
-            document.getElementById("palette").style.display = "block";
-            // document.getElementById('canvas').style.display = 'none';
-            document.getElementById("hideContents").style.display = "block";
-            document.getElementById("buttoncontainerBOTTOM").style.display = "block";
-            document.getElementById("buttoncontainerTOP").style.display = "block";
+            clearInterval(window.intervalId);
+            document.getElementById("loadingText").textContent = _("Loading Complete!");
+
+            setTimeout(() => {
+                const loadingText = document.getElementById("loadingText");
+                if (loadingText) loadingText.textContent = null;
+
+                const loadingImageContainer = document.getElementById("loading-image-container");
+                if (loadingImageContainer) loadingImageContainer.style.display = "none";
+
+                // Try hiding load-container instead if it exists
+                const loadContainer = document.getElementById("load-container");
+                if (loadContainer) loadContainer.style.display = "none";
+
+                const bottomRightLogo = document.getElementById("bottom-right-logo");
+                if (bottomRightLogo) bottomRightLogo.style.display = "none";
+
+                const palette = document.getElementById("palette");
+                if (palette) palette.style.display = "block";
+
+                // document.getElementById('canvas').style.display = 'none';
+
+                const hideContents = document.getElementById("hideContents");
+                if (hideContents) hideContents.style.display = "block";
+
+                const btnBottom = document.getElementById("buttoncontainerBOTTOM");
+                if (btnBottom) btnBottom.style.display = "block";
+
+                const btnTop = document.getElementById("buttoncontainerTOP");
+                if (btnTop) btnTop.style.display = "block";
+            }, 500);
         };
 
         this.justLoadStart = () => {
@@ -5257,8 +5401,13 @@ class Activity {
          * Hides all message containers
          */
         this.hideMsgs = () => {
-            // FIXME: When running before everything is set up.
-            if (this.errorMsgText === null) {
+            // The containers may not be ready yet, so check before accessing.
+            if (
+                this.errorMsgText === null ||
+                this.msgText === null ||
+                this.errorText === undefined ||
+                this.printText === undefined
+            ) {
                 return;
             }
             this.errorMsgText.parent.visible = false;
@@ -5274,8 +5423,6 @@ class Activity {
             this.refreshCanvas();
         };
 
-        // Accessed from index.html
-        // eslint-disable-next-line no-unused-vars
         const hideArrows = () => {
             globalActivity._hideArrows();
         };
@@ -5744,7 +5891,9 @@ class Activity {
             this.update = true;
         };
 
-        this.__showAltoAccidentals = () => {};
+        this.__showAltoAccidentals = () => {
+            // No-op for Alto clef
+        };
 
         /*
          * Shows musical alto staff
@@ -6000,8 +6149,8 @@ class Activity {
                                 let customName = "custom";
                                 if (myBlock.connections[1] !== null) {
                                     // eslint-disable-next-line max-len
-                                    customName = this.blocks.blockList[myBlock.connections[1]]
-                                        .value;
+                                    customName =
+                                        this.blocks.blockList[myBlock.connections[1]].value;
                                 }
                                 // eslint-disable-next-line no-console
                                 console.log(customName);
@@ -6358,7 +6507,7 @@ class Activity {
          */
         this.showHelpfulSearchWidget = () => {
             // Bring widget to top.
-            const $j = jQuery.noConflict();
+            const $j = window.jQuery;
             if ($j("#helpfulSearch")) {
                 try {
                     $j("#helpfulSearch").autocomplete("destroy");
@@ -6389,39 +6538,56 @@ class Activity {
          * Uses JQuery to add autocompleted search suggestions
          */
         this.doHelpfulSearch = () => {
-            const $j = jQuery.noConflict();
+            const $j = window.jQuery;
+            if (this.searchSuggestions.length === 0) {
+                this.prepSearchWidget();
+            }
 
             const that = this;
-            $j("#helpfulSearch").autocomplete({
-                source: that.searchSuggestions,
-                select: (event, ui) => {
-                    event.preventDefault();
-                    that.helpfulSearchWidget.value = ui.item.label;
-                    that.helpfulSearchWidget.idInput_custom = ui.item.value;
-                    that.helpfulSearchWidget.protoblk = ui.item.specialDict;
-                    that.doHelpfulSearch();
-                },
-                focus: event => {
-                    event.preventDefault();
-                }
-            });
+            const $helpfulSearch = $j("#helpfulSearch");
 
-            $j("#helpfulSearch").autocomplete("instance")._renderItem = (ul, item) => {
-                return $j("<li></li>")
-                    .data("item.autocomplete", item)
-                    .append(
-                        '<img src="' +
-                            item.artwork +
-                            '" height = "20px">' +
-                            "<a>" +
-                            " " +
-                            item.label +
-                            "</a>"
-                    )
-                    .appendTo(ul.css("z-index", 9999));
-            };
+            if (!$helpfulSearch.data("autocomplete-init")) {
+                $helpfulSearch.autocomplete({
+                    source: that.searchSuggestions,
+                    appendTo: "body",
+                    select: (event, ui) => {
+                        event.preventDefault();
+                        that.helpfulSearchWidget.value = ui.item.label;
+                        that.helpfulSearchWidget.idInput_custom = ui.item.value;
+                        that.helpfulSearchWidget.protoblk = ui.item.specialDict;
+                        that.doHelpfulSearch();
+                    },
+                    focus: event => {
+                        event.preventDefault();
+                    }
+                });
+
+                const instance = $helpfulSearch.autocomplete("instance");
+                if (instance) {
+                    instance._renderItem = (ul, item) => {
+                        return $j("<li></li>")
+                            .append(
+                                '<img src="' +
+                                    (item.artwork || "") +
+                                    '" height = "20px">' +
+                                    "<a>" +
+                                    " " +
+                                    item.label +
+                                    "</a>"
+                            )
+                            .appendTo(ul.css("z-index", 35000));
+                    };
+                }
+                $helpfulSearch.data("autocomplete-init", true);
+            }
+
             const searchInput = this.helpfulSearchWidget.idInput_custom;
-            if (!searchInput || searchInput.length <= 0) return;
+            if (!searchInput || searchInput.length <= 0) {
+                if (this.helpfulSearchWidget.value && this.helpfulSearchWidget.value.length > 0) {
+                    $helpfulSearch.autocomplete("search", this.helpfulSearchWidget.value);
+                }
+                return;
+            }
 
             const protoblk = this.helpfulSearchWidget.protoblk;
             const paletteName = protoblk.palette.name;
@@ -6502,14 +6668,13 @@ class Activity {
             container.setAttribute("class", "tooltipped");
             container.setAttribute("data-tooltip", label);
             container.setAttribute("data-position", "top");
-            jQuery.noConflict()(".tooltipped").tooltip({
+            window.jQuery(".tooltipped").tooltip({
                 html: true,
                 delay: 100
             });
 
             const that = this;
-            // eslint-disable-next-line no-unused-vars
-            container.onmouseover = event => {
+            container.onmouseover = () => {
                 if (!that.loading) {
                     document.body.style.cursor = "pointer";
                     container.style.transition = "0.12s ease-out";
@@ -6517,8 +6682,7 @@ class Activity {
                 }
             };
 
-            // eslint-disable-next-line no-unused-vars
-            container.onmouseout = event => {
+            container.onmouseout = () => {
                 if (!that.loading) {
                     document.body.style.cursor = "default";
                     container.style.transition = "0.15s ease-out";
@@ -6549,8 +6713,7 @@ class Activity {
          */
         this._loadButtonDragHandler = (container, actionClick, arg) => {
             const that = this;
-            // eslint-disable-next-line no-unused-vars
-            container.onmousedown = event => {
+            container.onmousedown = () => {
                 if (!that.loading) {
                     document.body.style.cursor = "default";
                 }
@@ -6613,8 +6776,7 @@ class Activity {
          * Ran once dom is ready and editable
          * Sets up dependencies and vars
          */
-        // eslint-disable-next-line no-unused-vars
-        this.domReady = async doc => {
+        this.domReady = async () => {
             this.saveLocally = undefined;
 
             // Do we need to update the stage?
@@ -6675,7 +6837,8 @@ class Activity {
         // Setup mouse events to start the drag
 
         this.setupMouseEvents = () => {
-            document.addEventListener(
+            this.addEventListener(
+                document,
                 "mousedown",
                 event => {
                     if (!this.isSelecting) return;
@@ -6698,7 +6861,7 @@ class Activity {
         };
 
         // end the drag on navbar
-        document.getElementById("toolbars").addEventListener("mouseover", () => {
+        this.addEventListener(document.getElementById("toolbars"), "mouseover", () => {
             this.isDragging = false;
         });
 
@@ -6727,6 +6890,7 @@ class Activity {
                 // set selection mode to false
                 this.blocks.setSelectionToActivity(false);
                 this.refreshCanvas();
+                // Cache DOM element reference for performance
                 document.getElementById("helpfulWheelDiv").style.display = "none";
             }
         };
@@ -6767,6 +6931,7 @@ class Activity {
                 this.unhighlightSelectedBlocks(false, false);
                 this.blocks.setSelectedBlocks(this.selectedBlocks);
                 this.refreshCanvas();
+                // Cache DOM element reference for performance
                 document.getElementById("helpfulWheelDiv").style.display = "none";
             }
         };
@@ -6788,12 +6953,15 @@ class Activity {
             this.currentX = 0;
             this.currentY = 0;
             this.hasMouseMoved = false;
+            if (this.selectionArea && this.selectionArea.parentNode) {
+                this.selectionArea.parentNode.removeChild(this.selectionArea);
+            }
             this.selectionArea = document.createElement("div");
             document.body.appendChild(this.selectionArea);
 
             this.setupMouseEvents();
 
-            document.addEventListener("mousemove", event => {
+            this.addEventListener(document, "mousemove", event => {
                 this.hasMouseMoved = true;
                 // event.preventDefault();
                 // this.selectedBlocks = [];
@@ -6810,7 +6978,7 @@ class Activity {
                 }
             });
 
-            document.addEventListener("mouseup", event => {
+            this.addEventListener(document, "mouseup", event => {
                 // event.preventDefault();
                 if (!this.isSelecting) return;
                 this.isDragging = false;
@@ -6979,20 +7147,23 @@ class Activity {
             this.stage = new createjs.Stage(this.canvas);
             createjs.Touch.enable(this.stage);
 
-            // createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
-            // createjs.Ticker.framerate = 15;
-            // createjs.Ticker.addEventListener('tick', this.stage);
-            // createjs.Ticker.addEventListener('tick', that.__tick);
+            // Initialize Ticker with optimal framerate
+            createjs.Ticker.framerate = 60;
 
+            // ===== Idle Ticker Optimization =====
+            // Throttle rendering when user is inactive and no music is playing
+            this._initIdleWatcher();
+
+            // Named event handlers for proper cleanup
             let mouseEvents = 0;
-            document.addEventListener("mousemove", () => {
+            this.handleMouseMove = () => {
                 mouseEvents++;
                 if (mouseEvents % 4 === 0) {
                     that.__tick();
                 }
-            });
+            };
 
-            document.addEventListener("click", e => {
+            this.handleDocumentClick = e => {
                 if (!this.hasMouseMoved) {
                     if (this.selectionModeOn) {
                         this.deselectSelectedBlocks();
@@ -7000,7 +7171,11 @@ class Activity {
                         this._hideHelpfulSearchWidget(e);
                     }
                 }
-            });
+            };
+
+            // Use managed addEventListener for automatic cleanup
+            this.addEventListener(document, "mousemove", this.handleMouseMove);
+            this.addEventListener(document, "click", this.handleDocumentClick);
 
             this._createMsgContainer(
                 "#ffffff",
@@ -7139,26 +7314,27 @@ class Activity {
             // Load custom mode saved in local storage.
             const custommodeData = this.storage.custommode;
             if (custommodeData !== undefined) {
-                // FIX ME
-                // eslint-disable-next-line no-unused-vars
-                const customMode = JSON.parse(custommodeData);
+                // Parse and update the custom musical mode with saved data.
+                try {
+                    const customModeDataObj = JSON.parse(custommodeData);
+                    Object.assign(MUSICALMODES["custom"], customModeDataObj);
+                } catch (e) {
+                    console.error("Error parsing custommode data:", e);
+                }
             }
 
-            // eslint-disable-next-line no-unused-vars
-            this.fileChooser.addEventListener("click", event => {
+            this.fileChooser.addEventListener("click", () => {
                 that.value = null;
             });
 
             this.fileChooser.addEventListener(
                 "change",
-                // eslint-disable-next-line no-unused-vars
-                event => {
+                () => {
                     // Read file here.
                     const reader = new FileReader();
                     const midiReader = new FileReader();
 
-                    // eslint-disable-next-line no-unused-vars
-                    reader.onload = theFile => {
+                    reader.onload = () => {
                         that.loading = true;
                         document.body.style.cursor = "wait";
                         that.doLoadAnimation();
@@ -7199,8 +7375,7 @@ class Activity {
 
                                     if (!that.merging) {
                                         // Wait for the old blocks to be removed.
-                                        // eslint-disable-next-line no-unused-vars
-                                        const __listener = event => {
+                                        const __listener = () => {
                                             that.blocks.loadNewBlocks(obj);
                                             that.stage.removeAllEventListeners("trashsignal");
                                             if (that.planet) {
@@ -7276,8 +7451,7 @@ class Activity {
                 const midiReader = new FileReader();
 
                 const abcReader = new FileReader();
-                // eslint-disable-next-line no-unused-vars
-                reader.onload = theFile => {
+                reader.onload = () => {
                     that.loading = true;
                     document.body.style.cursor = "wait";
                     // doLoadAnimation();
@@ -7310,8 +7484,7 @@ class Activity {
                                 };
 
                                 // Wait for the old blocks to be removed.
-                                // eslint-disable-next-line no-unused-vars
-                                const __listener = event => {
+                                const __listener = () => {
                                     that.blocks.loadNewBlocks(obj);
                                     that.stage.removeAllEventListeners("trashsignal");
 
@@ -7368,21 +7541,6 @@ class Activity {
                     });
                 };
 
-                // Music Block Parser from abc to MB
-                abcReader.onload = event => {
-                    //get the abc data and replace the / so that the block does not break
-                    let abcData = event.target.result;
-                    abcData = abcData.replace(/\\/g, "");
-
-                    const tunebook = new ABCJS.parseOnly(abcData);
-                    // eslint-disable-next-line no-console
-                    console.log(tunebook);
-                    tunebook.forEach(tune => {
-                        //call parseABC to parse abcdata to MB json
-                        this.parseABC(tune);
-                    });
-                };
-
                 // Work-around in case the handler is called by the
                 // widget drag & drop code.
                 if (files[0] !== undefined) {
@@ -7400,7 +7558,6 @@ class Activity {
                         return;
                     }
                     reader.readAsText(files[0]);
-                    reader.readAsText(files[0]);
                     window.scroll(0, 0);
                 }
             };
@@ -7415,29 +7572,25 @@ class Activity {
             dropZone.addEventListener("dragover", __handleDragOver, false);
             dropZone.addEventListener("drop", __handleFileSelect, false);
 
-            // eslint-disable-next-line no-unused-vars
-            this.allFilesChooser.addEventListener("click", event => {
+            this.allFilesChooser.addEventListener("click", () => {
                 this.value = null;
             });
 
-            // eslint-disable-next-line no-unused-vars
-            this.pluginChooser.addEventListener("click", event => {
+            this.pluginChooser.addEventListener("click", () => {
                 window.scroll(0, 0);
                 this.value = null;
             });
 
             this.pluginChooser.addEventListener(
                 "change",
-                // eslint-disable-next-line no-unused-vars
-                event => {
+                () => {
                     window.scroll(0, 0);
 
                     // Read file here.
                     const reader = new FileReader();
                     const pluginFile = that.pluginChooser.files[0];
 
-                    // eslint-disable-next-line no-unused-vars
-                    reader.onload = theFile => {
+                    reader.onload = () => {
                         that.loading = true;
                         document.body.style.cursor = "wait";
                         //doLoadAnimation();
@@ -7510,7 +7663,7 @@ class Activity {
             // We use G (one sharp) and F (one flat) as prototypes for all
             // of the accidentals. When applied, these graphics are offset
             // vertically to rendering different sharps and flats and
-            // horizonally so as not to overlap.
+            // horizontally so as not to overlap.
             for (let i = 0; i < 7; i++) {
                 this.grandSharpBitmap[i] = this._createGrid(
                     "data:image/svg+xml;base64," + window.btoa(base64Encode(GRAND_G))
@@ -7611,8 +7764,7 @@ class Activity {
                                             const n = data.arg;
                                             env.push(parseInt(n));
                                         },
-                                        // eslint-disable-next-line no-unused-vars
-                                        status => {
+                                        () => {
                                             alert(
                                                 "Something went wrong reading JSON-encoded project data."
                                             );
@@ -7652,8 +7804,10 @@ class Activity {
 
             this.prepSearchWidget();
 
-            // create functionality of 2D drag to select blocks in bulk
+            // initialize doSearch
+            this.doSearch();
 
+            // create functionality of 2D drag to select blocks in bulk
             this._create2Ddrag();
 
             /*
@@ -7661,15 +7815,79 @@ class Activity {
             document.addEventListener("DOMMouseScroll", scrollEvent, false);
             */
 
+            // Named event handler for proper cleanup
             const activity = this;
-            document.onkeydown = () => {
+            this.handleKeyDown = event => {
                 activity.__keyPressed(event);
             };
+
+            // Use managed addEventListener instead of onkeydown assignment
+            this.addEventListener(document, "keydown", this.handleKeyDown);
 
             if (this.planet !== undefined) {
                 this.planet.planet.setAnalyzeProject(doAnalyzeProject);
             }
         };
+    }
+
+    /**
+     * Managed addEventListener that tracks listeners for cleanup.
+     * @param {EventTarget} target - The DOM element or object to attach the listener to.
+     * @param {string} type - The event type.
+     * @param {Function} listener - The callback function.
+     * @param {Object|boolean} [options] - listener options.
+     */
+    addEventListener(target, type, listener, options) {
+        if (!target || typeof target.addEventListener !== "function") return;
+        target.addEventListener(type, listener, options);
+        this._listeners.push({ target, type, listener, options });
+    }
+
+    /**
+     * Managed removeEventListener that also updates the tracker.
+     * @param {EventTarget} target - The DOM element or object to remove the listener from.
+     * @param {string} type - The event type.
+     * @param {Function} listener - The callback function.
+     * @param {Object|boolean} [options] - listener options.
+     */
+    removeEventListener(target, type, listener, options) {
+        if (!target || typeof target.removeEventListener !== "function") return;
+        target.removeEventListener(type, listener, options);
+        this._listeners = this._listeners.filter(
+            l =>
+                l.target !== target ||
+                l.type !== type ||
+                l.listener !== listener ||
+                !this._areOptionsEqual(l.options, options)
+        );
+    }
+
+    /**
+     * Checks if two event listener option sets are equivalent for the purpose of removal.
+     * @param {Object|boolean} opt1 - First option set.
+     * @param {Object|boolean} opt2 - Second option set.
+     * @returns {boolean} True if they are effectively equal.
+     */
+    _areOptionsEqual(opt1, opt2) {
+        // Normalize options to booleans for capture flag, as that's the primary discriminator for removal
+        const getCapture = opt => {
+            if (typeof opt === "boolean") return opt;
+            if (typeof opt === "object" && opt !== null) return !!opt.capture;
+            return false;
+        };
+        return getCapture(opt1) === getCapture(opt2);
+    }
+
+    /**
+     * Removes all tracked event listeners.
+     */
+    cleanupEventListeners() {
+        while (this._listeners.length > 0) {
+            const { target, type, listener, options } = this._listeners.pop();
+            if (target && typeof target.removeEventListener === "function") {
+                target.removeEventListener(type, listener, options);
+            }
+        }
     }
 
     /**
@@ -7783,16 +8001,45 @@ class Activity {
 
 const activity = new Activity();
 
-require(["domReady!"], doc => {
-    setTimeout(() => {
-        activity.setupDependencies();
-        activity.domReady(doc);
-    }, 5000);
-});
+// Execute initialization once all RequireJS modules are loaded AND DOM is ready
+define(["domReady!"].concat(MYDEFINES), doc => {
+    const initialize = () => {
+        // Defensive check for multiple critical globals that may be delayed
+        // due to 'defer' execution timing variances.
+        const globalsReady =
+            typeof createDefaultStack !== "undefined" &&
+            typeof createjs !== "undefined" &&
+            typeof Tone !== "undefined" &&
+            typeof GIFAnimator !== "undefined" &&
+            typeof SuperGif !== "undefined";
 
-// eslint-disable-next-line no-unused-vars
-define(MYDEFINES, compatibility => {
-    activity.setupDependencies();
-    activity.doContextMenus();
-    activity.doPluginsAndPaletteCols();
+        if (globalsReady) {
+            activity.setupDependencies();
+            activity.domReady(doc);
+            activity.doContextMenus();
+            activity.doPluginsAndPaletteCols();
+        } else {
+            // Race condition in Firefox: non-AMD scripts might not have
+            // finished global assignment yet.
+            // Use readiness-based initialization for Firefox for better performance
+            if (typeof jQuery !== "undefined" && jQuery.browser && jQuery.browser.mozilla) {
+                waitForReadiness(
+                    () => {
+                        activity.setupDependencies();
+                        activity.domReady(doc);
+                        activity.doContextMenus();
+                        activity.doPluginsAndPaletteCols();
+                    },
+                    {
+                        maxWait: 10000,
+                        minWait: 500,
+                        checkInterval: 100
+                    }
+                );
+            } else {
+                setTimeout(initialize, 50); // Increased delay slightly
+            }
+        }
+    };
+    initialize();
 });

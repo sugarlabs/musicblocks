@@ -211,3 +211,6 @@ const TunerUtils = {
         return Math.pow(2, (baseCents + adjustment) / 1200);
     }
 };
+if (typeof module !== "undefined") {
+    module.exports = { TunerDisplay, TunerUtils };
+}

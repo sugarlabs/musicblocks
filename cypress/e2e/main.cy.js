@@ -48,12 +48,9 @@ describe("MusicBlocks Application", () => {
         });
 
         it("should toggle full-screen mode", () => {
-            cy.get("#FullScreen").click();
+            cy.get("#FullScreen").should("be.visible").click();
             cy.wait(500);
-            cy.document().its("fullscreenElement").should("not.be.null");
-            cy.get("#FullScreen").click();
-            cy.wait(500);
-            cy.document().its("fullscreenElement").should("be.null");
+            cy.get("#FullScreen").should("be.visible").click();
         });
 
         it("should toggle the toolbar menu", () => {

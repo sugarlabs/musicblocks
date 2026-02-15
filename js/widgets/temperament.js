@@ -673,8 +673,7 @@ function TemperamentWidget() {
 
             const playImage = docById("play_" + i);
 
-            // eslint-disable-next-line no-unused-vars
-            playImage.onmouseover = function (event) {
+            playImage.onmouseover = function () {
                 this.style.cursor = "pointer";
             };
 
@@ -782,8 +781,7 @@ function TemperamentWidget() {
         menuItems[0].style.background = "#c8C8C8";
         that.equalEdit();
 
-        // eslint-disable-next-line no-unused-vars
-        menuItems[0].onclick = function (event) {
+        menuItems[0].onclick = function () {
             menuItems[1].style.background = platformColor.selectorBackground;
             menuItems[2].style.background = platformColor.selectorBackground;
             menuItems[3].style.background = platformColor.selectorBackground;
@@ -791,8 +789,7 @@ function TemperamentWidget() {
             that.equalEdit();
         };
 
-        // eslint-disable-next-line no-unused-vars
-        menuItems[1].onclick = function (event) {
+        menuItems[1].onclick = function () {
             menuItems[0].style.background = platformColor.selectorBackground;
             menuItems[2].style.background = platformColor.selectorBackground;
             menuItems[3].style.background = platformColor.selectorBackground;
@@ -800,8 +797,7 @@ function TemperamentWidget() {
             that.ratioEdit();
         };
 
-        // eslint-disable-next-line no-unused-vars
-        menuItems[2].onclick = function (event) {
+        menuItems[2].onclick = function () {
             menuItems[0].style.background = platformColor.selectorBackground;
             menuItems[1].style.background = platformColor.selectorBackground;
             menuItems[3].style.background = platformColor.selectorBackground;
@@ -809,8 +805,7 @@ function TemperamentWidget() {
             that.arbitraryEdit();
         };
 
-        // eslint-disable-next-line no-unused-vars
-        menuItems[3].onclick = function (event) {
+        menuItems[3].onclick = function () {
             menuItems[0].style.background = platformColor.selectorBackground;
             menuItems[1].style.background = platformColor.selectorBackground;
             menuItems[2].style.background = platformColor.selectorBackground;
@@ -1722,8 +1717,14 @@ function TemperamentWidget() {
             [4, ["number", { value: this.frequencies[0] }], 0, 0, [2]],
             [5, ["octavespace"], 0, 0, [2, 6, 9]],
             [6, ["divide"], 0, 0, [5, 7, 8]],
-            [7, ["number", { value: rationalToFraction(getOctaveRatio())[0] }], 0, 0, [6]],
-            [8, ["number", { value: rationalToFraction(getOctaveRatio())[1] }], 0, 0, [6]],
+            // Cache rationalToFraction result to avoid duplicate calls
+            ...(function () {
+                const octaveFraction = rationalToFraction(getOctaveRatio());
+                return [
+                    [7, ["number", { value: octaveFraction[0] }], 0, 0, [6]],
+                    [8, ["number", { value: octaveFraction[1] }], 0, 0, [6]]
+                ];
+            })(),
             [9, "vspace", 0, 0, [5, 10]]
         ];
         let previousBlock = 9;
@@ -1817,20 +1818,10 @@ function TemperamentWidget() {
                     [idx + 1]
                 ]);
                 newStack.push([idx + 3, ["divide"], 0, 0, [idx + 1, idx + 4, idx + 5]]);
-                newStack.push([
-                    idx + 4,
-                    ["number", { value: rationalToFraction(this.ratios[i])[0] }],
-                    0,
-                    0,
-                    [idx + 3]
-                ]);
-                newStack.push([
-                    idx + 5,
-                    ["number", { value: rationalToFraction(this.ratios[i])[1] }],
-                    0,
-                    0,
-                    [idx + 3]
-                ]);
+                // Cache rationalToFraction result to avoid duplicate calls
+                const ratioFraction = rationalToFraction(this.ratios[i]);
+                newStack.push([idx + 4, ["number", { value: ratioFraction[0] }], 0, 0, [idx + 3]]);
+                newStack.push([idx + 5, ["number", { value: ratioFraction[1] }], 0, 0, [idx + 3]]);
                 newStack.push([idx + 6, "vspace", 0, 0, [idx, idx + 7]]);
                 newStack.push([idx + 7, ["pitch"], 0, 0, [idx + 6, idx + 8, idx + 9, null]]);
 
@@ -2325,8 +2316,7 @@ function TemperamentWidget() {
 
         this._circleOfNotes();
 
-        // eslint-disable-next-line no-unused-vars
-        noteCell.onclick = function (event) {
+        noteCell.onclick = function () {
             that.editMode = null;
             if (that.circleIsVisible) {
                 that._circleOfNotes();
@@ -2335,12 +2325,7 @@ function TemperamentWidget() {
             }
         };
 
-        widgetWindow.addButton(
-            "add2.svg",
-            ICONSIZE,
-            _("Add pitches")
-            // eslint-disable-next-line no-unused-vars
-        ).onclick = function (event) {
+        widgetWindow.addButton("add2.svg", ICONSIZE, _("Add pitches")).onclick = function () {
             that.edit();
         };
 
