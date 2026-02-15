@@ -4527,20 +4527,14 @@ class Block {
                     // Rename both do <- name and nameddo blocks.
                     this.blocks.renameDos(oldValue, newValue);
 
+                    // eslint-disable-next-line no-case-declarations
+                    const metadata = this.blocks.actionMetadata(c);
                     if (oldValue === _("action")) {
-                        this.blocks.newNameddoBlock(
-                            newValue,
-                            this.blocks.actionHasReturn(c),
-                            this.blocks.actionHasArgs(c)
-                        );
+                        this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
                         this.blocks.setActionProtoVisibility(false);
                     }
 
-                    this.blocks.newNameddoBlock(
-                        newValue,
-                        this.blocks.actionHasReturn(c),
-                        this.blocks.actionHasArgs(c)
-                    );
+                    this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
                     // eslint-disable-next-line no-case-declarations
                     const blockPalette = this.blocks.palettes.dict["action"];
                     for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
@@ -4557,11 +4551,7 @@ class Block {
                     }
 
                     if (oldValue === _("action")) {
-                        this.blocks.newNameddoBlock(
-                            newValue,
-                            this.blocks.actionHasReturn(c),
-                            this.blocks.actionHasArgs(c)
-                        );
+                        this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
                         this.blocks.setActionProtoVisibility(false);
                     }
                     this.blocks.renameNameddos(oldValue, newValue);

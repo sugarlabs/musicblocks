@@ -79,7 +79,6 @@
             setTimeout(fixAutocompletePosition, 1000);
         });
     </script>
-    <script src="lib/webL10n.js" defer></script>
     <script src="lib/Tone.js" defer></script>
     <script src="lib/midi.js" defer></script>
     <script src="lib/jquery.ruler.js" defer></script>
@@ -99,130 +98,45 @@
         <!-- gif-animator.js integrates SuperGif with Music Blocks. It manages
      decoding and drawing GIF frames onto the turtle's overlay canvas.
      Canvas refreshing is handled separately by CreateJS Ticker. -->
-        <script src="js/gif-animator.js" defer></script>
-        <script defer>
-            document.addEventListener("DOMContentLoaded", function () {
-                if (window.hljs) hljs.highlightAll();
-            });
-        </script>
-        <script src="lib/astring.min.js" defer></script>
+    <script src="js/gif-animator.js" defer></script>
+    <script defer>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (window.hljs) hljs.highlightAll();
+        });
+    </script>
+    <script src="lib/astring.min.js" defer></script>
 
-        <script src="lib/acorn.min.js" defer></script>
+    <script src="lib/acorn.min.js" defer></script>
 
-        <link rel="prefetch" type="application/l10n" href="./localization.ini" />
 
-        <script data-main="js/loader" src="lib/require.js" defer></script>
-        <link type="text/css" href="fonts/material-icons.css" rel="stylesheet" />
-        <link
-            rel="preload"
-            href="/fonts/material-icons.woff2"
-            as="font"
-            type="font/woff2"
-            crossorigin="anonymous"
-        />
-        <link rel="stylesheet" href="lib/materialize-iso.css" />
-        <link rel="stylesheet" href="css/themes.css?v=fixed" />
-        <script src="lib/easeljs.min.js" defer></script>
-        <script src="lib/tweenjs.min.js" defer></script>
-        <script>
-            let ast2blocklist_config;
-            document.addEventListener("DOMContentLoaded", function () {
-                fetch("js/js-export/ast2blocks.min.json")
-                    .then(response => response.json())
-                    .then(data => {
-                        ast2blocklist_config = data;
-                    });
-            });
-        </script>
-    </head>
+    <script data-main="js/loader" src="lib/require.js" defer></script>
+    <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
+    <link rel="preload" href="/fonts/material-icons.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="stylesheet" href="lib/materialize-iso.css">
+    <link rel="stylesheet" href="css/themes.css?v=fixed">
+    <script src="lib/easeljs.min.js" defer></script>
+    <script src="lib/tweenjs.min.js" defer></script>
+    <script>
+        let ast2blocklist_config;
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("js/js-export/ast2blocks.min.json")
+                .then(response => response.json())
+                .then(data => { ast2blocklist_config = data });
+        });
+    </script>
+</head>
 
-    <body id="body" data-title="index" style="background: #f9f9f9">
-        <!-- Fallback for browsers that don't support preload -->
-        <noscript> JavaScript is required to view this page. </noscript>
-        <header>
-            <div
-                id="loading-image-container"
-                style="
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100vh;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    background-color: #ffffff;
-                    z-index: 9999;
-                    contain: paint;
-                "
-            >
-                <div
-                    id="loading-media"
-                    style="width: 100%; padding: 0 20px; box-sizing: border-box"
-                ></div>
-                <div
-                    class="loading-text"
-                    id="loadingText"
-                    style="color: #333; margin-top: 2rem; min-height: 1.5em; font-size: 1.2rem"
-                ></div>
-                <a
-                    href="https://www.sugarlabs.org/"
-                    target="_blank"
-                    id="link-to-sugarLabs"
-                    style="position: fixed; bottom: 20px; right: 20px"
-                >
-                    <div class="logo-container" id="bottom-right-logo">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 501 167"
-                            height="50"
-                            width="150"
-                        >
-                            <!-- Logo paths -->
-                            <path
-                                d="m63.05 117.52c-11.05 0-21.12-5.5-21.12-11.539 0-3.157 2.303-5.63 5.244-5.63 2.02 0 3.719 1.183 5.515 2.435 2.592 1.809 5.529 3.855 10.651 3.855 5.139 0 8.21-2.647 8.21-5.209 0-3.416-5.271-5.607-10.852-7.927-7.799-3.243-16.639-6.918-16.639-15.886 0-10.573 9.933-16.279 19.28-16.279 7.89 0 18.895 4.132 18.895 10.86 0 2.526-1.763 5.244-5.632 5.244-2.068 0-3.558-1.125-4.997-2.212-1.872-1.414-3.994-3.02-8.266-3.02-1.209 0-7.242.227-7.242 4.726 0 2.729 4.879 4.613 10.04 6.608 7.772 3 17.446 6.739 17.446 16.333.002 12.12-10.646 17.636-20.538 17.636"
-                                class="color-change"
-                            />
-                            <path
-                                d="m117.65 117.52c-10.726 0-22.19-5.854-22.19-22.281v-27.59c0-3.773 2.418-6.309 6.02-6.309s6.02 2.536 6.02 6.309v27.299c0 7.979 3.224 11.693 10.146 11.693 6.922 0 10.146-3.715 10.146-11.693v-27.3c0-3.773 2.418-6.309 6.02-6.309 3.6 0 6.02 2.536 6.02 6.309v27.59c0 16.428-11.46 22.282-22.18 22.282"
-                                class="color-change"
-                            />
-                            <path
-                                d="m175.53 137.85c-8.493 0-21.509-4.994-21.509-11.149 0-2.758 1.671-5.729 5.342-5.729 2.02 0 3.766 1.074 5.785 2.317 2.804 1.728 5.981 3.683 11.06 3.683 10.827 0 12.215-9.426 12.273-13.816-3.037 2.818-7.04 4.37-11.498 4.37-16.03 0-24.414-14.13-24.414-28.09s8.386-28.09 24.414-28.09c4.424 0 8.692 1.905 11.688 4.32.654-2.638 2.95-4.32 6.122-4.32 2.778 0 5.731 2.077 5.731 5.923v44.24c0 16-9.811 26.346-24.993 26.346m1.452-65.63c-9.132 0-12.372 9.271-12.372 17.212s3.24 17.211 12.372 17.211c9.13 0 12.371-9.271 12.371-17.211s-3.241-17.212-12.371-17.212"
-                                class="color-change"
-                            />
-                            <path
-                                d="m256.26 117.52c-2.625 0-5.279-1.729-5.68-5.04-3.492 3.314-7.752 5.04-12.52 5.04-16.03 0-24.411-14.13-24.411-28.09 0-13.958 8.385-28.09 24.411-28.09 4.755 0 8.745 1.484 12.563 4.743.52-3.119 3.091-4.743 5.636-4.743 2.776 0 5.727 2.076 5.727 5.923v44.33c.001 3.846-2.95 5.923-5.726 5.923m-18.199-45.3c-9.132 0-12.373 9.273-12.373 17.212 0 7.94 3.241 17.212 12.373 17.212 9.133 0 12.373-9.272 12.373-17.212 0-7.939-3.24-17.212-12.373-17.212"
-                                class="color-change"
-                            />
-                            <path
-                                d="m282.98 117.52c-3.601 0-6.02-2.536-6.02-6.311v-43.561c0-3.774 2.419-6.309 6.02-6.309 3.289 0 5.593 2.118 5.965 5.361 2.537-2.849 6.103-5.361 10.1-5.361 3.768 0 6.503 2.572 6.503 6.115 0 2.326-1.173 5.322-6.76 6.375-2.961.515-9.793 2.788-9.793 12.89v24.49c0 3.774-2.419 6.311-6.02 6.311"
-                                class="color-change"
-                            />
-                            <path
-                                d="m324.99 111.21c0 2.808-1.646 4.551-4.259 4.551-2.614 0-4.26-1.743-4.26-4.551v-66.21c0-2.808 1.646-4.55 4.26-4.55 2.613 0 4.259 1.743 4.259 4.55z"
-                                fill="#969696"
-                                stroke-width="0"
-                            />
-                            <path
-                                d="m386.07 111.59c0 3-2.324 4.164-3.969 4.164-1.742 0-3.969-1.162-3.969-4.164v-3.581h-.193c-3.68 5.228-8.52 7.745-14.04 7.745-14.52 0-22.65-12.682-22.65-26.331s8.131-26.33 22.65-26.33c5.906 0 10.07 2.516 14.04 6.873h.193v-2.71c0-3 2.227-4.163 3.969-4.163 1.645 0 3.969 1.162 3.969 4.163zm-22.17-3.195c10.455 0 14.13-10.26 14.13-18.972 0-8.712-3.678-18.973-14.13-18.973-10.453 0-14.13 10.261-14.13 18.973 0 8.713 3.679 18.972 14.13 18.972"
-                                fill="#969696"
-                                stroke-width="0"
-                            />
-                            <path
-                                d="m404.95 44.997c0-2.808 1.646-4.55 4.26-4.55s4.26 1.743 4.26 4.55v25.07h.192c2.227-3.194 6.97-6.969 13.745-6.969 13.941 0 21.975 12.681 21.975 26.33s-8.03 26.331-21.975 26.331c-6.775 0-11.324-2.421-13.745-7.07h-.192v2.518c0 2.808-1.646 4.551-4.26 4.551s-4.26-1.743-4.26-4.551zm21.781 63.4c10.453 0 14.13-10.26 14.13-18.972 0-8.712-3.678-18.973-14.13-18.973-10.455 0-14.13 10.261-14.13 18.973 0 8.713 3.68 18.972 14.13 18.972"
-                                fill="#969696"
-                                stroke-width="0"
-                            />
-                            <path
-                                d="m482 63.1c7.07 0 17.13 3.775 17.13 9.1 0 1.839-1.26 3.484-3.873 3.484-3.678 0-5.13-5.227-13.262-5.227-4.84 0-9 2.129-9 6.485 0 9 27.491 8.03 27.491 22.941 0 10.746-9.196 15.877-18.778 15.877-10.843 0-19.361-5.422-19.361-9.779 0-2.321 1.646-3.87 3.484-3.87 3.775 0 6.873 6.291 16.17 6.291 6.195 0 9.971-3.484 9.971-6.97 0-10.07-27.491-9.486-27.491-23.812-.001-9.485 8.904-14.519 17.52-14.519"
-                                fill="#969696"
-                                stroke-width="0"
-                            />
-                        </svg>
-                    </div>
-                </a>
+<body id="body" data-title="index" style="background: #f9f9f9;">
+    <!-- Fallback for browsers that don't support preload -->
+    <noscript>
+        JavaScript is required to view this page.
+    </noscript>
+    <header>
+        <div id="loading-image-container"
+            style="position: fixed; top: 0; left: 0; width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #FFFFFF; z-index: 9999; contain: paint;">
+            <div id="loading-media" style="width: 100%; padding: 0 20px; box-sizing: border-box;"></div>
+            <div class="loading-text" id="loadingText"
+                style="color:#333; margin-top: 2rem; min-height: 1.5em; font-size: 1.2rem;">
             </div>
         </header>
 
@@ -458,8 +372,114 @@
                         <input onkeypress="doPaste()" type="submit" value="" tabindex="-1" />
                     </div>
 
-                    <div id="myProgress" tabindex="-1">
-                        <div id="myBar" tabindex="-1"></div>
+                <div id="myProgress" tabindex="-1">
+                    <div id="myBar" tabindex="-1"></div>
+                </div>
+            </footer>
+
+            <dialog id="lilypondModal" class="modal" tabindex="-1">
+                <!-- Modal content for Lilypond save dialog -->
+                <div class="modal-content" tabindex="-1">
+                    <span class="close">&times;</span>
+                    <div id="fileNameText"></div>
+                    <input type="text" id="fileName" tabindex="-1">
+                    <p></p>
+                    <div id="titleText"></div>
+                    <input type="text" id="title" tabindex="-1">
+                    <p></p>
+                    <div id="authorText"></div>
+                    <input type="text" id="author" tabindex="-1">
+                    <p></p>
+                    <div id="MIDIText"></div>
+                    <input type="checkbox" id="MIDICheck" tabindex="-1">
+                    <p></p>
+                    <div id="guitarText"></div>
+                    <input type="checkbox" id="guitarCheck" tabindex="-1">
+                    <p></p>
+                    <p><button class="confirm-button" id="submitLilypond"></button></p>
+                    <!-- <button id="submitPDF"></button></p> -->
+                </div>
+            </dialog>
+            <div class="materialize-iso" tabindex="-1">
+                <nav id="toolbars" class="nav-wrapper">
+                    <div class="blue nav-wrapper" tabindex="-1">
+                        <div id="mb-logo" class="logo left tooltipped"
+                            style="display: flex; align-items: center; line-height: 0; height: 100%; padding-right: 0;"
+                            data-position="bottom">
+                            <amp-img alt="MusicBlocks Logo" width="100%" src="images/logo.svg">
+                            </amp-img>
+                        </div>
+                        <ul class="main left">
+                            <li>
+                                <a id="play" class="left tooltipped"><i
+                                        class="material-icons main">play_circle_filled</i></a>
+                            </li>
+                            <li>
+                                <a id="stop" class="left tooltipped"><i class="material-icons main">stop</i></a>
+                            </li>
+                            <li>
+                                <a id="record" class="left tooltipped" data-tooltip="Record"></a>
+                            </li>
+                        </ul>
+
+                        <ul class="main right">
+                            <li>
+                                <a id="FullScreen" class="FullScreen tooltipped dropdown-trigger" data-position="bottom"
+                                    onclick="setIcon()">
+                                    <i class="material-icons" id="FullScrIcon">fullscreen</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="newFile" class="tooltipped dropdown-trigger" data-position="bottom"
+                                    data-activates="newdropdown">
+                                    <i class="material-icons md-48">note_add</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="load" class="tooltipped" data-position="bottom">
+                                    <i class="material-icons md-48">folder</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="saveButton" class="tooltipped dropdown-trigger" data-position="bottom"
+                                    data-activates="saveddropdownbeg">
+                                    <i id="save1" class="material-icons md-48">save_alt</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="saveButtonAdvanced" style="display: none;" class="tooltipped dropdown-trigger"
+                                    data-position="bottom" data-activates="saveddropdown">
+                                    <i id="save2" class="material-icons md-48">save_alt</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="planetIcon" class="tooltipped" data-position="bottom">
+                                    <i class="material-icons md-48">public</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a style="display: none;" id="planetIconDisabled" class="tooltipped"
+                                    data-position="bottom">
+                                    <i style="color: #a5acba;" class="material-icons md-48">public</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="toggleAuxBtn" class="tooltipped" data-position="bottom">
+                                    <i id="menu" class="animated-icon material-icons md-48">menu</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="helpIcon" class="tooltipped" data-position="bottom">
+                                    <i class="material-icons md-48">help</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="installButton" class="tooltipped hidden" data-position="bottom"
+                                    data-tooltip="Install App" aria-label="Install App">
+                                    <i class="material-icons md-48">file_download</i>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
                 </footer>
 
@@ -872,8 +892,10 @@
             // Detect if running on localhost for development
             const isLocalDev = window.location.hostname === "localhost" ||
                 window.location.hostname === "127.0.0.1";
+            // Localhost SW is disabled to avoid caching; set allowLocalPwa to test installs.
+            const allowLocalPwa = localStorage.getItem("allowLocalPwa") === "true";
 
-            if (!isLocalDev) {
+            if (!isLocalDev || allowLocalPwa) {
                 // Production: Register service worker for offline mode
                 if (navigator.serviceWorker.controller) {
                     console.debug("[PWA Builder] active service worker found, no need to register");
@@ -886,16 +908,51 @@
                         );
                     });
                 }
+            } else {
+                // Development: Skip service worker for instant updates
+                console.log(
+                    "🔥 [DEV MODE] Service worker disabled on localhost for instant code updates"
+                );
+                console.log(
+                    "Set localStorage.allowLocalPwa = 'true' to enable PWA install testing on localhost."
+                );
             }
-        });
+        }
     </script>
     <script>
-        $(document).ready(function () {
-            // Defensive check for doSearch global (now an Activity member)
-            if (typeof doSearch === "function") {
-                doSearch();
-            } else if (window.activity && typeof window.activity.doSearch === "function") {
-                window.activity.doSearch();
+        let deferredPrompt;
+
+        window.addEventListener("beforeinstallprompt", (event) => {
+            event.preventDefault(); // Prevent automatic browser prompt
+            deferredPrompt = event;
+
+            // Show the install button
+            const installButton = document.getElementById("installButton");
+            if (installButton) {
+                installButton.classList.remove("hidden");
+            }
+        });
+
+        // Handle install button click
+        document.addEventListener("DOMContentLoaded", function () {
+            const installButton = document.getElementById("installButton");
+            if (installButton) {
+                installButton.addEventListener("click", async function () {
+                    if (deferredPrompt) {
+                        // Show the install prompt
+                        deferredPrompt.prompt();
+                        
+                        // Wait for user choice
+                        const { outcome } = await deferredPrompt.userChoice;
+                        console.log(`User response to the install prompt: ${outcome}`);
+                        
+                        // Clear the deferredPrompt
+                        deferredPrompt = null;
+                        
+                        // Hide the button
+                        installButton.classList.add("hidden");
+                    }
+                });
             }
         });
     </script>
@@ -1104,6 +1161,12 @@
         document.addEventListener('mozfullscreenchange', handleFullscreenChange);
         document.addEventListener('MSFullscreenChange', handleFullscreenChange);
     </script>
+
+    <style>
+        #installButton.hidden {
+            display: none !important;
+        }
+    </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {

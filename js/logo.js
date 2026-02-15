@@ -444,7 +444,9 @@ class Logo {
         }
 
         for (const turtle in this.activity.turtles.turtleList) {
-            for (const synth in this.activity.turtles.ithTurtle(turtle).singer.synthVolume) {
+            // Cache ithTurtle result to avoid redundant function calls in inner loop
+            const tur = this.activity.turtles.ithTurtle(turtle);
+            for (const synth in tur.singer.synthVolume) {
                 Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
             }
         }
@@ -463,7 +465,9 @@ class Logo {
 
         Singer.setMasterVolume(this.activity.logo, DEFAULTVOLUME);
         for (const turtle in this.activity.turtles.turtleList) {
-            for (const synth in this.activity.turtles.ithTurtle(turtle).singer.synthVolume) {
+            // Cache ithTurtle result to avoid redundant function calls in inner loop
+            const tur = this.activity.turtles.ithTurtle(turtle);
+            for (const synth in tur.singer.synthVolume) {
                 Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
             }
         }

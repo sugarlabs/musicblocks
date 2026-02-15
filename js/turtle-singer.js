@@ -2108,8 +2108,10 @@ class Singer {
                                 pitchNumber *
                                 (Math.log10(ratio[k]) / Math.log10(getOctaveRatio()))
                             ).toFixed(0);
-                            numerator[k] = rationalToFraction(ratio[k])[0];
-                            denominator[k] = rationalToFraction(ratio[k])[1];
+                            // Cache rationalToFraction result to avoid duplicate calls
+                            const fraction = rationalToFraction(ratio[k]);
+                            numerator[k] = fraction[0];
+                            denominator[k] = fraction[1];
                         }
                     }
 
