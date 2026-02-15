@@ -1,0 +1,46 @@
+name: PR Title Check
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+
+jobs:
+  check-pr-title:
+    name: Validate PR Title
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check PR Title Format
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+
+          # Rule 1: PR title must not be empty
+          if [ -z "$PR_TITLE" ]; then
+            echo "❌ PR title cannot be empty."
+            exit 1
+          fi
+
+          # Rule 2: PR title must follow Conventional Commits format
+          # Allowed types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
+          PATTERN="^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?: .+"
+          if ! echo "$PR_TITLE" | grep -Eq "$PATTERN"; then
+            echo "❌ PR title does not follow the required format."
+            echo ""
+            echo "Expected format: <type>: <description>"
+            echo "  or:            <type>(scope): <description>"
+            echo ""
+            echo "Allowed types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert"
+            echo ""
+            echo "Examples:"
+            echo "  feat: add new block palette"
+            echo "  fix: resolve audio issue"
+            echo "  docs: update contributing guidelines"
+            echo ""
+            echo "Your title: \"$PR_TITLE\""
+            exit 1
+          fi
+
+          echo "✅ PR title is valid: \"$PR_TITLE\""
