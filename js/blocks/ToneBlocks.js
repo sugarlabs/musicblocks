@@ -636,7 +636,13 @@ function setupToneBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Chorus block adds a chorus effect."),
+                _("The Chorus block adds a chorus effect.") +
+                " " +
+                _("The rate controls the speed of the oscillation.") +
+                " " +
+                _("The delay sets the time delay between voices.") +
+                " " +
+                _("The depth controls the intensity of the effect."),
                 "documentation",
                 null,
                 "chorushelp"
@@ -695,7 +701,11 @@ function setupToneBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Vibrato block adds a rapid, slight variation in pitch."),
+                _("The Vibrato block adds a rapid, slight variation in pitch.") +
+                " " +
+                _("The intensity controls the strength of the pitch variation.") +
+                " " +
+                _("The rate controls the speed of the variation."),
                 "documentation",
                 null,
                 "vibratohelp"
