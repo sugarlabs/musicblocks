@@ -422,14 +422,12 @@ function setupOrnamentBlocks(activity) {
             }
 
             tur.singer.glideOverride = Singer.noteCounter(logo, turtle, args[1]);
-            // eslint-disable-next-line no-console
-            console.debug("length of glide " + tur.singer.glideOverride);
 
             const listenerName = "_glide_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = (event) => {
+            const __listener = event => {
                 if (tur.singer.justCounting.length === 0) {
                     logo.notation.notationEndSlur(turtle);
                 }
@@ -623,7 +621,9 @@ function setupOrnamentBlocks(activity) {
              * @param {string[]} [] - An array with help string information.
              */
             this.setHelpString([
-                _("The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes."),
+                _(
+                    "The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes."
+                ),
                 "documentation",
                 null,
                 "slurhelp"
@@ -687,7 +687,9 @@ function setupOrnamentBlocks(activity) {
              * @param {string[]} [] - An array with help string information.
              */
             this.setHelpString([
-                _("The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes."),
+                _(
+                    "The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes."
+                ),
                 "documentation",
                 null,
                 "staccatohelp"

@@ -96,9 +96,7 @@ function setupToneActions(activity) {
                     // The electronic synthvolume will track any
                     // changes to the master volume, e.g., the
                     // articulation block.
-                    tur.singer.synthVolume[synth] = [
-                        last(tur.singer.synthVolume[DEFAULTVOICE])
-                    ];
+                    tur.singer.synthVolume[synth] = [last(tur.singer.synthVolume[DEFAULTVOICE])];
                     tur.singer.crescendoInitialVolume[synth] = [
                         last(tur.singer.synthVolume[DEFAULTVOICE])
                     ];
@@ -491,4 +489,3 @@ function setupToneActions(activity) {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = setupToneActions;
 }
-

@@ -21,14 +21,14 @@
  */
 
 const { setupBooleanBlocks } = require("../BooleanBlocks");
-global._ = jest.fn((str) => str);
-global.BooleanBlock = jest.fn().mockImplementation((type) => ({
+global._ = jest.fn(str => str);
+global.BooleanBlock = jest.fn().mockImplementation(type => ({
     type,
     setPalette: jest.fn(),
     setHelpString: jest.fn(),
     formBlock: jest.fn(),
     updateParameter: jest.fn(),
-    arg: jest.fn(function(logo, turtle, blk, receivedArg) {
+    arg: jest.fn(function (logo, turtle, blk, receivedArg) {
         const connections = mockActivity.blocks.blockList[blk].connections;
 
         if (this.type === "not") {
@@ -152,27 +152,27 @@ global.BooleanBlock = jest.fn().mockImplementation((type) => ({
         return undefined;
     }),
     setup: jest.fn(),
-    beginnerBlock: jest.fn(),
+    beginnerBlock: jest.fn()
 }));
 global.NOINPUTERRORMSG = "No input error message";
 
 const mockActivity = {
     blocks: {
         blockList: {
-            "blk1": { value: true, connections: [null, null, null] },
-            "blk2": { value: false, connections: [null, null, null] },
-            "blk3": { value: true, connections: [null, "blk4", "blk5"] },
-            "blk4": { value: false, connections: [null, null, null] },
-            "blk5": { value: true, connections: [null, null, null] },
-            "blk6": { value: false, connections: [null, "blk7", "blk8"] },
-            "blk7": { value: true, connections: [null, null, null] },
-            "blk8": { value: false, connections: [null, null, null] },
-            "blk9": { value: true, connections: [null, "blk10", "blk11"] },
-            "blk10": { value: false, connections: [null, null, null] },
-            "blk11": { value: true, connections: [null, null, null] },
-        },
+            blk1: { value: true, connections: [null, null, null] },
+            blk2: { value: false, connections: [null, null, null] },
+            blk3: { value: true, connections: [null, "blk4", "blk5"] },
+            blk4: { value: false, connections: [null, null, null] },
+            blk5: { value: true, connections: [null, null, null] },
+            blk6: { value: false, connections: [null, "blk7", "blk8"] },
+            blk7: { value: true, connections: [null, null, null] },
+            blk8: { value: false, connections: [null, null, null] },
+            blk9: { value: true, connections: [null, "blk10", "blk11"] },
+            blk10: { value: false, connections: [null, null, null] },
+            blk11: { value: true, connections: [null, null, null] }
+        }
     },
-    errorMsg: jest.fn(),
+    errorMsg: jest.fn()
 };
 
 const mockLogo = {
@@ -181,7 +181,7 @@ const mockLogo = {
             throw new Error(`Block ${cblk} not found in blockList`);
         }
         return mockActivity.blocks.blockList[cblk].value;
-    }),
+    })
 };
 
 describe("setupBooleanBlocks - Additional Tests", () => {

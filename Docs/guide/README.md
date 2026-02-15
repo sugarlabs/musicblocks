@@ -63,6 +63,7 @@ This guide details the many musical features of the language.
    6. [Graphics](#36-adding-graphics)
    7. [Interactions](#37-interactions)
    8. [Ensemble](#38-ensemble)
+   9. [Program Blocks](#39-program-blocks)
 4. [Widgets](#4-widgets)
     1. [Monitoring Status](#41-monitoring-status)
     2. [Generating groups of Notes](#42-generating-chunks-of-notes)
@@ -1562,7 +1563,7 @@ the link below, takes musical paint in a novel direction.
 
 [RUN LIVE](https://sugarlabs.github.io/musicblocks/index.html?id=1523896294964170&run=True&run=True)
 
-## <a name="ENSEMBLE">3.8 Ensemble</a>
+### <a name="ENSEMBLE">3.8 Ensemble</a>
 
 Much of music involves multiple instruments (voices or "mice" in Music
 Blocks) playing together. There are a number of special blocks that
@@ -1624,6 +1625,14 @@ The *Found mouse* block will return true if the specified mouse can be found.
 The *Set mouse* block sends a stack of blocks to be run by the specified mouse.
 
 ![set](../documentation/setturtle_block.svg "set mouse")
+
+### <a name="PROGRAM-BLOCKS">3.9 Program Blocks</a>
+
+The *Program* palette contains blocks that allow you to manipulate the program itself, manage data (heaps and dictionaries), and interact with the project environment.
+
+For a detailed reference of these blocks, please see the [Program Palette](../documentation/README.md#8-program-palette) section in the documentation.
+
+These blocks are particularly useful for creating meta-programming projects, such as the [Musical Paint](#musical-paint) example, where the *Make Block* is used to generate code from a drawing.
 
 ## <a name="WIDGETS">4. Widgets</a>
 

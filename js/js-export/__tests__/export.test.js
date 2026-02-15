@@ -20,17 +20,17 @@
 const { Mouse, MusicBlocks } = require("../export.js");
 global.importMembers = jest.fn();
 global.JSInterface = {
-    validateArgs: jest.fn((method, args) => args),
+    validateArgs: jest.fn((method, args) => args)
 };
 global.Painter = {
     prototype: {
         method1: jest.fn(),
-        method2: jest.fn(),
-    },
+        method2: jest.fn()
+    }
 };
 
 const JSEditor = {
-    logConsole: jest.fn(),
+    logConsole: jest.fn()
 };
 global.JSEditor = JSEditor;
 
@@ -42,24 +42,24 @@ const globalActivity = {
         getIndexOfTurtle: jest.fn(),
         removeTurtle: jest.fn(),
         screenX2turtleX: jest.fn(),
-        screenY2turtleY: jest.fn(),
+        screenY2turtleY: jest.fn()
     },
     logo: {
         prepSynths: jest.fn(),
         firstNoteTime: null,
         stage: {
-            removeEventListener: jest.fn(),
-        },
+            removeEventListener: jest.fn()
+        }
     },
     textMsg: jest.fn(),
     stage: {
-        dispatchEvent: jest.fn(),
-    },
+        dispatchEvent: jest.fn()
+    }
 };
 global.globalActivity = globalActivity;
 global.Singer = {
     RhythmActions: {
-        getNoteValue: jest.fn(),
+        getNoteValue: jest.fn()
     },
     MeterActions: {
         setPickup: jest.fn(),
@@ -68,23 +68,23 @@ global.Singer = {
         getMeasureCount: jest.fn(),
         getBPM: jest.fn(),
         getBeatFactor: jest.fn(),
-        getCurrentMeter: jest.fn(),
+        getCurrentMeter: jest.fn()
     },
     PitchActions: {
         deltaPitch: jest.fn(),
-        consonantStepSize: jest.fn(),
+        consonantStepSize: jest.fn()
     },
     IntervalsActions: {
         setMovableDo: jest.fn(),
         getCurrentKey: jest.fn(),
         getCurrentMode: jest.fn(),
-        getModeLength: jest.fn(),
+        getModeLength: jest.fn()
     },
     VolumeActions: {
         setPanning: jest.fn(),
         setMasterVolume: jest.fn(),
-        masterVolume: 1.0,
-    },
+        masterVolume: 1.0
+    }
 };
 
 describe("Mouse Class", () => {
@@ -96,7 +96,7 @@ describe("Mouse Class", () => {
         globalActivity.turtles.getTurtle.mockReturnValue({
             id: 1,
             initTurtle: jest.fn(),
-            doWait: jest.fn(),
+            doWait: jest.fn()
         });
         mouse = new Mouse(mockFlow);
     });
@@ -136,7 +136,7 @@ describe("MusicBlocks Class", () => {
             id: 1,
             initTurtle: jest.fn(),
             doWait: jest.fn(),
-            container: { x: 10, y: 20 },
+            container: { x: 10, y: 20 }
         });
         mouse = new Mouse(jest.fn());
         mouse.run = jest.fn();
@@ -169,6 +169,20 @@ describe("MusicBlocks Class", () => {
         await musicBlocks.ENDFLOWCOMMAND;
         expect(globalActivity.stage.dispatchEvent).toHaveBeenCalledWith("testSignal");
         expect(musicBlocks.turtle.doWait).toHaveBeenCalledWith(0);
+    });
+
+    test("should handle ENDMOUSE and remove mouse from list", async () => {
+        Mouse.MouseList = [mouse];
+        Mouse.AddedTurtles = [];
+        await musicBlocks.ENDMOUSE;
+        expect(Mouse.MouseList).not.toContain(mouse);
+    });
+
+    test("should call init(false) when last mouse ends", async () => {
+        Mouse.MouseList = [mouse];
+        Mouse.AddedTurtles = [];
+        await musicBlocks.ENDMOUSE;
+        expect(MusicBlocks.isRun).toBe(false);
     });
 
     test("should print a message", () => {
@@ -227,9 +241,25 @@ describe("MusicBlocks Class", () => {
         expect(musicBlocks.NOTEVALUE).toBe(1);
     });
 
-    test("should set PICKUP", () => {
-        musicBlocks.PICKUP = 2;
-        expect(Singer.MeterActions.setPickup).toHaveBeenCalledWith(2, musicBlocks.turIndex);
+    describe("PICKUP setter", () => {
+        beforeEach(() => {
+            Singer.MeterActions.setPickup.mockClear();
+        });
+
+        test("should set PICKUP with positive value", () => {
+            musicBlocks.PICKUP = 2;
+            expect(Singer.MeterActions.setPickup).toHaveBeenCalledWith(2, musicBlocks.turIndex);
+        });
+
+        test("should clamp negative PICKUP value to 0", () => {
+            musicBlocks.PICKUP = -5;
+            expect(Singer.MeterActions.setPickup).toHaveBeenCalledWith(0, musicBlocks.turIndex);
+        });
+
+        test("should allow PICKUP value of 0", () => {
+            musicBlocks.PICKUP = 0;
+            expect(Singer.MeterActions.setPickup).toHaveBeenCalledWith(0, musicBlocks.turIndex);
+        });
     });
 
     test("should get WHOLENOTESPLAYED", () => {
@@ -284,7 +314,10 @@ describe("MusicBlocks Class", () => {
 
     test("should set MOVABLEDO", () => {
         musicBlocks.MOVABLEDO = true;
-        expect(Singer.IntervalsActions.setMovableDo).toHaveBeenCalledWith(true, musicBlocks.turIndex);
+        expect(Singer.IntervalsActions.setMovableDo).toHaveBeenCalledWith(
+            true,
+            musicBlocks.turIndex
+        );
     });
 
     test("should get CURRENTKEY", () => {
@@ -309,10 +342,67 @@ describe("MusicBlocks Class", () => {
 
     test("should set MASTERVOLUME", () => {
         musicBlocks.MASTERVOLUME = 0.8;
-        expect(Singer.VolumeActions.setMasterVolume).toHaveBeenCalledWith(0.8, musicBlocks.turIndex);
+        expect(Singer.VolumeActions.setMasterVolume).toHaveBeenCalledWith(
+            0.8,
+            musicBlocks.turIndex
+        );
     });
 
     test("should get MASTERVOLUME", () => {
         expect(musicBlocks.MASTERVOLUME).toBe(1.0);
+    });
+
+    describe("runCommand", () => {
+        beforeEach(() => {
+            musicBlocks.turtle.waitTime = 0;
+            musicBlocks.turtle.doWait = jest.fn();
+            MusicBlocks._methodList = {};
+        });
+
+        test("should execute _anonymous command with callback", async () => {
+            const callback = jest.fn();
+            await musicBlocks.runCommand("_anonymous", callback);
+            expect(callback).toHaveBeenCalled();
+        });
+
+        test("should handle _anonymous command with undefined args", async () => {
+            const result = await musicBlocks.runCommand("_anonymous", undefined);
+            expect(result).toBeUndefined();
+        });
+
+        test("should call method from _methodList with args", async () => {
+            const mockMethod = jest.fn().mockReturnValue("result");
+            global.TestActions = { testMethod: mockMethod };
+            MusicBlocks._methodList["TestActions"] = ["testMethod"];
+
+            await musicBlocks.runCommand("testMethod", ["arg1", "arg2"]);
+            expect(mockMethod).toHaveBeenCalledWith("arg1", "arg2");
+        });
+
+        test("should call method with no args when args is empty array", async () => {
+            const mockMethod = jest.fn().mockReturnValue(42);
+            global.TestActions = { noArgMethod: mockMethod };
+            MusicBlocks._methodList["TestActions"] = ["noArgMethod"];
+
+            const result = await musicBlocks.runCommand("noArgMethod", []);
+            expect(mockMethod).toHaveBeenCalledWith();
+            expect(result).toBe(42);
+        });
+
+        test("should reset turtle waitTime to 0 after command", async () => {
+            musicBlocks.turtle.waitTime = 500;
+            await musicBlocks.runCommand("_anonymous", undefined);
+            expect(musicBlocks.turtle.doWait).toHaveBeenCalledWith(0);
+        });
+
+        test("should use Painter when className is Painter", async () => {
+            const mockPainterMethod = jest.fn().mockReturnValue("painted");
+            musicBlocks.turtle.painter = { draw: mockPainterMethod };
+            MusicBlocks._methodList["Painter"] = ["draw"];
+
+            const result = await musicBlocks.runCommand("draw", []);
+            expect(mockPainterMethod).toHaveBeenCalled();
+            expect(result).toBe("painted");
+        });
     });
 });

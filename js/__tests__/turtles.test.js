@@ -24,9 +24,9 @@ global.createjs = {
         addChild: jest.fn(),
         removeAllChildren: jest.fn(),
         on: jest.fn(),
-        removeAllEventListeners: jest.fn(),
+        removeAllEventListeners: jest.fn()
     })),
-    Bitmap: jest.fn().mockImplementation(() => ({})),
+    Bitmap: jest.fn().mockImplementation(() => ({}))
 };
 
 global.importMembers = jest.fn();
@@ -46,7 +46,7 @@ global.Turtle = jest.fn().mockImplementation(() => ({
         doSetPensize: jest.fn(),
         doSetChroma: jest.fn(),
         doSetValue: jest.fn(),
-        doSetColor: jest.fn(),
+        doSetColor: jest.fn()
     },
     rename: jest.fn(),
     container: {
@@ -54,8 +54,8 @@ global.Turtle = jest.fn().mockImplementation(() => ({
         scaleY: 1,
         scale: 1,
         on: jest.fn(),
-        removeAllEventListeners: jest.fn(),
-    },
+        removeAllEventListeners: jest.fn()
+    }
 }));
 
 describe("Turtles Class", () => {
@@ -69,7 +69,7 @@ describe("Turtles Class", () => {
             turtleContainer: new createjs.Container(),
             hideAuxMenu: jest.fn(),
             hideGrids: jest.fn(),
-            _doCartesianPolar: jest.fn(),
+            _doCartesianPolar: jest.fn()
         };
 
         turtles = new Turtles(activityMock);
@@ -79,8 +79,8 @@ describe("Turtles Class", () => {
             container: {
                 scaleX: 1,
                 scaleY: 1,
-                scale: 1,
-            },
+                scale: 1
+            }
         }));
 
         turtles.pushTurtle = jest.fn();

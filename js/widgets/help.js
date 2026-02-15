@@ -73,7 +73,7 @@ class HelpWidget {
         // Which help page are we on?
 
         this._helpDiv.style.width = 100 + "%";
-        this._helpDiv.style.backgroundColor = "#e8e8e8";
+        // this._helpDiv.style.backgroundColor = "#e8e8e8";
 
         // this._helpDiv.style.maxHeight = "100%";
         // this._helpDiv.style.overflowY = "auto";
@@ -88,22 +88,24 @@ class HelpWidget {
         this._helpDiv.insertAdjacentHTML("afterbegin", innerHTML);
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
 
-
         let leftArrow, rightArrow;
         if (!useActiveBlock) {
             if (page == 0) {
                 this.widgetWindow.updateTitle(_("Take a tour"));
-            }
-            else {
+            } else {
                 this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
             }
             rightArrow = document.getElementById("right-arrow");
             rightArrow.style.display = "block";
             rightArrow.classList.add("hover");
+            rightArrow.setAttribute("title", _("Next"));
+            rightArrow.setAttribute("aria-label", _("Next"));
 
             leftArrow = document.getElementById("left-arrow");
             leftArrow.style.display = "block";
             leftArrow.classList.add("hover");
+            leftArrow.setAttribute("title", _("Previous"));
+            leftArrow.setAttribute("aria-label", _("Previous"));
 
             document.onkeydown = function handleArrowKeys(event) {
                 if (event.key === "ArrowLeft") {
@@ -123,8 +125,7 @@ class HelpWidget {
                     leftArrow.classList.remove("disabled");
                     if (page == 0) {
                         this.widgetWindow.updateTitle(_("Take a tour"));
-                    }
-                    else {
+                    } else {
                         this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
                     }
                     this._showPage(page);
@@ -137,27 +138,24 @@ class HelpWidget {
             cell = docById("right-arrow");
 
             cell.onclick = () => {
+                if (page >= HELPCONTENT.length - 1) {
+                    return;
+                }
+
                 page = page + 1;
                 leftArrow.classList.remove("disabled");
-                if (page === HELPCONTENT.length) {
-                    page = 0;
-                }
-                if (page == 0) {
-                    this.widgetWindow.updateTitle(_("Take a tour"));
-                }
-                else {
-                    this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
-                }
+
+                this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
                 this._showPage(page);
             };
         } else {
             if (this.activity.blocks.activeBlock.name !== null) {
-                const label = this.activity.blocks.blockList[this.activity.blocks.activeBlock]
-                    .protoblock.staticLabels[0];
+                const label =
+                    this.activity.blocks.blockList[this.activity.blocks.activeBlock].protoblock
+                        .staticLabels[0];
                 if (page == 0) {
                     this.widgetWindow.updateTitle(_("Take a tour"));
-                }
-                else {
+                } else {
                     this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
                 }
             }
@@ -165,10 +163,14 @@ class HelpWidget {
             rightArrow = document.getElementById("right-arrow");
             rightArrow.style.display = "none";
             rightArrow.classList.remove("hover");
+            rightArrow.setAttribute("title", _("Next"));
+            rightArrow.setAttribute("aria-label", _("Next"));
 
             leftArrow = document.getElementById("left-arrow");
             leftArrow.style.display = "none";
             leftArrow.classList.remove("hover");
+            leftArrow.setAttribute("title", _("Previous"));
+            leftArrow.setAttribute("aria-label", _("Previous"));
         }
 
         if (!useActiveBlock) {
@@ -181,8 +183,7 @@ class HelpWidget {
             if (this.activity.blocks.activeBlock.name !== null) {
                 const name = this.activity.blocks.blockList[this.activity.blocks.activeBlock].name;
 
-                const advIcon =
-                    `<a class="tooltipped"
+                const advIcon = `<a class="tooltipped"
                         data-toggle="tooltip"
                         title="This block is only available in advance mode"
                         data-position="bottom">
@@ -190,8 +191,7 @@ class HelpWidget {
                      </a>
                     `;
 
-                const findIcon =
-                    `<a class="tooltipped"
+                const findIcon = `<a class="tooltipped"
                         data-toggle="tooltip"
                         title="Show Palette containing the block"
                         data-position="bottom">
@@ -209,8 +209,9 @@ class HelpWidget {
                 // svg file, and an optional macro name for generating
                 // the help output.
 
-                const message = this.activity.blocks.blockList[this.activity.blocks.activeBlock]
-                    .protoblock.helpString;
+                const message =
+                    this.activity.blocks.blockList[this.activity.blocks.activeBlock].protoblock
+                        .helpString;
 
                 if (message) {
                     const helpBody = docById("helpBodyDiv");
@@ -252,7 +253,8 @@ class HelpWidget {
 
                     body += `<p>${message[0]}</p>`;
 
-                    const loadButtonHTML = '<i style="margin-right: 10px" id="loadButton" data-toggle="tooltip" title="Load this block" class="material-icons md-48">get_app</i>';
+                    const loadButtonHTML =
+                        '<i style="margin-right: 10px" id="loadButton" data-toggle="tooltip" title="Load this block" class="material-icons md-48">get_app</i>';
                     iconsContainer.insertAdjacentHTML("afterbegin", loadButtonHTML);
 
                     helpBody.insertAdjacentHTML("afterbegin", body);
@@ -264,7 +266,7 @@ class HelpWidget {
                         iconsContainer.insertAdjacentHTML("beforeend", advIcon);
                     }
 
-                    // append the icons container to the helpBodyDiv. It contains load, find and adv icons. 
+                    // append the icons container to the helpBodyDiv. It contains load, find and adv icons.
                     helpBody.append(iconsContainer);
 
                     const object = this.activity.blocks.palettes.getProtoNameAndPalette(name);
@@ -287,14 +289,19 @@ class HelpWidget {
                                 if (protoResult) {
                                     this.activity.blocks.palettes.dict[
                                         paletteName
-                                    ].makeBlockFromSearch(protoblk, protoName, (newBlock) => {
+                                    ].makeBlockFromSearch(protoblk, protoName, newBlock => {
                                         this.activity.blocks.moveBlock(newBlock, 100, 100);
                                     });
                                 }
                             } else if (typeof message[3] === "string") {
                                 // If it is a string, load the macro
                                 // assocuated with this block
-                                const blocksToLoad = getMacroExpansion(this.activity, message[3], 100, 100);
+                                const blocksToLoad = getMacroExpansion(
+                                    this.activity,
+                                    message[3],
+                                    100,
+                                    100
+                                );
                                 // console.debug("CLICK: " + blocksToLoad);
                                 this.activity.blocks.loadNewBlocks(blocksToLoad);
                             } else {
@@ -327,8 +334,13 @@ class HelpWidget {
         helpBody.innerHTML = "";
         const totalPages = HELPCONTENT.length;
         const pageCount = `${page + 1}/${totalPages}`;
+        const rightArrow = docById("right-arrow");
+        const leftArrow = docById("left-arrow");
 
-        // Previous HTML content is removed, and new one is generated. 
+        rightArrow.classList.toggle("disabled", page === HELPCONTENT.length - 1);
+        leftArrow.classList.toggle("disabled", page === 0);
+
+        // Previous HTML content is removed, and new one is generated.
         let body = "";
         if (
             [
@@ -345,8 +357,7 @@ class HelpWidget {
             body = `<figure>&nbsp;<img src=" ${HELPCONTENT[page][2]}" width="64px" height="64px"></figure>`;
         }
 
-        const helpContentHTML =
-            `<h1 class="heading">${HELPCONTENT[page][0]}</h1> 
+        const helpContentHTML = `<h1 class="heading">${HELPCONTENT[page][0]}</h1> 
          <p class="description">${HELPCONTENT[page][1]}</p>
          <p>${pageCount}</p>`;
 
@@ -364,22 +375,18 @@ class HelpWidget {
             cell.onclick = () => {
                 this._prepareBlockList();
             };
-        }
-        else {
+        } else {
             const cell = docById("right-arrow");
             const leftArrow = docById("left-arrow");
             cell.onclick = () => {
+                if (page >= HELPCONTENT.length - 1) {
+                    return;
+                }
+
                 page = page + 1;
                 leftArrow.classList.remove("disabled");
-                if (page === HELPCONTENT.length) {
-                    page = 0;
-                }
-                if (page == 0) {
-                    this.widgetWindow.updateTitle(_("Take a tour"));
-                }
-                else {
-                    this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
-                }
+
+                this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
                 this._showPage(page);
             };
             if (page === 0) {
@@ -391,8 +398,7 @@ class HelpWidget {
                     leftArrow.classList.remove("disabled");
                     if (page == 0) {
                         this.widgetWindow.updateTitle(_("Take a tour"));
-                    }
-                    else {
+                    } else {
                         this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
                     }
                     this._showPage(page);
@@ -405,7 +411,6 @@ class HelpWidget {
 
         helpBody.style.color = "#505050";
         helpBody.insertAdjacentHTML("afterbegin", body);
-
 
         this.widgetWindow.takeFocus();
     }
@@ -459,7 +464,7 @@ class HelpWidget {
 
         //this._helpDiv.style.width = "500px";
         this._helpDiv.style.height = "70vh";
-        this._helpDiv.style.backgroundColor = "#e8e8e8";
+        // this._helpDiv.style.backgroundColor = "#e8e8e8";
 
         const helpDivHTML =
             '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
@@ -499,8 +504,7 @@ class HelpWidget {
                 widgetWindow.clear();
                 this._helpDiv = document.createElement("div");
                 this._setup(false, HELPCONTENT.length - 1);
-            }
-            else {
+            } else {
                 this.index -= 1;
                 this._blockHelp(
                     this.activity.blocks.protoBlockDict[this.appendedBlockList[this.index]]
@@ -515,8 +519,7 @@ class HelpWidget {
         if (block.name !== null) {
             const name = block.name;
 
-            const advIcon =
-                `<a class="tooltipped"
+            const advIcon = `<a class="tooltipped"
                     data-toggle="tooltip"
                     title="This block is only available in advance mode"
                     data-position="bottom">
@@ -526,8 +529,7 @@ class HelpWidget {
                  </a>
                 `;
 
-            const findIcon =
-                `<a class="tooltipped"
+            const findIcon = `<a class="tooltipped"
                     data-toggle="tooltip"
                     title="Show Palette containing the block"
                     data-position="bottom">
@@ -545,7 +547,7 @@ class HelpWidget {
 
             const helpBody = docById("helpBodyDiv");
             helpBody.style.height = "70vh";
-            helpBody.style.backgroundColor = "#e8e8e8";
+            // helpBody.style.backgroundColor = "#e8e8e8";
             if (message) {
                 let body = "";
                 if (message.length > 1) {
@@ -593,7 +595,7 @@ class HelpWidget {
                     iconsContainer.insertAdjacentHTML("beforeend", advIcon);
                 }
 
-                // append the iconsContainer to the helpBodyDiv 
+                // append the iconsContainer to the helpBodyDiv
                 helpBody.append(iconsContainer);
 
                 const findIconMethod = docById("findIcon");
@@ -622,7 +624,7 @@ class HelpWidget {
                                 this.activity.blocks.palettes.dict[paletteName].makeBlockFromSearch(
                                     protoblk,
                                     protoName,
-                                    (newBlock) => {
+                                    newBlock => {
                                         this.activity.blocks.moveBlock(newBlock, 100, 100);
                                     }
                                 );
@@ -630,7 +632,12 @@ class HelpWidget {
                         } else if (typeof message[3] === "string") {
                             // If it is a string, load the macro
                             // assocuated with this block
-                            const blocksToLoad = getMacroExpansion(this.activity, message[3], 100, 100);
+                            const blocksToLoad = getMacroExpansion(
+                                this.activity,
+                                message[3],
+                                100,
+                                100
+                            );
                             // console.debug("CLICK: " + blocksToLoad);
                             this.activity.blocks.loadNewBlocks(blocksToLoad);
                         } else {

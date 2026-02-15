@@ -21,9 +21,8 @@
 */
 
 class LocalPlanet {
-
     constructor(Planet) {
-        this.Planet = Planet ;
+        this.Planet = Planet;
         this.CookieDuration = 3650;
         this.ProjectTable = null;
         this.projects = null;
@@ -38,12 +37,12 @@ class LocalPlanet {
         this.refreshProjectArray();
         this.initCards();
         this.renderAllProjects();
-    };
+    }
 
-    setCurrentProjectImage(image)  {
+    setCurrentProjectImage(image) {
         this.currentProjectImage = image;
         this.currentProjectID = this.Planet.ProjectStorage.getCurrentProjectID();
-    };
+    }
 
     refreshProjectArray() {
         this.projects = [];
@@ -51,23 +50,25 @@ class LocalPlanet {
         for (const project in this.ProjectTable) {
             // eslint-disable-next-line no-prototype-builtins
             if (this.ProjectTable.hasOwnProperty(project)) {
-                this.projects.push([project,null]);
+                this.projects.push([project, null]);
             }
         }
 
         this.projects.sort((a, b) => {
             // eslint-disable-next-line max-len
-            return this.ProjectTable[b[0]].DateLastModified - this.ProjectTable[a[0]].DateLastModified;
+            return (
+                this.ProjectTable[b[0]].DateLastModified - this.ProjectTable[a[0]].DateLastModified
+            );
         });
-    };
+    }
 
     initCards() {
         for (let i = 0; i < this.projects.length; i++) {
-            const Planet = this.Planet ;
+            const Planet = this.Planet;
             this.projects[i][1] = new LocalCard(Planet);
             this.projects[i][1].init(this.projects[i][0]);
         }
-    };
+    }
 
     renderAllProjects() {
         document.getElementById("local-projects").innerHTML = "";
@@ -75,19 +76,18 @@ class LocalPlanet {
         let index = -1;
         for (let i = 0; i < this.projects.length; i++) {
             this.projects[i][1].render();
-            if (this.projects[i][0] === this.currentProjectID)
-                index = i;
+            if (this.projects[i][0] === this.currentProjectID) index = i;
         }
 
-        if (index!=-1) {
+        if (index != -1) {
             const id = `local-project-image-${this.projects[index][0]}`;
             // eslint-disable-next-line no-console
             const cardimg = document.getElementById(id);
-            cardimg.src=this.currentProjectImage;
+            cardimg.src = this.currentProjectImage;
         }
 
-        jQuery(".tooltipped").tooltip({delay: 50});
-    };
+        jQuery(".tooltipped").tooltip({ delay: 50 });
+    }
 
     initDeleteModal() {
         const t = this;
@@ -101,41 +101,39 @@ class LocalPlanet {
                 }
             }
         );
-    };
+    }
 
-    openDeleteModal(id)  {
+    openDeleteModal(id) {
         this.DeleteModalID = id;
         const name = this.ProjectTable[id].ProjectName;
         document.getElementById("deleter-title").textContent = name;
         document.getElementById("deleter-name").textContent = name;
         jQuery("#deleter").modal("open");
-    };
+    }
 
     openProject(id) {
-        const Planet = this.Planet ;
+        const Planet = this.Planet;
         Planet.ProjectStorage.setCurrentProjectID(id);
         Planet.loadProjectFromData(this.ProjectTable[id].ProjectData);
-    };
+    }
 
     mergeProject(id) {
-        const Planet = this.Planet ;
+        const Planet = this.Planet;
         const d = this.ProjectStorage.getCurrentProjectData();
 
         if (d === null) {
             this.ProjectStorage.initialiseNewProject();
             Planet.loadProjectFromData(this.ProjectTable[id].ProjectData);
-        }
-        else Planet.loadProjectFromData(this.ProjectTable[id].ProjectData, true);
-    };
+        } else Planet.loadProjectFromData(this.ProjectTable[id].ProjectData, true);
+    }
 
     init() {
-        const Planet = this.Planet ;
+        const Planet = this.Planet;
 
         this.ProjectTable = Planet.ProjectStorage.data.Projects;
         this.refreshProjectArray();
         this.initDeleteModal();
         this.Publisher = new Publisher(Planet);
         this.Publisher.init();
-    };
-
+    }
 }
