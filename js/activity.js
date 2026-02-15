@@ -1976,15 +1976,19 @@ class Activity {
              * Handles the recording process.
              */
             function recording() {
-                start.addEventListener("click", async function handler() {
+                // Remove any previous handler to avoid multiple triggers
+                if (start._recordHandler) {
+                    start.removeEventListener("click", start._recordHandler);
+                }
+                const handler = async function handler() {
                     try {
                         const stream = await recordScreen();
                         const mimeType = "video/webm";
                         mediaRecorder = createRecorder(stream, mimeType);
                         if (flag == 1) {
-                            this.removeEventListener("click", handler);
+                            start.removeEventListener("click", handler);
                             // Add stop handler
-                            start.addEventListener("click", function stopHandler() {
+                            const stopHandler = function stopHandler() {
                                 if (mediaRecorder && mediaRecorder.state === "recording") {
                                     mediaRecorder.stop();
                                     mediaRecorder = new MediaRecorder(stream);
@@ -2000,10 +2004,11 @@ class Activity {
                                             .forEach(track => track.stop());
                                     }
                                 }
-                                this.removeEventListener("click", stopHandler);
+                                start.removeEventListener("click", stopHandler);
                                 // Re-enable recording for next time
                                 recording();
-                            });
+                            };
+                            start.addEventListener("click", stopHandler);
                         }
                         recInside.setAttribute("fill", "red");
                     } catch (error) {
@@ -2013,7 +2018,9 @@ class Activity {
                         // Re-enable recording button
                         recording();
                     }
-                });
+                };
+                start.addEventListener("click", handler);
+                start._recordHandler = handler;
             }
 
             // Start recording process if not already executing
