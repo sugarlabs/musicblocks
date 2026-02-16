@@ -293,4 +293,174 @@ describe("setupRhythmActions", () => {
 
         expect(value).toBe(0);
     });
+
+    describe("doTie", () => {
+        // Store original implementations to restore after tests
+        let originalGetMouseFromTurtle;
+        let originalIsRun;
+
+        beforeEach(() => {
+            // Store original values before each test
+            originalGetMouseFromTurtle = global.Mouse.getMouseFromTurtle;
+            originalIsRun = global.MusicBlocks.isRun;
+
+            targetTurtle.singer.tie = false;
+            targetTurtle.singer.tieNotePitches = [];
+            targetTurtle.singer.tieNoteExtras = [];
+            targetTurtle.singer.tieCarryOver = 0;
+            targetTurtle.singer.tieFirstDrums = [];
+            targetTurtle.singer.justCounting = [];
+            targetTurtle.singer.bpm = [];
+            activity.logo.notation = {
+                ...activity.logo.notation,
+                notationRemoveTie: jest.fn(),
+                notationStaging: { 0: [] }
+            };
+            activity.blocks.blockList = { 1: { name: "note" } };
+        });
+
+        afterEach(() => {
+            // Restore MusicBlocks.isRun to its default value
+            global.MusicBlocks.isRun = originalIsRun;
+
+            // Restore Mouse.getMouseFromTurtle to its original implementation
+            global.Mouse.getMouseFromTurtle = originalGetMouseFromTurtle;
+
+            // Clear Jest mocks to avoid state leakage across tests
+            jest.clearAllMocks();
+        });
+
+        it("initializes tie state correctly", () => {
+            Singer.RhythmActions.doTie(0, 1);
+
+            expect(targetTurtle.singer.tie).toBe(true);
+            expect(targetTurtle.singer.tieNotePitches).toEqual([]);
+            expect(targetTurtle.singer.tieNoteExtras).toEqual([]);
+            expect(targetTurtle.singer.tieCarryOver).toBe(0);
+            expect(targetTurtle.singer.tieFirstDrums).toEqual([]);
+        });
+
+        it("sets dispatch block when blk is in blockList", () => {
+            Singer.RhythmActions.doTie(0, 1);
+
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_tie_0");
+            expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                "_tie_0",
+                expect.any(Function)
+            );
+        });
+
+        it("adds listener to mouse when MusicBlocks.isRun and blk undefined", () => {
+            const mockMouse = { MB: { listeners: [] } };
+            global.MusicBlocks.isRun = true;
+            global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+
+            Singer.RhythmActions.doTie(0, undefined);
+
+            expect(mockMouse.MB.listeners).toContain("_tie_0");
+        });
+
+        it("cleans up tie state on listener when tieCarryOver is 0", () => {
+            let listener;
+            activity.logo.setTurtleListener = jest.fn((_, __, cb) => {
+                listener = cb;
+            });
+
+            Singer.RhythmActions.doTie(0, 1);
+
+            // Simulate some tie data that should be cleaned up
+            targetTurtle.singer.tieNotePitches = [["C", 4, 0, 0]];
+            targetTurtle.singer.tieNoteExtras = [1, [], [], [], []];
+            targetTurtle.singer.tieCarryOver = 0;
+
+            listener();
+
+            expect(targetTurtle.singer.tie).toBe(false);
+            expect(targetTurtle.singer.tieNotePitches).toEqual([]);
+            expect(targetTurtle.singer.tieNoteExtras).toEqual([]);
+        });
+
+        it("plays remaining note when tieCarryOver > 0", () => {
+            let listener;
+            activity.logo.setTurtleListener = jest.fn((_, __, cb) => {
+                listener = cb;
+            });
+
+            // Mock doWait on turtle
+            targetTurtle.doWait = jest.fn();
+
+            // Add saveBlk to blockList so listener can access blockList[saveBlk].name
+            activity.blocks.blockList[5] = { name: "note" };
+
+            // Call doTie first - this initializes state and captures the listener
+            Singer.RhythmActions.doTie(0, 1);
+
+            // Now set up the tieCarryOver state AFTER doTie (since doTie resets tieCarryOver to 0)
+            // The listener uses tur.singer.tieCarryOver which is a reference
+            targetTurtle.singer.inNoteBlock = [];
+            targetTurtle.singer.justCounting = [];
+            targetTurtle.singer.tieCarryOver = 2;
+            targetTurtle.singer.tieNotePitches = [["C", 4, 0, 261.63]];
+            targetTurtle.singer.tieNoteExtras = [
+                5, // saveBlk
+                ["sine"], // oscList
+                1, // noteBeat
+                [1], // noteBeatValues
+                [] // noteDrums
+            ];
+            targetTurtle.singer.bpm = [120];
+
+            listener();
+
+            expect(Singer.processNote).toHaveBeenCalled();
+            expect(targetTurtle.doWait).toHaveBeenCalled();
+            expect(targetTurtle.singer.tie).toBe(false);
+            expect(targetTurtle.singer.tieNotePitches).toEqual([]);
+            expect(targetTurtle.singer.tieNoteExtras).toEqual([]);
+        });
+
+        it("removes tie from notation when justCounting is empty and tieCarryOver > 0", () => {
+            let listener;
+            activity.logo.setTurtleListener = jest.fn((_, __, cb) => {
+                listener = cb;
+            });
+
+            // Add saveBlk to blockList so listener can access blockList[saveBlk].name
+            activity.blocks.blockList[5] = { name: "note" };
+
+            targetTurtle.doWait = jest.fn();
+
+            // Call doTie first
+            Singer.RhythmActions.doTie(0, 1);
+
+            // Set up state AFTER doTie (since doTie resets tieCarryOver to 0)
+            targetTurtle.singer.inNoteBlock = [2];
+            targetTurtle.singer.notePitches = { 2: ["C", "E"] };
+            targetTurtle.singer.justCounting = [];
+            targetTurtle.singer.tieCarryOver = 2;
+            targetTurtle.singer.tieNotePitches = [["C", 4, 0, 261.63]];
+            targetTurtle.singer.tieNoteExtras = [5, ["sine"], 1, [1], []];
+            targetTurtle.singer.bpm = [120];
+
+            listener();
+
+            expect(activity.logo.notation.notationRemoveTie).toHaveBeenCalledTimes(2);
+        });
+
+        it("does not add mouse listener when mouse is null", () => {
+            global.MusicBlocks.isRun = true;
+            global.Mouse.getMouseFromTurtle = jest.fn(() => null);
+
+            Singer.RhythmActions.doTie(0, undefined);
+
+            expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+            // Assert exact arguments passed to setTurtleListener
+            expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+                0, // turtle index
+                "_tie_0", // listener name
+                expect.any(Function) // callback
+            );
+        });
+    });
 });

@@ -101,6 +101,101 @@
         />
 
         <!-- libgif.js (SuperGif) provides low-level GIF frame extraction.
+
+
+<head>
+    <meta charset="UTF-8">
+    <title>Music Blocks</title>
+
+    <meta name="description"
+        content="Learn to code through music with Music Blocks. Arrange colorful blocks to create everything from simple melodies to interactive games.">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta id="theme-color" name="theme-color" content="#2196F3">
+
+    <!-- Icons & PWA -->
+    <link rel="icon" sizes="192x192" href="favicon.ico">
+    <link rel="apple-touch-icon" href="/activity/activity-icon-color-512.png">
+    <link rel="manifest" href="android_chrome_manifest.json">
+
+    <!-- Stylesheets -->
+    <link rel="preload" href="https://fonts.googleapis.com/icon?family=Material+Icons" as="style"
+        onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="fonts/material-icons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <!-- NOTE: The exact query-string URL here must be listed in sw.js `precacheFiles`.
+         If you change `?v=fixed` (or remove/add a query param), update sw.js so offline still works. -->
+    <link rel="preload" href="css/activities.css?v=fixed" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="dist/css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="dist/css/keyboard.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="dist/css/windows.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="lib/materialize-iso.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/darkmode.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="prefetch" as="video" href="loading-animation.webm" type="video/webm">
+    <link rel="prefetch" as="video" href="loading-animation.mp4" type="video/mp4">
+
+    <!-- <script src="js/utils/detectIE.js"></script> -->
+
+    <!-- <script src="sounds/samples/manifest.js"></script> -->
+
+    <!-- <script src="lib/mespeak.js"></script> -->
+
+    <script src="lib/reqwest.js" defer></script>
+
+    <script src="lib/jquery-3.7.1.min.js"></script>
+    <script src="lib/jquery-ui.js"></script>
+    <script src="lib/materialize.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script>
+        jQuery(document).ready(function () {
+            if (jQuery.ui && jQuery.ui.autocomplete) {
+                jQuery.fn.materializeAutocomplete = jQuery.fn.autocomplete;
+                jQuery.widget.bridge("autocomplete", jQuery.ui.autocomplete);
+            }
+        });
+    </script>
+    <script>
+        jQuery(document).ready(function () {
+            const fixAutocompletePosition = function () {
+                const $search = jQuery('#search');
+                if ($search.length && $search.data('ui-autocomplete')) {
+                    const instance = $search.autocomplete('instance');
+                    if (instance) {
+                        const originalRenderMenu = instance._renderMenu;
+                        instance._renderMenu = function (ul, items) {
+                            originalRenderMenu.call(this, ul, items);
+                            setTimeout(() => {
+                                const searchInput = document.querySelector('#search');
+                                const dropdown = ul[0];
+                                if (searchInput && dropdown) {
+                                    const rect = searchInput.getBoundingClientRect();
+                                    dropdown.style.position = 'fixed';
+                                    dropdown.style.left = rect.left + 'px';
+                                    dropdown.style.top = (rect.bottom + 2) + 'px';
+                                    dropdown.style.width = rect.width + 'px';
+                                }
+                            }, 0);
+                        };
+                    }
+                } else {
+                    setTimeout(fixAutocompletePosition, 500);
+                }
+            };
+            setTimeout(fixAutocompletePosition, 1000);
+        });
+    </script>
+    <script src="lib/Tone.js" defer></script>
+    <script src="lib/midi.js" defer></script>
+    <script src="lib/jquery.ruler.js" defer></script>
+    <script src="lib/modernizr-2.6.2.min.js" defer></script>
+    <script src="lib/raphael.min.js" defer></script>
+    <script src="lib/wheelnav.js" defer></script>
+    <script src="lib/abc.min.js" defer></script>
+    <script src="lib/codejar/codejar.min.js" defer></script>
+    <script src="lib/codejar/highlight.pack.js" defer></script>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+
+    <!-- libgif.js (SuperGif) provides low-level GIF frame extraction.
+
      Browsers expose only the first frame of a GIF; SuperGif lets us
      step through frames so animated GIFs can be drawn onto our canvas. -->
         <script src="https://cdn.jsdelivr.net/gh/buzzfeed/libgif-js/libgif.js" defer></script>
@@ -108,6 +203,7 @@
         <!-- gif-animator.js integrates SuperGif with Music Blocks. It manages
      decoding and drawing GIF frames onto the turtle's overlay canvas.
      Canvas refreshing is handled separately by CreateJS Ticker. -->
+
         <script src="js/gif-animator.js" defer></script>
         <script defer>
             document.addEventListener("DOMContentLoaded", function () {
@@ -232,6 +328,47 @@
                         </svg>
                     </div>
                 </a>
+
+    <script src="js/gif-animator.js" defer></script>
+    <script defer>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (window.hljs) hljs.highlightAll();
+        });
+    </script>
+    <script src="lib/astring.min.js" defer></script>
+
+    <script src="lib/acorn.min.js" defer></script>
+
+
+    <script data-main="js/loader" src="lib/require.js" defer></script>
+    <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
+    <link rel="preload" href="/fonts/material-icons.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="stylesheet" href="lib/materialize-iso.css">
+    <link rel="stylesheet" href="css/themes.css?v=fixed">
+    <script src="lib/easeljs.min.js" defer></script>
+    <script src="lib/tweenjs.min.js" defer></script>
+    <script>
+        let ast2blocklist_config;
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("js/js-export/ast2blocks.min.json")
+                .then(response => response.json())
+                .then(data => { ast2blocklist_config = data });
+        });
+    </script>
+</head>
+
+<body id="body" data-title="index" style="background: #f9f9f9;">
+    <!-- Fallback for browsers that don't support preload -->
+    <noscript>
+        JavaScript is required to view this page.
+    </noscript>
+    <header>
+        <div id="loading-image-container"
+            style="position: fixed; top: 0; left: 0; width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #FFFFFF; z-index: 9999; contain: paint;">
+            <div id="loading-media" style="width: 100%; padding: 0 20px; box-sizing: border-box;"></div>
+            <div class="loading-text" id="loadingText"
+                style="color:#333; margin-top: 2rem; min-height: 1.5em; font-size: 1.2rem;">
+
             </div>
         </header>
 
@@ -330,6 +467,52 @@
                             </div>
                         </div>
                     </div>
+
+                </div>
+
+                <canvas id="overlayCanvas" width="1200" height="900"
+                    style="position:absolute; pointer-events:none; left:0; top:0; z-index:-100; visibility:hidden;"></canvas>
+                <canvas id="myChart" width="600" height="600" tabindex="-1"></canvas>
+                <video id="camVideo" style="visibility:hidden;" tabindex="-1"></video>
+                <canvas id="camCanvas" style="visibility:hidden;" tabindex="-1"></canvas>
+
+                <div id="languageDiv" tabindex="-1"></div>
+                <div id="labelDiv" tabindex="-1"></div>
+                <div id="textLabel" tabindex="-1"></div>
+
+                <div id="ioDiv" style="display:none" tabindex="-1">
+                    <input class="file" type="file" id="myMedia" accept="image/*" tabindex="-1">
+                    <input class="file" type="file" id="myOpenFile" accept=".ta, .tb, .html,.mid,.midi" tabindex="-1">
+                    <input class="file" type="file" id="myOpenPlugin" accept=".json" tabindex="-1">
+                    <input class="file" type="file" id="audioInput" accept=".mp3, .wav" tabindex="-1">
+                    <input class="file" type="file" id="myOpenAll" tabindex="-1">
+                </div>
+            </div>
+            <!-- canvasHolder -->
+            <footer>
+                <div id="audio" tabindex="-1"></div>
+
+                <div id="tourData" tabindex="-1"></div>
+
+                <div id="popdown-palette" tabindex="-1"></div>
+
+                <div id="loader"></div>
+
+                <iframe src="planet/index.html" id="planet-iframe" style="display: none;"></iframe>
+
+                <div id="floatingWindows"></div>
+
+                <div id="helpElem" tabindex="-1"></div>
+
+                <div id="wheelDiv" class="wheelNav"
+                    style=" display: none; background-size: contain;background-image: url(./images/gray.svg)"
+                    tabindex="-1"></div>
+
+                <div id="wheelDiv2" class="wheelNav"
+                    style="display: none; background-size: contain;background-image: url(./images/gray.svg);visibility: hidden"
+                    tabindex="-1">
+                </div>
+
 
                     <canvas
                         id="overlayCanvas"
@@ -467,6 +650,7 @@
                         <input onkeypress="doPaste()" type="submit" value="" tabindex="-1" />
                     </div>
 
+
                     <div id="myProgress" tabindex="-1">
                         <div id="myBar" tabindex="-1"></div>
                     </div>
@@ -514,6 +698,140 @@
                                 </amp-img>
                             </div>
                             <ul class="main left">
+
+                <div id="myProgress" tabindex="-1">
+                    <div id="myBar" tabindex="-1"></div>
+                </div>
+            </footer>
+
+            <dialog id="lilypondModal" class="modal" tabindex="-1">
+                <!-- Modal content for Lilypond save dialog -->
+                <div class="modal-content" tabindex="-1">
+                    <span class="close">&times;</span>
+                    <div id="fileNameText"></div>
+                    <input type="text" id="fileName" tabindex="-1">
+                    <p></p>
+                    <div id="titleText"></div>
+                    <input type="text" id="title" tabindex="-1">
+                    <p></p>
+                    <div id="authorText"></div>
+                    <input type="text" id="author" tabindex="-1">
+                    <p></p>
+                    <div id="MIDIText"></div>
+                    <input type="checkbox" id="MIDICheck" tabindex="-1">
+                    <p></p>
+                    <div id="guitarText"></div>
+                    <input type="checkbox" id="guitarCheck" tabindex="-1">
+                    <p></p>
+                    <p><button class="confirm-button" id="submitLilypond"></button></p>
+                    <!-- <button id="submitPDF"></button></p> -->
+                </div>
+            </dialog>
+            <div class="materialize-iso" tabindex="-1">
+                <nav id="toolbars" class="nav-wrapper">
+                    <div class="blue nav-wrapper" tabindex="-1">
+                        <div id="mb-logo" class="logo left tooltipped"
+                            style="display: flex; align-items: center; line-height: 0; height: 100%; padding-right: 0;"
+                            data-position="bottom">
+                            <amp-img alt="MusicBlocks Logo" width="100%" src="images/logo.svg">
+                            </amp-img>
+                        </div>
+                        <ul class="main left">
+                            <li>
+                                <a id="play" class="left tooltipped"><i
+                                        class="material-icons main">play_circle_filled</i></a>
+                            </li>
+                            <li>
+                                <a id="stop" class="left tooltipped"><i class="material-icons main">stop</i></a>
+                            </li>
+                            <li>
+                                <a id="record" class="left tooltipped" data-tooltip="Record"></a>
+                            </li>
+                        </ul>
+
+                        <ul class="main right">
+                            <li>
+                                <a id="FullScreen" class="FullScreen tooltipped dropdown-trigger" data-position="bottom"
+                                    onclick="setIcon()">
+                                    <i class="material-icons" id="FullScrIcon">fullscreen</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="newFile" class="tooltipped dropdown-trigger" data-position="bottom"
+                                    data-activates="newdropdown">
+                                    <i class="material-icons md-48">note_add</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="load" class="tooltipped" data-position="bottom">
+                                    <i class="material-icons md-48">folder</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="saveButton" class="tooltipped dropdown-trigger" data-position="bottom"
+                                    data-activates="saveddropdownbeg">
+                                    <i id="save1" class="material-icons md-48">save_alt</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="saveButtonAdvanced" style="display: none;" class="tooltipped dropdown-trigger"
+                                    data-position="bottom" data-activates="saveddropdown">
+                                    <i id="save2" class="material-icons md-48">save_alt</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="planetIcon" class="tooltipped" data-position="bottom">
+                                    <i class="material-icons md-48">public</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a style="display: none;" id="planetIconDisabled" class="tooltipped"
+                                    data-position="bottom">
+                                    <i style="color: #a5acba;" class="material-icons md-48">public</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="toggleAuxBtn" class="tooltipped" data-position="bottom">
+                                    <i id="menu" class="animated-icon material-icons md-48">menu</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="helpIcon" class="tooltipped" data-position="bottom">
+                                    <i class="material-icons md-48">help</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="installButton" class="tooltipped hidden" data-position="bottom"
+                                    data-tooltip="Install App" aria-label="Install App">
+                                    <i class="material-icons md-48">file_download</i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="nav-wrapper" id="aux-toolbar" style="display: none;" tabindex="-1">
+                        <div class="blue darken-1 nav-wrapper" tabindex="-1">
+                            <ul class="aux left">
+                                <li>
+                                    <a id="runSlowlyIcon" class="tooltipped" data-position="bottom" data-delay="10">
+                                        <i class="material-icons md-48">play_circle_outline</i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a id="runStepByStepIcon" class="tooltipped" data-position="bottom" data-delay="10">
+                                        <i class="material-icons md-48">video_library</i>
+                                    </a>
+                                </li>
+                            </ul>
+                            <ul class="aux right">
+                                <li>
+                                    <a id="displayStatsIcon" class="tooltipped" data-position="bottom"
+                                        data-delay="10"><i class="material-icons md-48">poll</i></a>
+                                </li>
+                                <li>
+                                    <a id="loadPluginIcon" class="tooltipped" data-position="bottom" data-delay="10"><i
+                                            class="material-icons md-48">add_circle</i></a>
+                                </li>
+
                                 <li>
                                     <a id="play" class="left tooltipped"
                                         ><i class="material-icons main">play_circle_filled</i></a
@@ -581,9 +899,16 @@
                                     </a>
                                 </li>
                                 <li>
+
                                     <a id="planetIcon" class="tooltipped" data-position="bottom">
                                         <i class="material-icons md-48">public</i>
                                     </a>
+
+                                    <a id="restoreIcon" class="tooltipped" data-position="bottom"
+                                        data-tooltip="Restore"><i
+                                            class="material-icons md-48">restore_from_trash</i></a>
+                                    <div id="trashList"></div>
+
                                 </li>
                                 <li>
                                     <a
@@ -605,6 +930,7 @@
                                     </a>
                                 </li>
                                 <li>
+
                                     <a id="helpIcon" class="tooltipped" data-position="bottom">
                                         <i class="material-icons md-48">help</i>
                                     </a>
@@ -782,6 +1108,69 @@
                     <ul id="saveddropdownbeg" class="dropdown-content">
                         <li><a id="save-html-beg"></a></li>
                         <li><a id="save-png-beg"></a></li>
+
+                                    <a id="languageSelectIcon" class="tooltipped dropdown-trigger"
+                                        data-position="bottom" data-activates="languagedropdown"
+                                        data-tooltip="Select Language"><i class="material-icons md-48">translate</i></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+
+                <ul id="saveddropdownbeg" class="dropdown-content">
+                    <li><a id="save-html-beg"></a></li>
+                    <li><a id="save-png-beg"></a></li>
+                </ul>
+
+                <ul id="saveddropdown" class="dropdown-content">
+                    <li><a id="save-html"></a></li>
+                    <li><a id="save-midi"></a></li>
+                    <li><a id="save-svg"></a></li>
+                    <li><a id="save-png"></a></li>
+                    <li><a id="save-wav"></a></li>
+                    <li><a id="save-abc"> </a></li>
+                    <li><a id="save-ly"></a></li>
+                    <li><a id="save-mxml"></a></li>
+                    <li><a id="save-blockartwork-svg"></a></li>
+                    <li><a id="save-blockartwork-png"></a></li>
+                </ul>
+
+                <ul id="languagedropdown" class="dropdown-content">
+                    <li><a id="enUS"></a></li>
+                    <li><a id="enUK"></a></li>
+                    <li><a id="es"></a></li>
+                    <li><a id="pt"></a></li>
+                    <li><a id="ja"></a></li>
+                    <li><a id="kana"></a></li>
+                    <li><a id="ko"></a></li>
+                    <li><a id="zhCN"></a></li>
+                    <li><a id="th"></a></li>
+                    <li><a id="tr"></a></li>
+                    <li><a id="ayc"></a></li>
+                    <li><a id="quz"></a></li>
+                    <li><a id="gug"></a></li>
+                    <li><a id="hi"></a></li>
+                    <li><a id="te"></a></li>
+                    <li><a id="ibo"></a></li>
+                    <li><a id="ar"></a></li>
+                    <li><a id="bn"></a></li>
+                    <li><a id="he"></a></li>
+                    <li><a id="ur"></a></li>
+
+                </ul>
+
+                <ul style="display: none;" id="themedropdown" class="dropdown-content">
+                    <li><a id="light" class="tooltipped" data-tooltip="Light Mode"><i
+                                class='material-icons'>brightness_7</i></a></li>
+                    <li><a id="dark" class="tooltipped" data-tooltip="Dark Mode"><i
+                                class='material-icons'>brightness_4</i></a>
+                    </li>
+                </ul>
+
+                <div id="modal-container" style="display: none;z-index: 999;">
+                    <ul id="newdropdown" class="dropdown-content" style="padding: 24px;">
+
                     </ul>
 
                     <ul id="saveddropdown" class="dropdown-content">
@@ -838,6 +1227,7 @@
                 </div>
             </div>
 
+
             <div id="searchBar" tabindex="-1">
                 <input
                     type="text"
@@ -890,6 +1280,126 @@
                 const divInstall = document.getElementById("installButton");
                 if (divInstall) {
                     divInstall.classList.remove("hidden");
+
+        </div>
+
+        <div id="searchBar" tabindex="-1">
+            <input type="text" name="search" id="search" class="ui-autocomplete" placeholder="Search for Blocks"
+                tabindex="-1">
+            <ul class="matches" id="searchResults"></ul>
+        </div>
+    </main>
+
+    <!-- Initialize Scripts -->
+    <script>
+        let canvas, stage;
+        function init() {
+            // Defensive check: ensure createjs is loaded before using it
+            if (typeof createjs === "undefined") {
+                // Retry after a short delay if createjs isn't ready yet
+                setTimeout(init, 50);
+                return;
+            }
+
+            canvas = document.getElementById("canvas");
+            stage = new createjs.Stage(canvas);
+
+            createjs.Ticker.framerate = 60;
+            // createjs.Ticker.addEventListener("tick", stage); // Managed by Activity class
+        }
+        document.addEventListener("DOMContentLoaded", init);
+    </script>
+
+    <script>
+        // Register service worker only in production (not on localhost)
+        if ("serviceWorker" in navigator) {
+            // Detect if running on localhost for development
+            const isLocalDev = window.location.hostname === "localhost" ||
+                window.location.hostname === "127.0.0.1";
+            // Localhost SW is disabled to avoid caching; set allowLocalPwa to test installs.
+            const allowLocalPwa = localStorage.getItem("allowLocalPwa") === "true";
+
+            if (!isLocalDev || allowLocalPwa) {
+                // Production: Register service worker for offline mode
+                if (navigator.serviceWorker.controller) {
+                    console.debug(
+                        "[PWA Builder] Active service worker found, no need to register"
+                    );
+                } else {
+                    // Register the service worker
+                    navigator.serviceWorker
+                        .register("/sw.js")
+                        .then(function (reg) {
+                            console.debug(
+                                "[PWA Builder] Service worker registered for scope: " +
+                                reg.scope
+                            );
+                        })
+                        .catch(function (err) {
+                            console.error("[PWA Builder] Service worker registration failed:", err);
+                        });
+                }
+            } else {
+                // Development: Skip service worker for instant updates
+                console.log(
+                    "🔥 [DEV MODE] Service worker disabled on localhost for instant code updates"
+                );
+                console.log(
+                    "Set localStorage.allowLocalPwa = 'true' to enable PWA install testing on localhost."
+                );
+            }
+        }
+    </script>
+    <script>
+        let deferredPrompt;
+
+        window.addEventListener("beforeinstallprompt", (event) => {
+            event.preventDefault(); // Prevent automatic browser prompt
+            deferredPrompt = event;
+
+            // Show the install button
+            const installButton = document.getElementById("installButton");
+            if (installButton) {
+                installButton.classList.remove("hidden");
+            }
+        });
+
+        // Handle install button click
+        document.addEventListener("DOMContentLoaded", function () {
+            const installButton = document.getElementById("installButton");
+            if (installButton) {
+                installButton.addEventListener("click", async function () {
+                    if (deferredPrompt) {
+                        // Show the install prompt
+                        deferredPrompt.prompt();
+                        
+                        // Wait for user choice
+                        const { outcome } = await deferredPrompt.userChoice;
+                        console.log(`User response to the install prompt: ${outcome}`);
+                        
+                        // Clear the deferredPrompt
+                        deferredPrompt = null;
+                        
+                        // Hide the button
+                        installButton.classList.add("hidden");
+                    }
+                });
+            }
+        });
+    </script>
+
+    <!-- Loading Dialog Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let loadL10nSplashScreen = function () {
+                console.debug("The browser is set to " + navigator.language);
+                let lang = navigator.language;
+                if (localStorage.languagePreference) {
+                    console.debug(
+                        "Music Blocks is set to " + localStorage.languagePreference
+                    );
+                    lang = localStorage.languagePreference;
+
                 }
             });
         </script>
@@ -915,10 +1425,17 @@
                         console.debug("Reverting to " + lang);
                     }
 
+
                     const container = document.getElementById("loading-media");
                     const content = lang.startsWith("ja")
                         ? `<img src="loading-animation-ja.svg" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
                         : `<video loop autoplay muted playsinline fetchpriority="high" style="width: 90%; height: 100%; object-fit: contain;">
+
+                const container = document.getElementById("loading-media");
+                const content = lang.startsWith("ja")
+                    ? `<img src="loading-animation-ja.png" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
+                    : `<video loop autoplay muted playsinline fetchpriority="high" style="width: 90%; height: 100%; object-fit: contain;">
+
                         <source src="loading-animation.webm" type="video/webm">
                         <source src="loading-animation.mp4" type="video/mp4">
                        </video>`;
@@ -1011,6 +1528,99 @@
                 });
             });
 
+        });
+
+        let isDragging = false;
+    </script>
+
+    <script>
+        var elem = document.documentElement;
+
+        function openFullscreen() {
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            } else if (elem.mozRequestFullscreen) {
+                elem.mozRequestFullscreen();
+            }
+        }
+
+        function closeFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            } else if (document.mozExitFullscreen) {
+                document.mozExitFullscreen();
+            }
+        }
+
+        function setIcon() {
+            var iconCode = document.querySelector('#FullScrIcon');
+            // Determine fullscreen state using the browser fullscreen API
+            // instead of relying on a manual counter. This keeps the icon
+            // in sync when fullscreen is exited via ESC or browser controls.
+            var isFullscreen =
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
+
+            if (!isFullscreen) {
+                openFullscreen();
+                iconCode.textContent = '\ue5d1'; // fullscreen_exit icon
+            } else {
+                closeFullscreen();
+                iconCode.textContent = '\ue5d0'; // fullscreen icon
+            }
+        }
+
+        function handleFullscreenChange() {
+            var iconCode = document.querySelector('#FullScrIcon');
+            // Update fullscreen icon based on actual fullscreen state.
+            // This removes the need for a separate state variable and
+            // prevents incorrect icon state when fullscreen is toggled
+            // outside the button (e.g., ESC key).
+            var isFullscreen =
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
+
+            iconCode.textContent = isFullscreen ? '\ue5d1' : '\ue5d0';
+        }
+
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+    </script>
+
+    <style>
+        #installButton.hidden {
+            display: none !important;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let persistentNotification = null;
+
+            function showPersistentNotification() {
+                if (!persistentNotification) {
+                    persistentNotification = document.createElement("div");
+                    persistentNotification.id = "persistentNotification";
+                    persistentNotification.innerHTML = "Play only mode enabled. For full Music Blocks experience, use a larger display.";
+                    document.body.appendChild(persistentNotification);
+                }
+            }
+
+
             let isDragging = false;
         </script>
 
@@ -1061,6 +1671,7 @@
                     count = 0;
                 }
             }
+
             document.addEventListener("fullscreenchange", handleFullscreenChange);
             document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
             document.addEventListener("mozfullscreenchange", handleFullscreenChange);
@@ -1105,6 +1716,37 @@
                     if (elem) {
                         elem.style.display = "none";
                     }
+
+            function togglePlayOnlyMode() {
+                const isSmallScreen = (window.innerWidth < 768) || (window.innerHeight < 600);
+                const body = document.body;
+                const homeButton = document.getElementById("Home [HOME]");
+                const buttonContainer = document.getElementById("buttoncontainerBOTTOM");
+
+                if (isSmallScreen) {
+                    // Enable play-only mode
+                    body.classList.add("play-only");
+                    showPersistentNotification();
+
+                    // Hide certain elements
+                    hideElementById("Show/hide blocks");
+                    hideElementById("Expand/collapse blocks");
+                    hideElementById("Decrease block size");
+                    hideElementById("Increase block size");
+                    hideElementById("grid");
+                    hideElementById("palette");
+                } else {
+                    // Disable play-only mode
+                    body.classList.remove("play-only");
+                    removePersistentNotification();
+
+                    showElementById("Show/hide blocks");
+                    showElementById("Expand/collapse blocks");
+                    showElementById("Decrease block size");
+                    showElementById("Increase block size");
+                    showElementById("grid");
+                    showElementById("palette");
+
                 }
 
                 function showElementById(elementId) {

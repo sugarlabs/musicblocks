@@ -34,39 +34,7 @@
    NOTATIONSTACCATO
  */
 
-const DEFAULTVOLUME = 50;
-const PREVIEWVOLUME = 80;
-const DEFAULTDELAY = 500; // milliseconds
-// The oscillator runs hot. We must scale back its volume.
-const OSCVOLUMEADJUSTMENT = 1.5;
-
-const TONEBPM = 240; // seems to be the default
-const TARGETBPM = 90; // what we'd like to use for beats per minute
-const TURTLESTEP = -1; // run in step-by-step mode
-const NOTEDIV = 8; // number of steps to divide turtle graphics
-
-// These error messages don't need translation since they are
-// converted into artwork w/o text.
-const NOMICERRORMSG = "The microphone is not available.";
-const NANERRORMSG = "Not a number.";
-const NOSTRINGERRORMSG = "Not a string.";
-const NOBOXERRORMSG = "Cannot find box";
-const NOACTIONERRORMSG = "Cannot find action.";
-const NOINPUTERRORMSG = "Missing argument.";
-const NOSQRTERRORMSG = "Cannot take square root of negative number.";
-const ZERODIVIDEERRORMSG = "Cannot divide by zero.";
-const EMPTYHEAPERRORMSG = "empty heap.";
-const POSNUMBER = "Argument must be a positive number";
-
-const INVALIDPITCH = _("Not a valid pitch name");
-
-const NOTATIONNOTE = 0;
-const NOTATIONDURATION = 1;
-const NOTATIONDOTCOUNT = 2;
-const NOTATIONTUPLETVALUE = 3;
-const NOTATIONROUNDDOWN = 4;
-const NOTATIONINSIDECHORD = 5; // deprecated
-const NOTATIONSTACCATO = 6;
+// Constants moved to js/logoconstants.js to resolve circular dependency
 
 /**
  * @class
@@ -100,9 +68,97 @@ class Queue {
 class Logo {
     /**
      * @constructor
+     * @param {Object|LogoDependencies} activityOrDeps - Either an Activity object (old pattern)
+     *                                                    or a LogoDependencies object (new pattern)
+     *
+     * @example
+     * // Old pattern (still supported)
+     * const logo = new Logo(activity);
+     *
+     * @example
+     * // New pattern (explicit dependencies)
+     * const deps = new LogoDependencies({
+     *     blocks: activity.blocks,
+     *     turtles: activity.turtles,
+     *     // ... other dependencies
+     * });
+     * const logo = new Logo(deps);
      */
-    constructor(activity) {
-        this.activity = activity;
+    constructor(activityOrDeps) {
+        // Support both old Activity pattern and new LogoDependencies pattern
+        // Check if this is a LogoDependencies instance by looking for the characteristic structure
+        const isExplicitDeps =
+            activityOrDeps &&
+            activityOrDeps.blocks &&
+            activityOrDeps.turtles &&
+            activityOrDeps.stage &&
+            activityOrDeps.errorHandler;
+
+        if (isExplicitDeps) {
+            // New pattern: explicit dependencies
+            this.deps = activityOrDeps;
+            // For backward compatibility, also set activity to point to deps
+            // This allows gradual migration of code
+            const deps = this.deps; // Capture for closure
+            this.activity = {
+                blocks: deps.blocks,
+                turtles: deps.turtles,
+                stage: deps.stage,
+                errorMsg: deps.errorHandler,
+                hideMsgs: deps.messageHandler.hide,
+                saveLocally: deps.storage.saveLocally,
+                get showBlocksAfterRun() {
+                    return deps.config.showBlocksAfterRun;
+                },
+                set showBlocksAfterRun(value) {
+                    deps.config.showBlocksAfterRun = value;
+                },
+                onStopTurtle: deps.callbacks.onStopTurtle,
+                onRunTurtle: deps.callbacks.onRunTurtle,
+                meSpeak: deps.meSpeak,
+                logo: this // Self-reference for compatibility
+            };
+        } else {
+            // Old pattern: Activity facade
+            this.activity = activityOrDeps;
+            // Create deps as a view over activity for future migration
+            this.deps = {
+                blocks: this.activity.blocks,
+                turtles: this.activity.turtles,
+                stage: this.activity.stage,
+                errorHandler: (msg, blk) => this.activity.errorMsg(msg, blk),
+                messageHandler: {
+                    hide: () => this.activity.hideMsgs()
+                },
+                storage: {
+                    saveLocally: () => this.activity.saveLocally()
+                },
+                config: {
+                    get showBlocksAfterRun() {
+                        return this.activity.showBlocksAfterRun;
+                    },
+                    set showBlocksAfterRun(value) {
+                        this.activity.showBlocksAfterRun = value;
+                    }
+                },
+                callbacks: {
+                    get onStopTurtle() {
+                        return this.activity.onStopTurtle;
+                    },
+                    get onRunTurtle() {
+                        return this.activity.onRunTurtle;
+                    }
+                },
+                meSpeak: this.activity.meSpeak
+            };
+        }
+
+        // Bind commonly-used dependencies locally for readability
+        // This reduces verbosity while maintaining explicit dependency injection
+        this.blocks = this.deps.blocks;
+        this.turtles = this.deps.turtles;
+        this.stage = this.deps.stage;
+
         this.blockList = this.activity.blocks.blockList;
         this._onStopTurtle = this.activity.onStopTurtle;
         this._onRunTurtle = this.activity.onRunTurtle;
@@ -162,6 +218,7 @@ class Logo {
 
         this.time = 0;
         this.firstNoteTime = null;
+        this.firstNoteAudioTime = null;
         this._turtleDelay = 0;
         this.sounds = [];
         this.cameraID = null;
@@ -233,6 +290,7 @@ class Logo {
 
         // Load the default synthesizer
         this.synth = new Synth();
+        this.synth.activity = this.activity; // Reference for voice tracking
         this.synth.changeInTemperament = false;
 
         // Mode widget
@@ -387,7 +445,9 @@ class Logo {
         }
 
         for (const turtle in this.activity.turtles.turtleList) {
-            for (const synth in this.activity.turtles.ithTurtle(turtle).singer.synthVolume) {
+            // Cache ithTurtle result to avoid redundant function calls in inner loop
+            const tur = this.activity.turtles.ithTurtle(turtle);
+            for (const synth in tur.singer.synthVolume) {
                 Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
             }
         }
@@ -406,7 +466,9 @@ class Logo {
 
         Singer.setMasterVolume(this.activity.logo, DEFAULTVOLUME);
         for (const turtle in this.activity.turtles.turtleList) {
-            for (const synth in this.activity.turtles.ithTurtle(turtle).singer.synthVolume) {
+            // Cache ithTurtle result to avoid redundant function calls in inner loop
+            const tur = this.activity.turtles.ithTurtle(turtle);
+            for (const synth in tur.singer.synthVolume) {
                 Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
             }
         }
@@ -465,8 +527,8 @@ class Logo {
             if (new RegExp("^[A-Za-z,. ]$").test(text[i])) new_text += text[i];
         }
 
-        if (this.meSpeak !== null) {
-            this.meSpeak.speak(new_text);
+        if (this._meSpeak) {
+            this._meSpeak.speak(new_text);
         }
     }
 
@@ -681,9 +743,8 @@ class Logo {
                     ) {
                         logo.statusFields.push([blk, "color"]);
                     } else {
-                        logo.blockList[blk].value = logo.activity.turtles.getTurtle(
-                            turtle
-                        ).painter.color;
+                        logo.blockList[blk].value =
+                            logo.activity.turtles.getTurtle(turtle).painter.color;
                     }
                     break;
 
@@ -942,7 +1003,13 @@ class Logo {
 
         this.sounds = [];
 
+        // Kill all active audio voices to prevent "zombie audio"
         for (const turtle in this.activity.turtles.turtleList) {
+            const tur = this.activity.turtles.getTurtle(turtle);
+            if (tur && tur.singer && typeof tur.singer.killAllVoices === "function") {
+                tur.singer.killAllVoices();
+            }
+
             for (const instrumentName in instruments[turtle]) {
                 this.synth.stopSound(turtle, instrumentName);
             }
@@ -1044,6 +1111,7 @@ class Logo {
         // Run the Logo commands here.
         this.time = new Date().getTime();
         this.firstNoteTime = null;
+        this.firstNoteAudioTime = null;
 
         // Ensure we have at least one turtle.
         if (this.activity.turtles.getTurtleCount() === 0) {
@@ -1130,7 +1198,8 @@ class Logo {
         this.activity.blocks.findStacks();
         this.actions = {};
 
-        for (let blk = 0; blk < this.activity.blocks.stackList.length; blk++) {
+        const stackListLength = this.activity.blocks.stackList.length;
+        for (let blk = 0; blk < stackListLength; blk++) {
             if (
                 ["start", "drum", "status", "oscilloscope"].includes(
                     this.blockList[this.activity.blocks.stackList[blk]].name
@@ -1217,8 +1286,9 @@ class Logo {
             this.runFromBlock(this, turtle, startHere, 0, env);
         } else if (startBlocks.length > 0) {
             let delayStart = 0;
+            const startBlocksLength = startBlocks.length;
             // Look for status and oscilloscope blocks.
-            for (let b = 0; b < startBlocks.length; b++) {
+            for (let b = 0; b < startBlocksLength; b++) {
                 if (
                     ["status", "oscilloscope"].includes(this.blockList[startBlocks[b]].name) &&
                     !this.blockList[startBlocks[b]].trash
@@ -1245,7 +1315,7 @@ class Logo {
                 }
 
                 // If there are multiple start blocks, run them all.
-                for (let b = 0; b < startBlocks.length; b++) {
+                for (let b = 0; b < startBlocksLength; b++) {
                     if (!["status", "oscilloscope"].includes(this.blockList[startBlocks[b]].name)) {
                         const turtle = this.blockList[startBlocks[b]].value;
                         const tur = this.activity.turtles.ithTurtle(turtle);
@@ -1651,7 +1721,8 @@ class Logo {
             if (!logo._prematureRestart) {
                 // Make sure any unissued signals are dispatched.
                 for (const b in tur.endOfClampSignals) {
-                    for (let i = 0; i < tur.endOfClampSignals[b].length; i++) {
+                    const signalsLength = tur.endOfClampSignals[b].length;
+                    for (let i = 0; i < signalsLength; i++) {
                         if (tur.endOfClampSignals[b][i] != null) {
                             if (
                                 tur.butNotThese[b] == null ||
@@ -2259,8 +2330,9 @@ class Logo {
             }
         };
 
+        const embeddedGraphicsLength = tur.singer.embeddedGraphics[blk].length;
         let extendedGraphicsCounter = 0;
-        for (let i = 0; i < tur.singer.embeddedGraphics[blk].length; i++) {
+        for (let i = 0; i < embeddedGraphicsLength; i++) {
             const b = tur.singer.embeddedGraphics[blk][i];
             switch (this.blockList[b].name) {
                 case "forward":
@@ -2303,7 +2375,7 @@ class Logo {
             tur.singer.dispatchFactor = NOTEDIV;
         }
 
-        for (let i = 0; i < tur.singer.embeddedGraphics[blk].length; i++) {
+        for (let i = 0; i < embeddedGraphicsLength; i++) {
             const b = tur.singer.embeddedGraphics[blk][i];
             const name = this.blockList[b].name;
 
@@ -2412,34 +2484,60 @@ class Logo {
     }
 }
 
+// Export Logo
+if (typeof define === "function" && define.amd) {
+    define([], function () {
+        return Logo;
+    });
+}
+
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = {
-        Queue,
-        Logo,
-        DEFAULTVOLUME,
-        PREVIEWVOLUME,
-        DEFAULTDELAY,
-        OSCVOLUMEADJUSTMENT,
-        TONEBPM,
-        TARGETBPM,
-        TURTLESTEP,
-        NOTEDIV,
-        NOMICERRORMSG,
-        NANERRORMSG,
-        NOSTRINGERRORMSG,
-        NOBOXERRORMSG,
-        NOACTIONERRORMSG,
-        NOINPUTERRORMSG,
-        NOSQRTERRORMSG,
-        ZERODIVIDEERRORMSG,
-        EMPTYHEAPERRORMSG,
-        POSNUMBER,
-        NOTATIONNOTE,
-        NOTATIONDURATION,
-        NOTATIONDOTCOUNT,
-        NOTATIONTUPLETVALUE,
-        NOTATIONROUNDDOWN,
-        NOTATIONINSIDECHORD,
-        NOTATIONSTACCATO
-    };
+    let exportsObj = { Logo, Queue };
+
+    // In Node.js / Jest environment, we need to include constants
+    if (typeof DEFAULTVOLUME === "undefined") {
+        try {
+            const constants = require("./logoconstants");
+            Object.assign(global, constants);
+            Object.assign(exportsObj, constants);
+        } catch (e) {
+            // Ignore
+        }
+    } else {
+        // If they are already global (e.g. via logoconstants.js loaded before)
+        exportsObj = Object.assign(exportsObj, {
+            DEFAULTVOLUME,
+            PREVIEWVOLUME,
+            DEFAULTDELAY,
+            OSCVOLUMEADJUSTMENT,
+            TONEBPM,
+            TARGETBPM,
+            TURTLESTEP,
+            NOTEDIV,
+            NOMICERRORMSG,
+            NANERRORMSG,
+            NOSTRINGERRORMSG,
+            NOBOXERRORMSG,
+            NOACTIONERRORMSG,
+            NOINPUTERRORMSG,
+            NOSQRTERRORMSG,
+            ZERODIVIDEERRORMSG,
+            EMPTYHEAPERRORMSG,
+            POSNUMBER,
+            NOTATIONNOTE,
+            NOTATIONDURATION,
+            NOTATIONDOTCOUNT,
+            NOTATIONTUPLETVALUE,
+            NOTATIONROUNDDOWN,
+            NOTATIONINSIDECHORD,
+            NOTATIONSTACCATO
+        });
+    }
+
+    module.exports = exportsObj;
+}
+
+if (typeof window !== "undefined") {
+    window.Logo = Logo;
+    window.Queue = Queue;
 }

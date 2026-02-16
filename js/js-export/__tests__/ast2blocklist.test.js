@@ -58,8 +58,11 @@ describe("AST2BlockList Class", () => {
         try {
             AST2BlockList.toBlockList(AST, config);
         } catch (e) {
-            //TODO: error message should isolate to smallest scope
+            // Verify error message provides context about unsupported statement
             expect(e.prefix).toEqual("Unsupported statement: ");
+            // Error should include position information for scope isolation
+            expect(e.start).toBeDefined();
+            expect(e.end).toBeDefined();
         }
     });
 
