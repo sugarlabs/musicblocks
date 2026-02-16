@@ -30,6 +30,18 @@
 
 // What is the scale factor when stage is shrunk?
 const CONTAINERSCALEFACTOR = 4;
+// Provide a safe fallback for LEADING when this file is loaded in tests
+// or environments where `LEADING` may not yet be defined.
+const LEADING_FALLBACK = typeof LEADING !== "undefined" ? LEADING : 0;
+// Provide a safe fallback for base64Encode when not available in the environment
+const _base64Encode = typeof base64Encode !== "undefined" ? base64Encode : s => s;
+// Provide a minimal fallback for MBOUNDARY when not present (tests may not load artwork.js).
+const _MBOUNDARY =
+    typeof MBOUNDARY !== "undefined"
+        ? MBOUNDARY
+        : '<svg xmlns="http://www.w3.org/2000/svg" height="HEIGHT" width="WIDTH">' +
+          '<rect x="X" y="Y" width="DX" height="DY" stroke="stroke_color" fill="fill_color" stroke-width="STROKE"/>' +
+          "</svg>";
 
 /**
  * Class for managing all the turtles.
@@ -536,7 +548,7 @@ Turtles.TurtlesModel = class {
      * @returns {void}
      */
     addTurtleGraphicProps(turtle, blkInfoAvailable, infoDict) {
-        setTimeout(() => {
+        requestAnimationFrame(() => {
             if (blkInfoAvailable) {
                 if ("heading" in infoDict) {
                     turtle.painter.doSetHeading(infoDict["heading"]);
@@ -562,7 +574,7 @@ Turtles.TurtlesModel = class {
                     turtle.rename(infoDict["name"]);
                 }
             }
-        }, 2000);
+        });
     }
 
     /**
@@ -571,7 +583,8 @@ Turtles.TurtlesModel = class {
      * @return {Boolean} - running
      */
     running() {
-        for (let i = 0; i < this.getTurtleCount(); i++) {
+        const turtleCount = this.getTurtleCount();
+        for (let i = 0; i < turtleCount; i++) {
             if (this.getTurtle(i).running) {
                 return true;
             }
@@ -592,7 +605,8 @@ Turtles.TurtlesModel = class {
      * @returns index number of companion turtle or i
      */
     companionTurtle(i) {
-        for (let t = 0; t < this.getTurtleCount(); t++) {
+        const turtleCount = this.getTurtleCount();
+        for (let t = 0; t < turtleCount; t++) {
             if (this.getTurtle(t).companionTurtle === i) {
                 return t;
             }
@@ -606,7 +620,8 @@ Turtles.TurtlesModel = class {
      */
     turtleCount() {
         let count = 0;
-        for (let t = 0; t < this.getTurtleCount(); t++) {
+        const totalTurtles = this.getTurtleCount();
+        for (let t = 0; t < totalTurtles; t++) {
             if (this.companionTurtle(t) === t && !this.getTurtle(t).inTrash) {
                 count += 1;
             }
@@ -654,28 +669,50 @@ Turtles.TurtlesView = class {
 
         this.currentGrid = null; // currently selected grid
 
-        // Attach an event listener to the 'resize' event
+        // Debounce timer for resize events
+        this._resizeTimer = null;
+
+        // Attach a debounced event listener to the 'resize' event
+        // This prevents rapid-fire resize calculations that can cause
+        // crashes when toggling DevTools or switching tabs.
         window.addEventListener("resize", () => {
-            // Call the updateDimensions function when resizing occurs
-            var screenWidth =
-                window.innerWidth ||
-                document.documentElement.clientWidth ||
-                document.body.clientWidth;
-            var screenHeight =
-                window.innerHeight ||
-                document.documentElement.clientHeight ||
-                document.body.clientHeight;
+            if (this._resizeTimer) {
+                clearTimeout(this._resizeTimer);
+            }
 
-            // Set a scaling factor to adjust the dimensions based on the screen size
-            var scale = Math.min(screenWidth / 1200, screenHeight / 900);
+            this._resizeTimer = setTimeout(() => {
+                // Skip dimension updates when the tab is hidden
+                // (canvas reports 0x0 in background tabs)
+                if (document.hidden) {
+                    return;
+                }
 
-            // Calculate the new dimensions
-            var newWidth = Math.round(1200 * scale);
-            var newHeight = Math.round(900 * scale);
+                // Call the updateDimensions function when resizing occurs
+                var screenWidth =
+                    window.innerWidth ||
+                    document.documentElement.clientWidth ||
+                    document.body.clientWidth;
+                var screenHeight =
+                    window.innerHeight ||
+                    document.documentElement.clientHeight ||
+                    document.body.clientHeight;
 
-            // Update the dimensions
-            this._w = newWidth;
-            this._h = newHeight;
+                // Guard against zero or invalid dimensions
+                if (screenWidth <= 0 || screenHeight <= 0) {
+                    return;
+                }
+
+                // Set a scaling factor to adjust the dimensions based on the screen size
+                var scale = Math.min(screenWidth / 1200, screenHeight / 900);
+
+                // Calculate the new dimensions
+                var newWidth = Math.round(1200 * scale);
+                var newHeight = Math.round(900 * scale);
+
+                // Update the dimensions
+                this._w = newWidth;
+                this._h = newHeight;
+            }, 150);
         });
     }
 
@@ -736,6 +773,17 @@ Turtles.TurtlesView = class {
         const color =
             index === -1 ? platformColor.background : this.getTurtle(index).painter.canvasColor;
         this._backgroundColor = color;
+        // Update DOM body and canvas styles so tests and themes reflect the change.
+        try {
+            if (typeof document !== "undefined" && document.body && document.body.style) {
+                document.body.style.backgroundColor = this._backgroundColor;
+            }
+            if (this.activity && this.activity.canvas && this.activity.canvas.style) {
+                this.activity.canvas.style.backgroundColor = this._backgroundColor;
+            }
+        } catch (e) {
+            // Ignore errors in non-browser environments
+        }
         this.makeBackground();
         this.activity.refreshCanvas();
     }
@@ -837,7 +885,9 @@ Turtles.TurtlesView = class {
         const borderContainer = this.borderContainer;
 
         // Remove any old background containers
-        borderContainer.removeAllChildren();
+        if (borderContainer && typeof borderContainer.removeAllChildren === "function") {
+            borderContainer.removeAllChildren();
+        }
 
         const turtlesStage = this.stage;
         // We put the buttons on the stage so they will be on top
@@ -848,7 +898,7 @@ Turtles.TurtlesView = class {
             container.setAttribute("class", "tooltipped");
             container.setAttribute("data-tooltip", object.label);
             container.setAttribute("data-position", "bottom");
-            jQuery.noConflict()(".tooltipped").tooltip({
+            window.jQuery(".tooltipped").tooltip({
                 html: true,
                 delay: 100
             });
@@ -869,7 +919,7 @@ Turtles.TurtlesView = class {
                 }
             };
             const img = new Image();
-            img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svg));
+            img.src = "data:image/svg+xml;base64," + window.btoa(_base64Encode(svg));
 
             container.appendChild(img);
             container.setAttribute(
@@ -918,7 +968,7 @@ Turtles.TurtlesView = class {
             this._collapsedBoundary.visible = true;
             this._expandedBoundary.visible = false;
             turtlesStage.x = (this._w * 3) / 4 - 10;
-            turtlesStage.y = 55 + LEADING + 6;
+            turtlesStage.y = 55 + LEADING_FALLBACK + 6;
             this._isShrunk = true;
 
             for (let i = 0; i < this.getTurtleCount(); i++) {
@@ -948,7 +998,7 @@ Turtles.TurtlesView = class {
                     label: _("Grid")
                 },
                 this._w - 10 - 3 * 55,
-                70 + LEADING + 6
+                70 + LEADING_FALLBACK + 6
             );
             const that = this;
             this.gridButton.onclick = () => {
@@ -965,7 +1015,7 @@ Turtles.TurtlesView = class {
                     label: _("Clear")
                 },
                 this._w - 5 - 2 * 55,
-                70 + LEADING + 6
+                70 + LEADING_FALLBACK + 6
             );
 
             // Assign click listener to the Clear button
@@ -986,7 +1036,7 @@ Turtles.TurtlesView = class {
                     label: _("Collapse")
                 },
                 this._w - 55,
-                70 + LEADING + 6
+                70 + LEADING_FALLBACK + 6
             );
 
             this._collapseButton.onclick = () => {
@@ -1054,7 +1104,7 @@ Turtles.TurtlesView = class {
                     label: _("Expand")
                 },
                 this._w - 55,
-                70 + LEADING + 6
+                70 + LEADING_FALLBACK + 6
             );
             if (this._expandButton !== null) {
                 this._expandButton.style.visibility = "hidden";
@@ -1138,7 +1188,7 @@ Turtles.TurtlesView = class {
         const __makeAllButtons = () => {
             let second = false;
             if (docById("buttoncontainerTOP")) {
-                jQuery.noConflict()(".tooltipped").tooltip("close");
+                window.jQuery(".tooltipped").tooltip("close");
                 docById("buttoncontainerTOP").parentElement.removeChild(
                     docById("buttoncontainerTOP")
                 );
@@ -1155,7 +1205,7 @@ Turtles.TurtlesView = class {
             jQuery
                 .noConflict()(".tooltipped")
                 .each(function () {
-                    jQuery.noConflict()(this).tooltip({
+                    window.jQuery(this).tooltip({
                         html: true,
                         delay: 100
                     });
@@ -1190,18 +1240,19 @@ Turtles.TurtlesView = class {
 
                 this._collapsedBoundary = new createjs.Bitmap(img);
                 this._collapsedBoundary.x = 0;
-                this._collapsedBoundary.y = 55 + LEADING;
+                this._collapsedBoundary.y = 55 + LEADING_FALLBACK;
                 borderContainer.addChild(this._collapsedBoundary);
                 this._collapsedBoundary.visible = false;
             };
 
             const dx = this._w - 20;
-            const dy = this._h - 55 - LEADING;
+            const dy = this._h - 55 - LEADING_FALLBACK;
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
-                    base64Encode(
-                        MBOUNDARY.replace("HEIGHT", this._h)
+                    _base64Encode(
+                        _MBOUNDARY
+                            .replace("HEIGHT", this._h)
                             .replace("WIDTH", this._w)
                             .replace("Y", 10)
                             .replace("X", 10)
@@ -1229,18 +1280,19 @@ Turtles.TurtlesView = class {
 
                 this._expandedBoundary = new createjs.Bitmap(img);
                 this._expandedBoundary.x = 0;
-                this._expandedBoundary.y = 55 + LEADING;
+                this._expandedBoundary.y = 55 + LEADING_FALLBACK;
                 borderContainer.addChild(this._expandedBoundary);
                 __makeBoundary2();
             };
 
             const dx = this._w - 5;
-            const dy = this._h - 55 - LEADING;
+            const dy = this._h - 55 - LEADING_FALLBACK;
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
-                    base64Encode(
-                        MBOUNDARY.replace("HEIGHT", this._h)
+                    _base64Encode(
+                        _MBOUNDARY
+                            .replace("HEIGHT", this._h)
                             .replace("WIDTH", this._w)
                             .replace("Y", 10 / CONTAINERSCALEFACTOR)
                             .replace("X", 10 / CONTAINERSCALEFACTOR)
@@ -1291,4 +1343,8 @@ Turtles.TurtlesView = class {
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = Turtles;
+}
+
+if (typeof window !== "undefined") {
+    window.Turtles = Turtles;
 }
