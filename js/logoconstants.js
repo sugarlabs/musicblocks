@@ -27,7 +27,7 @@ const TARGETBPM = 90; // what we'd like to use for beats per minute
 const TURTLESTEP = -1; // run in step-by-step mode
 const NOTEDIV = 8; // number of steps to divide turtle graphics
 /** Minimum time (ms) to keep a block highlighted during execution so users can see which block is active. */
-const MIN_HIGHLIGHT_DURATION_MS = 200;
+const MIN_HIGHLIGHT_DURATION_MS = 400;
 
 // These error messages don't need translation since they are
 // converted into artwork w/o text.

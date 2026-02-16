@@ -2446,10 +2446,7 @@ class Singer {
                 tur.singer.embeddedGraphics[blk] = [];
 
                 // Ensure note value block unhighlights after note plays (minimum duration so highlight is visible).
-                const highlightDurationMs = Math.max(
-                    beatValue * 1000,
-                    MIN_HIGHLIGHT_DURATION_MS
-                );
+                const highlightDurationMs = Math.max(beatValue * 1000, MIN_HIGHLIGHT_DURATION_MS);
                 setTimeout(() => {
                     if (activity.blocks.visible && blk in activity.blocks.blockList) {
                         activity.blocks.unhighlight(blk);
