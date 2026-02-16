@@ -373,6 +373,12 @@ class Block {
                         that.regenerateArtwork(true, []);
                         checkBounds(loopCount + 1);
                     } else {
+                        if (that.container.cacheCanvas){
+                            try{
+                                that.container.uncache();
+                            }catch (e) {
+                            }
+                        }
                         that.container.cache(
                             that.bounds.x,
                             that.bounds.y,
@@ -383,7 +389,8 @@ class Block {
                         resolve();
                     }
                 } catch (e) {
-                    reject(e);
+                    resolve();
+                    return;
                 }
             };
             checkBounds();
@@ -398,7 +405,12 @@ class Block {
      */
     updateCache() {
         const that = this;
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
+            const c = this.container;
+            if (!c || !c.cacheCanvas) {
+              resolve();
+              return;
+            }
             let loopCount = 0;
             const MAX_RETRIES = 15;
             const INITIAL_DELAY = 100;
@@ -418,7 +430,11 @@ class Block {
                         await that.pause(delayTime);
                         updateBounds(loopCount + 1);
                     } else {
-                        that.container.updateCache();
+                        try{
+                            that.container.updateCache();
+                        }catch(e) {
+
+                        }
                         that.activity.refreshCanvas();
                         resolve();
                     }
@@ -1048,6 +1064,9 @@ class Block {
          * @param {object} that - Reference to the current object.
          */
         const __processHighlightBitmap = (bitmap, that) => {
+            if (that.blocks._isUndoingMove){
+                return;
+            }
             if (that.highlightBitmap != null) {
                 that.container.removeChild(that.highlightBitmap);
             }
@@ -1056,7 +1075,8 @@ class Block {
             that.container.addChild(that.highlightBitmap);
             that.highlightBitmap.x = 0;
             that.highlightBitmap.y = 0;
-            that.highlightBitmap.name = "bmp_highlight_" + thisBlock;
+            const thisBlock = that.blocks.blockList.indexOf(that);
+            that.highlightBitmap.name = "bmp_highlight_" + (thisBlock || "unknown");
             if (!that.activity.logo.runningLilypond) {
                 that.highlightBitmap.cursor = "pointer";
             }
@@ -1065,7 +1085,7 @@ class Block {
 
             // At me point, it should be safe to calculate the
             // bounds of the container and cache its contents.
-            if (!firstTime) {
+            if (!firstTime && !that.blocks._isUndoingMove) {
                 that.container.uncache();
             }
 
@@ -3034,6 +3054,18 @@ class Block {
 
             // Always show the trash when there is a block selected,
             that.activity.trashcan.show();
+
+            // Store original position for undo/redo before drag starts
+            that.blocks.findDragGroup(thisBlock);
+            for (let i = 0; i < that.blocks.dragGroup.length; i++) {
+                const blk = that.blocks.blockList[that.blocks.dragGroup[i]];
+                if (blk && blk.container) {
+                    blk._originalDragPosition = {
+                        x: blk.container.x,
+                        y: blk.container.y
+                    };
+                }
+            }
 
             // Raise entire stack to the top.
             that.blocks.raiseStackToTop(thisBlock);
