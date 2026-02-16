@@ -1765,6 +1765,8 @@ class Logo {
                     queueStart === 0 &&
                     tur.singer.justCounting.length === 0
                 ) {
+                    // Ensure stop button is disabled when playback ends
+                    logo.onStopTurtle();
                     if (logo.runningLilypond) {
                         if (logo.collectingStats) {
                             // console.debug("stats collection completed");

@@ -394,42 +394,39 @@ class Toolbar {
         const playIcon = docById("play");
         const stopIcon = docById("stop");
         const recordButton = docById("record");
-        let isPlayIconRunning = false;
+        this._isPlayIconRunning = false;
+
+        const that = this;
+        this._restorePlayButton = function () {
+            if (that._isPlayIconRunning) {
+                playIcon.onclick = tempClick;
+                that._isPlayIconRunning = false;
+            }
+        };
 
         function handleClick() {
-            if (!isPlayIconRunning) {
+            if (!that._isPlayIconRunning) {
                 playIcon.onclick = null;
             } else {
-                // eslint-disable-next-line no-use-before-define
                 playIcon.onclick = tempClick;
-                isPlayIconRunning = false;
+                that._isPlayIconRunning = false;
             }
         }
 
         var tempClick = (playIcon.onclick = () => {
-            const hideMsgs = () => {
-                this.activity.hideMsgs();
-            };
-            isPlayIconRunning = false;
-            onclick(this.activity);
+            that._isPlayIconRunning = false;
+            onclick(that.activity);
             handleClick();
-            stopIcon.style.color = this.stopIconColorWhenPlaying;
+            // Stop button state is managed by onRunTurtle/onStopTurtle in activity.js
             saveButton.disabled = true;
             saveButtonAdvanced.disabled = true;
             saveButton.className = "grey-text inactiveLink";
             saveButtonAdvanced.className = "grey-text inactiveLink";
             recordButton.className = "grey-text inactiveLink";
-            isPlayIconRunning = true;
+            that._isPlayIconRunning = true;
             play_button_debounce_timeout = setTimeout(function () {
                 handleClick();
             }, 2000);
-
-            stopIcon.addEventListener("click", function () {
-                clearTimeout(play_button_debounce_timeout);
-                isPlayIconRunning = true;
-                hideMsgs();
-                handleClick();
-            });
         });
     }
 
@@ -443,9 +440,21 @@ class Toolbar {
     renderStopIcon(onclick) {
         const stopIcon = docById("stop");
         const recordButton = docById("record");
+
+        // Initially disable stop button until play is triggered
+        stopIcon.style.pointerEvents = "none";
+        stopIcon.classList.add("grey-text", "inactiveLink");
+
+        const that = this;
         stopIcon.onclick = () => {
-            onclick(this.activity);
-            stopIcon.style.color = "white";
+            // Clear play button debounce timeout and restore play button
+            clearTimeout(play_button_debounce_timeout);
+            that._isPlayIconRunning = true;
+            if (that._restorePlayButton) {
+                that._restorePlayButton();
+            }
+            onclick(that.activity);
+            // Stop button state is managed by onStopTurtle in activity.js
             saveButton.disabled = false;
             saveButtonAdvanced.disabled = false;
             saveButton.className = "";
