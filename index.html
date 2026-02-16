@@ -20,7 +20,9 @@
     <link rel="preload" href="https://fonts.googleapis.com/icon?family=Material+Icons" as="style"
         onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="fonts/material-icons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="css/activities.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <!-- NOTE: The exact query-string URL here must be listed in sw.js `precacheFiles`.
+         If you change `?v=fixed` (or remove/add a query param), update sw.js so offline still works. -->
+    <link rel="preload" href="css/activities.css?v=fixed" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/keyboard.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/windows.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -28,8 +30,6 @@
     <link rel="preload" href="css/darkmode.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="prefetch" as="video" href="loading-animation.webm" type="video/webm">
     <link rel="prefetch" as="video" href="loading-animation.mp4" type="video/mp4">
-    <link rel="prefetch" as="image" href="loading-animation-ja.svg">
-
 
     <!-- <script src="js/utils/detectIE.js"></script> -->
 
@@ -39,11 +39,48 @@
 
     <script src="lib/reqwest.js" defer></script>
 
-    <!-- <script src="lib/jquery-3.7.1.js"></script> -->
-    <script src="lib/jquery-2.1.4.min.js"></script>
-    <script src="lib/jquery-ui.js" defer></script>
-    <script src="lib/materialize.min.js" defer></script>
-    <script src="lib/webL10n.js" defer></script>
+    <script src="lib/jquery-3.7.1.min.js"></script>
+    <script src="lib/jquery-ui.js"></script>
+    <script src="lib/materialize.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script>
+        jQuery(document).ready(function () {
+            if (jQuery.ui && jQuery.ui.autocomplete) {
+                jQuery.fn.materializeAutocomplete = jQuery.fn.autocomplete;
+                jQuery.widget.bridge("autocomplete", jQuery.ui.autocomplete);
+            }
+        });
+    </script>
+    <script>
+        jQuery(document).ready(function () {
+            const fixAutocompletePosition = function () {
+                const $search = jQuery('#search');
+                if ($search.length && $search.data('ui-autocomplete')) {
+                    const instance = $search.autocomplete('instance');
+                    if (instance) {
+                        const originalRenderMenu = instance._renderMenu;
+                        instance._renderMenu = function (ul, items) {
+                            originalRenderMenu.call(this, ul, items);
+                            setTimeout(() => {
+                                const searchInput = document.querySelector('#search');
+                                const dropdown = ul[0];
+                                if (searchInput && dropdown) {
+                                    const rect = searchInput.getBoundingClientRect();
+                                    dropdown.style.position = 'fixed';
+                                    dropdown.style.left = rect.left + 'px';
+                                    dropdown.style.top = (rect.bottom + 2) + 'px';
+                                    dropdown.style.width = rect.width + 'px';
+                                }
+                            }, 0);
+                        };
+                    }
+                } else {
+                    setTimeout(fixAutocompletePosition, 500);
+                }
+            };
+            setTimeout(fixAutocompletePosition, 1000);
+        });
+    </script>
     <script src="lib/Tone.js" defer></script>
     <script src="lib/midi.js" defer></script>
     <script src="lib/jquery.ruler.js" defer></script>
@@ -73,13 +110,12 @@
 
     <script src="lib/acorn.min.js" defer></script>
 
-    <link rel="prefetch" type="application/l10n" href="./localization.ini" />
 
     <script data-main="js/loader" src="lib/require.js" defer></script>
     <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
     <link rel="preload" href="/fonts/material-icons.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="stylesheet" href="lib/materialize-iso.css">
-    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/themes.css?v=fixed">
     <script src="lib/easeljs.min.js" defer></script>
     <script src="lib/tweenjs.min.js" defer></script>
     <script>
@@ -355,6 +391,12 @@
                                     <i class="material-icons md-48">help</i>
                                 </a>
                             </li>
+                            <li>
+                                <a id="installButton" class="tooltipped hidden" data-position="bottom"
+                                    data-tooltip="Install App" aria-label="Install App">
+                                    <i class="material-icons md-48">file_download</i>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     <div class="nav-wrapper" id="aux-toolbar" style="display: none;" tabindex="-1">
@@ -481,7 +523,7 @@
                     <li><a id="bn"></a></li>
                     <li><a id="he"></a></li>
                     <li><a id="ur"></a></li>
-                    
+
                 </ul>
 
                 <ul style="display: none;" id="themedropdown" class="dropdown-content">
@@ -510,6 +552,13 @@
     <script>
         let canvas, stage;
         function init() {
+            // Defensive check: ensure createjs is loaded before using it
+            if (typeof createjs === "undefined") {
+                // Retry after a short delay if createjs isn't ready yet
+                setTimeout(init, 50);
+                return;
+            }
+
             canvas = document.getElementById("canvas");
             stage = new createjs.Stage(canvas);
 
@@ -520,21 +569,42 @@
     </script>
 
     <script>
+        // Register service worker only in production (not on localhost)
         if ("serviceWorker" in navigator) {
-            if (navigator.serviceWorker.controller) {
-                console.debug(
-                    "[PWA Builder] active service worker found, no need to register"
-                );
+            // Detect if running on localhost for development
+            const isLocalDev = window.location.hostname === "localhost" ||
+                window.location.hostname === "127.0.0.1";
+            // Localhost SW is disabled to avoid caching; set allowLocalPwa to test installs.
+            const allowLocalPwa = localStorage.getItem("allowLocalPwa") === "true";
+
+            if (!isLocalDev || allowLocalPwa) {
+                // Production: Register service worker for offline mode
+                if (navigator.serviceWorker.controller) {
+                    console.debug(
+                        "[PWA Builder] Active service worker found, no need to register"
+                    );
+                } else {
+                    // Register the service worker
+                    navigator.serviceWorker
+                        .register("/sw.js")
+                        .then(function (reg) {
+                            console.debug(
+                                "[PWA Builder] Service worker registered for scope: " +
+                                reg.scope
+                            );
+                        })
+                        .catch(function (err) {
+                            console.error("[PWA Builder] Service worker registration failed:", err);
+                        });
+                }
             } else {
-                // Register the service worker
-                navigator.serviceWorker
-                    .register("/sw.js")
-                    .then(function (reg) {
-                        console.debug(
-                            "[PWA Builder] Service worker has been registered for scope: " +
-                            reg.scope
-                        );
-                    });
+                // Development: Skip service worker for instant updates
+                console.log(
+                    "🔥 [DEV MODE] Service worker disabled on localhost for instant code updates"
+                );
+                console.log(
+                    "Set localStorage.allowLocalPwa = 'true' to enable PWA install testing on localhost."
+                );
             }
         }
     </script>
@@ -545,16 +615,34 @@
             event.preventDefault(); // Prevent automatic browser prompt
             deferredPrompt = event;
 
-            // Show your install button here
-            const divInstall = document.getElementById("installButton");
-            if (divInstall) {
-                divInstall.classList.remove("hidden");
+            // Show the install button
+            const installButton = document.getElementById("installButton");
+            if (installButton) {
+                installButton.classList.remove("hidden");
             }
         });
-    </script>
-    <script>
-        $(document).ready(function () {
-            doSearch();
+
+        // Handle install button click
+        document.addEventListener("DOMContentLoaded", function () {
+            const installButton = document.getElementById("installButton");
+            if (installButton) {
+                installButton.addEventListener("click", async function () {
+                    if (deferredPrompt) {
+                        // Show the install prompt
+                        deferredPrompt.prompt();
+                        
+                        // Wait for user choice
+                        const { outcome } = await deferredPrompt.userChoice;
+                        console.log(`User response to the install prompt: ${outcome}`);
+                        
+                        // Clear the deferredPrompt
+                        deferredPrompt = null;
+                        
+                        // Hide the button
+                        installButton.classList.add("hidden");
+                    }
+                });
+            }
         });
     </script>
 
@@ -579,7 +667,7 @@
 
                 const container = document.getElementById("loading-media");
                 const content = lang.startsWith("ja")
-                    ? `<img src="loading-animation-ja.svg" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
+                    ? `<img src="loading-animation-ja.png" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
                     : `<video loop autoplay muted playsinline fetchpriority="high" style="width: 90%; height: 100%; object-fit: contain;">
                         <source src="loading-animation.webm" type="video/webm">
                         <source src="loading-animation.mp4" type="video/mp4">
@@ -683,13 +771,12 @@
 
     <script>
         var elem = document.documentElement;
+
         function openFullscreen() {
             if (elem.requestFullscreen) {
                 elem.requestFullscreen();
-                // For safari browser
             } else if (elem.webkitRequestFullscreen) {
                 elem.webkitRequestFullscreen();
-                // For IE(supported above 10)
             } else if (elem.msRequestFullscreen) {
                 elem.msRequestFullscreen();
             } else if (elem.mozRequestFullscreen) {
@@ -700,42 +787,61 @@
         function closeFullscreen() {
             if (document.exitFullscreen) {
                 document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) { /* Safari */
+            } else if (document.webkitExitFullscreen) {
                 document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) { /* IE11 */
+            } else if (document.msExitFullscreen) {
                 document.msExitFullscreen();
-            } else if (document.mozExitFullscreen) { /* IE11 */
+            } else if (document.mozExitFullscreen) {
                 document.mozExitFullscreen();
             }
         }
-        var count = 0;
+
         function setIcon() {
-            var property = document.getElementById(FullScreen);
             var iconCode = document.querySelector('#FullScrIcon');
-            //Calling full Screen
-            if (count == 0) {
+            // Determine fullscreen state using the browser fullscreen API
+            // instead of relying on a manual counter. This keeps the icon
+            // in sync when fullscreen is exited via ESC or browser controls.
+            var isFullscreen =
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
+
+            if (!isFullscreen) {
                 openFullscreen();
-                iconCode.textContent = '\ue5d1';
-                count = 1;
-            }
-            //Closing full Screen
-            else {
+                iconCode.textContent = '\ue5d1'; // fullscreen_exit icon
+            } else {
                 closeFullscreen();
-                iconCode.textContent = '\ue5d0';
-                count = 0;
+                iconCode.textContent = '\ue5d0'; // fullscreen icon
             }
         }
+
+        function handleFullscreenChange() {
+            var iconCode = document.querySelector('#FullScrIcon');
+            // Update fullscreen icon based on actual fullscreen state.
+            // This removes the need for a separate state variable and
+            // prevents incorrect icon state when fullscreen is toggled
+            // outside the button (e.g., ESC key).
+            var isFullscreen =
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
+
+            iconCode.textContent = isFullscreen ? '\ue5d1' : '\ue5d0';
+        }
+
         document.addEventListener('fullscreenchange', handleFullscreenChange);
         document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
         document.addEventListener('mozfullscreenchange', handleFullscreenChange);
         document.addEventListener('MSFullscreenChange', handleFullscreenChange);
-
-        function handleFullscreenChange() {
-            var iconCode = document.querySelector('#FullScrIcon');
-            count = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement ? 1 : 0;
-            iconCode.textContent = count ? '\ue5d1' : '\ue5d0';
-        }
     </script>
+
+    <style>
+        #installButton.hidden {
+            display: none !important;
+        }
+    </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -782,19 +888,6 @@
                     body.classList.add("play-only");
                     showPersistentNotification();
 
-                    if (buttonContainer) {
-                        buttonContainer.style.display = "flex";
-                        buttonContainer.style.justifyContent = "flex-end";
-                        buttonContainer.style.alignItems = "center";
-                    }
-                    if (homeButton) {
-                        homeButton.style.display = "flex";
-                        homeButton.style.position = "fixed";
-                        homeButton.style.right = "15px";
-                        homeButton.style.bottom = "15px";
-                        homeButton.style.zIndex = "10000";
-                    }
-
                     // Hide certain elements
                     hideElementById("Show/hide blocks");
                     hideElementById("Expand/collapse blocks");
@@ -806,9 +899,6 @@
                     // Disable play-only mode
                     body.classList.remove("play-only");
                     removePersistentNotification();
-
-                    if (homeButton) homeButton.style = "";
-                    if (buttonContainer) buttonContainer.style = "";
 
                     showElementById("Show/hide blocks");
                     showElementById("Expand/collapse blocks");

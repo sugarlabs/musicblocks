@@ -192,4 +192,70 @@ describe("setupIntervalsBlocks", () => {
 
         expect(createdBlocks.key.arg(logo, turtleIndex, blk)).toBe("C");
     });
+
+    // === NEW TESTS ===
+
+    it("SetTemperamentBlock calls setTemperament", () => {
+        createdBlocks.settemperament.flow(["equal", "C", 4], logo, turtleIndex, "blk");
+        expect(Singer.IntervalsActions.setTemperament).toHaveBeenCalledWith("equal", "C", 4);
+    });
+
+    it("SemitoneIntervalBlock sets interval and returns child block", () => {
+        const result = createdBlocks.semitoneinterval.flow([5, "childBlk"], logo, turtleIndex, "blk");
+        expect(Singer.IntervalsActions.setSemitoneInterval).toHaveBeenCalledWith(5, turtleIndex, "blk");
+        expect(result).toEqual(["childBlk", 1]);
+    });
+
+    it("SemitoneIntervalBlock returns early when args[1] undefined", () => {
+        const result = createdBlocks.semitoneinterval.flow([5, undefined], logo, turtleIndex, "blk");
+        expect(result).toBeUndefined();
+    });
+
+    it("DoublyBlock returns 0 and shows error on null connection", () => {
+        activity.blocks.blockList.blk1 = { connections: [null, null] };
+        const result = createdBlocks.doubly.arg(logo, turtleIndex, "blk1", null);
+        expect(result).toBe(0);
+        expect(activity.errorMsg).toHaveBeenCalledWith("No input", "blk1");
+    });
+
+    it("DoublyBlock adds 1 for augmented intervalname", () => {
+        activity.blocks.blockList.blk1 = { connections: [null, "conn1"] };
+        activity.blocks.blockList.conn1 = { name: "intervalname", value: "augmented" };
+        logo.parseArg = jest.fn(() => 5);
+        const result = createdBlocks.doubly.arg(logo, turtleIndex, "blk1", null);
+        expect(result).toBe(6); // 5 + 1
+    });
+
+    it("DoublyBlock subtracts 1 for diminished intervalname", () => {
+        activity.blocks.blockList.blk1 = { connections: [null, "conn1"] };
+        activity.blocks.blockList.conn1 = { name: "intervalname", value: "diminished" };
+        logo.parseArg = jest.fn(() => 5);
+        const result = createdBlocks.doubly.arg(logo, turtleIndex, "blk1", null);
+        expect(result).toBe(4); // 5 - 1
+    });
+
+    it("DoublyBlock doubles number values", () => {
+        activity.blocks.blockList.blk1 = { connections: [null, "conn1"] };
+        activity.blocks.blockList.conn1 = { name: "number", connections: [null, null] };
+        logo.parseArg = jest.fn(() => 3);
+        const result = createdBlocks.doubly.arg(logo, turtleIndex, "blk1", null);
+        expect(result).toBe(6); // 3 * 2
+    });
+
+    it("IntervalNumberBlock pushes to statusFields when inStatusMatrix", () => {
+        logo.inStatusMatrix = true;
+        activity.blocks.blockList.blk1 = { connections: ["print1"] };
+        activity.blocks.blockList.print1 = { name: "print" };
+        createdBlocks.intervalnumber.arg(logo, turtleIndex, "blk1");
+        expect(logo.statusFields).toContainEqual(["blk1", "intervalnumber"]);
+    });
+
+    it("CurrentIntervalBlock pushes to statusFields when inStatusMatrix", () => {
+        logo.inStatusMatrix = true;
+        activity.blocks.blockList.blk1 = { connections: ["print1"] };
+        activity.blocks.blockList.print1 = { name: "print" };
+        createdBlocks.currentinterval.arg(logo, turtleIndex, "blk1");
+        expect(logo.statusFields).toContainEqual(["blk1", "currentinterval"]);
+    });
+
 });

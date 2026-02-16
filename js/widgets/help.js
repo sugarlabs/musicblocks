@@ -98,10 +98,14 @@ class HelpWidget {
             rightArrow = document.getElementById("right-arrow");
             rightArrow.style.display = "block";
             rightArrow.classList.add("hover");
+            rightArrow.setAttribute("title", _("Next"));
+            rightArrow.setAttribute("aria-label", _("Next"));
 
             leftArrow = document.getElementById("left-arrow");
             leftArrow.style.display = "block";
             leftArrow.classList.add("hover");
+            leftArrow.setAttribute("title", _("Previous"));
+            leftArrow.setAttribute("aria-label", _("Previous"));
 
             document.onkeydown = function handleArrowKeys(event) {
                 if (event.key === "ArrowLeft") {
@@ -146,8 +150,9 @@ class HelpWidget {
             };
         } else {
             if (this.activity.blocks.activeBlock.name !== null) {
-                const label = this.activity.blocks.blockList[this.activity.blocks.activeBlock]
-                    .protoblock.staticLabels[0];
+                const label =
+                    this.activity.blocks.blockList[this.activity.blocks.activeBlock].protoblock
+                        .staticLabels[0];
                 if (page == 0) {
                     this.widgetWindow.updateTitle(_("Take a tour"));
                 } else {
@@ -158,10 +163,14 @@ class HelpWidget {
             rightArrow = document.getElementById("right-arrow");
             rightArrow.style.display = "none";
             rightArrow.classList.remove("hover");
+            rightArrow.setAttribute("title", _("Next"));
+            rightArrow.setAttribute("aria-label", _("Next"));
 
             leftArrow = document.getElementById("left-arrow");
             leftArrow.style.display = "none";
             leftArrow.classList.remove("hover");
+            leftArrow.setAttribute("title", _("Previous"));
+            leftArrow.setAttribute("aria-label", _("Previous"));
         }
 
         if (!useActiveBlock) {
@@ -200,8 +209,9 @@ class HelpWidget {
                 // svg file, and an optional macro name for generating
                 // the help output.
 
-                const message = this.activity.blocks.blockList[this.activity.blocks.activeBlock]
-                    .protoblock.helpString;
+                const message =
+                    this.activity.blocks.blockList[this.activity.blocks.activeBlock].protoblock
+                        .helpString;
 
                 if (message) {
                     const helpBody = docById("helpBodyDiv");
@@ -377,8 +387,8 @@ class HelpWidget {
                 leftArrow.classList.remove("disabled");
 
                 this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
-            this._showPage(page);
-        };
+                this._showPage(page);
+            };
             if (page === 0) {
                 leftArrow.classList.add("disabled");
             }

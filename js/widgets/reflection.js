@@ -690,6 +690,7 @@ class ReflectionMatrix {
         // Line breaks
         html = html.replace(/\n/gim, "<br>");
 
-        return html.trim();
+        // Step 3: Sanitize the generated HTML using DOMParser
+        return this.sanitizeHTML(html);
     }
 }

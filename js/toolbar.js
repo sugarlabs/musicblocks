@@ -17,7 +17,7 @@
 /* exported Toolbar */
 
 let WRAP = true;
-const $j = jQuery.noConflict();
+const $j = window.jQuery;
 let play_button_debounce_timeout = null;
 class Toolbar {
     /**
@@ -319,7 +319,7 @@ class Toolbar {
             beginnerMode.style.display = "none";
         } else {
             advancedMode.style.display = "none";
-            beginnerMode.style.display = "display";
+            beginnerMode.style.display = "block";
         }
 
         for (let i = 0; i < strings.length; i++) {
@@ -353,6 +353,9 @@ class Toolbar {
             hover: false,
             belowOrigin: true // Displays dropdown below the button
         });
+
+        // Setup keyboard navigation for toolbar
+        this.setupKeyboardNavigation();
     }
 
     /**
@@ -396,8 +399,6 @@ class Toolbar {
         function handleClick() {
             if (!isPlayIconRunning) {
                 playIcon.onclick = null;
-                // eslint-disable-next-line no-console
-                console.log("Wait for next 2 seconds to play the music");
             } else {
                 // eslint-disable-next-line no-use-before-define
                 playIcon.onclick = tempClick;
@@ -475,13 +476,23 @@ class Toolbar {
         confirmationMessage.textContent = _("Are you sure you want to create a new project?");
         newDropdown.appendChild(confirmationMessage);
 
-        const confirmationButtonLi = document.createElement("li");
+        const buttonRowLi = document.createElement("li");
+        buttonRowLi.classList.add("button-row");
+
         const confirmationButton = document.createElement("div");
         confirmationButton.classList.add("confirm-button");
         confirmationButton.id = "new-project";
+        confirmationButton.setAttribute("tabindex", "0"); // Make focusable
         confirmationButton.textContent = _("Confirm");
-        confirmationButtonLi.appendChild(confirmationButton);
-        newDropdown.appendChild(confirmationButtonLi);
+
+        const cancelButton = document.createElement("div");
+        cancelButton.classList.add("cancel-button");
+        cancelButton.id = "cancel-project";
+        cancelButton.textContent = _("Cancel");
+
+        buttonRowLi.appendChild(confirmationButton);
+        buttonRowLi.appendChild(cancelButton);
+        newDropdown.appendChild(buttonRowLi);
 
         modalContainer.style.display = "flex";
         confirmationButton.onclick = () => {
@@ -489,18 +500,100 @@ class Toolbar {
             onclick(this.activity);
         };
 
-        //Cancel Button
-        const cancelButtonLi = document.createElement("li");
-        const cancelButton = document.createElement("div");
-        cancelButton.classList.add("cancel-button");
-        cancelButton.id = "cancel-project";
-        cancelButton.textContent = _("Cancel");
-        cancelButtonLi.appendChild(cancelButton);
-        newDropdown.appendChild(cancelButtonLi);
+        // Add tabindex for accessibility
+        cancelButton.setAttribute("tabindex", "0"); // Make focusable
+
         cancelButton.onclick = () => {
             modalContainer.style.display = "none";
         };
         modalContainer.style.display = "flex";
+
+        // Make modal container focusable
+        modalContainer.setAttribute("tabindex", "-1");
+
+        // Setup keyboard navigation for modal
+        const modalButtons = [confirmationButton, cancelButton];
+        let currentModalFocusIndex = 0;
+
+        // Handle keyboard events for modal
+        const modalKeyHandler = e => {
+            switch (e.key) {
+                case "ArrowDown":
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // Move to next button (Cancel)
+                    modalButtons[currentModalFocusIndex].classList.remove("modal-btn-focused");
+                    currentModalFocusIndex = (currentModalFocusIndex + 1) % modalButtons.length;
+                    modalButtons[currentModalFocusIndex].focus();
+                    modalButtons[currentModalFocusIndex].classList.add("modal-btn-focused");
+                    break;
+                case "ArrowUp":
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // Move to previous button (Confirm)
+                    modalButtons[currentModalFocusIndex].classList.remove("modal-btn-focused");
+                    currentModalFocusIndex =
+                        (currentModalFocusIndex - 1 + modalButtons.length) % modalButtons.length;
+                    modalButtons[currentModalFocusIndex].focus();
+                    modalButtons[currentModalFocusIndex].classList.add("modal-btn-focused");
+                    break;
+                case "Enter":
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // Trigger click on currently focused button
+                    modalButtons[currentModalFocusIndex].click();
+                    break;
+                case "Escape":
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // Close modal
+                    modalContainer.style.display = "none";
+                    break;
+            }
+        };
+
+        // Add event listeners to each button AND the modal container
+        modalButtons.forEach(btn => {
+            btn.addEventListener("keydown", modalKeyHandler);
+            // Track focus changes
+            btn.addEventListener("focus", () => {
+                const index = modalButtons.indexOf(btn);
+                if (index >= 0) {
+                    currentModalFocusIndex = index;
+                    modalButtons.forEach(b => b.classList.remove("modal-btn-focused"));
+                    btn.classList.add("modal-btn-focused");
+                }
+            });
+        });
+        modalContainer.addEventListener("keydown", modalKeyHandler);
+
+        // Auto-focus the Confirm button when modal opens
+        setTimeout(() => {
+            confirmationButton.focus();
+            confirmationButton.classList.add("modal-btn-focused");
+        }, 150);
+
+        // Clean up listener when modal closes
+        const closeModal = () => {
+            modalButtons.forEach(btn => {
+                btn.removeEventListener("keydown", modalKeyHandler);
+                btn.classList.remove("modal-btn-focused");
+            });
+            modalContainer.removeEventListener("keydown", modalKeyHandler);
+        };
+
+        // Update onclick handlers to clean up
+        const originalConfirmClick = confirmationButton.onclick;
+        confirmationButton.onclick = () => {
+            closeModal();
+            originalConfirmClick();
+        };
+
+        const originalCancelClick = cancelButton.onclick;
+        cancelButton.onclick = () => {
+            closeModal();
+            originalCancelClick();
+        };
     }
 
     /**
@@ -1031,6 +1124,11 @@ class Toolbar {
                 console.error(e);
             }
 
+            // Disable horizontal scrolling when switching to beginner mode
+            if (this.activity.beginnerMode && this.activity.scrollBlockContainer) {
+                setScroller(this.activity);
+            }
+
             updateUIForMode();
 
             // Reinitialize tooltips after mode switch
@@ -1272,6 +1370,529 @@ class Toolbar {
      * @param {Function} onclick
      * @returns {void}
      */
+    /**
+     * Sets up keyboard navigation for the toolbar.
+     * Allows users to navigate toolbar buttons using arrow keys (left/right),
+     * activate buttons with Enter, and provides visual feedback for focused buttons.
+     *
+     * @public
+     * @returns {void}
+     */
+    setupKeyboardNavigation() {
+        const toolbars = docById("toolbars");
+        if (!toolbars) return;
+
+        toolbars.setAttribute("tabindex", "0");
+
+        // STATE MANAGEMENT
+        let currentFocusIndex = -1;
+        let buttons = { mainButtons: [], auxButtons: [], allButtons: [] };
+
+        // BUTTON SELECTION
+        /**
+         * Gets all navigable buttons from both main and auxiliary toolbars
+         * @returns {{mainButtons: HTMLElement[], auxButtons: HTMLElement[], allButtons: HTMLElement[]}}
+         */
+        const getNavigableButtons = () => {
+            // Main toolbar button selectors
+            const mainSelectors =
+                "#play, #stop, #record, #FullScreen, #newFile, #load, " +
+                "#saveButton, #saveButtonAdvanced, #planetIcon, #toggleAuxBtn, #helpIcon";
+
+            // Aux toolbar button selectors
+            const auxSelectors =
+                "#runSlowlyIcon, #runStepByStepIcon, #displayStatsIcon, " +
+                "#loadPluginIcon, #delPluginIcon, #enableHorizScrollIcon, " +
+                "#disableHorizScrollIcon, #themeSelectIcon, #mergeWithCurrentIcon, " +
+                "#wrapTurtle, #chooseKeyIcon, #toggleJavaScriptIcon, #restoreIcon, " +
+                "#beginnerMode, #advancedMode, #languageSelectIcon";
+
+            const isVisible = btn => {
+                const style = window.getComputedStyle(btn);
+                return style.display !== "none" && style.visibility !== "hidden";
+            };
+
+            const mainButtons = Array.from(toolbars.querySelectorAll(mainSelectors)).filter(
+                isVisible
+            );
+
+            let auxButtons = [];
+            const auxToolbar = docById("aux-toolbar");
+            if (auxToolbar && auxToolbar.style.display !== "none") {
+                auxButtons = Array.from(auxToolbar.querySelectorAll(auxSelectors)).filter(
+                    isVisible
+                );
+            }
+
+            return { mainButtons, auxButtons, allButtons: [...mainButtons, ...auxButtons] };
+        };
+
+        /**
+         * Updates the buttons list and attaches click handlers for mouse support
+         */
+        const updateButtonsList = () => {
+            buttons = getNavigableButtons();
+
+            // Add click handlers for mouse support - clicking a button sets keyboard focus
+            buttons.allButtons.forEach((btn, index) => {
+                // Avoid adding duplicate listeners
+                if (!btn.hasAttribute("data-kb-nav-listener")) {
+                    btn.setAttribute("data-kb-nav-listener", "true");
+                    btn.addEventListener("click", () => {
+                        // Check if this is a mode toggle button
+                        const isModeToggle = btn.id === "beginnerMode" || btn.id === "advancedMode";
+
+                        if (isModeToggle) {
+                            // After mode switch, refocus on the new mode button
+                            setTimeout(() => {
+                                updateButtonsList();
+                                // Find the new mode button (it will be the opposite one)
+                                const newModeBtn =
+                                    docById("beginnerMode") || docById("advancedMode");
+                                if (newModeBtn) {
+                                    const newIndex = buttons.allButtons.indexOf(newModeBtn);
+                                    if (newIndex >= 0) {
+                                        setFocus(newIndex);
+                                    }
+                                }
+                            }, 100);
+                        } else {
+                            currentFocusIndex = buttons.allButtons.indexOf(btn);
+                            clearFocus();
+                            setFocus(currentFocusIndex);
+                        }
+                    });
+                }
+            });
+
+            // Clamp currentFocusIndex to valid range
+            if (currentFocusIndex >= buttons.allButtons.length) {
+                currentFocusIndex = buttons.allButtons.length - 1;
+            }
+        };
+
+        // FOCUS MANAGEMENT
+        /**
+         * Removes focus class from all buttons
+         */
+        const clearFocus = () => {
+            buttons.allButtons.forEach(btn => btn.classList.remove("toolbar-btn-focused"));
+        };
+
+        /**
+         * Sets focus on a specific button by index
+         * @param {number} index - The index in allButtons array
+         */
+        const setFocus = index => {
+            clearFocus();
+            if (index >= 0 && index < buttons.allButtons.length) {
+                currentFocusIndex = index;
+                const targetButton = buttons.allButtons[currentFocusIndex];
+                targetButton.classList.add("toolbar-btn-focused");
+                // Also set actual DOM focus
+                targetButton.focus();
+            }
+        };
+
+        //  NAVIGATION HELPERS
+        /**
+         * Closes all open dropdown menus
+         */
+        const closeAllDropdowns = () => {
+            // Find all open Materialize dropdowns and close them
+            const openDropdowns = document.querySelectorAll(".dropdown-content");
+            openDropdowns.forEach(dropdown => {
+                // Materialize dropdowns use 'display: block' when open
+                if (dropdown.style.display === "block") {
+                    dropdown.style.display = "none";
+                    dropdown.classList.remove("active");
+                }
+            });
+        };
+
+        /**
+         * Navigates horizontally within the current toolbar (main or aux)
+         * @param {number} direction - 1 for right, -1 for left
+         */
+        const navigateHorizontal = direction => {
+            // Close any open dropdowns when navigating
+            closeAllDropdowns();
+
+            if (currentFocusIndex < 0) {
+                setFocus(direction > 0 ? 0 : buttons.allButtons.length - 1);
+                return;
+            }
+
+            const isOnMainToolbar = currentFocusIndex < buttons.mainButtons.length;
+
+            if (isOnMainToolbar) {
+                // Loop within main toolbar only
+                const newIndex =
+                    (currentFocusIndex + direction + buttons.mainButtons.length) %
+                    buttons.mainButtons.length;
+                setFocus(newIndex);
+            } else {
+                // Loop within aux toolbar only
+                const auxIndex = currentFocusIndex - buttons.mainButtons.length;
+                const newAuxIndex =
+                    (auxIndex + direction + buttons.auxButtons.length) % buttons.auxButtons.length;
+                setFocus(buttons.mainButtons.length + newAuxIndex);
+            }
+        };
+
+        /**
+         * Finds the button with the closest horizontal position (spatial mapping)
+         * @param {HTMLElement[]} targetButtons - Array of buttons to search
+         * @param {HTMLElement} currentButton - Current focused button
+         * @returns {number} Index in targetButtons array
+         */
+        const findNearestButtonHorizontally = (targetButtons, currentButton) => {
+            const currentRect = currentButton.getBoundingClientRect();
+            const currentCenter = currentRect.left + currentRect.width / 2;
+
+            let closestIndex = 0;
+            let closestDistance = Infinity;
+
+            targetButtons.forEach((btn, idx) => {
+                const btnRect = btn.getBoundingClientRect();
+                const btnCenter = btnRect.left + btnRect.width / 2;
+                const distance = Math.abs(btnCenter - currentCenter);
+
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestIndex = idx;
+                }
+            });
+
+            return closestIndex;
+        };
+
+        /**
+         * Navigates vertically between main and aux toolbars
+         * @param {boolean} goingDown - true for down (main→aux), false for up (aux→main)
+         */
+        const navigateVertical = goingDown => {
+            // Close any open dropdowns when navigating
+            closeAllDropdowns();
+
+            if (goingDown) {
+                // From main toolbar to aux toolbar
+                const isOnMainToolbar = currentFocusIndex < buttons.mainButtons.length;
+                if (isOnMainToolbar && buttons.auxButtons.length > 0) {
+                    const currentButton = buttons.allButtons[currentFocusIndex];
+                    const nearestAuxIndex = findNearestButtonHorizontally(
+                        buttons.auxButtons,
+                        currentButton
+                    );
+                    setFocus(buttons.mainButtons.length + nearestAuxIndex);
+                }
+            } else {
+                // From aux toolbar to main toolbar
+                const isOnAuxToolbar = currentFocusIndex >= buttons.mainButtons.length;
+                if (isOnAuxToolbar) {
+                    const currentButton = buttons.allButtons[currentFocusIndex];
+                    const nearestMainIndex = findNearestButtonHorizontally(
+                        buttons.mainButtons,
+                        currentButton
+                    );
+                    setFocus(nearestMainIndex);
+                }
+            }
+        };
+
+        /**
+         * Activates the currently focused button and handles special cases
+         */
+        const activateFocusedButton = event => {
+            if (currentFocusIndex < 0 || currentFocusIndex >= buttons.allButtons.length) return;
+
+            const button = buttons.allButtons[currentFocusIndex];
+            const toggleAuxBtn = docById("toggleAuxBtn");
+            const isTogglingAux = button === toggleAuxBtn;
+
+            // Check if button is a Materialize dropdown trigger or has a target
+            const dropdownId = button.getAttribute("data-activates");
+            // If it has a target ID, we treat it as a dropdown even if class is missing (defensive)
+            const isValidDropdown = !!dropdownId;
+
+            // Check if this is a mode toggle button
+            const isModeToggle = button.id === "beginnerMode" || button.id === "advancedMode";
+
+            if (isValidDropdown) {
+                // For Materialize dropdowns, manually trigger the dropdown
+                if (dropdownId) {
+                    // Defensive: If class is missing, add it and re-init (Materialize depends on this class)
+                    if (!button.classList.contains("dropdown-trigger")) {
+                        button.classList.add("dropdown-trigger");
+                        if (typeof $j !== "undefined") {
+                            // Use the same options as the original initialization
+                            $j(button).dropdown({
+                                constrainWidth: false,
+                                hover: false,
+                                belowOrigin: true
+                            });
+                        }
+                    }
+
+                    // Trigger click to open dropdown using jQuery to ensure Materialize listeners capture it
+                    if (typeof $j !== "undefined") {
+                        $j(button).trigger("click");
+                    } else {
+                        button.click();
+                    }
+
+                    // After dropdown opens, focus first menu item
+                    setTimeout(() => {
+                        const dropdownMenu = docById(dropdownId);
+                        if (dropdownMenu) {
+                            const menuItems = Array.from(dropdownMenu.querySelectorAll("li a"));
+                            if (menuItems.length > 0) {
+                                // Enable keyboard navigation in dropdown
+                                enableDropdownNavigation(dropdownMenu, menuItems);
+                                // Focus first item
+                                menuItems[0].focus();
+                                menuItems[0].classList.add("dropdown-item-focused");
+                            }
+                        }
+                    }, 50);
+                }
+            } else if (isModeToggle) {
+                // Special handling for mode toggle - activate and refocus on star
+                button.click();
+                setTimeout(() => {
+                    updateButtonsList();
+                    // Find the new mode button (whichever is visible)
+                    const newModeBtn = docById("beginnerMode") || docById("advancedMode");
+                    if (newModeBtn) {
+                        const newIndex = buttons.allButtons.indexOf(newModeBtn);
+                        if (newIndex >= 0) {
+                            setFocus(newIndex);
+                        }
+                    }
+                }, 150);
+            } else {
+                // Trigger onclick handler (supports both direct onclick and child onclick)
+                if (button.onclick) {
+                    button.onclick.call(button, event);
+                } else {
+                    const childWithOnclick = button.querySelector('[onclick], [id="menu"]');
+                    if (childWithOnclick && childWithOnclick.onclick) {
+                        childWithOnclick.onclick.call(childWithOnclick, event);
+                    } else {
+                        button.click();
+                    }
+                }
+            }
+
+            // Special handling: When opening aux toolbar, auto-focus the star button
+            if (isTogglingAux) {
+                setTimeout(() => {
+                    updateButtonsList();
+                    if (buttons.auxButtons.length > 0) {
+                        // Find the visible mode button (either beginnerMode or advancedMode)
+                        const starBtn = docById("beginnerMode") || docById("advancedMode");
+                        if (starBtn) {
+                            const starIndex = buttons.allButtons.indexOf(starBtn);
+                            if (starIndex >= 0) {
+                                setFocus(starIndex);
+                            }
+                        }
+                    }
+                }, 100);
+            }
+        };
+
+        /**
+         * Enables keyboard navigation within a dropdown menu
+         */
+        const enableDropdownNavigation = (dropdownMenu, menuItems) => {
+            let currentMenuIndex = 0;
+
+            // Make all menu items focusable
+            menuItems.forEach((item, idx) => {
+                item.setAttribute("tabindex", "0");
+            });
+
+            const clearMenuFocus = () => {
+                menuItems.forEach(item => item.classList.remove("dropdown-item-focused"));
+            };
+
+            const setMenuFocus = index => {
+                clearMenuFocus();
+                if (index >= 0 && index < menuItems.length) {
+                    currentMenuIndex = index;
+                    menuItems[currentMenuIndex].classList.add("dropdown-item-focused");
+                    menuItems[currentMenuIndex].focus();
+                }
+            };
+
+            // Add keydown handler to each menu item (handles focus better)
+            const dropdownKeyHandler = e => {
+                switch (e.key) {
+                    case "ArrowDown":
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setMenuFocus((currentMenuIndex + 1) % menuItems.length);
+                        break;
+                    case "ArrowUp":
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setMenuFocus((currentMenuIndex - 1 + menuItems.length) % menuItems.length);
+                        break;
+                    case "Enter":
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (currentMenuIndex >= 0 && currentMenuIndex < menuItems.length) {
+                            menuItems[currentMenuIndex].click();
+                        }
+                        break;
+                    case "Escape":
+                        e.preventDefault();
+                        e.stopPropagation();
+                        // Close dropdown and return focus to toolbar
+                        toolbars.focus();
+                        break;
+                }
+            };
+
+            // Add listener to each menu item
+            menuItems.forEach((item, idx) => {
+                item.addEventListener("keydown", dropdownKeyHandler);
+                // Track which item has focus
+                item.addEventListener("focus", () => {
+                    currentMenuIndex = idx;
+                    clearMenuFocus();
+                    item.classList.add("dropdown-item-focused");
+                });
+            });
+
+            // Also add to dropdown menu itself as fallback
+            dropdownMenu.addEventListener("keydown", dropdownKeyHandler);
+
+            // Clean up listeners when dropdown closes
+            const cleanup = () => {
+                menuItems.forEach(item => {
+                    item.removeEventListener("keydown", dropdownKeyHandler);
+                    item.classList.remove("dropdown-item-focused");
+                });
+                dropdownMenu.removeEventListener("keydown", dropdownKeyHandler);
+            };
+
+            // Watch for dropdown close
+            const observer = new MutationObserver(() => {
+                if (
+                    dropdownMenu.style.display === "none" ||
+                    !dropdownMenu.classList.contains("active")
+                ) {
+                    cleanup();
+                    observer.disconnect();
+                }
+            });
+
+            observer.observe(dropdownMenu, {
+                attributes: true,
+                attributeFilter: ["style", "class"]
+            });
+        };
+
+        //  EVENT HANDLERS
+        /**
+         * Handles keyboard navigation
+         */
+        toolbars.addEventListener("keydown", event => {
+            updateButtonsList();
+            if (buttons.allButtons.length === 0) return;
+
+            switch (event.key) {
+                case "ArrowRight":
+                    event.preventDefault();
+                    event.stopPropagation();
+                    navigateHorizontal(1);
+                    break;
+
+                case "ArrowLeft":
+                    event.preventDefault();
+                    event.stopPropagation();
+                    navigateHorizontal(-1);
+                    break;
+
+                case "ArrowDown":
+                    event.preventDefault();
+                    event.stopPropagation();
+                    navigateVertical(true);
+                    break;
+
+                case "ArrowUp":
+                    event.preventDefault();
+                    event.stopPropagation();
+                    navigateVertical(false);
+                    break;
+
+                case "Enter":
+                    event.preventDefault();
+                    event.stopPropagation();
+                    activateFocusedButton(event);
+                    break;
+
+                case "Escape":
+                    clearFocus();
+                    currentFocusIndex = -1;
+                    toolbars.blur();
+                    break;
+            }
+        });
+
+        /**
+         * Restores focus when toolbar receives focus (Tab or click)
+         */
+        toolbars.addEventListener("focus", () => {
+            updateButtonsList();
+            if (buttons.allButtons.length > 0) {
+                // Restore to last focused button if valid
+                if (currentFocusIndex >= 0 && currentFocusIndex < buttons.allButtons.length) {
+                    setFocus(currentFocusIndex);
+                } else if (
+                    currentFocusIndex >= buttons.allButtons.length &&
+                    buttons.allButtons.length > 0
+                ) {
+                    // Index out of bounds (e.g., aux closed) - go to last available
+                    setFocus(buttons.allButtons.length - 1);
+                } else {
+                    // First time - start at first button
+                    setFocus(0);
+                }
+            }
+        });
+
+        /**
+         * Clears visual focus but remembers position when toolbar loses focus
+         */
+        toolbars.addEventListener("blur", () => {
+            clearFocus();
+            // Keep currentFocusIndex for memory
+        });
+
+        /**
+         * Allows clicking on toolbar background to focus it
+         */
+        toolbars.addEventListener("click", event => {
+            if (event.target === toolbars || event.target.closest("nav")) {
+                toolbars.focus();
+            }
+        });
+
+        /**
+         * Exits focus mode when clicking outside toolbar
+         */
+        document.addEventListener("click", event => {
+            if (!toolbars.contains(event.target)) {
+                clearFocus();
+                toolbars.blur(); // Fully exit focus mode
+                // Keep currentFocusIndex for memory
+            }
+        });
+    }
+
     closeAuxToolbar = onclick => {
         const auxToolbar = docById("aux-toolbar");
         if (auxToolbar.style.display === "block") {
