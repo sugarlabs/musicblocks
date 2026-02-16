@@ -97,6 +97,11 @@ describe("Turtles Class", () => {
 
         turtles = new Turtles(activityMock);
         turtles.activity = activityMock;
+        turtles._borderContainer = new createjs.Container();
+
+        // Mix in the prototypes to get the getters and setters
+        mixinPrototypes(turtles);
+
         turtles.getTurtleCount = jest.fn().mockReturnValue(0);
         turtles.getTurtle = jest.fn(() => ({
             container: {
