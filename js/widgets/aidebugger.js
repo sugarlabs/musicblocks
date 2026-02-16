@@ -1209,3 +1209,7 @@ function AIDebuggerWidget() {
         }
     };
 }
+
+if (typeof module !== "undefined") {
+    module.exports = AIDebuggerWidget;
+}
