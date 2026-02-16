@@ -550,6 +550,21 @@ function Synth() {
      * @type {function|null}
      */
     this.detectPitch = null;
+    /**
+     * Flag to track whether tuner update loop is active.
+     * @type {boolean}
+     */
+    this._tunerActive = false;
+    /**
+     * Animation frame id for the tuner update loop.
+     * @type {number|null}
+     */
+    this._tunerRafId = null;
+    /**
+     * Cached tuner segments to avoid querying on every frame.
+     * @type {NodeList|null}
+     */
+    this._tunerSegments = null;
 
     /**
      * Function to initialize a new Tone.js instance.
@@ -2449,6 +2464,12 @@ function Synth() {
 
         this.tunerAnalyser = new Tone.Analyser("waveform", 2048);
         this.tunerMic.connect(this.tunerAnalyser);
+        this._tunerActive = true;
+        this._tunerSegments = null;
+        if (this._tunerRafId !== null && typeof cancelAnimationFrame === "function") {
+            cancelAnimationFrame(this._tunerRafId);
+        }
+        this._tunerRafId = null;
 
         const YIN = (sampleRate, bufferSize = 2048, threshold = 0.1) => {
             // Low-Pass Filter to remove high-frequency noise
@@ -2530,6 +2551,15 @@ function Synth() {
         let targetPitch = { note: "A4", frequency: 440 }; // Default target pitch
 
         const updatePitch = () => {
+            if (!this._tunerActive) return;
+
+            const tunerContainer = document.getElementById("tunerContainer");
+            if (!tunerContainer || !this.tunerAnalyser || !this.detectPitch) {
+                this._tunerActive = false;
+                this._tunerRafId = null;
+                return;
+            }
+
             const buffer = this.tunerAnalyser.getValue();
             const pitch = this.detectPitch(buffer);
 
@@ -2547,14 +2577,6 @@ function Synth() {
                     // Target pitch mode
                     // Show current note in display but calculate cents from target
                     note = currentNote.note; // Show the current note being played
-
-                    // Debug logging
-                    console.log("Debug values:", {
-                        detectedPitch: pitch,
-                        targetNote: targetPitch.note,
-                        targetFrequency: targetPitch.frequency,
-                        currentNote: note
-                    });
 
                     // Ensure we have valid frequencies before calculation
                     if (pitch > 0 && targetPitch.frequency > 0) {
@@ -2596,17 +2618,8 @@ function Synth() {
                     }
                 }
 
-                // Debug logging
-                console.log({
-                    frequency: pitch.toFixed(1),
-                    detectedNote: note,
-                    centsDeviation: cents,
-                    mode: tunerMode
-                });
-
                 // Initialize display elements if they don't exist
                 let noteDisplayContainer = document.getElementById("noteDisplayContainer");
-                const tunerContainer = document.getElementById("tunerContainer");
 
                 if (!noteDisplayContainer && tunerContainer) {
                     // Create container
@@ -3136,7 +3149,11 @@ function Synth() {
                 }
 
                 // Update tuner segments
-                const tunerSegments = document.querySelectorAll("#tunerContainer svg path");
+                let tunerSegments = this._tunerSegments;
+                if (!tunerSegments || tunerSegments.length === 0 || !tunerSegments[0].isConnected) {
+                    tunerSegments = tunerContainer.querySelectorAll("svg path");
+                    this._tunerSegments = tunerSegments;
+                }
 
                 // Define colors for the gradient
                 const colors = {
@@ -3292,16 +3309,25 @@ function Synth() {
                 });
             }
 
-            requestAnimationFrame(updatePitch);
+            if (this._tunerActive && typeof requestAnimationFrame === "function") {
+                this._tunerRafId = requestAnimationFrame(updatePitch);
+            }
         };
 
         updatePitch();
     };
 
     this.stopTuner = () => {
+        this._tunerActive = false;
+        if (this._tunerRafId !== null && typeof cancelAnimationFrame === "function") {
+            cancelAnimationFrame(this._tunerRafId);
+        }
+        this._tunerRafId = null;
+        this._tunerSegments = null;
         if (this.tunerMic) {
             this.tunerMic.close();
         }
+        this.tunerAnalyser = null;
     };
 
     const frequencyToNote = frequency => {
