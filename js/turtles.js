@@ -1246,7 +1246,10 @@ Turtles.TurtlesView = class {
             };
             const leading = typeof LEADING !== "undefined" ? LEADING : 0;
             const dx = this._w - 20;
-            const boundaryTemplate = typeof MBOUNDARY !== "undefined" ? MBOUNDARY : "";
+            const boundaryTemplate =
+                typeof MBOUNDARY !== "undefined"
+                    ? MBOUNDARY
+                    : '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"></svg>';
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
@@ -1290,7 +1293,10 @@ Turtles.TurtlesView = class {
             const leading = typeof LEADING !== "undefined" ? LEADING : 0;
             const dx = this._w - 5;
             const dy = this._h - 55 - leading;
-            const boundaryTemplate = typeof MBOUNDARY !== "undefined" ? MBOUNDARY : "";
+            const boundaryTemplate =
+                typeof MBOUNDARY !== "undefined"
+                    ? MBOUNDARY
+                    : '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"></svg>';
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
