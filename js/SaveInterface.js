@@ -784,20 +784,49 @@ class SaveInterface {
 
     afterSaveLilypondLY(lydata, filename) {
         filename = docById("fileName").value;
-        if (platform.FF) {
-            // eslint-disable-next-line no-console
-            console.debug('execCommand("copy") does not work on FireFox');
-        } else {
-            const tmp = jQuery("<textarea />").appendTo(document.body);
-            tmp.val(lydata);
-            tmp.select();
-            tmp[0].setSelectionRange(0, lydata.length);
-            document.execCommand("copy");
-            tmp.remove();
+        const showCopiedMessage = () => {
             this.activity.textMsg(
                 _("The Lilypond code is copied to clipboard. You can paste it here: ") +
                     "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a> "
             );
+        };
+
+        const legacyCopy = () => {
+            const tmp = jQuery("<textarea />").appendTo(document.body);
+            tmp.val(lydata);
+            tmp.select();
+            tmp[0].setSelectionRange(0, lydata.length);
+            let copied = false;
+            try {
+                copied = document.execCommand("copy");
+            } catch (e) {
+                copied = false;
+            }
+            tmp.remove();
+            return copied;
+        };
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard
+                .writeText(lydata)
+                .then(showCopiedMessage)
+                .catch(err => {
+                    const copied = legacyCopy();
+                    if (copied) {
+                        showCopiedMessage();
+                    } else {
+                        // eslint-disable-next-line no-console
+                        console.debug("Clipboard copy failed:", err);
+                    }
+                });
+        } else {
+            const copied = legacyCopy();
+            if (copied) {
+                showCopiedMessage();
+            } else {
+                // eslint-disable-next-line no-console
+                console.debug("Clipboard copy failed");
+            }
         }
         this.download("ly", "data:text;utf8," + encodeURIComponent(lydata), filename);
     }

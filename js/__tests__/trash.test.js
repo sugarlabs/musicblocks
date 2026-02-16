@@ -160,3 +160,245 @@ describe("Trashcan Class", () => {
         expect(trashcan.overTrashcan(300, 300)).toBe(false);
     });
 });
+
+describe("overTrashcan edge cases", () => {
+    let trashcan;
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        trashcan = new Trashcan(mockActivity);
+        trashcan._container.x = 100;
+        trashcan._container.y = 200;
+    });
+
+    it("should return true for a point exactly at the top-left corner", () => {
+        expect(trashcan.overTrashcan(100, 200)).toBe(true);
+    });
+
+    it("should return true for a point exactly at the top-right corner", () => {
+        // TRASHWIDTH is 120, so top-right is (100 + 120, 200)
+        expect(trashcan.overTrashcan(220, 200)).toBe(true);
+    });
+
+    it("should return false for a point just left of the left edge", () => {
+        expect(trashcan.overTrashcan(99, 200)).toBe(false);
+    });
+
+    it("should return false for a point just above the top edge", () => {
+        expect(trashcan.overTrashcan(150, 199)).toBe(false);
+    });
+
+    it("should return false for a point just right of the right edge", () => {
+        // x > tx + TRASHWIDTH (100 + 120 = 220), so 221 is out
+        expect(trashcan.overTrashcan(221, 200)).toBe(false);
+    });
+
+    it("should return true for a point far below the trashcan (no lower y bound)", () => {
+        // overTrashcan has no lower y bound check
+        expect(trashcan.overTrashcan(150, 10000)).toBe(true);
+    });
+
+    it("should return true for a point exactly on the left edge", () => {
+        expect(trashcan.overTrashcan(100, 250)).toBe(true);
+    });
+
+    it("should return true for a point exactly on the right edge", () => {
+        expect(trashcan.overTrashcan(220, 250)).toBe(true);
+    });
+
+    it("should return false for negative x coordinates", () => {
+        expect(trashcan.overTrashcan(-50, 250)).toBe(false);
+    });
+
+    it("should return false for negative y coordinates", () => {
+        expect(trashcan.overTrashcan(150, -50)).toBe(false);
+    });
+
+    it("should return true for the center of the trashcan area", () => {
+        // center x = 100 + 60 = 160, y = 200 + 60 = 260
+        expect(trashcan.overTrashcan(160, 260)).toBe(true);
+    });
+
+    it("should return false when x is at left boundary but y is above", () => {
+        expect(trashcan.overTrashcan(100, 199)).toBe(false);
+    });
+});
+
+describe("shouldResize edge cases", () => {
+    let trashcan;
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        trashcan = new Trashcan(mockActivity);
+    });
+
+    it("should return false when both dimensions match container position", () => {
+        trashcan._container.x = 500;
+        trashcan._container.y = 400;
+        expect(trashcan.shouldResize(500, 400)).toBe(false);
+    });
+
+    it("should return true when only x differs", () => {
+        trashcan._container.x = 500;
+        trashcan._container.y = 400;
+        expect(trashcan.shouldResize(600, 400)).toBe(true);
+    });
+
+    it("should return true when only y differs", () => {
+        trashcan._container.x = 500;
+        trashcan._container.y = 400;
+        expect(trashcan.shouldResize(500, 300)).toBe(true);
+    });
+
+    it("should return true when both dimensions differ", () => {
+        trashcan._container.x = 500;
+        trashcan._container.y = 400;
+        expect(trashcan.shouldResize(600, 300)).toBe(true);
+    });
+
+    it("should return false with zero positions matching", () => {
+        trashcan._container.x = 0;
+        trashcan._container.y = 0;
+        expect(trashcan.shouldResize(0, 0)).toBe(false);
+    });
+
+    it("should return true with zero vs non-zero", () => {
+        trashcan._container.x = 0;
+        trashcan._container.y = 0;
+        expect(trashcan.shouldResize(100, 0)).toBe(true);
+    });
+});
+
+describe("stopHighlightAnimation", () => {
+    let trashcan;
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        trashcan = new Trashcan(mockActivity);
+    });
+
+    it("should do nothing if not in animation", () => {
+        trashcan._inAnimation = false;
+        const clearSpy = jest.spyOn(global, "clearInterval");
+
+        trashcan.stopHighlightAnimation();
+
+        expect(clearSpy).not.toHaveBeenCalled();
+        clearSpy.mockRestore();
+    });
+
+    it("should clear interval and reset state when in animation", () => {
+        trashcan._inAnimation = true;
+        trashcan._animationInterval = 42;
+        trashcan._animationLevel = 100;
+        trashcan._highlightPower = 128;
+        trashcan.isVisible = true;
+        const clearSpy = jest.spyOn(global, "clearInterval");
+
+        trashcan.stopHighlightAnimation();
+
+        expect(clearSpy).toHaveBeenCalledWith(42);
+        expect(trashcan._inAnimation).toBe(false);
+        expect(trashcan.isVisible).toBe(false);
+        expect(trashcan._animationLevel).toBe(0);
+        expect(trashcan._highlightPower).toBe(255);
+        clearSpy.mockRestore();
+    });
+
+    it("should be safe to call multiple times", () => {
+        trashcan._inAnimation = true;
+        trashcan._animationInterval = 42;
+
+        trashcan.stopHighlightAnimation();
+        expect(trashcan._inAnimation).toBe(false);
+
+        // Second call should be a no-op since _inAnimation is now false
+        trashcan.stopHighlightAnimation();
+        expect(trashcan._inAnimation).toBe(false);
+    });
+
+    it("should reset animation level and highlight power to defaults", () => {
+        trashcan._inAnimation = true;
+        trashcan._animationLevel = 500;
+        trashcan._highlightPower = 0;
+
+        trashcan.stopHighlightAnimation();
+
+        expect(trashcan._animationLevel).toBe(0);
+        expect(trashcan._highlightPower).toBe(255);
+    });
+});
+
+describe("scale and container positioning", () => {
+    let trashcan;
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        trashcan = new Trashcan(mockActivity);
+    });
+
+    it("should have default scale of 1", () => {
+        expect(trashcan._scale).toBe(1);
+    });
+
+    it("should update scale via resizeEvent", () => {
+        trashcan.resizeEvent(2);
+        expect(trashcan._scale).toBe(2);
+    });
+
+    it("should update container position based on scale", () => {
+        // window.innerWidth = 1024, window.innerHeight = 768 (jsdom defaults)
+        trashcan._scale = 1;
+        trashcan.updateContainerPosition();
+
+        const expectedX =
+            window.innerWidth / trashcan._scale - Trashcan.TRASHWIDTH - 2 * trashcan._iconsize;
+        const expectedY =
+            window.innerHeight / trashcan._scale -
+            Trashcan.TRASHHEIGHT -
+            (5 / 4) * trashcan._iconsize;
+
+        expect(trashcan._container.x).toBe(expectedX);
+        expect(trashcan._container.y).toBe(expectedY);
+    });
+
+    it("should compute different positions at different scales", () => {
+        trashcan._scale = 1;
+        trashcan.updateContainerPosition();
+        const x1 = trashcan._container.x;
+        const y1 = trashcan._container.y;
+
+        trashcan._scale = 2;
+        trashcan.updateContainerPosition();
+        const x2 = trashcan._container.x;
+        const y2 = trashcan._container.y;
+
+        // At scale 2, window dimensions are halved, so positions should be different
+        expect(x2).not.toBe(x1);
+        expect(y2).not.toBe(y1);
+    });
+
+    it("should have static TRASHWIDTH and TRASHHEIGHT constants", () => {
+        expect(Trashcan.TRASHWIDTH).toBe(120);
+        expect(Trashcan.TRASHHEIGHT).toBe(120);
+    });
+
+    it("should set iconsize based on trash bitmap bounds", () => {
+        // _makeTrash sets _iconsize from bitmap getBounds().width (mocked as 100)
+        expect(trashcan._iconsize).toBe(100);
+    });
+
+    it("should initialize _borderHighlightBitmap during construction", () => {
+        // resizeEvent(1) in constructor triggers _makeBorderHighlight
+        expect(trashcan._borderHighlightBitmap).not.toBeNull();
+    });
+
+    it("should have _isHighlightInitialized set after construction", () => {
+        // resizeEvent(1) in constructor triggers _makeBorderHighlight which sets this
+        expect(trashcan._isHighlightInitialized).toBe(true);
+    });
+
+    it("should initialize animationTime as 500", () => {
+        expect(trashcan.animationTime).toBe(500);
+    });
+});
