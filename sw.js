@@ -38,6 +38,23 @@ self.addEventListener("activate", function (event) {
     event.waitUntil(self.clients.claim());
 });
 
+// Helper function to check if a request can be cached
+function isCacheableRequest(request) {
+    const url = new URL(request.url);
+    // Only cache HTTP and HTTPS requests
+    return url.protocol === "http:" || url.protocol === "https:";
+}
+
+// Helper function to determine if a response should be cached
+function shouldCacheResponse(request, response) {
+    // Don't cache requests with unsupported schemes
+    if (!isCacheableRequest(request)) {
+        return false;
+    }
+    // Only cache successful responses
+    return response && response.ok;
+}
+
 function updateCache(request, response) {
     // Don't cache requests with unsupported schemes
     if (!isCacheableRequest(request)) {
