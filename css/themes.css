@@ -278,7 +278,18 @@ body.highcontrast {
     border: 1px solid #ffffff;
 }
 
+.highcontrast .ui-autocomplete .ui-menu-item a {
+    color: #ffffff !important;
+    background-color: #000000 !important;
+}
+
+.highcontrast .ui-autocomplete .ui-menu-item a:hover {
+    color: #000000 !important;
+    background-color: #00ffff !important;
+}
+
 .highcontrast #helpfulSearchDiv {
+    color: #ffffff !important;
     background-color: transparent !important;
 }
 
