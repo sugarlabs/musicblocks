@@ -293,6 +293,35 @@ window.__wheelnavA11yAnnounce = navItem => {
 window.__wheelnavA11ySpeak = navItem => {
     const label = __pieMenuA11yLabelFromTitle(navItem && navItem.title);
     __speakPieMenuLabel(label);
+// Ensure exit wheels behave like stateless buttons (no sticky selection)
+const configureExitWheel = exitWheel => {
+    if (!exitWheel || !exitWheel.navItems) {
+        return;
+    }
+
+    const clearSelection = () => {
+        exitWheel.selectedNavItemIndex = null;
+        for (let i = 0; i < exitWheel.navItems.length; i++) {
+            exitWheel.navItems[i].selected = false;
+            exitWheel.navItems[i].hovered = false;
+        }
+        if (exitWheel.raphael && exitWheel.raphael.canvas) {
+            exitWheel.refreshWheel(true);
+        }
+    };
+
+    clearSelection();
+
+    exitWheel.navigateWheel = clicked => {
+        const item = exitWheel.navItems[clicked];
+        if (!item || item.enabled === false) {
+            return;
+        }
+        clearSelection();
+        if (typeof item.navigateFunction === "function") {
+            item.navigateFunction();
+        }
+    };
 };
 
 const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accidental, custom) => {
@@ -379,6 +408,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     if (!custom) {
         block._accidentalsWheel.colors = platformColor.accidentalsWheelcolors;
@@ -1132,6 +1162,9 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
+
+    // Avoid auto-selecting the close button on open.
 
     const that = block;
 
@@ -1363,6 +1396,7 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     block._octavesWheel.colors = platformColor.octavesWheelcolors;
     block._octavesWheel.slicePathFunction = slicePath().DonutSlice;
@@ -1612,6 +1646,7 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -1771,6 +1806,7 @@ const piemenuNoteValue = (block, noteValue) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const tabsLabels = [];
     for (let i = 0; i < WHEELVALUES.length; i++) {
@@ -2031,6 +2067,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     block._exitWheel.navItems[2].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[2].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -2311,6 +2348,7 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -2468,6 +2506,7 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -2707,6 +2746,7 @@ const piemenuChords = (block, selectedChord) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -2851,6 +2891,7 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -3040,6 +3081,7 @@ const piemenuIntervals = (block, selectedInterval) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -3273,6 +3315,7 @@ const piemenuModes = (block, selectedMode) => {
     block._exitWheel.navItems[1].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[1].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -3891,6 +3934,7 @@ const piemenuGrid = activity => {
     activity.turtles._exitWheel.sliceInitPathCustom = activity.turtles._exitWheel.slicePathCustom;
     activity.turtles._exitWheel.clickModeRotate = false;
     activity.turtles._exitWheel.createWheel(["×", " "]);
+    configureExitWheel(activity.turtles._exitWheel);
 
     activity.turtles._exitWheel.navItems[0].navigateFunction = () => {
         hidePiemenu(activity);
@@ -4001,6 +4045,7 @@ const piemenuKey = activity => {
     exitWheel.colors = platformColor.exitWheelcolors;
     exitWheel.animatetime = 0;
     exitWheel.createWheel(["×", " "]);
+    configureExitWheel(exitWheel);
 
     const x = event.clientX;
     const y = event.clientY;
@@ -4322,6 +4367,7 @@ const piemenuDissectNumber = widget => {
     exitWheel.navItems[2].titleSelectedAttr.cursor = "pointer";
     exitWheel.navItems[2].titleHoverAttr.cursor = "pointer";
     exitWheel.createWheel();
+    configureExitWheel(exitWheel);
 
     // Handle selection
     const __selectionChanged = () => {
