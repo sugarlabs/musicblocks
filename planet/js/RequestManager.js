@@ -219,7 +219,7 @@ class RequestManager {
             //Make _executeWithRetry() throw error when max retries exceeded
             this.stats.failures++;
 
-            throw lastFailure || new Error("MAX_RETRIES_EXCEEDED");
+            return lastFailure || { success: false, error: "MAX_RETRIES_EXCEEDED" };
         }
     }
 
@@ -232,7 +232,7 @@ class RequestManager {
     _promisifyRequest(requestFn) {
         return new Promise((resolve, reject) => {
             const timeout = setTimeout(() => {
-                reject(new Error("REQUEST_TIMEOUT"));
+                resolve({ success: false, error: "REQUEST_TIMEOUT" });;
             }, 30000); // 30 seconds
 
             try {
