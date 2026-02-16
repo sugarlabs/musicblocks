@@ -862,7 +862,9 @@ Turtles.TurtlesView = class {
         const borderContainer = this.borderContainer;
 
         // Remove any old background containers
-        borderContainer.removeAllChildren();
+        if (borderContainer) {
+            borderContainer.removeAllChildren();
+        }
 
         const turtlesStage = this.stage;
         // We put the buttons on the stage so they will be on top
@@ -1216,7 +1218,9 @@ Turtles.TurtlesView = class {
                 this._collapsedBoundary = new createjs.Bitmap(img);
                 this._collapsedBoundary.x = 0;
                 this._collapsedBoundary.y = 55 + LEADING;
-                borderContainer.addChild(this._collapsedBoundary);
+                if (borderContainer) {
+                    borderContainer.addChild(this._collapsedBoundary);
+                }
                 this._collapsedBoundary.visible = false;
             };
 
@@ -1255,7 +1259,9 @@ Turtles.TurtlesView = class {
                 this._expandedBoundary = new createjs.Bitmap(img);
                 this._expandedBoundary.x = 0;
                 this._expandedBoundary.y = 55 + LEADING;
-                borderContainer.addChild(this._expandedBoundary);
+                if (borderContainer) {
+                    borderContainer.addChild(this._expandedBoundary);
+                }
                 __makeBoundary2();
             };
 
