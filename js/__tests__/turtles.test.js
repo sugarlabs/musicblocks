@@ -29,7 +29,11 @@ global.createjs = {
     Bitmap: jest.fn().mockImplementation(() => ({}))
 };
 
-global.importMembers = jest.fn();
+global.importMembers = jest.fn((obj, className, modelArgs) => {
+    if (Array.isArray(modelArgs) && modelArgs.length > 0) {
+        obj.activity = modelArgs[0];
+    }
+});
 global.setupRhythmActions = jest.fn();
 global.setupMeterActions = jest.fn();
 global.setupPitchActions = jest.fn();
