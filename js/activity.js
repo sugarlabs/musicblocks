@@ -2733,6 +2733,60 @@ class Activity {
         };
 
         /**
+         * Initialize an idle watcher that throttles the application's framerate
+         * when the application is inactive and no music is playing.
+         * This significantly reduces CPU usage and improves battery life.
+         */
+        this._initIdleWatcher = () => {
+            const IDLE_THRESHOLD = 5000; // 5 seconds
+            const ACTIVE_FPS = 60;
+            const IDLE_FPS = 1;
+
+            let lastActivity = Date.now();
+            this.isAppIdle = false;
+
+            // Wake up function - restores full framerate
+            const resetIdleTimer = () => {
+                lastActivity = Date.now();
+                if (this.isAppIdle) {
+                    this.isAppIdle = false;
+                    createjs.Ticker.framerate = ACTIVE_FPS;
+                    // Force immediate redraw for responsiveness
+                    if (this.stage) this.stage.update();
+                }
+            };
+
+            // Track user activity
+            window.addEventListener("mousemove", resetIdleTimer);
+            window.addEventListener("mousedown", resetIdleTimer);
+            window.addEventListener("keydown", resetIdleTimer);
+            window.addEventListener("touchstart", resetIdleTimer);
+            window.addEventListener("wheel", resetIdleTimer);
+
+            // Periodic check for idle state
+            setInterval(() => {
+                // Check if music/code is playing
+                const isMusicPlaying = this.logo?._alreadyRunning || false;
+
+                if (!isMusicPlaying && Date.now() - lastActivity > IDLE_THRESHOLD) {
+                    if (!this.isAppIdle) {
+                        this.isAppIdle = true;
+                        createjs.Ticker.framerate = IDLE_FPS;
+                        console.log("⚡ Idle mode: Throttling to 1 FPS to save battery");
+                    }
+                } else if (this.isAppIdle && isMusicPlaying) {
+                    // Music started playing - wake up immediately
+                    resetIdleTimer();
+                }
+            }, 1000);
+
+            // Expose activity instance for external checks
+            if (typeof window !== "undefined") {
+                window.activity = this;
+            }
+        };
+
+        /**
          * Renders an error message with appropriate artwork.
          * @param {string} name - The name specifying the SVG to be rendered.
          */
@@ -6834,6 +6888,12 @@ class Activity {
 
             this.stage = new createjs.Stage(this.canvas);
             createjs.Touch.enable(this.stage);
+
+            // Initialize Ticker with optimal framerate
+            createjs.Ticker.framerate = 60;
+
+            // Throttle rendering when user is inactive and no music is playing
+            this._initIdleWatcher();
 
             // createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
             // createjs.Ticker.framerate = 15;
