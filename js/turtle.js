@@ -199,6 +199,7 @@ class Turtle {
         this.singer.scalarTranspositionValues = [];
         this.singer.transposition = 0;
         this.singer.transpositionValues = [];
+        this.singer.transpositionRatios = [];
 
         this.singer.register = 0;
         this.singer.beatFactor = 1;
@@ -245,6 +246,8 @@ class Turtle {
         this.singer.crescendoInitialVolume = { DEFAULTVOICE: [DEFAULTVOLUME] };
         this.singer.intervals = [];
         this.singer.semitoneIntervals = [];
+        this.singer.chordIntervals = [];
+        this.singer.ratioIntervals = [];
         this.singer.staccato = [];
         this.singer.glide = [];
         this.singer.glideOverride = 0;
