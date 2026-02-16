@@ -864,6 +864,17 @@ Turtles.TurtlesView = class {
         // Remove any old background containers
         borderContainer.removeAllChildren();
 
+        // Update the canvas background color
+        const canvas = this.canvas;
+        if (canvas) {
+            canvas.style.backgroundColor = this._backgroundColor;
+        }
+
+        // Also update body background if available
+        if (typeof document !== "undefined") {
+            document.body.style.backgroundColor = this._backgroundColor;
+        }
+
         const turtlesStage = this.stage;
         // We put the buttons on the stage so they will be on top
 
