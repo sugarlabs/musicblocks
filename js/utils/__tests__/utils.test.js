@@ -33,7 +33,8 @@ describe("Utility Functions (logic-only)", () => {
         rationalToFraction,
         rgbToHex,
         hexToRGB,
-        hex2rgb;
+        hex2rgb,
+        format;
 
     beforeAll(() => {
         global.window = {
@@ -64,10 +65,6 @@ describe("Utility Functions (logic-only)", () => {
                     getContext: jest.fn(() => ({ measureText: () => ({ width: 42 }) }))
                 };
             }),
-            webL10n: {
-                get: jest.fn(str => str),
-                getLanguage: jest.fn(() => "en")
-            },
             body: { innerHTML: "" },
             createElement: jest.fn(() => {
                 return {
@@ -115,7 +112,8 @@ describe("Utility Functions (logic-only)", () => {
                 rationalToFraction: typeof rationalToFraction !== "undefined" ? rationalToFraction : undefined,
                 rgbToHex: typeof rgbToHex !== "undefined" ? rgbToHex : undefined,
                 hexToRGB: typeof hexToRGB !== "undefined" ? hexToRGB : undefined,
-                hex2rgb: typeof hex2rgb !== "undefined" ? hex2rgb : undefined
+                hex2rgb: typeof hex2rgb !== "undefined" ? hex2rgb : undefined,
+                format: typeof format !== "undefined" ? format : undefined
             };
         `);
 
@@ -134,6 +132,7 @@ describe("Utility Functions (logic-only)", () => {
         rgbToHex = exported.rgbToHex;
         hexToRGB = exported.hexToRGB;
         hex2rgb = exported.hex2rgb;
+        format = exported.format;
     });
 
     describe("toTitleCase()", () => {
@@ -261,6 +260,37 @@ describe("Utility Functions (logic-only)", () => {
     describe("hex2rgb()", () => {
         it("converts hex to rgba string", () => {
             expect(hex2rgb("ff0000")).toBe("rgba(255,0,0,1)");
+        });
+    });
+
+    /**
+     * @author Alok Dangre
+     * @copyright 2026 Alok Dangre
+     */
+    describe("format() function logic", () => {
+        it("should replace simple placeholders", () => {
+            const result = format("Hello {name}!", { name: "World" });
+            expect(result).toBe("Hello World!");
+        });
+
+        it("should replace multiple placeholders", () => {
+            const result = format("{greeting} {name}!", { greeting: "Hi", name: "User" });
+            expect(result).toBe("Hi User!");
+        });
+
+        it("should handle nested property access", () => {
+            const result = format("Name: {user.name}", { user: { name: "Alice" } });
+            expect(result).toBe("Name: Alice");
+        });
+
+        it("should replace undefined values with empty string", () => {
+            const result = format("Value: {missing}", { other: "data" });
+            expect(result).toBe("Value: ");
+        });
+
+        it("should handle empty data object", () => {
+            const result = format("Static text", {});
+            expect(result).toBe("Static text");
         });
     });
 });
