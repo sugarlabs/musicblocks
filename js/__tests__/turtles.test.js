@@ -40,6 +40,15 @@ global.setupVolumeActions = jest.fn();
 global.setupDrumActions = jest.fn();
 global.setupDictActions = jest.fn();
 
+global.LEADING = 35;
+global.CARTESIANBUTTON = "";
+global.CLEARBUTTON = "";
+global.COLLAPSEBUTTON = "";
+global.EXPANDBUTTON = "";
+global.MBOUNDARY = "";
+global.piemenuGrid = {};
+global.base64Encode = jest.fn(str => str);
+
 global.Turtle = jest.fn().mockImplementation(() => ({
     painter: {
         doSetHeading: jest.fn(),
@@ -113,6 +122,9 @@ describe("Turtles Class", () => {
         turtles.addTurtleGraphicProps = jest.fn();
         turtles.isShrunk = jest.fn().mockReturnValue(false);
         document.body.innerHTML = '<div id="loader"></div>';
+        window.jQuery = jest.fn().mockReturnValue({
+            tooltip: jest.fn()
+        });
     });
 
     test("should initialize properly", () => {
@@ -382,6 +394,7 @@ describe("setBackgroundColor", () => {
         turtles._scale = 1.0;
         global.platformColor = { background: "#ffffff" };
         turtles._backgroundColor = platformColor.background;
+        turtles._borderContainer = new createjs.Container();
     });
 
     test("should set default background color when index is -1", () => {
@@ -447,6 +460,7 @@ describe("doScale", () => {
         turtles._locked = false;
         turtles._queue = [];
         turtles._backgroundColor = "#ffffff";
+        turtles._borderContainer = new createjs.Container();
     });
 
     test("should update scale, width, and height when not locked", () => {
