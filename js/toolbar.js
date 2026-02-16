@@ -410,6 +410,14 @@ class Toolbar {
             }
         }
 
+        // Named handler to prevent memory leak from duplicate listeners
+        const stopClickHandler = () => {
+            clearTimeout(play_button_debounce_timeout);
+            isPlayIconRunning = true;
+            this.activity.hideMsgs();
+            handleClick();
+        };
+
         var tempClick = (playIcon.onclick = () => {
             const hideMsgs = () => {
                 this.activity.hideMsgs();
@@ -428,12 +436,9 @@ class Toolbar {
                 handleClick();
             }, 2000);
 
-            stopIcon.addEventListener("click", function () {
-                clearTimeout(play_button_debounce_timeout);
-                isPlayIconRunning = true;
-                hideMsgs();
-                handleClick();
-            });
+            // Remove existing listener before adding to prevent accumulation
+            stopIcon.removeEventListener("click", stopClickHandler);
+            stopIcon.addEventListener("click", stopClickHandler);
         });
     }
 

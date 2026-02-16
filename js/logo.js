@@ -290,6 +290,7 @@ class Logo {
 
         // Load the default synthesizer
         this.synth = new Synth();
+        this.synth.activity = this.activity; // Reference for voice tracking
         this.synth.changeInTemperament = false;
 
         // Mode widget
@@ -1002,7 +1003,13 @@ class Logo {
 
         this.sounds = [];
 
+        // Kill all active audio voices to prevent "zombie audio"
         for (const turtle in this.activity.turtles.turtleList) {
+            const tur = this.activity.turtles.getTurtle(turtle);
+            if (tur && tur.singer && typeof tur.singer.killAllVoices === "function") {
+                tur.singer.killAllVoices();
+            }
+
             for (const instrumentName in instruments[turtle]) {
                 this.synth.stopSound(turtle, instrumentName);
             }

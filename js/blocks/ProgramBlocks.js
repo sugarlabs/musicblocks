@@ -1255,21 +1255,72 @@ function setupProgramBlocks(activity) {
                     [8, "hidden", 0, 0, [0, null]]
                 ];
                 activity.blocks.loadNewBlocks(newNote);
-                // eslint-disable-next-line no-console
-                console.debug("BLOCKNUMBER " + blockNumber);
                 return blockNumber;
             } else if (name === _("start")) {
                 const newBlock = [[0, "start", x, y, [null, null, null]]];
                 activity.blocks.loadNewBlocks(newBlock);
-                // eslint-disable-next-line no-console
-                console.debug("BLOCKNUMBER " + blockNumber);
                 return blockNumber;
             } else if (name === _("silence")) {
-                // FIXME: others too
                 const newBlock = [[0, "rest2", x, y, [null, null]]];
                 activity.blocks.loadNewBlocks(newBlock);
-                // eslint-disable-next-line no-console
-                console.debug("BLOCKNUMBER " + blockNumber);
+                return blockNumber;
+            } else if (name === _("tempo")) {
+                let bpm, beat;
+                switch (blockArgs.length) {
+                    case 1:
+                        bpm = 90;
+                        beat = 4;
+                        break;
+                    case 2:
+                        bpm = blockArgs[1];
+                        beat = 4;
+                        break;
+                    default:
+                        bpm = blockArgs[1];
+                        beat = blockArgs[2];
+                        break;
+                }
+                const newTempo = [
+                    [0, "setbpm3", x, y, [null, 1, 2, 5]],
+                    [1, ["number", { value: bpm }], 0, 0, [0]],
+                    [2, "divide", 0, 0, [0, 3, 4]],
+                    [3, ["number", { value: 1 }], 0, 0, [2]],
+                    [4, ["number", { value: beat }], 0, 0, [2]],
+                    [5, "vspace", 0, 0, [0, null]]
+                ];
+                activity.blocks.loadNewBlocks(newTempo);
+                return blockNumber;
+            } else if (name === _("volume")) {
+                let synth, vol;
+                switch (blockArgs.length) {
+                    case 1:
+                        synth = "piano";
+                        vol = 50;
+                        break;
+                    case 2:
+                        synth = blockArgs[1];
+                        vol = 50;
+                        break;
+                    default:
+                        synth = blockArgs[1];
+                        vol = blockArgs[2];
+                        break;
+                }
+                const newVolume = [
+                    [0, "setsynthvolume", x, y, [null, 1, 2, null]],
+                    [1, ["voicename", { value: synth }], 0, 0, [0]],
+                    [2, ["number", { value: vol }], 0, 0, [0]]
+                ];
+                activity.blocks.loadNewBlocks(newVolume);
+                return blockNumber;
+            } else if (name === _("instrument")) {
+                let instr = blockArgs.length > 1 ? blockArgs[1] : "piano";
+                const newInstrument = [
+                    [0, "settimbre", x, y, [null, 1, null, 2]],
+                    [1, ["voicename", { value: instr }], 0, 0, [0]],
+                    [2, "hidden", 0, 0, [0, null]]
+                ];
+                activity.blocks.loadNewBlocks(newInstrument);
                 return blockNumber;
             } else {
                 const obj = activity.blocks.palettes.getProtoNameAndPalette(name);

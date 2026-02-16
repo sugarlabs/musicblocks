@@ -240,7 +240,8 @@ describe("Toolbar Class", () => {
             },
             stop: {
                 style: { color: "" },
-                addEventListener: jest.fn()
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn()
             },
             record: {
                 className: ""
@@ -267,6 +268,10 @@ describe("Toolbar Class", () => {
         expect(global.saveButtonAdvanced.disabled).toBe(true);
         expect(global.saveButton.className).toBe("grey-text inactiveLink");
         expect(elements.record.className).toBe("grey-text inactiveLink");
+        expect(elements.stop.removeEventListener).toHaveBeenCalledWith(
+            "click",
+            expect.any(Function)
+        );
         expect(elements.stop.addEventListener).toHaveBeenCalledWith("click", expect.any(Function));
 
         const stopClickHandler = elements.stop.addEventListener.mock.calls[0][1];
