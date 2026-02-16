@@ -36,7 +36,18 @@ self.addEventListener("activate", function (event) {
     event.waitUntil(self.clients.claim());
 });
 
+// Helper function to check if a request can be cached
+function isCacheableRequest(request) {
+    const url = new URL(request.url);
+    // Only cache HTTP and HTTPS requests
+    return url.protocol === "http:" || url.protocol === "https:";
+}
+
 function updateCache(request, response) {
+    // Don't cache requests with unsupported schemes
+    if (!isCacheableRequest(request)) {
+        return Promise.resolve();
+    }
     if (response.status === 206) {
         console.log("Partial response is unsupported for caching.");
         return Promise.resolve();
@@ -65,6 +76,11 @@ function fromCache(request) {
 // serve it from there first
 self.addEventListener("fetch", function (event) {
     if (event.request.method !== "GET") return;
+
+    // Only handle cacheable requests (HTTP/HTTPS)
+    if (!isCacheableRequest(event.request)) {
+        return;
+    }
 
     event.respondWith(
         fromCache(event.request).then(
