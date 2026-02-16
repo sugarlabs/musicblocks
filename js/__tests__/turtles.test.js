@@ -382,12 +382,14 @@ describe("setBackgroundColor", () => {
         turtles._scale = 1.0;
         global.platformColor = { background: "#ffffff" };
         turtles._backgroundColor = platformColor.background;
+        turtles.makeBackground = jest.fn();
     });
 
     test("should set default background color when index is -1", () => {
         turtles.setBackgroundColor(-1);
 
         expect(turtles._backgroundColor).toBe(platformColor.background);
+        expect(turtles.makeBackground).toHaveBeenCalled();
         expect(activityMock.refreshCanvas).toHaveBeenCalled();
     });
 
@@ -402,25 +404,22 @@ describe("setBackgroundColor", () => {
         turtles.setBackgroundColor(0);
 
         expect(turtles._backgroundColor).toBe("#ff0000");
+        expect(turtles.makeBackground).toHaveBeenCalled();
         expect(activityMock.refreshCanvas).toHaveBeenCalled();
     });
 
-    test("should update DOM body background color", () => {
+    test("should call makeBackground for default background", () => {
         turtles.setBackgroundColor(-1);
 
-        // jsdom normalizes hex colors to rgb format
-        const bgColor = document.body.style.backgroundColor;
-        expect(bgColor === platformColor.background || bgColor === "rgb(255, 255, 255)").toBe(true);
+        expect(turtles.makeBackground).toHaveBeenCalled();
     });
 
-    test("should update canvas background color", () => {
-        turtles.setBackgroundColor(-1);
+    test("should call makeBackground for turtle background", () => {
+        turtles.getTurtle = jest.fn().mockReturnValue({ painter: { canvasColor: "#00ff00" } });
 
-        // Canvas style object is a plain object, not a DOM style, so it keeps the original value
-        const canvasBg = activityMock.canvas.style.backgroundColor;
-        expect(canvasBg === platformColor.background || canvasBg === "rgb(255, 255, 255)").toBe(
-            true
-        );
+        turtles.setBackgroundColor(0);
+
+        expect(turtles.makeBackground).toHaveBeenCalled();
     });
 });
 
@@ -447,6 +446,7 @@ describe("doScale", () => {
         turtles._locked = false;
         turtles._queue = [];
         turtles._backgroundColor = "#ffffff";
+        turtles.makeBackground = jest.fn();
     });
 
     test("should update scale, width, and height when not locked", () => {
