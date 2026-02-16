@@ -218,6 +218,7 @@ class Logo {
 
         this.time = 0;
         this.firstNoteTime = null;
+        this.firstNoteAudioTime = null;
         this._turtleDelay = 0;
         this.sounds = [];
         this.cameraID = null;
@@ -289,6 +290,7 @@ class Logo {
 
         // Load the default synthesizer
         this.synth = new Synth();
+        this.synth.activity = this.activity; // Reference for voice tracking
         this.synth.changeInTemperament = false;
 
         // Mode widget
@@ -443,7 +445,9 @@ class Logo {
         }
 
         for (const turtle in this.activity.turtles.turtleList) {
-            for (const synth in this.activity.turtles.ithTurtle(turtle).singer.synthVolume) {
+            // Cache ithTurtle result to avoid redundant function calls in inner loop
+            const tur = this.activity.turtles.ithTurtle(turtle);
+            for (const synth in tur.singer.synthVolume) {
                 Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
             }
         }
@@ -462,7 +466,9 @@ class Logo {
 
         Singer.setMasterVolume(this.activity.logo, DEFAULTVOLUME);
         for (const turtle in this.activity.turtles.turtleList) {
-            for (const synth in this.activity.turtles.ithTurtle(turtle).singer.synthVolume) {
+            // Cache ithTurtle result to avoid redundant function calls in inner loop
+            const tur = this.activity.turtles.ithTurtle(turtle);
+            for (const synth in tur.singer.synthVolume) {
                 Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
             }
         }
@@ -521,8 +527,8 @@ class Logo {
             if (new RegExp("^[A-Za-z,. ]$").test(text[i])) new_text += text[i];
         }
 
-        if (this.meSpeak !== null) {
-            this.meSpeak.speak(new_text);
+        if (this._meSpeak) {
+            this._meSpeak.speak(new_text);
         }
     }
 
@@ -997,7 +1003,13 @@ class Logo {
 
         this.sounds = [];
 
+        // Kill all active audio voices to prevent "zombie audio"
         for (const turtle in this.activity.turtles.turtleList) {
+            const tur = this.activity.turtles.getTurtle(turtle);
+            if (tur && tur.singer && typeof tur.singer.killAllVoices === "function") {
+                tur.singer.killAllVoices();
+            }
+
             for (const instrumentName in instruments[turtle]) {
                 this.synth.stopSound(turtle, instrumentName);
             }
@@ -1099,6 +1111,7 @@ class Logo {
         // Run the Logo commands here.
         this.time = new Date().getTime();
         this.firstNoteTime = null;
+        this.firstNoteAudioTime = null;
 
         // Ensure we have at least one turtle.
         if (this.activity.turtles.getTurtleCount() === 0) {
@@ -1185,7 +1198,8 @@ class Logo {
         this.activity.blocks.findStacks();
         this.actions = {};
 
-        for (let blk = 0; blk < this.activity.blocks.stackList.length; blk++) {
+        const stackListLength = this.activity.blocks.stackList.length;
+        for (let blk = 0; blk < stackListLength; blk++) {
             if (
                 ["start", "drum", "status", "oscilloscope"].includes(
                     this.blockList[this.activity.blocks.stackList[blk]].name
@@ -1272,8 +1286,9 @@ class Logo {
             this.runFromBlock(this, turtle, startHere, 0, env);
         } else if (startBlocks.length > 0) {
             let delayStart = 0;
+            const startBlocksLength = startBlocks.length;
             // Look for status and oscilloscope blocks.
-            for (let b = 0; b < startBlocks.length; b++) {
+            for (let b = 0; b < startBlocksLength; b++) {
                 if (
                     ["status", "oscilloscope"].includes(this.blockList[startBlocks[b]].name) &&
                     !this.blockList[startBlocks[b]].trash
@@ -1300,7 +1315,7 @@ class Logo {
                 }
 
                 // If there are multiple start blocks, run them all.
-                for (let b = 0; b < startBlocks.length; b++) {
+                for (let b = 0; b < startBlocksLength; b++) {
                     if (!["status", "oscilloscope"].includes(this.blockList[startBlocks[b]].name)) {
                         const turtle = this.blockList[startBlocks[b]].value;
                         const tur = this.activity.turtles.ithTurtle(turtle);
@@ -1706,7 +1721,8 @@ class Logo {
             if (!logo._prematureRestart) {
                 // Make sure any unissued signals are dispatched.
                 for (const b in tur.endOfClampSignals) {
-                    for (let i = 0; i < tur.endOfClampSignals[b].length; i++) {
+                    const signalsLength = tur.endOfClampSignals[b].length;
+                    for (let i = 0; i < signalsLength; i++) {
                         if (tur.endOfClampSignals[b][i] != null) {
                             if (
                                 tur.butNotThese[b] == null ||
@@ -2314,8 +2330,9 @@ class Logo {
             }
         };
 
+        const embeddedGraphicsLength = tur.singer.embeddedGraphics[blk].length;
         let extendedGraphicsCounter = 0;
-        for (let i = 0; i < tur.singer.embeddedGraphics[blk].length; i++) {
+        for (let i = 0; i < embeddedGraphicsLength; i++) {
             const b = tur.singer.embeddedGraphics[blk][i];
             switch (this.blockList[b].name) {
                 case "forward":
@@ -2358,7 +2375,7 @@ class Logo {
             tur.singer.dispatchFactor = NOTEDIV;
         }
 
-        for (let i = 0; i < tur.singer.embeddedGraphics[blk].length; i++) {
+        for (let i = 0; i < embeddedGraphicsLength; i++) {
             const b = tur.singer.embeddedGraphics[blk][i];
             const name = this.blockList[b].name;
 

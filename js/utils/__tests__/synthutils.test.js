@@ -56,6 +56,10 @@ describe("Utility Functions (logic-only)", () => {
         setVolume,
         getVolume,
         setMasterVolume,
+        getTunerFrequency,
+        stopTuner,
+        newTone,
+        preloadProjectSamples,
         Synth;
 
     const turtle = "turtle1";
@@ -160,6 +164,10 @@ describe("Utility Functions (logic-only)", () => {
         setVolume = Synth.setVolume;
         getVolume = Synth.getVolume;
         setMasterVolume = Synth.setMasterVolume;
+        getTunerFrequency = Synth.getTunerFrequency;
+        stopTuner = Synth.stopTuner;
+        newTone = Synth.newTone;
+        preloadProjectSamples = Synth.preloadProjectSamples;
     });
 
     describe("setupRecorder", () => {
@@ -1047,6 +1055,72 @@ describe("Utility Functions (logic-only)", () => {
 
             expect(result.attack).toBe(0.5);
             expect(result.unknownKey).toBeUndefined();
+        });
+    });
+
+    describe("getTunerFrequency", () => {
+        it("should return 440 when tunerAnalyser is null", () => {
+            Synth.tunerAnalyser = null;
+            Synth.detectPitch = jest.fn();
+            expect(getTunerFrequency()).toBe(440);
+            expect(Synth.detectPitch).not.toHaveBeenCalled();
+        });
+
+        it("should return 440 when detectPitch is null", () => {
+            Synth.tunerAnalyser = { getValue: jest.fn() };
+            Synth.detectPitch = null;
+            expect(getTunerFrequency()).toBe(440);
+        });
+
+        it("should return 440 when detected pitch is zero or negative", () => {
+            Synth.tunerAnalyser = { getValue: jest.fn(() => new Float32Array(16)) };
+            Synth.detectPitch = jest.fn(() => 0);
+            expect(getTunerFrequency()).toBe(440);
+
+            Synth.detectPitch = jest.fn(() => -1);
+            expect(getTunerFrequency()).toBe(440);
+        });
+
+        it("should return detected pitch when valid", () => {
+            Synth.tunerAnalyser = { getValue: jest.fn(() => new Float32Array(16)) };
+            Synth.detectPitch = jest.fn(() => 261.63);
+            expect(getTunerFrequency()).toBe(261.63);
+        });
+    });
+
+    describe("stopTuner", () => {
+        it("should not throw when tunerMic is null", () => {
+            Synth.tunerMic = null;
+            expect(() => stopTuner()).not.toThrow();
+        });
+
+        it("should call close on tunerMic when it exists", () => {
+            const mockClose = jest.fn();
+            Synth.tunerMic = { close: mockClose };
+            stopTuner();
+            expect(mockClose).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("newTone", () => {
+        it("should set tone to the Tone module", () => {
+            Synth.tone = null;
+            newTone();
+            expect(Synth.tone).toBe(Tone);
+        });
+    });
+
+    describe("preloadProjectSamples", () => {
+        it("should return immediately for null input", async () => {
+            await expect(preloadProjectSamples(null)).resolves.toBeUndefined();
+        });
+
+        it("should return immediately for non-array input", async () => {
+            await expect(preloadProjectSamples("not-an-array")).resolves.toBeUndefined();
+        });
+
+        it("should return immediately for empty array", async () => {
+            await expect(preloadProjectSamples([])).resolves.toBeUndefined();
         });
     });
 });
