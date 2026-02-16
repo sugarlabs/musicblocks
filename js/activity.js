@@ -166,6 +166,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         "widgets/meterwidget",
         "widgets/PhraseMakerUtils",
         "widgets/PhraseMakerGrid",
+        "widgets/PhraseMakerUI",
         "widgets/phrasemaker",
         "widgets/arpeggio",
         "widgets/aiwidget",
