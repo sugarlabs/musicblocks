@@ -2889,6 +2889,7 @@ class Block {
         let moved = false;
         let locked = false;
         let getInput = window.hasMouse;
+        let isCollapseButtonClick = false; // Flag to prevent drag when clicking collapse/expand buttons
 
         /**
          * Handles the click event on the block container.
@@ -3028,6 +3029,8 @@ class Block {
 
                 if (isColExpClick) {
                     that.activity.trashcan.hide();
+                    isCollapseButtonClick = true; // Set flag to prevent drag
+                    event.stopPropagation(); // Prevent event from bubbling
                     return;
                 }
             }
@@ -3063,6 +3066,12 @@ class Block {
          * @param {Event} event - The pressmove event.
          */
         this.container.on("pressmove", event => {
+            // Prevent drag if collapse/expand button was clicked
+            if (isCollapseButtonClick) {
+                return;
+            }
+
+            // FIXME: More voodoo
             // Prevent the browser's default drag behavior
             event.nativeEvent.preventDefault();
 
@@ -3192,6 +3201,7 @@ class Block {
             that.blocks.activeBlock = null;
 
             moved = false;
+            isCollapseButtonClick = false; // Reset flag on mouseout
         });
 
         /**
@@ -3214,6 +3224,7 @@ class Block {
             that.blocks.activeBlock = null;
 
             moved = false;
+            isCollapseButtonClick = false; // Reset flag on pressup
         });
     }
 
