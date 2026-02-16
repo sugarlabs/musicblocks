@@ -335,8 +335,9 @@
                             <li>
                                 <a id="stop" class="left tooltipped"><i class="material-icons main">stop</i></a>
                             </li>
-                            <li>
-                                <a id="record" class="left tooltipped" data-tooltip="Record"></a>
+                            <li style="display: flex; align-items: center;">
+                                <a id="record" class="left tooltipped" data-position="bottom" data-tooltip="Record"></a>
+                                <a id="recordDropdownArrow" class="left dropdown-trigger" data-activates="recorddropdown" style="margin-left: -5px; padding: 0; font-size: 28px;"></a>
                             </li>
                         </ul>
 
@@ -500,6 +501,11 @@
                     <li><a id="save-mxml"></a></li>
                     <li><a id="save-blockartwork-svg"></a></li>
                     <li><a id="save-blockartwork-png"></a></li>
+                </ul>
+
+                <ul id="recorddropdown" class="dropdown-content">
+                    <li><a id="record-with-menus">Record canvas and toolbars</a></li>
+                    <li><a id="record-canvas-only">Record canvas only</a></li>
                 </ul>
 
                 <ul id="languagedropdown" class="dropdown-content">
