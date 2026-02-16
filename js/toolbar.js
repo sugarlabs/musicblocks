@@ -406,6 +406,14 @@ class Toolbar {
             }
         }
 
+        // Named handler to prevent memory leak from duplicate listeners
+        const stopClickHandler = () => {
+            clearTimeout(play_button_debounce_timeout);
+            isPlayIconRunning = true;
+            this.activity.hideMsgs();
+            handleClick();
+        };
+
         var tempClick = (playIcon.onclick = () => {
             const hideMsgs = () => {
                 this.activity.hideMsgs();
@@ -424,12 +432,9 @@ class Toolbar {
                 handleClick();
             }, 2000);
 
-            stopIcon.addEventListener("click", function () {
-                clearTimeout(play_button_debounce_timeout);
-                isPlayIconRunning = true;
-                hideMsgs();
-                handleClick();
-            });
+            // Remove existing listener before adding to prevent accumulation
+            stopIcon.removeEventListener("click", stopClickHandler);
+            stopIcon.addEventListener("click", stopClickHandler);
         });
     }
 
@@ -878,17 +883,128 @@ class Toolbar {
      */
     updateRecordButton(rec_onclick) {
         const Record = docById("record");
+        const RecordDropdownArrow = docById("recordDropdownArrow");
         const browser = fnBrowserDetect();
         const hideIn = ["firefox", "safari"];
 
         if (hideIn.includes(browser)) {
             Record.classList.add("hide");
+            if (RecordDropdownArrow) RecordDropdownArrow.classList.add("hide");
             return;
         }
 
-        Record.style.display = "block";
+        if (!Record) {
+            return;
+        }
+
+        // Check beginner mode before showing buttons
+        if (!this.activity.beginnerMode) {
+            Record.classList.remove("hide");
+            Record.style.display = "block";
+        }
         Record.innerHTML = `<i class="material-icons main">${RECORDBUTTON}</i>`;
-        Record.onclick = () => rec_onclick(this.activity);
+
+        // Remove any existing onclick handler
+        Record.onclick = null;
+
+        // Set the onclick handler
+        Record.onclick = function () {
+            const savedMode = localStorage.getItem("musicBlocksRecordMode") || "screen";
+            rec_onclick();
+        };
+
+        if (RecordDropdownArrow) {
+            // Check beginner mode before showing buttons
+            if (!this.activity.beginnerMode) {
+                RecordDropdownArrow.classList.remove("hide");
+                RecordDropdownArrow.style.display = "block";
+            }
+            RecordDropdownArrow.innerHTML = `<i class="material-icons main" style="font-size: 28px;">arrow_drop_down</i>`;
+
+            // Toggle arrow on click
+            RecordDropdownArrow.addEventListener("click", function () {
+                setTimeout(() => {
+                    const dropdown = docById("recorddropdown");
+                    const arrowIcon = RecordDropdownArrow.querySelector("i");
+                    if (
+                        dropdown &&
+                        dropdown.style.display !== "none" &&
+                        dropdown.offsetParent !== null
+                    ) {
+                        arrowIcon.textContent = "arrow_drop_up";
+                    } else {
+                        arrowIcon.textContent = "arrow_drop_down";
+                    }
+                }, 50);
+            });
+
+            // Reset arrow when clicking outside (close dropdown)
+            document.addEventListener("click", function (e) {
+                const dropdown = docById("recorddropdown");
+                const arrowIcon = RecordDropdownArrow.querySelector("i");
+                if (
+                    arrowIcon &&
+                    !RecordDropdownArrow.contains(e.target) &&
+                    !dropdown.contains(e.target)
+                ) {
+                    arrowIcon.textContent = "arrow_drop_down";
+                }
+            });
+        }
+
+        // Set up click handlers for dropdown options
+        const recordWithMenus = docById("record-with-menus");
+        const recordCanvasOnly = docById("record-canvas-only");
+
+        // Function to update highlighting based on current mode
+        const updateModeHighlight = () => {
+            const currentMode = localStorage.getItem("musicBlocksRecordMode") || "screen";
+
+            // Remove highlight from both
+            if (recordWithMenus) {
+                recordWithMenus.style.backgroundColor = "";
+                recordWithMenus.style.fontWeight = "";
+            }
+            if (recordCanvasOnly) {
+                recordCanvasOnly.style.backgroundColor = "";
+                recordCanvasOnly.style.fontWeight = "";
+            }
+
+            // Add highlight to current mode
+            if (currentMode === "screen" && recordWithMenus) {
+                recordWithMenus.style.backgroundColor = "#e3f2fd";
+                recordWithMenus.style.fontWeight = "bold";
+            } else if (currentMode === "canvas" && recordCanvasOnly) {
+                recordCanvasOnly.style.backgroundColor = "#e3f2fd";
+                recordCanvasOnly.style.fontWeight = "bold";
+            }
+        };
+
+        // Initialize highlighting on page load
+        updateModeHighlight();
+
+        if (recordWithMenus) {
+            recordWithMenus.onclick = e => {
+                e.preventDefault();
+                localStorage.setItem("musicBlocksRecordMode", "screen");
+                updateModeHighlight();
+                // Reset arrow after selection
+                const arrowIcon = RecordDropdownArrow.querySelector("i");
+                if (arrowIcon) arrowIcon.textContent = "arrow_drop_down";
+            };
+        }
+
+        if (recordCanvasOnly) {
+            recordCanvasOnly.onclick = e => {
+                e.preventDefault();
+                localStorage.setItem("musicBlocksRecordMode", "canvas");
+                updateModeHighlight();
+
+                // Reset arrow after selection
+                const arrowIcon = RecordDropdownArrow.querySelector("i");
+                if (arrowIcon) arrowIcon.textContent = "arrow_drop_down";
+            };
+        }
     }
 
     /**
@@ -1001,13 +1117,34 @@ class Toolbar {
 
             // Update record button
             const recordButton = docById("record");
+            const recordDropdownArrow = docById("recordDropdownArrow");
+            const recordDropdown = docById("recorddropdown");
             if (recordButton) {
                 if (!this.activity.beginnerMode) {
                     recordButton.style.display = "block";
-                    this.updateRecordButton();
-                    recordButton.onclick = () => rec_onclick(this.activity);
+                    if (recordButton.classList) recordButton.classList.remove("hide");
+                    if (recordDropdownArrow) {
+                        recordDropdownArrow.style.display = "block";
+                        if (recordDropdownArrow.classList)
+                            recordDropdownArrow.classList.remove("hide");
+                    }
+                    if (recordDropdown) {
+                        if (recordDropdown.classList) recordDropdown.classList.remove("hide");
+                        // Let Materialize handle the display, don't force it
+                    }
+                    this.updateRecordButton(rec_onclick);
                 } else {
                     recordButton.style.display = "none";
+                    if (recordButton.classList) recordButton.classList.add("hide");
+                    if (recordDropdownArrow) {
+                        recordDropdownArrow.style.display = "none";
+                        if (recordDropdownArrow.classList)
+                            recordDropdownArrow.classList.add("hide");
+                    }
+                    if (recordDropdown) {
+                        recordDropdown.style.display = "none";
+                        if (recordDropdown.classList) recordDropdown.classList.add("hide");
+                    }
                 }
             }
 
