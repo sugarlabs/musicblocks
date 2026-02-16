@@ -56,6 +56,15 @@ const jsTask = () => {
         .pipe(dest("dist"));
 };
 
+// Lint task for JS files
+const lintTask = () => {
+    return gulp
+        .src(["js/**/*.js", "!node_modules/**"])
+        .pipe(eslint())
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError());
+};
+
 // Cachebust
 const cbString = new Date().getTime();
 const cacheBustTask = () => {
@@ -87,10 +96,14 @@ const validate = () => {
 // Watch task: watch SASS , CSS and JS files for changes
 // If any change, run sass, css and js tasks simultaneously
 const watchTask = () => {
+<<<<<<< HEAD
     return watch(
         [files.jsPath, files.cssPath, files.sassPath],
         parallel(jsTask, cssTask, sassTask)
     );
+=======
+    watch([files.jsPath, files.cssPath, files.sassPath], parallel(jsTask, cssTask, sassTask));
+>>>>>>> 4c7ee599 (chore: fix Prettier formatting issues)
 };
 
 // Export the default Gulp task so it can be run
@@ -100,6 +113,11 @@ exports.default = series(
     parallel(jsTask, cssTask, sassTask),
     prettify,
     cacheBustTask,
+<<<<<<< HEAD
     validate,
     watchTask
+=======
+    watchTask,
+    validate
+>>>>>>> 4c7ee599 (chore: fix Prettier formatting issues)
 );
