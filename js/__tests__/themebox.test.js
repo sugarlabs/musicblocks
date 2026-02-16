@@ -135,4 +135,69 @@ describe("ThemeBox", () => {
         const canvas = document.getElementById("canvas");
         expect(canvas.style.backgroundColor).toBe("rgb(249, 249, 249)");
     });
+    test("applyThemeInstantly() updates turtles background if turtles exist", () => {
+        mockActivity.turtles = {
+            _locked: true,
+            _backgroundColor: "",
+            makeBackground: jest.fn()
+        };
+
+        themeBox._theme = "dark";
+        themeBox.applyThemeInstantly();
+        expect(mockActivity.turtles._locked).toBe(false);
+        expect(mockActivity.turtles._backgroundColor).toBe("#303030");
+        expect(mockActivity.turtles.makeBackground).toHaveBeenCalled();
+        expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+    });
+    test("refreshUIComponents() updates floating windows style for dark mode", () => {
+        const windowsContainer = document.createElement("div");
+        windowsContainer.id = "floatingWindows";
+        const winFrame = document.createElement("div");
+        winFrame.className = "windowFrame";
+        windowsContainer.appendChild(winFrame);
+        document.body.appendChild(windowsContainer);
+
+        themeBox._theme = "dark";
+        themeBox.refreshUIComponents();
+        expect(winFrame.style.backgroundColor).toBe("rgb(69, 69, 69)");
+        expect(winFrame.style.borderColor).toBe("#000000");
+        themeBox._theme = "light";
+        themeBox.refreshUIComponents();
+        expect(winFrame.style.backgroundColor).toBe("");
+        expect(winFrame.style.borderColor).toBe("");
+    });
+    test("refreshUIComponents() updates planet iframe theme classes", () => {
+        const iframe = document.createElement("iframe");
+        iframe.id = "planet-iframe";
+        document.body.appendChild(iframe);
+        const mockIframeBody = {
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn()
+            }
+        };
+        Object.defineProperty(iframe, "contentDocument", {
+            value: { body: mockIframeBody },
+            writable: true
+        });
+
+        themeBox._theme = "dark";
+        themeBox.refreshUIComponents();
+        expect(mockIframeBody.classList.add).toHaveBeenCalledWith("dark");
+        expect(mockIframeBody.classList.remove).toHaveBeenCalledWith("light");
+    });
+    test("refreshUIComponents() updates palette border color", () => {
+        mockActivity.palettes = { myPalette: {} };
+
+        themeBox._theme = "dark";
+
+        themeBox.refreshUIComponents();
+
+        const paletteChild = document.getElementById("palette").childNodes[0];
+        expect(paletteChild.style.border).toContain("1px solid");
+    });
+    test("reload() calls window.location.reload", () => {
+        themeBox.reload();
+        expect(window.location.reload).toHaveBeenCalled();
+    });
 });
