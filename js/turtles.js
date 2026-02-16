@@ -912,10 +912,10 @@ Turtles.TurtlesView = class {
             container.setAttribute(
                 "style",
                 "position: absolute; right:" +
-                    (document.body.clientWidth - x) +
-                    "px;  top: " +
-                    y +
-                    "px;"
+                (document.body.clientWidth - x) +
+                "px;  top: " +
+                y +
+                "px;"
             );
             docById("buttoncontainerTOP").appendChild(container);
             return container;
@@ -1193,7 +1193,7 @@ Turtles.TurtlesView = class {
             }
             const cont = document.createElement("div");
             document.body.appendChild(cont);
-            cont.style.display = second ? "block" : "none";
+            cont.style.display = "block";
             cont.setAttribute("id", "buttoncontainerTOP");
             __makeCollapseButton();
             __makeExpandButton();
