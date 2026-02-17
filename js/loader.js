@@ -86,6 +86,9 @@ requirejs.config({
             deps: ["utils/utils"],
             exports: "Synth"
         },
+        "activity/logoconstants": {
+            deps: ["utils/utils"]
+        },
         "activity/logo": {
             deps: [
                 "activity/turtles",
