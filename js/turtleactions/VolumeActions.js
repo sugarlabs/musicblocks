@@ -97,6 +97,8 @@ function setupVolumeActions(activity) {
                     );
                     tur.singer.crescendoInitialVolume[synth].pop();
                 }
+
+                tur.singer.inCrescendo.pop();
             };
 
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
