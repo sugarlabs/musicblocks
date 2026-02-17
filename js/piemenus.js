@@ -99,9 +99,16 @@ const getPieMenuSize = block => {
     return Math.min(canvas.width, canvas.height);
 };
 
+// Debounce resize handler for performance
+let wheelResizeTimeout;
+const debouncedSetWheelSize = () => {
+    clearTimeout(wheelResizeTimeout);
+    wheelResizeTimeout = setTimeout(setWheelSize, 150);
+};
+
 // Call the function initially and whenever the window is resized
 setWheelSize();
-window.addEventListener("resize", setWheelSize);
+window.addEventListener("resize", debouncedSetWheelSize);
 
 /**
  * Enables mouse-wheel scrolling to rotate a wheelnav instance without triggering previews.
@@ -168,6 +175,37 @@ const enableWheelScroll = (wheel, itemCount) => {
     // Store the handler so we can remove it later
     wheelDiv._scrollHandler = scrollHandler;
     wheelDiv.addEventListener("wheel", scrollHandler, { passive: false });
+};
+
+// Ensure exit wheels behave like stateless buttons (no sticky selection)
+const configureExitWheel = exitWheel => {
+    if (!exitWheel || !exitWheel.navItems) {
+        return;
+    }
+
+    const clearSelection = () => {
+        exitWheel.selectedNavItemIndex = null;
+        for (let i = 0; i < exitWheel.navItems.length; i++) {
+            exitWheel.navItems[i].selected = false;
+            exitWheel.navItems[i].hovered = false;
+        }
+        if (exitWheel.raphael && exitWheel.raphael.canvas) {
+            exitWheel.refreshWheel(true);
+        }
+    };
+
+    clearSelection();
+
+    exitWheel.navigateWheel = clicked => {
+        const item = exitWheel.navItems[clicked];
+        if (!item || item.enabled === false) {
+            return;
+        }
+        clearSelection();
+        if (typeof item.navigateFunction === "function") {
+            item.navigateFunction();
+        }
+    };
 };
 
 /**
@@ -264,6 +302,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     if (!custom) {
         block._accidentalsWheel.colors = platformColor.accidentalsWheelcolors;
@@ -1025,6 +1064,9 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
+
+    // Avoid auto-selecting the close button on open.
 
     const that = block;
 
@@ -1262,6 +1304,7 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     block._octavesWheel.colors = platformColor.octavesWheelcolors;
     block._octavesWheel.slicePathFunction = slicePath().DonutSlice;
@@ -1518,6 +1561,7 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -1682,6 +1726,7 @@ const piemenuNoteValue = (block, noteValue) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const tabsLabels = [];
     for (let i = 0; i < WHEELVALUES.length; i++) {
@@ -1948,6 +1993,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     block._exitWheel.navItems[2].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[2].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -2235,6 +2281,7 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -2400,6 +2447,7 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -2651,6 +2699,7 @@ const piemenuChords = (block, selectedChord) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -2804,6 +2853,7 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -2998,6 +3048,7 @@ const piemenuIntervals = (block, selectedInterval) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -3236,6 +3287,7 @@ const piemenuModes = (block, selectedMode) => {
     block._exitWheel.navItems[1].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[1].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -3712,13 +3764,20 @@ const piemenuBlockContext = block => {
         docById("contextWheelDiv").style.display = "none";
     };
 
-    document.body.addEventListener("click", event => {
+    // Named function for proper cleanup
+    const hideContextWheelOnClick = event => {
         const wheelElement = document.getElementById("contextWheelDiv");
         const displayStyle = window.getComputedStyle(wheelElement).display;
         if (displayStyle === "block") {
             wheelElement.style.display = "none";
+            // Remove listener after hiding to prevent memory leak
+            document.body.removeEventListener("click", hideContextWheelOnClick);
         }
-    });
+    };
+
+    // Remove any existing listener before adding a new one
+    document.body.removeEventListener("click", hideContextWheelOnClick);
+    document.body.addEventListener("click", hideContextWheelOnClick);
 
     if (
         ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].includes(
@@ -3847,6 +3906,7 @@ const piemenuGrid = activity => {
     activity.turtles._exitWheel.sliceInitPathCustom = activity.turtles._exitWheel.slicePathCustom;
     activity.turtles._exitWheel.clickModeRotate = false;
     activity.turtles._exitWheel.createWheel(["×", " "]);
+    configureExitWheel(activity.turtles._exitWheel);
 
     activity.turtles._exitWheel.navItems[0].navigateFunction = () => {
         hidePiemenu(activity);
@@ -3957,6 +4017,7 @@ const piemenuKey = activity => {
     exitWheel.colors = platformColor.exitWheelcolors;
     exitWheel.animatetime = 0;
     exitWheel.createWheel(["×", " "]);
+    configureExitWheel(exitWheel);
 
     const x = event.clientX;
     const y = event.clientY;
@@ -4278,6 +4339,7 @@ const piemenuDissectNumber = widget => {
     exitWheel.navItems[2].titleSelectedAttr.cursor = "pointer";
     exitWheel.navItems[2].titleHoverAttr.cursor = "pointer";
     exitWheel.createWheel();
+    configureExitWheel(exitWheel);
 
     // Handle selection
     const __selectionChanged = () => {
