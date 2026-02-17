@@ -143,7 +143,7 @@ self.addEventListener("fetch", function (event) {
                 // This is where we call the server to get the newest
                 // version of the file to use the next time we show view
                 event.waitUntil(
-		    fetch(event.request).then(function (response) {
+                    fetch(event.request).then(function (response) {
                         if (response.ok) {
                             return updateCache(event.request, response);
                         }
@@ -153,10 +153,10 @@ self.addEventListener("fetch", function (event) {
             },
             async function () {
                 // The response was not found in the cache so we look
-		// for it on the server
+                // for it on the server
                 try {
                     const response = await fetch(event.request);
-		    if (response.ok) {
+                    if (response.ok) {
                         event.waitUntil(updateCache(event.request, response.clone()));
                     }
                     return response;
