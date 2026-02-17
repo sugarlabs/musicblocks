@@ -150,10 +150,10 @@ const themeConfigs = {
     },
     highcontrast: {
         textColor: "#FFFFFF",
-        blockText: "#FFFFFF",
+        blockText: "#000000",
         dialogueBox: "#000000",
         strokeColor: "#FFFFFF",
-        fillColor: "#000000",
+        fillColor: "#FFFFFF",
         blueButton: "#00FFFF",
         blueButtonHover: "#00CCCC",
         cancelButton: "#FFFFFF",
@@ -305,7 +305,14 @@ class ThemeBox {
             for (const blockId in this.activity.blocks.blockList) {
                 const block = this.activity.blocks.blockList[blockId];
                 if (block && block.protoblock && block.protoblock.palette) {
-                    // Redraw block to update colors
+                    // Update text color directly
+                    if (block.text) {
+                        block.text.color = window.platformColor.blockText;
+                    }
+                    if (block.collapseText) {
+                        block.collapseText.color = window.platformColor.blockText;
+                    }
+                    // Redraw block to update other colors
                     if (typeof block.regenerateArtwork === "function") {
                         block.regenerateArtwork(false);
                     }
@@ -351,6 +358,60 @@ class ThemeBox {
                 const paletteElement = document.getElementById("palette");
                 if (paletteElement && paletteElement.childNodes[0]) {
                     paletteElement.childNodes[0].style.border = `1px solid ${window.platformColor.selectorSelected}`;
+                }
+
+                // Refresh palette selector icons with new theme colors
+                const tr = document.querySelector("#palette > div > table > thead > tr");
+                if (tr) {
+                    for (let j = 0; j < MULTIPALETTEICONS.length; j++) {
+                        const img = makePaletteIcons(
+                            PALETTEICONS[MULTIPALETTEICONS[j]]
+                                .replace(
+                                    "background_fill_color",
+                                    platformColor.paletteLabelBackground
+                                )
+                                .replace(/stroke_color/g, platformColor.strokeColor)
+                                .replace(/fill_color/g, platformColor.fillColor),
+                            this.activity.palettes.cellSize,
+                            this.activity.palettes.cellSize
+                        );
+                        tr.children[j].children[0].src = img.src;
+                        tr.children[j].children[1].style.background =
+                            platformColor.paletteLabelBackground;
+                    }
+                }
+
+                // Refresh palette buttons and labels
+                const tbody = document.querySelector("#palette > div > table:nth-child(2) > tbody");
+                if (tbody) {
+                    // Update search button and label
+                    const searchRow = tbody.rows[0];
+                    if (searchRow) {
+                        const searchIcon = makePaletteIcons(
+                            PALETTEICONS["search"],
+                            this.activity.palettes.cellSize,
+                            this.activity.palettes.cellSize
+                        );
+                        searchRow.cells[0].firstChild.src = searchIcon.src;
+                        searchRow.cells[1].style.color = platformColor.paletteText;
+                        searchRow.style.backgroundColor = platformColor.paletteBackground;
+                    }
+
+                    // Update other palette buttons
+                    for (let i = 1; i < tbody.rows.length; i++) {
+                        const row = tbody.rows[i];
+                        const label = row.cells[1].textContent.trim().toLowerCase();
+                        if (label && PALETTEICONS[label]) {
+                            const icon = makePaletteIcons(
+                                PALETTEICONS[label],
+                                this.activity.palettes.cellSize,
+                                this.activity.palettes.cellSize
+                            );
+                            row.cells[0].firstChild.src = icon.src;
+                            row.cells[1].style.color = platformColor.paletteText;
+                            row.style.backgroundColor = platformColor.paletteBackground;
+                        }
+                    }
                 }
             } catch (e) {
                 console.debug("Could not refresh palette:", e);
