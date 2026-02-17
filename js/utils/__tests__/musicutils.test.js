@@ -2404,3 +2404,15 @@ describe("getStepSizeUp", () => {
         expect(result).toBe(0);
     });
 });
+
+describe("getStepSizeDown", () => {
+    it("should return the correct step size for C in C major going down", () => {
+        const result = getStepSizeDown("C major", "C", 0, "equal");
+        expect(result).toBe(-1);
+    });
+
+    it("should return 0 for an invalid temperament", () => {
+        const result = getStepSizeDown("C major", "C", 0, "invalid");
+        expect(result).toBe(0);
+    });
+});
