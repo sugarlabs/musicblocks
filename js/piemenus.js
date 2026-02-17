@@ -172,7 +172,6 @@ const __ensurePieMenuLiveRegion = () => {
     if (liveRegion) {
         return liveRegion;
     }
-
     liveRegion = document.createElement("div");
     liveRegion.id = "pieMenuLiveRegion";
     liveRegion.setAttribute("role", "status");
