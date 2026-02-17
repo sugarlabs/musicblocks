@@ -762,7 +762,12 @@ class Logo {
                     if (logo.blockList[blk].name in logo.evalArgDict) {
                         // eslint-disable-next-line no-console
                         console.log("running eval on " + logo.blockList[blk].name);
-                        eval(logo.evalArgDict[logo.blockList[blk].name]);
+                        this.safePluginExecute(
+                            logo.evalArgDict[logo.blockList[blk].name],
+                            logo,
+                            turtle,
+                            blk
+                        );
                     } else {
                         // eslint-disable-next-line no-console
                         console.error("I do not know how to " + logo.blockList[blk].name);
@@ -1098,7 +1103,7 @@ class Logo {
         this.activity.saveLocally(); // Save the state before running.
 
         for (const arg in this.evalOnStartList) {
-            eval(this.evalOnStartList[arg]);
+            this.safePluginExecute(this.evalOnStartList[arg], this);
         }
 
         this.stopTurtle = false;
@@ -1521,7 +1526,12 @@ class Logo {
                 // eslint-disable-next-line no-console
                 console.log("running eval on " + logo.blockList[blk].name);
                 logo.pluginReturnValue = null;
-                eval(logo.evalFlowDict[logo.blockList[blk].name]);
+                logo.safePluginExecute(
+                    logo.evalFlowDict[logo.blockList[blk].name],
+                    logo,
+                    turtle,
+                    blk
+                );
                 // Clamp blocks will return the child flow.
                 res = logo.pluginReturnValue;
             } else {
@@ -2481,6 +2491,27 @@ class Logo {
         // Mark the end time of this note's graphics operations.
         await delayExecution(beatValue * 1000);
         tur.embeddedGraphicsFinished = true;
+    }
+
+    /**
+     * Executes plugin code safely.
+     * @param code - The plugin code string to execute.
+     * @param logo - The logo object.
+     * @param turtle - The turtle index.
+     * @param blk - The block index.
+     * @param value - An optional value for setters.
+     */
+    safePluginExecute(code, logo, turtle, blk, value) {
+        if (typeof code !== "string") return;
+        // The security policy is to only execute code from vetted or user-confirmed plugins.
+        // This is primarily handled at plugin load time in processPluginData.
+        try {
+            // eslint-disable-next-line no-eval
+            eval(code);
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error("Plugin execution failed: ", e);
+        }
     }
 }
 

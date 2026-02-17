@@ -997,7 +997,7 @@ class Palette {
                 if (["media", "camera", "video"].includes(b.blkname)) {
                     // Use artwork.js strings as images for:
                     // cameraPALETTE, videoPALETTE, mediaPALETTE
-                    img = makePaletteIcons(eval(b.blkname + "PALETTE"));
+                    img = makePaletteIcons(window[b.blkname + "PALETTE"]);
                 } else {
                     // or use the plugin image...
                     img = makePaletteIcons(this.activity.pluginsImages[b.blkname]);

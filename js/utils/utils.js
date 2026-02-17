@@ -654,17 +654,41 @@ const processPluginData = (activity, pluginData, pluginSource) => {
         return null;
     }
 
-    const isTrustedPluginSource = src => {
-        if (!src) return false;
-
-        // allow only local paths
-        return (
-            src.startsWith("./") ||
-            src.startsWith("../") ||
-            src.startsWith("/") ||
-            (!src.includes("http://") && !src.includes("https://"))
-        );
+    const isVettedPlugin = source => {
+        if (!source) return false;
+        // Plugins from the local plugins folder are considered vetted (provenance)
+        if (source.startsWith("plugins/") || source.startsWith("./plugins/")) {
+            return true;
+        }
+        // Known plugins from local storage are also trusted as they were approved previously
+        if (source === "localStorage:plugins") {
+            return true;
+        }
+        return false;
     };
+
+    let userConfirmed = isVettedPlugin(pluginSource);
+
+    if (!userConfirmed) {
+        userConfirmed = confirm(
+            _("Security Warning") +
+                "\n\n" +
+                _(
+                    "This plugin contains code that will be executed in your browser. It has not been loaded from the built-in plugins directory and may contain unsafe code."
+                ) +
+                "\n\n" +
+                _("Do you want to allow this plugin to run?") +
+                "\n\n" +
+                _("Source: ") +
+                (pluginSource || _("unknown"))
+        );
+
+        if (!userConfirmed) {
+            // eslint-disable-next-line no-console
+            console.warn("User declined unvetted plugin execution:", pluginSource);
+            return null;
+        }
+    }
 
     const safeEval = (code, label = "plugin") => {
         if (typeof code !== "string") return;
@@ -677,7 +701,7 @@ const processPluginData = (activity, pluginData, pluginSource) => {
         }
 
         // NOTE: This eval is required for the Plugin system to load dynamic block definitions.
-        // The content comes from plugin JSON files which satisfy the isTrustedPluginSource check.
+        // The content comes from plugin JSON files which have been vetted or user-confirmed.
         try {
             // eslint-disable-next-line no-eval
             eval(code);
@@ -686,12 +710,6 @@ const processPluginData = (activity, pluginData, pluginSource) => {
             console.error("Plugin execution failed:", label, e);
         }
     };
-
-    if (!isTrustedPluginSource(pluginSource)) {
-        // eslint-disable-next-line no-console
-        console.warn("Blocked untrusted plugin source:", pluginSource);
-        return null;
-    }
 
     let obj;
     try {
