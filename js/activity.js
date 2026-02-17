@@ -2087,8 +2087,9 @@ class Activity {
                 // Queue and take first step.
                 if (!this.turtles.running()) {
                     this.logo.runLogoCommands();
-                    document.getElementById("stop").style.color =
-                        this.toolbar.stopIconColorWhenPlaying;
+                    document.getElementById(
+                        "stop"
+                    ).style.color = this.toolbar.stopIconColorWhenPlaying;
                 }
                 this.logo.step();
             } else {
@@ -2418,8 +2419,9 @@ class Activity {
                     i < this.palettes.dict[this.palettes.activePalette].protoList.length;
                     i++
                 ) {
-                    const name =
-                        this.palettes.dict[this.palettes.activePalette].protoList[i]["name"];
+                    const name = this.palettes.dict[this.palettes.activePalette].protoList[i][
+                        "name"
+                    ];
                     if (name in obj["FLOWPLUGINS"]) {
                         // eslint-disable-next-line no-console
                         console.log("deleting " + name);
@@ -2931,6 +2933,11 @@ class Activity {
             let lastActivity = Date.now();
             let isIdle = false;
 
+            // Prevent duplicate intervals
+            if (this._idleWatcherIntervalId) {
+                clearInterval(this._idleWatcherIntervalId);
+            }
+
             // Wake up function - restores full framerate
             const resetIdleTimer = () => {
                 lastActivity = Date.now();
@@ -2942,6 +2949,9 @@ class Activity {
                 }
             };
 
+            // Store reset handler for cleanup
+            this._resetIdleTimer = resetIdleTimer;
+
             // Track user activity
             window.addEventListener("mousemove", resetIdleTimer);
             window.addEventListener("mousedown", resetIdleTimer);
@@ -2950,7 +2960,7 @@ class Activity {
             window.addEventListener("wheel", resetIdleTimer);
 
             // Periodic check for idle state
-            setInterval(() => {
+            this._idleWatcherIntervalId = setInterval(() => {
                 // Check if music/code is playing
                 const isMusicPlaying = this.logo?._alreadyRunning || false;
 
@@ -2969,6 +2979,26 @@ class Activity {
             // Expose activity instance for external checks
             if (typeof window !== "undefined") {
                 window.activity = this;
+            }
+        };
+
+        /**
+         * Cleans up the Idle Watcher resources.
+         * Clears the interval and removes event listeners to prevent memory leaks.
+         * This method can be called when the activity is being destroyed or reset.
+         */
+        this.cleanupIdleWatcher = function () {
+            if (this._idleWatcherIntervalId) {
+                clearInterval(this._idleWatcherIntervalId);
+                this._idleWatcherIntervalId = null;
+            }
+
+            if (this._resetIdleTimer) {
+                window.removeEventListener("mousemove", this._resetIdleTimer);
+                window.removeEventListener("mousedown", this._resetIdleTimer);
+                window.removeEventListener("keydown", this._resetIdleTimer);
+                window.removeEventListener("touchstart", this._resetIdleTimer);
+                window.removeEventListener("wheel", this._resetIdleTimer);
             }
         };
 
@@ -5377,8 +5407,9 @@ class Activity {
                             }
                         }
                         staffBlocksMap[staffIndex].baseBlocks[0][0][firstnammedo][4][0] = blockId;
-                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][endnammedo][4][1] =
-                            null;
+                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
+                            endnammedo
+                        ][4][1] = null;
 
                         blockId += 2;
                     } else {
@@ -5446,8 +5477,9 @@ class Activity {
                                 prevnameddo
                             ][4][1] = blockId;
                         } else {
-                            staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3] =
-                                blockId;
+                            staffBlocksMap[staffIndex].repeatBlock[
+                                prevrepeatnameddo
+                            ][4][3] = blockId;
                         }
                         if (afternamedo !== -1) {
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
@@ -6322,8 +6354,8 @@ class Activity {
                                 let customName = "custom";
                                 if (myBlock.connections[1] !== null) {
                                     // eslint-disable-next-line max-len
-                                    customName =
-                                        this.blocks.blockList[myBlock.connections[1]].value;
+                                    customName = this.blocks.blockList[myBlock.connections[1]]
+                                        .value;
                                 }
                                 // eslint-disable-next-line no-console
                                 console.log(customName);
