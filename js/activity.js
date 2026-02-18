@@ -7076,10 +7076,10 @@ class Activity {
          */
         this.highlightBlock = (blk, minDurationMs = 300) => {
             // Skip highlighting in test environment
-            if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
+            if (typeof process !== "undefined" && process.env.NODE_ENV === "test") {
                 return;
             }
-            
+
             if (blk === undefined || !this.blocks.blockList[blk]) {
                 return;
             }
@@ -7125,10 +7125,10 @@ class Activity {
          */
         this.unhighlightBlock = (blk, force = false) => {
             // Skip highlighting in test environment
-            if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
+            if (typeof process !== "undefined" && process.env.NODE_ENV === "test") {
                 return;
             }
-            
+
             if (blk === undefined || !this.blocks.blockList[blk]) {
                 return;
             }
