@@ -94,6 +94,8 @@ describe("setupVolumeActions", () => {
             blocks: {
                 blockList: {}
             },
+            highlightBlock: jest.fn(),
+            unhighlightBlock: jest.fn(),
             logo: {
                 setDispatchBlock: jest.fn(),
                 setTurtleListener: jest.fn(),

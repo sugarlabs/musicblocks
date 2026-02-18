@@ -78,6 +78,8 @@ describe("setupRhythmActions", () => {
             blocks: {
                 blockList: {}
             },
+            highlightBlock: jest.fn(),
+            unhighlightBlock: jest.fn(),
             stage: {
                 dispatchEvent: jest.fn()
             },
