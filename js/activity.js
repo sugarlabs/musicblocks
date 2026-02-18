@@ -4599,14 +4599,24 @@ class Activity {
          * When turtle stops running restore stop button to normal state
          */
         this.onStopTurtle = () => {
-            // TODO: plugin support
+            const stopButton = document.getElementById("stop");
+            if (stopButton) {
+                stopButton.style.color = "white";
+                stopButton.style.display = "none";
+            }
         };
 
         /*
          * When turtle starts running change stop button to running state
          */
         this.onRunTurtle = () => {
-            // TODO: plugin support
+            const stopButton = document.getElementById("stop");
+            if (stopButton) {
+                stopButton.style.display = "inline-block";
+                stopButton.style.color = this.toolbar
+                    ? this.toolbar.stopIconColorWhenPlaying
+                    : window.platformColor.stopIconcolor;
+            }
         };
 
         /*

@@ -448,6 +448,8 @@ class Toolbar {
     renderStopIcon(onclick) {
         const stopIcon = docById("stop");
         const recordButton = docById("record");
+        stopIcon.style.display = "none";
+        stopIcon.style.color = "white";
         stopIcon.onclick = () => {
             onclick(this.activity);
             stopIcon.style.color = "white";
