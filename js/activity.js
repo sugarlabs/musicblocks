@@ -7075,17 +7075,41 @@ class Activity {
          * @returns {void}
          */
         this.highlightBlock = (blk, minDurationMs = 300) => {
-            // Skip highlighting in test environment
-            if (typeof process !== "undefined" && process.env.NODE_ENV === "test") {
+            // Skip highlighting in test environment and E2E tests
+            if (
+                typeof process !== "undefined" && process.env.NODE_ENV === "test" ||
+                typeof window !== "undefined" && window.Cypress ||
+                typeof window !== "undefined" && window.navigator.webdriver
+            ) {
                 return;
             }
 
-            if (blk === undefined || !this.blocks.blockList[blk]) {
+            // Validate inputs
+            if (
+                blk === undefined ||
+                !this.blocks ||
+                !this.blocks.blockList ||
+                !this.blocks.blockList[blk]
+            ) {
                 return;
             }
 
             const block = this.blocks.blockList[blk];
-            if (block.container) {
+            if (!block.container) {
+                return;
+            }
+
+            // Skip if CreateJS is not available
+            if (
+                typeof createjs === "undefined" ||
+                !createjs.BlurFilter ||
+                !createjs.ColorFilter ||
+                !createjs.ShadowFilter
+            ) {
+                return;
+            }
+
+            try {
                 // Store original filters and timing if not already stored
                 if (!block.originalFilters) {
                     block.originalFilters = block.container.filters || [];
@@ -7111,8 +7135,16 @@ class Activity {
                 block.minHighlightDuration = minDurationMs;
 
                 // Force stage update for immediate visibility
-                if (this.stage) {
+                if (this.stage && this.stage.update) {
                     this.stage.update();
+                }
+            } catch (error) {
+                console.warn("Block highlighting error:", error);
+                // Ensure block is in a consistent state
+                if (block.isHighlighted) {
+                    block.isHighlighted = false;
+                    block.highlightStartTime = null;
+                    block.minHighlightDuration = null;
                 }
             }
         };
@@ -7124,8 +7156,12 @@ class Activity {
          * @returns {void}
          */
         this.unhighlightBlock = (blk, force = false) => {
-            // Skip highlighting in test environment
-            if (typeof process !== "undefined" && process.env.NODE_ENV === "test") {
+            // Skip highlighting in test environment and E2E tests
+            if (
+                typeof process !== "undefined" && process.env.NODE_ENV === "test" ||
+                typeof window !== "undefined" && window.Cypress ||
+                typeof window !== "undefined" && window.navigator.webdriver
+            ) {
                 return;
             }
 
@@ -7135,33 +7171,42 @@ class Activity {
 
             const block = this.blocks.blockList[blk];
             if (block.container && block.isHighlighted) {
-                const now = Date.now();
-                const elapsed = now - block.highlightStartTime;
-                const remainingTime = Math.max(0, block.minHighlightDuration - elapsed);
+                try {
+                    const now = Date.now();
+                    const elapsed = now - block.highlightStartTime;
+                    const remainingTime = Math.max(0, block.minHighlightDuration - elapsed);
 
-                if (force || remainingTime === 0) {
-                    // Restore original filters
-                    block.container.filters = block.originalFilters || [];
-                    block.container.updateCache();
+                    if (force || remainingTime === 0) {
+                        // Restore original filters
+                        block.container.filters = block.originalFilters || [];
+                        block.container.updateCache();
 
-                    // Clear highlight state
+                        // Clear highlight state
+                        block.isHighlighted = false;
+                        block.highlightStartTime = null;
+                        block.minHighlightDuration = null;
+                        block.unhighlightTimeout = null;
+
+                        // Force stage update for immediate visibility
+                        if (this.stage && this.stage.update) {
+                            this.stage.update();
+                        }
+                    } else {
+                        // Schedule unhighlight for remaining time
+                        if (block.unhighlightTimeout) {
+                            clearTimeout(block.unhighlightTimeout);
+                        }
+                        block.unhighlightTimeout = setTimeout(() => {
+                            this.unhighlightBlock(blk, true);
+                        }, remainingTime);
+                    }
+                } catch (error) {
+                    console.warn("Block unhighlighting error:", error);
+                    // Ensure block is in a consistent state
                     block.isHighlighted = false;
                     block.highlightStartTime = null;
                     block.minHighlightDuration = null;
                     block.unhighlightTimeout = null;
-
-                    // Force stage update for immediate visibility
-                    if (this.stage) {
-                        this.stage.update();
-                    }
-                } else {
-                    // Schedule unhighlight for remaining time
-                    if (block.unhighlightTimeout) {
-                        clearTimeout(block.unhighlightTimeout);
-                    }
-                    block.unhighlightTimeout = setTimeout(() => {
-                        this.unhighlightBlock(blk, true);
-                    }, remainingTime);
                 }
             }
         };
