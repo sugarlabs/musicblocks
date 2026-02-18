@@ -39,42 +39,52 @@ class Publisher {
     }
 
     dataToTags(DATA) {
-        // convert to blocks like structure.
-        DATA = JSON.parse(DATA);
+        try {
+            // convert to blocks like structure.
+            DATA = JSON.parse(DATA);
 
-        const blocks = {
-            blockList: []
-        };
+            if (!Array.isArray(DATA)) {
+                return [];
+            }
 
-        for (const i of DATA) {
-            const block = {};
-            block.name = typeof i[1] === "string" ? i[1] : i[1][0];
-            block.connections = i[4];
-            blocks.blockList.push(block);
+            const blocks = {
+                blockList: []
+            };
+
+            for (const i of DATA) {
+                const block = {};
+                block.name = typeof i[1] === "string" ? i[1] : i[1][0];
+                block.connections = i[4];
+                blocks.blockList.push(block);
+            }
+
+            //convert blocks to score.
+            const score = this.Planet.analyzeProject();
+
+            //0("rhythm"),1("pitch"),2("tone"),3("mouse"),4("pen"),5("number"),
+            //6("flow"),7("action"),8("sensors"),9("media"),10("mice")
+
+            //use score to map tags.
+            const tags = [];
+
+            //Pitch, Tone, and/or Rhythm
+            if (score[1] && score[2]) tags.push("2"); // music
+
+            //pen,mouse
+            if (score[3] && score[4]) tags.push("3"); // art
+
+            //sensors
+            if (score[8]) tags.push("5"); // interactive
+
+            //number
+            if (score[5]) tags.push("4"); // math
+
+            return tags;
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error("dataToTags: failed to process project data:", e.message);
+            return [];
         }
-
-        //convert blocks to score.
-        const score = this.Planet.analyzeProject();
-
-        //0("rhythm"),1("pitch"),2("tone"),3("mouse"),4("pen"),5("number"),
-        //6("flow"),7("action"),8("sensors"),9("media"),10("mice")
-
-        //use score to map tags.
-        const tags = [];
-
-        //Pitch, Tone, and/or Rhythm
-        if (score[1] && score[2]) tags.push("2"); // music
-
-        //pen,mouse
-        if (score[3] && score[4]) tags.push("3"); // art
-
-        //sensors
-        if (score[8]) tags.push("5"); // interactive
-
-        //number
-        if (score[5]) tags.push("4"); // math
-
-        return tags;
     }
 
     findTagWithName(name) {
@@ -425,4 +435,9 @@ class Publisher {
             this.initSubmit();
         }
     }
+}
+
+// Export for Node.js / Jest environments
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Publisher;
 }
