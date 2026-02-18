@@ -20,7 +20,7 @@
 const themeConfigs = {
     dark: {
         textColor: "#E2E2E2",
-        blockText: "#E2E2E2",
+        blockText: "#000000",
         dialogueBox: "#1C1C1C",
         strokeColor: "#E2E2E2",
         fillColor: "#F9F9F9",
