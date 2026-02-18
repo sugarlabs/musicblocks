@@ -14,15 +14,19 @@
 
 /*
    global
-   _, getDrumSynthName
+   _, getDrumSynthName, Singer, TONEBPM
  */
 
 /*
    Global locations
     js/utils/musicutils.js
         getDrumSynthName
+    js/turtle-singer.js
+        Singer
     js/utils/utils.js
         _
+    js/activity.js
+        TONEBPM
 */
 
 /* exported Tempo */
@@ -201,15 +205,27 @@ class Tempo {
     _updateBPM(i) {
         this._intervals[i] = (60 / this.BPMs[i]) * 1000;
 
-        let blockNumber;
-        if (this.BPMBlocks[i] != null) {
-            blockNumber = this.activity.blocks.blockList[this.BPMBlocks[i]].connections[1];
-            if (blockNumber != null) {
-                this.activity.blocks.blockList[blockNumber].value = parseFloat(this.BPMs[i]);
-                this.activity.blocks.blockList[blockNumber].text.text = this.BPMs[i];
-                this.activity.blocks.blockList[blockNumber].updateCache();
-                this.activity.refreshCanvas();
-                this.activity.saveLocally();
+        if (this.BPMBlocks[i] == null) return;
+
+        const bpmBlock = this.activity.blocks.blockList[this.BPMBlocks[i]];
+        const blockNumber = bpmBlock.connections[1];
+        if (blockNumber != null) {
+            this.activity.blocks.blockList[blockNumber].value = parseFloat(this.BPMs[i]);
+            this.activity.blocks.blockList[blockNumber].text.text = this.BPMs[i];
+            this.activity.blocks.blockList[blockNumber].updateCache();
+            this.activity.refreshCanvas();
+            this.activity.saveLocally();
+        }
+
+        const bpmValue = parseFloat(this.BPMs[i]);
+        if (bpmBlock.name === "setmasterbpm2" || bpmBlock.name === "setmasterbpm") {
+            Singer.masterBPM = bpmValue;
+            Singer.defaultBPMFactor = TONEBPM / bpmValue;
+        } else if (bpmBlock.name === "setbpm3" || bpmBlock.name === "setbpm2") {
+            for (const tur of this.activity.turtles.turtleList) {
+                if (tur.singer.bpm.length > 0) {
+                    tur.singer.bpm[tur.singer.bpm.length - 1] = bpmValue;
+                }
             }
         }
     }
