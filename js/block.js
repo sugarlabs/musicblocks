@@ -616,7 +616,7 @@ class Block {
 
         return false;
     }
-
+ 
     /**
      * Checks if the block is off-screen based on the provided boundary.
      * @param {object} boundary - The boundary object representing the canvas dimensions.
