@@ -105,6 +105,8 @@ function setupToneActions(activity) {
 
             const listenerName = "_settimbre_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
+                // Highlight the block when it starts executing
+                activity.highlightBlock(blk);
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
@@ -112,6 +114,11 @@ function setupToneActions(activity) {
             }
 
             const __listener = () => {
+                // Unhighlight the block when it finishes executing
+                if (blk !== undefined && blk in activity.blocks.blockList) {
+                    activity.unhighlightBlock(blk);
+                }
+
                 tur.inSetTimbre = false;
                 tur.singer.instrumentNames.pop();
             };
@@ -145,6 +152,8 @@ function setupToneActions(activity) {
 
             const listenerName = "_vibrato_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
+                // Highlight the block when it starts executing
+                activity.highlightBlock(blk);
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
@@ -152,6 +161,11 @@ function setupToneActions(activity) {
             }
 
             const __listener = () => {
+                // Unhighlight the block when it finishes executing
+                if (blk !== undefined && blk in activity.blocks.blockList) {
+                    activity.unhighlightBlock(blk);
+                }
+
                 tur.singer.vibratoIntensity.pop();
                 tur.singer.vibratoRate.pop();
             };
@@ -159,9 +173,8 @@ function setupToneActions(activity) {
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
 
             if (activity.logo.inTimbre) {
-                instrumentsEffects[turtle][activity.logo.timbre.instrumentName][
-                    "vibratoActive"
-                ] = true;
+                instrumentsEffects[turtle][activity.logo.timbre.instrumentName]["vibratoActive"] =
+                    true;
                 activity.logo.timbre.vibratoEffect.push(blk);
                 activity.logo.timbre.vibratoParams.push(last(tur.singer.vibratoIntensity) * 100);
                 instrumentsEffects[turtle][activity.logo.timbre.instrumentName][
