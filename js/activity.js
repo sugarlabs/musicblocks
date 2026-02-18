@@ -7135,9 +7135,7 @@ class Activity {
                 block.minHighlightDuration = minDurationMs;
 
                 // Force stage update for immediate visibility
-                if (this.stage && this.stage.update) {
-                    this.stage.update();
-                }
+                this._scheduleStageUpdate();
             } catch (error) {
                 console.warn("Block highlighting error:", error);
                 // Ensure block is in a consistent state
@@ -7188,9 +7186,7 @@ class Activity {
                         block.unhighlightTimeout = null;
 
                         // Force stage update for immediate visibility
-                        if (this.stage && this.stage.update) {
-                            this.stage.update();
-                        }
+                        this._scheduleStageUpdate();
                     } else {
                         // Schedule unhighlight for remaining time
                         if (block.unhighlightTimeout) {
@@ -7208,6 +7204,20 @@ class Activity {
                     block.minHighlightDuration = null;
                     block.unhighlightTimeout = null;
                 }
+            }
+        };
+
+        // Performance optimization: Throttle stage updates
+        this._highlightUpdateScheduled = false;
+        this._scheduleStageUpdate = () => {
+            if (!this._highlightUpdateScheduled && this.stage && this.stage.update) {
+                this._highlightUpdateScheduled = true;
+                requestAnimationFrame(() => {
+                    if (this.stage && this.stage.update) {
+                        this.stage.update();
+                    }
+                    this._highlightUpdateScheduled = false;
+                });
             }
         };
 
