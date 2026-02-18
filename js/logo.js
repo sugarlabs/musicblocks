@@ -26,6 +26,7 @@
 
    Queue, Logo, DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY,
    OSCVOLUMEADJUSTMENT, TONEBPM, TARGETBPM, TURTLESTEP, NOTEDIV,
+   MIN_HIGHLIGHT_DURATION_MS,
    NOMICERRORMSG, NANERRORMSG, NOSTRINGERRORMSG, NOBOXERRORMSG,
    NOACTIONERRORMSG, NOINPUTERRORMSG, NOSQRTERRORMSG,
    ZERODIVIDEERRORMSG, EMPTYHEAPERRORMSG, INVALIDPITCH, POSNUMBER,
@@ -1511,6 +1512,10 @@ class Logo {
                 // Highlight the current block
                 logo.activity.blocks.highlight(blk, false);
                 logo._currentlyHighlightedBlock = blk;
+                // Force stage update to ensure highlight is visible
+                if (logo.activity.stage) {
+                    logo.activity.stage.update();
+                }
             }
         }
 
@@ -1652,6 +1657,10 @@ class Logo {
                     logo._unhighlightStepQueue[turtle] = blk;
                 } else {
                     if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
+                        const unhighlightDelay = Math.max(
+                            logo.turtleDelay + tur.waitTime,
+                            MIN_HIGHLIGHT_DURATION_MS
+                        );
                         setTimeout(() => {
                             if (logo.activity.blocks.visible) {
                                 logo.activity.blocks.unhighlight(blk);
@@ -1659,8 +1668,12 @@ class Logo {
                                 if (logo._currentlyHighlightedBlock === blk) {
                                     logo._currentlyHighlightedBlock = null;
                                 }
+                                // Update stage after unhighlighting
+                                if (logo.activity.stage) {
+                                    logo.activity.stage.update();
+                                }
                             }
-                        }, logo.turtleDelay + tur.waitTime);
+                        }, unhighlightDelay);
                     }
                 }
             }
@@ -1683,6 +1696,10 @@ class Logo {
                         tur.unhighlightQueue.push(last(tur.parentFlowQueue));
                     } else if (tur.unhighlightQueue.length > 0) {
                         // The child flow is finally complete, so unhighlight.
+                        const unhighlightDelay = Math.max(
+                            logo.turtleDelay,
+                            MIN_HIGHLIGHT_DURATION_MS
+                        );
                         setTimeout(() => {
                             if (logo.activity.blocks.visible) {
                                 const unhighlightBlock = tur.unhighlightQueue.pop();
@@ -1694,7 +1711,7 @@ class Logo {
                             } else {
                                 tur.unhighlightQueue.pop();
                             }
-                        }, logo.turtleDelay);
+                        }, unhighlightDelay);
                     }
                 }
             }
