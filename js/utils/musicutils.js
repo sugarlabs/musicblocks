@@ -55,7 +55,7 @@
   DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
   INTERVALVALUES, getIntervalRatio, frequencyToPitch, NOTESTEP,
   GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
-  SEMITONES
+  SEMITONES, CHROMATIC_SOLFEGE
 */
 
 /**
@@ -185,6 +185,10 @@ const STOSHARP = {
     "f#": "F" + SHARP
 };
 
+/**
+ * Array containing the solfege names for the chromatic scale.
+ * @constant {string[]}
+ */
 const CHROMATIC_SOLFEGE = [
     "Do", // 0
     "Di", // 1
