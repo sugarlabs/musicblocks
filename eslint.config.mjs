@@ -46,6 +46,7 @@ export default [
                 Turtles: 'readonly',
                 Activity: 'readonly',
                 _: 'readonly', // i18n
+                createjs: 'readonly', // CreateJS globals
             },
         },
         rules: {

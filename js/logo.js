@@ -2498,9 +2498,19 @@ class Logo {
                 };
             }
 
-            // Apply glowing effect using CreateJS filters
-            const glowFilter = new createjs.ShadowFilter("#FFD700", 0, 0, 20);
-            block.container.filters = [glowFilter];
+            // Apply visual highlighting effect
+            // Use alpha blending and scaling for compatibility
+            block.container.alpha = 0.9;
+            
+            // Create a highlight background if it doesn't exist
+            if (!block._highlightBackground) {
+                block._highlightBackground = new createjs.Shape();
+                block._highlightBackground.graphics
+                    .beginFill("rgba(255, 215, 0, 0.3)")
+                    .drawRoundRect(-5, -5, block.container.getBounds().width + 10, block.container.getBounds().height + 10, 5);
+                block.container.addChildAt(block._highlightBackground, 0);
+            }
+            block._highlightBackground.visible = true;
 
             // Slight scale increase for emphasis
             block.container.scaleX = block._executionHighlightState.scaleX * 1.05;
@@ -2535,13 +2545,18 @@ class Logo {
                 block.container.scaleX = block._executionHighlightState.scaleX;
                 block.container.scaleY = block._executionHighlightState.scaleY;
                 block.container.alpha = block._executionHighlightState.alpha;
-
+                
+                // Hide highlight background
+                if (block._highlightBackground) {
+                    block._highlightBackground.visible = false;
+                }
+                
                 // Update the cache to apply changes
                 if (block.container.updateCache) {
                     block.container.updateCache();
                 }
             }
-
+            
             // Also remove traditional highlighting
             this.activity.blocks.unhighlight(blk);
         }
