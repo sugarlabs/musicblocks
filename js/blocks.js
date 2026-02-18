@@ -228,6 +228,17 @@ class Blocks {
         this._homeButtonContainers = [];
         this.blockScale = DEFAULTBLOCKSCALE;
 
+        /**
+         * Deferred checkBounds batching state.
+         * When _deferCheckBoundsCount > 0, checkBounds calls are suppressed
+         * and _checkBoundsPending is set to true. When the count returns to 0,
+         * a single checkBounds call is made if any were pending.
+         * This eliminates O(N×M) overhead where N = blocks in stack,
+         * M = total blocks, during recursive layout operations like adjustDocks.
+         */
+        this._deferCheckBoundsCount = 0;
+        this._checkBoundsPending = false;
+
         /** We need to know if we are processing a copy or save stack command. */
         this.inLongPress = false;
         this.customTemperamentDefined = false;
@@ -896,14 +907,47 @@ class Blocks {
         };
 
         /**
+         * Begin deferring checkBounds calls. Supports nesting.
+         * Call _endDeferCheckBounds when the batch operation is complete.
+         * @private
+         * @returns {void}
+         */
+        this._beginDeferCheckBounds = () => {
+            this._deferCheckBoundsCount++;
+        };
+
+        /**
+         * End deferring checkBounds calls. Runs a single checkBounds
+         * if any were suppressed during the deferred window.
+         * @private
+         * @returns {void}
+         */
+        this._endDeferCheckBounds = () => {
+            if (this._deferCheckBoundsCount > 0) {
+                this._deferCheckBoundsCount--;
+            }
+
+            if (this._deferCheckBoundsCount === 0 && this._checkBoundsPending) {
+                this._checkBoundsPending = false;
+                this.checkBounds();
+            }
+        };
+
+        /**
          * Given a block, adjust the dock position of all its connections.
+         * Uses deferred checkBounds to avoid O(N×M) overhead.
          * @param - blk - block
          * @param - resetLoopCounter (to prevent infinite loops in the
-                                      case the connections are broken).
+                                       case the connections are broken).
          * @public
          * @returns {void}
          */
         this.adjustDocks = (blk, resetLoopCounter) => {
+            const isOuterCall = this._deferCheckBoundsCount === 0;
+            if (isOuterCall) {
+                this._beginDeferCheckBounds();
+            }
+
             const myBlock = this.blockList[blk];
 
             /** For when we come in from makeBlock */
@@ -918,23 +962,27 @@ class Blocks {
             if (myBlock == null) {
                 // eslint-disable-next-line no-console
                 console.debug("Saw a null block: " + blk);
+                if (isOuterCall) this._endDeferCheckBounds();
                 return;
             }
 
             if (myBlock.connections == null) {
                 // eslint-disable-next-line no-console
                 console.debug("Saw a block with null connections: " + blk);
+                if (isOuterCall) this._endDeferCheckBounds();
                 return;
             }
 
             if (myBlock.connections.length === 0) {
                 // eslint-disable-next-line no-console
                 console.debug("Saw a block with [] connections: " + blk);
+                if (isOuterCall) this._endDeferCheckBounds();
                 return;
             }
 
             /** Value blocks only have one dock. */
             if (myBlock.docks.length === 1) {
+                if (isOuterCall) this._endDeferCheckBounds();
                 return;
             }
 
@@ -944,6 +992,7 @@ class Blocks {
                 console.debug(
                     "Infinite loop encountered while adjusting docks: " + blk + " " + this.blockList
                 );
+                if (isOuterCall) this._endDeferCheckBounds();
                 return;
             }
 
@@ -1049,6 +1098,10 @@ class Blocks {
                     /** Recurse on connected blocks. */
                     this.adjustDocks(cblk, true);
                 }
+            }
+
+            if (isOuterCall) {
+                this._endDeferCheckBounds();
             }
         };
 
@@ -2262,9 +2315,11 @@ class Blocks {
          * @returns {void}
          */
         this.updateBlockPositions = () => {
+            this._beginDeferCheckBounds();
             for (const [blk, block] of this.blockList.entries()) {
                 this._moveBlock(blk, block.container.x, block.container.y);
             }
+            this._endDeferCheckBounds();
         };
 
         /**
@@ -2338,7 +2393,11 @@ class Blocks {
                 myBlock.container.x = Math.floor(x + 0.5);
                 myBlock.container.y = Math.floor(y + 0.5);
 
-                this.checkBounds();
+                if (this._deferCheckBoundsCount > 0) {
+                    this._checkBoundsPending = true;
+                } else {
+                    this.checkBounds();
+                }
             } else {
                 // eslint-disable-next-line no-console
                 console.debug("No container yet for block " + myBlock.name);
@@ -2361,7 +2420,11 @@ class Blocks {
                 myBlock.container.x += dx;
                 myBlock.container.y += dy;
 
-                this.checkBounds();
+                if (this._deferCheckBoundsCount > 0) {
+                    this._checkBoundsPending = true;
+                } else {
+                    this.checkBounds();
+                }
             } else {
                 // eslint-disable-next-line no-console
                 console.debug("No container yet for block " + myBlock.name);
@@ -2379,9 +2442,11 @@ class Blocks {
         this.moveStackRelative = (blk, dx, dy) => {
             this.findDragGroup(blk);
             if (this.dragGroup.length > 0) {
+                this._beginDeferCheckBounds();
                 for (let b = 0; b < this.dragGroup.length; b++) {
                     this.moveBlockRelative(this.dragGroup[b], dx, dy);
                 }
+                this._endDeferCheckBounds();
             }
         };
 
@@ -2394,10 +2459,12 @@ class Blocks {
          * @returns {void}
          */
         this.moveAllBlocksExcept = (blk, dx, dy) => {
+            this._beginDeferCheckBounds();
             for (const [blockIdx, block] of this.blockList.entries()) {
                 const topBlock = this.blockList[this.findTopBlock(blockIdx)];
                 if (topBlock !== blk) this.moveBlockRelative(blockIdx, dx, dy);
             }
+            this._endDeferCheckBounds();
         };
 
         /**
