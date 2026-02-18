@@ -13,6 +13,44 @@
    exported RequestManager
 */
 
+function stableStringify(value) {
+    const inProgress = new WeakSet();
+
+    function normalize(v) {
+        if (Array.isArray(v)) {
+            if (inProgress.has(v)) {
+                throw new TypeError("Converting circular structure to JSON");
+            }
+            inProgress.add(v);
+            try {
+                return v.map(normalize);
+            } finally {
+                inProgress.delete(v);
+            }
+        }
+
+        if (v && typeof v === "object" && v.constructor === Object) {
+            if (inProgress.has(v)) {
+                throw new TypeError("Converting circular structure to JSON");
+            }
+            inProgress.add(v);
+            try {
+                const sorted = {};
+                for (const key of Object.keys(v).sort()) {
+                    sorted[key] = normalize(v[key]);
+                }
+                return sorted;
+            } finally {
+                inProgress.delete(v);
+            }
+        }
+
+        return v;
+    }
+
+    return JSON.stringify(normalize(value));
+}
+
 /**
  * RequestManager - Handles rate limiting, request throttling, and retry logic
  * for Planet API calls. Prevents API abuse and improves reliability.
@@ -61,7 +99,7 @@ class RequestManager {
         const action = data.action || "unknown";
         const params = { ...data };
         delete params["api-key"];
-        return `${action}:${JSON.stringify(params)}`;
+        return `${action}:${stableStringify(params)}`;
     }
 
     /**

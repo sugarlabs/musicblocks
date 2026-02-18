@@ -76,6 +76,45 @@ describe("RequestManager", () => {
             });
             expect(key1).toBe(key2);
         });
+
+        it("should generate same key regardless of property insertion order", () => {
+            const key1 = requestManager.generateRequestKey({
+                action: "getProject",
+                id: 1,
+                foo: "x"
+            });
+
+            // Same logical payload, different insertion order
+            const key2 = requestManager.generateRequestKey({
+                foo: "x",
+                id: 1,
+                action: "getProject"
+            });
+
+            expect(key1).toBe(key2);
+        });
+
+        it("should generate same key for nested objects with different key order", () => {
+            const key1 = requestManager.generateRequestKey({
+                action: "search",
+                filters: {
+                    b: 2,
+                    a: 1
+                },
+                list: [{ y: 2, x: 1 }]
+            });
+
+            const key2 = requestManager.generateRequestKey({
+                list: [{ x: 1, y: 2 }],
+                filters: {
+                    a: 1,
+                    b: 2
+                },
+                action: "search"
+            });
+
+            expect(key1).toBe(key2);
+        });
     });
 
     describe("throttledRequest", () => {
@@ -115,6 +154,31 @@ describe("RequestManager", () => {
             expect(result1).toEqual(mockResult);
             expect(result2).toEqual(mockResult);
             // Should only make one actual request due to deduplication
+            expect(callCount).toBe(1);
+        });
+
+        it("should deduplicate concurrent requests even when object key order differs", async () => {
+            let callCount = 0;
+            const mockResult = { success: true, data: "test" };
+
+            const mockRequestFn = jest.fn(callback => {
+                callCount++;
+                setTimeout(() => callback(mockResult), 50);
+            });
+
+            const promise1 = requestManager.throttledRequest(
+                { action: "test", id: 1, foo: "x" },
+                mockRequestFn
+            );
+            const promise2 = requestManager.throttledRequest(
+                { foo: "x", id: 1, action: "test" },
+                mockRequestFn
+            );
+
+            const [result1, result2] = await Promise.all([promise1, promise2]);
+
+            expect(result1).toEqual(mockResult);
+            expect(result2).toEqual(mockResult);
             expect(callCount).toBe(1);
         });
 
