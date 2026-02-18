@@ -147,7 +147,7 @@ const PhraseMakerGrid = {
 
         while (pm._deps.last(myBlock.connections) != null) {
             bottomBlockLoop += 1;
-            if (bottomBlockLoop > 2 * pm.activity.blocks.blockList) {
+            if (bottomBlockLoop > 2 * pm.activity.blocks.blockList.length) {
                 // Could happen if the block data is malformed.
                 break;
             }
