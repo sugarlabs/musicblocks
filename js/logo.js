@@ -215,6 +215,7 @@ class Logo {
         this._runningBlock = null;
         this._ignoringBlock = null;
         this._currentlyHighlightedBlock = null;
+        this._executionHighlightEnabled = true; // Enable execution highlighting
 
         this.time = 0;
         this.firstNoteTime = null;
@@ -1491,19 +1492,35 @@ class Logo {
         let childFlowCount = 0;
         const actionArgs = [];
 
-        // Highlight only the current executing block
-        if (logo.activity.blocks.visible) {
+        // Enhanced highlighting for block execution - Issue #5349
+        if (logo.activity.blocks.visible && logo._executionHighlightEnabled) {
             if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
-                // Unhighlight any previously highlighted block
+                // Remove execution highlight from any previously highlighted block
                 if (
                     logo._currentlyHighlightedBlock !== null &&
                     logo._currentlyHighlightedBlock !== blk
                 ) {
-                    logo.activity.blocks.unhighlight(logo._currentlyHighlightedBlock);
+                    logo._removeExecutionHighlight(logo._currentlyHighlightedBlock);
                 }
-                // Highlight the current block
-                logo.activity.blocks.highlight(blk, false);
+                // Add execution highlight to the current block
+                logo._addExecutionHighlight(blk);
                 logo._currentlyHighlightedBlock = blk;
+            }
+        } else {
+            // Fallback to basic highlighting for compatibility
+            if (logo.activity.blocks.visible) {
+                if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
+                    // Unhighlight any previously highlighted block
+                    if (
+                        logo._currentlyHighlightedBlock !== null &&
+                        logo._currentlyHighlightedBlock !== blk
+                    ) {
+                        logo.activity.blocks.unhighlight(logo._currentlyHighlightedBlock);
+                    }
+                    // Highlight the current block
+                    logo.activity.blocks.highlight(blk, false);
+                    logo._currentlyHighlightedBlock = blk;
+                }
             }
         }
 
@@ -1647,7 +1664,7 @@ class Logo {
                     if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
                         setTimeout(() => {
                             if (logo.activity.blocks.visible) {
-                                logo.activity.blocks.unhighlight(blk);
+                                logo._removeExecutionHighlight(blk);
                                 // Clear the currently highlighted block if it was this one
                                 if (logo._currentlyHighlightedBlock === blk) {
                                     logo._currentlyHighlightedBlock = null;
@@ -1674,25 +1691,10 @@ class Logo {
                         last(tur.queue).parentBlk !== last(tur.parentFlowQueue)
                     ) {
                         tur.unhighlightQueue.push(last(tur.parentFlowQueue));
-                    } else if (tur.unhighlightQueue.length > 0) {
-                        // The child flow is finally complete, so unhighlight.
-                        setTimeout(() => {
-                            if (logo.activity.blocks.visible) {
-                                const unhighlightBlock = tur.unhighlightQueue.pop();
-                                logo.activity.blocks.unhighlight(unhighlightBlock);
-                                // Clear the currently highlighted block if it was this one
-                                if (logo._currentlyHighlightedBlock === unhighlightBlock) {
-                                    logo._currentlyHighlightedBlock = null;
-                                }
-                            } else {
-                                tur.unhighlightQueue.pop();
-                            }
-                        }, logo.turtleDelay);
                     }
                 }
             }
 
-            // We don't update parameter blocks when running full speed.
             if (logo.turtleDelay !== 0) {
                 for (const pblk in tur.parameterQueue) {
                     logo.activity.blocks.updateParameterBlock(
@@ -2474,6 +2476,75 @@ class Logo {
         // Mark the end time of this note's graphics operations.
         await delayExecution(beatValue * 1000);
         tur.embeddedGraphicsFinished = true;
+    }
+
+    /**
+     * Adds execution highlighting to a block - Issue #5349
+     * @param {number} blk - Block ID to highlight
+     * @returns {void}
+     */
+    _addExecutionHighlight(blk) {
+        if (blk === null || blk === undefined) return;
+
+        const block = this.activity.blocks.blockList[blk];
+        if (block && block.container) {
+            // Store original state for restoration
+            if (!block._executionHighlightState) {
+                block._executionHighlightState = {
+                    filters: block.container.filters || [],
+                    scaleX: block.container.scaleX,
+                    scaleY: block.container.scaleY,
+                    alpha: block.container.alpha
+                };
+            }
+
+            // Apply glowing effect using CreateJS filters
+            const glowFilter = new createjs.ShadowFilter("#FFD700", 0, 0, 20);
+            block.container.filters = [glowFilter];
+
+            // Slight scale increase for emphasis
+            block.container.scaleX = block._executionHighlightState.scaleX * 1.05;
+            block.container.scaleY = block._executionHighlightState.scaleY * 1.05;
+
+            // Ensure the block is fully visible
+            block.container.alpha = 1;
+
+            // Update the cache to apply changes
+            if (block.container.updateCache) {
+                block.container.updateCache();
+            }
+
+            // Also apply traditional highlighting as fallback
+            this.activity.blocks.highlight(blk, false);
+        }
+    }
+
+    /**
+     * Removes execution highlighting from a block - Issue #5349
+     * @param {number} blk - Block ID to unhighlight
+     * @returns {void}
+     */
+    _removeExecutionHighlight(blk) {
+        if (blk === null || blk === undefined) return;
+
+        const block = this.activity.blocks.blockList[blk];
+        if (block && block.container) {
+            // Restore original state
+            if (block._executionHighlightState) {
+                block.container.filters = block._executionHighlightState.filters;
+                block.container.scaleX = block._executionHighlightState.scaleX;
+                block.container.scaleY = block._executionHighlightState.scaleY;
+                block.container.alpha = block._executionHighlightState.alpha;
+
+                // Update the cache to apply changes
+                if (block.container.updateCache) {
+                    block.container.updateCache();
+                }
+            }
+
+            // Also remove traditional highlighting
+            this.activity.blocks.unhighlight(blk);
+        }
     }
 }
 

@@ -1,0 +1,32 @@
+/* Block highlighting during execution - Issue #5349 */
+
+.block-executing {
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 16px rgba(255, 215, 0, 0.6));
+    transform: scale(1.05);
+    transition: all 0.2s ease-in-out;
+    z-index: 1000;
+}
+
+.block-executing-glow {
+    animation: blockPulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes blockPulse {
+    0% {
+        filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8))
+            drop-shadow(0 0 16px rgba(255, 215, 0, 0.6));
+    }
+    100% {
+        filter: drop-shadow(0 0 12px rgba(255, 215, 0, 1))
+            drop-shadow(0 0 24px rgba(255, 215, 0, 0.8));
+    }
+}
+
+/* Ensure highlighted blocks stay above other elements */
+.createjs-stage {
+    position: relative;
+}
+
+.createjs-stage .block-executing {
+    position: relative !important;
+}
