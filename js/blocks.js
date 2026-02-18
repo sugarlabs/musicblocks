@@ -239,6 +239,16 @@ class Blocks {
 
         this.selectedBlocks = [];
 
+        // --- Performance: drag interaction optimizations ---
+        // rAF-debounced checkBounds to avoid O(n) iteration on every block move
+        this._checkBoundsScheduled = false;
+        // Cached drag group computed once on mousedown, reused during pressmove
+        this._cachedDragGroup = null;
+        // Cached top-block map for moveAllBlocksExcept edge-scroll
+        this._topBlockCache = null;
+        // Throttle timestamp for edge-scroll calls
+        this._lastEdgeScrollTime = 0;
+
         /**
          * We stage deletion of prototype action blocks on the palette so
          * as to avoid palette refresh race conditions.
@@ -2314,6 +2324,23 @@ class Blocks {
         };
 
         /**
+         * Schedule a bounds check on the next animation frame.
+         * Coalesces multiple calls per frame into a single O(n) scan.
+         * @public
+         * @returns {void}
+         */
+        this.scheduleCheckBounds = () => {
+            if (this._checkBoundsScheduled) {
+                return;
+            }
+            this._checkBoundsScheduled = true;
+            requestAnimationFrame(() => {
+                this._checkBoundsScheduled = false;
+                this.checkBounds();
+            });
+        };
+
+        /**
          * Move a block to a specified position and check the docks afterward.
          * @public
          * @returns{void}
@@ -2369,6 +2396,26 @@ class Blocks {
         };
 
         /**
+         * Move a block by dx, dy without running checkBounds.
+         * Used during drag operations where checkBounds is deferred
+         * to a single rAF-scheduled call at the end of the frame.
+         * @param - blk - block index
+         * @param - dx - delta x
+         * @param - dy - delta y
+         * @public
+         * @returns {void}
+         */
+        this.moveBlockRelativeBatched = (blk, dx, dy) => {
+            this.inLongPress = false;
+            this.isBlockMoving = true;
+            const myBlock = this.blockList[blk];
+            if (myBlock.container != null) {
+                myBlock.container.x += dx;
+                myBlock.container.y += dy;
+            }
+        };
+
+        /**
          * Moves the blocks in a stack to a new position.
          * @param blk - block
          * @param dx - x position
@@ -2387,17 +2434,34 @@ class Blocks {
 
         /**
          * Moves all blocks except given stack
-         * @param blk - exception
+         * @param blk - exception block (the block object, not index)
          * @param dx - delta x
          * @param dy - delta y
          * @public
          * @returns {void}
          */
         this.moveAllBlocksExcept = (blk, dx, dy) => {
-            for (const [blockIdx, block] of this.blockList.entries()) {
-                const topBlock = this.blockList[this.findTopBlock(blockIdx)];
-                if (topBlock !== blk) this.moveBlockRelative(blockIdx, dx, dy);
+            // Build top-block cache if not available.
+            // The cache maps each block index to its top block index,
+            // avoiding repeated O(depth) findTopBlock walks.
+            if (this._topBlockCache == null) {
+                this._topBlockCache = new Map();
+                for (let i = 0; i < this.blockList.length; i++) {
+                    this._topBlockCache.set(i, this.findTopBlock(i));
+                }
             }
+
+            const blkIdx = this.blockList.indexOf(blk);
+            const excludeTop = blkIdx >= 0 ? this._topBlockCache.get(blkIdx) : -1;
+
+            for (let i = 0; i < this.blockList.length; i++) {
+                if (this._topBlockCache.get(i) !== excludeTop) {
+                    this.moveBlockRelativeBatched(i, dx, dy);
+                }
+            }
+
+            // Single deferred bounds check instead of one per block
+            this.scheduleCheckBounds();
         };
 
         /**
@@ -3580,6 +3644,37 @@ class Blocks {
             this.dragLoopCounter = 0;
             this.dragGroup = [];
             this._calculateDragGroup(blk);
+        };
+
+        /**
+         * Cache the drag group for a block. Call on mousedown so the
+         * expensive tree traversal runs once, not on every pressmove.
+         * @param - blk - block index
+         * @public
+         * @returns {void}
+         */
+        this.cacheDragGroup = blk => {
+            this.findDragGroup(blk);
+            this._cachedDragGroup = this.dragGroup.slice();
+        };
+
+        /**
+         * Invalidate the cached drag group (call on pressup/mouseout).
+         * @public
+         * @returns {void}
+         */
+        this.clearCachedDragGroup = () => {
+            this._cachedDragGroup = null;
+        };
+
+        /**
+         * Invalidate the top-block cache (call when blocks are
+         * added, removed, or connections change).
+         * @public
+         * @returns {void}
+         */
+        this.invalidateTopBlockCache = () => {
+            this._topBlockCache = null;
         };
 
         /**
