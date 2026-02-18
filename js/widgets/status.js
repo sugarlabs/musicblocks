@@ -150,8 +150,9 @@ class StatusMatrix {
                     if (localStorage.languagePreference === "ja") {
                         label = _("beats per minute2");
                     } else {
-                        label = this.activity.blocks.blockList[statusField[0]].protoblock
-                            .staticLabels[0];
+                        label =
+                            this.activity.blocks.blockList[statusField[0]].protoblock
+                                .staticLabels[0];
                     }
                     // console.debug(label);
                     break;
@@ -159,8 +160,8 @@ class StatusMatrix {
                     label = this.activity.blocks.blockList[statusField[0]].privateData;
                     break;
                 default:
-                    label = this.activity.blocks.blockList[statusField[0]].protoblock
-                        .staticLabels[0];
+                    label =
+                        this.activity.blocks.blockList[statusField[0]].protoblock.staticLabels[0];
                     break;
             }
             let str = label;
