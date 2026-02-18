@@ -13,7 +13,7 @@
 /*
    global
 
-   _, PhraseMakerUtils, platformColor, docById, MATRIXSOLFEHEIGHT, toFraction, Singer,
+   _, PhraseMakerUtils, PhraseMakerGrid, platformColor, docById, MATRIXSOLFEHEIGHT, toFraction, Singer,
    SOLFEGECONVERSIONTABLE, slicePath, wheelnav, delayExecution,
    DEFAULTVOICE, getDrumName, MATRIXSOLFEWIDTH, getDrumIcon,
    noteIsSolfege, isCustomTemperament, i18nSolfege, getNote, DEFAULTDRUM, last,
@@ -269,90 +269,7 @@ class PhraseMaker {
      * Adjusts the dimensions and overflow settings of window frames and widget bodies.
      */
     stylePhraseMaker() {
-        /**
-         * Width of the screen.
-         * @type {number}
-         */
-        const screenWidth = window.innerWidth;
-
-        /**
-         * Height of the screen.
-         * @type {number}
-         */
-        const screenHeight = window.innerHeight;
-
-        /**
-         * Container element for floating windows.
-         * @type {HTMLElement}
-         */
-        const floatingWindowsDiv = document.getElementById("floatingWindows");
-
-        /**
-         * Collection of window frame elements.
-         * @type {NodeListOf<Element>}
-         */
-        const windowFrameElements = floatingWindowsDiv.querySelectorAll(".windowFrame");
-
-        for (let i = 0; i < windowFrameElements.length; i++) {
-            /**
-             * Current window frame element.
-             * @type {Element}
-             */
-            const windowFrame = windowFrameElements[i];
-
-            /**
-             * Widget body element within the window frame.
-             * @type {Element}
-             */
-            const wfWinBody = windowFrame.querySelector(".wfWinBody");
-
-            /**
-             * Widget element within the window frame.
-             * @type {Element}
-             */
-            const wfbWidget = windowFrame.querySelector(".wfbWidget");
-
-            /**
-             * Total width of the window frame.
-             * @type {number}
-             */
-            const totalWidth = parseFloat(window.getComputedStyle(windowFrame).width);
-
-            /**
-             * Total height of the window frame.
-             * @type {number}
-             */
-            const totalHeight = parseFloat(window.getComputedStyle(windowFrame).height);
-
-            /**
-             * Maximum allowed width for the window frame.
-             * @type {number}
-             */
-            const maxWidth = screenWidth * 0.8;
-
-            /**
-             * Maximum allowed height for the window frame.
-             * @type {number}
-             */
-            const maxHeight = screenHeight * 0.8;
-
-            if (totalWidth > screenWidth || totalHeight > screenHeight) {
-                windowFrame.style.height = Math.min(totalHeight, maxHeight) + "px";
-                windowFrame.style.width = Math.min(totalWidth, maxWidth) + "px";
-                wfbWidget.style.overflowY = totalHeight > maxHeight ? "auto" : "hidden";
-                wfbWidget.style.overflowX = totalWidth > maxWidth ? "auto" : "hidden";
-                wfbWidget.style.width = "-webkit-fill-available";
-                wfbWidget.style.height = "-webkit-fill-available";
-                wfbWidget.style.position = "absolute";
-                wfbWidget.style.left = "55px";
-                wfWinBody.style.position = "absolute";
-                wfWinBody.style.overflowY = totalHeight > maxHeight ? "auto" : "hidden";
-                wfWinBody.style.overflowX = totalWidth > maxWidth ? "auto" : "hidden";
-                wfWinBody.style.width = "-webkit-fill-available";
-                wfWinBody.style.height = "-webkit-fill-available";
-                wfWinBody.style.background = "#cccccc";
-            }
-        }
+        PhraseMakerUI.stylePhraseMaker(this);
     }
 
     /**
@@ -360,12 +277,7 @@ class PhraseMaker {
      * Resets arrays used to track row and column blocks.
      */
     clearBlocks() {
-        // When creating a new matrix, we want to clear out any old
-        // block references.
-        this._rowBlocks = [];
-        this._colBlocks = [];
-        this._rowMap = [];
-        this._rowOffset = [];
+        PhraseMakerGrid.clearBlocks(this);
     }
 
     /**
@@ -374,17 +286,7 @@ class PhraseMaker {
      * @param {number} rowBlock - The pitch or drum block identifier to add to the matrix row.
      */
     addRowBlock(rowBlock) {
-        // When creating a matrix, we add rows whenever we encounter a
-        // pitch or drum block (and some graphics blocks).
-        this._rowMap.push(this._rowBlocks.length);
-        this._rowOffset.push(0);
-        // In case there is a repeat block, use a unique block number
-        // for each instance.
-        while (this._rowBlocks.includes(rowBlock)) {
-            rowBlock = rowBlock + 1000000;
-        }
-
-        this._rowBlocks.push(rowBlock);
+        PhraseMakerGrid.addRowBlock(this, rowBlock);
     }
 
     /**
@@ -394,22 +296,7 @@ class PhraseMaker {
      * @param {number} n - The index of the rhythm block within the matrix column.
      */
     addColBlock(rhythmBlock, n) {
-        // When creating a matrix, we add columns when we encounter
-        // rhythm blocks.
-        // Search for previous instance of the same block (from a
-        // repeat).
-        let startIdx = 0;
-        let obj;
-        for (let i = 0; i < this._colBlocks.length; i++) {
-            obj = this._colBlocks[i];
-            if (obj[0] === rhythmBlock) {
-                startIdx += 1;
-            }
-        }
-
-        for (let i = startIdx; i < n + startIdx; i++) {
-            this._colBlocks.push([rhythmBlock, i]);
-        }
+        PhraseMakerGrid.addColBlock(this, rhythmBlock, n);
     }
 
     /**
@@ -421,22 +308,7 @@ class PhraseMaker {
      * @param {number} blk - The block identifier representing the matrix cell.
      */
     addNode(rowBlock, rhythmBlock, n, blk) {
-        // A node exists for each cell in the matrix. It is used to
-        // preserve and restore the state of the cell.
-        if (this._blockMap[blk] === undefined) {
-            this._blockMap[blk] = [];
-        }
-
-        let j = 0;
-        let obj;
-        for (let i = 0; i < this._blockMap[blk].length; i++) {
-            obj = this._blockMap[blk][i];
-            if (obj[0] === rowBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
-                j += 1;
-            }
-        }
-
-        this._blockMap[blk].push([rowBlock, [rhythmBlock, n], j]);
+        PhraseMakerGrid.addNode(this, rowBlock, rhythmBlock, n, blk);
     }
 
     /**
@@ -447,15 +319,7 @@ class PhraseMaker {
      * @param {number} n - The index of the rhythm block within its column.
      */
     removeNode(rowBlock, rhythmBlock, n) {
-        // When the matrix is changed, we may need to remove nodes.
-        const blk = this.blockNo;
-        let obj;
-        for (let i = 0; i < this._blockMap[blk].length; i++) {
-            obj = this._blockMap[blk][i];
-            if (obj[0] === rowBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
-                this._blockMap[blk].splice(i, 1);
-            }
-        }
+        PhraseMakerGrid.removeNode(this, rowBlock, rhythmBlock, n);
     }
 
     /**
@@ -3067,7 +2931,7 @@ class PhraseMaker {
      * @returns {number} The calculated width of the note cell.
      */
     _noteWidth(noteValue) {
-        return Math.max(Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this._cellScale), 15);
+        return PhraseMakerUI.calculateNoteWidth(this, noteValue);
     }
 
     /**
@@ -3197,33 +3061,7 @@ class PhraseMaker {
      * @private
      */
     _lookForNoteBlocksOrRepeat() {
-        this._noteBlocks = false;
-        const bno = this.blockNo;
-        let blk;
-        for (let i = 0; i < this._blockMap[bno].length; i++) {
-            blk = this._blockMap[bno][i][1][0];
-            if (blk === -1) {
-                continue;
-            }
-
-            if (this.activity.blocks.blockList[blk] === null) {
-                continue;
-            }
-
-            if (this.activity.blocks.blockList[blk] === undefined) {
-                //eslint-disable-next-line no-console
-                console.debug("block " + blk + " is undefined");
-                continue;
-            }
-
-            if (
-                this.activity.blocks.blockList[blk].name === "newnote" ||
-                this.activity.blocks.blockList[blk].name === "repeat"
-            ) {
-                this._noteBlocks = true;
-                break;
-            }
-        }
+        PhraseMakerGrid.lookForNoteBlocksOrRepeat(this);
     }
 
     /**
@@ -3231,37 +3069,7 @@ class PhraseMaker {
      * @private
      */
     _syncMarkedBlocks() {
-        const newBlockMap = [];
-        const blk = this.blockNo;
-        for (let i = 0; i < this._blockMap[blk].length; i++) {
-            if (this._blockMap[blk][i][0] === -1) {
-                continue;
-            }
-
-            for (let j = 0; j < this._blockMapHelper.length; j++) {
-                if (
-                    JSON.stringify(this._blockMap[blk][i][1]) ===
-                    JSON.stringify(this._blockMapHelper[j][0])
-                ) {
-                    for (let k = 0; k < this._blockMapHelper[j][1].length; k++) {
-                        newBlockMap.push([
-                            this._blockMap[blk][i][0],
-                            this._colBlocks[this._blockMapHelper[j][1][k]],
-                            this._blockMap[blk][i][2]
-                        ]);
-                    }
-                }
-            }
-        }
-
-        this._blockMap[blk] = newBlockMap.filter((el, i) => {
-            return (
-                i ===
-                newBlockMap.findIndex(ele => {
-                    return JSON.stringify(ele) === JSON.stringify(el);
-                })
-            );
-        });
+        PhraseMakerGrid.syncMarkedBlocks(this);
     }
 
     /**
@@ -3410,50 +3218,7 @@ class PhraseMaker {
      * @private
      */
     _mapNotesBlocks(blockName, withName) {
-        const notesBlockMap = [];
-        let blk = this.activity.blocks.blockList[this.blockNo].connections[1];
-        let myBlock = this.activity.blocks.blockList[blk];
-
-        let bottomBlockLoop = 0;
-        if (
-            myBlock.name === blockName ||
-            (blockName === "all" &&
-                myBlock.name !== "hidden" &&
-                myBlock.name !== "vspace" &&
-                myBlock.name !== "hiddennoflow")
-        ) {
-            if (withName) {
-                notesBlockMap.push([blk, myBlock.name]);
-            } else {
-                notesBlockMap.push(blk);
-            }
-        }
-
-        while (this._deps.last(myBlock.connections) != null) {
-            bottomBlockLoop += 1;
-            if (bottomBlockLoop > 2 * this.activity.blocks.blockList) {
-                // Could happen if the block data is malformed.
-                break;
-            }
-
-            blk = this._deps.last(myBlock.connections);
-            myBlock = this.activity.blocks.blockList[blk];
-            if (
-                myBlock.name === blockName ||
-                (blockName === "all" &&
-                    myBlock.name !== "hidden" &&
-                    myBlock.name !== "vspace" &&
-                    myBlock.name !== "hiddennoflow")
-            ) {
-                if (withName) {
-                    notesBlockMap.push([blk, myBlock.name]);
-                } else {
-                    notesBlockMap.push(blk);
-                }
-            }
-        }
-
-        return notesBlockMap;
+        return PhraseMakerGrid.mapNotesBlocks(this, blockName, withName);
     }
 
     /**
@@ -4599,20 +4364,7 @@ class PhraseMaker {
      * @private
      */
     _resetMatrix() {
-        let row = this._noteValueRow;
-        let cell;
-        for (let i = 0; i < row.cells.length; i++) {
-            cell = row.cells[i];
-            cell.style.backgroundColor = this.platformColor.rhythmcellcolor;
-        }
-
-        if (this._matrixHasTuplets) {
-            row = this._tupletNoteValueRow;
-            for (let i = 0; i < row.cells.length; i++) {
-                cell = row.cells[i];
-                cell.style.backgroundColor = this.platformColor.tupletBackground;
-            }
-        }
+        PhraseMakerUI.resetMatrix(this);
     }
 
     /**

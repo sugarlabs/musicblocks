@@ -107,8 +107,8 @@
         });
     </script>
     <script src="lib/astring.min.js" defer></script>
-
     <script src="lib/acorn.min.js" defer></script>
+    <script src="env.js"></script>
 
 
     <script data-main="js/loader" src="lib/require.js" defer></script>
@@ -335,8 +335,9 @@
                             <li>
                                 <a id="stop" class="left tooltipped"><i class="material-icons main">stop</i></a>
                             </li>
-                            <li>
-                                <a id="record" class="left tooltipped" data-tooltip="Record"></a>
+                            <li style="display: flex; align-items: center;">
+                                <a id="record" class="left tooltipped" data-position="bottom" data-tooltip="Record"></a>
+                                <a id="recordDropdownArrow" class="left dropdown-trigger" data-activates="recorddropdown" style="margin-left: -5px; padding: 0; font-size: 28px;"></a>
                             </li>
                         </ul>
 
@@ -502,6 +503,11 @@
                     <li><a id="save-blockartwork-png"></a></li>
                 </ul>
 
+                <ul id="recorddropdown" class="dropdown-content">
+                    <li><a id="record-with-menus">Record canvas and toolbars</a></li>
+                    <li><a id="record-canvas-only">Record canvas only</a></li>
+                </ul>
+
                 <ul id="languagedropdown" class="dropdown-content">
                     <li><a id="enUS"></a></li>
                     <li><a id="enUK"></a></li>
@@ -571,13 +577,15 @@
     <script>
         // Register service worker only in production (not on localhost)
         if ("serviceWorker" in navigator) {
-            // Detect if running on localhost for development
-            const isLocalDev = window.location.hostname === "localhost" ||
-                window.location.hostname === "127.0.0.1";
+
             // Localhost SW is disabled to avoid caching; set allowLocalPwa to test installs.
             const allowLocalPwa = localStorage.getItem("allowLocalPwa") === "true";
 
-            if (!isLocalDev || allowLocalPwa) {
+            // Detect if running on localhost for development
+            const runtimeEnv = window.MB_ENV
+            const isDevMode = runtimeEnv !== "production";
+
+            if (!isDevMode || allowLocalPwa) {
                 // Production: Register service worker for offline mode
                 if (navigator.serviceWorker.controller) {
                     console.debug(
@@ -600,7 +608,7 @@
             } else {
                 // Development: Skip service worker for instant updates
                 console.log(
-                    "🔥 [DEV MODE] Service worker disabled on localhost for instant code updates"
+                    "🔥 [DEV MODE] Service worker disabled for instant code updates"
                 );
                 console.log(
                     "Set localStorage.allowLocalPwa = 'true' to enable PWA install testing on localhost."

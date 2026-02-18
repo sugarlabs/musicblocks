@@ -165,6 +165,8 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         "widgets/modewidget",
         "widgets/meterwidget",
         "widgets/PhraseMakerUtils",
+        "widgets/PhraseMakerGrid",
+        "widgets/PhraseMakerUI",
         "widgets/phrasemaker",
         "widgets/arpeggio",
         "widgets/aiwidget",
@@ -1709,6 +1711,12 @@ class Activity {
                 return; // Exit the function if execution is already in progress
             }
 
+            if (!activity || typeof activity._doRecordButton !== "function") {
+                console.warn("doRecordButton called without valid activity context");
+                isExecuting = false;
+                return;
+            }
+
             isExecuting = true; // Set the flag to indicate execution has started
             activity._doRecordButton();
         };
@@ -1718,34 +1726,136 @@ class Activity {
          * @private
          */
         this._doRecordButton = () => {
+            const that = this;
             const start = document.getElementById("record"),
                 recInside = document.getElementById("rec_inside");
             let mediaRecorder;
             var clickEvent = new Event("click");
             let flag = 0;
+            let currentStream = null;
+            let audioDestination = null;
 
             /**
              * Records the screen using the browser's media devices API.
              * @returns {Promise<MediaStream>} A promise resolving to the recorded media stream.
              */
+
             async function recordScreen() {
-                flag = 1;
-                return await navigator.mediaDevices.getDisplayMedia({
-                    preferCurrentTab: "True",
-                    systemAudio: "include",
-                    audio: "True",
-                    video: { mediaSource: "tab" },
-                    bandwidthProfile: {
-                        video: {
-                            clientTrackSwitchOffControl: "auto",
-                            contentPreferencesMode: "auto"
-                        }
-                    },
-                    preferredVideoCodecs: "auto"
-                });
+                const mode = localStorage.getItem("musicBlocksRecordMode");
+
+                if (mode === "canvas") {
+                    return await recordCanvasOnly();
+                } else {
+                    return await recordScreenWithTools();
+                }
             }
 
-            const that = this;
+            async function recordCanvasOnly() {
+                flag = 1;
+                const canvas = document.getElementById("myCanvas");
+                if (!canvas) {
+                    throw new Error("Canvas element not found");
+                }
+
+                // Get the toolbar height to exclude from recording
+                const toolbar = document.getElementById("toolbars");
+                const toolbarHeight = toolbar ? toolbar.offsetHeight : 0;
+
+                // Get canvas dimensions
+                const canvasRect = canvas.getBoundingClientRect();
+
+                // Get the actual canvas dimensions
+                const canvasWidth = canvas.width;
+                const canvasHeight = canvas.height;
+
+                // Calculate the visible area (excluding toolbar)
+                const visibleHeight = canvasHeight - toolbarHeight;
+
+                // Create a clean recording canvas
+                const recordCanvas = document.createElement("canvas");
+                recordCanvas.width = canvasWidth;
+                recordCanvas.height = canvasHeight;
+                const recordCtx = recordCanvas.getContext("2d");
+
+                // Set background to match the canvas (white/light gray)
+                recordCtx.fillStyle = "#f5f5f5"; // Adjust this color to match your canvas background
+                let animationFrameId;
+
+                // Function to continuously copy canvas content
+                const copyFrame = () => {
+                    // Fill background
+                    recordCtx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+                    // Draw only the visible portion of the canvas (skip the toolbar area)
+                    recordCtx.drawImage(
+                        canvas,
+                        0,
+                        toolbarHeight, // Source x, y (skip toolbar)
+                        canvasWidth,
+                        visibleHeight, // Source width, height
+                        0,
+                        0, // Destination x, y
+                        canvasWidth,
+                        visibleHeight // Destination width, height
+                    );
+
+                    // Continue if still recording
+                    if (flag === 1) {
+                        animationFrameId = requestAnimationFrame(copyFrame);
+                    }
+                };
+
+                // Start copying frames
+                copyFrame();
+
+                // Capture the canvas stream directly at 30fps
+                const canvasStream = recordCanvas.captureStream(30);
+
+                // Add audio track if available
+                const Tone = that.logo.synth.tone;
+                if (Tone && Tone.context) {
+                    const dest = Tone.context.createMediaStreamDestination();
+                    Tone.Destination.connect(dest);
+                    audioDestination = dest;
+                    const audioTrack = dest.stream.getAudioTracks()[0];
+                    if (audioTrack) {
+                        canvasStream.addTrack(audioTrack);
+                    }
+                }
+                currentStream = canvasStream;
+
+                // Clean up animation frame when recording stops
+                canvasStream.getTracks()[0].addEventListener("ended", () => {
+                    if (animationFrameId) {
+                        cancelAnimationFrame(animationFrameId);
+                    }
+                });
+
+                return canvasStream;
+            }
+            async function recordScreenWithTools() {
+                flag = 1;
+
+                try {
+                    return await navigator.mediaDevices.getDisplayMedia({
+                        preferCurrentTab: "True",
+                        systemAudio: "include",
+                        audio: "True",
+                        video: { mediaSource: "tab" },
+                        bandwidthProfile: {
+                            video: {
+                                clientTrackSwitchOffControl: "auto",
+                                contentPreferencesMode: "auto"
+                            }
+                        },
+                        preferredVideoCodecs: "auto"
+                    });
+                } catch (error) {
+                    console.error("Screen capture failed:", error);
+                    flag = 0;
+                    throw error;
+                }
+            }
 
             /**
              * Saves the recorded chunks as a video file.
@@ -1754,10 +1864,35 @@ class Activity {
             function saveFile(recordedChunks) {
                 flag = 1;
                 recInside.classList.remove("blink");
+                // Prevent zero-byte files
+                if (!recordedChunks || recordedChunks.length === 0) {
+                    alert(_("Recorded file is empty. File not saved."));
+                    flag = 0;
+                    recording();
+                    doRecordButton();
+                    return;
+                }
                 const blob = new Blob(recordedChunks, {
                     type: "video/webm"
                 });
-
+                if (blob.size === 0) {
+                    alert(_("Recorded file is empty. File not saved."));
+                    flag = 0;
+                    recording();
+                    doRecordButton();
+                    return;
+                }
+                // Clean up stream after recording
+                if (currentStream) {
+                    currentStream.getTracks().forEach(track => track.stop());
+                    currentStream = null;
+                }
+                if (audioDestination && audioDestination.stream) {
+                    audioDestination.stream.getTracks().forEach(track => track.stop());
+                    audioDestination = null;
+                }
+                mediaRecorder = null;
+                // Prompt to save file
                 const filename = window.prompt(_("Enter file name"));
                 if (filename === null || filename.trim() === "") {
                     alert(_("File save canceled"));
@@ -1766,27 +1901,33 @@ class Activity {
                     doRecordButton();
                     return; // Exit without saving the file
                 }
-
                 const downloadLink = document.createElement("a");
                 downloadLink.href = URL.createObjectURL(blob);
                 downloadLink.download = `${filename}.webm`;
-
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
                 URL.revokeObjectURL(blob);
                 document.body.removeChild(downloadLink);
                 flag = 0;
-                // eslint-disable-next-line no-use-before-define
+                // Allow multiple recordings
                 recording();
                 doRecordButton();
-                that.textMsg(_("Click on stop saving"));
+                that.textMsg(_("Recording stopped. File saved."));
             }
             /**
              * Stops the recording process.
              */
             function stopRec() {
                 flag = 0;
-                mediaRecorder.stop();
+
+                if (mediaRecorder && typeof mediaRecorder.stop === "function") {
+                    mediaRecorder.stop();
+                }
+
+                // Clean up the recording canvas stream
+                if (currentStream) {
+                    currentStream.getTracks().forEach(track => track.stop());
+                }
                 const node = document.createElement("p");
                 node.textContent = "Stopped recording";
                 document.body.appendChild(node);
@@ -1801,9 +1942,10 @@ class Activity {
             function createRecorder(stream, mimeType) {
                 flag = 1;
                 recInside.classList.add("blink");
+                that.textMsg(_("Recording started. Click stop to finish."));
                 start.removeEventListener("click", createRecorder, true);
                 let recordedChunks = [];
-                const mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder = new MediaRecorder(stream);
                 stream.oninactive = function () {
                     // eslint-disable-next-line no-console
                     console.log("Recording is ready to save");
@@ -1837,31 +1979,57 @@ class Activity {
              * Handles the recording process.
              */
             function recording() {
-                start.addEventListener("click", async function handler() {
-                    const stream = await recordScreen();
-                    const mimeType = "video/webm";
-                    mediaRecorder = createRecorder(stream, mimeType);
-                    if (flag == 1) {
-                        this.removeEventListener("click", handler);
+                // Remove any previous handler to avoid multiple triggers
+                if (start._recordHandler) {
+                    start.removeEventListener("click", start._recordHandler);
+                }
+                const handler = async function handler() {
+                    try {
+                        const stream = await recordScreen();
+                        const mimeType = "video/webm";
+                        mediaRecorder = createRecorder(stream, mimeType);
+                        if (flag == 1) {
+                            start.removeEventListener("click", handler);
+                            // Add stop handler
+                            const stopHandler = function stopHandler() {
+                                if (mediaRecorder && mediaRecorder.state === "recording") {
+                                    mediaRecorder.stop();
+                                    mediaRecorder = new MediaRecorder(stream);
+                                    recInside.classList.remove("blink");
+                                    flag = 0;
+                                    // Clean up stream
+                                    if (currentStream) {
+                                        currentStream.getTracks().forEach(track => track.stop());
+                                    }
+                                    if (audioDestination && audioDestination.stream) {
+                                        audioDestination.stream
+                                            .getTracks()
+                                            .forEach(track => track.stop());
+                                    }
+                                }
+                                start.removeEventListener("click", stopHandler);
+                                // Re-enable recording for next time
+                                recording();
+                            };
+                            start.addEventListener("click", stopHandler);
+                        }
+                        recInside.setAttribute("fill", "red");
+                    } catch (error) {
+                        console.error("Recording failed:", error);
+                        that.textMsg(_("Recording failed: ") + error.message);
+                        flag = 0;
+                        // Re-enable recording button
+                        recording();
                     }
-                    const node = document.createElement("p");
-                    node.textContent = "Started recording";
-                    document.body.appendChild(node);
-                    recInside.setAttribute("fill", "red");
-                });
+                };
+                start.addEventListener("click", handler);
+                start._recordHandler = handler;
             }
 
             // Start recording process if not already executing
             if (flag == 0 && isExecuting) {
                 recording();
                 start.dispatchEvent(clickEvent);
-                flag = 1;
-            }
-
-            // Stop recording if already executing
-            if (flag == 1 && isExecuting) {
-                start.addEventListener("click", stopRec);
-                flag = 0;
             }
         };
 
@@ -1998,6 +2166,11 @@ class Activity {
             // Regenerate palettes
             if (activity.regeneratePalettes) {
                 activity.regeneratePalettes();
+            }
+
+            // Update record button and dropdown visibility
+            if (activity.toolbar && typeof activity.toolbar.updateRecordButton === "function") {
+                activity.toolbar.updateRecordButton(() => doRecordButton(activity));
             }
 
             // Force immediate canvas refresh
@@ -7265,7 +7438,7 @@ class Activity {
             this.toolbar.renderHelpIcon(showHelp);
             this.toolbar.renderModeSelectIcon(
                 doSwitchMode,
-                doRecordButton,
+                () => doRecordButton(this),
                 doAnalytics,
                 doOpenPlugin,
                 deletePlugin,
