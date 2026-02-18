@@ -2505,9 +2505,17 @@ class Logo {
             // Create a highlight background if it doesn't exist
             if (!block._highlightBackground) {
                 block._highlightBackground = new createjs.Shape();
-                block._highlightBackground.graphics
-                    .beginFill("rgba(255, 215, 0, 0.3)")
-                    .drawRoundRect(-5, -5, block.container.getBounds().width + 10, block.container.getBounds().height + 10, 5);
+                const bounds = block.container.getBounds();
+                if (bounds) {
+                    block._highlightBackground.graphics
+                        .beginFill("rgba(255, 215, 0, 0.3)")
+                        .drawRoundRect(-5, -5, bounds.width + 10, bounds.height + 10, 5);
+                } else {
+                    // Fallback if bounds are not available
+                    block._highlightBackground.graphics
+                        .beginFill("rgba(255, 215, 0, 0.3)")
+                        .drawRoundRect(-5, -5, 100, 40, 5);
+                }
                 block.container.addChildAt(block._highlightBackground, 0);
             }
             block._highlightBackground.visible = true;
