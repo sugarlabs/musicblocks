@@ -25,12 +25,20 @@ class RequestManager {
      * @param {number} options.maxRetries - Maximum number of retry attempts (default: 3)
      * @param {number} options.baseRetryDelay - Base delay for exponential backoff in ms (default: 1000)
      * @param {number} options.maxConcurrent - Maximum concurrent requests (default: 3)
+     * @param {number} options.maxQueueSize - Maximum queued requests (default: 1000)
      */
     constructor(options = {}) {
         this.minDelay = options.minDelay || 500;
         this.maxRetries = options.maxRetries || 3;
         this.baseRetryDelay = options.baseRetryDelay || 1000;
-        this.maxConcurrent = options.maxConcurrent || 3;
+        this.maxConcurrent =
+            Number.isFinite(options.maxConcurrent) && options.maxConcurrent >= 0
+                ? Math.floor(options.maxConcurrent)
+                : 3;
+        this.maxQueueSize =
+            Number.isFinite(options.maxQueueSize) && options.maxQueueSize > 0
+                ? Math.floor(options.maxQueueSize)
+                : 1000;
 
         // Track pending requests to prevent duplicates
         this.pendingRequests = new Map();
@@ -77,6 +85,12 @@ class RequestManager {
         if (this.pendingRequests.has(key)) {
             this.stats.cachedResponses++;
             return this.pendingRequests.get(key);
+        }
+
+        if (this.requestQueue.length >= this.maxQueueSize) {
+            const error = new Error("Request queue full");
+            error.code = "REQUEST_QUEUE_FULL";
+            throw error;
         }
 
         // Create the request promise

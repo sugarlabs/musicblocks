@@ -15,7 +15,8 @@ describe("RequestManager", () => {
             minDelay: 100,
             maxRetries: 2,
             baseRetryDelay: 50,
-            maxConcurrent: 2
+            maxConcurrent: 2,
+            maxQueueSize: 10
         });
     });
 
@@ -30,6 +31,7 @@ describe("RequestManager", () => {
             expect(rm.maxRetries).toBe(3);
             expect(rm.baseRetryDelay).toBe(1000);
             expect(rm.maxConcurrent).toBe(3);
+            expect(rm.maxQueueSize).toBe(1000);
         });
 
         it("should initialize with custom options", () => {
@@ -37,6 +39,7 @@ describe("RequestManager", () => {
             expect(requestManager.maxRetries).toBe(2);
             expect(requestManager.baseRetryDelay).toBe(50);
             expect(requestManager.maxConcurrent).toBe(2);
+            expect(requestManager.maxQueueSize).toBe(10);
         });
 
         it("should initialize empty pending requests", () => {
@@ -184,6 +187,36 @@ describe("RequestManager", () => {
             expect(stats.cachedResponses).toBe(0);
             expect(stats.retries).toBe(0);
             expect(stats.failures).toBe(0);
+        });
+    });
+
+    describe("queue cap", () => {
+        it("should cap queue length and reject overflow requests", async () => {
+            const maxQueueSize = 3;
+            const rm = new RequestManager({ maxQueueSize, maxConcurrent: 0 });
+            const neverCalledRequest = jest.fn(() => {});
+
+            // Fill the queue (maxConcurrent=0 prevents draining)
+            for (let i = 0; i < maxQueueSize; i++) {
+                rm.throttledRequest({ action: "test", id: i }, neverCalledRequest).catch(() => {});
+            }
+            expect(rm.requestQueue.length).toBe(maxQueueSize);
+
+            // Next requests must reject immediately and must NOT increase the queue length
+            const overflow1 = rm.throttledRequest(
+                { action: "test", id: maxQueueSize + 1 },
+                neverCalledRequest
+            );
+            const overflow2 = rm.throttledRequest(
+                { action: "test", id: maxQueueSize + 2 },
+                neverCalledRequest
+            );
+
+            await expect(overflow1).rejects.toMatchObject({ code: "REQUEST_QUEUE_FULL" });
+            await expect(overflow2).rejects.toMatchObject({ code: "REQUEST_QUEUE_FULL" });
+            expect(rm.requestQueue.length).toBe(maxQueueSize);
+
+            rm.clearPending();
         });
     });
 
