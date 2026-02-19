@@ -157,7 +157,7 @@ class PolySynth {
 }
 
 class context {
-    static resume() { }
+    static resume() {}
 }
 
 class Transport {

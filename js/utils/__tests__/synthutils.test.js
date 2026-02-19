@@ -46,9 +46,7 @@ global.getOscillatorTypes = jest.fn(() => null);
 global.getArticulation = jest.fn(() => 0);
 global.getTemperament = jest.fn(() => "equal");
 global.pitchToFrequency = jest.fn(() => 440);
-global.getCustomNote = jest.fn(note =>
-    note.replace("b", "♭")
-);
+global.getCustomNote = jest.fn(note => note.replace("b", "♭"));
 global.pitchToNumber = jest.fn(() => 0);
 global.isCustomTemperament = jest.fn(() => false);
 global.getNoteFromInterval = jest.fn(() => "C");
@@ -56,7 +54,13 @@ global.last = arr => arr[arr.length - 1];
 global.pitchToFrequency = (note, octave) => {
     const A4 = 440;
     const semitones = {
-        C: -9, D: -7, E: -5, F: -4, G: -2, A: 0, B: 2
+        C: -9,
+        D: -7,
+        E: -5,
+        F: -4,
+        G: -2,
+        A: 0,
+        B: 2
     };
 
     const base = note[0];
@@ -121,7 +125,6 @@ const {
     CUSTOMSAMPLES,
     DEFAULTSYNTHVOLUME
 } = synthModule;
-
 
 describe("Utility Functions (logic-only)", () => {
     const turtle = "turtle1";
@@ -494,7 +497,7 @@ describe("Utility Functions (logic-only)", () => {
         });
 
         test("should return default volume if instrument is not found", () => {
-            const consoleSpy = jest.spyOn(console, "debug").mockImplementation(() => { });
+            const consoleSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
 
             const result = getVolume("turtle1", "nonexistent");
 
