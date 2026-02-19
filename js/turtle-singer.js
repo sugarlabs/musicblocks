@@ -349,17 +349,17 @@ class Singer {
                 noteObj[1],
                 steps > 0
                     ? getStepSizeUp(
-                          tur.singer.keySignature,
-                          noteObj[0],
-                          steps,
-                          logo.synth.inTemperament
-                      )
+                        tur.singer.keySignature,
+                        noteObj[0],
+                        steps,
+                        logo.synth.inTemperament
+                    )
                     : getStepSizeDown(
-                          tur.singer.keySignature,
-                          noteObj[0],
-                          steps,
-                          logo.synth.inTemperament
-                      ),
+                        tur.singer.keySignature,
+                        noteObj[0],
+                        steps,
+                        logo.synth.inTemperament
+                    ),
                 tur.singer.keySignature,
                 tur.singer.movable,
                 null,
@@ -1493,7 +1493,7 @@ class Singer {
         } else if (tur.singer.crescendoDelta.length > 0) {
             if (
                 last(tur.singer.synthVolume[DEFAULTVOICE]) ===
-                    last(tur.singer.crescendoInitialVolume[DEFAULTVOICE]) &&
+                last(tur.singer.crescendoInitialVolume[DEFAULTVOICE]) &&
                 tur.singer.justCounting.length === 0
             ) {
                 activity.logo.notation.notationBeginCrescendo(
@@ -1975,7 +1975,7 @@ class Singer {
                             if (
                                 i === j ||
                                 tur.singer.noteOctaves[thisBlk][i] !==
-                                    tur.singer.noteOctaves[thisBlk][j]
+                                tur.singer.noteOctaves[thisBlk][j]
                             ) {
                                 continue;
                             }
@@ -2115,9 +2115,9 @@ class Singer {
                     const notesFrequency = isCustomTemperament(activity.logo.synth.inTemperament)
                         ? activity.logo.synth.getCustomFrequency(notes)
                         : activity.logo.synth.getFrequency(
-                              notes,
-                              activity.logo.synth.changeInTemperament
-                          );
+                            notes,
+                            activity.logo.synth.changeInTemperament
+                        );
                     const startingPitch = activity.logo.synth.startingPitch;
                     const frequency = pitchToFrequency(
                         startingPitch.substring(0, startingPitch.length - 1),
@@ -2224,8 +2224,8 @@ class Singer {
                                     if (notes.length > 1) {
                                         activity.errorMsg(
                                             last(tur.singer.oscList[thisBlk]) +
-                                                ": " +
-                                                _("synth cannot play chords."),
+                                            ": " +
+                                            _("synth cannot play chords."),
                                             blk
                                         );
                                     }
@@ -2537,7 +2537,7 @@ class Singer {
             callback();
         }
 
-        activity.stage.update();
+        activity.stageDirty = true;
     }
 }
 
