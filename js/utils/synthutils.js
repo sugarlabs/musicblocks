@@ -826,8 +826,8 @@ function Synth() {
                             const octaveDiff = octave - thisTemperament[pitchNumber][2];
                             return Number(
                                 thisTemperament[pitchNumber][0] *
-                                    startPitchFrequency *
-                                    Math.pow(getOctaveRatio(), octaveDiff)
+                                startPitchFrequency *
+                                Math.pow(getOctaveRatio(), octaveDiff)
                             );
                         }
                     }
@@ -2383,7 +2383,7 @@ function Synth() {
             window.activity = {
                 blocks: {
                     blockList: [],
-                    setPitchOctave: () => {},
+                    setPitchOctave: () => { },
                     findPitchOctave: () => 4,
                     stageClick: false
                 },
@@ -2696,7 +2696,7 @@ function Synth() {
                                             }
                                         ],
                                         stageClick: false,
-                                        setPitchOctave: () => {},
+                                        setPitchOctave: () => { },
                                         findPitchOctave: () => 4,
                                         turtles: {
                                             _canvas: {
@@ -2713,7 +2713,7 @@ function Synth() {
                                     connections: [0], // Connect to the pitch block
                                     value: targetPitch.note,
                                     text: { text: targetPitch.note },
-                                    updateCache: () => {},
+                                    updateCache: () => { },
                                     _exitWheel: null,
                                     _pitchWheel: null,
                                     _accidentalsWheel: null,
@@ -2723,7 +2723,7 @@ function Synth() {
                                     container: {
                                         x: targetNoteSelector.offsetLeft,
                                         y: targetNoteSelector.offsetTop,
-                                        setChildIndex: () => {}
+                                        setChildIndex: () => { }
                                     },
                                     prevAccidental: "♮",
                                     name: "pitch", // This is needed for pitch preview
@@ -2734,9 +2734,9 @@ function Synth() {
                                 if (!window.activity.logo) {
                                     window.activity.logo = {
                                         synth: {
-                                            createDefaultSynth: () => {},
-                                            loadSynth: () => {},
-                                            setMasterVolume: () => {},
+                                            createDefaultSynth: () => { },
+                                            loadSynth: () => { },
+                                            setMasterVolume: () => { },
                                             trigger: (turtle, note, duration, instrument) => {
                                                 // Use the Web Audio API to play the preview note
                                                 const audioContext = new (window.AudioContext ||
@@ -3231,7 +3231,7 @@ function Synth() {
                             const shouldLight =
                                 centsFromTarget < 0
                                     ? segmentCents <= 0 &&
-                                      Math.abs(segmentCents) <= Math.abs(centsFromTarget) // Flat side
+                                    Math.abs(segmentCents) <= Math.abs(centsFromTarget) // Flat side
                                     : segmentCents >= 0 && segmentCents <= centsFromTarget; // Sharp side
 
                             if (shouldLight || Math.abs(centsFromTarget - segmentCents) <= 5) {
@@ -3527,4 +3527,61 @@ function Synth() {
     this.mic = null;
 
     return this;
+}
+
+if (typeof module !== "undefined") {
+    const synthInstance = new Synth();
+    Object.defineProperty(Synth, "samples", {
+        get: () => synthInstance.samples,
+        set: val => synthInstance.samples = val
+    });
+
+    Object.defineProperty(Synth, "tone", {
+        get: () => synthInstance.tone,
+        set: val => synthInstance.tone = val
+    });
+    module.exports = {
+        Synth,
+        synthInstance,
+        // expose bound instance methods
+        loadSamples: synthInstance.loadSamples.bind(synthInstance),
+        _loadSample: synthInstance._loadSample.bind(synthInstance),
+        createDefaultSynth: synthInstance.createDefaultSynth.bind(synthInstance),
+        _createBuiltinSynth: synthInstance._createBuiltinSynth.bind(synthInstance),
+        _createCustomSynth: synthInstance._createCustomSynth.bind(synthInstance),
+        _createSampleSynth: synthInstance._createSampleSynth.bind(synthInstance),
+        __createSynth: synthInstance.__createSynth.bind(synthInstance),
+        createSynth: synthInstance.createSynth.bind(synthInstance),
+        loadSynth: synthInstance.loadSynth.bind(synthInstance),
+        temperamentChanged: synthInstance.temperamentChanged.bind(synthInstance),
+        whichTemperament: synthInstance.whichTemperament.bind(synthInstance),
+        resume: synthInstance.resume.bind(synthInstance),
+        rampTo: synthInstance.rampTo.bind(synthInstance),
+        setVolume: synthInstance.setVolume.bind(synthInstance),
+        getVolume: synthInstance.getVolume.bind(synthInstance),
+        setMasterVolume: synthInstance.setMasterVolume.bind(synthInstance),
+        startSound: synthInstance.startSound.bind(synthInstance),
+        stopSound: synthInstance.stopSound.bind(synthInstance),
+        trigger: synthInstance.trigger.bind(synthInstance),
+        loop: synthInstance.loop.bind(synthInstance),
+        start: synthInstance.start.bind(synthInstance),
+        stop: synthInstance.stop.bind(synthInstance),
+        getFrequency: synthInstance.getFrequency.bind(synthInstance),
+        _getFrequency: synthInstance._getFrequency.bind(synthInstance),
+        getCustomFrequency: synthInstance.getCustomFrequency.bind(synthInstance),
+        getDefaultParamValues: synthInstance.getDefaultParamValues.bind(synthInstance),
+        _parseSampleCenterNo: synthInstance._parseSampleCenterNo.bind(synthInstance),
+        getTunerFrequency: synthInstance.getTunerFrequency.bind(synthInstance),
+        stopTuner: synthInstance.stopTuner.bind(synthInstance),
+        newTone: synthInstance.newTone.bind(synthInstance),
+        preloadProjectSamples: synthInstance.preloadProjectSamples.bind(synthInstance),
+        setupRecorder: synthInstance.setupRecorder?.bind(synthInstance),
+
+
+        // expose shared state
+        instruments,
+        instrumentsSource,
+        CUSTOMSAMPLES,
+        DEFAULTSYNTHVOLUME
+    };
 }
