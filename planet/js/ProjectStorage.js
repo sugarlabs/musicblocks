@@ -55,6 +55,42 @@ class ProjectStorage {
         return prefix + suffix;
     }
 
+    _isQuotaExceededError(error) {
+        if (!error) return false;
+
+        const name = error.name || "";
+        const message = error.message || "";
+        const code = error.code;
+
+        return (
+            name === "QuotaExceededError" ||
+            name === "NS_ERROR_DOM_QUOTA_REACHED" ||
+            code === 22 ||
+            code === 1014 ||
+            message.includes("QuotaExceededError") ||
+            message.toLowerCase().includes("quota")
+        );
+    }
+
+    _dropProjectImages() {
+        if (!this.data || !this.data.Projects) return 0;
+
+        let removed = 0;
+        const projectIDs = Object.keys(this.data.Projects);
+
+        for (let i = 0; i < projectIDs.length; i++) {
+            const id = projectIDs[i];
+            const project = this.data.Projects[id];
+
+            if (project && project.ProjectImage) {
+                project.ProjectImage = null;
+                removed++;
+            }
+        }
+
+        return removed;
+    }
+
     saveLocally(data, image) {
         if (this.data.CurrentProject === undefined) this.initialiseNewProject();
 
@@ -197,7 +233,41 @@ class ProjectStorage {
 
     async save() {
         this.TimeLastSaved = Date.now();
-        await this.set(this.LocalStorageKey, this.data);
+
+        try {
+            await this.set(this.LocalStorageKey, this.data);
+            return true;
+        } catch (error) {
+            let saveError = error;
+
+            if (this._isQuotaExceededError(saveError)) {
+                const removedImages = this._dropProjectImages();
+
+                if (removedImages > 0) {
+                    try {
+                        await this.set(this.LocalStorageKey, this.data);
+                        // eslint-disable-next-line no-console
+                        console.warn(
+                            `[ProjectStorage] Storage quota exceeded. Removed ${removedImages} cached project image(s) and retried save.`
+                        );
+                        return true;
+                    } catch (retryError) {
+                        saveError = retryError;
+                    }
+                }
+
+                // eslint-disable-next-line no-console
+                console.warn(
+                    "[ProjectStorage] Save failed due to browser storage limits. Delete old projects or export projects to free space.",
+                    saveError
+                );
+                return false;
+            }
+
+            // eslint-disable-next-line no-console
+            console.error("[ProjectStorage] Failed to save project data:", saveError);
+            return false;
+        }
     }
 
     async restore() {
@@ -259,4 +329,8 @@ class ProjectStorage {
         await this.restore();
         await this.initialiseStorage();
     }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = ProjectStorage;
 }
