@@ -7077,9 +7077,9 @@ class Activity {
         this.highlightBlock = (blk, minDurationMs = 300) => {
             // Skip highlighting in test environment and E2E tests
             if (
-                typeof process !== "undefined" && process.env.NODE_ENV === "test" ||
-                typeof window !== "undefined" && window.Cypress ||
-                typeof window !== "undefined" && window.navigator.webdriver
+                (typeof process !== "undefined" && process.env.NODE_ENV === "test") ||
+                (typeof window !== "undefined" && window.Cypress) ||
+                (typeof window !== "undefined" && window.navigator.webdriver)
             ) {
                 return;
             }
@@ -7156,9 +7156,9 @@ class Activity {
         this.unhighlightBlock = (blk, force = false) => {
             // Skip highlighting in test environment and E2E tests
             if (
-                typeof process !== "undefined" && process.env.NODE_ENV === "test" ||
-                typeof window !== "undefined" && window.Cypress ||
-                typeof window !== "undefined" && window.navigator.webdriver
+                (typeof process !== "undefined" && process.env.NODE_ENV === "test") ||
+                (typeof window !== "undefined" && window.Cypress) ||
+                (typeof window !== "undefined" && window.navigator.webdriver)
             ) {
                 return;
             }
