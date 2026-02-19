@@ -777,7 +777,7 @@ function setupIntervalsBlocks(activity) {
             }
 
             // Queue each block in the clamp.
-            const listenerName = "_duplicate_" + turtle;
+            const listenerName = "_duplicate_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __lookForOtherTurtles = function (blk, turtle) {
