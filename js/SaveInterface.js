@@ -243,9 +243,7 @@ class SaveInterface {
             const lower = raw.toLowerCase();
             if (lower.startsWith("data:")) {
                 // Only allow data:image/* to avoid data:text/html, etc.
-                return /^data:image\/[a-z0-9.+-]+;base64,[a-z0-9+/=\s]+$/i.test(raw)
-                    ? raw
-                    : "";
+                return /^data:image\/[a-z0-9.+-]+;base64,[a-z0-9+/=\s]+$/i.test(raw) ? raw : "";
             }
 
             if (lower.startsWith("http://") || lower.startsWith("https://")) return raw;

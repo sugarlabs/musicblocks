@@ -199,17 +199,15 @@ describe("save HTML methods", () => {
             ...activity,
             PlanetInterface: {
                 ...activity.PlanetInterface,
-                getCurrentProjectName: jest.fn(
-                    () => "</title><img src=x onerror=alert(1)><title>"
-                ),
+                getCurrentProjectName: jest.fn(() => "</title><img src=x onerror=alert(1)><title>"),
                 getCurrentProjectDescription: jest.fn(() => "<b>desc</b>"),
-                getCurrentProjectImage: jest.fn(() => "x\" onerror=alert(1)\"")
+                getCurrentProjectImage: jest.fn(() => 'x" onerror=alert(1)"')
             },
             prepareExport: jest.fn(() => "<script>alert(1)</script>")
         };
 
         instance.htmlSaveTemplate =
-            "<title>{{ project_name }}</title><p>{{ project_description }}</p><img src=\"{{ project_image }}\"><div>{{ data }}</div>";
+            '<title>{{ project_name }}</title><p>{{ project_description }}</p><img src="{{ project_image }}"><div>{{ data }}</div>';
 
         const file = instance.prepareHTML();
 
