@@ -760,8 +760,7 @@ class Logo {
                 default:
                     // Is it a plugin?
                     if (logo.blockList[blk].name in logo.evalArgDict) {
-                        // eslint-disable-next-line no-console
-                        console.log("running eval on " + logo.blockList[blk].name);
+                        // Debug logging removed to avoid console noise in production
                         eval(logo.evalArgDict[logo.blockList[blk].name]);
                     } else {
                         // eslint-disable-next-line no-console
