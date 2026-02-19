@@ -68,7 +68,6 @@ class StatusMatrix {
 
         cell.innerHTML = "&nbsp;";
         // One column per mouse/turtle
-        const headerCells = [];
         for (const turtle of this.activity.turtles.turtleList) {
             if (turtle.inTrash) {
                 continue;
@@ -95,7 +94,6 @@ class StatusMatrix {
                     >&nbsp;&nbsp;`;
             }
             cell.style.width = "212.5px";
-            headerCells.push(cell);
             // cell.style.width = StatusMatrix.BUTTONSIZE * this._cellScale*2 + "px";
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
             cell.className = "headcol";
@@ -105,11 +103,16 @@ class StatusMatrix {
             this.isMaximized = !this.isMaximized;
             const headerFontSize =
                 Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
+            const headerCells = this._statusTable.querySelectorAll("thead .headcol");
             headerCells.forEach(headerCell => {
-                headerCell.style.width = this.isMaximized ? "100vw" : "212.5px";
                 if (this.isMaximized) {
+                    headerCell.style.width = "100vw";
                     headerCell.style.paddingLeft = "30px";
                     headerCell.style.fontSize = headerFontSize;
+                } else {
+                    headerCell.style.width = "212.5px";
+                    headerCell.style.paddingLeft = "";
+                    headerCell.style.fontSize = "";
                 }
             });
         };
