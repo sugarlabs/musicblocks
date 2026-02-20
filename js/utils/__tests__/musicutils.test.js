@@ -17,6 +17,119 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+// -------------------------------------------------------------
+// Pitch Helpers (MIDI-based: C4 = 60)
+// -------------------------------------------------------------
+
+// Semitone map relative to C
+const SEMITONE_MAP = {
+    C: 0,
+    "C#": 1,
+    DB: 1,
+    D: 2,
+    "D#": 3,
+    EB: 3,
+    E: 4,
+    F: 5,
+    "F#": 6,
+    GB: 6,
+    G: 7,
+    "G#": 8,
+    AB: 8,
+    A: 9,
+    "A#": 10,
+    BB: 10,
+    B: 11
+};
+
+/**
+ * Calculate a MIDI-style pitch number from note name and octave.
+ *
+ * Example:
+ * C4  → 60
+ * C#4 → 61
+ * Db4 → 61
+ *
+ * @param {string} noteName - Note name (e.g., "C", "C#", "Db")
+ * @param {number} octave - Octave number
+ * @returns {number|null} MIDI-style pitch number or null if invalid
+ */
+function _calculate_pitch_number(noteName, octave) {
+    if (!noteName || typeof octave !== "number") return null;
+
+    const normalized = noteName.trim().toUpperCase();
+
+    if (!(normalized in SEMITONE_MAP)) return null;
+
+    const semitone = SEMITONE_MAP[normalized];
+
+    // MIDI formula
+    return (octave + 1) * 12 + semitone;
+}
+
+/**
+ * Parse note string or numeric pitch and return structured pitch info.
+ *
+ * Examples:
+ * getPitchInfo("C4")  → { name: "C", octave: 4, pitchNumber: 60 }
+ * getPitchInfo("Db5") → { name: "Db", octave: 5, pitchNumber: 73 }
+ * getPitchInfo(60)    → { name: "C", octave: 4, pitchNumber: 60 }
+ *
+ * @param {string|number} noteOrPitch
+ * @returns {{name: string, octave: number, pitchNumber: number}|null}
+ */
+function getPitchInfo(noteOrPitch) {
+    // Case 1: Numeric pitch number
+    if (typeof noteOrPitch === "number" && Number.isInteger(noteOrPitch)) {
+        const pitchNumber = noteOrPitch;
+        const octave = Math.floor(pitchNumber / 12) - 1;
+        const semitone = pitchNumber % 12;
+
+        const sharpNotes = [
+            "C", "C#", "D", "D#", "E",
+            "F", "F#", "G", "G#", "A", "A#", "B"
+        ];
+
+        return {
+            name: sharpNotes[semitone],
+            octave,
+            pitchNumber
+        };
+    }
+
+    // Case 2: String input like "C#4" or "Db3"
+    if (typeof noteOrPitch === "string") {
+        const match = noteOrPitch.trim().match(/^([A-Ga-g][#b]?)(-?\d+)$/);
+        if (!match) return null;
+
+        const nameRaw = match[1];
+        const octave = parseInt(match[2], 10);
+
+        const normalizedName = nameRaw.toUpperCase();
+
+        const pitchNumber = _calculate_pitch_number(normalizedName, octave);
+        if (pitchNumber === null) return null;
+
+        return {
+            name: normalizedName,
+            octave,
+            pitchNumber
+        };
+    }
+
+    return null;
+}
+
+// -------------------------------------------------------------
+// Export
+// -------------------------------------------------------------
+
+module.exports = {
+    // ... existing exports
+    _calculate_pitch_number,
+    getPitchInfo
+};
+
 const { TextEncoder } = require("util");
 global.TextEncoder = TextEncoder;
 global._ = jest.fn(str => str);
