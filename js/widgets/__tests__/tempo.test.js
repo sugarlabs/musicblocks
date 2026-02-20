@@ -800,7 +800,7 @@ describe("Tempo Widget", () => {
             const oldIntervalId = tempoWidget._intervalID;
 
             tempoWidget.init(mockActivity);
-            expect(jest.getTimerCount()).toBe(1); // Only the new one
+            expect(jest.getTimerCount()).toBe(1);
         });
 
         test("should call widgetWindow.onclose callback", () => {
