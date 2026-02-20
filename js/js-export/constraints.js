@@ -1211,10 +1211,10 @@ var __MB_methodArgConstraints = {
     typeof globalThis !== "undefined"
         ? globalThis
         : typeof window !== "undefined"
-            ? window
-            : typeof global !== "undefined"
-                ? global
-                : this
+        ? window
+        : typeof global !== "undefined"
+        ? global
+        : this
 );
 
 if (typeof module !== "undefined" && module.exports) {
