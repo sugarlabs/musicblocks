@@ -1909,12 +1909,34 @@ function TemperamentWidget() {
         const duration = 1 / 2;
         let notes;
 
+        // Ensure the synth's temperament is set correctly
+        this._logo.synth.inTemperament = this.inTemperament;
+        this._logo.synth.changeInTemperament = true;
+
         if (docById("wheelDiv4") === null) {
-            notes = this.frequencies[pitchNumber];
+            // For edit modes, use frequencies directly
             if (this.editMode == "equal" && this.eqTempHzs && this.eqTempHzs.length) {
                 notes = this.eqTempHzs[pitchNumber];
             } else if (this.editMode == "ratio" && this.NEqTempHzs && this.NEqTempHzs.length) {
                 notes = this.NEqTempHzs[pitchNumber];
+            } else {
+                // For default temperaments, use note names so the synth can apply temperament mapping
+                if (isCustomTemperament(this.inTemperament)) {
+                    // For custom temperaments, use frequency or custom frequency method
+                    notes = this.frequencies[pitchNumber];
+                } else {
+                    // For default temperaments (non-12EDO), use note names
+                    // Convert note array to string format (e.g., ["C", 4] -> "C4")
+                    if (this.notes[pitchNumber] && Array.isArray(this.notes[pitchNumber])) {
+                        const noteName = this.notes[pitchNumber][0];
+                        const octave = this.notes[pitchNumber][1];
+                        // Replace Unicode sharps/flats with ASCII equivalents
+                        notes = noteName.replace(/♭/g, "b").replace(/♯/g, "#") + octave;
+                    } else {
+                        // Fallback to frequency if note format is unexpected
+                        notes = this.frequencies[pitchNumber];
+                    }
+                }
             }
         } else {
             notes = this.tempRatios1[pitchNumber] * this.frequencies[0];
