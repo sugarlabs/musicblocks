@@ -7068,6 +7068,159 @@ class Activity {
             }
         };
 
+        /**
+         * Highlights a block during execution to show it's currently running
+         * @param {number} blk - Block ID to highlight
+         * @param {number} [minDurationMs=300] - Minimum highlight duration in milliseconds
+         * @returns {void}
+         */
+        this.highlightBlock = (blk, minDurationMs = 300) => {
+            // Skip highlighting in test environment and E2E tests
+            if (
+                (typeof process !== "undefined" && process.env.NODE_ENV === "test") ||
+                (typeof window !== "undefined" && window.Cypress) ||
+                (typeof window !== "undefined" && window.navigator.webdriver)
+            ) {
+                return;
+            }
+
+            // Validate inputs
+            if (
+                blk === undefined ||
+                !this.blocks ||
+                !this.blocks.blockList ||
+                !this.blocks.blockList[blk]
+            ) {
+                return;
+            }
+
+            const block = this.blocks.blockList[blk];
+            if (!block.container) {
+                return;
+            }
+
+            // Skip if CreateJS is not available
+            if (
+                typeof createjs === "undefined" ||
+                !createjs.BlurFilter ||
+                !createjs.ColorFilter ||
+                !createjs.ShadowFilter
+            ) {
+                return;
+            }
+
+            try {
+                // Store original filters and timing if not already stored
+                if (!block.originalFilters) {
+                    block.originalFilters = block.container.filters || [];
+                }
+
+                // Clear any existing unhighlight timeout
+                if (block.unhighlightTimeout) {
+                    clearTimeout(block.unhighlightTimeout);
+                    block.unhighlightTimeout = null;
+                }
+
+                // Create enhanced glow effect using CreateJS filters
+                const glowFilter = new createjs.BlurFilter(12, 12, 2);
+                const colorFilter = new createjs.ColorFilter(1.2, 1.2, 0.8, 1, 80, 60, 0, 0);
+                const shadowFilter = new createjs.ShadowFilter("#FFD700", 0, 0, 20);
+
+                block.container.filters = [glowFilter, colorFilter, shadowFilter];
+                block.container.updateCache();
+
+                // Mark as highlighted and store minimum duration
+                block.isHighlighted = true;
+                block.highlightStartTime = Date.now();
+                block.minHighlightDuration = minDurationMs;
+
+                // Force stage update for immediate visibility
+                this._scheduleStageUpdate();
+            } catch (error) {
+                console.warn("Block highlighting error:", error);
+                // Ensure block is in a consistent state
+                if (block.isHighlighted) {
+                    block.isHighlighted = false;
+                    block.highlightStartTime = null;
+                    block.minHighlightDuration = null;
+                }
+            }
+        };
+
+        /**
+         * Removes highlight from a block after execution completes
+         * @param {number} blk - Block ID to unhighlight
+         * @param {boolean} [force=false] - Force immediate unhighlight
+         * @returns {void}
+         */
+        this.unhighlightBlock = (blk, force = false) => {
+            // Skip highlighting in test environment and E2E tests
+            if (
+                (typeof process !== "undefined" && process.env.NODE_ENV === "test") ||
+                (typeof window !== "undefined" && window.Cypress) ||
+                (typeof window !== "undefined" && window.navigator.webdriver)
+            ) {
+                return;
+            }
+
+            if (blk === undefined || !this.blocks.blockList[blk]) {
+                return;
+            }
+
+            const block = this.blocks.blockList[blk];
+            if (block.container && block.isHighlighted) {
+                try {
+                    const now = Date.now();
+                    const elapsed = now - block.highlightStartTime;
+                    const remainingTime = Math.max(0, block.minHighlightDuration - elapsed);
+
+                    if (force || remainingTime === 0) {
+                        // Restore original filters
+                        block.container.filters = block.originalFilters || [];
+                        block.container.updateCache();
+
+                        // Clear highlight state
+                        block.isHighlighted = false;
+                        block.highlightStartTime = null;
+                        block.minHighlightDuration = null;
+                        block.unhighlightTimeout = null;
+
+                        // Force stage update for immediate visibility
+                        this._scheduleStageUpdate();
+                    } else {
+                        // Schedule unhighlight for remaining time
+                        if (block.unhighlightTimeout) {
+                            clearTimeout(block.unhighlightTimeout);
+                        }
+                        block.unhighlightTimeout = setTimeout(() => {
+                            this.unhighlightBlock(blk, true);
+                        }, remainingTime);
+                    }
+                } catch (error) {
+                    console.warn("Block unhighlighting error:", error);
+                    // Ensure block is in a consistent state
+                    block.isHighlighted = false;
+                    block.highlightStartTime = null;
+                    block.minHighlightDuration = null;
+                    block.unhighlightTimeout = null;
+                }
+            }
+        };
+
+        // Performance optimization: Throttle stage updates
+        this._highlightUpdateScheduled = false;
+        this._scheduleStageUpdate = () => {
+            if (!this._highlightUpdateScheduled && this.stage && this.stage.update) {
+                this._highlightUpdateScheduled = true;
+                requestAnimationFrame(() => {
+                    if (this.stage && this.stage.update) {
+                        this.stage.update();
+                    }
+                    this._highlightUpdateScheduled = false;
+                });
+            }
+        };
+
         this.copyMultipleBlocks = () => {
             if (this.blocks.selectionModeOn && this.blocks.selectedBlocks.length) {
                 const blocksArray = this.blocks.selectedBlocks;

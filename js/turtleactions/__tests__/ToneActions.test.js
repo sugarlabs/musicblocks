@@ -72,6 +72,8 @@ describe("setupToneActions", () => {
             blocks: {
                 blockList: { 1: {}, 2: {} }
             },
+            highlightBlock: jest.fn(),
+            unhighlightBlock: jest.fn(),
             logo: {
                 setDispatchBlock: jest.fn(_name => {}),
                 setTurtleListener: jest.fn((_, _name, callback) => {

@@ -268,6 +268,8 @@ function setupRhythmActions(activity) {
 
             const listenerName = "_tie_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
+                // Highlight the block when it starts executing
+                activity.highlightBlock(blk);
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
@@ -275,6 +277,11 @@ function setupRhythmActions(activity) {
             }
 
             const __listener = () => {
+                // Unhighlight the block when it finishes executing
+                if (blk !== undefined && blk in activity.blocks.blockList) {
+                    activity.unhighlightBlock(blk);
+                }
+
                 tur.singer.tie = false;
 
                 // If tieCarryOver > 0, we have one more note to play

@@ -134,6 +134,8 @@ function setupVolumeActions(activity) {
 
             const listenerName = "_articulation_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
+                // Highlight the block when it starts executing
+                activity.highlightBlock(blk);
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
@@ -141,6 +143,11 @@ function setupVolumeActions(activity) {
             }
 
             const __listener = () => {
+                // Unhighlight the block when it finishes executing
+                if (blk !== undefined && blk in activity.blocks.blockList) {
+                    activity.unhighlightBlock(blk);
+                }
+
                 for (const synth in tur.singer.synthVolume) {
                     tur.singer.synthVolume[synth].pop();
                     Singer.setSynthVolume(
