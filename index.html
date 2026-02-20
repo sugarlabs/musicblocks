@@ -20,6 +20,8 @@
     <link rel="preload" href="https://fonts.googleapis.com/icon?family=Material+Icons" as="style"
         onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="fonts/material-icons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <!-- NOTE: The exact query-string URL here must be listed in sw.js `precacheFiles`.
+         If you change `?v=fixed` (or remove/add a query param), update sw.js so offline still works. -->
     <link rel="preload" href="css/activities.css?v=fixed" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/keyboard.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -79,7 +81,6 @@
             setTimeout(fixAutocompletePosition, 1000);
         });
     </script>
-    <script src="lib/webL10n.js" defer></script>
     <script src="lib/Tone.js" defer></script>
     <script src="lib/midi.js" defer></script>
     <script src="lib/jquery.ruler.js" defer></script>
@@ -106,10 +107,9 @@
         });
     </script>
     <script src="lib/astring.min.js" defer></script>
-
     <script src="lib/acorn.min.js" defer></script>
+    <script src="env.js"></script>
 
-    <link rel="prefetch" type="application/l10n" href="./localization.ini" />
 
     <script data-main="js/loader" src="lib/require.js" defer></script>
     <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
@@ -335,8 +335,9 @@
                             <li>
                                 <a id="stop" class="left tooltipped"><i class="material-icons main">stop</i></a>
                             </li>
-                            <li>
-                                <a id="record" class="left tooltipped" data-tooltip="Record"></a>
+                            <li style="display: flex; align-items: center;">
+                                <a id="record" class="left tooltipped" data-position="bottom" data-tooltip="Record"></a>
+                                <a id="recordDropdownArrow" class="left dropdown-trigger" data-activates="recorddropdown" style="margin-left: -5px; padding: 0; font-size: 28px;"></a>
                             </li>
                         </ul>
 
@@ -389,6 +390,12 @@
                             <li>
                                 <a id="helpIcon" class="tooltipped" data-position="bottom">
                                     <i class="material-icons md-48">help</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="installButton" class="tooltipped hidden" data-position="bottom"
+                                    data-tooltip="Install App" aria-label="Install App">
+                                    <i class="material-icons md-48">file_download</i>
                                 </a>
                             </li>
                         </ul>
@@ -496,6 +503,11 @@
                     <li><a id="save-blockartwork-png"></a></li>
                 </ul>
 
+                <ul id="recorddropdown" class="dropdown-content">
+                    <li><a id="record-with-menus">Record canvas and toolbars</a></li>
+                    <li><a id="record-canvas-only">Record canvas only</a></li>
+                </ul>
+
                 <ul id="languagedropdown" class="dropdown-content">
                     <li><a id="enUS"></a></li>
                     <li><a id="enUK"></a></li>
@@ -565,11 +577,15 @@
     <script>
         // Register service worker only in production (not on localhost)
         if ("serviceWorker" in navigator) {
-            // Detect if running on localhost for development
-            const isLocalDev = window.location.hostname === "localhost" ||
-                window.location.hostname === "127.0.0.1";
 
-            if (!isLocalDev) {
+            // Localhost SW is disabled to avoid caching; set allowLocalPwa to test installs.
+            const allowLocalPwa = localStorage.getItem("allowLocalPwa") === "true";
+
+            // Detect if running on localhost for development
+            const runtimeEnv = window.MB_ENV
+            const isDevMode = runtimeEnv !== "production";
+
+            if (!isDevMode || allowLocalPwa) {
                 // Production: Register service worker for offline mode
                 if (navigator.serviceWorker.controller) {
                     console.debug(
@@ -592,7 +608,10 @@
             } else {
                 // Development: Skip service worker for instant updates
                 console.log(
-                    "🔥 [DEV MODE] Service worker disabled on localhost for instant code updates"
+                    "🔥 [DEV MODE] Service worker disabled for instant code updates"
+                );
+                console.log(
+                    "Set localStorage.allowLocalPwa = 'true' to enable PWA install testing on localhost."
                 );
             }
         }
@@ -604,20 +623,33 @@
             event.preventDefault(); // Prevent automatic browser prompt
             deferredPrompt = event;
 
-            // Show your install button here
-            const divInstall = document.getElementById("installButton");
-            if (divInstall) {
-                divInstall.classList.remove("hidden");
+            // Show the install button
+            const installButton = document.getElementById("installButton");
+            if (installButton) {
+                installButton.classList.remove("hidden");
             }
         });
-    </script>
-    <script>
-        $(document).ready(function () {
-            // Defensive check for doSearch global (now an Activity member)
-            if (typeof doSearch === "function") {
-                doSearch();
-            } else if (window.activity && typeof window.activity.doSearch === "function") {
-                window.activity.doSearch();
+
+        // Handle install button click
+        document.addEventListener("DOMContentLoaded", function () {
+            const installButton = document.getElementById("installButton");
+            if (installButton) {
+                installButton.addEventListener("click", async function () {
+                    if (deferredPrompt) {
+                        // Show the install prompt
+                        deferredPrompt.prompt();
+                        
+                        // Wait for user choice
+                        const { outcome } = await deferredPrompt.userChoice;
+                        console.log(`User response to the install prompt: ${outcome}`);
+                        
+                        // Clear the deferredPrompt
+                        deferredPrompt = null;
+                        
+                        // Hide the button
+                        installButton.classList.add("hidden");
+                    }
+                });
             }
         });
     </script>
@@ -812,6 +844,12 @@
         document.addEventListener('mozfullscreenchange', handleFullscreenChange);
         document.addEventListener('MSFullscreenChange', handleFullscreenChange);
     </script>
+
+    <style>
+        #installButton.hidden {
+            display: none !important;
+        }
+    </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {

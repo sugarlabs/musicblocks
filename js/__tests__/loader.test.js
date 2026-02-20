@@ -84,7 +84,7 @@ describe("loader.js coverage", () => {
 
         require("../loader.js");
 
-        await new Promise(resolve => setTimeout(resolve, 50)); // More time
+        await new Promise(resolve => setTimeout(resolve, 200)); // More time
     }; // Allow async main() to proceed
 
     test("Configures requirejs correctly", async () => {

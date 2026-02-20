@@ -290,6 +290,7 @@ class Logo {
 
         // Load the default synthesizer
         this.synth = new Synth();
+        this.synth.activity = this.activity; // Reference for voice tracking
         this.synth.changeInTemperament = false;
 
         // Mode widget
@@ -444,7 +445,9 @@ class Logo {
         }
 
         for (const turtle in this.activity.turtles.turtleList) {
-            for (const synth in this.activity.turtles.ithTurtle(turtle).singer.synthVolume) {
+            // Cache ithTurtle result to avoid redundant function calls in inner loop
+            const tur = this.activity.turtles.ithTurtle(turtle);
+            for (const synth in tur.singer.synthVolume) {
                 Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
             }
         }
@@ -463,7 +466,9 @@ class Logo {
 
         Singer.setMasterVolume(this.activity.logo, DEFAULTVOLUME);
         for (const turtle in this.activity.turtles.turtleList) {
-            for (const synth in this.activity.turtles.ithTurtle(turtle).singer.synthVolume) {
+            // Cache ithTurtle result to avoid redundant function calls in inner loop
+            const tur = this.activity.turtles.ithTurtle(turtle);
+            for (const synth in tur.singer.synthVolume) {
                 Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
             }
         }
@@ -522,8 +527,8 @@ class Logo {
             if (new RegExp("^[A-Za-z,. ]$").test(text[i])) new_text += text[i];
         }
 
-        if (this.meSpeak !== null) {
-            this.meSpeak.speak(new_text);
+        if (this._meSpeak) {
+            this._meSpeak.speak(new_text);
         }
     }
 
@@ -755,8 +760,7 @@ class Logo {
                 default:
                     // Is it a plugin?
                     if (logo.blockList[blk].name in logo.evalArgDict) {
-                        // eslint-disable-next-line no-console
-                        console.log("running eval on " + logo.blockList[blk].name);
+                        // Debug logging removed to avoid console noise in production
                         eval(logo.evalArgDict[logo.blockList[blk].name]);
                     } else {
                         // eslint-disable-next-line no-console
@@ -998,7 +1002,13 @@ class Logo {
 
         this.sounds = [];
 
+        // Kill all active audio voices to prevent "zombie audio"
         for (const turtle in this.activity.turtles.turtleList) {
+            const tur = this.activity.turtles.getTurtle(turtle);
+            if (tur && tur.singer && typeof tur.singer.killAllVoices === "function") {
+                tur.singer.killAllVoices();
+            }
+
             for (const instrumentName in instruments[turtle]) {
                 this.synth.stopSound(turtle, instrumentName);
             }
