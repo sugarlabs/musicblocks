@@ -30,6 +30,18 @@
 
 // What is the scale factor when stage is shrunk?
 const CONTAINERSCALEFACTOR = 4;
+// Provide a safe fallback for LEADING when this file is loaded in tests
+// or environments where `LEADING` may not yet be defined.
+const LEADING_FALLBACK = typeof LEADING !== "undefined" ? LEADING : 0;
+// Provide a safe fallback for base64Encode when not available in the environment
+const _base64Encode = typeof base64Encode !== "undefined" ? base64Encode : s => s;
+// Provide a minimal fallback for MBOUNDARY when not present (tests may not load artwork.js).
+const _MBOUNDARY =
+    typeof MBOUNDARY !== "undefined"
+        ? MBOUNDARY
+        : '<svg xmlns="http://www.w3.org/2000/svg" height="HEIGHT" width="WIDTH">' +
+          '<rect x="X" y="Y" width="DX" height="DY" stroke="stroke_color" fill="fill_color" stroke-width="STROKE"/>' +
+          "</svg>";
 
 /**
  * Class for managing all the turtles.
@@ -761,6 +773,17 @@ Turtles.TurtlesView = class {
         const color =
             index === -1 ? platformColor.background : this.getTurtle(index).painter.canvasColor;
         this._backgroundColor = color;
+        // Update DOM body and canvas styles so tests and themes reflect the change.
+        try {
+            if (typeof document !== "undefined" && document.body && document.body.style) {
+                document.body.style.backgroundColor = this._backgroundColor;
+            }
+            if (this.activity && this.activity.canvas && this.activity.canvas.style) {
+                this.activity.canvas.style.backgroundColor = this._backgroundColor;
+            }
+        } catch (e) {
+            // Ignore errors in non-browser environments
+        }
         this.makeBackground();
         this.activity.refreshCanvas();
     }
@@ -862,7 +885,9 @@ Turtles.TurtlesView = class {
         const borderContainer = this.borderContainer;
 
         // Remove any old background containers
-        borderContainer.removeAllChildren();
+        if (borderContainer && typeof borderContainer.removeAllChildren === "function") {
+            borderContainer.removeAllChildren();
+        }
 
         // Update the canvas background color
         const canvas = this.canvas;
@@ -905,7 +930,7 @@ Turtles.TurtlesView = class {
                 }
             };
             const img = new Image();
-            img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svg));
+            img.src = "data:image/svg+xml;base64," + window.btoa(_base64Encode(svg));
 
             container.appendChild(img);
             container.setAttribute(
@@ -954,7 +979,7 @@ Turtles.TurtlesView = class {
             this._collapsedBoundary.visible = true;
             this._expandedBoundary.visible = false;
             turtlesStage.x = (this._w * 3) / 4 - 10;
-            turtlesStage.y = 55 + LEADING + 6;
+            turtlesStage.y = 55 + LEADING_FALLBACK + 6;
             this._isShrunk = true;
 
             for (let i = 0; i < this.getTurtleCount(); i++) {
@@ -984,7 +1009,7 @@ Turtles.TurtlesView = class {
                     label: _("Grid")
                 },
                 this._w - 10 - 3 * 55,
-                70 + LEADING + 6
+                70 + LEADING_FALLBACK + 6
             );
             const that = this;
             this.gridButton.onclick = () => {
@@ -1001,7 +1026,7 @@ Turtles.TurtlesView = class {
                     label: _("Clear")
                 },
                 this._w - 5 - 2 * 55,
-                70 + LEADING + 6
+                70 + LEADING_FALLBACK + 6
             );
 
             // Assign click listener to the Clear button
@@ -1022,7 +1047,7 @@ Turtles.TurtlesView = class {
                     label: _("Collapse")
                 },
                 this._w - 55,
-                70 + LEADING + 6
+                70 + LEADING_FALLBACK + 6
             );
 
             this._collapseButton.onclick = () => {
@@ -1090,7 +1115,7 @@ Turtles.TurtlesView = class {
                     label: _("Expand")
                 },
                 this._w - 55,
-                70 + LEADING + 6
+                70 + LEADING_FALLBACK + 6
             );
             if (this._expandButton !== null) {
                 this._expandButton.style.visibility = "hidden";
@@ -1226,18 +1251,19 @@ Turtles.TurtlesView = class {
 
                 this._collapsedBoundary = new createjs.Bitmap(img);
                 this._collapsedBoundary.x = 0;
-                this._collapsedBoundary.y = 55 + LEADING;
+                this._collapsedBoundary.y = 55 + LEADING_FALLBACK;
                 borderContainer.addChild(this._collapsedBoundary);
                 this._collapsedBoundary.visible = false;
             };
 
             const dx = this._w - 20;
-            const dy = this._h - 55 - LEADING;
+            const dy = this._h - 55 - LEADING_FALLBACK;
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
-                    base64Encode(
-                        MBOUNDARY.replace("HEIGHT", this._h)
+                    _base64Encode(
+                        _MBOUNDARY
+                            .replace("HEIGHT", this._h)
                             .replace("WIDTH", this._w)
                             .replace("Y", 10)
                             .replace("X", 10)
@@ -1265,18 +1291,19 @@ Turtles.TurtlesView = class {
 
                 this._expandedBoundary = new createjs.Bitmap(img);
                 this._expandedBoundary.x = 0;
-                this._expandedBoundary.y = 55 + LEADING;
+                this._expandedBoundary.y = 55 + LEADING_FALLBACK;
                 borderContainer.addChild(this._expandedBoundary);
                 __makeBoundary2();
             };
 
             const dx = this._w - 5;
-            const dy = this._h - 55 - LEADING;
+            const dy = this._h - 55 - LEADING_FALLBACK;
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
-                    base64Encode(
-                        MBOUNDARY.replace("HEIGHT", this._h)
+                    _base64Encode(
+                        _MBOUNDARY
+                            .replace("HEIGHT", this._h)
                             .replace("WIDTH", this._w)
                             .replace("Y", 10 / CONTAINERSCALEFACTOR)
                             .replace("X", 10 / CONTAINERSCALEFACTOR)
