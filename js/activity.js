@@ -7540,7 +7540,9 @@ class Activity {
                                               )
                                             : cleanData.match('<div class="code">(.+?)</div>');
                                         if (!match) {
-                                            throw new Error("Could not find project data in HTML file");
+                                            throw new Error(
+                                                "Could not find project data in HTML file"
+                                            );
                                         }
 
                                         obj = JSON.parse(decodeHtmlEntities(match[1]));
