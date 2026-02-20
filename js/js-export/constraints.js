@@ -1207,7 +1207,15 @@ var __MB_methodArgConstraints = {
     } catch (e) {
         // ignore environment errors
     }
-})(typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : this);
+})(
+    typeof globalThis !== "undefined"
+        ? globalThis
+        : typeof window !== "undefined"
+        ? window
+        : typeof global !== "undefined"
+        ? global
+        : this
+);
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = __MB_methodArgConstraints;
