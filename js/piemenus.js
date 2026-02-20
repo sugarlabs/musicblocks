@@ -60,7 +60,19 @@
    piemenuNoteValue, piemenuAccidentals, piemenuKey, piemenuChords,
    piemenuDissectNumber
 */
-
+/*
+   * Sets and adjusts the size of the pie menu wheel element based on screen width.
+ *
+ * This function dynamically resizes the wheel menu (`wheelDiv`) to maintain
+ * responsive UI behavior across desktop, tablet, and mobile screen sizes.
+ * It also ensures the wheel is positioned above floating windows using a high z-index.
+ *
+ * Screen Size Behavior:
+ * - Desktop (≥1200px): Uses full provided size
+ * - Tablet (768px – 1199px): Reduces size by 50px
+ * - Mobile (<768px): Reduces size by 100px
+*/
+  
 const setWheelSize = (i = 400) => {
     const wheelDiv = document.getElementById("wheelDiv");
     const screenWidth = window.innerWidth;
@@ -83,6 +95,20 @@ const setWheelSize = (i = 400) => {
 
     wheelDiv.style.height = wheelDiv.style.width;
 };
+/**
+ * Calculates the appropriate pie menu size based on the smallest dimension
+ * of the canvas associated with the given block.
+ *
+ * This helps ensure the pie menu fits properly within the visible canvas area
+ * without overflowing, maintaining consistent UI scaling.
+ *
+ * @param {Object} block - Block object containing rendering and turtle canvas references.
+ * @param {Object} block.blocks - Block container object.
+ * @param {Object} block.blocks.turtles - Turtles manager instance.
+ * @param {HTMLCanvasElement} block.blocks.turtles._canvas - Canvas element used for rendering.
+ *
+ * @returns {number} The minimum value between canvas width and height, used as the pie menu size.
+ */
 
 const getPieMenuSize = block => {
     const canvas = block.blocks.turtles._canvas;
@@ -99,6 +125,32 @@ const debouncedSetWheelSize = () => {
 // Call the function initially and whenever the window is resized
 setWheelSize();
 window.addEventListener("resize", debouncedSetWheelSize);
+
+
+
+/**
+ * Enables mouse wheel scrolling navigation for the pie menu wheel.
+ *
+ * This function attaches a throttled wheel scroll event listener to the wheel container,
+ * allowing users to navigate between pie menu items using the mouse scroll wheel.
+ * It also temporarily disables item navigation sound previews during scroll navigation
+ * to provide a smoother user experience.
+ *
+ * Key Features:
+ * - Removes any previously attached scroll handler to prevent duplicate listeners
+ * - Throttles scroll events (150ms interval) to avoid excessive navigation triggers
+ * - Supports circular navigation (wraps from last item to first and vice versa)
+ * - Temporarily disables navigation functions during scroll to prevent sound previews
+ *
+ * @param {Object} wheel - Pie menu wheel instance containing navigation logic and items.
+ * @param {Array} wheel.navItems - Array of navigation items present in the wheel.
+ * @param {number} wheel.selectedNavItemIndex - Currently selected navigation item index.
+ * @param {Function} wheel.navigateWheel - Function used to navigate to a specific wheel item.
+ *
+ * @param {number} itemCount - Total number of items present in the pie menu.
+ *
+ * @returns {void} Does not return anything. Directly attaches event listeners to the DOM.
+ */
 
 // Helper function to enable scroll-to-rotate for pie menus
 const enableWheelScroll = (wheel, itemCount) => {
