@@ -1129,6 +1129,9 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
         streaming = true;
         video.play();
         if (isVideo) {
+            if (cameraID !== null) {
+                window.clearInterval(cameraID);
+            }
             cameraID = window.setInterval(draw, 100);
             setCameraID(cameraID);
         } else {
@@ -1136,27 +1139,26 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
         }
     }
 
-    video.addEventListener(
-        "canplay",
-        () => {
-            // console.debug("canplay", streaming, CameraManager.isSetup);
-            if (!streaming) {
-                video.setAttribute("width", w);
-                video.setAttribute("height", h);
-                canvas.setAttribute("width", w);
-                canvas.setAttribute("height", h);
-                streaming = true;
+    video.oncanplay = () => {
+        // console.debug("canplay", streaming, CameraManager.isSetup);
+        if (!streaming) {
+            video.setAttribute("width", w);
+            video.setAttribute("height", h);
+            canvas.setAttribute("width", w);
+            canvas.setAttribute("height", h);
+            streaming = true;
 
-                if (isVideo) {
-                    cameraID = window.setInterval(draw, 100);
-                    setCameraID(cameraID);
-                } else {
-                    draw();
+            if (isVideo) {
+                if (cameraID !== null) {
+                    window.clearInterval(cameraID);
                 }
+                cameraID = window.setInterval(draw, 100);
+                setCameraID(cameraID);
+            } else {
+                draw();
             }
-        },
-        false
-    );
+        }
+    };
 };
 
 /**
@@ -1612,10 +1614,10 @@ let hexToRGB = hex => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
         ? {
-              r: parseInt(result[1], 16),
-              g: parseInt(result[2], 16),
-              b: parseInt(result[3], 16)
-          }
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        }
         : null;
 };
 
