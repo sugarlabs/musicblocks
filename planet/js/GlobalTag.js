@@ -12,13 +12,26 @@
 /*
    global
 
-   _, toTitleCase
+   _
 */
 /*
    exported
 
    GlobalTag
 */
+
+/**
+ * Converts the first character of a string to uppercase.
+ * Defined locally because GlobalTag.js runs inside the Planet iframe
+ * and does not have access to the toTitleCase exported by js/utils/utils.js.
+ * @param {string} str - The string to convert.
+ * @returns {string|undefined} The converted string or undefined if input is not a string.
+ */
+const toTitleCase = (str) => {
+    if (typeof str !== "string") return;
+    return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
 class GlobalTag {
     /* 
      this.tagNames = [

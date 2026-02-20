@@ -283,7 +283,7 @@ describe("Toolbar Class", () => {
     });
 
     test("renderStopIcon sets onclick and updates stop button behavior", () => {
-        const stopIcon = { onclick: null, style: { color: "" } };
+        const stopIcon = { onclick: null, style: { color: "", display: "" } };
         const recordButton = { className: "recording" };
 
         global.docById.mockImplementation(id =>
@@ -296,6 +296,8 @@ describe("Toolbar Class", () => {
 
         const mockOnClick = jest.fn();
         toolbar.renderStopIcon(mockOnClick);
+
+        expect(stopIcon.style.display).toBe("none");
 
         stopIcon.onclick();
 
