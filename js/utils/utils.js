@@ -1133,6 +1133,7 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
         if (isVideo) {
             if (CameraManager.intervalId !== null) {
                 window.clearInterval(CameraManager.intervalId);
+                CameraManager.intervalId = null;
             }
             cameraID = window.setInterval(draw, 100);
             CameraManager.intervalId = cameraID;
@@ -1158,6 +1159,7 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
             if (isVideo) {
                 if (CameraManager.intervalId !== null) {
                     window.clearInterval(CameraManager.intervalId);
+                    CameraManager.intervalId = null;
                 }
                 cameraID = window.setInterval(draw, 100);
                 CameraManager.intervalId = cameraID;
