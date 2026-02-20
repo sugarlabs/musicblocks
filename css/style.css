@@ -9,7 +9,7 @@ input[type="range"] {
   width: 250px;
 }
 
-input[type="range"]:focus {
+input[type="range"]:focus:not(:focus-visible) {
   outline: none;
 }
 

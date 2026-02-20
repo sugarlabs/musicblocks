@@ -14,8 +14,15 @@
 
 @import url("play-only-mode.css");
 
-*:focus {
+/* Hide focus ring for mouse/touch interactions */
+*:focus:not(:focus-visible) {
   outline: none;
+}
+
+/* Show visible focus ring for keyboard navigation (WCAG 2.4.7) */
+*:focus-visible {
+  outline: 2px solid #0066FF;
+  outline-offset: 2px;
 }
 
 body:not(.dark) #helpfulSearch,
