@@ -620,63 +620,42 @@ class ReflectionMatrix {
     }
 
     /**
-     * Escapes HTML special characters to prevent XSS attacks.
-     * @param {string} text - The text to escape.
+     * Escapes HTML-sensitive characters to prevent script execution.
+     * @param {string} text - The raw text to escape.
      * @returns {string} - The escaped text.
      */
     escapeHTML(text) {
-        const escapeMap = {
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#x27;"
-        };
-        return text.replace(/[&<>"']/g, char => escapeMap[char]);
-    }
-
-    /**
-     * Sanitizes HTML content using DOMParser to prevent XSS.
-     * Removes unsafe attributes and ensures links are safe.
-     * @param {string} htmlString - The HTML string to sanitize.
-     * @returns {string} - The sanitized HTML string.
-     */
-    sanitizeHTML(htmlString) {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(htmlString, "text/html");
-
-        // Sanitize links
-        const links = doc.getElementsByTagName("a");
-        for (let i = 0; i < links.length; i++) {
-            const link = links[i];
-            const href = link.getAttribute("href");
-
-            // If no href, or it's unsafe, remove the attribute
-            if (!href || this.isUnsafeUrl(href)) {
-                link.removeAttribute("href");
-            } else {
-                // Enforce security attributes for external links
-                link.setAttribute("target", "_blank");
-                link.setAttribute("rel", "noopener noreferrer");
-            }
+        if (!text) {
+            return "";
         }
 
-        return doc.body.innerHTML;
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
     }
 
     /**
-     * Checks if a URL is unsafe (javascript:, data:, vbscript:).
-     * @param {string} url - The URL to check.
-     * @returns {boolean} - True if unsafe, false otherwise.
+     * Sanitizes URLs used inside markdown links.
+     * Rejects javascript:, data:, and vbscript: schemes.
+     * @param {string} url - The URL to sanitize.
+     * @returns {string|null} - The sanitized URL or null if unsafe.
      */
-    isUnsafeUrl(url) {
-        const trimmed = url.trim().toLowerCase();
-        const unsafeSchemes = ["javascript:", "data:", "vbscript:"];
-        // Check if it starts with any unsafe scheme
-        // Note: DOMParser handles HTML entity decoding, so we check the raw attribute safely here
-        // But for extra safety against control characters, we rely on the fact that
-        // we are operating on the parsed DOM attribute.
-        return unsafeSchemes.some(scheme => trimmed.replace(/\s+/g, "").startsWith(scheme));
+    sanitizeUrl(url) {
+        if (!url) {
+            return null;
+        }
+
+        const trimmed = url.trim();
+        const lower = trimmed.toLowerCase();
+
+        if (/^(javascript|data|vbscript):/.test(lower)) {
+            return null;
+        }
+
+        return trimmed.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
     }
 
     /**
@@ -685,10 +664,7 @@ class ReflectionMatrix {
      * @returns {string} - The converted HTML text.
      */
     mdToHTML(md) {
-        // Step 1: Escape HTML first to prevent XSS attacks from raw tags
         let html = this.escapeHTML(md);
-
-        // Step 2: Convert Markdown syntax to HTML
 
         // Headings
         html = html.replace(/^###### (.*$)/gim, "<h6>$1</h6>");
@@ -702,8 +678,14 @@ class ReflectionMatrix {
         html = html.replace(/\*\*(.*?)\*\*/gim, "<b>$1</b>");
         html = html.replace(/\*(.*?)\*/gim, "<i>$1</i>");
 
-        // Links - Create raw anchor tags, sanitization happens in Step 3
-        html = html.replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2'>$1</a>");
+        // Links
+        html = html.replace(/\[(.*?)\]\((.*?)\)/gim, (match, text, url) => {
+            const safeUrl = this.sanitizeUrl(url);
+            if (!safeUrl) {
+                return text;
+            }
+            return `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+        });
 
         // Line breaks
         html = html.replace(/\n/gim, "<br>");
