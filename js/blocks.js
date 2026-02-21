@@ -2123,7 +2123,21 @@ class Blocks {
                 }
 
                 this.adjustDocks(newBlock, true);
-                /** TODO: some graphical feedback re new connection? */
+                /** Graphical feedback for the new connection */
+                // Staged scheduling to anchor feedback after docking redraw storm
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        const feedbackBlockObj = this.blockList[newBlock];
+                        if (feedbackBlockObj) {
+                            feedbackBlockObj.highlight();
+                            this.activity.refreshCanvas();
+                            setTimeout(() => {
+                                feedbackBlockObj.unhighlight();
+                                this.activity.refreshCanvas();
+                            }, 220);
+                        }
+                    });
+                });
 
                 /** Check if top block is one of the widget blocks. */
                 let lockInit = false;
