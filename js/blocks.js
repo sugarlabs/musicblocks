@@ -904,6 +904,8 @@ class Blocks {
          * @returns {void}
          */
         this.adjustDocks = (blk, resetLoopCounter) => {
+            console.count("Blocks.adjustDocks");
+            const startTime = performance.now();
             const myBlock = this.blockList[blk];
 
             /** For when we come in from makeBlock */
@@ -1049,6 +1051,11 @@ class Blocks {
                     /** Recurse on connected blocks. */
                     this.adjustDocks(cblk, true);
                 }
+            }
+
+            const duration = performance.now() - startTime;
+            if (duration > 10) {
+                console.log(`Blocks.adjustDocks for block ${blk} took ${duration.toFixed(2)}ms`);
             }
         };
 
@@ -2294,6 +2301,8 @@ class Blocks {
          * @returns {void}
          */
         this.checkBounds = () => {
+            console.count("Blocks.checkBounds");
+            const startTime = performance.now();
             let onScreen = true;
             for (const block of this.blockList) {
                 if (block.connections[0] == null) {
@@ -2310,6 +2319,15 @@ class Blocks {
             if (onScreen) {
                 this.activity.setHomeContainers(false);
                 this.boundary.hide();
+            }
+
+            const duration = performance.now() - startTime;
+            if (duration > 5) {
+                console.log(
+                    `Blocks.checkBounds took ${duration.toFixed(2)}ms for ${
+                        this.blockList.length
+                    } blocks`
+                );
             }
         };
 
