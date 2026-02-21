@@ -26,6 +26,14 @@ body.dark {
   color: var(--fg);
 }
 
+.dark #helpBodyDiv a {
+  color: #64B5F6 !important;
+}
+
+.dark #helpBodyDiv a:hover {
+  color: #90CAF9 !important;
+}
+
 /* Fix white side bars in Help / Tour widget */
 .dark #floatingWindows .wfWinBody {
   background-color: var(--bg) !important;
