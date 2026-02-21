@@ -647,12 +647,16 @@ function MusicKeyboard(activity) {
                 myNode.innerHTML = "";
             }
 
-            this.tick = false;
-            this.firstNote = false;
-            this.metronomeON = false;
+            // Ensure countdown interval/loop resources are cleaned up on close.
+            if (typeof this.stopMetronome === "function") {
+                this.stopMetronome();
+            } else {
+                this.tick = false;
+                this.firstNote = false;
+                this.metronomeON = false;
+            }
 
             selectedNotes = [];
-            if (this.loopTick) this.loopTick.stop();
             docById("wheelDivptm").style.display = "none";
             docById("wheelDivptm").style.display = "none";
             if (this._menuWheel) this._menuWheel.removeWheel();
