@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Worker Fix Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        #console-output {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Service Worker Fix Test - Issue #5660</h1>
+    
+    <div class="test-section info">
+        <h2>Test Information</h2>
+        <p>This test verifies that the Service Worker correctly filters out non-HTTP/HTTPS requests.</p>
+        <p><strong>Expected Behavior:</strong> No cache errors should appear in the console for chrome-extension:// or other non-HTTP schemes.</p>
+    </div>
+
+    <div class="test-section">
+        <h2>Service Worker Status</h2>
+        <p id="sw-status">Checking...</p>
+        <button onclick="registerServiceWorker()">Register Service Worker</button>
+        <button onclick="unregisterServiceWorker()">Unregister Service Worker</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Requests</h2>
+        <button onclick="testHttpRequest()">Test HTTP Request</button>
+        <button onclick="testHttpsRequest()">Test HTTPS Request</button>
+        <button onclick="simulateExtensionRequest()">Simulate Extension Request</button>
+        <button onclick="clearConsole()">Clear Console</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Console Output</h2>
+        <div id="console-output"></div>
+    </div>
+
+    <script>
+        const consoleOutput = document.getElementById('console-output');
+        const swStatus = document.getElementById('sw-status');
+
+        // Intercept console methods
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+
+        function addToConsole(type, ...args) {
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.style.color = type === 'error' ? 'red' : type === 'warn' ? 'orange' : 'black';
+            div.textContent = `[${timestamp}] [${type.toUpperCase()}] ${message}`;
+            consoleOutput.appendChild(div);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToConsole('log', ...args);
+        };
+
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToConsole('error', ...args);
+        };
+
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addToConsole('warn', ...args);
+        };
+
+        // Check Service Worker support
+        if ('serviceWorker' in navigator) {
+            checkServiceWorkerStatus();
+        } else {
+            swStatus.textContent = '❌ Service Workers not supported in this browser';
+            swStatus.style.color = 'red';
+        }
+
+        async function checkServiceWorkerStatus() {
+            try {
+                const registration = await navigator.serviceWorker.getRegistration();
+                if (registration) {
+                    swStatus.textContent = '✅ Service Worker is registered';
+                    swStatus.style.color = 'green';
+                    console.log('Service Worker scope:', registration.scope);
+                } else {
+                    swStatus.textContent = '⚠️ Service Worker not registered';
+                    swStatus.style.color = 'orange';
+                }
+            } catch (error) {
+                swStatus.textContent = '❌ Error checking Service Worker status';
+                swStatus.style.color = 'red';
+                console.error('Error:', error);
+            }
+        }
+
+        async function registerServiceWorker() {
+            if (!('serviceWorker' in navigator)) {
+                console.error('Service Workers not supported');
+                return;
+            }
+
+            try {
+                console.log('Registering Service Worker...');
+                const registration = await navigator.serviceWorker.register('/sw.js');
+                console.log('✅ Service Worker registered successfully');
+                console.log('Scope:', registration.scope);
+                await checkServiceWorkerStatus();
+            } catch (error) {
+                console.error('❌ Service Worker registration failed:', error);
+            }
+        }
+
+        async function unregisterServiceWorker() {
+            try {
+                const registration = await navigator.serviceWorker.getRegistration();
+                if (registration) {
+                    await registration.unregister();
+                    console.log('✅ Service Worker unregistered');
+                    await checkServiceWorkerStatus();
+                } else {
+                    console.log('No Service Worker to unregister');
+                }
+            } catch (error) {
+                console.error('❌ Error unregistering Service Worker:', error);
+            }
+        }
+
+        async function testHttpRequest() {
+            console.log('Testing HTTP request...');
+            try {
+                const response = await fetch('http://httpbin.org/get');
+                console.log('✅ HTTP request successful:', response.status);
+            } catch (error) {
+                console.error('❌ HTTP request failed:', error.message);
+            }
+        }
+
+        async function testHttpsRequest() {
+            console.log('Testing HTTPS request...');
+            try {
+                const response = await fetch('https://httpbin.org/get');
+                console.log('✅ HTTPS request successful:', response.status);
+            } catch (error) {
+                console.error('❌ HTTPS request failed:', error.message);
+            }
+        }
+
+        function simulateExtensionRequest() {
+            console.log('Simulating extension request...');
+            console.log('ℹ️ Note: The Service Worker should ignore chrome-extension:// URLs');
+            console.log('ℹ️ Check browser console for any cache-related errors');
+            console.log('ℹ️ With the fix, you should NOT see any cache errors for non-HTTP schemes');
+            
+            // Log what would happen
+            const testUrls = [
+                'chrome-extension://example/script.js',
+                'moz-extension://example/script.js',
+                'file:///path/to/file.html'
+            ];
+            
+            testUrls.forEach(url => {
+                console.log(`ℹ️ Service Worker should skip: ${url}`);
+            });
+        }
+
+        function clearConsole() {
+            consoleOutput.innerHTML = '';
+            console.log('Console cleared');
+        }
+
+        // Initial log
+        console.log('Test page loaded. Service Worker fix test ready.');
+        console.log('Open browser DevTools (F12) to see detailed Service Worker logs.');
+    </script>
+</body>
+</html>
