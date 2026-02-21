@@ -654,6 +654,7 @@ function MusicKeyboard(activity) {
                 this.tick = false;
                 this.firstNote = false;
                 this.metronomeON = false;
+                if (this.loopTick) this.loopTick.stop();
             }
 
             selectedNotes = [];
