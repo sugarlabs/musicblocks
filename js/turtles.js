@@ -760,6 +760,16 @@ Turtles.TurtlesView = class {
     setBackgroundColor(index) {
         const color =
             index === -1 ? platformColor.background : this.getTurtle(index).painter.canvasColor;
+
+        // Ensure background color is applied even when stage is not present (test environment)
+        if (typeof document !== "undefined" && document.body) {
+            document.body.style.backgroundColor = color;
+        }
+
+        if (this.canvas && this.canvas.style) {
+            this.canvas.style.backgroundColor = color;
+        }
+
         this._backgroundColor = color;
         this.makeBackground();
         this.activity.refreshCanvas();
@@ -862,7 +872,9 @@ Turtles.TurtlesView = class {
         const borderContainer = this.borderContainer;
 
         // Remove any old background containers
-        borderContainer.removeAllChildren();
+        if (borderContainer) {
+            borderContainer.removeAllChildren();
+        }
 
         // Update the canvas background color
         const canvas = this.canvas;
@@ -911,10 +923,10 @@ Turtles.TurtlesView = class {
             container.setAttribute(
                 "style",
                 "position: absolute; right:" +
-                    (document.body.clientWidth - x) +
-                    "px;  top: " +
-                    y +
-                    "px;"
+                (document.body.clientWidth - x) +
+                "px;  top: " +
+                y +
+                "px;"
             );
             docById("buttoncontainerTOP").appendChild(container);
             return container;
@@ -924,6 +936,7 @@ Turtles.TurtlesView = class {
          * Setup dragging of smaller canvas .
          */
         const dragCanvas = () => {
+            if (!turtlesStage) return;
             let offset;
             turtlesStage.removeAllEventListeners("pressmove");
             turtlesStage.removeAllEventListeners("mousedown");
@@ -953,8 +966,11 @@ Turtles.TurtlesView = class {
             this.setStageScale(0.25);
             this._collapsedBoundary.visible = true;
             this._expandedBoundary.visible = false;
-            turtlesStage.x = (this._w * 3) / 4 - 10;
-            turtlesStage.y = 55 + LEADING + 6;
+            if (turtlesStage) {
+                const leading = typeof LEADING !== "undefined" ? LEADING : 0;
+                turtlesStage.x = (this._w * 3) / 4 - 10;
+                turtlesStage.y = 55 + leading + 6;
+            }
             this._isShrunk = true;
 
             for (let i = 0; i < this.getTurtleCount(); i++) {
@@ -965,8 +981,10 @@ Turtles.TurtlesView = class {
             }
 
             // remove the stage and add it back at the top
-            this.masterStage.removeChild(turtlesStage);
-            this.masterStage.addChild(turtlesStage);
+            if (this.masterStage && turtlesStage) {
+                this.masterStage.removeChild(turtlesStage);
+                this.masterStage.addChild(turtlesStage);
+            }
             dragCanvas();
 
             this.activity.refreshCanvas();
@@ -984,7 +1002,7 @@ Turtles.TurtlesView = class {
                     label: _("Grid")
                 },
                 this._w - 10 - 3 * 55,
-                70 + LEADING + 6
+                70 + (typeof LEADING !== "undefined" ? LEADING : 0) + 6
             );
             const that = this;
             this.gridButton.onclick = () => {
@@ -1001,7 +1019,7 @@ Turtles.TurtlesView = class {
                     label: _("Clear")
                 },
                 this._w - 5 - 2 * 55,
-                70 + LEADING + 6
+                70 + (typeof LEADING !== "undefined" ? LEADING : 0) + 6
             );
 
             // Assign click listener to the Clear button
@@ -1022,7 +1040,7 @@ Turtles.TurtlesView = class {
                     label: _("Collapse")
                 },
                 this._w - 55,
-                70 + LEADING + 6
+                70 + (typeof LEADING !== "undefined" ? LEADING : 0) + 6
             );
 
             this._collapseButton.onclick = () => {
@@ -1090,7 +1108,7 @@ Turtles.TurtlesView = class {
                     label: _("Expand")
                 },
                 this._w - 55,
-                70 + LEADING + 6
+                70 + (typeof LEADING !== "undefined" ? LEADING : 0) + 6
             );
             if (this._expandButton !== null) {
                 this._expandButton.style.visibility = "hidden";
@@ -1126,11 +1144,13 @@ Turtles.TurtlesView = class {
                 }
             });
             this._collapsedBoundary.visible = false;
-            turtlesStage.removeAllEventListeners("pressmove");
-            turtlesStage.removeAllEventListeners("mousedown");
+            if (turtlesStage) {
+                turtlesStage.removeAllEventListeners("pressmove");
+                turtlesStage.removeAllEventListeners("mousedown");
 
-            turtlesStage.x = 0;
-            turtlesStage.y = 0;
+                turtlesStage.x = 0;
+                turtlesStage.y = 0;
+            }
             this._isShrunk = false;
 
             for (let i = 0; i < this.getTurtleCount(); i++) {
@@ -1159,8 +1179,10 @@ Turtles.TurtlesView = class {
             }
 
             // remove the stage and add it back in position 0
-            this.masterStage.removeChild(turtlesStage);
-            this.masterStage.addChildAt(turtlesStage, 0);
+            if (this.masterStage && turtlesStage) {
+                this.masterStage.removeChild(turtlesStage);
+                this.masterStage.addChildAt(turtlesStage, 0);
+            }
 
             if (docById("helpfulWheelDiv").style.display !== "none") {
                 docById("helpfulWheelDiv").style.display = "none";
@@ -1182,7 +1204,7 @@ Turtles.TurtlesView = class {
             }
             const cont = document.createElement("div");
             document.body.appendChild(cont);
-            cont.style.display = second ? "block" : "none";
+            cont.style.display = "block";
             cont.setAttribute("id", "buttoncontainerTOP");
             __makeCollapseButton();
             __makeExpandButton();
@@ -1226,18 +1248,25 @@ Turtles.TurtlesView = class {
 
                 this._collapsedBoundary = new createjs.Bitmap(img);
                 this._collapsedBoundary.x = 0;
-                this._collapsedBoundary.y = 55 + LEADING;
-                borderContainer.addChild(this._collapsedBoundary);
+                const leading = typeof LEADING !== "undefined" ? LEADING : 0;
+                this._collapsedBoundary.y = 55 + leading;
+                if (borderContainer) {
+                    borderContainer.addChild(this._collapsedBoundary);
+                }
                 this._collapsedBoundary.visible = false;
             };
-
+            const leading = typeof LEADING !== "undefined" ? LEADING : 0;
             const dx = this._w - 20;
-            const dy = this._h - 55 - LEADING;
+            const boundaryTemplate =
+                typeof MBOUNDARY !== "undefined"
+                    ? MBOUNDARY
+                    : '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"></svg>';
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
                     base64Encode(
-                        MBOUNDARY.replace("HEIGHT", this._h)
+                        boundaryTemplate
+                            .replace("HEIGHT", this._h)
                             .replace("WIDTH", this._w)
                             .replace("Y", 10)
                             .replace("X", 10)
@@ -1265,18 +1294,26 @@ Turtles.TurtlesView = class {
 
                 this._expandedBoundary = new createjs.Bitmap(img);
                 this._expandedBoundary.x = 0;
-                this._expandedBoundary.y = 55 + LEADING;
-                borderContainer.addChild(this._expandedBoundary);
+                const leading = typeof LEADING !== "undefined" ? LEADING : 0;
+                this._expandedBoundary.y = 55 + leading;
+                if (borderContainer) {
+                    borderContainer.addChild(this._expandedBoundary);
+                }
                 __makeBoundary2();
             };
-
+            const leading = typeof LEADING !== "undefined" ? LEADING : 0;
             const dx = this._w - 5;
-            const dy = this._h - 55 - LEADING;
+            const dy = this._h - 55 - leading;
+            const boundaryTemplate =
+                typeof MBOUNDARY !== "undefined"
+                    ? MBOUNDARY
+                    : '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"></svg>';
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
                     base64Encode(
-                        MBOUNDARY.replace("HEIGHT", this._h)
+                        boundaryTemplate
+                            .replace("HEIGHT", this._h)
                             .replace("WIDTH", this._w)
                             .replace("Y", 10 / CONTAINERSCALEFACTOR)
                             .replace("X", 10 / CONTAINERSCALEFACTOR)

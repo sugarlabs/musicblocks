@@ -67,6 +67,34 @@ global.Turtle = jest.fn().mockImplementation(() => ({
     }
 }));
 
+// Mock global functions required by TurtlesView
+global.docById = jest.fn(id => {
+    const element = document.getElementById(id);
+    if (!element && id === "buttoncontainerTOP") {
+        const div = document.createElement("div");
+        div.id = id;
+        document.body.appendChild(div);
+        return div;
+    }
+    return element;
+});
+
+global.window = global.window || {};
+global.window.jQuery = jest.fn(() => ({
+    tooltip: jest.fn()
+}));
+global.window.jQuery.noConflict = jest.fn(() => global.window.jQuery);
+
+global.window.btoa = jest.fn(str => Buffer.from(str).toString("base64"));
+global.base64Encode = jest.fn(str => str);
+
+global.platformColor = {
+    background: "#ffffff",
+    ruleColor: "#000000"
+};
+
+global._ = jest.fn(str => str);
+
 /**
  * Helper to mix TurtlesModel and TurtlesView prototype methods into a Turtles instance,
  * mimicking what importMembers does at runtime.
@@ -99,6 +127,7 @@ describe("Turtles Class", () => {
             stage: { addChild: jest.fn(), removeChild: jest.fn() },
             refreshCanvas: jest.fn(),
             turtleContainer: new createjs.Container(),
+            canvas: { width: 1200, height: 900, style: {} },
             hideAuxMenu: jest.fn(),
             hideGrids: jest.fn(),
             _doCartesianPolar: jest.fn()
@@ -106,6 +135,17 @@ describe("Turtles Class", () => {
 
         turtles = new Turtles(activityMock);
         turtles.activity = activityMock;
+        turtles._borderContainer = new createjs.Container();
+        turtles._canvas = activityMock.canvas;
+        turtles._masterStage = activityMock.stage;
+        turtles._stage = activityMock.turtleContainer;
+        turtles._scale = 1.0;
+        turtles._w = 1200;
+        turtles._h = 900;
+
+        // Mix in the prototypes to get the getters and setters
+        mixinPrototypes(turtles);
+
         turtles.getTurtleCount = jest.fn().mockReturnValue(0);
         turtles.getTurtle = jest.fn(() => ({
             container: {
