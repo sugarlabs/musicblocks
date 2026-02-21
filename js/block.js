@@ -3056,10 +3056,20 @@ class Block {
                 x: Math.round(that.container.x - that.original.x),
                 y: Math.round(that.container.y - that.original.y)
             };
+
+            // Cache the drag group once on mousedown instead of
+            // recomputing the tree traversal on every pressmove.
+            that.blocks.cacheDragGroup(thisBlock);
+            // Invalidate the top-block cache since a drag may
+            // disconnect blocks, changing the topology.
+            that.blocks.invalidateTopBlockCache();
         });
 
         /**
          * Handles the pressmove event on the block container.
+         * Performance-optimized: uses cached drag group, batched block
+         * moves, throttled edge scroll, and a single deferred
+         * checkBounds + refreshCanvas per frame.
          * @param {Event} event - The pressmove event.
          */
         this.container.on("pressmove", event => {
@@ -3119,14 +3129,27 @@ class Block {
                 dy += 45 - finalPos;
             }
 
-            // scroll when reached edges.
-            if (event.stageX < 10 && that.activity.scrollBlockContainer)
-                that.blocks.moveAllBlocksExcept(that, 10, 0);
-            else if (event.stageX > window.innerWidth - 10 && that.activity.scrollBlockContainer)
-                that.blocks.moveAllBlocksExcept(that, -10, 0);
-            else if (event.stageY > window.innerHeight - 10)
-                that.blocks.moveAllBlocksExcept(that, 0, -10);
-            else if (event.stageY < 60) that.blocks.moveAllBlocksExcept(that, 0, 10);
+            // Edge-scroll: throttled to ~60fps (16ms) to avoid
+            // running moveAllBlocksExcept on every mouse event.
+            const now = Date.now();
+            if (now - that.blocks._lastEdgeScrollTime >= 16) {
+                if (event.stageX < 10 && that.activity.scrollBlockContainer) {
+                    that.blocks.moveAllBlocksExcept(that, 10, 0);
+                    that.blocks._lastEdgeScrollTime = now;
+                } else if (
+                    event.stageX > window.innerWidth - 10 &&
+                    that.activity.scrollBlockContainer
+                ) {
+                    that.blocks.moveAllBlocksExcept(that, -10, 0);
+                    that.blocks._lastEdgeScrollTime = now;
+                } else if (event.stageY > window.innerHeight - 10) {
+                    that.blocks.moveAllBlocksExcept(that, 0, -10);
+                    that.blocks._lastEdgeScrollTime = now;
+                } else if (event.stageY < 60) {
+                    that.blocks.moveAllBlocksExcept(that, 0, 10);
+                    that.blocks._lastEdgeScrollTime = now;
+                }
+            }
 
             if (that.blocks.longPressTimeout != null) {
                 clearTimeout(that.blocks.longPressTimeout);
@@ -3138,7 +3161,8 @@ class Block {
                 that.label.style.display = "none";
             }
 
-            that.blocks.moveBlockRelative(thisBlock, dx, dy);
+            // Move the dragged block itself (batched — no checkBounds).
+            that.blocks.moveBlockRelativeBatched(thisBlock, dx, dy);
 
             // If we are over the trash, warn the user.
             if (
@@ -3157,17 +3181,31 @@ class Block {
                 that.container.setChildIndex(that.text, that.container.children.length - 1);
             }
 
-            // ...and move any connected blocks.
-            that.blocks.findDragGroup(thisBlock);
-            if (that.blocks.dragGroup.length > 0) {
-                for (let b = 0; b < that.blocks.dragGroup.length; b++) {
-                    const blk = that.blocks.dragGroup[b];
-                    if (b !== 0) {
-                        that.blocks.moveBlockRelative(blk, dx, dy);
+            // Move connected blocks using the cached drag group
+            // (computed once on mousedown, not every pressmove).
+            const cachedGroup = that.blocks._cachedDragGroup;
+            if (cachedGroup != null && cachedGroup.length > 0) {
+                for (let b = 0; b < cachedGroup.length; b++) {
+                    const blk = cachedGroup[b];
+                    if (blk !== thisBlock) {
+                        that.blocks.moveBlockRelativeBatched(blk, dx, dy);
+                    }
+                }
+            } else {
+                // Fallback: recompute if cache is missing
+                that.blocks.findDragGroup(thisBlock);
+                if (that.blocks.dragGroup.length > 0) {
+                    for (let b = 0; b < that.blocks.dragGroup.length; b++) {
+                        const blk = that.blocks.dragGroup[b];
+                        if (b !== 0) {
+                            that.blocks.moveBlockRelativeBatched(blk, dx, dy);
+                        }
                     }
                 }
             }
 
+            // Single deferred checkBounds + single canvas refresh per frame
+            that.blocks.scheduleCheckBounds();
             that.activity.refreshCanvas();
         });
 
@@ -3190,6 +3228,9 @@ class Block {
                 that.blocks.unhighlight(thisBlock, true);
             }
             that.blocks.activeBlock = null;
+            // Release cached drag group and top-block map
+            that.blocks.clearCachedDragGroup();
+            that.blocks.invalidateTopBlockCache();
 
             moved = false;
         });
@@ -3212,6 +3253,9 @@ class Block {
 
             that.blocks.unhighlight(thisBlock, true);
             that.blocks.activeBlock = null;
+            // Release cached drag group and top-block map
+            that.blocks.clearCachedDragGroup();
+            that.blocks.invalidateTopBlockCache();
 
             moved = false;
         });
