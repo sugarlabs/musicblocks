@@ -507,5 +507,5 @@ a {
 	border-radius: 5px;
 	cursor: pointer;
 	font-size: 16px;
-	outline: none;
+	/* outline preserved for keyboard focus via global :focus-visible rule */
 }
