@@ -706,6 +706,19 @@
                     index = (index + 1) % texts.length;
                 }, 1500);
             }, 3000);
+
+            const languageDropdown = document.getElementById("languagedropdown");
+            if (languageDropdown) {
+            const langLinks = languageDropdown.querySelectorAll("a");
+            langLinks.forEach(link => {
+            link.addEventListener("click", function (e) {
+                e.preventDefault(); // prevent default <a> behavior
+                const selectedLang = this.id; // ID corresponds to language code
+                localStorage.setItem("languagePreference", selectedLang);
+                location.reload(); // automatically reload
+            });
+        });
+    }
         });
 
     </script>
