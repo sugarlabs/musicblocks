@@ -151,6 +151,7 @@ describe("Search Widget Listener Fix", () => {
 
         // Re-inject mocks that might be overwritten or needed
         activity.searchWidget = sandbox.document.getElementById("search");
+        activity.searchWidget.style.visibility = "hidden";
         activity.palettes = new sandbox.Palettes();
         activity.doSearch = jest.fn();
 
@@ -201,6 +202,9 @@ describe("Search Widget Listener Fix", () => {
         searchElem.contains.mockReturnValue(true);
 
         listener({ target: searchElem });
+
+        // Restore mock to default behavior so it doesn't leak
+        searchElem.contains.mockImplementation(target => target === searchElem);
 
         // Verify removeEventListener was NOT called for this listener
         const removeCalls = activity.removeEventListener.mock.calls.filter(c => c[2] === listener);
