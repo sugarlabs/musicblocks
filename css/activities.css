@@ -1217,6 +1217,16 @@ table {
   margin: auto;
 }
 
+#helpBodyDiv a {
+  color: #1976D2 !important;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+#helpBodyDiv a:hover {
+  color: #1565C0 !important;
+}
+
 #helpBodyDiv .icon-container {
   width: 30%;
   margin-top: 1.5rem;
