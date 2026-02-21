@@ -2541,11 +2541,19 @@ class Singer {
     }
 }
 
+// Maintain CommonJS compatibility for tests
 if (typeof module !== "undefined" && module.exports) {
     module.exports = Singer;
 }
 
-// Export to global scope for browser (RequireJS shim)
+// Implement additive AMD define
+if (typeof define === "function" && define.amd) {
+    define(["activity/logoconstants"], function () {
+        return Singer;
+    });
+}
+
+// Preserve existing global exposure exactly as before
 if (typeof window !== "undefined") {
     window.Singer = Singer;
 }
