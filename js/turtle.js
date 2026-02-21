@@ -21,7 +21,7 @@
    globals
 
    createjs, DEFAULTVOLUME, delayExecution, importMembers, Painter, Singer,
-   DEFAULTVOICE
+   DEFAULTVOICE, retryWithBackoff
  */
 /* exported Turtle */
 /**
@@ -87,43 +87,69 @@ class Turtle {
 
     /**
      * Internal function for creating cache.
-     * Includes workaround for a race condition.
+     * Uses bounded retry with exponential backoff to handle the race
+     * condition where container bounds are not yet available.
      *
      * @private
+     * @returns {Promise} Resolves when cache is created, rejects after max retries.
      */
     _createCache() {
-        this.bounds = this.container.getBounds();
+        const that = this;
+        const MAX_RETRIES = 20;
+        const INITIAL_DELAY = 50;
 
-        if (this.bounds == null) {
-            setTimeout(() => {
-                this._createCache();
-            }, 200);
-        } else {
-            this.container.cache(
-                this.bounds.x,
-                this.bounds.y,
-                this.bounds.width,
-                this.bounds.height
-            );
-        }
+        return retryWithBackoff({
+            check: () => {
+                that.bounds = that.container.getBounds();
+                return that.bounds;
+            },
+            onSuccess: bounds => {
+                that.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+            },
+            maxRetries: MAX_RETRIES,
+            initialDelay: INITIAL_DELAY,
+            errorMessage:
+                "Turtle._createCache: could not get container bounds after " +
+                MAX_RETRIES +
+                " attempts"
+        });
     }
 
     /**
      * Internal function for updating cache.
-     * Includes workaround for a race condition.
+     * Uses bounded retry with exponential backoff to handle the race
+     * condition where bounds are not yet available.
      *
-     * @async
+     * @returns {Promise} Resolves when cache is updated, rejects after max retries.
      */
-    async updateCache() {
-        if (this.bounds == null) {
-            // eslint-disable-next-line no-console
-            console.debug("Block container for " + this.name + " not yet ready.");
-            await delayExecution(300);
-            this.updateCache();
-        } else {
-            this.container.updateCache();
-            this.activity.refreshCanvas();
-        }
+    updateCache() {
+        const that = this;
+        const MAX_RETRIES = 15;
+        const INITIAL_DELAY = 100;
+
+        return retryWithBackoff({
+            check: () => that.bounds !== null,
+            onSuccess: () => {
+                that.container.updateCache();
+                that.activity.refreshCanvas();
+            },
+            onRetry: attempt => {
+                // eslint-disable-next-line no-console
+                console.debug(
+                    "Turtle container for " +
+                        that.name +
+                        " not yet ready (attempt " +
+                        (attempt + 1) +
+                        "/" +
+                        MAX_RETRIES +
+                        ")"
+                );
+            },
+            maxRetries: MAX_RETRIES,
+            initialDelay: INITIAL_DELAY,
+            errorMessage:
+                "Turtle.updateCache: bounds not available after " + MAX_RETRIES + " attempts"
+        });
     }
 
     /**
@@ -985,4 +1011,8 @@ Turtle.TurtleView = class {
 
 if (typeof window !== "undefined") {
     window.Turtle = Turtle;
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Turtle;
 }
