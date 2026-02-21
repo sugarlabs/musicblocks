@@ -200,3 +200,12 @@ self.addEventListener("refreshOffline", function () {
         });
     });
 });
+// Background Sync event listener
+self.addEventListener("sync", function (event) {
+    if (event.tag === "workspace-sync") {
+        // eslint-disable-next-line no-console
+        console.log("[PWA Builder] Syncing workspace in background");
+        // In a real implementation, we would perform the sync here.
+        // For now, we'll just log it as the SyncManager handles it when the app is open.
+    }
+});

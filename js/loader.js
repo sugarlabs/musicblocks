@@ -155,7 +155,13 @@ requirejs.config({
         "i18nextHttpBackend": [
             "lib/i18nextHttpBackend.min",
             "https://cdn.jsdelivr.net/npm/i18next-http-backend@2.5.1/i18nextHttpBackend.min"
-        ]
+        ],
+        // Phase 2: Offline Mode & Cloud Sync modules
+        "WorkspaceStorage": "../js/WorkspaceStorage",
+        "SyncManager": "../js/SyncManager",
+        "ConflictResolver": "../js/ConflictResolver",
+        // Phase 3: Version Control
+        "VersionControl": "../js/VersionControl"
     },
     packages: []
 });
