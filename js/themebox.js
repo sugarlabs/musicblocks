@@ -206,6 +206,8 @@ class ThemeBox {
                 if (paletteElement && paletteElement.childNodes[0]) {
                     paletteElement.childNodes[0].style.border = `1px solid ${window.platformColor.selectorSelected}`;
                 }
+
+                this.refreshPaletteColors();
             } catch (e) {
                 console.debug("Could not refresh palette:", e);
             }
@@ -246,6 +248,45 @@ class ThemeBox {
                 // Cross-origin restriction may prevent this
                 console.debug("Could not update planet iframe theme:", e);
             }
+        }
+    }
+    /**
+     * Refresh palette UI colors after theme change
+     * @private
+     */
+    refreshPaletteColors() {
+        if (!this.activity.palettes) return;
+
+        const palette = document.getElementById("palette");
+        if (!palette) return;
+
+        // Update selector buttons (top icons)
+        const selectorCells = palette.querySelectorAll("thead td");
+        selectorCells.forEach(td => {
+            td.style.backgroundColor = window.platformColor.selectorBackground;
+            td.style.borderColor = window.platformColor.selectorSelected;
+        });
+
+
+
+        // Update palette list rows (search + category buttons)
+        const rows = palette.querySelectorAll("tbody tr");
+        rows.forEach(row => {
+            row.style.backgroundColor = window.platformColor.paletteBackground;
+
+            const label = row.querySelector("td:nth-child(2)");
+            if (label) {
+                label.style.color = window.platformColor.paletteText;
+            }
+        });
+
+        // Update open PaletteBody if visible
+        const paletteBody = document.getElementById("PaletteBody");
+        if (paletteBody) {
+            paletteBody.style.background =
+                window.platformColor.paletteBackground;
+            paletteBody.style.border =
+                `1px solid ${window.platformColor.selectorSelected}`;
         }
     }
 
