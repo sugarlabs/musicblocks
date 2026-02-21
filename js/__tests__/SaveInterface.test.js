@@ -184,20 +184,39 @@ describe("save HTML methods", () => {
     });
 
     it("should replace placeholders with actual project data", () => {
-        let file = activity.htmlSaveTemplate;
-        file = file
-            .replace(
-                /{{ project_description }}/g,
-                activity.PlanetInterface.getCurrentProjectDescription()
-            )
-            .replace(/{{ project_name }}/g, activity.PlanetInterface.getCurrentProjectName())
-            .replace(/{{ data }}/g, activity.prepareExport())
-            .replace(/{{ project_image }}/g, activity.PlanetInterface.getCurrentProjectImage());
+        instance.activity = activity;
+        instance.htmlSaveTemplate = activity.htmlSaveTemplate;
+        const file = instance.prepareHTML();
 
         expect(file).toContain("<h1>Mock Project</h1>");
         expect(file).toContain("<p>Mock Description</p>");
         expect(file).toContain("<img src='mock-image.png'/>");
         expect(file).toContain("<div>Mock Exported Data</div>");
+    });
+
+    it("should escape project name/description/data to prevent HTML injection", () => {
+        instance.activity = {
+            ...activity,
+            PlanetInterface: {
+                ...activity.PlanetInterface,
+                getCurrentProjectName: jest.fn(() => "</title><img src=x onerror=alert(1)><title>"),
+                getCurrentProjectDescription: jest.fn(() => "<b>desc</b>"),
+                getCurrentProjectImage: jest.fn(() => 'x" onerror=alert(1)"')
+            },
+            prepareExport: jest.fn(() => "<script>alert(1)</script>")
+        };
+
+        instance.htmlSaveTemplate =
+            '<title>{{ project_name }}</title><p>{{ project_description }}</p><img src="{{ project_image }}"><div>{{ data }}</div>';
+
+        const file = instance.prepareHTML();
+
+        expect(file).toContain("&lt;/title&gt;&lt;img src=x onerror=alert(1)&gt;&lt;title&gt;");
+        expect(file).toContain("&lt;b&gt;desc&lt;/b&gt;");
+        expect(file).toContain("x&quot; onerror=alert(1)&quot;");
+        expect(file).toContain("&lt;script&gt;alert(1)&lt;/script&gt;");
+        expect(file).not.toContain("<img src=x onerror=alert(1)>");
+        expect(file).not.toContain("<script>alert(1)</script>");
     });
 
     it("should call prepareHTML and download the file", () => {
