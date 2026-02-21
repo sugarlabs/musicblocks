@@ -262,6 +262,7 @@ class LanguageBox {
             } catch (e) {
                 console.warn("Could not save language preference:", e);
             }
+            this.activity.textMsg(_("Music Blocks is already set to this language."));
         } else {
             this.activity.storage.languagePreference = this._language;
 
