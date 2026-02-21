@@ -1119,6 +1119,7 @@ class Logo {
 
         Singer.masterBPM = TARGETBPM;
         Singer.defaultBPMFactor = TONEBPM / TARGETBPM;
+        Singer.masterVolume = [DEFAULTVOLUME];
         this.synth.changeInTemperament = false;
 
         this._checkingCompletionState = false;
