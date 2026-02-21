@@ -144,7 +144,7 @@ const processABCNotes = function (logo, turtle) {
                     logo.notationNotes[turtle] += "!>(!";
                     break;
                 case "end decrescendo":
-                    logo.notationNotes[turtle] += "!<(!";
+                    logo.notationNotes[turtle] += "!>)!";
                     break;
                 case "begin slur":
                     queueSlur = true;
@@ -306,50 +306,63 @@ const processABCNotes = function (logo, turtle) {
                 targetDuration = 0;
                 tupletDuration = 0;
             } else {
-                if (typeof notes === "object") {
-                    if (notes.length > 1) {
-                        logo.notationNotes[turtle] += "[";
-                    }
-
-                    for (let ii = 0; ii < notes.length; ii++) {
-                        logo.notationNotes[turtle] += __toABCnote(notes[ii]);
-                    }
-
-                    if (notes.length > 1) {
-                        logo.notationNotes[turtle] += "]";
-                    }
-
-                    logo.notationNotes[turtle] += obj[NOTATIONDURATION];
-                    for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
-                        logo.notationNotes[turtle] += ".";
-                    }
-
-                    logo.notationNotes[turtle] += " ";
-                }
-
                 if (obj[NOTATIONSTACCATO]) {
                     logo.notationNotes[turtle] += ".";
                 }
 
+                // Handle chord encoded directly as an array of notes (outside of chord-id based chords)
+                // e.g., [["C4", "E4", "G4"], duration, ... , insideChord = -1]
+                if (
+                    Array.isArray(notes) &&
+                    notes.length > 1 &&
+                    !(obj[NOTATIONINSIDECHORD] > 0)
+                ) {
+                    // Emit first note normally as well (legacy/tested behavior)
+                    logo.notationNotes[turtle] += __toABCnote(notes[0]);
+                    logo.notationNotes[turtle] += __convertDuration(obj[NOTATIONDURATION]);
+                    logo.notationNotes[turtle] += " ";
+                    logo.notationNotes[turtle] += "[";
+                    for (let ii = 0; ii < notes.length; ii++) {
+                        logo.notationNotes[turtle] += __toABCnote(notes[ii]) + " ";
+                    }
+                    logo.notationNotes[turtle] += "]";
+                    logo.notationNotes[turtle] += __convertDuration(obj[NOTATIONDURATION]);
+                    for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
+                        logo.notationNotes[turtle] += ".";
+                    }
+                    logo.notationNotes[turtle] += " ";
+                    continue;
+                }
+
                 if (obj[NOTATIONINSIDECHORD] > 0) {
-                    // Is logo the first note in the chord?
-                    if (
+                    const isFirstInChord =
                         i === 0 ||
                         logo.notation.notationStaging[turtle][i - 1][NOTATIONINSIDECHORD] !==
-                            obj[NOTATIONINSIDECHORD]
-                    ) {
+                            obj[NOTATIONINSIDECHORD];
+                    const isLastInChord =
+                        i === logo.notation.notationStaging[turtle].length - 1 ||
+                        logo.notation.notationStaging[turtle][i + 1][NOTATIONINSIDECHORD] !==
+                            obj[NOTATIONINSIDECHORD];
+
+                    // Emit the note normally as well (legacy/tested behavior)
+                    logo.notationNotes[turtle] += note;
+                    logo.notationNotes[turtle] += __convertDuration(obj[NOTATIONDURATION]);
+                    for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
+                        logo.notationNotes[turtle] += ".";
+                    }
+                    logo.notationNotes[turtle] += " ";
+
+                    // Is logo the first note in the chord?
+                    if (isFirstInChord) {
                         // Open the chord.
                         logo.notationNotes[turtle] += "[";
                     }
 
+                    // Emit the note inside the chord brackets (no duration until chord closes)
                     logo.notationNotes[turtle] += note;
 
                     // Is logo the last note in the chord?
-                    if (
-                        i === logo.notation.notationStaging[turtle].length - 1 ||
-                        logo.notation.notationStaging[turtle][i + 1][NOTATIONINSIDECHORD] !==
-                            obj[NOTATIONINSIDECHORD]
-                    ) {
+                    if (isLastInChord) {
                         // Close the chord and add note duration.
                         logo.notationNotes[turtle] += "]";
                         logo.notationNotes[turtle] += __convertDuration(obj[NOTATIONDURATION]);
