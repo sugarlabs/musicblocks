@@ -58,8 +58,8 @@ global.localStorage = {
 };
 
 global.XMLHttpRequest = class {
-    open() { }
-    setRequestHeader() { }
+    open() {}
+    setRequestHeader() {}
     send() {
         this.status = 200;
         this.responseText = "Mock response";
@@ -177,7 +177,6 @@ describe("Utility Functions (logic-only)", () => {
         it("handles zero", () => {
             expect(mixedNumber(0)).toBe("0/1");
         });
-
     });
 
     describe("nearestBeat()", () => {
@@ -187,7 +186,6 @@ describe("Utility Functions (logic-only)", () => {
         it("handles large numbers", () => {
             expect(nearestBeat(123.456)).toBeDefined();
         });
-
     });
 
     describe("oneHundredToFraction()", () => {
@@ -225,7 +223,6 @@ describe("Utility Functions (logic-only)", () => {
                 expect(rgbToHex(255, 255, 255)).toBe("#ffffff");
             });
         });
-
     });
 
     describe("hexToRGB()", () => {
@@ -246,7 +243,6 @@ describe("Utility Functions (logic-only)", () => {
                 expect(rgbToHex(255, 255, 255)).toBe("#ffffff");
             });
         });
-
     });
 
     describe("hex2rgb()", () => {
@@ -285,23 +281,23 @@ describe("Utility Functions (logic-only)", () => {
             expect(result).toBe("Static text");
         });
         /**
-     * @license
-     * MusicBlocks v3.4.1
-     * Copyright (C) 2024 ravjot07
-     *
-     * This program is free software: you can redistribute it and/or modify
-     * it under the terms of the GNU Affero General Public License as published by
-     * the Free Software Foundation, either version 3 of the License, or
-     * (at your option) any later version.
-     *
-     * This program is distributed in the hope that it will be useful,
-     * but WITHOUT ANY WARRANTY; without even the implied warranty of
-     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-     * GNU Affero General Public License for more details.
-     *
-     * You should have received a copy of the GNU Affero General Public License
-     * along with this program. If not, see <https://www.gnu.org/licenses/>.
-     */
+         * @license
+         * MusicBlocks v3.4.1
+         * Copyright (C) 2024 ravjot07
+         *
+         * This program is free software: you can redistribute it and/or modify
+         * it under the terms of the GNU Affero General Public License as published by
+         * the Free Software Foundation, either version 3 of the License, or
+         * (at your option) any later version.
+         *
+         * This program is distributed in the hope that it will be useful,
+         * but WITHOUT ANY WARRANTY; without even the implied warranty of
+         * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+         * GNU Affero General Public License for more details.
+         *
+         * You should have received a copy of the GNU Affero General Public License
+         * along with this program. If not, see <https://www.gnu.org/licenses/>.
+         */
 
         describe("toTitleCase()", () => {
             it("converts first character to uppercase", () => {
@@ -412,7 +408,6 @@ describe("Utility Functions (logic-only)", () => {
                 expect(rgbToHex(0, 255, 0)).toBe("#00ff00");
                 expect(rgbToHex(0, 0, 255)).toBe("#0000ff");
             });
-
         });
 
         describe("hexToRGB()", () => {
@@ -424,7 +419,6 @@ describe("Utility Functions (logic-only)", () => {
             it("returns null for invalid hex", () => {
                 expect(hexToRGB("#zzz")).toBeNull();
             });
-
         });
 
         describe("hex2rgb()", () => {
@@ -474,7 +468,6 @@ describe("Utility Functions (logic-only)", () => {
             it("ignores unmatched braces", () => {
                 expect(format("Hello {name", { name: "A" })).toBe("Hello {name");
             });
-
         });
     });
     describe("fileBasename() edge cases", () => {
@@ -484,8 +477,7 @@ describe("Utility Functions (logic-only)", () => {
     });
     describe("safeSVG() multiple characters", () => {
         it("escapes &, < and >", () => {
-            expect(safeSVG("<div>&</div>"))
-                .toBe("&lt;div&gt;&amp;&lt;/div&gt;");
+            expect(safeSVG("<div>&</div>")).toBe("&lt;div&gt;&amp;&lt;/div&gt;");
         });
     });
     describe("rationalToFraction() > 1 case", () => {
@@ -545,7 +537,6 @@ describe("Utility Functions (logic-only)", () => {
                 expect(rationalSum([-1, 3], [1, 3])).toEqual([0, 3]);
             });
         });
-
     });
     describe("hexToRGB() without hash", () => {
         it("parses hex without #", () => {
@@ -625,12 +616,10 @@ describe("Utility Functions (logic-only)", () => {
         });
         it("calls window.widgetWindows.hideAllWindows", () => {
             closeWidgets();
-            expect(window.widgetWindows.hideAllWindows)
-                .toHaveBeenCalled();
+            expect(window.widgetWindows.hideAllWindows).toHaveBeenCalled();
         });
     });
     describe("closeBlkWidgets()", () => {
-
         beforeEach(() => {
             window.widgetWindows = {
                 hideAllWindows: jest.fn(),
@@ -645,23 +634,18 @@ describe("Utility Functions (logic-only)", () => {
 
             closeBlkWidgets("TestWidget");
 
-            expect(window.widgetWindows.hideWindow)
-                .toHaveBeenCalledWith("TestWidget");
+            expect(window.widgetWindows.hideWindow).toHaveBeenCalledWith("TestWidget");
         });
 
         it("does nothing if no match found", () => {
-            document.getElementsByClassName = jest.fn(() => [
-                { innerHTML: "OtherWidget" }
-            ]);
+            document.getElementsByClassName = jest.fn(() => [{ innerHTML: "OtherWidget" }]);
 
             closeBlkWidgets("TestWidget");
 
-            expect(window.widgetWindows.hideWindow)
-                .not.toHaveBeenCalled();
+            expect(window.widgetWindows.hideWindow).not.toHaveBeenCalled();
         });
     });
     describe("resolveObject()", () => {
-
         beforeAll(() => {
             global.TestNamespace = {
                 Sub: {
@@ -671,13 +655,11 @@ describe("Utility Functions (logic-only)", () => {
         });
 
         it("resolves nested path", () => {
-            expect(resolveObject("TestNamespace.Sub.value"))
-                .toBe(42);
+            expect(resolveObject("TestNamespace.Sub.value")).toBe(42);
         });
 
         it("returns undefined for invalid path", () => {
-            expect(resolveObject("TestNamespace.Invalid.prop"))
-                .toBeUndefined();
+            expect(resolveObject("TestNamespace.Invalid.prop")).toBeUndefined();
         });
 
         it("returns undefined for null input", () => {
@@ -687,10 +669,8 @@ describe("Utility Functions (logic-only)", () => {
         it("returns undefined for non-string input", () => {
             expect(resolveObject(123)).toBeUndefined();
         });
-
     });
     describe("importMembers()", () => {
-
         class DummyModel {
             constructor() {
                 this.modelVar = 10;
@@ -719,7 +699,7 @@ describe("Utility Functions (logic-only)", () => {
         });
 
         it("imports model and view members into object", () => {
-            class TestController { }
+            class TestController {}
 
             const obj = new TestController();
 
@@ -730,6 +710,5 @@ describe("Utility Functions (logic-only)", () => {
             expect(obj.modelMethod()).toBe("model");
             expect(obj.viewMethod()).toBe("view");
         });
-
     });
 });
