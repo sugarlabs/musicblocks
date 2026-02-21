@@ -3252,7 +3252,15 @@ class Block {
                     event.stageY / this.activity.getStageScale()
                 )
             ) {
-                if (this.activity.trashcan.isVisible) {
+                // If the trash is visible OR the trash subsystem just
+                // completed its highlight (trashReady), treat this as a
+                // confirmed delete. This fixes a touch-device race where the
+                // highlight may become visible slightly after the release.
+                if (
+                    this.activity.trashcan.isVisible ||
+                    this.blocks.trashReady ||
+                    this.blocks.trashReadyBlock === thisBlock
+                ) {
                     this.blocks.sendStackToTrash(this);
                     this.activity.textMsg(
                         _(
@@ -3260,6 +3268,10 @@ class Block {
                         ),
                         3000
                     );
+
+                    // Clear pending flag after use.
+                    this.blocks.trashReady = false;
+                    this.blocks.trashReadyBlock = null;
                 }
             } else {
                 // Otherwise, process move.
