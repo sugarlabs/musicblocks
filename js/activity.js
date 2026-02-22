@@ -3354,8 +3354,11 @@ class Activity {
                         };
 
                         // Capture phase fires BEFORE jQuery UI's event delegation
-                        img.addEventListener("mousedown", down, true);
-                        img.addEventListener("touchstart", down, { capture: true, passive: false });
+                        li[0].addEventListener("mousedown", down, true);
+                        li[0].addEventListener("touchstart", down, {
+                            capture: true,
+                            passive: false
+                        });
 
                         li.append(img);
                         li.append("<a> " + item.label + "</a>");
