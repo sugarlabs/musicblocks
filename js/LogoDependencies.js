@@ -13,8 +13,7 @@
  * @file LogoDependencies.js
  * @description Explicit dependency container for the Logo execution engine.
  *
- * This class makes Logo's dependencies explicit rather than accessing them
- * through the global Activity facade, improving testability and code clarity.
+ * This class manages Logo's explicit dependencies.
  */
 
 /**
@@ -62,7 +61,7 @@ class LogoDependencies {
      * @param {Function} deps.callbacks.onStopTurtle - Called when turtle stops
      * @param {Function} deps.callbacks.onRunTurtle - Called when turtle runs
      *
-     * @param {Object} [deps.meSpeak] - Optional speech synthesis object
+
      */
     constructor({
         blocks,
@@ -73,7 +72,15 @@ class LogoDependencies {
         storage,
         config,
         callbacks,
-        meSpeak = null
+
+        instruments = null,
+        instrumentsFilters = null,
+        instrumentsEffects = null,
+        widgetWindows = null,
+        utils = null,
+        Singer = null,
+        Tone = null,
+        classes = null
     }) {
         // Validate required dependencies
         if (!blocks) {
@@ -137,11 +144,38 @@ class LogoDependencies {
          */
         this.callbacks = callbacks || { onStopTurtle: null, onRunTurtle: null };
 
-        /**
-         * Speech synthesis (optional)
-         * @type {Object|null}
-         */
-        this.meSpeak = meSpeak;
+        // Audio and utility dependencies
+        this.instruments =
+            instruments || (typeof window !== "undefined" ? window.instruments : null);
+        this.instrumentsFilters =
+            instrumentsFilters ||
+            (typeof window !== "undefined" ? window.instrumentsFilters : null);
+        this.instrumentsEffects =
+            instrumentsEffects ||
+            (typeof window !== "undefined" ? window.instrumentsEffects : null);
+        this.widgetWindows =
+            widgetWindows || (typeof window !== "undefined" ? window.widgetWindows : null);
+        this.Singer = Singer || (typeof window !== "undefined" ? window.Singer : null);
+        this.Tone = Tone || (typeof window !== "undefined" ? window.Tone : null);
+        this.utils = utils || {
+            doUseCamera: typeof doUseCamera !== "undefined" ? doUseCamera : null,
+            doStopVideoCam: typeof doStopVideoCam !== "undefined" ? doStopVideoCam : null,
+            getIntervalDirection:
+                typeof getIntervalDirection !== "undefined" ? getIntervalDirection : null,
+            getIntervalNumber: typeof getIntervalNumber !== "undefined" ? getIntervalNumber : null,
+            mixedNumber: typeof mixedNumber !== "undefined" ? mixedNumber : null,
+            rationalToFraction:
+                typeof rationalToFraction !== "undefined" ? rationalToFraction : null,
+            getStatsFromNotation:
+                typeof getStatsFromNotation !== "undefined" ? getStatsFromNotation : null,
+            delayExecution: typeof delayExecution !== "undefined" ? delayExecution : null,
+            last: typeof last !== "undefined" ? last : null
+        };
+        this.classes = classes || {
+            Notation: typeof Notation !== "undefined" ? Notation : null,
+            Synth: typeof Synth !== "undefined" ? Synth : null,
+            StatusMatrix: typeof StatusMatrix !== "undefined" ? StatusMatrix : null
+        };
     }
 
     /**
@@ -179,7 +213,36 @@ class LogoDependencies {
                 onStopTurtle: activity.onStopTurtle,
                 onRunTurtle: activity.onRunTurtle
             },
-            meSpeak: activity.meSpeak
+
+            // Pass globals for backward compatibility during migration
+            instruments: typeof instruments !== "undefined" ? instruments : null,
+            instrumentsFilters:
+                typeof instrumentsFilters !== "undefined" ? instrumentsFilters : null,
+            instrumentsEffects:
+                typeof instrumentsEffects !== "undefined" ? instrumentsEffects : null,
+            widgetWindows: typeof window !== "undefined" ? window.widgetWindows : null,
+            Singer: typeof Singer !== "undefined" ? Singer : null,
+            Tone: typeof Tone !== "undefined" ? Tone : null,
+            utils: {
+                doUseCamera: typeof doUseCamera !== "undefined" ? doUseCamera : null,
+                doStopVideoCam: typeof doStopVideoCam !== "undefined" ? doStopVideoCam : null,
+                getIntervalDirection:
+                    typeof getIntervalDirection !== "undefined" ? getIntervalDirection : null,
+                getIntervalNumber:
+                    typeof getIntervalNumber !== "undefined" ? getIntervalNumber : null,
+                mixedNumber: typeof mixedNumber !== "undefined" ? mixedNumber : null,
+                rationalToFraction:
+                    typeof rationalToFraction !== "undefined" ? rationalToFraction : null,
+                getStatsFromNotation:
+                    typeof getStatsFromNotation !== "undefined" ? getStatsFromNotation : null,
+                delayExecution: typeof delayExecution !== "undefined" ? delayExecution : null,
+                last: typeof last !== "undefined" ? last : null
+            },
+            classes: {
+                Notation: typeof Notation !== "undefined" ? Notation : null,
+                Synth: typeof Synth !== "undefined" ? Synth : null,
+                StatusMatrix: typeof StatusMatrix !== "undefined" ? StatusMatrix : null
+            }
         });
     }
 

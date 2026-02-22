@@ -101,7 +101,16 @@ describe("Logo with LogoDependencies", () => {
                 onStopTurtle: jest.fn(),
                 onRunTurtle: jest.fn()
             },
-            meSpeak: null
+
+            instruments: {},
+            Singer: { setSynthVolume: jest.fn() },
+            Tone: {},
+            utils: { last: jest.fn() },
+            classes: {
+                Notation: jest.fn(),
+                Synth: jest.fn(),
+                StatusMatrix: jest.fn()
+            }
         };
     });
 
@@ -121,8 +130,7 @@ describe("Logo with LogoDependencies", () => {
             saveLocally: jest.fn(),
             showBlocksAfterRun: false,
             onStopTurtle: jest.fn(),
-            onRunTurtle: jest.fn(),
-            meSpeak: null
+            onRunTurtle: jest.fn()
         };
 
         const logo = new Logo(mockActivity);
@@ -134,7 +142,7 @@ describe("Logo with LogoDependencies", () => {
         const deps = new LogoDependencies(mockDeps);
         const logo = new Logo(deps);
         logo.activity.errorMsg("Test error");
-        expect(mockDeps.errorHandler).toHaveBeenCalledWith("Test error");
+        expect(mockDeps.errorHandler).toHaveBeenCalledWith("Test error", undefined);
     });
 
     test("Config properties work with getters/setters", () => {
@@ -142,6 +150,12 @@ describe("Logo with LogoDependencies", () => {
         expect(logo.activity.showBlocksAfterRun).toBe(false);
         logo.activity.showBlocksAfterRun = true;
         expect(mockDeps.config.showBlocksAfterRun).toBe(true);
+    });
+
+    test("Audio dependencies are correctly injected", () => {
+        const logo = new Logo(mockDeps);
+        expect(logo.deps.instruments).toBe(mockDeps.instruments);
+        expect(logo.deps.Singer).toBe(mockDeps.Singer);
     });
 });
 
@@ -156,12 +170,13 @@ describe("LogoDependencies.fromActivity", () => {
             saveLocally: jest.fn(),
             showBlocksAfterRun: false,
             onStopTurtle: jest.fn(),
-            onRunTurtle: jest.fn(),
-            meSpeak: null
+            onRunTurtle: jest.fn()
         };
 
         const deps = LogoDependencies.fromActivity(mockActivity);
         expect(deps.blocks).toBe(mockActivity.blocks);
         expect(deps.turtles).toBe(mockActivity.turtles);
+        expect(deps.instruments).toBe(global.instruments);
+        expect(deps.Singer).toBe(global.Singer);
     });
 });
