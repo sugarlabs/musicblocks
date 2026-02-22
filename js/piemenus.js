@@ -2111,26 +2111,44 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         __exitMenu();
     };
     block._exitWheel.navItems[1].navigateFunction = () => {
-        const cblk1 = that.connections[0];
-        const cblk2 = that.blocks.blockList[cblk1]?.connections[0];
-        // Decrease the value but ensure it does not go below 1
-        if (that.value > 1) {
-            that.value -= 1;
+        const index = wheelValues.indexOf(that.value);
+        if (index === -1) return;
+
+        const isAscending = wheelValues[0] < wheelValues[wheelValues.length - 1];
+
+        if (isAscending) {
+            if (index > 0) {
+                that.value = wheelValues[index - 1];
+            }
+        } else {
+            if (index < wheelValues.length - 1) {
+                that.value = wheelValues[index + 1];
+            }
         }
+
         that.text.text = that.value.toString();
-        // Make sure text is on top.
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
         that.label.value = that.value;
     };
+
     block._exitWheel.navItems[2].navigateFunction = () => {
-        const cblk = that.connections[0];
-        // Increase the value but ensure it does not exceed 8
-        if (that.value < 8) {
-            that.value += 1;
+        const index = wheelValues.indexOf(that.value);
+        if (index === -1) return;
+
+        const isAscending = wheelValues[0] < wheelValues[wheelValues.length - 1];
+
+        if (isAscending) {
+            if (index < wheelValues.length - 1) {
+                that.value = wheelValues[index + 1];
+            }
+        } else {
+            if (index > 0) {
+                that.value = wheelValues[index - 1];
+            }
         }
+
         that.text.text = that.value.toString();
-        // Make sure text is on top.
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
         that.label.value = that.value;
