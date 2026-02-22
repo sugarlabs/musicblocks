@@ -40,7 +40,8 @@ const EMPTYHEAPERRORMSG = "empty heap.";
 const POSNUMBER = "Argument must be a positive number";
 
 // NOTE: _() must be available globaly (shimmed or loaded)
-const INVALIDPITCH = _("Not a valid pitch name");
+const INVALIDPITCH =
+    typeof _ === "function" ? _("Not a valid pitch name") : "Not a valid pitch name";
 
 const NOTATIONNOTE = 0;
 const NOTATIONDURATION = 1;
@@ -50,7 +51,7 @@ const NOTATIONROUNDDOWN = 4;
 const NOTATIONINSIDECHORD = 5; // deprecated
 const NOTATIONSTACCATO = 6;
 
-const exportsObj = {
+const logoconstants = {
     DEFAULTVOLUME,
     PREVIEWVOLUME,
     DEFAULTDELAY,
@@ -79,8 +80,19 @@ const exportsObj = {
     NOTATIONSTACCATO
 };
 
+// Maintain CommonJS compatibility for tests
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = exportsObj;
-} else if (typeof window !== "undefined") {
-    Object.assign(window, exportsObj);
+    module.exports = logoconstants;
+}
+
+// Implement additive AMD define
+if (typeof define === "function" && define.amd) {
+    define(function () {
+        return logoconstants;
+    });
+}
+
+// Preserve existing global exposure exactly as before
+if (typeof window !== "undefined") {
+    Object.assign(window, logoconstants);
 }
