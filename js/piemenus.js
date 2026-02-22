@@ -89,9 +89,16 @@ const getPieMenuSize = block => {
     return Math.min(canvas.width, canvas.height);
 };
 
+// Debounce resize handler for performance
+let wheelResizeTimeout;
+const debouncedSetWheelSize = () => {
+    clearTimeout(wheelResizeTimeout);
+    wheelResizeTimeout = setTimeout(setWheelSize, 150);
+};
+
 // Call the function initially and whenever the window is resized
 setWheelSize();
-window.addEventListener("resize", setWheelSize);
+window.addEventListener("resize", debouncedSetWheelSize);
 
 // Helper function to enable scroll-to-rotate for pie menus
 const enableWheelScroll = (wheel, itemCount) => {
@@ -154,6 +161,37 @@ const enableWheelScroll = (wheel, itemCount) => {
     // Store the handler so we can remove it later
     wheelDiv._scrollHandler = scrollHandler;
     wheelDiv.addEventListener("wheel", scrollHandler, { passive: false });
+};
+
+// Ensure exit wheels behave like stateless buttons (no sticky selection)
+const configureExitWheel = exitWheel => {
+    if (!exitWheel || !exitWheel.navItems) {
+        return;
+    }
+
+    const clearSelection = () => {
+        exitWheel.selectedNavItemIndex = null;
+        for (let i = 0; i < exitWheel.navItems.length; i++) {
+            exitWheel.navItems[i].selected = false;
+            exitWheel.navItems[i].hovered = false;
+        }
+        if (exitWheel.raphael && exitWheel.raphael.canvas) {
+            exitWheel.refreshWheel(true);
+        }
+    };
+
+    clearSelection();
+
+    exitWheel.navigateWheel = clicked => {
+        const item = exitWheel.navItems[clicked];
+        if (!item || item.enabled === false) {
+            return;
+        }
+        clearSelection();
+        if (typeof item.navigateFunction === "function") {
+            item.navigateFunction();
+        }
+    };
 };
 
 const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accidental, custom) => {
@@ -240,6 +278,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     if (!custom) {
         block._accidentalsWheel.colors = platformColor.accidentalsWheelcolors;
@@ -462,7 +501,6 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
 
             // Ensure synth is initialized before proceeding
             if (!that.activity.logo.synth) {
-                console.debug("Creating synth in logo");
                 that.activity.logo.synth = new Synth();
             }
 
@@ -575,7 +613,6 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                     that.activity.logo.synth.createDefaultSynth(0);
                     await that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
                 } catch (e) {
-                    console.debug("Error initializing synth:", e);
                     return;
                 }
             }
@@ -590,7 +627,6 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                 that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
                 that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
             } catch (e) {
-                console.debug("Error setting volume:", e);
                 return;
             }
 
@@ -608,8 +644,6 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                         false
                     );
                 } catch (e) {
-                    console.debug("Error triggering note:", e);
-                } finally {
                     // Ensure trigger lock is released after a delay
                     setTimeout(() => {
                         that._triggerLock = false;
@@ -750,9 +784,10 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     const setupAudioContext = async () => {
         try {
             await Tone.start();
-            console.debug("Audio context started");
         } catch (e) {
-            console.debug("Error starting audio context:", e);
+            // Tone.start() may fail if the user has not interacted with the page yet
+            // or if the audio context is already running. We can safely ignore this.
+            console.debug("Tone.start() skipped or failed", e);
         }
     };
 
@@ -997,6 +1032,9 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
+
+    // Avoid auto-selecting the close button on open.
 
     const that = block;
 
@@ -1228,6 +1266,7 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     block._octavesWheel.colors = platformColor.octavesWheelcolors;
     block._octavesWheel.slicePathFunction = slicePath().DonutSlice;
@@ -1354,14 +1393,18 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
         /* We're using a default of C major ==> -7 to -1 should be one octave lower
            than the reference, 0-6 in the same octave and 7 should be once octave higher
         */
-        let deltaOctave = 0;
-        if (noteLabels[i] == 7) {
-            deltaOctave = 1;
-        } else if (noteLabels[i] < 0) {
-            deltaOctave = -1;
+        let deltaOctave;
+        let note;
+
+        // Use C major as of now; fix block to use current keySignature once that feature is in place
+        const keySignature =
+            block.activity.KeySignatureEnv[0] + " " + block.activity.KeySignatureEnv[1];
+        if (noteValues[i] >= 0) {
+            [note, deltaOctave] = nthDegreeToPitch(keySignature, noteValues[i]);
+        } else {
+            [note, deltaOctave] = nthDegreeToPitch(keySignature, 7 + noteValues[i]);
         }
 
-        // prevPitch = i;
         let octave = Number(
             that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
         );
@@ -1370,17 +1413,6 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
             octave = 1;
         } else if (octave > 8) {
             octave = 8;
-        }
-
-        let note;
-
-        // Use C major as of now; fix block to use current keySignature once that feature is in place
-        const keySignature =
-            block.activity.KeySignatureEnv[0] + " " + block.activity.KeySignatureEnv[1];
-        if (noteValues[i] >= 0) {
-            note = nthDegreeToPitch(keySignature, noteValues[i]);
-        } else {
-            note = nthDegreeToPitch(keySignature, 7 + noteValues[i]);
         }
 
         const tur = that.activity.turtles.ithTurtle(0);
@@ -1484,6 +1516,7 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -1643,6 +1676,7 @@ const piemenuNoteValue = (block, noteValue) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const tabsLabels = [];
     for (let i = 0; i < WHEELVALUES.length; i++) {
@@ -1903,6 +1937,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     block._exitWheel.navItems[2].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[2].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -2183,6 +2218,7 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -2340,6 +2376,7 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -2579,6 +2616,7 @@ const piemenuChords = (block, selectedChord) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -2723,6 +2761,7 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -2912,6 +2951,7 @@ const piemenuIntervals = (block, selectedInterval) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -3145,6 +3185,7 @@ const piemenuModes = (block, selectedMode) => {
     block._exitWheel.navItems[1].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[1].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -3621,13 +3662,20 @@ const piemenuBlockContext = block => {
         docById("contextWheelDiv").style.display = "none";
     };
 
-    document.body.addEventListener("click", event => {
+    // Named function for proper cleanup
+    const hideContextWheelOnClick = event => {
         const wheelElement = document.getElementById("contextWheelDiv");
         const displayStyle = window.getComputedStyle(wheelElement).display;
         if (displayStyle === "block") {
             wheelElement.style.display = "none";
+            // Remove listener after hiding to prevent memory leak
+            document.body.removeEventListener("click", hideContextWheelOnClick);
         }
-    });
+    };
+
+    // Remove any existing listener before adding a new one
+    document.body.removeEventListener("click", hideContextWheelOnClick);
+    document.body.addEventListener("click", hideContextWheelOnClick);
 
     if (
         ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].includes(
@@ -3756,6 +3804,7 @@ const piemenuGrid = activity => {
     activity.turtles._exitWheel.sliceInitPathCustom = activity.turtles._exitWheel.slicePathCustom;
     activity.turtles._exitWheel.clickModeRotate = false;
     activity.turtles._exitWheel.createWheel(["×", " "]);
+    configureExitWheel(activity.turtles._exitWheel);
 
     activity.turtles._exitWheel.navItems[0].navigateFunction = () => {
         hidePiemenu(activity);
@@ -3866,6 +3915,7 @@ const piemenuKey = activity => {
     exitWheel.colors = platformColor.exitWheelcolors;
     exitWheel.animatetime = 0;
     exitWheel.createWheel(["×", " "]);
+    configureExitWheel(exitWheel);
 
     const x = event.clientX;
     const y = event.clientY;
@@ -4187,6 +4237,7 @@ const piemenuDissectNumber = widget => {
     exitWheel.navItems[2].titleSelectedAttr.cursor = "pointer";
     exitWheel.navItems[2].titleHoverAttr.cursor = "pointer";
     exitWheel.createWheel();
+    configureExitWheel(exitWheel);
 
     // Handle selection
     const __selectionChanged = () => {

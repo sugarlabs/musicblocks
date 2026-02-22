@@ -620,12 +620,75 @@ class ReflectionMatrix {
     }
 
     /**
+     * Escapes HTML special characters to prevent XSS attacks.
+     * @param {string} text - The text to escape.
+     * @returns {string} - The escaped text.
+     */
+    escapeHTML(text) {
+        const escapeMap = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#x27;"
+        };
+        return text.replace(/[&<>"']/g, char => escapeMap[char]);
+    }
+
+    /**
+     * Sanitizes HTML content using DOMParser to prevent XSS.
+     * Removes unsafe attributes and ensures links are safe.
+     * @param {string} htmlString - The HTML string to sanitize.
+     * @returns {string} - The sanitized HTML string.
+     */
+    sanitizeHTML(htmlString) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlString, "text/html");
+
+        // Sanitize links
+        const links = doc.getElementsByTagName("a");
+        for (let i = 0; i < links.length; i++) {
+            const link = links[i];
+            const href = link.getAttribute("href");
+
+            // If no href, or it's unsafe, remove the attribute
+            if (!href || this.isUnsafeUrl(href)) {
+                link.removeAttribute("href");
+            } else {
+                // Enforce security attributes for external links
+                link.setAttribute("target", "_blank");
+                link.setAttribute("rel", "noopener noreferrer");
+            }
+        }
+
+        return doc.body.innerHTML;
+    }
+
+    /**
+     * Checks if a URL is unsafe (javascript:, data:, vbscript:).
+     * @param {string} url - The URL to check.
+     * @returns {boolean} - True if unsafe, false otherwise.
+     */
+    isUnsafeUrl(url) {
+        const trimmed = url.trim().toLowerCase();
+        const unsafeSchemes = ["javascript:", "data:", "vbscript:"];
+        // Check if it starts with any unsafe scheme
+        // Note: DOMParser handles HTML entity decoding, so we check the raw attribute safely here
+        // But for extra safety against control characters, we rely on the fact that
+        // we are operating on the parsed DOM attribute.
+        return unsafeSchemes.some(scheme => trimmed.replace(/\s+/g, "").startsWith(scheme));
+    }
+
+    /**
      * Converts Markdown text to HTML.
      * @param {string} md - The Markdown text.
      * @returns {string} - The converted HTML text.
      */
     mdToHTML(md) {
-        let html = md;
+        // Step 1: Escape HTML first to prevent XSS attacks from raw tags
+        let html = this.escapeHTML(md);
+
+        // Step 2: Convert Markdown syntax to HTML
 
         // Headings
         html = html.replace(/^###### (.*$)/gim, "<h6>$1</h6>");
@@ -639,12 +702,13 @@ class ReflectionMatrix {
         html = html.replace(/\*\*(.*?)\*\*/gim, "<b>$1</b>");
         html = html.replace(/\*(.*?)\*/gim, "<i>$1</i>");
 
-        // Links
-        html = html.replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2' target='_blank'>$1</a>");
+        // Links - Create raw anchor tags, sanitization happens in Step 3
+        html = html.replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2'>$1</a>");
 
         // Line breaks
         html = html.replace(/\n/gim, "<br>");
 
-        return html.trim();
+        // Step 3: Sanitize the generated HTML using DOMParser
+        return this.sanitizeHTML(html);
     }
 }

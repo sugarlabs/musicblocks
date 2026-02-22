@@ -633,7 +633,7 @@ Turtle.TurtleModel = class {
         this.butNotThese = {};
 
         // Used to halt runtime during input
-        this.delayTimeout = {};
+        this.delayTimeout = null;
         this.delayParameters = {};
 
         this._media = []; // media (text, images) we need to remove on clear

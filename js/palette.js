@@ -99,14 +99,13 @@ class Palettes {
     }
 
     deltaY(dy) {
-        const curr = parseInt(document.getElementById("palette").style.top);
-        document.getElementById("palette").style.top = curr + dy + "px";
+        // Cache DOM element reference to avoid multiple lookups and forced reflow
+        const palette = document.getElementById("palette");
+        const curr = parseInt(palette.style.top);
+        palette.style.top = curr + dy + "px";
     }
 
     _makeSelectorButton(i) {
-        // eslint-disable-next-line no-console
-        console.debug("makeSelectorButton " + i);
-
         if (!document.getElementById("palette")) {
             const element = document.createElement("div");
             element.id = "palette";
@@ -134,6 +133,7 @@ class Palettes {
             element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
             document.body.appendChild(element);
         }
+
         const tr = docById("palette").children[0].children[0].children[0].children[0];
         const td = tr.insertCell();
         td.width = 1.5 * this.cellSize;
@@ -218,8 +218,6 @@ class Palettes {
     }
 
     getPluginMacroExpansion(blkname, x, y) {
-        // eslint-disable-next-line no-console
-        console.debug(this.pluginMacros[blkname]);
         const obj = this.pluginMacros[blkname];
         if (obj != null) {
             obj[0][2] = x;
@@ -638,9 +636,9 @@ class PaletteModel {
         }
 
         const protoBlock = this.activity.blocks.protoBlockDict[blkname];
+
         if (protoBlock === null) {
-            // eslint-disable-next-line no-console
-            console.debug("Could not find block " + blkname);
+            return;
         }
 
         let label = "";
@@ -872,6 +870,10 @@ class Palette {
         docById(
             "palette"
         ).childNodes[0].style.borderRight = `1px solid ${platformColor.selectorSelected}`;
+        if (this._outsideClickListener) {
+            document.removeEventListener("click", this._outsideClickListener);
+            this._outsideClickListener = null;
+        }
         this._hideMenuItems();
     }
 
@@ -945,20 +947,22 @@ class Palette {
         this._showMenuItems();
 
         // Close palette menu on outside click
+        // Remove any existing outside-click listener
         if (this._outsideClickListener) {
-            // Remove any existing listener before attaching a new one
             document.removeEventListener("click", this._outsideClickListener);
+            this._outsideClickListener = null;
         }
 
         this._outsideClickListener = event => {
-            if (!this.menuContainer.contains(event.target)) {
-                this.hideMenu(); // Calls your existing hideMenu() → _hideMenuItems()
-                document.removeEventListener("click", this._outsideClickListener);
-                this._outsideClickListener = null;
+            if (this.menuContainer && this.menuContainer.contains(event.target)) {
+                return;
             }
-        };
 
-        // Delay listener to avoid capturing the click that opened the menu
+            this.hideMenu();
+            document.removeEventListener("click", this._outsideClickListener);
+            this._outsideClickListener = null;
+        };
+        // Delay attachment to avoid capturing the opening click
         setTimeout(() => {
             document.addEventListener("click", this._outsideClickListener);
         }, 0);
@@ -1164,8 +1168,6 @@ class Palette {
 
     _makeBlockFromPalette(protoblk, blkname, callback) {
         if (protoblk === null) {
-            // eslint-disable-next-line no-console
-            console.debug("null protoblk?");
             return;
         }
 
@@ -1185,10 +1187,7 @@ class Palette {
                 break;
             case "storein2":
                 // Use the name of the box in the label
-                // eslint-disable-next-line no-console
-                console.debug(
-                    "storein2" + " " + protoblk.defaults[0] + " " + protoblk.staticLabels[0]
-                );
+
                 blkname = "store in2 " + protoblk.defaults[0];
                 newBlk = protoblk.name;
                 arg = protoblk.staticLabels[0];
@@ -1205,8 +1204,6 @@ class Palette {
                     blkname = "namedbox";
                     arg = _("box");
                 } else {
-                    // eslint-disable-next-line no-console
-                    console.debug(protoblk.defaults[0]);
                     blkname = protoblk.defaults[0];
                     arg = protoblk.defaults[0];
                 }
@@ -1342,9 +1339,6 @@ class Palette {
                 for (let blk = 0; blk < this.activity.blocks.blockList.length; blk++) {
                     const block = this.activity.blocks.blockList[blk];
                     if (block.name === "status" && !block.trash) {
-                        console.log(
-                            "Status block already exists, preventing creation of another one"
-                        );
                         return;
                     }
                 }
@@ -1468,7 +1462,6 @@ class Palette {
                 for (let i = 0; i < boxBlocks.length; i++) {
                     const boxBlockId = boxBlocks[i];
                     const boxBlock = activity.blocks.blockList[boxBlockId];
-                    console.log("Adding box block to status:", boxBlock);
 
                     statusBlocks.push([
                         lastBlockIndex + 1,
@@ -1493,7 +1486,7 @@ class Palette {
                     ]);
                     lastBlockIndex += 2;
                 }
-                console.log("blocks");
+
                 macroExpansion = statusBlocks;
 
                 // Initialize the status matrix
@@ -1631,8 +1624,7 @@ const initPalettes = async palettes => {
 
     palettes.init_selectors();
     palettes.makePalettes(0);
-    // eslint-disable-next-line no-console
-    console.debug("Time to show the palettes.");
+
     palettes.show();
 };
 
