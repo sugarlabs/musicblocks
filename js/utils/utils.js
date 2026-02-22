@@ -224,43 +224,48 @@ function windowWidth() {
 
 /**
  * Performs an HTTP GET request to retrieve data from the server.
+ * Uses async fetch to avoid blocking the UI during network requests.
  * @param {string|null} projectName - The name of the project (or null for the base URL).
- * @throws {string} Throws an error if the HTTP status code is greater than 299.
- * @returns {string} The response text from the server.
+ * @throws {Error} Throws an error if the HTTP status code is greater than 299.
+ * @returns {Promise<string>} A promise that resolves to the response text from the server.
  */
-let httpGet = projectName => {
-    let xmlHttp = null;
-    xmlHttp = new XMLHttpRequest();
-    if (projectName === null) {
-        xmlHttp.open("GET", window.server, false);
-        xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
-    } else {
-        xmlHttp.open("GET", window.server + projectName, false);
-        xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
+let httpGet = async projectName => {
+    const url = projectName === null ? window.server : window.server + projectName;
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+            "x-api-key": "3tgTzMXbbw6xEKX7"
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error("Error from server");
     }
 
-    xmlHttp.send();
-    if (xmlHttp.status > 299) {
-        throw "Error from server";
-    }
-
-    return xmlHttp.responseText;
+    return response.text();
 };
 
 /**
  * Performs an HTTP POST request to send data to the server.
+ * Uses async fetch to avoid blocking the UI during network requests.
  * @param {string} projectName - The name of the project.
  * @param {string} data - The data to be sent in the POST request.
- * @returns {string} The response text from the server.
+ * @returns {Promise<string>} A promise that resolves to the response text from the server.
  */
-let httpPost = (projectName, data) => {
-    let xmlHttp = null;
-    xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("POST", window.server + projectName, false);
-    xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
-    xmlHttp.send(data);
-    return xmlHttp.responseText;
-    // return 'https://apps.facebook.com/turtleblocks/?file=' + projectName;
+let httpPost = async (projectName, data) => {
+    const response = await fetch(window.server + projectName, {
+        method: "POST",
+        headers: {
+            "x-api-key": "3tgTzMXbbw6xEKX7"
+        },
+        body: data
+    });
+
+    if (!response.ok) {
+        throw new Error("Error from server");
+    }
+
+    return response.text();
 };
 
 /**
@@ -1093,14 +1098,6 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
     let streaming = false;
     const video = document.querySelector("#camVideo");
     const canvas = document.querySelector("#camCanvas");
-    navigator.getMedia =
-        navigator.getUserMedia ||
-        navigator.mozGetUserMedia ||
-        navigator.webkitGetUserMedia ||
-        navigator.msGetUserMedia;
-    if (navigator.getMedia === undefined) {
-        errorMsg("Your browser does not support the webcam");
-    }
 
     function draw() {
         canvas.width = w;
@@ -1111,24 +1108,23 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
     }
 
     if (!CameraManager.isSetup) {
-        navigator.getMedia(
-            { video: true, audio: false },
-            stream => {
-                if (navigator.mozGetUserMedia) {
-                    video.mozSrcObject = stream;
-                } else {
-                    video.srcObject = stream;
-                }
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            errorMsg("Your browser does not support the webcam");
+            return;
+        }
 
+        navigator.mediaDevices
+            .getUserMedia({ video: true, audio: false })
+            .then(stream => {
+                video.srcObject = stream;
                 video.play();
                 CameraManager.isSetup = true;
-            },
-            error => {
+            })
+            .catch(error => {
                 errorMsg("Could not connect to camera");
                 // eslint-disable-next-line no-console
                 console.debug(error);
-            }
-        );
+            });
     } else {
         streaming = true;
         video.play();
@@ -1219,7 +1215,7 @@ function displayMsg(/*blocks, text*/) {
  */
 function safeSVG(label) {
     if (typeof label === "string") {
-        return label.replace(/&/, "&amp;").replace(/</, "&lt;").replace(/>/, "&gt;");
+        return label.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     } else {
         return label;
     }
@@ -1414,16 +1410,15 @@ let rationalSum = (a, b) => {
     } else {
         objb1 = [b[1], 1];
     }
-
-    a[0] = obja0[0] * obja1[1];
-    a[1] = obja0[1] * obja1[0];
-    b[0] = objb0[0] * objb1[1];
-    b[1] = objb0[1] * objb1[0];
+    // Use local variables to avoid mutating the caller's arrays
+    const a0 = obja0[0] * obja1[1];
+    const a1 = obja0[1] * obja1[0];
+    const b0 = objb0[0] * objb1[1];
+    const b1 = objb0[1] * objb1[0];
 
     // Find the least common denomenator
-    const lcd = LCD(a[1], b[1]);
-    // const c0 = (a[0] * lcd) / a[1] + (b[0] * lcd) / b[1];
-    return [(a[0] * lcd) / a[1] + (b[0] * lcd) / b[1], lcd];
+    const lcd = LCD(a1, b1);
+    return [(a0 * lcd) / a1 + (b0 * lcd) / b1, lcd];
 };
 
 /**
@@ -1785,8 +1780,15 @@ if (typeof module !== "undefined" && module.exports) {
         nearestBeat,
         oneHundredToFraction,
         rationalToFraction,
+        rationalSum,
         rgbToHex,
         hexToRGB,
-        hex2rgb
+        hex2rgb,
+        format,
+        delayExecution,
+        closeWidgets,
+        closeBlkWidgets,
+        resolveObject,
+        importMembers
     };
 }

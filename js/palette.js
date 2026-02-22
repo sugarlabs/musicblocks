@@ -99,8 +99,10 @@ class Palettes {
     }
 
     deltaY(dy) {
-        const curr = parseInt(document.getElementById("palette").style.top);
-        document.getElementById("palette").style.top = curr + dy + "px";
+        // Cache DOM element reference to avoid multiple lookups and forced reflow
+        const palette = document.getElementById("palette");
+        const curr = parseInt(palette.style.top);
+        palette.style.top = curr + dy + "px";
     }
 
     _makeSelectorButton(i) {

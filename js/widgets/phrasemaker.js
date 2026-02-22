@@ -13,7 +13,7 @@
 /*
    global
 
-   _, platformColor, docById, MATRIXSOLFEHEIGHT, toFraction, Singer,
+   _, PhraseMakerUtils, PhraseMakerGrid, platformColor, docById, MATRIXSOLFEHEIGHT, toFraction, Singer,
    SOLFEGECONVERSIONTABLE, slicePath, wheelnav, delayExecution,
    DEFAULTVOICE, getDrumName, MATRIXSOLFEWIDTH, getDrumIcon,
    noteIsSolfege, isCustomTemperament, i18nSolfege, getNote, DEFAULTDRUM, last,
@@ -49,21 +49,6 @@ Globals location
 /* exported PhraseMaker */
 // The last selected index for piemenu
 let lastIndex = 5;
-const MATRIXGRAPHICS = [
-    "forward",
-    "back",
-    "right",
-    "left",
-    "setheading",
-    "setcolor",
-    "setshade",
-    "sethue",
-    "setgrey",
-    "settranslucency",
-    "setpensize"
-];
-const MATRIXGRAPHICS2 = ["arc", "setxy"];
-const MATRIXSYNTHS = ["sine", "triangle", "sawtooth", "square", "hertz"]; // Deprecated
 
 /**
  * Represents a PhraseMaker widget for creating and managing musical phrases.
@@ -284,90 +269,7 @@ class PhraseMaker {
      * Adjusts the dimensions and overflow settings of window frames and widget bodies.
      */
     stylePhraseMaker() {
-        /**
-         * Width of the screen.
-         * @type {number}
-         */
-        const screenWidth = window.innerWidth;
-
-        /**
-         * Height of the screen.
-         * @type {number}
-         */
-        const screenHeight = window.innerHeight;
-
-        /**
-         * Container element for floating windows.
-         * @type {HTMLElement}
-         */
-        const floatingWindowsDiv = document.getElementById("floatingWindows");
-
-        /**
-         * Collection of window frame elements.
-         * @type {NodeListOf<Element>}
-         */
-        const windowFrameElements = floatingWindowsDiv.querySelectorAll(".windowFrame");
-
-        for (let i = 0; i < windowFrameElements.length; i++) {
-            /**
-             * Current window frame element.
-             * @type {Element}
-             */
-            const windowFrame = windowFrameElements[i];
-
-            /**
-             * Widget body element within the window frame.
-             * @type {Element}
-             */
-            const wfWinBody = windowFrame.querySelector(".wfWinBody");
-
-            /**
-             * Widget element within the window frame.
-             * @type {Element}
-             */
-            const wfbWidget = windowFrame.querySelector(".wfbWidget");
-
-            /**
-             * Total width of the window frame.
-             * @type {number}
-             */
-            const totalWidth = parseFloat(window.getComputedStyle(windowFrame).width);
-
-            /**
-             * Total height of the window frame.
-             * @type {number}
-             */
-            const totalHeight = parseFloat(window.getComputedStyle(windowFrame).height);
-
-            /**
-             * Maximum allowed width for the window frame.
-             * @type {number}
-             */
-            const maxWidth = screenWidth * 0.8;
-
-            /**
-             * Maximum allowed height for the window frame.
-             * @type {number}
-             */
-            const maxHeight = screenHeight * 0.8;
-
-            if (totalWidth > screenWidth || totalHeight > screenHeight) {
-                windowFrame.style.height = Math.min(totalHeight, maxHeight) + "px";
-                windowFrame.style.width = Math.min(totalWidth, maxWidth) + "px";
-                wfbWidget.style.overflowY = totalHeight > maxHeight ? "auto" : "hidden";
-                wfbWidget.style.overflowX = totalWidth > maxWidth ? "auto" : "hidden";
-                wfbWidget.style.width = "-webkit-fill-available";
-                wfbWidget.style.height = "-webkit-fill-available";
-                wfbWidget.style.position = "absolute";
-                wfbWidget.style.left = "55px";
-                wfWinBody.style.position = "absolute";
-                wfWinBody.style.overflowY = totalHeight > maxHeight ? "auto" : "hidden";
-                wfWinBody.style.overflowX = totalWidth > maxWidth ? "auto" : "hidden";
-                wfWinBody.style.width = "-webkit-fill-available";
-                wfWinBody.style.height = "-webkit-fill-available";
-                wfWinBody.style.background = "#cccccc";
-            }
-        }
+        PhraseMakerUI.stylePhraseMaker(this);
     }
 
     /**
@@ -375,12 +277,7 @@ class PhraseMaker {
      * Resets arrays used to track row and column blocks.
      */
     clearBlocks() {
-        // When creating a new matrix, we want to clear out any old
-        // block references.
-        this._rowBlocks = [];
-        this._colBlocks = [];
-        this._rowMap = [];
-        this._rowOffset = [];
+        PhraseMakerGrid.clearBlocks(this);
     }
 
     /**
@@ -389,17 +286,7 @@ class PhraseMaker {
      * @param {number} rowBlock - The pitch or drum block identifier to add to the matrix row.
      */
     addRowBlock(rowBlock) {
-        // When creating a matrix, we add rows whenever we encounter a
-        // pitch or drum block (and some graphics blocks).
-        this._rowMap.push(this._rowBlocks.length);
-        this._rowOffset.push(0);
-        // In case there is a repeat block, use a unique block number
-        // for each instance.
-        while (this._rowBlocks.includes(rowBlock)) {
-            rowBlock = rowBlock + 1000000;
-        }
-
-        this._rowBlocks.push(rowBlock);
+        PhraseMakerGrid.addRowBlock(this, rowBlock);
     }
 
     /**
@@ -409,22 +296,7 @@ class PhraseMaker {
      * @param {number} n - The index of the rhythm block within the matrix column.
      */
     addColBlock(rhythmBlock, n) {
-        // When creating a matrix, we add columns when we encounter
-        // rhythm blocks.
-        // Search for previous instance of the same block (from a
-        // repeat).
-        let startIdx = 0;
-        let obj;
-        for (let i = 0; i < this._colBlocks.length; i++) {
-            obj = this._colBlocks[i];
-            if (obj[0] === rhythmBlock) {
-                startIdx += 1;
-            }
-        }
-
-        for (let i = startIdx; i < n + startIdx; i++) {
-            this._colBlocks.push([rhythmBlock, i]);
-        }
+        PhraseMakerGrid.addColBlock(this, rhythmBlock, n);
     }
 
     /**
@@ -436,22 +308,7 @@ class PhraseMaker {
      * @param {number} blk - The block identifier representing the matrix cell.
      */
     addNode(rowBlock, rhythmBlock, n, blk) {
-        // A node exists for each cell in the matrix. It is used to
-        // preserve and restore the state of the cell.
-        if (this._blockMap[blk] === undefined) {
-            this._blockMap[blk] = [];
-        }
-
-        let j = 0;
-        let obj;
-        for (let i = 0; i < this._blockMap[blk].length; i++) {
-            obj = this._blockMap[blk][i];
-            if (obj[0] === rowBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
-                j += 1;
-            }
-        }
-
-        this._blockMap[blk].push([rowBlock, [rhythmBlock, n], j]);
+        PhraseMakerGrid.addNode(this, rowBlock, rhythmBlock, n, blk);
     }
 
     /**
@@ -462,15 +319,7 @@ class PhraseMaker {
      * @param {number} n - The index of the rhythm block within its column.
      */
     removeNode(rowBlock, rhythmBlock, n) {
-        // When the matrix is changed, we may need to remove nodes.
-        const blk = this.blockNo;
-        let obj;
-        for (let i = 0; i < this._blockMap[blk].length; i++) {
-            obj = this._blockMap[blk][i];
-            if (obj[0] === rowBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
-                this._blockMap[blk].splice(i, 1);
-            }
-        }
+        PhraseMakerGrid.removeNode(this, rowBlock, rhythmBlock, n);
     }
 
     /**
@@ -624,9 +473,9 @@ class PhraseMaker {
             this.columnBlocksMap = this._mapNotesBlocks("all", true);
             for (let i = 0; i < this.columnBlocksMap.length; i++) {
                 if (
-                    MATRIXGRAPHICS.includes(this.columnBlocksMap[i][1]) ||
-                    MATRIXGRAPHICS2.includes(this.columnBlocksMap[i][1]) ||
-                    MATRIXSYNTHS.includes(this.columnBlocksMap[i][1]) ||
+                    PhraseMakerUtils.MATRIXGRAPHICS.includes(this.columnBlocksMap[i][1]) ||
+                    PhraseMakerUtils.MATRIXGRAPHICS2.includes(this.columnBlocksMap[i][1]) ||
+                    PhraseMakerUtils.MATRIXSYNTHS.includes(this.columnBlocksMap[i][1]) ||
                     ["playdrum", "pitch"].includes(this.columnBlocksMap[i][1])
                 ) {
                     continue;
@@ -652,8 +501,8 @@ class PhraseMaker {
             // Depending on the row, we choose a different background color.
             if (this.rowLabels[i] === "print") break;
             else if (
-                MATRIXGRAPHICS.indexOf(this.rowLabels[i]) != -1 ||
-                MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) != -1
+                PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[i]) != -1 ||
+                PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) != -1
             ) {
                 cellColor = this.platformColor.graphicsLabelBackground;
             } else {
@@ -697,21 +546,21 @@ class PhraseMaker {
                         width="${iconSize / 2}" 
                         vertical-align="middle"
                     />&nbsp;&nbsp;`;
-            } else if (MATRIXSYNTHS.includes(this.rowLabels[i])) {
+            } else if (PhraseMakerUtils.MATRIXSYNTHS.includes(this.rowLabels[i])) {
                 cell.innerHTML = `&nbsp;&nbsp;<img 
                         src="images/synth2.svg" 
                         height="${iconSize}" 
                         width="${iconSize}" 
                         vertical-align="middle"
                     >&nbsp;&nbsp;`;
-            } else if (MATRIXGRAPHICS.includes(this.rowLabels[i])) {
+            } else if (PhraseMakerUtils.MATRIXGRAPHICS.includes(this.rowLabels[i])) {
                 cell.innerHTML = `&nbsp;&nbsp;<img 
                         src="images/mouse.svg" 
                         height="${iconSize}" 
                         width="${iconSize}" 
                         vertical-align="middle"
                     >&nbsp;&nbsp;`;
-            } else if (MATRIXGRAPHICS2.includes(this.rowLabels[i])) {
+            } else if (PhraseMakerUtils.MATRIXGRAPHICS2.includes(this.rowLabels[i])) {
                 cell.innerHTML = `&nbsp;&nbsp;<img 
                         src="images/mouse.svg" 
                         height="${iconSize}" 
@@ -787,7 +636,7 @@ class PhraseMaker {
                 cell.innerHTML = this.rowLabels[i];
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
                 this._noteStored.push(this.rowLabels[i].replace(/ /g, ": "));
-            } else if (MATRIXSYNTHS.includes(this.rowLabels[i])) {
+            } else if (PhraseMakerUtils.MATRIXSYNTHS.includes(this.rowLabels[i])) {
                 cell.innerHTML = this.rowArgs[i];
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
                 cell.setAttribute("alt", i + "__" + "synthsblocks");
@@ -803,7 +652,7 @@ class PhraseMaker {
                 };
 
                 this._noteStored.push(this.rowArgs[i]);
-            } else if (MATRIXGRAPHICS.includes(this.rowLabels[i])) {
+            } else if (PhraseMakerUtils.MATRIXGRAPHICS.includes(this.rowLabels[i])) {
                 blockLabel =
                     this.activity.blocks.protoBlockDict[this.rowLabels[i]]["staticLabels"][0];
                 cell.innerHTML = `${blockLabel}<br>${this.rowArgs[i]}`;
@@ -821,7 +670,7 @@ class PhraseMaker {
                 };
 
                 this._noteStored.push(this.rowLabels[i] + ": " + this.rowArgs[i]);
-            } else if (MATRIXGRAPHICS2.includes(this.rowLabels[i])) {
+            } else if (PhraseMakerUtils.MATRIXGRAPHICS2.includes(this.rowLabels[i])) {
                 blockLabel =
                     this.activity.blocks.protoBlockDict[this.rowLabels[i]]["staticLabels"][0];
                 cell.innerHTML = `${blockLabel}<br>${this.rowArgs[i][0]} ${this.rowArgs[i][1]}`;
@@ -1104,12 +953,12 @@ class PhraseMaker {
         }
 
         const graphicLabels = [];
-        for (let i = 0; i < MATRIXGRAPHICS.length; i++) {
-            graphicLabels.push(MATRIXGRAPHICS[i]);
+        for (let i = 0; i < PhraseMakerUtils.MATRIXGRAPHICS.length; i++) {
+            graphicLabels.push(PhraseMakerUtils.MATRIXGRAPHICS[i]);
         }
 
-        for (let i = 0; i < MATRIXGRAPHICS2.length; i++) {
-            graphicLabels.push(MATRIXGRAPHICS2[i]);
+        for (let i = 0; i < PhraseMakerUtils.MATRIXGRAPHICS2.length; i++) {
+            graphicLabels.push(PhraseMakerUtils.MATRIXGRAPHICS2[i]);
         }
 
         this._menuWheel = new this.wheelnav("wheelDivptm", null, 200, 200);
@@ -1369,7 +1218,7 @@ class PhraseMaker {
         this._exitWheel = new this.wheelnav("_exitWheel", this._pitchWheel.raphael);
         this._blockLabelsWheel = new this.wheelnav("_blockLabelsWheel", this._pitchWheel.raphael);
         this._blockLabelsWheel2 = new this.wheelnav("_blockLabelsWheel2", this._pitchWheel.raphael);
-        const _blockNames = MATRIXGRAPHICS2.slice();
+        const _blockNames = PhraseMakerUtils.MATRIXGRAPHICS2.slice();
         const _blockLabels = [];
         for (let i = 0; i < _blockNames.length; i++) {
             _blockLabels.push(
@@ -1557,7 +1406,7 @@ class PhraseMaker {
             let blockLabel;
             let cell = this._headcols[blockIndex];
             const iconSize = PhraseMaker.ICONSIZE * (window.innerWidth / 1200);
-            if (MATRIXGRAPHICS2.includes(this.rowLabels[blockIndex])) {
+            if (PhraseMakerUtils.MATRIXGRAPHICS2.includes(this.rowLabels[blockIndex])) {
                 cell.innerHTML = `&nbsp;&nbsp;<img 
                         src="images/mouse.svg" 
                         height="${iconSize}" 
@@ -1567,7 +1416,7 @@ class PhraseMaker {
             }
 
             cell = this._labelcols[blockIndex];
-            if (MATRIXGRAPHICS2.includes(this.rowLabels[blockIndex])) {
+            if (PhraseMakerUtils.MATRIXGRAPHICS2.includes(this.rowLabels[blockIndex])) {
                 blockLabel =
                     this.activity.blocks.protoBlockDict[this.rowLabels[blockIndex]][
                         "staticLabels"
@@ -1645,14 +1494,14 @@ class PhraseMaker {
             blockNamesPen = [];
             blockLabelsPen = [];
             for (let i = 0; i < 5; i++) {
-                name = MATRIXGRAPHICS[i];
+                name = PhraseMakerUtils.MATRIXGRAPHICS[i];
                 blockNamesGraphics.push(name);
                 blockLabelsGraphics.push(
                     this.activity.blocks.protoBlockDict[name]["staticLabels"][0]
                 );
             }
-            for (let i = 5; i < MATRIXGRAPHICS.length; i++) {
-                name = MATRIXGRAPHICS[i];
+            for (let i = 5; i < PhraseMakerUtils.MATRIXGRAPHICS.length; i++) {
+                name = PhraseMakerUtils.MATRIXGRAPHICS[i];
                 blockNamesPen.push(name);
                 blockLabelsPen.push(this.activity.blocks.protoBlockDict[name]["staticLabels"][0]);
             }
@@ -1838,14 +1687,14 @@ class PhraseMaker {
             // Update the cell label.
             let cell = this._headcols[blockIndex];
             const iconSize = PhraseMaker.ICONSIZE * (window.innerWidth / 1200);
-            if (MATRIXSYNTHS.includes(this.rowLabels[blockIndex])) {
+            if (PhraseMakerUtils.MATRIXSYNTHS.includes(this.rowLabels[blockIndex])) {
                 cell.innerHTML = `&nbsp;&nbsp;<img 
                         src="images/synth2.svg" 
                         height="${iconSize}" 
                         width="${iconSize}" 
                         vertical-align="middle"
                     >&nbsp;&nbsp;`;
-            } else if (MATRIXGRAPHICS.includes(this.rowLabels[blockIndex])) {
+            } else if (PhraseMakerUtils.MATRIXGRAPHICS.includes(this.rowLabels[blockIndex])) {
                 cell.innerHTML = `&nbsp;&nbsp;<img 
                         src="images/mouse.svg" 
                         height="${iconSize}" 
@@ -1855,10 +1704,10 @@ class PhraseMaker {
             }
 
             cell = this._labelcols[blockIndex];
-            if (MATRIXSYNTHS.includes(this.rowLabels[blockIndex])) {
+            if (PhraseMakerUtils.MATRIXSYNTHS.includes(this.rowLabels[blockIndex])) {
                 cell.innerHTML = this.rowArgs[blockIndex];
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
-            } else if (MATRIXGRAPHICS.includes(this.rowLabels[blockIndex])) {
+            } else if (PhraseMakerUtils.MATRIXGRAPHICS.includes(this.rowLabels[blockIndex])) {
                 blockLabel =
                     this.activity.blocks.protoBlockDict[this.rowLabels[blockIndex]][
                         "staticLabels"
@@ -2472,8 +2321,7 @@ class PhraseMaker {
      * @returns {string} The data URI representing the file content.
      */
     _generateDataURI(file) {
-        const data = "data: text/html;charset=utf-8, " + encodeURIComponent(file);
-        return data;
+        return PhraseMakerUtils.generateDataURI(file);
     }
 
     /**
@@ -2513,9 +2361,9 @@ class PhraseMaker {
             drumName = this._deps.getDrumName(this.rowLabels[i]);
             if (drumName != null) {
                 continue;
-            } else if (MATRIXGRAPHICS.includes(this.rowLabels[i])) {
+            } else if (PhraseMakerUtils.MATRIXGRAPHICS.includes(this.rowLabels[i])) {
                 continue;
-            } else if (MATRIXGRAPHICS2.includes(this.rowLabels[i])) {
+            } else if (PhraseMakerUtils.MATRIXGRAPHICS2.includes(this.rowLabels[i])) {
                 continue;
             }
 
@@ -2553,8 +2401,8 @@ class PhraseMaker {
 
         let gi;
         for (let i = 0; i < this.rowLabels.length; i++) {
-            if (MATRIXGRAPHICS.includes(this.rowLabels[i])) {
-                gi = MATRIXGRAPHICS.indexOf(this.rowLabels[i]) + 100;
+            if (PhraseMakerUtils.MATRIXGRAPHICS.includes(this.rowLabels[i])) {
+                gi = PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[i]) + 100;
                 sortableList.push([
                     -gi,
                     this.rowLabels[i],
@@ -2562,8 +2410,8 @@ class PhraseMaker {
                     i,
                     this._noteStored[i]
                 ]);
-            } else if (MATRIXGRAPHICS2.includes(this.rowLabels[i])) {
-                gi = MATRIXGRAPHICS.indexOf(this.rowLabels[i]) + 200;
+            } else if (PhraseMakerUtils.MATRIXGRAPHICS2.includes(this.rowLabels[i])) {
+                gi = PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[i]) + 200;
                 sortableList.push([
                     -gi,
                     this.rowLabels[i],
@@ -2717,15 +2565,15 @@ class PhraseMaker {
             } else if (this.rowLabels[i].slice(0, 4) === "http") {
                 exportLabel.innerHTML = this.rowLabels[i];
                 exportLabel.style.fontSize = Math.floor(this._cellScale * 14) + "px";
-            } else if (MATRIXSYNTHS.includes(this.rowLabels[i])) {
+            } else if (PhraseMakerUtils.MATRIXSYNTHS.includes(this.rowLabels[i])) {
                 exportLabel.innerHTML = this.rowArgs[i];
                 exportLabel.style.fontSize = Math.floor(this._cellScale * 14) + "px";
-            } else if (MATRIXGRAPHICS.includes(this.rowLabels[i])) {
+            } else if (PhraseMakerUtils.MATRIXGRAPHICS.includes(this.rowLabels[i])) {
                 blockLabel =
                     this.activity.blocks.protoBlockDict[this.rowLabels[i]]["staticLabels"][0];
                 exportLabel.innerHTML = blockLabel + "<br>" + this.rowArgs[i];
                 exportLabel.style.fontSize = Math.floor(this._cellScale * 12) + "px";
-            } else if (MATRIXGRAPHICS2.includes(this.rowLabels[i])) {
+            } else if (PhraseMakerUtils.MATRIXGRAPHICS2.includes(this.rowLabels[i])) {
                 blockLabel =
                     this.activity.blocks.protoBlockDict[this.rowLabels[i]]["staticLabels"][0];
                 exportLabel.innerHTML = `${blockLabel}<br>${this.rowArgs[i][0]} ${this.rowArgs[i][1]}`;
@@ -2998,7 +2846,7 @@ class PhraseMaker {
             // Add the notes to the matrix a la addNote.
             for (let j = 0; j < this.rowLabels.length; j++) {
                 // Depending on the row, we choose a different background color.
-                if (MATRIXGRAPHICS.indexOf(this.rowLabels[j]) != -1) {
+                if (PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[j]) != -1) {
                     cellColor = this.platformColor.graphicsBackground;
                 } else {
                     drumName = this._deps.getDrumName(this.rowLabels[j]);
@@ -3083,7 +2931,7 @@ class PhraseMaker {
      * @returns {number} The calculated width of the note cell.
      */
     _noteWidth(noteValue) {
-        return Math.max(Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this._cellScale), 15);
+        return PhraseMakerUI.calculateNoteWidth(this, noteValue);
     }
 
     /**
@@ -3118,8 +2966,8 @@ class PhraseMaker {
             for (let i = 0; i < rowCount; i++) {
                 // Depending on the row, we choose a different background color.
                 if (
-                    MATRIXGRAPHICS.indexOf(this.rowLabels[i]) != -1 ||
-                    MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) != -1
+                    PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[i]) != -1 ||
+                    PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) != -1
                 ) {
                     cellColor = this.platformColor.graphicsBackground;
                 } else {
@@ -3213,33 +3061,7 @@ class PhraseMaker {
      * @private
      */
     _lookForNoteBlocksOrRepeat() {
-        this._noteBlocks = false;
-        const bno = this.blockNo;
-        let blk;
-        for (let i = 0; i < this._blockMap[bno].length; i++) {
-            blk = this._blockMap[bno][i][1][0];
-            if (blk === -1) {
-                continue;
-            }
-
-            if (this.activity.blocks.blockList[blk] === null) {
-                continue;
-            }
-
-            if (this.activity.blocks.blockList[blk] === undefined) {
-                //eslint-disable-next-line no-console
-                console.debug("block " + blk + " is undefined");
-                continue;
-            }
-
-            if (
-                this.activity.blocks.blockList[blk].name === "newnote" ||
-                this.activity.blocks.blockList[blk].name === "repeat"
-            ) {
-                this._noteBlocks = true;
-                break;
-            }
-        }
+        PhraseMakerGrid.lookForNoteBlocksOrRepeat(this);
     }
 
     /**
@@ -3247,37 +3069,7 @@ class PhraseMaker {
      * @private
      */
     _syncMarkedBlocks() {
-        const newBlockMap = [];
-        const blk = this.blockNo;
-        for (let i = 0; i < this._blockMap[blk].length; i++) {
-            if (this._blockMap[blk][i][0] === -1) {
-                continue;
-            }
-
-            for (let j = 0; j < this._blockMapHelper.length; j++) {
-                if (
-                    JSON.stringify(this._blockMap[blk][i][1]) ===
-                    JSON.stringify(this._blockMapHelper[j][0])
-                ) {
-                    for (let k = 0; k < this._blockMapHelper[j][1].length; k++) {
-                        newBlockMap.push([
-                            this._blockMap[blk][i][0],
-                            this._colBlocks[this._blockMapHelper[j][1][k]],
-                            this._blockMap[blk][i][2]
-                        ]);
-                    }
-                }
-            }
-        }
-
-        this._blockMap[blk] = newBlockMap.filter((el, i) => {
-            return (
-                i ===
-                newBlockMap.findIndex(ele => {
-                    return JSON.stringify(ele) === JSON.stringify(el);
-                })
-            );
-        });
+        PhraseMakerGrid.syncMarkedBlocks(this);
     }
 
     /**
@@ -3426,50 +3218,7 @@ class PhraseMaker {
      * @private
      */
     _mapNotesBlocks(blockName, withName) {
-        const notesBlockMap = [];
-        let blk = this.activity.blocks.blockList[this.blockNo].connections[1];
-        let myBlock = this.activity.blocks.blockList[blk];
-
-        let bottomBlockLoop = 0;
-        if (
-            myBlock.name === blockName ||
-            (blockName === "all" &&
-                myBlock.name !== "hidden" &&
-                myBlock.name !== "vspace" &&
-                myBlock.name !== "hiddennoflow")
-        ) {
-            if (withName) {
-                notesBlockMap.push([blk, myBlock.name]);
-            } else {
-                notesBlockMap.push(blk);
-            }
-        }
-
-        while (this._deps.last(myBlock.connections) != null) {
-            bottomBlockLoop += 1;
-            if (bottomBlockLoop > 2 * this.activity.blocks.blockList) {
-                // Could happen if the block data is malformed.
-                break;
-            }
-
-            blk = this._deps.last(myBlock.connections);
-            myBlock = this.activity.blocks.blockList[blk];
-            if (
-                myBlock.name === blockName ||
-                (blockName === "all" &&
-                    myBlock.name !== "hidden" &&
-                    myBlock.name !== "vspace" &&
-                    myBlock.name !== "hiddennoflow")
-            ) {
-                if (withName) {
-                    notesBlockMap.push([blk, myBlock.name]);
-                } else {
-                    notesBlockMap.push(blk);
-                }
-            }
-        }
-
-        return notesBlockMap;
+        return PhraseMakerGrid.mapNotesBlocks(this, blockName, withName);
     }
 
     /**
@@ -3477,22 +3226,10 @@ class PhraseMaker {
      * @returns {Array<Array<number>>} An array containing adjusted notes represented as [noteValue, count].
      */
     recalculateBlocks() {
-        const adjustedNotes = [];
-        adjustedNotes.push([this.activity.logo.tupletRhythms[0][2], 1]);
-        let startidx = 1;
-        for (let i = 1; i < this.activity.logo.tupletRhythms.length; i++) {
-            if (this.activity.logo.tupletRhythms[i][2] === this._deps.last(adjustedNotes)[0]) {
-                startidx += 1;
-            } else {
-                adjustedNotes[adjustedNotes.length - 1][1] = startidx;
-                adjustedNotes.push([this.activity.logo.tupletRhythms[i][2], 1]);
-                startidx = 1;
-            }
-        }
-        if (startidx > 1) {
-            adjustedNotes[adjustedNotes.length - 1][1] = startidx;
-        }
-        return adjustedNotes;
+        return PhraseMakerUtils.recalculateBlocks(
+            this.activity.logo.tupletRhythms,
+            this._deps.last
+        );
     }
 
     /**
@@ -4369,7 +4106,7 @@ class PhraseMaker {
                     obj = note[i].split(": ");
                     if (obj.length > 1) {
                         // Deprecated
-                        if (MATRIXSYNTHS.includes(obj[0])) {
+                        if (PhraseMakerUtils.MATRIXSYNTHS.includes(obj[0])) {
                             synthNotes.push(note[i]);
                         } else {
                             this._processGraphics(obj);
@@ -4572,8 +4309,8 @@ class PhraseMaker {
                     } else {
                         if (
                             // if graphic block
-                            MATRIXGRAPHICS.indexOf(this.rowLabels[j]) != -1 ||
-                            MATRIXGRAPHICS2.indexOf(this.rowLabels[j]) != -1
+                            PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[j]) != -1 ||
+                            PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(this.rowLabels[j]) != -1
                         ) {
                             // push "action: value"
                             note.push(this.rowLabels[j] + ": " + this.rowArgs[j]);
@@ -4627,20 +4364,7 @@ class PhraseMaker {
      * @private
      */
     _resetMatrix() {
-        let row = this._noteValueRow;
-        let cell;
-        for (let i = 0; i < row.cells.length; i++) {
-            cell = row.cells[i];
-            cell.style.backgroundColor = this.platformColor.rhythmcellcolor;
-        }
-
-        if (this._matrixHasTuplets) {
-            row = this._tupletNoteValueRow;
-            for (let i = 0; i < row.cells.length; i++) {
-                cell = row.cells[i];
-                cell.style.backgroundColor = this.platformColor.tupletBackground;
-            }
-        }
+        PhraseMakerUI.resetMatrix(this);
     }
 
     /**
@@ -4728,12 +4452,12 @@ class PhraseMaker {
                         } else {
                             obj = note[i].split(": ");
                             // Deprecated
-                            if (MATRIXSYNTHS.includes(obj[0])) {
+                            if (PhraseMakerUtils.MATRIXSYNTHS.includes(obj[0])) {
                                 synthNotes.push(note[i]);
                                 continue;
-                            } else if (MATRIXGRAPHICS.includes(obj[0])) {
+                            } else if (PhraseMakerUtils.MATRIXGRAPHICS.includes(obj[0])) {
                                 this._processGraphics(obj);
-                            } else if (MATRIXGRAPHICS2.includes(obj[0])) {
+                            } else if (PhraseMakerUtils.MATRIXGRAPHICS2.includes(obj[0])) {
                                 this._processGraphics(obj);
                             } else {
                                 pitchNotes.push(note[i].replace(/♭/g, "b").replace(/♯/g, "#"));
@@ -4962,8 +4686,8 @@ class PhraseMaker {
             graphicsBlock = false;
             graphicNote = note.split(": ");
             if (
-                MATRIXGRAPHICS.indexOf(graphicNote[0]) != -1 &&
-                MATRIXGRAPHICS2.indexOf(graphicNote[0]) != -1
+                PhraseMakerUtils.MATRIXGRAPHICS.indexOf(graphicNote[0]) != -1 &&
+                PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(graphicNote[0]) != -1
             ) {
                 graphicsBlock = true;
             }
@@ -5015,7 +4739,7 @@ class PhraseMaker {
                     console.debug("Cannot parse note object: " + obj);
                 }
             }
-        } else if (MATRIXSYNTHS.includes(obj[0])) {
+        } else if (PhraseMakerUtils.MATRIXSYNTHS.includes(obj[0])) {
             this.activity.logo.synth.trigger(0, [Number(obj[1])], noteValue, obj[0], null, null);
         }
     }
@@ -5544,4 +5268,7 @@ class PhraseMaker {
         this.activity.blocks.loadNewBlocks(newStack);
         activity.textMsg(this._("New action block generated."), 3000);
     }
+}
+if (typeof module !== "undefined") {
+    module.exports = PhraseMaker;
 }

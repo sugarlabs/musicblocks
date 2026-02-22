@@ -21,6 +21,10 @@
  * Class representing the SaveInterface.
  * @class
  */
+const STR_MY_PROJECT = _("My Project");
+const STR_SHOW = _("Show");
+const STR_HIDE = _("Hide");
+
 class SaveInterface {
     /**
      * Creates an instance of SaveInterface.
@@ -56,9 +60,9 @@ class SaveInterface {
          */
         this.htmlSaveTemplate =
             '<!DOCTYPE html><html lang="en"><head> <meta charset="utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="description" content="{{ project_description }}"> <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"> <title>{{ project_name }}</title> <meta property="og:site_name" content="Music Blocks"/> <meta property="og:type" content="website"/> <meta property="og:title" content="' +
-            _("Music Blocks Project") +
+            STR_MY_PROJECT +
             ' - {{ project_name }}"/> <meta property="og:description" content="{{ project_description }}"/> <style>body{background-color: #dbf0fb;}#main{background-color: white; padding: 5%; position: fixed; width: 80vw; height: max-content; margin: auto; top: 0; left: 0; bottom: 0; right: 0; display: flex; flex-direction: column; justify-content: center; text-align: center; color: #424242; box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23); font-family: "Roboto", "Helvetica","Arial",sans-serif;}h3{font-weight: 400; font-size: 36px; margin-top: 10px;}hr{border-top: 0px solid #ccc; margin: 1em;}.btn {display: inline-block; margin-left: 10px; cursor: pointer; font-size: 14px; border-radius: 12px; border: 1px solid #1678ad; padding: 3px 5px; line-height: 20px; color: #181818;}.btn:hover {transition: 0.4s; -webkit-transition: 0.3s; -moz-transition: 0.3s; background-color: #3eb7e7;}.code{word-break: break-all; height: 15vh; background: #f6f8fa; color: #494949; text-align: justify; margin-right: 10vw; margin-left: 10vw; padding: 16px; overflow: auto; line-height: 1.45; background-color: #f6f8fa; border-radius: 3px; font-family: "SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace;}.image{border-radius: 2px 2px 0 0; position: relative; background-color: #96D3F3;}.image-div{margin-bottom: 10px;}.moreinfo-div{margin-top: 20px;}h4{font-weight: 500; font-size: 1.4em; margin-top: 10px; margin-bottom: 10px;}.tbcode{margin-bottom: 10px;}</style></head><body> <div id="main"> <div class="image-div"><img class="image" id="project-image" src="{{ project_image }}"></div><h3 id="title">' +
-            _("Music Blocks Project") +
+            STR_MY_PROJECT +
             ' - {{ project_name }}</h3> <p>{{ project_description }}</p><hr> <div> <div style="color: #9E9E9E"><p>' +
             _("This project was created in Music Blocks") +
             ' (<a href="https://musicblocks.sugarlabs.org" target="_blank">https://musicblocks.sugarlabs.org</a>). ' +
@@ -86,7 +90,7 @@ class SaveInterface {
             "</h4>" +
             _("This code stores data about the blocks in a project.") +
             '<a href="javascript:toggle();" id="showhide">' +
-            _("Show") +
+            STR_SHOW +
             "</a>" +
             '<button class="btn" onclick="copyCode()" style="margin-left: 10px;">' +
             _("Copy to Clipboard") +
@@ -99,12 +103,12 @@ class SaveInterface {
             '  if (codeBlock.style.display === "none") {' +
             '    codeBlock.style.display = "flex";' +
             '    showHideButton.textContent = "' +
-            _("Hide") +
+            STR_HIDE +
             '";' +
             "  } else {" +
             '    codeBlock.style.display = "none";' +
             '    showHideButton.textContent = "' +
-            _("Show") +
+            STR_SHOW +
             '";' +
             "  }" +
             "}" +
@@ -113,7 +117,7 @@ class SaveInterface {
             '  var showHideButton = document.getElementById("showhide");' +
             '  codeBlock.style.display = "none";' +
             '  showHideButton.textContent = "' +
-            _("Show") +
+            STR_SHOW +
             '";' +
             "};" +
             "function copyCode() {" +
@@ -161,7 +165,7 @@ class SaveInterface {
         let filename = null;
         if (defaultfilename === undefined || defaultfilename === null) {
             if (this.activity.PlanetInterface === undefined) {
-                defaultfilename = _("My Project");
+                defaultfilename = STR_MY_PROJECT;
             } else {
                 defaultfilename = this.activity.PlanetInterface.getCurrentProjectName();
             }
@@ -233,7 +237,7 @@ class SaveInterface {
 
         // let author = '';
         // Currently we're using anonymous for authors - not storing names.
-        let name = _("My Project");
+        let name = STR_MY_PROJECT;
         if (this.activity.PlanetInterface !== undefined) {
             name = this.activity.PlanetInterface.getCurrentProjectName();
         }
@@ -291,7 +295,7 @@ class SaveInterface {
                     html
                 );
             } else {
-                activity.save.downloadURL(_("My Project").replace(" ", "_") + ".html", html);
+                activity.save.downloadURL(STR_MY_PROJECT.replace(" ", "_") + ".html", html);
             }
         }, 500);
     }
@@ -585,7 +589,7 @@ class SaveInterface {
         }
 
         const lyext = "ly";
-        let filename = _("My Project");
+        let filename = STR_MY_PROJECT;
         if (activity.PlanetInterface !== undefined) {
             filename = activity.PlanetInterface.getCurrentProjectName();
         }
@@ -613,7 +617,7 @@ class SaveInterface {
             docById("title").value = activity.PlanetInterface.getCurrentProjectName();
         } else {
             //.TRANS: default project title when saving as Lilypond
-            docById("title").value = _("My Project");
+            docById("title").value = STR_MY_PROJECT;
         }
 
         // Load custom author saved in local storage.
@@ -784,20 +788,49 @@ class SaveInterface {
 
     afterSaveLilypondLY(lydata, filename) {
         filename = docById("fileName").value;
-        if (platform.FF) {
-            // eslint-disable-next-line no-console
-            console.debug('execCommand("copy") does not work on FireFox');
-        } else {
-            const tmp = jQuery("<textarea />").appendTo(document.body);
-            tmp.val(lydata);
-            tmp.select();
-            tmp[0].setSelectionRange(0, lydata.length);
-            document.execCommand("copy");
-            tmp.remove();
+        const showCopiedMessage = () => {
             this.activity.textMsg(
                 _("The Lilypond code is copied to clipboard. You can paste it here: ") +
                     "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a> "
             );
+        };
+
+        const legacyCopy = () => {
+            const tmp = jQuery("<textarea />").appendTo(document.body);
+            tmp.val(lydata);
+            tmp.select();
+            tmp[0].setSelectionRange(0, lydata.length);
+            let copied = false;
+            try {
+                copied = document.execCommand("copy");
+            } catch (e) {
+                copied = false;
+            }
+            tmp.remove();
+            return copied;
+        };
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard
+                .writeText(lydata)
+                .then(showCopiedMessage)
+                .catch(err => {
+                    const copied = legacyCopy();
+                    if (copied) {
+                        showCopiedMessage();
+                    } else {
+                        // eslint-disable-next-line no-console
+                        console.debug("Clipboard copy failed:", err);
+                    }
+                });
+        } else {
+            const copied = legacyCopy();
+            if (copied) {
+                showCopiedMessage();
+            } else {
+                // eslint-disable-next-line no-console
+                console.debug("Clipboard copy failed");
+            }
         }
         this.download("ly", "data:text;utf8," + encodeURIComponent(lydata), filename);
     }

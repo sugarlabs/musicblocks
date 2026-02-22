@@ -683,3 +683,6 @@ class PitchStaircase {
         this._makeStairs(true);
     }
 }
+if (typeof module !== "undefined") {
+    module.exports = PitchStaircase;
+}

@@ -1368,7 +1368,7 @@ class Painter {
             turtles.canvas1 = document.createElement("canvas");
             turtles.canvas1.width = 3 * this.turtle.ctx.canvas.width;
             turtles.canvas1.height = 3 * this.turtle.ctx.canvas.height;
-            turtles.c1ctx = turtles.canvas1.getContext("2d");
+            turtles.c1ctx = turtles.canvas1.getContext("2d", { willReadFrequently: true });
             turtles.c1ctx.rect(
                 0,
                 0,
