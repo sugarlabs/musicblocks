@@ -58,17 +58,18 @@ Follow [AI guidelines for Sugar Labs](https://github.com/sugarlabs/sugar-docs/bl
 
 ### Before You Push
 
-Run these commands locally before submitting a PR:
+Code is automatically formatted via pre-commit hooks. When you commit, ESLint
+and Prettier will automatically run on staged files to fix any style issues.
+
+If you need to run linting manually:
 
 ```bash
-npm run lint              # ESLint
-npx prettier --check .    # Formatting
+npm run lint              # ESLint check
+npm run lint:fix          # ESLint fix + Prettier format
 npm test                  # Jest
 ```
 
-NOTE: Only run ```prettier``` on the files you have modified.
-
-If formatting fails, run `npx prettier --write .` to fix it.
+You can bypass the pre-commit hook with `git commit --no-verify` if needed.
 
 ### After your PR is merged
 
