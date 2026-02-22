@@ -60,6 +60,75 @@
    piemenuNoteValue, piemenuAccidentals, piemenuKey, piemenuChords,
    piemenuDissectNumber
 */
+/**
+ * Sets the size and positioning of the main pie menu container (wheelDiv)
+ * based on the current screen width.
+ *
+ * The wheel size adjusts responsively:
+ * - Full size for large screens (>=1200px)
+ * - Slightly reduced for tablets (>=768px)
+ * - Further reduced for small screens
+ *
+ * @param {number} [i=400] - Base diameter (in pixels) of the wheel.
+ * @returns {void}
+ */
+/**
+ * Calculates the optimal pie menu size based on the canvas dimensions
+ * associated with the current block.
+ *
+ * @param {Object} block - The block object containing turtle canvas data.
+ * @returns {number} The minimum dimension (width or height) of the canvas.
+ */
+/**
+ * Debounced wrapper for setWheelSize to improve performance during
+ * rapid window resize events.
+ *
+ * Ensures resizing logic runs only after resizing has stopped
+ * for 150 milliseconds.
+ *
+ * @returns {void}
+ */
+/**
+ * Enables scroll-based rotation for a pie menu.
+ *
+ * Allows users to rotate the wheel using the mouse scroll wheel.
+ * Navigation functions are temporarily disabled during rotation
+ * to prevent unintended sound previews.
+ *
+ * @param {Object} wheel - The wheelnav instance representing the pie menu.
+ * @param {number} itemCount - Total number of selectable items in the wheel.
+ * @returns {void}
+ */
+/**
+ * Configures the exit wheel to behave like a stateless button.
+ *
+ * Ensures the exit button does not retain selection state and
+ * clears all highlights after interaction.
+ *
+ * @param {Object} exitWheel - The wheelnav instance for the exit button.
+ * @returns {void}
+ */
+/**
+ * Creates and displays a pie menu for selecting musical pitches.
+ *
+ * This function initializes:
+ * - The main pitch selection wheel
+ * - Optional accidentals wheel
+ * - Optional octave wheel
+ * - Exit button wheel
+ *
+ * The wheel configuration varies depending on block context,
+ * such as whether it is connected to pitch, key, or frequency blocks.
+ *
+ * @param {Object} block - The block instance that triggered the pie menu.
+ * @param {string[]} noteLabels - Labels displayed on the pitch wheel.
+ * @param {string[]} noteValues - Internal pitch values corresponding to labels.
+ * @param {string[]} accidentals - Available accidental symbols.
+ * @param {string} note - Currently selected note.
+ * @param {string} accidental - Currently selected accidental.
+ * @param {boolean} [custom=false] - Whether the wheel is custom-configured.
+ * @returns {void}
+ */
 
 const setWheelSize = (i = 400) => {
     const wheelDiv = document.getElementById("wheelDiv");
