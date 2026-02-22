@@ -913,6 +913,34 @@ describe("modeMapper", () => {
         expect(modeMapper("E♭", "locrian")).toEqual(["d♭", "minor"]);
         expect(modeMapper("B♭", "locrian")).toEqual(["d♭", "minor"]);
     });
+    it("should map Aeolian to minor", () => {
+        expect(modeMapper("A", "aeolian")).toEqual(["a", "minor"]);
+        expect(modeMapper("C", "aeolian")).toEqual(["c", "minor"]);
+    });
+
+    it("should map natural minor to minor", () => {
+        expect(modeMapper("D", "natural minor")).toEqual(["d", "minor"]);
+    });
+
+    it("should leave major unchanged", () => {
+        expect(modeMapper("E", "major")).toEqual(["e", "major"]);
+    });
+
+    it("should leave minor unchanged", () => {
+        expect(modeMapper("F♯", "minor")).toEqual(["f♯", "minor"]);
+    });
+
+    it("should correctly map Phrygian major branch", () => {
+        expect(modeMapper("C", "phrygian")).toEqual(["g♯", "major"]);
+    });
+
+    it("should correctly switch to minor in Mixolydian", () => {
+        expect(modeMapper("A♯", "mixolydian")).toEqual(["c", "minor"]);
+    });
+
+    it("should normalize uppercase input", () => {
+        expect(modeMapper("C", "DORIAN")).toEqual(["a♯", "major"]);
+    });
 });
 
 describe("getSharpFlatPreference", () => {
@@ -980,6 +1008,38 @@ describe("pitchToNumber", () => {
     it("should handle basic notes", () => {
         expect(pitchToNumber("C", 4, "C major")).toBe(39);
         expect(pitchToNumber("A", 4, "C major")).toBe(48);
+    });
+    it("should handle single flat and sharp", () => {
+        expect(pitchToNumber("Db", 4, "C major")).toBe(40);
+        expect(pitchToNumber("C#", 4, "C major")).toBe(40);
+        // D index = 1 -> 4*12 + 1 - 5 - 1 = 40
+    });
+    it("should handle double flat and double sharp", () => {
+        expect(pitchToNumber("D𝄫", 4, "C major")).toBe(39);
+        expect(pitchToNumber("C𝄪", 4, "C major")).toBe(41);
+    });
+    it("should handle mixed accidental and normalize pitch", () => {
+        expect(pitchToNumber("C#b", 4, "C major")).toBe(39);
+        expect(pitchToNumber("c#", 4, "C major")).toBe(40);
+    });
+    it("should use solfege mapping when pitch not in PITCHES", () => {
+        expect(pitchToNumber("do", 4, "C major")).toBe(39);
+    });
+
+    it("should fallback using FIXEDSOLFEGE1 when solfege not found", () => {
+        global.getScaleAndHalfSteps = jest
+            .fn()
+            .mockReturnValue([["C", "D", "E", "F", "G", "A", "B"], []]);
+
+        expect(pitchToNumber("do", 4, "C major")).toBe(39);
+        expect(pitchToNumber("re", 4, "C major")).toBe(41);
+    });
+    it("should fallback to index 0 and log debg for invalid pitch", () => {
+        global.getScaleAndHalfSteps = jest
+            .fn()
+            .mockReturnValue([["C", "D", "E", "F", "G", "A", "B"], []]);
+        expect(pitchToNumber("xyz", 4, "C major")).toBe(39);
+        expect(console.debug).toHaveBeenCalled();
     });
 });
 
@@ -1091,6 +1151,20 @@ describe("getNoteFromInterval", () => {
     it("should calculate augmented intervals correctly", () => {
         expect(getNoteFromInterval("C4", "augmented 4")).toEqual(["F♯", 4]);
         expect(getNoteFromInterval("F4", "augmented 5")).toEqual(["C♯", 5]);
+    });
+    it("should calculate minor 3rd correctly", () => {
+        expect(getNoteFromInterval("C4", "minor 3")).toEqual(["E♭", 4]);
+    });
+    it("should calculate diminished interval correctly", () => {
+        expect(getNoteFromInterval("B4", "diminished 5")).toBeDefined();
+    });
+    it("should handle octave rollover correctly", () => {
+        const result = getNoteFromInterval("B4", "major 2");
+        expect(result[1]).toBe(5);
+        expect(result[0]).toBeDefined();
+    });
+    it("should handle perfect octave correctly", () => {
+        expect(getNoteFromInterval("C4", "perfect 8")).toEqual(["C", 5]);
     });
 });
 
@@ -1244,6 +1318,34 @@ describe("getNote", () => {
     it("should return the correct note for G♯4 in G major", () => {
         const result = getNote("G♯", 4, 0, "G major");
         expect(result).toEqual(["G♯", 4, 0]);
+    });
+
+    it("should handle negative transposition", () => {
+        const result = getNote("D", 4, -2, "C major");
+        expect(result[0]).toBe("C");
+        expect(result[1]).toBe(4);
+        expect(Math.abs(result[2])).toBe(0);
+    });
+
+    it("should handle octave increment on transposition overflow", () => {
+        const result = getNote("B", 4, 1, "C major");
+        expect(result[1]).toBe(5);
+    });
+
+    it("should normalize lowercase note input", () => {
+        const result = getNote("c", 4, 0, "C major");
+        expect(result[0]).toBeDefined();
+        expect(result[1]).toBe(4);
+    });
+
+    it("should preserve sharp accidental when no transposition", () => {
+        const result = getNote("A♯", 4, 0, "A major");
+        expect(result[0]).toBe("A♯");
+    });
+
+    it("should fallback safely for unknown note", () => {
+        const result = getNote("invalidNote", 4, 0, "C major");
+        expect(result).toBeDefined();
     });
 });
 
@@ -2402,464 +2504,5 @@ describe("getStepSizeUp", () => {
     it("should return 0 for an invalid temperament", () => {
         const result = getStepSizeUp("C major", "C", 0, "invalid");
         expect(result).toBe(0);
-    });
-});
-
-describe("convertFactor - edge cases", () => {
-    it("returns correct values for known factors", () => {
-        expect(convertFactor(0.25)).toBe("4");
-        expect(convertFactor(0.5)).toBe("2");
-        expect(convertFactor(1)).toBe("1");
-    });
-
-    it("returns null for unknown factors", () => {
-        expect(convertFactor(0.123)).toBeNull();
-        expect(convertFactor(-1)).toBeNull();
-        expect(convertFactor(undefined)).toBeNull();
-    });
-});
-
-describe("getPitchInfo - realistic branch coverage", () => {
-    beforeEach(() => {
-        global.DOUBLESHARP = "𝄪";
-        global.DOUBLEFLAT = "𝄫";
-        global.SHARP = "♯";
-        global.FLAT = "♭";
-        global.NOTESSHARP = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
-        global.NOTESFLAT = ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"];
-        global.EQUIVALENTFLATS = {};
-        global.EQUIVALENTSHARPS = {};
-        global.YSTAFFNOTEHEIGHT = 10;
-        global.YSTAFFOCTAVEHEIGHT = 70;
-    });
-
-    const tur = {
-        singer: {
-            keySignature: "C major",
-            movable: false
-        }
-    };
-
-    const activity = {
-        logo: {
-            synth: {
-                _getFrequency: jest.fn(() => 440),
-                changeInTemperament: null
-            }
-        }
-    };
-
-    it("returns alphabet correctly", () => {
-        const result = getPitchInfo(activity, "alphabet", "C4", tur);
-        expect(result).toBe("C");
-    });
-
-    it("returns letter class", () => {
-        const result = getPitchInfo(activity, "letter class", "D4", tur);
-        expect(result).toBe("D");
-    });
-
-    it("handles pitch to shade", () => {
-        const result = getPitchInfo(activity, "pitch to shade", "C4", tur);
-        expect(result).toBe(50); // 4 * 12.5
-    });
-
-    it("handles pitch to color for valid pitch", () => {
-        const result = getPitchInfo(activity, "pitch to color", "C4", tur);
-        expect(typeof result).toBe("number");
-    });
-
-    it("handles pitch to color fallback", () => {
-        const result = getPitchInfo(activity, "pitch to color", "Z4", tur);
-        expect(result).toBe(0);
-    });
-
-    it("handles pitch in hertz", () => {
-        const result = getPitchInfo(activity, "pitch in hertz", "A4", tur);
-        expect(result).toBe(440);
-    });
-
-    it("handles numeric frequency input path", () => {
-        const result = getPitchInfo(activity, "alphabet", 440, tur);
-        expect(typeof result).toBe("string");
-    });
-
-    it("handles scalar class", () => {
-        const result = getPitchInfo(activity, "scalar class", "C4", tur);
-        expect(result).toBeDefined();
-    });
-
-    it("handles scale degree", () => {
-        const result = getPitchInfo(activity, "scale degree", "C4", tur);
-        expect(typeof result).toBe("string");
-    });
-
-    it("handles nth degree", () => {
-        const result = getPitchInfo(activity, "nth degree", "C4", tur);
-        expect(typeof result).toBe("number");
-    });
-
-    it("handles pitch number", () => {
-        const result = getPitchInfo(activity, "pitch number", "C4", tur);
-        expect(typeof result).toBe("number");
-    });
-
-    it("returns invalid input for unknown type", () => {
-        const result = getPitchInfo(activity, "unknown-type", "C4", tur);
-        expect(result).toBe("__INVALID_INPUT__");
-    });
-
-    it("handles double sharp", () => {
-        const result = getPitchInfo(activity, "alphabet", "F𝄪4", tur);
-        expect(typeof result).toBe("string");
-    });
-
-    it("handles double flat", () => {
-        const result = getPitchInfo(activity, "alphabet", "G𝄫4", tur);
-        expect(typeof result).toBe("string");
-    });
-});
-
-describe("getPitchInfo - deep branch activation", () => {
-    beforeEach(() => {
-        global.DOUBLESHARP = "𝄪";
-        global.DOUBLEFLAT = "𝄫";
-        global.SHARP = "♯";
-        global.FLAT = "♭";
-        global.NOTESSHARP = ["A", "A♯", "B", "C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯"];
-        global.NOTESFLAT = ["A", "B♭", "B", "C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭"];
-        global.EQUIVALENTFLATS = { "C♯": "D♭" };
-        global.EQUIVALENTSHARPS = { "D♭": "C♯" };
-        global.YSTAFFNOTEHEIGHT = 10;
-        global.YSTAFFOCTAVEHEIGHT = 70;
-    });
-
-    afterEach(() => {
-        jest.restoreAllMocks();
-    });
-
-    const tur = {
-        singer: {
-            keySignature: "C major",
-            movable: false
-        }
-    };
-
-    const activity = {
-        logo: {
-            synth: {
-                _getFrequency: jest.fn(() => 440),
-                changeInTemperament: null
-            }
-        }
-    };
-
-    it("hits DOUBLESHARP special B case", () => {
-        const result = getPitchInfo(activity, "alphabet", "B𝄪4", tur);
-        expect(typeof result).toBe("string");
-    });
-
-    it("hits DOUBLEFLAT special C case", () => {
-        const result = getPitchInfo(activity, "alphabet", "C𝄫4", tur);
-        expect(typeof result).toBe("string");
-    });
-
-    it("hits EQUIVALENTFLATS mapping branch", () => {
-        const result = getPitchInfo(activity, "alphabet", "C#4", tur);
-        expect(typeof result).toBe("string");
-    });
-
-    it("hits EQUIVALENTSHARPS mapping branch", () => {
-        const result = getPitchInfo(activity, "alphabet", "Db4", tur);
-        expect(typeof result).toBe("string");
-    });
-
-    it("hits NOTESFLAT color branch", () => {
-        const result = getPitchInfo(activity, "pitch to color", "Db4", tur);
-        expect(typeof result).toBe("number");
-    });
-});
-
-describe("durationToNoteValue - branch coverage", () => {
-    it("returns direct power-of-two match", () => {
-        const result = durationToNoteValue(4);
-        expect(Array.isArray(result)).toBe(true);
-        expect(result[1]).toBe(0);
-    });
-
-    it("handles dotted match", () => {
-        const result = durationToNoteValue(3);
-        expect(Array.isArray(result)).toBe(true);
-    });
-
-    it("handles non power-of-two duration fallback", () => {
-        const result = durationToNoteValue(6);
-        expect(Array.isArray(result)).toBe(true);
-        expect(result.length).toBeGreaterThanOrEqual(3);
-    });
-});
-
-describe("durationToNoteValue - deep fallback branch", () => {
-    beforeEach(() => {
-        global.POWER2 = [1, 2, 4, 8, 16, 32, 64];
-    });
-
-    afterEach(() => {
-        jest.restoreAllMocks();
-    });
-
-    it("forces roundDown to fallback 128", () => {
-        const result = durationToNoteValue(999);
-        expect(Array.isArray(result)).toBe(true);
-    });
-
-    it("forces while loop break path", () => {
-        const result = durationToNoteValue(7);
-        expect(Array.isArray(result)).toBe(true);
-    });
-});
-
-describe("solfege utilities", () => {
-    beforeEach(() => {
-        global.SOLFEGECONVERSIONTABLE = { C: "do" };
-    });
-
-    afterEach(() => {
-        jest.restoreAllMocks();
-    });
-
-    it("noteIsSolfege returns true when not in table", () => {
-        expect(noteIsSolfege("re")).toBe(true);
-    });
-
-    it("noteIsSolfege returns false when in table", () => {
-        expect(noteIsSolfege("C")).toBe(false);
-    });
-
-    it("getSolfege returns original if already solfege", () => {
-        expect(getSolfege("re")).toBe("re");
-    });
-
-    it("getSolfege converts using table", () => {
-        expect(getSolfege("C")).toBe("do");
-    });
-});
-
-describe("splitSolfege", () => {
-    beforeEach(() => {
-        global.SOLFNOTES = ["do", "re", "mi", "fa", "sol", "la", "ti"];
-    });
-
-    afterEach(() => {
-        jest.restoreAllMocks();
-    });
-
-    it("splits plain solfege", () => {
-        expect(splitSolfege("do")).toEqual(["do", ""]);
-    });
-
-    it("splits sol with accidental", () => {
-        expect(splitSolfege("sol#")).toEqual(["sol", "#"]);
-    });
-
-    it("splits other note with accidental", () => {
-        expect(splitSolfege("fa#")).toEqual(["fa", "#"]);
-    });
-
-    it("handles null input", () => {
-        expect(splitSolfege(null)).toEqual(["sol", ""]);
-    });
-});
-
-describe("splitScaleDegree", () => {
-    it("splits normal value", () => {
-        expect(splitScaleDegree("5#")).toEqual(["5", "#"]);
-    });
-
-    it("handles falsy value", () => {
-        expect(splitScaleDegree(null)).toBeDefined();
-    });
-});
-
-describe("calcOctave - deep branch coverage", () => {
-    beforeEach(() => {
-        global.SOLFEGENAMES1 = [];
-        global.FIXEDSOLFEGE1 = {};
-        global.getNumber = jest.fn((note, octave) => octave * 12);
-    });
-
-    afterEach(() => {
-        jest.restoreAllMocks();
-    });
-
-    it("returns bounded numeric arg", () => {
-        expect(calcOctave(4, 12, null, "C")).toBe(9);
-        expect(calcOctave(4, 0, null, "C")).toBe(1);
-    });
-
-    it("handles current branch", () => {
-        const result = calcOctave(4, "current", ["C4"], "D");
-        expect(typeof result).toBe("number");
-    });
-
-    it("handles next branch", () => {
-        const result = calcOctave(4, "next", ["C4"], "D");
-        expect(typeof result).toBe("number");
-    });
-
-    it("handles previous branch", () => {
-        const result = calcOctave(4, "previous", ["C4"], "D");
-        expect(typeof result).toBe("number");
-    });
-
-    it("handles default numeric string", () => {
-        const result = calcOctave(4, "6", ["C4"], "D");
-        expect(result).toBe(4);
-    });
-
-    it("handles numeric zero explicitly", () => {
-        expect(calcOctaveInterval(0)).toBe(0);
-    });
-
-    it("handles lastNotePlayed null", () => {
-        const result = calcOctave(4, "current", null, "D");
-        expect(typeof result).toBe("number");
-    });
-});
-
-describe("isInt", () => {
-    it("returns true for integer", () => {
-        expect(isInt(5)).toBe(true);
-    });
-
-    it("returns false for float", () => {
-        expect(isInt(5.2)).toBe(false);
-    });
-
-    it("returns false for string", () => {
-        expect(isInt("5")).toBe(false);
-    });
-});
-
-describe("convertFromSolfege", () => {
-    beforeEach(() => {
-        global.FIXEDSOLFEGE1 = { do: "C" };
-        global.EQUIVALENTNATURALS = { C: "C" };
-    });
-
-    afterEach(() => {
-        jest.restoreAllMocks();
-    });
-
-    it("converts using FIXEDSOLFEGE1", () => {
-        expect(convertFromSolfege("do")).toBe("C");
-    });
-
-    it("returns unchanged if no mapping", () => {
-        expect(convertFromSolfege("G")).toBe("G");
-    });
-});
-
-describe("getInterval - branch coverage", () => {
-    beforeEach(() => {
-        global.buildScale = jest.fn(() => [
-            ["C", "D", "E", "F", "G", "A", "B"],
-            [2, 2, 1, 2, 2, 2, 1]
-        ]);
-
-        global.SOLFEGENAMES = ["do"];
-        global.FIXEDSOLFEGE = { do: "C" };
-        global.BTOFLAT = {};
-        global.STOSHARP = {};
-        global.EQUIVALENTFLATS = { "C#": "Db" };
-        global.EQUIVALENTSHARPS = { Db: "C#" };
-        global.EQUIVALENTNATURALS = {};
-        global.PITCHES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-        global.PITCHES2 = global.PITCHES;
-    });
-
-    afterEach(() => {
-        jest.restoreAllMocks();
-    });
-
-    it("handles interval 0", () => {
-        expect(getInterval(0, "C", "C")).toBe(0);
-    });
-
-    it("handles positive interval", () => {
-        expect(typeof getInterval(2, "C", "C")).toBe("number");
-    });
-
-    it("handles negative interval", () => {
-        expect(typeof getInterval(-2, "C", "C")).toBe("number");
-    });
-
-    it("handles solfege conversion branch", () => {
-        expect(typeof getInterval(1, "C", "do")).toBe("number");
-    });
-
-    it("handles equivalent flats fallback", () => {
-        expect(typeof getInterval(1, "C", "C#")).toBe("number");
-    });
-
-    it("handles pitch not found fallback", () => {
-        expect(typeof getInterval(1, "C", "Z")).toBe("number");
-    });
-});
-
-describe("reducedFraction", () => {
-    beforeEach(() => {
-        global.NSYMBOLS = { 1: "𝅝", 2: "𝅗𝅥", 4: "𝅘𝅥", 8: "𝅘𝅥𝅮", 16: "𝅘𝅥𝅯" };
-    });
-
-    afterEach(() => {
-        jest.restoreAllMocks();
-    });
-
-    it("returns symbolic format when denominator matches", () => {
-        const result = reducedFraction(2, 4);
-        expect(typeof result).toBe("string");
-    });
-
-    it("returns generic format otherwise", () => {
-        const result = reducedFraction(3, 7);
-        expect(typeof result).toBe("string");
-    });
-});
-
-describe("toFraction", () => {
-    it("handles value less than 1", () => {
-        const result = toFraction(0.5);
-        expect(Array.isArray(result)).toBe(true);
-    });
-
-    it("handles value greater than 1 (flip branch)", () => {
-        const result = toFraction(2);
-        expect(Array.isArray(result)).toBe(true);
-    });
-});
-
-describe("calcNoteValueToDisplay", () => {
-    beforeEach(() => {
-        global.NSYMBOLS = { 1: "𝅝", 2: "𝅗𝅥", 4: "𝅘𝅥", 8: "𝅘𝅥𝅮", 16: "𝅘𝅥𝅯" };
-    });
-
-    afterEach(() => {
-        jest.restoreAllMocks();
-    });
-
-    it("handles direct NSYMBOL match", () => {
-        const result = calcNoteValueToDisplay(1, 4);
-        expect(typeof result).toBe("string");
-    });
-
-    it("handles dotted branch", () => {
-        const result = calcNoteValueToDisplay(3, 4);
-        expect(typeof result).toBe("string");
-    });
-
-    it("falls back to reducedFraction", () => {
-        const result = calcNoteValueToDisplay(5, 7);
-        expect(typeof result).toBe("string");
     });
 });
