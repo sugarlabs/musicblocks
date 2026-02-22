@@ -53,6 +53,21 @@ function resolveGlobalByPath(path) {
 }
 
 /**
+ * Resolve an API class name to its value using the static registry first,
+ * then fall back to resolving a global by path. This preserves the safe
+ * registry-based lookup while retaining backward compatibility with
+ * test/legacy globals that may be injected at runtime.
+ */
+function resolveApiClass(className) {
+    const registry = getStaticApiClassRegistry();
+    const getApiClass = registry[className];
+    if (getApiClass) {
+        return getApiClass();
+    }
+    return resolveGlobalByPath(className);
+}
+
+/**
  * @class
  * @classdesc pertains to the Mouse (corresponding to Turtle) in JavaScript based Music Blocks programs.
  */
@@ -200,14 +215,11 @@ class MusicBlocks {
                     return;
                 }
 
-                const getApiClass = apiClassRegistry[className];
-                if (!getApiClass) {
-                    throw new Error(`Unknown API class for method enumeration: ${className}`);
-                }
-
-                const apiClass = getApiClass();
+                // Use the same safe resolution strategy used by dispatch so
+                // enumeration remains compatible with injected globals.
+                const apiClass = resolveApiClass(className);
                 if (!apiClass) {
-                    throw new Error(`API class resolver returned empty value: ${className}`);
+                    throw new Error(`Unknown API class for method enumeration: ${className}`);
                 }
 
                 for (const methodName of Object.getOwnPropertyNames(apiClass)) {

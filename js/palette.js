@@ -1010,6 +1010,11 @@ class Palette {
                     const getPaletteImage = BUILTIN_IMAGE_PALETTE_REGISTRY[b.blkname];
                     if (getPaletteImage) {
                         img = makePaletteIcons(getPaletteImage());
+                    } else {
+                        // Fallback: preserve previous behavior and warn so missing registry
+                        // entries are visible during development/runtime.
+                        console.warn(`Missing built-in palette image for ${b.blkname}`);
+                        img = makePaletteIcons(this.activity.pluginsImages[b.blkname]);
                     }
                 } else {
                     // or use the plugin image...
@@ -1443,7 +1448,7 @@ class Palette {
                 // Add variables first
                 for (let i = 0; i < foundVariables.length; i++) {
                     const [blockId, blockType] = foundVariables[i];
-                    const block = activity.blocks.blockList[blockId];
+                    const block = this.activity.blocks.blockList[blockId];
                     const isLastVar = i === foundVariables.length - 1;
                     const hasBoxes = boxBlocks.length > 0;
 
@@ -1474,7 +1479,7 @@ class Palette {
                 // Then add box blocks
                 for (let i = 0; i < boxBlocks.length; i++) {
                     const boxBlockId = boxBlocks[i];
-                    const boxBlock = activity.blocks.blockList[boxBlockId];
+                    const boxBlock = this.activity.blocks.blockList[boxBlockId];
 
                     statusBlocks.push([
                         lastBlockIndex + 1,
