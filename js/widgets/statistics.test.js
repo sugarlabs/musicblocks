@@ -4,7 +4,8 @@
  * @author Divyam Agarwal
  *
  * @copyright 2026 Divyam Agarwal
- *
+ * @copyright 2026 Om-A-osc
+ * 
  * @license
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
