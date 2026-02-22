@@ -12,7 +12,7 @@
 //A dropdown for selecting language
 
 /*
-   global _
+   global _, createHelpContent
 */
 
 /* exported LanguageBox */
@@ -207,80 +207,32 @@ class LanguageBox {
         this.hide();
     }
 
-    /**
-     * @public
-     * @returns {void}
-     */
-    OnClick() {
-        this.reload();
-    }
-
-    /**
-     * @public
-     * @returns {void}
-     */
     reload() {
         window.location.reload();
     }
 
     hide() {
-        const MSGPrefix =
-            "<a href='#' class='language-link' " +
-            "onMouseOver='this.style.opacity = 0.5'" +
-            "onMouseOut='this.style.opacity = 1'>";
-        const MSGSuffix = "</a>";
-        const MSG = {
-            default: _("Refresh your browser to change your language preference."),
-            enUS: "Refresh your browser to change your language preference.",
-            enUK: "Refresh your browser to change your language preference.",
-            ja: "言語を変えるには、ブラウザをこうしんしてください。",
-            kana: "げんごを かえるには、ブラウザを こうしんしてください。",
-            ko: "언어 기본 설정을 변경하려면 브라우저를 새로 고치십시오.",
-            es: "Actualice su navegador para cambiar su preferencia de idioma.",
-            pt: "Atualize seu navegador para alterar sua preferência de idioma.",
-            zh_CN: "刷新浏览器以更改您的语言偏好",
-            th: "รีเฟรชเบราเซอร์เพื่อเปลี่ยนการตั้งค่าภาษาของคุณ",
-            hi: "अपनी भाषा की वरीयता बदलने के लिए अपना ब्राउज़र ताज़ा करें",
-            te: "మీ భాష ప్రాధాన్యతను మార్చడానికి మీ బ్రౌజర్‌ని రిఫ్రెష్ చేయండి.",
-            tr: "dil tercihinizi değiştirmek için tarayıcınızı yenileyin",
-            ibo: "Mee ka nchọgharị gị gbanwee mmasị asụsụ gị.",
-            ar: "حدث المتصفح لتغيير تفضيلات اللغة.",
-            he: "רענן את הדפדפן כדי לשנות את העדפת השפה שלך.",
-            ayc: "Actualice su navegador para cambiar su preferencia de idioma.",
-            quz: "Actualice su navegador para cambiar su preferencia de idioma.",
-            bn: "ভাষা পরিবর্তন করতে আপনার ব্রাউজার রিফ্রেশ করুন।",
-            gug: "Actualice su navegador para cambiar su preferencia de idioma.",
-            ur: "اپنی زبان کی ترجیح کو تبدیل کرنے کے لئے اپنے براؤزر کو تازہ دم کریں۔"
-        };
-        if (localStorage.getItem("languagePreference") === this._language) {
-            if (this._language.includes("ja")) {
-                this._language = this._language.split("-")[0];
-            }
+        let lang = this._language;
 
-            try {
-                localStorage.setItem("languagePreference", this._language);
-            } catch (e) {
-                console.warn("Could not save language preference:", e);
-            }
-            this.activity.textMsg(_("Music Blocks is already set to this language."));
-        } else {
-            this.activity.storage.languagePreference = this._language;
-
-            if (this._language === "ja" && this.activity.storage.kanaPreference === "kana") {
-                this.activity.textMsg(MSGPrefix + MSG["kana"] + MSGSuffix);
-            } else {
-                if (this._language.includes("ja")) {
-                    this._language = this._language.split("-")[0];
-                }
-
-                this.activity.textMsg(MSGPrefix + MSG[this._language] + MSGSuffix);
-            }
+        // Extract base language code for Japanese variations
+        if (lang.includes("ja")) {
+            lang = lang.split("-")[0];
         }
 
-        const languageLinks = document.querySelectorAll(".language-link");
-        languageLinks.forEach(link => {
-            link.addEventListener("click", () => this.OnClick());
-        });
+        // Save the project before switching languages to prevent data loss
+        if (this.activity && typeof this.activity.saveLocally === "function") {
+            this.activity.saveLocally();
+        }
+
+        // Update localStorage with the new language setting
+        try {
+            localStorage.setItem("languagePreference", lang);
+        } catch (e) {
+            console.warn("Could not save language preference:", e);
+        }
+
+        // Force a browser reload to apply the new language
+        window.location.reload();
     }
 }
 if (typeof module !== "undefined" && module.exports) {
