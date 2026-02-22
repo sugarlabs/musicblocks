@@ -32,7 +32,7 @@ define(["p5.sound.min"], function () {
     // and sometimes the reference check fails (e.g. if p5.sound wraps it in a way that preserves identity or if we missed the timing).
     // The error "s.connect(...) is undefined" confirms we MUST ensure a return value.
     if (window.AudioNode && window.AudioNode.prototype) {
-        var currentConnect = window.AudioNode.prototype.connect;
+        const currentConnect = window.AudioNode.prototype.connect;
 
         // Avoid double-patching if we already did it
         if (!currentConnect.isP5AdapterPatched) {
@@ -41,7 +41,7 @@ define(["p5.sound.min"], function () {
             );
 
             window.AudioNode.prototype.connect = function () {
-                var result = currentConnect.apply(this, arguments);
+                const result = currentConnect.apply(this, arguments);
                 // If the result is undefined (which breaks Tone.js chaining), return the destination (arguments[0])
                 if (result === undefined) {
                     return arguments[0];

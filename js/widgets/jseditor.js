@@ -599,6 +599,7 @@ class JSEditor {
         this.widgetWindow.takeFocus();
 
         this._setupDividerResize(divider, editorContainer, editorconsole, consolelabel);
+        this._setupWindowResize();
 
         window.jsEditor = this;
 
@@ -647,6 +648,168 @@ class JSEditor {
     }
 
     /**
+     * Setup resize handles for the entire editor window.
+     * Allows users to resize by dragging edges (left, right, bottom) and corners.
+     * @returns {void}
+     */
+    _setupWindowResize() {
+        const windowFrame = this.widgetWindow._frame;
+        const windowBody = this.widgetWindow._body;
+
+        // Create resize handles
+        const createHandle = (position, cursor) => {
+            const handle = document.createElement("div");
+            handle.className = `resize-handle resize-handle-${position}`;
+            handle.style.position = "absolute";
+            handle.style.zIndex = "1000";
+
+            // Common styles for all handles
+            const handleStyles = {
+                "right": {
+                    top: "32px",
+                    right: "0",
+                    width: "5px",
+                    height: "calc(100% - 32px)",
+                    cursor: "ew-resize"
+                },
+                "left": {
+                    top: "32px",
+                    left: "0",
+                    width: "5px",
+                    height: "calc(100% - 32px)",
+                    cursor: "ew-resize"
+                },
+                "bottom": {
+                    bottom: "0",
+                    left: "0",
+                    width: "100%",
+                    height: "5px",
+                    cursor: "ns-resize"
+                },
+                "bottom-right": {
+                    bottom: "0",
+                    right: "0",
+                    width: "15px",
+                    height: "15px",
+                    cursor: "nwse-resize"
+                },
+                "bottom-left": {
+                    bottom: "0",
+                    left: "0",
+                    width: "15px",
+                    height: "15px",
+                    cursor: "nesw-resize"
+                }
+            };
+
+            Object.assign(handle.style, handleStyles[position]);
+            handle.style.background = "transparent";
+            handle.style.transition = "background 0.2s";
+
+            // Visual feedback on hover
+            handle.addEventListener("mouseenter", () => {
+                handle.style.background = "rgba(33, 150, 243, 0.3)";
+            });
+            handle.addEventListener("mouseleave", () => {
+                handle.style.background = "transparent";
+            });
+
+            return handle;
+        };
+
+        // Add handles to window frame
+        const handles = {
+            right: createHandle("right"),
+            left: createHandle("left"),
+            bottom: createHandle("bottom"),
+            bottomRight: createHandle("bottom-right"),
+            bottomLeft: createHandle("bottom-left")
+        };
+
+        Object.values(handles).forEach(handle => windowFrame.appendChild(handle));
+
+        // Resize logic
+        let isResizing = false;
+        let resizeDirection = null;
+        let startX, startY, startWidth, startHeight, startLeft, startTop;
+
+        const startResize = (e, direction) => {
+            if (this.widgetWindow._maximized) return; // Don't resize when maximized
+
+            isResizing = true;
+            resizeDirection = direction;
+            startX = e.clientX;
+            startY = e.clientY;
+
+            const rect = windowFrame.getBoundingClientRect();
+            startWidth = rect.width;
+            startHeight = rect.height;
+            startLeft = rect.left;
+            startTop = rect.top;
+
+            e.preventDefault();
+            e.stopPropagation();
+        };
+
+        const doResize = e => {
+            if (!isResizing) return;
+
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+
+            let newWidth = startWidth;
+            let newHeight = startHeight;
+            let newLeft = startLeft;
+
+            // Calculate new dimensions based on direction
+            if (resizeDirection.includes("right")) {
+                newWidth = Math.max(400, startWidth + deltaX);
+            }
+            if (resizeDirection.includes("left")) {
+                const widthDelta = startWidth - deltaX;
+                if (widthDelta >= 400) {
+                    newWidth = widthDelta;
+                    newLeft = startLeft + deltaX;
+                }
+            }
+            if (resizeDirection.includes("bottom")) {
+                newHeight = Math.max(300, startHeight + deltaY);
+            }
+
+            // Apply new dimensions
+            windowFrame.style.width = newWidth + "px";
+            windowFrame.style.height = newHeight + "px";
+
+            if (resizeDirection.includes("left")) {
+                windowFrame.style.left = newLeft + "px";
+            }
+
+            // Update editor content size
+            const editorDiv = this._editor;
+            if (editorDiv) {
+                editorDiv.style.width = newWidth + "px";
+                editorDiv.style.height = newHeight - 32 + "px"; // Subtract title bar height
+            }
+        };
+
+        const stopResize = () => {
+            if (!isResizing) return;
+            isResizing = false;
+            resizeDirection = null;
+        };
+
+        // Attach event listeners
+        handles.right.addEventListener("mousedown", e => startResize(e, "right"));
+        handles.left.addEventListener("mousedown", e => startResize(e, "left"));
+        handles.bottom.addEventListener("mousedown", e => startResize(e, "bottom"));
+        handles.bottomRight.addEventListener("mousedown", e => startResize(e, "bottom-right"));
+        handles.bottomLeft.addEventListener("mousedown", e => startResize(e, "bottom-left"));
+
+        document.addEventListener("mousemove", doResize);
+        document.addEventListener("mouseup", stopResize);
+    }
+
+    /**
      * Sets up scroll synchronization between line numbers and debug buttons
      * @returns {void}
      */
@@ -673,20 +836,24 @@ class JSEditor {
      */
     static logConsole(message, color) {
         if (color === undefined) color = "midnightblue";
-        if (docById("editorConsole")) {
-            if (docById("editorConsole").innerHTML !== "")
-                docById("editorConsole").innerHTML += "</br>";
-            docById("editorConsole").innerHTML += `<span style="color: ${color}">${message}</span>`;
+        const consoleEl = docById("editorConsole");
+        if (consoleEl) {
+            if (consoleEl.childNodes.length > 0) {
+                consoleEl.appendChild(document.createElement("br"));
+            }
+            const line = document.createElement("span");
+            line.style.color = color;
+            line.textContent = message;
+            consoleEl.appendChild(line);
         } else {
             // console.error("EDITOR MISSING!");
         }
-        // eslint-disable-next-line
-        console.log("%c" + message, `color: ${color}`);
     }
 
     static clearConsole() {
-        if (docById("editorConsole")) {
-            docById("editorConsole").innerHTML = "";
+        const consoleEl = docById("editorConsole");
+        if (consoleEl) {
+            consoleEl.textContent = "";
         }
     }
 
@@ -998,4 +1165,8 @@ class JSEditor {
 
         JSEditor.logConsole("Status window opened.", "green");
     }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { JSEditor };
 }

@@ -345,16 +345,9 @@ class Painter {
             let cy = ny;
             let sa = oAngleRadians - Math.PI;
             let ea = oAngleRadians;
-            this.turtle.ctx.arc(cx, cy, step, sa, ea, false);
-
-            nxScaled = (nx + dx) * turtlesScale;
-            nyScaled = (ny + dy) * turtlesScale;
-
-            let radiusScaled = step * turtlesScale;
 
             const steps = Math.max(Math.floor(savedStroke, 1));
-            this._svgArc(steps, cx * turtlesScale, cy * turtlesScale, radiusScaled, sa);
-            this._svgOutput += nxScaled + "," + nyScaled + " ";
+            this._svgArc(steps, cx, cy, step, sa, ea, false, true);
 
             this.turtle.ctx.lineTo(ox + dx, oy + dy);
             nxScaled = (ox + dx) * turtlesScale;
@@ -370,14 +363,9 @@ class Painter {
             cy = oy;
             sa = oAngleRadians - Math.PI;
             ea = oAngleRadians;
-            this.turtle.ctx.arc(cx, cy, step, sa, ea, false);
 
-            nxScaled = (ox + dx) * turtlesScale;
-            nyScaled = (oy + dy) * turtlesScale;
-
-            radiusScaled = step * turtlesScale;
-            this._svgArc(steps, cx * turtlesScale, cy * turtlesScale, radiusScaled, sa);
-            this._svgOutput += nxScaled + "," + nyScaled + " ";
+            const stepsFinal = Math.max(Math.floor(savedStroke, 1));
+            this._svgArc(stepsFinal, cx, cy, step, sa, ea, false, true);
 
             this.closeSVG();
 
@@ -470,17 +458,71 @@ class Painter {
      * @param sa - start angle
      * @param ea - end angle
      */
-    _svgArc(nsteps, cx, cy, radius, sa, ea) {
-        // Import SVG arcs reliably
-        let a = sa;
-        const da = ea == null ? Math.PI / nsteps : (ea - sa) / nsteps;
+    _svgArc(nsteps, cx, cy, radius, sa, ea, anticlockwise, drawOnCanvas) {
+        const turtlesScale = this.turtles.scale;
+        let diff = ea - sa;
 
-        for (let i = 0; i < nsteps; i++) {
-            const nx = cx + radius * Math.cos(a);
-            const ny = cy + radius * Math.sin(a);
-            this._svgOutput += nx + "," + ny + " ";
-            a += da;
+        // Match canvas arc logic for anticlockwise wrapping
+        if (!anticlockwise && diff < 0) {
+            diff += 2 * Math.PI;
+        } else if (anticlockwise && diff > 0) {
+            diff -= 2 * Math.PI;
         }
+
+        for (let i = 1; i <= nsteps; i++) {
+            const t = i / nsteps;
+            const angle = sa + diff * t;
+            const nx = cx + radius * Math.cos(angle);
+            const ny = cy + radius * Math.sin(angle);
+            this._svgOutput += nx * turtlesScale + "," + ny * turtlesScale + " ";
+            if (drawOnCanvas) {
+                this.turtle.ctx.lineTo(nx, ny);
+            }
+        }
+    }
+
+    /**
+     * Discrete sampling of a cubic Bezier curve for SVG export.
+     * Matches the philosophy of _svgArc() to ensure pixel-perfect parity
+     * with canvas. Coordinates are computed in screen space and scaled
+     * only at the moment of emission to avoid precision drift.
+     *
+     * @private
+     * @param nsteps - number of segments to sample
+     * @param x0, y0 - start point
+     * @param cx1, cy1 - control point 1
+     * @param cx2, cy2 - control point 2
+     * @param x1, y1 - end point
+     */
+    _svgBezier(nsteps, x0, y0, cx1, cy1, cx2, cy2, x1, y1, drawOnCanvas) {
+        const turtlesScale = this.turtles.scale;
+        for (let i = 1; i <= nsteps; i++) {
+            const t = i / nsteps;
+            const mt = 1 - t;
+            const mt2 = mt * mt;
+            const mt3 = mt2 * mt;
+            const t2 = t * t;
+            const t3 = t2 * t;
+
+            const nx = mt3 * x0 + 3 * mt2 * t * cx1 + 3 * mt * t2 * cx2 + t3 * x1;
+            const ny = mt3 * y0 + 3 * mt2 * t * cy1 + 3 * mt * t2 * cy2 + t3 * y1;
+            this._svgOutput += nx * turtlesScale + "," + ny * turtlesScale + " ";
+            if (drawOnCanvas) {
+                this.turtle.ctx.lineTo(nx, ny);
+            }
+        }
+    }
+    _estimateBezierSteps(x0, y0, cx1, cy1, cx2, cy2, x1, y1) {
+        const chord = Math.hypot(x1 - x0, y1 - y0);
+
+        const contNet =
+            Math.hypot(cx1 - x0, cy1 - y0) +
+            Math.hypot(cx2 - cx1, cy2 - cy1) +
+            Math.hypot(x1 - cx2, y1 - cy2);
+
+        const flatness = contNet - chord;
+
+        return Math.max(12, Math.ceil(Math.sqrt(flatness) * 3));
     }
 
     /**
@@ -555,18 +597,16 @@ class Painter {
             }
             this._svgOutput += '<path d="M ' + oxScaled + "," + oyScaled + " ";
 
-            this.turtle.ctx.arc(cx, cy, radius + step, sa, ea, anticlockwise);
-            const nsteps = Math.max(Math.floor((radius * Math.abs(sa - ea)) / 2), 2);
+            let diff = ea - sa;
+            if (!anticlockwise && diff < 0) {
+                diff += 2 * Math.PI;
+            } else if (anticlockwise && diff > 0) {
+                diff -= 2 * Math.PI;
+            }
+            const nsteps = Math.max(Math.floor((radius * Math.abs(diff)) / 2), 2);
             const steps = Math.max(Math.floor(savedStroke, 1));
 
-            this._svgArc(
-                nsteps,
-                cx * turtlesScale,
-                cy * turtlesScale,
-                (radius + step) * turtlesScale,
-                sa,
-                ea
-            );
+            this._svgArc(nsteps, cx, cy, radius + step, sa, ea, anticlockwise, true);
 
             capAngleRadians = ((this.turtle.orientation + 90) * Math.PI) / 180.0;
             dx = step * Math.sin(capAngleRadians);
@@ -576,37 +616,13 @@ class Painter {
             const cy1 = ny;
             const sa1 = ea;
             const ea1 = ea + Math.PI;
-            this.turtle.ctx.arc(cx1, cy1, step, sa1, ea1, anticlockwise);
-            this._svgArc(
-                steps,
-                cx1 * turtlesScale,
-                cy1 * turtlesScale,
-                step * turtlesScale,
-                sa1,
-                ea1
-            );
-            this.turtle.ctx.arc(cx, cy, radius - step, ea, sa, !anticlockwise);
-            this._svgArc(
-                nsteps,
-                cx * turtlesScale,
-                cy * turtlesScale,
-                (radius - step) * turtlesScale,
-                ea,
-                sa
-            );
+            this._svgArc(steps, cx1, cy1, step, sa1, ea1, anticlockwise, true);
+            this._svgArc(nsteps, cx, cy, radius - step, ea, sa, !anticlockwise, true);
             const cx2 = ox;
             const cy2 = oy;
             const sa2 = sa - Math.PI;
             const ea2 = sa;
-            this.turtle.ctx.arc(cx2, cy2, step, sa2, ea2, anticlockwise);
-            this._svgArc(
-                steps,
-                cx2 * turtlesScale,
-                cy2 * turtlesScale,
-                step * turtlesScale,
-                sa2,
-                ea2
-            );
+            this._svgArc(steps, cx2, cy2, step, sa2, ea2, anticlockwise, true);
             this.closeSVG();
 
             this.turtle.ctx.stroke();
@@ -618,7 +634,6 @@ class Painter {
             this.turtle.ctx.lineCap = "round";
             this.turtle.ctx.moveTo(nx, ny);
         } else if (this._penDown) {
-            this.turtle.ctx.arc(cx, cy, radius, sa, ea, anticlockwise);
             if (!this._svgPath) {
                 this._svgPath = true;
                 const oxScaled = ox * turtlesScale;
@@ -626,23 +641,16 @@ class Painter {
                 this._svgOutput += '<path d="M ' + oxScaled + "," + oyScaled + " ";
             }
 
-            const sweep = anticlockwise ? 0 : 1;
+            let diff = ea - sa;
+            if (!anticlockwise && diff < 0) {
+                diff += 2 * Math.PI;
+            } else if (anticlockwise && diff > 0) {
+                diff -= 2 * Math.PI;
+            }
 
-            const nxScaled = nx * turtlesScale;
-            const nyScaled = ny * turtlesScale;
-            const radiusScaled = radius * turtlesScale;
-            this._svgOutput +=
-                "A " +
-                radiusScaled +
-                "," +
-                radiusScaled +
-                " 0 0 " +
-                sweep +
-                " " +
-                nxScaled +
-                "," +
-                nyScaled +
-                " ";
+            const nsteps = Math.max(Math.floor((radius * Math.abs(diff)) / 2), 10);
+            this._svgArc(nsteps, cx, cy, radius, sa, ea, anticlockwise, true);
+
             this.turtle.ctx.stroke();
             if (!this._fillState) {
                 this.turtle.ctx.closePath();
@@ -658,8 +666,8 @@ class Painter {
             this.turtle.x = x;
             this.turtle.y = y;
         } else {
-            this.turtle.x = this.screenX2turtles.turtleX(x);
-            this.turtle.y = this.screenY2turtles.turtleY(y);
+            this.turtle.x = turtles.screenX2turtleX(x);
+            this.turtle.y = turtles.screenY2turtleY(y);
         }
     }
 
@@ -996,7 +1004,7 @@ class Painter {
     }
 
     /**
-     * Draws a bezier curve.
+     * Moves turtle to ending point in a bezier curve.
      *
      * @param x2 - the x-coordinate of the ending point
      * @param y2 - the y-coordinate of the ending point
@@ -1007,8 +1015,6 @@ class Painter {
         const cp2x = this.cp2x;
         const cp2y = this.cp2y;
 
-        // FIXME: Add SVG output
-
         let fx, fy;
         let ax, ay, bx, by, cx, cy, dx, dy;
         let dxi, dyi, dxf, dyf;
@@ -1017,8 +1023,6 @@ class Painter {
         const turtlesScale = turtles.scale;
 
         if (this._penDown && this._hollowState) {
-            // Convert from turtle coordinates to screen coordinates
-            /* eslint-disable no-unused-vars */
             fx = turtles.turtleX2screenX(x2);
             fy = turtles.turtleY2screenY(y2);
             const ix = turtles.turtleX2screenX(this.turtle.x);
@@ -1028,104 +1032,124 @@ class Painter {
             const cx2 = turtles.turtleX2screenX(cp2x);
             const cy2 = turtles.turtleY2screenY(cp2y);
 
-            // Close the current SVG path
-            this.closeSVG();
-
-            // Save the current stroke width
             const savedStroke = this.stroke;
             this.stroke = 1;
             this.turtle.ctx.lineWidth = this.stroke;
             this.turtle.ctx.lineCap = "round";
 
-            // Draw a hollow line
             const step = savedStroke < 3 ? 0.5 : (savedStroke - 2) / 2;
             const steps = Math.max(Math.floor(savedStroke, 1));
 
-            /* We need both the initial and final headings */
-            // The initial heading is the angle between (cp1x, cp1y) and (this.turtle.x, this.turtle.y)
             let degreesInitial = Math.atan2(cp1x - this.turtle.x, cp1y - this.turtle.y);
             degreesInitial = (180 * degreesInitial) / Math.PI;
             if (degreesInitial < 0) {
                 degreesInitial += 360;
             }
 
-            // The final heading is the angle between (cp2x, cp2y) and (fx, fy)
             let degreesFinal = Math.atan2(x2 - cp2x, y2 - cp2y);
             degreesFinal = (180 * degreesFinal) / Math.PI;
             if (degreesFinal < 0) {
                 degreesFinal += 360;
             }
 
-            // We also need to calculate the deltas for the 'caps' at each end
             const capAngleRadiansInitial = ((degreesInitial - 90) * Math.PI) / 180.0;
-            dxi = step * Math.sin(capAngleRadiansInitial);
-            dyi = -step * Math.cos(capAngleRadiansInitial);
+            const dxi = step * Math.sin(capAngleRadiansInitial);
+            const dyi = -step * Math.cos(capAngleRadiansInitial);
             const capAngleRadiansFinal = ((degreesFinal - 90) * Math.PI) / 180.0;
-            dxf = step * Math.sin(capAngleRadiansFinal);
-            dyf = -step * Math.cos(capAngleRadiansFinal);
+            const dxf = step * Math.sin(capAngleRadiansFinal);
+            const dyf = -step * Math.cos(capAngleRadiansFinal);
 
-            // The four 'corners'
-            ax = ix - dxi;
-            ay = iy - dyi;
-            const axScaled = ax * turtlesScale;
-            const ayScaled = ay * turtlesScale;
-            bx = fx - dxf;
-            by = fy - dyf;
-            const bxScaled = bx * turtlesScale;
-            const byScaled = by * turtlesScale;
-            cx = fx + dxf;
-            cy = fy + dyf;
-            const cxScaled = cx * turtlesScale;
-            const cyScaled = cy * turtlesScale;
-            dx = ix + dxi;
-            dy = iy + dyi;
+            const ax = ix - dxi;
+            const ay = iy - dyi;
+            const bx = fx - dxf;
+            const by = fy - dyf;
+            const cx = fx + dxf;
+            const cy = fy + dyf;
+            const dx = ix + dxi;
+            const dy = iy + dyi;
+
             const dxScaled = dx * turtlesScale;
             const dyScaled = dy * turtlesScale;
+            const cxScaled = cx * turtlesScale;
+            const cyScaled = cy * turtlesScale;
+            const bxScaled = bx * turtlesScale;
+            const byScaled = by * turtlesScale;
+            const axScaled = ax * turtlesScale;
+            const ayScaled = ay * turtlesScale;
 
-            // Control points scaled for SVG output
-            // const cx1Scaled = (cx1 + dxi) * turtlesScale;
-            // const cy1Scaled = (cy1 + dyi) * turtlesScale;
-            // const cx2Scaled = (cx2 + dxf) * turtlesScale;
-            // const cy2Scaled = (cy2 + dyf) * turtlesScale;
-
+            // Start the SVG path at the first corner
+            this.closeSVG();
             this._svgPath = true;
+            this._svgOutput += '<path d="M ' + dxScaled + "," + dyScaled + " ";
 
-            // Initial arc
-            let oAngleRadians = ((180 + degreesInitial) / 180) * Math.PI;
-            let arccx = ix;
-            let arccy = iy;
+            this.turtle.ctx.beginPath();
+            this.turtle.ctx.moveTo(dx, dy);
+
+            const nstepsCurve1 = this._estimateBezierSteps(
+                dx,
+                dy,
+                cx1 + dxi,
+                cy1 + dyi,
+                cx2 + dxf,
+                cy2 + dyf,
+                cx,
+                cy
+            );
+
+            // Side 1: Forward Bezier
+            this._svgBezier(
+                nstepsCurve1,
+                dx,
+                dy,
+                cx1 + dxi,
+                cy1 + dyi,
+                cx2 + dxf,
+                cy2 + dyf,
+                cx,
+                cy,
+                true
+            );
+
+            // End cap arc
+            let oAngleRadians = (degreesFinal / 180) * Math.PI;
             let sa = oAngleRadians - Math.PI;
             let ea = oAngleRadians;
-            this.turtle.ctx.arc(arccx, arccy, step, sa, ea, false);
-            this._svgArc(
-                steps,
-                arccx * turtlesScale,
-                arccy * turtlesScale,
-                step * turtlesScale,
-                sa,
-                ea
+            this._svgArc(steps, fx, fy, step, sa, ea, false, true);
+            this._svgOutput += bxScaled + "," + byScaled + " ";
+
+            const nstepsCurve2 = this._estimateBezierSteps(
+                bx,
+                by,
+                cx2 - dxf,
+                cy2 - dyf,
+                cx1 - dxi,
+                cy1 - dyi,
+                ax,
+                ay
             );
 
-            // Final arc
-            oAngleRadians = (degreesFinal / 180) * Math.PI;
-            arccx = fx;
-            arccy = fy;
+            // Side 2: Return Bezier
+            this._svgBezier(
+                nstepsCurve2,
+                bx,
+                by,
+                cx2 - dxf,
+                cy2 - dyf,
+                cx1 - dxi,
+                cy1 - dyi,
+                ax,
+                ay,
+                true
+            );
+
+            // Start cap arc
+            oAngleRadians = ((180 + degreesInitial) / 180) * Math.PI;
             sa = oAngleRadians - Math.PI;
             ea = oAngleRadians;
-            this.turtle.ctx.arc(arccx, arccy, step, sa, ea, false);
-            this._svgArc(
-                steps,
-                arccx * turtlesScale,
-                arccy * turtlesScale,
-                step * turtlesScale,
-                sa,
-                ea
-            );
+            this._svgArc(steps, ix, iy, step, sa, ea, false, true);
+            this._svgOutput += dxScaled + "," + dyScaled + " ";
 
-            fx = turtles.turtleX2screenX(x2);
-            fy = turtles.turtleY2screenY(y2);
-            const fxScaled = fx * turtlesScale;
-            const fyScaled = fy * turtlesScale;
+            this.closeSVG();
 
             this.turtle.ctx.stroke();
             this.turtle.ctx.closePath();
@@ -1135,16 +1159,17 @@ class Painter {
             this.turtle.ctx.lineWidth = this.stroke;
             this.turtle.ctx.lineCap = "round";
             this.turtle.ctx.moveTo(fx, fy);
-            this._svgOutput += "M " + fxScaled + "," + fyScaled + " ";
             this.turtle.x = x2;
             this.turtle.y = y2;
+
+            // IMPORTANT: allow next normal stroke to start a new SVG path
+            this._svgPath = false;
+
             /* eslint-enable no-unused-vars */
         } else if (this._penDown) {
             this._processColor();
             this.turtle.ctx.lineWidth = this.stroke;
             this.turtle.ctx.lineCap = "round";
-            this.turtle.ctx.beginPath();
-            this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
 
             // Convert from turtle coordinates to screen coordinates
             fx = turtles.turtleX2screenX(x2);
@@ -1154,48 +1179,30 @@ class Painter {
             const cx2 = turtles.turtleX2screenX(cp2x);
             const cy2 = turtles.turtleY2screenY(cp2y);
 
-            this.turtle.ctx.bezierCurveTo(cx1 + dxi, cy1 + dyi, cx2 + dxf, cy2 + dyf, cx, cy);
-            this.turtle.ctx.bezierCurveTo(cx2 - dxf, cy2 - dyf, cx1 - dxi, cy1 - dyi, ax, ay);
-            this.turtle.ctx.bezierCurveTo(cx1, cy1, cx2, cy2, fx, fy);
+            // capture start BEFORE drawing
+            const startX = this.turtle.x;
+            const startY = this.turtle.y;
 
+            // start point in screen coords
+            const ix = turtles.turtleX2screenX(this.turtle.x);
+            const iy = turtles.turtleY2screenY(this.turtle.y);
+
+            // SVG must always start exactly where canvas path starts
             if (!this._svgPath) {
                 this._svgPath = true;
-                const ix = turtles.turtleX2screenX(this.turtle.x);
-                const iy = turtles.turtleY2screenY(this.turtle.y);
-                const ixScaled = ix * turtlesScale;
-                const iyScaled = iy * turtlesScale;
-                this._svgOutput += '<path d="M ' + ixScaled + "," + iyScaled + " ";
+                this._svgOutput +=
+                    '<path d="M ' + ix * turtlesScale + "," + iy * turtlesScale + " ";
             }
 
-            const cx1Scaled = cx1 * turtlesScale;
-            const cy1Scaled = cy1 * turtlesScale;
-            const cx2Scaled = cx2 * turtlesScale;
-            const cy2Scaled = cy2 * turtlesScale;
-            const fxScaled = fx * turtlesScale;
-            const fyScaled = fy * turtlesScale;
+            const nstepsCurve = this._estimateBezierSteps(ix, iy, cx1, cy1, cx2, cy2, fx, fy);
 
-            // Curve to: ControlPointX1, ControlPointY1 >> ControlPointX2, ControlPointY2 >> X, Y
-            this._svgOutput +=
-                "C " +
-                cx1Scaled +
-                "," +
-                cy1Scaled +
-                " " +
-                cx2Scaled +
-                "," +
-                cy2Scaled +
-                " " +
-                fxScaled +
-                "," +
-                fyScaled;
-            this.closeSVG();
+            this._svgBezier(nstepsCurve, ix, iy, cx1, cy1, cx2, cy2, fx, fy, true);
 
             this.turtle.x = x2;
             this.turtle.y = y2;
+
+            // draw it
             this.turtle.ctx.stroke();
-            if (!this._fillState) {
-                this.turtle.ctx.closePath();
-            }
         } else {
             this.turtle.x = x2;
             this.turtle.y = y2;
@@ -1207,9 +1214,10 @@ class Painter {
         this.turtle.container.x = fx;
         this.turtle.container.y = fy;
 
-        // The new heading is the angle between (cp2x, cp2y) and (x2, y2)
+        // compute heading using turtle-space tangent (MusicBlocks convention: North=0)
         let degrees = Math.atan2(x2 - cp2x, y2 - cp2y);
         degrees = (180 * degrees) / Math.PI;
+
         this.doSetHeading(degrees);
     }
 
@@ -1259,7 +1267,7 @@ class Painter {
             turtles.gy = this.turtle.ctx.canvas.height;
         }
 
-        const i = turtles.getIndexOfTurtle(this) % 10;
+        const i = turtles.getIndexOfTurtle(this.turtle) % 10;
         if (resetPen) {
             this.color = i * 10;
             this.value = DEFAULTVALUE;
@@ -1360,7 +1368,7 @@ class Painter {
             turtles.canvas1 = document.createElement("canvas");
             turtles.canvas1.width = 3 * this.turtle.ctx.canvas.width;
             turtles.canvas1.height = 3 * this.turtle.ctx.canvas.height;
-            turtles.c1ctx = turtles.canvas1.getContext("2d");
+            turtles.c1ctx = turtles.canvas1.getContext("2d", { willReadFrequently: true });
             turtles.c1ctx.rect(
                 0,
                 0,
