@@ -88,7 +88,7 @@ class FlowBlock extends BaseBlock {
         super(name);
     }
 
-    flow() {}
+    flow() { }
 }
 
 class FlowClampBlock extends FlowBlock {
@@ -105,8 +105,8 @@ class ValueBlock extends BaseBlock {
         this.parameter = false;
     }
 
-    arg() {}
-    updateParameter() {}
+    arg() { }
+    updateParameter() { }
 }
 
 global.BaseBlock = BaseBlock;
@@ -529,24 +529,24 @@ describe("RhythmBlocks", () => {
 
             rhythmBlockNames.forEach(blockName => {
                 const block = activity.registeredBlocks[blockName];
-                if (block) {
-                    expect(block.palette).toBe("rhythm");
-                }
+                expect(block).toBeDefined();
+                expect(block.palette).toBe("rhythm");
             });
         });
 
         test("Flow blocks return correct tuple format", () => {
-            const flowBlocks = ["swing", "newswing2", "skipnotes", "multiplybeatfactor", "tie"];
+            // newswing2 is excluded: it checks args[2] for undefined and returns early
+            // when called with only [1, true]; it is covered by its own dedicated test.
+            const flowBlocks = ["swing", "skipnotes", "multiplybeatfactor", "tie"];
 
             flowBlocks.forEach(blockName => {
                 const block = getBlock(blockName);
-                if (block && block.flow) {
-                    const result = block.flow([1, true], logo, 0, 10);
-                    if (result) {
-                        expect(Array.isArray(result)).toBe(true);
-                        expect(result.length).toBe(2);
-                    }
-                }
+                expect(block).toBeDefined();
+                expect(typeof block.flow).toBe("function");
+                const result = block.flow([1, true], logo, 0, 10);
+                expect(result).toBeDefined();
+                expect(Array.isArray(result)).toBe(true);
+                expect(result.length).toBe(2);
             });
         });
 
