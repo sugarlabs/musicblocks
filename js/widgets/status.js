@@ -109,7 +109,6 @@ class StatusMatrix {
             cell.className = "headcol";
         }
 
-
         // One row per field, one column per mouse (plus the labels)
         let label;
         for (const statusField of this.activity.logo.statusFields) {
@@ -118,7 +117,6 @@ class StatusMatrix {
             cell = row.insertCell(); // i + 1);
             cell.style.fontSize =
                 Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
-
 
             switch (statusField[1]) {
                 case "plus":
@@ -143,16 +141,17 @@ class StatusMatrix {
                     if (localStorage.languagePreference === "ja") {
                         label = _("beats per minute2");
                     } else {
-                        label = this.activity.blocks.blockList[statusField[0]].protoblock
-                            .staticLabels[0];
+                        label =
+                            this.activity.blocks.blockList[statusField[0]].protoblock
+                                .staticLabels[0];
                     }
                     break;
                 case "outputtools":
                     label = this.activity.blocks.blockList[statusField[0]].privateData;
                     break;
                 default:
-                    label = this.activity.blocks.blockList[statusField[0]].protoblock
-                        .staticLabels[0];
+                    label =
+                        this.activity.blocks.blockList[statusField[0]].protoblock.staticLabels[0];
                     break;
             }
             let str = label;
