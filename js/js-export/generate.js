@@ -252,16 +252,9 @@ class JSGenerate {
             for (const i of tree) {
                 let spaces = "";
                 for (let j = 0; j < 4 * level; j++) spaces += " ";
-                console.log(
-                    "%c" + spaces + "%c" + i[0] + " : " + "%c" + PrintArgs(i[1]),
-                    "background: mediumslateblue",
-                    "background; none",
-                    "color: dodgerblue"
-                );
                 if (i[2] !== null) {
                     PrintTree(i[2], level + 1);
                     if (i.length === 4 && i[3] !== null) {
-                        console.log("%c" + spaces + "** NEXTFLOW **", "color: green");
                         PrintTree(i[3], level + 1);
                     }
                 }
@@ -269,28 +262,20 @@ class JSGenerate {
         }
 
         if (JSGenerate.startTrees.length === 0) {
-            console.log("%cno start trees generated", "color: tomato");
+            // returning as no start trees generated
+            return;
         } else {
             for (const tree of JSGenerate.startTrees) {
-                console.log(
-                    "\n   " + "%c START ",
-                    "background: navy; color: white; font-weight: bold"
-                );
                 PrintTree(tree);
-                console.log("\n");
             }
         }
 
         if (JSGenerate.startTrees.length === 0) {
-            console.log("%cno action trees generated", "color: tomato");
+            // returning as no action trees generated
+            return;
         } else {
             for (const tree of JSGenerate.actionTrees) {
-                console.log(
-                    "\n   " + "%c ACTION ",
-                    "background: green; color: white; font-weight: bold"
-                );
                 PrintTree(tree);
-                console.log("\n");
             }
         }
     }
@@ -360,26 +345,10 @@ class JSGenerate {
     static run(printStacksTree, printCode) {
         JSGenerate.generateStacksTree();
         if (printStacksTree) {
-            console.log(
-                "\n   " + "%c STACK TREES ",
-                "background: greenyellow; color: midnightblue; font-weight: bold"
-            );
             JSGenerate.printStacksTree();
         }
 
         JSGenerate.generateCode();
-
-        if (printStacksTree & printCode) {
-            console.log("%c _______________________________________", "color: darkorange");
-        }
-
-        if (printCode) {
-            console.log(
-                "\n   " + "%c CODE ",
-                "background: greenyellow; color: midnightblue; font-weight: bold"
-            );
-            console.log(JSGenerate.code);
-        }
     }
 }
 if (typeof module !== "undefined" && module.exports) {
