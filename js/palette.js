@@ -17,8 +17,10 @@
    i18nSolfege, NUMBERBLOCKDEFAULT, TEXTWIDTH, STRINGLEN,
    DEFAULTBLOCKSCALE, SVG, DISABLEDFILLCOLOR, DISABLEDSTROKECOLOR,
    PALETTEFILLCOLORS, PALETTESTROKECOLORS, last, getTextWidth,
-   STANDARDBLOCKHEIGHT, CLOSEICON, BUILTINPALETTES,
+    STANDARDBLOCKHEIGHT, CLOSEICON, BUILTINPALETTES,
    safeSVG, blockIsMacro, getMacroExpansion
+
+    cameraPALETTE, videoPALETTE, mediaPALETTE
 */
 
 /* exported Palettes, initPalettes */
@@ -51,6 +53,14 @@ const makePaletteIcons = (data, width, height) => {
     if (width) img.width = width;
     if (height) img.height = height;
     return img;
+};
+
+// Registry for built-in palette images defined in artwork.js.
+// Using lazy getters preserves script load order expectations (same behavior as prior eval).
+const BUILTIN_IMAGE_PALETTE_REGISTRY = {
+    media: () => mediaPALETTE,
+    camera: () => cameraPALETTE,
+    video: () => videoPALETTE
 };
 
 class Palettes {
@@ -997,7 +1007,10 @@ class Palette {
                 if (["media", "camera", "video"].includes(b.blkname)) {
                     // Use artwork.js strings as images for:
                     // cameraPALETTE, videoPALETTE, mediaPALETTE
-                    img = makePaletteIcons(eval(b.blkname + "PALETTE"));
+                    const getPaletteImage = BUILTIN_IMAGE_PALETTE_REGISTRY[b.blkname];
+                    if (getPaletteImage) {
+                        img = makePaletteIcons(getPaletteImage());
+                    }
                 } else {
                     // or use the plugin image...
                     img = makePaletteIcons(this.activity.pluginsImages[b.blkname]);

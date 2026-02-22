@@ -18,7 +18,39 @@
  * Internal functions' names are in PascalCase.
  */
 
-/* global JSEditor, last, importMembers, Singer, JSInterface, globalActivity */
+/* global JSEditor, last, importMembers, Singer, JSInterface, globalActivity, Painter, Turtle */
+
+// Static registry for known API action objects.
+// Resolvers must return stable objects (not factories).
+// This replaces eval-based static lookups without changing behavior.
+const STATIC_API_CLASS_REGISTRY = {
+    "Singer.RhythmActions": () => Singer.RhythmActions,
+    "Singer.MeterActions": () => Singer.MeterActions,
+    "Singer.PitchActions": () => Singer.PitchActions,
+    "Singer.IntervalsActions": () => Singer.IntervalsActions,
+    "Singer.ToneActions": () => Singer.ToneActions,
+    "Singer.OrnamentActions": () => Singer.OrnamentActions,
+    "Singer.VolumeActions": () => Singer.VolumeActions,
+    "Singer.DrumActions": () => Singer.DrumActions,
+    "Turtle.DictActions": () => Turtle.DictActions
+};
+
+function getStaticApiClassRegistry() {
+    return STATIC_API_CLASS_REGISTRY;
+}
+
+function resolveGlobalByPath(path) {
+    if (typeof path !== "string") return undefined;
+    if (!/^[A-Za-z0-9_.]+$/.test(path)) return undefined;
+
+    const parts = path.split(".");
+    let current = globalThis;
+    for (const part of parts) {
+        if (!part) return undefined;
+        current = current?.[part];
+    }
+    return current;
+}
 
 /**
  * @class
@@ -143,6 +175,7 @@ class MusicBlocks {
          * @returns {void}
          */
         function CreateAPIMethodList() {
+            const apiClassRegistry = getStaticApiClassRegistry();
             [
                 "Painter",
                 // "Painter.GraphicsActions",
@@ -160,16 +193,24 @@ class MusicBlocks {
                 MusicBlocks._methodList[className] = [];
 
                 if (className === "Painter") {
-                    for (const methodName of Object.getOwnPropertyNames(
-                        eval(className + ".prototype")
-                    )) {
+                    for (const methodName of Object.getOwnPropertyNames(Painter.prototype)) {
                         if (methodName !== "constructor" && !methodName.startsWith("_"))
                             MusicBlocks._methodList[className].push(methodName);
                     }
                     return;
                 }
 
-                for (const methodName of Object.getOwnPropertyNames(eval(className))) {
+                const getApiClass = apiClassRegistry[className];
+                if (!getApiClass) {
+                    throw new Error(`Unknown API class for method enumeration: ${className}`);
+                }
+
+                const apiClass = getApiClass();
+                if (!apiClass) {
+                    throw new Error(`API class resolver returned empty value: ${className}`);
+                }
+
+                for (const methodName of Object.getOwnPropertyNames(apiClass)) {
                     if (methodName !== "length" && methodName !== "prototype")
                         MusicBlocks._methodList[className].push(methodName);
                 }
@@ -246,7 +287,30 @@ class MusicBlocks {
                     }
                 }
 
-                cname = cname === "Painter" ? this.turtle.painter : eval(cname);
+                if (cname === "Painter") {
+                    cname = this.turtle.painter;
+                } else {
+                    const apiClassRegistry = getStaticApiClassRegistry();
+                    const getApiClass = apiClassRegistry[cname];
+                    let apiClass;
+
+                    if (getApiClass) {
+                        apiClass = getApiClass();
+                    } else {
+                        // Backward-compatible fallback for test harnesses or other non-user-controlled
+                        // environments that inject additional API action classes.
+                        apiClass = resolveGlobalByPath(cname);
+                    }
+
+                    if (
+                        !apiClass ||
+                        (typeof apiClass !== "object" && typeof apiClass !== "function")
+                    ) {
+                        throw new ReferenceError(`${cname} did not resolve to a valid API object`);
+                    }
+
+                    cname = apiClass;
+                }
 
                 returnVal =
                     args === undefined || (Array.isArray(args) && args.length === 0)
