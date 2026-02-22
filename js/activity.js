@@ -7073,24 +7073,25 @@ class Activity {
          * @param {number} blk - Block ID to highlight
          * @returns {void}
          */
-        this.highlightBlock = (blk) => {
+        this.highlightBlock = blk => {
             if (!blk || !this.blocks?.blockList?.[blk]) return;
-            
+
             const block = this.blocks.blockList[blk];
             if (!block.container) return;
-            
-            if (typeof createjs === "undefined" || !createjs.BlurFilter || !createjs.ColorFilter) return;
-            
+
+            if (typeof createjs === "undefined" || !createjs.BlurFilter || !createjs.ColorFilter)
+                return;
+
             try {
                 if (!block.originalFilters) block.originalFilters = block.container.filters || [];
-                
+
                 const glowFilter = new createjs.BlurFilter(12, 12, 2);
                 const colorFilter = new createjs.ColorFilter(1.2, 1.2, 0.8, 1, 80, 60, 0, 0);
-                
+
                 block.container.filters = [glowFilter, colorFilter];
                 block.container.updateCache();
                 block.isHighlighted = true;
-                
+
                 if (this.stage?.update) this.stage.update();
             } catch (error) {
                 console.warn("Block highlighting error:", error);
@@ -7102,16 +7103,16 @@ class Activity {
          * @param {number} blk - Block ID to unhighlight
          * @returns {void}
          */
-        this.unhighlightBlock = (blk) => {
+        this.unhighlightBlock = blk => {
             if (!blk || !this.blocks?.blockList?.[blk]) return;
-            
+
             const block = this.blocks.blockList[blk];
             if (block.container && block.isHighlighted) {
                 try {
                     block.container.filters = block.originalFilters || [];
                     block.container.updateCache();
                     block.isHighlighted = false;
-                    
+
                     if (this.stage?.update) this.stage.update();
                 } catch (error) {
                     console.warn("Block unhighlighting error:", error);
