@@ -88,7 +88,7 @@ class FlowBlock extends BaseBlock {
         super(name);
     }
 
-    flow() { }
+    flow() {}
 }
 
 class FlowClampBlock extends FlowBlock {
@@ -105,8 +105,8 @@ class ValueBlock extends BaseBlock {
         this.parameter = false;
     }
 
-    arg() { }
-    updateParameter() { }
+    arg() {}
+    updateParameter() {}
 }
 
 global.BaseBlock = BaseBlock;
