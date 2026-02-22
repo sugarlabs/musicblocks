@@ -105,6 +105,7 @@ function setupToneActions(activity) {
 
             const listenerName = "_settimbre_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
+                activity.highlightBlock(blk);
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
@@ -112,6 +113,10 @@ function setupToneActions(activity) {
             }
 
             const __listener = () => {
+                if (blk !== undefined && blk in activity.blocks.blockList) {
+                    activity.unhighlightBlock(blk);
+                }
+
                 tur.inSetTimbre = false;
                 tur.singer.instrumentNames.pop();
             };
