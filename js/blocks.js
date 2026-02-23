@@ -2132,8 +2132,14 @@ class Blocks {
                             feedbackBlockObj.highlight();
                             this.activity.refreshCanvas();
                             setTimeout(() => {
-                                feedbackBlockObj.unhighlight();
-                                this.activity.refreshCanvas();
+                                // Guard against rare deletion edge cases
+                                if (
+                                    this.blockList[newBlock] === feedbackBlockObj &&
+                                    !feedbackBlockObj.trash
+                                ) {
+                                    feedbackBlockObj.unhighlight();
+                                    this.activity.refreshCanvas();
+                                }
                             }, 220);
                         }
                     });
