@@ -228,6 +228,33 @@ class SaveInterface {
      * @method
      * @instance
      */
+   
+   escapeHTML(str) {
+    if (typeof str !== "string") return "";
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+sanitizeURL(url) {
+    if (typeof url !== "string") return "";
+    try {
+        const parsed = new URL(url, window.location.origin);
+        if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+            return parsed.href;
+        }
+    } catch (e) {
+        return "";
+    }
+    return "";
+}
+
+   
+   
+   
     prepareHTML() {
         let file = this.htmlSaveTemplate;
         let description = _("No description provided");
@@ -248,13 +275,19 @@ class SaveInterface {
             image = this.activity.PlanetInterface.getCurrentProjectImage();
         }
 
-        file = file
-            .replace(new RegExp("{{ project_description }}", "g"), description)
-            .replace(new RegExp("{{ project_name }}", "g"), name)
-            .replace(new RegExp("{{ data }}", "g"), data)
-            .replace(new RegExp("{{ project_image }}", "g"), image);
-        return file;
-    }
+        const safeDescription = this.escapeHTML(description);
+const safeName = this.escapeHTML(name);
+const safeData = this.escapeHTML(data);
+const safeImage = this.sanitizeURL(image);
+
+file = file
+    .replace(new RegExp("{{ project_description }}", "g"), safeDescription)
+    .replace(new RegExp("{{ project_name }}", "g"), safeName)
+    .replace(new RegExp("{{ data }}", "g"), safeData)
+    .replace(new RegExp("{{ project_image }}", "g"), safeImage);
+
+  return file;
+  }
 
     /**
      * Save HTML representation of an activity.
