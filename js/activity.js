@@ -6962,11 +6962,18 @@ class Activity {
                 return;
             }
 
-            const cleanData = rawData.replace("\n", " ");
+            const cleanData = rawData.replace(/\n/g, " ").trim();
+
+            // Check if input looks like JSON (starts with [ or {)
+            if (!cleanData.startsWith("[") && !cleanData.startsWith("{")) {
+                this.errorMsg(_("Please paste valid Music Blocks code (JSON format)."));
+                return;
+            }
+
             try {
                 obj = JSON.parse(cleanData);
             } catch (e) {
-                this.errorMsg(_("Could not parse JSON input."));
+                this.errorMsg(_("Invalid JSON format. Please paste exported Music Blocks code."));
                 return;
             }
 
