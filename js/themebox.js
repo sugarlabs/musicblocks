@@ -205,9 +205,7 @@ class ThemeBox {
                 // this.current stores palette NAME (e.g. "pitch")
                 // selectorRows[] is indexed by NUMBER (0, 1, 2)
                 const currentName = this.activity.palettes.current;
-                const currentIndex = MULTIPALETTES.findIndex(group => 
-                    group.includes(currentName)
-                );
+                const currentIndex = MULTIPALETTES.findIndex(group => group.includes(currentName));
 
                 if (currentIndex === -1) return;
 
