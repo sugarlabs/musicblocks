@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Music Blocks Meter Palette (Beginner) Test Suite">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>Music Blocks - Meter Palette (Beginner) Test Suite</title>
+    <meta property="og:site_name" content="Music Blocks"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:title" content="Music Blocks Project - Meter Palette (Beginner) Test Suite"/>
+    <meta property="og:description" content="Test suite for Music Blocks Meter palette beginner blocks"/>
+    <style>
+        body {
+            background-color: #dbf0fb;
+            font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #424242;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-description {
+            background-color: #f6f8fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .test-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .test-list li {
+            background-color: #e3f2fd;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 3px;
+            border-left: 4px solid #2196f3;
+        }
+        .load-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 20px auto;
+        }
+        .load-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Music Blocks - Meter Palette (Beginner) Test Suite</h1>
+        
+        <div class="test-description">
+            <h3>About This Test Suite</h3>
+            <p>This test suite covers the beginner blocks in the Meter palette of Music Blocks. It tests the functionality of blocks related to meter, tempo, and beat counting.</p>
+        </div>
+
+        <div class="test-description">
+            <h3>Blocks Tested</h3>
+            <ul class="test-list">
+                <li><strong>Meter Block</strong> - Sets the musical meter (time signature)</li>
+                <li><strong>Beat Count Block</strong> - Returns the current beat number</li>
+                <li><strong>Master BPM Block</strong> - Sets the beats per minute tempo</li>
+                <li><strong>Beat Factor Block</strong> - Returns the ratio of note value to meter</li>
+                <li><strong>Every Beat Do Block</strong> - Executes actions on each beat</li>
+            </ul>
+        </div>
+
+        <div class="test-description">
+            <h3>How to Use</h3>
+            <p>1. Open this file in Music Blocks web application</p>
+            <p>2. The test will automatically load and you can run it</p>
+            <p>3. Check the console output for test results</p>
+            <p>4. Verify that all blocks are working as expected</p>
+        </div>
+
+        <button class="load-button" onclick="loadTest()">Load Test in Music Blocks</button>
+
+        <div class="test-description">
+            <h3>Expected Results</h3>
+            <p>When you run this test, you should see:</p>
+            <ul class="test-list">
+                <li>Beat count values from 1 to 4 (for 4/4 meter)</li>
+                <li>Beat factor calculations</li>
+                <li>Actions triggered on each beat</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function loadTest() {
+            // This would typically integrate with Music Blocks application
+            // For now, it's a placeholder for the integration
+            alert('This test should be loaded directly in the Music Blocks application. Open the .tb file in Music Blocks to run the tests.');
+        }
+    </script>
+</body>
+</html>
