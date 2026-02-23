@@ -109,12 +109,19 @@ class WidgetWindow {
                 e.stopImmediatePropagation();
             };
         }
-        const closeButton = this._create("div", "wftButton close", this._drag);
-        closeButton.title = _("Close");
+        const closeButton = this._create("button", "wftButton close", this._drag);
+        closeButton.title = _("Close dialog");
+        closeButton.setAttribute("aria-label", _("Close dialog"));
         closeButton.onclick = e => {
             this.onclose();
             e.preventDefault();
             e.stopPropagation();
+        };
+        closeButton.onkeydown = e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                closeButton.click();
+            }
         };
 
         this._nonclose = this._create("div", "nonclose", this._drag);
