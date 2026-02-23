@@ -247,7 +247,7 @@ class LanguageBox {
             gug: "Actualizar",
             ur: "ریفریش"
         };
-        
+
         const MSG = {
             default: _("Refresh your browser to change your language preference."),
             enUS: "Refresh your browser to change your language preference.",
@@ -289,10 +289,10 @@ class LanguageBox {
 
             if (this._language === "ja" && this.activity.storage.kanaPreference === "kana") {
                 this.activity.textMsg(
-                    MSG["kana"] + 
-                    '<br><button class="language-refresh-btn">' + 
-                    RefreshButtonLabels["kana"] + 
-                    '</button>'
+                    MSG["kana"] +
+                        '<br><button class="language-refresh-btn">' +
+                        RefreshButtonLabels["kana"] +
+                        "</button>"
                 );
             } else {
                 if (this._language.includes("ja")) {
@@ -301,12 +301,12 @@ class LanguageBox {
 
                 const langKey = MSG[this._language] ? this._language : "default";
                 const btnKey = RefreshButtonLabels[this._language] ? this._language : "default";
-                
+
                 this.activity.textMsg(
-                    MSG[langKey] + 
-                    '<br><button class="language-refresh-btn">' + 
-                    RefreshButtonLabels[btnKey] + 
-                    '</button>'
+                    MSG[langKey] +
+                        '<br><button class="language-refresh-btn">' +
+                        RefreshButtonLabels[btnKey] +
+                        "</button>"
                 );
             }
         }
@@ -319,12 +319,12 @@ class LanguageBox {
                 button.addEventListener("click", () => {
                     // Save language preference when button is clicked
                     that.activity.storage.languagePreference = that._language;
-                    
+
                     // Save kana preference if it was set (for Japanese)
                     if (that._pendingKanaPreference) {
                         that.activity.storage.kanaPreference = that._pendingKanaPreference;
                     }
-                    
+
                     that.OnClick();
                 });
             });
