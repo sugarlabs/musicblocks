@@ -57,7 +57,10 @@ global.doStopVideoCam = jest.fn();
 global.CAMERAVALUE = "camera:";
 global.VIDEOVALUE = "video:";
 global.doUseCamera = jest.fn();
-global.delayExecution = jest.fn((ms, callback) => callback());
+global.delayExecution = jest.fn((ms, callback) => {
+    if (typeof callback === 'function') callback();
+    return Promise.resolve();
+});
 global.getStatsFromNotation = jest.fn();
 global.Tone = {
     UserMedia: jest.fn().mockImplementation(() => ({
@@ -913,16 +916,16 @@ describe("Logo comprehensive method coverage", () => {
     });
 
     test("initMediaDevices sets mic/limit on success and reports microphone errors", () => {
-        const originalTone = global.Tone;
+        const originalTone = logo.deps.Tone;
         const open = jest.fn();
-        global.Tone = { UserMedia: jest.fn(() => ({ open })) };
+        logo.deps.Tone = { UserMedia: jest.fn(() => ({ open })) };
 
         logo.initMediaDevices();
         expect(open).toHaveBeenCalled();
         expect(logo.limit).toBe(16384);
         expect(logo.mic).toBeTruthy();
 
-        global.Tone = {
+        logo.deps.Tone = {
             UserMedia: jest.fn(() => ({
                 open: jest.fn(() => {
                     throw new Error("no mic");
@@ -933,7 +936,7 @@ describe("Logo comprehensive method coverage", () => {
         expect(mockActivity.errorMsg).toHaveBeenCalledWith("The microphone is not available.");
         expect(logo.mic).toBeNull();
 
-        global.Tone = originalTone;
+        logo.deps.Tone = originalTone;
     });
 
     test("processShow handles image/url/loadFile/default branches", () => {
@@ -956,7 +959,7 @@ describe("Logo comprehensive method coverage", () => {
             fn();
             return 2;
         });
-        global.delayExecution = jest.fn(() => Promise.resolve());
+        global.delayExecution.mockClear();
 
         turtle0.singer.embeddedGraphics = {};
         await logo.dispatchTurtleSignals(0, 0.5, 3, 0);
@@ -977,7 +980,7 @@ describe("Logo comprehensive method coverage", () => {
     });
 
     test("runLogoCommands handles already-running state and status widget initialization", () => {
-        const clearTimeoutSpy = jest.spyOn(global, "clearTimeout").mockImplementation(() => {});
+        const clearTimeoutSpy = jest.spyOn(global, "clearTimeout").mockImplementation(() => { });
         logo._alreadyRunning = true;
         logo._runningBlock = 7;
         logo._lastNoteTimeout = 99;
@@ -1060,7 +1063,7 @@ describe("Logo comprehensive method coverage", () => {
     });
 
     test("doStopTurtles covers companion/camera/recorder/showBlocks branches", () => {
-        const clearIntervalSpy = jest.spyOn(global, "clearInterval").mockImplementation(() => {});
+        const clearIntervalSpy = jest.spyOn(global, "clearInterval").mockImplementation(() => { });
         global.instruments = { 0: { flute: {} }, 1: { piano: {} } };
         turtle0.singer.killAllVoices = jest.fn();
         turtle0.companionTurtle = 1;
@@ -1073,6 +1076,7 @@ describe("Logo comprehensive method coverage", () => {
             recorder: { state: "recording", stop: jest.fn() }
         };
         logo._restoreConnections = jest.fn();
+        logo.deps.instruments = { 0: { flute: {} }, 1: { piano: {} } };
         mockActivity.showBlocksAfterRun = true;
 
         logo.doStopTurtles();
@@ -1141,7 +1145,7 @@ describe("Logo comprehensive method coverage", () => {
         logo.parseArg = jest.fn(() => 9);
         logo.processShow = jest.fn();
         logo.processSpeak = jest.fn();
-        global.delayExecution = jest.fn(() => Promise.resolve());
+        global.delayExecution.mockClear();
 
         turtle0.singer.suppressOutput = false;
         turtle0.embeddedGraphicsFinished = false;
@@ -1217,7 +1221,13 @@ describe("Logo comprehensive method coverage", () => {
             storage: { saveLocally: jest.fn() },
             config: { showBlocksAfterRun: false },
             callbacks: { onStopTurtle: jest.fn(), onRunTurtle: jest.fn() },
-            meSpeak: { speak: jest.fn() }
+            meSpeak: { speak: jest.fn() },
+            utils: { last: global.last },
+            classes: {
+                Notation: global.Notation,
+                Synth: global.Synth,
+                StatusMatrix: global.StatusMatrix
+            }
         };
 
         const depLogo = new Logo(deps);
@@ -1228,7 +1238,7 @@ describe("Logo comprehensive method coverage", () => {
     });
 
     test("clearTurtleRun clears timeout and resumes execution", () => {
-        const clearTimeoutSpy = jest.spyOn(global, "clearTimeout").mockImplementation(() => {});
+        const clearTimeoutSpy = jest.spyOn(global, "clearTimeout").mockImplementation(() => { });
         turtle0.delayTimeout = 123;
         turtle0.delayParameters = { blk: 4, flow: 1, arg: ["p"] };
         logo.runFromBlockNow = jest.fn();
@@ -1411,7 +1421,7 @@ describe("Logo comprehensive method coverage", () => {
     });
 
     test("dispatchTurtleSignals with suppressOutput true executes immediate graphics operations", async () => {
-        global.delayExecution = jest.fn(() => Promise.resolve());
+        global.delayExecution.mockClear();
         turtle0.singer.suppressOutput = true;
         logo.parseArg = jest.fn(() => 7);
         logo.blockList = [
@@ -1440,7 +1450,7 @@ describe("Logo comprehensive method coverage", () => {
     });
 
     test("dispatchTurtleSignals adjusts dispatchFactor for large stepTime", async () => {
-        global.delayExecution = jest.fn(() => Promise.resolve());
+        global.delayExecution.mockClear();
         turtle0.singer.suppressOutput = false;
         turtle0.singer.dispatchFactor = 1;
         logo.parseArg = jest.fn(() => 8);
