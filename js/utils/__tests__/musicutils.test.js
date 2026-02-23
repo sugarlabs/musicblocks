@@ -23,6 +23,7 @@ global._ = jest.fn(str => str);
 global.window = {
     btoa: jest.fn(str => Buffer.from(str, "utf8").toString("base64"))
 };
+global.INVALIDPITCH = "Not a valid pitch name";
 
 const {
     scaleDegreeToPitchMapping,
@@ -97,14 +98,15 @@ const {
     numberToPitchSharp,
     getNumber,
     getNoteFromInterval,
-    numberToPitch,
-    GetNotesForInterval,
-    base64Encode,
-    NOTESFLAT,
     NOTESSHARP,
     MUSICALMODES,
     getStepSizeUp,
-    getStepSizeDown
+    getStepSizeDown,
+    INVALIDPITCH,
+    numberToPitch,
+    GetNotesForInterval,
+    base64Encode,
+    NOTESFLAT
 } = require("../musicutils");
 
 describe("musicutils", () => {
@@ -2241,39 +2243,6 @@ describe("getPitchInfo", () => {
     });
 });
 
-describe("_calculate_pitch_number", () => {
-    let activity, tur;
-
-    beforeEach(() => {
-        activity = {
-            errorMsg: jest.fn()
-        };
-
-        tur = {
-            singer: {
-                lastNotePlayed: null,
-                inNoteBlock: {},
-                notePitches: {},
-                noteOctaves: {},
-                keySignature: "C major",
-                movable: false,
-                pitchNumberOffset: 0
-            }
-        };
-    });
-
-    it("calculates pitch number for a standard note string", () => {
-        const val = _calculate_pitch_number(activity, "C4", tur);
-        expect(typeof val).toBe("number");
-    });
-
-    it("calculates pitch number relative to another note", () => {
-        const valC4 = _calculate_pitch_number(activity, "C4", tur);
-        const valC5 = _calculate_pitch_number(activity, "C5", tur);
-        expect(valC5).toBeGreaterThan(valC4);
-    });
-});
-
 describe("NOTESFLAT", () => {
     it("should contain 12 chromatic notes", () => {
         expect(NOTESFLAT.length).toBe(12);
@@ -2402,5 +2371,98 @@ describe("getStepSizeUp", () => {
     it("should return 0 for an invalid temperament", () => {
         const result = getStepSizeUp("C major", "C", 0, "invalid");
         expect(result).toBe(0);
+    });
+});
+
+describe("_calculate_pitch_number", () => {
+    it("should return the correct pitch number for common notes", () => {
+        expect(_calculate_pitch_number("C", 4)).toBe(60);
+        expect(_calculate_pitch_number("A", 4)).toBe(69);
+        expect(_calculate_pitch_number("C", 5)).toBe(72);
+    });
+
+    it("should maintain enharmonic consistency", () => {
+        expect(_calculate_pitch_number("C#", 4)).toBe(61);
+        expect(_calculate_pitch_number("Db", 4)).toBe(61);
+    });
+
+    it("should return INVALIDPITCH for invalid input", () => {
+        expect(_calculate_pitch_number("Invalid", 4)).toBe("Not a valid pitch name");
+        expect(_calculate_pitch_number(null, 4)).toBe("Not a valid pitch name");
+    });
+});
+
+describe("getPitchInfo", () => {
+    it("should correctly parse string inputs", () => {
+        const info = getPitchInfo("C#5");
+        expect(info).toEqual({
+            name: "C#",
+            octave: 5,
+            pitchNumber: 73
+        });
+
+        const info10 = getPitchInfo("C10");
+        expect(info10).toEqual({
+            name: "C",
+            octave: 10,
+            pitchNumber: 132
+        });
+
+        // F𝄪5 (F double-sharp) → same pitch as G5 = (5+1)*12 + 7 = 79
+        const infoDoubleSharp = getPitchInfo("F\u{1D12A}5");
+        expect(infoDoubleSharp.pitchNumber).toBe(79);
+        expect(infoDoubleSharp.octave).toBe(5);
+
+        // Bb𝄫5 (B double-flat) → same pitch as A5 = (5+1)*12 + 9 = 81
+        const infoDoubleFlat = getPitchInfo("B\u{1D12B}5");
+        expect(infoDoubleFlat.pitchNumber).toBe(81);
+        expect(infoDoubleFlat.octave).toBe(5);
+
+        // Cx4 (C textual double-sharp) → same pitch as D4 = (4+1)*12 + 2 = 62
+        const infoX = getPitchInfo("Cx4");
+        expect(infoX.pitchNumber).toBe(62);
+        expect(infoX.octave).toBe(4);
+    });
+
+    it("should correctly parse numeric inputs", () => {
+        const info = getPitchInfo(60);
+        expect(info).toEqual({
+            name: "C",
+            octave: 4,
+            pitchNumber: 60
+        });
+    });
+
+    it("should handle invalid inputs", () => {
+        const info = getPitchInfo("InvalidNote");
+        expect(info).toEqual({
+            name: null,
+            octave: null,
+            pitchNumber: "Not a valid pitch name"
+        });
+    });
+
+    it("should handle accidental offset accumulation edge cases", () => {
+        // Gb-1: G(7) + flat(-1) = index 6 (G♭). (-1+1)*12 + 6 = 6
+        const infoGbNeg1 = getPitchInfo("Gb-1");
+        expect(infoGbNeg1.pitchNumber).toBe(6);
+        expect(infoGbNeg1.octave).toBe(-1);
+
+        // D𝄫-1 enharmonic of C at oct -1: (-1+1)*12 + 2 + (-2) = 0
+        // Note: D𝄫-2 (oct=-2) gives -12; octave must be -1 to reach pitch 0.
+        const infoDdblFlatNeg1 = getPitchInfo("D\u{1D12B}-1");
+        expect(infoDdblFlatNeg1.pitchNumber).toBe(0);
+        expect(infoDdblFlatNeg1.octave).toBe(-1);
+
+        // E##4: E(4) + ##(+2) → index 6 (F#). (4+1)*12 + 4 + 2 = 66
+        // Spelled with two ASCII '#' chars; each contributes +1 via ACCIDENTAL_SEMITONE_MAP.
+        const infoEDblSharp4 = getPitchInfo("E##4");
+        expect(infoEDblSharp4.pitchNumber).toBe(66);
+        expect(infoEDblSharp4.octave).toBe(4);
+
+        // Fx10: F(5) + x(+2) → index 7 (G). (10+1)*12 + 5 + 2 = 139
+        const infoFx10 = getPitchInfo("Fx10");
+        expect(infoFx10.pitchNumber).toBe(139);
+        expect(infoFx10.octave).toBe(10);
     });
 });
