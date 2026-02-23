@@ -2338,6 +2338,25 @@ class Block {
         this.updateCache();
         this.unhighlight();
         this.activity.refreshCanvas();
+        // Ensure surrounding docks and expandable clamps are updated
+        // immediately when a collapse/expand occurs (fixes layout not
+        // updating until mouse leaves the control).
+        try {
+            // Always adjust docks for this block's stack.
+            this.blocks.adjustDocks(thisBlock, true);
+
+            // If any nested clamp blocks need checking, collect them and
+            // run the expandable-clamp adjuster immediately.
+            const clampList = [];
+            this.blocks.findNestedClampBlocks(thisBlock, clampList);
+            if (clampList.length > 0) {
+                this.blocks.clampBlocksToCheck = clampList;
+                this.blocks.adjustExpandableClampBlock();
+            }
+        } catch (e) {
+            // Defensive: don't allow any errors here to break collapse flow.
+            console.debug("Error forcing immediate clamp/dock adjust:", e);
+        }
     }
 
     /**
