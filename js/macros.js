@@ -1675,7 +1675,7 @@ const getMacroExpansion = (activity, blkname, x, y) => {
         actionhelp: ACTIONHELP,
         archelp: ARCHELP,
         amsynthhelp: AMSYNTHHELP,
-        acticulationhelp: ARTICULATIONHELP,
+        articulationhelp: ARTICULATIONHELP,
         beatvaluehelp: BEATVALUEHELP,
         bottomposhelp: BOTTOMPOSHELP,
         box1help: BOX1HELP,
