@@ -6121,21 +6121,28 @@ const convertFactor = factor => {
  * @returns {*} The pitch information based on the specified type.
  */
 const getPitchInfo = (activity, type, currentNote, tur) => {
-    // A variety of conversions.
+    // Declare all variables locally
     let pitch;
     let octave;
     let obj;
-    if (Number(currentNote)) {
-        // If it is a frequency, convert it to a pitch/octave.
+    let cents; // <-- declared to fix the undeclared variable issue
+
+    if (!isNaN(Number(currentNote))) {
+        // If it is a frequency, convert it to a pitch/octave/cents
         obj = frequencyToPitch(currentNote);
         pitch = obj[0];
         octave = obj[1];
         cents = obj[2];
     } else {
-        // Turn the note into pitch and octave.
+        // Turn the note into pitch and octave
         pitch = currentNote.substr(0, currentNote.length - 1);
         octave = currentNote[currentNote.length - 1];
+        cents = 0; // assign 0 if no cents info
     }
+
+    // Return an object with all pitch info
+    return { pitch, octave, cents };
+};
     // Remap double sharps/double flats.
     if (pitch.includes(DOUBLESHARP)) {
         pitch = pitch.replace(DOUBLESHARP, "");
