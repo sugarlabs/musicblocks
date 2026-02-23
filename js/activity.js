@@ -1257,10 +1257,11 @@ class Activity {
                 }
             }
 
-            blockHelpList.forEach((name, i) => {
+            let i = 0;
+            for (const name of blockHelpList) {
                 this.__saveHelpBlock(name, i * 2000);
-            });
-
+                i++;
+            }
             this.sendAllToTrash(true, true);
         };
 
