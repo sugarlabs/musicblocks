@@ -157,7 +157,8 @@ let MYDEFINES = [
     "activity/blocks/EnsembleBlocks",
     "widgets/widgetWindows",
     "widgets/statistics",
-    "widgets/jseditor"
+    "widgets/jseditor",
+    "activity/WorkspaceStorage"
 ];
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -7470,6 +7471,28 @@ class Activity {
 
             this.save = new SaveInterface(this);
 
+            try {
+                this.workspaceStorage = new WorkspaceStorage(this);
+                await this.workspaceStorage.init();
+
+                this._setupWorkspaceEventHandlers();
+
+                const lastWorkspace = await this.workspaceStorage.doLoadWorkspace();
+                if (lastWorkspace && lastWorkspace !== "[]" && this._isCanvasEmpty()) {
+                    try {
+                        const obj = JSON.parse(lastWorkspace);
+                        if (Array.isArray(obj) && obj.length > 0) {
+                            this.blocks.loadNewBlocks(obj);
+                            this.refreshCanvas();
+                        }
+                    } catch (e) {
+                        console.error("Failed to restore last workspace", e);
+                    }
+                }
+            } catch (e) {
+                console.warn("WorkspaceStorage failed to initialize.", e);
+            }
+
             this.toolbar = new Toolbar();
             this.toolbar.init(this);
 
@@ -8227,6 +8250,60 @@ class Activity {
             console.error("Error regenerating palettes:", e);
             this.errorMsg(_("Error regenerating palettes. Please refresh the page."));
         }
+    }
+
+    _isCanvasEmpty() {
+        if (!this.blocks || !this.blocks.blockList) return true;
+        const activeBlocks = Object.values(this.blocks.blockList).filter(
+            block => block && !block.trash
+        );
+        return activeBlocks.length <= 1;
+    }
+
+    _setupWorkspaceEventHandlers() {
+        const that = this;
+        const translate = typeof _ !== "undefined" ? _ : s => s;
+
+        window.addEventListener("workspace:online", function () {
+            const planetIcon = document.getElementById("planetIcon");
+            const planetIconDisabled = document.getElementById("planetIconDisabled");
+
+            if (typeof jQuery !== "undefined" && jQuery.fn && jQuery.fn.tooltip) {
+                jQuery(".tooltipped").tooltip("close");
+            }
+
+            if (planetIcon) planetIcon.style.display = "block";
+            if (planetIconDisabled) planetIconDisabled.style.display = "none";
+
+            if (that && typeof that.textMsg === "function") {
+                that.textMsg(translate("Online"), 3000);
+            }
+        });
+
+        window.addEventListener("workspace:offline", function () {
+            const planetIcon = document.getElementById("planetIcon");
+            const planetIconDisabled = document.getElementById("planetIconDisabled");
+
+            if (typeof jQuery !== "undefined" && jQuery.fn && jQuery.fn.tooltip) {
+                jQuery(".tooltipped").tooltip("close");
+            }
+
+            if (planetIcon) planetIcon.style.display = "none";
+            if (planetIconDisabled) planetIconDisabled.style.display = "block";
+
+            if (that && typeof that.textMsg === "function") {
+                that.textMsg(translate("Offline"), 3000);
+            }
+        });
+
+        setTimeout(() => {
+            const isOnline = navigator.onLine;
+            window.dispatchEvent(
+                new CustomEvent(isOnline ? "workspace:online" : "workspace:offline", {
+                    detail: { isOnline: isOnline }
+                })
+            );
+        }, 1000);
     }
 }
 
