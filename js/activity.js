@@ -2309,7 +2309,7 @@ class Activity {
             }
 
             await this.setSmallerLargerStatus();
-            await this.stage.update();
+            this.stageDirty = true;
         };
 
         /**
@@ -2349,7 +2349,7 @@ class Activity {
             }
 
             await this.setSmallerLargerStatus();
-            await this.stage.update();
+            this.stageDirty = true;
         };
 
         /*
@@ -2939,7 +2939,7 @@ class Activity {
                     isIdle = false;
                     createjs.Ticker.framerate = ACTIVE_FPS;
                     // Force immediate redraw for responsiveness
-                    if (this.stage) this.stage.update();
+                    this.stageDirty = true;
                 }
             };
 
@@ -3664,7 +3664,7 @@ class Activity {
                             disableHorizScrollIcon.style.display == "block"
                         ) {
                             this.blocksContainer.x += this.canvas.width / 10;
-                            this.stage.update();
+                            this.stageDirty = true;
                         }
                     // fall through
                     case 220:
@@ -3674,7 +3674,7 @@ class Activity {
                             disableHorizScrollIcon.style.display == "block"
                         ) {
                             this.blocksContainer.x -= this.canvas.width / 10;
-                            this.stage.update();
+                            this.stageDirty = true;
                         }
                 }
             } else if (event.ctrlKey) {
@@ -3733,17 +3733,17 @@ class Activity {
                             this.textMsg("END " + _("Jumping to the bottom of the page."));
                             this.blocksContainer.y =
                                 -this.blocks.bottomMostBlock() + this.canvas.height / 2;
-                            this.stage.update();
+                            this.stageDirty = true;
                             break;
                         case PAGE_UP:
                             this.textMsg("PAGE_UP " + _("Scrolling up."));
                             this.blocksContainer.y += this.canvas.height / 2;
-                            this.stage.update();
+                            this.stageDirty = true;
                             break;
                         case PAGE_DOWN:
                             this.textMsg("PAGE_DOWN " + _("Scrolling down."));
                             this.blocksContainer.y -= this.canvas.height / 2;
-                            this.stage.update();
+                            this.stageDirty = true;
                             break;
                         case DEL:
                             this.textMsg("DEL " + _("Extracting block"));
@@ -3767,7 +3767,7 @@ class Activity {
                                 } else {
                                     this.blocksContainer.y += 20;
                                 }
-                                this.stage.update();
+                                this.stageDirty = true;
                             }
                             break;
                         case KEYCODE_DOWN:
@@ -3791,7 +3791,7 @@ class Activity {
                                 } else {
                                     this.blocksContainer.y -= 20;
                                 }
-                                this.stage.update();
+                                this.stageDirty = true;
                             }
                             break;
                         case KEYCODE_LEFT:
@@ -3808,7 +3808,7 @@ class Activity {
                                 } else if (this.scrollBlockContainer) {
                                     this.blocksContainer.x += 20;
                                 }
-                                this.stage.update();
+                                this.stageDirty = true;
                             }
                             break;
                         case KEYCODE_RIGHT:
@@ -3825,7 +3825,7 @@ class Activity {
                                 } else if (this.scrollBlockContainer) {
                                     this.blocksContainer.x -= 20;
                                 }
-                                this.stage.update();
+                                this.stageDirty = true;
                             }
                             break;
                         case HOME:
@@ -3843,7 +3843,7 @@ class Activity {
                                 // Bring all the blocks "home".
                                 this._findBlocks();
                             }
-                            this.stage.update();
+                            this.stageDirty = true;
                             break;
                         case TAB:
                             break;
