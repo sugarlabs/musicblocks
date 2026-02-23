@@ -340,9 +340,9 @@ class Activity {
 
             for (let i = 0; i < this.themes.length; i++) {
                 if (this.themes[i] === activeTheme) {
-                    body.classList.add(this.themes[i]);
+                    document.body.classList.add(this.themes[i]);
                 } else {
-                    body.classList.remove(this.themes[i]);
+                    document.body.classList.remove(this.themes[i]);
                 }
             }
         } catch (e) {
