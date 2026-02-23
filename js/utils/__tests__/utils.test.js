@@ -709,6 +709,7 @@ describe("Utility Functions (logic-only)", () => {
             expect(obj.viewVar).toBe(20);
             expect(obj.modelMethod()).toBe("model");
             expect(obj.viewMethod()).toBe("view");
+        });
         it("should return empty string for missing nested property", () => {
             const result = format("User: {user.age}", { user: { name: "Alice" } });
             expect(result).toBe("User: ");
