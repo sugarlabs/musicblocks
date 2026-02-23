@@ -920,13 +920,28 @@
                     body.classList.add("play-only");
                     showPersistentNotification();
 
-                    // Hide certain elements
+                    if (buttonContainer) {
+                        buttonContainer.style.display = "flex";
+                        buttonContainer.style.justifyContent = "flex-end";
+                        buttonContainer.style.alignItems = "center";
+                    }
+                    if (homeButton) {
+                        homeButton.style.display = "flex";
+                        homeButton.style.position = "fixed";
+                        homeButton.style.right = "15px";
+                        homeButton.style.bottom = "15px";
+                        homeButton.style.zIndex = "10000";
+                    }
+
+                    // Hide only non-essential elements
                     hideElementById("Show/hide blocks");
                     hideElementById("Expand/collapse blocks");
-                    hideElementById("Decrease block size");
-                    hideElementById("Increase block size");
-                    hideElementById("grid");
                     hideElementById("palette");
+
+                    // Keep Zoom and Grid visible
+                    showElementById("Decrease block size");
+                    showElementById("Increase block size");
+                    showElementById("Grid");
                 } else {
                     // Disable play-only mode
                     body.classList.remove("play-only");
@@ -936,7 +951,7 @@
                     showElementById("Expand/collapse blocks");
                     showElementById("Decrease block size");
                     showElementById("Increase block size");
-                    showElementById("grid");
+                    showElementById("Grid");
                     showElementById("palette");
                 }
             }
