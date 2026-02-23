@@ -224,11 +224,30 @@ class LanguageBox {
     }
 
     hide() {
-        const MSGPrefix =
-            "<a href='#' class='language-link' " +
-            "onMouseOver='this.style.opacity = 0.5'" +
-            "onMouseOut='this.style.opacity = 1'>";
-        const MSGSuffix = "</a>";
+        const RefreshButtonLabels = {
+            default: _("Refresh"),
+            enUS: "Refresh",
+            enUK: "Refresh",
+            ja: "リフレッシュ",
+            kana: "リフレッシュ",
+            ko: "새로 고침",
+            es: "Actualizar",
+            pt: "Atualizar",
+            zh_CN: "刷新",
+            th: "รีเฟรช",
+            hi: "रिफ़्रेश करें",
+            te: "రిఫ్రెష్ చేయండి",
+            tr: "Yenile",
+            ibo: "Nwee ọhụrụ",
+            ar: "تحديث",
+            he: "רענן",
+            ayc: "Actualizar",
+            quz: "Actualizar",
+            bn: "রিফ্রেশ করুন",
+            gug: "Actualizar",
+            ur: "ریفریش"
+        };
+        
         const MSG = {
             default: _("Refresh your browser to change your language preference."),
             enUS: "Refresh your browser to change your language preference.",
@@ -252,6 +271,7 @@ class LanguageBox {
             gug: "Actualice su navegador para cambiar su preferencia de idioma.",
             ur: "اپنی زبان کی ترجیح کو تبدیل کرنے کے لئے اپنے براؤزر کو تازہ دم کریں۔"
         };
+
         if (localStorage.getItem("languagePreference") === this._language) {
             if (this._language.includes("ja")) {
                 this._language = this._language.split("-")[0];
@@ -267,20 +287,36 @@ class LanguageBox {
             this.activity.storage.languagePreference = this._language;
 
             if (this._language === "ja" && this.activity.storage.kanaPreference === "kana") {
-                this.activity.textMsg(MSGPrefix + MSG["kana"] + MSGSuffix);
+                this.activity.textMsg(
+                    MSG["kana"] + 
+                    '<br><button class="language-refresh-btn">' + 
+                    RefreshButtonLabels["kana"] + 
+                    '</button>'
+                );
             } else {
                 if (this._language.includes("ja")) {
                     this._language = this._language.split("-")[0];
                 }
 
-                this.activity.textMsg(MSGPrefix + MSG[this._language] + MSGSuffix);
+                const langKey = MSG[this._language] ? this._language : "default";
+                const btnKey = RefreshButtonLabels[this._language] ? this._language : "default";
+                
+                this.activity.textMsg(
+                    MSG[langKey] + 
+                    '<br><button class="language-refresh-btn">' + 
+                    RefreshButtonLabels[btnKey] + 
+                    '</button>'
+                );
             }
         }
 
-        const languageLinks = document.querySelectorAll(".language-link");
-        languageLinks.forEach(link => {
-            link.addEventListener("click", () => this.OnClick());
-        });
+        // Use setTimeout to ensure the button is in the DOM before attaching listeners
+        setTimeout(() => {
+            const refreshButtons = document.querySelectorAll(".language-refresh-btn");
+            refreshButtons.forEach(button => {
+                button.addEventListener("click", () => this.OnClick());
+            });
+        }, 100);
     }
 }
 if (typeof module !== "undefined" && module.exports) {
