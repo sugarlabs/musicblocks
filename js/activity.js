@@ -4656,15 +4656,34 @@ class Activity {
         /*
          * When turtle stops running restore stop button to normal state
          */
+        /*
+         * When turtle stops running restore stop button to normal state
+         */
         this.onStopTurtle = () => {
-            // TODO: plugin support
+            for (const pluginName in this.logo.evalOnStopList) {
+                try {
+                    // eslint-disable-next-line no-eval
+                    eval(this.logo.evalOnStopList[pluginName]);
+                } catch (e) {
+                    // eslint-disable-next-line no-console
+                    console.error("Error running plugin onStop: " + pluginName, e);
+                }
+            }
         };
 
         /*
          * When turtle starts running change stop button to running state
          */
         this.onRunTurtle = () => {
-            // TODO: plugin support
+            for (const pluginName in this.logo.evalOnStartList) {
+                try {
+                    // eslint-disable-next-line no-eval
+                    eval(this.logo.evalOnStartList[pluginName]);
+                } catch (e) {
+                    // eslint-disable-next-line no-console
+                    console.error("Error running plugin onRun: " + pluginName, e);
+                }
+            }
         };
 
         /*
