@@ -204,6 +204,487 @@ const doAnalyzeProject = function () {
     return analyzeProject(globalActivity);
 };
 
+class Action {
+  constructor(doFunc, undoFunc, description = "") {
+    this.doFunc = doFunc;
+    this.undoFunc = undoFunc;
+    this.description = description;
+  }
+
+  undo() {
+    if (typeof this.undoFunc === "function") {
+      this.undoFunc();
+    }
+  }
+
+  do() {
+    if (typeof this.doFunc === "function") {
+      this.doFunc();
+    }
+  }
+}
+
+/**
+ * Command class for block movement operations.
+ * Implements the Command pattern for undo/redo functionality.
+ */
+class MoveBlockCommand {
+  constructor(blocks, blockIndices, oldPositions, newPositions, oldConnections, newConnections, oldArgClampSlots, newArgClampSlots) {
+    this.blocks = blocks;
+    this.blockIndices = blockIndices; // Array of block indices that were moved
+    this.oldPositions = oldPositions; // Map of index -> {x, y}
+    this.newPositions = newPositions; // Map of index -> {x, y}
+    this.oldConnections = oldConnections; // Map of index -> connections array
+    this.newConnections = newConnections; // Map of index -> connections array
+    this.oldArgClampSlots = oldArgClampSlots; // Map of index -> argClampSlots
+    this.newArgClampSlots = newArgClampSlots; // Map of index -> argClampSlots
+  }
+
+  /**
+   * Execute the command (redo) - move blocks to new positions
+   */
+  execute() {
+    this._restoreState(
+      this.newPositions,
+      this.newConnections,
+      this.newArgClampSlots
+    )
+  }
+
+  /**
+   * Undo the command - move blocks back to old positions
+   */
+  undo() {
+    this._restoreState(
+      this.oldPositions,
+      this.oldConnections,
+      this.oldArgClampSlots
+    )
+  }
+
+  _restoreState(positions, connections, argSlots) {
+    this.blocks._isUndoingMove = true;
+    this.blocks._isRebuildingLayout = false;
+    try {
+      // First, restore positions
+      for (const index of this.blockIndices) {
+        const blk = this.blocks.blockList[index];
+        const pos = positions.get(index);
+
+        if (!blk || blk.trash || !blk.container || !pos) continue;
+        blk.container.x = pos.x;
+        blk.container.y = pos.y;
+      }
+
+      // First disconnect current connections to avoid conflicts
+      for (const index of this.blockIndices) {
+        const blk = this.blocks.blockList[index];
+        if (!blk || blk.trash) continue;
+
+        // Disconnect from current parent
+        const currentParent = blk.connections[0];
+        if (currentParent != null && currentParent >= 0 && currentParent < this.blocks.blockList.length) {
+          const parentBlk = this.blocks.blockList[currentParent];
+          if (parentBlk && !parentBlk.trash && Array.isArray(parentBlk.connections)) {
+            for (let i = 1; i < parentBlk.connections.length; i++) {
+              if (parentBlk.connections[i] === index) {
+                parentBlk.connections[i] = null;
+                break;
+              }
+            }
+          }
+        }
+
+        // Disconnect from current children
+        if (Array.isArray(blk.connections)) {
+          for (let i = 1; i < blk.connections.length; i++) {
+            const childIndex = blk.connections[i];
+            if (childIndex != null && childIndex >= 0 && childIndex < this.blocks.blockList.length) {
+              const childBlk = this.blocks.blockList[childIndex];
+              if (childBlk && !childBlk.trash && childBlk.connections[0] === index) {
+                childBlk.connections[0] = null;
+              }
+            }
+          }
+        }
+      }
+
+      // Now restore connections arrays
+      for (const index of this.blockIndices) {
+        const blk = this.blocks.blockList[index];
+        const conn = connections.get(index);
+        if (!blk || blk.trash || !conn || !Array.isArray(conn)) continue;
+        blk.connections = [...conn];
+      }
+
+      // Restore bidirectional connections
+
+      for (const index of this.blockIndices) {
+        const blk = this.blocks.blockList[index];
+        if (!blk || blk.trash || !Array.isArray(blk.connections)) continue;
+
+        const oldConn = connections.get(index);
+        if (!oldConn) continue;
+
+        // Restore parent connection (bidirectional)
+        const parent = oldConn[0];
+        if (parent != null && parent >= 0 && parent < this.blocks.blockList.length) {
+          const parentBlk = this.blocks.blockList[parent];
+          if (parentBlk && !parentBlk.trash && Array.isArray(parentBlk.connections)) {
+            // Find which dock index in parent's old connections pointed to this block
+            // We need to check the parent's old connections if it was also moved
+            const oldParentConn = connections.get(parent);
+            let connectionRestored = false;
+
+            if (oldParentConn && Array.isArray(oldParentConn)) {
+              // Parent was also moved, use its old connections to find the right dock index
+              for (let i = 1; i < oldParentConn.length; i++) {
+                if (oldParentConn[i] === index) {
+                  parentBlk.connections[i] = index;
+                  // If parent is an expandable/clamp block, add it to clampBlocksToCheck
+                  if ((typeof parentBlk.isClampBlock === 'function' && parentBlk.isClampBlock()) ||
+                    (typeof parentBlk.isExpandableBlock === 'function' && parentBlk.isExpandableBlock())) {
+                  }
+                  connectionRestored = true;
+                  break;
+                }
+              }
+            }
+
+            // If parent wasn't moved or connection not found, search for the right slot
+            if (!connectionRestored) {
+              // Try to find where it should be connected based on connection type
+              // First check if it's already connected (shouldn't happen after disconnect, but safety check)
+              for (let i = 1; i < parentBlk.connections.length; i++) {
+                if (parentBlk.connections[i] === index) {
+                  // If parent is an expandable/clamp block, add it to clampBlocksToCheck
+                  if ((typeof parentBlk.isClampBlock === 'function' && parentBlk.isClampBlock()) ||
+                    (typeof parentBlk.isExpandableBlock === 'function' && parentBlk.isExpandableBlock())) {
+                  }
+                  connectionRestored = true;
+                  break;
+                }
+              }
+
+              // If still not found, find an appropriate empty slot
+              if (!connectionRestored) {
+                for (let i = 1; i < parentBlk.connections.length; i++) {
+                  if (parentBlk.connections[i] == null) {
+                    parentBlk.connections[i] = index;
+                    // If parent is an expandable/clamp block, add it to clampBlocksToCheck
+                    if (parentBlk.isClampBlock && parentBlk.isClampBlock() ||
+                      parentBlk.isExpandableBlock && parentBlk.isExpandableBlock()) {
+                    }
+                    break;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // Restore child connections (bidirectional)
+        for (let i = 1; i < oldConn.length; i++) {
+          const child = oldConn[i];
+          if (child != null && child >= 0 && child < this.blocks.blockList.length) {
+            const childBlk = this.blocks.blockList[child];
+            if (childBlk && !childBlk.trash) {
+              childBlk.connections[0] = index;
+            }
+          }
+        }
+      }
+
+      for (const index of this.blockIndices) {
+        const blk = this.blocks.blockList[index];
+        const slots = argSlots.get(index);
+        if (!blk || blk.trash || !slots) continue;
+        blk.argClampSlots = [...slots];
+        if (blk.updateArgSlots) {
+          blk.updateArgSlots(blk.argClampSlots);
+        }
+      }
+      
+      const topBlocks = new Set();
+      for (const index of this.blockIndices){
+        topBlocks.add(this.blocks.findTopBlock(index));
+      }
+      
+      this.blocks._isUndoingMove = true;
+      for (const top of topBlocks){
+        this.blocks.blockMoved(top);
+      }
+    } finally {
+      this.blocks._isUndoingMove = false;
+      this.blocks.activity.refreshCanvas();
+    }
+  }
+}
+
+class UndoRedoManager {
+  constructor() {
+    this.undoStack = [];
+    this.redoStack = [];
+  }
+
+  addAction(action) {
+    // Ensure stacks are arrays
+    if (!Array.isArray(this.undoStack)) {
+      this.undoStack = [];
+    }
+    if (!Array.isArray(this.redoStack)) {
+      this.redoStack = [];
+    }
+
+    this.undoStack.push(action);
+    this.redoStack = []; // Clear redo stack when new action is performed
+    this.updateButtons();
+  }
+
+  executeCommand(command) {
+    // Ensure stacks are arrays
+    if (!Array.isArray(this.undoStack)) {
+      this.undoStack = [];
+    }
+    if (!Array.isArray(this.redoStack)) {
+      this.redoStack = [];
+    }
+
+    // For command pattern - execute the command and add to undo stack
+    if (command && typeof command.execute === 'function') {
+      command.execute();
+      this.undoStack.push(command);
+      this.redoStack = []; // Clear redo stack when new action is performed
+      this.updateButtons();
+      if (globalActivity) {
+        try {
+          globalActivity.refreshCanvas();
+        } catch (e) {
+          console.error('Error refreshing canvas after executeCommand:', e);
+        }
+      }
+    } else {
+      console.warn('Invalid command passed to executeCommand');
+    }
+  }
+
+  undo() {
+    // Multiple safety checks to prevent execution when stack is empty
+    if (!Array.isArray(this.undoStack)) {
+      this.undoStack = [];
+      this.updateButtons();
+      return;
+    }
+
+    if (this.undoStack.length === 0) {
+      this.updateButtons();
+      return;
+    }
+
+    if (!this.canUndo()) {
+      this.updateButtons();
+      return;
+    }
+
+    const command = this.undoStack.pop();
+    if (!command) {
+      // Safety check - if pop returned undefined, something went wrong
+      this.updateButtons();
+      return;
+    }
+
+    try {
+      if (typeof command.undo !== 'function') {
+        console.warn('Command does not have undo method');
+        // Push back to stack to maintain consistency
+        if (!Array.isArray(this.undoStack)) {
+          this.undoStack = [];
+        }
+        this.undoStack.push(command);
+        this.updateButtons();
+        return;
+      }
+
+      // Execute undo
+      command.undo();
+
+      // Only push to redo stack if undo succeeded
+      if (!Array.isArray(this.redoStack)) {
+        this.redoStack = [];
+      }
+      this.redoStack.push(command);
+      this.updateButtons();
+
+      // Refresh canvas with error handling
+      if (globalActivity) {
+        try {
+          if (typeof globalActivity.refreshCanvas === 'function') {
+            globalActivity.refreshCanvas();
+          }
+        } catch (e) {
+          console.error('Error refreshing canvas after undo:', e);
+          // Don't crash, but try to recover
+          try {
+            if (globalActivity.stage && typeof globalActivity.stage.update === 'function') {
+              globalActivity.stage.update();
+            }
+          } catch (e2) {
+            console.error('Error updating stage during recovery:', e2);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error during undo operation:', error);
+      // Push command back to undo stack on error to maintain consistency
+      this.undoStack.push(command);
+      // Try to refresh canvas anyway to prevent white screen
+      if (globalActivity) {
+        try {
+          if (typeof globalActivity.refreshCanvas === 'function') {
+            globalActivity.refreshCanvas();
+          } else if (globalActivity.stage && typeof globalActivity.stage.update === 'function') {
+            globalActivity.stage.update();
+          }
+        } catch (e) {
+          console.error('Error refreshing canvas during error recovery:', e);
+          // Last resort - try to update stage directly
+          try {
+            if (globalActivity.stage) {
+              globalActivity.stage.update();
+            }
+          } catch (e2) {
+            console.error('Critical error - unable to refresh display:', e2);
+          }
+        }
+      }
+    }
+  }
+
+  redo() {
+    // Multiple safety checks to prevent execution when stack is empty
+    if (!Array.isArray(this.redoStack)) {
+      this.redoStack = [];
+      this.updateButtons();
+      return;
+    }
+
+    if (this.redoStack.length === 0) {
+      this.updateButtons();
+      return;
+    }
+
+    if (!this.canRedo()) {
+      this.updateButtons();
+      return;
+    }
+
+    const command = this.redoStack.pop();
+    if (!command) {
+      // Safety check - if pop returned undefined, something went wrong
+      this.updateButtons();
+      return;
+    }
+
+    try {
+      // Handle both Command pattern (execute) and Action pattern (do)
+      let executed = false;
+      if (typeof command.execute === 'function') {
+        command.execute();
+        executed = true;
+      } else if (typeof command.do === 'function') {
+        command.do();
+        executed = true;
+      } else if (typeof command.doFunc === 'function') {
+        command.doFunc();
+        executed = true;
+      }
+
+      if (!executed) {
+        console.warn('Command does not have execute, do, or doFunc method');
+        // Push back to stack to maintain consistency
+        if (!Array.isArray(this.redoStack)) {
+          this.redoStack = [];
+        }
+        this.redoStack.push(command);
+        this.updateButtons();
+        return;
+      }
+
+      // Only push to undo stack if redo succeeded
+      if (!Array.isArray(this.undoStack)) {
+        this.undoStack = [];
+      }
+      this.undoStack.push(command);
+      this.updateButtons();
+
+      // Refresh canvas with error handling
+      if (globalActivity) {
+        try {
+          if (typeof globalActivity.refreshCanvas === 'function') {
+            globalActivity.refreshCanvas();
+          }
+        } catch (e) {
+          console.error('Error refreshing canvas after redo:', e);
+          // Don't crash, but try to recover
+          try {
+            if (globalActivity.stage && typeof globalActivity.stage.update === 'function') {
+              globalActivity.stage.update();
+            }
+          } catch (e2) {
+            console.error('Error updating stage during recovery:', e2);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error during redo operation:', error);
+      // Push command back to redo stack on error to maintain consistency
+      this.redoStack.push(command);
+      // Try to refresh canvas anyway to prevent white screen
+      if (globalActivity) {
+        try {
+          if (typeof globalActivity.refreshCanvas === 'function') {
+            globalActivity.refreshCanvas();
+          } else if (globalActivity.stage && typeof globalActivity.stage.update === 'function') {
+            globalActivity.stage.update();
+          }
+        } catch (e) {
+          console.error('Error refreshing canvas during error recovery:', e);
+          // Last resort - try to update stage directly
+          try {
+            if (globalActivity.stage) {
+              globalActivity.stage.update();
+            }
+          } catch (e2) {
+            console.error('Critical error - unable to refresh display:', e2);
+          }
+        }
+      }
+    }
+  }
+
+  canUndo() {
+    // Robust check: ensure stack is an array and has items
+    return Array.isArray(this.undoStack) && this.undoStack.length > 0;
+  }
+
+  canRedo() {
+    // Robust check: ensure stack is an array and has items
+    return Array.isArray(this.redoStack) && this.redoStack.length > 0;
+  }
+
+  updateButtons() {
+    // Update button states
+    if (globalActivity && globalActivity.toolbar) {
+      globalActivity.toolbar.updateUndoRedoButton();
+    }
+  }
+}
+
+// Global instance
+window.UndoRedo = new UndoRedoManager();
+window.Action = Action;
+window.MoveBlockCommand = MoveBlockCommand;
+
 /**
  * Represents an activity in the application.
  */

@@ -680,6 +680,39 @@ class Toolbar {
         };
     }
 
+    renderUndoRedoButtons(){
+        const undoButton = docById("undoButton");
+        const redoButton = docById("redoButton");
+        if (!undoButton || !redoButton) return;
+        const that = this;
+        undoButton.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            // Use canUndo() for robust check
+            if (window.UndoRedo && window.UndoRedo.canUndo()) {
+                window.UndoRedo.undo();
+            }
+        };
+        redoButton.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            // Use canRedo() for robust check
+            if (window.UndoRedo && window.UndoRedo.canRedo()) {
+                window.UndoRedo.redo();
+            }
+        };
+        // Initialize button states
+        this.updateUndoRedoButton();
+    }
+    updateUndoRedoButton(){
+        const undoBtn = docById("undoButton");
+        const redoBtn = docById("redoButton");
+        if (undoBtn && redoBtn && window.UndoRedo) {
+            undoBtn.disabled = !window.UndoRedo.canUndo();
+            redoBtn.disabled = !window.UndoRedo.canRedo();
+        }
+    }
+
     /**
      * Toggles the turtle wrap functionality.
      *
