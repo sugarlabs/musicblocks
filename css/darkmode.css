@@ -1,64 +1,71 @@
 /* Light Mode Defaults */
 body {
-  --bg: #e8e8e8;
-  --fg: #666666;
-  --overlay-bg: rgba(255, 255, 255, 0.75);
+    --bg: #e8e8e8;
+    --fg: #666666;
+    --overlay-bg: rgba(255, 255, 255, 0.75);
 }
 
 /* Dark Mode Overrides */
 body.dark {
-  --bg: #1d1d20;
-  --fg: #e8e8e8;
-  --overlay-bg: rgba(15, 15, 16, 0.75);
+    --bg: #1d1d20;
+    --fg: #e8e8e8;
+    --overlay-bg: rgba(15, 15, 16, 0.75);
 
-  background: var(--bg);
-  color: var(--fg);
+    background: var(--bg);
+    color: var(--fg);
 }
 
 /* Help widget colors */
 .dark #helpBodyDiv {
-  background: #505050;
-  color: var(--fg);
-} 
+    background: #505050;
+    color: var(--fg);
+}
 
-.dark #helpBodyDiv>.heading,
+.dark #helpBodyDiv > .heading,
 .dark #helpBodyDiv p {
-  color: var(--fg);
+    color: var(--fg);
+}
+
+.dark #helpBodyDiv a {
+    color: #64b5f6 !important;
+}
+
+.dark #helpBodyDiv a:hover {
+    color: #90caf9 !important;
 }
 
 /* Fix white side bars in Help / Tour widget */
 .dark #floatingWindows .wfWinBody {
-  background-color: var(--bg) !important;
+    background-color: var(--bg) !important;
 }
 
 .dark #floatingWindows .windowFrame {
-  background-color: var(--bg) !important;
+    background-color: var(--bg) !important;
 }
-
 
 /* Trash view colors for dark mode */
 .dark .trash-view {
-  background-color: #2d2d2d;
-  color: #e8e8e8;
-  border: 2px solid #4a9eff;
+    background-color: #2d2d2d;
+    color: #e8e8e8;
+    border: 2px solid #4a9eff;
 }
 
 .dark .button-container {
-  background: #022363;
-  border-bottom: 1px solid #444444;
+    background: #022363;
+    border-bottom: 1px solid #444444;
 }
 
 .dark .trash-item.hover {
-  background-color: #444444;
+    background-color: #444444;
 }
 
 .dark .trash-item.selected {
-  background-color: #555555;
+    background-color: #555555;
 }
 
 /* Improve block icon visibility in dark mode */
 .dark .trash-item-icon {
-  background-color: rgba(255, 255, 255, 0.855);
-  border-radius: 3px;
-  padding: 2px;
+    background-color: rgba(255, 255, 255, 0.855);
+    border-radius: 3px;
+    padding: 2px;
 }
