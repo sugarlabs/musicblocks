@@ -134,6 +134,12 @@ function fromCache(request) {
 self.addEventListener("fetch", function (event) {
     if (event.request.method !== "GET") return;
 
+    // Only handle http/https requests to avoid caching errors with
+    // chrome-extension:// and other non-HTTP schemes
+    if (!event.request.url.startsWith("http://") && !event.request.url.startsWith("https://")) {
+        return;
+    }
+
     event.respondWith(
         fromCache(event.request).then(
             function (response) {
