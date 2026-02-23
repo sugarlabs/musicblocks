@@ -239,6 +239,15 @@ class Blocks {
 
         this.selectedBlocks = [];
 
+    /**
+     * When the trash highlight animation completes we set this flag to
+     * indicate that a release over the trash should delete the active block.
+     * This avoids a timing/race condition on touch devices where the
+     * highlight becomes visible slightly after the release event.
+     */
+    this.trashReady = false;
+    this.trashReadyBlock = null;
+
         /**
          * We stage deletion of prototype action blocks on the palette so
          * as to avoid palette refresh race conditions.
@@ -7183,6 +7192,31 @@ class Blocks {
                     y <= blockY + block.height
                 );
             });
+        };
+
+        /**
+         * Returns the index of the block at the given coordinates, or -1 if none.
+         * @param {number} x - x coordinate
+         * @param {number} y - y coordinate
+         * @returns {number}
+         */
+        this.getBlockAtCoordinate = function (x, y) {
+            for (let i = 0; i < this.blockList.length; i++) {
+                const block = this.blockList[i];
+                if (!block || block.trash) continue;
+
+                const blockX = block.container.x;
+                const blockY = block.container.y;
+                if (
+                    x >= blockX &&
+                    x <= blockX + block.width &&
+                    y >= blockY &&
+                    y <= blockY + block.height
+                ) {
+                    return i;
+                }
+            }
+            return -1;
         };
     }
 }
