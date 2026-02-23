@@ -100,6 +100,8 @@ const {
     numberToPitch,
     GetNotesForInterval,
     base64Encode,
+    NOTESFLAT,
+    NOTESSHARP,
     MUSICALMODES,
     getStepSizeUp,
     getStepSizeDown
@@ -2269,6 +2271,73 @@ describe("_calculate_pitch_number", () => {
         const valC4 = _calculate_pitch_number(activity, "C4", tur);
         const valC5 = _calculate_pitch_number(activity, "C5", tur);
         expect(valC5).toBeGreaterThan(valC4);
+    });
+});
+
+describe("NOTESFLAT", () => {
+    it("should contain 12 chromatic notes", () => {
+        expect(NOTESFLAT.length).toBe(12);
+    });
+
+    it("should start with C and end with B", () => {
+        expect(NOTESFLAT[0]).toBe("C");
+        expect(NOTESFLAT[11]).toBe("B");
+    });
+
+    it("should contain flats for black keys", () => {
+        expect(NOTESFLAT[1]).toContain("♭");
+        expect(NOTESFLAT[3]).toContain("♭");
+        expect(NOTESFLAT[6]).toContain("♭");
+    });
+
+    it("should have correct positions for natural notes", () => {
+        expect(NOTESFLAT[0]).toBe("C");
+        expect(NOTESFLAT[2]).toBe("D");
+        expect(NOTESFLAT[4]).toBe("E");
+        expect(NOTESFLAT[5]).toBe("F");
+        expect(NOTESFLAT[7]).toBe("G");
+        expect(NOTESFLAT[9]).toBe("A");
+    });
+
+    it("should be an array of strings", () => {
+        expect(Array.isArray(NOTESFLAT)).toBe(true);
+        NOTESFLAT.forEach(note => expect(typeof note).toBe("string"));
+    });
+});
+
+describe("NOTESSHARP", () => {
+    it("should contain 12 chromatic notes", () => {
+        expect(NOTESSHARP.length).toBe(12);
+    });
+    it("should start with C and end with B", () => {
+        expect(NOTESSHARP[0]).toBe("C");
+        expect(NOTESSHARP[11]).toBe("B");
+    });
+
+    it("should contain sharps for black keys", () => {
+        expect(NOTESSHARP[1]).toContain("♯");
+        expect(NOTESSHARP[3]).toContain("♯");
+        expect(NOTESSHARP[6]).toContain("♯");
+    });
+
+    it("should have correct positions for natural notes", () => {
+        expect(NOTESSHARP[0]).toBe("C");
+        expect(NOTESSHARP[2]).toBe("D");
+        expect(NOTESSHARP[4]).toBe("E");
+        expect(NOTESSHARP[5]).toBe("F");
+        expect(NOTESSHARP[7]).toBe("G");
+        expect(NOTESSHARP[9]).toBe("A");
+    });
+
+    it("should have same natural notes as NOTESFLAT", () => {
+        [0, 2, 4, 5, 7, 9, 11].forEach(i => {
+            expect(NOTESSHARP[i]).toBe(NOTESFLAT[i]);
+        });
+    });
+
+    it("should be an array of strings", () => {
+        expect(Array.isArray(NOTESSHARP)).toBe(true);
+        NOTESSHARP.forEach(note => expect(typeof note).toBe("string"));
     });
 });
 

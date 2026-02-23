@@ -43,6 +43,7 @@ const astring = {
 
 global.ASTUtils = ASTUtils;
 global.astring = astring;
+global.JSInterface = { isGetter: jest.fn(() => false) };
 
 global.JSInterface = {
     isGetter: jest.fn(name => name === "myGetter")
@@ -173,6 +174,94 @@ describe("JSGenerate Class", () => {
         );
         expect(console.log).toHaveBeenCalledWith("generated code");
     });
+
+    test("should set generateFailed when astring.generate throws", () => {
+        JSGenerate.actionTrees = [];
+        JSGenerate.startTrees = [[["start", null, null]]];
+
+        ASTUtils.getMouseAST.mockReturnValue({ type: "Mouse" });
+        astring.generate.mockImplementationOnce(() => {
+            throw new Error("Invalid AST");
+        });
+        astring.generate.mockReturnValueOnce("fallback code");
+
+        JSGenerate.generateCode();
+
+        expect(JSGenerate.generateFailed).toBe(true);
+        expect(console.error).toHaveBeenCalledWith(
+            "CANNOT GENERATE CODE\nError: INVALID ABSTRACT SYNTAX TREE"
+        );
+        expect(JSGenerate.code).toBe("fallback code");
+    });
+
+    test("should generate action tree for valid action block with connections", () => {
+        globalActivity.blocks.stackList = [1];
+        globalActivity.blocks.blockList = {
+            1: { name: "action", trash: false, connections: [null, 2, 3, null] },
+            2: { name: "text", value: "myAction", connections: [1] },
+            3: {
+                name: "forward",
+                connections: [1, 4, null],
+                protoblock: { args: 1, style: "arg" }
+            },
+            4: {
+                name: "number",
+                value: 100,
+                connections: [3],
+                protoblock: {
+                    args: 0,
+                    style: "value",
+                    __proto__: { __proto__: { constructor: { name: "ValueBlock" } } }
+                }
+            }
+        };
+
+        JSGenerate.generateStacksTree();
+
+        expect(JSGenerate.actionNames).toEqual(["myAction"]);
+        expect(JSGenerate.actionTrees.length).toBe(1);
+    });
+
+    test("should print tree with nested args including null and object", () => {
+        JSGenerate.startTrees = [[["forward", [100, null, ["add", [3, 4]]], null]]];
+        JSGenerate.actionTrees = [];
+
+        JSGenerate.printStacksTree();
+
+        expect(console.log).toHaveBeenCalledWith(
+            "\n   %c START ",
+            "background: navy; color: white; font-weight: bold"
+        );
+    });
+
+    test("should print tree with clamp sub-tree", () => {
+        JSGenerate.startTrees = [[["repeat", [3], [["forward", [100], null]]]]];
+        JSGenerate.actionTrees = [];
+
+        JSGenerate.printStacksTree();
+
+        expect(console.log).toHaveBeenCalledTimes(4);
+    });
+
+    test("should run without printing separator when printCode is false", () => {
+        globalActivity.blocks.stackList = [];
+        globalActivity.blocks.blockList = {};
+        ASTUtils.getMethodAST.mockReturnValue({ type: "Method" });
+        ASTUtils.getMouseAST.mockReturnValue({ type: "Mouse" });
+        astring.generate.mockReturnValue("code");
+
+        JSGenerate.run(true, false);
+
+        expect(console.log).not.toHaveBeenCalledWith(
+            "%c _______________________________________",
+            "color: darkorange"
+        );
+        expect(console.log).not.toHaveBeenCalledWith(
+            "\n   %c CODE ",
+            "background: greenyellow; color: midnightblue; font-weight: bold"
+        );
+    });
+  
     test("should generate stack trees with various block types and arguments", () => {
         globalActivity.blocks.stackList = [1, 20];
         const booleanGrandParent = { constructor: { name: "BooleanBlock" } };

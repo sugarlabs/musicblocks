@@ -165,9 +165,9 @@ requirejs.config({
 
 requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBackend) {
     // Use globally-loaded jQuery and Materialize (avoids AMD conflicts)
-    var $ = window.jQuery;
+    const $ = window.jQuery;
     // Materialize v0.100.2 (bundled) uses 'Materialize' as global, not 'M'
-    var M = window.Materialize || window.M;
+    const M = window.Materialize || window.M;
 
     // Ensure both M and Materialize are available for compatibility
     if (typeof M !== "undefined") {

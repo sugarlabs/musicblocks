@@ -10,15 +10,12 @@ const CACHE_VERSION = "v1";
 const CACHE_NAME = `musicblocks-cache-${CACHE_VERSION}`;
 const precacheFiles = [
     /* Add an array of files to precache for your app */
-    "./index.html",
-    // Keep in sync with the query-param URL used in index.html.
-    "./css/activities.css?v=fixed"
+    "./index.html"
 ];
 
 self.addEventListener("install", function (event) {
     // eslint-disable-next-line no-console
     console.log("[PWA Builder] Install Event processing");
-
     // eslint-disable-next-line no-console
     console.log("[PWA Builder] Skip waiting on install");
     self.skipWaiting();
@@ -95,7 +92,7 @@ self.addEventListener("activate", function (event) {
         })()
     );
 });
-
+/*
 function isPrecachedRequest(request) {
     try {
         const url = new URL(request.url);
@@ -171,7 +168,7 @@ function shouldCacheResponse(request, response) {
     // Only cache responses for allowlisted requests (static assets + explicit precache URLs).
     return isStaticAssetRequest(request) || isPrecachedRequest(request);
 }
-
+*/
 function updateCache(request, response) {
     if (response.status === 206) {
         console.log("Partial response is unsupported for caching.");
@@ -202,57 +199,29 @@ function fromCache(request) {
 self.addEventListener("fetch", function (event) {
     if (event.request.method !== "GET") return;
 
-    // App-shell offline support: serve cached index.html for navigations.
-    if (isAppShellNavigation(event.request)) {
-        event.respondWith(
-            (async () => {
-                const indexRequest = new Request("./index.html");
-                try {
-                    const cached = await fromCache(indexRequest);
-                    // Update the cached app-shell in the background.
-                    event.waitUntil(
-                        fetch(indexRequest).then(function (response) {
-                            if (shouldCacheResponse(indexRequest, response)) {
-                                return updateCache(indexRequest, response.clone());
-                            }
-                        })
-                    );
-                    return cached;
-                } catch {
-                    // No cached app-shell yet: fall back to network.
-                    return fetch(event.request);
-                }
-            })()
-        );
-        return;
-    }
-
-    // Only use cache-first for explicit precache URLs and allowlisted static assets.
-    const canUseCache = isPrecachedRequest(event.request) || isStaticAssetRequest(event.request);
-    if (!canUseCache) {
-        // Network-only for everything else (prevents caching/serving user-specific responses).
-        event.respondWith(fetch(event.request));
-        return;
-    }
-
     event.respondWith(
         fromCache(event.request).then(
             function (response) {
-                // Cache hit: return immediately, then update in background.
+                // The response was found in the cache so we responde
+                // with it and update the entry
+
+                // This is where we call the server to get the newest
+                // version of the file to use the next time we show view
                 event.waitUntil(
-                    fetch(event.request).then(function (networkResponse) {
-                        if (shouldCacheResponse(event.request, networkResponse)) {
-                            return updateCache(event.request, networkResponse.clone());
+                    fetch(event.request).then(function (response) {
+                        if (response.ok) {
+                            return updateCache(event.request, response);
                         }
                     })
                 );
                 return response;
             },
             async function () {
-                // Cache miss: fetch from network and cache if safe.
+                // The response was not found in the cache so we look
+                // for it on the server
                 try {
                     const response = await fetch(event.request);
-                    if (shouldCacheResponse(event.request, response)) {
+                    if (response.ok) {
                         event.waitUntil(updateCache(event.request, response.clone()));
                     }
                     return response;

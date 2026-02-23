@@ -352,6 +352,93 @@ describe("MusicBlocks Class", () => {
         expect(musicBlocks.MASTERVOLUME).toBe(1.0);
     });
 
+    describe("MusicBlocks.run", () => {
+        beforeEach(() => {
+            Mouse.MouseList = [];
+            jest.clearAllMocks();
+        });
+
+        test("should call prepSynths on logo", () => {
+            MusicBlocks.run();
+            expect(globalActivity.logo.prepSynths).toHaveBeenCalled();
+        });
+
+        test("should reset firstNoteTime to null", () => {
+            globalActivity.logo.firstNoteTime = 100;
+            MusicBlocks.run();
+            expect(globalActivity.logo.firstNoteTime).toBeNull();
+        });
+
+        test("should run all mice in MouseList", () => {
+            const mouse1 = { run: jest.fn(), turtle: { listeners: {} } };
+            const mouse2 = { run: jest.fn(), turtle: { listeners: {} } };
+            Mouse.MouseList = [mouse1, mouse2];
+
+            MusicBlocks.run();
+
+            expect(mouse1.run).toHaveBeenCalled();
+            expect(mouse2.run).toHaveBeenCalled();
+        });
+
+        test("should remove active listeners from turtles", () => {
+            const mockListener = jest.fn();
+            const mockMouse = {
+                run: jest.fn(),
+                turtle: {
+                    listeners: { testEvent: mockListener }
+                }
+            };
+            Mouse.MouseList = [mockMouse];
+
+            MusicBlocks.run();
+
+            expect(globalActivity.logo.stage.removeEventListener).toHaveBeenCalledWith(
+                "testEvent",
+                mockListener,
+                false
+            );
+            expect(mockMouse.turtle.listeners).toEqual({});
+        });
+
+        test("should handle empty MouseList without error", () => {
+            Mouse.MouseList = [];
+            expect(() => MusicBlocks.run()).not.toThrow();
+        });
+
+        test("should handle null stage gracefully", () => {
+            const originalStage = globalActivity.logo.stage;
+            globalActivity.logo.stage = null;
+            const mockMouse = {
+                run: jest.fn(),
+                turtle: { listeners: { testEvent: jest.fn() } }
+            };
+            Mouse.MouseList = [mockMouse];
+
+            expect(() => MusicBlocks.run()).not.toThrow();
+            expect(mockMouse.run).toHaveBeenCalled();
+
+            globalActivity.logo.stage = originalStage;
+        });
+
+        test("should clear all listeners even with multiple events", () => {
+            const mockMouse = {
+                run: jest.fn(),
+                turtle: {
+                    listeners: {
+                        event1: jest.fn(),
+                        event2: jest.fn(),
+                        event3: jest.fn()
+                    }
+                }
+            };
+            Mouse.MouseList = [mockMouse];
+
+            MusicBlocks.run();
+
+            expect(mockMouse.turtle.listeners).toEqual({});
+        });
+    });
+
     describe("runCommand", () => {
         beforeEach(() => {
             musicBlocks.turtle.waitTime = 0;
