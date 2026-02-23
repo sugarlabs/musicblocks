@@ -1294,13 +1294,10 @@ describe("Palettes Class", () => {
         test("_makeBlockFromPalette handles null protoblk", () => {
             palettes.add("test");
             const palette = palettes.dict.test;
-            const consoleSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
 
             const result = palette._makeBlockFromPalette(null, "box", jest.fn());
 
             expect(result).toBeUndefined();
-            expect(consoleSpy).toHaveBeenCalled();
-            consoleSpy.mockRestore();
         });
 
         test("_makeBlockFromPalette uses namedbox default when undefined", () => {

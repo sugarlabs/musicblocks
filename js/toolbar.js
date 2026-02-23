@@ -73,6 +73,7 @@ class Toolbar {
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["chooseKeyIcon", _("Set Pitch Preview")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
+                ["toggleMidiImportIcon", _("Import MIDI")],
                 ["restoreIcon", _("Restore")],
                 ["beginnerMode", _("Switch to beginner mode")],
                 ["advancedMode", _("Switch to advanced mode")],
@@ -142,6 +143,7 @@ class Toolbar {
                 _("Merge with current project"),
                 _("Set Pitch Preview"),
                 _("JavaScript Editor"),
+                _("Import MIDI"),
                 _("Restore"),
                 _("Switch to beginner mode"),
                 _("Switch to advanced mode"),
@@ -214,6 +216,7 @@ class Toolbar {
                 ["dark", _("Dark Mode")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
+                ["toggleMidiImportIcon", _("Import MIDI")],
                 ["restoreIcon", _("Restore")],
                 ["beginnerMode", _("Switch to beginner mode")],
                 ["advancedMode", _("Switch to advanced mode")],
@@ -277,6 +280,7 @@ class Toolbar {
                 _("Dark Mode"),
                 _("Merge with current project"),
                 _("JavaScript Editor"),
+                _("Import MIDI"),
                 _("Restore"),
                 _("Switch to beginner mode"),
                 _("Switch to advanced mode"),
@@ -1383,6 +1387,20 @@ class Toolbar {
      */
     renderJavaScriptIcon(onclick) {
         docById("toggleJavaScriptIcon").onclick = () => onclick(this.activity);
+    }
+
+    /**
+     * Renders the MIDI Import icon with the provided onclick handler.
+     *
+     * @public
+     * @param {Function} onclick - The onclick handler for the MIDI Import icon.
+     * @returns {void}
+     */
+    renderMidiImportIcon(onclick) {
+        const icon = docById("toggleMidiImportIcon");
+        if (icon) {
+            icon.onclick = () => onclick(this.activity);
+        }
     }
 
     /**

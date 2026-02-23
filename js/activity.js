@@ -26,7 +26,8 @@
    getMacroExpansion, getOctaveRatio, getTemperament, transcribeMidi,
    GOHOMEBUTTON, GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
    hideDOMLabel, initBasicProtoBlocks, initPalettes,
-   INLINECOLLAPSIBLES, jQuery, JSEditor, LanguageBox, ThemeBox, Logo, MSGBLOCK,
+   INLINECOLLAPSIBLES, jQuery, JSEditor, MidiWidget, AIMusicGenerator,
+   AI_PROVIDERS, LanguageBox, ThemeBox, Logo, MSGBLOCK,
    NANERRORMSG, NOACTIONERRORMSG, NOBOXERRORMSG, NOINPUTERRORMSG,
    NOMICERRORMSG, NOSQRTERRORMSG, NOSTRINGERRORMSG, PALETTEFILLCOLORS,
    PALETTESTROKECOLORS, PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
@@ -184,6 +185,8 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         "widgets/sampler",
         "widgets/reflection",
         "widgets/legobricks",
+        "widgets/midiWidget",
+        "activity/ai-music-generator",
         "activity/lilypond",
         "activity/abc",
         "activity/midi",
@@ -6860,6 +6863,13 @@ class Activity {
             new JSEditor(activity);
         };
 
+        /**
+         * Toggles display of MIDI import widget.
+         */
+        const toggleMidiWidget = activity => {
+            new MidiWidget(activity);
+        };
+
         const doAnalytics = activity => {
             if (!activity.statsWindow || !activity.statsWindow.isOpen) {
                 activity.statsWindow = new StatsWindow(activity);
@@ -7511,6 +7521,7 @@ class Activity {
                 this.toolbar.renderChooseKeyIcon(chooseKeyMenu);
             }
             this.toolbar.renderJavaScriptIcon(toggleJSWindow);
+            this.toolbar.renderMidiImportIcon(toggleMidiWidget);
             this.toolbar.renderLanguageSelectIcon(this.languageBox);
             this.toolbar.renderWrapIcon();
 

@@ -466,6 +466,10 @@
                                     <a id="toggleJavaScriptIcon" class="tooltipped" data-position="bottom" role="button"
                                         tabindex="0"><i class="material-icons md-48">code</i></a>
                                 </li>
+                                <li>
+                                    <a id="toggleMidiImportIcon" class="tooltipped" data-position="bottom" role="button"
+                                        tabindex="0"><i class="material-icons md-48">queue_music</i></a>
+                                </li>
                                 <li class="filler" id="aligns_merge_under_load"
                                     style="user-select: none; visibility: hidden;">
                                     <a style="color: transparent;">space&nbsp;&nbsp;&nbsp;</a>
@@ -709,16 +713,16 @@
 
             const languageDropdown = document.getElementById("languagedropdown");
             if (languageDropdown) {
-            const langLinks = languageDropdown.querySelectorAll("a");
-            langLinks.forEach(link => {
-            link.addEventListener("click", function (e) {
-                e.preventDefault(); // prevent default <a> behavior
-                const selectedLang = this.id; // ID corresponds to language code
-                localStorage.setItem("languagePreference", selectedLang);
-                location.reload(); // automatically reload
-            });
-        });
-    }
+                const langLinks = languageDropdown.querySelectorAll("a");
+                langLinks.forEach(link => {
+                    link.addEventListener("click", function (e) {
+                        e.preventDefault(); // prevent default <a> behavior
+                        const selectedLang = this.id; // ID corresponds to language code
+                        localStorage.setItem("languagePreference", selectedLang);
+                        location.reload(); // automatically reload
+                    });
+                });
+            }
         });
 
     </script>
