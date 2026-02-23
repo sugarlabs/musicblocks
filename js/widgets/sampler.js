@@ -189,8 +189,8 @@ function SampleWidget() {
                         this.activity.blocks.blockList[mainSampleBlock].text.text
                     ) {
                         // Append cent adjustment to the block text if possible
-                        const currentText = this.activity.blocks.blockList[mainSampleBlock].text
-                            .text;
+                        const currentText =
+                            this.activity.blocks.blockList[mainSampleBlock].text.text;
                         if (!currentText.includes("¢")) {
                             this.activity.blocks.blockList[mainSampleBlock].text.text +=
                                 " " + centText;
@@ -522,28 +522,24 @@ function SampleWidget() {
             }
         };
 
-        widgetWindow.addButton(
-            "load-media.svg",
-            ICONSIZE,
-            _("Upload sample"),
-            ""
-        ).onclick = function () {
-            stopTuner();
-            const fileChooser = docById("myOpenAll");
+        widgetWindow.addButton("load-media.svg", ICONSIZE, _("Upload sample"), "").onclick =
+            function () {
+                stopTuner();
+                const fileChooser = docById("myOpenAll");
 
-            // eslint-disable-next-line no-unused-vars
-            const __readerAction = function (event) {
+                // eslint-disable-next-line no-unused-vars
+                const __readerAction = function (event) {
+                    window.scroll(0, 0);
+                    const sampleFile = fileChooser.files[0];
+                    that.handleFiles(sampleFile);
+                    fileChooser.removeEventListener("change", __readerAction);
+                };
+
+                fileChooser.addEventListener("change", __readerAction, false);
+                fileChooser.focus();
+                fileChooser.click();
                 window.scroll(0, 0);
-                const sampleFile = fileChooser.files[0];
-                that.handleFiles(sampleFile);
-                fileChooser.removeEventListener("change", __readerAction);
             };
-
-            fileChooser.addEventListener("change", __readerAction, false);
-            fileChooser.focus();
-            fileChooser.click();
-            window.scroll(0, 0);
-        };
 
         // Create a container for the pitch button and frequency display
         this.pitchBtnContainer = document.createElement("div");
@@ -576,22 +572,18 @@ function SampleWidget() {
         };
 
         this._save_lock = false;
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            ICONSIZE,
-            _("Save sample"),
-            ""
-        ).onclick = function () {
-            stopTuner();
-            // Debounce button
-            if (!that._get_save_lock()) {
-                that._save_lock = true;
-                that._saveSample();
-                setTimeout(function () {
-                    that._save_lock = false;
-                }, 1000);
-            }
-        };
+        widgetWindow.addButton("export-chunk.svg", ICONSIZE, _("Save sample"), "").onclick =
+            function () {
+                stopTuner();
+                // Debounce button
+                if (!that._get_save_lock()) {
+                    that._save_lock = true;
+                    that._saveSample();
+                    setTimeout(function () {
+                        that._save_lock = false;
+                    }, 1000);
+                }
+            };
 
         this._recordBtn = widgetWindow.addButton("mic.svg", ICONSIZE, _("Toggle Mic"), "");
 
@@ -1783,9 +1775,8 @@ function SampleWidget() {
 
         const __selectionChanged = () => {
             const label = this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
-            const attr = this._accidentalsWheel.navItems[
-                this._accidentalsWheel.selectedNavItemIndex
-            ].title;
+            const attr =
+                this._accidentalsWheel.navItems[this._accidentalsWheel.selectedNavItemIndex].title;
             const octave = Number(
                 this._octavesWheel.navItems[this._octavesWheel.selectedNavItemIndex].title
             );
@@ -1906,16 +1897,16 @@ function SampleWidget() {
             // Set initial note display
             const noteObj = TunerUtils.frequencyToPitch(
                 A0 *
-                Math.pow(
-                    2,
-                    (pitchToNumber(
-                        SOLFEGENAMES[this.pitchCenter] +
-                        EXPORTACCIDENTALNAMES[this.accidentalCenter],
-                        this.octaveCenter
-                    ) -
-                        57) /
-                    12
-                )
+                    Math.pow(
+                        2,
+                        (pitchToNumber(
+                            SOLFEGENAMES[this.pitchCenter] +
+                                EXPORTACCIDENTALNAMES[this.accidentalCenter],
+                            this.octaveCenter
+                        ) -
+                            57) /
+                            12
+                    )
             );
             this.tunerDisplay.update(noteObj[0], noteObj[1], this.centsValue);
 
@@ -2047,9 +2038,8 @@ function SampleWidget() {
             const playbackRate = TunerUtils.calculatePlaybackRate(0, this.centsValue);
             // Apply the playback rate to the sample
             if (instruments[0]["customsample_" + this.originalSampleName]) {
-                instruments[0][
-                    "customsample_" + this.originalSampleName
-                ].playbackRate.value = playbackRate;
+                instruments[0]["customsample_" + this.originalSampleName].playbackRate.value =
+                    playbackRate;
             }
         }
     };
