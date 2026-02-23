@@ -59,7 +59,7 @@ class LanguageBox {
      */
     ja_onclick() {
         this._language = "ja-kanji";
-        this.activity.storage.kanaPreference = "kanji";
+        this._pendingKanaPreference = "kanji";
         this.hide();
     }
 
@@ -69,7 +69,7 @@ class LanguageBox {
      */
     kana_onclick() {
         this._language = "ja-kana";
-        this.activity.storage.kanaPreference = "kana";
+        this._pendingKanaPreference = "kana";
         this.hide();
     }
 
@@ -284,7 +284,8 @@ class LanguageBox {
             }
             this.activity.textMsg(_("Music Blocks is already set to this language."));
         } else {
-            this.activity.storage.languagePreference = this._language;
+            // Don't save to storage yet - wait for button click
+            // this.activity.storage.languagePreference = this._language;
 
             if (this._language === "ja" && this.activity.storage.kanaPreference === "kana") {
                 this.activity.textMsg(
@@ -311,10 +312,21 @@ class LanguageBox {
         }
 
         // Use setTimeout to ensure the button is in the DOM before attaching listeners
+        const that = this;
         setTimeout(() => {
             const refreshButtons = document.querySelectorAll(".language-refresh-btn");
             refreshButtons.forEach(button => {
-                button.addEventListener("click", () => this.OnClick());
+                button.addEventListener("click", () => {
+                    // Save language preference when button is clicked
+                    that.activity.storage.languagePreference = that._language;
+                    
+                    // Save kana preference if it was set (for Japanese)
+                    if (that._pendingKanaPreference) {
+                        that.activity.storage.kanaPreference = that._pendingKanaPreference;
+                    }
+                    
+                    that.OnClick();
+                });
             });
         }, 100);
     }
