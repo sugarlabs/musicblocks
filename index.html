@@ -198,13 +198,21 @@
                 <div class="popupMsg" id="printText" tabindex="-1">
                     <div class="contentWrapper">
                         <span id="printTextContent"></span>
-                        <img class="msgCloseIcon" onclick="hidePrintText()" src="images/close.svg" alt="Close">
+                        <button class="msgCloseButton" onclick="hidePrintText()"
+                            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"
+                            aria-label="Close dialog">
+                            <img src="images/close.svg" alt="">
+                        </button>
                     </div>
                 </div>
                 <div class="popupMsg" id="errorText" tabindex="-1">
                     <div class="contentWrapper">
                         <span id="errorTextContent"></span>
-                        <img class="msgCloseIcon" onclick="hideErrorText()" src="images/close.svg" alt="Close">
+                        <button class="msgCloseButton" onclick="hideErrorText()"
+                            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"
+                            aria-label="Close dialog">
+                            <img src="images/close.svg" alt="">
+                        </button>
                     </div>
                 </div>
 
@@ -298,7 +306,9 @@
             <dialog id="lilypondModal" class="modal" tabindex="-1">
                 <!-- Modal content for Lilypond save dialog -->
                 <div class="modal-content" tabindex="-1">
-                    <span class="close">&times;</span>
+                    <button class="close"
+                        onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"
+                        aria-label="Close dialog">&times;</button>
                     <div id="fileNameText"></div>
                     <input type="text" id="fileName" tabindex="-1">
                     <p></p>
@@ -709,16 +719,16 @@
 
             const languageDropdown = document.getElementById("languagedropdown");
             if (languageDropdown) {
-            const langLinks = languageDropdown.querySelectorAll("a");
-            langLinks.forEach(link => {
-            link.addEventListener("click", function (e) {
-                e.preventDefault(); // prevent default <a> behavior
-                const selectedLang = this.id; // ID corresponds to language code
-                localStorage.setItem("languagePreference", selectedLang);
-                location.reload(); // automatically reload
-            });
-        });
-    }
+                const langLinks = languageDropdown.querySelectorAll("a");
+                langLinks.forEach(link => {
+                    link.addEventListener("click", function (e) {
+                        e.preventDefault(); // prevent default <a> behavior
+                        const selectedLang = this.id; // ID corresponds to language code
+                        localStorage.setItem("languagePreference", selectedLang);
+                        location.reload(); // automatically reload
+                    });
+                });
+            }
         });
 
     </script>
@@ -946,38 +956,38 @@
             window.addEventListener("resize", togglePlayOnlyMode);
         });
 
-    (function () {
-        function setAppHeight() {
-            const vh = window.innerHeight * 0.01;
-            document.documentElement.style.setProperty('--vh', `${vh}px`);
-        }
+        (function () {
+            function setAppHeight() {
+                const vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            }
 
-        window.addEventListener('resize', setAppHeight);
-        document.addEventListener('fullscreenchange', setAppHeight);
-        setAppHeight();
-    })();
+            window.addEventListener('resize', setAppHeight);
+            document.addEventListener('fullscreenchange', setAppHeight);
+            setAppHeight();
+        })();
 
-(function () {
-  function resizeCanvasesToScreen() {
-    const canvases = document.querySelectorAll("canvas");
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+        (function () {
+            function resizeCanvasesToScreen() {
+                const canvases = document.querySelectorAll("canvas");
+                const width = window.innerWidth;
+                const height = window.innerHeight;
 
-    canvases.forEach(c => {
-      c.width = width;
-      c.height = height;
-      c.style.width = "100%";
-      c.style.height = "100%";
-    });
-  }
+                canvases.forEach(c => {
+                    c.width = width;
+                    c.height = height;
+                    c.style.width = "100%";
+                    c.style.height = "100%";
+                });
+            }
 
-  window.addEventListener("resize", resizeCanvasesToScreen);
-  document.addEventListener("fullscreenchange", resizeCanvasesToScreen);
+            window.addEventListener("resize", resizeCanvasesToScreen);
+            document.addEventListener("fullscreenchange", resizeCanvasesToScreen);
 
-  setTimeout(resizeCanvasesToScreen, 150);
-})();
+            setTimeout(resizeCanvasesToScreen, 150);
+        })();
 
-</script>
+    </script>
 
 
 </body>
