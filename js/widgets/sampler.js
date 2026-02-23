@@ -305,14 +305,14 @@ function SampleWidget() {
      * @returns {void}
      */
     this.__save = function () {
-        const that = this;
+        var that = this;
         setTimeout(function () {
             that._addSample();
 
             // Include the cent adjustment value in the sample block
             const centAdjustment = that.centAdjustmentValue || 0;
 
-            const newStack = [
+            var newStack = [
                 [0, "settimbre", 100, 100, [null, 1, null, 5]],
                 [
                     1,
@@ -493,16 +493,10 @@ function SampleWidget() {
             }
 
             docById("wheelDivptm").style.display = "none";
-            if (this._pitchWheel !== undefined) {
+            if (!this.pitchWheel === undefined) {
                 this._pitchWheel.removeWheel();
-            }
-            if (this._exitWheel !== undefined) {
                 this._exitWheel.removeWheel();
-            }
-            if (this._accidentalsWheel !== undefined) {
                 this._accidentalsWheel.removeWheel();
-            }
-            if (this._octavesWheel !== undefined) {
                 this._octavesWheel.removeWheel();
             }
             this.pitchAnalysers = {};
@@ -1906,16 +1900,16 @@ function SampleWidget() {
             // Set initial note display
             const noteObj = TunerUtils.frequencyToPitch(
                 A0 *
-                Math.pow(
-                    2,
-                    (pitchToNumber(
-                        SOLFEGENAMES[this.pitchCenter] +
-                        EXPORTACCIDENTALNAMES[this.accidentalCenter],
-                        this.octaveCenter
-                    ) -
-                        57) /
-                    12
-                )
+                    Math.pow(
+                        2,
+                        (pitchToNumber(
+                            SOLFEGENAMES[this.pitchCenter] +
+                                EXPORTACCIDENTALNAMES[this.accidentalCenter],
+                            this.octaveCenter
+                        ) -
+                            57) /
+                            12
+                    )
             );
             this.tunerDisplay.update(noteObj[0], noteObj[1], this.centsValue);
 
@@ -2336,6 +2330,7 @@ function SampleWidget() {
                 instruments[0][instrumentName].playbackRate.value = playbackRate;
             } else {
                 // If the instrument doesn't exist yet, we'll apply the adjustment when playing
+                console.log("Instrument not found, will apply cent adjustment during playback");
             }
         }
 
