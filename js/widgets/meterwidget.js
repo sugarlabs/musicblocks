@@ -490,7 +490,6 @@ class MeterWidget {
             n += 3;
         }
 
-        // console.debug(newStack);
         this.activity.blocks.loadNewBlocks(newStack);
     }
 
