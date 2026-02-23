@@ -135,7 +135,7 @@
     </noscript>
     <header>
         <div id="loading-image-container"
-            style="position: fixed; top: 0; left: 0; width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #FFFFFF; z-index: 9999; contain: paint;">
+            style="position: fixed; top: 0; left: 0; width: 100%; height: calc(var(--vh) * 100); display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #FFFFFF; z-index: 9999; contain: paint;">
             <div id="loading-media" style="width: 100%; padding: 0 20px; box-sizing: border-box;"></div>
             <div class="loading-text" id="loadingText"
                 style="color:#333; margin-top: 2rem; min-height: 1.5em; font-size: 1.2rem;">
@@ -190,7 +190,7 @@
             <label for="fixed">Fixed</label>
         </div>
         <!-- #92B5C8  width = 3790 height = 1743-->
-        <canvas id="canvas" width="100%" height="100%" style="background-color:#FFFFFF; width:100%;"></canvas>
+        <canvas id="canvas" style="background-color:#FFFFFF; width:100%; height:100%;"></canvas>
 
         <!--hidden at the beginning whilst everything loads-->
         <div id="hideContents" style="display: none;" tabindex="-1">
@@ -706,6 +706,19 @@
                     index = (index + 1) % texts.length;
                 }, 1500);
             }, 3000);
+
+            const languageDropdown = document.getElementById("languagedropdown");
+            if (languageDropdown) {
+            const langLinks = languageDropdown.querySelectorAll("a");
+            langLinks.forEach(link => {
+            link.addEventListener("click", function (e) {
+                e.preventDefault(); // prevent default <a> behavior
+                const selectedLang = this.id; // ID corresponds to language code
+                localStorage.setItem("languagePreference", selectedLang);
+                location.reload(); // automatically reload
+            });
+        });
+    }
         });
 
     </script>
@@ -933,7 +946,39 @@
             window.addEventListener("resize", togglePlayOnlyMode);
         });
 
-    </script>
+    (function () {
+        function setAppHeight() {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+
+        window.addEventListener('resize', setAppHeight);
+        document.addEventListener('fullscreenchange', setAppHeight);
+        setAppHeight();
+    })();
+
+(function () {
+  function resizeCanvasesToScreen() {
+    const canvases = document.querySelectorAll("canvas");
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    canvases.forEach(c => {
+      c.width = width;
+      c.height = height;
+      c.style.width = "100%";
+      c.style.height = "100%";
+    });
+  }
+
+  window.addEventListener("resize", resizeCanvasesToScreen);
+  document.addEventListener("fullscreenchange", resizeCanvasesToScreen);
+
+  setTimeout(resizeCanvasesToScreen, 150);
+})();
+
+</script>
+
 
 </body>
 
