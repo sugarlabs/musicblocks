@@ -136,18 +136,8 @@ describe("Search Widget Listener Fix", () => {
         activity.turtleBlocksScale = 1;
 
         // Fresh mocks for each instance
-        activity.addEventListener = jest.fn(function (target, type, listener) {
-            if (target && target.addEventListener) {
-                target.addEventListener(type, listener);
-            }
-            if (!this._listeners) this._listeners = [];
-            this._listeners.push({ target, type, listener });
-        });
-        activity.removeEventListener = jest.fn(function (target, type, listener) {
-            if (target && target.removeEventListener) {
-                target.removeEventListener(type, listener);
-            }
-        });
+        activity = new Activity();
+        activity.turtleBlocksScale = 1;
 
         // Re-inject mocks that might be overwritten or needed
         activity.searchWidget = sandbox.document.getElementById("search");
@@ -167,35 +157,35 @@ describe("Search Widget Listener Fix", () => {
             throw e;
         }
 
-        const addCalls = activity.addEventListener.mock.calls.filter(c => c[1] === "mousedown");
+        const addCalls = sandbox.document.addEventListener.mock.calls.filter(c => c[0] === "mousedown");
         expect(addCalls.length).toBe(1);
     });
 
     test("showSearchWidget should NOT accumulate listeners when toggled", () => {
         activity.showSearchWidget(); // Toggles ON
-        expect(activity.addEventListener.mock.calls.filter(c => c[1] === "mousedown").length).toBe(1);
+        expect(sandbox.document.addEventListener.mock.calls.filter(c => c[0] === "mousedown").length).toBe(1);
 
         activity.showSearchWidget(); // Toggles OFF
 
-        expect(activity.removeEventListener.mock.calls.filter(c => c[1] === "mousedown").length).toBe(1);
+        expect(sandbox.document.removeEventListener.mock.calls.filter(c => c[0] === "mousedown").length).toBe(1);
         // addEventListener should NOT have been called again during toggle OFF
-        expect(activity.addEventListener.mock.calls.filter(c => c[1] === "mousedown").length).toBe(1);
+        expect(sandbox.document.addEventListener.mock.calls.filter(c => c[0] === "mousedown").length).toBe(1);
     });
 
-    test("hideSearchWidget should remove the listener via wrapper", () => {
+    test("hideSearchWidget should remove the listener", () => {
         activity.showSearchWidget();
 
         // Capture the listener added
-        const listener = activity.addEventListener.mock.calls.find(c => c[1] === "mousedown")[2];
+        const listener = sandbox.document.addEventListener.mock.calls.find(c => c[0] === "mousedown")[1];
 
         activity.hideSearchWidget();
 
-        expect(activity.removeEventListener).toHaveBeenCalledWith(sandbox.document, "mousedown", listener);
+        expect(sandbox.document.removeEventListener).toHaveBeenCalledWith("mousedown", listener);
     });
 
     test("clicking inside search should NOT remove listener", () => {
         activity.showSearchWidget();
-        const listener = activity.addEventListener.mock.calls.find(c => c[1] === "mousedown")[2];
+        const listener = sandbox.document.addEventListener.mock.calls.find(c => c[0] === "mousedown")[1];
 
         const searchElem = activity.searchWidget;
         searchElem.style.visibility = "visible";
@@ -207,20 +197,20 @@ describe("Search Widget Listener Fix", () => {
         searchElem.contains.mockImplementation(target => target === searchElem);
 
         // Verify removeEventListener was NOT called for this listener
-        const removeCalls = activity.removeEventListener.mock.calls.filter(c => c[2] === listener);
+        const removeCalls = sandbox.document.removeEventListener.mock.calls.filter(c => c[1] === listener);
         expect(removeCalls.length).toBe(0);
     });
 
     test("clicking outside search SHOULD remove listener and hide widget", () => {
         activity.showSearchWidget();
-        const listener = activity.addEventListener.mock.calls.find(c => c[1] === "mousedown")[2];
+        const listener = sandbox.document.addEventListener.mock.calls.find(c => c[0] === "mousedown")[1];
         const hideSpy = jest.spyOn(activity, "hideSearchWidget");
 
         // Clicked outside
         listener({ target: {} });
 
         expect(hideSpy).toHaveBeenCalled();
-        expect(activity.removeEventListener).toHaveBeenCalledWith(sandbox.document, "mousedown", listener);
+        expect(sandbox.document.removeEventListener).toHaveBeenCalledWith("mousedown", listener);
         hideSpy.mockRestore();
     });
 });

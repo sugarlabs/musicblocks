@@ -581,7 +581,7 @@ class Activity {
             if (this.helpfulSearchDiv && this.helpfulSearchDiv.parentNode) {
                 this.helpfulSearchDiv.parentNode.removeChild(this.helpfulSearchDiv);
             }
-            this.__tick();
+            that.__tick();
         };
 
         /*
@@ -3164,9 +3164,8 @@ class Activity {
             this.searchWidget.style.visibility = "hidden";
             this.searchWidget.idInput_custom = "";
 
-            // clean up listener
             if (this._searchCloseListener) {
-                this.removeEventListener(document, "mousedown", this._searchCloseListener);
+                document.removeEventListener("mousedown", this._searchCloseListener);
                 this._searchCloseListener = null;
             }
         };
@@ -3199,40 +3198,40 @@ class Activity {
                 this.searchBlockPosition = [100, 100];
                 this.prepSearchWidget();
 
+                const that = this;
                 const closeListener = e => {
                     if (
                         document.getElementById("search").style.visibility === "visible" &&
                         (e.target === document.getElementById("search") ||
                             document.getElementById("search").contains(e.target))
                     ) {
-                        // do nothing in input field
+                        //do nothing when clicked in the input field
                     } else if (
                         document.getElementById("ui-id-1") &&
                         document.getElementById("ui-id-1").style.display === "block" &&
                         (e.target === document.getElementById("ui-id-1") ||
                             document.getElementById("ui-id-1").contains(e.target))
                     ) {
-                        // do nothing on menu
+                        //do nothing when clicked on the menu
                     } else if (document.getElementsByTagName("tr")[2].contains(e.target)) {
-                        // do nothing on search row
+                        //do nothing when clicked on the search row
                     } else {
-                        // hide search bar if someone clicks on menu items
-                        this.hideSearchWidget();
+                        // this will hide the search bar if someone clicks on menu items
+                        that.hideSearchWidget();
                     }
                 };
 
-                // remove previous listener
                 if (this._searchCloseListener) {
-                    this.removeEventListener(document, "mousedown", this._searchCloseListener);
+                    document.removeEventListener("mousedown", this._searchCloseListener);
                 }
                 this._searchCloseListener = closeListener;
-                this.addEventListener(document, "mousedown", closeListener);
+                document.addEventListener("mousedown", closeListener);
 
                 // Give the browser time to update before selecting
                 // focus.
                 setTimeout(() => {
-                    this.searchWidget.focus();
-                    this.doSearch();
+                    that.searchWidget.focus();
+                    that.doSearch();
                 }, 500);
             }
         };
