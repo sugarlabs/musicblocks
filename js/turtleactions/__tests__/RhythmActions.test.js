@@ -293,6 +293,33 @@ describe("setupRhythmActions", () => {
 
         expect(value).toBe(0);
     });
+    it("respects getNoteValue priority hierarchy", () => {
+        // Simulate active note block
+        targetTurtle.singer.inNoteBlock = [7];
+
+        // Provide ALL possible sources
+        targetTurtle.singer.noteValue = { 7: 0.25 }; // highest priority
+        targetTurtle.singer.lastNotePlayed = [null, 8]; // second priority
+        targetTurtle.singer.notePitches = { 7: ["C"] }; // third priority
+        targetTurtle.singer.noteBeat = { 7: 4 };
+
+        const value = Singer.RhythmActions.getNoteValue(0);
+
+        // noteValue = 0.25 -> internally inverted twice -> returns 0.25
+        expect(value).toBe(0.25);
+    });
+    it("falls back to noteBeat when noteValue and lastNotePlayed are absent", () => {
+        targetTurtle.singer.inNoteBlock = [5];
+
+        targetTurtle.singer.noteValue = {};
+        targetTurtle.singer.lastNotePlayed = null;
+        targetTurtle.singer.notePitches = { 5: ["C"] };
+        targetTurtle.singer.noteBeat = { 5: 4 };
+
+        const value = Singer.RhythmActions.getNoteValue(0);
+
+        expect(value).toBe(0.25); // 1 / 4
+    });
 
     describe("doTie", () => {
         // Store original implementations to restore after tests
@@ -462,5 +489,66 @@ describe("setupRhythmActions", () => {
                 expect.any(Function) // callback
             );
         });
+    });
+
+    it("restores beatFactor after dot and multiply lifecycle", () => {
+        let dotListener, multiplyListener;
+
+        activity.logo.setTurtleListener = jest.fn((_, name, cb) => {
+            if (name.includes("_dot_")) dotListener = cb;
+            if (name.includes("_multiplybeat_")) multiplyListener = cb;
+        });
+
+        targetTurtle.singer.beatFactor = 1;
+        targetTurtle.singer.dotCount = 0;
+
+        Singer.RhythmActions.doRhythmicDot(1, 0, 1);
+        Singer.RhythmActions.multiplyNoteValue(2, 0, 1);
+
+        const mutated = targetTurtle.singer.beatFactor;
+        expect(mutated).not.toBe(1);
+
+        multiplyListener();
+        dotListener();
+
+        expect(targetTurtle.singer.beatFactor).toBeCloseTo(1);
+    });
+    it("maintains stable beatFactor after repeated dots", () => {
+        targetTurtle.singer.beatFactor = 1;
+        targetTurtle.singer.dotCount = 0;
+
+        Singer.RhythmActions.doRhythmicDot(1, 0, 1);
+        Singer.RhythmActions.doRhythmicDot(1, 0, 1);
+
+        expect(targetTurtle.singer.dotCount).toBe(2);
+        expect(targetTurtle.singer.beatFactor).toBeGreaterThan(0);
+    });
+    it("treats osctime differently from note duration", () => {
+        const enqueue = jest.fn();
+        Singer.processNote.mockClear();
+
+        Singer.RhythmActions.playNote(2, "note", 0, 1, enqueue);
+        let listener = activity.logo.setTurtleListener.mock.calls[0][2];
+        listener();
+
+        const noteCall = Singer.processNote.mock.calls[0];
+
+        Singer.processNote.mockClear();
+
+        Singer.RhythmActions.playNote(500, "osctime", 0, 1, enqueue);
+        listener = activity.logo.setTurtleListener.mock.calls[1][2];
+        listener();
+
+        const oscCall = Singer.processNote.mock.calls[0];
+
+        expect(noteCall[2]).toBe(false);
+        expect(oscCall[2]).toBe(true);
+    });
+    it("activates multipleVoices for nested notes", () => {
+        targetTurtle.singer.inNoteBlock = [10];
+
+        Singer.RhythmActions.playNote(1, "note", 0, 1, jest.fn());
+
+        expect(targetTurtle.singer.multipleVoices).toBe(true);
     });
 });
