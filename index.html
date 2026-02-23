@@ -118,6 +118,7 @@
     <link rel="stylesheet" href="css/themes.css?v=fixed">
     <script src="lib/easeljs.min.js" defer></script>
     <script src="lib/tweenjs.min.js" defer></script>
+    <script src="js/experimental/recorder-dev-only.js" defer></script>
     <script>
         let ast2blocklist_config;
         document.addEventListener("DOMContentLoaded", function () {
@@ -686,6 +687,7 @@
 
                 const container = document.getElementById("loading-media");
                 const content = lang.startsWith("ja")
+                ? `<img src="loading-animation-ja.svg" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
                     ? `<img src="loading-animation-ja.png" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
                     : `<video loop autoplay muted playsinline fetchpriority="high" style="width: 90%; height: 100%; object-fit: contain;">
                         <source src="loading-animation.webm" type="video/webm">
