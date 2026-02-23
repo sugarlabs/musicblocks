@@ -1906,16 +1906,16 @@ function SampleWidget() {
             // Set initial note display
             const noteObj = TunerUtils.frequencyToPitch(
                 A0 *
-                    Math.pow(
-                        2,
-                        (pitchToNumber(
-                            SOLFEGENAMES[this.pitchCenter] +
-                                EXPORTACCIDENTALNAMES[this.accidentalCenter],
-                            this.octaveCenter
-                        ) -
-                            57) /
-                            12
-                    )
+                Math.pow(
+                    2,
+                    (pitchToNumber(
+                        SOLFEGENAMES[this.pitchCenter] +
+                        EXPORTACCIDENTALNAMES[this.accidentalCenter],
+                        this.octaveCenter
+                    ) -
+                        57) /
+                    12
+                )
             );
             this.tunerDisplay.update(noteObj[0], noteObj[1], this.centsValue);
 
@@ -2336,7 +2336,6 @@ function SampleWidget() {
                 instruments[0][instrumentName].playbackRate.value = playbackRate;
             } else {
                 // If the instrument doesn't exist yet, we'll apply the adjustment when playing
-                console.log("Instrument not found, will apply cent adjustment during playback");
             }
         }
 
