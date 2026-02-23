@@ -196,6 +196,17 @@ body:not(.dark) #helpfulSearchDiv {
   float: right;
   font-size: 28px;
   font-weight: bold;
+  background: none;
+  border: none;
+  padding: 0;
+  line-height: 1;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .close:hover,
@@ -1990,8 +2001,23 @@ table {
   transition: background-color 0.3s, filter 0.3s;
 }
 
-.msgCloseIcon:hover {
+.msgCloseButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.msgCloseButton:hover .msgCloseIcon {
   filter: invert(0%);
+}
+
+.msgCloseButton:focus {
+  outline: 2px solid #2196F3;
+  outline-offset: 2px;
 }
 
 .disable_highlighting {
@@ -2170,6 +2196,32 @@ table {
   #right-arrow {
     right: 20px !important;
   }
+}
+
+#crossButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  background: #f2f2f2;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 30px;
+  height: 30px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+}
+
+#crossButton:hover {
+  background: #e0e0e0;
+}
+
+#crossButton:focus {
+  outline: 2px solid #2196F3;
+  outline-offset: 2px;
 }
 
 /* ======================================================
