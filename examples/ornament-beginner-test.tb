@@ -1,0 +1,41 @@
+[
+[200,["action",{"collapsed":false}],900,150,[null,201,202,null]],
+[201,["text",{"value":"Ornament Palette (Beginner) Tests"}],1000,160,[200]],
+
+[202,["action",{"collapsed":false}],900,200,[null,203,204,null]],
+[203,["text",{"value":"Test 1: Neighbor Note"}],1000,210,[202]],
+[204,["neighbor",{"value":1}],900,250,[202,205,null]],
+[205,["newnote",{}],900,300,[204,206,207,208]],
+[206,["number",{"value":1}],1000,330,[205]],
+[207,["solfege",{"value":"do"}],1000,360,[205]],
+[208,["print",{}],900,400,[205,209,null]],
+[209,["text",{"value":"Neighbor note test completed"}],1000,430,[208]],
+
+[210,["action",{"collapsed":false}],900,480,[null,211,212,null]],
+[211,["text",{"value":"Test 2: New Slur Effect"}],1000,490,[210]],
+[212,["newslur",{}],900,530,[210,213,null]],
+[213,["newnote",{}],900,580,[212,214,215,216]],
+[214,["number",{"value":1}],1000,610,[213]],
+[215,["solfege",{"value":"re"}],1000,640,[213]],
+[216,["print",{}],900,680,[213,217,null]],
+[217,["text",{"value":"Slur effect test completed"}],1000,710,[216]],
+
+[218,["action",{"collapsed":false}],900,760,[null,219,220,null]],
+[219,["text",{"value":"Test 3: New Staccato Effect"}],1000,770,[218]],
+[220,["newstaccato",{}],900,810,[218,221,null]],
+[221,["newnote",{}],900,860,[220,222,223,224]],
+[222,["number",{"value":1}],1000,890,[221]],
+[223,["solfege",{"value":"mi"}],1000,920,[221]],
+[224,["print",{}],900,960,[221,225,null]],
+[225,["text",{"value":"Staccato effect test completed"}],1000,990,[224]],
+
+[226,["action",{"collapsed":false}],900,1040,[null,227,228,null]],
+[227,["text",{"value":"Test 4: Combined Ornaments"}],1000,1050,[226]],
+[228,["newslur",{}],900,1090,[226,229,null]],
+[229,["neighbor",{"value":2}],900,1130,[228,230,null]],
+[230,["newnote",{}],900,1180,[229,231,232,233]],
+[231,["number",{"value":1}],1000,1210,[230]],
+[232,["solfege",{"value":"fa"}],1000,1240,[230]],
+[233,["print",{}],900,1280,[230,234,null]],
+[234,["text",{"value":"Combined ornaments test completed"}],1000,1310,[233]]
+]
