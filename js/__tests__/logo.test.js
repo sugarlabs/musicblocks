@@ -57,7 +57,11 @@ global.doStopVideoCam = jest.fn();
 global.CAMERAVALUE = "camera:";
 global.VIDEOVALUE = "video:";
 global.doUseCamera = jest.fn();
-global.delayExecution = jest.fn((ms, callback) => callback());
+global.delayExecution = jest.fn((ms, callback) => {
+    if (typeof callback === "function") {
+        callback();
+    }
+});
 global.getStatsFromNotation = jest.fn();
 global.Tone = {
     UserMedia: jest.fn().mockImplementation(() => ({
@@ -230,7 +234,8 @@ describe("Logo Class", () => {
             },
             stage: {
                 removeEventListener: jest.fn(),
-                addEventListener: jest.fn()
+                addEventListener: jest.fn(),
+                update: jest.fn()
             },
             onStopTurtle: jest.fn(),
             onRunTurtle: jest.fn(),
@@ -708,7 +713,8 @@ describe("Logo comprehensive method coverage", () => {
             stage: {
                 addEventListener: jest.fn(),
                 removeEventListener: jest.fn(),
-                dispatchEvent: jest.fn()
+                dispatchEvent: jest.fn(),
+                update: jest.fn()
             },
             errorMsg: jest.fn(),
             textMsg: jest.fn(),

@@ -92,6 +92,7 @@ describe("logoconstants", () => {
             "EMPTYHEAPERRORMSG",
             "POSNUMBER",
             "INVALIDPITCH",
+            "MIN_HIGHLIGHT_DURATION_MS",
             "NOTATIONNOTE",
             "NOTATIONDURATION",
             "NOTATIONDOTCOUNT",
