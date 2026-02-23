@@ -296,7 +296,6 @@ class ReflectionMatrix {
     async updateProjectCode() {
         const code = await this.activity.prepareExport();
         if (code === this.code) {
-            console.log("No changes in code detected.");
             return; // No changes in code
         }
 
@@ -308,8 +307,6 @@ class ReflectionMatrix {
             if (data.algorithm !== "unchanged") {
                 this.projectAlgorithm = data.algorithm; // update algorithm
                 this.code = code;
-            } else {
-                console.log("No changes in algorithm detected.");
             }
             this.botReplyDiv(data, false, false);
         } else {
@@ -416,7 +413,6 @@ class ReflectionMatrix {
      */
     async generateAnalysis() {
         try {
-            console.log("Summary stored", this.summary);
             const response = await fetch(`${this.PORT}/analysis`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -580,7 +576,6 @@ class ReflectionMatrix {
         } catch (e) {
             console.warn("Could not save analysis report to localStorage:", e);
         }
-        console.log("Conversation saved in localStorage.");
     }
 
     /** Reads the analysis report from localStorage.
