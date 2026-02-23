@@ -8043,7 +8043,6 @@ class Activity {
 
             /*
             document.addEventListener("mousewheel", scrollEvent, false);
-            document.addEventListener("DOMMouseScroll", scrollEvent, false);
             */
 
             // Named event handler for proper cleanup
