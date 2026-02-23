@@ -2195,7 +2195,7 @@ function TemperamentWidget() {
         row.id = "buttonsRow";
 
         temperamentCell = row.insertCell();
-        if (temperamentCell){
+        if (temperamentCell) {
             temperamentCell.innerHTML = this.inTemperament;
         }
         temperamentCell.style.width = 2 * BUTTONSIZE + "px";

@@ -1,7 +1,7 @@
 const TemperamentWidget = require("../temperament");
 describe("TemperamentWidget basic tests", () => {
     let widget;
-    global._ = jest.fn((text) => text);
+    global._ = jest.fn(text => text);
 
     beforeEach(() => {
         document.body.innerHTML = `
@@ -10,7 +10,7 @@ describe("TemperamentWidget basic tests", () => {
         <div id="userEdit"></div>
     `;
 
-        global._ = jest.fn((text) => text);
+        global._ = jest.fn(text => text);
 
         global.wheelnav = jest.fn().mockImplementation(() => ({
             wheelRadius: 0,
@@ -45,7 +45,7 @@ describe("TemperamentWidget basic tests", () => {
             DonutSliceCustomization: () => ({})
         }));
 
-        global.docById = jest.fn((id) => ({
+        global.docById = jest.fn(id => ({
             innerHTML: "",
             style: {},
             append: jest.fn(),
@@ -68,8 +68,8 @@ describe("TemperamentWidget basic tests", () => {
         widget._logo = {
             resetSynth: jest.fn(),
             synth: {
-                trigger: jest.fn(),
-            },
+                trigger: jest.fn()
+            }
         };
 
         widget.frequencies = [440];
@@ -151,7 +151,7 @@ describe("TemperamentWidget basic tests", () => {
         widget.tempRatios1 = [2];
         widget.frequencies = [440];
 
-        global.docById = jest.fn((id) => {
+        global.docById = jest.fn(id => {
             if (id === "wheelDiv4") return null;
             return { style: {} };
         });
@@ -205,7 +205,7 @@ describe("TemperamentWidget basic tests", () => {
         global.docById = jest.fn(() => ({
             innerHTML: "",
             style: {},
-            append: jest.fn(),
+            append: jest.fn()
         }));
         document.querySelectorAll = jest.fn(() => [
             { style: {} },
@@ -244,7 +244,7 @@ describe("TemperamentWidget basic tests", () => {
     });
 
     test("arbitraryEdit sets editMode to arbitrary", () => {
-        global.docById = jest.fn((id) => {
+        global.docById = jest.fn(id => {
             if (id === "circ1") {
                 return {
                     style: {},
@@ -266,7 +266,7 @@ describe("TemperamentWidget basic tests", () => {
                 innerHTML: "",
                 style: {},
                 append: jest.fn(),
-                addEventListener: jest.fn()   // 👈 ADD THIS
+                addEventListener: jest.fn() // 👈 ADD THIS
             };
         });
 
@@ -338,7 +338,10 @@ describe("TemperamentWidget basic tests", () => {
         widget.ratios = [1, 2];
         widget.frequencies = [440, 880];
         widget.intervals = ["0", "1"];
-        widget.notes = [["C", 4], ["C", 5]];
+        widget.notes = [
+            ["C", 4],
+            ["C", 5]
+        ];
         widget.scaleNotes = ["C"];
         widget.circleIsVisible = false;
 
@@ -375,7 +378,7 @@ describe("TemperamentWidget basic tests", () => {
         widget.tempRatios1 = [1];
         widget.tempRatios = [1];
 
-        global.docById = jest.fn((id) => {
+        global.docById = jest.fn(id => {
             if (id === "frequencySlider") {
                 return { value: 880 };
             }
@@ -410,7 +413,7 @@ describe("TemperamentWidget basic tests", () => {
             textMsg: jest.fn()
         };
 
-        global.docById = jest.fn((id) => {
+        global.docById = jest.fn(id => {
             if (id === "startNote") return { value: 3 };
             if (id === "endNote") return { value: 1 };
             return {
@@ -465,7 +468,7 @@ describe("TemperamentWidget basic tests", () => {
             synth: {
                 stop: jest.fn(),
                 setMasterVolume: jest.fn(),
-                startingPitch: "C4"   // 👈 REQUIRED
+                startingPitch: "C4" // 👈 REQUIRED
             }
         };
 
@@ -485,7 +488,10 @@ describe("TemperamentWidget basic tests", () => {
 
         widget.inTemperament = "equal";
         widget.ratios = [1, 2];
-        widget.notes = [["C", 4], ["C", 5]];
+        widget.notes = [
+            ["C", 4],
+            ["C", 5]
+        ];
         widget.powerBase = 2;
 
         widget._logo = {
