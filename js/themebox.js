@@ -102,7 +102,8 @@ class ThemeBox {
      */
     constructor(activity) {
         this.activity = activity;
-        this._theme = activity.storage.themePreference || "light";
+        // Use stored preference if exists, otherwise detect system preference
+        this._theme = activity.storage.themePreference || getSystemThemePreference();
         this._themes = ["light", "dark"];
     }
 
@@ -257,6 +258,10 @@ class ThemeBox {
         window.location.reload();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     setPreference() {
         if (localStorage.getItem("themePreference") === this._theme) {
             this.activity.textMsg(_("Music Blocks is already set to this theme."));

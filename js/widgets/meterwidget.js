@@ -219,13 +219,10 @@ class MeterWidget {
             }, 1000);
         };
 
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            MeterWidget.ICONSIZE,
-            _("Save")
-        ).onclick = () => {
-            this._save();
-        };
+        widgetWindow.addButton("export-chunk.svg", MeterWidget.ICONSIZE, _("Save")).onclick =
+            () => {
+                this._save();
+            };
 
         // The pie menu goes here.
         const meterTableDiv = this.meterDiv;
@@ -660,4 +657,8 @@ class MeterWidget {
             this._beatWheel.navItems[3].navItem.show();
         }
     }
+}
+
+if (typeof module !== "undefined") {
+    module.exports = MeterWidget;
 }

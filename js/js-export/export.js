@@ -444,3 +444,8 @@ class MusicBlocks {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = { Mouse, MusicBlocks };
 }
+
+if (typeof window !== "undefined") {
+    window.Mouse = Mouse;
+    window.MusicBlocks = MusicBlocks;
+}

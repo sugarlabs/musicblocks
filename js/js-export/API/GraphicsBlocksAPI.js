@@ -89,3 +89,6 @@ class GraphicsBlocksAPI {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = GraphicsBlocksAPI;
 }
+if (typeof window !== "undefined") {
+    window.GraphicsBlocksAPI = GraphicsBlocksAPI;
+}

@@ -230,7 +230,7 @@ function setupPitchActions(activity) {
 
             scaleDegree = isNegativeArg ? modeLength - scaleDegree : scaleDegree;
 
-            const note = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
+            const [note, offset] = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
             let semitones = ref;
             semitones += NOTESFLAT.includes(note)
                 ? NOTESFLAT.indexOf(note) - ref
@@ -301,13 +301,42 @@ function setupPitchActions(activity) {
             const octave = obj[1];
             const cents = obj[2];
 
+            let startLength = 0;
+            let blockId = null;
+            if (tur.singer.inNoteBlock.length > 0) {
+                blockId = last(tur.singer.inNoteBlock);
+                if (tur.singer.notePitches && tur.singer.notePitches[blockId]) {
+                    startLength = tur.singer.notePitches[blockId].length;
+                }
+            }
+
             Singer.processPitch(activity, note, octave, cents, turtle, blk);
             if (tur.singer.inNoteBlock.length > 0) {
                 if (activity.logo.runningLilypond) {
-                    activity.logo.notation.notationMarkup(
-                        turtle,
-                        hertz // FIXME: what if hertz was transformed?
-                    );
+                    let transformedHertz = hertz;
+                    // processPitch applies all pitch transformations (transpose, scalar, invert, etc.)
+                    // and stores the resulting pitch in the note block buffers.
+                    // The original hertz input may not match the rendered pitch, so
+                    // Lilypond export must use the transformed pitch instead of raw input.
+                    if (
+                        blockId !== null &&
+                        tur.singer.notePitches &&
+                        tur.singer.noteOctaves &&
+                        tur.singer.noteCents &&
+                        tur.singer.notePitches[blockId] &&
+                        tur.singer.noteOctaves[blockId] &&
+                        tur.singer.noteCents[blockId] &&
+                        tur.singer.notePitches[blockId].length > startLength
+                    ) {
+                        const p = tur.singer.notePitches[blockId][startLength];
+                        const o = tur.singer.noteOctaves[blockId][startLength];
+                        const c = tur.singer.noteCents[blockId][startLength];
+                        transformedHertz = pitchToFrequency(p, o, c, tur.singer.keySignature);
+
+                        if (c !== 0) {
+                            activity.logo.notation.notationMarkup(turtle, transformedHertz);
+                        }
+                    }
                 }
             }
             return;
