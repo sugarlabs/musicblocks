@@ -247,6 +247,27 @@ class GlobalCard {
         this.ProjectData = this.Planet.GlobalPlanet.cache[id];
     }
 }
+function showTemporaryCopyMessage(target, message) {
+    // Remove existing feedback if present
+    const existing = target.parentNode.querySelector(".copy-feedback");
+    if (existing) {
+        existing.remove();
+    }
+
+    const msg = document.createElement("span");
+    msg.textContent = message;
+    msg.className = "copy-feedback";
+
+    msg.style.marginLeft = "8px";
+    msg.style.fontSize = "12px";
+    msg.style.color = "#d32f2f"; // red for failure
+
+    target.parentNode.appendChild(msg);
+
+    setTimeout(() => {
+        msg.remove();
+    }, 2000);
+}
 
 function copyURLToClipboard() {
     const clipboard = new ClipboardJS(".copyshareurl");
@@ -258,7 +279,7 @@ function copyURLToClipboard() {
     });
 
     clipboard.on("error", e => {
-        alert("Failed to copy!");
+        showTemporaryCopyMessage(e.trigger, "Failed to copy");
         // eslint-disable-next-line no-console
         console.error("Failed to copy:", e.action);
     });
