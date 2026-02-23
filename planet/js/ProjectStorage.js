@@ -188,9 +188,8 @@ class ProjectStorage {
 
         try {
             return JSON.parse(jsonobj);
-        } catch (e) {
-            // eslint-disable-next-line no-console
-            console.log(e);
+        } catch (error) {
+            console.error("ProjectStorage.get: Failed to parse JSON for key:", key, error);
             return null;
         }
     }
@@ -205,9 +204,8 @@ class ProjectStorage {
 
         try {
             this.data = typeof currentData === "string" ? JSON.parse(currentData) : currentData;
-        } catch (e) {
-            // eslint-disable-next-line no-console
-            console.log(e);
+        } catch (error) {
+            console.error("ProjectStorage.restore: Failed to parse stored data from", this.LocalStorageKey, error);
             return null;
         }
     }

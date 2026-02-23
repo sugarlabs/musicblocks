@@ -304,9 +304,8 @@ class Publisher {
     parseProject(tb) {
         try {
             tb = JSON.parse(tb);
-        } catch (e) {
-            // eslint-disable-next-line no-console
-            console.log(e);
+        } catch (error) {
+            console.error("Publisher.parseProject: Failed to parse project block data", error);
             return "";
         }
 
