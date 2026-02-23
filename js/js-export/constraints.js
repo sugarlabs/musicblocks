@@ -17,10 +17,12 @@
 /* global JSInterface */
 
 /**
- * @static
- * lookup table for API method names to argument constraints
+ * Store method argument constraints in a safe global variable so that this
+ * file can be loaded before or after the definition of `JSInterface` in
+ * browser environments. The runtime consumer (`interface.js`) will pick up
+ * pending constraints if it defines `JSInterface` later.
  */
-JSInterface._methodArgConstraints = {
+var __MB_methodArgConstraints = {
     // Rhythm blocks
     playNote: [
         {
@@ -1191,6 +1193,30 @@ JSInterface._methodArgConstraints = {
         ]
     ]
 };
+
+// Attempt to attach constraints to JSInterface if it already exists; otherwise
+// stash them on a temporary global so a later-loaded `interface.js` can pick
+// them up and attach to the real `JSInterface`.
+(function (global) {
+    try {
+        if (typeof global.JSInterface !== "undefined") {
+            global.JSInterface._methodArgConstraints = __MB_methodArgConstraints;
+        } else {
+            global.__MB_pending_methodArgConstraints = __MB_methodArgConstraints;
+        }
+    } catch (e) {
+        // ignore environment errors
+    }
+})(
+    typeof globalThis !== "undefined"
+        ? globalThis
+        : typeof window !== "undefined"
+        ? window
+        : typeof global !== "undefined"
+        ? global
+        : this
+);
+
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { JSInterface };
+    module.exports = __MB_methodArgConstraints;
 }
