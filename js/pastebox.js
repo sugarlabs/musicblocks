@@ -127,7 +127,6 @@ class PasteBox {
 
             const x = event.stageX / this._scale - this._container.x;
             const y = event.stageY / this._scale - this._container.y;
-            console.log(x, y);
 
             if (x > 200 && x < 250 && y < 55) {
                 this.activity.pasted();
