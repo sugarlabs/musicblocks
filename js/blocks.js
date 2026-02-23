@@ -162,7 +162,8 @@ class Blocks {
         /** Did the user right click? */
         this.stageClick = false;
 
-        /** We keep a list of stacks in the trash. */
+        /** We keep a list of stacks in the trash with connection info. */
+        /** Each entry: {blockId, parentBlock, parentSlot} */
         this.trashStacks = [];
 
         /** We keep a dictionary for the proto blocks, */
@@ -6940,17 +6941,29 @@ class Blocks {
 
             const thisBlock = this.blockList.indexOf(myBlock);
 
-            /** Add this block to the list of blocks in the trash so we can undo this action. */
-            this.trashStacks.push(thisBlock);
-
-            /** Disconnect block. */
+            /** Save parent connection info before disconnecting. */
             const parentBlock = myBlock.connections[0];
+            let parentSlot = null;
             if (parentBlock != null) {
                 for (const c in this.blockList[parentBlock].connections) {
                     if (this.blockList[parentBlock].connections[c] === thisBlock) {
-                        this.blockList[parentBlock].connections[c] = null;
+                        parentSlot = c;
                         break;
                     }
+                }
+            }
+
+            /** Add this block to the list of blocks in the trash so we can undo this action. */
+            this.trashStacks.push({
+                blockId: thisBlock,
+                parentBlock: parentBlock,
+                parentSlot: parentSlot
+            });
+
+            /** Disconnect block. */
+            if (parentBlock != null) {
+                if (parentSlot !== null) {
+                    this.blockList[parentBlock].connections[parentSlot] = null;
                 }
                 const parentExpandableBlk = this.insideExpandableBlock(thisBlock);
                 myBlock.connections[0] = null;

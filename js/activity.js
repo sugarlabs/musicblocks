@@ -4243,8 +4243,27 @@ class Activity {
             }
         };
 
-        this._restoreTrashById = blockId => {
-            const blockIndex = this.blocks.trashStacks.indexOf(blockId);
+        this._restoreTrashById = trashEntry => {
+            // Handle both old integer format and new object format
+            let blockId, parentBlock, parentSlot, blockIndex;
+
+            if (typeof trashEntry === "object" && trashEntry !== null) {
+                blockId = trashEntry.blockId;
+                parentBlock = trashEntry.parentBlock;
+                parentSlot = trashEntry.parentSlot;
+                blockIndex = this.blocks.trashStacks.findIndex(
+                    entry => (typeof entry === "object" ? entry.blockId : entry) === blockId
+                );
+            } else {
+                // Legacy: trashEntry is just a blockId
+                blockId = trashEntry;
+                parentBlock = null;
+                parentSlot = null;
+                blockIndex = this.blocks.trashStacks.findIndex(
+                    entry => (typeof entry === "object" ? entry.blockId : entry) === blockId
+                );
+            }
+
             if (blockIndex === -1) return; // Block not found in trash
 
             this.blocks.trashStacks.splice(blockIndex, 1); // Remove from trash
@@ -4269,6 +4288,23 @@ class Activity {
 
             this.blocks.raiseStackToTop(blockId);
             const restoredBlock = this.blocks.blockList[blockId];
+
+            // Restore parent connection if it was saved and parent still exists
+            if (parentBlock !== null && parentSlot !== null) {
+                if (
+                    this.blocks.blockList[parentBlock] &&
+                    !this.blocks.blockList[parentBlock].trash &&
+                    this.blocks.blockList[parentBlock].connections[parentSlot] === null
+                ) {
+                    // Reconnect child to parent
+                    restoredBlock.connections[0] = parentBlock;
+                    // Reconnect parent to child
+                    this.blocks.blockList[parentBlock].connections[parentSlot] = blockId;
+
+                    // Adjust docks and position
+                    this.blocks.adjustDocks(parentBlock, true);
+                }
+            }
 
             if (restoredBlock.name === "start" || restoredBlock.name === "drum") {
                 const turtle = restoredBlock.value;
@@ -4405,7 +4441,9 @@ class Activity {
             trashView.appendChild(buttonContainer);
 
             // Render trash items
-            this.blocks.trashStacks.forEach(blockId => {
+            this.blocks.trashStacks.forEach(trashEntry => {
+                // Handle both old integer format and new object format
+                const blockId = typeof trashEntry === "object" ? trashEntry.blockId : trashEntry;
                 const block = this.blocks.blockList[blockId];
                 const listItem = document.createElement("div");
                 listItem.classList.add("trash-item");
@@ -4427,7 +4465,7 @@ class Activity {
                 listItem.addEventListener("mouseover", () => listItem.classList.add("hover"));
                 listItem.addEventListener("mouseout", () => listItem.classList.remove("hover"));
                 listItem.addEventListener("click", () => {
-                    this._restoreTrashById(blockId);
+                    this._restoreTrashById(trashEntry);
                     trashView.classList.add("hidden");
                 });
                 handleClickOutsideTrashView(trashView);
