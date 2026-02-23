@@ -4816,7 +4816,7 @@ function _parse_pitch_string(str) {
  * @param {number} octave - The octave number.
  * @returns {number|string} The calculated pitch number or INVALIDPITCH if calculation fails.
  */
-function _calculate_pitch_number(noteName, octave) {
+function _calculate_pitch_number(noteName, octave, applyOffset = 0) {
     if (typeof noteName !== "string") {
         return INVALIDPITCH;
     }
@@ -4832,7 +4832,7 @@ function _calculate_pitch_number(noteName, octave) {
         if (baseIndex === -1) baseIndex = NOTESFLAT.indexOf(baseLetter);
         if (baseIndex === -1) return INVALIDPITCH;
         const rawPitch = (parseInt(octave, 10) + 1) * 12 + baseIndex + offset;
-        return rawPitch;
+        return rawPitch - applyOffset;
     }
 
     if (EQUIVALENTSHARPS[name]) {
@@ -4852,7 +4852,7 @@ function _calculate_pitch_number(noteName, octave) {
         return INVALIDPITCH;
     }
 
-    return (parseInt(octave, 10) + 1) * 12 + pitchIndex;
+    return (parseInt(octave, 10) + 1) * 12 + pitchIndex - applyOffset;
 }
 
 /**
@@ -6293,9 +6293,7 @@ const getPitchInfo = function (activity, type, currentNote, tur) {
                     (octave - 4) * YSTAFFOCTAVEHEIGHT
                 );
             case "pitch number":
-                return (
-                    _calculate_pitch_number(pitch, octave) - (tur?.singer?.pitchNumberOffset || 0)
-                );
+                return _calculate_pitch_number(pitch, octave, tur?.singer?.pitchNumberOffset || 0);
             case "pitch in hertz":
                 // This function ignores cents.
                 return activity.logo.synth._getFrequency(
