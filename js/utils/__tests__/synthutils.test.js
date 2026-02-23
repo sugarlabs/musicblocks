@@ -1100,6 +1100,20 @@ describe("Utility Functions (logic-only)", () => {
             stopTuner();
             expect(mockClose).toHaveBeenCalledTimes(1);
         });
+
+        it("should cancel any pending tuner animation frame", () => {
+            const originalCancel = global.cancelAnimationFrame;
+            const mockCancel = jest.fn();
+            global.cancelAnimationFrame = mockCancel;
+            Synth._tunerRafId = 123;
+            Synth._tunerActive = true;
+            Synth.tunerMic = null;
+            stopTuner();
+            expect(mockCancel).toHaveBeenCalledWith(123);
+            expect(Synth._tunerRafId).toBeNull();
+            expect(Synth._tunerActive).toBe(false);
+            global.cancelAnimationFrame = originalCancel;
+        });
     });
 
     describe("newTone", () => {
