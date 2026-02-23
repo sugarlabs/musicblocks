@@ -183,6 +183,13 @@ describe("Logo Class", () => {
         global.instrumentsFilters = { 0: {} };
         global.instrumentsEffects = { 0: {} };
 
+        // Mock Tone.UserMedia for initMediaDevices tests
+        global.Tone = {
+            UserMedia: jest.fn(() => ({
+                open: jest.fn()
+            }))
+        };
+
         mockActivity = {
             blocks: {
                 blockList: [],
@@ -919,27 +926,27 @@ describe("Logo comprehensive method coverage", () => {
     });
 
     test("initMediaDevices sets mic/limit on success and reports microphone errors", () => {
-        const originalTone = global.Tone;
         const open = jest.fn();
-        global.Tone = { UserMedia: jest.fn(() => ({ open })) };
+        // Update logo.deps.Tone since it was captured at constructor time
+        logo.deps.Tone = { UserMedia: jest.fn(() => ({ open })) };
 
         logo.initMediaDevices();
         expect(open).toHaveBeenCalled();
         expect(logo.limit).toBe(16384);
         expect(logo.mic).toBeTruthy();
 
-        global.Tone = {
+        // Test error case - mock open to throw
+        const errorOpen = jest.fn(() => {
+            throw new Error("no mic");
+        });
+        logo.deps.Tone = {
             UserMedia: jest.fn(() => ({
-                open: jest.fn(() => {
-                    throw new Error("no mic");
-                })
+                open: errorOpen
             }))
         };
         logo.initMediaDevices();
         expect(mockActivity.errorMsg).toHaveBeenCalledWith("The microphone is not available.");
         expect(logo.mic).toBeNull();
-
-        global.Tone = originalTone;
     });
 
     test("processShow handles image/url/loadFile/default branches", () => {
@@ -962,15 +969,20 @@ describe("Logo comprehensive method coverage", () => {
             fn();
             return 2;
         });
-        global.delayExecution = jest.fn(() => Promise.resolve());
+        // Update logo.deps.utils.delayExecution since it was captured at constructor time
+        logo.deps.utils.delayExecution = jest.fn((ms, callback) => {
+            if (typeof callback === "function") {
+                callback();
+            }
+        });
 
         turtle0.singer.embeddedGraphics = {};
         await logo.dispatchTurtleSignals(0, 0.5, 3, 0);
-        expect(global.delayExecution).not.toHaveBeenCalled();
+        expect(logo.deps.utils.delayExecution).not.toHaveBeenCalled();
 
         turtle0.singer.embeddedGraphics = { 3: [] };
         await logo.dispatchTurtleSignals(0, 0.5, 3, 0);
-        expect(global.delayExecution).not.toHaveBeenCalled();
+        expect(logo.deps.utils.delayExecution).not.toHaveBeenCalled();
 
         turtle0.singer.embeddedGraphics = { 3: [1] };
         logo.blockList = [null, { name: "clear", connections: [] }];
@@ -978,7 +990,7 @@ describe("Logo comprehensive method coverage", () => {
 
         expect(turtle0.painter.doSetHeading).toHaveBeenCalledWith(0);
         expect(turtle0.painter.doSetXY).toHaveBeenCalledWith(0, 0);
-        expect(global.delayExecution).toHaveBeenCalledWith(500);
+        expect(logo.deps.utils.delayExecution).toHaveBeenCalledWith(500);
         expect(turtle0.embeddedGraphicsFinished).toBe(true);
     });
 
@@ -1067,7 +1079,10 @@ describe("Logo comprehensive method coverage", () => {
 
     test("doStopTurtles covers companion/camera/recorder/showBlocks branches", () => {
         const clearIntervalSpy = jest.spyOn(global, "clearInterval").mockImplementation(() => {});
-        global.instruments = { 0: { flute: {} }, 1: { piano: {} } };
+        // Update deps.instruments since it was captured at constructor time
+        logo.deps.instruments = { 0: { flute: {} }, 1: { piano: {} } };
+        // Populate turtleList so the for loop iterates over both turtles
+        mockActivity.turtles.turtleList = [turtle0, turtle1];
         turtle0.singer.killAllVoices = jest.fn();
         turtle0.companionTurtle = 1;
         turtle1.interval = 888;
@@ -1147,7 +1162,12 @@ describe("Logo comprehensive method coverage", () => {
         logo.parseArg = jest.fn(() => 9);
         logo.processShow = jest.fn();
         logo.processSpeak = jest.fn();
-        global.delayExecution = jest.fn(() => Promise.resolve());
+        // Update logo.deps.utils.delayExecution since it was captured at constructor time
+        logo.deps.utils.delayExecution = jest.fn((ms, callback) => {
+            if (typeof callback === "function") {
+                callback();
+            }
+        });
 
         turtle0.singer.suppressOutput = false;
         turtle0.embeddedGraphicsFinished = false;
@@ -1210,7 +1230,7 @@ describe("Logo comprehensive method coverage", () => {
         expect(logo.processShow).toHaveBeenCalled();
         expect(logo.processSpeak).toHaveBeenCalled();
         expect(mockActivity.textMsg).toHaveBeenCalledWith("9");
-        expect(global.delayExecution).toHaveBeenCalledWith(1000);
+        expect(logo.deps.utils.delayExecution).toHaveBeenCalledWith(1000);
     });
 
     test("constructor supports explicit dependency object mode", () => {
@@ -1223,7 +1243,30 @@ describe("Logo comprehensive method coverage", () => {
             storage: { saveLocally: jest.fn() },
             config: { showBlocksAfterRun: false },
             callbacks: { onStopTurtle: jest.fn(), onRunTurtle: jest.fn() },
-            meSpeak: { speak: jest.fn() }
+            meSpeak: { speak: jest.fn() },
+            // Add missing required fields
+            instruments: {},
+            instrumentsFilters: {},
+            instrumentsEffects: {},
+            Singer: {},
+            Tone: {},
+            widgetWindows: { isOpen: jest.fn(() => false) },
+            classes: {
+                Notation: jest.fn().mockImplementation(() => ({})),
+                Synth: jest.fn().mockImplementation(() => ({})),
+                StatusMatrix: jest.fn().mockImplementation(() => ({}))
+            },
+            utils: {
+                doUseCamera: jest.fn(),
+                doStopVideoCam: jest.fn(),
+                getIntervalDirection: jest.fn(),
+                getIntervalNumber: jest.fn(),
+                mixedNumber: jest.fn(),
+                rationalToFraction: jest.fn(),
+                getStatsFromNotation: jest.fn(),
+                delayExecution: jest.fn(),
+                last: jest.fn(arr => arr[arr.length - 1])
+            }
         };
 
         const depLogo = new Logo(deps);
