@@ -2140,7 +2140,7 @@ function MusicKeyboard(activity) {
                     break;
                 default:
                     // eslint-disable-next-line no-console
-                    console.log("Nothing to do for " + label);
+                    
             }
 
             let aboveBlock = -1;
@@ -2188,8 +2188,8 @@ function MusicKeyboard(activity) {
                         key.objId; //convet solfege to alphabetic.
                 }, 500);
             } else {
-                // eslint-disable-next-line no-console
-                console.log("Could not find anywhere to insert new block.");
+                console.warn("Could not find anywhere to insert new block.")
+                
             }
         };
 
