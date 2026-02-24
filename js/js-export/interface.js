@@ -119,6 +119,9 @@ class JSInterface {
         x: "X",
         y: "Y",
         heading: "HEADING",
+        // Media blocks
+        bottompos: "BOTTOMPOS",
+        camera: "CAMERA",
         // Pen blocks
         pensize: "PENSIZE",
         color: "COLOR",
