@@ -4619,22 +4619,18 @@ class Block {
  * @public
  * @returns {Array|HTMLElement} - An array of elements or a single element.
  */
-const $ = () => {
-    const elements = new Array();
-
-    for (let i = 0; i < elements.length; i++) {
-        let element = elements[i];
+const $ = (...args) => {
+    const elements = [];
+    for (let i = 0; i < args.length; i++) {
+        let element = args[i];
         if (typeof element === "string") {
             element = docById(element);
         }
-
-        if (elements.length === 1) {
+        if (args.length === 1) {
             return element;
         }
-
         elements.push(element);
     }
-
     return elements;
 };
 
