@@ -189,7 +189,7 @@
                     top: 0;
                     left: 0;
                     width: 100%;
-                    height: 100vh;
+                    height: calc(var(--vh) * 100);
                     display: flex;
                     flex-direction: column;
                     align-items: center;
@@ -289,9 +289,7 @@
             <!-- #92B5C8  width = 3790 height = 1743-->
             <canvas
                 id="canvas"
-                width="100%"
-                height="100%"
-                style="background-color: #ffffff; width: 100%"
+                style="background-color: #ffffff; width: 100%; height: 100%"
             ></canvas>
 
             <!--hidden at the beginning whilst everything loads-->
@@ -548,12 +546,12 @@
                             </div>
                             <ul class="main left">
                                 <li>
-                                    <a id="play" class="left tooltipped"
+                                    <a id="play" class="left tooltipped" role="button" tabindex="0"
                                         ><i class="material-icons main">play_circle_filled</i></a
                                     >
                                 </li>
                                 <li>
-                                    <a id="stop" class="left tooltipped"
+                                    <a id="stop" class="left tooltipped" role="button" tabindex="0"
                                         ><i class="material-icons main">stop</i></a
                                     >
                                 </li>
@@ -563,12 +561,16 @@
                                         class="left tooltipped"
                                         data-position="bottom"
                                         data-tooltip="Record"
+                                        role="button"
+                                        tabindex="0"
                                     ></a>
                                     <a
                                         id="recordDropdownArrow"
                                         class="left dropdown-trigger"
                                         data-activates="recorddropdown"
                                         style="margin-left: -5px; padding: 0; font-size: 28px"
+                                        role="button"
+                                        tabindex="0"
                                     ></a>
                                 </li>
                             </ul>
@@ -579,6 +581,8 @@
                                         id="FullScreen"
                                         class="FullScreen tooltipped dropdown-trigger"
                                         data-position="bottom"
+                                        role="button"
+                                        tabindex="0"
                                         onclick="setIcon()"
                                     >
                                         <i class="material-icons" id="FullScrIcon">fullscreen</i>
@@ -589,13 +593,21 @@
                                         id="newFile"
                                         class="tooltipped dropdown-trigger"
                                         data-position="bottom"
+                                        role="button"
+                                        tabindex="0"
                                         data-activates="newdropdown"
                                     >
                                         <i class="material-icons md-48">note_add</i>
                                     </a>
                                 </li>
                                 <li>
-                                    <a id="load" class="tooltipped" data-position="bottom">
+                                    <a
+                                        id="load"
+                                        class="tooltipped"
+                                        data-position="bottom"
+                                        role="button"
+                                        tabindex="0"
+                                    >
                                         <i class="material-icons md-48">folder</i>
                                     </a>
                                 </li>
@@ -604,6 +616,8 @@
                                         id="saveButton"
                                         class="tooltipped dropdown-trigger"
                                         data-position="bottom"
+                                        role="button"
+                                        tabindex="0"
                                         data-activates="saveddropdownbeg"
                                     >
                                         <i id="save1" class="material-icons md-48">save_alt</i>
@@ -614,6 +628,8 @@
                                         id="saveButtonAdvanced"
                                         style="display: none"
                                         class="tooltipped dropdown-trigger"
+                                        role="button"
+                                        tabindex="0"
                                         data-position="bottom"
                                         data-activates="saveddropdown"
                                     >
@@ -621,7 +637,13 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a id="planetIcon" class="tooltipped" data-position="bottom">
+                                    <a
+                                        id="planetIcon"
+                                        class="tooltipped"
+                                        data-position="bottom"
+                                        role="button"
+                                        tabindex="0"
+                                    >
                                         <i class="material-icons md-48">public</i>
                                     </a>
                                 </li>
@@ -630,6 +652,8 @@
                                         style="display: none"
                                         id="planetIconDisabled"
                                         class="tooltipped"
+                                        role="button"
+                                        tabindex="0"
                                         data-position="bottom"
                                     >
                                         <i style="color: #a5acba" class="material-icons md-48"
@@ -638,14 +662,26 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a id="toggleAuxBtn" class="tooltipped" data-position="bottom">
+                                    <a
+                                        id="toggleAuxBtn"
+                                        class="tooltipped"
+                                        data-position="bottom"
+                                        role="button"
+                                        tabindex="0"
+                                    >
                                         <i id="menu" class="animated-icon material-icons md-48"
                                             >menu</i
                                         >
                                     </a>
                                 </li>
                                 <li>
-                                    <a id="helpIcon" class="tooltipped" data-position="bottom">
+                                    <a
+                                        id="helpIcon"
+                                        class="tooltipped"
+                                        data-position="bottom"
+                                        role="button"
+                                        tabindex="0"
+                                    >
                                         <i class="material-icons md-48">help</i>
                                     </a>
                                 </li>
@@ -654,6 +690,8 @@
                                         id="installButton"
                                         class="tooltipped hidden"
                                         data-position="bottom"
+                                        role="button"
+                                        tabindex="0"
                                         data-tooltip="Install App"
                                         aria-label="Install App"
                                     >
@@ -676,6 +714,8 @@
                                             class="tooltipped"
                                             data-position="bottom"
                                             data-delay="10"
+                                            role="button"
+                                            tabindex="0"
                                         >
                                             <i class="material-icons md-48">play_circle_outline</i>
                                         </a>
@@ -686,6 +726,8 @@
                                             class="tooltipped"
                                             data-position="bottom"
                                             data-delay="10"
+                                            role="button"
+                                            tabindex="0"
                                         >
                                             <i class="material-icons md-48">video_library</i>
                                         </a>
@@ -697,6 +739,8 @@
                                             id="displayStatsIcon"
                                             class="tooltipped"
                                             data-position="bottom"
+                                            role="button"
+                                            tabindex="0"
                                             data-delay="10"
                                             ><i class="material-icons md-48">poll</i></a
                                         >
@@ -707,6 +751,8 @@
                                             class="tooltipped"
                                             data-position="bottom"
                                             data-delay="10"
+                                            role="button"
+                                            tabindex="0"
                                             ><i class="material-icons md-48">add_circle</i></a
                                         >
                                     </li>
@@ -716,6 +762,8 @@
                                             class="tooltipped"
                                             data-position="bottom"
                                             data-delay="10"
+                                            role="button"
+                                            tabindex="0"
                                             ><i class="material-icons md-48">remove_circle</i></a
                                         >
                                     </li>
@@ -724,6 +772,8 @@
                                             id="enableHorizScrollIcon"
                                             class="tooltipped"
                                             data-position="bottom"
+                                            role="button"
+                                            tabindex="0"
                                             ><i class="material-icons md-48">compare_arrows</i></a
                                         >
                                     </li>
@@ -732,6 +782,8 @@
                                             style="display: none"
                                             id="disableHorizScrollIcon"
                                             class="tooltipped"
+                                            role="button"
+                                            tabindex="0"
                                             data-position="bottom"
                                             ><i class="material-icons md-48">lock</i></a
                                         >
@@ -741,6 +793,8 @@
                                             id="themeSelectIcon"
                                             class="tooltipped dropdown-trigger"
                                             data-position="bottom"
+                                            role="button"
+                                            tabindex="0"
                                             data-activates="themedropdown"
                                             data-tooltip="Select Theme"
                                             ><i class="material-icons md-48">brightness_7</i></a
@@ -751,11 +805,18 @@
                                             id="mergeWithCurrentIcon"
                                             class="tooltipped"
                                             data-position="bottom"
+                                            role="button"
+                                            tabindex="0"
                                             ><i class="material-icons md-48">merge_type</i></a
                                         >
                                     </li>
                                     <li>
-                                        <a id="wrapTurtle" class="tooltipped" data-position="bottom"
+                                        <a
+                                            id="wrapTurtle"
+                                            class="tooltipped"
+                                            data-position="bottom"
+                                            role="button"
+                                            tabindex="0"
                                             ><i class="material-icons md-48">wrap_text</i></a
                                         >
                                     </li>
@@ -764,6 +825,8 @@
                                             id="chooseKeyIcon"
                                             class="tooltipped"
                                             data-position="bottom"
+                                            role="button"
+                                            tabindex="0"
                                             ><i class="material-icons md-48">music_note</i></a
                                         >
                                     </li>
@@ -772,6 +835,8 @@
                                             id="toggleJavaScriptIcon"
                                             class="tooltipped"
                                             data-position="bottom"
+                                            role="button"
+                                            tabindex="0"
                                             ><i class="material-icons md-48">code</i></a
                                         >
                                     </li>
@@ -788,6 +853,8 @@
                                             id="restoreIcon"
                                             class="tooltipped"
                                             data-position="bottom"
+                                            role="button"
+                                            tabindex="0"
                                             data-tooltip="Restore"
                                             ><i class="material-icons md-48"
                                                 >restore_from_trash</i
@@ -800,6 +867,8 @@
                                             id="beginnerMode"
                                             class="tooltipped"
                                             data-position="bottom"
+                                            role="button"
+                                            tabindex="0"
                                             ><i id="begIconText" class="material-icons md-48"
                                                 >star</i
                                             ></a
@@ -810,6 +879,8 @@
                                             id="advancedMode"
                                             class="tooltipped"
                                             data-position="bottom"
+                                            role="button"
+                                            tabindex="0"
                                             ><i id="advIconText" class="material-icons md-48"
                                                 >star_border</i
                                             ></a
@@ -819,6 +890,8 @@
                                         <a
                                             id="languageSelectIcon"
                                             class="tooltipped dropdown-trigger"
+                                            role="button"
+                                            tabindex="0"
                                             data-position="bottom"
                                             data-activates="languagedropdown"
                                             data-tooltip="Select Language"
@@ -831,59 +904,77 @@
                     </nav>
 
                     <ul id="saveddropdownbeg" class="dropdown-content">
-                        <li><a id="save-html-beg"></a></li>
-                        <li><a id="save-png-beg"></a></li>
+                        <li><a id="save-html-beg" role="button" tabindex="0"></a></li>
+                        <li><a id="save-png-beg" role="button" tabindex="0"></a></li>
                     </ul>
 
                     <ul id="saveddropdown" class="dropdown-content">
-                        <li><a id="save-html"></a></li>
-                        <li><a id="save-midi"></a></li>
-                        <li><a id="save-svg"></a></li>
-                        <li><a id="save-png"></a></li>
-                        <li><a id="save-wav"></a></li>
-                        <li><a id="save-abc"> </a></li>
-                        <li><a id="save-ly"></a></li>
-                        <li><a id="save-mxml"></a></li>
-                        <li><a id="save-blockartwork-svg"></a></li>
-                        <li><a id="save-blockartwork-png"></a></li>
+                        <li><a id="save-html" role="button" tabindex="0"></a></li>
+                        <li><a id="save-midi" role="button" tabindex="0"></a></li>
+                        <li><a id="save-svg" role="button" tabindex="0"></a></li>
+                        <li><a id="save-png" role="button" tabindex="0"></a></li>
+                        <li><a id="save-wav" role="button" tabindex="0"></a></li>
+                        <li><a id="save-abc" role="button" tabindex="0"> </a></li>
+                        <li><a id="save-ly" role="button" tabindex="0"></a></li>
+                        <li><a id="save-mxml" role="button" tabindex="0"></a></li>
+                        <li><a id="save-blockartwork-svg" role="button" tabindex="0"></a></li>
+                        <li><a id="save-blockartwork-png" role="button" tabindex="0"></a></li>
                     </ul>
 
                     <ul id="recorddropdown" class="dropdown-content">
-                        <li><a id="record-with-menus">Record canvas and toolbars</a></li>
-                        <li><a id="record-canvas-only">Record canvas only</a></li>
+                        <li>
+                            <a id="record-with-menus" role="button" tabindex="0"
+                                >Record canvas and toolbars</a
+                            >
+                        </li>
+                        <li>
+                            <a id="record-canvas-only" role="button" tabindex="0"
+                                >Record canvas only</a
+                            >
+                        </li>
                     </ul>
 
                     <ul id="languagedropdown" class="dropdown-content">
-                        <li><a id="enUS"></a></li>
-                        <li><a id="enUK"></a></li>
-                        <li><a id="es"></a></li>
-                        <li><a id="pt"></a></li>
-                        <li><a id="ja"></a></li>
-                        <li><a id="kana"></a></li>
-                        <li><a id="ko"></a></li>
-                        <li><a id="zhCN"></a></li>
-                        <li><a id="th"></a></li>
-                        <li><a id="tr"></a></li>
-                        <li><a id="ayc"></a></li>
-                        <li><a id="quz"></a></li>
-                        <li><a id="gug"></a></li>
-                        <li><a id="hi"></a></li>
-                        <li><a id="te"></a></li>
-                        <li><a id="ibo"></a></li>
-                        <li><a id="ar"></a></li>
-                        <li><a id="bn"></a></li>
-                        <li><a id="he"></a></li>
-                        <li><a id="ur"></a></li>
+                        <li><a id="enUS" role="button" tabindex="0"></a></li>
+                        <li><a id="enUK" role="button" tabindex="0"></a></li>
+                        <li><a id="es" role="button" tabindex="0"></a></li>
+                        <li><a id="pt" role="button" tabindex="0"></a></li>
+                        <li><a id="ja" role="button" tabindex="0"></a></li>
+                        <li><a id="kana" role="button" tabindex="0"></a></li>
+                        <li><a id="ko" role="button" tabindex="0"></a></li>
+                        <li><a id="zhCN" role="button" tabindex="0"></a></li>
+                        <li><a id="th" role="button" tabindex="0"></a></li>
+                        <li><a id="tr" role="button" tabindex="0"></a></li>
+                        <li><a id="ayc" role="button" tabindex="0"></a></li>
+                        <li><a id="quz" role="button" tabindex="0"></a></li>
+                        <li><a id="gug" role="button" tabindex="0"></a></li>
+                        <li><a id="hi" role="button" tabindex="0"></a></li>
+                        <li><a id="te" role="button" tabindex="0"></a></li>
+                        <li><a id="ibo" role="button" tabindex="0"></a></li>
+                        <li><a id="ar" role="button" tabindex="0"></a></li>
+                        <li><a id="bn" role="button" tabindex="0"></a></li>
+                        <li><a id="he" role="button" tabindex="0"></a></li>
+                        <li><a id="ur" role="button" tabindex="0"></a></li>
                     </ul>
 
                     <ul style="display: none" id="themedropdown" class="dropdown-content">
                         <li>
-                            <a id="light" class="tooltipped" data-tooltip="Light Mode"
+                            <a
+                                id="light"
+                                class="tooltipped"
+                                data-tooltip="Light Mode"
+                                role="button"
+                                tabindex="0"
                                 ><i class="material-icons">brightness_7</i></a
                             >
                         </li>
                         <li>
-                            <a id="dark" class="tooltipped" data-tooltip="Dark Mode"
+                            <a
+                                id="dark"
+                                class="tooltipped"
+                                data-tooltip="Dark Mode"
+                                role="button"
+                                tabindex="0"
                                 ><i class="material-icons">brightness_4</i></a
                             >
                         </li>
@@ -892,6 +983,8 @@
                                 id="highcontrast"
                                 class="tooltipped"
                                 data-tooltip="High Contrast Mode"
+                                role="button"
+                                tabindex="0"
                                 ><i class="material-icons">brightness_6</i></a
                             >
                         </li>
@@ -1059,6 +1152,19 @@
                         index = (index + 1) % texts.length;
                     }, 1500);
                 }, 3000);
+
+                const languageDropdown = document.getElementById("languagedropdown");
+                if (languageDropdown) {
+                    const langLinks = languageDropdown.querySelectorAll("a");
+                    langLinks.forEach(link => {
+                        link.addEventListener("click", function (e) {
+                            e.preventDefault(); // prevent default <a> behavior
+                            const selectedLang = this.id; // ID corresponds to language code
+                            localStorage.setItem("languagePreference", selectedLang);
+                            location.reload(); // automatically reload
+                        });
+                    });
+                }
             });
         </script>
 
@@ -1277,6 +1383,37 @@
 
                 window.addEventListener("resize", togglePlayOnlyMode);
             });
+
+            (function () {
+                function setAppHeight() {
+                    const vh = window.innerHeight * 0.01;
+                    document.documentElement.style.setProperty("--vh", `${vh}px`);
+                }
+
+                window.addEventListener("resize", setAppHeight);
+                document.addEventListener("fullscreenchange", setAppHeight);
+                setAppHeight();
+            })();
+
+            (function () {
+                function resizeCanvasesToScreen() {
+                    const canvases = document.querySelectorAll("canvas");
+                    const width = window.innerWidth;
+                    const height = window.innerHeight;
+
+                    canvases.forEach(c => {
+                        c.width = width;
+                        c.height = height;
+                        c.style.width = "100%";
+                        c.style.height = "100%";
+                    });
+                }
+
+                window.addEventListener("resize", resizeCanvasesToScreen);
+                document.addEventListener("fullscreenchange", resizeCanvasesToScreen);
+
+                setTimeout(resizeCanvasesToScreen, 150);
+            })();
         </script>
     </body>
 </html>

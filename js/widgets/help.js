@@ -82,8 +82,10 @@ class HelpWidget {
                     <div id="right-arrow" class="hover" tabindex="-1"></div>
                     <div id="left-arrow" class="hover" tabindex="-1"></div>
                     <div id="helpButtonsDiv" tabindex="-1"></div>
-                    <div id="helpBodyDiv" tabindex="-1"></div>
-                         `;
+                    <div id="helpScrollWrapper">
+                        <div id="helpBodyDiv" tabindex="-1"></div>
+                    </div>
+                          `;
 
         this._helpDiv.insertAdjacentHTML("afterbegin", innerHTML);
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
@@ -467,7 +469,7 @@ class HelpWidget {
         // this._helpDiv.style.backgroundColor = "#e8e8e8";
 
         const helpDivHTML =
-            '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
+            '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpScrollWrapper"><div id="helpBodyDiv" tabindex="-1"></div></div>';
         this._helpDiv.insertAdjacentHTML("afterbegin", helpDivHTML);
 
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
