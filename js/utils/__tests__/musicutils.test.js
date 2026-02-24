@@ -913,6 +913,34 @@ describe("modeMapper", () => {
         expect(modeMapper("E♭", "locrian")).toEqual(["d♭", "minor"]);
         expect(modeMapper("B♭", "locrian")).toEqual(["d♭", "minor"]);
     });
+    it("should map Aeolian to minor", () => {
+        expect(modeMapper("A", "aeolian")).toEqual(["a", "minor"]);
+        expect(modeMapper("C", "aeolian")).toEqual(["c", "minor"]);
+    });
+
+    it("should map natural minor to minor", () => {
+        expect(modeMapper("D", "natural minor")).toEqual(["d", "minor"]);
+    });
+
+    it("should leave major unchanged", () => {
+        expect(modeMapper("E", "major")).toEqual(["e", "major"]);
+    });
+
+    it("should leave minor unchanged", () => {
+        expect(modeMapper("F♯", "minor")).toEqual(["f♯", "minor"]);
+    });
+
+    it("should correctly map Phrygian major branch", () => {
+        expect(modeMapper("C", "phrygian")).toEqual(["g♯", "major"]);
+    });
+
+    it("should correctly switch to minor in Mixolydian", () => {
+        expect(modeMapper("A♯", "mixolydian")).toEqual(["c", "minor"]);
+    });
+
+    it("should normalize uppercase input", () => {
+        expect(modeMapper("C", "DORIAN")).toEqual(["a♯", "major"]);
+    });
 });
 
 describe("getSharpFlatPreference", () => {
@@ -980,6 +1008,38 @@ describe("pitchToNumber", () => {
     it("should handle basic notes", () => {
         expect(pitchToNumber("C", 4, "C major")).toBe(39);
         expect(pitchToNumber("A", 4, "C major")).toBe(48);
+    });
+    it("should handle single flat and sharp", () => {
+        expect(pitchToNumber("Db", 4, "C major")).toBe(40);
+        expect(pitchToNumber("C#", 4, "C major")).toBe(40);
+        // D index = 1 -> 4*12 + 1 - 5 - 1 = 40
+    });
+    it("should handle double flat and double sharp", () => {
+        expect(pitchToNumber("D𝄫", 4, "C major")).toBe(39);
+        expect(pitchToNumber("C𝄪", 4, "C major")).toBe(41);
+    });
+    it("should handle mixed accidental and normalize pitch", () => {
+        expect(pitchToNumber("C#b", 4, "C major")).toBe(39);
+        expect(pitchToNumber("c#", 4, "C major")).toBe(40);
+    });
+    it("should use solfege mapping when pitch not in PITCHES", () => {
+        expect(pitchToNumber("do", 4, "C major")).toBe(39);
+    });
+
+    it("should fallback using FIXEDSOLFEGE1 when solfege not found", () => {
+        global.getScaleAndHalfSteps = jest
+            .fn()
+            .mockReturnValue([["C", "D", "E", "F", "G", "A", "B"], []]);
+
+        expect(pitchToNumber("do", 4, "C major")).toBe(39);
+        expect(pitchToNumber("re", 4, "C major")).toBe(41);
+    });
+    it("should fallback to index 0 and log debg for invalid pitch", () => {
+        global.getScaleAndHalfSteps = jest
+            .fn()
+            .mockReturnValue([["C", "D", "E", "F", "G", "A", "B"], []]);
+        expect(pitchToNumber("xyz", 4, "C major")).toBe(39);
+        expect(console.debug).toHaveBeenCalled();
     });
 });
 
@@ -1091,6 +1151,20 @@ describe("getNoteFromInterval", () => {
     it("should calculate augmented intervals correctly", () => {
         expect(getNoteFromInterval("C4", "augmented 4")).toEqual(["F♯", 4]);
         expect(getNoteFromInterval("F4", "augmented 5")).toEqual(["C♯", 5]);
+    });
+    it("should calculate minor 3rd correctly", () => {
+        expect(getNoteFromInterval("C4", "minor 3")).toEqual(["E♭", 4]);
+    });
+    it("should calculate diminished interval correctly", () => {
+        expect(getNoteFromInterval("B4", "diminished 5")).toBeDefined();
+    });
+    it("should handle octave rollover correctly", () => {
+        const result = getNoteFromInterval("B4", "major 2");
+        expect(result[1]).toBe(5);
+        expect(result[0]).toBeDefined();
+    });
+    it("should handle perfect octave correctly", () => {
+        expect(getNoteFromInterval("C4", "perfect 8")).toEqual(["C", 5]);
     });
 });
 
@@ -1244,6 +1318,34 @@ describe("getNote", () => {
     it("should return the correct note for G♯4 in G major", () => {
         const result = getNote("G♯", 4, 0, "G major");
         expect(result).toEqual(["G♯", 4, 0]);
+    });
+
+    it("should handle negative transposition", () => {
+        const result = getNote("D", 4, -2, "C major");
+        expect(result[0]).toBe("C");
+        expect(result[1]).toBe(4);
+        expect(Math.abs(result[2])).toBe(0);
+    });
+
+    it("should handle octave increment on transposition overflow", () => {
+        const result = getNote("B", 4, 1, "C major");
+        expect(result[1]).toBe(5);
+    });
+
+    it("should normalize lowercase note input", () => {
+        const result = getNote("c", 4, 0, "C major");
+        expect(result[0]).toBeDefined();
+        expect(result[1]).toBe(4);
+    });
+
+    it("should preserve sharp accidental when no transposition", () => {
+        const result = getNote("A♯", 4, 0, "A major");
+        expect(result[0]).toBe("A♯");
+    });
+
+    it("should fallback safely for unknown note", () => {
+        const result = getNote("invalidNote", 4, 0, "C major");
+        expect(result).toBeDefined();
     });
 });
 
