@@ -2692,8 +2692,10 @@ class Activity {
              */
             const __wheelHandler = event => {
                 const data = normalizeWheel(event);
-                const delY = data.pixelY;
-                const delX = data.pixelX;
+                // Apply scroll speed multiplier for smoother scrolling
+                const SCROLL_SPEED_MULTIPLIER = 2;
+                const delY = data.pixelY * SCROLL_SPEED_MULTIPLIER;
+                const delX = data.pixelX * SCROLL_SPEED_MULTIPLIER;
 
                 if (event.ctrlKey) {
                     event.preventDefault();
@@ -2714,6 +2716,19 @@ class Activity {
 
                 that.refreshCanvas();
             };
+
+            // Remove previous wheel event listener if it exists
+            if (this._wheelHandler) {
+                this.removeEventListener(
+                    document.getElementById("myCanvas"),
+                    "wheel",
+                    this._wheelHandler,
+                    false
+                );
+            }
+
+            // Store the handler reference for future cleanup
+            this._wheelHandler = __wheelHandler;
 
             this.addEventListener(
                 document.getElementById("myCanvas"),
