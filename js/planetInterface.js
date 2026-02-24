@@ -199,9 +199,13 @@ class PlanetInterface {
          * Function to save the current project locally.
          * Prepares project data for export, generates SVG data, and saves the project data locally.
          */
-        this.saveLocally = () => {
-            this.activity.stage.update(event);
-            const data = this.activity.prepareExport();
+        this.saveLocally = data => {
+            if (typeof this.activity.stage.update === "function") {
+                this.activity.stage.update();
+            }
+            if (!data) {
+                data = this.activity.prepareExport();
+            }
             const svgData = doSVG(
                 this.activity.canvas,
                 this.activity.logo,
