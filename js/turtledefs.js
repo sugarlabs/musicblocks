@@ -785,10 +785,18 @@ const createHelpContent = activity => {
             "https://github.com/sugarlabs/musicblocks",
             _("Music Blocks GitHub repository")
         ]);
+
+        // Card 38: First Project Tutorial
         HELPCONTENT.push([
-            _("Congratulations!"),
-            _("You have finished the tour. Please enjoy Music Blocks!"),
-            "data:image/svg+xml;base64," + window.btoa(base64Encode(LOGO))
+            _("Build Your First Project"),
+            _("Ready to create your first musical masterpiece?") +
+                " " +
+                _(
+                    "This interactive tutorial will guide you step-by-step to create a melody, add rhythm, and make the turtle draw while playing music!"
+                ) +
+                " " +
+                _("Click the Start Tutorial button below to begin."),
+            "data:image/svg+xml;base64," + window.btoa(base64Encode(MOUSEPALETTEICON))
         ]);
     }
 };
