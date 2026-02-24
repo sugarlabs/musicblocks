@@ -165,21 +165,21 @@ const themeConfigs = {
         paletteColors: {
             widgets: ["#00FF00", "#00CC00", "#00CC00", "#66FF66"],
             pitch: ["#00FF00", "#00CC00", "#00CC00", "#66FF66"],
-            rhythm: ["#FF0000", "#CC0000", "#CC0000", "#FF6666"],
-            meter: ["#FF0000", "#CC0000", "#CC0000", "#FF6666"],
+            rhythm: ["#FF8C9E", "#FFB3C1", "#FFD1DC", "#FFB3A7"],
+            meter: ["#FF8C9E", "#FFB3C1", "#FFD1DC", "#FFB3A7"],
             tone: ["#00FFFF", "#00CCCC", "#00CCCC", "#66FFFF"],
             ornament: ["#00FFFF", "#00CCCC", "#00CCCC", "#66FFFF"],
             intervals: ["#00FF00", "#00CC00", "#00CC00", "#66FF66"],
             volume: ["#00FFFF", "#00CCCC", "#00CCCC", "#66FFFF"],
             drum: ["#00FFFF", "#00CCCC", "#00CCCC", "#66FFFF"],
-            graphics: ["#FF00FF", "#CC00CC", "#CC00CC", "#FF66FF"],
+            graphics: ["#FF29FF", "#FF8CFF", "#FFB3FF", "#FFD1FF"],
             turtle: ["#FF00FF", "#CC00CC", "#CC00CC", "#FF66FF"],
-            pen: ["#FF00FF", "#CC00CC", "#CC00CC", "#FF66FF"],
+            pen: ["#FF29FF", "#FF8CFF", "#FFB3FF", "#FFD1FF"],
             boxes: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
             action: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
-            media: ["#FF0000", "#CC0000", "#CC0000", "#FF6666"],
-            number: ["#FF00FF", "#CC00CC", "#CC00CC", "#FF66FF"],
-            boolean: ["#FF00FF", "#CC00CC", "#CC00CC", "#FF66FF"],
+            media: ["#FF8C9E", "#FFB3C1", "#FFD1DC", "#FFB3A7"],
+            number: ["#FF29FF", "#FF8CFF", "#FFB3FF", "#FFD1FF"],
+            boolean: ["#FF29FF", "#FF8CFF", "#FFB3FF", "#FFD1FF"],
             flow: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
             sensors: ["#00FF00", "#00CC00", "#00CC00", "#66FF66"],
             extras: ["#FFFFFF", "#CCCCCC", "#CCCCCC", "#FFFFFF"],
@@ -187,7 +187,7 @@ const themeConfigs = {
             myblocks: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
             heap: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
             dictionary: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
-            ensemble: ["#FF00FF", "#CC00CC", "#CC00CC", "#FF66FF"]
+            ensemble: ["#FF29FF", "#FF8CFF", "#FFB3FF", "#FFD1FF"]
         },
         disconnected: "#666666",
         header: "#00FFFF",
@@ -305,16 +305,17 @@ class ThemeBox {
             for (const blockId in this.activity.blocks.blockList) {
                 const block = this.activity.blocks.blockList[blockId];
                 if (block && block.protoblock && block.protoblock.palette) {
-                    // Update text color directly
+                    // Redraw block to update other colors
+                    if (typeof block.regenerateArtwork === "function") {
+                        // Ensure blockfactory uses the correct theme information
+                        block.regenerateArtwork(false);
+                    }
+                    // Update text color
                     if (block.text) {
                         block.text.color = window.platformColor.blockText;
                     }
                     if (block.collapseText) {
                         block.collapseText.color = window.platformColor.blockText;
-                    }
-                    // Redraw block to update other colors
-                    if (typeof block.regenerateArtwork === "function") {
-                        block.regenerateArtwork(false);
                     }
                 }
             }
