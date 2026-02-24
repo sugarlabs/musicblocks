@@ -397,6 +397,8 @@ class Block {
      * @throws {Error} - Throws an error if cache update fails after multiple attempts.
      */
     updateCache() {
+        console.count("Block.updateCache");
+        const startTime = performance.now();
         const that = this;
         return new Promise((resolve, reject) => {
             let loopCount = 0;
@@ -420,6 +422,12 @@ class Block {
                     } else {
                         that.container.updateCache();
                         that.activity.refreshCanvas();
+                        const duration = performance.now() - startTime;
+                        if (duration > 5) {
+                            console.log(
+                                `Block.updateCache for ${that.name} took ${duration.toFixed(2)}ms`
+                            );
+                        }
                         resolve();
                     }
                 } catch (e) {
