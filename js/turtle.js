@@ -892,7 +892,7 @@ Turtle.TurtleView = class {
     }
 
     /**
-     * Adds a text object to the canvas.
+     * Adds a text object to the canvas with auto-wrapping.
      *
      * @param  size - specifies text size
      * @param  myText - string of text to be displayed
@@ -903,38 +903,79 @@ Turtle.TurtleView = class {
         }
 
         const textList = typeof myText !== "string" ? [myText.toString()] : myText.split("\\n");
-
         const textSize = size.toString() + "px " + this.painter.font;
-        for (let i = 0; i < textList.length; i++) {
-            const text = new createjs.Text(textList[i], textSize, this.painter.canvasColor);
-            text.textAlign = "left";
-            text.textBaseline = "alphabetic";
-            this.turtles.stage.addChild(text);
-            this._media.push(text);
-            text.x = this.container.x;
-            text.y = this.container.y + i * size;
-            text.rotation = this.orientation;
 
-            const xScaled = text.x * this.turtles.scale;
-            const yScaled = text.y * this.turtles.scale;
-            const sizeScaled = size * this.turtles.scale;
-            this.painter.svgOutput +=
-                '<text x="' +
-                xScaled +
-                '" y = "' +
-                yScaled +
-                '" fill="' +
-                this.painter.canvasColor +
-                '" font-family = "' +
-                this.painter.font +
-                '" font-size = "' +
-                sizeScaled +
-                '">' +
-                myText +
-                "</text>";
+        // Skip wrapping for rotated text.
+        const isRotated = this.orientation % 360 !== 0;
 
-            this.activity.refreshCanvas();
+        let maxWidth = Infinity;
+        if (!isRotated) {
+            const stageCanvas = this.turtles.stage && this.turtles.stage.canvas;
+            const canvasWidth = stageCanvas ? stageCanvas.width : window.innerWidth;
+            const available = canvasWidth - this.container.x - 20;
+            maxWidth = Math.max(size, available); // at least one char wide
         }
+
+        const wrapText = (str, maxW) => {
+            if (maxW === Infinity) return [str];
+
+            const lines = [];
+            const tempText = new createjs.Text("", textSize, this.painter.canvasColor);
+            let currentLine = "";
+
+            for (let j = 0; j < str.length; j++) {
+                const testLine = currentLine + str[j];
+                tempText.text = testLine;
+                if (tempText.getMeasuredWidth() > maxW && currentLine.length > 0) {
+                    lines.push(currentLine);
+                    currentLine = str[j];
+                } else {
+                    currentLine = testLine;
+                }
+            }
+            if (currentLine.length > 0) {
+                lines.push(currentLine);
+            }
+            return lines.length > 0 ? lines : [str];
+        };
+
+        let currentYOffset = 0;
+
+        for (let i = 0; i < textList.length; i++) {
+            const wrappedLines = wrapText(textList[i], maxWidth);
+
+            for (let k = 0; k < wrappedLines.length; k++) {
+                const lineContent = wrappedLines[k];
+                const text = new createjs.Text(lineContent, textSize, this.painter.canvasColor);
+                text.textAlign = "left";
+                text.textBaseline = "alphabetic";
+                this.turtles.stage.addChild(text);
+                this._media.push(text);
+                text.x = this.container.x;
+                text.y = this.container.y + currentYOffset;
+                text.rotation = this.orientation;
+                currentYOffset += text.getMeasuredHeight() + size * 0.2;
+
+                const xScaled = text.x * this.turtles.scale;
+                const yScaled = text.y * this.turtles.scale;
+                const sizeScaled = size * this.turtles.scale;
+                this.painter.svgOutput +=
+                    '<text x="' +
+                    xScaled +
+                    '" y = "' +
+                    yScaled +
+                    '" fill="' +
+                    this.painter.canvasColor +
+                    '" font-family = "' +
+                    this.painter.font +
+                    '" font-size = "' +
+                    sizeScaled +
+                    '">' +
+                    lineContent +
+                    "</text>";
+            }
+        }
+        this.activity.refreshCanvas();
     }
 
     /**
