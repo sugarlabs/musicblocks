@@ -3258,12 +3258,16 @@ class Activity {
                         //do nothing when clicked in the input field
                     } else if (
                         document.getElementById("ui-id-1") &&
-                        document.getElementById("ui-id-1").style.display === "block" &&
                         (e.target === document.getElementById("ui-id-1") ||
                             document.getElementById("ui-id-1").contains(e.target))
                     ) {
-                        //do nothing when clicked on the menu
-                    } else if (document.getElementsByTagName("tr")[2].contains(e.target)) {
+                        //do nothing when clicked on the autocomplete menu
+                    } else if (e.target.closest(".ui-menu")) {
+                        //do nothing when clicked on any autocomplete menu element
+                    } else if (
+                        document.getElementsByTagName("tr")[2] &&
+                        document.getElementsByTagName("tr")[2].contains(e.target)
+                    ) {
                         //do nothing when clicked on the search row
                     } else {
                         // this will hide the search bar if someone clicks on menu items

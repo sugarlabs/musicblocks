@@ -958,6 +958,20 @@ class Palette {
                 return;
             }
 
+            // For search palette, also check if click is on search widget or autocomplete menu
+            if (this.name === "search") {
+                const searchWidget = document.getElementById("search");
+                const autocompleteMenu = document.getElementById("ui-id-1");
+
+                if (searchWidget && searchWidget.contains(event.target)) {
+                    return;
+                }
+
+                if (autocompleteMenu && autocompleteMenu.contains(event.target)) {
+                    return;
+                }
+            }
+
             this.hideMenu();
             document.removeEventListener("click", this._outsideClickListener);
             this._outsideClickListener = null;
