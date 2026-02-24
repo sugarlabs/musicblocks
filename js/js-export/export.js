@@ -316,6 +316,16 @@ class MusicBlocks {
         }
     }
 
+    _ensureHeap() {
+        if (!globalActivity.logo.turtleHeaps) {
+            globalActivity.logo.turtleHeaps = {};
+        }
+        if (!(this.turIndex in globalActivity.logo.turtleHeaps)) {
+            globalActivity.logo.turtleHeaps[this.turIndex] = [];
+        }
+        return globalActivity.logo.turtleHeaps[this.turIndex];
+    }
+
     // ========= Getters/Setters ===================================================================
 
     // ============================== GRAPHICS ================================
@@ -330,6 +340,72 @@ class MusicBlocks {
 
     get HEADING() {
         return this.turtle.orientation;
+    }
+
+    // =============================== HEAP ===================================
+
+    get HEAP() {
+        return JSON.stringify(this._ensureHeap());
+    }
+
+    get HEAPLENGTH() {
+        return this._ensureHeap().length;
+    }
+
+    get HEAPEMPTY() {
+        return this._ensureHeap().length === 0;
+    }
+
+    emptyHeap() {
+        this._ensureHeap();
+        globalActivity.logo.turtleHeaps[this.turIndex] = [];
+    }
+
+    reverseHeap() {
+        const heap = this._ensureHeap();
+        globalActivity.logo.turtleHeaps[this.turIndex] = heap.reverse();
+    }
+
+    setHeapEntry(index, value) {
+        if (index === null || index === undefined || value === null || value === undefined) {
+            JSEditor.logConsole("Missing heap index or value.", "maroon");
+            return;
+        }
+
+        if (typeof index !== "number" || typeof value !== "number") {
+            JSEditor.logConsole("Heap index and value must be numbers.", "maroon");
+            return;
+        }
+
+        let idx = Math.floor(index);
+        if (idx < 1) {
+            JSEditor.logConsole("Index must be > 0.", "maroon");
+            idx = 1;
+        }
+
+        if (idx > 1000) {
+            JSEditor.logConsole("Maximum heap size is 1000.", "maroon");
+            idx = 1000;
+        }
+
+        const heap = this._ensureHeap();
+        while (heap.length < idx) {
+            heap.push(0);
+        }
+        heap[idx - 1] = value;
+    }
+
+    setHeap(index, value) {
+        this.setHeapEntry(index, value);
+    }
+
+    push(value) {
+        if (value === null || value === undefined) {
+            JSEditor.logConsole("Missing heap value.", "maroon");
+            return;
+        }
+        const heap = this._ensureHeap();
+        heap.push(value);
     }
 
     // ================================ PEN ===================================
