@@ -91,6 +91,10 @@ class WidgetWindow {
         this._setupLanguage();
 
         // Global watchers
+        this._dragTopHandler = this._dragTopHandler.bind(this);
+        this._docMouseMoveHandler = this._docMouseMoveHandler.bind(this);
+        this._docMouseDownHandler = this._docMouseDownHandler.bind(this);
+
         document.addEventListener("mouseup", this._dragTopHandler, true);
         document.addEventListener("mousemove", this._docMouseMoveHandler, true);
         document.addEventListener("mousedown", this._docMouseDownHandler, true);
