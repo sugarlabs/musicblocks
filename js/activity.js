@@ -3626,7 +3626,7 @@ class Activity {
                         break;
                     }
                     case 13: {
-                        // 'R or ENTER'
+                        // Alt+ENTER
                         if (this.isInputON) return;
 
                         if (this.searchWidget.style.visibility === "visible") {
@@ -3637,12 +3637,20 @@ class Activity {
                             document.getElementById("paste").style.visibility = "hidden";
                             return;
                         }
-                        this.textMsg("Enter " + _("Play"));
-                        const stopbt = document.getElementById("stop");
-                        if (stopbt) {
-                            stopbt.style.color = platformColor.stopIconcolor;
+
+                        // Check if any widget window is open
+                        const hasOpenWidget = Object.values(window.widgetWindows.openWindows).some(
+                            w => w
+                        );
+                        if (this.turtles.running()) {
+                            this._doHardStopButton();
+                        } else if (!hasOpenWidget) {
+                            const stopbtn = document.getElementById("stop");
+                            if (stopbtn) {
+                                stopbtn.style.color = platformColor.stopIconcolor;
+                            }
+                            this._doFastButton();
                         }
-                        this._doFastButton();
                         break;
                     }
                     case 83: // 'S'
@@ -3853,23 +3861,24 @@ class Activity {
                                 this.searchWidget.style.visibility = "hidden";
                             }
                             break;
-                        case RETURN:
-                            this.textMsg("Return " + _("Play"));
-                            if (this.inTempoWidget) {
-                                if (this.logo.tempo.isMoving) {
-                                    this.logo.tempo.pause();
+                        case RETURN: {
+                            // Check if any widget window is open
+                            const hasOpenWidget = Object.values(
+                                window.widgetWindows.openWindows
+                            ).some(w => w);
+                            if (this.turtles.running()) {
+                                event.preventDefault();
+                                this._doHardStopButton();
+                            } else if (!disableKeys && !hasOpenWidget) {
+                                event.preventDefault();
+                                const stopbtn = document.getElementById("stop");
+                                if (stopbtn) {
+                                    stopbtn.style.color = platformColor.stopIconcolor;
                                 }
-                                this.logo.tempo.resume();
-                            }
-                            if (
-                                this.blocks.activeBlock === null ||
-                                !SPECIALINPUTS.includes(
-                                    this.blocks.blockList[this.blocks.activeBlock].name
-                                )
-                            ) {
-                                this.logo.runLogoCommands();
+                                this._doFastButton();
                             }
                             break;
+                        }
                         default:
                             break;
                     }
