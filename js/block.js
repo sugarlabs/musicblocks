@@ -2185,9 +2185,7 @@ class Block {
                     fileChooser.value = "";
                 }
             };
-            if (that.name === "media") {
-                reader.readAsDataURL(fileChooser.files[0]);
-            } else if (that.name === "audiofile") {
+            if (that.name === "media" || that.name === "audiofile") {
                 reader.readAsDataURL(fileChooser.files[0]);
             } else {
                 reader.readAsText(fileChooser.files[0]);
