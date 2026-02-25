@@ -2479,16 +2479,10 @@ class Singer {
                 // After the note plays, clear the embedded graphics and notes queue.
                 tur.singer.embeddedGraphics[blk] = [];
 
-                // Ensure note value block unhighlights after note plays.
-                // -- Merged fix: our timer-dedup + master's min-duration floor & stage.update --
-                // 1. Cancel any previously pending unhighlight timer for this block to
-                //    prevent unbounded timer accumulation in tight infinite loops, which
-                //    would otherwise saturate the JS timer queue and stall the main thread.
-                // 2. Enforce a minimum visible highlight duration (80 ms) so fast notes
-                //    still produce a visible glow rather than instantly clearing.
-                // 3. Call activity.stage.update() after unhighlight so the canvas
-                //    repaints immediately (matches master's behaviour).
-                const MIN_HIGHLIGHT_DURATION_MS = 80;
+                // Ensure note value block unhighlights after note plays (minimum duration so highlight is visible).
+                // Cancel any previously pending unhighlight timer for this block to
+                // prevent unbounded timer accumulation in tight infinite loops, which
+                // would otherwise saturate the JS timer queue and stall the main thread.
                 if (!tur.singer._unhighlightTimers) {
                     tur.singer._unhighlightTimers = {};
                 }
@@ -2497,9 +2491,6 @@ class Singer {
                 }
                 const highlightDurationMs = Math.max(beatValue * 1000, MIN_HIGHLIGHT_DURATION_MS);
                 tur.singer._unhighlightTimers[blk] = setTimeout(() => {
-                // Ensure note value block unhighlights after note plays (minimum duration so highlight is visible).
-                const highlightDurationMs = Math.max(beatValue * 1000, MIN_HIGHLIGHT_DURATION_MS);
-                setTimeout(() => {
                     if (activity.blocks.visible && blk in activity.blocks.blockList) {
                         activity.blocks.unhighlight(blk);
                         if (activity.stage) {
