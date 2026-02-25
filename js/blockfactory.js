@@ -967,16 +967,26 @@ class SVG {
         this.margins[3] = 0;
         const cacheKey =
             "bb|" +
-            this._scale + "|" +
-            this._expandX + "|" +
-            this._expandY + "|" +
-            (this._expandY2 || 0) + "|" +
-            this._innies.join("") + "|" +
-            (this._slot ? 1 : 0) + "|" +
-            (this._tab ? 1 : 0) + "|" +
-            (this._outie ? 1 : 0) + "|" +
-            (this._bool ? 1 : 0) + "|" +
-            (this._porch ? 1 : 0) + "|" +
+            this._scale +
+            "|" +
+            this._expandX +
+            "|" +
+            this._expandY +
+            "|" +
+            (this._expandY2 || 0) +
+            "|" +
+            this._innies.join("") +
+            "|" +
+            (this._slot ? 1 : 0) +
+            "|" +
+            (this._tab ? 1 : 0) +
+            "|" +
+            (this._outie ? 1 : 0) +
+            "|" +
+            (this._bool ? 1 : 0) +
+            "|" +
+            (this._porch ? 1 : 0) +
+            "|" +
             (this._tail ? 1 : 0);
 
         if (__svgCache.has(cacheKey)) {
@@ -1159,10 +1169,10 @@ class SVG {
         let svg = this._startBoolean(
             this._strokeWidth / 2.0,
             this._radius * 5.5 +
-            this._strokeWidth / 2.0 +
-            this._innieY2 +
-            this._inniesSpacer +
-            this._expandY
+                this._strokeWidth / 2.0 +
+                this._innieY2 +
+                this._inniesSpacer +
+                this._expandY
         );
         svg += this._rLineTo(
             0,
@@ -1332,11 +1342,16 @@ class SVG {
         const yoff = this._radius * 2;
         const cacheKey =
             "boolcmp|" +
-            this._scale + "|" +
-            this._expandX + "|" +
-            this._expandY + "|" +
-            (this._expandY2 || 0) + "|" +
-            this._innies.join("") + "|" +
+            this._scale +
+            "|" +
+            this._expandX +
+            "|" +
+            this._expandY +
+            "|" +
+            (this._expandY2 || 0) +
+            "|" +
+            this._innies.join("") +
+            "|" +
             (this._porch ? 1 : 0);
 
         if (__svgCache.has(cacheKey)) {
@@ -1452,18 +1467,30 @@ class SVG {
         this.margins[3] = 0;
         const cacheKey =
             "bc|" +
-            this._scale + "|" +
-            this._expandX + "|" +
-            this._expandY + "|" +
-            (this._expandY2 || 0) + "|" +
-            this._innies.join("") + "|" +
-            (this._slot ? 1 : 0) + "|" +
-            (this._tab ? 1 : 0) + "|" +
-            (this._outie ? 1 : 0) + "|" +
-            (this._bool ? 1 : 0) + "|" +
-            this._clampCount + "|" +
-            JSON.stringify(this._clampSlots) + "|" +
-            (this._tail ? 1 : 0) + "|" +
+            this._scale +
+            "|" +
+            this._expandX +
+            "|" +
+            this._expandY +
+            "|" +
+            (this._expandY2 || 0) +
+            "|" +
+            this._innies.join("") +
+            "|" +
+            (this._slot ? 1 : 0) +
+            "|" +
+            (this._tab ? 1 : 0) +
+            "|" +
+            (this._outie ? 1 : 0) +
+            "|" +
+            (this._bool ? 1 : 0) +
+            "|" +
+            this._clampCount +
+            "|" +
+            JSON.stringify(this._clampSlots) +
+            "|" +
+            (this._tail ? 1 : 0) +
+            "|" +
             (this._cap ? 1 : 0);
 
         if (__svgCache.has(cacheKey)) {
@@ -1680,16 +1707,26 @@ class SVG {
         this.margins[3] = 0;
         const cacheKey =
             "ac|" +
-            this._scale + "|" +
-            this._expandX + "|" +
-            this._expandY + "|" +
-            (this._expandY2 || 0) + "|" +
-            this._innies.join("") + "|" +
-            (this._slot ? 1 : 0) + "|" +
-            (this._tab ? 1 : 0) + "|" +
-            (this._outie ? 1 : 0) + "|" +
-            (this._bool ? 1 : 0) + "|" +
-            JSON.stringify(this._clampSlots) + "|" +
+            this._scale +
+            "|" +
+            this._expandX +
+            "|" +
+            this._expandY +
+            "|" +
+            (this._expandY2 || 0) +
+            "|" +
+            this._innies.join("") +
+            "|" +
+            (this._slot ? 1 : 0) +
+            "|" +
+            (this._tab ? 1 : 0) +
+            "|" +
+            (this._outie ? 1 : 0) +
+            "|" +
+            (this._bool ? 1 : 0) +
+            "|" +
+            JSON.stringify(this._clampSlots) +
+            "|" +
             (this._tail ? 1 : 0);
 
         if (__svgCache.has(cacheKey)) {
