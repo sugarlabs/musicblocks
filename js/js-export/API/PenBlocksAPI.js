@@ -72,6 +72,14 @@ class PenBlocksAPI {
         return this.runCommand("doPenDown");
     }
 
+    beginFill() {
+        return this.runCommand("doStartFill");
+    }
+
+    endFill() {
+        return this.runCommand("doEndFill");
+    }
+
     async fillShape(flow) {
         await this.runCommand("doStartFill");
         await flow();

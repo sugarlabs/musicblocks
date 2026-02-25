@@ -1993,6 +1993,89 @@
             }
         },
         {
+            "name": "definemode",
+            "comment": "Define mode block",
+            "arguments": [
+                {
+                    "type": "text"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "defineMode"
+                    }
+                ],
+                "argument_properties": [
+                    "expression.argument.arguments[0]"
+                ],
+                "children_properties": [
+                    "expression.argument.arguments[1].body.body"
+                ]
+            },
+            "default_vspaces": {
+                "argument": 1
+            }
+        },
+        {
+            "name": "movable",
+            "comment": "Movable do block",
+            "arguments": [
+                {
+                    "type": "BooleanExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AssignmentExpression"
+                    },
+                    {
+                        "property": "expression.operator",
+                        "value": "="
+                    },
+                    {
+                        "property": "expression.left.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.left.property.name",
+                        "value": "MOVABLEDO"
+                    }
+                ],
+                "argument_properties": [
+                    "expression.right"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "next_sibling"
+            ]
+        },
+        {
             "name": "semitoneinterval",
             "comment": "Set semitone interval block",
             "arguments": [
@@ -3586,6 +3669,148 @@
             ]
         },
         {
+            "name": "beginfill",
+            "comment": "Begin fill block",
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "beginFill"
+                    }
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "next_sibling"
+            ]
+        },
+        {
+            "name": "endfill",
+            "comment": "End fill block",
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "endFill"
+                    }
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "next_sibling"
+            ]
+        },
+        {
+            "name": "fill",
+            "comment": "Fill block",
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "fillShape"
+                    }
+                ],
+                "children_properties": [
+                    "expression.argument.arguments[0].body.body"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "first_child",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "argument": 0
+            }
+        },
+        {
+            "name": "hollowline",
+            "comment": "Hollow line block",
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "hollowLine"
+                    }
+                ],
+                "children_properties": [
+                    "expression.argument.arguments[0].body.body"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "first_child",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "argument": 0
+            }
+        },
+        {
             "name": "background",
             "comment": "Fill background block",
             "ast": {
@@ -3646,6 +3871,79 @@
                     {
                         "property": "expression.argument.callee.property.name",
                         "value": "setFont"
+                    }
+                ],
+                "argument_properties": [
+                    "expression.argument.arguments[0]"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "next_sibling"
+            ]
+        },
+        {
+            "name": "erasemedia",
+            "comment": "Erase media block",
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "clearMedia"
+                    }
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "next_sibling"
+            ]
+        },
+        {
+            "name": "wait",
+            "comment": "Wait block",
+            "arguments": [
+                {
+                    "type": "NumberExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "doWait"
                     }
                 ],
                 "argument_properties": [
