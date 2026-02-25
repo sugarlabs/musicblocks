@@ -965,21 +965,23 @@ class SVG {
 
         this.margins[2] = 0;
         this.margins[3] = 0;
-        const cacheKey = JSON.stringify({
-            type: "basicBlock",
-            scale: this._scale,
-            expandX: this._expandX,
-            expandY: this._expandY,
-            innies: this._innies,
-            slot: this._slot,
-            tab: this._tab,
-            outie: this._outie,
-            bool: this._bool
-        });
+        const cacheKey =
+            "bb|" +
+            this._scale + "|" +
+            this._expandX + "|" +
+            this._expandY + "|" +
+            (this._expandY2 || 0) + "|" +
+            this._innies.join("") + "|" +
+            (this._slot ? 1 : 0) + "|" +
+            (this._tab ? 1 : 0) + "|" +
+            (this._outie ? 1 : 0) + "|" +
+            (this._bool ? 1 : 0) + "|" +
+            (this._porch ? 1 : 0) + "|" +
+            (this._tail ? 1 : 0);
 
         if (__svgCache.has(cacheKey)) {
             const cached = __svgCache.get(cacheKey);
-            this.docks = JSON.parse(JSON.stringify(cached.docks));
+            this.docks = cached.docks.map(d => [...d]);
             this._width = cached.width;
             this._height = cached.height;
             return cached.svg;
@@ -1093,13 +1095,14 @@ class SVG {
         }
 
         svg += this._footer();
+        const finalSvg = this._header(false) + svg;
         __svgCache.set(cacheKey, {
-            svg: svgString,
+            svg: finalSvg,
             docks: JSON.parse(JSON.stringify(this.docks)),
             width: this._width,
             height: this._height
         });
-        return this._header(false) + svg;
+        return finalSvg;
     }
 
     /**
@@ -1327,21 +1330,18 @@ class SVG {
         const xoffset = this._strokeWidth / 2.0;
 
         const yoff = this._radius * 2;
-        const cacheKey = JSON.stringify({
-            type: "booleanCompare",
-            scale: this._scale,
-            expandX: this._expandX,
-            expandY: this._expandY,
-            innies: this._innies,
-            slot: this._slot,
-            tab: this._tab,
-            outie: this._outie,
-            bool: this._bool
-        });
+        const cacheKey =
+            "boolcmp|" +
+            this._scale + "|" +
+            this._expandX + "|" +
+            this._expandY + "|" +
+            (this._expandY2 || 0) + "|" +
+            this._innies.join("") + "|" +
+            (this._porch ? 1 : 0);
 
         if (__svgCache.has(cacheKey)) {
             const cached = __svgCache.get(cacheKey);
-            this.docks = JSON.parse(JSON.stringify(cached.docks));
+            this.docks = cached.docks.map(d => [...d]);
             this._width = cached.width;
             this._height = cached.height;
             return cached.svg;
@@ -1412,13 +1412,14 @@ class SVG {
         );
 
         svg += this._footer();
+        const finalSvg = this._header(false) + svg;
         __svgCache.set(cacheKey, {
-            svg: svgString,
+            svg: finalSvg,
             docks: JSON.parse(JSON.stringify(this.docks)),
             width: this._width,
             height: this._height
         });
-        return this._header(false) + svg;
+        return finalSvg;
     }
 
     /**
@@ -1449,21 +1450,25 @@ class SVG {
         this.margins[1] = (this._strokeWidth + 0.5) * this._scale;
         this.margins[2] = 0;
         this.margins[3] = 0;
-        const cacheKey = JSON.stringify({
-            type: "basicClamp",
-            scale: this._scale,
-            expandX: this._expandX,
-            expandY: this._expandY,
-            innies: this._innies,
-            slot: this._slot,
-            tab: this._tab,
-            outie: this._outie,
-            bool: this._bool
-        });
+        const cacheKey =
+            "bc|" +
+            this._scale + "|" +
+            this._expandX + "|" +
+            this._expandY + "|" +
+            (this._expandY2 || 0) + "|" +
+            this._innies.join("") + "|" +
+            (this._slot ? 1 : 0) + "|" +
+            (this._tab ? 1 : 0) + "|" +
+            (this._outie ? 1 : 0) + "|" +
+            (this._bool ? 1 : 0) + "|" +
+            this._clampCount + "|" +
+            JSON.stringify(this._clampSlots) + "|" +
+            (this._tail ? 1 : 0) + "|" +
+            (this._cap ? 1 : 0);
 
         if (__svgCache.has(cacheKey)) {
             const cached = __svgCache.get(cacheKey);
-            this.docks = JSON.parse(JSON.stringify(cached.docks));
+            this.docks = cached.docks.map(d => [...d]);
             this._width = cached.width;
             this._height = cached.height;
             return cached.svg;
@@ -1644,13 +1649,14 @@ class SVG {
         }
 
         svg += this._footer();
+        const finalSvg = this._header(false) + svg;
         __svgCache.set(cacheKey, {
-            svg: svgString,
+            svg: finalSvg,
             docks: JSON.parse(JSON.stringify(this.docks)),
             width: this._width,
             height: this._height
         });
-        return this._header(false) + svg;
+        return finalSvg;
     }
 
     /**
@@ -1672,21 +1678,23 @@ class SVG {
         this.margins[1] = (this._strokeWidth + 0.5) * this._scale;
         this.margins[2] = 0;
         this.margins[3] = 0;
-        const cacheKey = JSON.stringify({
-            type: "argClamp",
-            scale: this._scale,
-            expandX: this._expandX,
-            expandY: this._expandY,
-            innies: this._innies,
-            slot: this._slot,
-            tab: this._tab,
-            outie: this._outie,
-            bool: this._bool
-        });
+        const cacheKey =
+            "ac|" +
+            this._scale + "|" +
+            this._expandX + "|" +
+            this._expandY + "|" +
+            (this._expandY2 || 0) + "|" +
+            this._innies.join("") + "|" +
+            (this._slot ? 1 : 0) + "|" +
+            (this._tab ? 1 : 0) + "|" +
+            (this._outie ? 1 : 0) + "|" +
+            (this._bool ? 1 : 0) + "|" +
+            JSON.stringify(this._clampSlots) + "|" +
+            (this._tail ? 1 : 0);
 
         if (__svgCache.has(cacheKey)) {
             const cached = __svgCache.get(cacheKey);
-            this.docks = JSON.parse(JSON.stringify(cached.docks));
+            this.docks = cached.docks.map(d => [...d]);
             this._width = cached.width;
             this._height = cached.height;
             return cached.svg;
@@ -1786,13 +1794,14 @@ class SVG {
         );
 
         svg += this._footer();
+        const finalSvg = this._header(false) + svg;
         __svgCache.set(cacheKey, {
-            svg: svgString,
+            svg: finalSvg,
             docks: JSON.parse(JSON.stringify(this.docks)),
             width: this._width,
             height: this._height
         });
-        return this._header(false) + svg;
+        return finalSvg;
     }
 
     /**
