@@ -95,30 +95,30 @@ class Planet {
         this.GlobalPlanet.openGlobalProject(id, error);
     }
 
-showNewProjectConfirmation() {
-    const button = document.getElementById("planet-new-project");
-    const rect = button.getBoundingClientRect();
+    showNewProjectConfirmation() {
+        const button = document.getElementById("planet-new-project");
+        const rect = button.getBoundingClientRect();
 
-    // Remove existing confirmation if any
-    const old = document.getElementById("new-project-confirmation");
-    if (old) old.remove();
+        // Remove existing confirmation if any
+        const old = document.getElementById("new-project-confirmation");
+        if (old) old.remove();
 
-    const modal = document.createElement("div");
-    modal.id = "new-project-confirmation";
-    modal.style.position = "absolute";
-    modal.style.top = rect.bottom + window.scrollY + 8 + "px";
-    modal.style.left = rect.left + window.scrollX + "px";
-    modal.style.background = "#1b5e20"; // dark green
-    modal.style.color = "#ffffff";
-    modal.style.padding = "16px";
-    modal.style.borderRadius = "10px";
-    modal.style.width = "260px";
-    modal.style.boxShadow = "0 6px 16px rgba(0,0,0,0.3)";
-    modal.style.zIndex = "10000";
-    modal.style.fontFamily = "sans-serif";
-    modal.style.animation = "fadeIn 0.15s ease-out";
+        const modal = document.createElement("div");
+        modal.id = "new-project-confirmation";
+        modal.style.position = "absolute";
+        modal.style.top = rect.bottom + window.scrollY + 8 + "px";
+        modal.style.left = rect.left + window.scrollX + "px";
+        modal.style.background = "#1b5e20"; // dark green
+        modal.style.color = "#ffffff";
+        modal.style.padding = "16px";
+        modal.style.borderRadius = "10px";
+        modal.style.width = "260px";
+        modal.style.boxShadow = "0 6px 16px rgba(0,0,0,0.3)";
+        modal.style.zIndex = "10000";
+        modal.style.fontFamily = "sans-serif";
+        modal.style.animation = "fadeIn 0.15s ease-out";
 
-    modal.innerHTML = `
+        modal.innerHTML = `
         <div style="font-size:15px; font-weight:600; margin-bottom:6px;">
             Start New Project?
         </div>
@@ -137,28 +137,28 @@ showNewProjectConfirmation() {
         </div>
     `;
 
-    document.body.appendChild(modal);
+        document.body.appendChild(modal);
 
-    // Cancel
-    modal.querySelector("#cancel-new").onclick = (e) => {
-        e.stopPropagation();
-        modal.remove();
-    };
-
-    // Confirm
-    modal.querySelector("#confirm-new").onclick = () => {
-        modal.remove();
-        this.loadNewProject();
-    };
-
-    // Click outside to close
-    document.addEventListener("click", function handler(e) {
-        if (!modal.contains(e.target) && e.target !== button) {
+        // Cancel
+        modal.querySelector("#cancel-new").onclick = e => {
+            e.stopPropagation();
             modal.remove();
-            document.removeEventListener("click", handler);
-        }
-    });
-}
+        };
+
+        // Confirm
+        modal.querySelector("#confirm-new").onclick = () => {
+            modal.remove();
+            this.loadNewProject();
+        };
+
+        // Click outside to close
+        document.addEventListener("click", function handler(e) {
+            if (!modal.contains(e.target) && e.target !== button) {
+                modal.remove();
+                document.removeEventListener("click", handler);
+            }
+        });
+    }
 
     async init() {
         this.StringHelper = new StringHelper(this);
@@ -181,8 +181,8 @@ showNewProjectConfirmation() {
 
         // eslint-disable-next-line no-unused-vars
         document.getElementById("planet-new-project").addEventListener("click", evt => {
-            evt.preventDefault(); 
-            evt.stopPropagation(); 
+            evt.preventDefault();
+            evt.stopPropagation();
             this.showNewProjectConfirmation();
         });
 
