@@ -52,7 +52,8 @@ app.use(
 );
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, "127.0.0.1", () => {
-    console.log(`Music Blocks running at http://127.0.0.1:${PORT}/`);
+const HOST = process.env.HOST || "127.0.0.1";
+app.listen(PORT, HOST, () => {
+    console.log(`Music Blocks running at http://${HOST}:${PORT}/`);
     console.log("Compression enabled");
 });
