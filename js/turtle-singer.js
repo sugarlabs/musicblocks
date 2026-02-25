@@ -879,7 +879,9 @@ class Singer {
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
                 );
-                nnote[0] = noteIsSolfege(note) ? getSolfege(nnote[0]) : nnote[0];
+                nnote[0] = noteIsSolfege(note)
+                    ? getSolfege(nnote[0], tur.singer.keySignature, tur.singer.movable)
+                    : nnote[0];
 
                 if (tur.singer.drumStyle.length > 0) {
                     activity.logo.pitchDrumMatrix.drums.push(last(tur.singer.drumStyle));
@@ -925,7 +927,11 @@ class Singer {
                     tur.singer.keySignature[1].toLowerCase() === "major" &&
                     noteIsSolfege(note)
                 ) {
-                    noteObj[0] = getSolfege(noteObj[0]);
+                    noteObj[0] = getSolfege(
+                        noteObj[0],
+                        tur.singer.keySignature,
+                        tur.singer.movable
+                    );
                 }
 
                 // If we are in a setdrum clamp, override the pitch.
@@ -988,7 +994,11 @@ class Singer {
                     tur.singer.keySignature[1].toLowerCase() === "major" &&
                     noteIsSolfege(note)
                 ) {
-                    noteObj[0] = getSolfege(noteObj[0]);
+                    noteObj[0] = getSolfege(
+                        noteObj[0],
+                        tur.singer.keySignature,
+                        tur.singer.movable
+                    );
                 }
 
                 // If we are in a setdrum clamp, override the pitch.
@@ -1236,7 +1246,9 @@ class Singer {
                 null,
                 activity.errorMsg
             );
-            nnote[0] = noteIsSolfege(note) ? getSolfege(nnote[0]) : nnote[0];
+            nnote[0] = noteIsSolfege(note)
+                ? getSolfege(nnote[0], tur.singer.keySignature, tur.singer.movable)
+                : nnote[0];
 
             if (tur.singer.drumStyle.length === 0) {
                 activity.logo.musicKeyboard.instruments.push(last(tur.singer.instrumentNames));

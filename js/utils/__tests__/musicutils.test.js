@@ -1753,6 +1753,15 @@ describe("getSolfege", () => {
     it("should return undefined for invalid notes not present in the conversion table", () => {
         expect(getSolfege("X")).toBe("X");
     });
+
+    it("should return correct movable solfege", () => {
+        // G Major: G=do, A=re, B=mi, C=fa, D=sol, E=la, F#=ti
+        expect(getSolfege("G", "G major", true)).toBe("do");
+        expect(getSolfege("F#", "G major", true)).toBe("ti");
+        // Fixed Do fallback (movable=false)
+        expect(getSolfege("G", "G major", false)).toBe("sol");
+        // Unknown note in scale fallbacks to fixed do behavior
+    });
 });
 
 describe("splitSolfege", () => {

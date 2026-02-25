@@ -55,7 +55,7 @@
   DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
   INTERVALVALUES, getIntervalRatio, frequencyToPitch, NOTESTEP,
   GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
-  SEMITONES
+  SEMITONES, CHROMATIC_SOLFEGE
 */
 
 /**
@@ -184,6 +184,25 @@ const STOSHARP = {
     "c#": "C" + SHARP,
     "f#": "F" + SHARP
 };
+
+/**
+ * Array containing the solfege names for the chromatic scale.
+ * @constant {string[]}
+ */
+const CHROMATIC_SOLFEGE = [
+    "Do", // 0
+    "Di", // 1
+    "Re", // 2
+    "Ri", // 3
+    "Mi", // 4
+    "Fa", // 5
+    "Fi", // 6
+    "Sol", // 7
+    "Si", // 8
+    "La", // 9
+    "Li", // 10
+    "Ti" // 11
+];
 
 /**
  * Array of notes with sharps.
@@ -5787,11 +5806,15 @@ const noteToFrequency = (note, keySignature) => {
  * @returns {boolean} True if the note is in solfege, false otherwise.
  */
 const noteIsSolfege = note => {
-    if (SOLFEGECONVERSIONTABLE[note] === undefined) {
-        return true;
-    } else {
+    if (SOLFEGECONVERSIONTABLE[note] !== undefined) {
         return false;
     }
+    // Check normalized version (ASCII to Unicode)
+    const altNote = note.replace("#", SHARP).replace("b", FLAT);
+    if (SOLFEGECONVERSIONTABLE[altNote] !== undefined) {
+        return false;
+    }
+    return true;
 };
 
 /**
@@ -5800,13 +5823,61 @@ const noteIsSolfege = note => {
  * @param {string} note - The note string.
  * @returns {string} The solfege representation.
  */
-const getSolfege = note => {
-    // TODO: Use mode-specific conversion.
+const getSolfege = (note, keySignature, movable) => {
     if (noteIsSolfege(note)) {
         return note;
-    } else {
-        return SOLFEGECONVERSIONTABLE[note];
     }
+
+    if (movable && keySignature) {
+        const scaleResult = buildScale(keySignature);
+        if (!scaleResult) return SOLFEGECONVERSIONTABLE[note];
+
+        const scale = scaleResult[0];
+
+        // 1) exact match
+        let index = scale.indexOf(note);
+
+        // 2) normalized accidental match
+        if (index === -1) {
+            const altNote = note.replace("#", SHARP).replace("b", FLAT);
+            index = scale.indexOf(altNote);
+        }
+
+        const isMinor = Array.isArray(keySignature)
+            ? keySignature[1].toLowerCase() === "minor"
+            : keySignature.toLowerCase().includes("minor");
+
+        // diatonic note
+        if (index !== -1 && index < SOLFEGENAMES.length) {
+            let solfegeIndex = index;
+
+            // minor movable-do → la-based
+            if (isMinor) {
+                solfegeIndex = (index + 5) % 7;
+            }
+
+            return SOLFEGENAMES[solfegeIndex].toLowerCase();
+        }
+
+        // 3) chromatic fallback (interval based)
+        const tonic = scale[0];
+        const tonicPitch = pitchToNumber(tonic, 4, keySignature);
+        const notePitch = pitchToNumber(note, 4, keySignature);
+
+        // semitones from tonic
+        let semitones = (notePitch - tonicPitch + 12) % 12;
+
+        if (isMinor) {
+            // For minor, relative major is 3 semitones up.
+            // We want solfege relative to the relative major.
+            // e.g. Minor tonic (La) -> +9 -> La
+            semitones = (semitones + 9) % 12;
+        }
+
+        return CHROMATIC_SOLFEGE[semitones].toLowerCase();
+    }
+
+    return SOLFEGECONVERSIONTABLE[note];
 };
 
 /**
