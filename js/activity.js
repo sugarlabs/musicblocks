@@ -1865,9 +1865,37 @@ class Activity {
             function saveFile(recordedChunks) {
                 flag = 1;
                 recInside.classList.remove("blink");
+                const showDialog = message => {
+                    if (window.MBDialog && typeof window.MBDialog.alert === "function") {
+                        window.MBDialog.alert(message, _("Save recording"));
+                    } else {
+                        alert(message);
+                    }
+                };
+                const finalizeSave = filename => {
+                    if (filename === null || filename.trim() === "") {
+                        showDialog(_("File save canceled"));
+                        flag = 0;
+                        recording();
+                        doRecordButton();
+                        return; // Exit without saving the file
+                    }
+                    const downloadLink = document.createElement("a");
+                    downloadLink.href = URL.createObjectURL(blob);
+                    downloadLink.download = `${filename}.webm`;
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    URL.revokeObjectURL(blob);
+                    document.body.removeChild(downloadLink);
+                    flag = 0;
+                    // Allow multiple recordings
+                    recording();
+                    doRecordButton();
+                    that.textMsg(_("Recording stopped. File saved."));
+                };
                 // Prevent zero-byte files
                 if (!recordedChunks || recordedChunks.length === 0) {
-                    alert(_("Recorded file is empty. File not saved."));
+                    showDialog(_("Recorded file is empty. File not saved."));
                     flag = 0;
                     recording();
                     doRecordButton();
@@ -1877,7 +1905,7 @@ class Activity {
                     type: "video/webm"
                 });
                 if (blob.size === 0) {
-                    alert(_("Recorded file is empty. File not saved."));
+                    showDialog(_("Recorded file is empty. File not saved."));
                     flag = 0;
                     recording();
                     doRecordButton();
@@ -1894,26 +1922,18 @@ class Activity {
                 }
                 mediaRecorder = null;
                 // Prompt to save file
-                const filename = window.prompt(_("Enter file name"));
-                if (filename === null || filename.trim() === "") {
-                    alert(_("File save canceled"));
-                    flag = 0;
-                    recording();
-                    doRecordButton();
-                    return; // Exit without saving the file
+                if (window.MBDialog && typeof window.MBDialog.prompt === "function") {
+                    window.MBDialog.prompt({
+                        title: _("Save recording"),
+                        message: _("Filename:"),
+                        defaultValue: _("recording"),
+                        okText: _("Save"),
+                        cancelText: _("Cancel")
+                    }).then(result => finalizeSave(result));
+                } else {
+                    const filename = window.prompt(_("Enter file name"));
+                    finalizeSave(filename);
                 }
-                const downloadLink = document.createElement("a");
-                downloadLink.href = URL.createObjectURL(blob);
-                downloadLink.download = `${filename}.webm`;
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                URL.revokeObjectURL(blob);
-                document.body.removeChild(downloadLink);
-                flag = 0;
-                // Allow multiple recordings
-                recording();
-                doRecordButton();
-                that.textMsg(_("Recording stopped. File saved."));
             }
             /**
              * Stops the recording process.
