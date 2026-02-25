@@ -1170,18 +1170,22 @@ class Toolbar {
                     delPluginIcon.onclick = () => delPlugin_onclick(this.activity);
                 }
 
-                // Horizontal Scroll
+                // Horizontal Scroll - sync icon state with current scroll setting
                 const enableHorizScrollIcon = docById("enableHorizScrollIcon");
                 const disableHorizScrollIcon = docById("disableHorizScrollIcon");
 
-                if (enableHorizScrollIcon) {
-                    enableHorizScrollIcon.style.display = "block";
+                if (enableHorizScrollIcon && disableHorizScrollIcon) {
+                    // Show correct icon based on current scroll state
+                    if (this.activity.scrollBlockContainer) {
+                        enableHorizScrollIcon.style.display = "none";
+                        disableHorizScrollIcon.style.display = "block";
+                    } else {
+                        enableHorizScrollIcon.style.display = "block";
+                        disableHorizScrollIcon.style.display = "none";
+                    }
                     enableHorizScrollIcon.onclick = () => {
                         setScroller(this.activity);
                     };
-                }
-
-                if (disableHorizScrollIcon) {
                     disableHorizScrollIcon.onclick = () => {
                         setScroller(this.activity);
                     };

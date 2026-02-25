@@ -6,7 +6,7 @@ is a community-driven project, and every meaningful contribution helps
 improve the platform for learners and educators around the world.
 
 If you’re new to the project, start by setting up the local
-development environment using the guide linked above, then explore
+development environment using the guide linked below, then explore
 open issues or discussions to find a place to contribute.
 
 - [How to set up a local server](README.md#how-to-set-up-a-local-server)
@@ -49,8 +49,12 @@ following resources:
 - [JavaScript tutorial - w3schools.com](https://www.w3schools.com/js/default.asp)
 - [JavaScript reference - MDN Web Docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
-Programmers, please follow these general [guidelines for
+For code contributions, please follow these general [guidelines for
 contributions](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md).
+
+### AI guidelines
+
+Follow [AI guidelines for Sugar Labs](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md#ai-guidelines-for-sugar-labs)
 
 ### Before You Push
 

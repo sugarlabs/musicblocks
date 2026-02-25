@@ -18,7 +18,7 @@
 /*
    global
 
-   DEFAULTVOLUME, TARGETBPM, TONEBPM, frequencyToPitch, last,
+   DEFAULTVOLUME, TARGETBPM, TONEBPM, MIN_HIGHLIGHT_DURATION_MS, frequencyToPitch, last,
    pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp,
    getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
@@ -2497,6 +2497,9 @@ class Singer {
                 }
                 const highlightDurationMs = Math.max(beatValue * 1000, MIN_HIGHLIGHT_DURATION_MS);
                 tur.singer._unhighlightTimers[blk] = setTimeout(() => {
+                // Ensure note value block unhighlights after note plays (minimum duration so highlight is visible).
+                const highlightDurationMs = Math.max(beatValue * 1000, MIN_HIGHLIGHT_DURATION_MS);
+                setTimeout(() => {
                     if (activity.blocks.visible && blk in activity.blocks.blockList) {
                         activity.blocks.unhighlight(blk);
                         if (activity.stage) {
