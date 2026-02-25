@@ -95,6 +95,71 @@ class Planet {
         this.GlobalPlanet.openGlobalProject(id, error);
     }
 
+showNewProjectConfirmation() {
+    const button = document.getElementById("planet-new-project");
+    const rect = button.getBoundingClientRect();
+
+    // Remove existing confirmation if any
+    const old = document.getElementById("new-project-confirmation");
+    if (old) old.remove();
+
+    const modal = document.createElement("div");
+    modal.id = "new-project-confirmation";
+    modal.style.position = "absolute";
+    modal.style.top = rect.bottom + window.scrollY + 8 + "px";
+    modal.style.left = rect.left + window.scrollX + "px";
+    modal.style.background = "#1b5e20"; // dark green
+    modal.style.color = "#ffffff";
+    modal.style.padding = "16px";
+    modal.style.borderRadius = "10px";
+    modal.style.width = "260px";
+    modal.style.boxShadow = "0 6px 16px rgba(0,0,0,0.3)";
+    modal.style.zIndex = "10000";
+    modal.style.fontFamily = "sans-serif";
+    modal.style.animation = "fadeIn 0.15s ease-out";
+
+    modal.innerHTML = `
+        <div style="font-size:15px; font-weight:600; margin-bottom:6px;">
+            Start New Project?
+        </div>
+        <div style="font-size:13px; opacity:0.85; margin-bottom:12px;">
+            Unsaved changes will be lost.
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:8px;">
+            <button id="cancel-new"
+                style="padding:6px 12px; border:none; background:#2e7d32; color:#fff; border-radius:6px; cursor:pointer;">
+                No
+            </button>
+            <button id="confirm-new"
+                style="padding:6px 12px; border:none; background:#66bb6a; color:#000; font-weight:600; border-radius:6px; cursor:pointer;">
+                Yes
+            </button>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Cancel
+    modal.querySelector("#cancel-new").onclick = (e) => {
+        e.stopPropagation();
+        modal.remove();
+    };
+
+    // Confirm
+    modal.querySelector("#confirm-new").onclick = () => {
+        modal.remove();
+        this.loadNewProject();
+    };
+
+    // Click outside to close
+    document.addEventListener("click", function handler(e) {
+        if (!modal.contains(e.target) && e.target !== button) {
+            modal.remove();
+            document.removeEventListener("click", handler);
+        }
+    });
+}
+
     async init() {
         this.StringHelper = new StringHelper(this);
         this.StringHelper.init();
@@ -116,7 +181,9 @@ class Planet {
 
         // eslint-disable-next-line no-unused-vars
         document.getElementById("planet-new-project").addEventListener("click", evt => {
-            this.loadNewProject();
+            evt.preventDefault(); 
+            evt.stopPropagation(); 
+            this.showNewProjectConfirmation();
         });
 
         this.ServerInterface.getTagManifest(
@@ -127,10 +194,7 @@ class Planet {
     }
 
     closeButton() {
-        if (this.ProjectStorage.getCurrentProjectID() !== this.oldCurrentProjectID) {
-            const data = this.ProjectStorage.getCurrentProjectData();
-            !data ? this.loadNewProject() : this.loadProjectFromData(data);
-        } else this.planetClose();
+        this.planetClose();
     }
 
     initPlanets(tags) {
