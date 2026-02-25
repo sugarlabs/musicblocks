@@ -2950,7 +2950,20 @@ class Block {
             let topBlk;
 
             const dx = event.stageX / that.activity.getStageScale() - that.container.x;
-            if (!moved && that.isCollapsible() && dx < 30 / that.activity.getStageScale()) {
+            
+            // Check if this was a collapse/expand button click that was already handled in mousedown
+            const hasColExpBtns = that.collapseButtonBitmap && that.expandButtonBitmap;
+            let wasColExpHandled = false;
+            
+            if (hasColExpBtns) {
+                const localPoint = that.container.globalToLocal(event.stageX, event.stageY);
+                const isColExpClick =
+                    that.collapseButtonBitmap.getBounds().contains(localPoint.x, localPoint.y) ||
+                    that.expandButtonBitmap.getBounds().contains(localPoint.x, localPoint.y);
+                wasColExpHandled = isColExpClick;
+            }
+            
+            if (!moved && that.isCollapsible() && dx < 30 / that.activity.getStageScale() && !wasColExpHandled) {
                 that.collapseToggle();
             } else if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
                 if (["media", "audiofile", "loadFile"].includes(that.name)) {
@@ -3028,6 +3041,10 @@ class Block {
 
                 if (isColExpClick) {
                     that.activity.trashcan.hide();
+                    // Trigger collapseToggle immediately on mousedown for instant sidebar updates
+                    if (that.isCollapsible()) {
+                        that.collapseToggle();
+                    }
                     return;
                 }
             }
