@@ -186,7 +186,7 @@ describe("setupPitchBlocks", () => {
             if (key === "Ab") return ["Ab", "major"];
             return ["C", "major"];
         });
-        global.nthDegreeToPitch = jest.fn(() => "C4");
+        global.nthDegreeToPitch = jest.fn(() => ["C", 0]);
         global.calcOctave = jest.fn(() => 4);
         global.scaleDegreeToPitchMapping = jest.fn(() => "C");
 

@@ -761,31 +761,36 @@ class Arpeggio {
      */
     _save() {
         // Saves the current matrix as a custom Chord
+        // Export format: [scalar, semitone] where scalar is the scale degree (0-based)
+        // and semitone is the chromatic offset from that scale degree
         const pairs = this.__makePairsList();
         const chordValues = [];
         for (let i = 0; i < pairs.length; i++) {
-            // TODO: export as (scalar, semitone)
             if (pairs[i][0] === -1) {
                 chordValues.push(["-", "-"]); // rest
             } else {
                 const ii = this._rowBlocks.length - pairs[i][0] - 1;
                 if (this._inMode(ii)) {
-                    chordValues.push([this._modeNumbers.indexOf(ii.toString()), 0]);
+                    // Note is in the mode - export as (scalar, 0)
+                    const scalar = this._modeNumbers.indexOf(ii.toString());
+                    chordValues.push([scalar, 0]);
                 } else {
+                    // Note is not in the mode - find nearest lower scale degree
+                    // and calculate semitone offset
                     if (pairs[i][0] === 0) {
                         // top row -> octave
                         chordValues.push([this._modeNumbers.length, 0]);
                     } else {
-                        let j = 1;
-                        while (ii - j >= 0) {
-                            if (this._inMode(ii - j)) {
-                                chordValues.push([
-                                    this._modeNumbers.indexOf((ii - j).toString()),
-                                    j
-                                ]);
+                        let semitoneOffset = 1;
+                        while (ii - semitoneOffset >= 0) {
+                            if (this._inMode(ii - semitoneOffset)) {
+                                const scalar = this._modeNumbers.indexOf(
+                                    (ii - semitoneOffset).toString()
+                                );
+                                chordValues.push([scalar, semitoneOffset]);
                                 break;
                             }
-                            j += 1;
+                            semitoneOffset += 1;
                         }
                     }
                 }
@@ -811,4 +816,7 @@ class Arpeggio {
         ];
         this._activity.blocks.loadNewBlocks(newStack);
     }
+}
+if (typeof module !== "undefined") {
+    module.exports = Arpeggio;
 }
