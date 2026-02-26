@@ -38,22 +38,19 @@ function getTargetTurtle(turtles, targetTurtle) {
         }
     }
 
-    // eslint-disable-next-line no-console
-    console.debug(`turtle "${targetTurtle}" not found`);
+    //Debug: `turtle "${targetTurtle}" not found` returning null
     return null;
 }
 
 function _blockFindTurtle(activity, turtle, blk, receivedArg) {
     const cblk = activity.blocks.blockList[blk].connections[1];
     if (cblk === null) {
-        // eslint-disable-next-line no-console
-        console.debug("Could not find connecting block");
+        //Debug: connecting block not found, returning null
         return null;
     }
     const targetTurtle = activity.logo.parseArg(activity.logo, turtle, cblk, blk, receivedArg);
     if (targetTurtle === null) {
-        // eslint-disable-next-line no-console
-        console.debug("Could not find target turtle name from arg");
+        //Debug: target turtleName from arg not found, returning null
         return null;
     }
     return activity.turtles.getTurtle(getTargetTurtle(activity.turtles, targetTurtle));
@@ -213,8 +210,7 @@ function setupEnsembleBlocks(activity) {
                 tur.parentFlowQueue = [];
                 tur.unhighlightQueue = [];
                 tur.parameterQueue = [];
-                // eslint-disable-next-line no-console
-                console.debug("stopping " + targetTurtle);
+
                 activity.turtles.ithTurtle(turtle).running = false;
                 logo.doBreak(tur);
             }
@@ -255,8 +251,6 @@ function setupEnsembleBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
-            // eslint-disable-next-line no-console
-            console.debug("start mouse from mouse " + turtle);
             if (args[0] === null) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
@@ -296,8 +290,6 @@ function setupEnsembleBlocks(activity) {
                     }
                 }
                 if (foundStartBlock) {
-                    // eslint-disable-next-line no-console
-                    console.debug("STARTING " + targetTurtle + " " + startBlk);
                     logo.runFromBlock(logo, targetTurtle, startBlk, isflow, receivedArg);
                 } else {
                     activity.errorMsg(_("Cannot find start block") + " " + args[0], blk);
@@ -538,8 +530,7 @@ function setupEnsembleBlocks(activity) {
 
             if (thisTurtle) return activity.turtles.screenY2turtleY(thisTurtle.container.y);
             thisTurtle = activity.turtles.getTurtle(turtle);
-            // eslint-disable-next-line no-console
-            console.debug("Mouse not found. Using current mouse value instead.");
+            // Debug: Mouse not found. Using current mouse value instead (fallback behavior)
             return activity.turtles.screenY2turtleY(thisTurtle.container.y);
         }
     }
@@ -585,8 +576,7 @@ function setupEnsembleBlocks(activity) {
             if (thisTurtle) return activity.turtles.screenX2turtleX(thisTurtle.container.x);
 
             thisTurtle = activity.turtles.getTurtle(turtle);
-            // eslint-disable-next-line no-console
-            console.debug("Mouse not found. Using current mouse value instead.");
+            // Debug: Mouse not found. Using current mouse value instead (fallback behavior)
             return activity.turtles.screenX2turtleX(thisTurtle.container.x);
         }
     }
@@ -716,8 +706,7 @@ function setupEnsembleBlocks(activity) {
                             logo.synth.inTemperament
                         );
                     } else {
-                        // eslint-disable-next-line no-console
-                        console.debug("Cannot find a note for mouse " + turtle);
+                        //Debug: note for mouse not found + turtle
                         activity.errorMsg(INVALIDPITCH, blk);
                         obj = ["G", 4];
                     }
@@ -755,8 +744,7 @@ function setupEnsembleBlocks(activity) {
                         logo.synth.inTemperament
                     );
                 } else {
-                    // eslint-disable-next-line no-console
-                    console.debug("Cannot find a note for mouse " + turtle);
+                    //Debug: note for mouse not found + turtle
                     activity.errorMsg(INVALIDPITCH, blk);
                     obj = ["G", 4];
                 }
@@ -1030,8 +1018,7 @@ function setupEnsembleBlocks(activity) {
 
                 activity.blocks.loadNewBlocks(newBlock);
             } else {
-                // eslint-disable-next-line no-console
-                console.debug("Turtle " + turtleName + " already exists.");
+                // Debug: Attempted to create turtle that already exists
                 activity.stage.dispatchEvent(turtleName);
             }
         }

@@ -1096,10 +1096,11 @@ class Blocks {
                         that.blockList[blk].container.updateCache();
 
                         if (that.blockList[blk].value !== that.blockList[oldBlock].value) {
+                            const metadata = that.actionMetadata(parentblk);
                             that.newNameddoBlock(
                                 that.blockList[blk].value,
-                                that.actionHasReturn(parentblk),
-                                that.actionHasArgs(parentblk)
+                                metadata.hasReturn,
+                                metadata.hasArgs
                             );
                             const blockPalette = that.activity.palettes.dict["action"];
                             for (let b = 0; b < blockPalette.protoList.length; b++) {
@@ -2005,10 +2006,11 @@ class Blocks {
                                     this.activity.palettes.dict["action"].hideMenu(true);
                                 }
 
+                                const metadata = this.actionMetadata(newBlock);
                                 this.newNameddoBlock(
                                     myBlock.value,
-                                    this.actionHasReturn(newBlock),
-                                    this.actionHasArgs(newBlock)
+                                    metadata.hasReturn,
+                                    metadata.hasArgs
                                 );
                                 const blockPalette = this.activity.palettes.dict["action"];
                                 for (let b = 0; b < blockPalette.protoList.length; b++) {
@@ -2107,10 +2109,11 @@ class Blocks {
                                     }
                                     this.blockList[thisBlock].text.text = label;
                                     this.blockList[thisBlock].container.updateCache();
+                                    const metadata = this.actionMetadata(b);
                                     this.newNameddoBlock(
                                         this.blockList[thisBlock].value,
-                                        this.actionHasReturn(b),
-                                        this.actionHasArgs(b)
+                                        metadata.hasReturn,
+                                        metadata.hasArgs
                                     );
                                     this.setActionProtoVisibility(false);
                                 }
@@ -3444,8 +3447,8 @@ class Blocks {
                     /** Make sure we don't make two actions with the same name. */
                     value = this.findUniqueActionName(_("action"));
                     if (value !== _("action")) {
-                        /** TODO: are there return or arg blocks? */
-                        this.newNameddoBlock(value, false, false);
+                        const metadata = this.actionMetadata(blk);
+                        this.newNameddoBlock(value, metadata.hasReturn, metadata.hasArgs);
                         /** this.activity.palettes.hide(); */
                         this.activity.palettes.updatePalettes("action");
                         /** this.activity.palettes.show(); */
@@ -6665,11 +6668,12 @@ class Blocks {
                     const myBlock = this.blockList[blk];
                     const c = myBlock.connections[1];
                     if (c != null && this.blockList[c].value !== _("action")) {
+                        const metadata = this.actionMetadata(blk);
                         if (
                             this.newNameddoBlock(
                                 this.blockList[c].value,
-                                this.actionHasReturn(blk),
-                                this.actionHasArgs(blk)
+                                metadata.hasReturn,
+                                metadata.hasArgs
                             )
                         ) {
                             updatePalettes = true;
@@ -6759,23 +6763,39 @@ class Blocks {
         };
 
         /**
+         * Look for Return and Arg blocks in an action stack.
+         * @param - blk - block
+         * @public
+         * @returns { hasReturn: boolean, hasArgs: boolean }
+         */
+        this.actionMetadata = blk => {
+            if (this.blockList[blk].name !== "action") {
+                return { hasReturn: false, hasArgs: false };
+            }
+            this.findDragGroup(blk);
+            let hasReturn = false;
+            let hasArgs = false;
+            for (let b = 0; b < this.dragGroup.length; b++) {
+                const name = this.blockList[this.dragGroup[b]].name;
+                if (name === "return") {
+                    hasReturn = true;
+                } else if (name === "arg" || name === "namedarg") {
+                    hasArgs = true;
+                }
+                if (hasReturn && hasArgs) {
+                    break;
+                }
+            }
+            return { hasReturn, hasArgs };
+        };
+
+        /**
          * Look for a Return block in an action stack.
          * @param - blk - block
          * @public
          * @returns boolean
          */
-        this.actionHasReturn = blk => {
-            if (this.blockList[blk].name !== "action") {
-                return false;
-            }
-            this.findDragGroup(blk);
-            for (let b = 0; b < this.dragGroup.length; b++) {
-                if (this.blockList[this.dragGroup[b]].name === "return") {
-                    return true;
-                }
-            }
-            return false;
-        };
+        this.actionHasReturn = blk => this.actionMetadata(blk).hasReturn;
 
         /**
          * Look for an Arg block in an action stack.
@@ -6783,21 +6803,7 @@ class Blocks {
          * @public
          * @returns boolean
          */
-        this.actionHasArgs = blk => {
-            if (this.blockList[blk].name !== "action") {
-                return false;
-            }
-            this.findDragGroup(blk);
-            for (let b = 0; b < this.dragGroup.length; b++) {
-                if (
-                    this.blockList[this.dragGroup[b]].name === "arg" ||
-                    this.blockList[this.dragGroup[b]].name === "namedarg"
-                ) {
-                    return true;
-                }
-            }
-            return false;
-        };
+        this.actionHasArgs = blk => this.actionMetadata(blk).hasArgs;
 
         /**
          * Move the stack associated with blk to the top.

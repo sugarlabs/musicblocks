@@ -224,43 +224,48 @@ function windowWidth() {
 
 /**
  * Performs an HTTP GET request to retrieve data from the server.
+ * Uses async fetch to avoid blocking the UI during network requests.
  * @param {string|null} projectName - The name of the project (or null for the base URL).
- * @throws {string} Throws an error if the HTTP status code is greater than 299.
- * @returns {string} The response text from the server.
+ * @throws {Error} Throws an error if the HTTP status code is greater than 299.
+ * @returns {Promise<string>} A promise that resolves to the response text from the server.
  */
-let httpGet = projectName => {
-    let xmlHttp = null;
-    xmlHttp = new XMLHttpRequest();
-    if (projectName === null) {
-        xmlHttp.open("GET", window.server, false);
-        xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
-    } else {
-        xmlHttp.open("GET", window.server + projectName, false);
-        xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
+let httpGet = async projectName => {
+    const url = projectName === null ? window.server : window.server + projectName;
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+            "x-api-key": "3tgTzMXbbw6xEKX7"
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error("Error from server");
     }
 
-    xmlHttp.send();
-    if (xmlHttp.status > 299) {
-        throw "Error from server";
-    }
-
-    return xmlHttp.responseText;
+    return response.text();
 };
 
 /**
  * Performs an HTTP POST request to send data to the server.
+ * Uses async fetch to avoid blocking the UI during network requests.
  * @param {string} projectName - The name of the project.
  * @param {string} data - The data to be sent in the POST request.
- * @returns {string} The response text from the server.
+ * @returns {Promise<string>} A promise that resolves to the response text from the server.
  */
-let httpPost = (projectName, data) => {
-    let xmlHttp = null;
-    xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("POST", window.server + projectName, false);
-    xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
-    xmlHttp.send(data);
-    return xmlHttp.responseText;
-    // return 'https://apps.facebook.com/turtleblocks/?file=' + projectName;
+let httpPost = async (projectName, data) => {
+    const response = await fetch(window.server + projectName, {
+        method: "POST",
+        headers: {
+            "x-api-key": "3tgTzMXbbw6xEKX7"
+        },
+        body: data
+    });
+
+    if (!response.ok) {
+        throw new Error("Error from server");
+    }
+
+    return response.text();
 };
 
 /**
@@ -1775,8 +1780,15 @@ if (typeof module !== "undefined" && module.exports) {
         nearestBeat,
         oneHundredToFraction,
         rationalToFraction,
+        rationalSum,
         rgbToHex,
         hexToRGB,
-        hex2rgb
+        hex2rgb,
+        format,
+        delayExecution,
+        closeWidgets,
+        closeBlkWidgets,
+        resolveObject,
+        importMembers
     };
 }

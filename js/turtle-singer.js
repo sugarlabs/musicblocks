@@ -18,7 +18,7 @@
 /*
    global
 
-   DEFAULTVOLUME, TARGETBPM, TONEBPM, frequencyToPitch, last,
+   DEFAULTVOLUME, TARGETBPM, TONEBPM, MIN_HIGHLIGHT_DURATION_MS, frequencyToPitch, last,
    pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp,
    getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
@@ -210,6 +210,38 @@ class Singer {
         this.dispatchFactor = 1; // scale factor for turtle graphics embedded in notes
 
         this.inverted = false; // tracks if the notes being played are inverted
+
+        // Voice Manager: Track active audio sources for proper cleanup
+        this.activeVoices = new Set();
+    }
+
+    /**
+     * Kills all active audio voices for this turtle.
+     * Called during stop/halt to prevent "zombie audio" that continues playing.
+     * Uses try/catch to handle nodes that may have already stopped.
+     *
+     * @returns {void}
+     */
+    killAllVoices() {
+        this.activeVoices.forEach(audioNode => {
+            try {
+                // Stop Tone.Player instances (drums/samples)
+                if (audioNode.stop && typeof audioNode.stop === "function") {
+                    audioNode.stop();
+                }
+                // Release all voices for PolySynth/Sampler instances
+                else if (audioNode.releaseAll && typeof audioNode.releaseAll === "function") {
+                    audioNode.releaseAll();
+                }
+                // Disconnect as fallback
+                else if (audioNode.disconnect && typeof audioNode.disconnect === "function") {
+                    audioNode.disconnect();
+                }
+            } catch (e) {
+                // Ignore errors from already-stopped nodes
+            }
+        });
+        this.activeVoices.clear();
     }
 
     // ========= Class variables ==============================================
@@ -2108,8 +2140,10 @@ class Singer {
                                 pitchNumber *
                                 (Math.log10(ratio[k]) / Math.log10(getOctaveRatio()))
                             ).toFixed(0);
-                            numerator[k] = rationalToFraction(ratio[k])[0];
-                            denominator[k] = rationalToFraction(ratio[k])[1];
+                            // Cache rationalToFraction result to avoid duplicate calls
+                            const fraction = rationalToFraction(ratio[k]);
+                            numerator[k] = fraction[0];
+                            denominator[k] = fraction[1];
                         }
                     }
 
@@ -2445,12 +2479,16 @@ class Singer {
                 // After the note plays, clear the embedded graphics and notes queue.
                 tur.singer.embeddedGraphics[blk] = [];
 
-                // Ensure note value block unhighlights after note plays.
+                // Ensure note value block unhighlights after note plays (minimum duration so highlight is visible).
+                const highlightDurationMs = Math.max(beatValue * 1000, MIN_HIGHLIGHT_DURATION_MS);
                 setTimeout(() => {
                     if (activity.blocks.visible && blk in activity.blocks.blockList) {
                         activity.blocks.unhighlight(blk);
+                        if (activity.stage) {
+                            activity.stage.update();
+                        }
                     }
-                }, beatValue * 1000);
+                }, highlightDurationMs);
             };
 
             if (last(tur.singer.inNoteBlock) !== null || noteInNote) {

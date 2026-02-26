@@ -1910,6 +1910,31 @@ function Synth() {
         }
     };
 
+    /**
+     * Tracks an active audio source node for garbage collection on stop.
+     * Handles both Tone.Player instances (drums) and synthesizer voices.
+     * @function
+     * @memberof Synth
+     * @param {number} turtle - The turtle index.
+     * @param {Object} audioNode - The audio source node (Tone.Player, Synth, etc.).
+     */
+    this._trackVoice = (turtle, audioNode) => {
+        if (!this.activity || !this.activity.turtles) {
+            return;
+        }
+
+        try {
+            const singer = this.activity.turtles.ithTurtle(turtle).singer;
+            if (!singer || !singer.activeVoices) {
+                return;
+            }
+
+            singer.activeVoices.add(audioNode);
+        } catch (e) {
+            // Silently fail - tracking is optional
+        }
+    };
+
     // Generalised version of 'trigger and 'triggerwitheffects' functions
     /**
      * Triggers notes on a specified turtle with the given parameters.
@@ -2032,17 +2057,21 @@ function Synth() {
                         instrumentName.slice(0, 21) === "data:audio/wav;base64"
                     ) {
                         tempSynth.start(Tone.now() + future);
+                        this._trackVoice(turtle, tempSynth);
                     } else if (instrumentName.slice(0, 4) === "file") {
                         tempSynth.start(Tone.now() + future);
+                        this._trackVoice(turtle, tempSynth);
                     } else {
                         try {
                             tempSynth.start(Tone.now() + future);
+                            this._trackVoice(turtle, tempSynth);
                         } catch (e) {
                             console.debug("Error starting drum synth:", e);
                         }
                     }
                     break;
                 case 2: // voice sample
+                    this._trackVoice(turtle, tempSynth);
                     await this._performNotes(
                         tempSynth.toDestination(),
                         notes,
@@ -2058,6 +2087,7 @@ function Synth() {
                         tempNotes = notes[0];
                     }
 
+                    this._trackVoice(turtle, tempSynth);
                     await this._performNotes(
                         tempSynth.toDestination(),
                         tempNotes,
@@ -2069,10 +2099,12 @@ function Synth() {
                     );
                     break;
                 case 4:
+                    this._trackVoice(turtle, tempSynth);
                     tempSynth.triggerAttackRelease("c2", beatValue, Tone.now() + future);
                     break;
                 case 0: // default synth
                 default:
+                    this._trackVoice(turtle, tempSynth);
                     await this._performNotes(
                         tempSynth.toDestination(),
                         tempNotes,
@@ -3324,10 +3356,11 @@ function Synth() {
         const widgetBody = this.widgetWindow.getWidgetBody();
 
         // Store the current content to restore later
-        this.previousContent = widgetBody.innerHTML;
-
-        // Clear the widget body
-        widgetBody.innerHTML = "";
+        this.previousContent = [];
+        while (widgetBody.firstChild) {
+            this.previousContent.push(widgetBody.firstChild);
+            widgetBody.removeChild(widgetBody.firstChild);
+        }
 
         // Create the cents adjustment interface
         const centsInterface = document.createElement("div");
@@ -3457,8 +3490,18 @@ function Synth() {
      */
     this.removeCentsSlider = function () {
         if (this.sliderDiv && this.sliderDiv.parentNode) {
+            const widgetBody = this.widgetWindow.getWidgetBody();
+            // Clear the slider interface by removing all child nodes
+            while (widgetBody.firstChild) {
+                widgetBody.removeChild(widgetBody.firstChild);
+            }
+
             // Restore the previous content
-            this.widgetWindow.getWidgetBody().innerHTML = this.previousContent;
+            if (Array.isArray(this.previousContent)) {
+                this.previousContent.forEach(node => {
+                    widgetBody.appendChild(node);
+                });
+            }
             this.previousContent = null;
         }
         this.sliderVisible = false;
