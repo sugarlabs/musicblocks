@@ -82,9 +82,7 @@ class ReflectionMatrix {
                 window.location.hostname === "127.0.0.1"
             ) {
                 return "http://localhost:8000";
-            } else if (
-                window.location.hostname.includes("musicblocks.sugarlabs.org")
-            ) {
+            } else if (window.location.hostname.includes("musicblocks.sugarlabs.org")) {
                 return `${window.location.protocol}//api.musicblocks.sugarlabs.org`;
             } else {
                 return `${window.location.protocol}//${window.location.hostname}:8000`;
