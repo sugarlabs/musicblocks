@@ -596,91 +596,92 @@ function Synth() {
 
         const frequency = Tone.Frequency(startPitch).toFrequency();
 
+        // Cache getNoteFromInterval results to avoid duplicate calls (performance optimization)
+        const intervalCache = {
+            "minor 2": getNoteFromInterval(startingPitch, "minor 2"),
+            "augmented 1": getNoteFromInterval(startingPitch, "augmented 1"),
+            "major 2": getNoteFromInterval(startingPitch, "major 2"),
+            "minor 3": getNoteFromInterval(startingPitch, "minor 3"),
+            "augmented 2": getNoteFromInterval(startingPitch, "augmented 2"),
+            "major 3": getNoteFromInterval(startingPitch, "major 3"),
+            "augmented 3": getNoteFromInterval(startingPitch, "augmented 3"),
+            "diminished 4": getNoteFromInterval(startingPitch, "diminished 4"),
+            "perfect 4": getNoteFromInterval(startingPitch, "perfect 4"),
+            "augmented 4": getNoteFromInterval(startingPitch, "augmented 4"),
+            "diminished 5": getNoteFromInterval(startingPitch, "diminished 5"),
+            "perfect 5": getNoteFromInterval(startingPitch, "perfect 5"),
+            "augmented 5": getNoteFromInterval(startingPitch, "augmented 5"),
+            "minor 6": getNoteFromInterval(startingPitch, "minor 6"),
+            "major 6": getNoteFromInterval(startingPitch, "major 6"),
+            "augmented 6": getNoteFromInterval(startingPitch, "augmented 6"),
+            "minor 7": getNoteFromInterval(startingPitch, "minor 7"),
+            "major 7": getNoteFromInterval(startingPitch, "major 7"),
+            "augmented 7": getNoteFromInterval(startingPitch, "augmented 7"),
+            "diminished 8": getNoteFromInterval(startingPitch, "diminished 8"),
+            "perfect 8": getNoteFromInterval(startingPitch, "perfect 8")
+        };
+
         this.noteFrequencies = {
             // note: [octave, Frequency]
             [startingPitch.substring(0, len - 1)]: [Number(startingPitch.slice(-1)), frequency],
-            [getNoteFromInterval(startingPitch, "minor 2")[0]]: [
-                getNoteFromInterval(startingPitch, "minor 2")[1],
-                t["minor 2"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "augmented 1")[0]]: [
-                getNoteFromInterval(startingPitch, "augmented 1")[1],
+            [intervalCache["minor 2"][0]]: [intervalCache["minor 2"][1], t["minor 2"] * frequency],
+            [intervalCache["augmented 1"][0]]: [
+                intervalCache["augmented 1"][1],
                 t["augmented 1"] * frequency
             ],
-            [getNoteFromInterval(startingPitch, "major 2")[0]]: [
-                getNoteFromInterval(startingPitch, "major 2")[1],
-                t["major 2"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "minor 3")[0]]: [
-                getNoteFromInterval(startingPitch, "minor 3")[1],
-                t["minor 3"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "augmented 2")[0]]: [
-                getNoteFromInterval(startingPitch, "augmented 2")[1],
+            [intervalCache["major 2"][0]]: [intervalCache["major 2"][1], t["major 2"] * frequency],
+            [intervalCache["minor 3"][0]]: [intervalCache["minor 3"][1], t["minor 3"] * frequency],
+            [intervalCache["augmented 2"][0]]: [
+                intervalCache["augmented 2"][1],
                 t["augmented 2"] * frequency
             ],
-            [getNoteFromInterval(startingPitch, "major 3")[0]]: [
-                getNoteFromInterval(startingPitch, "major 3")[1],
-                t["major 3"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "augmented 3")[0]]: [
-                getNoteFromInterval(startingPitch, "augmented 3")[1],
+            [intervalCache["major 3"][0]]: [intervalCache["major 3"][1], t["major 3"] * frequency],
+            [intervalCache["augmented 3"][0]]: [
+                intervalCache["augmented 3"][1],
                 t["augmented 3"] * frequency
             ],
-            [getNoteFromInterval(startingPitch, "diminished 4")[0]]: [
-                getNoteFromInterval(startingPitch, "diminished 4")[1],
+            [intervalCache["diminished 4"][0]]: [
+                intervalCache["diminished 4"][1],
                 t["diminished 4"] * frequency
             ],
-            [getNoteFromInterval(startingPitch, "perfect 4")[0]]: [
-                getNoteFromInterval(startingPitch, "perfect 4")[1],
+            [intervalCache["perfect 4"][0]]: [
+                intervalCache["perfect 4"][1],
                 t["perfect 4"] * frequency
             ],
-            [getNoteFromInterval(startingPitch, "augmented 4")[0]]: [
-                getNoteFromInterval(startingPitch, "augmented 4")[1],
+            [intervalCache["augmented 4"][0]]: [
+                intervalCache["augmented 4"][1],
                 t["augmented 4"] * frequency
             ],
-            [getNoteFromInterval(startingPitch, "diminished 5")[0]]: [
-                getNoteFromInterval(startingPitch, "diminished 5")[1],
+            [intervalCache["diminished 5"][0]]: [
+                intervalCache["diminished 5"][1],
                 t["diminished 5"] * frequency
             ],
-            [getNoteFromInterval(startingPitch, "perfect 5")[0]]: [
-                getNoteFromInterval(startingPitch, "perfect 5")[1],
+            [intervalCache["perfect 5"][0]]: [
+                intervalCache["perfect 5"][1],
                 t["perfect 5"] * frequency
             ],
-            [getNoteFromInterval(startingPitch, "augmented 5")[0]]: [
-                getNoteFromInterval(startingPitch, "augmented 5")[1],
+            [intervalCache["augmented 5"][0]]: [
+                intervalCache["augmented 5"][1],
                 t["augmented 5"] * frequency
             ],
-            [getNoteFromInterval(startingPitch, "minor 6")[0]]: [
-                getNoteFromInterval(startingPitch, "minor 6")[1],
-                t["minor 6"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "major 6")[0]]: [
-                getNoteFromInterval(startingPitch, "major 6")[1],
-                t["major 6"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "augmented 6")[0]]: [
-                getNoteFromInterval(startingPitch, "augmented 6")[1],
+            [intervalCache["minor 6"][0]]: [intervalCache["minor 6"][1], t["minor 6"] * frequency],
+            [intervalCache["major 6"][0]]: [intervalCache["major 6"][1], t["major 6"] * frequency],
+            [intervalCache["augmented 6"][0]]: [
+                intervalCache["augmented 6"][1],
                 t["augmented 6"] * frequency
             ],
-            [getNoteFromInterval(startingPitch, "minor 7")[0]]: [
-                getNoteFromInterval(startingPitch, "minor 7")[1],
-                t["minor 7"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "major 7")[0]]: [
-                getNoteFromInterval(startingPitch, "major 7")[1],
-                t["major 7"] * frequency
-            ],
-            [getNoteFromInterval(startingPitch, "augmented 7")[0]]: [
-                getNoteFromInterval(startingPitch, "augmented 7")[1],
+            [intervalCache["minor 7"][0]]: [intervalCache["minor 7"][1], t["minor 7"] * frequency],
+            [intervalCache["major 7"][0]]: [intervalCache["major 7"][1], t["major 7"] * frequency],
+            [intervalCache["augmented 7"][0]]: [
+                intervalCache["augmented 7"][1],
                 t["augmented 7"] * frequency
             ],
-            [getNoteFromInterval(startingPitch, "diminished 8")[0]]: [
-                getNoteFromInterval(startingPitch, "diminished 8")[1],
+            [intervalCache["diminished 8"][0]]: [
+                intervalCache["diminished 8"][1],
                 t["diminished 8"] * frequency
             ],
-            [getNoteFromInterval(startingPitch, "perfect 8")[0]]: [
-                getNoteFromInterval(startingPitch, "perfect 8")[1],
+            [intervalCache["perfect 8"][0]]: [
+                intervalCache["perfect 8"][1],
                 t["perfect 8"] * frequency
             ]
         };
@@ -1726,6 +1727,10 @@ function Synth() {
                     console.debug("Error triggering note:", e);
                 }
             } else {
+                // Remove the dry path so effects are routed serially, not in parallel
+                synth.disconnect(Tone.Destination);
+                const chainNodes = [];
+
                 if (paramsFilters !== null && paramsFilters !== undefined) {
                     numFilters = paramsFilters.length; // no. of filters
                     for (let k = 0; k < numFilters; k++) {
@@ -1736,7 +1741,7 @@ function Synth() {
                             paramsFilters[k].filterRolloff
                         );
                         temp_filters.push(filterVal);
-                        synth.chain(temp_filters[k], Tone.Destination);
+                        chainNodes.push(filterVal);
                     }
                 }
 
@@ -1752,26 +1757,22 @@ function Synth() {
                             1 / paramsEffects.vibratoFrequency,
                             paramsEffects.vibratoIntensity
                         );
-                        synth.chain(vibrato, Tone.Destination);
+                        chainNodes.push(vibrato);
                         effectsToDispose.push(vibrato);
                     }
 
                     if (paramsEffects.doDistortion) {
-                        distortion = new Tone.Distortion(
-                            paramsEffects.distortionAmount
-                        ).toDestination();
-                        synth.connect(distortion, Tone.Destination);
-                        effectsToDispose.push(distortion);
+                        distortion = new Tone.Distortion(paramsEffects.distortionAmount);
+                        chainNodes.push(distortion);
                     }
 
                     if (paramsEffects.doTremolo) {
                         tremolo = new Tone.Tremolo({
                             frequency: paramsEffects.tremoloFrequency,
                             depth: paramsEffects.tremoloDepth
-                        })
-                            .toDestination()
-                            .start();
-                        synth.chain(tremolo);
+                        }).start();
+
+                        chainNodes.push(tremolo);
                         effectsToDispose.push(tremolo);
                     }
 
@@ -1780,8 +1781,9 @@ function Synth() {
                             frequency: paramsEffects.rate,
                             octaves: paramsEffects.octaves,
                             baseFrequency: paramsEffects.baseFrequency
-                        }).toDestination();
-                        synth.chain(phaser, Tone.Destination);
+                        });
+
+                        chainNodes.push(phaser);
                         effectsToDispose.push(phaser);
                     }
 
@@ -1790,8 +1792,9 @@ function Synth() {
                             frequency: paramsEffects.chorusRate,
                             delayTime: paramsEffects.delayTime,
                             depth: paramsEffects.chorusDepth
-                        }).toDestination();
-                        synth.chain(chorus, Tone.Destination);
+                        });
+
+                        chainNodes.push(chorus);
                         effectsToDispose.push(chorus);
                     }
 
@@ -1846,6 +1849,8 @@ function Synth() {
                         effectsToDispose.push(neighbor);
                     }
                 }
+
+                synth.chain(...chainNodes, Tone.Destination);
 
                 if (!paramsEffects.doNeighbor) {
                     if (setNote !== undefined && setNote) {
@@ -1902,6 +1907,31 @@ function Synth() {
                     filter.dispose();
                 }
             });
+        }
+    };
+
+    /**
+     * Tracks an active audio source node for garbage collection on stop.
+     * Handles both Tone.Player instances (drums) and synthesizer voices.
+     * @function
+     * @memberof Synth
+     * @param {number} turtle - The turtle index.
+     * @param {Object} audioNode - The audio source node (Tone.Player, Synth, etc.).
+     */
+    this._trackVoice = (turtle, audioNode) => {
+        if (!this.activity || !this.activity.turtles) {
+            return;
+        }
+
+        try {
+            const singer = this.activity.turtles.ithTurtle(turtle).singer;
+            if (!singer || !singer.activeVoices) {
+                return;
+            }
+
+            singer.activeVoices.add(audioNode);
+        } catch (e) {
+            // Silently fail - tracking is optional
         }
     };
 
@@ -2027,17 +2057,21 @@ function Synth() {
                         instrumentName.slice(0, 21) === "data:audio/wav;base64"
                     ) {
                         tempSynth.start(Tone.now() + future);
+                        this._trackVoice(turtle, tempSynth);
                     } else if (instrumentName.slice(0, 4) === "file") {
                         tempSynth.start(Tone.now() + future);
+                        this._trackVoice(turtle, tempSynth);
                     } else {
                         try {
                             tempSynth.start(Tone.now() + future);
+                            this._trackVoice(turtle, tempSynth);
                         } catch (e) {
                             console.debug("Error starting drum synth:", e);
                         }
                     }
                     break;
                 case 2: // voice sample
+                    this._trackVoice(turtle, tempSynth);
                     await this._performNotes(
                         tempSynth.toDestination(),
                         notes,
@@ -2053,6 +2087,7 @@ function Synth() {
                         tempNotes = notes[0];
                     }
 
+                    this._trackVoice(turtle, tempSynth);
                     await this._performNotes(
                         tempSynth.toDestination(),
                         tempNotes,
@@ -2064,10 +2099,12 @@ function Synth() {
                     );
                     break;
                 case 4:
+                    this._trackVoice(turtle, tempSynth);
                     tempSynth.triggerAttackRelease("c2", beatValue, Tone.now() + future);
                     break;
                 case 0: // default synth
                 default:
+                    this._trackVoice(turtle, tempSynth);
                     await this._performNotes(
                         tempSynth.toDestination(),
                         tempNotes,
@@ -2134,6 +2171,8 @@ function Synth() {
     };
 
     this.rampTo = (turtle, instrumentName, oldVol, volume, rampTime) => {
+        // guard invalid UI/programmatic input (audio boundary safety)
+        volume = Math.max(0, Math.min(volume, 100));
         if (
             percussionInstruments.includes(instrumentName) ||
             stringInstruments.includes(instrumentName)
@@ -2153,7 +2192,8 @@ function Synth() {
             nv = volume;
         }
 
-        const db = Tone.gainToDb(nv / 100);
+        const gain = Math.max(0.0001, nv / 100);
+        const db = Tone.gainToDb(gain);
 
         let synth = instruments[turtle]["electronic synth"];
         if (instrumentName in instruments[turtle]) {
@@ -2201,6 +2241,8 @@ function Synth() {
      * @param {number} volume - The volume level (0 to 100).
      */
     this.setVolume = (turtle, instrumentName, volume) => {
+        // guard invalid UI/programmatic input (audio boundary safety)
+        volume = Math.max(0, Math.min(volume, 100));
         // We pass in volume as a number from 0 to 100.
         // As per #1697, we adjust the volume of some instruments.
         let nv;
@@ -2216,10 +2258,18 @@ function Synth() {
             nv = volume;
         }
 
-        // Convert volume to decibals
-        const db = Tone.gainToDb(nv / 100);
+        const gain = Math.max(0.0001, nv / 100);
+        const db = Tone.gainToDb(gain);
         if (instrumentName in instruments[turtle]) {
-            instruments[turtle][instrumentName].volume.value = db;
+            const synth = instruments[turtle][instrumentName];
+            // Do not schedule a ramp if volume didn't actually change to avoid "flutter" buzz
+            if (Math.abs(synth.volume.value - db) < 0.001) return;
+
+            // Use a tiny ramp (10ms) to prevent clicks
+            const now = Tone.now();
+            synth.volume.cancelScheduledValues(now);
+            synth.volume.setValueAtTime(synth.volume.value, now);
+            synth.volume.linearRampToValueAtTime(db, now + 0.01);
         }
     };
 
@@ -2242,7 +2292,10 @@ function Synth() {
                 this.trigger(0, "G4", 1 / 4, "electronic synth", null, null, false);
             }, 200);
         } else {
-            const db = Tone.gainToDb(volume / 100);
+            // guard invalid UI/programmatic input (audio boundary safety)
+            volume = Math.max(0, Math.min(volume, 100));
+            const gain = Math.max(0.0001, volume / 100);
+            const db = Tone.gainToDb(gain);
             Tone.Destination.volume.rampTo(db, 0.01);
         }
     };
@@ -3303,10 +3356,11 @@ function Synth() {
         const widgetBody = this.widgetWindow.getWidgetBody();
 
         // Store the current content to restore later
-        this.previousContent = widgetBody.innerHTML;
-
-        // Clear the widget body
-        widgetBody.innerHTML = "";
+        this.previousContent = [];
+        while (widgetBody.firstChild) {
+            this.previousContent.push(widgetBody.firstChild);
+            widgetBody.removeChild(widgetBody.firstChild);
+        }
 
         // Create the cents adjustment interface
         const centsInterface = document.createElement("div");
@@ -3436,8 +3490,18 @@ function Synth() {
      */
     this.removeCentsSlider = function () {
         if (this.sliderDiv && this.sliderDiv.parentNode) {
+            const widgetBody = this.widgetWindow.getWidgetBody();
+            // Clear the slider interface by removing all child nodes
+            while (widgetBody.firstChild) {
+                widgetBody.removeChild(widgetBody.firstChild);
+            }
+
             // Restore the previous content
-            this.widgetWindow.getWidgetBody().innerHTML = this.previousContent;
+            if (Array.isArray(this.previousContent)) {
+                this.previousContent.forEach(node => {
+                    widgetBody.appendChild(node);
+                });
+            }
             this.previousContent = null;
         }
         this.sliderVisible = false;

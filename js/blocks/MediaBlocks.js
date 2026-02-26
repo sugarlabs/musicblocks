@@ -70,6 +70,13 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The updated parameter value.
          */
         updateParameter() {
+            if (
+                !activity.turtles._canvas ||
+                !activity.turtles._canvas.width ||
+                !activity.turtles.scale
+            ) {
+                return 0;
+            }
             return toFixed2(activity.turtles._canvas.width / (2.0 * activity.turtles.scale));
         }
 
@@ -78,6 +85,13 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The argument value.
          */
         arg() {
+            if (
+                !activity.turtles._canvas ||
+                !activity.turtles._canvas.width ||
+                !activity.turtles.scale
+            ) {
+                return 0;
+            }
             return activity.turtles._canvas.width / (2.0 * activity.turtles.scale);
         }
     }
@@ -132,6 +146,13 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The updated parameter value.
          */
         updateParameter() {
+            if (
+                !activity.turtles._canvas ||
+                !activity.turtles._canvas.width ||
+                !activity.turtles.scale
+            ) {
+                return 0;
+            }
             return toFixed2(-1 * (activity.turtles._canvas.width / (2.0 * activity.turtles.scale)));
         }
 
@@ -140,6 +161,13 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The argument value.
          */
         arg() {
+            if (
+                !activity.turtles._canvas ||
+                !activity.turtles._canvas.width ||
+                !activity.turtles.scale
+            ) {
+                return 0;
+            }
             return -1 * (activity.turtles._canvas.width / (2.0 * activity.turtles.scale));
         }
     }
@@ -193,6 +221,13 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The updated parameter value.
          */
         updateParameter() {
+            if (
+                !activity.turtles._canvas ||
+                !activity.turtles._canvas.height ||
+                !activity.turtles.scale
+            ) {
+                return 0;
+            }
             return toFixed2(activity.turtles._canvas.height / (2.0 * activity.turtles.scale));
         }
 
@@ -201,6 +236,13 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The argument value.
          */
         arg() {
+            if (
+                !activity.turtles._canvas ||
+                !activity.turtles._canvas.height ||
+                !activity.turtles.scale
+            ) {
+                return 0;
+            }
             return activity.turtles._canvas.height / (2.0 * activity.turtles.scale);
         }
     }
@@ -254,6 +296,13 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The updated parameter value.
          */
         updateParameter() {
+            if (
+                !activity.turtles._canvas ||
+                !activity.turtles._canvas.height ||
+                !activity.turtles.scale
+            ) {
+                return 0;
+            }
             return toFixed2(
                 -1 * (activity.turtles._canvas.height / (2.0 * activity.turtles.scale))
             );
@@ -264,6 +313,13 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The argument value.
          */
         arg() {
+            if (
+                !activity.turtles._canvas ||
+                !activity.turtles._canvas.height ||
+                !activity.turtles.scale
+            ) {
+                return 0;
+            }
             return -1 * (activity.turtles._canvas.height / (2.0 * activity.turtles.scale));
         }
     }
@@ -299,6 +355,13 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The updated parameter value.
          */
         updateParameter() {
+            if (
+                !activity.turtles._canvas ||
+                !activity.turtles._canvas.width ||
+                !activity.turtles.scale
+            ) {
+                return 0;
+            }
             return toFixed2(activity.turtles._canvas.width / activity.turtles.scale);
         }
 
@@ -307,6 +370,13 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The argument value.
          */
         arg() {
+            if (
+                !activity.turtles._canvas ||
+                !activity.turtles._canvas.width ||
+                !activity.turtles.scale
+            ) {
+                return 0;
+            }
             return activity.turtles._canvas.width / activity.turtles.scale;
         }
     }
@@ -342,6 +412,13 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The updated parameter value.
          */
         updateParameter() {
+            if (
+                !activity.turtles._canvas ||
+                !activity.turtles._canvas.height ||
+                !activity.turtles.scale
+            ) {
+                return 0;
+            }
             return toFixed2(activity.turtles._canvas.height / activity.turtles.scale);
         }
 
@@ -350,6 +427,13 @@ function setupMediaBlocks(activity) {
          * @returns {number} - The argument value.
          */
         arg() {
+            if (
+                !activity.turtles._canvas ||
+                !activity.turtles._canvas.height ||
+                !activity.turtles.scale
+            ) {
+                return 0;
+            }
             return activity.turtles._canvas.height / activity.turtles.scale;
         }
     }
@@ -681,21 +765,7 @@ function setupMediaBlocks(activity) {
             // Set palette and activity for the block
             this.setPalette("media", activity);
             this.piemenuValuesC1 = [
-                220,
-                247,
-                262,
-                294,
-                330,
-                349,
-                392,
-                440,
-                494,
-                523,
-                587,
-                659,
-                698,
-                784,
-                880
+                220, 247, 262, 294, 330, 349, 392, 440, 494, 523, 587, 659, 698, 784, 880
             ];
             this.setHelpString();
 

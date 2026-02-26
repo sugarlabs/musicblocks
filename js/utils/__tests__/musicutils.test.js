@@ -100,6 +100,9 @@ const {
     numberToPitch,
     GetNotesForInterval,
     base64Encode,
+    NOTESFLAT,
+    NOTESSHARP,
+    MUSICALMODES,
     getStepSizeUp,
     getStepSizeDown
 } = require("../musicutils");
@@ -2271,6 +2274,113 @@ describe("_calculate_pitch_number", () => {
     });
 });
 
+describe("NOTESFLAT", () => {
+    it("should contain 12 chromatic notes", () => {
+        expect(NOTESFLAT.length).toBe(12);
+    });
+
+    it("should start with C and end with B", () => {
+        expect(NOTESFLAT[0]).toBe("C");
+        expect(NOTESFLAT[11]).toBe("B");
+    });
+
+    it("should contain flats for black keys", () => {
+        expect(NOTESFLAT[1]).toContain("♭");
+        expect(NOTESFLAT[3]).toContain("♭");
+        expect(NOTESFLAT[6]).toContain("♭");
+    });
+
+    it("should have correct positions for natural notes", () => {
+        expect(NOTESFLAT[0]).toBe("C");
+        expect(NOTESFLAT[2]).toBe("D");
+        expect(NOTESFLAT[4]).toBe("E");
+        expect(NOTESFLAT[5]).toBe("F");
+        expect(NOTESFLAT[7]).toBe("G");
+        expect(NOTESFLAT[9]).toBe("A");
+    });
+
+    it("should be an array of strings", () => {
+        expect(Array.isArray(NOTESFLAT)).toBe(true);
+        NOTESFLAT.forEach(note => expect(typeof note).toBe("string"));
+    });
+});
+
+describe("NOTESSHARP", () => {
+    it("should contain 12 chromatic notes", () => {
+        expect(NOTESSHARP.length).toBe(12);
+    });
+    it("should start with C and end with B", () => {
+        expect(NOTESSHARP[0]).toBe("C");
+        expect(NOTESSHARP[11]).toBe("B");
+    });
+
+    it("should contain sharps for black keys", () => {
+        expect(NOTESSHARP[1]).toContain("♯");
+        expect(NOTESSHARP[3]).toContain("♯");
+        expect(NOTESSHARP[6]).toContain("♯");
+    });
+
+    it("should have correct positions for natural notes", () => {
+        expect(NOTESSHARP[0]).toBe("C");
+        expect(NOTESSHARP[2]).toBe("D");
+        expect(NOTESSHARP[4]).toBe("E");
+        expect(NOTESSHARP[5]).toBe("F");
+        expect(NOTESSHARP[7]).toBe("G");
+        expect(NOTESSHARP[9]).toBe("A");
+    });
+
+    it("should have same natural notes as NOTESFLAT", () => {
+        [0, 2, 4, 5, 7, 9, 11].forEach(i => {
+            expect(NOTESSHARP[i]).toBe(NOTESFLAT[i]);
+        });
+    });
+
+    it("should be an array of strings", () => {
+        expect(Array.isArray(NOTESSHARP)).toBe(true);
+        NOTESSHARP.forEach(note => expect(typeof note).toBe("string"));
+    });
+});
+
+describe("MUSICALMODES", () => {
+    it("should contain major mode with correct intervals", () => {
+        expect(MUSICALMODES["major"]).toEqual([2, 2, 1, 2, 2, 2, 1]);
+    });
+
+    it("should contain minor mode with correct intervals", () => {
+        expect(MUSICALMODES["minor"]).toEqual([2, 1, 2, 2, 1, 2, 2]);
+    });
+
+    it("should have chromatic mode with 12 semitones", () => {
+        expect(MUSICALMODES["chromatic"]).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+        expect(MUSICALMODES["chromatic"].length).toBe(12);
+    });
+
+    it("should have pentatonic modes with 5 notes", () => {
+        expect(MUSICALMODES["major pentatonic"].length).toBe(5);
+        expect(MUSICALMODES["minor pentatonic"].length).toBe(5);
+    });
+
+    it("should have all mode intervals sum to 12 semitones", () => {
+        const sum = arr => arr.reduce((a, b) => a + b, 0);
+        expect(sum(MUSICALMODES["major"])).toBe(12);
+        expect(sum(MUSICALMODES["minor"])).toBe(12);
+        expect(sum(MUSICALMODES["dorian"])).toBe(12);
+        expect(sum(MUSICALMODES["whole tone"])).toBe(12);
+    });
+
+    it("should contain custom mode for user definitions", () => {
+        expect(MUSICALMODES["custom"]).toBeDefined();
+        expect(Array.isArray(MUSICALMODES["custom"])).toBe(true);
+    });
+
+    it("should have ionian equivalent to major", () => {
+        expect(MUSICALMODES["ionian"]).toEqual(MUSICALMODES["major"]);
+    });
+
+    it("should have aeolian equivalent to minor", () => {
+        expect(MUSICALMODES["aeolian"]).toEqual(MUSICALMODES["minor"]);
+    });
+});
 describe("getStepSizeDown", () => {
     it("should return the correct step size for D in C major going down", () => {
         const result = getStepSizeDown("C major", "D", 0, "equal");

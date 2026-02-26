@@ -43,6 +43,11 @@ const astring = {
 
 global.ASTUtils = ASTUtils;
 global.astring = astring;
+global.JSInterface = { isGetter: jest.fn(() => false) };
+
+global.JSInterface = {
+    isGetter: jest.fn(name => name === "myGetter")
+};
 
 describe("JSGenerate Class", () => {
     beforeEach(() => {
@@ -262,5 +267,263 @@ describe("JSGenerate Class", () => {
                 "background: greenyellow; color: midnightblue; font-weight: bold"
             );
         });
+    test("should set generateFailed when astring.generate throws", () => {
+        JSGenerate.actionTrees = [];
+        JSGenerate.startTrees = [[["start", null, null]]];
+
+        ASTUtils.getMouseAST.mockReturnValue({ type: "Mouse" });
+        astring.generate.mockImplementationOnce(() => {
+            throw new Error("Invalid AST");
+        });
+        astring.generate.mockReturnValueOnce("fallback code");
+
+        JSGenerate.generateCode();
+
+        expect(JSGenerate.generateFailed).toBe(true);
+        expect(console.error).toHaveBeenCalledWith(
+            "CANNOT GENERATE CODE\nError: INVALID ABSTRACT SYNTAX TREE"
+        );
+        expect(JSGenerate.code).toBe("fallback code");
+    });
+
+    test("should generate action tree for valid action block with connections", () => {
+        globalActivity.blocks.stackList = [1];
+        globalActivity.blocks.blockList = {
+            1: { name: "action", trash: false, connections: [null, 2, 3, null] },
+            2: { name: "text", value: "myAction", connections: [1] },
+            3: {
+                name: "forward",
+                connections: [1, 4, null],
+                protoblock: { args: 1, style: "arg" }
+            },
+            4: {
+                name: "number",
+                value: 100,
+                connections: [3],
+                protoblock: {
+                    args: 0,
+                    style: "value",
+                    __proto__: { __proto__: { constructor: { name: "ValueBlock" } } }
+                }
+            }
+        };
+
+        JSGenerate.generateStacksTree();
+
+        expect(JSGenerate.actionNames).toEqual(["myAction"]);
+        expect(JSGenerate.actionTrees.length).toBe(1);
+    });
+
+    test("should print tree with nested args including null and object", () => {
+        JSGenerate.startTrees = [[["forward", [100, null, ["add", [3, 4]]], null]]];
+        JSGenerate.actionTrees = [];
+
+        JSGenerate.printStacksTree();
+
+        expect(console.log).toHaveBeenCalledWith(
+            "\n   %c START ",
+            "background: navy; color: white; font-weight: bold"
+        );
+    });
+
+    test("should print tree with clamp sub-tree", () => {
+        JSGenerate.startTrees = [[["repeat", [3], [["forward", [100], null]]]]];
+        JSGenerate.actionTrees = [];
+
+        JSGenerate.printStacksTree();
+
+        expect(console.log).toHaveBeenCalledTimes(4);
+    });
+
+    test("should run without printing separator when printCode is false", () => {
+        globalActivity.blocks.stackList = [];
+        globalActivity.blocks.blockList = {};
+        ASTUtils.getMethodAST.mockReturnValue({ type: "Method" });
+        ASTUtils.getMouseAST.mockReturnValue({ type: "Mouse" });
+        astring.generate.mockReturnValue("code");
+
+        JSGenerate.run(true, false);
+
+        expect(console.log).not.toHaveBeenCalledWith(
+            "%c _______________________________________",
+            "color: darkorange"
+        );
+        expect(console.log).not.toHaveBeenCalledWith(
+            "\n   %c CODE ",
+            "background: greenyellow; color: midnightblue; font-weight: bold"
+        );
+    });
+  
+    test("should generate stack trees with various block types and arguments", () => {
+        globalActivity.blocks.stackList = [1, 20];
+        const booleanGrandParent = { constructor: { name: "BooleanBlock" } };
+        const booleanParent = Object.create(booleanGrandParent);
+        const booleanProtoblock = Object.create(booleanParent);
+        booleanProtoblock.style = "value";
+        const standardGrandParent = { constructor: { name: "StandardBlock" } };
+        const standardParent = Object.create(standardGrandParent);
+        const standardProtoblock = Object.create(standardParent);
+        standardProtoblock.style = "value";
+
+        globalActivity.blocks.blockList = {
+            1: {
+                name: "start",
+                trash: false,
+                connections: [null, 2, null],
+                protoblock: { style: "hat" }
+            },
+            2: {
+                name: "storein2",
+                privateData: "myVar",
+                connections: [1, 4, 3],
+                protoblock: { style: "command", args: 1 }
+            },
+            4: {
+                name: "hspace",
+                connections: [2, 5],
+                protoblock: { style: "spacer" }
+            },
+            5: {
+                name: "value",
+                value: 42,
+                connections: [4],
+                protoblock: standardProtoblock
+            },
+            3: {
+                name: "if",
+                connections: [2, 6, 7, 10, 13],
+                protoblock: { style: "doubleclamp", args: 3 }
+            },
+            6: {
+                name: "boolean",
+                value: "true",
+                connections: [3],
+                protoblock: booleanProtoblock
+            },
+            7: {
+                name: "nameddo",
+                privateData: "myProc",
+                connections: [3, 8],
+                protoblock: { style: "command" }
+            },
+            8: { name: "hidden", connections: [7, 9], protoblock: { style: "command" } },
+            9: { name: "command", connections: [8, null], protoblock: { style: "command" } },
+
+            10: {
+                name: "repeat",
+                connections: [3, 11, 12, null],
+                protoblock: { style: "clamp", args: 2 }
+            },
+            11: {
+                name: "namedbox",
+                privateData: "box1",
+                connections: [10],
+                protoblock: standardProtoblock
+            },
+            12: { name: "command", connections: [10, null], protoblock: { style: "command" } },
+            13: { name: "command", connections: [3, null], protoblock: { style: "command" } },
+            20: {
+                name: "action",
+                trash: false,
+                connections: [null, 21, 22, null],
+                protoblock: { style: "hat" }
+            },
+            21: {
+                name: "value",
+                value: "myAction",
+                connections: [20],
+                protoblock: standardProtoblock
+            },
+            22: {
+                name: "myGetter",
+                connections: [20, null],
+                protoblock: { style: "value" }
+            }
+        };
+
+        JSGenerate.generateStacksTree();
+
+        expect(JSGenerate.startTrees.length).toBe(1);
+        expect(JSGenerate.actionTrees.length).toBe(1);
+        expect(JSGenerate.actionNames).toContain("myAction");
+
+        const tree = JSGenerate.startTrees[0];
+        expect(tree[0][0]).toBe("storein2_myVar");
+        expect(tree[0][1][0]).toBe(42);
+        expect(tree[1][0]).toBe("if");
+        expect(tree[1][1][0]).toBe("bool_true");
+        expect(tree[1][2][0][0]).toBe("nameddo_myProc");
+        expect(tree[1][3][0][1][0]).toBe("box_box1");
+    });
+
+    test("should warn when clamp block flows left", () => {
+        globalActivity.blocks.stackList = [1];
+        globalActivity.blocks.blockList = {
+            1: {
+                name: "start",
+                trash: false,
+                connections: [null, 2, null],
+                protoblock: { style: "hat" }
+            },
+            2: {
+                name: "command",
+                connections: [1, 3, null],
+                protoblock: { style: "command", args: 1 }
+            },
+            3: {
+                name: "badClamp",
+                connections: [2],
+                protoblock: {
+                    style: "clamp",
+                    _style: { flows: { left: true } }
+                }
+            }
+        };
+
+        const warnSpy = jest.spyOn(console, "warn").mockImplementation();
+        JSGenerate.generateStacksTree();
+        expect(warnSpy).toHaveBeenCalledWith('CANNOT PROCESS "badClamp" BLOCK');
+        warnSpy.mockRestore();
+    });
+    test("should print complex stack trees with nested args and flows", () => {
+        JSGenerate.startTrees = [
+            [
+                ["block1", ["arg1", "subArg"], null],
+                ["block2", null, [["flow1Block", null, null]], [["flow2Block", null, null]]]
+            ]
+        ];
+        JSGenerate.actionTrees = [[["actionBlock", null, null]]];
+
+        JSGenerate.printStacksTree();
+        expect(console.log).toHaveBeenCalledWith(
+            expect.stringContaining("(arg1, subArg)"),
+            "background: mediumslateblue",
+            "background; none",
+            "color: dodgerblue"
+        );
+        expect(console.log).toHaveBeenCalledWith(
+            expect.stringContaining("** NEXTFLOW **"),
+            "color: green"
+        );
+        expect(console.log).toHaveBeenCalledWith(
+            expect.stringContaining("ACTION"),
+            "background: green; color: white; font-weight: bold"
+        );
+    });
+    test("should handle astring generation errors", () => {
+        JSGenerate.AST = { type: "Program", body: [] };
+        astring.generate
+            .mockImplementationOnce(() => {
+                throw new Error("Code Gen Error");
+            })
+            .mockImplementationOnce(() => "fallback code");
+
+        JSGenerate.generateCode();
+
+        expect(JSGenerate.generateFailed).toBe(true);
+        expect(console.error).toHaveBeenCalledWith(
+            "CANNOT GENERATE CODE\nError: INVALID ABSTRACT SYNTAX TREE"
+        );
+        expect(JSGenerate.code).toBe("fallback code");
     });
 });
