@@ -51,6 +51,26 @@
             }
         },
         {
+            "comment": "Logical expressions like 'a && b' or 'a || b' in the Boolean palette",
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "LogicalExpression"
+                    }
+                ],
+                "name_property": "operator",
+                "argument_properties": [
+                    "left",
+                    "right"
+                ]
+            },
+            "name_map": {
+                "&&": "and",
+                "||": "or"
+            }
+        },
+        {
             "comment": "Unary expressions such as ! in boolean palette or - in number palette",
             "ast": {
                 "identifiers": [
@@ -250,12 +270,74 @@
                 "SHADE": "shade",
                 "PENSIZE": "pensize",
                 "COLOR": "color",
+                    "BOTTOMPOS": "bottompos",
+                    "CAMERA": "camera",
                 "BEATCOUNT": "nopValueBlock",
                 "MEASURECOUNT": "nopValueBlock",
                 "BPM": "nopValueBlock",
                 "WHOLENOTESPLAYED": "elapsednotes",
                 "BEATFACTOR": "beatfactor",
                 "NOTEVALUE": "notevalue"
+            }
+        },
+        {
+            "comment": "Box getter function",
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "callee.object.name",
+                        "value": "mouse"
+                    },
+                    {
+                        "property": "callee.property.name",
+                        "value": "getBox"
+                    }
+                ],
+                "name_property": "callee.property.name",
+                "argument_properties": [
+                    "arguments[0]"
+                ]
+            },
+            "name_map": {
+                "getBox": "box"
+            }
+        },
+        {
+            "comment": "Action argument access (actionArgs[n])",
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "object.type",
+                        "value": "Identifier"
+                    },
+                    {
+                        "property": "object.name",
+                        "value": "actionArgs"
+                    },
+                    {
+                        "property": "computed",
+                        "value": true
+                    }
+                ],
+                "name_property": "object.name",
+                "argument_properties": [
+                    "property"
+                ]
+            },
+            "name_map": {
+                "actionArgs": "arg"
             }
         },
         {
@@ -371,6 +453,55 @@
             ]
         },
         {
+            "name": "storein",
+            "comment": "Store in block using mouse.setBox(name, value)",
+            "arguments": [
+                {
+                    "type": "ValueExpression"
+                },
+                {
+                    "type": "ValueExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "setBox"
+                    }
+                ],
+                "argument_properties": [
+                    "expression.argument.arguments[0]",
+                    "expression.argument.arguments[1]"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "argument",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "body": 2
+            }
+        },
+        {
             "name": "decrementOne",
             "comment": "Decrement by one block in the Boxes palette 'box1 = box1 - 1;'",
             "arguments": [
@@ -444,6 +575,55 @@
                 "argument_properties": [
                     "expression.left",
                     "expression.right.right"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "argument",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "body": 2
+            }
+        },
+        {
+            "name": "increment",
+            "comment": "Increment block using mouse.incrementBox(name, delta)",
+            "arguments": [
+                {
+                    "type": "ValueExpression"
+                },
+                {
+                    "type": "NumberExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "incrementBox"
+                    }
+                ],
+                "argument_properties": [
+                    "expression.argument.arguments[0]",
+                    "expression.argument.arguments[1]"
                 ]
             },
             "blocklist_connections": [
@@ -711,6 +891,55 @@
                 "parent_or_previous_sibling",
                 "next_sibling"
             ]
+        },
+        {
+            "name": "nameddoArg",
+            "comment": "Action palette, async block with arguments",
+            "arguments": [
+                {
+                    "type": "ValueExpression"
+                }
+            ],
+            "arguments_repeat": true,
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "Identifier"
+                    },
+                    {
+                        "property": "expression.argument.arguments",
+                        "size": 2
+                    },
+                    {
+                        "property": "expression.argument.arguments[1].type",
+                        "value": "ArrayExpression"
+                    }
+                ],
+                "name_property": "expression.argument.callee.name",
+                "arguments_property": "expression.argument.arguments[1].elements",
+                "arguments_offset": 1
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "body": 2
+            }
         },
         {
             "name": "nameddo",
