@@ -1567,6 +1567,7 @@ const MODE_PIE_MENUS = {
 // The table contains the intervals that define the modes.
 // All of these modes assume 12 semitones per octave.
 // See http://www.pianoscales.org <== this is in no way definitive
+
 const PITCH_COLLECTIONS = {
     "12": {
         "chromatic": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
