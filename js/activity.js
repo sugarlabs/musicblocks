@@ -452,7 +452,15 @@ class Activity {
             this.hideBlocksContainer = null;
             this.collapseBlocksContainer = null;
 
+            // --- DOM reads (batched to avoid forced synchronous layout) ---
             this.searchWidget = document.getElementById("search");
+            this.progressBar = document.getElementById("myProgress");
+            const pasteEl = document.getElementById("paste");
+            new createjs.DOMElement(pasteEl);
+            this.paste = pasteEl;
+            this.toolbarHeight = document.getElementById("toolbars").offsetHeight;
+
+            // --- DOM writes (after all reads complete) ---
             this.searchWidget.style.visibility = "hidden";
             this.searchWidget.placeholder = _("Search for blocks");
 
@@ -461,14 +469,8 @@ class Activity {
             this.helpfulSearchWidget.style.visibility = "hidden";
             this.helpfulSearchWidget.placeholder = _("Search for blocks");
             this.helpfulSearchWidget.classList.add("ui-autocomplete");
-            this.progressBar = document.getElementById("myProgress");
             this.progressBar.style.visibility = "hidden";
-
-            new createjs.DOMElement(document.getElementById("paste"));
-            this.paste = document.getElementById("paste");
             this.paste.style.visibility = "hidden";
-
-            this.toolbarHeight = document.getElementById("toolbars").offsetHeight;
 
             this.helpfulWheelItems = [];
 
@@ -2633,47 +2635,55 @@ class Activity {
              * Handles touch start event on the canvas.
              * @param {TouchEvent} event - The touch event object.
              */
-            myCanvas.addEventListener("touchstart", event => {
-                if (event.touches.length === 2) {
-                    for (let i = 0; i < 2; i++) {
-                        initialTouches[i][0] = event.touches[i].clientY;
-                        initialTouches[i][1] = event.touches[i].clientX;
+            myCanvas.addEventListener(
+                "touchstart",
+                event => {
+                    if (event.touches.length === 2) {
+                        for (let i = 0; i < 2; i++) {
+                            initialTouches[i][0] = event.touches[i].clientY;
+                            initialTouches[i][1] = event.touches[i].clientX;
+                        }
                     }
-                }
-            });
+                },
+                { passive: true }
+            );
 
             /**
              * Handles touch move event on the canvas.
              * @param {TouchEvent} event - The touch event object.
              */
-            myCanvas.addEventListener("touchmove", event => {
-                if (event.touches.length === 2) {
-                    for (let i = 0; i < 2; i++) {
-                        const touchY = event.touches[i].clientY;
-                        const touchX = event.touches[i].clientX;
+            myCanvas.addEventListener(
+                "touchmove",
+                event => {
+                    if (event.touches.length === 2) {
+                        for (let i = 0; i < 2; i++) {
+                            const touchY = event.touches[i].clientY;
+                            const touchX = event.touches[i].clientX;
 
-                        if (initialTouches[i][0] !== null && initialTouches[i][1] !== null) {
-                            const deltaY = touchY - initialTouches[i][0];
-                            const deltaX = touchX - initialTouches[i][1];
+                            if (initialTouches[i][0] !== null && initialTouches[i][1] !== null) {
+                                const deltaY = touchY - initialTouches[i][0];
+                                const deltaX = touchX - initialTouches[i][1];
 
-                            if (deltaY !== 0) {
-                                closeAnyOpenMenusAndLabels();
-                                that.blocksContainer.y -= deltaY;
+                                if (deltaY !== 0) {
+                                    closeAnyOpenMenusAndLabels();
+                                    that.blocksContainer.y -= deltaY;
+                                }
+
+                                if (that.scrollBlockContainer && deltaX !== 0) {
+                                    closeAnyOpenMenusAndLabels();
+                                    that.blocksContainer.x -= deltaX;
+                                }
+
+                                initialTouches[i][0] = touchY;
+                                initialTouches[i][1] = touchX;
                             }
-
-                            if (that.scrollBlockContainer && deltaX !== 0) {
-                                closeAnyOpenMenusAndLabels();
-                                that.blocksContainer.x -= deltaX;
-                            }
-
-                            initialTouches[i][0] = touchY;
-                            initialTouches[i][1] = touchX;
                         }
-                    }
 
-                    that.refreshCanvas();
-                }
-            });
+                        that.refreshCanvas();
+                    }
+                },
+                { passive: true }
+            );
 
             /**
              * Handles touch end event on the canvas.
@@ -2946,8 +2956,12 @@ class Activity {
             window.addEventListener("mousemove", resetIdleTimer);
             window.addEventListener("mousedown", resetIdleTimer);
             window.addEventListener("keydown", resetIdleTimer);
-            window.addEventListener("touchstart", resetIdleTimer);
-            window.addEventListener("wheel", resetIdleTimer);
+            window.addEventListener("touchstart", resetIdleTimer, {
+                passive: true
+            });
+            window.addEventListener("wheel", resetIdleTimer, {
+                passive: true
+            });
 
             // Periodic check for idle state
             setInterval(() => {
@@ -6865,15 +6879,16 @@ class Activity {
 
             const img = new Image();
             img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(name));
+            // Accessibility: derive alt text from the button label
+            const altText = label ? label.replace(/\s*\[.*\]$/, "") : "Toolbar button";
+            img.setAttribute("alt", altText);
 
+            // Batch DOM reads before writes to avoid forced synchronous layout
+            const rightPos = document.body.clientWidth - x;
             container.appendChild(img);
             container.setAttribute(
                 "style",
-                "position: absolute; right:" +
-                    (document.body.clientWidth - x) +
-                    "px;  top: " +
-                    y +
-                    "px;"
+                "position: absolute; right:" + rightPos + "px;  top: " + y + "px;"
             );
             document.getElementById("buttoncontainerBOTTOM").appendChild(container);
             return container;
@@ -7291,14 +7306,17 @@ class Activity {
          * Inits everything. The main function.
          */
         this.init = async () => {
+            // Batch DOM reads before any writes to avoid forced synchronous layout
             this._clientWidth = document.body.clientWidth;
             this._clientHeight = document.body.clientHeight;
             this._innerWidth = window.innerWidth;
             this._innerHeight = window.innerHeight;
             this._outerWidth = window.outerWidth;
             this._outerHeight = window.outerHeight;
+            const loaderEl = document.getElementById("loader");
 
-            document.getElementById("loader").className = "loader";
+            // DOM write: apply class after all geometry reads
+            loaderEl.className = "loader";
 
             /*
              * Run browser check before implementing onblur -->
