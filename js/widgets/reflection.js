@@ -76,7 +76,20 @@ class ReflectionMatrix {
         this.isOpen = true;
         this.isMaximized = false;
         this.activity.isInputON = true;
-        this.PORT = "http://3.105.177.138:8000"; // http://127.0.0.1:8000
+        this.PORT = (() => {
+            if (
+                window.location.hostname === "localhost" ||
+                window.location.hostname === "127.0.0.1"
+            ) {
+                return "http://localhost:8000";
+            } else if (
+                window.location.hostname.includes("musicblocks.sugarlabs.org")
+            ) {
+                return `${window.location.protocol}//api.musicblocks.sugarlabs.org`;
+            } else {
+                return `${window.location.protocol}//${window.location.hostname}:8000`;
+            }
+        })();
 
         const widgetWindow = window.widgetWindows.windowFor(this, "reflection", "reflection");
         this.widgetWindow = widgetWindow;
