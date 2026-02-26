@@ -669,6 +669,62 @@ describe("Utility Functions (logic-only)", () => {
         it("returns undefined for non-string input", () => {
             expect(resolveObject(123)).toBeUndefined();
         });
+        it("returns undefined for empty string", () => {
+            expect(resolveObject("")).toBeUndefined();
+        });
+        it("returns undefined for boolean input", () => {
+            expect(resolveObject(true)).toBeUndefined();
+        });
+        it("returns undefined for object input", () => {
+            expect(resolveObject({})).toBeUndefined();
+        });
+        it("returns undefined when null encountered in path", () => {
+            global.TestNull = { A: null };
+            expect(resolveObject("TestNull.A.B")).toBeUndefined();
+            delete global.TestNull;
+        });
+        it("returns undefined and warns if an error occurs during resolution", () => {
+            const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+
+            const originalSplit = String.prototype.split;
+            String.prototype.split = () => {
+                throw new Error("forced error");
+            };
+            expect(resolveObject("Any.Path")).toBeUndefined();
+            expect(warnSpy).toHaveBeenCalled();
+            String.prototype.split = originalSplit;
+            warnSpy.mockRestore();
+        });
+    });
+    describe("delayExecution()", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+        });
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+        it("resolves after the specified duration", async () => {
+            const promise = delayExecution(1000);
+            jest.advanceTimersByTime(1000);
+            await expect(promise).resolves.toBe(true);
+        });
+        it("does not resolve before duration", async () => {
+            const promise = delayExecution(1000);
+
+            let resolved = false;
+            promise.then(() => {
+                resolved = true;
+            });
+            jest.advanceTimersByTime(500);
+            await Promise.resolve();
+            expect(resolved).toBe(false);
+            jest.advanceTimersByTime(500);
+        });
+        it("resolves immediately when duration is 0", async () => {
+            const promise = delayExecution(0);
+            jest.advanceTimersByTime(0);
+            await expect(promise).resolves.toBe(true);
+        });
     });
     describe("importMembers()", () => {
         class DummyModel {
