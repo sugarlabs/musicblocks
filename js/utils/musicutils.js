@@ -1569,17 +1569,17 @@ const MODE_PIE_MENUS = {
 // See http://www.pianoscales.org <== this is in no way definitive
 
 const PITCH_COLLECTIONS = {
-    "12": {
-        "chromatic": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    12: {
+        chromatic: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     },
-    "8": {
-        "algerian": [2, 1, 2, 1, 1, 1, 3, 1],
-        "diminished": [2, 1, 2, 1, 2, 1, 2, 1],
-        "spanish": [1, 2, 1, 1, 1, 2, 2, 2],
-        "octatonic": [1, 2, 1, 2, 1, 2, 1, 2],
-        "bebop": [1, 1, 1, 2, 2, 1, 2, 2]
+    8: {
+        algerian: [2, 1, 2, 1, 1, 1, 3, 1],
+        diminished: [2, 1, 2, 1, 2, 1, 2, 1],
+        spanish: [1, 2, 1, 1, 1, 2, 2, 2],
+        octatonic: [1, 2, 1, 2, 1, 2, 1, 2],
+        bebop: [1, 1, 1, 2, 2, 1, 2, 2]
     },
-    "7": {
+    7: {
         "major": [2, 2, 1, 2, 2, 2, 1],
         "harmonic major": [2, 2, 1, 2, 1, 3, 1],
         "natural minor": [2, 1, 2, 2, 1, 2, 2],
@@ -1598,12 +1598,12 @@ const PITCH_COLLECTIONS = {
         "romanian minor": [2, 1, 3, 1, 2, 1, 2],
         "spanish gypsy": [1, 3, 1, 2, 1, 2, 2]
     },
-    "6": {
+    6: {
         "minor blues": [3, 2, 1, 1, 3, 2],
         "major blues": [2, 1, 1, 3, 2, 2],
         "whole tone": [2, 2, 2, 2, 2, 2]
     },
-    "5": {
+    5: {
         "major pentatonic": [2, 2, 3, 2, 3],
         "minor pentatonic": [3, 2, 2, 3, 2],
         "chinese": [4, 2, 1, 4, 1],
