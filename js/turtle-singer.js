@@ -538,7 +538,7 @@ class Singer {
 
         for (const b in tur.endOfClampSignals) {
             tur.butNotThese[b] = [];
-            for (const i in tur.endOfClampSignals[b]) {
+            for (const i of tur.endOfClampSignals[b]) {
                 tur.butNotThese[b].push(i);
             }
         }
