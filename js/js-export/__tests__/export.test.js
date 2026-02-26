@@ -47,6 +47,7 @@ const globalActivity = {
     logo: {
         prepSynths: jest.fn(),
         firstNoteTime: null,
+        turtleHeaps: {},
         stage: {
             removeEventListener: jest.fn()
         }
@@ -138,6 +139,7 @@ describe("MusicBlocks Class", () => {
             doWait: jest.fn(),
             container: { x: 10, y: 20 }
         });
+        globalActivity.turtles.getIndexOfTurtle.mockReturnValue(0);
         mouse = new Mouse(jest.fn());
         mouse.run = jest.fn();
         musicBlocks = new MusicBlocks(mouse);
@@ -234,6 +236,47 @@ describe("MusicBlocks Class", () => {
     test("should get GREY", () => {
         musicBlocks.turtle.painter = { chroma: 75 };
         expect(musicBlocks.GREY).toBe(75);
+    });
+
+    describe("Heap helpers", () => {
+        test("should get HEAP as JSON string", () => {
+            globalActivity.logo.turtleHeaps[musicBlocks.turIndex] = [1, 2, 3];
+            expect(musicBlocks.HEAP).toBe(JSON.stringify([1, 2, 3]));
+        });
+
+        test("should get HEAPLENGTH", () => {
+            globalActivity.logo.turtleHeaps[musicBlocks.turIndex] = [1, 2, 3, 4];
+            expect(musicBlocks.HEAPLENGTH).toBe(4);
+        });
+
+        test("should get HEAPEMPTY when heap is missing", () => {
+            delete globalActivity.logo.turtleHeaps[musicBlocks.turIndex];
+            expect(musicBlocks.HEAPEMPTY).toBe(true);
+        });
+
+        test("should emptyHeap", () => {
+            globalActivity.logo.turtleHeaps[musicBlocks.turIndex] = [1, 2];
+            musicBlocks.emptyHeap();
+            expect(globalActivity.logo.turtleHeaps[musicBlocks.turIndex]).toEqual([]);
+        });
+
+        test("should reverseHeap", () => {
+            globalActivity.logo.turtleHeaps[musicBlocks.turIndex] = [1, 2, 3];
+            musicBlocks.reverseHeap();
+            expect(globalActivity.logo.turtleHeaps[musicBlocks.turIndex]).toEqual([3, 2, 1]);
+        });
+
+        test("should setHeapEntry", () => {
+            globalActivity.logo.turtleHeaps[musicBlocks.turIndex] = [];
+            musicBlocks.setHeapEntry(2, 5);
+            expect(globalActivity.logo.turtleHeaps[musicBlocks.turIndex]).toEqual([0, 5]);
+        });
+
+        test("should push to heap", () => {
+            globalActivity.logo.turtleHeaps[musicBlocks.turIndex] = [1];
+            musicBlocks.push(2);
+            expect(globalActivity.logo.turtleHeaps[musicBlocks.turIndex]).toEqual([1, 2]);
+        });
     });
 
     test("should get NOTEVALUE", () => {
