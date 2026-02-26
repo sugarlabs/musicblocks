@@ -1160,8 +1160,11 @@
                         link.addEventListener("click", function (e) {
                             e.preventDefault(); // prevent default <a> behavior
                             const selectedLang = this.id; // ID corresponds to language code
-                            localStorage.setItem("languagePreference", selectedLang);
-                            location.reload(); // automatically reload
+                            const currentLang = localStorage.getItem("languagePreference");
+                            if (currentLang !== selectedLang) {
+                                localStorage.setItem("languagePreference", selectedLang);
+                                location.reload(); // automatically reload
+                            }
                         });
                     });
                 }
