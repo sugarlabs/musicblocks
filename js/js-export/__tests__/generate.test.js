@@ -175,6 +175,99 @@ describe("JSGenerate Class", () => {
         expect(console.log).toHaveBeenCalledWith("generated code");
     });
 
+    describe("generateCode edge cases", () => {
+        beforeEach(() => {
+            jest.clearAllMocks();
+            JSGenerate.generateFailed = false;
+        });
+
+        test("should handle astring.generate failure", () => {
+            JSGenerate.actionTrees = [];
+            JSGenerate.actionNames = [];
+            JSGenerate.startTrees = [[["start", null, null]]];
+
+            ASTUtils.getMouseAST.mockReturnValue({ type: "Mouse" });
+            astring.generate
+                .mockImplementationOnce(() => {
+                    throw new Error("Invalid AST");
+                })
+                .mockReturnValueOnce("fallback code");
+
+            JSGenerate.generateCode();
+
+            expect(JSGenerate.generateFailed).toBe(true);
+            expect(console.error).toHaveBeenCalledWith(
+                "CANNOT GENERATE CODE\nError: INVALID ABSTRACT SYNTAX TREE"
+            );
+        });
+
+        test("should handle multiple action trees", () => {
+            JSGenerate.actionTrees = [[["action1", null, null]], [["action2", null, null]]];
+            JSGenerate.actionNames = ["first", "second"];
+            JSGenerate.startTrees = [];
+
+            ASTUtils.getMethodAST.mockReturnValue({ type: "Method" });
+            astring.generate.mockReturnValue("multi-action code");
+
+            JSGenerate.generateCode();
+
+            expect(ASTUtils.getMethodAST).toHaveBeenCalledTimes(2);
+            expect(JSGenerate.generateFailed).toBe(false);
+        });
+
+        test("should handle multiple start trees", () => {
+            JSGenerate.actionTrees = [];
+            JSGenerate.actionNames = [];
+            JSGenerate.startTrees = [[["start1", null, null]], [["start2", null, null]]];
+
+            ASTUtils.getMouseAST.mockReturnValue({ type: "Mouse" });
+            astring.generate.mockReturnValue("multi-start code");
+
+            JSGenerate.generateCode();
+
+            expect(ASTUtils.getMouseAST).toHaveBeenCalledTimes(2);
+            expect(JSGenerate.generateFailed).toBe(false);
+        });
+    });
+
+    describe("run options", () => {
+        beforeEach(() => {
+            jest.clearAllMocks();
+            ASTUtils.getMouseAST.mockReturnValue({ type: "Mouse" });
+            astring.generate.mockReturnValue("code");
+        });
+
+        test("should run without printing when both options false", () => {
+            JSGenerate.run(false, false);
+
+            expect(console.log).not.toHaveBeenCalledWith(
+                expect.stringContaining("STACK TREES"),
+                expect.any(String)
+            );
+            expect(console.log).not.toHaveBeenCalledWith(
+                expect.stringContaining("CODE"),
+                expect.any(String)
+            );
+        });
+
+        test("should print only stacks when printStacksTree is true", () => {
+            JSGenerate.run(true, false);
+
+            expect(console.log).toHaveBeenCalledWith(
+                "\n   %c STACK TREES ",
+                "background: greenyellow; color: midnightblue; font-weight: bold"
+            );
+        });
+
+        test("should print only code when printCode is true", () => {
+            JSGenerate.run(false, true);
+
+            expect(console.log).toHaveBeenCalledWith(
+                "\n   %c CODE ",
+                "background: greenyellow; color: midnightblue; font-weight: bold"
+            );
+        });
+    });
     test("should set generateFailed when astring.generate throws", () => {
         JSGenerate.actionTrees = [];
         JSGenerate.startTrees = [[["start", null, null]]];

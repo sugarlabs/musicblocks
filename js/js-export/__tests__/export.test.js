@@ -352,6 +352,70 @@ describe("MusicBlocks Class", () => {
         expect(musicBlocks.MASTERVOLUME).toBe(1.0);
     });
 
+    describe("ENDFLOWCOMMAND edge cases", () => {
+        beforeEach(() => {
+            musicBlocks.turtle.waitTime = 0;
+            musicBlocks.turtle.doWait = jest.fn();
+            globalActivity.stage.dispatchEvent.mockClear();
+        });
+
+        test("should handle empty listeners array", async () => {
+            musicBlocks.listeners = [];
+            await musicBlocks.ENDFLOWCOMMAND;
+            expect(globalActivity.stage.dispatchEvent).not.toHaveBeenCalled();
+        });
+
+        test("should handle null signal in listeners", async () => {
+            musicBlocks.listeners = [null];
+            await musicBlocks.ENDFLOWCOMMAND;
+            expect(globalActivity.stage.dispatchEvent).not.toHaveBeenCalled();
+        });
+
+        test("should pop and dispatch last listener only", async () => {
+            musicBlocks.listeners = ["first", "second"];
+            await musicBlocks.ENDFLOWCOMMAND;
+            expect(globalActivity.stage.dispatchEvent).toHaveBeenCalledWith("second");
+            expect(musicBlocks.listeners).toEqual(["first"]);
+        });
+    });
+
+    describe("print edge cases", () => {
+        beforeEach(() => {
+            globalActivity.textMsg.mockClear();
+            JSEditor.logConsole.mockClear();
+        });
+
+        test("should convert number to string", () => {
+            musicBlocks.print(42);
+            expect(globalActivity.textMsg).toHaveBeenCalledWith("42");
+        });
+
+        test("should handle empty string", () => {
+            musicBlocks.print("");
+            expect(globalActivity.textMsg).toHaveBeenCalledWith("");
+        });
+
+        test("should handle boolean false", () => {
+            musicBlocks.print(false);
+            expect(globalActivity.textMsg).toHaveBeenCalledWith("false");
+        });
+    });
+
+    describe("PICKUP setter edge cases", () => {
+        beforeEach(() => {
+            Singer.MeterActions.setPickup.mockClear();
+        });
+
+        test("should clamp negative value to 0", () => {
+            musicBlocks.PICKUP = -5;
+            expect(Singer.MeterActions.setPickup).toHaveBeenCalledWith(0, musicBlocks.turIndex);
+        });
+
+        test("should allow zero value", () => {
+            musicBlocks.PICKUP = 0;
+            expect(Singer.MeterActions.setPickup).toHaveBeenCalledWith(0, musicBlocks.turIndex);
+        });
+    });
     describe("MusicBlocks.run", () => {
         beforeEach(() => {
             Mouse.MouseList = [];
