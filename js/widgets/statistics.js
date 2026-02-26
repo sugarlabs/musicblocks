@@ -116,3 +116,7 @@ class StatsWindow {
             <li>ornaments used: ${stats["ornaments"]}</li>`;
     }
 }
+/* istanbul ignore next */
+if (typeof module !== "undefined") {
+    module.exports = StatsWindow;
+}

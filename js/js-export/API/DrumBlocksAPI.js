@@ -54,3 +54,6 @@ class DrumBlocksAPI {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = DrumBlocksAPI;
 }
+if (typeof window !== "undefined") {
+    window.DrumBlocksAPI = DrumBlocksAPI;
+}

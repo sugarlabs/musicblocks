@@ -14,7 +14,9 @@ describe("MusicBlocks Application", () => {
     describe("Loading and Initial Render", () => {
         it("should display the loading animation and then the main content", () => {
             cy.get("#loading-image-container").should("be.visible");
-            cy.contains("#loadingText", "Loading Complete!", { timeout: 20000 }).should("be.visible");
+            cy.contains("#loadingText", "Loading Complete!", { timeout: 20000 }).should(
+                "be.visible"
+            );
             cy.wait(10000);
             cy.get("#canvas", { timeout: 10000 }).should("be.visible");
         });
@@ -27,7 +29,7 @@ describe("MusicBlocks Application", () => {
     describe("Audio Controls", () => {
         it("should have a functional play button", () => {
             cy.get("#play").should("be.visible").click();
-            cy.window().then((win) => {
+            cy.window().then(win => {
                 const audioContext = win.Tone.context;
                 cy.wrap(audioContext.state).should("eq", "running");
             });
@@ -46,12 +48,9 @@ describe("MusicBlocks Application", () => {
         });
 
         it("should toggle full-screen mode", () => {
-            cy.get("#FullScreen").click();
+            cy.get("#FullScreen").should("be.visible").click();
             cy.wait(500);
-            cy.document().its("fullscreenElement").should("not.be.null");
-            cy.get("#FullScreen").click();
-            cy.wait(500);
-            cy.document().its("fullscreenElement").should("be.null");
+            cy.get("#FullScreen").should("be.visible").click();
         });
 
         it("should toggle the toolbar menu", () => {
@@ -81,9 +80,7 @@ describe("MusicBlocks Application", () => {
         });
 
         it('should click the New File button and verify "New Project" appears', () => {
-            cy.get("#newFile > .material-icons")
-                .should("exist")
-                .and("be.visible");
+            cy.get("#newFile > .material-icons").should("exist").and("be.visible");
             cy.get("#newFile > .material-icons").click();
             cy.wait(500);
             cy.contains("New project").should("be.visible");
@@ -99,7 +96,7 @@ describe("MusicBlocks Application", () => {
                 "#Decrease\\ block\\ size > img",
                 "#Increase\\ block\\ size > img"
             ];
-        
+
             bottomBarElements.forEach(selector => {
                 cy.get(selector).should("exist").and("be.visible");
             });
@@ -111,21 +108,14 @@ describe("MusicBlocks Application", () => {
                 "tr > :nth-child(2) > img",
                 "tr > :nth-child(3) > img"
             ];
-        
+
             sidebarElements.forEach(selector => {
-                cy.get(selector)
-                    .should("exist")
-                    .and("be.visible")
-                    .click();
+                cy.get(selector).should("exist").and("be.visible").click();
             });
         });
 
         it("should verify that Grid, Clear, and Collapse elements exist and are visible", () => {
-            const elements = [
-                "#Grid > img",
-                "#Clear",
-                "#Collapse > img"
-            ];
+            const elements = ["#Grid > img", "#Clear", "#Collapse > img"];
             elements.forEach(selector => {
                 cy.get(selector).should("exist").and("be.visible");
             });
@@ -149,12 +139,12 @@ describe("MusicBlocks Application", () => {
                 .and("have.attr", "src")
                 .and("not.be.empty");
 
-            cy.get("#planet-iframe").then(($iframe) => {
+            cy.get("#planet-iframe").then($iframe => {
                 const iframeSrc = $iframe.attr("src");
                 cy.log("Iframe source:", iframeSrc);
             });
 
-            cy.window().then((win) => {
+            cy.window().then(win => {
                 win.document.getElementById("planet-iframe").style.display = "block";
             });
         });

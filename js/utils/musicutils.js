@@ -2555,7 +2555,6 @@ const getDrumName = name => {
         }
     }
 
-    // console.debug(name + ' not found in DRUMNAMES');
     return null;
 };
 
@@ -2698,7 +2697,6 @@ const getNoiseName = name => {
         }
     }
 
-    // console.debug(name + " not found in NOISENAMES");
     return DEFAULTNOISE;
 };
 
@@ -2771,7 +2769,6 @@ const getVoiceName = name => {
         }
     }
 
-    // console.debug(name + " not found in VOICENAMES");
     return DEFAULTVOICE;
 };
 
@@ -5425,15 +5422,17 @@ const nthDegreeToPitch = (keySignature, scaleDegree) => {
     // Returns note corresponding to scale degree in current key
     // signature. Used for movable solfege.
     const scale = buildScale(keySignature)[0];
+    const modeLength = scale.length - 1;
+
     // Scale degree is specified as do === 1, re === 2, etc., so we need
     // to subtract 1 to make it zero-based.
-    // scaleDegree -= 1;
+    scaleDegree = Math.floor(Number(scaleDegree));
+    const degree = scaleDegree - 1;
 
-    // We mod to ensure we don't run out of notes.
-    // FixMe: bump octave if we wrap.
+    const octaveOffset = Math.floor(degree / modeLength);
+    const index = ((degree % modeLength) + modeLength) % modeLength;
 
-    scaleDegree %= scale.length - 1;
-    return scale[scaleDegree];
+    return [scale[index], octaveOffset];
 };
 
 /**

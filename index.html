@@ -20,7 +20,9 @@
     <link rel="preload" href="https://fonts.googleapis.com/icon?family=Material+Icons" as="style"
         onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="fonts/material-icons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="css/activities.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <!-- NOTE: The exact query-string URL here must be listed in sw.js `precacheFiles`.
+         If you change `?v=fixed` (or remove/add a query param), update sw.js so offline still works. -->
+    <link rel="preload" href="css/activities.css?v=fixed" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/keyboard.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/windows.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -28,8 +30,6 @@
     <link rel="preload" href="css/darkmode.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="prefetch" as="video" href="loading-animation.webm" type="video/webm">
     <link rel="prefetch" as="video" href="loading-animation.mp4" type="video/mp4">
-    <link rel="prefetch" as="image" href="loading-animation-ja.svg">
-
 
     <!-- <script src="js/utils/detectIE.js"></script> -->
 
@@ -39,11 +39,48 @@
 
     <script src="lib/reqwest.js" defer></script>
 
-    <script src="lib/jquery-3.7.1.js"></script>
-    <!-- <script src="lib/jquery-2.1.4.min.js"></script> -->
-    <script src="lib/jquery-ui.js" defer></script>
-    <script src="lib/materialize.min.js" defer></script>
-    <script src="lib/webL10n.js" defer></script>
+    <script src="lib/jquery-3.7.1.min.js"></script>
+    <script src="lib/jquery-ui.js"></script>
+    <script src="lib/materialize.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script>
+        jQuery(document).ready(function () {
+            if (jQuery.ui && jQuery.ui.autocomplete) {
+                jQuery.fn.materializeAutocomplete = jQuery.fn.autocomplete;
+                jQuery.widget.bridge("autocomplete", jQuery.ui.autocomplete);
+            }
+        });
+    </script>
+    <script>
+        jQuery(document).ready(function () {
+            const fixAutocompletePosition = function () {
+                const $search = jQuery('#search');
+                if ($search.length && $search.data('ui-autocomplete')) {
+                    const instance = $search.autocomplete('instance');
+                    if (instance) {
+                        const originalRenderMenu = instance._renderMenu;
+                        instance._renderMenu = function (ul, items) {
+                            originalRenderMenu.call(this, ul, items);
+                            setTimeout(() => {
+                                const searchInput = document.querySelector('#search');
+                                const dropdown = ul[0];
+                                if (searchInput && dropdown) {
+                                    const rect = searchInput.getBoundingClientRect();
+                                    dropdown.style.position = 'fixed';
+                                    dropdown.style.left = rect.left + 'px';
+                                    dropdown.style.top = (rect.bottom + 2) + 'px';
+                                    dropdown.style.width = rect.width + 'px';
+                                }
+                            }, 0);
+                        };
+                    }
+                } else {
+                    setTimeout(fixAutocompletePosition, 500);
+                }
+            };
+            setTimeout(fixAutocompletePosition, 1000);
+        });
+    </script>
     <script src="lib/Tone.js" defer></script>
     <script src="lib/midi.js" defer></script>
     <script src="lib/jquery.ruler.js" defer></script>
@@ -52,7 +89,7 @@
     <script src="lib/wheelnav.js" defer></script>
     <script src="lib/abc.min.js" defer></script>
     <script src="lib/codejar/codejar.min.js" defer></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js" defer></script>
+    <script src="lib/codejar/highlight.pack.js" defer></script>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
 
     <!-- libgif.js (SuperGif) provides low-level GIF frame extraction.
@@ -70,16 +107,15 @@
         });
     </script>
     <script src="lib/astring.min.js" defer></script>
-
     <script src="lib/acorn.min.js" defer></script>
+    <script src="env.js"></script>
 
-    <link rel="prefetch" type="application/l10n" href="./localization.ini" />
 
     <script data-main="js/loader" src="lib/require.js" defer></script>
     <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
     <link rel="preload" href="/fonts/material-icons.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="stylesheet" href="lib/materialize-iso.css">
-    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/themes.css?v=fixed">
     <script src="lib/easeljs.min.js" defer></script>
     <script src="lib/tweenjs.min.js" defer></script>
     <script>
@@ -99,9 +135,10 @@
     </noscript>
     <header>
         <div id="loading-image-container"
-            style="position: fixed; top: 0; left: 0; width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #FFFFFF; z-index: 9999; contain: paint;">
+            style="position: fixed; top: 0; left: 0; width: 100%; height: calc(var(--vh) * 100); display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #FFFFFF; z-index: 9999; contain: paint;">
             <div id="loading-media" style="width: 100%; padding: 0 20px; box-sizing: border-box;"></div>
-            <div class="loading-text" id="loadingText" style="color:#333; margin-top: 2rem; min-height: 1.5em; font-size: 1.2rem;">
+            <div class="loading-text" id="loadingText"
+                style="color:#333; margin-top: 2rem; min-height: 1.5em; font-size: 1.2rem;">
             </div>
             <a href="https://www.sugarlabs.org/" target="_blank" id="link-to-sugarLabs"
                 style="position: fixed; bottom: 20px; right: 20px;">
@@ -153,7 +190,7 @@
             <label for="fixed">Fixed</label>
         </div>
         <!-- #92B5C8  width = 3790 height = 1743-->
-        <canvas id="canvas" width="100%" height="100%" style="background-color:#FFFFFF; width:100%;"></canvas>
+        <canvas id="canvas" style="background-color:#FFFFFF; width:100%; height:100%;"></canvas>
 
         <!--hidden at the beginning whilst everything loads-->
         <div id="hideContents" style="display: none;" tabindex="-1">
@@ -226,7 +263,8 @@
                 <div id="helpElem" tabindex="-1"></div>
 
                 <div id="wheelDiv" class="wheelNav"
-                    style=" display: none; background-size: contain;background-image: url(./images/gray.svg)" tabindex="-1"></div>
+                    style=" display: none; background-size: contain;background-image: url(./images/gray.svg)"
+                    tabindex="-1"></div>
 
                 <div id="wheelDiv2" class="wheelNav"
                     style="display: none; background-size: contain;background-image: url(./images/gray.svg);visibility: hidden"
@@ -282,7 +320,7 @@
             </dialog>
             <div class="materialize-iso" tabindex="-1">
                 <nav id="toolbars" class="nav-wrapper">
-                <div class="blue nav-wrapper" tabindex="-1">
+                    <div class="blue nav-wrapper" tabindex="-1">
                         <div id="mb-logo" class="logo left tooltipped"
                             style="display: flex; align-items: center; line-height: 0; height: 100%; padding-right: 0;"
                             data-position="bottom">
@@ -291,66 +329,80 @@
                         </div>
                         <ul class="main left">
                             <li>
-                                <a id="play" class="left tooltipped"><i
+                                <a id="play" class="left tooltipped" role="button" tabindex="0"><i
                                         class="material-icons main">play_circle_filled</i></a>
                             </li>
                             <li>
-                                <a id="stop" class="left tooltipped"><i class="material-icons main">stop</i></a>
+                                <a id="stop" class="left tooltipped" role="button" tabindex="0"><i
+                                        class="material-icons main">stop</i></a>
                             </li>
-                            <li>
-                            <a id="record" class="left tooltipped" data-tooltip="Record"></a>
+                            <li style="display: flex; align-items: center;">
+                                <a id="record" class="left tooltipped" data-position="bottom" data-tooltip="Record"
+                                    role="button" tabindex="0"></a>
+                                <a id="recordDropdownArrow" class="left dropdown-trigger"
+                                    data-activates="recorddropdown"
+                                    style="margin-left: -5px; padding: 0; font-size: 28px;" role="button"
+                                    tabindex="0"></a>
                             </li>
                         </ul>
 
                         <ul class="main right">
                             <li>
                                 <a id="FullScreen" class="FullScreen tooltipped dropdown-trigger" data-position="bottom"
-                                onclick="setIcon()">
-                                <i class="material-icons" id="FullScrIcon">fullscreen</i>
-                            </a>
+                                    role="button" tabindex="0" onclick="setIcon()">
+                                    <i class="material-icons" id="FullScrIcon">fullscreen</i>
+                                </a>
                             </li>
                             <li>
-                                <a id="newFile" class="tooltipped dropdown-trigger" data-position="bottom"
-                                data-activates="newdropdown">
-                                <i class="material-icons md-48">note_add</i>
-                            </a>
+                                <a id="newFile" class="tooltipped dropdown-trigger" data-position="bottom" role="button"
+                                    tabindex="0" data-activates="newdropdown">
+                                    <i class="material-icons md-48">note_add</i>
+                                </a>
                             </li>
                             <li>
-                            <a id="load" class="tooltipped" data-position="bottom">
-                                <i class="material-icons md-48">folder</i>
-                            </a>
+                                <a id="load" class="tooltipped" data-position="bottom" role="button" tabindex="0">
+                                    <i class="material-icons md-48">folder</i>
+                                </a>
                             </li>
                             <li>
-                            <a id="saveButton"  class="tooltipped dropdown-trigger" data-position="bottom"
-                                data-activates="saveddropdownbeg">
-                                <i id="save1" class="material-icons md-48">save_alt</i>
-                            </a>
+                                <a id="saveButton" class="tooltipped dropdown-trigger" data-position="bottom"
+                                    role="button" tabindex="0" data-activates="saveddropdownbeg">
+                                    <i id="save1" class="material-icons md-48">save_alt</i>
+                                </a>
                             </li>
                             <li>
-                            <a id="saveButtonAdvanced" style="display: none;"  class="tooltipped dropdown-trigger"
-                                data-position="bottom" data-activates="saveddropdown">
-                                <i id="save2" class="material-icons md-48">save_alt</i>
-                            </a>
+                                <a id="saveButtonAdvanced" style="display: none;" class="tooltipped dropdown-trigger"
+                                    role="button" tabindex="0" data-position="bottom" data-activates="saveddropdown">
+                                    <i id="save2" class="material-icons md-48">save_alt</i>
+                                </a>
                             </li>
                             <li>
-                            <a id="planetIcon" class="tooltipped" data-position="bottom">
-                                <i class="material-icons md-48">public</i>
-                            </a>
+                                <a id="planetIcon" class="tooltipped" data-position="bottom" role="button" tabindex="0">
+                                    <i class="material-icons md-48">public</i>
+                                </a>
                             </li>
                             <li>
-                            <a style="display: none;" id="planetIconDisabled" class="tooltipped" data-position="bottom">
-                                <i style="color: #a5acba;" class="material-icons md-48">public</i>
-                            </a>
+                                <a style="display: none;" id="planetIconDisabled" class="tooltipped" role="button"
+                                    tabindex="0" data-position="bottom">
+                                    <i style="color: #a5acba;" class="material-icons md-48">public</i>
+                                </a>
                             </li>
                             <li>
-                            <a id="toggleAuxBtn" class="tooltipped" data-position="bottom">
-                                <i id="menu" class="animated-icon material-icons md-48">menu</i>
-                            </a>
+                                <a id="toggleAuxBtn" class="tooltipped" data-position="bottom" role="button"
+                                    tabindex="0">
+                                    <i id="menu" class="animated-icon material-icons md-48">menu</i>
+                                </a>
                             </li>
                             <li>
-                            <a id="helpIcon" class="tooltipped" data-position="bottom">
-                                <i class="material-icons md-48">help</i>
-                            </a>
+                                <a id="helpIcon" class="tooltipped" data-position="bottom" role="button" tabindex="0">
+                                    <i class="material-icons md-48">help</i>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="installButton" class="tooltipped hidden" data-position="bottom" role="button"
+                                    tabindex="0" data-tooltip="Install App" aria-label="Install App">
+                                    <i class="material-icons md-48">file_download</i>
+                                </a>
                             </li>
                         </ul>
                     </div>
@@ -358,57 +410,61 @@
                         <div class="blue darken-1 nav-wrapper" tabindex="-1">
                             <ul class="aux left">
                                 <li>
-                                <a id="runSlowlyIcon" class="tooltipped" data-position="bottom" data-delay="10">
-                                    <i class="material-icons md-48">play_circle_outline</i>
-                                </a>
+                                    <a id="runSlowlyIcon" class="tooltipped" data-position="bottom" data-delay="10"
+                                        role="button" tabindex="0">
+                                        <i class="material-icons md-48">play_circle_outline</i>
+                                    </a>
                                 </li>
                                 <li>
-                                <a id="runStepByStepIcon" class="tooltipped" data-position="bottom" data-delay="10">
-                                    <i class="material-icons md-48">video_library</i>
-                                </a>
+                                    <a id="runStepByStepIcon" class="tooltipped" data-position="bottom" data-delay="10"
+                                        role="button" tabindex="0">
+                                        <i class="material-icons md-48">video_library</i>
+                                    </a>
                                 </li>
                             </ul>
                             <ul class="aux right">
                                 <li>
-                                <a id="displayStatsIcon" class="tooltipped" data-position="bottom" data-delay="10"><i
-                                        class="material-icons md-48">poll</i></a>
+                                    <a id="displayStatsIcon" class="tooltipped" data-position="bottom" role="button"
+                                        tabindex="0" data-delay="10"><i class="material-icons md-48">poll</i></a>
                                 </li>
                                 <li>
-                                    <a id="loadPluginIcon" class="tooltipped" data-position="bottom" data-delay="10"><i
-                                            class="material-icons md-48">add_circle</i></a>
+                                    <a id="loadPluginIcon" class="tooltipped" data-position="bottom" data-delay="10"
+                                        role="button" tabindex="0"><i class="material-icons md-48">add_circle</i></a>
                                 </li>
                                 <li>
-                                    <a id="delPluginIcon" class="tooltipped" data-position="bottom" data-delay="10"><i
-                                            class="material-icons md-48">remove_circle</i></a>
+                                    <a id="delPluginIcon" class="tooltipped" data-position="bottom" data-delay="10"
+                                        role="button" tabindex="0"><i class="material-icons md-48">remove_circle</i></a>
                                 </li>
                                 <li>
-                                    <a id="enableHorizScrollIcon" class="tooltipped" data-position="bottom"><i
+                                    <a id="enableHorizScrollIcon" class="tooltipped" data-position="bottom"
+                                        role="button" tabindex="0"><i
                                             class="material-icons md-48">compare_arrows</i></a>
                                 </li>
                                 <li>
                                     <a style="display: none;" id="disableHorizScrollIcon" class="tooltipped"
-                                        data-position="bottom"><i class="material-icons md-48">lock</i></a>
+                                        role="button" tabindex="0" data-position="bottom"><i
+                                            class="material-icons md-48">lock</i></a>
                                 </li>
                                 <li>
                                     <a id="themeSelectIcon" class="tooltipped dropdown-trigger" data-position="bottom"
-                                        data-activates="themedropdown" data-tooltip="Select Theme"><i
-                                            class="material-icons md-48">brightness_7</i></a>
+                                        role="button" tabindex="0" data-activates="themedropdown"
+                                        data-tooltip="Select Theme"><i class="material-icons md-48">brightness_7</i></a>
                                 </li>
                                 <li>
-                                    <a id="mergeWithCurrentIcon" class="tooltipped" data-position="bottom"><i
-                                            class="material-icons md-48">merge_type</i></a>
+                                    <a id="mergeWithCurrentIcon" class="tooltipped" data-position="bottom" role="button"
+                                        tabindex="0"><i class="material-icons md-48">merge_type</i></a>
                                 </li>
                                 <li>
-                                    <a id="wrapTurtle" class="tooltipped" data-position="bottom"><i
-                                            class="material-icons md-48">wrap_text</i></a>
+                                    <a id="wrapTurtle" class="tooltipped" data-position="bottom" role="button"
+                                        tabindex="0"><i class="material-icons md-48">wrap_text</i></a>
                                 </li>
                                 <li>
-                                    <a id="chooseKeyIcon" class="tooltipped" data-position="bottom"><i
-                                            class="material-icons md-48">music_note</i></a>
+                                    <a id="chooseKeyIcon" class="tooltipped" data-position="bottom" role="button"
+                                        tabindex="0"><i class="material-icons md-48">music_note</i></a>
                                 </li>
                                 <li>
-                                    <a id="toggleJavaScriptIcon" class="tooltipped" data-position="bottom"><i
-                                            class="material-icons md-48">code</i></a>
+                                    <a id="toggleJavaScriptIcon" class="tooltipped" data-position="bottom" role="button"
+                                        tabindex="0"><i class="material-icons md-48">code</i></a>
                                 </li>
                                 <li class="filler" id="aligns_merge_under_load"
                                     style="user-select: none; visibility: hidden;">
@@ -416,22 +472,24 @@
                                 </li>
 
                                 <li>
-                                <a id="restoreIcon" class="tooltipped" data-position="bottom" data-tooltip="Restore"><i
+                                    <a id="restoreIcon" class="tooltipped" data-position="bottom" role="button"
+                                        tabindex="0" data-tooltip="Restore"><i
                                             class="material-icons md-48">restore_from_trash</i></a>
                                     <div id="trashList"></div>
                                 </li>
                                 <li>
-                                    <a id="beginnerMode" class="tooltipped" data-position="bottom"><i id="begIconText"
-                                            class="material-icons md-48">star</i></a>
+                                    <a id="beginnerMode" class="tooltipped" data-position="bottom" role="button"
+                                        tabindex="0"><i id="begIconText" class="material-icons md-48">star</i></a>
                                 </li>
                                 <li>
-                                    <a id="advancedMode" class="tooltipped" data-position="bottom"><i id="advIconText"
+                                    <a id="advancedMode" class="tooltipped" data-position="bottom" role="button"
+                                        tabindex="0"><i id="advIconText"
                                             class="material-icons md-48">star_border</i></a>
                                 </li>
                                 <li>
-                                    <a id="languageSelectIcon" class="tooltipped dropdown-trigger" data-position="bottom"
-                                        data-activates="languagedropdown" data-tooltip="Select Language"><i
-                                            class="material-icons md-48">translate</i></a>
+                                    <a id="languageSelectIcon" class="tooltipped dropdown-trigger" role="button"
+                                        tabindex="0" data-position="bottom" data-activates="languagedropdown"
+                                        data-tooltip="Select Language"><i class="material-icons md-48">translate</i></a>
                                 </li>
                             </ul>
                         </div>
@@ -439,49 +497,56 @@
                 </nav>
 
                 <ul id="saveddropdownbeg" class="dropdown-content">
-                    <li><a id="save-html-beg"></a></li>
-                    <li><a id="save-png-beg"></a></li>
+                    <li><a id="save-html-beg" role="button" tabindex="0"></a></li>
+                    <li><a id="save-png-beg" role="button" tabindex="0"></a></li>
                 </ul>
 
                 <ul id="saveddropdown" class="dropdown-content">
-                    <li><a id="save-html"></a></li>
-                    <li><a id="save-midi"></a></li>
-                    <li><a id="save-svg"></a></li>
-                    <li><a id="save-png"></a></li>
-                    <li><a id="save-wav"></a></li>
-                    <li><a id="save-abc"> </a></li>
-                    <li><a id="save-ly"></a></li>
-                    <li><a id="save-mxml"></a></li>
-                    <li><a id="save-blockartwork-svg"></a></li>
-                    <li><a id="save-blockartwork-png"></a></li>
+                    <li><a id="save-html" role="button" tabindex="0"></a></li>
+                    <li><a id="save-midi" role="button" tabindex="0"></a></li>
+                    <li><a id="save-svg" role="button" tabindex="0"></a></li>
+                    <li><a id="save-png" role="button" tabindex="0"></a></li>
+                    <li><a id="save-wav" role="button" tabindex="0"></a></li>
+                    <li><a id="save-abc" role="button" tabindex="0"> </a></li>
+                    <li><a id="save-ly" role="button" tabindex="0"></a></li>
+                    <li><a id="save-mxml" role="button" tabindex="0"></a></li>
+                    <li><a id="save-blockartwork-svg" role="button" tabindex="0"></a></li>
+                    <li><a id="save-blockartwork-png" role="button" tabindex="0"></a></li>
+                </ul>
+
+                <ul id="recorddropdown" class="dropdown-content">
+                    <li><a id="record-with-menus" role="button" tabindex="0">Record canvas and toolbars</a></li>
+                    <li><a id="record-canvas-only" role="button" tabindex="0">Record canvas only</a></li>
                 </ul>
 
                 <ul id="languagedropdown" class="dropdown-content">
-                    <li><a id="enUS"></a></li>
-                    <li><a id="enUK"></a></li>
-                    <li><a id="es"></a></li>
-                    <li><a id="pt"></a></li>
-                    <li><a id="ja"></a></li>
-                    <li><a id="kana"></a></li>
-                    <li><a id="ko"></a></li>
-                    <li><a id="zhCN"></a></li>
-                    <li><a id="th"></a></li>
-                    <li><a id="tr"></a></li>
-                    <li><a id="ayc"></a></li>
-                    <li><a id="quz"></a></li>
-                    <li><a id="gug"></a></li>
-                    <li><a id="hi"></a></li>
-                    <li><a id="te"></a></li>
-                    <li><a id="ibo"></a></li>
-                    <li><a id="ar"></a></li>
-                    <li><a id="he"></a></li>
-                    <li><a id="ur"></a></li>
+                    <li><a id="enUS" role="button" tabindex="0"></a></li>
+                    <li><a id="enUK" role="button" tabindex="0"></a></li>
+                    <li><a id="es" role="button" tabindex="0"></a></li>
+                    <li><a id="pt" role="button" tabindex="0"></a></li>
+                    <li><a id="ja" role="button" tabindex="0"></a></li>
+                    <li><a id="kana" role="button" tabindex="0"></a></li>
+                    <li><a id="ko" role="button" tabindex="0"></a></li>
+                    <li><a id="zhCN" role="button" tabindex="0"></a></li>
+                    <li><a id="th" role="button" tabindex="0"></a></li>
+                    <li><a id="tr" role="button" tabindex="0"></a></li>
+                    <li><a id="ayc" role="button" tabindex="0"></a></li>
+                    <li><a id="quz" role="button" tabindex="0"></a></li>
+                    <li><a id="gug" role="button" tabindex="0"></a></li>
+                    <li><a id="hi" role="button" tabindex="0"></a></li>
+                    <li><a id="te" role="button" tabindex="0"></a></li>
+                    <li><a id="ibo" role="button" tabindex="0"></a></li>
+                    <li><a id="ar" role="button" tabindex="0"></a></li>
+                    <li><a id="bn" role="button" tabindex="0"></a></li>
+                    <li><a id="he" role="button" tabindex="0"></a></li>
+                    <li><a id="ur" role="button" tabindex="0"></a></li>
+
                 </ul>
 
                 <ul style="display: none;" id="themedropdown" class="dropdown-content">
-                    <li><a id="light" class="tooltipped" data-tooltip="Light Mode"><i
+                    <li><a id="light" class="tooltipped" data-tooltip="Light Mode" role="button" tabindex="0"><i
                                 class='material-icons'>brightness_7</i></a></li>
-                    <li><a id="dark" class="tooltipped" data-tooltip="Dark Mode"><i
+                    <li><a id="dark" class="tooltipped" data-tooltip="Dark Mode" role="button" tabindex="0"><i
                                 class='material-icons'>brightness_4</i></a>
                     </li>
                 </ul>
@@ -502,33 +567,63 @@
 
     <!-- Initialize Scripts -->
     <script>
-    let canvas, stage;
-function init() {
-    canvas = document.getElementById("canvas");
-    stage = new createjs.Stage(canvas);
+        let canvas, stage;
+        function init() {
+            // Defensive check: ensure createjs is loaded before using it
+            if (typeof createjs === "undefined") {
+                // Retry after a short delay if createjs isn't ready yet
+                setTimeout(init, 50);
+                return;
+            }
 
-    createjs.Ticker.framerate = 60;
-    createjs.Ticker.addEventListener("tick", stage);
-}
-document.addEventListener("DOMContentLoaded", init);
+            canvas = document.getElementById("canvas");
+            stage = new createjs.Stage(canvas);
+
+            createjs.Ticker.framerate = 60;
+            // createjs.Ticker.addEventListener("tick", stage); // Managed by Activity class
+        }
+        document.addEventListener("DOMContentLoaded", init);
     </script>
 
     <script>
+        // Register service worker only in production (not on localhost)
         if ("serviceWorker" in navigator) {
-            if (navigator.serviceWorker.controller) {
-                console.debug(
-                    "[PWA Builder] active service worker found, no need to register"
-                );
+
+            // Localhost SW is disabled to avoid caching; set allowLocalPwa to test installs.
+            const allowLocalPwa = localStorage.getItem("allowLocalPwa") === "true";
+
+            // Detect if running on localhost for development
+            const runtimeEnv = window.MB_ENV
+            const isDevMode = runtimeEnv !== "production";
+
+            if (!isDevMode || allowLocalPwa) {
+                // Production: Register service worker for offline mode
+                if (navigator.serviceWorker.controller) {
+                    console.debug(
+                        "[PWA Builder] Active service worker found, no need to register"
+                    );
+                } else {
+                    // Register the service worker
+                    navigator.serviceWorker
+                        .register("/sw.js")
+                        .then(function (reg) {
+                            console.debug(
+                                "[PWA Builder] Service worker registered for scope: " +
+                                reg.scope
+                            );
+                        })
+                        .catch(function (err) {
+                            console.error("[PWA Builder] Service worker registration failed:", err);
+                        });
+                }
             } else {
-                // Register the service worker
-                navigator.serviceWorker
-                    .register("/sw.js")
-                    .then(function (reg) {
-                        console.debug(
-                            "[PWA Builder] Service worker has been registered for scope: " +
-                            reg.scope
-                        );
-                    });
+                // Development: Skip service worker for instant updates
+                console.log(
+                    "🔥 [DEV MODE] Service worker disabled for instant code updates"
+                );
+                console.log(
+                    "Set localStorage.allowLocalPwa = 'true' to enable PWA install testing on localhost."
+                );
             }
         }
     </script>
@@ -539,14 +634,36 @@ document.addEventListener("DOMContentLoaded", init);
             event.preventDefault(); // Prevent automatic browser prompt
             deferredPrompt = event;
 
-            // Show your install button here
-            const divInstall = document.getElementById("installButton");
-            if (divInstall) {
-                divInstall.classList.remove("hidden");
+            // Show the install button
+            const installButton = document.getElementById("installButton");
+            if (installButton) {
+                installButton.classList.remove("hidden");
+            }
+        });
+
+        // Handle install button click
+        document.addEventListener("DOMContentLoaded", function () {
+            const installButton = document.getElementById("installButton");
+            if (installButton) {
+                installButton.addEventListener("click", async function () {
+                    if (deferredPrompt) {
+                        // Show the install prompt
+                        deferredPrompt.prompt();
+
+                        // Wait for user choice
+                        const { outcome } = await deferredPrompt.userChoice;
+                        console.log(`User response to the install prompt: ${outcome}`);
+
+                        // Clear the deferredPrompt
+                        deferredPrompt = null;
+
+                        // Hide the button
+                        installButton.classList.add("hidden");
+                    }
+                });
             }
         });
     </script>
-    
 
     <!-- Loading Dialog Script -->
     <script>
@@ -568,8 +685,8 @@ document.addEventListener("DOMContentLoaded", init);
                 }
 
                 const container = document.getElementById("loading-media");
-                const content = lang.startsWith("ja")                    
-                ? `<img src="loading-animation-ja.svg" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
+                const content = lang.startsWith("ja")
+                    ? `<img src="loading-animation-ja.png" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
                     : `<video loop autoplay muted playsinline fetchpriority="high" style="width: 90%; height: 100%; object-fit: contain;">
                         <source src="loading-animation.webm" type="video/webm">
                         <source src="loading-animation.mp4" type="video/mp4">
@@ -589,6 +706,22 @@ document.addEventListener("DOMContentLoaded", init);
                     index = (index + 1) % texts.length;
                 }, 1500);
             }, 3000);
+
+            const languageDropdown = document.getElementById("languagedropdown");
+            if (languageDropdown) {
+            const langLinks = languageDropdown.querySelectorAll("a");
+            langLinks.forEach(link => {
+            link.addEventListener("click", function (e) {
+                e.preventDefault(); // prevent default <a> behavior
+                const selectedLang = this.id; // ID corresponds to language code
+                const currentLang = localStorage.getItem("languagePreference");
+                if (currentLang !== selectedLang) {
+                    localStorage.setItem("languagePreference", selectedLang);
+                    location.reload(); // automatically reload
+                }
+            });
+        });
+    }
         });
 
     </script>
@@ -673,13 +806,12 @@ document.addEventListener("DOMContentLoaded", init);
 
     <script>
         var elem = document.documentElement;
+
         function openFullscreen() {
             if (elem.requestFullscreen) {
                 elem.requestFullscreen();
-                // For safari browser
             } else if (elem.webkitRequestFullscreen) {
                 elem.webkitRequestFullscreen();
-                // For IE(supported above 10)
             } else if (elem.msRequestFullscreen) {
                 elem.msRequestFullscreen();
             } else if (elem.mozRequestFullscreen) {
@@ -690,42 +822,61 @@ document.addEventListener("DOMContentLoaded", init);
         function closeFullscreen() {
             if (document.exitFullscreen) {
                 document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) { /* Safari */
+            } else if (document.webkitExitFullscreen) {
                 document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) { /* IE11 */
+            } else if (document.msExitFullscreen) {
                 document.msExitFullscreen();
-            } else if (document.mozExitFullscreen) { /* IE11 */
+            } else if (document.mozExitFullscreen) {
                 document.mozExitFullscreen();
             }
         }
-        var count = 0;
+
         function setIcon() {
-            var property = document.getElementById(FullScreen);
             var iconCode = document.querySelector('#FullScrIcon');
-            //Calling full Screen
-            if (count == 0) {
+            // Determine fullscreen state using the browser fullscreen API
+            // instead of relying on a manual counter. This keeps the icon
+            // in sync when fullscreen is exited via ESC or browser controls.
+            var isFullscreen =
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
+
+            if (!isFullscreen) {
                 openFullscreen();
-                iconCode.textContent = '\ue5d1';
-                count = 1;
-            }
-            //Closing full Screen
-            else {
+                iconCode.textContent = '\ue5d1'; // fullscreen_exit icon
+            } else {
                 closeFullscreen();
-                iconCode.textContent = '\ue5d0';
-                count = 0;
+                iconCode.textContent = '\ue5d0'; // fullscreen icon
             }
         }
+
+        function handleFullscreenChange() {
+            var iconCode = document.querySelector('#FullScrIcon');
+            // Update fullscreen icon based on actual fullscreen state.
+            // This removes the need for a separate state variable and
+            // prevents incorrect icon state when fullscreen is toggled
+            // outside the button (e.g., ESC key).
+            var isFullscreen =
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
+
+            iconCode.textContent = isFullscreen ? '\ue5d1' : '\ue5d0';
+        }
+
         document.addEventListener('fullscreenchange', handleFullscreenChange);
         document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
         document.addEventListener('mozfullscreenchange', handleFullscreenChange);
         document.addEventListener('MSFullscreenChange', handleFullscreenChange);
-
-        function handleFullscreenChange() {
-            var iconCode = document.querySelector('#FullScrIcon');
-            count = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement ? 1 : 0;
-            iconCode.textContent = count ? '\ue5d1' : '\ue5d0';
-        }
     </script>
+
+    <style>
+        #installButton.hidden {
+            display: none !important;
+        }
+    </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -772,19 +923,6 @@ document.addEventListener("DOMContentLoaded", init);
                     body.classList.add("play-only");
                     showPersistentNotification();
 
-                    if (buttonContainer) {
-                        buttonContainer.style.display = "flex";
-                        buttonContainer.style.justifyContent = "flex-end";
-                        buttonContainer.style.alignItems = "center";
-                    }
-                    if (homeButton) {
-                        homeButton.style.display = "flex";
-                        homeButton.style.position = "fixed";
-                        homeButton.style.right = "15px";
-                        homeButton.style.bottom = "15px";
-                        homeButton.style.zIndex = "10000";
-                    }
-
                     // Hide certain elements
                     hideElementById("Show/hide blocks");
                     hideElementById("Expand/collapse blocks");
@@ -796,9 +934,6 @@ document.addEventListener("DOMContentLoaded", init);
                     // Disable play-only mode
                     body.classList.remove("play-only");
                     removePersistentNotification();
-
-                    if (homeButton) homeButton.style = "";
-                    if (buttonContainer) buttonContainer.style = "";
 
                     showElementById("Show/hide blocks");
                     showElementById("Expand/collapse blocks");
@@ -814,7 +949,39 @@ document.addEventListener("DOMContentLoaded", init);
             window.addEventListener("resize", togglePlayOnlyMode);
         });
 
-    </script>
+    (function () {
+        function setAppHeight() {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+
+        window.addEventListener('resize', setAppHeight);
+        document.addEventListener('fullscreenchange', setAppHeight);
+        setAppHeight();
+    })();
+
+(function () {
+  function resizeCanvasesToScreen() {
+    const canvases = document.querySelectorAll("canvas");
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    canvases.forEach(c => {
+      c.width = width;
+      c.height = height;
+      c.style.width = "100%";
+      c.style.height = "100%";
+    });
+  }
+
+  window.addEventListener("resize", resizeCanvasesToScreen);
+  document.addEventListener("fullscreenchange", resizeCanvasesToScreen);
+
+  setTimeout(resizeCanvasesToScreen, 150);
+})();
+
+</script>
+
 
 </body>
 

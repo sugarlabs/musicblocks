@@ -34,6 +34,7 @@ Object.assign(global, {
     nthDegreeToPitch: musicUtils.nthDegreeToPitch,
     keySignatureToMode: musicUtils.keySignatureToMode,
     frequencyToPitch: musicUtils.frequencyToPitch,
+    pitchToFrequency: musicUtils.pitchToFrequency,
     numberToPitch: musicUtils.numberToPitch,
     isCustomTemperament: musicUtils.isCustomTemperament,
     ACCIDENTALNAMES: musicUtils.ACCIDENTALNAMES,
@@ -106,6 +107,7 @@ describe("Tests for Singer.PitchActions setup", () => {
             }
         };
         setupPitchActions(activity);
+        Singer.processPitch.mockImplementation(() => {});
     });
 
     test("playPitch → always calls processPitch", () => {
@@ -225,29 +227,88 @@ describe("Tests for Singer.PitchActions setup", () => {
         });
     });
 
-    test("Tests for playHertz", () => {
+    test("Tests for playHertz (symbolic/440Hz)", () => {
+        turtle.singer.notePitches = { 1: [] };
+        turtle.singer.noteOctaves = { 1: [] };
+        turtle.singer.noteCents = { 1: [] };
         turtle.singer.inNoteBlock = [1];
         activity.logo.runningLilypond = true;
+
+        // Mock processPitch to simulate adding a symbolic note (0 cents)
+        Singer.processPitch.mockImplementation(() => {
+            turtle.singer.notePitches[1].push("A");
+            turtle.singer.noteOctaves[1].push(4);
+            turtle.singer.noteCents[1].push(0);
+        });
+
         jest.spyOn(activity.logo.notation, "notationMarkup");
         Singer.PitchActions.playHertz(440, 0, blkId);
-        expect(activity.logo.notation.notationMarkup).toHaveBeenCalled();
+
+        // Should NOT call markup for symbolic note
+        expect(activity.logo.notation.notationMarkup).not.toHaveBeenCalled();
     });
 
-    test("playHertz notationMarkup occurs only when both inNoteBlock AND runningLilypond", () => {
-        const spyMark = jest.spyOn(activity.logo.notation, "notationMarkup");
+    test("Tests for playHertz (microtonal/445Hz)", () => {
+        turtle.singer.notePitches = { 1: [] };
+        turtle.singer.noteOctaves = { 1: [] };
+        turtle.singer.noteCents = { 1: [] };
         turtle.singer.inNoteBlock = [1];
         activity.logo.runningLilypond = true;
-        Singer.PitchActions.playHertz(440, 0, blkId);
-        expect(spyMark).toHaveBeenCalledWith(0, 440);
+
+        // Mock processPitch to simulate adding a microtonal note (e.g. 20 cents)
+        Singer.processPitch.mockImplementation(() => {
+            turtle.singer.notePitches[1].push("A");
+            turtle.singer.noteOctaves[1].push(4);
+            turtle.singer.noteCents[1].push(20);
+        });
+
+        const spyMark = jest.spyOn(activity.logo.notation, "notationMarkup");
+        Singer.PitchActions.playHertz(445, 0, blkId);
+
+        // Should call markup for microtonal note
+        // transformedHertz calculated from A4 + 20 cents
+        expect(spyMark).toHaveBeenCalled();
+    });
+
+    test("playHertz notationMarkup occurs only when both inNoteBlock AND runningLilypond AND microtonal", () => {
+        const spyMark = jest.spyOn(activity.logo.notation, "notationMarkup");
+        turtle.singer.inNoteBlock = [1];
+        turtle.singer.notePitches = { 1: [] };
+        turtle.singer.noteOctaves = { 1: [] };
+        turtle.singer.noteCents = { 1: [] };
+
+        // Microtonal setup
+        Singer.processPitch.mockImplementation(() => {
+            turtle.singer.notePitches[1].push("A");
+            turtle.singer.noteOctaves[1].push(4);
+            turtle.singer.noteCents[1].push(50);
+        });
+
+        activity.logo.runningLilypond = true;
+        Singer.PitchActions.playHertz(440, 0, blkId); // 440 input doesn't matter, mock storage dictates 50 cents
+        expect(spyMark).toHaveBeenCalled(); // Called because cents=50
+
         spyMark.mockClear();
+        // Reset storage for next case
+        turtle.singer.notePitches[1] = [];
+        turtle.singer.noteOctaves[1] = [];
+        turtle.singer.noteCents[1] = [];
+
         activity.logo.runningLilypond = false;
         Singer.PitchActions.playHertz(440, 0, blkId);
         expect(spyMark).not.toHaveBeenCalled();
+
         spyMark.mockClear();
-        turtle.singer.inNoteBlock = [];
+        // Reset storage
+        turtle.singer.notePitches[1] = [];
+        turtle.singer.noteOctaves[1] = [];
+        turtle.singer.noteCents[1] = [];
+
+        turtle.singer.inNoteBlock = []; // No note block
         activity.logo.runningLilypond = true;
         Singer.PitchActions.playHertz(440, 0, blkId);
         expect(spyMark).not.toHaveBeenCalled();
+
         spyMark.mockRestore();
     });
 
