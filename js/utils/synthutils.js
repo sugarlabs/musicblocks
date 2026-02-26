@@ -3528,3 +3528,59 @@ function Synth() {
 
     return this;
 }
+
+if (typeof module !== "undefined") {
+    const synthInstance = new Synth();
+    Object.defineProperty(Synth, "samples", {
+        get: () => synthInstance.samples,
+        set: val => (synthInstance.samples = val)
+    });
+
+    Object.defineProperty(Synth, "tone", {
+        get: () => synthInstance.tone,
+        set: val => (synthInstance.tone = val)
+    });
+    module.exports = {
+        Synth,
+        synthInstance,
+        // expose bound instance methods
+        loadSamples: synthInstance.loadSamples.bind(synthInstance),
+        _loadSample: synthInstance._loadSample.bind(synthInstance),
+        createDefaultSynth: synthInstance.createDefaultSynth.bind(synthInstance),
+        _createBuiltinSynth: synthInstance._createBuiltinSynth.bind(synthInstance),
+        _createCustomSynth: synthInstance._createCustomSynth.bind(synthInstance),
+        _createSampleSynth: synthInstance._createSampleSynth.bind(synthInstance),
+        __createSynth: synthInstance.__createSynth.bind(synthInstance),
+        createSynth: synthInstance.createSynth.bind(synthInstance),
+        loadSynth: synthInstance.loadSynth.bind(synthInstance),
+        temperamentChanged: synthInstance.temperamentChanged.bind(synthInstance),
+        whichTemperament: synthInstance.whichTemperament.bind(synthInstance),
+        resume: synthInstance.resume.bind(synthInstance),
+        rampTo: synthInstance.rampTo.bind(synthInstance),
+        setVolume: synthInstance.setVolume.bind(synthInstance),
+        getVolume: synthInstance.getVolume.bind(synthInstance),
+        setMasterVolume: synthInstance.setMasterVolume.bind(synthInstance),
+        startSound: synthInstance.startSound.bind(synthInstance),
+        stopSound: synthInstance.stopSound.bind(synthInstance),
+        trigger: synthInstance.trigger.bind(synthInstance),
+        loop: synthInstance.loop.bind(synthInstance),
+        start: synthInstance.start.bind(synthInstance),
+        stop: synthInstance.stop.bind(synthInstance),
+        getFrequency: synthInstance.getFrequency.bind(synthInstance),
+        _getFrequency: synthInstance._getFrequency.bind(synthInstance),
+        getCustomFrequency: synthInstance.getCustomFrequency.bind(synthInstance),
+        getDefaultParamValues: synthInstance.getDefaultParamValues.bind(synthInstance),
+        _parseSampleCenterNo: synthInstance._parseSampleCenterNo.bind(synthInstance),
+        getTunerFrequency: synthInstance.getTunerFrequency.bind(synthInstance),
+        stopTuner: synthInstance.stopTuner.bind(synthInstance),
+        newTone: synthInstance.newTone.bind(synthInstance),
+        preloadProjectSamples: synthInstance.preloadProjectSamples.bind(synthInstance),
+        setupRecorder: synthInstance.setupRecorder?.bind(synthInstance),
+
+        // expose shared state
+        instruments,
+        instrumentsSource,
+        CUSTOMSAMPLES,
+        DEFAULTSYNTHVOLUME
+    };
+}
