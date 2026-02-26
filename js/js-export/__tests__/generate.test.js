@@ -267,6 +267,7 @@ describe("JSGenerate Class", () => {
                 "background: greenyellow; color: midnightblue; font-weight: bold"
             );
         });
+    });
     test("should set generateFailed when astring.generate throws", () => {
         JSGenerate.actionTrees = [];
         JSGenerate.startTrees = [[["start", null, null]]];
