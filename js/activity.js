@@ -7513,7 +7513,6 @@ class Activity {
             this.toolbar.renderJavaScriptIcon(toggleJSWindow);
             this.toolbar.renderLanguageSelectIcon(this.languageBox);
             this.toolbar.renderWrapIcon();
-
             initPalettes(this.palettes);
 
             if (this.planet !== undefined) {
@@ -7524,7 +7523,7 @@ class Activity {
 
             window.saveLocally = this.saveLocally;
 
-            initBasicProtoBlocks(this);
+            initCoreProtoBlocks(this);
 
             // Load any macros saved in local storage.
             // this.storage.macros = null;
@@ -7540,6 +7539,15 @@ class Activity {
                     this,
                     processPluginData(this, this.pluginData, "localStorage:plugins")
                 );
+            }
+            if ("requestIdleCallback" in window) {
+                requestIdleCallback(() => {
+                    initAdvancedProtoBlocks(this);
+                });
+            } else {
+                setTimeout(() => {
+                    initAdvancedProtoBlocks(this);
+                }, 100);
             }
 
             // Load custom mode saved in local storage.
@@ -8191,7 +8199,8 @@ class Activity {
 
             // Reinitialize blocks
             if (this.blocks) {
-                initBasicProtoBlocks(this);
+                initCoreProtoBlocks(this);
+                initAdvancedProtoBlocks(this);
             }
 
             // Restore palette positions
