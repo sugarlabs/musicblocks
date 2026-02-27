@@ -17,7 +17,7 @@
         platformColor
 */
 /* exported SVG */
-
+const __svgCache = new Map();
 class SVG {
     // Interface to the graphical representation of blocks, turtles,
     // palettes, etc. on screen.
@@ -965,6 +965,37 @@ class SVG {
 
         this.margins[2] = 0;
         this.margins[3] = 0;
+        const cacheKey =
+            "bb|" +
+            this._scale +
+            "|" +
+            this._expandX +
+            "|" +
+            this._expandY +
+            "|" +
+            (this._expandY2 || 0) +
+            "|" +
+            this._innies.join("") +
+            "|" +
+            (this._slot ? 1 : 0) +
+            "|" +
+            (this._tab ? 1 : 0) +
+            "|" +
+            (this._outie ? 1 : 0) +
+            "|" +
+            (this._bool ? 1 : 0) +
+            "|" +
+            (this._porch ? 1 : 0) +
+            "|" +
+            (this._tail ? 1 : 0);
+
+        if (__svgCache.has(cacheKey)) {
+            const cached = __svgCache.get(cacheKey);
+            this.docks = cached.docks.map(d => [...d]);
+            this._width = cached.width;
+            this._height = cached.height;
+            return cached.svg;
+        }
 
         let svg = this._newPath(x, y);
         svg += this._corner(1, -1, 90, 0, 1, true, true, false);
@@ -1074,7 +1105,14 @@ class SVG {
         }
 
         svg += this._footer();
-        return this._header(false) + svg;
+        const finalSvg = this._header(false) + svg;
+        __svgCache.set(cacheKey, {
+            svg: finalSvg,
+            docks: JSON.parse(JSON.stringify(this.docks)),
+            width: this._width,
+            height: this._height
+        });
+        return finalSvg;
     }
 
     /**
@@ -1302,6 +1340,27 @@ class SVG {
         const xoffset = this._strokeWidth / 2.0;
 
         const yoff = this._radius * 2;
+        const cacheKey =
+            "boolcmp|" +
+            this._scale +
+            "|" +
+            this._expandX +
+            "|" +
+            this._expandY +
+            "|" +
+            (this._expandY2 || 0) +
+            "|" +
+            this._innies.join("") +
+            "|" +
+            (this._porch ? 1 : 0);
+
+        if (__svgCache.has(cacheKey)) {
+            const cached = __svgCache.get(cacheKey);
+            this.docks = cached.docks.map(d => [...d]);
+            this._width = cached.width;
+            this._height = cached.height;
+            return cached.svg;
+        }
         let svg = '<g transform="matrix(1,0,0,1,0,-' + yoff + ')"> ';
 
         svg += this._newPath(xoffset, yoffset + this._radius);
@@ -1368,7 +1427,14 @@ class SVG {
         );
 
         svg += this._footer();
-        return this._header(false) + svg;
+        const finalSvg = this._header(false) + svg;
+        __svgCache.set(cacheKey, {
+            svg: finalSvg,
+            docks: JSON.parse(JSON.stringify(this.docks)),
+            width: this._width,
+            height: this._height
+        });
+        return finalSvg;
     }
 
     /**
@@ -1399,6 +1465,41 @@ class SVG {
         this.margins[1] = (this._strokeWidth + 0.5) * this._scale;
         this.margins[2] = 0;
         this.margins[3] = 0;
+        const cacheKey =
+            "bc|" +
+            this._scale +
+            "|" +
+            this._expandX +
+            "|" +
+            this._expandY +
+            "|" +
+            (this._expandY2 || 0) +
+            "|" +
+            this._innies.join("") +
+            "|" +
+            (this._slot ? 1 : 0) +
+            "|" +
+            (this._tab ? 1 : 0) +
+            "|" +
+            (this._outie ? 1 : 0) +
+            "|" +
+            (this._bool ? 1 : 0) +
+            "|" +
+            this._clampCount +
+            "|" +
+            JSON.stringify(this._clampSlots) +
+            "|" +
+            (this._tail ? 1 : 0) +
+            "|" +
+            (this._cap ? 1 : 0);
+
+        if (__svgCache.has(cacheKey)) {
+            const cached = __svgCache.get(cacheKey);
+            this.docks = cached.docks.map(d => [...d]);
+            this._width = cached.width;
+            this._height = cached.height;
+            return cached.svg;
+        }
 
         let svg = this._newPath(x, y);
         svg += this._corner(1, -1, 90, 0, 1, true, true, false);
@@ -1575,7 +1676,14 @@ class SVG {
         }
 
         svg += this._footer();
-        return this._header(false) + svg;
+        const finalSvg = this._header(false) + svg;
+        __svgCache.set(cacheKey, {
+            svg: finalSvg,
+            docks: JSON.parse(JSON.stringify(this.docks)),
+            width: this._width,
+            height: this._height
+        });
+        return finalSvg;
     }
 
     /**
@@ -1597,6 +1705,37 @@ class SVG {
         this.margins[1] = (this._strokeWidth + 0.5) * this._scale;
         this.margins[2] = 0;
         this.margins[3] = 0;
+        const cacheKey =
+            "ac|" +
+            this._scale +
+            "|" +
+            this._expandX +
+            "|" +
+            this._expandY +
+            "|" +
+            (this._expandY2 || 0) +
+            "|" +
+            this._innies.join("") +
+            "|" +
+            (this._slot ? 1 : 0) +
+            "|" +
+            (this._tab ? 1 : 0) +
+            "|" +
+            (this._outie ? 1 : 0) +
+            "|" +
+            (this._bool ? 1 : 0) +
+            "|" +
+            JSON.stringify(this._clampSlots) +
+            "|" +
+            (this._tail ? 1 : 0);
+
+        if (__svgCache.has(cacheKey)) {
+            const cached = __svgCache.get(cacheKey);
+            this.docks = cached.docks.map(d => [...d]);
+            this._width = cached.width;
+            this._height = cached.height;
+            return cached.svg;
+        }
 
         let svg = this._newPath(x, y);
         svg += this._corner(1, -1, 90, 0, 1, true, true, false);
@@ -1692,7 +1831,14 @@ class SVG {
         );
 
         svg += this._footer();
-        return this._header(false) + svg;
+        const finalSvg = this._header(false) + svg;
+        __svgCache.set(cacheKey, {
+            svg: finalSvg,
+            docks: JSON.parse(JSON.stringify(this.docks)),
+            width: this._width,
+            height: this._height
+        });
+        return finalSvg;
     }
 
     /**
