@@ -1,0 +1,703 @@
+﻿
+> musicblocks@3.4.1 test
+> jest turtles.test.js
+
+npm : FAIL js/__tests
+__/turtles.test.js
+At line:1 char:1
++ npm test -- 
+turtles.test.js 2>&1 
+| Out-File -FilePath 
+test-errors.txt ...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (FAIL js   
+ /__tests__/turtl    
+es.test.js:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+  Turtles Class
+    ΓêÜ should 
+initialize properly 
+(22 ms)
+    ΓêÜ should call 
+initActions on 
+construction (3 ms)
+    ΓêÜ should add a 
+turtle properly (5 
+ms)
+    ΓêÜ should 
+toggle running state 
+correctly (2 ms)
+  markAllAsStopped
+    ΓêÜ should set 
+running to false for 
+all turtles (2 ms)
+    ΓêÜ should call 
+refreshCanvas after 
+stopping all turtles 
+(1 ms)
+    ΓêÜ should 
+handle empty turtle 
+list (1 ms)
+    ΓêÜ should stop 
+turtles that are 
+already stopped 
+without error (1 ms)
+  Coordinate 
+Conversion
+    screenX2turtleX
+      ΓêÜ should 
+convert screen 
+center X to turtle X 
+of 0 (1 ms)
+      ΓêÜ should 
+convert screen X 0 
+to negative turtle X
+      ΓêÜ should 
+convert screen X at 
+right edge to 
+positive turtle X (1 
+ms)
+      ΓêÜ should 
+account for scale 
+factor (1 ms)
+    screenY2turtleY
+      ΓêÜ should 
+convert screen 
+center Y to turtle Y 
+of 0
+      ΓêÜ should 
+convert screen Y 0 
+to positive turtle Y 
+(inverted)
+      ΓêÜ should 
+convert screen Y at 
+bottom to negative 
+turtle Y (1 ms)
+      ΓêÜ should 
+account for scale 
+factor (1 ms)
+    turtleX2screenX
+      ΓêÜ should 
+convert turtle X of 
+0 to screen center X
+      ΓêÜ should 
+convert positive 
+turtle X to screen X 
+right of center
+      ΓêÜ should 
+convert negative 
+turtle X to screen X 
+left of center (1 ms)
+      ΓêÜ should 
+account for scale 
+factor (1 ms)
+    turtleY2screenY
+      ΓêÜ should 
+convert turtle Y of 
+0 to screen center Y
+      ΓêÜ should 
+convert positive 
+turtle Y to screen Y 
+above center
+      ΓêÜ should 
+convert negative 
+turtle Y to screen Y 
+below center (1 ms)
+    round-trip 
+conversion
+      ΓêÜ screenX -> 
+turtleX -> screenX 
+should return 
+original value (1 ms)
+      ΓêÜ screenY -> 
+turtleY -> screenY 
+should return 
+original value (1 ms)
+      ΓêÜ round-trip 
+should work with 
+non-default scale
+  setBackgroundColor
+    ├ù should set 
+default background 
+color when index is 
+-1 (2 ms)
+    ├ù should set 
+background color 
+from turtle painter 
+when index is valid 
+(2 ms)
+    ├ù should update 
+DOM body background 
+color (2 ms)
+    ├ù should update 
+canvas background 
+color (1 ms)
+  doScale
+    ├ù should update 
+scale, width, and 
+height when not 
+locked (1 ms)
+    ├ù should queue 
+values when locked 
+(1 ms)
+    ├ù should not 
+change scale when 
+locked (2 ms)
+  setStageScale
+    ΓêÜ should set 
+scaleX and scaleY on 
+the stage (1 ms)
+    ΓêÜ should call 
+refreshCanvas after 
+setting scale (1 ms)
+
+  ΓùÅ 
+setBackgroundColor 
+ΓÇ║ should set 
+default background 
+color when index is 
+-1
+
+    TypeError: 
+Cannot read 
+properties of 
+undefined (reading 
+'removeAllChildren')
+
+    [0m [90m 863 
+|[39m
+     [90m 864 
+|[39m         
+[90m// Remove any 
+old background 
+containers[39m
+    [31m[1m>[22m[
+39m[90m 865 |[39m  
+       borderContaine
+r[33m.[39mremoveAll
+Children()[33m;[39m
+     [90m     
+|[39m               
+          
+[31m[1m^[22m[39m
+     [90m 866 |[39m
+     [90m 867 
+|[39m         
+[36mconst[39m 
+turtlesStage 
+[33m=[39m [36mthis
+[39m[33m.[39mstage
+[33m;[39m
+     [90m 868 
+|[39m         
+[90m// We put the 
+buttons on the stage 
+so they will be on 
+top[39m[0m
+
+      at Turtles.remo
+veAllChildren [as 
+makeBackground] (js/t
+urtles.js:865:25)
+      at Turtles.make
+Background [as 
+setBackgroundColor] (
+js/turtles.js:764:14)
+      at Object.setBa
+ckgroundColor (js/__t
+ests__/turtles.test.j
+s:400:17)
+
+  ΓùÅ 
+setBackgroundColor 
+ΓÇ║ should set 
+background color 
+from turtle painter 
+when index is valid
+
+    TypeError: 
+Cannot read 
+properties of 
+undefined (reading 
+'removeAllChildren')
+
+    [0m [90m 863 
+|[39m
+     [90m 864 
+|[39m         
+[90m// Remove any 
+old background 
+containers[39m
+    [31m[1m>[22m[
+39m[90m 865 |[39m  
+       borderContaine
+r[33m.[39mremoveAll
+Children()[33m;[39m
+     [90m     
+|[39m               
+          
+[31m[1m^[22m[39m
+     [90m 866 |[39m
+     [90m 867 
+|[39m         
+[36mconst[39m 
+turtlesStage 
+[33m=[39m [36mthis
+[39m[33m.[39mstage
+[33m;[39m
+     [90m 868 
+|[39m         
+[90m// We put the 
+buttons on the stage 
+so they will be on 
+top[39m[0m
+
+      at Turtles.remo
+veAllChildren [as 
+makeBackground] (js/t
+urtles.js:865:25)
+      at Turtles.make
+Background [as 
+setBackgroundColor] (
+js/turtles.js:764:14)
+      at Object.setBa
+ckgroundColor (js/__t
+ests__/turtles.test.j
+s:414:17)
+
+  ΓùÅ 
+setBackgroundColor 
+ΓÇ║ should update 
+DOM body background 
+color
+
+    TypeError: 
+Cannot read 
+properties of 
+undefined (reading 
+'removeAllChildren')
+
+    [0m [90m 863 
+|[39m
+     [90m 864 
+|[39m         
+[90m// Remove any 
+old background 
+containers[39m
+    [31m[1m>[22m[
+39m[90m 865 |[39m  
+       borderContaine
+r[33m.[39mremoveAll
+Children()[33m;[39m
+     [90m     
+|[39m               
+          
+[31m[1m^[22m[39m
+     [90m 866 |[39m
+     [90m 867 
+|[39m         
+[36mconst[39m 
+turtlesStage 
+[33m=[39m [36mthis
+[39m[33m.[39mstage
+[33m;[39m
+     [90m 868 
+|[39m         
+[90m// We put the 
+buttons on the stage 
+so they will be on 
+top[39m[0m
+
+      at Turtles.remo
+veAllChildren [as 
+makeBackground] (js/t
+urtles.js:865:25)
+      at Turtles.make
+Background [as 
+setBackgroundColor] (
+js/turtles.js:764:14)
+      at Object.setBa
+ckgroundColor (js/__t
+ests__/turtles.test.j
+s:421:17)
+
+  ΓùÅ 
+setBackgroundColor 
+ΓÇ║ should update 
+canvas background 
+color
+
+    TypeError: 
+Cannot read 
+properties of 
+undefined (reading 
+'removeAllChildren')
+
+    [0m [90m 863 
+|[39m
+     [90m 864 
+|[39m         
+[90m// Remove any 
+old background 
+containers[39m
+    [31m[1m>[22m[
+39m[90m 865 |[39m  
+       borderContaine
+r[33m.[39mremoveAll
+Children()[33m;[39m
+     [90m     
+|[39m               
+          
+[31m[1m^[22m[39m
+     [90m 866 |[39m
+     [90m 867 
+|[39m         
+[36mconst[39m 
+turtlesStage 
+[33m=[39m [36mthis
+[39m[33m.[39mstage
+[33m;[39m
+     [90m 868 
+|[39m         
+[90m// We put the 
+buttons on the stage 
+so they will be on 
+top[39m[0m
+
+      at Turtles.remo
+veAllChildren [as 
+makeBackground] (js/t
+urtles.js:865:25)
+      at Turtles.make
+Background [as 
+setBackgroundColor] (
+js/turtles.js:764:14)
+      at Object.setBa
+ckgroundColor (js/__t
+ests__/turtles.test.j
+s:429:17)
+
+  ΓùÅ doScale ΓÇ║ 
+should update scale, 
+width, and height 
+when not locked
+
+    TypeError: 
+Cannot read 
+properties of 
+undefined (reading 
+'removeAllChildren')
+
+    [0m [90m 863 
+|[39m
+     [90m 864 
+|[39m         
+[90m// Remove any 
+old background 
+containers[39m
+    [31m[1m>[22m[
+39m[90m 865 |[39m  
+       borderContaine
+r[33m.[39mremoveAll
+Children()[33m;[39m
+     [90m     
+|[39m               
+          
+[31m[1m^[22m[39m
+     [90m 866 |[39m
+     [90m 867 
+|[39m         
+[36mconst[39m 
+turtlesStage 
+[33m=[39m [36mthis
+[39m[33m.[39mstage
+[33m;[39m
+     [90m 868 
+|[39m         
+[90m// We put the 
+buttons on the stage 
+so they will be on 
+top[39m[0m
+
+      at Turtles.remo
+veAllChildren [as 
+makeBackground] (js/t
+urtles.js:865:25)
+      at Turtles.make
+Background [as 
+doScale] (js/turtles.
+js:736:14)
+      at 
+Object.doScale (js/__
+tests__/turtles.test.
+js:465:17)
+
+  ΓùÅ doScale ΓÇ║ 
+should queue values 
+when locked
+
+    TypeError: 
+Cannot read 
+properties of 
+undefined (reading 
+'removeAllChildren')
+
+    [0m [90m 863 
+|[39m
+     [90m 864 
+|[39m         
+[90m// Remove any 
+old background 
+containers[39m
+    [31m[1m>[22m[
+39m[90m 865 |[39m  
+       borderContaine
+r[33m.[39mremoveAll
+Children()[33m;[39m
+     [90m     
+|[39m               
+          
+[31m[1m^[22m[39m
+     [90m 866 |[39m
+     [90m 867 
+|[39m         
+[36mconst[39m 
+turtlesStage 
+[33m=[39m [36mthis
+[39m[33m.[39mstage
+[33m;[39m
+     [90m 868 
+|[39m         
+[90m// We put the 
+buttons on the stage 
+so they will be on 
+top[39m[0m
+
+      at Turtles.remo
+veAllChildren [as 
+makeBackground] (js/t
+urtles.js:865:25)
+      at Turtles.make
+Background [as 
+doScale] (js/turtles.
+js:736:14)
+      at 
+Object.doScale (js/__
+tests__/turtles.test.
+js:474:17)
+
+  ΓùÅ doScale ΓÇ║ 
+should not change 
+scale when locked
+
+    TypeError: 
+Cannot read 
+properties of 
+undefined (reading 
+'removeAllChildren')
+
+    [0m [90m 863 
+|[39m
+     [90m 864 
+|[39m         
+[90m// Remove any 
+old background 
+containers[39m
+    [31m[1m>[22m[
+39m[90m 865 |[39m  
+       borderContaine
+r[33m.[39mremoveAll
+Children()[33m;[39m
+     [90m     
+|[39m               
+          
+[31m[1m^[22m[39m
+     [90m 866 |[39m
+     [90m 867 
+|[39m         
+[36mconst[39m 
+turtlesStage 
+[33m=[39m [36mthis
+[39m[33m.[39mstage
+[33m;[39m
+     [90m 868 
+|[39m         
+[90m// We put the 
+buttons on the stage 
+so they will be on 
+top[39m[0m
+
+      at Turtles.remo
+veAllChildren [as 
+makeBackground] (js/t
+urtles.js:865:25)
+      at Turtles.make
+Background [as 
+doScale] (js/turtles.
+js:736:14)
+      at 
+Object.doScale (js/__
+tests__/turtles.test.
+js:482:17)
+
+
+=============================== Coverage summary ===============================
+Statements   : 0.14% ( 74/50151 )
+Branches     : 0.11% ( 24/20206 )
+Functions    : 0.35% ( 17/4782 )
+Lines        : 0.14% ( 72/48511 )
+================================================================================
+------------------------------|---------|----------|---------|---------|----------------------------------------------------------------------------------------------------------------------------
+File                          | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                                                                          
+------------------------------|---------|----------|---------|---------|----------------------------------------------------------------------------------------------------------------------------
+All files                     |    0.14 |     0.11 |    0.35 |    0.14 |                                                                                                                            
+ js                           |    0.35 |     0.27 |    0.96 |    0.35 |                                                                                                                            
+  LogoDependencies.js         |       0 |        0 |       0 |       0 | 79-207                                                                                                                     
+  SaveInterface.js            |       0 |        0 |       0 |       0 | 35-908                                                                                                                     
+  abc.js                      |       0 |        0 |       0 |       0 | 23-431                                                                                                                     
+  activity.js                 |       0 |        0 |       0 |       0 | 50-8044                                                                                                                    
+  artwork.js                  |       0 |        0 |       0 |       0 | 63-804                                                                                                                     
+  background.js               |       0 |        0 |       0 |       0 | 16-38                                                                                                                      
+  base64Utils.js              |       0 |        0 |       0 |       0 | 31-50                                                                                                                      
+  basicblocks.js              |       0 |        0 |       0 |       0 | 40-121                                                                                                                     
+  block.js                    |       0 |        0 |       0 |       0 | 82-4645                                                                                                                    
+  blockfactory.js             |       0 |        0 |       0 |       0 | 40-1818                                                                                                                    
+  blocks.js                   |       0 |        0 |       0 |       0 | 60-7201                                                                                                                    
+  boundary.js                 |       0 |        0 |       0 |       0 | 28-125                                                                                                                     
+  gif-animator.js             |       0 |        0 |       0 |       0 | 30-251                                                                                                                     
+  languagebox.js              |       0 |        0 |       0 |       0 | 25-287                                                                                                                     
+  lilypond.js                 |       0 |        0 |       0 |       0 | 41-999                                                                                                                     
+  loader.js                   |       0 |        0 |       0 |       0 | 14-348                                                                                                                     
+  logo.js                     |       0 |        0 |       0 |       0 | 52-2542                                                                                                                    
+  logoconstants.js            |       0 |        0 |     100 |       0 | 18-85                                                                                                                      
+  macros.js                   |       0 |        0 |       0 |       0 | 50-1762                                                                                                                    
+  midi.js                     |       0 |        0 |       0 |       0 | 16-452                                                                                                                     
+  mxml.js                     |       0 |        0 |       0 |       0 | 15-263                                                                                                                     
+  notation.js                 |       0 |        0 |       0 |       0 | 48-506                                                                                                                     
+  p5-adapter.js               |       0 |        0 |       0 |       0 | 2-27                                                                                                                       
+  p5-sound-adapter.js         |       0 |        0 |       0 |       0 | 2-55                                                                                                                       
+  palette.js                  |       0 |        0 |       0 |       0 | 28-1632                                                                                                                    
+  pastebox.js                 |       0 |        0 |       0 |       0 | 13-159                                                                                                                     
+  piemenus.js                 |       0 |        0 |       0 |       0 | 64-4313                                                                                                                    
+  planetInterface.js          |       0 |        0 |       0 |       0 | 30-335                                                                                                                     
+  protoblocks.js              |       0 |        0 |       0 |       0 | 40-2103                                                                                                                    
+  rubrics.js                  |       0 |        0 |       0 |       0 | 41-884                                                                                                                     
+  themebox.js                 |       0 |        0 |       0 |       0 | 20-284                                                                                                                     
+  toolbar.js                  |       0 |        0 |       0 |       0 | 19-1909                                                                                                                    
+  trash.js                    |       0 |        0 |       0 |       0 | 22-274                                                                                                                     
+  turtle-painter.js           |       0 |        0 |       0 |       0 | 38-1563                                                                                                                    
+  turtle-singer.js            |       0 |        0 |       0 |       0 | 70-2550                                                                                                                    
+  turtle.js                   |       0 |        0 |       0 |       0 | 56-987                                                                                                                     
+  turtledefs.js               |       0 |        0 |       0 |       0 | 38-809                                                                                                                     
+  turtles.js                  |   15.41 |    15.68 |    19.1 |   15.25 | 86-89,134,138,142-144,159-178,184,190,195-204,209-218,248-263,277,298-364,381-617,637-702,743-751,765-775,837-845,867-1313 
+ js/blocks                    |       0 |        0 |       0 |       0 |                                                                                                                            
+  ActionBlocks.js             |       0 |        0 |       0 |       0 | 38-1559                                                                                                                    
+  BooleanBlocks.js            |       0 |        0 |       0 |       0 | 30-1054                                                                                                                    
+  BoxesBlocks.js              |       0 |        0 |       0 |       0 | 32-858                                                                                                                     
+  DictBlocks.js               |       0 |        0 |       0 |       0 | 30-460                                                                                                                     
+  DrumBlocks.js               |       0 |        0 |       0 |       0 | 32-612                                                                                                                     
+  EnsembleBlocks.js           |       0 |        0 |       0 |       0 | 30-1361                                                                                                                    
+  ExtrasBlocks.js             |       0 |        0 |       0 |       0 | 33-917                                                                                                                     
+  FlowBlocks.js               |       0 |        0 |       0 |       0 | 32-1263                                                                                                                    
+  GraphicsBlocks.js           |       0 |        0 |       0 |       0 | 46-1291                                                                                                                    
+  HeapBlocks.js               |       0 |        0 |       0 |       0 | 31-737                                                                                                                     
+  IntervalsBlocks.js          |       0 |        0 |       0 |       0 | 45-1544                                                                                                                    
+  MediaBlocks.js              |       0 |        0 |       0 |       0 | 35-1089                                                                                                                    
+  MeterBlocks.js              |       0 |        0 |       0 |       0 | 34-1446                                                                                                                    
+  NumberBlocks.js             |       0 |        0 |       0 |       0 | 25-1008                                                                                                                    
+  OrnamentBlocks.js           |       0 |        0 |       0 |       0 | 32-747                                                                                                                     
+  PenBlocks.js                |       0 |        0 |       0 |       0 | 30-1241                                                                                                                    
+  PitchBlocks.js              |       0 |        0 |       0 |       0 | 31-2153                                                                                                                    
+  ProgramBlocks.js            |       0 |        0 |       0 |       0 | 30-1499                                                                                                                    
+  RhythmBlockPaletteBlocks.js |       0 |        0 |       0 |       0 | 22-1048                                                                                                                    
+  RhythmBlocks.js             |       0 |        0 |       0 |       0 | 33-1256                                                                                                                    
+  SensorsBlocks.js            |       0 |        0 |       0 |       0 | 32-1035                                                                                                                    
+  ToneBlocks.js               |       0 |        0 |       0 |       0 | 34-1177                                                                                                                    
+  VolumeBlocks.js             |       0 |        0 |       0 |       0 | 35-955                                                                                                                     
+  WidgetBlocks.js             |       0 |        0 |       0 |       0 | 86-1918                                                                                                                    
+ js/js-export                 |       0 |        0 |       0 |       0 |                                                                                                                            
+  ASTutils.js                 |       0 |        0 |       0 |       0 | 36-769                                                                                                                     
+  ast2blocklist.js            |       0 |        0 |       0 |       0 | 33-715                                                                                                                     
+  constraints.js              |       0 |        0 |     100 |       0 | 23-1195                                                                                                                    
+  export.js                   |       0 |        0 |       0 |       0 | 29-450                                                                                                                     
+  generate.js                 |       0 |        0 |       0 |       0 | 36-386                                                                                                                     
+  interface.js                |       0 |        0 |       0 |       0 | 33-1811                                                                                                                    
+  minify.js                   |       0 |      100 |     100 |       0 | 1-7                                                                                                                        
+ js/js-export/API             |       0 |        0 |       0 |       0 |                                                                                                                            
+  DictBlocksAPI.js            |       0 |        0 |       0 |       0 | 31-58                                                                                                                      
+  DrumBlocksAPI.js            |       0 |        0 |       0 |       0 | 31-58                                                                                                                      
+  GraphicsBlocksAPI.js        |       0 |        0 |       0 |       0 | 31-93                                                                                                                      
+  IntervalsBlocksAPI.js       |       0 |        0 |       0 |       0 | 31-65                                                                                                                      
+  MeterBlocksAPI.js           |       0 |        0 |       0 |       0 | 31-81                                                                                                                      
+  OrnamentBlocksAPI.js        |       0 |        0 |       0 |       0 | 31-55                                                                                                                      
+  PenBlocksAPI.js             |       0 |        0 |       0 |       0 | 31-108                                                                                                                     
+  PitchBlocksAPI.js           |       0 |        0 |       0 |       0 | 37-186                                                                                                                     
+  RhythmBlocksAPI.js          |       0 |        0 |       0 |       0 | 37-120                                                                                                                     
+  ToneBlocksAPI.js            |       0 |        0 |       0 |       0 | 37-136                                                                                                                     
+  VolumeBlocksAPI.js          |       0 |        0 |       0 |       0 | 31-65                                                                                                                      
+ js/js-export/samples         |       0 |      100 |     100 |       0 |                                                                                                                            
+  sample.js                   |       0 |      100 |     100 |       0 | 19-299                                                                                                                     
+ js/turtleactions             |       0 |        0 |       0 |       0 |                                                                                                                            
+  DictActions.js              |       0 |        0 |       0 |       0 | 52-267                                                                                                                     
+  DrumActions.js              |       0 |        0 |       0 |       0 | 52-234                                                                                                                     
+  IntervalsActions.js         |       0 |        0 |       0 |       0 | 49-476                                                                                                                     
+  MeterActions.js             |       0 |        0 |       0 |       0 | 54-387                                                                                                                     
+  OrnamentActions.js          |       0 |        0 |       0 |       0 | 36-133                                                                                                                     
+  PitchActions.js             |       0 |        0 |       0 |       0 | 58-681                                                                                                                     
+  RhythmActions.js            |       0 |        0 |       0 |       0 | 40-472                                                                                                                     
+  ToneActions.js              |       0 |        0 |       0 |       0 | 47-490                                                                                                                     
+  VolumeActions.js            |       0 |        0 |       0 |       0 | 49-314                                                                                                                     
+ js/utils                     |       0 |        0 |       0 |       0 |                                                                                                                            
+  mathutils.js                |       0 |        0 |       0 |       0 | 59-330                                                                                                                     
+  munsell.js                  |       0 |        0 |       0 |       0 | 31-6862                                                                                                                    
+  musicutils.js               |       0 |        0 |       0 |       0 | 67-6235                                                                                                                    
+  platformstyle.js            |       0 |        0 |       0 |       0 | 22-392                                                                                                                     
+  synthutils.js               |       0 |        0 |       0 |       0 | 55-3518                                                                                                                    
+  utils.js                    |       0 |        0 |       0 |       0 | 52-1771                                                                                                                    
+ js/utils/__tests__           |       0 |      100 |       0 |       0 |                                                                                                                            
+  tonemock.js                 |       0 |      100 |       0 |       0 | 22-210                                                                                                                     
+ js/widgets                   |       0 |        0 |       0 |       0 |                                                                                                                            
+  PhraseMakerUtils.js         |       0 |        0 |       0 |       0 | 17-99                                                                                                                      
+  aidebugger.js               |       0 |        0 |       0 |       0 | 20-1208                                                                                                                    
+  aiwidget.js                 |       0 |        0 |       0 |       0 | 26-1251                                                                                                                    
+  arpeggio.js                 |       0 |        0 |       0 |       0 | 33-821                                                                                                                     
+  help.js                     |       0 |        0 |       0 |       0 | 32-663                                                                                                                     
+  jseditor.js                 |       0 |        0 |       0 |       0 | 34-1171                                                                                                                    
+  legobricks.js               |       0 |        0 |       0 |       0 | 16-3066                                                                                                                    
+  meterwidget.js              |       0 |        0 |       0 |       0 | 61-663                                                                                                                     
+  modewidget.js               |       0 |        0 |       0 |       0 | 32-1196                                                                                                                    
+  musickeyboard.js            |       0 |        0 |       0 |       0 | 49-3502                                                                                                                    
+  oscilloscope.js             |       0 |        0 |       0 |       0 | 41-256                                                                                                                     
+  phrasemaker.js              |       0 |        0 |       0 |       0 | 51-5521                                                                                                                    
+  pitchdrummatrix.js          |       0 |        0 |       0 |       0 | 51-1066                                                                                                                    
+  pitchslider.js              |       0 |        0 |       0 |       0 | 26-228                                                                                                                     
+  pitchstaircase.js           |       0 |        0 |       0 |       0 | 33-687                                                                                                                     
+  reflection.js               |       0 |        0 |       0 |       0 | 20-712                                                                                                                     
+  rhythmruler.js              |       0 |        0 |       0 |       0 | 67-2771                                                                                                                    
+  sampler.js                  |       0 |        0 |       0 |       0 | 27-2386                                                                                                                    
+  statistics.js               |       0 |        0 |       0 |       0 | 27-102                                                                                                                     
+  status.js                   |       0 |        0 |       0 |       0 | 20-348                                                                                                                     
+  temperament.js              |       0 |        0 |       0 |       0 | 38-2332                                                                                                                    
+  tempo.js                    |       0 |        0 |       0 |       0 | 30-442                                                                                                                     
+  timbre.js                   |       0 |        0 |       0 |       0 | 40-2588                                                                                                                    
+  tuner.js                    |       0 |        0 |       0 |       0 | 6-215                                                                                                                      
+  widgetWindows.js            |       0 |        0 |       0 |       0 | 20-716                                                                                                                     
+------------------------------|---------|----------|---------|---------|----------------------------------------------------------------------------------------------------------------------------
+Test Suites: 1 
+failed, 1 total
+Tests:       7 
+failed, 28 passed, 
+35 total
+Snapshots:   0 total
+Time:        16.169 s
+Ran all test suites 
+matching 
+/turtles.test.js/i.
