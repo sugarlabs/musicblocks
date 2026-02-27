@@ -100,7 +100,23 @@ body.highcontrast {
 
 /* Improve block icon visibility in dark mode */
 .dark .trash-item-icon {
-    background-color: rgba(255, 255, 255, 0.855);
-    border-radius: 3px;
-    padding: 2px;
+  background-color: rgba(255, 255, 255, 0.855);
+  border-radius: 3px;
+  padding: 2px;
+}
+
+/* Window table colors for dark mode */
+.dark .windowFrame td {
+  background-color: #022363 !important;
+  color: #eeeeee !important;
+}
+
+.dark .windowFrame td.headcol {
+  background-color: #363636 !important;
+  color: #ffffff !important;
+}
+
+/* Ensure bold text in cells is also light colored */
+.dark .windowFrame td b {
+  color: #ffffff !important;
 }
