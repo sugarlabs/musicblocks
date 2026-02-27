@@ -1562,6 +1562,13 @@ function Synth() {
             }
         } else if (sourceName in BUILTIN_SYNTHS) {
             if (instruments[turtle] && instruments[turtle][instrumentName]) {
+                if (typeof instruments[turtle][instrumentName].dispose === "function") {
+                    try {
+                        instruments[turtle][instrumentName].dispose();
+                    } catch (e) {
+                        console.debug("Error disposing instrument:", e);
+                    }
+                }
                 delete instruments[turtle][instrumentName];
             }
 
@@ -1575,6 +1582,13 @@ function Synth() {
             }
         } else if (sourceName in CUSTOM_SYNTHS) {
             if (instruments[turtle] && instruments[turtle][instrumentName]) {
+                if (typeof instruments[turtle][instrumentName].dispose === "function") {
+                    try {
+                        instruments[turtle][instrumentName].dispose();
+                    } catch (e) {
+                        console.debug("Error disposing instrument:", e);
+                    }
+                }
                 delete instruments[turtle][instrumentName];
             }
 
@@ -1585,6 +1599,13 @@ function Synth() {
             instrumentsSource[instrumentName] = [0, "poly"];
         } else if (sourceName in CUSTOMSAMPLES) {
             if (instruments[turtle] && instruments[turtle][instrumentName]) {
+                if (typeof instruments[turtle][instrumentName].dispose === "function") {
+                    try {
+                        instruments[turtle][instrumentName].dispose();
+                    } catch (e) {
+                        console.debug("Error disposing instrument:", e);
+                    }
+                }
                 delete instruments[turtle][instrumentName];
             }
 
@@ -3507,6 +3528,68 @@ function Synth() {
         this.sliderVisible = false;
         this.centsSliderBtn.getElementsByTagName("img")[0].style.filter = "";
         this.centsSliderBtn.style.backgroundColor = "";
+    };
+
+    /**
+     * Disposes all Tone.js instruments, filters, and effects for every turtle
+     * to free audio memory (decoded AudioBuffers, Web Audio nodes, etc.).
+     * Instruments will be re-created by prepSynths() on the next run.
+     * @function
+     * @memberof Synth
+     * @returns {void}
+     */
+    this.disposeAllInstruments = () => {
+        for (const turtle in instruments) {
+            for (const instrumentName in instruments[turtle]) {
+                if (
+                    instruments[turtle][instrumentName] &&
+                    typeof instruments[turtle][instrumentName].dispose === "function"
+                ) {
+                    try {
+                        instruments[turtle][instrumentName].dispose();
+                    } catch (e) {
+                        console.debug("Error disposing instrument:", e);
+                    }
+                }
+                delete instruments[turtle][instrumentName];
+            }
+        }
+
+        for (const turtle in instrumentsFilters) {
+            for (const instrumentName in instrumentsFilters[turtle]) {
+                const filters = instrumentsFilters[turtle][instrumentName];
+                if (Array.isArray(filters)) {
+                    filters.forEach(f => {
+                        if (f && typeof f.dispose === "function") {
+                            try {
+                                f.dispose();
+                            } catch (e) {
+                                console.debug("Error disposing filter:", e);
+                            }
+                        }
+                    });
+                }
+                delete instrumentsFilters[turtle][instrumentName];
+            }
+        }
+
+        for (const turtle in instrumentsEffects) {
+            for (const instrumentName in instrumentsEffects[turtle]) {
+                const effects = instrumentsEffects[turtle][instrumentName];
+                if (Array.isArray(effects)) {
+                    effects.forEach(fx => {
+                        if (fx && typeof fx.dispose === "function") {
+                            try {
+                                fx.dispose();
+                            } catch (e) {
+                                console.debug("Error disposing effect:", e);
+                            }
+                        }
+                    });
+                }
+                delete instrumentsEffects[turtle][instrumentName];
+            }
+        }
     };
 
     this.tone = null;
