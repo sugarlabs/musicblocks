@@ -708,20 +708,20 @@ class Singer {
      * @returns {void}
      */
     static setMasterVolume(logo, volume, blk) {
-    const activity = logo.activity;
-    volume = Math.min(Math.max(volume, 0), 100);
-    if (blk) {
-        const firstConnection = activity.blocks.blockList[blk].connections[0];
-        const lastConnection = last(activity.blocks.blockList[blk].connections);
-        logo.synth.setMasterVolume(volume, firstConnection, lastConnection);
-    } else {
-        logo.synth.setMasterVolume(volume);
-    }
-    for (const turtle of activity.turtles.turtleList) {
-        for (const synth in turtle.singer.synthVolume) {
-            turtle.singer.synthVolume[synth].push(volume);
+        const activity = logo.activity;
+        volume = Math.min(Math.max(volume, 0), 100);
+        if (blk) {
+            const firstConnection = activity.blocks.blockList[blk].connections[0];
+            const lastConnection = last(activity.blocks.blockList[blk].connections);
+            logo.synth.setMasterVolume(volume, firstConnection, lastConnection);
+        } else {
+            logo.synth.setMasterVolume(volume);
         }
-    }
+        for (const turtle of activity.turtles.turtleList) {
+            for (const synth in turtle.singer.synthVolume) {
+                turtle.singer.synthVolume[synth].push(volume);
+            }
+        }
 }
 
     /**

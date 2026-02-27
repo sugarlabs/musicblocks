@@ -54,6 +54,13 @@ const createActivityMock = turtleMock => ({
         ithTurtle: jest.fn().mockReturnValue(turtleMock),
         turtleList: [turtleMock]
     },
+    blocks: {
+        blockList: {
+            mockBlk: {
+                connections: [0, 0]
+            }
+        }
+    },
     logo: {
         synth: {
             setMasterVolume: jest.fn(),
@@ -66,12 +73,7 @@ const createActivityMock = turtleMock => ({
         stopTurtle: false,
         inPitchDrumMatrix: false,
         inMatrix: false,
-        clearNoteParams: jest.fn(),
-        blockList: {
-            mockBlk: {
-                connections: [0, 0]
-            }
-        }
+        clearNoteParams: jest.fn()
     }
 });
 
