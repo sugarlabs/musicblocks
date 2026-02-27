@@ -80,11 +80,7 @@ function createMockWidgetWindow() {
     };
 }
 
-// Load the Oscilloscope class by reading the source and wrapping it
-// so the class is assigned to global (class declarations are block-scoped)
-const fs = require("fs");
-const path = require("path");
-const oscilloscopeSource = fs.readFileSync(path.resolve(__dirname, "../oscilloscope.js"), "utf-8");
+const Oscilloscope = require("../oscilloscope.js");
 
 let mockWidgetWindow;
 
@@ -95,10 +91,6 @@ window.widgetWindows = {
     _posCache: {},
     windowFor: jest.fn(() => mockWidgetWindow)
 };
-
-// Wrap source: execute the class definition and assign to global
-const wrappedSource = oscilloscopeSource + "\nglobal.Oscilloscope = Oscilloscope;\n";
-new Function(wrappedSource)();
 
 beforeEach(() => {
     mockWidgetWindow = createMockWidgetWindow();
