@@ -199,11 +199,28 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
         });
     }
 
-    function initializeI18next() {
+    function resolveInitialLanguage() {
+        try {
+            const savedLanguage = window.localStorage && window.localStorage.languagePreference;
+            if (savedLanguage) {
+                return savedLanguage.startsWith("ja") ? "ja" : savedLanguage;
+            }
+        } catch (e) {
+            // Continue with navigator fallback when storage is unavailable.
+        }
+
+        const browserLanguage = (window.navigator && window.navigator.language) || "en";
+        const normalized = browserLanguage.includes("-")
+            ? browserLanguage.slice(0, browserLanguage.indexOf("-"))
+            : browserLanguage;
+        return normalized || "en";
+    }
+
+    function initializeI18next(lang) {
         return new Promise(resolve => {
             i18next.use(i18nextHttpBackend).init(
                 {
-                    lng: "en",
+                    lng: lang,
                     fallbackLng: "en",
                     keySeparator: false,
                     nsSeparator: false,
@@ -227,19 +244,12 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
 
     async function main() {
         try {
-            await initializeI18next();
+            const lang = resolveInitialLanguage();
+            await initializeI18next(lang);
 
             if (typeof M !== "undefined" && M.AutoInit) {
                 M.AutoInit();
             }
-
-            const lang = "en";
-            i18next.changeLanguage(lang, function (err) {
-                if (err) {
-                    console.error("Error changing language:", err);
-                }
-                updateContent();
-            });
 
             if (document.readyState === "loading") {
                 document.addEventListener("DOMContentLoaded", updateContent);
