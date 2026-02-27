@@ -1,3 +1,6 @@
+// Legacy gulpfile (non-functional)
+// Retained for reference only — use gulpfile.mjs instead.
+
 /*
   global
 
