@@ -5797,7 +5797,38 @@ class Blocks {
             const blockOffset = this.blockList.length;
             const firstBlock = this.blockList.length;
 
-            for (let b = 0; b < this._loadCounter; b++) {
+            /**
+             * Chunked block-loading: yield to the main thread every ~50ms
+             * so the browser can paint and remain interactive during
+             * large-project loads.  Each chunk processes CHUNK_SIZE blocks
+             * synchronously, then schedules the next chunk via setTimeout(0).
+             */
+            const CHUNK_SIZE = 20;
+            const totalBlocks = this._loadCounter;
+            let bIndex = 0;
+
+            const processChunk = () => {
+                const chunkEnd = Math.min(bIndex + CHUNK_SIZE, totalBlocks);
+                for (let b = bIndex; b < chunkEnd; b++) {
+                    this._processOneBlock(b, blockObjs, blockOffset, firstBlock);
+                }
+                bIndex = chunkEnd;
+                if (bIndex < totalBlocks) {
+                    setTimeout(processChunk, 0);
+                }
+            };
+
+            processChunk();
+        };
+
+        /**
+         * Processes a single block object during load.  Extracted from
+         * the former monolithic for-loop inside loadNewBlocks so the
+         * loop can be chunked across frames.
+         * @private
+         */
+        this._processOneBlock = (b, blockObjs, blockOffset, firstBlock) => {
+            {
                 const thisBlock = blockOffset + b;
                 const blkData = blockObjs[b];
                 let blkInfo;

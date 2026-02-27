@@ -239,18 +239,20 @@ function AIWidget() {
         return blocks;
     }
 
-    //function to search index for particular type of block mainly used to find nammeddo block in repeat block
+    // Fast index lookup — builds a one-time Map for O(1) repeated searches
+    // on the same array, with a transparent fallback to linear scan.
+    const _indexMaps = new WeakMap();
     function searchIndexForMusicBlock(array, x) {
-        // Iterate over each sub-array in the main array
-        for (let i = 0; i < array.length; i++) {
-            // Check if the 0th element of the sub-array matches x
-            if (array[i][0] === x) {
-                // Return the index if a match is found
-                return i;
+        let map = _indexMaps.get(array);
+        if (!map) {
+            map = new Map();
+            for (let i = 0; i < array.length; i++) {
+                map.set(array[i][0], i);
             }
+            _indexMaps.set(array, map);
         }
-        // Return -1 if no match is found
-        return -1;
+        const idx = map.get(x);
+        return idx !== undefined ? idx : -1;
     }
 
     this._parseABC = async function (tune) {
@@ -277,8 +279,10 @@ function AIWidget() {
         });
         for (const lineId in organizeBlock) {
             organizeBlock[lineId].arrangedBlocks?.forEach(staff => {
-                if (!staffBlocksMap.hasOwnProperty(lineId)) {
-                    staffBlocksMap[lineId] = {
+                // Cache the entry for this lineId to avoid repeated property lookups
+                let entry = staffBlocksMap[lineId];
+                if (!entry) {
+                    entry = {
                         meterNum: staff?.meter?.value[0]?.num || 4,
                         meterDen: staff?.meter?.value[0]?.den || 4,
                         keySignature: staff.key,
@@ -376,6 +380,7 @@ function AIWidget() {
 
                     //for adding above 17 blocks above
                     blockId = blockId + 17;
+                    staffBlocksMap[lineId] = entry;
                 }
 
                 const actionBlock = [];
@@ -398,7 +403,7 @@ function AIWidget() {
                                 staff.key,
                                 actionBlock,
                                 tripletFinder,
-                                staffBlocksMap[lineId].meterDen
+                                entry.meterDen
                             );
                             if (element?.endTriplet !== null && element?.endTriplet !== undefined) {
                                 tripletFinder = null;
@@ -431,14 +436,10 @@ function AIWidget() {
                     actionBlock[actionBlock.length - 1][4][1] = null;
 
                     //update the namedo block if not first nameddo block appear
-                    if (staffBlocksMap[lineId].baseBlocks.length != 0) {
-                        staffBlocksMap[lineId].baseBlocks[
-                            staffBlocksMap[lineId].baseBlocks.length - 1
-                        ][0][
-                            staffBlocksMap[lineId].baseBlocks[
-                                staffBlocksMap[lineId].baseBlocks.length - 1
-                            ][0].length - 4
-                        ][4][1] = blockId;
+                    const baseBlocks = entry.baseBlocks;
+                    if (baseBlocks.length != 0) {
+                        const lastBase = baseBlocks[baseBlocks.length - 1];
+                        lastBase[0][lastBase[0].length - 4][4][1] = blockId;
                     }
                     //add the nameddo action text and hidden block for each line
                     actionBlock.push(
@@ -448,21 +449,17 @@ function AIWidget() {
                                 "nameddo",
                                 {
                                     value: `V: ${parseInt(lineId) + 1} Line ${
-                                        staffBlocksMap[lineId]?.baseBlocks?.length + 1
+                                        baseBlocks.length + 1
                                     }`
                                 }
                             ],
                             0,
                             0,
                             [
-                                staffBlocksMap[lineId].baseBlocks.length === 0
+                                baseBlocks.length === 0
                                     ? null
-                                    : staffBlocksMap[lineId].baseBlocks[
-                                          staffBlocksMap[lineId].baseBlocks.length - 1
-                                      ][0][
-                                          staffBlocksMap[lineId].baseBlocks[
-                                              staffBlocksMap[lineId].baseBlocks.length - 1
-                                          ][0].length - 4
+                                    : baseBlocks[baseBlocks.length - 1][0][
+                                          baseBlocks[baseBlocks.length - 1][0].length - 4
                                       ][0],
                                 null
                             ]
@@ -480,7 +477,7 @@ function AIWidget() {
                                 "text",
                                 {
                                     value: `V: ${parseInt(lineId) + 1} Line ${
-                                        staffBlocksMap[lineId]?.baseBlocks?.length + 1
+                                        baseBlocks.length + 1
                                     }`
                                 }
                             ],
@@ -491,20 +488,20 @@ function AIWidget() {
                         [blockId + 3, "hidden", 0, 0, [blockId + 1, actionBlock[0][0]]]
                     ); // blockid of topaction block
 
-                    if (!staffBlocksMap[lineId].nameddoArray) {
-                        staffBlocksMap[lineId].nameddoArray = {};
+                    if (!entry.nameddoArray) {
+                        entry.nameddoArray = {};
                     }
 
                     // Ensure the array at nameddoArray[lineId] is initialized if it doesn't exist
-                    if (!staffBlocksMap[lineId].nameddoArray[lineId]) {
-                        staffBlocksMap[lineId].nameddoArray[lineId] = [];
+                    if (!entry.nameddoArray[lineId]) {
+                        entry.nameddoArray[lineId] = [];
                     }
 
-                    staffBlocksMap[lineId].nameddoArray[lineId].push(blockId);
+                    entry.nameddoArray[lineId].push(blockId);
                     blockId = blockId + 4;
 
                     musicBlocksJSON.push(actionBlock);
-                    staffBlocksMap[lineId].baseBlocks.push([actionBlock]);
+                    baseBlocks.push([actionBlock]);
                 });
             });
         }
@@ -873,6 +870,21 @@ function AIWidget() {
      * Plays the reference pitch based on the current sample's pitch, accidental, and octave.
      * @returns {void}
      */
+    // Reuse a single AudioContext across plays to avoid the browser limit
+    // on the number of AudioContexts that can be created.
+    let _sharedAudioContext = null;
+    function _getAudioContext() {
+        window.AudioContext =
+            window.AudioContext ||
+            window.webkitAudioContext ||
+            navigator.mozAudioContext ||
+            navigator.msAudioContext;
+        if (!_sharedAudioContext || _sharedAudioContext.state === "closed") {
+            _sharedAudioContext = new window.AudioContext();
+        }
+        return _sharedAudioContext;
+    }
+
     this._playABCSong = function () {
         const abc = abcNotationSong;
         const stopAudioButton = document.querySelector(".stop-audio");
@@ -882,16 +894,7 @@ function AIWidget() {
         })[0];
 
         if (ABCJS.synth.supportsAudio()) {
-            // An audio context is needed - this can be passed in for two reasons:
-            // 1) So that you can share this audio context with other elements on your page.
-            // 2) So that you can create it during a user interaction so that the browser doesn't block the sound.
-            // Setting this is optional - if you don't set an audioContext, then abcjs will create one.
-            window.AudioContext =
-                window.AudioContext ||
-                window.webkitAudioContext ||
-                navigator.mozAudioContext ||
-                navigator.msAudioContext;
-            const audioContext = new window.AudioContext();
+            const audioContext = _getAudioContext();
             audioContext.resume().then(function () {
                 // In theory the AC shouldn't start suspended because it is being initialized in a click handler, but iOS seems to anyway.
 
@@ -1028,9 +1031,10 @@ function AIWidget() {
     this._scale = function () {
         let width, height;
         const canvas = document.getElementsByClassName("samplerCanvas");
-        Array.prototype.forEach.call(canvas, ele => {
-            this.widgetWindow.getWidgetBody().removeChild(ele);
-        });
+        const body = this.widgetWindow.getWidgetBody();
+        for (let i = canvas.length - 1; i >= 0; i--) {
+            body.removeChild(canvas[i]);
+        }
         if (!this.widgetWindow.isMaximized()) {
             width = SAMPLEWIDTH;
             height = SAMPLEHEIGHT;
@@ -1051,52 +1055,55 @@ function AIWidget() {
      * @returns {void}
      */
     this.makeCanvas = function (width, height) {
+        // Build the entire widget DOM off-screen in a DocumentFragment,
+        // then append once to avoid multiple reflows.
+        const fragment = document.createDocumentFragment();
+
         // Create a container to center the elements
         const container = document.createElement("div");
-
-        this.widgetWindow.getWidgetBody().appendChild(container);
+        fragment.appendChild(container);
 
         // Create a scrollable container for the textarea
         const scrollContainer = document.createElement("div");
-        scrollContainer.style.overflowY = "auto"; // Enable vertical scrolling
-        scrollContainer.style.height = height + "px"; // Set the height of the scroll container
-        scrollContainer.style.border = "1px solid #ccc"; // Optional: Add a border for visibility
-        scrollContainer.style.marginBottom = "8px";
-        scrollContainer.style.marginLeft = "8px";
-        scrollContainer.style.display = "flex"; // Use flexbox for centering
-        scrollContainer.style.flexDirection = "column"; // Stack elements vertically
-        scrollContainer.style.alignItems = "center"; // Center items horizontally
+        scrollContainer.style.cssText =
+            "overflow-y:auto;" +
+            "height:" +
+            height +
+            "px;" +
+            "border:1px solid #ccc;" +
+            "margin-bottom:8px;" +
+            "margin-left:8px;" +
+            "display:flex;" +
+            "flex-direction:column;" +
+            "align-items:center";
         container.appendChild(scrollContainer);
 
         // Create the textarea element
         const textarea = document.createElement("textarea");
-        textarea.style.height = height + "px"; // Keep the height for the scrollable area
-        textarea.style.width = width + "px";
+        textarea.style.cssText =
+            "height:" +
+            height +
+            "px;" +
+            "width:" +
+            width +
+            "px;" +
+            "margin-left:20px;" +
+            "font-size:20px;" +
+            "padding:10px";
         textarea.className = "samplerTextarea";
-        textarea.style.marginLeft = "20px";
-        textarea.style.fontSize = "20px";
-        textarea.style.padding = "10px";
         scrollContainer.appendChild(textarea); // Append textarea to scroll container
 
         // Create hint text elements
         const hintsContainer = document.createElement("div");
-        hintsContainer.style.marginBottom = "10px";
-
-        hintsContainer.style.display = "flex";
-        hintsContainer.style.justifyContent = "center";
-        hintsContainer.style.marginTop = "8px";
+        hintsContainer.style.cssText =
+            "margin-bottom:10px;display:flex;justify-content:center;margin-top:8px";
         const hints = ["Dance tune", "Fiddle jig", "Nice melody", "Fun song", "Simple canon"];
         hints.forEach(hintText => {
             const hint = document.createElement("span");
             hint.textContent = hintText;
-            hint.style.marginRight = "20px";
-            hint.style.cursor = "pointer";
-            hint.style.marginRight = "4px";
-            hint.style.fontSize = "20px";
-            hint.style.color = "blue";
-            hint.style.backgroundColor = "rgb(227 162 162 / 80%)"; // Light white background
-            hint.style.padding = "10px"; // Add padding for spacing
-            hint.style.borderRadius = "5px"; // Optional: Rounded corners
+            hint.style.cssText =
+                "cursor:pointer;margin-right:4px;font-size:20px;color:blue;" +
+                "background-color:rgb(227 162 162 / 80%);padding:10px;border-radius:5px";
 
             hint.onclick = function () {
                 inputField.value = hintText;
@@ -1112,12 +1119,9 @@ function AIWidget() {
         inputField.type = "text";
         inputField.className = "inputField";
         inputField.placeholder = "Enter text here";
-        inputField.style.fontSize = "20px";
-        inputField.style.marginRight = "2px";
-        inputField.style.marginLeft = "64px";
-        inputField.style.padding = "10px";
-        inputField.style.marginBottom = "10px";
-        inputField.style.width = "60%";
+        inputField.style.cssText =
+            "font-size:20px;margin-right:2px;margin-left:64px;" +
+            "padding:10px;margin-bottom:10px;width:60%";
         container.appendChild(inputField);
 
         inputField.addEventListener("click", function () {
@@ -1245,5 +1249,8 @@ function AIWidget() {
         textarea.addEventListener("input", function () {
             abcNotationSong = textarea.value;
         });
+
+        // Single DOM append — all elements are now in the fragment
+        this.widgetWindow.getWidgetBody().appendChild(fragment);
     };
 }
