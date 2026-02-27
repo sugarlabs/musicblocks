@@ -346,7 +346,7 @@ class Painter {
             let sa = oAngleRadians - Math.PI;
             let ea = oAngleRadians;
 
-            const steps = Math.max(Math.floor(savedStroke, 1));
+            const steps = Math.max(Math.floor(savedStroke), 1);
             this._svgArc(steps, cx, cy, step, sa, ea, false, true);
 
             this.turtle.ctx.lineTo(ox + dx, oy + dy);
@@ -364,7 +364,7 @@ class Painter {
             sa = oAngleRadians - Math.PI;
             ea = oAngleRadians;
 
-            const stepsFinal = Math.max(Math.floor(savedStroke, 1));
+            const stepsFinal = Math.max(Math.floor(savedStroke), 1);
             this._svgArc(stepsFinal, cx, cy, step, sa, ea, false, true);
 
             this.closeSVG();
@@ -604,7 +604,7 @@ class Painter {
                 diff -= 2 * Math.PI;
             }
             const nsteps = Math.max(Math.floor((radius * Math.abs(diff)) / 2), 2);
-            const steps = Math.max(Math.floor(savedStroke, 1));
+            const steps = Math.max(Math.floor(savedStroke), 1);
 
             this._svgArc(nsteps, cx, cy, radius + step, sa, ea, anticlockwise, true);
 
@@ -1038,7 +1038,7 @@ class Painter {
             this.turtle.ctx.lineCap = "round";
 
             const step = savedStroke < 3 ? 0.5 : (savedStroke - 2) / 2;
-            const steps = Math.max(Math.floor(savedStroke, 1));
+            const steps = Math.max(Math.floor(savedStroke), 1);
 
             let degreesInitial = Math.atan2(cp1x - this.turtle.x, cp1y - this.turtle.y);
             degreesInitial = (180 * degreesInitial) / Math.PI;
