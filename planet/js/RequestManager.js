@@ -219,17 +219,41 @@ class RequestManager {
             }
 
             this.stats.failures++;
-            // Return the last failure or a generic error response
-            return lastFailure || { success: false, error: "MAX_RETRIES_EXCEEDED" };
+            // Return error response if max retries exceeded
+            return lastFailure || { success: false, error: "REQUEST_FAILED" };
         }
     }
 
     /**
-     * Converts callback-based request to Promise
+     * Wraps a promise with a timeout
+     * @private
+     * @param {Promise} promise - The promise to wrap
+     * @param {number} timeoutMs - Timeout in milliseconds (default: 30000)
+     * @returns {Promise}
+     */
+    _withTimeout(promise, timeoutMs = 30000) {
+        let timeoutId;
+
+        const timeoutPromise = new Promise((_, reject) => {
+            timeoutId = setTimeout(() => {
+                const error = new Error(`Request timeout after ${timeoutMs}ms`);
+                error.name = "TimeoutError";
+                reject(error);
+            }, timeoutMs);
+        });
+
+        return Promise.race([
+            promise.finally(() => clearTimeout(timeoutId)),
+            timeoutPromise
+        ]);
+    }
+
+    /**
+     * Converts callback-based request to Promise with timeout
      * @private
      */
     _promisifyRequest(requestFn) {
-        return new Promise((resolve, reject) => {
+        const promise = new Promise((resolve, reject) => {
             try {
                 requestFn(result => {
                     resolve(result);
@@ -238,6 +262,9 @@ class RequestManager {
                 reject(error);
             }
         });
+
+        // Wrap with 30 second timeout
+        return this._withTimeout(promise, 30000);
     }
 
     /**
