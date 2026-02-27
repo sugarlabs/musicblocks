@@ -3,10 +3,9 @@
  * MusicBlocks v3.6.2
  * Copyright (C) 2025 Anubhab
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,6 +15,61 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
+// Mock the entire musicutils module to prevent _ function ReferenceError
+jest.mock("../../utils/musicutils", () => ({
+    TEMPERAMENT: {
+        equal: {
+            "pitchNumber": 12,
+            "perfect 1": 1,
+            "major 2": 1.122462,
+            "perfect 8": 2
+        },
+        custom31: {
+            "pitchNumber": 31,
+            "perfect 1": 1,
+            "perfect 8": 2
+        }
+    },
+    isCustomTemperament: temperament => {
+        return ![
+            "equal",
+            "major",
+            "minor",
+            "harmonicminor",
+            "ionian",
+            "dorian",
+            "phrygian",
+            "lydian",
+            "mixolydian",
+            "aeolian",
+            "blues",
+            "chromatic",
+            "whole",
+            "pentatonic",
+            "pythagorean",
+            "just",
+            "quarter",
+            "31-EDO",
+            "19-EDO",
+            "5-EDO",
+            "7-EDO"
+        ].includes(temperament);
+    },
+    getTemperament: entry => {
+        const temperamentMap = {
+            equal: {
+                "pitchNumber": 12,
+                "perfect 1": 1,
+                "major 2": 1.122462,
+                "perfect 8": 2
+            }
+        };
+        return temperamentMap[entry] || null;
+    },
+    _: str => str
+}));
+
 const { setupIntervalsActions } = require("../IntervalsActions");
 
 describe("setupIntervalsActions", () => {
@@ -28,7 +82,7 @@ describe("setupIntervalsActions", () => {
 
         global._ = x => x;
         global.NOINPUTERRORMSG = "NOINPUT";
-
+        global.window = {};
         global.MUSICALMODES = {
             major: [2, 2, 1, 2, 2, 2, 1],
             minor: [2, 1, 2, 2, 1, 2, 2]
@@ -50,10 +104,16 @@ describe("setupIntervalsActions", () => {
         global.getNote = jest.fn(() => ["C"]);
         global.getModeLength = jest.fn(() => 7);
 
-        global.MusicBlocks = { isRun: false };
-        global.Mouse = { getMouseFromTurtle: jest.fn() };
-
+        global.MusicBlocks = {
+            isRun: false,
+            isPlaying: false,
+            isRecording: false,
+            isLooping: false,
+            isMuted: false,
+            isSoloed: false
+        };
         global.Singer = {};
+        global.Mouse = { getMouseFromTurtle: jest.fn() };
 
         turtle = {
             singer: {
@@ -331,12 +391,12 @@ describe("setupIntervalsActions", () => {
         activity.blocks.blockList.blk = { connections: [null, "text1"] };
         activity.blocks.blockList.text1 = { name: "text" };
 
-        Singer.IntervalsActions.defineMode("custom", 0, "blk");
+        Singer.IntervalsActions.defineMode("custom31", 0, "blk");
 
         turtle.singer.defineMode.push(0, 4, 7);
         listener();
 
-        expect(MUSICALMODES.custom).toBeDefined();
+        expect(MUSICALMODES["custom31"]).toBeDefined();
     });
 
     test("defineMode error paths", () => {
@@ -346,7 +406,7 @@ describe("setupIntervalsActions", () => {
         activity.blocks.blockList.blk = { connections: [null, "text1"] };
         activity.blocks.blockList.text1 = { name: "text" };
 
-        Singer.IntervalsActions.defineMode(null, 0, "blk");
+        Singer.IntervalsActions.defineMode("custom31", 0, "blk");
 
         turtle.singer.defineMode.push(4);
         turtle.singer.defineMode.push(12);
@@ -357,7 +417,27 @@ describe("setupIntervalsActions", () => {
         expect(activity.errorMsg).toHaveBeenCalled();
     });
 
-    test("setTemperament state changes", () => {
+    test("defineMode with custom temperament wrapping", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+
+        // Mock custom temperament with 31 pitches
+        const originalTemperament = logo.synth.inTemperament;
+        logo.synth.inTemperament = "custom31";
+        logo.synth.changeInTemperament = true;
+
+        activity.blocks.blockList.blk = { connections: [null, "text1"] };
+        activity.blocks.blockList.text1 = { name: "text" };
+
+        Singer.IntervalsActions.defineMode("custom31", 0, "blk");
+
+        // Add pitch numbers that should be wrapped
+        turtle.singer.defineMode.push(0, 5, 10, 15, 35);
+
+        listener();
+
+        // Restore original temperament
+        logo.synth.inTemperament = originalTemperament;
         Singer.IntervalsActions.setTemperament("equal", "C", 4);
         expect(logo.synth.inTemperament).toBe("equal");
         expect(logo.synth.startingPitch).toBe("C4");
