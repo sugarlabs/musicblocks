@@ -53,7 +53,7 @@ describe("TemperamentWidget basic tests", () => {
         global.FLAT = "♭";
         global.SHARP = "♯";
 
-        const createMockElement = (id) => ({
+        const createMockElement = id => ({
             id: id,
             innerHTML: "",
             style: {},
@@ -636,8 +636,8 @@ describe("TemperamentWidget basic tests", () => {
                 return {
                     interval: ["0", "1"],
                     pitchNumber: 1,
-                    "0": 1,
-                    "1": 2
+                    0: 1,
+                    1: 2
                 };
             }
             return { interval: [], pitchNumber: 0 };
