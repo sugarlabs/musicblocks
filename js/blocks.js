@@ -165,6 +165,10 @@ class Blocks {
         /** We keep a list of stacks in the trash. */
         this.trashStacks = [];
 
+        /** When true, checkBounds() calls are suppressed until
+         *  _endDeferCheckBounds() runs one final check. */
+        this._deferCheckBounds = false;
+
         /** We keep a dictionary for the proto blocks, */
         this.protoBlockDict = {};
         /** and a list of the blocks we create. */
@@ -766,7 +770,7 @@ class Blocks {
                     vspaceBlock.container.x = thisBlock.container.x + dx;
                     /** Math.floor(thisBlock.container.y + dy + 0.5); */
                     vspaceBlock.container.y = thisBlock.container.y + dy;
-                    vspaceBlock.connections[0] = that.blockList.indexOf(thisBlock);
+                    vspaceBlock.connections[0] = thisBlock.blockIndex;
                     vspaceBlock.connections[1] = nextBlock;
                     thisBlock.connections[thisBlock.connections.length - 1] = vspace;
                     if (nextBlock) {
@@ -1500,7 +1504,7 @@ class Blocks {
                                 silenceBlock
                             ) {
                                 this.blockList[silenceBlockobj.connections[0]].connections[c] =
-                                    this.blockList.indexOf(thisBlockobj);
+                                    thisBlockobj.blockIndex;
                                 break;
                             }
                         }
@@ -2294,6 +2298,8 @@ class Blocks {
          * @returns {void}
          */
         this.checkBounds = () => {
+            if (this._deferCheckBounds) return;
+
             let onScreen = true;
             for (const block of this.blockList) {
                 if (block.connections[0] == null) {
@@ -2311,6 +2317,27 @@ class Blocks {
                 this.activity.setHomeContainers(false);
                 this.boundary.hide();
             }
+        };
+
+        /**
+         * Suppress checkBounds() calls during bulk block moves.
+         * Call _endDeferCheckBounds() when done to run one final check.
+         * @public
+         * @returns {void}
+         */
+        this._beginDeferCheckBounds = () => {
+            this._deferCheckBounds = true;
+        };
+
+        /**
+         * Resume checkBounds() after a deferred section and run one
+         * final bounds check.
+         * @public
+         * @returns {void}
+         */
+        this._endDeferCheckBounds = () => {
+            this._deferCheckBounds = false;
+            this.checkBounds();
         };
 
         /**
@@ -2640,8 +2667,10 @@ class Blocks {
                     /** Could happen if the block data is malformed. */
                     // eslint-disable-next-line no-console
                     console.debug("infinite loop finding topBlock?");
-                    // eslint-disable-next-line no-console
-                    console.debug(this.blockList.indexOf(myBlock) + " " + myBlock.name);
+                    if (myBlock.garbage) {
+                        // eslint-disable-next-line no-console
+                        console.debug(myBlock.blockIndex + " " + myBlock.name);
+                    }
                     break;
                 }
                 blk = myBlock.connections[0];
@@ -3111,6 +3140,9 @@ class Blocks {
 
             /** We copy the dock because expandable blocks modify it. */
             const myBlock = last(this.blockList);
+            // Cache the block's index for O(1) lookups instead of
+            // O(N) blockList.indexOf() scans.
+            myBlock.blockIndex = this.blockList.length - 1;
             myBlock.copySize();
 
             /** We may need to do some postProcessing to the block */
@@ -4789,7 +4821,7 @@ class Blocks {
                 this.blockList[dblk].name === "divide"
             ) {
                 /** Are we the denominator (c == 2) or numerator (c == 1)? */
-                if (this.blockList[dblk].connections[c] === this.blockList.indexOf(myBlock)) {
+                if (this.blockList[dblk].connections[c] === myBlock.blockIndex) {
                     /** Is the divide block connected to a note value block? */
                     const cblk = this.blockList[dblk].connections[0];
                     if (cblk !== null) {
@@ -6938,7 +6970,7 @@ class Blocks {
 
             this.activity.refreshCanvas();
 
-            const thisBlock = this.blockList.indexOf(myBlock);
+            const thisBlock = myBlock.blockIndex;
 
             /** Add this block to the list of blocks in the trash so we can undo this action. */
             this.trashStacks.push(thisBlock);

@@ -7133,7 +7133,7 @@ class Activity {
                     pasteDy = 0;
                 const map = new Map();
                 for (let i = 0; i < blocksArray.length; i++) {
-                    const idx = this.blocks.blockList.indexOf(blocksArray[i]);
+                    const idx = blocksArray[i].blockIndex;
                     map.set(
                         idx,
                         blocksArray[i].connections.filter(blk => blk !== null)
