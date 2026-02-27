@@ -1072,6 +1072,8 @@ let prepareMacroExports = (name, stack, macroDict) => {
 // Encapsulates camera-related operations for video/image capture
 const CameraManager = {
     isSetup: false,
+    canPlayHandler: null,
+    intervalId: null,
 
     /**
      * Resets the camera setup state
@@ -1129,34 +1131,48 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
         streaming = true;
         video.play();
         if (isVideo) {
+            if (CameraManager.intervalId !== null) {
+                window.clearInterval(CameraManager.intervalId);
+                CameraManager.intervalId = null;
+            }
             cameraID = window.setInterval(draw, 100);
+            CameraManager.intervalId = cameraID;
             setCameraID(cameraID);
         } else {
             draw();
         }
     }
 
-    video.addEventListener(
-        "canplay",
-        () => {
-            // console.debug("canplay", streaming, CameraManager.isSetup);
-            if (!streaming) {
-                video.setAttribute("width", w);
-                video.setAttribute("height", h);
-                canvas.setAttribute("width", w);
-                canvas.setAttribute("height", h);
-                streaming = true;
+    if (CameraManager.canPlayHandler) {
+        video.removeEventListener("canplay", CameraManager.canPlayHandler, false);
+    }
 
-                if (isVideo) {
-                    cameraID = window.setInterval(draw, 100);
-                    setCameraID(cameraID);
-                } else {
-                    draw();
+    function handleCanPlay() {
+        // console.debug("canplay", streaming, CameraManager.isSetup);
+        if (!streaming) {
+            video.setAttribute("width", w);
+            video.setAttribute("height", h);
+            canvas.setAttribute("width", w);
+            canvas.setAttribute("height", h);
+            streaming = true;
+
+            if (isVideo) {
+                if (CameraManager.intervalId !== null) {
+                    window.clearInterval(CameraManager.intervalId);
+                    CameraManager.intervalId = null;
                 }
+                cameraID = window.setInterval(draw, 100);
+                CameraManager.intervalId = cameraID;
+                setCameraID(cameraID);
+            } else {
+                draw();
             }
-        },
-        false
-    );
+        }
+    }
+
+    CameraManager.canPlayHandler = handleCanPlay;
+
+    video.addEventListener("canplay", CameraManager.canPlayHandler, false);
 };
 
 /**
