@@ -2969,7 +2969,19 @@ class Activity {
 
             // Expose activity instance for external checks
             if (typeof window !== "undefined") {
-                window.activity = this;
+                // Single authority: ActivityContext
+                // TODO: window.activity is deprecated; use ActivityContext instead
+                if (
+                    window.ActivityContext &&
+                    typeof window.ActivityContext.setActivity === "function"
+                ) {
+                    window.ActivityContext.setActivity(this);
+                }
+
+                // TEMP compatibility bridge
+                if (!window.activity) {
+                    window.activity = this;
+                }
             }
         };
 
@@ -3034,7 +3046,19 @@ class Activity {
 
             // Expose activity instance for external checks
             if (typeof window !== "undefined") {
-                window.activity = this;
+                // Single authority: ActivityContext
+                // TODO: window.activity is deprecated; use ActivityContext instead
+                if (
+                    window.ActivityContext &&
+                    typeof window.ActivityContext.setActivity === "function"
+                ) {
+                    window.ActivityContext.setActivity(this);
+                }
+
+                // TEMP compatibility bridge
+                if (!window.activity) {
+                    window.activity = this;
+                }
             }
         };
 
