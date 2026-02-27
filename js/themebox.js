@@ -12,7 +12,7 @@
 //A dropdown for selecting theme
 
 /*
-   global _, platformColor
+   global _, platformColor, MULTIPALETTES
 */
 
 /* exported ThemeBox, themeConfigs */
@@ -201,11 +201,24 @@ class ThemeBox {
         // Refresh palette if it exists
         if (this.activity.palettes) {
             try {
-                // Update palette selector border color
-                const paletteElement = document.getElementById("palette");
-                if (paletteElement && paletteElement.childNodes[0]) {
-                    paletteElement.childNodes[0].style.border = `1px solid ${window.platformColor.selectorSelected}`;
-                }
+                // Convert palette NAME to group INDEX
+                // this.current stores palette NAME (e.g. "pitch")
+                // selectorRows[] is indexed by NUMBER (0, 1, 2)
+                const currentName = this.activity.palettes.current;
+                const currentIndex = MULTIPALETTES.findIndex(group => group.includes(currentName));
+
+                if (currentIndex === -1) return;
+
+                // Clear palette DOM and rebuild selectors with new theme colors
+                this.activity.palettes.clear();
+
+                // Restore selection using stored selector rows
+                const selectorRow = this.activity.palettes.selectorRows[currentIndex];
+                if (!selectorRow) return;
+
+                // Apply selection highlight and build category list (same as hover)
+                this.activity.palettes.showSelection(currentIndex, selectorRow);
+                this.activity.palettes.makePalettes(currentIndex);
             } catch (e) {
                 console.debug("Could not refresh palette:", e);
             }

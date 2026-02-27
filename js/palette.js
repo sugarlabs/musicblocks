@@ -83,6 +83,7 @@ class Palettes {
         this.dict = {};
         this.selectorButtonsOff = []; // Select between palettes
         this.selectorButtonsOn = []; // Select between palettes in their on state
+        this.selectorRows = []; // Store selector TR elements for state restoration
         this.buttons = {}; // The toolbar button for each palette.
         this.labels = {}; // The label for each button.
         this.pluginPalettes = []; // List of palettes not in multipalette list
@@ -135,6 +136,8 @@ class Palettes {
         }
 
         const tr = docById("palette").children[0].children[0].children[0].children[0];
+        // Store selector TR for state restoration after theme change
+        this.selectorRows[i] = tr;
         const td = tr.insertCell();
         td.width = 1.5 * this.cellSize;
         td.height = 1.5 * this.cellSize;
@@ -454,6 +457,9 @@ class Palettes {
                 </div>`;
             element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
             document.body.appendChild(element);
+
+            // Rebuild selector buttons with new theme colors
+            this.init_selectors();
         } catch (e) {
             console.error("Error clearing palettes:", e);
         }
