@@ -20,7 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const StatsWindow = require("./statistics.js");
+const StatsWindow = require("../statistics.js");
 
 describe("StatsWindow", () => {
     let activity, widgetWin, body, capturedCb;
