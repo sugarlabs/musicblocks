@@ -2378,24 +2378,39 @@ function Synth() {
      * @returns {Promise<void>}
      */
     this.startTuner = async () => {
-        // Initialize required components for pie menu
-        if (!window.activity) {
-            window.activity = {
-                blocks: {
-                    blockList: [],
-                    setPitchOctave: () => {},
-                    findPitchOctave: () => 4,
-                    stageClick: false
-                },
-                logo: {
-                    synth: this
-                },
-                canvas: document.createElement("canvas"),
-                blocksContainer: { x: 0, y: 0 },
-                getStageScale: () => 1,
-                KeySignatureEnv: ["A", "major", false]
-            };
-        }
+        const getSafeActivity = () => {
+            try {
+                if (
+                    typeof window !== "undefined" &&
+                    window.ActivityContext &&
+                    typeof window.ActivityContext.getActivity === "function"
+                ) {
+                    return window.ActivityContext.getActivity();
+                }
+            } catch (e) {
+                // Fall through to warning below.
+            }
+
+            // In practice this runs in the browser; keep a safe fallback for tests.
+            try {
+                if (typeof module !== "undefined" && module.exports) {
+                    // eslint-disable-next-line global-require
+                    const ctx = require("../activity-context");
+                    if (ctx && typeof ctx.getActivity === "function") {
+                        return ctx.getActivity();
+                    }
+                }
+            } catch (e) {
+                // Ignore.
+            }
+
+            console.warn("Activity not ready yet in synthutils");
+            return null;
+        };
+
+        // No fake globals: if Activity isn't ready, fail fast.
+        const activity = getSafeActivity();
+        if (!activity) return;
 
         // Initialize wheelnav if not already done
         if (typeof wheelnav !== "function") {
@@ -2676,13 +2691,30 @@ function Synth() {
                             }
 
                             try {
-                                // Create a temporary block object to use with piemenuPitches
+                                // Prepare a non-mutating activity proxy with a local logo fallback
+                                const defaultLogo = {
+                                    synth: {
+                                        createDefaultSynth: () => {},
+                                        loadSynth: () => {},
+                                        setMasterVolume: () => {},
+                                        trigger: () => {},
+                                        inTemperament: "equal"
+                                    },
+                                    errorMsg: msg => {
+                                        console.warn(msg);
+                                    }
+                                };
+
+                                const logo = activity.logo || defaultLogo;
+                                const activityProxy = Object.create(activity);
+                                activityProxy.logo = logo;
+
                                 const tempBlock = {
                                     container: {
                                         x: targetNoteSelector.offsetLeft,
                                         y: targetNoteSelector.offsetTop
                                     },
-                                    activity: window.activity,
+                                    activity: activityProxy,
                                     blocks: {
                                         blockList: [
                                             {
@@ -2730,54 +2762,8 @@ function Synth() {
                                     _triggerLock: false // This is needed for pitch preview
                                 };
 
-                                // Add required activity properties for preview
-                                if (!window.activity.logo) {
-                                    window.activity.logo = {
-                                        synth: {
-                                            createDefaultSynth: () => {},
-                                            loadSynth: () => {},
-                                            setMasterVolume: () => {},
-                                            trigger: (turtle, note, duration, instrument) => {
-                                                // Use the Web Audio API to play the preview note
-                                                const audioContext = new (window.AudioContext ||
-                                                    window.webkitAudioContext)();
-                                                const oscillator = audioContext.createOscillator();
-                                                const gainNode = audioContext.createGain();
-
-                                                oscillator.connect(gainNode);
-                                                gainNode.connect(audioContext.destination);
-
-                                                // Convert note to frequency
-                                                const freq = pitchToFrequency(note[0], "equal");
-                                                oscillator.frequency.value = freq;
-
-                                                // Set volume
-                                                gainNode.gain.value = 0.1; // Low volume for preview
-
-                                                // Schedule note
-                                                oscillator.start();
-                                                gainNode.gain.setValueAtTime(
-                                                    0.1,
-                                                    audioContext.currentTime
-                                                );
-                                                gainNode.gain.linearRampToValueAtTime(
-                                                    0,
-                                                    audioContext.currentTime + duration
-                                                );
-                                                oscillator.stop(
-                                                    audioContext.currentTime + duration
-                                                );
-                                            },
-                                            inTemperament: "equal"
-                                        },
-                                        errorMsg: msg => {
-                                            console.warn(msg);
-                                        }
-                                    };
-                                }
-
-                                // Add key signature environment
-                                window.activity.KeySignatureEnv = ["C", "major", false];
+                                // Add key signature environment (on proxy, not real activity)
+                                activityProxy.KeySignatureEnv = ["C", "major", false];
 
                                 // Make sure wheelDiv is properly positioned and visible
                                 const wheelDiv = docById("wheelDiv");
