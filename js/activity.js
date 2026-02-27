@@ -7580,20 +7580,30 @@ class Activity {
                                 );
                             } else {
                                 const cleanData = rawData.replace("\n", " ");
+
+                                const decodeHtmlEntities = value => {
+                                    if (typeof value !== "string") return value;
+                                    if (value.indexOf("&") === -1) return value;
+                                    const textarea = document.createElement("textarea");
+                                    textarea.innerHTML = value;
+                                    return textarea.value;
+                                };
+
                                 let obj;
                                 try {
                                     if (cleanData.includes("html")) {
-                                        if (cleanData.includes('id="codeBlock"')) {
-                                            obj = JSON.parse(
-                                                cleanData.match(
-                                                    '<div class="code" id="codeBlock">(.+?)</div>'
-                                                )[1]
-                                            );
-                                        } else {
-                                            obj = JSON.parse(
-                                                cleanData.match('<div class="code">(.+?)</div>')[1]
+                                        const match = cleanData.includes('id="codeBlock"')
+                                            ? cleanData.match(
+                                                  '<div class="code" id="codeBlock">(.+?)</div>'
+                                              )
+                                            : cleanData.match('<div class="code">(.+?)</div>');
+                                        if (!match) {
+                                            throw new Error(
+                                                "Could not find project data in HTML file"
                                             );
                                         }
+
+                                        obj = JSON.parse(decodeHtmlEntities(match[1]));
                                     } else {
                                         obj = JSON.parse(cleanData);
                                     }

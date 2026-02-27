@@ -229,6 +229,34 @@ class SaveInterface {
      * @instance
      */
     prepareHTML() {
+        const escapeHTML = value => {
+            if (value === null || value === undefined) return "";
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/\"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        };
+
+        const sanitizeImageURL = value => {
+            if (value === null || value === undefined) return "";
+            const raw = String(value).trim();
+            if (raw === "") return "";
+
+            const lower = raw.toLowerCase();
+            if (lower.startsWith("data:")) {
+                // Only allow data:image/* to avoid data:text/html, etc.
+                return /^data:image\/[a-z0-9.+-]+;base64,[a-z0-9+/=\s]+$/i.test(raw) ? raw : "";
+            }
+
+            if (lower.startsWith("http://") || lower.startsWith("https://")) return raw;
+
+            // Allow relative URLs but reject other schemes.
+            if (/^[a-z][a-z0-9+.-]*:/i.test(raw)) return "";
+            return raw;
+        };
+
         let file = this.htmlSaveTemplate;
         let description = _("No description provided");
         if (this.activity.PlanetInterface !== undefined) {
@@ -249,10 +277,13 @@ class SaveInterface {
         }
 
         file = file
-            .replace(new RegExp("{{ project_description }}", "g"), description)
-            .replace(new RegExp("{{ project_name }}", "g"), name)
-            .replace(new RegExp("{{ data }}", "g"), data)
-            .replace(new RegExp("{{ project_image }}", "g"), image);
+            .replace(new RegExp("{{ project_description }}", "g"), () => escapeHTML(description))
+            .replace(new RegExp("{{ project_name }}", "g"), () => escapeHTML(name))
+            // Always render project data as text, never as HTML.
+            .replace(new RegExp("{{ data }}", "g"), () => escapeHTML(data))
+            .replace(new RegExp("{{ project_image }}", "g"), () =>
+                escapeHTML(sanitizeImageURL(image))
+            );
         return file;
     }
 
