@@ -527,6 +527,7 @@ function SampleWidget() {
                 stopTuner();
                 const fileChooser = docById("myOpenAll");
 
+                // eslint-disable-next-line no-unused-vars
                 const __readerAction = function (event) {
                     window.scroll(0, 0);
                     const sampleFile = fileChooser.files[0];
@@ -534,6 +535,11 @@ function SampleWidget() {
                     fileChooser.removeEventListener("change", __readerAction);
                 };
 
+                fileChooser.addEventListener("change", __readerAction, false);
+                fileChooser.focus();
+                fileChooser.click();
+                window.scroll(0, 0);
+            };
                 fileChooser.addEventListener("change", __readerAction, false);
                 fileChooser.focus();
                 fileChooser.click();
