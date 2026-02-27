@@ -711,8 +711,8 @@ class Singer {
         const activity = logo.activity;
         volume = Math.min(Math.max(volume, 0), 100);
         if (blk) {
-            const firstConnection = activity.logo.blockList[blk].connections[0];
-            const lastConnection = last(activity.logo.blockList[blk].connections);
+            const firstConnection = activity.blocks.blockList[blk].connections[0];
+            const lastConnection = last(activity.blocks.blockList[blk].connections);
             logo.synth.setMasterVolume(volume, firstConnection, lastConnection);
         } else {
             logo.synth.setMasterVolume(volume);
