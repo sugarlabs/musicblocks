@@ -32,6 +32,20 @@ describe("RequestManager", () => {
             expect(rm.maxConcurrent).toBe(3);
         });
 
+        it("should preserve explicit 0 option values", () => {
+            const rm = new RequestManager({
+                minDelay: 0,
+                maxRetries: 0,
+                baseRetryDelay: 0,
+                maxConcurrent: 0
+            });
+
+            expect(rm.minDelay).toBe(0);
+            expect(rm.maxRetries).toBe(0);
+            expect(rm.baseRetryDelay).toBe(0);
+            expect(rm.maxConcurrent).toBe(0);
+        });
+
         it("should initialize with custom options", () => {
             expect(requestManager.minDelay).toBe(100);
             expect(requestManager.maxRetries).toBe(2);

@@ -27,10 +27,10 @@ class RequestManager {
      * @param {number} options.maxConcurrent - Maximum concurrent requests (default: 3)
      */
     constructor(options = {}) {
-        this.minDelay = options.minDelay || 500;
-        this.maxRetries = options.maxRetries || 3;
-        this.baseRetryDelay = options.baseRetryDelay || 1000;
-        this.maxConcurrent = options.maxConcurrent || 3;
+        this.minDelay = options.minDelay ?? 500;
+        this.maxRetries = options.maxRetries ?? 3;
+        this.baseRetryDelay = options.baseRetryDelay ?? 1000;
+        this.maxConcurrent = options.maxConcurrent ?? 3;
 
         // Track pending requests to prevent duplicates
         this.pendingRequests = new Map();
