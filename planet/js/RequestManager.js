@@ -31,6 +31,7 @@ class RequestManager {
         this.maxRetries = options.maxRetries || 3;
         this.baseRetryDelay = options.baseRetryDelay || 1000;
         this.maxConcurrent = options.maxConcurrent || 3;
+        this.timeoutMs = options.timeoutMs || 30000;
 
         // Track pending requests to prevent duplicates
         this.pendingRequests = new Map();
@@ -173,7 +174,10 @@ class RequestManager {
      */
     async _executeWithRetry(requestFn, attempt = 0, lastFailure = null) {
         try {
-            const result = await this._promisifyRequest(requestFn);
+            const result = await this._withTimeout(
+                this._promisifyRequest(requestFn),
+                this.timeoutMs
+            );
 
             // Check if the result indicates a failure that should be retried
             if (result && result.success === false && result.error === "ERROR_CONNECTION_FAILURE") {
@@ -238,6 +242,26 @@ class RequestManager {
                 reject(error);
             }
         });
+    }
+
+    /**
+     * Wraps a promise with a timeout
+     * @param {Promise} promise - The promise to wrap
+     * @param {number} timeoutMs - Timeout in milliseconds
+     * @returns {Promise}
+     */
+    _withTimeout(promise, timeoutMs) {
+        let timeoutId;
+
+        const timeoutPromise = new Promise((_, reject) => {
+            timeoutId = setTimeout(() => {
+                const error = new Error(`Request timeout after ${timeoutMs}ms`);
+                error.name = "TimeoutError";
+                reject(error);
+            }, timeoutMs);
+        });
+
+        return Promise.race([promise.finally(() => clearTimeout(timeoutId)), timeoutPromise]);
     }
 
     /**
