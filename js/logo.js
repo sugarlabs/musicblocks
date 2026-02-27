@@ -1047,9 +1047,14 @@ class Logo {
         this.onStopTurtle();
         this.activity.blocks.bringToTop();
 
+        this._alreadyRunning = false;
         this.stepQueue = {};
         for (const turtle of this.activity.turtles.turtleList) {
             turtle.unhighlightQueue = [];
+            if (turtle.delayTimeout !== null) {
+                clearTimeout(turtle.delayTimeout);
+                turtle.delayTimeout = null;
+            }
         }
 
         this._restoreConnections();
