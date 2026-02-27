@@ -8232,6 +8232,9 @@ class Activity {
 
 const activity = new Activity();
 
+// expose legacy global used by index.html
+window.doSearch = activity.doSearch;
+
 // Execute initialization once all RequireJS modules are loaded AND DOM is ready
 define(["domReady!"].concat(MYDEFINES), doc => {
     const initialize = () => {
@@ -8247,6 +8250,7 @@ define(["domReady!"].concat(MYDEFINES), doc => {
         if (globalsReady) {
             activity.setupDependencies();
             activity.domReady(doc);
+            activity.doSearch();
             activity.doContextMenus();
             activity.doPluginsAndPaletteCols();
         } else {
