@@ -1,7 +1,6 @@
 /*
   global
 
-    offlineFallbackPage
 */
 
 // This is the "Offline page" service worker
@@ -11,6 +10,7 @@ const precacheFiles = [
     /* Add an array of files to precache for your app */
     "./index.html"
 ];
+const offlineFallbackPage = "./index.html";
 
 self.addEventListener("install", function (event) {
     // eslint-disable-next-line no-console
