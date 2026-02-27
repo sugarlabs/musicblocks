@@ -67,6 +67,33 @@ class ReflectionMatrix {
         this.code = "";
     }
 
+    escapeHTML(text) {
+        const escapeMap = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        };
+
+        return text.replace(/[&<>"']/g, char => escapeMap[char]);
+    }
+
+    sanitizeLinks(html) {
+        return html.replace(
+            /<a\s+[^>]*href\s*=\s*(['"]?)([^'">\s]+)\1/gi,
+            (match, quote, url) => {
+                const unsafeSchemes = /^(javascript|data|vbscript):/i;
+
+                if (unsafeSchemes.test(url.trim())) {
+                    return match.replace(url, "#");
+                }
+
+                return match;
+            }
+        );
+    }
+
     /**
      * Initializes the reflection widget.
      */
@@ -479,7 +506,10 @@ class ReflectionMatrix {
         const botReply = document.createElement("div");
 
         if (md) {
-            botReply.innerHTML = this.mdToHTML(reply.response);
+            const safeText = this.escapeHTML(reply.response);
+            let html = this.mdToHTML(safeText);
+            html = this.sanitizeLinks(html);
+            botReply.innerHTML = html;
         } else {
             botReply.innerText = reply.response;
         }
