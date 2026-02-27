@@ -1567,66 +1567,79 @@ const MODE_PIE_MENUS = {
 // The table contains the intervals that define the modes.
 // All of these modes assume 12 semitones per octave.
 // See http://www.pianoscales.org <== this is in no way definitive
-// TODO: better system of organizing and naming collections of pitches
-const MUSICALMODES = {
-    // 12 notes in an octave
-    "chromatic": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 
-    // 8 notes in an octave
-    "algerian": [2, 1, 2, 1, 1, 1, 3, 1],
-    "diminished": [2, 1, 2, 1, 2, 1, 2, 1],
-    "spanish": [1, 2, 1, 1, 1, 2, 2, 2],
-    "octatonic": [1, 2, 1, 2, 1, 2, 1, 2],
-    "bebop": [1, 1, 1, 2, 2, 1, 2, 2],
-
-    // 7 notes in an octave
-    "major": [2, 2, 1, 2, 2, 2, 1],
-    "harmonic major": [2, 2, 1, 2, 1, 3, 1],
-    "natural minor": [2, 1, 2, 2, 1, 2, 2],
-    "harmonic minor": [2, 1, 2, 2, 1, 3, 1],
-    "melodic minor": [2, 1, 2, 2, 2, 2, 1],
-
-    "ionian": [2, 2, 1, 2, 2, 2, 1],
-    "dorian": [2, 1, 2, 2, 2, 1, 2],
-    "phrygian": [1, 2, 2, 2, 1, 2, 2],
-    "lydian": [2, 2, 2, 1, 2, 2, 1],
-    "mixolydian": [2, 2, 1, 2, 2, 1, 2],
-    "minor": [2, 1, 2, 2, 1, 2, 2],
-    "aeolian": [2, 1, 2, 2, 1, 2, 2],
-    "locrian": [1, 2, 2, 1, 2, 2, 2],
-
-    "jazz minor": [2, 1, 2, 2, 2, 2, 1],
-
-    "arabic": [2, 2, 1, 1, 2, 2, 2],
-    "byzantine": [1, 3, 1, 2, 1, 3, 1],
-    "enigmatic": [1, 3, 2, 2, 2, 1, 1],
-    "ethiopian": [2, 1, 2, 2, 1, 2, 2],
-    "geez": [2, 1, 2, 2, 1, 2, 2],
-    "hindu": [2, 2, 1, 2, 1, 2, 2],
-    "hungarian": [2, 1, 3, 1, 1, 3, 1],
-    "maqam": [1, 3, 1, 2, 1, 3, 1],
-    "romanian minor": [2, 1, 3, 1, 2, 1, 2],
-    "spanish gypsy": [1, 3, 1, 2, 1, 2, 2],
-
-    // 6 notes in an octave
-    "minor blues": [3, 2, 1, 1, 3, 2],
-    "major blues": [2, 1, 1, 3, 2, 2],
-    "whole tone": [2, 2, 2, 2, 2, 2],
-
-    // 5 notes in an octave
-    "major pentatonic": [2, 2, 3, 2, 3],
-    "minor pentatonic": [3, 2, 2, 3, 2],
-    "chinese": [4, 2, 1, 4, 1],
-    "egyptian": [2, 3, 2, 3, 2],
-    "hirajoshi": [1, 4, 1, 4, 2],
-    "in": [1, 4, 2, 1, 4],
-    "minyo": [3, 2, 2, 3, 2],
-    "fibonacci": [1, 1, 2, 3, 5],
-    "alt pentatonic": [2, 3, 2, 2, 3],
-
-    // User definition overrides this constant
-    "custom": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+const PITCH_COLLECTIONS = {
+    12: {
+        chromatic: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    },
+    8: {
+        algerian: [2, 1, 2, 1, 1, 1, 3, 1],
+        diminished: [2, 1, 2, 1, 2, 1, 2, 1],
+        spanish: [1, 2, 1, 1, 1, 2, 2, 2],
+        octatonic: [1, 2, 1, 2, 1, 2, 1, 2],
+        bebop: [1, 1, 1, 2, 2, 1, 2, 2]
+    },
+    7: {
+        "major": [2, 2, 1, 2, 2, 2, 1],
+        "harmonic major": [2, 2, 1, 2, 1, 3, 1],
+        "natural minor": [2, 1, 2, 2, 1, 2, 2],
+        "harmonic minor": [2, 1, 2, 2, 1, 3, 1],
+        "melodic minor": [2, 1, 2, 2, 2, 2, 1],
+        "dorian": [2, 1, 2, 2, 2, 1, 2],
+        "phrygian": [1, 2, 2, 2, 1, 2, 2],
+        "lydian": [2, 2, 2, 1, 2, 2, 1],
+        "mixolydian": [2, 2, 1, 2, 2, 1, 2],
+        "locrian": [1, 2, 2, 1, 2, 2, 2],
+        "arabic": [2, 2, 1, 1, 2, 2, 2],
+        "byzantine": [1, 3, 1, 2, 1, 3, 1],
+        "enigmatic": [1, 3, 2, 2, 2, 1, 1],
+        "hindu": [2, 2, 1, 2, 1, 2, 2],
+        "hungarian": [2, 1, 3, 1, 1, 3, 1],
+        "romanian minor": [2, 1, 3, 1, 2, 1, 2],
+        "spanish gypsy": [1, 3, 1, 2, 1, 2, 2]
+    },
+    6: {
+        "minor blues": [3, 2, 1, 1, 3, 2],
+        "major blues": [2, 1, 1, 3, 2, 2],
+        "whole tone": [2, 2, 2, 2, 2, 2]
+    },
+    5: {
+        "major pentatonic": [2, 2, 3, 2, 3],
+        "minor pentatonic": [3, 2, 2, 3, 2],
+        "chinese": [4, 2, 1, 4, 1],
+        "egyptian": [2, 3, 2, 3, 2],
+        "hirajoshi": [1, 4, 1, 4, 2],
+        "in": [1, 4, 2, 1, 4],
+        "fibonacci": [1, 1, 2, 3, 5],
+        "alt pentatonic": [2, 3, 2, 2, 3]
+    }
 };
+
+const PITCH_COLLECTION_ALIASES = {
+    "ionian": "major",
+    "minor": "natural minor",
+    "aeolian": "natural minor",
+    "ethiopian": "natural minor",
+    "geez": "natural minor",
+    "jazz minor": "melodic minor",
+    "maqam": "byzantine",
+    "minyo": "minor pentatonic"
+};
+
+const MUSICALMODES = {};
+for (const count in PITCH_COLLECTIONS) {
+    const collections = PITCH_COLLECTIONS[count];
+    for (const name in collections) {
+        MUSICALMODES[name] = collections[name];
+    }
+}
+
+for (const alias in PITCH_COLLECTION_ALIASES) {
+    MUSICALMODES[alias] = MUSICALMODES[PITCH_COLLECTION_ALIASES[alias]];
+}
+
+// User definition overrides this constant.
+MUSICALMODES["custom"] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 
 /**
  * Maqam table mapping specific maqams to their corresponding keys.
