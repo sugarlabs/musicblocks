@@ -326,3 +326,7 @@ class Oscilloscope {
         }
     }
 }
+
+if (typeof module !== "undefined") {
+    module.exports = Oscilloscope;
+}
