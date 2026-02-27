@@ -7291,7 +7291,7 @@ class Activity {
 
         this.unhighlightSelectedBlocks = (unhighlight, selectionModeOn) => {
             for (let i = 0; i < this.selectedBlocks.length; i++) {
-                for (const blk in this.blocks.blockList) {
+                for (let blk = 0; blk < this.blocks.blockList.length; blk++) {
                     if (this.isEqual(this.blocks.blockList[blk], this.selectedBlocks[i])) {
                         if (unhighlight) {
                             this.blocks.unhighlightSelectedBlocks(blk, true);
