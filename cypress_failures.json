@@ -1,0 +1,34 @@
+
+DevTools listening on ws://127.0.0.1:38231/devtools/browser/ab723e64-1537-4781-803b-f3d2c6a7d632
+Can't run because you've entered an invalid browser name.
+
+Browser: chrome was not found on your system or is not supported by Cypress.
+
+Cypress supports the following browsers:
+ - electron
+ - chrome
+ - chromium
+ - chrome-for-testing
+ - edge
+ - firefox
+
+You can also use a custom browser: https://on.cypress.io/customize-browsers
+
+Available browsers found on your system are:
+ - electron
+Can't run because you've entered an invalid browser name.
+
+Browser: chrome was not found on your system or is not supported by Cypress.
+
+Cypress supports the following browsers:
+ - electron
+ - chrome
+ - chromium
+ - chrome-for-testing
+ - edge
+ - firefox
+
+You can also use a custom browser: https://on.cypress.io/customize-browsers
+
+Available browsers found on your system are:
+ - electron

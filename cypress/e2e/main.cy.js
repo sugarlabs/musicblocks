@@ -44,13 +44,17 @@ describe("MusicBlocks Application", () => {
         it("should open the language selection dropdown", () => {
             cy.get("#aux-toolbar").invoke("show");
             cy.get("#languageSelectIcon").click({ force: true });
-            cy.get("#languagedropdown").should("be.visible");
+            cy.get("#languagedropdown.dropdown-content").should("be.visible");
         });
 
         it("should toggle full-screen mode", () => {
-            cy.get("#FullScreen").should("be.visible").click();
+            cy.get("#FullScreen.FullScreen.tooltipped.dropdown-trigger")
+                .should("be.visible")
+                .click();
             cy.wait(500);
-            cy.get("#FullScreen").should("be.visible").click();
+            cy.get("#FullScreen.FullScreen.tooltipped.dropdown-trigger")
+                .should("be.visible")
+                .click();
         });
 
         it("should toggle the toolbar menu", () => {
@@ -96,7 +100,6 @@ describe("MusicBlocks Application", () => {
                 "#Decrease\\ block\\ size > img",
                 "#Increase\\ block\\ size > img"
             ];
-
             bottomBarElements.forEach(selector => {
                 cy.get(selector).should("exist").and("be.visible");
             });
@@ -108,7 +111,6 @@ describe("MusicBlocks Application", () => {
                 "tr > :nth-child(2) > img",
                 "tr > :nth-child(3) > img"
             ];
-
             sidebarElements.forEach(selector => {
                 cy.get(selector).should("exist").and("be.visible").click();
             });
@@ -133,17 +135,14 @@ describe("MusicBlocks Application", () => {
     describe("Planet Page Interaction", () => {
         it("should load the Planet page and return to the main page when clicking the close button", () => {
             cy.get("#planetIcon > .material-icons").should("exist").and("be.visible").click();
-
             cy.get("#planet-iframe", { timeout: 10000 })
                 .should("be.visible")
                 .and("have.attr", "src")
                 .and("not.be.empty");
-
             cy.get("#planet-iframe").then($iframe => {
                 const iframeSrc = $iframe.attr("src");
                 cy.log("Iframe source:", iframeSrc);
             });
-
             cy.window().then(win => {
                 win.document.getElementById("planet-iframe").style.display = "block";
             });
