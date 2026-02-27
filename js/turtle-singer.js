@@ -722,7 +722,7 @@ class Singer {
                 turtle.singer.synthVolume[synth].push(volume);
             }
         }
-}
+    }
 
     /**
      * Sets the synth volume to a value of at least 0 and, unless the synth is noise3, at most 100.
