@@ -1125,20 +1125,8 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
                 // eslint-disable-next-line no-console
                 console.debug(error);
             });
-    } else {
-        streaming = true;
-        video.play();
-        if (isVideo) {
-            cameraID = window.setInterval(draw, 100);
-            setCameraID(cameraID);
-        } else {
-            draw();
-        }
-    }
 
-    video.addEventListener(
-        "canplay",
-        () => {
+        video.oncanplay = () => {
             // console.debug("canplay", streaming, CameraManager.isSetup);
             if (!streaming) {
                 video.setAttribute("width", w);
@@ -1148,15 +1136,29 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
                 streaming = true;
 
                 if (isVideo) {
+                    if (cameraID !== null) {
+                        window.clearInterval(cameraID);
+                    }
                     cameraID = window.setInterval(draw, 100);
                     setCameraID(cameraID);
                 } else {
                     draw();
                 }
             }
-        },
-        false
-    );
+        };
+    } else {
+        streaming = true;
+        video.play();
+        if (isVideo) {
+            if (cameraID !== null) {
+                window.clearInterval(cameraID);
+            }
+            cameraID = window.setInterval(draw, 100);
+            setCameraID(cameraID);
+        } else {
+            draw();
+        }
+    }
 };
 
 /**
