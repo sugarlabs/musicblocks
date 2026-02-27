@@ -1562,3 +1562,8 @@ class Painter {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = Painter;
 }
+
+// Export to global scope for browser (RequireJS shim)
+if (typeof window !== "undefined") {
+    window.Painter = Painter;
+}
