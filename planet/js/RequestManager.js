@@ -261,10 +261,7 @@ class RequestManager {
             }, timeoutMs);
         });
 
-        return Promise.race([
-            promise.finally(() => clearTimeout(timeoutId)),
-            timeoutPromise
-        ]);
+        return Promise.race([promise.finally(() => clearTimeout(timeoutId)), timeoutPromise]);
     }
 
     /**
