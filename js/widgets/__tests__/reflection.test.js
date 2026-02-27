@@ -600,4 +600,3 @@ describe("ReflectionMatrix", () => {
         });
     });
 });
-
