@@ -178,7 +178,7 @@ function setupFlowBlocks(activity) {
                 tur.singer.duplicateFactor *= factor;
 
                 // Queue each block in the clamp
-                const listenerName = "_duplicate_" + turtle;
+                const listenerName = "_duplicate_" + turtle + "_" + blk;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
                 // Function to look for other turtles in the connection store
@@ -1178,9 +1178,8 @@ function setupFlowBlocks(activity) {
             ) {
                 logo.statusFields.push([blk, "duplicate"]);
             } else {
-                activity.blocks.blockList[blk].value = activity.turtles.ithTurtle(
-                    turtle
-                ).singer.duplicateFactor;
+                activity.blocks.blockList[blk].value =
+                    activity.turtles.ithTurtle(turtle).singer.duplicateFactor;
             }
         }
     }
