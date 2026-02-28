@@ -18,7 +18,8 @@
    instrumentsEffects, Singer, Tone, CAMERAVALUE, doUseCamera,
    VIDEOVALUE, last, getIntervalDirection, getIntervalNumber,
    mixedNumber, rationalToFraction, doStopVideoCam, StatusMatrix,
-   getStatsFromNotation, delayExecution, DEFAULTVOICE
+   getStatsFromNotation, delayExecution, DEFAULTVOICE,
+   performanceTracker
 */
 
 /*
@@ -1015,6 +1016,13 @@ class Logo {
      * @returns {void}
      */
     runLogoCommands(startHere, env) {
+        // Performance instrumentation: enable/disable based on URL flag
+        if (window.location.search.includes("performance=true")) {
+            performanceTracker.enable();
+        } else {
+            performanceTracker.disable();
+        }
+
         this._prematureRestart = this._alreadyRunning;
         if (this._alreadyRunning && this._runningBlock !== null) {
             this._ignoringBlock = this._runningBlock;
@@ -1184,6 +1192,9 @@ class Logo {
             this.activity.turtles.getTurtle(turtle).running = false;
         }
 
+        // Performance instrumentation: begin tracking
+        performanceTracker.startRun();
+
         /*
         ===========================================================================
         (2) Execute the stack. (A bit complicated due to lots of corner cases.)
@@ -1319,6 +1330,8 @@ class Logo {
      * @returns {void}
      */
     runFromBlockNow(logo, turtle, blk, isflow, receivedArg, queueStart) {
+        performanceTracker.enterBlock();
+
         this._alreadyRunning = true;
 
         this.receivedArg = receivedArg;
@@ -1470,7 +1483,10 @@ class Logo {
                 const [cf, cfc, ret] = res;
                 if (cf !== undefined) childFlow = cf;
                 if (cfc !== undefined) childFlowCount = cfc;
-                if (ret) return ret;
+                if (ret) {
+                    performanceTracker.exitBlock();
+                    return ret;
+                }
             }
         } else {
             if (
@@ -1694,6 +1710,10 @@ class Logo {
                     queueStart === 0 &&
                     tur.singer.justCounting.length === 0
                 ) {
+                    // Performance instrumentation: end tracking and log stats
+                    performanceTracker.endRun();
+                    performanceTracker.logStats();
+
                     if (logo.runningLilypond) {
                         if (logo.collectingStats) {
                             // console.debug("stats collection completed");
@@ -1768,6 +1788,8 @@ class Logo {
 
             setTimeout(__checkCompletionState, 100);
         }
+
+        performanceTracker.exitBlock();
     }
 
     /**
