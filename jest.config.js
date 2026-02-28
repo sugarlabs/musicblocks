@@ -3,6 +3,7 @@ module.exports = {
     clearMocks: true,
     moduleFileExtensions: ["js", "json", "node"],
     testEnvironment: "jsdom",
+    setupFilesAfterEnv: ["./jest.setup.js"],
     collectCoverage: true,
     collectCoverageFrom: [
         "js/**/*.js",
