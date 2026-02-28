@@ -1173,8 +1173,6 @@ function setupPitchBlocks(activity) {
                 if (intervalName in INTERVALVALUES) {
                     r = INTERVALVALUES[intervalName][2];
                 } else {
-                    // eslint-disable-next-line no-console
-                    console.log("could not find " + intervalName + " in INTERVALVALUES");
                     r = 1;
                 }
             }

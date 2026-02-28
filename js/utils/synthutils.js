@@ -1410,8 +1410,6 @@ function Synth() {
             console.debug("Cannot parse " + fragment);
         }
         const pitchNumber = octave * 12 + chromaticNumber + attr;
-        // eslint-disable-next-line no-console
-        console.log(solfege + octave + " = " + pitchNumber);
         return pitchNumber.toString();
     };
 
@@ -2312,12 +2310,11 @@ function Synth() {
         await this.mic
             .open()
             .then(() => {
-                console.log("Mic opened");
                 this.mic.connect(this.recorder);
                 this.recorder.start();
             })
             .catch(error => {
-                console.log(error);
+                console.error(error);
             });
     };
 
@@ -2548,14 +2545,6 @@ function Synth() {
                     // Show current note in display but calculate cents from target
                     note = currentNote.note; // Show the current note being played
 
-                    // Debug logging
-                    console.log("Debug values:", {
-                        detectedPitch: pitch,
-                        targetNote: targetPitch.note,
-                        targetFrequency: targetPitch.frequency,
-                        currentNote: note
-                    });
-
                     // Ensure we have valid frequencies before calculation
                     if (pitch > 0 && targetPitch.frequency > 0) {
                         // Calculate cents from target frequency
@@ -2595,14 +2584,6 @@ function Synth() {
                         this.displayText = "0 cents";
                     }
                 }
-
-                // Debug logging
-                console.log({
-                    frequency: pitch.toFixed(1),
-                    detectedNote: note,
-                    centsDeviation: cents,
-                    mode: tunerMode
-                });
 
                 // Initialize display elements if they don't exist
                 let noteDisplayContainer = document.getElementById("noteDisplayContainer");
@@ -2931,12 +2912,6 @@ function Synth() {
                                         freq *= Math.pow(2, octaveDiff);
 
                                         targetPitch.frequency = freq;
-
-                                        // Debug logging
-                                        console.log("Target pitch updated:", {
-                                            note: noteWithOctave,
-                                            frequency: targetPitch.frequency
-                                        });
 
                                         // Validate frequency
                                         if (

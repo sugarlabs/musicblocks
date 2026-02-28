@@ -55,7 +55,7 @@ class Planet {
 
     open(image) {
         if (this.LocalPlanet === null) {
-            console.log("Local Planet unavailable");
+            // Local planet unavailable
         } else {
             this.LocalPlanet.setCurrentProjectImage(image);
             this.LocalPlanet.updateProjects();
