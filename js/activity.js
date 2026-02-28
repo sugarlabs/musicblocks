@@ -8122,6 +8122,71 @@ class Activity {
     }
 
     /**
+     * Shows a tooltip with the specified text at the given coordinates.
+     * @param {string} text - The text to display.
+     * @param {number} x - The x coordinate.
+     * @param {number} y - The y coordinate.
+     */
+    showTooltip(text, x, y) {
+        if (!this.tooltipDiv) {
+            this.tooltipDiv = document.createElement("div");
+            this.tooltipDiv.id = "block-tooltip";
+            this.tooltipDiv.style.cssText = `
+                position: absolute;
+                background-color: rgba(30, 30, 30, 0.9);
+                color: white;
+                padding: 8px 12px;
+                border-radius: 4px;
+                font-size: 14px;
+                z-index: 10000;
+                pointer-events: none;
+                display: none;
+                max-width: 250px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                line-height: 1.4;
+                font-family: sans-serif;
+            `;
+            document.body.appendChild(this.tooltipDiv);
+        }
+
+        this.tooltipDiv.textContent = text;
+        this.tooltipDiv.style.display = "block";
+
+        // Position validation
+        const tooltipWidth = this.tooltipDiv.offsetWidth;
+        const tooltipHeight = this.tooltipDiv.offsetHeight;
+
+        let left = x + 15;
+        let top = y + 15;
+
+        // Keep within viewport width
+        if (left + tooltipWidth > window.innerWidth) {
+            left = x - tooltipWidth - 10;
+        }
+
+        // Keep within viewport height
+        if (top + tooltipHeight > window.innerHeight) {
+            top = y - tooltipHeight - 10;
+        }
+
+        // Ensure non-negative coordinates
+        left = Math.max(0, left);
+        top = Math.max(0, top);
+
+        this.tooltipDiv.style.left = left + "px";
+        this.tooltipDiv.style.top = top + "px";
+    }
+
+    /**
+     * Hides the tooltip.
+     */
+    hideTooltip() {
+        if (this.tooltipDiv) {
+            this.tooltipDiv.style.display = "none";
+        }
+    }
+
+    /**
      * Saves the current state locally
      * @returns {void}
      */
