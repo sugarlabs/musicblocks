@@ -111,6 +111,9 @@ class WidgetWindow {
         }
         const closeButton = this._create("div", "wftButton close", this._drag);
         closeButton.title = _("Close");
+        closeButton.setAttribute("role", "button");
+        closeButton.setAttribute("aria-label", _("Close window"));
+        closeButton.setAttribute("tabindex", "0");
         closeButton.onclick = e => {
             this.onclose();
             e.preventDefault();
@@ -156,6 +159,9 @@ class WidgetWindow {
         this._rollButton = this._create("div", "wftButton rollup", this._nonclosebuttons);
         const rollButton = this._rollButton;
         rollButton.title = _("Minimize");
+        rollButton.setAttribute("role", "button");
+        rollButton.setAttribute("aria-label", _("Roll up window"));
+        rollButton.setAttribute("tabindex", "0");
         rollButton.onclick = e => {
             if (this._rolled) {
                 this.unroll();
@@ -173,6 +179,9 @@ class WidgetWindow {
 
         if (this._fullscreenEnabled) {
             const maxminButton = this._create("div", "wftButton wftMaxmin", this._nonclosebuttons);
+            maxminButton.setAttribute("role", "button");
+            maxminButton.setAttribute("aria-label", _("Maximize window"));
+            maxminButton.setAttribute("tabindex", "0");
             maxminButton.onclick = e => {
                 if (this._maximized) {
                     this._restore();
