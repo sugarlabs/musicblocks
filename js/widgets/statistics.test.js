@@ -4,6 +4,7 @@
  * @author Divyam Agarwal
  *
  * @copyright 2026 Divyam Agarwal
+ * @copyright 2026 Om-A-osc
  *
  * @license
  * This program is free software: you can redistribute it and/or modify
@@ -23,7 +24,7 @@
 const StatsWindow = require("./statistics.js");
 
 describe("StatsWindow", () => {
-    let activity, widgetWin, body, capturedCb;
+    let activity, widgetWin, body, capturedCb, myChartMock, radarMock;
 
     beforeEach(() => {
         capturedCb = null;
@@ -58,7 +59,8 @@ describe("StatsWindow", () => {
             windowFor: jest.fn().mockReturnValue(widgetWin)
         };
 
-        global.docById = jest.fn().mockReturnValue({ getContext: jest.fn().mockReturnValue({}) });
+        myChartMock = { getContext: jest.fn().mockReturnValue({}) };
+        global.docById = jest.fn().mockReturnValue(myChartMock);
 
         global.analyzeProject = jest.fn().mockReturnValue({});
         global.runAnalytics = jest.fn();
@@ -68,10 +70,11 @@ describe("StatsWindow", () => {
             return {};
         });
 
+        radarMock = {
+            toBase64Image: jest.fn().mockReturnValue("data:image/png;base64,fakedata")
+        };
         global.Chart = jest.fn().mockImplementation(() => ({
-            Radar: jest.fn().mockReturnValue({
-                toBase64Image: jest.fn().mockReturnValue("data:image/png;base64,fakedata")
-            })
+            Radar: jest.fn().mockReturnValue(radarMock)
         }));
     });
 
@@ -118,6 +121,22 @@ describe("StatsWindow", () => {
         expect(body.style.padding).toBe("0px 0px");
     });
 
+    test("onmaximize clears existing body content before rerender", () => {
+        const sw = new StatsWindow(activity);
+        const staleNode = document.createElement("p");
+        staleNode.textContent = "stale";
+        body.appendChild(staleNode);
+        const previousJsonObject = sw.jsonObject;
+        global.analyzeProject.mockClear();
+
+        widgetWin.isMaximized.mockReturnValue(false);
+        widgetWin.onmaximize();
+
+        expect(body.textContent).not.toContain("stale");
+        expect(sw.jsonObject).not.toBe(previousJsonObject);
+        expect(global.analyzeProject).toHaveBeenCalledTimes(1);
+    });
+
     test("chart callback sets img width to 200 when not maximized", () => {
         widgetWin.isMaximized.mockReturnValue(false);
         const sw = new StatsWindow(activity);
@@ -141,6 +160,65 @@ describe("StatsWindow", () => {
 
         const imgs = body.querySelectorAll("img");
         expect(imgs[imgs.length - 1].width).toBe(420); // 500 - 80
+    });
+
+    test("doAnalytics initializes chart with canvas context and analytics data", () => {
+        const chartData = { labels: ["a"] };
+        const chartOptions = { responsive: true };
+        global.scoreToChartData.mockReturnValue(chartData);
+        global.getChartOptions.mockImplementation(cb => {
+            capturedCb = cb;
+            return chartOptions;
+        });
+
+        const sw = new StatsWindow(activity);
+
+        expect(global.docById).toHaveBeenCalledWith("myChart");
+        expect(myChartMock.getContext).toHaveBeenCalledWith("2d");
+        expect(global.scoreToChartData).toHaveBeenCalledWith({});
+        expect(global.getChartOptions).toHaveBeenCalledWith(expect.any(Function));
+        expect(global.Chart).toHaveBeenCalledWith(myChartMock.getContext.mock.results[0].value);
+        expect(activity.blocks.activeBlock).toBeNull();
+        expect(document.body.style.cursor).toBe("wait");
+        expect(activity.loading).toBe(true);
+    });
+
+    test("doAnalytics appends json list container with left float style", () => {
+        const sw = new StatsWindow(activity);
+
+        expect(sw.jsonObject).toBeInstanceOf(HTMLUListElement);
+        expect(sw.jsonObject.style.float).toBe("left");
+        expect(body.lastChild).toBe(sw.jsonObject);
+    });
+
+    test("chart callback reads base64 image from radar chart", () => {
+        const sw = new StatsWindow(activity);
+
+        capturedCb();
+
+        expect(radarMock.toBase64Image).toHaveBeenCalled();
+        const imgs = body.querySelectorAll("img");
+        expect(imgs[imgs.length - 1].src).toContain("data:image/png;base64,fakedata");
+    });
+
+    test("chart callback appends chart image after stats list", () => {
+        const sw = new StatsWindow(activity);
+
+        capturedCb();
+
+        expect(body.children[0]).toBe(sw.jsonObject);
+        expect(body.children[body.children.length - 1].tagName).toBe("IMG");
+    });
+
+    test("onmaximize reruns analytics and updates chart callback reference", () => {
+        const sw = new StatsWindow(activity);
+        const firstCb = capturedCb;
+        global.getChartOptions.mockClear();
+
+        widgetWin.onmaximize();
+
+        expect(global.getChartOptions).toHaveBeenCalledTimes(1);
+        expect(capturedCb).not.toBe(firstCb);
     });
 
     test("displayInfo renders all stats fields with correct Hz", () => {
