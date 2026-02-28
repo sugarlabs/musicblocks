@@ -158,7 +158,7 @@ class WidgetWindow {
         this._nonclosebuttons.style.display = "flex";
         this._rollButton = this._create("div", "wftButton rollup", this._nonclosebuttons);
         const rollButton = this._rollButton;
-        rollButton.title = _("Minimize");
+        rollButton.title = _("Roll up");
         rollButton.setAttribute("role", "button");
         rollButton.setAttribute("aria-label", _("Roll up window"));
         rollButton.setAttribute("tabindex", "0");
