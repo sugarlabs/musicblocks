@@ -187,7 +187,11 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         "activity/lilypond",
         "activity/abc",
         "activity/midi",
-        "activity/mxml"
+        "activity/mxml",
+        "activity/ai/AIModelAdapter",
+        "activity/ai/AIModelRegistry",
+        "activity/ai/MockAIModelAdapter",
+        "activity/ai/ai-playground"
     ];
     MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
 }
@@ -208,6 +212,9 @@ const doAnalyzeProject = function () {
  * Represents an activity in the application.
  */
 class Activity {
+    static get aiRegistry() {
+        return window.AIModelRegistry;
+    }
     /**
      * Creates an Activity instance.
      */
