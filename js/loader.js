@@ -86,12 +86,16 @@ requirejs.config({
             deps: ["utils/utils"],
             exports: "Synth"
         },
+        "utils/ManagedTimer": {
+            exports: "ManagedTimer"
+        },
         "activity/logo": {
             deps: [
                 "activity/turtles",
                 "activity/notation",
                 "utils/synthutils",
-                "activity/logoconstants"
+                "activity/logoconstants",
+                "utils/ManagedTimer"
             ],
             exports: "Logo"
         },
