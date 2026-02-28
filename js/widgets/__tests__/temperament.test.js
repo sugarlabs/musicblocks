@@ -27,14 +27,19 @@ describe("TemperamentWidget basic tests", () => {
             refreshWheel: jest.fn()
         }));
 
-        global.platformColor = { selectorBackground: "#fff" };
+        global.platformColor = {
+            selectorBackground: "#fff",
+            selectorBackgroundHOVER: "#eee",
+            labelColor: "#ddd"
+        };
 
         global.Singer = { defaultBPMFactor: 1 };
 
         global.getTemperamentKeys = jest.fn(() => []);
         global.isCustomTemperament = jest.fn(() => false);
         global.getTemperament = jest.fn(() => ({
-            interval: []
+            interval: [],
+            pitchNumber: 0
         }));
         global.pitchToFrequency = jest.fn(() => 440);
         global.frequencyToPitch = jest.fn(() => ["C", 4, 0]);
@@ -45,13 +50,47 @@ describe("TemperamentWidget basic tests", () => {
             DonutSliceCustomization: () => ({})
         }));
 
-        global.docById = jest.fn(id => ({
+        global.FLAT = "♭";
+        global.SHARP = "♯";
+
+        const createMockElement = id => ({
+            id: id,
             innerHTML: "",
             style: {},
+            width: 100,
+            height: 100,
+            dataset: { message: "1" },
             append: jest.fn(),
-            getElementsByTagName: jest.fn(() => []),
-            addEventListener: jest.fn()
-        }));
+            appendChild: jest.fn(),
+            remove: jest.fn(),
+            getElementsByTagName: jest.fn(() => [createMockElement("img")]),
+            addEventListener: jest.fn(),
+            getContext: jest.fn(() => ({
+                beginPath: jest.fn(),
+                arc: jest.fn(),
+                fill: jest.fn(),
+                stroke: jest.fn(),
+                lineWidth: 0,
+                fillStyle: "",
+                strokeStyle: ""
+            })),
+            getBoundingClientRect: jest.fn(() => ({ left: 0, top: 0 })),
+            insertCell: jest.fn(() => createMockElement("cell")),
+            createTHead: jest.fn(() => ({
+                insertRow: jest.fn(() => ({
+                    id: "",
+                    insertCell: jest.fn(() => createMockElement("cell"))
+                }))
+            }))
+        });
+
+        const mockElements = {};
+        global.docById = jest.fn(id => {
+            if (!mockElements[id]) {
+                mockElements[id] = createMockElement(id);
+            }
+            return mockElements[id];
+        });
 
         widget = new TemperamentWidget();
     });
@@ -511,5 +550,118 @@ describe("TemperamentWidget basic tests", () => {
         widget._save();
 
         expect(widget.activity.blocks.loadNewBlocks).toHaveBeenCalled();
+    });
+
+    test("init sets up widget correctly", () => {
+        const mockWidgetWindow = {
+            clear: jest.fn(),
+            show: jest.fn(),
+            getWidgetBody: jest.fn(() => ({
+                append: jest.fn(),
+                style: {}
+            })),
+            addButton: jest.fn(() => ({
+                onclick: null,
+                getElementsByTagName: jest.fn(() => [{}])
+            })),
+            sendToCenter: jest.fn()
+        };
+
+        global.window.widgetWindows = {
+            windowFor: jest.fn(() => mockWidgetWindow)
+        };
+
+        global.window.innerWidth = 1200;
+        global.buildScale = jest.fn(() => [["C"], []]);
+        global.getNoteFromInterval = jest.fn(() => ["C", 4]);
+
+        const mockActivity = {
+            logo: {
+                synth: {
+                    startingPitch: "C4",
+                    _getFrequency: jest.fn(() => 440)
+                }
+            }
+        };
+
+        widget.inTemperament = "equal";
+        widget.scale = ["C", "Major"];
+        widget.init(mockActivity);
+
+        expect(mockWidgetWindow.clear).toHaveBeenCalled();
+        expect(mockWidgetWindow.show).toHaveBeenCalled();
+        expect(widget.activity).toBe(mockActivity);
+        expect(widget.pitchNumber).toBe(0); // getTemperament("equal") returns 0 in our mock
+    });
+
+    test("showNoteInfo creates a popup", () => {
+        widget.notesCircle = {
+            navItemCount: 1
+        };
+        widget.frequencies = [440];
+        widget.ratios = [1];
+        widget.powerBase = 2;
+        widget.ratiosNotesPair = [[1, ["C", 4]]];
+
+        const event = {
+            target: { id: "wheelnav-wheelDiv2-slice-0" },
+            clientX: 100,
+            clientY: 100
+        };
+
+        widget.showNoteInfo(event);
+
+        expect(global.docById("information").innerHTML).toContain("popup");
+    });
+
+    test("editFrequency sets up a frequency slider", () => {
+        widget.frequencies = [440, 466, 494];
+        widget.ratios = [1, 1.059, 1.122];
+        widget.temporaryRatios = [];
+
+        const event = {
+            target: { dataset: { message: "1" } }
+        };
+
+        widget.editFrequency(event);
+
+        expect(global.docById("noteInfo").innerHTML).toContain('type="range"');
+        expect(global.docById("noteInfo").innerHTML).toContain("frequencySlider1");
+    });
+
+    test("checkTemperament identifies predefined temperament", () => {
+        global.getTemperamentKeys = jest.fn(() => ["equal", "just"]);
+        global.getTemperament = jest.fn(key => {
+            if (key === "equal") {
+                return {
+                    interval: ["0", "1"],
+                    pitchNumber: 1,
+                    0: 1,
+                    1: 2
+                };
+            }
+            return { interval: [], pitchNumber: 0 };
+        });
+        global.isCustomTemperament = jest.fn(() => false);
+        global.buildScale = jest.fn(() => [["C"], []]);
+        global.getNoteFromInterval = jest.fn(() => ["C", 4]);
+
+        const mockActivity = {
+            logo: {
+                synth: {
+                    startingPitch: "C4",
+                    _getFrequency: jest.fn(() => 440)
+                }
+            }
+        };
+
+        // Call init to initialize temperamentCell
+        widget.inTemperament = "equal";
+        widget.scale = ["C", "Major"];
+        widget.init(mockActivity);
+
+        widget.checkTemperament(["1.00", "2.00"]);
+
+        expect(widget.inTemperament).toBe("equal");
     });
 });
