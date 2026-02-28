@@ -1366,14 +1366,16 @@ class Painter {
             turtles.gx = this.turtle.ctx.canvas.width;
             turtles.gy = this.turtle.ctx.canvas.height;
             turtles.canvas1 = document.createElement("canvas");
-            turtles.canvas1.width = 3 * this.turtle.ctx.canvas.width;
-            turtles.canvas1.height = 3 * this.turtle.ctx.canvas.height;
+            // Use 2x viewport instead of 3x to save ~40 MB of memory.
+            // At 1920x1080: 2x = 3840x2160x4 = 33 MB vs 3x = 5760x3240x4 = 75 MB.
+            turtles.canvas1.width = 2 * this.turtle.ctx.canvas.width;
+            turtles.canvas1.height = 2 * this.turtle.ctx.canvas.height;
             turtles.c1ctx = turtles.canvas1.getContext("2d", { willReadFrequently: true });
             turtles.c1ctx.rect(
                 0,
                 0,
-                3 * this.turtle.ctx.canvas.width,
-                3 * this.turtle.ctx.canvas.height
+                2 * this.turtle.ctx.canvas.width,
+                2 * this.turtle.ctx.canvas.height
             );
             turtles.c1ctx.fillStyle = "#F9F9F9";
             turtles.c1ctx.fill();
@@ -1383,15 +1385,12 @@ class Painter {
 
         turtles.gy -= dy;
         turtles.gx -= dx;
+        // Clamp to the bounds of the 2x scroll canvas (max offset = 1x viewport)
         turtles.gx =
-            2 * this.turtle.ctx.canvas.width > turtles.gx
-                ? turtles.gx
-                : 2 * this.turtle.ctx.canvas.width;
+            this.turtle.ctx.canvas.width > turtles.gx ? turtles.gx : this.turtle.ctx.canvas.width;
         turtles.gx = 0 > turtles.gx ? 0 : turtles.gx;
         turtles.gy =
-            2 * this.turtle.ctx.canvas.height > turtles.gy
-                ? turtles.gy
-                : 2 * this.turtle.ctx.canvas.height;
+            this.turtle.ctx.canvas.height > turtles.gy ? turtles.gy : this.turtle.ctx.canvas.height;
         turtles.gy = 0 > turtles.gy ? 0 : turtles.gy;
 
         const newImgData = turtles.c1ctx.getImageData(
