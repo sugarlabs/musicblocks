@@ -33,6 +33,7 @@
     "electron-builder": "26.4.0",
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^9.0.0",
+    "fake-indexeddb": "6.2.5",
     "gulp": "^5.0.1",
     "gulp-babel": "^8.0.0",
     "gulp-clean-css": "^4.3.0",
