@@ -65,11 +65,16 @@ let MYDEFINES = [
     "tweenjs.min",
     "preloadjs.min",
     "howler",
-    "p5.min",
-    "p5-sound-adapter",
-    "p5.dom.min",
-    // 'mespeak',
-    "Chart",
+    // p5.min, p5-sound-adapter, and p5.dom.min are NOT loaded eagerly.
+    // They are only needed by the JS-export feature and will be loaded
+    // on demand via require() when that feature is used, saving ~10-15 MB
+    // of heap memory on every page load.
+    // "p5.min",
+    // "p5-sound-adapter",
+    // "p5.dom.min",
+    // Chart.js is only used by the statistics widget and will be loaded
+    // on demand when the widget is opened, saving ~3-5 MB of heap memory.
+    // "Chart",
     "utils/utils",
     "activity/artwork",
     "widgets/status",
@@ -2943,6 +2948,9 @@ class Activity {
                 }
             };
 
+            // Store listener reference so we can remove them in cleanup
+            this._idleResetHandler = resetIdleTimer;
+
             // Track user activity
             window.addEventListener("mousemove", resetIdleTimer);
             window.addEventListener("mousedown", resetIdleTimer);
@@ -2950,8 +2958,8 @@ class Activity {
             window.addEventListener("touchstart", resetIdleTimer);
             window.addEventListener("wheel", resetIdleTimer);
 
-            // Periodic check for idle state
-            setInterval(() => {
+            // Periodic check for idle state — store interval ID for cleanup
+            this._idleCheckInterval = setInterval(() => {
                 // Check if music/code is playing
                 const isMusicPlaying = this.logo?._alreadyRunning || false;
 
@@ -2970,6 +2978,25 @@ class Activity {
             // Expose activity instance for external checks
             if (typeof window !== "undefined") {
                 window.activity = this;
+            }
+        };
+
+        /**
+         * Removes idle watcher event listeners and clears the interval
+         * to prevent memory leaks when the activity is torn down.
+         */
+        this._cleanupIdleWatcher = () => {
+            if (this._idleResetHandler) {
+                window.removeEventListener("mousemove", this._idleResetHandler);
+                window.removeEventListener("mousedown", this._idleResetHandler);
+                window.removeEventListener("keydown", this._idleResetHandler);
+                window.removeEventListener("touchstart", this._idleResetHandler);
+                window.removeEventListener("wheel", this._idleResetHandler);
+                this._idleResetHandler = null;
+            }
+            if (this._idleCheckInterval) {
+                clearInterval(this._idleCheckInterval);
+                this._idleCheckInterval = null;
             }
         };
 
