@@ -334,7 +334,8 @@ function setupPitchActions(activity) {
                         transformedHertz = pitchToFrequency(p, o, c, tur.singer.keySignature);
 
                         if (c !== 0) {
-                            activity.logo.notation.notationMarkup(turtle, transformedHertz);
+                            const formattedHertz = Number(transformedHertz.toFixed(2));
+                            activity.logo.notation.notationMarkup(turtle, formattedHertz);
                         }
                     }
                 }
