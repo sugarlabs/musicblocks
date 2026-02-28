@@ -237,7 +237,6 @@ function setupDictActions(activity) {
                 activity.logo.turtleDicts[turtle][dict] = {};
             }
             activity.logo.turtleDicts[turtle][dict][key] = value;
-            console.log(activity.logo.turtleDicts[turtle]);
         }
 
         /**

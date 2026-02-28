@@ -697,10 +697,7 @@ const processPluginData = (activity, pluginData, pluginSource) => {
     try {
         obj = JSON.parse(pluginData);
     } catch (e) {
-        // eslint-disable-next-line no-console
-        console.log(pluginData);
-        // eslint-disable-next-line no-console
-        console.log(e);
+        console.error(e);
         return null;
     }
     // Create a palette entry.
@@ -932,10 +929,7 @@ const processRawPluginData = (activity, rawData, pluginSource) => {
         obj = processPluginData(activity, cleanData.replace(/\n/g, ""), pluginSource);
     } catch (e) {
         obj = null;
-        // eslint-disable-next-line no-console
-        console.log(rawData);
-        // eslint-disable-next-line no-console
-        console.log(cleanData);
+        console.error("Error loading plugin: " + e);
         activity.errorMsg("Error loading plugin: " + e);
     }
 
@@ -1045,9 +1039,6 @@ let processMacroData = (macroData, palettes, blocks, macroDict) => {
 
             palettes.makePalettes(1);
         } catch (e) {
-            // eslint-disable-next-line no-console
-            console.log(macroData);
-            // eslint-disable-next-line no-console
             console.debug(e);
         }
     }
