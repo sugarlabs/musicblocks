@@ -450,4 +450,111 @@ describe("RhythmBlocks", () => {
             expect(block.hidden).toBe(true);
         });
     });
+
+    describe("Edge Cases and Additional Coverage", () => {
+        test("MultiplyBeatFactorBlock handles fractional factor", () => {
+            const block = getBlock("multiplybeatfactor");
+            block.flow([0.5, true], logo, 0, 10);
+
+            expect(global.Singer.RhythmActions.multiplyNoteValue).toHaveBeenCalledWith(0.5, 0, 10);
+        });
+
+        test("RhythmicDotBlock handles single dot", () => {
+            const block = getBlock("rhythmicdot");
+            const result = block.flow([true], logo, 0, 10);
+
+            // RhythmicDotBlock has internal implementation, not calling doRhythmicDot
+            // It should return the expected tuple format
+            expect(result).toEqual([true, 1]);
+        });
+
+        test("RhythmicDot2Block handles multiple dots", () => {
+            const block = getBlock("rhythmicdot2");
+            block.flow([3, true], logo, 0, 10);
+
+            expect(global.Singer.RhythmActions.doRhythmicDot).toHaveBeenCalledWith(3, 0, 10);
+        });
+
+        test("NewNoteBlock registers correctly", () => {
+            const block = getBlock("newnote");
+            expect(block).toBeDefined();
+            expect(block.formDefn).toBeDefined();
+        });
+
+        test("NoteBlock macros are defined", () => {
+            const noteBlocks = [
+                "note1",
+                "note2",
+                "note3",
+                "note4",
+                "note5",
+                "note6",
+                "note7",
+                "note8"
+            ];
+            noteBlocks.forEach(blockName => {
+                const block = getBlock(blockName);
+                expect(block).toBeDefined();
+                expect(block.macro).toBeDefined();
+            });
+        });
+
+        test("OctaveSpaceBlock is defined", () => {
+            const block = getBlock("octavespace");
+            expect(block).toBeDefined();
+        });
+
+        test("DefineFrequencyBlock is defined", () => {
+            const block = getBlock("definefrequency");
+            expect(block).toBeDefined();
+        });
+
+        test("All rhythm blocks have proper palette assignment", () => {
+            const rhythmBlockNames = [
+                "mynotevalue",
+                "skipfactor",
+                "osctime",
+                "swing",
+                "newswing",
+                "newswing2",
+                "skipnotes",
+                "multiplybeatfactor",
+                "tie",
+                "rhythmicdot",
+                "rhythmicdot2",
+                "rest2",
+                "note",
+                "newnote"
+            ];
+
+            rhythmBlockNames.forEach(blockName => {
+                const block = activity.registeredBlocks[blockName];
+                expect(block).toBeDefined();
+                expect(block.palette).toBe("rhythm");
+            });
+        });
+
+        test("Flow blocks return correct tuple format", () => {
+            // newswing2 is excluded: it checks args[2] for undefined and returns early
+            // when called with only [1, true]; it is covered by its own dedicated test.
+            const flowBlocks = ["swing", "skipnotes", "multiplybeatfactor", "tie"];
+
+            flowBlocks.forEach(blockName => {
+                const block = getBlock(blockName);
+                expect(block).toBeDefined();
+                expect(typeof block.flow).toBe("function");
+                const result = block.flow([1, true], logo, 0, 10);
+                expect(result).toBeDefined();
+                expect(Array.isArray(result)).toBe(true);
+                expect(result.length).toBe(2);
+            });
+        });
+
+        test("Rest2Block has correct palette and is beginner block", () => {
+            const block = getBlock("rest2");
+            expect(block).toBeDefined();
+            expect(block.palette).toBe("rhythm");
+            expect(block.isBeginner).toBe(true);
+        });
+    });
 });
