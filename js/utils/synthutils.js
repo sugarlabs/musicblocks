@@ -826,8 +826,8 @@ function Synth() {
                             const octaveDiff = octave - thisTemperament[pitchNumber][2];
                             return Number(
                                 thisTemperament[pitchNumber][0] *
-                                startPitchFrequency *
-                                Math.pow(getOctaveRatio(), octaveDiff)
+                                    startPitchFrequency *
+                                    Math.pow(getOctaveRatio(), octaveDiff)
                             );
                         }
                     }
@@ -2381,7 +2381,7 @@ function Synth() {
             window.activity = {
                 blocks: {
                     blockList: [],
-                    setPitchOctave: () => { },
+                    setPitchOctave: () => {},
                     findPitchOctave: () => 4,
                     stageClick: false
                 },
@@ -2678,7 +2678,7 @@ function Synth() {
                                             }
                                         ],
                                         stageClick: false,
-                                        setPitchOctave: () => { },
+                                        setPitchOctave: () => {},
                                         findPitchOctave: () => 4,
                                         turtles: {
                                             _canvas: {
@@ -2695,7 +2695,7 @@ function Synth() {
                                     connections: [0], // Connect to the pitch block
                                     value: targetPitch.note,
                                     text: { text: targetPitch.note },
-                                    updateCache: () => { },
+                                    updateCache: () => {},
                                     _exitWheel: null,
                                     _pitchWheel: null,
                                     _accidentalsWheel: null,
@@ -2705,7 +2705,7 @@ function Synth() {
                                     container: {
                                         x: targetNoteSelector.offsetLeft,
                                         y: targetNoteSelector.offsetTop,
-                                        setChildIndex: () => { }
+                                        setChildIndex: () => {}
                                     },
                                     prevAccidental: "♮",
                                     name: "pitch", // This is needed for pitch preview
@@ -2716,9 +2716,9 @@ function Synth() {
                                 if (!window.activity.logo) {
                                     window.activity.logo = {
                                         synth: {
-                                            createDefaultSynth: () => { },
-                                            loadSynth: () => { },
-                                            setMasterVolume: () => { },
+                                            createDefaultSynth: () => {},
+                                            loadSynth: () => {},
+                                            setMasterVolume: () => {},
                                             trigger: (turtle, note, duration, instrument) => {
                                                 // Use the Web Audio API to play the preview note
                                                 const audioContext = new (window.AudioContext ||
@@ -3207,7 +3207,7 @@ function Synth() {
                             const shouldLight =
                                 centsFromTarget < 0
                                     ? segmentCents <= 0 &&
-                                    Math.abs(segmentCents) <= Math.abs(centsFromTarget) // Flat side
+                                      Math.abs(segmentCents) <= Math.abs(centsFromTarget) // Flat side
                                     : segmentCents >= 0 && segmentCents <= centsFromTarget; // Sharp side
 
                             if (shouldLight || Math.abs(centsFromTarget - segmentCents) <= 5) {

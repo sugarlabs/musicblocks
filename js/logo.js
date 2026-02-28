@@ -1708,7 +1708,7 @@ class Logo {
                         tur.parentFlowQueue.length > 0 &&
                         tur.queue.length > 0 &&
                         logo.deps.utils.last(tur.queue).parentBlk !==
-                        logo.deps.utils.last(tur.parentFlowQueue)
+                            logo.deps.utils.last(tur.parentFlowQueue)
                     ) {
                         tur.unhighlightQueue.push(logo.deps.utils.last(tur.parentFlowQueue));
                     } else if (tur.unhighlightQueue.length > 0) {
