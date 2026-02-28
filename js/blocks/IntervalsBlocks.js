@@ -1543,3 +1543,7 @@ function setupIntervalsBlocks(activity) {
     new SetKeyBlock().setup(activity);
     new SetKey2Block().setup(activity);
 }
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupIntervalsBlocks };
+}
