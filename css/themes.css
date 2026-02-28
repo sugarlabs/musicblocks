@@ -31,6 +31,36 @@
     background-color: transparent !important;
 }
 
+/* High Contrast Mode Theme Dropdown - Override ALL styles */
+.highcontrast #themedropdown {
+    background-color: #000000 !important;
+    border: 1px solid #ffffff !important;
+}
+
+.highcontrast #themedropdown li {
+    background-color: transparent !important;
+}
+
+.highcontrast #themedropdown li a {
+    background-color: transparent !important;
+    color: #00ffff !important;
+}
+
+.highcontrast #themedropdown li a:hover,
+.highcontrast #themedropdown a:hover,
+.highcontrast #themedropdown li:hover,
+.highcontrast #themedropdown.dropdown-content li > a:hover,
+.highcontrast.dropdown-content li > a:hover {
+    background-color: transparent !important;
+    color: #00ffff !important;
+}
+
+/* Override Materialize CSS hover styles with maximum specificity */
+body.highcontrast #themedropdown.dropdown-content li > a:hover {
+    background-color: transparent !important;
+    color: #00ffff !important;
+}
+
 /* Dark Mode */
 
 .dark .blue {
@@ -153,7 +183,7 @@
 }
 
 .dark #newdropdown li:hover {
-  background-color: transparent !important;
+    background-color: transparent !important;
 }
 
 .dark #confirmation-message {
@@ -176,18 +206,161 @@ body.dark {
     --accent: #3fe0d1;
 }
 
+body.highcontrast {
+    --border: #ffffff;
+    --bg: #000000;
+    --fg: #ffffff;
+    --panel-bg: #000000;
+    --accent: #00ffff;
+}
+
+.highcontrast #canvas {
+    background-color: #000000 !important;
+}
+
+.highcontrast .blue {
+    background-color: #000080 !important;
+}
+
+.highcontrast .blue.darken-1 {
+    background-color: #0000ff !important;
+}
+
+.highcontrast #floatingWindows > .windowFrame {
+    border: 2px solid var(--border);
+    background-color: var(--bg);
+}
+
+.highcontrast .wfbtItem {
+    background-color: #00ffff;
+}
+
+.highcontrast #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
+    color: #ffffff;
+}
+
+.highcontrast #floatingWindows > .windowFrame > .wfWinBody .wfbWidget {
+    color: #ffffff !important;
+    background-color: #000000 !important;
+}
+
+.highcontrast .popupMsg {
+    background-color: #000000;
+    color: #ffffff;
+}
+
+.highcontrast #printText {
+    border-color: #ffffff;
+}
+
+.highcontrast #loading-image-container {
+    background-color: var(--bg) !important;
+}
+
+.highcontrast #loadingText {
+    color: white !important;
+}
+
+.highcontrast .language-link {
+    color: #ffffff;
+}
+
+.highcontrast #submitLilypond {
+    background-color: #00ffff;
+    color: #000000;
+}
+
+.highcontrast #search,
+.highcontrast #helpfulSearch,
+.highcontrast .ui-autocomplete {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 1px solid #ffffff;
+}
+
+.highcontrast .ui-autocomplete .ui-menu-item a {
+    color: #ffffff !important;
+    background-color: #000000 !important;
+}
+
+.highcontrast .ui-autocomplete .ui-menu-item a:hover {
+    color: #000000 !important;
+    background-color: #00ffff !important;
+}
+
+.highcontrast #helpfulSearchDiv {
+    color: #ffffff !important;
+    background-color: transparent !important;
+}
+
+.highcontrast #crossButton {
+    color: #ffffff;
+}
+
+.highcontrast #chooseKeyDiv {
+    background: #000000;
+    color: #ffffff;
+}
+
+.highcontrast #movable {
+    background: #000000;
+    color: #ffffff;
+}
+
+.highcontrast .dropdown-content li > a {
+    background-color: #000000;
+    color: #00ffff;
+}
+
+.highcontrast .dropdown-content {
+    background-color: #000000;
+    border: 1px solid #ffffff;
+}
+
+.highcontrast .modalBox {
+    background-color: #000000;
+}
+
+.highcontrast .modal-message {
+    color: #ffffff;
+    background-color: #000000;
+}
+
+.highcontrast #newdropdown {
+    border: #ffffff;
+    background-color: #000000;
+}
+
+.highcontrast #confirmation-message {
+    color: #ffffff;
+}
+
+.highcontrast .material-tooltip {
+    background-color: #000000 !important;
+    border: 1px solid #ffffff;
+}
+
+.highcontrast .material-tooltip .backdrop {
+    background-color: #000000 !important;
+}
+
+.highcontrast #languagedropdown li a.selected-language {
+    background-color: rgba(0, 255, 255, 0.25);
+    border-left: 3px solid #00ffff;
+}
+
 /* Your Custom Theme can go here if you don't want to modify the existing dark mode */
 
 /* Selected language highlight in language dropdown */
 #languagedropdown li a.selected-language {
-  background-color: rgba(33, 150, 243, 0.15);
-  border-left: 3px solid #2196F3;
-  font-weight: 600;
+    background-color: rgba(33, 150, 243, 0.15);
+    border-left: 3px solid #2196f3;
+    font-weight: 600;
 }
 
 .dark #languagedropdown li a.selected-language {
-  background-color: rgba(33, 150, 243, 0.25);
-  border-left: 3px solid #64B5F6;
+    background-color: rgba(33, 150, 243, 0.25);
+    border-left: 3px solid #64b5f6;
 }
 
 /* Dark Mode Tooltip Styling - Slightly lighter background for better contrast */

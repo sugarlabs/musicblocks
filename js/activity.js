@@ -322,7 +322,7 @@ class Activity {
         // When true, the stage needs to be redrawn on the next animation frame
         this.stageDirty = false;
 
-        this.themes = ["light", "dark"];
+        this.themes = ["light", "dark", "highcontrast"];
         try {
             // Detect system theme preference (using same logic as ThemeBox)
             const getSystemTheme = () => {
