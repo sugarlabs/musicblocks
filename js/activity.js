@@ -2932,6 +2932,15 @@ class Activity {
             let lastActivity = Date.now();
             let isIdle = false;
 
+            document.addEventListener("visibilitychange", () => {
+                if (document.hidden) {
+                    createjs.Ticker.paused = true;
+                } else {
+                    createjs.Ticker.paused = false;
+                    resetIdleTimer();
+                }
+            });
+
             // Wake up function - restores full framerate
             const resetIdleTimer = () => {
                 lastActivity = Date.now();
@@ -2951,8 +2960,7 @@ class Activity {
             window.addEventListener("wheel", resetIdleTimer);
 
             // Periodic check for idle state
-            setInterval(() => {
-                // Check if music/code is playing
+            const idleCheck = () => {
                 const isMusicPlaying = this.logo?._alreadyRunning || false;
 
                 if (!isMusicPlaying && Date.now() - lastActivity > IDLE_THRESHOLD) {
@@ -2962,10 +2970,13 @@ class Activity {
                         console.log("⚡ Idle mode: Throttling to 1 FPS to save battery");
                     }
                 } else if (isIdle && isMusicPlaying) {
-                    // Music started playing - wake up immediately
                     resetIdleTimer();
                 }
-            }, 1000);
+
+                setTimeout(idleCheck, 1000);
+            };
+
+            setTimeout(idleCheck, 1000);
 
             // Expose activity instance for external checks
             if (typeof window !== "undefined") {
@@ -7380,6 +7391,7 @@ class Activity {
 
             // Initialize Ticker with optimal framerate
             createjs.Ticker.framerate = 60;
+            createjs.Ticker.timingMode = createjs.Ticker.RAF;
 
             // ===== Idle Ticker Optimization =====
             // Throttle rendering when user is inactive and no music is playing
