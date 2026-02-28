@@ -157,7 +157,10 @@ let MYDEFINES = [
     "activity/blocks/EnsembleBlocks",
     "widgets/widgetWindows",
     "widgets/statistics",
-    "widgets/jseditor"
+    "widgets/jseditor",
+    "WorkspaceStorage",
+    "SyncManager",
+    "ConflictResolver"
 ];
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -7466,6 +7469,22 @@ class Activity {
                 await this.planet.init();
             } catch (e) {
                 this.planet = undefined;
+            }
+
+            // Phase 2: Initialize WorkspaceStorage and SyncManager
+            try {
+                if (typeof WorkspaceStorage !== "undefined") {
+                    this.workspaceStorage = new WorkspaceStorage(this);
+                    await this.workspaceStorage.init();
+                }
+                if (typeof SyncManager !== "undefined" && this.workspaceStorage) {
+                    this.syncManager = new SyncManager(this, this.workspaceStorage);
+                    await this.syncManager.init();
+                    window.syncManager = this.syncManager;
+                }
+            } catch (e) {
+                // eslint-disable-next-line no-console
+                console.error("Phase 2 initialization failed:", e);
             }
 
             this.save = new SaveInterface(this);
