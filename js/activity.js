@@ -6306,6 +6306,10 @@ class Activity {
          * Inits everything. The main function.
          */
         this.init = async () => {
+            // Guard against double initialization
+            if (this._initialized) return;
+            this._initialized = true;
+
             this._clientWidth = document.body.clientWidth;
             this._clientHeight = document.body.clientHeight;
             this._innerWidth = window.innerWidth;
@@ -7120,16 +7124,10 @@ class Activity {
 
 const activity = new Activity();
 
-require(["domReady!"], (doc) =>{
-    setTimeout(() => {
-        activity.setupDependencies();
-        activity.domReady(doc);
-    }, 5000);
-});
-
 // eslint-disable-next-line no-unused-vars
 define(MYDEFINES, (compatibility) =>{
     activity.setupDependencies();
     activity.doContextMenus();
     activity.doPluginsAndPaletteCols();
+    activity.domReady(document);
 });
