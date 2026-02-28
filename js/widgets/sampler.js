@@ -1906,16 +1906,16 @@ function SampleWidget() {
             // Set initial note display
             const noteObj = TunerUtils.frequencyToPitch(
                 A0 *
-                    Math.pow(
-                        2,
-                        (pitchToNumber(
-                            SOLFEGENAMES[this.pitchCenter] +
-                                EXPORTACCIDENTALNAMES[this.accidentalCenter],
-                            this.octaveCenter
-                        ) -
-                            57) /
-                            12
-                    )
+                Math.pow(
+                    2,
+                    (pitchToNumber(
+                        SOLFEGENAMES[this.pitchCenter] +
+                        EXPORTACCIDENTALNAMES[this.accidentalCenter],
+                        this.octaveCenter
+                    ) -
+                        57) /
+                    12
+                )
             );
             this.tunerDisplay.update(noteObj[0], noteObj[1], this.centsValue);
 
@@ -2186,9 +2186,11 @@ function SampleWidget() {
 
     /**
      * Start pitch detection
+     * @param {HTMLElement} pitchElement - Widget-local span for displaying detected pitch
+     * @param {HTMLElement} noteElement - Widget-local span for displaying detected note
      * @returns {Promise<void>}
      */
-    const startPitchDetection = async () => {
+    const startPitchDetection = async (pitchElement, noteElement) => {
         // Stop any existing pitch detection first to avoid multiple instances
         this.stopPitchDetection();
 
@@ -2221,10 +2223,7 @@ function SampleWidget() {
                 analyser.getFloatTimeDomainData(buffer);
                 const pitch = detectPitch(buffer);
 
-                // Safely update DOM elements (check if they exist first)
-                const pitchElement = document.getElementById("pitch");
-                const noteElement = document.getElementById("note");
-
+                // Use widget-local elements passed from makeTuner — no per-frame global query
                 if (pitchElement && noteElement) {
                     if (pitch > 0) {
                         const { note, cents } = frequencyToNote(pitch);
@@ -2307,7 +2306,7 @@ function SampleWidget() {
 
         this.widgetWindow.getWidgetBody().appendChild(container);
 
-        document.getElementById("start").addEventListener("click", startPitchDetection);
+        startButton.addEventListener("click", () => startPitchDetection(pitchSpan, noteSpan));
     };
 
     /**
