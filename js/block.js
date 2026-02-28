@@ -13,8 +13,8 @@
 /*
    global
 
-   _, ACCIDENTALLABELS, ACCIDENTALNAMES, addTemperamentToDictionary,
-   blockBlocks, COLLAPSEBUTTON, COLLAPSETEXTX, COLLAPSETEXTY,
+   _, addTemperamentToDictionary,
+   ACCIDENTALLABELS, ACCIDENTALNAMES, blockBlocks, COLLAPSEBUTTON, COLLAPSETEXTX, COLLAPSETEXTY,
    createjs, DEFAULTACCIDENTAL, DEFAULTDRUM, DEFAULTEFFECT,
    DEFAULTFILTERTYPE, DEFAULTINTERVAL, DEFAULTINVERT, DEFAULTMODE,
    DEFAULTNOISE, DEFAULTOSCILLATORTYPE, DEFAULTTEMPERAMENT,
@@ -31,7 +31,7 @@
    piemenuBoolean, piemenuColor, piemenuCustomNotes, piemenuIntervals,
    piemenuModes, piemenuNoteValue, piemenuNumber, piemenuPitches,
    piemenuVoices, piemenuChords, platformColor, ProtoBlock, RSYMBOLS,
-   safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
+   retryWithBackoff, safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
    splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
    topBlock, updateTemperaments, VALUETEXTX, DEFAULTCHORD,
    VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_
@@ -351,42 +351,24 @@ class Block {
      */
     _createCache(callback, args) {
         const that = this;
-        return new Promise((resolve, reject) => {
-            let loopCount = 0;
-            const MAX_RETRIES = 20;
-            const INITIAL_DELAY = 50;
+        const MAX_RETRIES = 20;
+        const INITIAL_DELAY = 50;
 
-            const checkBounds = async counter => {
-                try {
-                    if (counter !== undefined) {
-                        loopCount = counter;
-                    }
-                    if (loopCount > MAX_RETRIES) {
-                        throw new Error("COULD NOT CREATE CACHE");
-                    }
-
-                    that.bounds = that.container.getBounds();
-
-                    if (that.bounds === null) {
-                        const delayTime = INITIAL_DELAY * Math.pow(2, loopCount);
-                        await delayExecution(delayTime);
-                        that.regenerateArtwork(true, []);
-                        checkBounds(loopCount + 1);
-                    } else {
-                        that.container.cache(
-                            that.bounds.x,
-                            that.bounds.y,
-                            that.bounds.width,
-                            that.bounds.height
-                        );
-                        callback(that, args);
-                        resolve();
-                    }
-                } catch (e) {
-                    reject(e);
-                }
-            };
-            checkBounds();
+        return retryWithBackoff({
+            check: () => {
+                that.bounds = that.container.getBounds();
+                return that.bounds;
+            },
+            onSuccess: bounds => {
+                that.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+                callback(that, args);
+            },
+            onRetry: () => {
+                that.regenerateArtwork(true, []);
+            },
+            maxRetries: MAX_RETRIES,
+            initialDelay: INITIAL_DELAY,
+            errorMessage: "COULD NOT CREATE CACHE"
         });
     }
 
@@ -398,35 +380,18 @@ class Block {
      */
     updateCache() {
         const that = this;
-        return new Promise((resolve, reject) => {
-            let loopCount = 0;
-            const MAX_RETRIES = 15;
-            const INITIAL_DELAY = 100;
+        const MAX_RETRIES = 15;
+        const INITIAL_DELAY = 100;
 
-            const updateBounds = async counter => {
-                try {
-                    if (counter !== undefined) {
-                        loopCount = counter;
-                    }
-
-                    if (loopCount > MAX_RETRIES) {
-                        throw new Error("COULD NOT UPDATE CACHE");
-                    }
-
-                    if (that.bounds === null) {
-                        const delayTime = INITIAL_DELAY * Math.pow(2, loopCount);
-                        await that.pause(delayTime);
-                        updateBounds(loopCount + 1);
-                    } else {
-                        that.container.updateCache();
-                        that.activity.refreshCanvas();
-                        resolve();
-                    }
-                } catch (e) {
-                    reject(e);
-                }
-            };
-            updateBounds();
+        return retryWithBackoff({
+            check: () => that.bounds !== null,
+            onSuccess: () => {
+                that.container.updateCache();
+                that.activity.refreshCanvas();
+            },
+            maxRetries: MAX_RETRIES,
+            initialDelay: INITIAL_DELAY,
+            errorMessage: "COULD NOT UPDATE CACHE"
         });
     }
 
