@@ -197,6 +197,10 @@ class Blocks {
 
         /** Which block, if any, is highlighted? */
         this.highlightedBlock = null;
+
+        /** Virtual batching for highlight requests */
+        this._highlightQueue = [];
+        this._highlightScheduled = false;
         /** Which block, if any, is active? */
         this.activeBlock = null;
         /** Are the blocks visible? */
@@ -2960,20 +2964,16 @@ class Blocks {
          * @public
          * return {void}
          */
+
+        // Queue unhighlight requests for batching
         this.unhighlight = blk => {
-            if (!this.visible) {
-                return;
-            }
-
+            if (!this.visible) return;
             let thisBlock = blk;
-            if (blk === null) {
-                thisBlock = this.highlightedBlock;
-            }
-
+            if (blk === null) thisBlock = this.highlightedBlock;
             if (thisBlock !== null) {
-                this.blockList[thisBlock].unhighlight();
+                this._highlightQueue.push({ blk: thisBlock, type: "unhighlight" });
+                this._scheduleHighlightFlush();
             }
-
             if (this.highlightedBlock === thisBlock) {
                 this.highlightedBlock = null;
             }
@@ -2986,17 +2986,45 @@ class Blocks {
          * @public
          * @returns {void}
          */
+        // Queue highlight requests for batching
         this.highlight = (blk, unhighlight) => {
-            if (!this.visible) {
-                return;
-            }
-
+            if (!this.visible) return;
             if (blk !== null) {
-                if (unhighlight) {
-                    this.unhighlight(null);
-                }
-                this.blockList[blk].highlight();
+                if (unhighlight) this.unhighlight(null);
+                this._highlightQueue.push({ blk, type: "highlight" });
+                this._scheduleHighlightFlush();
                 this.highlightedBlock = blk;
+            }
+        };
+        // Internal: schedule a flush of the highlight queue using requestAnimationFrame
+        this._scheduleHighlightFlush = () => {
+            if (this._highlightScheduled) return;
+            this._highlightScheduled = true;
+            requestAnimationFrame(() => {
+                this._flushHighlightQueue();
+            });
+        };
+
+        // Internal: flush the highlight queue and apply all batched DOM changes
+        this._flushHighlightQueue = () => {
+            const seen = new Set();
+            // Only keep the last operation per block
+            const ops = [];
+            for (let i = this._highlightQueue.length - 1; i >= 0; i--) {
+                const { blk, type } = this._highlightQueue[i];
+                if (!seen.has(blk)) {
+                    ops.unshift({ blk, type });
+                    seen.add(blk);
+                }
+            }
+            this._highlightQueue = [];
+            this._highlightScheduled = false;
+            for (const { blk, type } of ops) {
+                if (type === "highlight") {
+                    this.blockList[blk]?.highlight();
+                } else if (type === "unhighlight") {
+                    this.blockList[blk]?.unhighlight();
+                }
             }
         };
 
