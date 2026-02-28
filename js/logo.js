@@ -1040,6 +1040,11 @@ class Logo {
         if (this.synth.recorder && this.synth.recorder.state == "recording")
             this.synth.recorder.stop();
 
+        // Dispose all Tone.js instruments to free decoded AudioBuffers
+        // and Web Audio nodes. They will be re-created by prepSynths()
+        // on the next run.
+        this.synth.disposeAllInstruments();
+
         if (this.cameraID != null) {
             this.deps.utils.doStopVideoCam(this.cameraID, this.setCameraID);
         }
@@ -1147,6 +1152,25 @@ class Logo {
 
         this.notation.notationStaging = {};
         this.notation.notationDrumStaging = {};
+
+        // Reset accumulated data structures to free memory between runs.
+        // These grow unboundedly across repeated executions.
+        this.turtleHeaps = {};
+        this.turtleDicts = {};
+        this.notationNotes = {};
+        this._midiData = {};
+        this.statusFields = [];
+        this.specialArgs = [];
+        this.connectionStore = {};
+        if (this.recordingBuffer && !this.recording) {
+            this.recordingBuffer = {
+                hasData: false,
+                notationOutput: "",
+                notationNotes: {},
+                notationStaging: {},
+                notationDrumStaging: {}
+            };
+        }
 
         // Each turtle needs to keep its own wait time and music states.
         for (const turtle in this.activity.turtles.turtleList) {
