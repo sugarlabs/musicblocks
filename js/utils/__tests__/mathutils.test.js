@@ -554,4 +554,35 @@ describe("MathUtility", () => {
             expect(MathUtility.doInt("abc")).toBeNaN();
         });
     });
+
+    describe("edge cases - Infinity, NaN, and boundary values", () => {
+        test("doMod returns NaN when divisor is zero", () => {
+            expect(MathUtility.doMod(5, 0)).toBeNaN();
+        });
+
+        test("doSqrt handles Infinity", () => {
+            expect(MathUtility.doSqrt(Infinity)).toBe(Infinity);
+        });
+
+        test("doAbs handles negative Infinity", () => {
+            expect(MathUtility.doAbs(-Infinity)).toBe(Infinity);
+        });
+
+        test("doDivide returns Infinity for Infinity dividend", () => {
+            expect(MathUtility.doDivide(Infinity, 1)).toBe(Infinity);
+        });
+
+        test("doPower returns Infinity for very large exponent", () => {
+            expect(MathUtility.doPower(10, 309)).toBe(Infinity);
+        });
+
+        test("doNegate handles floating-point numbers", () => {
+            expect(MathUtility.doNegate(-3.14)).toBeCloseTo(3.14);
+        });
+
+        test("doPlus coerces booleans via numeric branch", () => {
+            // booleans are not strings, so Number(true) + Number(true) = 2
+            expect(MathUtility.doPlus(true, true)).toBe(2);
+        });
+    });
 });

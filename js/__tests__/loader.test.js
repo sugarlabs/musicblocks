@@ -8,7 +8,9 @@ describe("loader.js coverage", () => {
     beforeEach(() => {
         jest.resetModules();
 
-        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {
+            // Mock empty implementation
+        });
 
         document.body.innerHTML = `
             <div data-i18n="title">Original Title</div>
@@ -20,7 +22,8 @@ describe("loader.js coverage", () => {
             init: jest.fn(),
             changeLanguage: jest.fn(),
             t: jest.fn(key => `TRANSLATED_${key}`),
-            on: jest.fn()
+            on: jest.fn(),
+            isInitialized: false
         };
 
         mockI18nextHttpBackend = {};
@@ -28,49 +31,67 @@ describe("loader.js coverage", () => {
         mockRequireJSConfig = jest.fn();
         mockRequireJS = jest.fn();
         mockRequireJS.config = mockRequireJSConfig;
+        mockRequireJS.defined = jest.fn(() => false);
 
         global.requirejs = mockRequireJS;
+        global.define = jest.fn();
         global.window = document.defaultView;
+        global.window.createjs = {
+            Stage: jest.fn(),
+            Ticker: { framerate: 60, addEventListener: jest.fn() }
+        };
     });
 
     afterEach(() => {
+        delete global.define;
         jest.restoreAllMocks();
     });
 
     const loadScript = async ({ initError = false, langError = false } = {}) => {
         mockRequireJS.mockImplementation((deps, callback) => {
-            if (deps[0] === "i18next") {
+            if (deps.includes("highlight")) {
+                if (callback) callback(null);
+            } else if (deps.includes("i18next")) {
                 mockI18next.init.mockImplementation((config, cb) => {
                     if (initError) {
                         cb("Init Failed");
                     } else {
+                        mockI18next.isInitialized = true;
                         cb(null);
                     }
                 });
-
                 mockI18next.changeLanguage.mockImplementation((lang, cb) => {
-                    if (langError) {
-                        cb("Lang Change Failed");
-                    } else {
-                        cb(null);
-                    }
+                    if (langError) cb("Lang Change Failed");
+                    else cb(null);
                 });
-
-                return callback(mockI18next, mockI18nextHttpBackend);
+                if (callback) {
+                    callback(mockI18next, mockI18nextHttpBackend);
+                }
+            } else if (deps.includes("easeljs.min")) {
+                // Phase 1 bootstrap
+                // Mock globals expected by verification
+                window.createDefaultStack = jest.fn();
+                window.Logo = jest.fn();
+                window.Blocks = jest.fn();
+                window.Turtles = jest.fn();
+                if (callback) callback();
+            } else if (deps.includes("activity/activity")) {
+                // Phase 2 bootstrap
+                if (callback) callback();
             }
             return null;
         });
 
         require("../loader.js");
 
-        await new Promise(resolve => process.nextTick(resolve));
-    };
+        await new Promise(resolve => setTimeout(resolve, 200)); // More time
+    }; // Allow async main() to proceed
 
     test("Configures requirejs correctly", async () => {
         await loadScript();
         expect(mockRequireJSConfig).toHaveBeenCalledWith(
             expect.objectContaining({
-                baseUrl: "lib",
+                baseUrl: "./",
                 paths: expect.any(Object),
                 shim: expect.any(Object)
             })
@@ -104,7 +125,12 @@ describe("loader.js coverage", () => {
 
         expect(mockI18next.on).toHaveBeenCalledWith("languageChanged", expect.any(Function));
 
-        expect(mockRequireJS).toHaveBeenCalledWith(["utils/utils", "activity/activity"]);
+        // Verify Phase 2 was reached
+        expect(mockRequireJS).toHaveBeenCalledWith(
+            ["activity/activity"],
+            expect.any(Function),
+            expect.any(Function)
+        );
     });
 
     test("Handles i18next initialization error", async () => {

@@ -420,6 +420,8 @@ function setupIntervalsBlocks(activity) {
             const saveCanvasAlpha = tur.painter.canvasAlpha;
             const saveOrientation = tur.orientation;
             const savePenState = tur.painter.penState;
+            const previousButNotThese = tur.butNotThese;
+            tur.butNotThese = JSON.parse(JSON.stringify(tur.butNotThese));
 
             tur.singer.suppressOutput = true;
             tur.singer.justCounting.push(true);
@@ -473,8 +475,7 @@ function setupIntervalsBlocks(activity) {
             tur.singer.justMeasuring.pop();
             tur.singer.suppressOutput = saveSuppressStatus;
 
-            // Handle cascading
-            tur.butNotThese = {};
+            tur.butNotThese = previousButNotThese;
 
             return distance;
         }
@@ -537,6 +538,8 @@ function setupIntervalsBlocks(activity) {
             const saveCanvasAlpha = tur.painter.canvasAlpha;
             const saveOrientation = tur.orientation;
             const savePenState = tur.painter.penState;
+            const previousButNotThese = tur.butNotThese;
+            tur.butNotThese = JSON.parse(JSON.stringify(tur.butNotThese));
 
             tur.singer.suppressOutput = true;
 
@@ -591,8 +594,7 @@ function setupIntervalsBlocks(activity) {
             tur.singer.justMeasuring.pop();
             tur.singer.suppressOutput = saveSuppressStatus;
 
-            // FIXME: we need to handle cascading.
-            tur.butNotThese = {};
+            tur.butNotThese = previousButNotThese;
             return distance;
         }
     }
@@ -667,31 +669,8 @@ function setupIntervalsBlocks(activity) {
             this.setPalette("intervals", activity);
             // Values for the piemenu (circle menu) representing semi-tone intervals.
             this.piemenuValuesC1 = [
-                -12,
-                -11,
-                -10,
-                -9,
-                -8,
-                -7,
-                -6,
-                -5,
-                -4,
-                -3,
-                -2,
-                -1,
-                0,
-                1,
-                2,
-                3,
-                4,
-                5,
-                6,
-                7,
-                8,
-                9,
-                10,
-                11,
-                12
+                -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                11, 12
             ];
             this.setHelpString([
                 _(

@@ -40,8 +40,6 @@ function AIDebuggerWidget() {
         TIMEOUT: 30000
     };
 
-    console.log("AI Debugger Backend URL:", BACKEND_CONFIG.BASE_URL);
-
     /**
      * Chat history array to store conversation
      * @type {Array}
@@ -96,7 +94,7 @@ function AIDebuggerWidget() {
      * @private
      */
     this._generateConversationId = function () {
-        return "conv_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+        return "conv_" + Date.now() + "_" + Math.random().toString(36).substring(2, 11);
     };
 
     this.conversationId = this._generateConversationId();

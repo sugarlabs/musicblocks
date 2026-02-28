@@ -104,4 +104,30 @@ input[type="range"]:focus::-ms-fill-upper {
   position: absolute;
   cursor: pointer;
 }
+
+/* Keyboard navigation focus state for toolbar buttons */
+.toolbar-btn-focused {
+  background-color: rgba(0, 0, 0, 0.25) !important;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+}
+
+/* Dark mode focus - brighten the background */
+body.dark .toolbar-btn-focused,
+.dark-theme .toolbar-btn-focused {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Keyboard navigation focus state for dropdown menu items */
+.dropdown-item-focused {
+  background-color: rgba(0, 150, 136, 0.2) !important;
+}
+
+/* Keyboard navigation focus state for modal dialog buttons */
+.modal-btn-focused {
+  outline: 3px solid #009688 !important;
+  outline-offset: 2px;
+  box-shadow: 0 0 8px rgba(0, 150, 136, 0.5) !important;
+}
+
 html, body { overscroll-behavior-x: none; }

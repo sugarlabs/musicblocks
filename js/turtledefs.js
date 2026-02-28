@@ -35,7 +35,7 @@
    getAuxToolbarButtonNames, TITLESTRING
  */
 
-const VERSION = "3.7.0";
+const VERSION = "3.7.1";
 let LOGODEFAULT;
 let LOGOJA1 = LOGODEFAULT;
 let LOGOJA = LOGODEFAULT;
@@ -800,4 +800,11 @@ if (typeof module !== "undefined" && module.exports) {
         DEFAULTPALETTE,
         TITLESTRING
     };
+}
+if (typeof window !== "undefined") {
+    window.createDefaultStack = createDefaultStack;
+    window.LOGOJA1 = LOGOJA1;
+    window.NUMBERBLOCKDEFAULT = NUMBERBLOCKDEFAULT;
+    window.DEFAULTPALETTE = DEFAULTPALETTE;
+    window.TITLESTRING = TITLESTRING;
 }
