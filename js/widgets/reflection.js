@@ -65,6 +65,18 @@ class ReflectionMatrix {
          * @type {string}
          */
         this.code = "";
+
+        /**
+         * Conversation summary 
+         * @type {string}
+         */
+        this.conversationSummary = "";
+
+        /**
+         * Index up to which messages have been summarized
+         * @type {number}
+         */
+        this.summarizedUpTo = 0;
     }
 
     /**
@@ -376,18 +388,29 @@ class ReflectionMatrix {
     async generateBotReply(message, chatHistory, mentor, algorithm) {
         try {
             this.showTypingIndicator();
+
+            const unsummarizedMessages = chatHistory.slice(this.summarizedUpTo);
+
             const response = await fetch(`${this.PORT}/chat`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     query: message,
-                    messages: chatHistory,
+                    messages: unsummarizedMessages,
                     mentor: mentor,
-                    algorithm: algorithm
+                    algorithm: algorithm,
+                    conversation_summary: this.conversationSummary || null,
+                    summarized_up_to: this.summarizedUpTo
                 })
             });
             this.hideTypingIndicator();
             const data = await response.json();
+
+            if (data.conversation_summary && data.summarized_up_to !== undefined) {
+                this.conversationSummary = data.conversation_summary;
+                this.summarizedUpTo = data.summarized_up_to;
+            }
+
             return data;
         } catch (error) {
             console.error("Error :", error);
