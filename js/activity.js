@@ -21,7 +21,7 @@
    Blocks, Boundary, CARTESIAN, changeImage, closeWidgets,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
-   DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
+   DEFAULTDELAY, define, docByClass,
    doSVG, EMPTYHEAPERRORMSG, EXPANDBUTTON, FILLCOLORS,
    getMacroExpansion, getOctaveRatio, getTemperament, transcribeMidi,
    GOHOMEBUTTON, GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
@@ -7358,22 +7358,11 @@ class Activity {
 
             document.getElementById("loader").className = "loader";
 
-            /*
-             * Run browser check before implementing onblur -->
-             * stop MB functionality
-             * (This is being done to stop MB to lose focus when
-             * increasing/decreasing volume on Firefox)
-             */
-
-            doBrowserCheck();
-
             const that = this;
 
-            if (!jQuery.browser.mozilla) {
-                window.onblur = () => {
-                    doHardStopButton(that, true);
-                };
-            }
+            window.onblur = () => {
+                doHardStopButton(that, true);
+            };
 
             this.stage = new createjs.Stage(this.canvas);
             createjs.Touch.enable(this.stage);
@@ -8253,7 +8242,7 @@ define(["domReady!"].concat(MYDEFINES), doc => {
             // Race condition in Firefox: non-AMD scripts might not have
             // finished global assignment yet.
             // Use readiness-based initialization for Firefox for better performance
-            if (typeof jQuery !== "undefined" && jQuery.browser && jQuery.browser.mozilla) {
+            if (navigator.userAgent.indexOf("Firefox") !== -1) {
                 waitForReadiness(
                     () => {
                         activity.setupDependencies();
