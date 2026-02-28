@@ -24,9 +24,7 @@ describe("saveMxmlOutput", () => {
         const logo = {
             notation: {
                 notationStaging: {
-                    "0": [
-                        [["C"], 4, 0],
-                    ],
+                    "0": [[["C"], 4, 0]],
                     "1": []
                 }
             }
@@ -35,10 +33,10 @@ describe("saveMxmlOutput", () => {
         const output = saveMxmlOutput(logo);
 
         expect(output).toContain("<?xml version='1.0' encoding='UTF-8'?>");
-        expect(output).toContain("<score-partwise version=\"3.1\">");
+        expect(output).toContain('<score-partwise version="3.1">');
         expect(output).toContain("<part-list>");
-        expect(output).toContain("<score-part id=\"P1\">");
-        expect(output).toContain("<part id=\"P1\">");
+        expect(output).toContain('<score-part id="P1">');
+        expect(output).toContain('<part id="P1">');
     });
 
     it("should handle multiple voices", () => {
@@ -59,10 +57,10 @@ describe("saveMxmlOutput", () => {
 
         const output = saveMxmlOutput(logo);
 
-        expect(output).toContain("<score-part id=\"P1\">");
-        expect(output).toContain("<score-part id=\"P2\">");
-        expect(output).toContain("<part id=\"P1\">");
-        expect(output).toContain("<part id=\"P2\">");
+        expect(output).toContain('<score-part id="P1">');
+        expect(output).toContain('<score-part id="P2">');
+        expect(output).toContain('<part id="P1">');
+        expect(output).toContain('<part id="P2">');
         expect(output).toContain("<step>C</step>");
         expect(output).toContain("<step>E</step>");
     });
@@ -71,11 +69,7 @@ describe("saveMxmlOutput", () => {
         const logo = {
             notation: {
                 notationStaging: {
-                    "0": [
-                        "voice one",
-                        [["C"], 4, 0],
-                        "voice two"
-                    ]
+                    "0": ["voice one", [["C"], 4, 0], "voice two"]
                 }
             }
         };
@@ -91,17 +85,14 @@ describe("saveMxmlOutput", () => {
         const logo = {
             notation: {
                 notationStaging: {
-                    "0": [
-                        "tempo", 120, 4,
-                        [["C"], 4, 0]
-                    ]
+                    "0": ["tempo", 120, 4, [["C"], 4, 0]]
                 }
             }
         };
 
         const output = saveMxmlOutput(logo);
 
-        expect(output).toContain("<sound tempo=\"120\"/>");
+        expect(output).toContain('<sound tempo="120"/>');
         expect(output).toContain("<step>C</step>");
     });
 
@@ -109,10 +100,7 @@ describe("saveMxmlOutput", () => {
         const logo = {
             notation: {
                 notationStaging: {
-                    "0": [
-                        "meter", 3, 4,
-                        [["C"], 4, 0]
-                    ]
+                    "0": ["meter", 3, 4, [["C"], 4, 0]]
                 }
             }
         };
@@ -153,11 +141,7 @@ describe("saveMxmlOutput", () => {
         const logo = {
             notation: {
                 notationStaging: {
-                    "0": [
-                        [["C"], 4, 0],
-                        "tie",
-                        [["C"], 4, 0]
-                    ]
+                    "0": [[["C"], 4, 0], "tie", [["C"], 4, 0]]
                 }
             }
         };

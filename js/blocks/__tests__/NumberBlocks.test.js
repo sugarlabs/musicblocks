@@ -30,9 +30,15 @@ class DummyFlowBlock {
         this.displayName = displayName || name;
         createdBlocks[name] = this;
     }
-    setPalette(palette, activity) { return this; }
-    beginnerBlock(flag) { return this; }
-    setHelpString(helpArr) { return this; }
+    setPalette(palette, activity) {
+        return this;
+    }
+    beginnerBlock(flag) {
+        return this;
+    }
+    setHelpString(helpArr) {
+        return this;
+    }
     formBlock(config) {
         this.config = config;
         return this;
@@ -41,8 +47,10 @@ class DummyFlowBlock {
         this.macro = fn;
         return this;
     }
-    setup(activity) { return this; }
-    flow() { }
+    setup(activity) {
+        return this;
+    }
+    flow() {}
 }
 
 class DummyValueBlock {
@@ -52,9 +60,15 @@ class DummyValueBlock {
         createdBlocks[name] = this;
         this.extraWidth = 0;
     }
-    setPalette(palette, activity) { return this; }
-    beginnerBlock(flag) { return this; }
-    setHelpString(helpArr) { return this; }
+    setPalette(palette, activity) {
+        return this;
+    }
+    beginnerBlock(flag) {
+        return this;
+    }
+    setHelpString(helpArr) {
+        return this;
+    }
     formBlock(config) {
         this.config = config;
         return this;
@@ -63,7 +77,9 @@ class DummyValueBlock {
         this.macro = fn;
         return this;
     }
-    setup(activity) { return this; }
+    setup(activity) {
+        return this;
+    }
     arg(logo, turtle, blk) {
         return global.activity.blocks.blockList[blk].value;
     }
@@ -75,9 +91,15 @@ class DummyLeftBlock {
         this.displayName = displayName || name;
         createdBlocks[name] = this;
     }
-    setPalette(palette, activity) { return this; }
-    beginnerBlock(flag) { return this; }
-    setHelpString(helpArr) { return this; }
+    setPalette(palette, activity) {
+        return this;
+    }
+    beginnerBlock(flag) {
+        return this;
+    }
+    setHelpString(helpArr) {
+        return this;
+    }
     formBlock(config) {
         this.config = config;
         return this;
@@ -86,7 +108,9 @@ class DummyLeftBlock {
         this.macro = fn;
         return this;
     }
-    setup(activity) { return this; }
+    setup(activity) {
+        return this;
+    }
     arg(logo, turtle, blk) {
         return global.activity.blocks.blockList[blk].value;
     }
@@ -95,7 +119,7 @@ class DummyLeftBlock {
 global.FlowBlock = DummyFlowBlock;
 global.ValueBlock = DummyValueBlock;
 global.LeftBlock = DummyLeftBlock;
-global._ = jest.fn((str) => str);
+global._ = jest.fn(str => str);
 
 global.NOINPUTERRORMSG = "No input provided";
 global.NANERRORMSG = "Not a number";
@@ -103,21 +127,21 @@ global.NOSQRTERRORMSG = "No square root";
 global.ZERODIVIDEERRORMSG = "Division by zero";
 
 global.MathUtility = {
-    doInt: (x) => Math.floor(Number(x)),
+    doInt: x => Math.floor(Number(x)),
     doMod: (a, b) => Number(a) % Number(b),
     doPower: (a, b) => Math.pow(Number(a), Number(b)),
-    doSqrt: (a) => {
+    doSqrt: a => {
         if (Number(a) < 0) throw "NoSqrtError";
         return Math.sqrt(Number(a));
     },
-    doAbs: (a) => Math.abs(Number(a)),
+    doAbs: a => Math.abs(Number(a)),
     doCalculateDistance: (x1, y1, x2, y2) => Math.hypot(x2 - x1, y2 - y1),
     doDivide: (a, b) => {
         if (Number(b) === 0) throw "DivByZeroError";
         return Number(a) / Number(b);
     },
     doMultiply: (a, b) => Number(a) * Number(b),
-    doNegate: (a) => -Number(a),
+    doNegate: a => -Number(a),
     doPlus: (a, b) => {
         if (!isNaN(a) && !isNaN(b)) {
             return Number(a) + Number(b);
@@ -132,7 +156,7 @@ global.MathUtility = {
 
 global.calcOctave = (currentOctave, val, lastNote, noteValue) => currentOctave + parseInt(val);
 
-global.toFixed2 = (val) => Number(val).toFixed(2);
+global.toFixed2 = val => Number(val).toFixed(2);
 
 const createDummyTurtle = () => ({
     id: "T1",

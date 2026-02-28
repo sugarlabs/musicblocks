@@ -79,8 +79,7 @@ class Tempo {
         pauseBtn.onclick = () => {
             if (this.isMoving) {
                 this.pause();
-                pauseBtn.innerHTML =
-                    `<img 
+                pauseBtn.innerHTML = `<img 
                         src="header-icons/play-button.svg" 
                         title="${_("Play")}" 
                         alt="${_("Play")}" 
@@ -91,8 +90,7 @@ class Tempo {
                 this.isMoving = false;
             } else {
                 this.resume();
-                pauseBtn.innerHTML =
-                    `<img 
+                pauseBtn.innerHTML = `<img 
                         src="header-icons/pause-button.svg" 
                         title="${_("Pause")}" 
                         alt="${_("Pause")}" 
@@ -141,13 +139,13 @@ class Tempo {
                 Tempo.ICONSIZE,
                 _("speed up"),
                 r1.insertCell()
-            ).onclick = ((i) => () => this.speedUp(i))(i);
+            ).onclick = (i => () => this.speedUp(i))(i);
             widgetWindow.addButton(
                 "down.svg",
                 Tempo.ICONSIZE,
                 _("slow down"),
                 r2.insertCell()
-            ).onclick = ((i) => () => this.slowDown(i))(i);
+            ).onclick = (i => () => this.slowDown(i))(i);
 
             this.BPMInputs[i] = widgetWindow.addInputButton(this.BPMs[i], r3.insertCell());
             this.tempoCanvases[i] = document.createElement("canvas");
@@ -160,7 +158,7 @@ class Tempo {
             tcCell.setAttribute("rowspan", "3");
 
             // The tempo can be set from the interval between successive clicks on the canvas.
-            this.tempoCanvases[i].onclick = ((id) => () => {
+            this.tempoCanvases[i].onclick = (id => () => {
                 const d = new Date();
                 let newBPM, BPMInput;
                 if (this._firstClickTime == null) {
@@ -181,7 +179,7 @@ class Tempo {
 
             this.BPMInputs[i].addEventListener(
                 "keyup",
-                ((id) => (e) => {
+                (id => e => {
                     if (e.keyCode === 13) {
                         this._useBPM(id);
                     }
@@ -189,7 +187,7 @@ class Tempo {
             );
         }
 
-        activity.textMsg(_("Adjust the tempo with the buttons."),3000);
+        activity.textMsg(_("Adjust the tempo with the buttons."), 3000);
         this.resume();
 
         widgetWindow.sendToCenter();
@@ -259,7 +257,7 @@ class Tempo {
             activity.errorMsg(_("Please enter a number between 30 and 1000"), 3000);
             return;
         }
-        
+
         this.BPMs[i] = this.BPMInputs[i].value;
         if (this.BPMs[i] > 1000) {
             this.BPMs[i] = 1000;
@@ -330,7 +328,15 @@ class Tempo {
             // Are we done yet?
             if (d.getTime() > this._widgetNextTimes[i]) {
                 // Play a tone.
-                this.activity.logo.synth.trigger(0, ["C2"], 0.0625, Tempo.TEMPOSYNTH, null, null, false);
+                this.activity.logo.synth.trigger(
+                    0,
+                    ["C2"],
+                    0.0625,
+                    Tempo.TEMPOSYNTH,
+                    null,
+                    null,
+                    false
+                );
                 this._widgetNextTimes[i] += this._intervals[i];
 
                 // Ensure we are at the edge.
@@ -431,4 +437,7 @@ class Tempo {
     _get_save_lock() {
         return this._save_lock;
     }
+}
+if (typeof module !== "undefined") {
+    module.exports = Tempo;
 }

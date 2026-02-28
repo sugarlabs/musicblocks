@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-17 00:31-0400\n"
-"PO-Revision-Date: 2012-11-25 06:59+0200\n"
-"Last-Translator: Chris <cjl@laptop.org>\n"
+"PO-Revision-Date: 2025-12-10 18:51+0530\n"
+"Last-Translator: Harihara Vardhan <hariharavardhan1234@gmail.com>\n"
 "Language-Team: LANGUAGE <walter@sugarlabs.org>\n"
 "Language: te\n"
 "MIME-Version: 1.0\n"
@@ -108,7 +108,7 @@ msgstr "డక్"
 
 #: js/themebox.js:66
 msgid "Music Blocks is already set to this theme."
-msgstr ""
+msgstr "మ్యూజిక్ బ్లాక్స్ ఇప్పటికే ఈ థీమ్ కు సెట్ అయింది."
 
 #: js/SaveInterface.js:59
 #: js/SaveInterface.js:61
@@ -246,19 +246,23 @@ msgstr "బ్లాక్‌లను శోధించండి"
 
 #: js/activity.js:1358
 msgid "Are you sure you want to clear the workspace?"
-msgstr ""
+msgstr "మీరు ఖచ్చితంగా వర్క్‌స్పేస్‌ను క్లియర్ చేయాలనుకుంటున్నారా?"
+
+#: js/activity.js:1472
+msgid "Clear Workspace"
+msgstr "వర్క్‌స్పేస్‌ను క్లియర్ చేయండి"
 
 #: js/activity.js:1577
 msgid "Enter file name"
-msgstr ""
+msgstr "ఫైల్ పేరును నమోదు చేయండి"
 
 #: js/activity.js:1579
 msgid "File save canceled"
-msgstr ""
+msgstr "ఫైల్ సేవ్ రద్దు చేయబడింది"
 
 #: js/activity.js:1598
 msgid "Click on stop saving"
-msgstr ""
+msgstr "సేవ్ చేయడం ఆపివేయిపై క్లిక్ చేయండి"
 
 #: js/activity.js:1882
 msgid "Catching mice"
@@ -353,7 +357,7 @@ msgstr "ముఖ్యమైన పేరు"
 #: js/activity.js:2630
 #: js/palette.js:675
 msgid "mode name"
-msgstr ""
+msgstr "మోడ్ పేరు"
 
 #: js/activity.js:2633
 msgid "chord name"
@@ -587,20 +591,20 @@ msgstr "బ్లాక్‌లను దాచు"
 #: js/activity.js:3657
 #: js/activity.js:3672
 msgid "Trash can is empty."
-msgstr ""
+msgstr "ట్రాష్ క్యాన్ ఖాళీగా ఉంది."
 
 #: js/activity.js:3679
 #: js/activity.js:3760
 msgid "Item restored from the trash."
-msgstr ""
+msgstr "ట్రాష్ నుండి అంశం పునరుద్ధరించబడింది."
 
 #: js/activity.js:3818
 msgid "Restore last item"
-msgstr ""
+msgstr "చివరి అంశాన్ని పునరుద్ధరించు"
 
 #: js/activity.js:3819
 msgid "Restore all items"
-msgstr ""
+msgstr "అన్ని అంశాలను పునరుద్ధరించు"
 
 #: js/activity.js:5016
 msgid "Click the run button to run the project."
@@ -637,11 +641,11 @@ msgstr "JSON ఇన్‌పుట్‌ను విశ్లేషించల
 
 #: js/activity.js:6624
 msgid "Select is enabled."
-msgstr ""
+msgstr "ఎంచుకోవడం ప్రారంభించబడింది."
 
 #: js/activity.js:6624
 msgid "Select is disabled."
-msgstr ""
+msgstr "ఎంచుకోవడం నిలిపివేయబడింది."
 
 #: js/activity.js:7005
 #: js/activity.js:7111
@@ -655,7 +659,7 @@ msgstr "అమాయక పరామిటర్లు"
 
 #: js/activity.js:7599
 msgid "Error regenerating palettes. Please refresh the page."
-msgstr ""
+msgstr "పాలెట్లను పునరుద్ధరించడంలో లోపం. దయచేసి పేజీని రీఫ్రెష్ చేయండి."
 
 #: js/block.js:1576
 #: js/block.js:1695
@@ -826,12 +830,12 @@ msgstr "శ్రుతి"
 
 #: js/block.js:2963
 msgid "Silence block cannot be removed."
-msgstr ""
+msgstr "సైలెన్స్ బ్లాక్‌ను తీసివేయలేము."
 
 #: js/block.js:3135
 #: js/piemenus.js:3457
 msgid "You can restore deleted blocks from the trash with the Restore From Trash button."
-msgstr ""
+msgstr "మీరు ట్రాష్ నుండి పునరుద్ధరించు బటన్‌తో తొలగించిన బ్లాక్‌లను పునరుద్ధరించవచ్చు."
 
 #: js/block.js:3765
 #: js/blocks.js:2607
@@ -944,11 +948,11 @@ msgstr "సంఖ్య కాదు"
 
 #: js/block.js:4418
 msgid "Octave value must be between 1 and 8."
-msgstr ""
+msgstr "ఆక్టేవ్ విలువ 1 మరియు 8 మధ్య ఉండాలి."
 
 #: js/block.js:4426
 msgid "Numbers can have at most 10 digits."
-msgstr ""
+msgstr "సంఖ్యలు గరిష్టంగా 10 అంకెలు కలిగి ఉండవచ్చు."
 
 #: js/blocks.js:1212
 #: js/blocks.js:3444
@@ -989,7 +993,7 @@ msgstr "పాఠము"
 #: js/palette.js:725
 #: js/blocks/BoxesBlocks.js:514
 msgid "store in box"
-msgstr ""
+msgstr "పెట్టెలో దాచు"
 
 #: js/blocks.js:3448
 #: js/blocks.js:3888
@@ -1048,7 +1052,7 @@ msgstr "విలువ"
 
 #: js/blocks.js:4465
 msgid "Forever loop detected inside a note value block. Unexpected things may happen."
-msgstr ""
+msgstr "నోట్ వాల్యూ బ్లాక్‌లో అనంతమైన లూప్ గుర్తించబడింది. ఊహించని విషయాలు జరగవచ్చు."
 
 #: js/blocks.js:4988
 msgid "There is no block selected."
@@ -1175,7 +1179,7 @@ msgstr "ఫ్లో"
 #: js/turtledefs.js:240
 #: planet/js/GlobalTag.js:48
 #. TRANS: On the Planet, we use labels to tag projects.
-msgid "Sensors"
+msgid "sensors"
 msgstr "సెన్సార్లు"
 
 #: js/rubrics.js:532
@@ -1184,7 +1188,7 @@ msgstr "సెన్సార్లు"
 #: js/blocks/MediaBlocks.js:930
 #: planet/js/GlobalTag.js:46
 #. TRANS: On the Planet, we use labels to tag projects.
-msgid "Media"
+msgid "media"
 msgstr "మీడియా"
 
 #: js/rubrics.js:533
@@ -1221,7 +1225,7 @@ msgstr "పూర్తి పరిపరచిన పరిచయం"
 #: js/toolbar.js:252
 #: js/turtledefs.js:516
 msgid "Toggle Fullscreen"
-msgstr ""
+msgstr "పూర్తి స్క్రీన్‌ని మార్చండి"
 
 #: js/toolbar.js:55
 #: js/toolbar.js:121
@@ -1337,7 +1341,7 @@ msgstr "ప్లగిన్ లోడ్ చేయండి"
 #: js/toolbar.js:265
 #: js/turtledefs.js:625
 msgid "Delete plugin"
-msgstr ""
+msgstr "ప్లగిన్‌ను తొలగించండి"
 
 #: js/toolbar.js:68
 #: js/toolbar.js:134
@@ -1359,21 +1363,21 @@ msgstr "అక్షరాభ్యంతర లోడింగ్‌ను న�
 #: js/toolbar.js:268
 #: js/turtledefs.js:642
 msgid "Change theme"
-msgstr ""
+msgstr "థీమ్ మార్చండి"
 
 #: js/toolbar.js:71
 #: js/toolbar.js:137
 #: js/toolbar.js:208
 #: js/toolbar.js:269
 msgid "Light Mode"
-msgstr ""
+msgstr "లైట్ మోడ్"
 
 #: js/toolbar.js:72
 #: js/toolbar.js:138
 #: js/toolbar.js:209
 #: js/toolbar.js:270
 msgid "Dark Mode"
-msgstr ""
+msgstr "డార్క్ మోడ్"
 
 #: js/toolbar.js:73
 #: js/toolbar.js:139
@@ -1397,7 +1401,7 @@ msgstr "పిచ్ ప్రివ్యూను సెట్ చేయండ
 #: js/toolbar.js:272
 #: js/turtledefs.js:669
 msgid "JavaScript Editor"
-msgstr ""
+msgstr "జావాస్క్రిప్ట్ ఎడిటర్"
 
 #: js/toolbar.js:76
 #: js/toolbar.js:142
@@ -1477,7 +1481,7 @@ msgstr "SVG రూపకలాబద్దం నాటించండి"
 #: js/toolbar.js:222
 #: js/toolbar.js:283
 msgid "Save block artwork as PNG"
-msgstr ""
+msgstr "బ్లాక్ కళాకృతిని PNG గా సేవ్ చేయండి"
 
 #: js/toolbar.js:91
 #: js/toolbar.js:154
@@ -1632,7 +1636,7 @@ msgstr "SVG రూపకలాబద్దం నాటించండి"
 #: js/toolbar.js:227
 #: js/toolbar.js:288
 msgid "한국인"
-msgstr "కొరియన్"
+msgstr ""
 
 #: js/toolbar.js:185
 #: js/toolbar.js:246
@@ -1652,7 +1656,7 @@ msgstr "టర్టిల్ వ్రాప్ ఆన్"
 
 #: js/toolbar.js:1121
 msgid "Are you sure you want to create a new project?"
-msgstr ""
+msgstr "మీరు తప్పకుండా కొత్త ప్రాజెక్ట్‌ని సృష్టించాలనుకుంటున్నారా?"
 
 #: js/logo.js:61
 msgid "Not a valid pitch name"
@@ -1794,11 +1798,11 @@ msgstr "సేవ్ స్ట్యాక్"
 
 #: js/piemenus.js:3412
 msgid "In order to copy a sample, you must reload the widget, import the sample again, and export it."
-msgstr ""
+msgstr "శాంపిల్ కాపీ చేయడానికి, మీరు విడ్జెట్‌ను మళ్లీ లోడ్ చేయాలి, శాంపిల్ ఇంపోర్ట్ చేయాలి మరియు ఎగుమతి చేయాలి."
 
 #: js/piemenus.js:3801
 msgid "You have chosen key for your pitch preview."
-msgstr ""
+msgstr "మీరు మీ పిచ్ ప్రివ్యూ కోసం కీని ఎంచుకున్నారు."
 
 #: js/turtle-singer.js:1364
 #. TRANS: partials are weighted components in a harmonic series
@@ -2002,7 +2006,7 @@ msgstr "మీ ప్రాజెక్ట్‌ను వీడియోగా 
 
 #: js/turtledefs.js:517
 msgid "Toggle Fullscreen mode."
-msgstr ""
+msgstr "పూర్తి స్క్రీన్ మోడ్‌ని మార్చండి"
 
 #: js/turtledefs.js:523
 msgid "Initialize a new project."
@@ -2032,7 +2036,7 @@ msgstr "మీ ప్రాజెక్ట్‌ను ఫైల్‌లో భ
 
 #: js/turtledefs.js:552
 msgid "Save graphics from your project to as SVG."
-msgstr ""
+msgstr "విశ్వసనీయత కోసం మీ ప్రాజెక్ట్ నుండి గ్రాఫిక్స్‌ను SVG గా సేవ్ చేయండి"
 
 #: js/turtledefs.js:556
 msgid "Save graphics from your project as PNG."
@@ -2044,11 +2048,11 @@ msgstr "మీ బ్లాక్ ఆర్ట్‌వర్క్‌ను SVG
 
 #: js/turtledefs.js:571
 msgid "Save sheet music as ABC, Lilypond or MusicXML"
-msgstr ""
+msgstr "షీట్ సంగీతాన్ని ABC, Lilypond లేదా MusicXML గా సేవ్ చేయండి"
 
 #: js/turtledefs.js:573
 msgid "Save block artwork as SVG or PNG"
-msgstr ""
+msgstr "బ్లాక్ కళాకృతిని SVG లేదా PNG గా సేవ్ చేయండి"
 
 #: js/turtledefs.js:580
 msgid "Load samples from server"
@@ -2063,12 +2067,12 @@ msgid "Expand/collapse option toolbar"
 msgstr "ఎంపిక టూల్‌బార్‌ను విస్తరించండి/మూసివేయండి"
 
 #: js/turtledefs.js:587
-msgid "Click this button to expand or collapse the auxillary toolbar."
-msgstr ""
+msgid "Click this button to expand or collapse the auxiliary toolbar."
+msgstr "సహాయక టూల్‌బార్‌ను విస్తరించడానికి లేదా కుదించడానికి ఈ బటన్‌ను క్లిక్ చేయండి."
 
 #: js/turtledefs.js:593
 msgid "Displays help messages for the main and auxiliary toolbar, right-click contextual menu for blocks and canvas, and palettes."
-msgstr ""
+msgstr "ప్రధాన మరియు సహాయక టూల్‌బార్ కోసం సహాయ సందేశాలను ప్రదర్శిస్తుంది, బ్లాక్‌లు మరియు కాన్వాస్, మరియు పాలెట్‌ల కోసం కుడి-క్లిక్ సందర్భోచిత మెను."
 
 #: js/turtledefs.js:599
 msgid "Click to run the project in slow mode."
@@ -2084,7 +2088,7 @@ msgstr "మీ సంగీత ప్రాజెక్ట్‌గా సంఖ
 
 #: js/turtledefs.js:618
 msgid "Load a selected plugin."
-msgstr ""
+msgstr "ఎంచుకున్న ప్లగిన్‌ను లోడ్ చేయండి."
 
 #: js/turtledefs.js:626
 msgid "Delete a selected plugin."
@@ -2100,11 +2104,11 @@ msgstr "మీరు క్యాన్వాస్‌లో బ్లాక్�
 
 #: js/turtledefs.js:643
 msgid "Switch between dark and light mode."
-msgstr ""
+msgstr "డాక్ మరియు లైట్ మోడ్ మధ్య మారండి."
 
 #: js/turtledefs.js:649
 msgid "Click to add another project into the current one."
-msgstr ""
+msgstr "ప్రస్తుత ప్రాజెక్ట్‌లో మరొక ప్రాజెక్ట్‌ను జోడించడానికి క్లిక్ చేయండి."
 
 #: js/turtledefs.js:654
 msgid "Wrap Turtle"
@@ -2116,11 +2120,11 @@ msgstr "టర్టిల్ గుర్తించిన స్థితి�
 
 #: js/turtledefs.js:663
 msgid "Click to set the current pitch."
-msgstr ""
+msgstr "ప్రస్తుత పిచ్‌ను సెట్ించడానికి క్లిక్ చేయండి."
 
 #: js/turtledefs.js:670
 msgid "Converts Music Block programs to JavaScript."
-msgstr ""
+msgstr "మ్యూజిక్ బ్లాక్ ప్రోగ్రామ్‌లను జావాస్క్రిప్ట్‌కు మారుస్తుంది."
 
 #: js/turtledefs.js:677
 msgid "Restore blocks from the trash."
@@ -2140,11 +2144,11 @@ msgstr "మీ భాషా ఇచ్చేందుకు ఎంపిక చ�
 
 #: js/turtledefs.js:696
 msgid "Contextual Menu for Blocks"
-msgstr ""
+msgstr "బ్లాక్‌ల కోసం సందర్భోచిత మెను"
 
 #: js/turtledefs.js:697
 msgid "Right-click on a block to access common actions."
-msgstr ""
+msgstr "సాధారణ చర్యలను యాక్సెస్ చేయడానికి బ్లాక్‌పై కుడి-క్లిక్ చేయండి."
 
 #: js/turtledefs.js:702
 #: planet/js/StringHelper.js:46
@@ -2153,15 +2157,15 @@ msgstr "తొలగించు"
 
 #: js/turtledefs.js:703
 msgid "To delete a block, right-click on it. You will see the delete option."
-msgstr ""
+msgstr "బ్లాక్‌ను తొలగించడానికి, దానిపై కుడి-క్లిక్ చేయండి. మీకు తొలగించు ఎంపిక కనిపిస్తుంది."
 
 #: js/turtledefs.js:709
 msgid "To copy a block, right-click on it. You will see the copy option."
-msgstr ""
+msgstr "బ్లాక్‌ను కాపీ చేయడానికి, దానిపై కుడి-క్లిక్ చేయండి. మీకు కాపీ ఎంపిక కనిపిస్తుంది."
 
 #: js/turtledefs.js:715
 msgid "To extract a block, right-click on it. You will see the extract option."
-msgstr ""
+msgstr "బ్లాక్‌ను వెలికితీసేందుకు, దానిపై కుడి-క్లిక్ చేయండి. మీకు ఎక్స్‌ట్రాక్ట్ ఎంపిక కనిపిస్తుంది."
 
 #: js/turtledefs.js:721
 msgid "Keyboard shortcuts"
@@ -2173,11 +2177,11 @@ msgstr "మీరు d నొక్కి do బ్లాక్ రాయవచ�
 
 #: js/turtledefs.js:729
 msgid "Contextual Menu for Canvas"
-msgstr ""
+msgstr "కాన్వాస్ కోసం సందర్భోచిత మెను"
 
 #: js/turtledefs.js:730
 msgid "Right-click on the canvas to perform additional canvas-related tasks."
-msgstr ""
+msgstr "అదనపు కాన్వాస్ సంబంధిత పనులను చేయడానికి కాన్వాస్‌పై కుడి-క్లిక్ చేయండి."
 
 #: js/turtledefs.js:736
 #: js/turtles.js:940
@@ -2187,11 +2191,11 @@ msgstr "గ్రిడ్"
 
 #: js/turtledefs.js:737
 msgid "Turn on/off lines for cartesian or polar grids."
-msgstr ""
+msgstr "కార్టీesian లేదా పోలార్ గ్రిడ్‌ల కోసం గీతలను ఆన్/ఆఫ్ చేయండి."
 
 #: js/turtledefs.js:739
 msgid "Turn on/off music staffs."
-msgstr ""
+msgstr "సంగీత స్టాఫ్‌లను ఆన్/ఆఫ్ చేయండి."
 
 #: js/turtledefs.js:744
 #: js/turtles.js:959
@@ -2244,11 +2248,11 @@ msgstr "బ్లాక్‌ల పరిమాణాన్ని పెంచ�
 
 #: js/turtledefs.js:789
 msgid "Select"
-msgstr ""
+msgstr "ఎంచుకోండి"
 
 #: js/turtledefs.js:790
 msgid "Left-click and drag on workspace to select multiple blocks."
-msgstr ""
+msgstr "బహుళ బ్లాక్‌లను ఎంచుకోవడానికి వర్క్‌స్పేస్‌పై ఎడమ-క్లిక్ చేసి లాగండి."
 
 #: js/turtledefs.js:797
 msgid "Palette buttons"
@@ -2320,7 +2324,7 @@ msgstr "మ్యూజిక్ బ్లాక్‌ల జిట్‌హబ�
 
 #: js/turtledefs.js:854
 msgid "Congratulations!"
-msgstr ""
+msgstr "అభినందనలు!"
 
 #: js/turtledefs.js:855
 msgid "You have finished the tour. Please enjoy Music Blocks!"
@@ -2361,179 +2365,179 @@ msgstr "విశ్రాంతి"
 
 #: js/utils/musicutils.js:687
 msgid "Perfect unison"
-msgstr ""
+msgstr "పర్ఫెక్ట్ యూనిసన్"
 
 #: js/utils/musicutils.js:687
 msgid "Diminished second"
-msgstr ""
+msgstr "డిమినిష్డ్ సెకండ్"
 
 #: js/utils/musicutils.js:688
 msgid "Minor second"
-msgstr ""
+msgstr "మైనర్ సెకండ్"
 
 #: js/utils/musicutils.js:688
 msgid "Augmented unison"
-msgstr ""
+msgstr "ఆగ్‌మెంటెడ్ యూనిసన్"
 
 #: js/utils/musicutils.js:689
 msgid "Major second"
-msgstr ""
+msgstr "మేజర్ సెకండ్"
 
 #: js/utils/musicutils.js:689
 msgid "Diminished third"
-msgstr ""
+msgstr "డిమినిష్డ్ థర్డ్"
 
 #: js/utils/musicutils.js:690
 msgid "Minor third"
-msgstr ""
+msgstr "మైనర్ థర్డ్"
 
 #: js/utils/musicutils.js:690
 msgid "Augmented second"
-msgstr ""
+msgstr "ఆగ్‌మెంటెడ్ సెకండ్"
 
 #: js/utils/musicutils.js:691
 msgid "Major third"
-msgstr ""
+msgstr "మేజర్ థర్డ్"
 
 #: js/utils/musicutils.js:691
 msgid "Diminished fourth"
-msgstr ""
+msgstr "డిమినిష్డ్ ఫోర్త్"
 
 #: js/utils/musicutils.js:692
 msgid "Perfect fourth"
-msgstr ""
+msgstr "పర్ఫెక్ట్ ఫోర్త్"
 
 #: js/utils/musicutils.js:692
 msgid "Augmented third"
-msgstr ""
+msgstr "ఆగ్‌మెంటెడ్ థర్డ్"
 
 #: js/utils/musicutils.js:693
 msgid "Diminished fifth"
-msgstr ""
+msgstr "డిమినిష్డ్ ఫిఫ్త్"
 
 #: js/utils/musicutils.js:693
 msgid "Augmented fourth"
-msgstr ""
+msgstr "ఆగ్‌మెంటెడ్ ఫోర్త్"
 
 #: js/utils/musicutils.js:694
 msgid "Perfect fifth"
-msgstr ""
+msgstr "పర్ఫెక్ట్ ఫిఫ్త్"
 
 #: js/utils/musicutils.js:694
 msgid "Diminished sixth"
-msgstr ""
+msgstr "డిమినిష్డ్ సిక్స్త్"
 
 #: js/utils/musicutils.js:695
 msgid "Minor sixth"
-msgstr ""
+msgstr "మైనర్ సిక్స్త్"
 
 #: js/utils/musicutils.js:695
 msgid "Augmented fifth"
-msgstr ""
+msgstr "ఆగ్‌మెంటెడ్ ఫిఫ్త్"
 
 #: js/utils/musicutils.js:696
 msgid "Major sixth"
-msgstr ""
+msgstr "మేజర్ సిక్స్త్"
 
 #: js/utils/musicutils.js:696
 msgid "Diminished seventh"
-msgstr ""
+msgstr "డిమినిష్డ్ సెవెంత్"
 
 #: js/utils/musicutils.js:697
 msgid "Minor seventh"
-msgstr ""
+msgstr "మైనర్ సెవెంత్"
 
 #: js/utils/musicutils.js:697
 msgid "Augmented sixth"
-msgstr ""
+msgstr "ఆగ్‌మెంటెడ్ సిక్స్త్"
 
 #: js/utils/musicutils.js:698
 msgid "Major seventh"
-msgstr ""
+msgstr "మేజర్ సెవెంత్"
 
 #: js/utils/musicutils.js:698
 msgid "Diminished octave"
-msgstr ""
+msgstr "డిమినిష్డ్ ఆక్టవ్"
 
 #: js/utils/musicutils.js:699
 msgid "Perfect octave"
-msgstr ""
+msgstr "పర్ఫెక్ట్ ఆక్టవ్"
 
 #: js/utils/musicutils.js:699
 msgid "Augmented seventh"
-msgstr ""
+msgstr "ఆగ్‌మెంటెడ్ సెవెంత్"
 
 #: js/utils/musicutils.js:700
 msgid "Minor ninth"
-msgstr ""
+msgstr "మైనర్ నైన్త్"
 
 #: js/utils/musicutils.js:700
 msgid "Augmented octave"
-msgstr ""
+msgstr "ఆగ్‌మెంటెడ్ ఆక్టవ్"
 
 #: js/utils/musicutils.js:701
 msgid "Major ninth"
-msgstr ""
+msgstr "మేజర్ నైన్త్"
 
 #: js/utils/musicutils.js:701
 msgid "Diminished tenth"
-msgstr ""
+msgstr "డిమినిష్డ్ టెన్త్"
 
 #: js/utils/musicutils.js:702
 msgid "Minor tenth"
-msgstr ""
+msgstr "మైనర్ టెన్త్"
 
 #: js/utils/musicutils.js:702
 msgid "Augmented ninth"
-msgstr ""
+msgstr "ఆగ్‌మెంటెడ్ నైన్త్"
 
 #: js/utils/musicutils.js:703
 msgid "Major tenth"
-msgstr ""
+msgstr "మేజర్ టెన్త్"
 
 #: js/utils/musicutils.js:703
 msgid "Diminished eleventh"
-msgstr ""
+msgstr "డిమినిష్డ్ ఎ లెవెన్త్"
 
 #: js/utils/musicutils.js:704
 msgid "Perfect eleventh"
-msgstr ""
+msgstr "పర్ఫెక్ట్ ఎ లెవెన్త్"
 
 #: js/utils/musicutils.js:704
 msgid "Augmented tenth"
-msgstr ""
+msgstr "ఆగ్‌మెంటెడ్ టెన్త్"
 
 #: js/utils/musicutils.js:705
 msgid "Diminished twelfth"
-msgstr ""
+msgstr "డిమినిష్డ్ ట్వెల్వ్త్"
 
 #: js/utils/musicutils.js:705
 msgid "Augmented eleventh"
-msgstr ""
+msgstr "ఆగ్‌మెంటెడ్ ఎ లెవెన్త్"
 
 #: js/utils/musicutils.js:706
 msgid "Perfect twelfth"
-msgstr ""
+msgstr "పర్ఫెక్ట్ ట్వెల్వ్త్"
 
 #: js/utils/musicutils.js:706
 msgid "Diminished thirteenth"
-msgstr ""
+msgstr "డిమినిష్డ్ థర్టీన్త్"
 
 #: js/utils/musicutils.js:707
 msgid "Minor thirteenth"
-msgstr ""
+msgstr "మైనర్ థర్టీన్త్"
 
 #: js/utils/musicutils.js:707
 msgid "Augmented fifth, plus an octave"
-msgstr ""
+msgstr "ఆగ్‌మెంటెడ్ ఫిఫ్త్, ప్లస్ ఏన్ ఆక్టవ్"
 
 #: js/utils/musicutils.js:708
 msgid "Major thirteenth"
-msgstr ""
+msgstr "మేజర్ థర్టీన్త్"
 
 #: js/utils/musicutils.js:708
 msgid "Diminished seventh, plus an octave"
-msgstr ""
+msgstr "డిమినిష్డ్ సెవెంత్, ప్లస్ ఏన్ ఆక్టవ్"
 
 #: js/utils/musicutils.js:836
 #. TRANS: ordinal number. Please keep exactly one space between each number.
@@ -2914,7 +2918,7 @@ msgstr "గిటార్"
 #: js/utils/synthutils.js:84
 #. TRANS: sitar musical instrument
 msgid "sitar"
-msgstr ""
+msgstr "సితార్"
 
 #: js/utils/musicutils.js:1113
 #: js/utils/synthutils.js:88
@@ -3228,7 +3232,7 @@ msgstr "కేవల సరళ సమాంతరం"
 #: js/utils/musicutils.js:1624
 #. TRANS: musical temperament
 msgid "Meantone"
-msgstr ""
+msgstr "మీన్‌టోన్"
 
 #: js/utils/musicutils.js:1188
 msgid "major 7th"
@@ -3257,37 +3261,37 @@ msgstr "హాఫ్-డిమినిష్డ్ 7వ"
 #: js/utils/musicutils.js:1600
 #: js/utils/musicutils.js:1616
 msgid "Equal (12EDO)"
-msgstr ""
+msgstr "సమానం (12EDO)"
 
 #: js/utils/musicutils.js:1601
 #: js/utils/musicutils.js:1617
 msgid "Equal (5EDO)"
-msgstr ""
+msgstr "సమానం (5EDO)"
 
 #: js/utils/musicutils.js:1602
 #: js/utils/musicutils.js:1618
 msgid "Equal (7EDO)"
-msgstr ""
+msgstr "సమానం (7EDO)"
 
 #: js/utils/musicutils.js:1603
 #: js/utils/musicutils.js:1619
 msgid "Equal (19EDO)"
-msgstr ""
+msgstr "సమానం (19EDO)"
 
 #: js/utils/musicutils.js:1604
 #: js/utils/musicutils.js:1620
 msgid "Equal (31EDO)"
-msgstr ""
+msgstr "సమానం (31EDO)"
 
 #: js/utils/musicutils.js:1605
 #: js/utils/musicutils.js:1621
 msgid "5-limit Just Intonation"
-msgstr ""
+msgstr "5-limit జస్ట్ ఇంటోనేషన్"
 
 #: js/utils/musicutils.js:1606
 #: js/utils/musicutils.js:1622
 msgid "Pythagorean (3-limit JI)"
-msgstr ""
+msgstr "పైథాగారియన్ (3-limit JI)"
 
 #: js/utils/musicutils.js:5631
 #: js/utils/musicutils.js:5674
@@ -3362,7 +3366,7 @@ msgstr "ఇరువు సంఖ్యలు సరిపడితే, అప�
 
 #: js/blocks/BooleanBlocks.js:909
 msgid "The Not-equal-to block returns True if the two numbers are not equal to each other."
-msgstr ""
+msgstr "రెండు సంఖ్యలు ఒకదానికొకటి సమానం కాకపోతే, నాట్-ఈక్వల్-టు బ్లాక్ నిజం అని తిరిగి ఇస్తుంది."
 
 #: js/blocks/BooleanBlocks.js:1008
 msgid "The Boolean block is used to specify true or false."
@@ -3628,7 +3632,7 @@ msgstr "అత్యధిక హీప్ పరిమాణం 1000."
 
 #: js/blocks/HeapBlocks.js:523
 msgid "The Set-heap entry block sets a value in he heap at the specified location."
-msgstr ""
+msgstr "సెట్-హీప్ ఎంట్రీ బ్లాక్ నిర్దిష్ట ప్రదేశంలో హీప్‌లో ఒక విలువను సెట్ చేస్తుంది."
 
 #: js/blocks/HeapBlocks.js:539
 #: js/blocks/ProgramBlocks.js:299
@@ -3698,7 +3702,7 @@ msgstr "అంతరాల సంఖ్య"
 
 #: js/blocks/IntervalsBlocks.js:317
 msgid "current interval"
-msgstr ""
+msgstr "ప్రస్తుత వ్యవధి"
 
 #: js/blocks/IntervalsBlocks.js:387
 #. TRANS: measure the distance between two pitches in semi-tones
@@ -4119,7 +4123,7 @@ msgstr "ఈ బ్లాక్ను తొలగించండి"
 
 #: js/blocks/ProgramBlocks.js:1025
 msgid "The Dock block block connections two blocks."
-msgstr ""
+msgstr "డాక్ బ్లాక్ రెండు బ్లాక్‌ల అనుసంధానాలను చేస్తుంది."
 
 #: js/blocks/ProgramBlocks.js:1036
 #. TRANS: We can connect a block to another block.
@@ -4459,7 +4463,7 @@ msgstr "అయితే"
 
 #: js/blocks/FlowBlocks.js:927
 msgid "else"
-msgstr ""
+msgstr "లేకపోతే"
 
 #: js/blocks/FlowBlocks.js:1025
 msgid "The Forever block will repeat the contained blocks forever."
@@ -4558,7 +4562,7 @@ msgstr "గానా కౌంటర్"
 #: js/blocks/MeterBlocks.js:497
 #. TRANS: number of whole notes that have been played
 msgid "whole notes played"
-msgstr ""
+msgstr "మొత్తం నోట్లు ప్లే చేయబడ్డాయి"
 
 #: js/blocks/MeterBlocks.js:506
 msgid "The Whole notes played block returns the total number of whole notes played."
@@ -4568,7 +4572,7 @@ msgstr "హోల్ నోట్లు ప్రారంభించబడి�
 #: js/turtleactions/DictActions.js:83
 #. TRANS: number of notes that have been played
 msgid "notes played"
-msgstr ""
+msgstr "నోట్లు ప్లే చేయబడ్డాయి"
 
 #: js/blocks/MeterBlocks.js:654
 msgid "The No clock block decouples the notes from the master clock."
@@ -4585,7 +4589,7 @@ msgstr "బలహీన బీట్పై చర్య చేయండి"
 
 #: js/blocks/MeterBlocks.js:706
 msgid "The On-weak-beat block lets you specify actions to take on weak (off) beats."
-msgstr ""
+msgstr "ఆన్-వీక్-బీట్ బ్లాక్ బలహీనమైన (ఆఫ్) బీట్‌లపై చర్యలను పేర్కొనడానికి మిమ్మల్ని అనుమతిస్తుంది."
 
 #: js/blocks/MeterBlocks.js:751
 msgid "on strong beat"
@@ -4593,7 +4597,7 @@ msgstr "బలమైన బీట్పై"
 
 #: js/blocks/MeterBlocks.js:759
 msgid "The On-strong-beat block lets you specify actions to take on specified beats."
-msgstr ""
+msgstr "ఆన్-స్ట్రాంగ్-బీట్ బ్లాక్ నిర్దిష్ట బీట్‌లపై చర్యలను పేర్కొనడానికి మిమ్మల్ని అనుమతిస్తుంది."
 
 #: js/blocks/MeterBlocks.js:770
 msgid "beat"
@@ -4613,7 +4617,7 @@ msgstr "ప్రతి బీట్పై చర్య చేయండి"
 
 #: js/blocks/MeterBlocks.js:822
 msgid "The On-every-beat block lets you specify actions to take on every beat."
-msgstr ""
+msgstr "ఆన్-ఎవ్రీ-బీట్ బ్లాక్ ప్రతి బీట్‌పై చర్యలను పేర్కొనడానికి మిమ్మల్ని అనుమతిస్తుంది."
 
 #: js/blocks/MeterBlocks.js:875
 msgid "on every note do"
@@ -4621,7 +4625,7 @@ msgstr "ప్రతి గానాను పైన చేయండి"
 
 #: js/blocks/MeterBlocks.js:883
 msgid "The On-every-note block lets you specify actions to take on every note."
-msgstr ""
+msgstr "ఆన్-ఎవ్రీ-నోట్ బ్లాక్ ప్రతి నోట్‌పై చర్యలను పేర్కొనడానికి మిమ్మల్ని అనుమతిస్తుంది."
 
 #: js/blocks/MeterBlocks.js:929
 #: js/blocks/MeterBlocks.js:1000
@@ -4723,7 +4727,7 @@ msgstr "పిచ్ సంఖ్య బ్లాక్ ప్రస్తుత
 #: js/blocks/PitchBlocks.js:433
 #. TRANS: the current pitch expressed in Hertz
 msgid "pitch in hertz"
-msgstr ""
+msgstr "హెర్ట్జ్‌లో పిచ్"
 
 #: js/blocks/PitchBlocks.js:334
 msgid "The Pitch in Hertz block is the value in Hertz of the pitch of the note currently being played."
@@ -4736,11 +4740,11 @@ msgstr "ప్రస్తుత పిచ్"
 
 #: js/blocks/PitchBlocks.js:373
 msgid "The Current Pitch block is used with the Pitch Converter block. In the example above, current pitch, sol 4, is displayed as 392 hertz."
-msgstr ""
+msgstr "ప్రస్తుత పిచ్ బ్లాక్ పిచ్ కన్వర్టర్ బ్లాక్‌తో ఉపయోగించబడుతుంది. పై ఉదాహరణలో, ప్రస్తుత పిచ్, sol 4, 392 హెర్ట్జ్‌గా ప్రదర్శించబడుతుంది."
 
 #: js/blocks/PitchBlocks.js:410
 msgid "This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."
-msgstr ""
+msgstr "ఈ బ్లాక్ చివరిగా ప్లే చేసిన నోట్ యొక్క పిచ్ విలువను హెర్ట్జ్, లెటర్ నేమ్, పిచ్ నంబర్, మొదలైన వివిధ ఫార్మాట్‌లలోకి మారుస్తుంది."
 
 #: js/blocks/PitchBlocks.js:434
 msgid "alphabet"
@@ -4813,7 +4817,7 @@ msgstr "నంబర్ ను పిచ్ కి మార్చండి"
 
 #: js/blocks/PitchBlocks.js:682
 msgid "The Number to pitch block will convert a pitch number to a pich name."
-msgstr ""
+msgstr "నంబర్ టు పిచ్ బ్లాక్ పిచ్ నంబర్‌ను పిచ్ పేరుకు మారుస్తుంది."
 
 #: js/blocks/PitchBlocks.js:715
 #. TRANS: convert piano key number (1-88) to octave
@@ -4842,23 +4846,23 @@ msgstr "అక్షిడెంటల్ సెలెక్టర్ బ్ల�
 
 #: js/blocks/PitchBlocks.js:858
 msgid "Pitch can be specified in terms of ni dha pa ma ga re sa."
-msgstr ""
+msgstr "పిచ్‌ను ni dha pa ma ga re sa పరంగా పేర్కొనవచ్చు."
 
 #: js/blocks/PitchBlocks.js:872
 msgid "Pitch can be specified in terms of C D E F G A B."
-msgstr ""
+msgstr "పిచ్‌ను C D E F G A B పరంగా పేర్కొనవచ్చు."
 
 #: js/blocks/PitchBlocks.js:884
 msgid "solfege"
-msgstr ""
+msgstr "సోల్ఫేజ్"
 
 #: js/blocks/PitchBlocks.js:887
 msgid "Pitch can be specified in terms of do re mi fa sol la ti."
-msgstr ""
+msgstr "పిచ్‌ను do re mi fa sol la ti పరంగా పేర్కొనవచ్చు."
 
 #: js/blocks/PitchBlocks.js:922
 msgid "The Invert block rotates any contained notes around a target note."
-msgstr ""
+msgstr "ఇన్వర్ట్ బ్లాక్ లక్ష్య నోట్ చుట్టూ ఉన్న నోట్లను తిప్పుతుంది."
 
 #: js/blocks/PitchBlocks.js:929
 #: js/widgets/modewidget.js:137
@@ -4888,7 +4892,7 @@ msgstr "రిజిస్టర్ బ్లాక్ అనుసరించ�
 #: js/blocks/PitchBlocks.js:1047
 #. TRANS: cents are units used to specify the ratio between pitches. There are 100 cents between successive notes.
 msgid "50 cents"
-msgstr ""
+msgstr "50 సెంట్లు"
 
 #: js/blocks/PitchBlocks.js:1102
 msgid "The Semi-tone transposition block will shift the pitches contained inside Note blocks up (or down) by half steps."
@@ -4905,7 +4909,7 @@ msgstr "సెమి-టోన్ ట్రాన్స్పోజ్"
 
 #: js/blocks/PitchBlocks.js:1143
 msgid "The Transpose by Ratio block will shift the pitches contained inside Note blocks up (or down) by a ratio"
-msgstr ""
+msgstr "రేషియో ద్వారా ట్రాన్స్పోజ్ బ్లాక్ నోట్ బ్లాక్‌లలో ఉన్న పిచ్‌లను ఒక నిష్పత్తి ద్వారా మారుస్తుంది."
 
 #: js/blocks/PitchBlocks.js:1149
 #. TRANS: adjust the amount of shift (up or down) of a pitch
@@ -4967,7 +4971,7 @@ msgstr "స్కాలర్ ట్రాన్స్పోజ్"
 
 #: js/blocks/PitchBlocks.js:1451
 msgid "The Accidental block is used to create sharps and flats"
-msgstr ""
+msgstr "యాక్సిడెంటల్ బ్లాక్ షార్ప్స్ మరియు ఫ్లాట్స్ సృష్టించడానికి ఉపయోగించబడుతుంది."
 
 #: js/blocks/PitchBlocks.js:1458
 #. TRANS: An accidental is a modification to a pitch, e.g., sharp or flat.
@@ -4999,7 +5003,7 @@ msgstr "మోడల్ పిచ్ యొక్క సంఖ్యాత్మ
 
 #: js/blocks/PitchBlocks.js:1706
 msgid "nth Modal Pitch takes the pattern of pitches in semitones for a mode and makes each point a degree of the mode,"
-msgstr ""
+msgstr "ఎన్త్ మోడల్ పిచ్ మోడ్ కోసం సెమిటోన్‌లలో పిచ్‌ల నమూనాను తీసుకుంటుంది మరియు ప్రతి పాయింట్‌ను మోడ్ యొక్క డిగ్రీగా చేస్తుంది,"
 
 #: js/blocks/PitchBlocks.js:1708
 msgid "starting from 1 and regardless of tonal framework (i.e. not always 8 notes in the octave)"
@@ -5007,7 +5011,7 @@ msgstr "1 ను నుంచి మరియు టోనల్ ఫ్రేమ
 
 #: js/blocks/PitchBlocks.js:1749
 msgid "Nth Modal Pitch takes a number as an input as the nth degree for the given mode. 0 is the first position, 1 is the second, -1 is the note before the first etc."
-msgstr ""
+msgstr "ఎన్త్ మోడల్ పిచ్ ఇచ్చిన మోడ్ కోసం ఎన్త్ డిగ్రీగా ఇన్‌పుట్‌గా ఒక సంఖ్యను తీసుకుంటుంది. 0 మొదటి స్థానం, 1 రెండవది, -1 మొదటిదానికి ముందు నోట్ మొ."
 
 #: js/blocks/PitchBlocks.js:1751
 msgid "The pitches change according to the mode specified without any need for respellings."
@@ -5829,7 +5833,7 @@ msgstr "డిస్ప్లే గ్రిడ్ బ్లాక్ గ్ర
 #: js/blocks/ExtrasBlocks.js:813
 #: js/blocks/ExtrasBlocks.js:832
 msgid "unknown"
-msgstr ""
+msgstr "తెలియనిది"
 
 #: js/blocks/GraphicsBlocks.js:46
 #: js/turtleactions/DictActions.js:77
@@ -5926,7 +5930,7 @@ msgstr "బేజియర్"
 
 #: js/blocks/GraphicsBlocks.js:583
 msgid "The Arc block moves the turtle in an arc."
-msgstr ""
+msgstr "ఆర్క్ బ్లాక్ టర్టిల్‌ను ఆర్క్‌లో కదిలిస్తుంది."
 
 #: js/blocks/GraphicsBlocks.js:591
 msgid "arc"
@@ -5945,14 +5949,14 @@ msgstr "వ్యాసార్ధం"
 #: js/blocks/GraphicsBlocks.js:1001
 #: js/blocks/GraphicsBlocks.js:1084
 msgid "Value must be within -5000 to 5000 when Wrap Mode is off."
-msgstr ""
+msgstr "రాప్ మోడ్ ఆఫ్ అయినప్పుడు విలువ -5000 నుండి 5000 లోపు ఉండాలి."
 
 #: js/blocks/GraphicsBlocks.js:613
 #: js/blocks/GraphicsBlocks.js:760
 #: js/blocks/GraphicsBlocks.js:1003
 #: js/blocks/GraphicsBlocks.js:1086
 msgid "Value must be within -20000 to 20000 when Wrap Mode is on."
-msgstr ""
+msgstr "రాప్ మోడ్ ఆన్ అయినప్పుడు విలువ -20000 నుండి 20000 లోపు ఉండాలి."
 
 #: js/blocks/GraphicsBlocks.js:651
 msgid "set heading"
@@ -6170,7 +6174,7 @@ msgstr "సంవర్ధన"
 #: js/blocks/MediaBlocks.js:692
 #: plugins/rodi.rtp:193
 msgid "duration (MS)"
-msgstr ""
+msgstr "వ్యవధి (MS)"
 
 #: js/blocks/MediaBlocks.js:728
 #. TRANS: translate a note into hertz, e.g., A4 -> 440HZ
@@ -6397,7 +6401,7 @@ msgstr "ఛాయను అమర్చు"
 
 #: js/blocks/PenBlocks.js:1034
 msgid "The Set-shade block changes the pen color from dark to light."
-msgstr "సెట్-షేడ్ బ్లాక్ పెన్ రంగును అంగడానికి మార్చిపెడతాయి."
+msgstr "సెట్-షాడ్ బ్లాక్ పెన్ రంగును ముదురు నుండి లేతగా మారుస్తుంది."
 
 #: js/blocks/PenBlocks.js:1088
 #. TRANS: set the level of vividness of the pen color
@@ -6406,7 +6410,7 @@ msgstr "గ్రే ను సెట్ చేయండి."
 
 #: js/blocks/PenBlocks.js:1096
 msgid "The Set grey block changes the vividness of the pen color."
-msgstr "సెట్ గ్రే బ్లాక్ పెన్ రంగును బృహదరంగా మార్చిపెడతాయి."
+msgstr "సెట్ గ్రే బ్లాక్ పెన్ రంగు యొక్క స్పష్టతను మారుస్తుంది."
 
 #: js/blocks/PenBlocks.js:1149
 msgid "set color"
@@ -6414,7 +6418,7 @@ msgstr "వర్ణాన్ని  అమర్చు"
 
 #: js/blocks/PenBlocks.js:1159
 msgid "The Set-color block changes the pen color."
-msgstr "సెట్-రంగు బ్లాక్ పెన్ రంగును మార్చిపెడతాయి."
+msgstr "సెట్-కలర్ బ్లాక్ పెన్ రంగును మారుస్తుంది."
 
 #: js/blocks/SensorsBlocks.js:36
 msgid "The Input block prompts for keyboard input."
@@ -6719,7 +6723,7 @@ msgstr "స్టేటస్ బ్లాక్ మ్యూజిక్ బ్
 #: js/widgets/aiwidget.js:699
 #. TRANS: AI-generated music
 msgid "AI Music"
-msgstr ""
+msgstr "AI సంగీతం"
 
 #: js/blocks/VolumeBlocks.js:35
 msgid "synth volume"
@@ -6817,52 +6821,52 @@ msgstr "క్రిస్సెండో"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "one"
-msgstr ""
+msgstr "ఒకటి"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "two"
-msgstr ""
+msgstr "రెండు"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "three"
-msgstr ""
+msgstr "మూడు"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "four"
-msgstr ""
+msgstr "నాలుగు"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "five"
-msgstr ""
+msgstr "ఐదు"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "six"
-msgstr ""
+msgstr "ఆరు"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "seven"
-msgstr ""
+msgstr "ఏడు"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "eight"
-msgstr ""
+msgstr "ఎనిమిది"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "nine"
-msgstr ""
+msgstr "తొమ్మిది"
 
 #: js/turtleactions/IntervalsActions.js:120
 #: js/turtleactions/IntervalsActions.js:140
 msgid "below"
-msgstr ""
+msgstr "క్రింద"
 
 #: js/turtleactions/IntervalsActions.js:124
 msgid "above"
-msgstr ""
+msgstr "పైన"
 
 #: js/turtleactions/IntervalsActions.js:131
 msgid "plus"
-msgstr ""
+msgstr "ప్లస్"
 
 #: js/turtleactions/IntervalsActions.js:258
 msgid "Adding missing pitch number 0."
@@ -6884,11 +6888,11 @@ msgstr "ఫాంట్"
 
 #: js/turtleactions/DictActions.js:255
 msgid "Dictionary with this name does not exist"
-msgstr ""
+msgstr "ఈ పేరుతో నిఘంటువు లేదు"
 
 #: js/turtleactions/DictActions.js:259
 msgid "Key with this name does not exist in "
-msgstr ""
+msgstr "ఈ పేరుతో కీ ఇందులో లేదు "
 
 #: js/turtleactions/DrumActions.js:227
 msgid "Noise Block: Did you mean to use a Note block?"
@@ -6974,11 +6978,11 @@ msgstr "హెచ్చరిక: సాంపిల్ 1MB కంటే ఎక�
 
 #: js/widgets/aiwidget.js:538
 msgid "New start block generated"
-msgstr ""
+msgstr "కొత్త ప్రారంభ బ్లాక్ సృష్టించబడింది"
 
 #: js/widgets/aiwidget.js:540
 msgid "MIDI loading. This may take some time depending upon the number of notes in the track"
-msgstr ""
+msgstr "MIDI లోడ్ అవుతోంది. ట్రాక్‌లోని నోట్ల సంఖ్యను బట్టి దీనికి కొంత సమయం పట్టవచ్చు"
 
 #: js/widgets/aiwidget.js:550
 #: js/widgets/sampler.js:252
@@ -7048,7 +7052,7 @@ msgstr "మోడ్ కోసం నోట్లను ఎంచుకోవడ
 #: js/widgets/tempo.js:412
 #: js/widgets/phrasemaker.js:5467
 msgid "New action block generated."
-msgstr ""
+msgstr "కొత్త చర్య బ్లాక్ సృష్టించబడింది."
 
 #: js/widgets/musickeyboard.js:743
 #: js/widgets/phrasemaker.js:595
@@ -7061,11 +7065,11 @@ msgstr "మెట్రానోమ్"
 
 #: js/widgets/musickeyboard.js:1574
 msgid "Note value"
-msgstr ""
+msgstr "నోట్ విలువ"
 
 #: js/widgets/musickeyboard.js:3209
 msgid "New action blocks generated."
-msgstr ""
+msgstr "కొత్త చర్య బ్లాక్‌లు సృష్టించబడ్డాయి."
 
 #: js/widgets/musickeyboard.js:3393
 #: js/widgets/musickeyboard.js:3401
@@ -7141,11 +7145,11 @@ msgstr "256 యొక్క అత్యధిక విలువ మీరి�
 
 #: js/widgets/sampler.js:235
 msgid "Recording started"
-msgstr ""
+msgstr "రికార్డింగ్ ప్రారంభమైంది"
 
 #: js/widgets/sampler.js:243
 msgid "Recording complete"
-msgstr ""
+msgstr "రికార్డింగ్ పూర్తయింది"
 
 #: js/widgets/sampler.js:281
 msgid "A new sample block was generated."
@@ -7157,15 +7161,15 @@ msgstr "సాంపిల్ అప్‌లోడ్"
 
 #: js/widgets/sampler.js:397
 msgid "Warning: Your sample cannot be loaded because it is >1MB."
-msgstr ""
+msgstr "హెచ్చరిక: మీ సాంపిల్ >1MB ఉన్నందున లోడ్ చేయబడలేదు."
 
 #: js/widgets/sampler.js:446
 msgid "Toggle Mic"
-msgstr ""
+msgstr "మైక్‌ను మార్చండి"
 
 #: js/widgets/sampler.js:453
 msgid "Playback"
-msgstr ""
+msgstr "ప్లేబ్యాక్"
 
 #: js/widgets/sampler.js:933
 #. TRANS: The reference tone is a sound used for comparison.
@@ -7228,7 +7232,7 @@ msgstr "ప్రొవియూ"
 
 #: js/widgets/temperament.js:888
 msgid "The Number of divisions is too large."
-msgstr ""
+msgstr "విభాగాల సంఖ్య చాలా పెద్దదిగా ఉంది."
 
 #: js/widgets/temperament.js:1023
 msgid "recursion"
@@ -7264,7 +7268,7 @@ msgstr "బటన్లు ఉపయోగించి టెంపోను స
 
 #: js/widgets/tempo.js:259
 msgid "Please enter a number between 30 and 1000"
-msgstr ""
+msgstr "దయచేసి 30 మరియు 1000 మధ్య సంఖ్యను నమోదు చేయండి"
 
 #: js/widgets/tempo.js:266
 #: js/widgets/tempo.js:269

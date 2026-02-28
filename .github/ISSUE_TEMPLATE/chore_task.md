@@ -1,7 +1,7 @@
 ---
 name: 🧹Chore or task
 about: Identify a necessary task to be addressed.
-title: ""
+title: "[Chore]"
 labels: ""
 assignees: ""
 ---

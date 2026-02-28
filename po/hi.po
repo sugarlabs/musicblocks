@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: \n"
-"Last-Translator: \n"
+"PO-Revision-Date: 2025-12-10 18:51+0530\n"
+"Last-Translator: Harihara Vardhan <hariharavardhan1234@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -436,7 +436,7 @@ msgstr "बहाव"
 #: js/turtledefs.js:240
 #: planet/js/GlobalTag.js:48
 #.TRANS: On the Planet, we use labels to tag projects.
-msgid "Sensors"
+msgid "sensors"
 msgstr "सेंसर्स"
 
 #: js/rubrics.js:532
@@ -445,7 +445,7 @@ msgstr "सेंसर्स"
 #: js/blocks/MediaBlocks.js:914
 #: planet/js/GlobalTag.js:46
 #.TRANS: On the Planet, we use labels to tag projects.
-msgid "Media"
+msgid "media"
 msgstr "मीडिया"
 
 #: js/rubrics.js:533
@@ -1017,7 +1017,7 @@ msgid "Expand/collapse option toolbar"
 msgstr "विकल्प टूलबार को विस्तृत/संकुचित करें"
 
 #: js/turtledefs.js:588
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxiliary toolbar."
 msgstr "सहायक उपकरण पट्टी को विस्तृत या संक्षिप्त करने के लिए यह बटन क्लिक करें."
 
 #: js/turtledefs.js:593
@@ -2271,7 +2271,7 @@ msgstr "पुष्टि करें"
 #: js/toolbar.js:290
 msgid "English (United States)"
 # TRANS: machine translation
-msgstr "English (United States)"
+msgstr ""
 
 #: js/toolbar.js:94
 #: js/toolbar.js:168
@@ -2279,7 +2279,7 @@ msgstr "English (United States)"
 #: js/toolbar.js:291
 msgid "English (United Kingdom)"
 # TRANS: machine translation
-msgstr "English (United Kingdom)"
+msgstr ""
 
 #: js/toolbar.js:95
 #: js/toolbar.js:169
@@ -2287,12 +2287,12 @@ msgstr "English (United Kingdom)"
 #: js/toolbar.js:292
 msgid "日本語"
 # TRANS: machine translation
-msgstr "日本語"
+msgstr ""
 
 #: js/toolbar.js:96
 msgid "한국어"
 # TRANS: machine translation
-msgstr "한국어"
+msgstr ""
 
 #: js/toolbar.js:97
 #: js/toolbar.js:171
@@ -2300,7 +2300,7 @@ msgstr "한국어"
 #: js/toolbar.js:294
 msgid "español"
 # TRANS: machine translation
-msgstr "español"
+msgstr ""
 
 #: js/toolbar.js:98
 #: js/toolbar.js:172
@@ -2308,7 +2308,7 @@ msgstr "español"
 #: js/toolbar.js:295
 msgid "português"
 # TRANS: machine translation
-msgstr "português"
+msgstr ""
 
 #: js/toolbar.js:99
 #: js/toolbar.js:173
@@ -2316,7 +2316,7 @@ msgstr "português"
 #: js/toolbar.js:296
 msgid "にほんご"
 # TRANS: machine translation
-msgstr "にほんご"
+msgstr ""
 
 #: js/toolbar.js:100
 #: js/toolbar.js:174
@@ -2324,7 +2324,7 @@ msgstr "にほんご"
 #: js/toolbar.js:297
 msgid "中文"
 # TRANS: machine translation
-msgstr "中文"
+msgstr ""
 
 #: js/toolbar.js:101
 #: js/toolbar.js:175
@@ -2332,7 +2332,7 @@ msgstr "中文"
 #: js/toolbar.js:298
 msgid "ภาษาไทย"
 # TRANS: machine translation
-msgstr "ภาษาไทย"
+msgstr ""
 
 #: js/toolbar.js:102
 #: js/toolbar.js:176
@@ -2340,7 +2340,7 @@ msgstr "ภาษาไทย"
 #: js/toolbar.js:299
 msgid "Turkish"
 # TRANS: machine translation
-msgstr "तुर्की"
+msgstr ""
 
 #: js/toolbar.js:103
 #: js/toolbar.js:177
@@ -2348,7 +2348,7 @@ msgstr "तुर्की"
 #: js/toolbar.js:300
 msgid "aymara"
 # TRANS: machine translation
-msgstr "aymara"
+msgstr ""
 
 #: js/toolbar.js:104
 #: js/toolbar.js:178
@@ -2356,7 +2356,7 @@ msgstr "aymara"
 #: js/toolbar.js:301
 msgid "quechua"
 # TRANS: machine translation
-msgstr "quechua"
+msgstr ""
 
 #: js/toolbar.js:105
 #: js/toolbar.js:179
@@ -2364,7 +2364,7 @@ msgstr "quechua"
 #: js/toolbar.js:302
 msgid "guarani"
 # TRANS: machine translation
-msgstr "guarani"
+msgstr ""
 
 #: js/toolbar.js:106
 #: js/toolbar.js:180
@@ -2372,7 +2372,7 @@ msgstr "guarani"
 #: js/toolbar.js:303
 msgid "हिंदी"
 # TRANS: machine translation
-msgstr "हिंदी"
+msgstr ""
 
 #: js/toolbar.js:107
 #: js/toolbar.js:182
@@ -2380,7 +2380,7 @@ msgstr "हिंदी"
 #: js/toolbar.js:305
 msgid "igbo"
 # TRANS: machine translation
-msgstr "igbo"
+msgstr ""
 
 #: js/toolbar.js:108
 #: js/toolbar.js:183
@@ -2388,7 +2388,7 @@ msgstr "igbo"
 #: js/toolbar.js:306
 msgid "عربى"
 # TRANS: machine translation
-msgstr "عربى"
+msgstr ""
 
 #: js/toolbar.js:109
 #: js/toolbar.js:181
@@ -2396,7 +2396,7 @@ msgstr "عربى"
 #: js/toolbar.js:304
 msgid "తెలుగు"
 # TRANS: machine translation
-msgstr "తెలుగు"
+msgstr ""
 
 #: js/toolbar.js:110
 #: js/toolbar.js:184
@@ -2404,7 +2404,7 @@ msgstr "తెలుగు"
 #: js/toolbar.js:307
 msgid "עִברִית"
 # TRANS: machine translation
-msgstr "עִברִית"
+msgstr ""
 
 #: js/toolbar.js:111
 #: js/toolbar.js:185
@@ -2412,14 +2412,14 @@ msgstr "עִברִית"
 #: js/toolbar.js:308
 msgid "اردو"
 # TRANS: machine translation
-msgstr "اردو"
+msgstr ""
 
 #: js/toolbar.js:170
 #: js/toolbar.js:231
 #: js/toolbar.js:293
 msgid "한국인"
 # TRANS: machine translation
-msgstr "한국인"
+msgstr ""
 
 #: js/toolbar.js:189
 #: js/toolbar.js:251
@@ -3428,7 +3428,7 @@ msgstr "पिछला"
 #: js/utils/synthutils.js:92
 #.TRANS: harmonium musical instrument
 msgid "harmonium"
-msgstr ""
+msgstr "हार्मोनियम"
 
 #: js/utils/synthutils.js:132
 #.TRANS: simple monotone synthesizer

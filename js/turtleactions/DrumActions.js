@@ -59,7 +59,7 @@ function setupDrumActions(activity) {
          */
         static GetDrumname(drum) {
             if (drum.slice(0, 4) === "http") return drum;
-            
+
             for (const [, value] of Object.entries(DRUMNAMES)) {
                 if (value[0] === drum) {
                     return value[1];
@@ -67,7 +67,7 @@ function setupDrumActions(activity) {
                     return drum;
                 }
             }
-            
+
             return DEFAULTDRUM;
         }
 

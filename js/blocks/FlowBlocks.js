@@ -93,7 +93,7 @@ function setupFlowBlocks(activity) {
             }
 
             // Set up the listener function
-            const __listener = (event) => tur.singer.backward.pop();
+            const __listener = event => tur.singer.backward.pop();
 
             // Set the turtle listener
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -123,7 +123,9 @@ function setupFlowBlocks(activity) {
             this.setHelpString([
                 _("The Duplicate block will run each block multiple times.") +
                     " " +
-                    _("The output of the example is: Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol."),
+                    _(
+                        "The output of the example is: Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol."
+                    ),
                 "documentation",
                 null,
                 "duphelp"
@@ -195,45 +197,79 @@ function setupFlowBlocks(activity) {
 
                 tur.singer.inDuplicate = true;
 
+                /**
+                 * Acquires the connectionStoreLock with proper waiting.
+                 * Uses a polling mechanism to wait for the lock to be released.
+                 * @param {number} maxRetries - Maximum number of retry attempts
+                 * @param {number} retryInterval - Milliseconds between retries
+                 * @returns {Promise<boolean>} - Resolves to true when lock is acquired
+                 */
+                const __acquireLock = (maxRetries = 100, retryInterval = 10) => {
+                    return new Promise(resolve => {
+                        let retries = 0;
+                        const tryAcquire = () => {
+                            if (!logo.connectionStoreLock) {
+                                logo.connectionStoreLock = true;
+                                resolve(true);
+                            } else if (retries < maxRetries) {
+                                retries++;
+                                setTimeout(tryAcquire, retryInterval);
+                            } else {
+                                // Force acquire after max retries to prevent deadlock
+                                console.warn(
+                                    "connectionStoreLock: Max retries reached, forcing lock acquisition"
+                                );
+                                logo.connectionStoreLock = true;
+                                resolve(true);
+                            }
+                        };
+                        tryAcquire();
+                    });
+                };
+
                 // Listener function for handling the end of duplication
-                const __listener = (event) => {
+                const __listener = async event => {
                     tur.singer.inDuplicate = false;
                     tur.singer.duplicateFactor /= factor;
 
-                    // Check for a race condition
-                    // FIXME: Do something about the race condition
-                    if (logo.connectionStoreLock) {
-                        console.debug("LOCKED");
-                    }
+                    // Acquire lock with proper waiting
+                    await __acquireLock();
 
-                    logo.connectionStoreLock = true;
-
-                    // The last turtle should restore the broken connections
-                    if (__lookForOtherTurtles(blk, turtle) === null) {
-                        const n = logo.connectionStore[turtle][blk].length;
-                        for (let i = 0; i < n; i++) {
-                            const obj = logo.connectionStore[turtle][blk].pop();
-                            activity.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
-                            if (obj[2] != null) {
-                                activity.blocks.blockList[obj[2]].connections[0] = obj[0];
+                    try {
+                        // The last turtle should restore the broken connections
+                        if (__lookForOtherTurtles(blk, turtle) === null) {
+                            const n = logo.connectionStore[turtle][blk].length;
+                            for (let i = 0; i < n; i++) {
+                                const obj = logo.connectionStore[turtle][blk].pop();
+                                activity.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
+                                if (obj[2] != null) {
+                                    activity.blocks.blockList[obj[2]].connections[0] = obj[0];
+                                }
                             }
+                        } else {
+                            delete logo.connectionStore[turtle][blk];
                         }
-                    } else {
-                        delete logo.connectionStore[turtle][blk];
+                    } finally {
+                        logo.connectionStoreLock = false;
                     }
-
-                    logo.connectionStoreLock = false;
                 };
 
                 // Set the turtle listener
                 logo.setTurtleListener(turtle, listenerName, __listener);
 
-                // Test for race condition
-                // FIXME: Do something about the race condition
-                if (logo.connectionStoreLock) {
-                    console.debug("LOCKED");
+                // Acquire lock synchronously for the main flow
+                // Note: This section runs synchronously, so we use a simple spin-wait
+                // with a maximum iteration count to prevent infinite loops
+                let lockAttempts = 0;
+                const maxLockAttempts = 1000;
+                while (logo.connectionStoreLock && lockAttempts < maxLockAttempts) {
+                    lockAttempts++;
                 }
-
+                if (lockAttempts >= maxLockAttempts) {
+                    console.warn(
+                        "connectionStoreLock: Max attempts reached in DuplicateBlock flow"
+                    );
+                }
                 logo.connectionStoreLock = true;
 
                 // Check to see if another turtle has already disconnected these blocks
@@ -894,7 +930,9 @@ function setupFlowBlocks(activity) {
 
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    _("Conditionals lets your program take different actions depending on the condition.") +
+                    _(
+                        "Conditionals lets your program take different actions depending on the condition."
+                    ) +
                         " " +
                         _("In this example if the mouse button is pressed a snare drum will play."),
                     "documentation",
@@ -903,9 +941,13 @@ function setupFlowBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    _("Conditionals lets your program take different actions depending on the condition.") +
+                    _(
+                        "Conditionals lets your program take different actions depending on the condition."
+                    ) +
                         " " +
-                        _("In this example if the mouse button is pressed a snare drum will play, else a kick drum will play."),
+                        _(
+                            "In this example if the mouse button is pressed a snare drum will play, else a kick drum will play."
+                        ),
                     "documentation",
                     null,
                     "elifhelp"
@@ -953,7 +995,9 @@ function setupFlowBlocks(activity) {
 
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    _("Conditionals lets your program take different actions depending on the condition.") +
+                    _(
+                        "Conditionals lets your program take different actions depending on the condition."
+                    ) +
                         " " +
                         _("In this example if the mouse button is pressed a snare drum will play."),
                     "documentation",
@@ -962,7 +1006,9 @@ function setupFlowBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    _("Conditionals lets your program take different actions depending on the condition.") +
+                    _(
+                        "Conditionals lets your program take different actions depending on the condition."
+                    ) +
                         " " +
                         _("In this example if the mouse button is pressed a snare drum will play."),
                     "documentation",
@@ -1012,7 +1058,9 @@ function setupFlowBlocks(activity) {
             this.setHelpString([
                 _("The Forever block will repeat the contained blocks forever.") +
                     " " +
-                    _("In this example of a simple drum machine a kick drum will play 1/4 notes forever."),
+                    _(
+                        "In this example of a simple drum machine a kick drum will play 1/4 notes forever."
+                    ),
                 "documentation",
                 null,
                 "foreverhelp"
@@ -1130,8 +1178,9 @@ function setupFlowBlocks(activity) {
             ) {
                 logo.statusFields.push([blk, "duplicate"]);
             } else {
-                activity.blocks.blockList[blk].value =
-                    activity.turtles.ithTurtle(turtle).singer.duplicateFactor;
+                activity.blocks.blockList[blk].value = activity.turtles.ithTurtle(
+                    turtle
+                ).singer.duplicateFactor;
             }
         }
     }
@@ -1208,4 +1257,8 @@ function setupFlowBlocks(activity) {
     new DuplicateFactorBlock().setup(activity);
     new HiddenNoFlowBlock().setup(activity);
     new HiddenBlock().setup(activity);
+}
+
+if (typeof module !== "undefined") {
+    module.exports = { setupFlowBlocks };
 }

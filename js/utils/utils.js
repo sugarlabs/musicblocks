@@ -39,7 +39,7 @@
    oneHundredToFraction, prepareMacroExports, preparePluginExports,
    processMacroData, processRawPluginData, rationalSum, rgbToHex,
    safeSVG, toFixed2, toTitleCase, windowHeight, windowWidth,
-   fnBrowserDetect
+    fnBrowserDetect, waitForReadiness
 */
 
 /**
@@ -68,7 +68,27 @@ function _(text, options = {}) {
     if (!text) return "";
 
     try {
-        const removeChars = [",", "(", ")", "?", "¿", "<", ">", ".", "\n", '"', ":", "%s", "%d", "/", "'", ";", "×", "!", "¡"];
+        const removeChars = [
+            ",",
+            "(",
+            ")",
+            "?",
+            "¿",
+            "<",
+            ">",
+            ".",
+            "\n",
+            '"',
+            ":",
+            "%s",
+            "%d",
+            "/",
+            "'",
+            ";",
+            "×",
+            "!",
+            "¡"
+        ];
         let cleanedText = text;
         for (let char of removeChars) cleanedText = cleanedText.split(char).join("");
 
@@ -77,9 +97,9 @@ function _(text, options = {}) {
 
         if (lang.startsWith("ja")) {
             const kanaPref = localStorage.getItem("kanaPreference") || "kanji";
-            const script = (kanaPref === "kana") ? "kana" : "kanji";
+            const script = kanaPref === "kana" ? "kana" : "kanji";
 
-            const resolveObj = (key) => {
+            const resolveObj = key => {
                 let obj = i18next.t(key, { ...options, ns: undefined, returnObjects: true });
 
                 if (obj && typeof obj === "object") {
@@ -104,9 +124,6 @@ function _(text, options = {}) {
     }
 }
 
-
-
-
 /**
  * A string formatting function using placeholder substitution.
  * @function
@@ -117,7 +134,7 @@ function _(text, options = {}) {
 let format = (str, data) => {
     str = str.replace(/{([a-zA-Z0-9.]*)}/g, (match, name) => {
         let x = data;
-        name.split(".").forEach((v) => {
+        name.split(".").forEach(v => {
             if (x === undefined) {
                 // eslint-disable-next-line no-console
                 console.debug("Undefined value in template string", str, name, x, v);
@@ -126,7 +143,7 @@ let format = (str, data) => {
             x = x[v];
         });
 
-        return x;
+        return x === undefined ? "" : x;
     });
 
     return str.replace(/{_([a-zA-Z0-9]+)}/g, (match, item) => {
@@ -207,43 +224,48 @@ function windowWidth() {
 
 /**
  * Performs an HTTP GET request to retrieve data from the server.
+ * Uses async fetch to avoid blocking the UI during network requests.
  * @param {string|null} projectName - The name of the project (or null for the base URL).
- * @throws {string} Throws an error if the HTTP status code is greater than 299.
- * @returns {string} The response text from the server.
+ * @throws {Error} Throws an error if the HTTP status code is greater than 299.
+ * @returns {Promise<string>} A promise that resolves to the response text from the server.
  */
-let httpGet = (projectName) => {
-    let xmlHttp = null;
-    xmlHttp = new XMLHttpRequest();
-    if (projectName === null) {
-        xmlHttp.open("GET", window.server, false);
-        xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
-    } else {
-        xmlHttp.open("GET", window.server + projectName, false);
-        xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
+let httpGet = async projectName => {
+    const url = projectName === null ? window.server : window.server + projectName;
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+            "x-api-key": "3tgTzMXbbw6xEKX7"
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error("Error from server");
     }
 
-    xmlHttp.send();
-    if (xmlHttp.status > 299) {
-        throw "Error from server";
-    }
-
-    return xmlHttp.responseText;
+    return response.text();
 };
 
 /**
  * Performs an HTTP POST request to send data to the server.
+ * Uses async fetch to avoid blocking the UI during network requests.
  * @param {string} projectName - The name of the project.
  * @param {string} data - The data to be sent in the POST request.
- * @returns {string} The response text from the server.
+ * @returns {Promise<string>} A promise that resolves to the response text from the server.
  */
-let httpPost = (projectName, data) => {
-    let xmlHttp = null;
-    xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("POST", window.server + projectName, false);
-    xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
-    xmlHttp.send(data);
-    return xmlHttp.responseText;
-    // return 'https://apps.facebook.com/turtleblocks/?file=' + projectName;
+let httpPost = async (projectName, data) => {
+    const response = await fetch(window.server + projectName, {
+        method: "POST",
+        headers: {
+            "x-api-key": "3tgTzMXbbw6xEKX7"
+        },
+        body: data
+    });
+
+    if (!response.ok) {
+        throw new Error("Error from server");
+    }
+
+    return response.text();
 };
 
 /**
@@ -292,7 +314,7 @@ function HttpRequest(url, loadCallback, userCallback) {
  * @function
  */
 function doBrowserCheck() {
-    jQuery.uaMatch = (ua) => {
+    jQuery.uaMatch = ua => {
         ua = ua.toLowerCase();
 
         const match =
@@ -324,6 +346,68 @@ function doBrowserCheck() {
     }
 
     jQuery.browser = browser;
+}
+
+/**
+ * Wait for critical dependencies to be ready before calling callback.
+ * Uses polling with exponential backoff and maximum timeout.
+ * This replaces the arbitrary 5-second delay for Firefox with actual readiness checks.
+ *
+ * @param {Function} callback - The function to call when ready
+ * @param {Object} options - Configuration options
+ * @param {number} options.maxWait - Maximum wait time in ms (default: 10000)
+ * @param {number} options.minWait - Minimum wait time in ms (default: 500)
+ * @param {number} options.checkInterval - Initial check interval in ms (default: 100)
+ */
+function waitForReadiness(callback, options = {}) {
+    const { maxWait = 10000, minWait = 500, checkInterval = 100 } = options;
+    const startTime = Date.now();
+
+    /**
+     * Check if critical dependencies and DOM elements are ready
+     * @returns {boolean} True if all critical dependencies are loaded
+     */
+    const isReady = () => {
+        // Check if critical JavaScript libraries are loaded
+        const createjsLoaded = typeof createjs !== "undefined" && createjs.Stage;
+        const howlerLoaded = typeof Howler !== "undefined";
+        const jqueryLoaded = typeof jQuery !== "undefined";
+
+        // Check if critical DOM elements exist
+        const canvas = document.getElementById("myCanvas");
+        const loader = document.getElementById("loader");
+        const toolbars = document.getElementById("toolbars");
+        const domReady = canvas && loader && toolbars;
+
+        return createjsLoaded && howlerLoaded && jqueryLoaded && domReady;
+    };
+
+    /**
+     * Polling function that checks readiness and calls callback when ready
+     */
+    const check = () => {
+        const elapsed = Date.now() - startTime;
+
+        if (elapsed >= minWait && isReady()) {
+            // Ready! Initialize the app
+            // eslint-disable-next-line no-console
+            console.log(`[Firefox] Initialized in ${elapsed}ms (readiness-based)`);
+            callback();
+        } else if (elapsed >= maxWait) {
+            // Timeout - initialize anyway as fallback
+            // eslint-disable-next-line no-console
+            console.warn(
+                `[Firefox] Initialization timed out after ${maxWait}ms, proceeding anyway`
+            );
+            callback();
+        } else {
+            // Not ready yet, check again on next animation frame
+            requestAnimationFrame(check);
+        }
+    };
+
+    // Start the readiness check loop
+    requestAnimationFrame(check);
 }
 
 // Check for Internet Explorer
@@ -427,7 +511,7 @@ function docBySelector(selector) {
  * @param {Array} myList - The array from which to get the last element.
  * @returns {*} The last element of the array, or null if the array is empty.
  */
-let last = (myList) => {
+let last = myList => {
     const i = myList.length;
     if (i === 0) {
         return null;
@@ -495,7 +579,7 @@ function doSVG(canvas, logo, turtles, width, height, scale) {
  * @param {object} turtles - The turtles object.
  * @returns {boolean} True if all turtle SVG outputs are empty, false otherwise.
  */
-let isSVGEmpty = (turtles) => {
+let isSVGEmpty = turtles => {
     for (const turtle in turtles.turtleList) {
         turtles.getTurtle(turtle).painter.closeSVG();
         if (turtles.getTurtle(turtle).painter.svgOutput !== "") {
@@ -510,7 +594,7 @@ let isSVGEmpty = (turtles) => {
  * @param {string} file - The file path or name.
  * @returns {string} The file extension.
  */
-let fileExt = (file) => {
+let fileExt = file => {
     if (file === null) {
         return "";
     }
@@ -528,7 +612,7 @@ let fileExt = (file) => {
  * @param {string} file - The file path or name.
  * @returns {string} The basename.
  */
-let fileBasename = (file) => {
+let fileBasename = file => {
     const parts = file.split(".");
     if (parts.length === 1) {
         return parts[0];
@@ -545,12 +629,18 @@ let fileBasename = (file) => {
  * @param {string} str - The input string.
  * @returns {string} The string with the first character in uppercase.
  */
-let toTitleCase = (str) => {
+function toTitleCase(str) {
     if (typeof str !== "string") return;
-    let tempStr = "";
-    if (str.length > 1) tempStr = str.substring(1);
-    return str.toUpperCase()[0] + tempStr;
-};
+    if (str.length === 0) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports.toTitleCase = toTitleCase;
+}
+if (typeof window !== "undefined") {
+    window.toTitleCase = toTitleCase;
+}
 
 /**
  * Processes plugin data and updates the activity based on the provided JSON-encoded dictionary.
@@ -558,11 +648,51 @@ let toTitleCase = (str) => {
  * @param {string} pluginData - The JSON-encoded plugin data.
  * @returns {object|null} The processed plugin data object or null if parsing fails.
  */
-const processPluginData = (activity, pluginData) => {
+const processPluginData = (activity, pluginData, pluginSource) => {
     // Plugins are JSON-encoded dictionaries.
     if (pluginData === undefined) {
         return null;
     }
+
+    const isTrustedPluginSource = src => {
+        if (!src) return false;
+
+        // allow only local paths
+        return (
+            src.startsWith("./") ||
+            src.startsWith("../") ||
+            src.startsWith("/") ||
+            (!src.includes("http://") && !src.includes("https://"))
+        );
+    };
+
+    const safeEval = (code, label = "plugin") => {
+        if (typeof code !== "string") return;
+
+        // basic sanity limit (prevents huge payloads)
+        if (code.length > 500000) {
+            // eslint-disable-next-line no-console
+            console.warn("Plugin code too large:", label);
+            return;
+        }
+
+        // NOTE: This eval is required for the Plugin system to load dynamic block definitions.
+        // The content comes from plugin JSON files which satisfy the isTrustedPluginSource check.
+        try {
+            // eslint-disable-next-line no-eval
+            eval(code);
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error("Plugin execution failed:", label, e);
+        }
+    };
+
+    if (!isTrustedPluginSource(pluginSource)) {
+        // eslint-disable-next-line no-console
+        console.warn("Blocked untrusted plugin source:", pluginSource);
+        return null;
+    }
+
     let obj;
     try {
         obj = JSON.parse(pluginData);
@@ -702,18 +832,13 @@ const processPluginData = (activity, pluginData) => {
         for (const block in obj["BLOCKPLUGINS"]) {
             // eslint-disable-next-line no-console
             console.debug("adding plugin block " + block);
-            try {
-                eval(obj["BLOCKPLUGINS"][block]);
-            } catch (e) {
-                // eslint-disable-next-line no-console
-                console.debug("Failed to load plugin for " + block + ": " + e);
-            }
+            safeEval(obj["BLOCKPLUGINS"][block], "BLOCKPLUGINS:" + block);
         }
     }
 
     // Create the globals.
     if ("GLOBALS" in obj) {
-        eval(obj["GLOBALS"]);
+        safeEval(obj["GLOBALS"], "GLOBALS");
     }
 
     if ("PARAMETERPLUGINS" in obj) {
@@ -725,7 +850,7 @@ const processPluginData = (activity, pluginData) => {
     // Code to execute when plugin is loaded
     if ("ONLOAD" in obj) {
         for (const arg in obj["ONLOAD"]) {
-            eval(obj["ONLOAD"][arg]);
+            safeEval(obj["ONLOAD"][arg], "ONLOAD:" + arg);
         }
     }
 
@@ -754,7 +879,8 @@ const processPluginData = (activity, pluginData) => {
                 console.debug("Cannot find palette for protoblock " + protoblock);
             } else {
                 activity.blocks.protoBlockDict[protoblock].palette.add(
-                    activity.blocks.protoBlockDict[protoblock]);
+                    activity.blocks.protoBlockDict[protoblock]
+                );
             }
         } catch (e) {
             // eslint-disable-next-line no-console
@@ -781,7 +907,7 @@ const processPluginData = (activity, pluginData) => {
  * @param {string} rawData - Raw plugin data to process.
  * @returns {object|null} The processed plugin data object or null if parsing fails.
  */
-const processRawPluginData = (activity, rawData) => {
+const processRawPluginData = (activity, rawData, pluginSource) => {
     const lineData = rawData.split("\n");
     let cleanData = "";
 
@@ -803,7 +929,7 @@ const processRawPluginData = (activity, rawData) => {
     // try/catch while debugging your plugin.
     let obj;
     try {
-        obj = processPluginData(activity, cleanData.replace(/\n/g, ""));
+        obj = processPluginData(activity, cleanData.replace(/\n/g, ""), pluginSource);
     } catch (e) {
         obj = null;
         // eslint-disable-next-line no-console
@@ -942,9 +1068,19 @@ let prepareMacroExports = (name, stack, macroDict) => {
     return JSON.stringify(macroDict);
 };
 
-// Some block-specific code
-// TODO: Move to camera plugin
-let hasSetupCamera = false;
+// Camera functionality module
+// Encapsulates camera-related operations for video/image capture
+const CameraManager = {
+    isSetup: false,
+
+    /**
+     * Resets the camera setup state
+     */
+    reset() {
+        this.isSetup = false;
+    }
+};
+
 /**
  * Uses the camera to capture images or video frames and displays them on the turtle's canvas.
  * @param {Array} args - Arguments passed to the function.
@@ -962,14 +1098,6 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
     let streaming = false;
     const video = document.querySelector("#camVideo");
     const canvas = document.querySelector("#camCanvas");
-    navigator.getMedia =
-        navigator.getUserMedia ||
-        navigator.mozGetUserMedia ||
-        navigator.webkitGetUserMedia ||
-        navigator.msGetUserMedia;
-    if (navigator.getMedia === undefined) {
-        errorMsg("Your browser does not support the webcam");
-    }
 
     function draw() {
         canvas.width = w;
@@ -979,25 +1107,24 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
         turtles.getTurtle(turtle).doShowImage(args[0], data);
     }
 
-    if (!hasSetupCamera) {
-        navigator.getMedia(
-            { video: true, audio: false },
-            (stream) => {
-                if (navigator.mozGetUserMedia) {
-                    video.mozSrcObject = stream;
-                } else {
-                    video.srcObject = stream;
-                }
+    if (!CameraManager.isSetup) {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            errorMsg("Your browser does not support the webcam");
+            return;
+        }
 
+        navigator.mediaDevices
+            .getUserMedia({ video: true, audio: false })
+            .then(stream => {
+                video.srcObject = stream;
                 video.play();
-                hasSetupCamera = true;
-            },
-            (error) => {
+                CameraManager.isSetup = true;
+            })
+            .catch(error => {
                 errorMsg("Could not connect to camera");
                 // eslint-disable-next-line no-console
                 console.debug(error);
-            }
-        );
+            });
     } else {
         streaming = true;
         video.play();
@@ -1012,7 +1139,7 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
     video.addEventListener(
         "canplay",
         () => {
-            // console.debug("canplay", streaming, hasSetupCamera);
+            // console.debug("canplay", streaming, CameraManager.isSetup);
             if (!streaming) {
                 video.setAttribute("width", w);
                 video.setAttribute("height", h);
@@ -1088,7 +1215,7 @@ function displayMsg(/*blocks, text*/) {
  */
 function safeSVG(label) {
     if (typeof label === "string") {
-        return label.replace(/&/, "&amp;").replace(/</, "&lt;").replace(/>/, "&gt;");
+        return label.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     } else {
         return label;
     }
@@ -1204,7 +1331,7 @@ function GCD(a, b) {
  * @param {number} d - The input number.
  * @returns {string} The mixed fraction string.
  */
-let mixedNumber = (d) => {
+let mixedNumber = d => {
     // Return number as a mixed fraction string, e.g., "2 1/4"
 
     if (typeof d === "number") {
@@ -1244,6 +1371,10 @@ const LCD = (a, b) => {
 
 /**
  * Adds two rational numbers represented as arrays [numerator, denominator].
+ *
+ * This helper is used internally where rational arithmetic is required
+ * to avoid floating-point precision issues (e.g., turtle singer logic).
+ *
  * @param {Array} a - The first rational number.
  * @param {Array} b - The second rational number.
  * @returns {Array} The sum of the two rational numbers in the form [numerator, denominator].
@@ -1279,16 +1410,15 @@ let rationalSum = (a, b) => {
     } else {
         objb1 = [b[1], 1];
     }
-
-    a[0] = obja0[0] * obja1[1];
-    a[1] = obja0[1] * obja1[0];
-    b[0] = objb0[0] * objb1[1];
-    b[1] = objb0[1] * objb1[0];
+    // Use local variables to avoid mutating the caller's arrays
+    const a0 = obja0[0] * obja1[1];
+    const a1 = obja0[1] * obja1[0];
+    const b0 = objb0[0] * objb1[1];
+    const b1 = objb0[1] * objb1[0];
 
     // Find the least common denomenator
-    const lcd = LCD(a[1], b[1]);
-    // const c0 = (a[0] * lcd) / a[1] + (b[0] * lcd) / b[1];
-    return [(a[0] * lcd) / a[1] + (b[0] * lcd) / b[1], lcd];
+    const lcd = LCD(a1, b1);
+    return [(a0 * lcd) / a1 + (b0 * lcd) / b1, lcd];
 };
 
 /**
@@ -1316,7 +1446,7 @@ let nearestBeat = (d, b) => {
  * @param {number} d - The input number.
  * @returns {Array} An array representing the fraction in the form [numerator, denominator].
  */
-let oneHundredToFraction = (d) => {
+let oneHundredToFraction = d => {
     // Generate some simple fractions based on a scale of 1-100
 
     if (d < 1) {
@@ -1478,14 +1608,14 @@ let rgbToHex = (r, g, b) => {
  * @param {string} hex - Hexadecimal color code.
  * @returns {Object} Object with RGB values {r, g, b} or null if invalid hex code.
  */
-let hexToRGB = (hex) => {
+let hexToRGB = hex => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
         ? {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        }
+              r: parseInt(result[1], 16),
+              g: parseInt(result[2], 16),
+              b: parseInt(result[3], 16)
+          }
         : null;
 };
 
@@ -1495,7 +1625,7 @@ let hexToRGB = (hex) => {
  * @param {number} hex - Hexadecimal color code.
  * @returns {string} RGBA color value with alpha set to 1.
  */
-let hex2rgb = (hex) => {
+let hex2rgb = hex => {
     const bigint = parseInt(hex, 16);
     const r = (bigint >> 16) & 255;
     const g = (bigint >> 8) & 255;
@@ -1510,8 +1640,8 @@ let hex2rgb = (hex) => {
  * @param {number} duration - Duration of the delay in milliseconds.
  * @returns {Promise} A promise that resolves after the specified duration.
  */
-let delayExecution = (duration) => {
-    return new Promise((resolve) => {
+let delayExecution = duration => {
+    return new Promise(resolve => {
         setTimeout(() => {
             resolve(true);
         }, duration);
@@ -1533,13 +1663,40 @@ function closeWidgets() {
  * @param {string} name - The name of the widget to be closed.
  * @returns {void}
  */
-let closeBlkWidgets = (name) => {
+let closeBlkWidgets = name => {
     const widgetTitle = document.getElementsByClassName("wftTitle");
     for (let i = 0; i < widgetTitle.length; i++) {
         if (widgetTitle[i].innerHTML === name) {
             window.widgetWindows.hideWindow(widgetTitle[i].innerHTML);
             break;
         }
+    }
+};
+
+/**
+ * Safely resolves a dot-notation string path to an object property globally.
+ * @param {string} path - The dot-notation path (e.g., "MyClass.Model").
+ * @returns {Object|undefined} The resolved object or undefined.
+ */
+const resolveObject = path => {
+    if (!path || typeof path !== "string") return undefined;
+
+    // Support both browser and Node.js environments
+    const globalObj = typeof window !== "undefined" ? window : global;
+
+    try {
+        const result = path.split(".").reduce((obj, prop) => {
+            if (obj === null || obj === undefined) {
+                return undefined;
+            }
+            return obj[prop];
+        }, globalObj);
+
+        return result;
+    } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn("Failed to resolve object path: " + path, e);
+        return undefined;
     }
 };
 
@@ -1553,7 +1710,6 @@ let closeBlkWidgets = (name) => {
  * @returns {void}
  */
 let importMembers = (obj, className, modelArgs, viewArgs) => {
-
     /**
      * Adds methods and variables of one class to another class's instance.
      *
@@ -1574,7 +1730,6 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
         } else {
             obj.added = new ctype(...args);
         }
-
 
         // Loop for all method names of class type
         for (const name of Object.getOwnPropertyNames(ctype.prototype)) {
@@ -1601,15 +1756,15 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
     const cname = obj.constructor.name; // class name of component object
 
     if (className !== "" && className !== undefined) {
-        addMembers(obj, eval(className));
+        addMembers(obj, resolveObject(className));
         return;
     }
 
     // Add members of Model (class type has to be controller's name + "Model")
-    addMembers(obj, eval(cname + "." + cname + "Model"), modelArgs);
+    addMembers(obj, resolveObject(cname + "." + cname + "Model"), modelArgs);
 
     // Add members of View (class type has to be controller's name + "View")
-    addMembers(obj, eval(cname + "." + cname + "View"), viewArgs);
+    addMembers(obj, resolveObject(cname + "." + cname + "View"), viewArgs);
 };
 
 if (typeof module !== "undefined" && module.exports) {
@@ -1625,8 +1780,15 @@ if (typeof module !== "undefined" && module.exports) {
         nearestBeat,
         oneHundredToFraction,
         rationalToFraction,
+        rationalSum,
         rgbToHex,
         hexToRGB,
-        hex2rgb
+        hex2rgb,
+        format,
+        delayExecution,
+        closeWidgets,
+        closeBlkWidgets,
+        resolveObject,
+        importMembers
     };
 }

@@ -145,8 +145,7 @@ function TemperamentWidget() {
      */
     this._addButton = function (row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
-        cell.innerHTML =
-            `&nbsp;&nbsp;<img 
+        cell.innerHTML = `&nbsp;&nbsp;<img 
                 src="header-icons/${icon}" 
                 title="${label}" 
                 alt="${label}" 
@@ -433,13 +432,13 @@ function TemperamentWidget() {
                     docById("noteInfo").remove();
                 }
 
-                docById("information").innerHTML +=
-                    `<div class="popup" id="noteInfo" style="left: ${x}px; top: ${y}px;">
+                docById(
+                    "information"
+                ).innerHTML += `<div class="popup" id="noteInfo" style="left: ${x}px; top: ${y}px;">
                         <span class="popuptext" id="myPopup"></span>
                     </div>`;
                 if (i !== 0) {
-                    docById("noteInfo").innerHTML +=
-                        `<img 
+                    docById("noteInfo").innerHTML += `<img 
                             src="header-icons/edit.svg" 
                             id="edit" 
                             title="${_("edit")}" 
@@ -459,8 +458,9 @@ function TemperamentWidget() {
                 for (let j = 0; j < this.ratiosNotesPair.length; j++) {
                     if (this.ratios[i] == this.ratiosNotesPair[j][0]) {
                         noteDefined = true;
-                        docById("noteInfo").innerHTML +=
-                            `<div id="note">&nbsp;${_("note")}&nbsp;${this.ratiosNotesPair[j][1]}</div>`;
+                        docById("noteInfo").innerHTML += `<div id="note">&nbsp;${_("note")}&nbsp;${
+                            this.ratiosNotesPair[j][1]
+                        }</div>`;
                         break;
                     }
                 }
@@ -477,15 +477,18 @@ function TemperamentWidget() {
                     });
                     const index = centsDiff1.indexOf(min);
                     if (centsDiff[index] < 0) {
-                        docById("noteInfo").innerHTML +=
-                            `<div id="note">&nbsp;${_("note")}&nbsp;${this.ratiosNotesPair[index][1]}(-${centsDiff1[index].toFixed(2)}¢)</div>`;
+                        docById("noteInfo").innerHTML += `<div id="note">&nbsp;${_("note")}&nbsp;${
+                            this.ratiosNotesPair[index][1]
+                        }(-${centsDiff1[index].toFixed(2)}¢)</div>`;
                     } else {
-                        docById("noteInfo").innerHTML +=
-                            `<div id="note">&nbsp;${_("note")}&nbsp;${this.ratiosNotesPair[index][1]}(${centsDiff1[index].toFixed(2)}¢)</div>`;
+                        docById("noteInfo").innerHTML += `<div id="note">&nbsp;${_("note")}&nbsp;${
+                            this.ratiosNotesPair[index][1]
+                        }(${centsDiff1[index].toFixed(2)}¢)</div>`;
                     }
                 }
-                docById("noteInfo").innerHTML +=
-                    `<div id="frequency">&nbsp;${_("frequency")}&nbsp;${frequency}</div>`;
+                docById("noteInfo").innerHTML += `<div id="frequency">&nbsp;${_(
+                    "frequency"
+                )}&nbsp;${frequency}</div>`;
 
                 docById("noteInfo").style.top = "130px";
                 docById("noteInfo").style.left = "132px";
@@ -517,12 +520,19 @@ function TemperamentWidget() {
         docById("noteInfo").style.height = "130px";
         docById("note").innerHTML = "";
         docById("frequency").innerHTML = "";
-        docById("noteInfo").innerHTML +=
-            `<center><input type="range" class="sliders" id="frequencySlider1" style="width:170px; background:white; border:0;" min="${this.frequencies[i - 1]}" max="${this.frequencies[i + 1]}"></center>`;
-        docById("noteInfo").innerHTML +=
-            `<br>&nbsp;&nbsp;${_("frequency")}<span class="rangeslidervalue" id="frequencydiv1">${this.frequencies[i]}</span>`;
-        docById("noteInfo").innerHTML +=
-            `<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>${_("done")}</center><div>`;
+        docById(
+            "noteInfo"
+        ).innerHTML += `<center><input type="range" class="sliders" id="frequencySlider1" style="width:170px; background:white; border:0;" min="${
+            this.frequencies[i - 1]
+        }" max="${this.frequencies[i + 1]}"></center>`;
+        docById("noteInfo").innerHTML += `<br>&nbsp;&nbsp;${_(
+            "frequency"
+        )}<span class="rangeslidervalue" id="frequencydiv1">${this.frequencies[i]}</span>`;
+        docById(
+            "noteInfo"
+        ).innerHTML += `<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>${_(
+            "done"
+        )}</center><div>`;
 
         docById("frequencySlider1").oninput = function () {
             docById("frequencydiv1").innerHTML = docById("frequencySlider1").value;
@@ -640,8 +650,7 @@ function TemperamentWidget() {
             notesRow[i] = docById("notes_" + i);
 
             notesCell[(i, 0)] = notesRow[i].insertCell(-1);
-            notesCell[(i, 0)].innerHTML =
-                `&nbsp;&nbsp;<img 
+            notesCell[(i, 0)].innerHTML = `&nbsp;&nbsp;<img 
                     src="header-icons/play-button.svg" 
                     title="${_("Play")}" 
                     alt="${_("Play")}" 
@@ -664,8 +673,7 @@ function TemperamentWidget() {
 
             const playImage = docById("play_" + i);
 
-            // eslint-disable-next-line no-unused-vars
-            playImage.onmouseover = function (event) {
+            playImage.onmouseover = function () {
                 this.style.cursor = "pointer";
             };
 
@@ -752,8 +760,7 @@ function TemperamentWidget() {
             this.notesCircle.removeWheel();
         }
         temperamentTableDiv.innerHTML = "";
-        temperamentTableDiv.innerHTML =
-            `<table id="editOctave" width="${BUTTONDIVWIDTH}"><tbody><tr id="menu"></tr></tbody></table>`;
+        temperamentTableDiv.innerHTML = `<table id="editOctave" width="${BUTTONDIVWIDTH}"><tbody><tr id="menu"></tr></tbody></table>`;
         const editMenus = [_("equal"), _("ratios"), _("arbitrary"), _("octave space")];
         let menus = "";
 
@@ -774,8 +781,7 @@ function TemperamentWidget() {
         menuItems[0].style.background = "#c8C8C8";
         that.equalEdit();
 
-        // eslint-disable-next-line no-unused-vars
-        menuItems[0].onclick = function (event) {
+        menuItems[0].onclick = function () {
             menuItems[1].style.background = platformColor.selectorBackground;
             menuItems[2].style.background = platformColor.selectorBackground;
             menuItems[3].style.background = platformColor.selectorBackground;
@@ -783,8 +789,7 @@ function TemperamentWidget() {
             that.equalEdit();
         };
 
-        // eslint-disable-next-line no-unused-vars
-        menuItems[1].onclick = function (event) {
+        menuItems[1].onclick = function () {
             menuItems[0].style.background = platformColor.selectorBackground;
             menuItems[2].style.background = platformColor.selectorBackground;
             menuItems[3].style.background = platformColor.selectorBackground;
@@ -792,8 +797,7 @@ function TemperamentWidget() {
             that.ratioEdit();
         };
 
-        // eslint-disable-next-line no-unused-vars
-        menuItems[2].onclick = function (event) {
+        menuItems[2].onclick = function () {
             menuItems[0].style.background = platformColor.selectorBackground;
             menuItems[1].style.background = platformColor.selectorBackground;
             menuItems[3].style.background = platformColor.selectorBackground;
@@ -801,8 +805,7 @@ function TemperamentWidget() {
             that.arbitraryEdit();
         };
 
-        // eslint-disable-next-line no-unused-vars
-        menuItems[3].onclick = function (event) {
+        menuItems[3].onclick = function () {
             menuItems[0].style.background = platformColor.selectorBackground;
             menuItems[1].style.background = platformColor.selectorBackground;
             menuItems[2].style.background = platformColor.selectorBackground;
@@ -820,12 +823,16 @@ function TemperamentWidget() {
         docById("userEdit").innerHTML = "";
         const equalEdit = docById("userEdit");
         equalEdit.style.backgroundColor = "#c8C8C8";
-        equalEdit.innerHTML =
-            `<br>${_("pitch number")}&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="octaveIn" value="0"></input>
+        equalEdit.innerHTML = `<br>${_(
+            "pitch number"
+        )}&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="octaveIn" value="0"></input>
             &nbsp;&nbsp; ${_("to")}&nbsp;&nbsp;
             <input type="text" id="octaveOut" value="0"></input><br><br>`;
-        equalEdit.innerHTML +=
-            `${_("number of divisions")} &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="divisions" value="${this.pitchNumber}"></input>`;
+        equalEdit.innerHTML += `${_(
+            "number of divisions"
+        )} &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="divisions" value="${
+            this.pitchNumber
+        }"></input>`;
         equalEdit.style.paddingLeft = "80px";
         const that = this;
 
@@ -835,12 +842,10 @@ function TemperamentWidget() {
             // Add Buttons
             divAppend.id = "divAppend";
             if (preview) {
-                divAppend.innerHTML =
-                    `<div id="preview" style="float:left;">${_("back")}</div>
+                divAppend.innerHTML = `<div id="preview" style="float:left;">${_("back")}</div>
                     <div id="done_" style="float:right;">${_("done")}</div>`;
             } else {
-                divAppend.innerHTML =
-                    `<div id="preview" style="float:left;">${_("preview")}</div>
+                divAppend.innerHTML = `<div id="preview" style="float:left;">${_("preview")}</div>
                     <div id="done_" style="float:right;">${_("done")}</div>`;
             }
             divAppend.style.textAlign = "center";
@@ -882,12 +887,11 @@ function TemperamentWidget() {
         this.tempRatios = [];
 
         divAppend.addEventListener("click", function (event) {
-            try{
+            try {
                 that.performEqualEdit(event);
-            } catch{
+            } catch {
                 activity.errorMsg(_("The Number of divisions is too large."), 3000);
             }
-
         });
 
         this.performEqualEdit = function (event) {
@@ -917,7 +921,7 @@ function TemperamentWidget() {
                 this.tempRatios.sort(function (a, b) {
                     return a - b;
                 });
-                
+
                 pitchNumber = this.tempRatios.length - 1;
                 this.typeOfEdit = "equal";
                 this.divisions = divisions;
@@ -1017,10 +1021,12 @@ function TemperamentWidget() {
         docById("userEdit").innerHTML = "";
         const ratioEdit = docById("userEdit");
         ratioEdit.style.backgroundColor = "#c8C8C8";
-        ratioEdit.innerHTML =
-            `<br>${_("ratio")} &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="ratioIn" value="1"></input> &nbsp;&nbsp; : &nbsp;&nbsp; <input type="text" id="ratioOut" value="1"></input><br><br>`;
-        ratioEdit.innerHTML +=
-            `${_("recursion")} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="recursion" value="1"></input>`;
+        ratioEdit.innerHTML = `<br>${_(
+            "ratio"
+        )} &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="ratioIn" value="1"></input> &nbsp;&nbsp; : &nbsp;&nbsp; <input type="text" id="ratioOut" value="1"></input><br><br>`;
+        ratioEdit.innerHTML += `${_(
+            "recursion"
+        )} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="recursion" value="1"></input>`;
         ratioEdit.style.paddingLeft = "100px";
         const that = this;
 
@@ -1029,12 +1035,10 @@ function TemperamentWidget() {
         function addButtons(preview) {
             divAppend.id = "divAppend";
             if (preview) {
-                divAppend.innerHTML =
-                    `<div id="preview" style="float:left;">${_("back")}</div>
+                divAppend.innerHTML = `<div id="preview" style="float:left;">${_("back")}</div>
                     <div id="done_" style="float:right;">${_("done")}</div>`;
             } else {
-                divAppend.innerHTML =
-                    `<div id="preview" style="float:left;">${_("preview")}</div>
+                divAppend.innerHTML = `<div id="preview" style="float:left;">${_("preview")}</div>
                     <div id="done_" style="float:right;">${_("done")}</div>`;
             }
             divAppend.style.textAlign = "center";
@@ -1285,8 +1289,7 @@ function TemperamentWidget() {
         arbitraryEdit.innerHTML += '<div id="wheelDiv4" class="wheelNav"></div>';
         this._createInnerWheel();
 
-        arbitraryEdit.innerHTML +=
-            `<canvas id="circ1" width = "${BUTTONDIVWIDTH}" height = "${height}"></canvas>`;
+        arbitraryEdit.innerHTML += `<canvas id="circ1" width = "${BUTTONDIVWIDTH}" height = "${height}"></canvas>`;
 
         const canvas = docById("circ1");
         canvas.style.position = "absolute";
@@ -1440,12 +1443,19 @@ function TemperamentWidget() {
                     '" alt="' +
                     _("Close") +
                     '" height=20px width=20px align="right">';
-                docById("noteInfo1").innerHTML +=
-                    `<br><center><input type="range" class="sliders" id = "frequencySlider" style="width:170px; background:white; border:0;" min="${frequencies[i]}" max="${frequencies[i + 1]}" value="30"></center>`;
-                docById("noteInfo1").innerHTML +=
-                    `&nbsp;&nbsp;${_("frequency")} : <span class="rangeslidervalue" id="frequencydiv">${frequencies[i]}</span>`;
-                docById("noteInfo1").innerHTML +=
-                    `<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>${_("done")}</center><div>`;
+                docById(
+                    "noteInfo1"
+                ).innerHTML += `<br><center><input type="range" class="sliders" id = "frequencySlider" style="width:170px; background:white; border:0;" min="${
+                    frequencies[i]
+                }" max="${frequencies[i + 1]}" value="30"></center>`;
+                docById("noteInfo1").innerHTML += `&nbsp;&nbsp;${_(
+                    "frequency"
+                )} : <span class="rangeslidervalue" id="frequencydiv">${frequencies[i]}</span>`;
+                docById(
+                    "noteInfo1"
+                ).innerHTML += `<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>${_(
+                    "done"
+                )}</center><div>`;
 
                 docById("noteInfo1").style.top = "100px";
                 docById("noteInfo1").style.left = "90px";
@@ -1518,8 +1528,7 @@ function TemperamentWidget() {
         const octaveRatio = this.ratios[len - 1];
         const octaveSpaceEdit = docById("userEdit");
         octaveSpaceEdit.style.backgroundColor = "#c8C8C8";
-        octaveSpaceEdit.innerHTML =
-            `<br><br>${_("octave space")} &nbsp;&nbsp;&nbsp;&nbsp; 
+        octaveSpaceEdit.innerHTML = `<br><br>${_("octave space")} &nbsp;&nbsp;&nbsp;&nbsp; 
             <input type="text" id="startNote" value="${octaveRatio}" style="width:50px;"></input> &nbsp;&nbsp; : &nbsp;&nbsp; <input type="text" id="endNote" value="1" style="width:50px;"></input><br><br>`;
         octaveSpaceEdit.style.paddingLeft = "70px";
         const that = this;
@@ -1546,7 +1555,8 @@ function TemperamentWidget() {
             const ratio = startRatio / endRatio;
             if (ratio !== 2) {
                 that.activity.textMsg(
-                    _("The octave ratio has changed. This changes temperament significantly."), 3000
+                    _("The octave ratio has changed. This changes temperament significantly."),
+                    3000
                 );
             }
             const powers = [];
@@ -1689,17 +1699,32 @@ function TemperamentWidget() {
         // Change from temporary "custom" to "custom1" or "custom2" ...
         this.inTemperament = value;
         const newStack = [
-            [0, ["temperament1", {
-                collapsed: true
-            }], 150, 100, [null, 1, 2, null]],
+            [
+                0,
+                [
+                    "temperament1",
+                    {
+                        collapsed: true
+                    }
+                ],
+                150,
+                100,
+                [null, 1, 2, null]
+            ],
             [1, ["text", { value: value }], 0, 0, [0]],
             [2, ["storein"], 0, 0, [0, 3, 4, 5]],
             [3, ["text", { value: this._logo.synth.startingPitch }], 0, 0, [2]],
             [4, ["number", { value: this.frequencies[0] }], 0, 0, [2]],
             [5, ["octavespace"], 0, 0, [2, 6, 9]],
             [6, ["divide"], 0, 0, [5, 7, 8]],
-            [7, ["number", { value: rationalToFraction(getOctaveRatio())[0] }], 0, 0, [6]],
-            [8, ["number", { value: rationalToFraction(getOctaveRatio())[1] }], 0, 0, [6]],
+            // Cache rationalToFraction result to avoid duplicate calls
+            ...(function () {
+                const octaveFraction = rationalToFraction(getOctaveRatio());
+                return [
+                    [7, ["number", { value: octaveFraction[0] }], 0, 0, [6]],
+                    [8, ["number", { value: octaveFraction[1] }], 0, 0, [6]]
+                ];
+            })(),
             [9, "vspace", 0, 0, [5, 10]]
         ];
         let previousBlock = 9;
@@ -1754,7 +1779,7 @@ function TemperamentWidget() {
                         [
                             "text",
                             {
-                                value: (this.notes[i].substring(0, this.notes[i].length - 1))
+                                value: this.notes[i].substring(0, this.notes[i].length - 1)
                             }
                         ],
                         0,
@@ -1793,20 +1818,10 @@ function TemperamentWidget() {
                     [idx + 1]
                 ]);
                 newStack.push([idx + 3, ["divide"], 0, 0, [idx + 1, idx + 4, idx + 5]]);
-                newStack.push([
-                    idx + 4,
-                    ["number", { value: rationalToFraction(this.ratios[i])[0] }],
-                    0,
-                    0,
-                    [idx + 3]
-                ]);
-                newStack.push([
-                    idx + 5,
-                    ["number", { value: rationalToFraction(this.ratios[i])[1] }],
-                    0,
-                    0,
-                    [idx + 3]
-                ]);
+                // Cache rationalToFraction result to avoid duplicate calls
+                const ratioFraction = rationalToFraction(this.ratios[i]);
+                newStack.push([idx + 4, ["number", { value: ratioFraction[0] }], 0, 0, [idx + 3]]);
+                newStack.push([idx + 5, ["number", { value: ratioFraction[1] }], 0, 0, [idx + 3]]);
                 newStack.push([idx + 6, "vspace", 0, 0, [idx, idx + 7]]);
                 newStack.push([idx + 7, ["pitch"], 0, 0, [idx + 6, idx + 8, idx + 9, null]]);
 
@@ -1873,8 +1888,6 @@ function TemperamentWidget() {
                     this.notes[i].slice(-1)
                 ];
             }
-            // eslint-disable-next-line no-console
-            console.log(newTemperament);
             addTemperamentToDictionary(this.inTemperament, newTemperament);
             updateTemperaments();
         }
@@ -1928,8 +1941,7 @@ function TemperamentWidget() {
 
         const cell = this.playButton;
         if (this._playing) {
-            cell.innerHTML =
-                `&nbsp;&nbsp;<img 
+            cell.innerHTML = `&nbsp;&nbsp;<img 
                     src="header-icons/stop-button.svg" 
                     title="${_("Stop")}" 
                     alt="${_("Stop")}" 
@@ -1941,8 +1953,7 @@ function TemperamentWidget() {
         } else {
             this._logo.synth.setMasterVolume(0);
             this._logo.synth.stop();
-            cell.innerHTML =
-                `&nbsp;&nbsp;<img 
+            cell.innerHTML = `&nbsp;&nbsp;<img 
                     src="header-icons/play-button.svg" 
                     title="${_("Play")}" 
                     alt="${_("Play")}" 
@@ -2093,9 +2104,8 @@ function TemperamentWidget() {
             } else {
                 that.inbetween = true;
             }
-            if(!that.playbackForward && i == -1){
-                cell.innerHTML =
-                    `&nbsp;&nbsp;<img 
+            if (!that.playbackForward && i == -1) {
+                cell.innerHTML = `&nbsp;&nbsp;<img 
                         src="header-icons/play-button.svg" 
                         title="${_("Play")}" 
                         alt="${_("Play")}" 
@@ -2116,7 +2126,11 @@ function TemperamentWidget() {
                 }, Singer.defaultBPMFactor * 1000 * duration);
             }
         };
-        if ((this._playing && currentTime - this.lastClickTime > Singer.defaultBPMFactor * 1000 * duration) || (this.inbetween)) {
+        if (
+            (this._playing &&
+                currentTime - this.lastClickTime > Singer.defaultBPMFactor * 1000 * duration) ||
+            this.inbetween
+        ) {
             that.playbackForward = true;
             this.inbetween = false;
             if (this.circleIsVisible) {
@@ -2181,7 +2195,9 @@ function TemperamentWidget() {
         row.id = "buttonsRow";
 
         temperamentCell = row.insertCell();
-        temperamentCell.innerHTML = this.inTemperament;
+        if (temperamentCell) {
+            temperamentCell.innerHTML = this.inTemperament;
+        }
         temperamentCell.style.width = 2 * BUTTONSIZE + "px";
         temperamentCell.style.minWidth = temperamentCell.style.width;
         temperamentCell.style.maxWidth = temperamentCell.style.width;
@@ -2203,7 +2219,7 @@ function TemperamentWidget() {
             that._save();
         };
 
-        var noteCell = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Table"));
+        const noteCell = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Table"));
 
         let t = getTemperament(this.inTemperament);
         this.pitchNumber = t.pitchNumber;
@@ -2223,7 +2239,11 @@ function TemperamentWidget() {
         this.ratiosNotesPair = [];
 
         for (let i = 0; i <= this.pitchNumber; i++) {
-            if (isCustomTemperament(this.inTemperament) && t["0"] !== undefined && t["0"][1] !== undefined) {
+            if (
+                isCustomTemperament(this.inTemperament) &&
+                t["0"] !== undefined &&
+                t["0"][1] !== undefined
+            ) {
                 //If temperament selected is custom and it is defined by user.
                 const pitchNumber = i + "";
                 if (i === this.pitchNumber) {
@@ -2298,8 +2318,7 @@ function TemperamentWidget() {
 
         this._circleOfNotes();
 
-        // eslint-disable-next-line no-unused-vars
-        noteCell.onclick = function (event) {
+        noteCell.onclick = function () {
             that.editMode = null;
             if (that.circleIsVisible) {
                 that._circleOfNotes();
@@ -2308,15 +2327,14 @@ function TemperamentWidget() {
             }
         };
 
-        widgetWindow.addButton(
-            "add2.svg",
-            ICONSIZE,
-            _("Add pitches")
-            // eslint-disable-next-line no-unused-vars
-        ).onclick = function (event) {
+        widgetWindow.addButton("add2.svg", ICONSIZE, _("Add pitches")).onclick = function () {
             that.edit();
         };
 
         widgetWindow.sendToCenter();
     };
+}
+
+if (typeof module !== "undefined") {
+    module.exports = TemperamentWidget;
 }

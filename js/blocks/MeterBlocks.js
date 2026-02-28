@@ -191,11 +191,24 @@ function setupMeterBlocks(activity) {
         setter(logo, value, turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
 
+            // Validate and clamp BPM to safe range [30, 1000]
+            let bpm = Number(value);
+            if (isNaN(bpm)) {
+                bpm = 60; // Default to 60 BPM
+                activity.errorMsg(_("BPM must be a number, defaulting to 60."));
+            } else if (bpm < 30) {
+                bpm = 30;
+                activity.errorMsg(_("BPM must be at least 30, clamping to 30."));
+            } else if (bpm > 1000) {
+                bpm = 1000;
+                activity.errorMsg(_("BPM must be at most 1000, clamping to 1000."));
+            }
+
             const len = tur.singer.bpm.length;
             if (len > 0) {
-                tur.singer.bpm[len - 1] = value;
+                tur.singer.bpm[len - 1] = bpm;
             } else {
-                tur.singer.bpm.push(value);
+                tur.singer.bpm.push(bpm);
             }
         }
 
@@ -1179,7 +1192,7 @@ function setupMeterBlocks(activity) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
                 // eslint-disable-next-line no-unused-vars
-                const __listener = (event) => {
+                const __listener = event => {
                     tur.singer.bpm.pop();
                 };
 
@@ -1254,7 +1267,7 @@ function setupMeterBlocks(activity) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
                 // eslint-disable-next-line no-unused-vars
-                const __listener = (event) => {
+                const __listener = event => {
                     tur.singer.bpm.pop();
                 };
 
@@ -1427,4 +1440,8 @@ function setupMeterBlocks(activity) {
     new SetBPMBlock().setup(activity);
     new PickupBlock().setup(activity);
     new MeterBlock().setup(activity);
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = setupMeterBlocks;
 }

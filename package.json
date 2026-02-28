@@ -1,6 +1,7 @@
 {
   "name": "musicblocks",
   "version": "3.4.1",
+  "main": "electron-main.js",
   "description": "A musical microworld",
   "repository": {
     "url": "https://github.com/sugarlabs/musicblocks.git"
@@ -11,27 +12,29 @@
   },
   "amd": {},
   "scripts": {
-    "lint": "eslint js/**/*.js",
+    "lint": "eslint js/ planet/js/",
     "serve": "http-server -a 127.0.0.1 -p 3000 --gzip --brotli",
+    "serve:dev": "http-server -a 127.0.0.1 -p 3000 -c-1",
     "start": "node index.js",
-    "dev": "nodemon index.js",
+    "dev": "cross-env NODE_ENV=development nodemon index.js",
+    "prod": "cross-env NODE_ENV=production node index.js",
     "test": "jest",
-    "cypress:run": "cypress run"
+    "cypress:run": "cypress run",
+    "electron": "electron .",
+    "dist": "electron-builder"
   },
   "devDependencies": {
-    "@babel/core": "^7.11.1",
-    "@babel/eslint-parser": "^7.26.10",
-    "@babel/preset-env": "^7.11.0",
-    "babel-eslint": "^10.1.0",
-    "clean-css": "^4.2.4",
-    "cypress": "^14.0.2",
-    "eslint": "^7.6.0",
-    "eslint-config-prettier": "^6.15.0",
-    "eslint-config-standard": "^14.1.1",
-    "eslint-plugin-import": "^2.22.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1",
-    "gulp": "^5.0.0",
+    "@babel/core": "^7.28.5",
+    "@babel/eslint-parser": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
+    "cross-env": "^7.0.3",
+    "cypress": "^15.9.0",
+    "electron": "40.0.0",
+    "electron-builder": "26.4.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "fake-indexeddb": "6.2.5",
+    "gulp": "^5.0.1",
     "gulp-babel": "^8.0.0",
     "gulp-clean-css": "^4.3.0",
     "gulp-prettier": "^3.0.0",
@@ -44,17 +47,33 @@
     "@tonejs/midi": "^2.0.28",
     "autoprefixer": "^10.4.16",
     "compression": "^1.8.1",
-    "cssnano": "^6.0.1",
-    "express": "^4.21.2",
+    "cssnano": "^7.1.2",
+    "express": "5.2.1",
     "gulp-concat": "^2.6.1",
-    "gulp-postcss": "^9.0.1",
-    "gulp-replace": "^1.0.0",
-    "gulp-sass": "^5.1.0",
-    "gulp-sourcemaps": "^2.6.5",
+    "gulp-postcss": "^10.0.0",
+    "gulp-replace": "^1.1.4",
+    "gulp-sass": "^6.0.1",
+    "gulp-sourcemaps": "^3.0.0",
     "http-server": "^14.1.1",
     "i18next": "^25.3.2",
     "i18next-http-backend": "^3.0.2",
     "node": "^24.2.0",
+    "postcss": "^8.5.6",
+    "sass": "^1.97.2",
     "tone": "^15.1.22"
+  },
+  "build": {
+    "appId": "com.musicblocks.app",
+    "productName": "Music Blocks",
+    "mac": {
+      "category": "public.app-category.music",
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
   }
 }

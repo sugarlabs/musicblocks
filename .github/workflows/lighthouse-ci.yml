@@ -1,0 +1,127 @@
+name: Lighthouse CI
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [master]
+
+jobs:
+  lighthouse:
+    name: Lighthouse Performance Audit
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli@0.14.x
+
+      - name: Run Lighthouse CI
+        id: lighthouse
+        run: |
+          lhci autorun --config=./lighthouserc.js 2>&1 | tee lighthouse-output.txt
+          echo "LIGHTHOUSE_EXIT_CODE=$?" >> $GITHUB_ENV
+
+      - name: Parse Lighthouse Results
+        id: parse
+        run: |
+          # Extract scores from the lighthouse output
+          # Create a results summary
+          mkdir -p lighthouse-results
+          
+          # Find the latest report
+          REPORT_DIR=".lighthouseci"
+          if [ -d "$REPORT_DIR" ]; then
+            # Get the manifest file
+            MANIFEST="$REPORT_DIR/manifest.json"
+            if [ -f "$MANIFEST" ]; then
+              # Extract average scores from manifest
+              PERF_SCORE=$(jq '[.[].summary.performance] | add / length * 100 | floor' "$MANIFEST" 2>/dev/null || echo "N/A")
+              A11Y_SCORE=$(jq '[.[].summary.accessibility] | add / length * 100 | floor' "$MANIFEST" 2>/dev/null || echo "N/A")
+              BP_SCORE=$(jq '[.[].summary["best-practices"]] | add / length * 100 | floor' "$MANIFEST" 2>/dev/null || echo "N/A")
+              SEO_SCORE=$(jq '[.[].summary.seo] | add / length * 100 | floor' "$MANIFEST" 2>/dev/null || echo "N/A")
+              
+              # Get report URL from temporary-public-storage
+              REPORT_URL=$(jq -r '.[0].url // "N/A"' "$MANIFEST" 2>/dev/null)
+              
+              echo "PERF_SCORE=$PERF_SCORE" >> $GITHUB_OUTPUT
+              echo "A11Y_SCORE=$A11Y_SCORE" >> $GITHUB_OUTPUT
+              echo "BP_SCORE=$BP_SCORE" >> $GITHUB_OUTPUT
+              echo "SEO_SCORE=$SEO_SCORE" >> $GITHUB_OUTPUT
+              echo "REPORT_URL=$REPORT_URL" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: Get Score Emoji
+        id: emoji
+        run: |
+          get_emoji() {
+            score=$1
+            if [ "$score" = "N/A" ]; then
+              echo "⚪"
+            elif [ "$score" -ge 90 ]; then
+              echo "🟢"
+            elif [ "$score" -ge 50 ]; then
+              echo "🟠"
+            else
+              echo "🔴"
+            fi
+          }
+          
+          echo "PERF_EMOJI=$(get_emoji '${{ steps.parse.outputs.PERF_SCORE }}')" >> $GITHUB_OUTPUT
+          echo "A11Y_EMOJI=$(get_emoji '${{ steps.parse.outputs.A11Y_SCORE }}')" >> $GITHUB_OUTPUT
+          echo "BP_EMOJI=$(get_emoji '${{ steps.parse.outputs.BP_SCORE }}')" >> $GITHUB_OUTPUT
+          echo "SEO_EMOJI=$(get_emoji '${{ steps.parse.outputs.SEO_SCORE }}')" >> $GITHUB_OUTPUT
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          message: |
+            ## 🔦 Lighthouse Performance Report
+
+            | Category | Score | Status |
+            |----------|-------|--------|
+            | ⚡ Performance | **${{ steps.parse.outputs.PERF_SCORE }}** | ${{ steps.emoji.outputs.PERF_EMOJI }} |
+            | ♿ Accessibility | **${{ steps.parse.outputs.A11Y_SCORE }}** | ${{ steps.emoji.outputs.A11Y_EMOJI }} |
+            | ✅ Best Practices | **${{ steps.parse.outputs.BP_SCORE }}** | ${{ steps.emoji.outputs.BP_EMOJI }} |
+            | 🔍 SEO | **${{ steps.parse.outputs.SEO_SCORE }}** | ${{ steps.emoji.outputs.SEO_EMOJI }} |
+
+            ### Score Legend
+            - 🟢 90-100: Excellent
+            - 🟠 50-89: Needs Improvement  
+            - 🔴 0-49: Poor
+
+            > 📊 [View Full Lighthouse Report](${{ steps.parse.outputs.REPORT_URL }})
+            
+            ---
+            *This performance audit helps ensure PRs don't negatively impact user experience.*
+          comment-tag: lighthouse-report
+          mode: recreate
+          pr-number: ${{ github.event.pull_request.number }}
+
+      - name: Upload Lighthouse Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/
+          retention-days: 30

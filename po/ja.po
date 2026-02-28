@@ -1189,7 +1189,7 @@ msgstr "実行手順"
 #: js/turtledefs.js:240
 #: planet/js/GlobalTag.js:48
 #. TRANS: On the Planet, we use labels to tag projects.
-msgid "Sensors"
+msgid "sensors"
 msgstr "センサー"
 
 #: js/rubrics.js:532
@@ -1198,7 +1198,7 @@ msgstr "センサー"
 #: js/blocks/MediaBlocks.js:930
 #: planet/js/GlobalTag.js:46
 #. TRANS: On the Planet, we use labels to tag projects.
-msgid "Media"
+msgid "media"
 msgstr "メディア"
 
 #: js/rubrics.js:533
@@ -1512,7 +1512,7 @@ msgstr "作成する"
 #: js/toolbar.js:285
 msgid "English (United States)"
 # TRANS: machine translation
-msgstr "English (United States)"
+msgstr ""
 
 #: js/toolbar.js:93
 #: js/toolbar.js:165
@@ -1520,7 +1520,7 @@ msgstr "English (United States)"
 #: js/toolbar.js:286
 msgid "English (United Kingdom)"
 # TRANS: machine translation
-msgstr "English (United Kingdom)"
+msgstr ""
 
 #: js/toolbar.js:94
 #: js/toolbar.js:166
@@ -1528,12 +1528,12 @@ msgstr "English (United Kingdom)"
 #: js/toolbar.js:287
 msgid "日本語"
 # TRANS: machine translation
-msgstr "日本語"
+msgstr ""
 
 #: js/toolbar.js:95
 msgid "한국어"
 # TRANS: machine translation
-msgstr "한국어"
+msgstr ""
 
 #: js/toolbar.js:96
 #: js/toolbar.js:168
@@ -1541,7 +1541,7 @@ msgstr "한국어"
 #: js/toolbar.js:289
 msgid "español"
 # TRANS: machine translation
-msgstr "español"
+msgstr ""
 
 #: js/toolbar.js:97
 #: js/toolbar.js:169
@@ -1549,7 +1549,7 @@ msgstr "español"
 #: js/toolbar.js:290
 msgid "português"
 # TRANS: machine translation
-msgstr "português"
+msgstr ""
 
 #: js/toolbar.js:98
 #: js/toolbar.js:170
@@ -1557,7 +1557,7 @@ msgstr "português"
 #: js/toolbar.js:291
 msgid "にほんご"
 # TRANS: machine translation
-msgstr "にほんご"
+msgstr ""
 
 #: js/toolbar.js:99
 #: js/toolbar.js:171
@@ -1565,7 +1565,7 @@ msgstr "にほんご"
 #: js/toolbar.js:292
 msgid "中文"
 # TRANS: machine translation
-msgstr "中文"
+msgstr ""
 
 #: js/toolbar.js:100
 #: js/toolbar.js:172
@@ -1573,7 +1573,7 @@ msgstr "中文"
 #: js/toolbar.js:293
 msgid "ภาษาไทย"
 # TRANS: machine translation
-msgstr "ภาษาไทย"
+msgstr ""
 
 #: js/toolbar.js:101
 #: js/toolbar.js:173
@@ -1581,7 +1581,7 @@ msgstr "ภาษาไทย"
 #: js/toolbar.js:294
 msgid "aymara"
 # TRANS: machine translation
-msgstr "aymara"
+msgstr ""
 
 #: js/toolbar.js:102
 #: js/toolbar.js:174
@@ -1589,7 +1589,7 @@ msgstr "aymara"
 #: js/toolbar.js:295
 msgid "quechua"
 # TRANS: machine translation
-msgstr "quechua"
+msgstr ""
 
 #: js/toolbar.js:103
 #: js/toolbar.js:175
@@ -1597,7 +1597,7 @@ msgstr "quechua"
 #: js/toolbar.js:296
 msgid "guarani"
 # TRANS: machine translation
-msgstr "guarani"
+msgstr ""
 
 #: js/toolbar.js:104
 #: js/toolbar.js:176
@@ -1605,7 +1605,7 @@ msgstr "guarani"
 #: js/toolbar.js:297
 msgid "हिंदी"
 # TRANS: machine translation
-msgstr "हिंदी"
+msgstr ""
 
 #: js/toolbar.js:105
 #: js/toolbar.js:178
@@ -1613,7 +1613,7 @@ msgstr "हिंदी"
 #: js/toolbar.js:299
 msgid "igbo"
 # TRANS: machine translation
-msgstr "igbo"
+msgstr ""
 
 #: js/toolbar.js:106
 #: js/toolbar.js:179
@@ -1621,7 +1621,7 @@ msgstr "igbo"
 #: js/toolbar.js:300
 msgid "عربى"
 # TRANS: machine translation
-msgstr "عربى"
+msgstr ""
 
 #: js/toolbar.js:107
 #: js/toolbar.js:177
@@ -1629,7 +1629,7 @@ msgstr "عربى"
 #: js/toolbar.js:298
 msgid "తెలుగు"
 # TRANS: machine translation
-msgstr "తెలుగు"
+msgstr ""
 
 #: js/toolbar.js:108
 #: js/toolbar.js:180
@@ -1637,7 +1637,7 @@ msgstr "తెలుగు"
 #: js/toolbar.js:301
 msgid "עִברִית"
 # TRANS: machine translation
-msgstr "עִברִית"
+msgstr ""
 
 #: js/toolbar.js:109
 #: js/toolbar.js:181
@@ -1645,7 +1645,7 @@ msgstr "עִברִית"
 #: js/toolbar.js:302
 msgid "اردو"
 # TRANS: machine translation
-msgstr "اردو"
+msgstr ""
 
 #: js/toolbar.js:157
 #: js/toolbar.js:160
@@ -1669,7 +1669,7 @@ msgstr "アートをSVGで保存"
 #: js/toolbar.js:288
 msgid "한국인"
 # TRANS: machine translation
-msgstr "한국인"
+msgstr ""
 
 #: js/toolbar.js:185
 #: js/toolbar.js:246
@@ -2104,7 +2104,7 @@ msgid "Expand/collapse option toolbar"
 msgstr "オプションツールバーを表示"
 
 #: js/turtledefs.js:587
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxiliary toolbar."
 msgstr "このボタンをクリックすると「サブメニュー」を開いたり、折りたたんだりすることができる。"
 
 #: js/turtledefs.js:593
@@ -2210,7 +2210,7 @@ msgstr "ブロックをコピーには、ブロックを右クリックすると
 
 #: js/turtledefs.js:715
 msgid "To extract a block, right-click on it. You will see the extract option."
-msgstr ""
+msgstr "ブロックを取り出すには、ブロックを右クリックします。「取り出す」オプションが表示されます。"
 
 #: js/turtledefs.js:721
 msgid "Keyboard shortcuts"

@@ -6,6 +6,10 @@
     <img src="https://img.shields.io/github/license/sugarlabs/musicblocks" />
 </a>
 
+<a href="https://github.com/sugarlabs/musicblocks/actions/workflows/node.js.yml" alt="CI">
+    <img src="https://github.com/sugarlabs/musicblocks/actions/workflows/node.js.yml/badge.svg" />
+</a>
+
 # Music Blocks
 
 “_All musicians are subconsciously mathematicians._” — Monk
@@ -26,9 +30,9 @@ is audio-visual; it produces graphics, artwork and music. Here are a
 couple of screenshots to give you an idea of how the application looks
 like:
 
-![alt tag](./screenshots/Screenshot-1.png)
+![Music Blocks workspace showing block-based music programming](./screenshots/Screenshot-1.png)
 
-![alt tag](./screenshots/Screenshot-2.png)
+![Music Blocks rhythm and melody blocks interface](./screenshots/Screenshot-2.png)
 
 Visit the Music Blocks website for a hands on experience:
 [https://musicblocks.sugarlabs.org](https://musicblocks.sugarlabs.org).
@@ -94,13 +98,15 @@ CLI_), on your local machine.
 2. In a terminal, `cd` to the directory where you downloaded/cloned
 Music Blocks, using `cd path/to/musicblocks/`.
 
-3. After you are in `path/to/musicblocks/` directory, install the dependencies using the following command
+3. After you are in `path/to/musicblocks/` directory, install the
+dependencies using the following command
 
     ```bash
     npm install
     ```
 
-4. After cloning the musicblocks repository, you can start a local server using npm
+4. After cloning the musicblocks repository, you can start a local
+server using npm
 
     ```bash
     npm run dev
@@ -114,8 +120,6 @@ listening on port 3000.
 
 **NOTE:** _Use `ctrl + c` or `cmd + c` to quit the HTTP Server to avoid
 `socket.error:[Errno 48]`_.
-
-
 
 ## Local Setup with Docker
 
@@ -150,33 +154,55 @@ Before you begin, ensure you have Docker installed on your machine. You can down
    docker run -p 3000:3000 musicblocks
    ```
 
-   This command will start a Docker container running Music Blocks and expose it on port 3000.
+   This command will start a Docker container running Music Blocks and
+   expose it on port 3000.
 
-2. Access Music Blocks in your web browser by navigating to `http://localhost:3000`.
+2. Access Music Blocks in your web browser by navigating to
+`http://localhost:3000`.
 
 ## Stopping the Docker container
 
-To stop the Docker container, use `Ctrl + C` in your terminal. This will stop the container and free up the port it was using.
+To stop the Docker container, use `Ctrl + C` in your terminal. This
+will stop the container and free up the port it was using.
+
+## Troubleshooting
+When running Music Blocks locally using `npm run dev`, the UI may load successfully even if some interactions appear unresponsive.
+
+New contributors may observe console errors such as:
+- `$ is not defined`
+- `lang is not defined`
+- `p5 is not defined`
+
+These errors can occur due to script loading order and initialization differences in local environments.
+
+If the UI loads and assets render correctly, the setup is generally considered successful for development purposes.
+
+Future improvements may address these issues as part of ongoing refactoring efforts.
 
 ## Additional Notes
 
-- Make sure to replace `musicblocks` with the appropriate image name if you have tagged the Docker image differently.
-- You can customize the port mapping (`-p`) if you prefer to use a different port for accessing Music Blocks.
+- Make sure to replace `musicblocks` with the appropriate image name
+  if you have tagged the Docker image differently.
+- You can customize the port mapping (`-p`) if you prefer to use a
+  different port for accessing Music Blocks.
 
 ---
 
-This documentation provides a basic setup for running Music Blocks locally using Docker. Feel free to customize it further based on your specific requirements and environment.
+This documentation provides a basic setup for running Music Blocks
+locally using Docker. Feel free to customize it further based on your
+specific requirements and environment.
+
 ## <a name="USING_MUSIC_BLOCKS"></a>Using Music Blocks
 
 Once Music Blocks is running, you'll want suggestions on how to use
-it. Follow [Using Music Blocks](./documentation/README.md) and [Music
-Blocks Guide](./guide/README.md).
+it. Follow [Using Music Blocks](./Docs/documentation/README.md) and [Music
+Blocks Guide](./Docs/guide/README.md).
 
 For Scratch and Snap users, you may want to look at [Music Blocks for
 Snap Users](./Music_Blocks_for_Snap_Users.md).
 
 Looking for a block? Find it in the
-[Palette Tables](./guide/README.md#6-appendix).
+[Palette Tables](./Docs/guide/README.md#6-appendix).
 
 ## <a name="CODEOFCONDUCT"></a>Code of Conduct
 
@@ -185,169 +211,13 @@ Conduct](https://github.com/sugarlabs/sugar-docs/blob/master/src/CODE_OF_CONDUCT
 
 ## <a name="CONTRIBUTING"></a>Contributing
 
-Please consider contributing to the project, with your ideas, your
-music, your lesson plans, your artwork, and your code.
+[Contributing.md](CONTRIBUTING.md) provides a general overview of
+Sugar Lab's guidelines.
 
-### Special Notes
-
-Music Blocks is being built from the ground-up, to address several
-architectural problems with this run. Since Music Blocks is a fork of
-Turtle Blocks JS, musical functionality was added on top of it.
-However, music is fundamental to Music Blocks. Besides, the Turtle
-Blocks JS started initially with handful of features and was written
-without a complex architecture. As Music Blocks was built on top of
-that, it became incrementally complex, but the architecture remained
-simple, thus resulting in a monolith. Also, the functionality is
-tightly coupled with the interface and native client API (Web API).
-
-Keeping these problems in mind, we have considered a foundational
-rebuild that will address all these issues, whilst adding buffers for
-future additions. Additionally, we will make use of a more elegant tech-stack to
-develop and maintain this project given its scale. After the core is
-built, we'll be porting features from this application to it.
-
-Refer to the repository
-[**sugarlabs/musicblocks-v4**](https://github.com/sugarlabs/musicblocks-v4)
-for more information about the new project &mdash; _Music Blocks 4.0_.
-
-### Tech Stack
-
-Music Blocks is a Web Application and is written using browser
-technologies &mdash; `HTML`, `CSS` (`SCSS`), `JavaScript`, `SVG`, etc.
-
-If you're just getting started with development, you may refer to the
-following resources:
-
-- [HTML tutorial - w3schools.com](https://www.w3schools.com/html/default.asp)
-- [HTML reference - MDN Web Docs](https://developer.mozilla.org/en-US/docs/Web/HTML)
-- [CSS tutorial - w3schools.com](https://www.w3schools.com/css/default.asp)
-- [CSS reference - MDN Web Docs](https://developer.mozilla.org/en-US/docs/Web/CSS)
-- [JavaScript tutorial - w3schools.com](https://www.w3schools.com/js/default.asp)
-- [JavaScript reference - MDN Web Docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-
-Programmers, please follow these general [guidelines for
-contributions](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md).
-
-### License Header
-
-Music Blocks is licensed under the [AGPL](https://www.gnu.org/licenses/agpl-3.0.en.html).
-If you add a new file to the Music Blocks code base, please be
-sure to include a license header as per below:
-
-```js
-/**
- * MusicBlocks v3.6.2 (ADD THE UP-TO-DATE VERSION)
- *
- * @author Walter Bender (MODIFY THE AUTHOR AS NEEDED)
- *
- * @copyright 2025 Walter Bender (MODIFY THE AUTHOR AND YEAR AS NEEDED)
- *
- * @license
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
-```
-
-This header must be added at the top of **all source code files** to ensure compliance
-with the project's open-source license.
-
-### Translators
-
-Music Blocks uses
-[PO files](https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html)
-to maintain translations of the text strings used in the
-interface. The PO files are available through an
-[interactive website](https://weblate.sugarlabs.org/projects/music-blocks/music-blocks/).
-
-Alternatively, translators can clone the
-[git repo](https://github.com/sugarlabs/musicblocks.git), edit the PO files
-locally, and make a pull request.
-
-Note that once the PO files are updated, they are compiled into an INI
-file, which is the file used by Music Blocks.
-
-### New Contributors
-
-Use the
-[discussions](https://github.com/sugarlabs/musicblocks/discussions)
-tab at the top of the repository to:
-
-- Ask questions you’re wondering about.
-- Share ideas.
-- Engage with other community members.
-
-Feel free. But, please don't spam :p.
-
-### Keep in Mind
-
-1. Your contributions need not necessarily have to address any
-discovered issue. If you encounter any, feel free to add a fix through
-a PR, or create a new issue ticket.
-
-2. Use [labels](https://github.com/sugarlabs/musicblocks/labels) on
-your issues and PRs.
-
-3. Please do not spam with many PRs consisting of little changes.
-
-4. If you are addressing a bulk change, divide your commits across
-multiple PRs, and send them one at a time. The fewer the number of
-files addressed per PR, the better.
-
-5. Communicate effectively. Go straight to the point. You don't need
-to address anyone using '_sir_'. Don't write unnecessary comments;
-don't be over-apologetic. There is no superiority hierarchy. Every
-single contribution is welcome, as long as it doesn't spam or distract
-the flow.
-
-6. Write useful, brief commit messages. Add commit descriptions if
-necessary. PR name should speak about what it is addressing and not
-the issue. In case a PR fixes an issue, use `fixes #ticketno` or
-`closes #ticketno` in the PR's comment. Briefly explain what your PR
-is doing.
-
-7. Always test your changes extensively before creating a PR. There's
-no sense in merging broken code. If a PR is a _work in progress
-(WIP)_, convert it to draft. It'll let the maintainers know it isn't
-ready for merging.
-
-8. Read and revise the concepts about programming constructs you're
-dealing with. You must be clear about the behavior of the language or
-compiler/transpiler. See [JavaScript
-docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript).
-
-9. If you have a question, do a _web search_ first. If you don't find
-any satisfactory answer, then ask it in a comment. If it is a general
-question about Music Blocks, please use the new
-[discussions](https://github.com/sugarlabs/musicblocks/discussions)
-tab on top the the repository, or the _Sugar-dev Devel
-<[sugar-devel@lists.sugarlabs.org](mailto:sugar-devel@lists.sugarlabs.org)>_
-mailing list. Don't ask silly questions (unless you don't know it is
-silly ;p) before searching it on the web.
-
-10. Work on things that matter. Follow three milestones: `Port Ready`,
-`Migration`, and `Future`.  Those tagged `Port Ready` are
-priority. Those tagged with `Migration` will be taken care of during
-or after the foundation rebuild. Feel free to participate in the
-conversation, adding valuable comments. Those tagged with `Future`
-need not be addressed presently.
-
-_Please note there is no need to ask permission to work on an
-issue. You should check for pull requests linked to an issue you are
-addressing; if there are none, then assume nobody has done
-anything. Begin to fix the problem, test, make your commits, push your
-commits, then make a pull request. Mention an issue number in the pull
-request, but not the commit message. These practices allow the
-competition of ideas (Sugar Labs is a meritocracy)._
+It contains best practices for writing code, submitting pull requests,
+and following coding standards.  Please refer to this guide before
+making contributions to ensure consistency and maintain the quality of
+the project.
 
 ## <a name="MODIFYING_MUSIC_BLOCKS"></a>Modifying Music Blocks
 
@@ -364,6 +234,14 @@ Code](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md)
 provides a general overview of Sugar Lab's guidelines. See
 [Contributing](#CONTRIBUTING) section for specific details about this
 repository.
+
+### Developer Quick Start
+
+1. Clone and install: `git clone https://github.com/sugarlabs/musicblocks.git && npm install`
+2. Run locally: `npm run dev`
+3. Before pushing: `npm run lint && npx prettier --check . && npm test`
+
+For writing tests, see [docs/TESTING.md](./docs/TESTING.md).
 
 ## <a name="REPORTING_BUGS"></a>Reporting Bugs
 

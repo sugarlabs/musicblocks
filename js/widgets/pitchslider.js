@@ -38,7 +38,7 @@ class PitchSlider {
     }
 
     /**
-     * Intializes the pitch/slider
+     * Initializes the pitch/slider
      * @returns {void}
      */
     init(activity) {
@@ -54,35 +54,39 @@ class PitchSlider {
 
         this._cellScale = 1.0;
         this.widgetWindow = window.widgetWindows.windowFor(this, "pitch slider", "slider", true);
-        
+
         this.isActive = true;
-        
+
         activity.logo.pitchSlider = this;
-        
+
         this.widgetWindow.onclose = () => {
+            document.removeEventListener("keydown", keyHandler, true);
             for (const osc of oscillators) osc.triggerRelease();
             this.isActive = false;
             activity.logo.pitchSlider = null;
             this.widgetWindow.destroy();
         };
 
-        const keyHandler = (event) => {
+        const keyHandler = event => {
             if (!this.isActive) return;
-            
-            if (event.key === "ArrowUp" || event.key === "ArrowDown" ||
-                event.key === "ArrowLeft" || event.key === "ArrowRight") {
-                
+
+            if (
+                event.key === "ArrowUp" ||
+                event.key === "ArrowDown" ||
+                event.key === "ArrowLeft" ||
+                event.key === "ArrowRight"
+            ) {
                 event.preventDefault();
                 event.stopPropagation();
-                
+
                 const sliderToUse = this.activeSlider !== null ? this.activeSlider : 0;
-                
+
                 if (this.sliders[sliderToUse]) {
                     const slider = this.sliders[sliderToUse];
                     const min = parseFloat(slider.min);
                     const max = parseFloat(slider.max);
                     const currentValue = parseFloat(slider.value);
-                    
+
                     if (event.key === "ArrowUp" || event.key === "ArrowRight") {
                         // Move up by a semitone
                         slider.value = Math.min(currentValue * PitchSlider.SEMITONE, max);
@@ -90,18 +94,18 @@ class PitchSlider {
                         // Move down by a semitone
                         slider.value = Math.max(currentValue / PitchSlider.SEMITONE, min);
                     }
-                    
+
                     const inputEvent = new Event("input", { bubbles: true });
                     slider.dispatchEvent(inputEvent);
                 }
-                
+
                 return false;
             }
         };
-        
+
         document.addEventListener("keydown", keyHandler, true);
 
-        const MakeToolbar = (id) => {
+        const MakeToolbar = id => {
             const toolBarDiv = document.createElement("div");
             this.widgetWindow._toolbar.appendChild(toolBarDiv);
             toolBarDiv.style.float = "left";
@@ -219,4 +223,7 @@ class PitchSlider {
 
         this.activity.blocks.loadNewBlocks(newStack);
     }
+}
+if (typeof module !== "undefined") {
+    module.exports = PitchSlider;
 }

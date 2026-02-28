@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: \n"
-"Last-Translator: Ignacio Rodriguez <ignacio@sugarlabs.org>\n"
+"PO-Revision-Date: 2025-12-10 18:51+0530\n"
+"Last-Translator: Harihara Vardhan <hariharavardhan1234@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
@@ -345,7 +345,7 @@ msgstr "nombre accidental"
 #: js/activity.js:2621
 #: js/blocks/PitchBlocks.js:855
 msgid "east indian solfege"
-msgstr ""
+msgstr "solfeo de la india oriental"
 
 #: js/activity.js:2624
 #: js/blocks/PitchBlocks.js:869
@@ -1182,7 +1182,7 @@ msgstr "flujo"
 #: js/turtledefs.js:240
 #: planet/js/GlobalTag.js:48
 #. TRANS: On the Planet, we use labels to tag projects.
-msgid "Sensors"
+msgid "sensors"
 msgstr "sensores"
 
 #: js/rubrics.js:532
@@ -1191,7 +1191,7 @@ msgstr "sensores"
 #: js/blocks/MediaBlocks.js:930
 #: planet/js/GlobalTag.js:46
 #. TRANS: On the Planet, we use labels to tag projects.
-msgid "Media"
+msgid "media"
 msgstr "medios"
 
 #: js/rubrics.js:533
@@ -2070,7 +2070,7 @@ msgid "Expand/collapse option toolbar"
 msgstr "Expandir/colapsar la barra de opciones."
 
 #: js/turtledefs.js:587
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxiliary toolbar."
 msgstr "Haga clic en este botón para expandir o contraer la barra de herramientas auxiliar."
 
 #: js/turtledefs.js:593
@@ -2343,7 +2343,7 @@ msgstr "efecto"
 
 #: js/palette.js:669
 msgid "sargam"
-msgstr ""
+msgstr "sargam"
 
 #: js/palette.js:684
 #: js/blocks/PitchBlocks.js:1209
@@ -2771,43 +2771,43 @@ msgstr "highpass"
 #: js/utils/musicutils.js:1575
 #. TRANS: lowpass filter
 msgid "lowpass"
-msgstr ""
+msgstr "paso bajo"
 
 #: js/utils/musicutils.js:1083
 #: js/utils/musicutils.js:1576
 #. TRANS: bandpass filter
 msgid "bandpass"
-msgstr ""
+msgstr "paso de banda"
 
 #: js/utils/musicutils.js:1085
 #: js/utils/musicutils.js:1577
 #. TRANS: high-shelf filter
 msgid "highshelf"
-msgstr ""
+msgstr "estante alto"
 
 #: js/utils/musicutils.js:1087
 #: js/utils/musicutils.js:1578
 #. TRANS: low-shelf filter
 msgid "lowshelf"
-msgstr ""
+msgstr "estante bajo"
 
 #: js/utils/musicutils.js:1089
 #: js/utils/musicutils.js:1579
 #. TRANS: notch-shelf filter
 msgid "notch"
-msgstr ""
+msgstr "muesca"
 
 #: js/utils/musicutils.js:1091
 #: js/utils/musicutils.js:1580
 #. TRANS: all-pass filter
 msgid "allpass"
-msgstr ""
+msgstr "pasa todo"
 
 #: js/utils/musicutils.js:1093
 #: js/utils/musicutils.js:1581
 #. TRANS: peaking filter
 msgid "peaking"
-msgstr ""
+msgstr "pico"
 
 #: js/utils/musicutils.js:1094
 #: js/utils/musicutils.js:1589
@@ -2921,7 +2921,7 @@ msgstr "guitarra"
 #: js/utils/synthutils.js:84
 #. TRANS: sitar musical instrument
 msgid "sitar"
-msgstr ""
+msgstr "sitar"
 
 #: js/utils/musicutils.js:1113
 #: js/utils/synthutils.js:88
@@ -3062,7 +3062,7 @@ msgstr "darbuka"
 #: js/utils/synthutils.js:166
 #. TRANS: musical instrument
 msgid "hi hat"
-msgstr ""
+msgstr "platillos charles"
 
 #: js/utils/musicutils.js:1138
 #: js/utils/synthutils.js:168
@@ -3235,7 +3235,7 @@ msgstr "solo entonación"
 #: js/utils/musicutils.js:1624
 #. TRANS: musical temperament
 msgid "Meantone"
-msgstr ""
+msgstr "Mesotónico"
 
 #: js/utils/musicutils.js:1188
 msgid "major 7th"
@@ -4667,7 +4667,7 @@ msgstr "El bloque Pulsaciones por minuto establece el número de 1/4 notas por m
 #: js/blocks/MeterBlocks.js:1280
 #. TRANS: anacrusis
 msgid "pickup"
-msgstr ""
+msgstr "anacrusa"
 
 #: js/blocks/MeterBlocks.js:1368
 msgid "number of beats"
@@ -4857,7 +4857,7 @@ msgstr "El tono puede especificarse en términos de C D E F G A B."
 
 #: js/blocks/PitchBlocks.js:884
 msgid "solfege"
-msgstr ""
+msgstr "solfeo"
 
 #: js/blocks/PitchBlocks.js:887
 msgid "Pitch can be specified in terms of do re mi fa sol la ti."
@@ -5399,7 +5399,7 @@ msgstr "El bloque de valor en la pila de tortuga devuelve un valor en el almacen
 #: js/blocks/EnsembleBlocks.js:1222
 #: js/blocks/EnsembleBlocks.js:1296
 msgid "Yertle"
-msgstr ""
+msgstr "Yertle"
 
 #: js/blocks/EnsembleBlocks.js:96
 #: js/blocks/EnsembleBlocks.js:1083

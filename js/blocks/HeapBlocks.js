@@ -115,7 +115,9 @@ function setupHeapBlocks(activity) {
              * @param {string[]} [] - An array with help string information.
              */
             this.setHelpString([
-                _("The Show-heap block displays the contents of the heap at the top of the screen."),
+                _(
+                    "The Show-heap block displays the contents of the heap at the top of the screen."
+                ),
                 "documentation",
                 ""
             ]);

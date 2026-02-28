@@ -76,7 +76,7 @@ class ReflectionMatrix {
         this.isOpen = true;
         this.isMaximized = false;
         this.activity.isInputON = true;
-        this.PORT = "http://3.105.177.138:8000"; // http://127.0.0.1:8000 
+        this.PORT = "http://3.105.177.138:8000"; // http://127.0.0.1:8000
 
         const widgetWindow = window.widgetWindows.windowFor(this, "reflection", "reflection");
         this.widgetWindow = widgetWindow;
@@ -88,6 +88,9 @@ class ReflectionMatrix {
         widgetWindow.onclose = () => {
             this.isOpen = false;
             this.activity.isInputON = false;
+            if (this.dotsInterval) {
+                clearInterval(this.dotsInterval);
+            }
             widgetWindow.destroy();
         };
 
@@ -98,8 +101,18 @@ class ReflectionMatrix {
         this.chatInterface.className = "chatInterface";
         widgetWindow.getWidgetBody().append(this.chatInterface);
 
-        widgetWindow.addButton("notes_icon.svg", ReflectionMatrix.ICONSIZE, _("Summary")).onclick =
-            () => this.getAnalysis();
+        this.summaryButton = widgetWindow.addButton(
+            "notes_icon.svg",
+            ReflectionMatrix.ICONSIZE,
+            _("Summary")
+        );
+
+        this.summaryButton.onclick = () => this.getAnalysis();
+
+        if (this.chatHistory.length < 10) {
+            this.summaryButton.style.background = "gray";
+        }
+
         widgetWindow.addButton(
             "save-button-dark.svg",
             ReflectionMatrix.ICONSIZE,
@@ -157,7 +170,7 @@ class ReflectionMatrix {
         this.input.style.marginLeft = "10px";
         this.inputContainer.appendChild(this.input);
 
-        this.input.onkeydown = (e) => {
+        this.input.onkeydown = e => {
             if (e.key === "Enter") {
                 this.sendMessage();
             }
@@ -283,7 +296,6 @@ class ReflectionMatrix {
     async updateProjectCode() {
         const code = await this.activity.prepareExport();
         if (code === this.code) {
-            console.log("No changes in code detected.");
             return; // No changes in code
         }
 
@@ -295,8 +307,6 @@ class ReflectionMatrix {
             if (data.algorithm !== "unchanged") {
                 this.projectAlgorithm = data.algorithm; // update algorithm
                 this.code = code;
-            } else {
-                console.log("No changes in algorithm detected.");
             }
             this.botReplyDiv(data, false, false);
         } else {
@@ -403,7 +413,6 @@ class ReflectionMatrix {
      */
     async generateAnalysis() {
         try {
-            console.log("Summary stored", this.summary);
             const response = await fetch(`${this.PORT}/analysis`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -430,6 +439,7 @@ class ReflectionMatrix {
         let reply;
         // check if message is from user or bot
         if (user_query === true) {
+            if (this.typingDiv) return;
             reply = await this.generateBotReply(
                 message,
                 this.chatHistory,
@@ -450,6 +460,10 @@ class ReflectionMatrix {
             role: this.AImentor,
             content: reply.response
         });
+
+        if (this.chatHistory.length > 10) {
+            this.summaryButton.style.removeProperty("background");
+        }
 
         const messageContainer = document.createElement("div");
         messageContainer.className = "message-container";
@@ -520,7 +534,7 @@ class ReflectionMatrix {
     renderChatHistory() {
         this.chatLog.innerHTML = "";
 
-        this.chatHistory.forEach((msg) => {
+        this.chatHistory.forEach(msg => {
             const messageContainer = document.createElement("div");
             messageContainer.className = "message-container";
 
@@ -557,8 +571,11 @@ class ReflectionMatrix {
      */
     saveReport(data) {
         const key = "musicblocks_analysis";
-        localStorage.setItem(key, data.response);
-        console.log("Conversation saved in localStorage.");
+        try {
+            localStorage.setItem(key, data.response);
+        } catch (e) {
+            console.warn("Could not save analysis report to localStorage:", e);
+        }
     }
 
     /** Reads the analysis report from localStorage.
@@ -581,8 +598,7 @@ class ReflectionMatrix {
         }
         const transcript = conversationData
             .map(
-                (item) =>
-                    `${this.mentorsMap[item.role] || item.role.toUpperCase()}: ${item.content}`
+                item => `${this.mentorsMap[item.role] || item.role.toUpperCase()}: ${item.content}`
             )
             .join("\n\n");
 
@@ -599,12 +615,75 @@ class ReflectionMatrix {
     }
 
     /**
+     * Escapes HTML special characters to prevent XSS attacks.
+     * @param {string} text - The text to escape.
+     * @returns {string} - The escaped text.
+     */
+    escapeHTML(text) {
+        const escapeMap = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#x27;"
+        };
+        return text.replace(/[&<>"']/g, char => escapeMap[char]);
+    }
+
+    /**
+     * Sanitizes HTML content using DOMParser to prevent XSS.
+     * Removes unsafe attributes and ensures links are safe.
+     * @param {string} htmlString - The HTML string to sanitize.
+     * @returns {string} - The sanitized HTML string.
+     */
+    sanitizeHTML(htmlString) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlString, "text/html");
+
+        // Sanitize links
+        const links = doc.getElementsByTagName("a");
+        for (let i = 0; i < links.length; i++) {
+            const link = links[i];
+            const href = link.getAttribute("href");
+
+            // If no href, or it's unsafe, remove the attribute
+            if (!href || this.isUnsafeUrl(href)) {
+                link.removeAttribute("href");
+            } else {
+                // Enforce security attributes for external links
+                link.setAttribute("target", "_blank");
+                link.setAttribute("rel", "noopener noreferrer");
+            }
+        }
+
+        return doc.body.innerHTML;
+    }
+
+    /**
+     * Checks if a URL is unsafe (javascript:, data:, vbscript:).
+     * @param {string} url - The URL to check.
+     * @returns {boolean} - True if unsafe, false otherwise.
+     */
+    isUnsafeUrl(url) {
+        const trimmed = url.trim().toLowerCase();
+        const unsafeSchemes = ["javascript:", "data:", "vbscript:"];
+        // Check if it starts with any unsafe scheme
+        // Note: DOMParser handles HTML entity decoding, so we check the raw attribute safely here
+        // But for extra safety against control characters, we rely on the fact that
+        // we are operating on the parsed DOM attribute.
+        return unsafeSchemes.some(scheme => trimmed.replace(/\s+/g, "").startsWith(scheme));
+    }
+
+    /**
      * Converts Markdown text to HTML.
      * @param {string} md - The Markdown text.
      * @returns {string} - The converted HTML text.
      */
     mdToHTML(md) {
-        let html = md;
+        // Step 1: Escape HTML first to prevent XSS attacks from raw tags
+        let html = this.escapeHTML(md);
+
+        // Step 2: Convert Markdown syntax to HTML
 
         // Headings
         html = html.replace(/^###### (.*$)/gim, "<h6>$1</h6>");
@@ -618,12 +697,13 @@ class ReflectionMatrix {
         html = html.replace(/\*\*(.*?)\*\*/gim, "<b>$1</b>");
         html = html.replace(/\*(.*?)\*/gim, "<i>$1</i>");
 
-        // Links
-        html = html.replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2' target='_blank'>$1</a>");
+        // Links - Create raw anchor tags, sanitization happens in Step 3
+        html = html.replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2'>$1</a>");
 
         // Line breaks
         html = html.replace(/\n/gim, "<br>");
 
-        return html.trim();
+        // Step 3: Sanitize the generated HTML using DOMParser
+        return this.sanitizeHTML(html);
     }
 }

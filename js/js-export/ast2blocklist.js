@@ -24,7 +24,7 @@
  * This class provides two static methods to convert an AST generated from JavaScript code
  * to a blockList (https://github.com/sugarlabs/musicblocks/blob/master/js/README.md#about-the-internal-block-format)
  * which can be loaded into the musicblocks UI by calling `blocks.loadNewBlocks(blockList)`.
- * 
+ *
  * Usage:
  *   let blockList = AST2BlockList.toBlockList(AST, config);
  */
@@ -59,7 +59,7 @@ class AST2BlockList {
          *     } ]
          *   }
          * The entire block is to play a whole note Sol on guitar in the third octave.
-         * 
+         *
          * @param {Object} AST - AST generated from JavaScript code
          * @param {Array} config - JSON config that maps AST to corresponding blocks
          * @returns {Array} trees, see example above
@@ -87,7 +87,7 @@ class AST2BlockList {
                     // Regex matching to handle array case such as arguments[0]
                     const matchStep = step.match(/(\w+)\[(\d+)\]/);
                     if (matchStep) {
-                        // Following the example above, the output of matchStep will have 
+                        // Following the example above, the output of matchStep will have
                         // 'arguments' at index 1 and the index (0) will be at index 2
                         current = current[matchStep[1]];
                         current = current[matchStep[2]];
@@ -123,11 +123,17 @@ class AST2BlockList {
                                     groupMatched = true;
                                     break;
                                 }
-                            } else if ("has_value" in identifier && ((!identifier.has_value && value == null) ||
-                                (identifier.has_value && value != null))) {
+                            } else if (
+                                "has_value" in identifier &&
+                                ((!identifier.has_value && value == null) ||
+                                    (identifier.has_value && value != null))
+                            ) {
                                 groupMatched = true;
                                 break;
-                            } else if (!("has_value" in identifier) && identifier.size === value.length) {
+                            } else if (
+                                !("has_value" in identifier) &&
+                                identifier.size === value.length
+                            ) {
                                 groupMatched = true;
                                 break;
                             }
@@ -140,7 +146,10 @@ class AST2BlockList {
                     if (matched) {
                         // If there's no name property but there is a name_map, try to get the name from the map
                         if (entry.name_map) {
-                            const calleePropertyName = _getPropertyValue(bodyAST, "expression.argument.callee.property.name");
+                            const calleePropertyName = _getPropertyValue(
+                                bodyAST,
+                                "expression.argument.callee.property.name"
+                            );
                             if (calleePropertyName && entry.name_map[calleePropertyName]) {
                                 console.log(entry.name_map[calleePropertyName]);
                                 entry.name = entry.name_map[calleePropertyName];
@@ -191,7 +200,9 @@ class AST2BlockList {
                 let node = {};
                 // Set block name
                 if ("name_property" in pair.ast) {
-                    node["name"] = { [pair.name]: _getPropertyValue(bodyAST, pair.ast.name_property) };
+                    node["name"] = {
+                        [pair.name]: _getPropertyValue(bodyAST, pair.ast.name_property)
+                    };
                 } else {
                     node["name"] = pair.name;
                 }
@@ -209,14 +220,20 @@ class AST2BlockList {
                 }
                 // Set children
                 if (pair.ast.children_properties !== undefined) {
-                    for (const child of _getPropertyValue(bodyAST, pair.ast.children_properties[0])) {
+                    for (const child of _getPropertyValue(
+                        bodyAST,
+                        pair.ast.children_properties[0]
+                    )) {
                         if (child.type != "ReturnStatement") {
                             _createNodeAndAddToTree(child, node);
                         }
                     }
                     if (pair.ast.children_properties.length > 1) {
-                        node["children"].push({ "name": "else" });
-                        for (const child of _getPropertyValue(bodyAST, pair.ast.children_properties[1])) {
+                        node["children"].push({ name: "else" });
+                        for (const child of _getPropertyValue(
+                            bodyAST,
+                            pair.ast.children_properties[1]
+                        )) {
                             if (child.type != "ReturnStatement") {
                                 _createNodeAndAddToTree(child, node);
                             }
@@ -248,7 +265,9 @@ class AST2BlockList {
                     if ("value_property" in argConfig.ast) {
                         argNode = _getPropertyValue(arg, argConfig.ast.value_property);
                     } else if (argConfig.ast.identifier_property) {
-                        argNode = { "identifier": _getPropertyValue(arg, argConfig.ast.identifier_property) };
+                        argNode = {
+                            identifier: _getPropertyValue(arg, argConfig.ast.identifier_property)
+                        };
                     } else {
                         const name = _getPropertyValue(arg, argConfig.ast.name_property);
                         if (name in argConfig.name_map) {
@@ -272,8 +291,8 @@ class AST2BlockList {
                                 };
                             }
                             argNode = {
-                                "name": blockName,
-                                "arguments": _createArgNode(args)
+                                name: blockName,
+                                arguments: _createArgNode(args)
                             };
                         } else {
                             throw {
@@ -303,14 +322,20 @@ class AST2BlockList {
             function _propertyOf(block) {
                 const block_name = Array.isArray(block[1]) ? block[1][0] : block[1];
                 for (const entry of config.body_blocks) {
-                    if (("name" in entry && entry.name === block_name) || ("name_map" in entry && Object.values(entry.name_map).includes(block_name))) {
+                    if (
+                        ("name" in entry && entry.name === block_name) ||
+                        ("name_map" in entry && Object.values(entry.name_map).includes(block_name))
+                    ) {
                         // Use default_connections if blocklist_connections is not specified
                         const connections = {
-                            count: entry.blocklist_connections ? entry.blocklist_connections.length : config.default_connections.length
+                            count: entry.blocklist_connections
+                                ? entry.blocklist_connections.length
+                                : config.default_connections.length
                         };
 
                         // Get the connections array to use
-                        const connectionsArray = entry.blocklist_connections || config.default_connections;
+                        const connectionsArray =
+                            entry.blocklist_connections || config.default_connections;
 
                         // Only add connection indices that exist
                         const prevIndex = connectionsArray.indexOf("parent_or_previous_sibling");
@@ -324,18 +349,21 @@ class AST2BlockList {
 
                         const secondChildIndex = connectionsArray.indexOf("second_child");
                         if (secondChildIndex !== -1) connections.second_child = secondChildIndex;
-                        
+
                         // Use default_vspaces if not specified in the block
-                        const vspaces = entry.default_vspaces || config.default_vspaces || { body: 1 };
-                        return "body" in vspaces ? {
-                            type: "block",
-                            connections: connections,
-                            vspaces: vspaces.body
-                        } : {
-                            type: "block",
-                            connections: connections,
-                            argument_v_spaces: vspaces.argument
-                        };
+                        const vspaces = entry.default_vspaces ||
+                            config.default_vspaces || { body: 1 };
+                        return "body" in vspaces
+                            ? {
+                                  type: "block",
+                                  connections: connections,
+                                  vspaces: vspaces.body
+                              }
+                            : {
+                                  type: "block",
+                                  connections: connections,
+                                  argument_v_spaces: vspaces.argument
+                              };
                     }
                 }
                 // doesn't match means it is a vspace block
@@ -370,12 +398,12 @@ class AST2BlockList {
              * For example, for a settimbre block, connection 0 is the parent or the previous sibling of the node,
              * connection 1 is the arguments of the node, connection 2 is the first child of the node, and connection 3
              * is the next sibling of the node.
-             * For a pitch block, connection 0 is the parent or the previous sibling of the node, connection 1 is the 
-             * first argument of the node - solfege, connection 2 is the second argument of the node - octave, and 
+             * For a pitch block, connection 0 is the parent or the previous sibling of the node, connection 1 is the
+             * first argument of the node - solfege, connection 2 is the second argument of the node - octave, and
              * connection 3 is the next sibling of the node.
              * For a number block (always as an argument), such as a divide block, connection 0 is the node that this
              * divide is its argument (e.g. a newnote block), connection 1 is numerator, and connection 2 is denominator.
-             * 
+             *
              * @param {Object} node - the tree node for which a new block is to be created
              * @param {Array} blockList - where the new block is going to be added to
              * @returns {Number} the number (index in blockList) of the newly created block
@@ -386,14 +414,14 @@ class AST2BlockList {
                 let blockNumber = blockList.length;
                 block.push(blockNumber);
                 blockList.push(block);
-                if ((typeof node.name) === "object") {
+                if (typeof node.name === "object") {
                     let blockName = Object.keys(node.name)[0];
-                    block.push([blockName, { "value": node.name[blockName] }]);
+                    block.push([blockName, { value: node.name[blockName] }]);
                 } else if (node.name !== "else") {
                     block.push(node.name);
                 }
-                block.push(0);  // x
-                block.push(0);  // y
+                block.push(0); // x
+                block.push(0); // y
 
                 let property = _propertyOf(block);
                 let connections = new Array(property.connections.count).fill(null);
@@ -401,18 +429,23 @@ class AST2BlockList {
 
                 // Process arguments
                 let argVSpaces = _createArgBlockAndAddToList(node, blockList, blockNumber);
-                let vspaces = Math.max(1, argVSpaces);  // A node takes at least 1 vertical space
+                let vspaces = Math.max(1, argVSpaces); // A node takes at least 1 vertical space
 
                 // Process children
                 if (node["children"] !== undefined && node["children"].length > 0) {
                     let elseIndex = node.children.findIndex(child => child.name === "else");
 
                     // Split children into if/else groups if applies (most cases first group will contain all children)
-                    let firstGroup = (elseIndex !== -1) ? node.children.slice(0, elseIndex) : node.children;
-                    let secondGroup = (elseIndex !== -1) ? node.children.slice(elseIndex + 1) : [];
+                    let firstGroup =
+                        elseIndex !== -1 ? node.children.slice(0, elseIndex) : node.children;
+                    let secondGroup = elseIndex !== -1 ? node.children.slice(elseIndex + 1) : [];
 
                     // Process first children group
-                    let ret = _processChildren(firstGroup, argVSpaces - property.argument_v_spaces, blockList);
+                    let ret = _processChildren(
+                        firstGroup,
+                        argVSpaces - property.argument_v_spaces,
+                        blockList
+                    );
                     vspaces += ret.vspaces;
 
                     // Set child-parent connection for first group
@@ -431,7 +464,8 @@ class AST2BlockList {
                         vspaces += ret.vspaces;
                         // Set child-parent connection for second group
                         if (property.connections.second_child !== undefined) {
-                            connections[property.connections.second_child] = ret.firstChildBlockNumber;
+                            connections[property.connections.second_child] =
+                                ret.firstChildBlockNumber;
                             let childBlock = blockList[ret.firstChildBlockNumber];
                             let childProperty = _propertyOf(childBlock);
                             if (childProperty.connections.prev !== undefined) {
@@ -441,7 +475,7 @@ class AST2BlockList {
                     }
                 }
 
-                return { "blockNumber": blockNumber, "vspaces": vspaces };
+                return { blockNumber: blockNumber, vspaces: vspaces };
             }
 
             // Helper to process a group of children (create and establish connections between them)
@@ -484,18 +518,18 @@ class AST2BlockList {
                         childBlock[4][property.connections.next] = childBlockNumbers[i + 1];
                     }
                 }
-                return { "firstChildBlockNumber": childBlockNumbers[0], "vspaces": vspaces };
+                return { firstChildBlockNumber: childBlockNumbers[0], vspaces: vspaces };
             }
 
             function _addVSpacer(blockList) {
-                let block = [];  // A block for the vertical spacer
+                let block = []; // A block for the vertical spacer
                 let blockNumber = blockList.length;
                 block.push(blockNumber);
                 blockList.push(block);
                 block.push("vspace");
-                block.push(0);  // x
-                block.push(0);  // y
-                block.push([null, null]);  // connections, prev and next
+                block.push(0); // x
+                block.push(0); // y
+                block.push([null, null]); // connections, prev and next
                 return blockNumber;
             }
 
@@ -538,16 +572,40 @@ class AST2BlockList {
                         // Handle pitch notes (solfege or note names)
                         const notes = new Set(["A", "B", "C", "D", "E", "F", "G"]);
                         vspaces += _addNthArgToBlockList(
-                            [notes.has(arg.charAt(0)) ? "notename" : "solfege", { "value": arg }],
-                            i + 1, blockList, parentBlockNumber);
+                            [notes.has(arg.charAt(0)) ? "notename" : "solfege", { value: arg }],
+                            i + 1,
+                            blockList,
+                            parentBlockNumber
+                        );
                     } else if (argConfig.type === "ValueExpression") {
                         // Handle value expressions (like storein2)
-                        vspaces += _addNthValueArgToBlockList(arg, i + 1, blockList, parentBlockNumber);
-                    } else if (argConfig.type === "NumberExpression" || argConfig.type === "BooleanExpression") {
+                        vspaces += _addNthValueArgToBlockList(
+                            arg,
+                            i + 1,
+                            blockList,
+                            parentBlockNumber
+                        );
+                    } else if (
+                        argConfig.type === "NumberExpression" ||
+                        argConfig.type === "BooleanExpression"
+                    ) {
                         // Handle number/boolean expressions
-                        vspaces += _addNthValueArgToBlockList(arg, i + 1, blockList, parentBlockNumber);
+                        vspaces += _addNthValueArgToBlockList(
+                            arg,
+                            i + 1,
+                            blockList,
+                            parentBlockNumber
+                        );
                     } else {
-                        vspaces += _addNthArgToBlockList([argConfig.type, { "value": typeof arg === "object" ? arg.identifier : arg }], i + 1, blockList, parentBlockNumber);
+                        vspaces += _addNthArgToBlockList(
+                            [
+                                argConfig.type,
+                                { value: typeof arg === "object" ? arg.identifier : arg }
+                            ],
+                            i + 1,
+                            blockList,
+                            parentBlockNumber
+                        );
                     }
                 }
                 return vspaces;
@@ -555,38 +613,38 @@ class AST2BlockList {
 
             // Add a new block to the blockList for the nth argument (1-indexed) of the parent block.
             function _addNthArgToBlockList(arg, nth, blockList, parentBlockNumber) {
-                let block = [];  // A block for the argument
+                let block = []; // A block for the argument
                 let blockNumber = blockList.length;
                 block.push(blockNumber);
                 blockList.push(block);
                 block.push(arg);
-                block.push(0);  // x
-                block.push(0);  // y
-                block.push([parentBlockNumber]);  // connections
+                block.push(0); // x
+                block.push(0); // y
+                block.push([parentBlockNumber]); // connections
                 let parentConnections = blockList[parentBlockNumber][4];
                 parentConnections[nth] = blockNumber;
-                return 1;  // vspaces
+                return 1; // vspaces
             }
 
             /**
              * Examples:
-             * 
+             *
              * args: [2] =>
              *   [5,["number",{"value":2}],0,0,[4]],
              *
-             * args: [{"name": "divide", 
+             * args: [{"name": "divide",
              *         "args": [1,4]}] =>
              *   [5,"divide",0,0,[4,6,7]],
              *   [6,["number",{"value":1}],0,0,[5]],
              *   [7,["number",{"value":4}],0,0,[5]]
              *
              * args: [{"name": "abs",
-             *         "args": [{"name": "neg", 
+             *         "args": [{"name": "neg",
              *                   "args": [1]}]}] =>
              *   [5,"abs",0,0,[4,6,7]],
              *   [6,["neg",0,0,[5,7]],
              *   [7,["number",{"value":1}],0,0,[6]]
-             * 
+             *
              * @param {Object} args - the args property of a tree node
              * @param {Array} blockList - the blockList to which the new argument blocks will be added
              * @param {Number} parentBlockNumber - the number of the parent block of the new argument blocks
@@ -594,7 +652,12 @@ class AST2BlockList {
             function _addValueArgsToBlockList(args, blockList, parentBlockNumber) {
                 let vspaces = 0;
                 for (let i = 0; i < args.length; i++) {
-                    vspaces += _addNthValueArgToBlockList(args[i], i + 1, blockList, parentBlockNumber);
+                    vspaces += _addNthValueArgToBlockList(
+                        args[i],
+                        i + 1,
+                        blockList,
+                        parentBlockNumber
+                    );
                 }
                 return vspaces;
             }
@@ -609,19 +672,27 @@ class AST2BlockList {
                 if (type === "string") {
                     type = "text";
                 }
-                if (type === "number" || type === "boolean" || type === "text" ||
-                    (type === "object" && arg.identifier !== undefined)) {
+                if (
+                    type === "number" ||
+                    type === "boolean" ||
+                    type === "text" ||
+                    (type === "object" && arg.identifier !== undefined)
+                ) {
                     // variables can be in number or boolean expressions
-                    block.push(type === "object" ? ["namedbox", { "value": arg.identifier }] : [type, { "value": arg }]);
-                    block.push(0);  // x
-                    block.push(0);  // y
+                    block.push(
+                        type === "object"
+                            ? ["namedbox", { value: arg.identifier }]
+                            : [type, { value: arg }]
+                    );
+                    block.push(0); // x
+                    block.push(0); // y
                     // Initialize connections with just the parent.
                     block.push([parentBlockNumber]);
                     vspaces = 1;
                 } else if (type === "object") {
                     block.push(arg.name);
-                    block.push(0);  // x
-                    block.push(0);  // y
+                    block.push(0); // x
+                    block.push(0); // y
                     let connections = new Array(1 + arg.arguments.length).fill(null);
                     connections[0] = parentBlockNumber;
                     block.push(connections);

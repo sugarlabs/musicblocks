@@ -43,7 +43,7 @@ class Arpeggio {
         // time) block is associated with a column. We need to keep
         // track of which intersections in the grid are populated.
         // These arrays get created each time the matrix is built.
-        this._blockMap = [];  // pairs storage
+        this._blockMap = []; // pairs storage
         this.defaultCols = Arpeggio.DEFAULTCOLS;
     }
 
@@ -64,14 +64,12 @@ class Arpeggio {
 
         // We use the mode number to highlight the scalar rows.
         this._modeNumbers = getModeNumbers(
-            keySignatureToMode(
-                this._activity.turtles.ithTurtle(0).singer.keySignature
-            )[1]
+            keySignatureToMode(this._activity.turtles.ithTurtle(0).singer.keySignature)[1]
         ).split(" ");
 
         this._playing = false;
         this._playList = [];
-        this._colBlocks = [];  // time steps
+        this._colBlocks = []; // time steps
         for (let i = 0; i < this.defaultCols; i++) {
             this._colBlocks.push(i + 1);
         }
@@ -84,11 +82,7 @@ class Arpeggio {
         widgetWindow.clear();
         widgetWindow.show();
 
-        this.playButton = widgetWindow.addButton(
-            "play-button.svg",
-            Arpeggio.ICONSIZE,
-            _("Play")
-        );
+        this.playButton = widgetWindow.addButton("play-button.svg", Arpeggio.ICONSIZE, _("Play"));
 
         this.playButton.onclick = () => {
             this._playing = !this._playing;
@@ -97,11 +91,7 @@ class Arpeggio {
         };
 
         this._save_lock = false;
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            Arpeggio.ICONSIZE,
-            _("Save")
-        ).onclick = () => {
+        widgetWindow.addButton("export-chunk.svg", Arpeggio.ICONSIZE, _("Save")).onclick = () => {
             // Debounce button
             if (!this._get_save_lock()) {
                 this._save_lock = true;
@@ -112,11 +102,7 @@ class Arpeggio {
             }
         };
 
-        widgetWindow.addButton(
-            "erase-button.svg",
-            Arpeggio.ICONSIZE,
-            _("Clear")
-        ).onclick = () => {
+        widgetWindow.addButton("erase-button.svg", Arpeggio.ICONSIZE, _("Clear")).onclick = () => {
             this._clear();
         };
 
@@ -170,8 +156,7 @@ class Arpeggio {
 
             arpeggioCell = arpeggioTableRow.insertCell();
             // Create tables to store individual notes.
-            arpeggioCell.innerHTML =
-                `<table cellpadding="0px" id="arpeggioCellTable${j}">
+            arpeggioCell.innerHTML = `<table cellpadding="0px" id="arpeggioCellTable${j}">
                     <tr></tr>
                 </table>`;
             arpeggioCellTable = docById("arpeggioCellTable" + j);
@@ -207,7 +192,8 @@ class Arpeggio {
 
         arpeggioCell = arpeggioTableRow.insertCell();
         // Create table to store arpeggio names.
-        arpeggioCell.innerHTML = '<table cellpadding="0px" id="arpeggioNoteTable"><tr></tr></table>';
+        arpeggioCell.innerHTML =
+            '<table cellpadding="0px" id="arpeggioNoteTable"><tr></tr></table>';
 
         // Add any arpeggio blocks here.
         for (let i = 0; i < this.defaultCols; i++) {
@@ -296,8 +282,7 @@ class Arpeggio {
      */
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
-        cell.innerHTML =
-            `&nbsp;&nbsp;<img 
+        cell.innerHTML = `&nbsp;&nbsp;<img 
                 src="header-icons/${icon}" 
                 title="${label}" 
                 alt="${label}" 
@@ -340,8 +325,7 @@ class Arpeggio {
      * @returns {boolean} true/false
      */
     _rowInMode(i) {
-        const ii = (this._rowLabels.length - i - 1) %
-              (this._rowLabels.length - 1);
+        const ii = (this._rowLabels.length - i - 1) % (this._rowLabels.length - 1);
         return this._inMode(ii);
     }
 
@@ -398,7 +382,7 @@ class Arpeggio {
         const arpeggioNoteTable = docById("arpeggioNoteTable");
         row = arpeggioNoteTable.rows[0];
         cell = row.insertCell();
-        cell.height = (Arpeggio.CELLSIZE + 1) + "px";
+        cell.height = Arpeggio.CELLSIZE + 1 + "px";
         cell.width = Arpeggio.CELLSIZE;
         cell.style.width = cell.width + "px";
         cell.style.minWidth = cell.style.width;
@@ -436,7 +420,7 @@ class Arpeggio {
                 // eslint-disable-next-line no-unused-vars
                 arpeggioCell = arpeggioRow.cells[j];
 
-                cell.onclick = (e) => {
+                cell.onclick = e => {
                     const currCell = e.target;
                     const rowcol = currCell.id.split(",");
                     if (currCell.style.backgroundColor === "black") {
@@ -502,7 +486,7 @@ class Arpeggio {
         const windowHeight =
             this.getWidgetFrame().offsetHeight - this.getDragElement().offsetHeight;
         const widgetBody = this.getWidgetBody();
-        const scale = this.isMaximized? windowHeight / widgetBody.offsetHeight: 1;
+        const scale = this.isMaximized ? windowHeight / widgetBody.offsetHeight : 1;
         widgetBody.style.display = "flex";
         widgetBody.style.flexDirection = "column";
         widgetBody.style.alignItems = "center";
@@ -527,8 +511,7 @@ class Arpeggio {
         // Play all of the arpeggio cells in the matrix.
         const icon = this.playButton;
         if (this._playing) {
-            icon.innerHTML =
-                `&nbsp;&nbsp;<img 
+            icon.innerHTML = `&nbsp;&nbsp;<img 
                     src="header-icons/stop-button.svg" 
                     title="${_("Stop")}" 
                     alt="${_("Stop")}" 
@@ -538,8 +521,7 @@ class Arpeggio {
                     align-content="center"
                 >&nbsp;&nbsp;`;
         } else {
-            icon.innerHTML =
-                `&nbsp;&nbsp;<img 
+            icon.innerHTML = `&nbsp;&nbsp;<img 
                     src="header-icons/play-button.svg" 
                     title="${_("Play")}" 
                     alt="${_("Play")}" 
@@ -565,15 +547,18 @@ class Arpeggio {
                 if (pairs[i][0] === -1) {
                     this._playList.push(["", noteValue]);
                 } else {
-                    this._playList.push([getNote(
-                        letter,
-                        octave,
-                        this._rowLabels.length - pairs[i][0] - 1,  // Transposition
-                        this._activity.turtles.ithTurtle(0).singer.keySignature,
-                        false,
-                        null,
-                        this._activity.errorMsg
-                    ), noteValue]);
+                    this._playList.push([
+                        getNote(
+                            letter,
+                            octave,
+                            this._rowLabels.length - pairs[i][0] - 1, // Transposition
+                            this._activity.turtles.ithTurtle(0).singer.keySignature,
+                            false,
+                            null,
+                            this._activity.errorMsg
+                        ),
+                        noteValue
+                    ]);
                 }
             }
         }
@@ -620,7 +605,8 @@ class Arpeggio {
             if (this._playList[i][0].length > 0) {
                 this._activity.logo.synth.trigger(
                     0,
-                    this._playList[i][0][0].replace(/♭/g, "b").replace(/♯/g, "#") + this._playList[i][0][1],
+                    this._playList[i][0][0].replace(/♭/g, "b").replace(/♯/g, "#") +
+                        this._playList[i][0][1],
                     this._playList[i][1],
                     "default",
                     null,
@@ -633,8 +619,7 @@ class Arpeggio {
             }, 2600 * this._playList[i][1]);
         } else {
             const icon = this.playButton;
-            icon.innerHTML =
-                `&nbsp;&nbsp;<img 
+            icon.innerHTML = `&nbsp;&nbsp;<img 
                     src="header-icons/play-button.svg" 
                     title="${_("Play")}" 
                     alt="${_("Play")}" 
@@ -697,16 +682,12 @@ class Arpeggio {
                 octave = 4;
             } else {
                 letter = this.notesToPlay[0][0].slice(0, -1);
-                octave = Number(
-                    this.notesToPlay[0][0].substr(
-                        this.notesToPlay[0][0].length - 1
-                    )
-                );
+                octave = Number(this.notesToPlay[0][0].substr(this.notesToPlay[0][0].length - 1));
             }
             const noteObj = getNote(
                 letter,
                 octave,
-                this._rowLabels.length - rowIndex - 1,  // Transposition
+                this._rowLabels.length - rowIndex - 1, // Transposition
                 this._activity.turtles.ithTurtle(0).singer.keySignature,
                 false,
                 null,
@@ -780,56 +761,62 @@ class Arpeggio {
      */
     _save() {
         // Saves the current matrix as a custom Chord
+        // Export format: [scalar, semitone] where scalar is the scale degree (0-based)
+        // and semitone is the chromatic offset from that scale degree
         const pairs = this.__makePairsList();
         const chordValues = [];
         for (let i = 0; i < pairs.length; i++) {
-            // TODO: export as (scalar, semitone)
             if (pairs[i][0] === -1) {
-                chordValues.push(["-", "-"]);  // rest
+                chordValues.push(["-", "-"]); // rest
             } else {
                 const ii = this._rowBlocks.length - pairs[i][0] - 1;
                 if (this._inMode(ii)) {
-                    chordValues.push([this._modeNumbers.indexOf(
-                        ii.toString()
-                    ), 0]);
+                    // Note is in the mode - export as (scalar, 0)
+                    const scalar = this._modeNumbers.indexOf(ii.toString());
+                    chordValues.push([scalar, 0]);
                 } else {
-                    if (pairs[i][0] === 0) { // top row -> octave
+                    // Note is not in the mode - find nearest lower scale degree
+                    // and calculate semitone offset
+                    if (pairs[i][0] === 0) {
+                        // top row -> octave
                         chordValues.push([this._modeNumbers.length, 0]);
                     } else {
-                        let j = 1;
-                        while(ii - j >= 0) {
-                            if (this._inMode(ii - j)) {
-                                chordValues.push([this._modeNumbers.indexOf(
-                                    (ii - j).toString()
-                                ), j]);
+                        let semitoneOffset = 1;
+                        while (ii - semitoneOffset >= 0) {
+                            if (this._inMode(ii - semitoneOffset)) {
+                                const scalar = this._modeNumbers.indexOf(
+                                    (ii - semitoneOffset).toString()
+                                );
+                                chordValues.push([scalar, semitoneOffset]);
                                 break;
                             }
-                            j += 1;
+                            semitoneOffset += 1;
                         }
                     }
                 }
             }
         }
 
-        // eslint-disable-next-line no-console
-        console.log(chordValues);
         setCustomChord(chordValues);
 
         // Also, save as an arpeggio block.
         const newStack = [
             [0, "arpeggio", 100, 100, [null, 1, 2, 11]],
-            [1, ["chordname",{"value": "custom"}], 0, 0, [0]],
-            [2, ["newnote", {"collapsed":false}], 0, 0, [0, 3, 6, 10]],
+            [1, ["chordname", { value: "custom" }], 0, 0, [0]],
+            [2, ["newnote", { collapsed: false }], 0, 0, [0, 3, 6, 10]],
             [3, "divide", 0, 0, [2, 4, 5]],
-            [4, ["number", {"value":1}], 0, 0, [3]],
-            [5, ["number", {"value":12}], 0, 0, [3]],
+            [4, ["number", { value: 1 }], 0, 0, [3]],
+            [5, ["number", { value: 12 }], 0, 0, [3]],
             [6, "vspace", 0, 0, [2, 7]],
             [7, "pitch", 0, 0, [6, 8, 9, null]],
-            [8, ["solfege", {"value": "do"}], 0, 0, [7]],
-            [9, ["number", {"value": 4}], 0, 0, [7]],
+            [8, ["solfege", { value: "do" }], 0, 0, [7]],
+            [9, ["number", { value: 4 }], 0, 0, [7]],
             [10, "hidden", 0, 0, [2, null]],
-            [11,"hidden", 0, 0, [0, null]]
+            [11, "hidden", 0, 0, [0, null]]
         ];
         this._activity.blocks.loadNewBlocks(newStack);
     }
+}
+if (typeof module !== "undefined") {
+    module.exports = Arpeggio;
 }

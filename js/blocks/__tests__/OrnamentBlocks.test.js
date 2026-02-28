@@ -62,18 +62,17 @@ describe("setupOrnamentBlocks", () => {
         }
     }
 
-    class DummyFlowClampBlock extends DummyValueBlock {
-    }
+    class DummyFlowClampBlock extends DummyValueBlock {}
 
     beforeEach(() => {
         createdBlocks = {};
 
-        global._ = jest.fn((str) => str);
+        global._ = jest.fn(str => str);
         global.ValueBlock = DummyValueBlock;
         global.FlowClampBlock = DummyFlowClampBlock;
         global.NOINPUTERRORMSG = "No input provided";
         global.NANERRORMSG = "Not a number";
-        global.last = (arr) => arr[arr.length - 1];
+        global.last = arr => arr[arr.length - 1];
 
         global.Singer = {
             OrnamentActions: {
@@ -118,7 +117,7 @@ describe("setupOrnamentBlocks", () => {
     });
 
     describe("StaccatoFactorBlock", () => {
-        it("should push \"staccato\" status when in status matrix", () => {
+        it('should push "staccato" status when in status matrix', () => {
             const blk = "blkSF1";
             activity.blocks.blockList[blk] = { connections: [10] };
             activity.blocks.blockList[10] = { name: "print" };
@@ -156,7 +155,7 @@ describe("setupOrnamentBlocks", () => {
     });
 
     describe("SlurFactorBlock", () => {
-        it("should push \"slur\" status when in status matrix", () => {
+        it('should push "slur" status when in status matrix', () => {
             const blk = "blkSLF1";
             activity.blocks.blockList[blk] = { connections: [20] };
             activity.blocks.blockList[20] = { name: "print" };
@@ -197,7 +196,12 @@ describe("setupOrnamentBlocks", () => {
         it("should call doNeighbor and return expected array", () => {
             const neighborBlock = createdBlocks["neighbor"];
             const result = neighborBlock.flow([2, 0.5, 99], logo, 0, "blkNeighbor");
-            expect(Singer.OrnamentActions.doNeighbor).toHaveBeenCalledWith(2, 0.5, 0, "blkNeighbor");
+            expect(Singer.OrnamentActions.doNeighbor).toHaveBeenCalledWith(
+                2,
+                0.5,
+                0,
+                "blkNeighbor"
+            );
             expect(result).toEqual([99, 1]);
         });
 
@@ -213,7 +217,12 @@ describe("setupOrnamentBlocks", () => {
         it("should inherit flow behavior from NeighborBlock", () => {
             const neighbor2Block = createdBlocks["neighbor2"];
             const result = neighbor2Block.flow([3, 0.25, 88], logo, 0, "blkNeighbor2");
-            expect(Singer.OrnamentActions.doNeighbor).toHaveBeenCalledWith(3, 0.25, 0, "blkNeighbor2");
+            expect(Singer.OrnamentActions.doNeighbor).toHaveBeenCalledWith(
+                3,
+                0.25,
+                0,
+                "blkNeighbor2"
+            );
             expect(result).toEqual([88, 1]);
         });
     });
@@ -306,7 +315,11 @@ describe("setupOrnamentBlocks", () => {
             const newStaccatoBlock = createdBlocks["newstaccato"];
             expect(newStaccatoBlock.hidden).toBe(false);
             newStaccatoBlock.flow([0.08, 12], logo, 0, "blkNewStaccato");
-            expect(Singer.OrnamentActions.setStaccato).toHaveBeenCalledWith(0.08, 0, "blkNewStaccato");
+            expect(Singer.OrnamentActions.setStaccato).toHaveBeenCalledWith(
+                0.08,
+                0,
+                "blkNewStaccato"
+            );
         });
     });
 });

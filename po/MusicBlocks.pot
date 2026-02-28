@@ -433,7 +433,7 @@ msgstr ""
 #: js/turtledefs.js:240
 #: planet/js/GlobalTag.js:48
 #.TRANS: On the Planet, we use labels to tag projects.
-msgid "Sensors"
+msgid "sensors"
 msgstr ""
 
 #: js/rubrics.js:532
@@ -442,7 +442,7 @@ msgstr ""
 #: js/blocks/MediaBlocks.js:914
 #: planet/js/GlobalTag.js:46
 #.TRANS: On the Planet, we use labels to tag projects.
-msgid "Media"
+msgid "media"
 msgstr ""
 
 #: js/rubrics.js:533
@@ -1011,7 +1011,7 @@ msgid "Expand/collapse option toolbar"
 msgstr ""
 
 #: js/turtledefs.js:588
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxiliary toolbar."
 msgstr ""
 
 #: js/turtledefs.js:593

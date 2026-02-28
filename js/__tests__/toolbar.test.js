@@ -37,32 +37,39 @@ global.window = {
     navigator: { language: "en-US" },
     document: {
         getElementById: jest.fn(() => ({ style: {} }))
-    }
+    },
+    getComputedStyle: jest.fn(() => ({ display: "block", visibility: "visible" }))
 };
 
 global.localStorage = window.localStorage;
 
 const Toolbar = require("../toolbar");
 
-global.document.getElementById = jest.fn((id) => ({
+const createMockElement = id => ({
     id,
     style: {},
     setAttribute: jest.fn(),
+    getAttribute: jest.fn(),
     innerHTML: "",
-    classList: { add: jest.fn() },
-    appendChild: jest.fn()
-}));
+    classList: {
+        add: jest.fn(),
+        remove: jest.fn(),
+        contains: jest.fn()
+    },
+    appendChild: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    querySelectorAll: jest.fn(() => []),
+    querySelector: jest.fn(() => null),
+    focus: jest.fn(),
+    click: jest.fn(),
+    getBoundingClientRect: jest.fn(() => ({ top: 0, left: 0, width: 10, height: 10 }))
+});
 
-global.docById = jest.fn((id) => ({
-    id,
-    setAttribute: jest.fn(),
-    innerHTML: "",
-    style: {},
-    classList: { add: jest.fn() },
-    appendChild: jest.fn()
-}));
+global.document.getElementById = jest.fn(createMockElement);
+global.docById = jest.fn(createMockElement);
 
-global._ = jest.fn((str) => str);
+global._ = jest.fn(str => str);
 
 global.$j = jest.fn(() => ({
     tooltip: jest.fn(),
@@ -95,14 +102,14 @@ describe("Toolbar Class", () => {
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ true", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = true;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(134);
+        expect(global._).toHaveBeenCalledTimes(135);
         expect(global._).toHaveBeenNthCalledWith(1, "About Music Blocks");
     });
 
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ false", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = false;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(116);
+        expect(global._).toHaveBeenCalledTimes(117);
         expect(global._).toHaveBeenNthCalledWith(1, "About Turtle Blocks");
     });
 
@@ -130,13 +137,16 @@ describe("Toolbar Class", () => {
             classList: { add: jest.fn() }
         };
 
-        global.docById.mockImplementation((id) => {
+        global.docById.mockImplementation(id => {
             if (id === "beginnerMode") return beginnerModeElem;
             if (id === "advancedMode") return advancedModeElem;
             return {
                 setAttribute: jest.fn(),
                 style: {},
-                classList: { add: jest.fn() }
+                classList: { add: jest.fn() },
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn(),
+                querySelectorAll: jest.fn(() => [])
             };
         });
 
@@ -179,7 +189,9 @@ describe("Toolbar Class", () => {
             }
         };
 
-        global.docById = jest.fn((id) => elements[id]);
+        global.docById = jest.fn(
+            id => elements[id] || { addEventListener: jest.fn(), querySelectorAll: jest.fn() }
+        );
         global.document = {
             body: {
                 style: {
@@ -228,14 +240,17 @@ describe("Toolbar Class", () => {
             },
             stop: {
                 style: { color: "" },
-                addEventListener: jest.fn()
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn()
             },
             record: {
                 className: ""
             }
         };
 
-        global.docById.mockImplementation((id) => elements[id] || {});
+        global.docById.mockImplementation(
+            id => elements[id] || { addEventListener: jest.fn(), querySelectorAll: jest.fn() }
+        );
 
         const mockActivity = {
             hideMsgs: jest.fn(),
@@ -253,6 +268,10 @@ describe("Toolbar Class", () => {
         expect(global.saveButtonAdvanced.disabled).toBe(true);
         expect(global.saveButton.className).toBe("grey-text inactiveLink");
         expect(elements.record.className).toBe("grey-text inactiveLink");
+        expect(elements.stop.removeEventListener).toHaveBeenCalledWith(
+            "click",
+            expect.any(Function)
+        );
         expect(elements.stop.addEventListener).toHaveBeenCalledWith("click", expect.any(Function));
 
         const stopClickHandler = elements.stop.addEventListener.mock.calls[0][1];
@@ -267,8 +286,12 @@ describe("Toolbar Class", () => {
         const stopIcon = { onclick: null, style: { color: "" } };
         const recordButton = { className: "recording" };
 
-        global.docById.mockImplementation((id) =>
-            id === "stop" ? stopIcon : id === "record" ? recordButton : {}
+        global.docById.mockImplementation(id =>
+            id === "stop"
+                ? stopIcon
+                : id === "record"
+                ? recordButton
+                : { addEventListener: jest.fn(), querySelectorAll: jest.fn() }
         );
 
         const mockOnClick = jest.fn();
@@ -288,16 +311,21 @@ describe("Toolbar Class", () => {
     test("renderNewProjectIcon displays modal and handles confirmation", () => {
         const elements = {
             "modal-container": {
-                style: { display: "" }
+                style: { display: "" },
+                setAttribute: jest.fn(),
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn()
             },
             "newdropdown": {
                 innerHTML: "",
                 appendChild: jest.fn()
             }
         };
-        global.docById = jest.fn((id) => elements[id]);
+        global.docById.mockImplementation(
+            id => elements[id] || { addEventListener: jest.fn(), querySelectorAll: jest.fn() }
+        );
         global.document = {
-            createElement: jest.fn((tagName) => ({
+            createElement: jest.fn(tagName => ({
                 tagName,
                 classList: { add: jest.fn() },
                 textContent: "",
@@ -306,7 +334,7 @@ describe("Toolbar Class", () => {
                 appendChild: jest.fn()
             }))
         };
-        global._ = jest.fn((str) => str);
+        global._ = jest.fn(str => str);
         const toolbar = new Toolbar();
         toolbar.activity = mockActivity;
 
@@ -356,7 +384,7 @@ describe("Toolbar Class", () => {
         toolbar.renderThemeSelectIcon(themeBox, themes);
         expect(themeSelectIcon.onclick).toBeInstanceOf(Function);
         themeSelectIcon.onclick();
-        themes.forEach((theme) => {
+        themes.forEach(theme => {
             if (theme === "light") {
                 expect(global.localStorage.themePreference).toBe("light");
             }
@@ -368,7 +396,8 @@ describe("Toolbar Class", () => {
             helpfulWheelItems: [
                 { label: "Turtle Wrap Off", display: false },
                 { label: "Turtle Wrap On", display: true }
-            ]
+            ],
+            textMsg: jest.fn()
         };
         toolbar.activity = mockActivity;
 
@@ -400,7 +429,8 @@ describe("Toolbar Class", () => {
             helpfulWheelItems: [
                 { label: "Turtle Wrap Off", display: false },
                 { label: "Turtle Wrap On", display: true }
-            ]
+            ],
+            textMsg: jest.fn()
         };
 
         const wrapIcon = {
@@ -410,12 +440,12 @@ describe("Toolbar Class", () => {
             style: { display: "block" }
         };
 
-        global._ = jest.fn((str) => str);
+        global._ = jest.fn(str => str);
         global.$j = jest.fn(() => ({
             tooltip: jest.fn()
         }));
         global.WRAP = false;
-        global.docById = jest.fn((id) => {
+        global.docById = jest.fn(id => {
             if (id === "wrapTurtle") return wrapIcon;
             if (id === "helpfulWheelDiv") return helpfulWheelDiv;
             return {};
@@ -451,7 +481,7 @@ describe("Toolbar Class", () => {
             "save-blockartwork-png": { onclick: null }
         };
 
-        global.docById = jest.fn((id) => elements[id] || { onclick: null });
+        global.docById = jest.fn(id => elements[id] || { onclick: null });
 
         const mockActivity = {
             beginnerMode: true,
@@ -566,7 +596,7 @@ describe("Toolbar Class", () => {
             }
         };
 
-        global.docById.mockImplementation((id) => elements[id] || {});
+        global.docById.mockImplementation(id => elements[id] || {});
 
         const mockOnClick = jest.fn();
         toolbar.activity = {};
@@ -611,7 +641,7 @@ describe("Toolbar Class", () => {
             }
         };
 
-        global.docById.mockImplementation((id) => elements[id] || {});
+        global.docById.mockImplementation(id => elements[id] || {});
 
         const mockOnClick = jest.fn();
         toolbar.activity = {};
@@ -646,7 +676,7 @@ describe("Toolbar Class", () => {
             style: { color: "" }
         };
 
-        global.docById.mockImplementation((id) => {
+        global.docById.mockImplementation(id => {
             if (id === "runSlowlyIcon") return runSlowlyIcon;
             if (id === "stop") return stopIcon;
             return {};
@@ -703,7 +733,7 @@ describe("Toolbar Class", () => {
             saveButtonAdvanced: { style: { display: "" } }
         };
 
-        global.docById = jest.fn((id) => elements[id]);
+        global.docById = jest.fn(id => elements[id]);
         global.localStorage = { setItem: jest.fn() };
         global.$j = jest.fn(() => ({
             tooltip: jest.fn(),
@@ -768,7 +798,7 @@ describe("Toolbar Class", () => {
             "delPluginIcon",
             "enableHorizScrollIcon",
             "toggleJavaScriptIcon"
-        ].forEach((iconId) => {
+        ].forEach(iconId => {
             expect(elements[iconId].style.display).toBe("none");
         });
 
@@ -811,7 +841,7 @@ describe("Toolbar Class", () => {
 
     test("renderRunStepIcon sets onclick and handles Japanese beginner mode", () => {
         const runStepByStepIcon = { onclick: null, style: { display: "" } };
-        global.docById.mockImplementation((id) =>
+        global.docById.mockImplementation(id =>
             id === "runStepByStepIcon" ? runStepByStepIcon : {}
         );
 
@@ -857,7 +887,7 @@ describe("Toolbar Class", () => {
     test("renderChooseKeyIcon sets onclick and toggles key selection visibility", () => {
         const chooseKeyIcon = { onclick: null };
         const chooseKeyDiv = { style: { display: "none" } };
-        global.docById.mockImplementation((id) => {
+        global.docById.mockImplementation(id => {
             if (id === "chooseKeyIcon") return chooseKeyIcon;
             if (id === "chooseKeyDiv") return chooseKeyDiv;
             return {};
@@ -884,8 +914,25 @@ describe("Toolbar Class", () => {
 
     test("renderLanguageSelectIcon sets onclick and updates language selection", () => {
         const languageSelectIcon = { onclick: null };
-        const languageBox = { setAttribute: jest.fn() };
-        global.docById.mockReturnValue(languageSelectIcon);
+        const languageBox = { enUS_onclick: jest.fn() };
+
+        // Mock elements for all language IDs with classList
+        const mockLangElement = {
+            onclick: null,
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn()
+            }
+        };
+
+        global.docById.mockImplementation(id => {
+            if (id === "languageSelectIcon") return languageSelectIcon;
+            // Return mock element with classList for any language ID
+            return mockLangElement;
+        });
+
+        global.localStorage.languagePreference = "enUS";
+
         toolbar.renderLanguageSelectIcon(languageBox);
         expect(languageSelectIcon.onclick).toBeInstanceOf(Function);
         languageSelectIcon.onclick();
@@ -908,7 +955,7 @@ describe("Toolbar Class", () => {
             "toggleAuxBtn": { className: "some-class blue darken-1" }
         };
 
-        global.docById.mockImplementation((id) => elements[id] || {});
+        global.docById.mockImplementation(id => elements[id] || {});
         const mockOnClick = jest.fn();
         toolbar.activity = {};
         toolbar.closeAuxToolbar(mockOnClick);

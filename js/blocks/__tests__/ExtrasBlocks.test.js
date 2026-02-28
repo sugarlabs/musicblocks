@@ -73,7 +73,7 @@ global.FlowBlock = class extends global.LeftBlock {};
 global.ValueBlock = class extends global.LeftBlock {};
 global.StackClampBlock = class extends global.LeftBlock {};
 
-global._ = jest.fn((str) => str);
+global._ = jest.fn(str => str);
 
 const { setupExtrasBlocks } = require("../ExtrasBlocks");
 
@@ -94,7 +94,7 @@ describe("ExtrasBlocks", () => {
                     _showSoprano: jest.fn(),
                     _showAlto: jest.fn(),
                     _showTenor: jest.fn(),
-                    _showBass: jest.fn(),
+                    _showBass: jest.fn()
                 }
             },
             turtles: {
@@ -104,9 +104,9 @@ describe("ExtrasBlocks", () => {
                         bpm: [120],
                         inNoteBlock: [],
                         turtleTime: 0,
-                        previousTurtleTime: 0,
+                        previousTurtleTime: 0
                     },
-                    doWait: jest.fn(),
+                    doWait: jest.fn()
                 })),
                 getTurtleCount: jest.fn(() => 1),
                 getTurtle: jest.fn(() => ({ inTrash: false, name: "turtle1" }))
@@ -114,10 +114,10 @@ describe("ExtrasBlocks", () => {
             save: {
                 afterSaveAbc: jest.fn(),
                 afterSaveLilypond: jest.fn(),
-                saveSVG: jest.fn(),
+                saveSVG: jest.fn()
             },
             errorMsg: jest.fn(),
-            textMsg: jest.fn(),
+            textMsg: jest.fn()
         };
 
         logo = {
@@ -132,7 +132,7 @@ describe("ExtrasBlocks", () => {
             turtleDelay: 0,
             runningLilypond: false,
             notation: { notationMarkup: jest.fn() },
-            phraseMaker: { lyricsON: false },
+            phraseMaker: { lyricsON: false }
         };
 
         turtle = 0;
@@ -147,55 +147,73 @@ describe("ExtrasBlocks", () => {
         };
 
         const blockNames = [
-            "FloatToStringBlock", "SaveABCBlock", "SaveLilypondBlock",
-            "SaveSVGBlock", "NoBackgroundBlock", "ShowBlocksBlock",
-            "HideBlocksBlock", "VSpaceBlock", "HSpaceBlock", "WaitBlock",
-            "CommentBlock", "PrintBlock", "DrumBlock", "GridBlock",
-            "NOPValueBlock", "NOPOneArgMathBlock", "NOPTwoArgMathBlock",
-            "NOPZeroArgBlock", "NOPOneArgBlock", "NOPTwoArgBlock",
-            "NOPThreeArgBlock", "NOPFourArgBlock", "DisplayGridBlock"
+            "FloatToStringBlock",
+            "SaveABCBlock",
+            "SaveLilypondBlock",
+            "SaveSVGBlock",
+            "NoBackgroundBlock",
+            "ShowBlocksBlock",
+            "HideBlocksBlock",
+            "VSpaceBlock",
+            "HSpaceBlock",
+            "WaitBlock",
+            "CommentBlock",
+            "PrintBlock",
+            "DrumBlock",
+            "GridBlock",
+            "NOPValueBlock",
+            "NOPOneArgMathBlock",
+            "NOPTwoArgMathBlock",
+            "NOPZeroArgBlock",
+            "NOPOneArgBlock",
+            "NOPTwoArgBlock",
+            "NOPThreeArgBlock",
+            "NOPFourArgBlock",
+            "DisplayGridBlock"
         ];
 
-        blockNames.forEach((name) => {
+        blockNames.forEach(name => {
             const blockInstance = new mockBlockClass();
-            
-            blockInstance.flow = jest.fn().mockImplementation(function (args = [], logo = {}, turtle) {
-                if (args.includes("test.abc")) {
-                    this.activity.save.afterSaveAbc("test.abc");
-                }
-                if (args.includes("test.ly")) {
-                    this.activity.save.afterSaveLilypond("test.ly");
-                }
-                if (args.includes("test.svg")) {
-                    this.activity.save.saveSVG("test.svg");
-                }
-                if (this instanceof this.activity.blocks.NoBackgroundBlock) {
-                    logo.svgBackground = false;
-                }
-                if (this instanceof this.activity.blocks.WaitBlock) {
-                    this.activity.turtles.ithTurtle(turtle);
-                }
-                if (this instanceof this.activity.blocks.ShowBlocksBlock) {
-                    this.activity.blocks.showBlocks();
-                }
-                if (this instanceof this.activity.blocks.HideBlocksBlock) {
-                    this.activity.blocks.hideBlocks();
-                }
-                if (this instanceof this.activity.blocks.CommentBlock) {
-                    this.activity.textMsg(args[0]);
-                }
-                if (this instanceof this.activity.blocks.PrintBlock) {
-                    this.activity.textMsg(args[0]);
-                }
-                if (this instanceof this.activity.blocks.DisplayGridBlock) {
-                    if (args[0] === "Cartesian") {
-                        this.activity.blocks.activity._showCartesian();
-                    } else if (args[0] === "polar") {
-                        this.activity.blocks.activity._showPolar();
+
+            blockInstance.flow = jest
+                .fn()
+                .mockImplementation(function (args = [], logo = {}, turtle) {
+                    if (args.includes("test.abc")) {
+                        this.activity.save.afterSaveAbc("test.abc");
                     }
-                }
-                return args;
-            });
+                    if (args.includes("test.ly")) {
+                        this.activity.save.afterSaveLilypond("test.ly");
+                    }
+                    if (args.includes("test.svg")) {
+                        this.activity.save.saveSVG("test.svg");
+                    }
+                    if (this instanceof this.activity.blocks.NoBackgroundBlock) {
+                        logo.svgBackground = false;
+                    }
+                    if (this instanceof this.activity.blocks.WaitBlock) {
+                        this.activity.turtles.ithTurtle(turtle);
+                    }
+                    if (this instanceof this.activity.blocks.ShowBlocksBlock) {
+                        this.activity.blocks.showBlocks();
+                    }
+                    if (this instanceof this.activity.blocks.HideBlocksBlock) {
+                        this.activity.blocks.hideBlocks();
+                    }
+                    if (this instanceof this.activity.blocks.CommentBlock) {
+                        this.activity.textMsg(args[0]);
+                    }
+                    if (this instanceof this.activity.blocks.PrintBlock) {
+                        this.activity.textMsg(args[0]);
+                    }
+                    if (this instanceof this.activity.blocks.DisplayGridBlock) {
+                        if (args[0] === "Cartesian") {
+                            this.activity.blocks.activity._showCartesian();
+                        } else if (args[0] === "polar") {
+                            this.activity.blocks.activity._showPolar();
+                        }
+                    }
+                    return args;
+                });
 
             blockInstance.arg = jest.fn().mockReturnValue("parsedArg");
 
@@ -274,10 +292,10 @@ describe("ExtrasBlocks", () => {
             new activity.blocks.NOPOneArgBlock(),
             new activity.blocks.NOPTwoArgBlock(),
             new activity.blocks.NOPThreeArgBlock(),
-            new activity.blocks.NOPFourArgBlock(),
+            new activity.blocks.NOPFourArgBlock()
         ];
 
-        nopBlocks.forEach((block) => {
+        nopBlocks.forEach(block => {
             expect(block).toBeDefined();
         });
     });

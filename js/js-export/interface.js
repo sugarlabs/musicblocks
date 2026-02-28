@@ -330,7 +330,7 @@ class JSInterface {
      */
     static rearrangeMethodArgs(methodName, args) {
         if (methodName in JSInterface._rearrangeArgsLookup) {
-            args = JSInterface._rearrangeArgsLookup[methodName].map((index) => args[index]);
+            args = JSInterface._rearrangeArgsLookup[methodName].map(index => args[index]);
         }
         return args;
     }
@@ -366,7 +366,7 @@ class JSInterface {
                 }
                 if (Array.isArray(props)) {
                     const error = `TypeMismatch error: expected one of "${props
-                        .map((prop) => prop["type"])
+                        .map(prop => prop["type"])
                         .toString()}" but found "${typeof arg}"`;
                     JSEditor.logConsole(error, "maroon");
                     throw error;
@@ -1805,8 +1805,12 @@ class JSInterface {
                 }
             ]
         ]
-    }
+    };
 }
 if (typeof module !== "undefined" && module.exports) {
     module.exports = JSInterface;
+}
+
+if (typeof window !== "undefined") {
+    window.JSInterface = JSInterface;
 }

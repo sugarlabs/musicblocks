@@ -15,16 +15,13 @@
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
    style=""
    id="svg376">
-  <rect
-     id="backgroundrect"
-     width="100%"
-     height="100%"
-     x="0"
-     y="0"
-     fill="none"
-     stroke="none"
-     class=""
-     style="" />
+   <!-- White background -->
+   <rect
+    x="0"
+    y="0"
+    width="100%"
+    height="100%"
+    fill="#ffffff" />
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"

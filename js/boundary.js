@@ -20,10 +20,9 @@
 
 /* exported Boundary */
 class Boundary {
-
     /**
      * @constructor
-     * @param {Object} stage 
+     * @param {Object} stage
      */
     constructor(stage) {
         this._container = new createjs.Container();
@@ -33,12 +32,12 @@ class Boundary {
     }
 
     // resizeEvent(scale) {};
-    
+
     /**
      * @public
-     * @param {number} w 
-     * @param {number} h 
-     * @param {number} scale 
+     * @param {number} w
+     * @param {number} h
+     * @param {number} scale
      * @returns {void}
      */
     setScale(w, h, scale) {
@@ -58,8 +57,8 @@ class Boundary {
 
     /**
      * @public
-     * @param {number} x 
-     * @param {number} y 
+     * @param {number} x
+     * @param {number} y
      * @returns {number}
      */
     offScreen(x, y) {
@@ -68,9 +67,9 @@ class Boundary {
 
     /**
      * @public
-     * @param {number} w 
-     * @param {number} h 
-     * @param {number} scale 
+     * @param {number} w
+     * @param {number} h
+     * @param {number} scale
      * @returns {void}
      */
     create(w, h, scale) {

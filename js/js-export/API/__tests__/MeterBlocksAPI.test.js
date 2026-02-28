@@ -18,7 +18,7 @@
  */
 
 const JSInterface = {
-    validateArgs: jest.fn(),
+    validateArgs: jest.fn()
 };
 global.JSInterface = JSInterface;
 const MeterBlocksAPI = require("../MeterBlocksAPI");
@@ -61,7 +61,12 @@ describe("MeterBlocksAPI", () => {
         JSInterface.validateArgs.mockReturnValue([action]);
         meterBlocksAPI.onEveryNoteDo(action);
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("onEveryNoteDo", [action]);
-        expect(meterBlocksAPI.runCommand).toHaveBeenCalledWith("onEveryNoteDo", [action, null, null, 1]);
+        expect(meterBlocksAPI.runCommand).toHaveBeenCalledWith("onEveryNoteDo", [
+            action,
+            null,
+            null,
+            1
+        ]);
     });
 
     test("onEveryBeatDo calls runCommand with validated arguments", () => {
@@ -69,7 +74,12 @@ describe("MeterBlocksAPI", () => {
         JSInterface.validateArgs.mockReturnValue([action]);
         meterBlocksAPI.onEveryBeatDo(action);
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("onEveryBeatDo", [action]);
-        expect(meterBlocksAPI.runCommand).toHaveBeenCalledWith("onEveryBeatDo", [action, null, null, 1]);
+        expect(meterBlocksAPI.runCommand).toHaveBeenCalledWith("onEveryBeatDo", [
+            action,
+            null,
+            null,
+            1
+        ]);
     });
 
     test("onStrongBeatDo calls runCommand with validated arguments", () => {
@@ -77,7 +87,13 @@ describe("MeterBlocksAPI", () => {
         JSInterface.validateArgs.mockReturnValue([2, action]);
         meterBlocksAPI.onStrongBeatDo(2, action);
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("onStrongBeatDo", [2, action]);
-        expect(meterBlocksAPI.runCommand).toHaveBeenCalledWith("onStrongBeatDo", [2, action, null, null, 1]);
+        expect(meterBlocksAPI.runCommand).toHaveBeenCalledWith("onStrongBeatDo", [
+            2,
+            action,
+            null,
+            null,
+            1
+        ]);
     });
 
     test("onWeakBeatDo calls runCommand with validated arguments", () => {
@@ -85,7 +101,12 @@ describe("MeterBlocksAPI", () => {
         JSInterface.validateArgs.mockReturnValue([action]);
         meterBlocksAPI.onWeakBeatDo(action);
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("onWeakBeatDo", [action]);
-        expect(meterBlocksAPI.runCommand).toHaveBeenCalledWith("onWeakBeatDo", [action, null, null, 1]);
+        expect(meterBlocksAPI.runCommand).toHaveBeenCalledWith("onWeakBeatDo", [
+            action,
+            null,
+            null,
+            1
+        ]);
     });
 
     test("setNoClock calls runCommand and awaits flow", async () => {

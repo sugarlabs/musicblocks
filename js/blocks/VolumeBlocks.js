@@ -462,7 +462,7 @@ function setupVolumeBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = (event) => {
+            const __listener = event => {
                 tur.singer.synthVolume[synth].pop();
                 // Restore previous volume
                 if (
@@ -752,7 +752,7 @@ function setupVolumeBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = (event) => {
+            const __listener = event => {
                 Singer.masterVolume.pop();
                 // Restore previous volume
                 if (tur.singer.justCounting.length === 0 && Singer.masterVolume.length > 0) {
@@ -840,9 +840,13 @@ function setupVolumeBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played.") +
+                _(
+                    "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
+                ) +
                     " " +
-                    _("For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."),
+                    _(
+                        "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
+                    ),
                 "documentation",
                 null,
                 "crescendohelp"
@@ -900,9 +904,13 @@ function setupVolumeBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Crescendo block will increase the volume of the contained notes by a specified amount for every note played.") +
+                _(
+                    "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
+                ) +
                     " " +
-                    _("For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."),
+                    _(
+                        "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
+                    ),
                 "documentation",
                 null,
                 "crescendohelp"

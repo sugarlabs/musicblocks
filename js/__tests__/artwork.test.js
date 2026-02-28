@@ -18,7 +18,15 @@
  */
 
 global._THIS_IS_TURTLE_BLOCKS_ = true;
-const { showMaterialHighlight, hideButtonHighlight, hidePaletteNameDisplay, COLLAPSEBUTTONXOFF, STANDARDBLOCKHEIGHT, FILLCOLORS, TURTLESVG } = require("../artwork");
+const {
+    showMaterialHighlight,
+    hideButtonHighlight,
+    hidePaletteNameDisplay,
+    COLLAPSEBUTTONXOFF,
+    STANDARDBLOCKHEIGHT,
+    FILLCOLORS,
+    TURTLESVG
+} = require("../artwork");
 
 global.createjs = {
     Shape: jest.fn(() => ({
@@ -59,7 +67,7 @@ describe("artwork.js Test Suite", () => {
         const circles = { highlight: {}, active: {} };
         hideButtonHighlight(circles, mockStage);
         jest.runAllTimers();
-        expect(mockStage.removeChild).toBeCalledWith(circles.active, circles.highlight);
+        expect(mockStage.removeChild).toHaveBeenCalledWith(circles.active, circles.highlight);
         jest.useRealTimers();
     });
 
@@ -68,7 +76,7 @@ describe("artwork.js Test Suite", () => {
         const paletteText = {};
         hidePaletteNameDisplay(paletteText, mockStage);
         jest.runAllTimers();
-        expect(mockStage.removeChild).toBeCalledWith(paletteText);
+        expect(mockStage.removeChild).toHaveBeenCalledWith(paletteText);
         jest.useRealTimers();
     });
 

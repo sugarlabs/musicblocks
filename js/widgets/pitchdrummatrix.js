@@ -33,11 +33,11 @@
 
 /**
  * Represents a PitchDrumMatrix widget for making a mapping between pitch and drum sounds.
- * 
+ *
  * @class
  * @memberof global
  * @requires Singer
- * @requires _ 
+ * @requires _
  * @requires docById
  * @requires platformColor
  * @exports PitchDrumMatrix
@@ -45,40 +45,40 @@
 class PitchDrumMatrix {
     /**
      * Width of the button division.
-     * 
+     *
      * @type {number}
      */
     static BUTTONDIVWIDTH = 295; // 5 buttons
 
     /**
      * Width of the drum name column.
-     * 
+     *
      * @type {number}
      */
     static DRUMNAMEWIDTH = 50;
 
     /**
      * Width of the outer window.
-     * 
+     *
      * @type {number}
      */
     static OUTERWINDOWWIDTH = 128;
 
     /**
      * Width of the inner window.
-     * 
+     *
      * @type {number}
      */
     static INNERWINDOWWIDTH = 50;
     /**
      * Size of the buttons.
-     * 
+     *
      * @type {number}
      */
     static BUTTONSIZE = 53;
     /**
      * Size of the icons.
-     * 
+     *
      * @type {number}
      */
     static ICONSIZE = 32;
@@ -106,39 +106,39 @@ class PitchDrumMatrix {
     }
 
     /**
-     * Initializes the pitch/drum matrix. 
-     * 
+     * Initializes the pitch/drum matrix.
+     *
      * @param {Activity} activity - The activity instance.
      */
     init(activity) {
         /**
          * The activity associated with the PitchDrumMatrix.
-         * 
+         *
          * @type {Activity}
          */
         this.activity = activity;
         const w = window.innerWidth;
         /**
          * The scale factor for cell sizes.
-         * 
+         *
          * @type {number}
          * @private
          */
         this._cellScale = w / 1200;
-        
+
         /**
          * The widget window for the PitchDrumMatrix.
-         * 
+         *
          * @type {WidgetWindow}
          */
         const widgetWindow = window.widgetWindows.windowFor(this, "pitch drum");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
-        
+
         /**
          * The button to play all sounds associated with the matrix.
-         * 
+         *
          * @type {HTMLButtonElement}
          */
         this.playButton = widgetWindow.addButton(
@@ -152,40 +152,34 @@ class PitchDrumMatrix {
             this.activity.logo.turtleDelay = 0;
             this._playAll();
         };
-        
+
         /**
          * Flag indicating whether saving operation is locked.
-         * 
+         *
          * @type {boolean}
          * @private
          */
         this._save_lock = false;
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            PitchDrumMatrix.ICONSIZE,
-            _("Save")
-        ).onclick = () => {
-            // Debounce button
-            if (!this._get_save_lock()) {
-                this._save_lock = true;
-                this._save();
-                setTimeout(() => {
-                    this._save_lock = false;
-                }, 1000);
-            }
-        };
+        widgetWindow.addButton("export-chunk.svg", PitchDrumMatrix.ICONSIZE, _("Save")).onclick =
+            () => {
+                // Debounce button
+                if (!this._get_save_lock()) {
+                    this._save_lock = true;
+                    this._save();
+                    setTimeout(() => {
+                        this._save_lock = false;
+                    }, 1000);
+                }
+            };
 
-        widgetWindow.addButton(
-            "erase-button.svg",
-            PitchDrumMatrix.ICONSIZE,
-            _("Clear")
-        ).onclick = () => {
-            this._clear();
-        };
-        
+        widgetWindow.addButton("erase-button.svg", PitchDrumMatrix.ICONSIZE, _("Clear")).onclick =
+            () => {
+                this._clear();
+            };
+
         /**
          * The container for the pitch/drum matrix.
-         * 
+         *
          * @type {HTMLDivElement}
          */
         this.pitchDrumDiv = document.createElement("div");
@@ -255,7 +249,7 @@ class PitchDrumMatrix {
             labelCell.style.left = "0";
             labelCell.style.top = "0";
             labelCell.style.zIndex = "5";
-           
+
             pdmCell = pdmTableRow.insertCell();
             // Create tables to store individual notes.
             pdmCell.innerHTML =
@@ -358,7 +352,7 @@ class PitchDrumMatrix {
 
     /**
      * Clears the row and column block arrays.
-     * 
+     *
      * @public
      * @returns {void}
      */
@@ -369,7 +363,7 @@ class PitchDrumMatrix {
 
     /**
      * Adds a pitch block to the row block array.
-     * 
+     *
      * @public
      * @param {number} pitchBlock - The pitch block to add.
      * @returns {void}
@@ -380,7 +374,7 @@ class PitchDrumMatrix {
 
     /**
      * Adds a drum block to the column block array.
-     * 
+     *
      * @public
      * @param {number} drumBlock - The drum block to add.
      * @returns {void}
@@ -391,7 +385,7 @@ class PitchDrumMatrix {
 
     /**
      * Adds a node (intersection) to the block map.
-     * 
+     *
      * @public
      * @param {number} pitchBlock - The pitch block index.
      * @param {number} drumBlock - The drum block index.
@@ -410,7 +404,7 @@ class PitchDrumMatrix {
 
     /**
      * Removes a node (intersection) from the block map.
-     * 
+     *
      * @public
      * @param {number} pitchBlock - The pitch block index.
      * @param {number} drumBlock - The drum block index.
@@ -428,7 +422,7 @@ class PitchDrumMatrix {
 
     /**
      * Returns the save lock element.
-     * 
+     *
      * @private
      * @returns {HTMLElement} - The save lock element.
      */
@@ -438,7 +432,7 @@ class PitchDrumMatrix {
 
     /**
      * [DEPRECATED] Adds a button to the matrix.
-     * 
+     *
      * @private
      * @deprecated This method is deprecated.
      * @param {HTMLTableRowElement} row - The table row to which the button will be added.
@@ -449,8 +443,7 @@ class PitchDrumMatrix {
      */
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
-        cell.innerHTML =
-            `&nbsp;&nbsp;<img 
+        cell.innerHTML = `&nbsp;&nbsp;<img 
                 src="header-icons/${icon}" 
                 title="${label}" 
                 alt="${label}" 
@@ -480,7 +473,7 @@ class PitchDrumMatrix {
 
     /**
      * Adds a drum to the matrix.
-     * 
+     *
      * @private
      * @param {number} drumIdx - The index of the drum to add.
      * @returns {void}
@@ -537,8 +530,7 @@ class PitchDrumMatrix {
             name = drumname;
         }
 
-        cell.innerHTML =
-            `&nbsp;&nbsp;<img 
+        cell.innerHTML = `&nbsp;&nbsp;<img 
                 src="${getDrumIcon(name)}" 
                 title="${name}" 
                 alt="${name}" 
@@ -551,7 +543,7 @@ class PitchDrumMatrix {
 
     /**
      * Makes the matrix clickable, enabling user interaction.
-     * 
+     *
      * @public
      * @returns {void}
      */
@@ -574,7 +566,7 @@ class PitchDrumMatrix {
                 // eslint-disable-next-line no-unused-vars
                 drumCell = drumRow.cells[j];
 
-                cell.onclick = (e) => {
+                cell.onclick = e => {
                     const currCell = e.target;
                     const rowcol = currCell.id.split(",");
                     if (currCell.style.backgroundColor === "black") {
@@ -627,7 +619,7 @@ class PitchDrumMatrix {
 
     /**
      * Handles the scaling of the widget.
-     * 
+     *
      * @private
      * @returns {void}
      */
@@ -635,7 +627,7 @@ class PitchDrumMatrix {
         const windowHeight =
             this.getWidgetFrame().offsetHeight - this.getDragElement().offsetHeight;
         const widgetBody = this.getWidgetBody();
-        const scale = this.isMaximized? windowHeight / widgetBody.offsetHeight: 1;
+        const scale = this.isMaximized ? windowHeight / widgetBody.offsetHeight : 1;
         widgetBody.style.display = "flex";
         widgetBody.style.flexDirection = "column";
         widgetBody.style.alignItems = "center";
@@ -654,7 +646,7 @@ class PitchDrumMatrix {
 
     /**
      * Handles playing all pitch/drum combinations in the matrix.
-     * 
+     *
      * @private
      * @returns {void}
      */
@@ -662,8 +654,7 @@ class PitchDrumMatrix {
         // Play all of the pitch/drum combinations in the matrix.
         const icon = this.playButton;
         if (this._playing) {
-            icon.innerHTML =
-                `&nbsp;&nbsp;<img 
+            icon.innerHTML = `&nbsp;&nbsp;<img 
                     src="header-icons/stop-button.svg" 
                     title="${_("Stop")}" 
                     alt="${_("Stop")}" 
@@ -673,8 +664,7 @@ class PitchDrumMatrix {
                     align-content="center"
                 >&nbsp;&nbsp;`;
         } else {
-            icon.innerHTML =
-                `&nbsp;&nbsp;<img 
+            icon.innerHTML = `&nbsp;&nbsp;<img 
                     src="header-icons/play-button.svg" 
                     title="${_("Play")}" 
                     alt="${_("Play")}" 
@@ -725,8 +715,7 @@ class PitchDrumMatrix {
             }
             setTimeout(() => {
                 this._playing = false;
-                icon.innerHTML =
-                    `&nbsp;&nbsp;<img 
+                icon.innerHTML = `&nbsp;&nbsp;<img 
                         src="header-icons/play-button.svg" 
                         title="${_("Play")}" 
                         alt="${_("Play")}" 
@@ -740,8 +729,7 @@ class PitchDrumMatrix {
             if (!this.widgetWindow._maximized) {
                 activity.textMsg(_("Click in the grid to map notes to drums."), 3000);
             }
-            icon.innerHTML =
-                `&nbsp;&nbsp;<img 
+            icon.innerHTML = `&nbsp;&nbsp;<img 
                     src="header-icons/play-button.svg" 
                     title="${_("Play")}" 
                     alt="${_("Play")}" 
@@ -755,7 +743,7 @@ class PitchDrumMatrix {
 
     /**
      * Plays the pitch and drum combination at the given index in the pairs array recursively.
-     * 
+     *
      * @private
      * @param {number} i - The index indicating which pair of pitch and drum to play.
      * @param {Array<Array<number>>} pairs - An array containing pairs of pitch and drum indices.
@@ -769,8 +757,7 @@ class PitchDrumMatrix {
                 pdmTable.rows[j].cells[0].style.backgroundColor = platformColor.labelColor;
             }
             const icon = this.playButton;
-            icon.innerHTML =
-                `&nbsp;&nbsp;<img 
+            icon.innerHTML = `&nbsp;&nbsp;<img 
                     src="header-icons/play-button.svg" 
                     title="${_("Play")}" 
                     alt="${_("Play")}" 
@@ -813,7 +800,7 @@ class PitchDrumMatrix {
 
     /**
      * Sets the pitch and drum combination for a specific cell in the matrix and plays the combination if specified.
-     * 
+     *
      * @private
      * @param {number} colIndex - The column index of the cell.
      * @param {number} rowIndex - The row index of the cell.
@@ -874,10 +861,10 @@ class PitchDrumMatrix {
             }
         }
     }
-    
+
     /**
      * Sets the pair of pitch and drum for a specific cell in the matrix and plays the combination if specified.
-     * 
+     *
      * @private
      * @param {number} rowIndex - The row index of the cell.
      * @param {number} colIndex - The column index of the cell.
@@ -926,7 +913,7 @@ class PitchDrumMatrix {
 
     /**
      * Clears all the selections in the matrix.
-     * 
+     *
      * @private
      * @returns {void}
      */
@@ -951,7 +938,7 @@ class PitchDrumMatrix {
 
     /**
      * Saves the current matrix as an action stack consisting of a set drum and pitch blocks.
-     * 
+     *
      * @private
      * @returns {void}
      */
@@ -1074,4 +1061,7 @@ class PitchDrumMatrix {
         // console.debug(newStack);
         this.activity.blocks.loadNewBlocks(newStack);
     }
+}
+if (typeof module !== "undefined") {
+    module.exports = PitchDrumMatrix;
 }

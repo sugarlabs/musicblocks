@@ -74,7 +74,7 @@ describe("setupVolumeBlocks", () => {
         createdBlocks = {};
 
         // Global dummy internationalization function.
-        global._ = jest.fn((str) => str);
+        global._ = jest.fn(str => str);
 
         // Dummy base classes.
         global.ValueBlock = DummyValueBlock;
@@ -84,7 +84,7 @@ describe("setupVolumeBlocks", () => {
 
         global.NOINPUTERRORMSG = "No input provided";
         global.NANERRORMSG = "Not a number";
-        global.last = (arr) => arr[arr.length - 1];
+        global.last = arr => arr[arr.length - 1];
 
         // Constants.
         global.DEFAULTVOLUME = 70;
@@ -186,10 +186,7 @@ describe("setupVolumeBlocks", () => {
             logo.parseArg.mockReturnValue("piano");
             const synthVolBlock = createdBlocks["synthvolumefactor"];
             const ret = synthVolBlock.arg(logo, turtleIndex, blk, "piano");
-            expect(Singer.VolumeActions.getSynthVolume).toHaveBeenCalledWith(
-                "piano",
-                turtleIndex
-            );
+            expect(Singer.VolumeActions.getSynthVolume).toHaveBeenCalledWith("piano", turtleIndex);
             expect(ret).toEqual(80);
         });
 
@@ -242,12 +239,7 @@ describe("setupVolumeBlocks", () => {
     describe("SetSynthVolume2Block", () => {
         it("should return undefined if third argument is undefined", () => {
             const setSynthVol2Block = createdBlocks["setsynthvolume2"];
-            const ret = setSynthVol2Block.flow(
-                ["piano", 80],
-                logo,
-                turtleIndex,
-                "blkSSV2"
-            );
+            const ret = setSynthVol2Block.flow(["piano", 80], logo, turtleIndex, "blkSSV2");
             expect(ret).toBeUndefined();
         });
 

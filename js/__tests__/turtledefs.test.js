@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-global._ = jest.fn((str) => str);
+global._ = jest.fn(str => str);
 global._THIS_IS_TURTLE_BLOCKS_ = true;
 const {
     createDefaultStack,
@@ -53,7 +53,9 @@ describe("turtledefs.js", () => {
     });
 
     test("GUIDEURL should default to the correct URL", () => {
-        expect(GUIDEURL).toBe("https://github.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md");
+        expect(GUIDEURL).toBe(
+            "https://github.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md"
+        );
     });
 
     test("TITLESTRING should be defined", () => {

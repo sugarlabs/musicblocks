@@ -18,7 +18,7 @@
  */
 
 const JSInterface = {
-    validateArgs: jest.fn(),
+    validateArgs: jest.fn()
 };
 global.JSInterface = JSInterface;
 const PitchBlocksAPI = require("../PitchBlocksAPI");
@@ -46,7 +46,13 @@ describe("PitchBlocksAPI", () => {
         pitchBlocksAPI.playPitch("C", 4);
 
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("playPitch", ["C", 4]);
-        expect(pitchBlocksAPI.runCommand).toHaveBeenCalledWith("playPitch", ["C", 4, 0, 1, MusicBlocks.BLK]);
+        expect(pitchBlocksAPI.runCommand).toHaveBeenCalledWith("playPitch", [
+            "C",
+            4,
+            0,
+            1,
+            MusicBlocks.BLK
+        ]);
     });
 
     test("stepPitch calls runCommand with validated arguments", () => {
@@ -64,7 +70,12 @@ describe("PitchBlocksAPI", () => {
         pitchBlocksAPI.playNthModalPitch(3, 5);
 
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("playNthModalPitch", [3, 5]);
-        expect(pitchBlocksAPI.runCommand).toHaveBeenCalledWith("playNthModalPitch", [3, 5, 1, MusicBlocks.BLK]);
+        expect(pitchBlocksAPI.runCommand).toHaveBeenCalledWith("playNthModalPitch", [
+            3,
+            5,
+            1,
+            MusicBlocks.BLK
+        ]);
     });
 
     test("playPitchNumber calls runCommand with validated arguments", () => {
@@ -73,7 +84,11 @@ describe("PitchBlocksAPI", () => {
         pitchBlocksAPI.playPitchNumber(7);
 
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("playPitchNumber", [7]);
-        expect(pitchBlocksAPI.runCommand).toHaveBeenCalledWith("playPitchNumber", [7, 1, MusicBlocks.BLK]);
+        expect(pitchBlocksAPI.runCommand).toHaveBeenCalledWith("playPitchNumber", [
+            7,
+            1,
+            MusicBlocks.BLK
+        ]);
     });
 
     test("playHertz calls runCommand with validated arguments", () => {
@@ -92,7 +107,11 @@ describe("PitchBlocksAPI", () => {
         const result = await pitchBlocksAPI.setAccidental("sharp", mockFlow);
 
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("setAccidental", ["sharp", mockFlow]);
-        expect(pitchBlocksAPI.runCommand).toHaveBeenCalledWith("setAccidental", ["sharp", 1, MusicBlocks.BLK]);
+        expect(pitchBlocksAPI.runCommand).toHaveBeenCalledWith("setAccidental", [
+            "sharp",
+            1,
+            MusicBlocks.BLK
+        ]);
         expect(mockFlow).toHaveBeenCalled();
         expect(result).toBe(pitchBlocksAPI.ENDFLOWCOMMAND);
     });
@@ -115,7 +134,10 @@ describe("PitchBlocksAPI", () => {
 
         const result = await pitchBlocksAPI.setSemitoneTranspose(1, mockFlow);
 
-        expect(JSInterface.validateArgs).toHaveBeenCalledWith("setSemitoneTranspose", [1, mockFlow]);
+        expect(JSInterface.validateArgs).toHaveBeenCalledWith("setSemitoneTranspose", [
+            1,
+            mockFlow
+        ]);
         expect(pitchBlocksAPI.runCommand).toHaveBeenCalledWith("setSemitoneTranspose", [1, 1]);
         expect(mockFlow).toHaveBeenCalled();
         expect(result).toBe(pitchBlocksAPI.ENDFLOWCOMMAND);
@@ -136,8 +158,18 @@ describe("PitchBlocksAPI", () => {
 
         const result = await pitchBlocksAPI.invert("inversionName", 4, "mode", mockFlow);
 
-        expect(JSInterface.validateArgs).toHaveBeenCalledWith("invert", ["inversionName", 4, "mode", mockFlow]);
-        expect(pitchBlocksAPI.runCommand).toHaveBeenCalledWith("invert", ["inversionName", 4, "mode", 1]);
+        expect(JSInterface.validateArgs).toHaveBeenCalledWith("invert", [
+            "inversionName",
+            4,
+            "mode",
+            mockFlow
+        ]);
+        expect(pitchBlocksAPI.runCommand).toHaveBeenCalledWith("invert", [
+            "inversionName",
+            4,
+            "mode",
+            1
+        ]);
         expect(mockFlow).toHaveBeenCalled();
         expect(result).toBe(pitchBlocksAPI.ENDFLOWCOMMAND);
     });

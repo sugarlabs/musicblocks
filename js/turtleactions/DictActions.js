@@ -202,7 +202,8 @@ function setupDictActions(activity) {
 
             return JSON.stringify(
                 dict in activity.logo.turtleDicts[turtle]
-                    ? activity.logo.turtleDicts[turtle][dict] : {}
+                    ? activity.logo.turtleDicts[turtle][dict]
+                    : {}
             );
         }
 
@@ -237,7 +238,6 @@ function setupDictActions(activity) {
             }
             activity.logo.turtleDicts[turtle][dict][key] = value;
             console.log(activity.logo.turtleDicts[turtle]);
-            
         }
 
         /**
@@ -251,12 +251,11 @@ function setupDictActions(activity) {
          * @returns {String|Number}
          */
         static getValue(dict, key, turtle, blk) {
-            if( ! (dict in activity.logo.turtleDicts[turtle]) ){
-                var msg=_("Dictionary with this name does not exist");
+            if (!(dict in activity.logo.turtleDicts[turtle])) {
+                const msg = _("Dictionary with this name does not exist");
                 return msg;
-            }
-            else if(! (key in activity.logo.turtleDicts[turtle][dict])){
-                var msg=_("Key with this name does not exist in ") + dict;
+            } else if (!(key in activity.logo.turtleDicts[turtle][dict])) {
+                const msg = _("Key with this name does not exist in ") + dict;
                 return msg;
             }
 

@@ -168,9 +168,7 @@ function setupGraphicsBlocks(activity) {
          * @returns {number} - The updated Y-coordinate value.
          */
         updateParameter(logo, turtle) {
-            return toFixed2(
-                activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).y
-            );
+            return toFixed2(activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).y);
         }
 
         /**
@@ -189,8 +187,7 @@ function setupGraphicsBlocks(activity) {
                 logo.statusFields.push([blk, "y"]);
             } else {
                 return activity.turtles.screenY2turtleY(
-                    activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).container
-                        .y
+                    activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).container.y
                 );
             }
         }
@@ -254,9 +251,7 @@ function setupGraphicsBlocks(activity) {
          * @returns {number} - The updated X-coordinate value.
          */
         updateParameter(logo, turtle) {
-            return toFixed2(
-                activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).x
-            );
+            return toFixed2(activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).x);
         }
 
         /**
@@ -275,8 +270,7 @@ function setupGraphicsBlocks(activity) {
                 logo.statusFields.push([blk, "x"]);
             } else {
                 return activity.turtles.screenX2turtleX(
-                    activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).container
-                        .x
+                    activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).container.x
                 );
             }
         }
@@ -337,7 +331,9 @@ function setupGraphicsBlocks(activity) {
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
-                    const requiredTurtle =  activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle));
+                    const requiredTurtle = activity.turtles.getTurtle(
+                        activity.turtles.companionTurtle(turtle)
+                    );
                     if (tur.singer.suppressOutput) {
                         const savedPenState = requiredTurtle.painter.penState;
                         requiredTurtle.painter.penState = false;
@@ -573,8 +569,30 @@ function setupGraphicsBlocks(activity) {
 
             // Set piemenu values for C1 and C2
             this.piemenuValuesC1 = [
-                15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180, 195, 210, 225, 240, 255, 270,
-                285, 300, 315, 330, 345, 360
+                15,
+                30,
+                45,
+                60,
+                75,
+                90,
+                105,
+                120,
+                135,
+                150,
+                165,
+                180,
+                195,
+                210,
+                225,
+                240,
+                255,
+                270,
+                285,
+                300,
+                315,
+                330,
+                345,
+                360
             ];
             this.piemenuValuesC2 = [25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300];
 
@@ -608,9 +626,15 @@ function setupGraphicsBlocks(activity) {
 
             if (args.length === 2) {
                 if ((args[1] > 5000 || args[1] < -5000) && (isWrap == false || isWrap == null)) {
-                    activity.errorMsg(_("Value must be within -5000 to 5000 when Wrap Mode is off."), blk);
+                    activity.errorMsg(
+                        _("Value must be within -5000 to 5000 when Wrap Mode is off."),
+                        blk
+                    );
                 } else if ((args[1] > 20000 || args[1] < -20000) && isWrap == true) {
-                    activity.errorMsg(_("Value must be within -20000 to 20000 when Wrap Mode is on."), blk);
+                    activity.errorMsg(
+                        _("Value must be within -20000 to 20000 when Wrap Mode is on."),
+                        blk
+                    );
                 } else {
                     if (typeof args[0] === "string" || typeof args[1] === "string") {
                         activity.errorMsg(NANERRORMSG, blk);
@@ -656,7 +680,22 @@ function setupGraphicsBlocks(activity) {
 
             // Set piemenu values for C1
             this.piemenuValuesC1 = [
-                0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330
+                0,
+                30,
+                45,
+                60,
+                90,
+                120,
+                135,
+                150,
+                180,
+                210,
+                225,
+                240,
+                270,
+                300,
+                315,
+                330
             ];
 
             // Set the help string for the Set Heading block
@@ -754,10 +793,22 @@ function setupGraphicsBlocks(activity) {
             const isWrap = activity.turtles.ithTurtle(turtle).painter.wrap;
 
             if (args.length === 2) {
-                if ((args[0] > 5000 || args[1] > 5000 || args[0] < -5000 || args[1] < -5000) && (isWrap == false || isWrap == null)) {
-                    activity.errorMsg(_("Value must be within -5000 to 5000 when Wrap Mode is off."), blk);
-                } else if ((args[0] > 20000 || args[1] > 20000 || args[0] < -20000 || args[1] < -20000) && isWrap == true) {
-                    activity.errorMsg(_("Value must be within -20000 to 20000 when Wrap Mode is on."), blk);
+                if (
+                    (args[0] > 5000 || args[1] > 5000 || args[0] < -5000 || args[1] < -5000) &&
+                    (isWrap == false || isWrap == null)
+                ) {
+                    activity.errorMsg(
+                        _("Value must be within -5000 to 5000 when Wrap Mode is off."),
+                        blk
+                    );
+                } else if (
+                    (args[0] > 20000 || args[1] > 20000 || args[0] < -20000 || args[1] < -20000) &&
+                    isWrap == true
+                ) {
+                    activity.errorMsg(
+                        _("Value must be within -20000 to 20000 when Wrap Mode is on."),
+                        blk
+                    );
                 } else {
                     if (typeof args[0] === "string" || typeof args[1] === "string") {
                         activity.errorMsg(NANERRORMSG, blk);
@@ -997,10 +1048,16 @@ function setupGraphicsBlocks(activity) {
             const isWrap = activity.turtles.ithTurtle(turtle).painter.wrap;
 
             if (args.length === 1) {
-                if ((args[0] > 5000 || args[0] < -5000) && (isWrap ==  false || isWrap == null)) {
-                    activity.errorMsg(_("Value must be within -5000 to 5000 when Wrap Mode is off."), blk);
-                } else if ((args[0] > 20000 || args[0] < -20000) && isWrap ==  true) {
-                    activity.errorMsg(_("Value must be within -20000 to 20000 when Wrap Mode is on."), blk);
+                if ((args[0] > 5000 || args[0] < -5000) && (isWrap == false || isWrap == null)) {
+                    activity.errorMsg(
+                        _("Value must be within -5000 to 5000 when Wrap Mode is off."),
+                        blk
+                    );
+                } else if ((args[0] > 20000 || args[0] < -20000) && isWrap == true) {
+                    activity.errorMsg(
+                        _("Value must be within -20000 to 20000 when Wrap Mode is on."),
+                        blk
+                    );
                 } else {
                     if (typeof args[0] === "string") {
                         activity.errorMsg(NANERRORMSG, blk);
@@ -1080,10 +1137,16 @@ function setupGraphicsBlocks(activity) {
             const isWrap = activity.turtles.ithTurtle(turtle).painter.wrap;
 
             if (args.length === 1) {
-                if ((args[0] > 5000 || args[0] < -5000) && (isWrap ==  false || isWrap == null)) {
-                    activity.errorMsg(_("Value must be within -5000 to 5000 when Wrap Mode is off."), blk);
-                } else if ((args[0] > 20000 || args[0] < -20000) && isWrap ==  true) {
-                    activity.errorMsg(_("Value must be within -20000 to 20000 when Wrap Mode is on."), blk);
+                if ((args[0] > 5000 || args[0] < -5000) && (isWrap == false || isWrap == null)) {
+                    activity.errorMsg(
+                        _("Value must be within -5000 to 5000 when Wrap Mode is off."),
+                        blk
+                    );
+                } else if ((args[0] > 20000 || args[0] < -20000) && isWrap == true) {
+                    activity.errorMsg(
+                        _("Value must be within -20000 to 20000 when Wrap Mode is on."),
+                        blk
+                    );
                 } else {
                     if (typeof args[0] === "string") {
                         activity.errorMsg(NANERRORMSG, blk);
@@ -1150,7 +1213,9 @@ function setupGraphicsBlocks(activity) {
 
             // Set the help string for the Wrap block
             this.setHelpString([
-                _("The Wrap block enables or disables screen wrapping for the graphics actions within it."),
+                _(
+                    "The Wrap block enables or disables screen wrapping for the graphics actions within it."
+                ),
                 "documentation",
                 null,
                 "wraphelp"
@@ -1221,4 +1286,7 @@ function setupGraphicsBlocks(activity) {
     new MLeftBlock().setup(activity);
     new BackBlock().setup(activity);
     new ForwardBlock().setup(activity);
+}
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupGraphicsBlocks };
 }

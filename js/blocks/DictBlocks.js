@@ -59,7 +59,9 @@ function setupDictBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Show-dictionary block displays the contents of the dictionary at the top of the screen."),
+                _(
+                    "The Show-dictionary block displays the contents of the dictionary at the top of the screen."
+                ),
                 "documentation",
                 ""
             ]);

@@ -29,7 +29,7 @@ describe("setupDictActions", () => {
             DictActions: {}
         };
 
-        global._ = jest.fn((key) => key);
+        global._ = jest.fn(key => key);
         global.Singer = {
             RhythmActions: {
                 getNoteValue: jest.fn().mockReturnValue(4)
@@ -46,7 +46,7 @@ describe("setupDictActions", () => {
             turtles: {
                 ithTurtle: jest.fn(),
                 screenX2turtleX: jest.fn(),
-                screenY2turtleY: jest.fn(),
+                screenY2turtleY: jest.fn()
             },
             logo: {
                 turtleDicts: {},
@@ -93,15 +93,15 @@ describe("setupDictActions", () => {
                 pitchNumberOffset: 0
             }
         };
-        
+
         activity.turtles.ithTurtle.mockReturnValue(targetTurtle);
         activity.turtles.screenX2turtleX.mockReturnValue(100);
         activity.turtles.screenY2turtleY.mockReturnValue(200);
-        
+
         global.getTargetTurtle.mockImplementation((turtles, name) => {
             return name === "target" ? 0 : null;
         });
-        
+
         setupDictActions(activity);
         activity.logo.turtleDicts[turtle] = {};
     });
@@ -121,31 +121,31 @@ describe("setupDictActions", () => {
         test.each(simpleGetTests)("should get %s correctly", (key, expected) => {
             expect(Turtle.DictActions._GetDict(0, turtle, key)).toBe(expected);
         });
-        
+
         it("should get the note value correctly", () => {
             const noteValue = Turtle.DictActions._GetDict(0, turtle, "note value");
             expect(noteValue).toBe(4);
             expect(Singer.RhythmActions.getNoteValue).toHaveBeenCalledWith(0);
         });
-        
+
         it("should get the current pitch correctly", () => {
             const currentPitch = Turtle.DictActions._GetDict(0, turtle, "current pitch");
             expect(currentPitch).toBe("C4");
         });
-        
+
         it("should get the pitch number correctly with lastNotePlayed", () => {
             const pitchNumber = Turtle.DictActions._GetDict(0, turtle, "pitch number");
             expect(pitchNumber).toBe(60);
             expect(pitchToNumber).toHaveBeenCalledWith("C", 4, "C");
         });
-        
+
         it("should get the pitch number correctly using notePitches when lastNotePlayed is null", () => {
             targetTurtle.singer.lastNotePlayed = null;
             const pitchNumber = Turtle.DictActions._GetDict(0, turtle, "pitch number", 1);
             expect(pitchNumber).toBe(60);
             expect(getNote).toHaveBeenCalled();
         });
-        
+
         it("should handle error when getting pitch number with no notes", () => {
             targetTurtle.singer.lastNotePlayed = null;
             targetTurtle.singer.notePitches = [];
@@ -192,11 +192,11 @@ describe("setupDictActions", () => {
             });
             expect(serialized).toBe(expected);
         });
-        
+
         it("should include additional properties from turtleDicts", () => {
             activity.logo.turtleDicts[turtle] = {
                 0: {
-                    "custom": "value"
+                    custom: "value"
                 }
             };
             const serialized = Turtle.DictActions.SerializeDict(0, turtle);
@@ -221,21 +221,21 @@ describe("setupDictActions", () => {
             const expected = Turtle.DictActions.SerializeDict(0, turtle);
             expect(result).toBe(expected);
         });
-        
+
         it("should return empty object JSON when dict does not exist", () => {
             activity.logo.turtleDicts[turtle] = {};
             const result = Turtle.DictActions.getDict("nonexistent", turtle);
             expect(result).toBe("{}");
         });
-        
+
         it("should return dictionary JSON when dict exists", () => {
             activity.logo.turtleDicts[turtle] = {
-                "testDict": { "key": "value" }
+                testDict: { key: "value" }
             };
             const result = Turtle.DictActions.getDict("testDict", turtle);
-            expect(result).toBe(JSON.stringify({ "key": "value" }));
+            expect(result).toBe(JSON.stringify({ key: "value" }));
         });
-        
+
         it("should initialize turtleDicts when it doesn't exist for the turtle", () => {
             delete activity.logo.turtleDicts[turtle];
             const result = Turtle.DictActions.getDict("nonexistent", turtle);
@@ -247,12 +247,12 @@ describe("setupDictActions", () => {
     describe("showDict", () => {
         it("should display the dictionary contents", () => {
             activity.logo.turtleDicts[turtle] = {
-                "testDict": { "key": "value" }
+                testDict: { key: "value" }
             };
             Turtle.DictActions.showDict("testDict", turtle);
-            expect(activity.textMsg).toHaveBeenCalledWith(JSON.stringify({ "key": "value" }));
+            expect(activity.textMsg).toHaveBeenCalledWith(JSON.stringify({ key: "value" }));
         });
-        
+
         it("should display turtle information when dict is a turtle name", () => {
             const expected = Turtle.DictActions.SerializeDict(0, turtle);
             Turtle.DictActions.showDict("target", turtle);
@@ -273,19 +273,19 @@ describe("setupDictActions", () => {
             Turtle.DictActions.setValue("customDict", "color", "green", turtle);
             expect(activity.logo.turtleDicts[turtle].customDict.color).toBe("green");
         });
-        
+
         it("should create a new dictionary if it doesn't exist", () => {
             activity.logo.turtleDicts[turtle] = {};
             Turtle.DictActions.setValue("newDict", "key", "value", turtle);
             expect(activity.logo.turtleDicts[turtle].newDict.key).toBe("value");
         });
-        
+
         it("should create a new turtleDicts entry if it doesn't exist", () => {
             delete activity.logo.turtleDicts[turtle];
             Turtle.DictActions.setValue("newDict", "key", "value", turtle);
             expect(activity.logo.turtleDicts[turtle].newDict.key).toBe("value");
         });
-        
+
         it("should log to console when setting a value", () => {
             console.log = jest.fn();
             activity.logo.turtleDicts[turtle] = {};
@@ -297,21 +297,21 @@ describe("setupDictActions", () => {
     describe("getValue", () => {
         it("should return value from the dictionary", () => {
             activity.logo.turtleDicts[turtle] = {
-                "testDict": { "key": "value" }
+                testDict: { key: "value" }
             };
             const value = Turtle.DictActions.getValue("testDict", "key", turtle);
             expect(value).toBe("value");
         });
-        
+
         it("should return error message if dictionary does not exist", () => {
             activity.logo.turtleDicts[turtle] = {};
             const result = Turtle.DictActions.getValue("nonexistentDict", "key", turtle);
             expect(result).toBe("Dictionary with this name does not exist");
         });
-        
+
         it("should return error message if key does not exist in dictionary", () => {
             activity.logo.turtleDicts[turtle] = {
-                "testDict": { "existingKey": "value" }
+                testDict: { existingKey: "value" }
             };
             const result = Turtle.DictActions.getValue("testDict", "nonexistentKey", turtle);
             expect(result).toBe("Key with this name does not exist in testDict");

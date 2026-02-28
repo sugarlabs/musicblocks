@@ -24,7 +24,7 @@
 
 /* exported getMunsellColor, getcolor, searchColors, COLORS40 */
 
-/** 
+/**
  * Array containing 40 high-chroma colors, each represented as [value, chroma, RGB].
  * @type {Array}
  */
@@ -6731,7 +6731,7 @@ const MUNSELL = [
  * @param {number} p - The interpolation parameter (between 0 and 1).
  * @returns {string} The interpolated hex color value.
  */
-const interpColor = (hex1, hex2, p)  => {
+const interpColor = (hex1, hex2, p) => {
     if (hex1 === undefined && hex2 === undefined) {
         null;
     } else if (hex1 === undefined) {
@@ -6813,7 +6813,7 @@ let getMunsellColor = (hue, value, chroma) => {
  * @param {number} color - The color value ranging from 0 to 100.
  * @returns {Array} An array containing value, chroma, and RGB components of the color.
  */
-let getcolor = (color) => {
+let getcolor = color => {
     let h1 = Math.floor(color / 2.5);
     let h2 = h1 + 1;
     const p = h2 - color / 2.5;
@@ -6830,7 +6830,7 @@ let getcolor = (color) => {
 
     const v = Math.floor(COLORS40[h1][0] * p + COLORS40[h2][0] * (1 - p));
     const c = Math.floor(COLORS40[h1][1] * p + COLORS40[h2][1] * (1 - p));
-    return [v * 10, c * 100 / 28, interpColor(COLORS40[h1][2], COLORS40[h2][2], p)];
+    return [v * 10, (c * 100) / 28, interpColor(COLORS40[h1][2], COLORS40[h2][2], p)];
 };
 
 /**
@@ -6859,7 +6859,7 @@ let searchColors = (r, g, b) => {
     return nearestColor;
 };
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = {interpColor, getMunsellColor, getcolor, searchColors};
+    module.exports = { interpColor, getMunsellColor, getcolor, searchColors };
 }
 // /**
 //  * @deprecated

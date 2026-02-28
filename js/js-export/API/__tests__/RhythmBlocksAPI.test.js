@@ -18,7 +18,7 @@
  */
 
 const JSInterface = {
-    validateArgs: jest.fn(),
+    validateArgs: jest.fn()
 };
 global.JSInterface = JSInterface;
 
@@ -45,11 +45,16 @@ describe("RhythmBlocksAPI", () => {
     test("playNote calls runCommand with correct arguments", async () => {
         const mockFlow = jest.fn();
         JSInterface.validateArgs.mockReturnValue([100, mockFlow]);
-        
+
         const result = await rhythmBlocksAPI.playNote(100, mockFlow);
-        
+
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("playNote", [100, mockFlow]);
-        expect(rhythmBlocksAPI.runCommand).toHaveBeenCalledWith("playNote", [100, "newnote", 0, "mockBLK"]);
+        expect(rhythmBlocksAPI.runCommand).toHaveBeenCalledWith("playNote", [
+            100,
+            "newnote",
+            0,
+            "mockBLK"
+        ]);
         expect(mockFlow).toHaveBeenCalled();
         expect(result).toBe("END");
     });
@@ -57,27 +62,32 @@ describe("RhythmBlocksAPI", () => {
     test("playNoteMillis calls runCommand with correct arguments", async () => {
         const mockFlow = jest.fn();
         JSInterface.validateArgs.mockReturnValue([1000, mockFlow]);
-        
+
         const result = await rhythmBlocksAPI.playNoteMillis(1000, mockFlow);
-        
+
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("playNoteMillis", [1000, mockFlow]);
-        expect(rhythmBlocksAPI.runCommand).toHaveBeenCalledWith("playNote", [1000, "osctime", 0, "mockBLK"]);
+        expect(rhythmBlocksAPI.runCommand).toHaveBeenCalledWith("playNote", [
+            1000,
+            "osctime",
+            0,
+            "mockBLK"
+        ]);
         expect(mockFlow).toHaveBeenCalled();
         expect(result).toBe("END");
     });
 
     test("playRest calls runCommand with correct arguments", () => {
         rhythmBlocksAPI.playRest();
-        
+
         expect(rhythmBlocksAPI.runCommand).toHaveBeenCalledWith("playRest", [0]);
     });
 
     test("dot calls runCommand with correct arguments", async () => {
         const mockFlow = jest.fn();
         JSInterface.validateArgs.mockReturnValue([1, mockFlow]);
-        
+
         const result = await rhythmBlocksAPI.dot(1, mockFlow);
-        
+
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("dot", [1, mockFlow]);
         expect(rhythmBlocksAPI.runCommand).toHaveBeenCalledWith("doRhythmicDot", [1, 0]);
         expect(mockFlow).toHaveBeenCalled();
@@ -86,10 +96,10 @@ describe("RhythmBlocksAPI", () => {
 
     test("tie calls runCommand with correct arguments", async () => {
         const mockFlow = jest.fn();
-        JSInterface.validateArgs.mockReturnValue([undefined, mockFlow]);  // Changed to match implementation
-        
+        JSInterface.validateArgs.mockReturnValue([undefined, mockFlow]); // Changed to match implementation
+
         const result = await rhythmBlocksAPI.tie(mockFlow);
-        
+
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("tie", [mockFlow]);
         expect(rhythmBlocksAPI.runCommand).toHaveBeenCalledWith("doTie", [0]);
         expect(mockFlow).toHaveBeenCalled();
@@ -99,9 +109,9 @@ describe("RhythmBlocksAPI", () => {
     test("multiplyNoteValue calls runCommand with correct arguments", async () => {
         const mockFlow = jest.fn();
         JSInterface.validateArgs.mockReturnValue([2, mockFlow]);
-        
+
         const result = await rhythmBlocksAPI.multiplyNoteValue(2, mockFlow);
-        
+
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("multiplyNoteValue", [2, mockFlow]);
         expect(rhythmBlocksAPI.runCommand).toHaveBeenCalledWith("multiplyNoteValue", [2, 0]);
         expect(mockFlow).toHaveBeenCalled();
@@ -111,10 +121,14 @@ describe("RhythmBlocksAPI", () => {
     test("swing calls runCommand with correct arguments", async () => {
         const mockFlow = jest.fn();
         JSInterface.validateArgs.mockReturnValue([1, 4, mockFlow]);
-        
+
         const result = await rhythmBlocksAPI.swing(1, 4, mockFlow);
-        
-        expect(JSInterface.validateArgs).toHaveBeenCalledWith("multiplyNoteValue", [1, 4, mockFlow]);  // Keep original validation method
+
+        expect(JSInterface.validateArgs).toHaveBeenCalledWith("multiplyNoteValue", [
+            1,
+            4,
+            mockFlow
+        ]); // Keep original validation method
         expect(rhythmBlocksAPI.runCommand).toHaveBeenCalledWith("addSwing", [1, 4, 0]);
         expect(mockFlow).toHaveBeenCalled();
         expect(result).toBe("END");
@@ -135,14 +149,18 @@ describe("RhythmBlocksAPI", () => {
 
     test("methods handle command execution errors correctly", async () => {
         JSInterface.validateArgs.mockReturnValue([1, jest.fn()]);
-        rhythmBlocksAPI.runCommand.mockRejectedValue(new Error("Command failed"));  // Changed to handle async rejection
+        rhythmBlocksAPI.runCommand.mockRejectedValue(new Error("Command failed")); // Changed to handle async rejection
 
         await expect(rhythmBlocksAPI.playNote(1, jest.fn())).rejects.toThrow("Command failed");
-        await expect(rhythmBlocksAPI.playNoteMillis(1, jest.fn())).rejects.toThrow("Command failed");
-        await expect(rhythmBlocksAPI.playRest()).rejects.toThrow("Command failed");  // Added await
+        await expect(rhythmBlocksAPI.playNoteMillis(1, jest.fn())).rejects.toThrow(
+            "Command failed"
+        );
+        await expect(rhythmBlocksAPI.playRest()).rejects.toThrow("Command failed"); // Added await
         await expect(rhythmBlocksAPI.dot(1, jest.fn())).rejects.toThrow("Command failed");
         await expect(rhythmBlocksAPI.tie(jest.fn())).rejects.toThrow("Command failed");
-        await expect(rhythmBlocksAPI.multiplyNoteValue(2, jest.fn())).rejects.toThrow("Command failed");
+        await expect(rhythmBlocksAPI.multiplyNoteValue(2, jest.fn())).rejects.toThrow(
+            "Command failed"
+        );
         await expect(rhythmBlocksAPI.swing(1, 4, jest.fn())).rejects.toThrow("Command failed");
     });
 });
