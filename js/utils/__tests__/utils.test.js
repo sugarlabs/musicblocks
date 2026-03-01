@@ -218,8 +218,8 @@ describe("utils.js — cleaned unit tests", () => {
   describe("object resolution & importMembers", () => {
     beforeAll(() => {
       global.TestNamespace = { Sub: { value: 42 } };
-      class DummyModel { constructor(){ this.modelVar = 10 } modelMethod(){ return "model" } }
-      class DummyView { constructor(){ this.viewVar = 20 } viewMethod(){ return "view" } }
+      class DummyModel { constructor(){ this.modelVar = 10; } modelMethod(){ return "model"; } }
+      class DummyView { constructor(){ this.viewVar = 20; } viewMethod(){ return "view"; } }
       global.TestController = { TestControllerModel: DummyModel, TestControllerView: DummyView };
     });
 
