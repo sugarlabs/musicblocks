@@ -2195,7 +2195,9 @@ function TemperamentWidget() {
         row.id = "buttonsRow";
 
         temperamentCell = row.insertCell();
-        temperamentCell.innerHTML = this.inTemperament;
+        if (temperamentCell) {
+            temperamentCell.innerHTML = this.inTemperament;
+        }
         temperamentCell.style.width = 2 * BUTTONSIZE + "px";
         temperamentCell.style.minWidth = temperamentCell.style.width;
         temperamentCell.style.maxWidth = temperamentCell.style.width;
@@ -2331,4 +2333,8 @@ function TemperamentWidget() {
 
         widgetWindow.sendToCenter();
     };
+}
+
+if (typeof module !== "undefined") {
+    module.exports = TemperamentWidget;
 }
