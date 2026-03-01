@@ -333,11 +333,6 @@ class Logo {
         // Midi Data
         this._midiData = {};
 
-        // Async yield mechanism: prevent infinite recursion from freezing the UI.
-        // _syncCounter tracks consecutive synchronous block executions.
-        // When it exceeds _YIELD_AFTER_SYNC_RUNS, we yield to the event loop
-        // via setTimeout(0) so the browser can process paint/input events.
-        // _totalIterations is a per-run safety limit to catch true infinite loops.
         this._syncCounter = 0;
         this._YIELD_AFTER_SYNC_RUNS = 1000;
         this._totalIterations = 0;
@@ -706,66 +701,73 @@ class Logo {
      * @returns {*}
      */
     parseArg(logo, turtle, blk, parentBlk, receivedArg) {
-        const tur = logo.activity.turtles.ithTurtle(turtle);
-
-        // Retrieve the value of a block
-        if (blk == null) {
+        if (blk === null) {
             logo.activity.errorMsg(NOINPUTERRORMSG, parentBlk);
-            // logo.stopTurtle = true;
             return null;
         }
 
-        if (logo.blockList[blk].protoblock.parameter) {
+        const currentBlock = logo.blockList[blk];
+        if (!currentBlock) {
+            console.error("Block index out of bounds:", blk);
+            return null;
+        }
+
+        const proto = currentBlock.protoblock;
+        const tur = logo.activity.turtles.ithTurtle(turtle);
+
+        // Retrieve the value of a block
+        if (proto.parameter) {
             if (!tur.parameterQueue.includes(blk)) {
                 tur.parameterQueue.push(blk);
             }
         }
 
-        if (typeof logo.blockList[blk].protoblock.arg === "function") {
-            return (logo.blockList[blk].value = logo.blockList[blk].protoblock.arg(
-                logo,
-                turtle,
-                blk,
-                receivedArg
-            ));
+        if (typeof proto.arg === "function") {
+            return (currentBlock.value = proto.arg(logo, turtle, blk, receivedArg));
         }
 
-        if (logo.blockList[blk].name === "intervalname") {
-            if (typeof logo.blockList[blk].value === "string") {
-                tur.singer.noteDirection = logo.deps.utils.getIntervalDirection(
-                    logo.blockList[blk].value
-                );
-                return logo.deps.utils.getIntervalNumber(logo.blockList[blk].value);
-            } else return 0;
-        } else if (logo.blockList[blk].isValueBlock()) {
-            return logo.blockList[blk].value;
-        } else if (
-            ["anyout", "numberout", "textout", "booleanout"].includes(
-                logo.blockList[blk].protoblock.dockTypes[0]
-            )
+        const blockName = currentBlock.name;
+        const utils = logo.deps.utils;
+
+        if (blockName === "intervalname") {
+            if (typeof currentBlock.value === "string") {
+                tur.singer.noteDirection = utils.getIntervalDirection(currentBlock.value);
+                return utils.getIntervalNumber(currentBlock.value);
+            }
+            return 0;
+        }
+
+        if (currentBlock.isValueBlock()) {
+            return currentBlock.value;
+        }
+
+        const firstDockType = proto.dockTypes[0];
+        if (
+            firstDockType === "anyout" ||
+            firstDockType === "numberout" ||
+            firstDockType === "textout" ||
+            firstDockType === "booleanout"
         ) {
-            switch (logo.blockList[blk].name) {
+            switch (blockName) {
                 case "dectofrac":
                     if (
                         logo.inStatusMatrix &&
-                        logo.blockList[logo.blockList[blk].connections[0]].name === "print"
+                        logo.blockList[currentBlock.connections[0]].name === "print"
                     ) {
                         logo.statusFields.push([blk, "dectofrac"]);
                     } else {
-                        const cblk = logo.blockList[blk].connections[1];
+                        const cblk = currentBlock.connections[1];
                         if (cblk === null) {
                             logo.activity.errorMsg(NOINPUTERRORMSG, blk);
-                            logo.blockList[blk].value = 0;
+                            currentBlock.value = 0;
                         } else {
                             const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                             if (typeof a === "number") {
-                                logo.blockList[blk].value =
-                                    a < 0
-                                        ? "-" + logo.deps.utils.mixedNumber(-a)
-                                        : logo.deps.utils.mixedNumber(a);
+                                currentBlock.value =
+                                    a < 0 ? "-" + utils.mixedNumber(-a) : utils.mixedNumber(a);
                             } else {
                                 logo.activity.errorMsg(NANERRORMSG, blk);
-                                logo.blockList[blk].value = 0;
+                                currentBlock.value = 0;
                             }
                         }
                     }
@@ -774,39 +776,45 @@ class Logo {
                 case "hue":
                     if (
                         logo.inStatusMatrix &&
-                        logo.blockList[logo.blockList[blk].connections[0]].name === "print"
+                        logo.blockList[currentBlock.connections[0]].name === "print"
                     ) {
                         logo.statusFields.push([blk, "color"]);
                     } else {
-                        logo.blockList[blk].value =
-                            logo.activity.turtles.getTurtle(turtle).painter.color;
+                        currentBlock.value = logo.activity.turtles.getTurtle(turtle).painter.color;
                     }
                     break;
 
                 /** @deprecated */
                 case "returnValue":
                     if (logo.returns[turtle].length > 0) {
-                        logo.blockList[blk].value = logo.returns[turtle].pop();
+                        currentBlock.value = logo.returns[turtle].pop();
                     } else {
-                        logo.blockList[blk].value = 0;
+                        currentBlock.value = 0;
                     }
                     break;
 
                 default:
                     // Is it a plugin?
-                    if (logo.blockList[blk].name in logo.evalArgDict) {
-                        // Debug logging removed to avoid console noise in production
-                        eval(logo.evalArgDict[logo.blockList[blk].name]);
+                    if (blockName in logo.evalArgDict) {
+                        const pluginFn = logo.evalArgDict[blockName];
+                        if (typeof pluginFn === "function") {
+                            pluginFn(logo, turtle, blk, receivedArg);
+                        } else {
+                            // Support legacy string-based eval if necessary,
+                            // though we converted them in processPluginData
+                            // eslint-disable-next-line no-eval
+                            eval(pluginFn);
+                        }
                     } else {
-                        console.error("I do not know how to " + logo.blockList[blk].name);
+                        console.error("I do not know how to " + blockName);
                     }
                     break;
             }
 
-            return logo.blockList[blk].value;
-        } else {
-            return blk;
+            return currentBlock.value;
         }
+
+        return blk;
     }
 
     /**
@@ -1147,7 +1155,6 @@ class Logo {
             return;
         }
 
-        // Performance instrumentation: enable/disable based on URL flag
         if (typeof performanceTracker !== "undefined") {
             if (performanceModeEnabled) {
                 performanceTracker.enable();
@@ -1177,7 +1184,6 @@ class Logo {
 
         this.stopTurtle = false;
 
-        // Reset async yield counters for this run.
         this._syncCounter = 0;
         this._totalIterations = 0;
 
@@ -1211,8 +1217,6 @@ class Logo {
         this.notation.notationStaging = {};
         this.notation.notationDrumStaging = {};
 
-        // Reset accumulated data structures to free memory between runs.
-        // These grow unboundedly across repeated executions.
         this.turtleHeaps = {};
         this.turtleDicts = {};
         this.notationNotes = {};
@@ -1276,7 +1280,6 @@ class Logo {
 
         // Set up status block.
         if (this.deps.widgetWindows.isOpen("status")) {
-            // Ensure widget has been created before trying to initialize it
             if (this.statusMatrix === null) {
                 this.statusMatrix = new this.deps.classes.StatusMatrix();
             }
@@ -1503,9 +1506,6 @@ class Logo {
 
         this.receivedArg = receivedArg;
 
-        // Safety check: stop execution if we have exceeded the maximum
-        // iteration limit, which indicates an infinite loop (e.g., an
-        // Action block that calls itself with no delay).
         logo._totalIterations++;
         if (logo._totalIterations > logo._MAX_ITERATIONS) {
             logo.activity.errorMsg(
