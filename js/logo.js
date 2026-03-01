@@ -743,7 +743,7 @@ class Logo {
                         logo.statusFields.push([blk, "dectofrac"]);
                     } else {
                         const cblk = currentBlock.connections[1];
-                        if (cblk === null) {
+                        if (cblk == null) {
                             logo.activity.errorMsg(NOINPUTERRORMSG, blk);
                             currentBlock.value = 0;
                         } else {
