@@ -2550,6 +2550,20 @@ class Activity {
             const that = this;
             let lastCoords = { x: 0, y: 0, delta: 0 };
 
+            // --- rAF-throttle state for panning, wheel, and touch ---
+            let _panRAFId = null;
+            let _pendingPanDx = 0;
+            let _pendingPanDy = 0;
+
+            let _wheelRAFId = null;
+            let _pendingWheelDx = 0;
+            let _pendingWheelDy = 0;
+            let _pendingZoomDir = 0;
+
+            let _touchRAFId = null;
+            let _pendingTouchDx = 0;
+            let _pendingTouchDy = 0;
+
             /**
              * Closes any open menus and labels.
              */
@@ -2646,34 +2660,51 @@ class Activity {
              * Handles touch move event on the canvas.
              * @param {TouchEvent} event - The touch event object.
              */
-            myCanvas.addEventListener("touchmove", event => {
-                if (event.touches.length === 2) {
-                    for (let i = 0; i < 2; i++) {
-                        const touchY = event.touches[i].clientY;
-                        const touchX = event.touches[i].clientX;
+            myCanvas.addEventListener(
+                "touchmove",
+                event => {
+                    if (event.touches.length === 2) {
+                        let hasDelta = false;
+                        for (let i = 0; i < 2; i++) {
+                            const touchY = event.touches[i].clientY;
+                            const touchX = event.touches[i].clientX;
 
-                        if (initialTouches[i][0] !== null && initialTouches[i][1] !== null) {
-                            const deltaY = touchY - initialTouches[i][0];
-                            const deltaX = touchX - initialTouches[i][1];
+                            if (initialTouches[i][0] !== null && initialTouches[i][1] !== null) {
+                                const deltaY = touchY - initialTouches[i][0];
+                                const deltaX = touchX - initialTouches[i][1];
 
-                            if (deltaY !== 0) {
-                                closeAnyOpenMenusAndLabels();
-                                that.blocksContainer.y -= deltaY;
+                                if (deltaY !== 0) {
+                                    _pendingTouchDy += deltaY;
+                                    hasDelta = true;
+                                }
+
+                                if (that.scrollBlockContainer && deltaX !== 0) {
+                                    _pendingTouchDx += deltaX;
+                                    hasDelta = true;
+                                }
+
+                                initialTouches[i][0] = touchY;
+                                initialTouches[i][1] = touchX;
                             }
+                        }
 
-                            if (that.scrollBlockContainer && deltaX !== 0) {
-                                closeAnyOpenMenusAndLabels();
-                                that.blocksContainer.x -= deltaX;
-                            }
-
-                            initialTouches[i][0] = touchY;
-                            initialTouches[i][1] = touchX;
+                        if (hasDelta && _touchRAFId === null) {
+                            _touchRAFId = requestAnimationFrame(() => {
+                                if (_pendingTouchDy !== 0 || _pendingTouchDx !== 0) {
+                                    closeAnyOpenMenusAndLabels();
+                                    that.blocksContainer.y -= _pendingTouchDy;
+                                    that.blocksContainer.x -= _pendingTouchDx;
+                                    _pendingTouchDy = 0;
+                                    _pendingTouchDx = 0;
+                                }
+                                _touchRAFId = null;
+                                that.refreshCanvas();
+                            });
                         }
                     }
-
-                    that.refreshCanvas();
-                }
-            });
+                },
+                { passive: true }
+            );
 
             /**
              * Handles touch end event on the canvas.
@@ -2696,22 +2727,42 @@ class Activity {
 
                 if (event.ctrlKey) {
                     event.preventDefault();
-                    delY < 0 ? doLargerBlocks(that) : doSmallerBlocks(that);
+                    // Accumulate zoom direction; apply once per frame
+                    _pendingZoomDir += delY;
                 } else {
                     closeAnyOpenMenusAndLabels();
                     if (that.scrollBlockContainer) {
                         // Horizontal scrolling enabled (Advanced)
-                        if (delY !== 0) that.blocksContainer.y -= delY;
-                        if (delX !== 0) that.blocksContainer.x -= delX;
+                        if (delY !== 0) _pendingWheelDy += delY;
+                        if (delX !== 0) _pendingWheelDx += delX;
                     } else {
                         // Vertical scrolling only (Beginner / Default)
                         if (event.axis === event.VERTICAL_AXIS && delY !== 0) {
-                            that.blocksContainer.y -= delY;
+                            _pendingWheelDy += delY;
                         }
                     }
                 }
 
-                that.refreshCanvas();
+                if (_wheelRAFId === null) {
+                    _wheelRAFId = requestAnimationFrame(() => {
+                        if (_pendingZoomDir !== 0) {
+                            _pendingZoomDir < 0 ? doLargerBlocks(that) : doSmallerBlocks(that);
+                            _pendingZoomDir = 0;
+                        }
+
+                        if (_pendingWheelDy !== 0 || _pendingWheelDx !== 0) {
+                            that.blocksContainer.y -= _pendingWheelDy;
+                            if (that.scrollBlockContainer) {
+                                that.blocksContainer.x -= _pendingWheelDx;
+                            }
+                            _pendingWheelDy = 0;
+                            _pendingWheelDx = 0;
+                        }
+
+                        that.refreshCanvas();
+                        _wheelRAFId = null;
+                    });
+                }
             };
 
             this.addEventListener(
@@ -2728,6 +2779,14 @@ class Activity {
             const __stageMouseUpHandler = event => {
                 that.stageMouseDown = false;
                 that.moving = false;
+
+                // Cancel any pending pan frame so stale deltas are not applied
+                if (_panRAFId !== null) {
+                    cancelAnimationFrame(_panRAFId);
+                    _panRAFId = null;
+                    _pendingPanDx = 0;
+                    _pendingPanDy = 0;
+                }
 
                 if (that.stage.getObjectUnderPoint() === null && lastCoords.delta < 4) {
                     that.stageX = event.stageX;
@@ -2781,18 +2840,29 @@ class Activity {
                         Math.abs(event.stageX - lastCoords.x) +
                         Math.abs(event.stageY - lastCoords.y);
 
+                    // Accumulate panning deltas; actual container move
+                    // is batched to the next animation frame.
                     if (that.scrollBlockContainer) {
-                        that.blocksContainer.x += event.stageX - lastCoords.x;
+                        _pendingPanDx += event.stageX - lastCoords.x;
                     }
+                    _pendingPanDy += event.stageY - lastCoords.y;
 
-                    that.blocksContainer.y += event.stageY - lastCoords.y;
                     lastCoords = {
                         x: event.stageX,
                         y: event.stageY,
                         delta: lastCoords.delta + delta
                     };
 
-                    that.refreshCanvas();
+                    if (_panRAFId === null) {
+                        _panRAFId = requestAnimationFrame(() => {
+                            that.blocksContainer.x += _pendingPanDx;
+                            that.blocksContainer.y += _pendingPanDy;
+                            _pendingPanDx = 0;
+                            _pendingPanDy = 0;
+                            _panRAFId = null;
+                            that.refreshCanvas();
+                        });
+                    }
                 });
 
                 that.stage.removeAllEventListeners("stagemouseup");
@@ -4640,10 +4710,12 @@ class Activity {
             this.update = true;
 
             const that = this;
-            setTimeout(() => {
+            // Use rAF instead of setTimeout so the guard is released
+            // in sync with the browser's paint cycle (~16 ms).
+            requestAnimationFrame(() => {
                 that.blockRefreshCanvas = false;
                 that.stageDirty = true;
-            }, 5);
+            });
         };
 
         /*

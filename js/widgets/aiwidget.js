@@ -14,7 +14,7 @@
 
    _, docById, DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP,
    CUSTOMSAMPLES, wheelnav, getVoiceSynthName, Singer, DRUMS, Tone,
-   instruments, slicePath, platformColor
+   instruments, slicePath, platformColor, toFraction, ABCJS
 */
 
 /* exported Abhijeet Singh */
@@ -42,7 +42,7 @@ function AIWidget() {
     const SAMPLEANALYSERSIZE = 8192;
     const SAMPLEOSCCOLORS = ["#3030FF", "#FF3050"];
     let abcNotationSong = "";
-    var midiBuffer;
+    let midiBuffer;
     /**
      * Reference to the timbre block.
      * @type {number | null}
@@ -665,9 +665,8 @@ function AIWidget() {
                         staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3] = blockId;
                     }
                     if (afternamedo != -1) {
-                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
-                            afternamedo
-                        ][4][1] = null;
+                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][afternamedo][4][1] =
+                            null;
                     }
 
                     staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
@@ -826,7 +825,7 @@ function AIWidget() {
                     >`;
                 this.isMoving = false;
             } else {
-                if (!(abcNotationSong == "")) {
+                if (abcNotationSong !== "") {
                     this.resume();
                     this._playABCSong();
                 }
@@ -834,21 +833,17 @@ function AIWidget() {
         };
 
         this._save_lock = false;
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            ICONSIZE,
-            _("Save sample"),
-            ""
-        ).onclick = function () {
-            // Debounce button
-            if (!that._get_save_lock()) {
-                that._save_lock = true;
-                that._saveSample();
-                setTimeout(function () {
-                    that._save_lock = false;
-                }, 1000);
-            }
-        };
+        widgetWindow.addButton("export-chunk.svg", ICONSIZE, _("Save sample"), "").onclick =
+            function () {
+                // Debounce button
+                if (!that._get_save_lock()) {
+                    that._save_lock = true;
+                    that._saveSample();
+                    setTimeout(function () {
+                        that._save_lock = false;
+                    }, 1000);
+                }
+            };
 
         widgetWindow.sendToCenter();
         this.widgetWindow = widgetWindow;
@@ -867,7 +862,7 @@ function AIWidget() {
      */
     this._addSample = function () {
         for (let i = 0; i < CUSTOMSAMPLES.length; i++) {
-            if (CUSTOMSAMPLES[i][0] == this.sampleName) {
+            if (CUSTOMSAMPLES[i][0] === this.sampleName) {
                 return;
             }
         }
@@ -939,7 +934,7 @@ function AIWidget() {
      * @returns {void}
      */
     this._playSample = function () {
-        if (this.sampleName != null && this.sampleName != "") {
+        if (this.sampleName !== null && this.sampleName !== "") {
             this.reconnectSynthsToAnalyser();
 
             this.activity.logo.synth.trigger(
@@ -1063,53 +1058,61 @@ function AIWidget() {
 
         // Create a scrollable container for the textarea
         const scrollContainer = document.createElement("div");
-        scrollContainer.style.overflowY = "auto"; // Enable vertical scrolling
-        scrollContainer.style.height = height + "px"; // Set the height of the scroll container
-        scrollContainer.style.border = "1px solid #ccc"; // Optional: Add a border for visibility
-        scrollContainer.style.marginBottom = "8px";
-        scrollContainer.style.marginLeft = "8px";
-        scrollContainer.style.display = "flex"; // Use flexbox for centering
-        scrollContainer.style.flexDirection = "column"; // Stack elements vertically
-        scrollContainer.style.alignItems = "center"; // Center items horizontally
+        Object.assign(scrollContainer.style, {
+            overflowY: "auto",
+            height: height + "px",
+            border: "1px solid #ccc",
+            marginBottom: "8px",
+            marginLeft: "8px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center"
+        });
         container.appendChild(scrollContainer);
 
         // Create the textarea element
         const textarea = document.createElement("textarea");
-        textarea.style.height = height + "px"; // Keep the height for the scrollable area
-        textarea.style.width = width + "px";
+        Object.assign(textarea.style, {
+            height: height + "px",
+            width: width + "px",
+            marginLeft: "20px",
+            fontSize: "20px",
+            padding: "10px"
+        });
         textarea.className = "samplerTextarea";
-        textarea.style.marginLeft = "20px";
-        textarea.style.fontSize = "20px";
-        textarea.style.padding = "10px";
-        scrollContainer.appendChild(textarea); // Append textarea to scroll container
+        scrollContainer.appendChild(textarea);
 
         // Create hint text elements
         const hintsContainer = document.createElement("div");
-        hintsContainer.style.marginBottom = "10px";
-
-        hintsContainer.style.display = "flex";
-        hintsContainer.style.justifyContent = "center";
-        hintsContainer.style.marginTop = "8px";
+        Object.assign(hintsContainer.style, {
+            marginBottom: "10px",
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "8px"
+        });
         const hints = ["Dance tune", "Fiddle jig", "Nice melody", "Fun song", "Simple canon"];
+        const hintFrag = document.createDocumentFragment();
         hints.forEach(hintText => {
             const hint = document.createElement("span");
             hint.textContent = hintText;
-            hint.style.marginRight = "20px";
-            hint.style.cursor = "pointer";
-            hint.style.marginRight = "4px";
-            hint.style.fontSize = "20px";
-            hint.style.color = "blue";
-            hint.style.backgroundColor = "rgb(227 162 162 / 80%)"; // Light white background
-            hint.style.padding = "10px"; // Add padding for spacing
-            hint.style.borderRadius = "5px"; // Optional: Rounded corners
+            Object.assign(hint.style, {
+                cursor: "pointer",
+                marginRight: "4px",
+                fontSize: "20px",
+                color: "blue",
+                backgroundColor: "rgb(227 162 162 / 80%)",
+                padding: "10px",
+                borderRadius: "5px"
+            });
 
             hint.onclick = function () {
                 inputField.value = hintText;
                 hintsContainer.style.display = "none";
             };
 
-            hintsContainer.appendChild(hint);
+            hintFrag.appendChild(hint);
         });
+        hintsContainer.appendChild(hintFrag);
 
         scrollContainer.appendChild(hintsContainer);
 
@@ -1117,12 +1120,14 @@ function AIWidget() {
         inputField.type = "text";
         inputField.className = "inputField";
         inputField.placeholder = "Enter text here";
-        inputField.style.fontSize = "20px";
-        inputField.style.marginRight = "2px";
-        inputField.style.marginLeft = "64px";
-        inputField.style.padding = "10px";
-        inputField.style.marginBottom = "10px";
-        inputField.style.width = "60%";
+        Object.assign(inputField.style, {
+            fontSize: "20px",
+            marginRight: "2px",
+            marginLeft: "64px",
+            padding: "10px",
+            marginBottom: "10px",
+            width: "60%"
+        });
         container.appendChild(inputField);
 
         inputField.addEventListener("click", function () {
@@ -1132,9 +1137,11 @@ function AIWidget() {
         const submitButton = document.createElement("button");
         submitButton.className = "submitButton";
         submitButton.textContent = "Submit";
-        submitButton.style.fontSize = "20px";
-        submitButton.style.padding = "10px 20px";
-        submitButton.style.marginBottom = "20px";
+        Object.assign(submitButton.style, {
+            fontSize: "20px",
+            padding: "10px 20px",
+            marginBottom: "20px"
+        });
         container.appendChild(submitButton);
 
         submitButton.onclick = function () {
@@ -1190,7 +1197,8 @@ function AIWidget() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${env.GROQ_API_KEY}` // Replace with your actual API key
+                    // eslint-disable-next-line no-undef
+                    "Authorization": `Bearer ${typeof env !== "undefined" ? env.GROQ_API_KEY : ""}` // Replace with your actual API key
                 },
                 body: requestBody
             })
