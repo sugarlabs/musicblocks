@@ -282,6 +282,10 @@ class ReflectionMatrix {
         if (this.triggerFirst == true) return;
 
         this.triggerFirst = true;
+
+        // Reset summarization state for a fresh session
+        this.conversationSummary = "";
+        this.summarizedUpTo = 0;
         setTimeout(() => {
             this.showTypingIndicator("Reading code");
         }, 1000);
@@ -389,7 +393,8 @@ class ReflectionMatrix {
         try {
             this.showTypingIndicator();
 
-            const unsummarizedMessages = chatHistory.slice(this.summarizedUpTo);
+            const safeIndex = Math.min(this.summarizedUpTo, chatHistory.length);
+            const unsummarizedMessages = chatHistory.slice(safeIndex);
 
             const response = await fetch(`${this.PORT}/chat`, {
                 method: "POST",
