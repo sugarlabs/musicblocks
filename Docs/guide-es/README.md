@@ -14,14 +14,12 @@ la lector a través de numerosos ejemplos.
 
 Bloques de Música está diseñado para ejecutarse en un navegador. La
 mayor parte del desarrollo se ha hecho en Cromo, pero también debería
-funcionar en Firefox. Se puede ejecutar desde [Bloques de Música]
-(https://musicblocks.sugarlabs.org) o por la descarga de una
+funcionar en Firefox. Se puede ejecutar desde [Bloques de Música](https://musicblocks.sugarlabs.org) o por la descarga de una
 copia del código y se ejecuta directamente desde el archivo sistema de
 su computadora.
 
 Para más detalles sobre el uso de Bloques de Música, ver [Uso de
-Bloques de Música]
-(http://github.com/sugarlabs/musicblocks/tree/master/documentation)
+Bloques de Música](http://github.com/sugarlabs/musicblocks/tree/master/documentation)
 y para más detalles sobre cómo utilizar los bloques de la tortuga, ver
 [Uso de la tortuga bloques
 
@@ -225,7 +223,7 @@ taking the same amount from the second note. Notes that do not match
 note value are unchanged.
 
 In the example, `re5` would be played as a `1/6` note and `me5` would
-be played as a `1/12` note (`1/8 + 1/24 === 1/6' and `1/8 - 1/24 ===
+be played as a `1/12` note (`1/8 + 1/24 === 1/6' and`1/8 - 1/24 ===
 1/12`). Observe that the total duration of the pair of notes is
 unchanged.
 

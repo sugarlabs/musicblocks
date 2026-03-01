@@ -377,8 +377,8 @@ class HelpWidget {
                 leftArrow.classList.remove("disabled");
 
                 this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
-            this._showPage(page);
-        };
+                this._showPage(page);
+            };
             if (page === 0) {
                 leftArrow.classList.add("disabled");
             }

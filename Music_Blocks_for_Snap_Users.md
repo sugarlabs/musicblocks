@@ -240,7 +240,7 @@ which can be really useful in music projects.
 
 ### Actions
 
-Action blocks are just like Command blocks in Snap. 
+Action blocks are just like Command blocks in Snap.
 
 ![Snap Command](./images/snap/snap-command.png)
 
@@ -316,13 +316,13 @@ each button press.
 
 There are a few additional debugging aids:
 
-* You can use the Show and Hide blocks to slow down and speed up
-  program execution. This is like setting breakpoints in your code.
+-   You can use the Show and Hide blocks to slow down and speed up
+    program execution. This is like setting breakpoints in your code.
 
 ![Music Blocks Show/Hide](./images/snap/show-hide.png)
 
-* The Comment block will put up messages, but only when the Play Slow
-  button is pressed.
+-   The Comment block will put up messages, but only when the Play Slow
+    button is pressed.
 
 ![Music Blocks Comment](./images/snap/comment.png)
 
@@ -470,7 +470,7 @@ staccato, vibrato, tremolo, et al.
 ### Phrases
 
 A fundamental component of music is the phrase, i.e., a sequential
-collection of notes.  Music Blocks uses Action blocks to contain
+collection of notes. Music Blocks uses Action blocks to contain
 multiple Note blocks. The actions are used in combination to create
 music.
 

@@ -901,8 +901,9 @@ function setupEnsembleBlocks(activity) {
                     activity.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
                 }
             } else {
-                activity.turtles.ithTurtle(turtle).singer.turtleTime =
-                    activity.turtles.ithTurtle(targetTurtle).singer.turtleTime;
+                activity.turtles.ithTurtle(turtle).singer.turtleTime = activity.turtles.ithTurtle(
+                    targetTurtle
+                ).singer.turtleTime;
             }
         }
     }

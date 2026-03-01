@@ -153,7 +153,7 @@
 }
 
 .dark #newdropdown li:hover {
-  background-color: transparent !important;
+    background-color: transparent !important;
 }
 
 .dark #confirmation-message {
@@ -180,14 +180,14 @@ body.dark {
 
 /* Selected language highlight in language dropdown */
 #languagedropdown li a.selected-language {
-  background-color: rgba(33, 150, 243, 0.15);
-  border-left: 3px solid #2196F3;
-  font-weight: 600;
+    background-color: rgba(33, 150, 243, 0.15);
+    border-left: 3px solid #2196f3;
+    font-weight: 600;
 }
 
 .dark #languagedropdown li a.selected-language {
-  background-color: rgba(33, 150, 243, 0.25);
-  border-left: 3px solid #64B5F6;
+    background-color: rgba(33, 150, 243, 0.25);
+    border-left: 3px solid #64b5f6;
 }
 
 /* Dark Mode Tooltip Styling - Slightly lighter background for better contrast */

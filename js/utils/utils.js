@@ -564,7 +564,6 @@ let fileBasename = file => {
  */
 function toTitleCase(str) {
     if (typeof str !== "string") return;
-
 }
 
 /**

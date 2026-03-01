@@ -2788,12 +2788,13 @@ function Synth() {
                                         i < tempBlock._accidentalsWheel.navItems.length;
                                         i++
                                     ) {
-                                        tempBlock._accidentalsWheel.navItems[i].navigateFunction =
-                                            () => {
-                                                selectionState.accidental =
-                                                    tempBlock._accidentalsWheel.navItems[i].title;
-                                                updateTargetNote();
-                                            };
+                                        tempBlock._accidentalsWheel.navItems[
+                                            i
+                                        ].navigateFunction = () => {
+                                            selectionState.accidental =
+                                                tempBlock._accidentalsWheel.navItems[i].title;
+                                            updateTargetNote();
+                                        };
                                     }
                                 }
 
@@ -2804,15 +2805,16 @@ function Synth() {
                                         i < tempBlock._octavesWheel.navItems.length;
                                         i++
                                     ) {
-                                        tempBlock._octavesWheel.navItems[i].navigateFunction =
-                                            () => {
-                                                const octave =
-                                                    tempBlock._octavesWheel.navItems[i].title;
-                                                if (octave && !isNaN(octave)) {
-                                                    selectionState.octave = parseInt(octave);
-                                                    updateTargetNote();
-                                                }
-                                            };
+                                        tempBlock._octavesWheel.navItems[
+                                            i
+                                        ].navigateFunction = () => {
+                                            const octave =
+                                                tempBlock._octavesWheel.navItems[i].title;
+                                            if (octave && !isNaN(octave)) {
+                                                selectionState.octave = parseInt(octave);
+                                                updateTargetNote();
+                                            }
+                                        };
                                     }
                                 }
 
