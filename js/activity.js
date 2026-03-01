@@ -4266,6 +4266,19 @@ class Activity {
                 const blk = this.blocks.dragGroup[b];
                 this.blocks.blockList[blk].trash = false;
                 this.blocks.moveBlockRelative(blk, dx, dy);
+
+                // Re-cache the container if it was uncached to save
+                // memory in sendStackToTrash().
+                const block = this.blocks.blockList[blk];
+                if (block.container && !block.container.bitmapCache) {
+                    block.container.cache(
+                        0,
+                        0,
+                        Math.max(block.width, 1),
+                        Math.max(block.height, 1)
+                    );
+                }
+
                 this.blocks.blockList[blk].show();
             }
 
