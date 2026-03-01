@@ -163,7 +163,6 @@ export default [
             "no-irregular-whitespace": "warn"
         }
     },
-
     {
         files: ["**/__tests__/**/*.js", "**/*.test.js"],
         rules: {
@@ -196,7 +195,9 @@ export default [
     {
         files: ["cypress/**/*.js"],
         languageOptions: {
+            sourceType: "module",
             globals: {
+                ...globals.browser,
                 cy: "readonly",
                 Cypress: "readonly",
                 describe: "readonly",
