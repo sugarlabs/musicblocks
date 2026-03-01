@@ -1100,7 +1100,7 @@ function Synth() {
             if (fileName) {
                 download(url, fileName + (platform.FF ? ".wav" : ".ogg"));
             } else {
-                alert("Download cancelled.");
+                alert(_("Download cancelled."));
             }
         };
         // this.recorder.start();
@@ -1971,7 +1971,10 @@ function Synth() {
                 if (Tone.context.state !== "running" && !window.hasShownAudioWarning) {
                     window.hasShownAudioWarning = true;
                     alert(
-                        "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
+                        "⚠️ " +
+                            _(
+                                "Sound is disabled! Please check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
+                            )
                     );
                 }
             }, 2000);

@@ -7997,7 +7997,9 @@ class Activity {
                                         },
                                         () => {
                                             alert(
-                                                "Something went wrong reading JSON-encoded project data."
+                                                _(
+                                                    "Something went wrong reading JSON-encoded project data."
+                                                )
                                             );
                                         }
                                     );
