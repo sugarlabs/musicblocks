@@ -16,7 +16,7 @@ app.get("/env.js", (req, res) => {
     res.setHeader("Surrogate-Control", "no-store");
     res.send(
         `window.MB_ENV=${JSON.stringify(process.env.NODE_ENV || "development")};` +
-        `window.MB_IS_DEV=${JSON.stringify(isDev)};`
+            `window.MB_IS_DEV=${JSON.stringify(isDev)};`
     );
 });
 
@@ -47,11 +47,11 @@ const SENSITIVE_PATTERNS = [
     /^\/\.github\//i,
     /^\/node_modules\//i,
     /^\/cypress\//i,
-    /^\/scripts\//i,
+    /^\/scripts\//i
 ];
 
 app.use((req, res, next) => {
-    if (SENSITIVE_PATTERNS.some((pattern) => pattern.test(req.path))) {
+    if (SENSITIVE_PATTERNS.some(pattern => pattern.test(req.path))) {
         return res.status(403).send("Forbidden");
     }
     next();
