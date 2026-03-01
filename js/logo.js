@@ -687,19 +687,15 @@ class Logo {
      * @returns {*}
      */
     parseArg(logo, turtle, blk, parentBlk, receivedArg) {
+        const tur = logo.activity.turtles.ithTurtle(turtle);
+
         if (blk == null) {
             logo.activity.errorMsg(NOINPUTERRORMSG, parentBlk);
             return null;
         }
 
         const currentBlock = logo.blockList[blk];
-        if (!currentBlock) {
-            console.error("Block index out of bounds:", blk);
-            return null;
-        }
-
         const proto = currentBlock.protoblock;
-        const tur = logo.activity.turtles.ithTurtle(turtle);
 
         // Retrieve the value of a block
         if (proto.parameter) {
@@ -784,10 +780,9 @@ class Logo {
                     if (blockName in logo.evalArgDict) {
                         const pluginFn = logo.evalArgDict[blockName];
                         if (typeof pluginFn === "function") {
-                            pluginFn(logo, turtle, blk, receivedArg);
+                            pluginFn(logo, turtle, blk, parentBlk, receivedArg, tur);
                         } else {
-                            // Support legacy string-based eval if necessary,
-                            // though we converted them in processPluginData
+                            // Support legacy string-based eval if necessary
                             // eslint-disable-next-line no-eval
                             eval(pluginFn);
                         }
@@ -1722,7 +1717,7 @@ class Logo {
                         tur.parentFlowQueue.length > 0 &&
                         tur.queue.length > 0 &&
                         logo.deps.utils.last(tur.queue).parentBlk !==
-                        logo.deps.utils.last(tur.parentFlowQueue)
+                            logo.deps.utils.last(tur.parentFlowQueue)
                     ) {
                         tur.unhighlightQueue.push(logo.deps.utils.last(tur.parentFlowQueue));
                     } else if (tur.unhighlightQueue.length > 0) {

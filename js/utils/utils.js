@@ -796,12 +796,15 @@ const processPluginData = (activity, pluginData, pluginSource) => {
         for (const arg in obj["ARGPLUGINS"]) {
             try {
                 // Pre-compile the plugin code into a function to avoid eval() in parseArg
+                // Standard scope exposure: logo, turtle, blk, parentBlk, receivedArg, tur
                 // eslint-disable-next-line no-new-func
                 activity.logo.evalArgDict[arg] = new Function(
                     "logo",
                     "turtle",
                     "blk",
+                    "parentBlk",
                     "receivedArg",
+                    "tur",
                     obj["ARGPLUGINS"][arg]
                 );
             } catch (e) {
