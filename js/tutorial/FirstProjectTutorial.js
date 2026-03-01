@@ -1,9 +1,16 @@
 /**
  * FirstProjectTutorial.js
  *
- * Interactive step-by-step tutorial that guides users through creating
- * their first Music Blocks project. Detects user actions and only allows
- * proceeding when the required action is completed.
+ * An interactive constructionist tutorial that guides users through creating
+ * their first Music Blocks project. Balances guided exploration with
+ * reflection — users are challenged to discover, not just follow orders.
+ *
+ * Philosophy: Constructionism (Seymour Papert)
+ *   - Pose challenges, not instructions
+ *   - Validate actions without prescribing exact steps
+ *   - Add reflection moments after key milestones
+ *   - Offer choice points for personal ownership
+ *   - End with open-ended invitation, not "Congratulations"
  *
  * @author Divyam Agarwal
  * @copyright 2026
@@ -14,9 +21,9 @@
 /* exported FirstProjectTutorial */
 
 /**
- * FirstProjectTutorial - An interactive onboarding tutorial
- * that highlights UI elements and guides users step-by-step.
- * The "Next" button only appears after the user completes each action.
+ * FirstProjectTutorial - A constructionist onboarding tutorial.
+ * Highlights UI elements, poses challenges, validates user actions,
+ * and prompts reflection between key milestones.
  */
 class FirstProjectTutorial {
     constructor(activity) {
@@ -28,154 +35,483 @@ class FirstProjectTutorial {
         this.spotlight = null;
         this.actionCompleted = false;
         this._checkInterval = null;
+        this._hintTimeout = null;
         this._initialBlockCount = 0;
+        this._initialNoteCount = 0;
+        this._playPressed = false;
+        this._savedBlocks = null;
+        this._keyHandler = null;
 
-        // Define all tutorial steps with validators
-        this.steps = [
+        // Hint delay: show "Need a hint?" after this many ms of no progress
+        this.HINT_DELAY_MS = 15000;
+
+        this.steps = this._buildSteps();
+    }
+
+    /**
+     * Build all tutorial steps.
+     * Steps are grouped into phases: Explore, Build, Listen, Personalize, Reflect.
+     * @private
+     * @returns {Array} The step definitions.
+     */
+    _buildSteps() {
+        return [
+            // ── Phase 1: Explore ──────────────────────────────────
             {
-                title: _("Step 1: Find the Start Block"),
-                content: _("Look at the canvas! Find the START block - every project begins here."),
+                title: _("🎵 Welcome, Composer!"),
+                content:
+                    _("Every Music Blocks project starts with a special block — the Start block.") +
+                    " " +
+                    _("Can you spot it on the canvas? It tells Music Blocks where your program begins."),
+                hint: _("The Start block is the green block sitting on the canvas — it looks like a flag!"),
                 target: () => this._getCanvas(),
                 position: "right",
-                instruction: _("✅ Can you see the Start block on the canvas?"),
-                // This step has no action required - just observation
+                challenge: _("Look at the canvas and find the Start block."),
                 validator: () => true,
-                autoComplete: true
+                autoComplete: true,
+                phase: "explore"
             },
+
+            // ── Phase 2: Build ────────────────────────────────────
             {
-                title: _("Step 2: Open the Rhythm Palette"),
-                content: _(
-                    "Click on the 'Rhythm' palette button on the left sidebar to see rhythm blocks."
-                ),
+                title: _("🥁 Music Needs Rhythm!"),
+                content:
+                    _("Music is built from notes — sounds with a specific length.") +
+                    " " +
+                    _("Can you find a block that creates a musical note?") +
+                    " " +
+                    _("Hint: Explore the Rhythm palette on the left sidebar! 🎵"),
+                hint: _("Look at the left sidebar — find the button labeled 'Rhythm' and click it!"),
                 target: () => this._findPaletteButton("rhythm"),
                 position: "right",
-                instruction: _("👆 Click the 'Rhythm' palette button"),
+                challenge: _("Open the Rhythm palette to discover note blocks."),
                 validator: () => this._isPaletteOpen("rhythm"),
-                autoComplete: false
+                autoComplete: false,
+                phase: "build"
             },
             {
-                title: _("Step 3: Drag a Note Block"),
-                content: _(
-                    "Find the 'Note' block in the Rhythm palette (should still be open) and drag it onto the canvas. This is how you create musical notes!"
-                ),
+                title: _("🧩 Drag a Note Block"),
+                content:
+                    _("Great — you found the Rhythm palette!") +
+                    " " +
+                    _("Now look for the Note block inside it.") +
+                    " " +
+                    _("Drag it onto the canvas — this is how you create musical sounds."),
+                hint: _("In the open palette, find the block labeled 'Note Value'. Click and drag it onto the white canvas area."),
                 target: () => this._getCanvas(),
                 position: "right",
-                instruction: _("🎵 Drag a Note block from the Rhythm palette to the canvas"),
+                challenge: _("Drag a Note block from the palette onto the canvas."),
                 validator: () => this._hasMoreBlocks(),
                 autoComplete: false,
-                allowInteraction: true, // Allow full screen interaction for dragging
+                allowInteraction: true,
+                phase: "build",
                 onStart: () => {
                     this._initialNoteCount = this._countBlocksByName("newnote");
                 }
             },
             {
-                title: _("Step 4: Connect to Start"),
-                content: _(
-                    "Now connect your Note block to the Start block. Drag it until it snaps into place!"
-                ),
+                title: _("🔗 Connect the Pieces"),
+                content:
+                    _("Blocks in Music Blocks snap together like puzzle pieces.") +
+                    " " +
+                    _("Can you connect your Note block to the Start block?") +
+                    " " +
+                    _("Drag it close and it will snap into place!"),
+                hint: _("Drag the Note block right below the Start block — when you get close enough, they will snap together automatically."),
                 target: () => this._getCanvas(),
                 position: "right",
-                instruction: _("🔗 Connect the Note block inside the Start block"),
+                challenge: _("Connect the Note block inside the Start block."),
                 validator: () => this._isBlockConnectedToStart("newnote"),
                 autoComplete: false,
-                allowInteraction: true // Allow full screen interaction for dragging
+                allowInteraction: true,
+                phase: "build"
             },
+
+            // ── Reflection Moment ─────────────────────────────────
             {
-                title: _("Step 5: Press Play!"),
-                content: _(
-                    "Time to hear your first note! Click the PLAY button to run your project!"
-                ),
-                target: () => docById("play") || docById("runButton"),
-                position: "bottom",
-                instruction: _("▶️ Click the PLAY button!"),
-                validator: () => this._hasPressedPlay(),
-                autoComplete: false,
-                onStart: () => {
-                    this._playPressed = false;
-                    this._setupPlayListener();
-                }
-            },
-            {
-                title: _("Step 6: Open Pitch Palette"),
-                content: _("Great! Now let's add a pitch. Click on the 'Pitch' palette."),
-                target: () => this._findPaletteButton("pitch"),
-                position: "right",
-                instruction: _("👆 Click the 'Pitch' palette button"),
-                validator: () => this._isPaletteOpen("pitch"),
-                autoComplete: false
-            },
-            {
-                title: _("Step 7: Add a Pitch Block"),
-                content: _(
-                    "Drag a 'Pitch' block and put it INSIDE your Note block. This tells Music Blocks which note to play!"
-                ),
+                title: _("🤔 What Did You Build?"),
+                content:
+                    _("Take a moment to look at what you've created.") +
+                    " " +
+                    _("The Start block tells Music Blocks to begin, and the Note block creates a beat.") +
+                    " " +
+                    _("Together, they make a tiny program that plays a sound!") +
+                    " " +
+                    _("Let's hear it..."),
                 target: () => this._getCanvas(),
                 position: "right",
-                instruction: _("🎹 Drag a Pitch block inside your Note block"),
-                validator: () => this._hasPitchInNote(),
-                autoComplete: false,
-                allowInteraction: true // Allow full screen interaction for dragging
-            },
-            {
-                title: _("Step 8: Play Again!"),
-                content: _("Now press PLAY again to hear your note with the pitch!"),
-                target: () => docById("play") || docById("runButton"),
-                position: "bottom",
-                instruction: _("▶️ Click PLAY to hear your music!"),
-                validator: () => this._hasPressedPlay(),
-                autoComplete: false,
-                onStart: () => {
-                    this._playPressed = false;
-                    this._setupPlayListener();
-                }
-            },
-            {
-                title: _("Step 9: Add More Notes (Optional)"),
-                content: _(
-                    "You can add more Note+Pitch blocks to create a melody! Or just click Next to finish."
-                ),
-                target: () => this._getCanvas(),
-                position: "right",
-                instruction: _("🎵 Add more notes, or click Next to finish"),
-                validator: () => true,
-                autoComplete: true
-            },
-            {
-                title: _("🎉 Congratulations!"),
-                content: _(
-                    "You've created your first Music Blocks project! Now explore adding loops (Flow palette), graphics (Graphics palette), and different instruments (Tone palette)!"
-                ),
-                target: null,
-                position: "center",
-                instruction: _("Click Finish to close the tutorial"),
+                challenge: _("Ready to hear your creation? Click Next!"),
                 validator: () => true,
                 autoComplete: true,
-                isLast: true
+                phase: "reflect",
+                isReflection: true
+            },
+
+            // ── Phase 3: Listen ───────────────────────────────────
+            {
+                title: _("▶️ Bring It to Life!"),
+                content:
+                    _("Time to hear what you've built!") +
+                    " " +
+                    _("Press the Play button and listen to your first sound.") +
+                    " " +
+                    _("What do you hear? 🎶"),
+                hint: _("Look for the ▶ Play button in the top toolbar — it's the triangle-shaped button."),
+                target: () => docById("play") || docById("runButton"),
+                position: "bottom",
+                challenge: _("Press the Play button to run your project!"),
+                validator: () => this._hasPressedPlay(),
+                autoComplete: false,
+                phase: "listen",
+                onStart: () => {
+                    this._playPressed = false;
+                    this._setupPlayListener();
+                }
+            },
+
+            // ── Reflection Moment ─────────────────────────────────
+            {
+                title: _("🎶 You Made a Sound!"),
+                content:
+                    _("You just played your first note!") +
+                    " " +
+                    _("But it was just a default beat — no specific pitch.") +
+                    " " +
+                    _("What if you could decide WHICH note to play?") +
+                    " " +
+                    _("Let's give your note a voice..."),
+                target: null,
+                position: "center",
+                challenge: _("Click Next to add a pitch to your note."),
+                validator: () => true,
+                autoComplete: true,
+                phase: "reflect",
+                isReflection: true
+            },
+
+            // ── Phase 4: Personalize ──────────────────────────────
+            {
+                title: _("🎹 Choose Your Sound"),
+                content:
+                    _("Now it's YOUR turn to decide how your music sounds.") +
+                    " " +
+                    _("Open the Pitch palette — it's where all the musical notes live.") +
+                    " " +
+                    _("Do, Re, Mi, Fa, Sol, La, Ti... which one will you choose?"),
+                hint: _("On the left sidebar, find the 'Pitch' button — it's near the Rhythm button you clicked earlier."),
+                target: () => this._findPaletteButton("pitch"),
+                position: "right",
+                challenge: _("Open the Pitch palette to see the available notes."),
+                validator: () => this._isPaletteOpen("pitch"),
+                autoComplete: false,
+                phase: "personalize"
+            },
+            {
+                title: _("🎵 Give Your Note a Voice"),
+                content:
+                    _("Find a Pitch block and drag it INSIDE your Note block.") +
+                    " " +
+                    _("This tells Music Blocks which specific note to play.") +
+                    " " +
+                    _("Pick any pitch you like — this is YOUR melody!"),
+                hint: _("Find the 'Pitch' block in the open palette. Drag it and drop it inside the Note block (between the top and bottom of the Note clamp)."),
+                target: () => this._getCanvas(),
+                position: "right",
+                challenge: _("Drag a Pitch block inside your Note block."),
+                validator: () => this._hasPitchInNote(),
+                autoComplete: false,
+                allowInteraction: true,
+                phase: "personalize"
+            },
+            {
+                title: _("🔊 Hear the Difference!"),
+                content:
+                    _("Press Play again and listen carefully.") +
+                    " " +
+                    _("Does it sound different from before?") +
+                    " " +
+                    _("That's the pitch you chose — you're composing music! 🎼"),
+                hint: _("Click the ▶ Play button in the toolbar again to hear the difference!"),
+                target: () => docById("play") || docById("runButton"),
+                position: "bottom",
+                challenge: _("Press Play to hear your note with pitch!"),
+                validator: () => this._hasPressedPlay(),
+                autoComplete: false,
+                phase: "listen",
+                onStart: () => {
+                    this._playPressed = false;
+                    this._setupPlayListener();
+                }
+            },
+
+            // ── Phase 5: Extend the Melody ────────────────────────
+            {
+                title: _("🎶 One Note Isn't a Melody!"),
+                content:
+                    _("A melody needs more than one note.") +
+                    " " +
+                    _("Can you add a SECOND Note block?") +
+                    " " +
+                    _("Drag another Note from the Rhythm palette and connect it below your first note.") +
+                    " " +
+                    _("Then add a Pitch block inside it — pick a DIFFERENT pitch this time!"),
+                hint: _("Open the Rhythm palette again, drag a new Note block, and snap it below your existing Note. Then open Pitch palette and add a pitch inside this new Note."),
+                target: () => this._getCanvas(),
+                position: "right",
+                challenge: _("Add a second Note block with a pitch."),
+                validator: () => this._countNotesWithPitch() >= 2,
+                autoComplete: false,
+                allowInteraction: true,
+                phase: "build",
+                onStart: () => {
+                    this._initialNoteCount = this._countBlocksByName("newnote");
+                }
+            },
+            {
+                title: _("🎵 Now Add a Third Note!"),
+                content:
+                    _("Great — you have two notes!") +
+                    " " +
+                    _("Three notes make a much more interesting melody.") +
+                    " " +
+                    _("Add one more Note+Pitch combo — choose whatever pitch sounds fun to you!"),
+                hint: _("Same as before: drag a Note block from Rhythm, connect it below the second note, then add a Pitch inside it."),
+                target: () => this._getCanvas(),
+                position: "right",
+                challenge: _("Add a third Note block with a pitch."),
+                validator: () => this._countNotesWithPitch() >= 3,
+                autoComplete: false,
+                allowInteraction: true,
+                phase: "build"
+            },
+
+            // ── Reflection: Hear the Melody ───────────────────────
+            {
+                title: _("🤔 What Will It Sound Like?"),
+                content:
+                    _("You now have three notes connected together — that's a melody!") +
+                    " " +
+                    _("Before you press play, try to imagine what it will sound like.") +
+                    " " +
+                    _("Each pitch you chose will play in order, one after another.") +
+                    " " +
+                    _("Ready to hear your composition?"),
+                target: null,
+                position: "center",
+                challenge: _("Click Next to play your melody!"),
+                validator: () => true,
+                autoComplete: true,
+                phase: "reflect",
+                isReflection: true
+            },
+            {
+                title: _("🎼 Play Your Melody!"),
+                content:
+                    _("This is the moment — press Play and listen to the melody YOU composed!") +
+                    " " +
+                    _("Three unique notes, three unique pitches, all chosen by you. 🎶"),
+                hint: _("Click the ▶ Play button in the toolbar to hear your 3-note melody!"),
+                target: () => docById("play") || docById("runButton"),
+                position: "bottom",
+                challenge: _("Press Play to hear your melody!"),
+                validator: () => this._hasPressedPlay(),
+                autoComplete: false,
+                phase: "listen",
+                onStart: () => {
+                    this._playPressed = false;
+                    this._setupPlayListener();
+                }
+            },
+
+            // ── Phase 6: Add Repetition ───────────────────────────
+            {
+                title: _("🔄 Make It Loop!"),
+                content:
+                    _("Your melody plays once and stops. But what if you want it to repeat?") +
+                    " " +
+                    _("The Flow palette has a powerful block called Repeat.") +
+                    " " +
+                    _("Look at the top of the left sidebar — click the second tab (the circular arrows ↻ icon) to find Flow!"),
+                hint: _("At the top of the left sidebar, you'll see small tab icons. Click the second one (↻ arrows) to switch to the Flow/Action palettes. Then click 'Flow'."),
+                target: () => this._findPaletteButton("flow"),
+                position: "right",
+                challenge: _("Open the Flow palette."),
+                validator: () => this._isPaletteOpen("flow"),
+                autoComplete: false,
+                phase: "build"
+            },
+            {
+                title: _("🔁 Wrap Your Melody in a Loop"),
+                content:
+                    _("Drag a Repeat block onto the canvas.") +
+                    " " +
+                    _("Then move your Note blocks INSIDE the Repeat block.") +
+                    " " +
+                    _("Connect the Repeat to the Start block — this will make your melody play multiple times!"),
+                hint: _("Drag the Repeat block from the Flow palette. Disconnect your notes from Start, connect Repeat to Start, then put your notes inside the Repeat clamp."),
+                target: () => this._getCanvas(),
+                position: "right",
+                challenge: _("Connect a Repeat block to Start with notes inside."),
+                validator: () => this._hasRepeatBlock(),
+                autoComplete: false,
+                allowInteraction: true,
+                phase: "build"
+            },
+            {
+                title: _("🎵 Hear It Loop!"),
+                content:
+                    _("Press Play and hear your melody repeat!") +
+                    " " +
+                    _("Notice how the Repeat block plays your notes over and over.") +
+                    " " +
+                    _("You can change the number in the Repeat block to control how many times it loops."),
+                hint: _("Click the ▶ Play button to hear your looping melody!"),
+                target: () => docById("play") || docById("runButton"),
+                position: "bottom",
+                challenge: _("Press Play to hear your melody loop!"),
+                validator: () => this._hasPressedPlay(),
+                autoComplete: false,
+                phase: "listen",
+                onStart: () => {
+                    this._playPressed = false;
+                    this._setupPlayListener();
+                }
+            },
+
+            // ── Reflection: Default Sound ─────────────────────────
+            {
+                title: _("🤔 Sounds a Bit... Electronic?"),
+                content:
+                    _("Your melody loops — great!") +
+                    " " +
+                    _("But it doesn't sound like a real instrument yet.") +
+                    " " +
+                    _("What if you could make it sound like a guitar, piano, or violin?") +
+                    " " +
+                    _("The Tone palette has a special block for choosing instruments!"),
+                target: null,
+                position: "center",
+                challenge: _("Click Next to give your melody a voice!"),
+                validator: () => true,
+                autoComplete: true,
+                phase: "reflect",
+                isReflection: true
+            },
+
+            // ── Phase 7: Set Instrument ────────────────────────────
+            {
+                title: _("🎸 Choose Your Instrument!"),
+                content:
+                    _("Open the Tone palette from the left sidebar.") +
+                    " " +
+                    _("Inside you'll find a 'Set Instrument' block.") +
+                    " " +
+                    _("This lets you pick any instrument — guitar, piano, violin, flute, and more!"),
+                hint: _("Switch back to the first sidebar tab (♩ music notes icon) if needed, then look for 'Tone' — it's below Volume."),
+                target: () => this._findPaletteButton("tone"),
+                position: "right",
+                challenge: _("Open the Tone palette."),
+                validator: () => this._isPaletteOpen("tone"),
+                autoComplete: false,
+                phase: "personalize"
+            },
+            {
+                title: _("🎹 Wrap Your Music in an Instrument"),
+                content:
+                    _("Drag a 'Set Instrument' block onto the canvas.") +
+                    " " +
+                    _("Connect it to the Start block and put your Repeat block INSIDE it.") +
+                    " " +
+                    _("Click on the instrument name to choose your favorite — guitar, piano, cello... it's YOUR sound!"),
+                hint: _("Drag 'Set Instrument' from Tone palette. Disconnect Repeat from Start. Connect Set Instrument to Start, then put Repeat inside the Set Instrument clamp."),
+                target: () => this._getCanvas(),
+                position: "right",
+                challenge: _("Add a Set Instrument block to your project."),
+                validator: () => this._hasSetTimbreBlock(),
+                autoComplete: false,
+                allowInteraction: true,
+                phase: "personalize"
+            },
+            {
+                title: _("🎶 The Grand Finale!"),
+                content:
+                    _("This is it — your complete composition!") +
+                    " " +
+                    _("A melody with pitches YOU chose, looping on an instrument YOU picked.") +
+                    " " +
+                    _("Press Play and enjoy your creation! 🎵🎶🎵"),
+                hint: _("Click the ▶ Play button for the final time!"),
+                target: () => docById("play") || docById("runButton"),
+                position: "bottom",
+                challenge: _("Press Play for the grand finale!"),
+                validator: () => this._hasPressedPlay(),
+                autoComplete: false,
+                phase: "listen",
+                onStart: () => {
+                    this._playPressed = false;
+                    this._setupPlayListener();
+                }
+            },
+
+            // ── Final Reflection & Open-Ended Invitation ──────────
+            {
+                title: _("🌟 You Composed a Song!"),
+                content:
+                    _("You just created a real composition in Music Blocks!") +
+                    " " +
+                    _("You discovered blocks, built a melody, chose an instrument, and made it loop.") +
+                    " " +
+                    _("Everything you hear was designed by YOU.") +
+                    "<br/><br/>" +
+                    _("Keep exploring:") +
+                    "<br/>" +
+                    "🥁 " + _("Add a second Start block with Drums for percussion") +
+                    "<br/>" +
+                    "🎨 " + _("Explore Graphics — your mouse draws while it plays!") +
+                    "<br/>" +
+                    "📦 " + _("Use Action blocks to name and reuse your melodies") +
+                    "<br/>" +
+                    "🎵 " + _("Try changing note durations — use 1/8 for faster notes, 1/2 for slower") +
+                    "<br/><br/>" +
+                    _("There's no wrong way to explore. What will YOU create next?"),
+                target: null,
+                position: "center",
+                challenge: _("Click Finish whenever you're ready to explore on your own!"),
+                validator: () => true,
+                autoComplete: true,
+                isLast: true,
+                phase: "reflect",
+                isReflection: true
             }
         ];
     }
 
     /**
-     * Start the tutorial
+     * Start the tutorial.
+     * Prepares a clean canvas with only a Start block, then begins.
      */
     start() {
         this.isActive = true;
         this.currentStep = 0;
+        this._prepareCleanCanvas();
         this._createOverlay();
+        this._setupKeyboardNav();
         this._showStep(0);
     }
 
     /**
-     * Stop the tutorial and clean up
+     * Stop the tutorial and clean up.
      */
     stop() {
         this.isActive = false;
         this._stopChecking();
+        this._stopHintTimer();
+        this._removeKeyboardNav();
         this._removeOverlay();
     }
 
     /**
-     * Move to the next step
+     * Move to the next step.
      */
     nextStep() {
         this._stopChecking();
@@ -188,7 +524,7 @@ class FirstProjectTutorial {
     }
 
     /**
-     * Move to the previous step
+     * Move to the previous step.
      */
     prevStep() {
         this._stopChecking();
@@ -198,14 +534,18 @@ class FirstProjectTutorial {
         }
     }
 
+    // ========================================
+    // UI RENDERING
+    // ========================================
+
     /**
-     * Create the overlay elements
+     * Create the overlay elements.
      * @private
      */
     _createOverlay() {
         this._removeOverlay();
 
-        // Create main overlay container
+        // Main overlay
         this.overlay = document.createElement("div");
         this.overlay.id = "tutorial-overlay";
         this.overlay.style.cssText = `
@@ -219,7 +559,7 @@ class FirstProjectTutorial {
             pointer-events: none;
         `;
 
-        // Create spotlight (hole in overlay)
+        // Spotlight
         this.spotlight = document.createElement("div");
         this.spotlight.id = "tutorial-spotlight";
         this.spotlight.style.cssText = `
@@ -229,24 +569,25 @@ class FirstProjectTutorial {
             z-index: 9999;
             pointer-events: none;
             transition: all 0.3s ease;
-            border: 3px solid #4CAF50;
+            border: 3px solid #7C4DFF;
         `;
 
-        // Create tooltip
+        // Tooltip
         this.tooltip = document.createElement("div");
         this.tooltip.id = "tutorial-tooltip";
         this.tooltip.style.cssText = `
             position: fixed;
             background: #ffffff;
-            border-radius: 8px;
-            padding: 20px;
-            max-width: 360px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 380px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             z-index: 10000;
             font-family: 'Roboto', sans-serif;
-            color: #505050;
+            color: #333;
             pointer-events: auto;
-            border: 1px solid #ddd;
+            border: none;
+            border-top: 4px solid #7C4DFF;
         `;
 
         document.body.appendChild(this.overlay);
@@ -255,7 +596,7 @@ class FirstProjectTutorial {
     }
 
     /**
-     * Remove overlay elements
+     * Remove overlay elements.
      * @private
      */
     _removeOverlay() {
@@ -274,7 +615,7 @@ class FirstProjectTutorial {
     }
 
     /**
-     * Display a specific step
+     * Display a specific step.
      * @private
      * @param {number} stepIndex
      */
@@ -284,7 +625,7 @@ class FirstProjectTutorial {
 
         this.actionCompleted = false;
 
-        // Run onStart if defined
+        // Run onStart callback if defined
         if (step.onStart) {
             step.onStart();
         }
@@ -304,108 +645,167 @@ class FirstProjectTutorial {
             this.spotlight.style.display = "none";
         }
 
-        // For steps that require interaction (like dragging blocks),
-        // reduce the overlay opacity and ensure spotlight doesn't block clicks
+        // Adjust overlay for interaction steps
         if (step.allowInteraction) {
-            this.overlay.style.background = "rgba(0, 0, 0, 0.2)";
-            this.spotlight.style.boxShadow = "0 0 0 9999px rgba(0, 0, 0, 0.2)";
-            this.spotlight.style.pointerEvents = "none";
+            this.overlay.style.background = "rgba(0, 0, 0, 0.15)";
+            this.spotlight.style.boxShadow = "0 0 0 9999px rgba(0, 0, 0, 0.15)";
         } else {
             this.overlay.style.background = "rgba(0, 0, 0, 0.5)";
             this.spotlight.style.boxShadow = "0 0 0 9999px rgba(0, 0, 0, 0.6)";
-            this.spotlight.style.pointerEvents = "none";
         }
+        this.spotlight.style.pointerEvents = "none";
 
-        // Check if action is already completed or autoComplete
+        // Check completion state
         const isCompleted = step.autoComplete || step.validator();
 
-        // Create tooltip content
+        // Phase colors
+        const phaseColors = {
+            explore: { bg: "#E3F2FD", accent: "#1976D2", icon: "🔍" },
+            build: { bg: "#FFF3E0", accent: "#E65100", icon: "🔨" },
+            listen: { bg: "#E8F5E9", accent: "#2E7D32", icon: "🎧" },
+            personalize: { bg: "#F3E5F5", accent: "#7B1FA2", icon: "✨" },
+            reflect: { bg: "#FFF8E1", accent: "#F57F17", icon: "💭" }
+        };
+        const phase = phaseColors[step.phase] || phaseColors.explore;
+
+        // Build tooltip HTML
+        const progressDots = this.steps
+            .map((s, i) => {
+                const dotColor =
+                    i < stepIndex ? "#7C4DFF" : i === stepIndex ? "#7C4DFF" : "#E0E0E0";
+                const dotSize = i === stepIndex ? "10px" : "6px";
+                return `<span style="
+                    display: inline-block;
+                    width: ${dotSize};
+                    height: ${dotSize};
+                    border-radius: 50%;
+                    background: ${dotColor};
+                    margin: 0 2px;
+                    transition: all 0.2s ease;
+                    ${i < stepIndex ? "opacity: 0.6;" : ""}
+                "></span>`;
+            })
+            .join("");
+
+        // Reflection steps get a special warm styling
+        const tooltipBorderColor = step.isReflection ? "#FFC107" : "#7C4DFF";
+        this.tooltip.style.borderTop = `4px solid ${tooltipBorderColor}`;
+
         this.tooltip.innerHTML = `
-            <div style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-                <span style="background: #f0f0f0; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; color: #666;">
-                    Step ${stepIndex + 1} of ${this.steps.length}
-                </span>
+            <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="
+                        background: ${phase.bg};
+                        color: ${phase.accent};
+                        padding: 4px 10px;
+                        border-radius: 12px;
+                        font-size: 11px;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                    ">${phase.icon} ${step.phase}</span>
+                </div>
                 <button id="tutorial-close" style="
                     background: transparent;
                     border: none;
                     color: #999;
                     font-size: 20px;
                     cursor: pointer;
-                    padding: 0;
+                    padding: 0 4px;
                     line-height: 1;
-                ">×</button>
+                    border-radius: 4px;
+                    transition: all 0.2s ease;
+                " onmouseover="this.style.color='#333';this.style.background='#f0f0f0';"
+                   onmouseout="this.style.color='#999';this.style.background='transparent';"
+                >×</button>
             </div>
-            <h3 style="margin: 0 0 10px 0; font-size: 16px; font-weight: 600; color: #333;">${
-                step.title
-            }</h3>
-            <p style="margin: 0 0 14px 0; color: #505050; line-height: 1.5; font-size: 14px;">${
-                step.content
-            }</p>
-            <div id="tutorial-instruction" style="
-                background: #f5f5f5;
+            <h3 style="
+                margin: 0 0 10px 0;
+                font-size: 17px;
+                font-weight: 700;
+                color: #1a1a1a;
+                line-height: 1.3;
+            ">${step.title}</h3>
+            <p style="
+                margin: 0 0 16px 0;
+                color: #555;
+                line-height: 1.6;
+                font-size: 13.5px;
+            ">${step.content}</p>
+            <div id="tutorial-challenge" style="
+                background: ${step.isReflection ? "#FFFDE7" : "#F5F5F5"};
                 padding: 12px 16px;
                 border-radius: 8px;
-                margin-bottom: 16px;
+                margin-bottom: 8px;
                 font-weight: 500;
                 font-size: 13px;
                 color: #333;
                 display: flex;
                 align-items: center;
                 gap: 10px;
+                border-left: 3px solid ${step.isReflection ? "#FFC107" : phase.accent};
             ">
-                <span id="instruction-icon">${isCompleted ? "✅" : "⏳"}</span>
-                <span id="instruction-text">${
-                    isCompleted ? _("Done! Click Next to continue.") : step.instruction
-                }</span>
+                <span id="challenge-icon" style="font-size: 16px;">${isCompleted ? "✅" : step.isReflection ? "💭" : "🎯"}</span>
+                <span id="challenge-text">${isCompleted ? _("Ready! Click Next to continue.") : step.challenge
+            }</span>
             </div>
-            <div style="display: flex; gap: 10px;">
-                ${
-                    stepIndex > 0
-                        ? `
-                    <button id="tutorial-prev" style="
-                        flex: 1;
-                        padding: 10px 16px;
-                        background: #f0f0f0;
-                        border: 1px solid #ddd;
-                        border-radius: 6px;
-                        cursor: pointer;
-                        font-size: 13px;
-                        font-weight: 500;
-                        color: #505050;
-                    ">← Back</button>
-                `
-                        : ""
-                }
+            <div id="tutorial-hint" style="display: none; margin-bottom: 12px;"></div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                ${stepIndex > 0
+                ? `<button id="tutorial-prev" style="
+                            padding: 10px 14px;
+                            background: #f5f5f5;
+                            border: 1px solid #e0e0e0;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-size: 13px;
+                            font-weight: 500;
+                            color: #666;
+                            transition: all 0.2s ease;
+                        " onmouseover="this.style.background='#eee';"
+                           onmouseout="this.style.background='#f5f5f5';">← Back</button>`
+                : ""
+            }
                 <button id="tutorial-next" style="
-                    flex: 2;
+                    flex: 1;
                     padding: 10px 20px;
-                    background: ${isCompleted ? "#4CAF50" : "#ccc"};
+                    background: ${isCompleted ? "#7C4DFF" : "#ccc"};
                     color: white;
                     border: none;
-                    border-radius: 6px;
+                    border-radius: 8px;
                     cursor: ${isCompleted ? "pointer" : "not-allowed"};
                     font-size: 14px;
                     font-weight: 600;
                     opacity: ${isCompleted ? "1" : "0.7"};
                     transition: all 0.2s ease;
-                " ${isCompleted ? "" : "disabled"}>${step.isLast ? "🎉 Finish" : "Next →"}</button>
+                    ${isCompleted ? "box-shadow: 0 2px 8px rgba(124, 77, 255, 0.3);" : ""}
+                " ${isCompleted ? "" : "disabled"}
+                  ${isCompleted ? 'onmouseover="this.style.background=\'#651FFF\';" onmouseout="this.style.background=\'#7C4DFF\';"' : ""}
+                >${step.isLast ? "🚀 " + _("Start Exploring!") : _("Next") + " →"}</button>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                <span style="font-size: 10px; color: #aaa;">${_("Esc to close • ←→ to navigate")}</span>
+                <div>${progressDots}</div>
             </div>
         `;
 
         // Position tooltip
         this._positionTooltip(targetElement, step.position);
 
-        // Add event listeners
+        // Set up event listeners
         this._setupTooltipListeners(step, isCompleted);
 
-        // Start checking for action completion if not auto-complete
+        // Start validation polling and hint timer if needed
         if (!step.autoComplete && !isCompleted) {
             this._startChecking(step);
+            if (step.hint) {
+                this._startHintTimer(step);
+            }
         }
     }
 
     /**
-     * Setup tooltip button listeners
+     * Setup tooltip button listeners.
      * @private
      */
     _setupTooltipListeners(step, isCompleted) {
@@ -425,20 +825,20 @@ class FirstProjectTutorial {
     }
 
     /**
-     * Start checking for action completion
+     * Start polling for action completion.
      * @private
      */
     _startChecking(step) {
         this._stopChecking();
         this._checkInterval = setInterval(() => {
             if (step.validator()) {
-                this._onActionCompleted();
+                this._onActionCompleted(step);
             }
-        }, 500); // Check every 500ms
+        }, 500);
     }
 
     /**
-     * Stop checking for action completion
+     * Stop polling for action completion.
      * @private
      */
     _stopChecking() {
@@ -449,29 +849,38 @@ class FirstProjectTutorial {
     }
 
     /**
-     * Called when the user completes the required action
+     * Called when the user completes the required action.
      * @private
      */
-    _onActionCompleted() {
+    _onActionCompleted(step) {
         this._stopChecking();
+        this._stopHintTimer();
         this.actionCompleted = true;
 
-        // Update the instruction to show completion
-        const icon = docById("instruction-icon");
-        const text = docById("instruction-text");
+        const icon = docById("challenge-icon");
+        const text = docById("challenge-text");
         const nextBtn = docById("tutorial-next");
+        const hintArea = docById("tutorial-hint");
 
         if (icon) icon.textContent = "✅";
-        if (text) text.textContent = _("Great job! Click Next to continue.");
+        if (text) text.textContent = _("Well done! Click Next to continue.");
+        if (hintArea) hintArea.style.display = "none";
 
         if (nextBtn) {
-            nextBtn.style.background = "#4CAF50";
+            nextBtn.style.background = "#7C4DFF";
             nextBtn.style.cursor = "pointer";
             nextBtn.style.opacity = "1";
+            nextBtn.style.boxShadow = "0 2px 8px rgba(124, 77, 255, 0.3)";
             nextBtn.disabled = false;
             nextBtn.onclick = () => this.nextStep();
+            nextBtn.onmouseover = () => {
+                nextBtn.style.background = "#651FFF";
+            };
+            nextBtn.onmouseout = () => {
+                nextBtn.style.background = "#7C4DFF";
+            };
 
-            // Add a little celebration animation
+            // Subtle celebration: pulse the button
             nextBtn.style.transform = "scale(1.05)";
             setTimeout(() => {
                 if (nextBtn) nextBtn.style.transform = "scale(1)";
@@ -479,8 +888,171 @@ class FirstProjectTutorial {
         }
     }
 
+    // ========================================
+    // CLEAN STARTING STATE
+    // ========================================
+
     /**
-     * Position the tooltip relative to target
+     * Clear the canvas and load a bare Start block.
+     * This ensures the tutorial starts from a clean state regardless
+     * of what was previously on the canvas.
+     * @private
+     */
+    _prepareCleanCanvas() {
+        const activity = this._getActivity();
+        if (!activity) return;
+
+        // Use the app's built-in sendAllToTrash mechanism.
+        // sendAllToTrash(addStartBlock, doNotSave, closeAllWidgets)
+        // We pass (false, true, true) = don't add default stack, don't save empty state, close widgets
+        if (typeof activity.sendAllToTrash === "function") {
+            activity.sendAllToTrash(false, true, true);
+        }
+
+        // Load a bare Start block (no pre-built melody)
+        const bareStartBlock = [
+            [0, "start", screen.width / 3, 150, [null, null, null]]
+        ];
+
+        if (activity.blocks && typeof activity.blocks.loadNewBlocks === "function") {
+            activity.blocks.loadNewBlocks(bareStartBlock);
+        }
+    }
+
+    // ========================================
+    // HINT SYSTEM
+    // ========================================
+
+    /**
+     * Start a timer that shows a "Need a hint?" link after HINT_DELAY_MS.
+     * @private
+     */
+    _startHintTimer(step) {
+        this._stopHintTimer();
+        this._hintTimeout = setTimeout(() => {
+            this._showHintLink(step);
+        }, this.HINT_DELAY_MS);
+    }
+
+    /**
+     * Stop the hint timer.
+     * @private
+     */
+    _stopHintTimer() {
+        if (this._hintTimeout) {
+            clearTimeout(this._hintTimeout);
+            this._hintTimeout = null;
+        }
+    }
+
+    /**
+     * Show a subtle "Need a hint?" link below the challenge box.
+     * @private
+     */
+    _showHintLink(step) {
+        const hintArea = docById("tutorial-hint");
+        if (!hintArea || !step.hint) return;
+
+        hintArea.innerHTML = `
+            <a id="tutorial-hint-link" href="#" style="
+                color: #7C4DFF;
+                font-size: 12px;
+                text-decoration: none;
+                font-weight: 500;
+                transition: opacity 0.3s ease;
+            ">💡 ${_("Need a hint?")}</a>
+        `;
+        hintArea.style.display = "block";
+        hintArea.style.opacity = "0";
+        // Fade in
+        requestAnimationFrame(() => {
+            hintArea.style.transition = "opacity 0.5s ease";
+            hintArea.style.opacity = "1";
+        });
+
+        const hintLink = docById("tutorial-hint-link");
+        if (hintLink) {
+            hintLink.onclick = (e) => {
+                e.preventDefault();
+                this._revealHint(step);
+            };
+        }
+    }
+
+    /**
+     * Replace the "Need a hint?" link with the actual hint text.
+     * @private
+     */
+    _revealHint(step) {
+        const hintArea = docById("tutorial-hint");
+        if (!hintArea || !step.hint) return;
+
+        hintArea.innerHTML = `
+            <div style="
+                background: #EDE7F6;
+                padding: 10px 14px;
+                border-radius: 6px;
+                font-size: 12.5px;
+                color: #4527A0;
+                line-height: 1.5;
+                border-left: 3px solid #7C4DFF;
+            ">💡 ${step.hint}</div>
+        `;
+    }
+
+    // ========================================
+    // KEYBOARD NAVIGATION
+    // ========================================
+
+    /**
+     * Set up keyboard event handler.
+     * Escape = close, → = next (if enabled), ← = back
+     * @private
+     */
+    _setupKeyboardNav() {
+        this._removeKeyboardNav();
+        this._keyHandler = (e) => this._onKeyDown(e);
+        document.addEventListener("keydown", this._keyHandler);
+    }
+
+    /**
+     * Remove keyboard event handler.
+     * @private
+     */
+    _removeKeyboardNav() {
+        if (this._keyHandler) {
+            document.removeEventListener("keydown", this._keyHandler);
+            this._keyHandler = null;
+        }
+    }
+
+    /**
+     * Handle keyboard events.
+     * @private
+     */
+    _onKeyDown(event) {
+        if (!this.isActive) return;
+
+        switch (event.key) {
+            case "Escape":
+                event.preventDefault();
+                this.stop();
+                break;
+            case "ArrowRight":
+                if (this.actionCompleted || this.steps[this.currentStep].autoComplete) {
+                    event.preventDefault();
+                    this.nextStep();
+                }
+                break;
+            case "ArrowLeft":
+                event.preventDefault();
+                this.prevStep();
+                break;
+        }
+    }
+
+    /**
+     * Position the tooltip relative to target.
      * @private
      */
     _positionTooltip(targetElement, position) {
@@ -503,14 +1075,14 @@ class FirstProjectTutorial {
                 break;
             case "left":
                 this.tooltip.style.top = Math.max(20, rect.top) + "px";
-                this.tooltip.style.left = rect.left - 400 - padding + "px";
+                this.tooltip.style.left = rect.left - 420 - padding + "px";
                 break;
             case "bottom":
                 this.tooltip.style.top = rect.bottom + padding + "px";
                 this.tooltip.style.left = Math.max(20, rect.left) + "px";
                 break;
             case "top":
-                this.tooltip.style.top = rect.top - 250 - padding + "px";
+                this.tooltip.style.top = rect.top - 280 - padding + "px";
                 this.tooltip.style.left = Math.max(20, rect.left) + "px";
                 break;
             default:
@@ -521,10 +1093,10 @@ class FirstProjectTutorial {
         // Keep tooltip on screen
         const tooltipRect = this.tooltip.getBoundingClientRect();
         if (tooltipRect.right > window.innerWidth - 20) {
-            this.tooltip.style.left = window.innerWidth - 400 + "px";
+            this.tooltip.style.left = window.innerWidth - 420 + "px";
         }
         if (tooltipRect.bottom > window.innerHeight - 20) {
-            this.tooltip.style.top = window.innerHeight - 350 + "px";
+            this.tooltip.style.top = window.innerHeight - 380 + "px";
         }
         if (parseFloat(this.tooltip.style.left) < 20) {
             this.tooltip.style.left = "20px";
@@ -539,7 +1111,7 @@ class FirstProjectTutorial {
     // ========================================
 
     /**
-     * Get the main canvas element
+     * Get the main canvas element.
      * @private
      */
     _getCanvas() {
@@ -547,11 +1119,10 @@ class FirstProjectTutorial {
     }
 
     /**
-     * Find a palette button by name
+     * Find a palette button by name.
      * @private
      */
     _findPaletteButton(paletteName) {
-        // Try different patterns for finding palette buttons
         const patterns = [
             paletteName.charAt(0).toUpperCase() + paletteName.slice(1) + "tabbutton",
             paletteName + "tabbutton",
@@ -563,7 +1134,6 @@ class FirstProjectTutorial {
             if (el) return el;
         }
 
-        // Search in palette buttons by looking at all elements
         const buttons = document.querySelectorAll('[id*="palette"], [id*="tabbutton"]');
         for (const btn of buttons) {
             if (btn.id.toLowerCase().includes(paletteName.toLowerCase())) {
@@ -575,11 +1145,10 @@ class FirstProjectTutorial {
     }
 
     /**
-     * Get the activity object, with fallback to window.activity
+     * Get the activity object with fallback.
      * @private
      */
     _getActivity() {
-        // Try this.activity first, then fallback to global window.activity
         if (this.activity && this.activity.blocks) {
             return this.activity;
         }
@@ -590,125 +1159,57 @@ class FirstProjectTutorial {
     }
 
     /**
-     * Check if a palette is currently open
+     * Check if a palette is currently open.
      * @private
      */
     _isPaletteOpen(paletteName) {
-        console.log("[Tutorial] _isPaletteOpen called for:", paletteName);
-
         const activity = this._getActivity();
-        console.log("[Tutorial] activity found:", !!activity);
 
-        // Method 1: Check via palettes.activePalette (most reliable)
+        // Method 1: Check via palettes.activePalette
         if (activity && activity.blocks && activity.blocks.palettes) {
             const palettes = activity.blocks.palettes;
-            console.log("[Tutorial] palettes.activePalette:", palettes.activePalette);
-
-            // The activePalette property is set when showPalette is called
             if (palettes.activePalette === paletteName) {
-                console.log("[Tutorial] ✅ Palette detected via activePalette:", paletteName);
                 return true;
             }
         }
 
-        // Method 2: Check if PaletteBody element exists (indicates a palette menu is open)
+        // Method 2: Check PaletteBody element
         const paletteBody = document.getElementById("PaletteBody");
-        console.log("[Tutorial] PaletteBody element found:", !!paletteBody);
         if (paletteBody) {
-            // Check if the header contains the palette name
             const headerSpan = paletteBody.querySelector("thead span");
-            console.log("[Tutorial] Header span found:", !!headerSpan, headerSpan?.textContent);
             if (headerSpan) {
                 const headerText = headerSpan.textContent.toLowerCase();
                 if (
                     headerText === paletteName.toLowerCase() ||
                     headerText.includes(paletteName.toLowerCase())
                 ) {
-                    console.log(
-                        "[Tutorial] ✅ Palette detected via PaletteBody header:",
-                        paletteName
-                    );
                     return true;
                 }
             }
 
-            // Alternative: check if any palette is open and it matches what we're looking for
-            // by checking the label image icon
             const labelImg = paletteBody.querySelector("thead img");
             if (labelImg && labelImg.src) {
-                // The image source contains the palette icon which may include the name
-                const src = labelImg.src.toLowerCase();
-                if (src.includes(paletteName.toLowerCase())) {
-                    console.log(
-                        "[Tutorial] ✅ Palette detected via PaletteBody icon:",
-                        paletteName
-                    );
+                if (labelImg.src.toLowerCase().includes(paletteName.toLowerCase())) {
                     return true;
                 }
             }
         }
 
-        // Method 3: Check for any open palette menu by looking for PaletteBody_items
+        // Method 3: Check PaletteBody_items
         const paletteItems = document.getElementById("PaletteBody_items");
-        console.log(
-            "[Tutorial] PaletteBody_items found:",
-            !!paletteItems,
-            paletteItems?.children?.length
-        );
         if (paletteItems && paletteItems.children.length > 0) {
-            // There are items in an open palette - check if it's the right one
-            // We can look at the current palette in the palettes object
             if (activity && activity.blocks && activity.blocks.palettes) {
-                const currentPalette = activity.blocks.palettes.activePalette;
-                console.log("[Tutorial] Checking activePalette again:", currentPalette);
-                if (currentPalette === paletteName) {
-                    console.log(
-                        "[Tutorial] ✅ Palette detected via PaletteBody_items:",
-                        paletteName
-                    );
+                if (activity.blocks.palettes.activePalette === paletteName) {
                     return true;
                 }
             }
         }
 
-        console.log("[Tutorial] ❌ Palette NOT detected:", paletteName);
         return false;
     }
 
     /**
-     * Count total blocks on canvas
-     * @private
-     */
-    _countBlocks() {
-        const activity = this._getActivity();
-        if (!activity || !activity.blocks || !activity.blocks.blockList) {
-            return 0;
-        }
-        return Object.keys(activity.blocks.blockList).length;
-    }
-
-    /**
-     * Check if a new block of specific type was added
-     * @private
-     */
-    _hasNewBlock(blockName) {
-        const activity = this._getActivity();
-        if (!activity || !activity.blocks || !activity.blocks.blockList) {
-            return false;
-        }
-
-        const blockList = activity.blocks.blockList;
-        for (const blockId in blockList) {
-            const block = blockList[blockId];
-            if (block && block.name === blockName) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Count blocks of a specific type
+     * Count blocks of a specific type.
      * @private
      */
     _countBlocksByName(blockName) {
@@ -729,7 +1230,7 @@ class FirstProjectTutorial {
     }
 
     /**
-     * Check if more note blocks were added since step started
+     * Check if more note blocks were added since step started.
      * @private
      */
     _hasMoreBlocks() {
@@ -739,7 +1240,9 @@ class FirstProjectTutorial {
     }
 
     /**
-     * Check if a note block is connected to the start block
+     * Check if a block of the given name exists anywhere in the chain
+     * starting from the Start block. Traverses clamp inner connections too.
+     * Checks ALL start blocks (in case there are duplicates).
      * @private
      */
     _isBlockConnectedToStart(blockName) {
@@ -750,29 +1253,42 @@ class FirstProjectTutorial {
 
         const blockList = activity.blocks.blockList;
 
-        // Find the start block
-        let startBlock = null;
+        // Find ALL non-trashed start blocks
+        const startBlocks = [];
         for (const blockId in blockList) {
-            if (blockList[blockId] && blockList[blockId].name === "start") {
-                startBlock = blockList[blockId];
-                break;
+            if (blockList[blockId] && blockList[blockId].name === "start" && !blockList[blockId].trash) {
+                startBlocks.push(blockList[blockId]);
             }
         }
 
-        if (!startBlock) return false;
+        // Check each start block — return true if ANY has the target block
+        for (const startBlock of startBlocks) {
+            if (!startBlock.connections || startBlock.connections[1] === null) continue;
 
-        // Check if a newnote block is connected to start
-        // The start block's connections[1] should be connected to something
-        if (
-            startBlock.connections &&
-            Array.isArray(startBlock.connections) &&
-            startBlock.connections.length > 1 &&
-            startBlock.connections[1] !== null
-        ) {
-            const connectedId = startBlock.connections[1];
-            const connectedBlock = blockList[connectedId];
-            if (connectedBlock && connectedBlock.name === blockName) {
-                return true;
+            // BFS traversal from start's flow connection
+            const visited = new Set();
+            const queue = [startBlock.connections[1]];
+
+            while (queue.length > 0) {
+                const currentId = queue.shift();
+                if (currentId === null || currentId === undefined || visited.has(currentId)) continue;
+                visited.add(currentId);
+
+                const block = blockList[currentId];
+                if (!block || block.trash) continue;
+
+                if (block.name === blockName) {
+                    return true;
+                }
+
+                // Follow ALL connections except parent (index 0)
+                if (block.connections) {
+                    for (let i = 1; i < block.connections.length; i++) {
+                        if (block.connections[i] !== null) {
+                            queue.push(block.connections[i]);
+                        }
+                    }
+                }
             }
         }
 
@@ -780,29 +1296,25 @@ class FirstProjectTutorial {
     }
 
     /**
-     * Check if pitch block is inside a note block
+     * Check if pitch block is inside a note block.
+     * Traverses the block hierarchy upward.
      * @private
      */
     _hasPitchInNote() {
         const activity = this._getActivity();
         if (!activity || !activity.blocks || !activity.blocks.blockList) {
-            console.log("[Tutorial] _hasPitchInNote: No activity or blocks found");
             return false;
         }
 
         const blockList = activity.blocks.blockList;
 
-        // Find a pitch block that is connected inside a newnote block
-        // The pitch might be connected through vspace or other intermediate blocks
         for (const blockId in blockList) {
             const block = blockList[blockId];
             if (block && block.name === "pitch") {
-                console.log("[Tutorial] Found pitch block:", blockId);
-
-                // Traverse up the connection chain to find if this pitch is inside a note
+                // Traverse up to find if this pitch is inside a note
                 let currentBlock = block;
                 let depth = 0;
-                const maxDepth = 10; // Prevent infinite loops
+                const maxDepth = 10;
 
                 while (currentBlock && depth < maxDepth) {
                     const connections = currentBlock.connections;
@@ -817,21 +1329,8 @@ class FirstProjectTutorial {
                         break;
                     }
 
-                    console.log("[Tutorial] Checking parent:", parent.name, "at depth", depth);
-
-                    // Check if parent is a note block
                     if (parent.name === "newnote" || parent.name === "note") {
-                        console.log("[Tutorial] ✅ Pitch is inside a note block!");
                         return true;
-                    }
-
-                    // Also check if we're inside a vspace that's inside a note
-                    // by looking at the parent's connections
-                    if (parent.name === "vspace") {
-                        // Continue traversing up
-                        currentBlock = parent;
-                        depth++;
-                        continue;
                     }
 
                     currentBlock = parent;
@@ -840,12 +1339,103 @@ class FirstProjectTutorial {
             }
         }
 
-        console.log("[Tutorial] ❌ No pitch found inside a note block");
         return false;
     }
 
     /**
-     * Setup listener for play button
+     * Count the number of Note blocks that have at least one Pitch inside.
+     * Used to validate that the user has built N complete note+pitch combos.
+     * @private
+     */
+    _countNotesWithPitch() {
+        const activity = this._getActivity();
+        if (!activity || !activity.blocks || !activity.blocks.blockList) {
+            return 0;
+        }
+
+        const blockList = activity.blocks.blockList;
+        let count = 0;
+
+        for (const blockId in blockList) {
+            const block = blockList[blockId];
+            if (block && (block.name === "newnote" || block.name === "note") && !block.trash) {
+                // Check if this note has a pitch inside it
+                if (this._noteHasPitch(block, blockList)) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+    /**
+     * Check if a single note block contains a pitch block.
+     * Traverses children (connections[2] is the inner clamp for newnote).
+     * @private
+     */
+    _noteHasPitch(noteBlock, blockList) {
+        if (!noteBlock.connections) return false;
+
+        // For newnote blocks, connections[2] is the inner flow (clamp content)
+        // We traverse down that chain looking for a pitch
+        const innerConnection = noteBlock.connections[2];
+        if (innerConnection === null || innerConnection === undefined) return false;
+
+        let currentId = innerConnection;
+        let depth = 0;
+        const maxDepth = 20;
+
+        while (currentId !== null && currentId !== undefined && depth < maxDepth) {
+            const block = blockList[currentId];
+            if (!block) break;
+
+            if (block.name === "pitch") {
+                return true;
+            }
+
+            // Follow the flow: for most blocks, the last connection is the next block
+            // But we also need to check inner children of vspace, etc.
+            if (block.connections && block.connections.length > 1) {
+                // Check all connections except the parent (index 0)
+                for (let i = 1; i < block.connections.length; i++) {
+                    const childId = block.connections[i];
+                    if (childId !== null && blockList[childId]) {
+                        if (blockList[childId].name === "pitch") {
+                            return true;
+                        }
+                    }
+                }
+                // Follow the last connection as flow
+                currentId = block.connections[block.connections.length - 1];
+            } else {
+                break;
+            }
+            depth++;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if there is a Repeat block connected anywhere in the start chain.
+     * @private
+     */
+    _hasRepeatBlock() {
+        return this._isBlockConnectedToStart("repeat") || this._isBlockConnectedToStart("forever");
+    }
+
+    /**
+     * Check if there is a Set Instrument (settimbre) block connected anywhere in the start chain.
+     * @private
+     */
+    _hasSetTimbreBlock() {
+        return this._isBlockConnectedToStart("settimbre") || this._isBlockConnectedToStart("setinstrument");
+    }
+
+    /**
+     * Setup listener for play button.
+     * Uses addEventListener with { once: true } to avoid conflicts.
      * @private
      */
     _setupPlayListener() {
@@ -863,7 +1453,7 @@ class FirstProjectTutorial {
     }
 
     /**
-     * Check if play was pressed
+     * Check if play was pressed.
      * @private
      */
     _hasPressedPlay() {
