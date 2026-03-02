@@ -4619,6 +4619,14 @@ class Block {
             this.activity.logo.synth.loadSynth(0, getDrumSynthName(this.value));
         }
     }
+
+    /**
+     * Dummy getClientRects to satisfy tools that might wrap a block instance.
+     * @returns {Array} - An empty array.
+     */
+    getClientRects() {
+        return [];
+    }
 }
 
 /**
