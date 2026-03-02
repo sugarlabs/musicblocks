@@ -31,6 +31,9 @@ requirejs.config({
         },
         "p5-sound-adapter": {
             deps: ["p5.sound.min"]
+        },
+        "activity/logoconstants": {
+            deps: ["utils/utils"]
         }
     },
     paths: {
