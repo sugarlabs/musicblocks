@@ -34,6 +34,7 @@ describe("Activity Event Listener Management", () => {
             _: key => key, // Mock translation function
             define: () => {},
             require: () => {},
+            performance: global.performance,
             setTimeout: setTimeout,
             createjs: {},
 
