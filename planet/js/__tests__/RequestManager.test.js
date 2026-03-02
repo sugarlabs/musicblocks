@@ -17,7 +17,83 @@ describe("RequestManager", () => {
             baseRetryDelay: 50,
             maxConcurrent: 2
         });
+   });
+    describe("failure handling and cleanup", () => {
+   
+    it("should reject the promise if request never responds", async () => {
+    jest.useFakeTimers();
+
+    const neverResolvingRequest = jest.fn(() => {
+        // intentionally never calls callback
     });
+
+    const promise = requestManager.throttledRequest(
+        { action: "hang-test" },
+        neverResolvingRequest
+    );
+
+    // Fast-forward time beyond expected timeout (30s or configured)
+    jest.advanceTimersByTime(60000);
+    await Promise.resolve();
+
+
+    await expect(promise).rejects.toBeDefined();
+
+    jest.useRealTimers();
+});
+
+it("should clean up pendingRequests after timeout failure", async () => {
+    jest.useFakeTimers();
+
+    const neverResolvingRequest = jest.fn(() => {});
+
+    const promise = requestManager.throttledRequest(
+        { action: "cleanup-test" },
+        neverResolvingRequest
+    );
+
+    // Request should be pending initially
+    expect(requestManager.pendingRequests.size).toBe(1);
+
+    jest.advanceTimersByTime(60000);
+    await Promise.resolve();
+
+
+    await promise.catch(() => {});
+
+    expect(requestManager.pendingRequests.size).toBe(0);
+
+    jest.useRealTimers();
+});
+
+it("should allow new requests after a failed request", async () => {
+    jest.useFakeTimers();
+
+    const neverResolvingRequest = jest.fn(() => {});
+    const successRequest = jest.fn(cb => cb({ success: true }));
+
+    const failed = requestManager.throttledRequest(
+        { action: "fail-first" },
+        neverResolvingRequest
+    );
+
+    jest.advanceTimersByTime(60000);
+    await Promise.resolve();
+
+    await failed.catch(() => {});
+
+    const result = await requestManager.throttledRequest(
+        { action: "next" },
+        successRequest
+    );
+
+    expect(result.success).toBe(true);
+
+    jest.useRealTimers();
+
+});
+
+}); 
 
     afterEach(() => {
         requestManager.clearPending();
