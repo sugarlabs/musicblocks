@@ -40,7 +40,7 @@
 // Use mocked functions in test environment, real ones in production
 var TEMPERAMENT, isCustomTemperament, getTemperament;
 
-if (typeof global !== 'undefined' && global.TEMPERAMENT) {
+if (typeof global !== "undefined" && global.TEMPERAMENT) {
     // Test environment - use globals
     TEMPERAMENT = global.TEMPERAMENT;
     isCustomTemperament = global.isCustomTemperament;
@@ -292,7 +292,7 @@ function setupIntervalsActions(activity) {
                 let maxPitchNumber = 11; // default for standard 12-tone temperament
                 let temperamentCardinality = 12;
 
-                if (isCustomTemperament(temperament)) {
+                if (isCustomTemperament(temperament) && temperament && TEMPERAMENT[temperament]) {
                     temperamentCardinality = TEMPERAMENT[temperament]["pitchNumber"];
                     maxPitchNumber = temperamentCardinality - 1;
                 } else {

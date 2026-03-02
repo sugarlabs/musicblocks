@@ -36,10 +36,32 @@ jest.mock("../../utils/musicutils", () => ({
             "perfect 8": 2
         }
     },
-    isCustomTemperament: (temperament) => {
-        return !["equal", "major", "minor", "harmonicminor", "ionian", "dorian", "phrygian", "lydian", "mixolydian", "aeolian", "blues", "chromatic", "whole", "pentatonic", "pythagorean", "just", "quarter", "31-EDO", "19-EDO", "5-EDO", "7-EDO"].includes(temperament);
+    isCustomTemperament: temperament => {
+        return ![
+            "equal",
+            "major",
+            "minor",
+            "harmonicminor",
+            "ionian",
+            "dorian",
+            "phrygian",
+            "lydian",
+            "mixolydian",
+            "aeolian",
+            "blues",
+            "chromatic",
+            "whole",
+            "pentatonic",
+            "pythagorean",
+            "just",
+            "quarter",
+            "31-EDO",
+            "19-EDO",
+            "5-EDO",
+            "7-EDO"
+        ].includes(temperament);
     },
-    getTemperament: (entry) => {
+    getTemperament: entry => {
         const temperamentMap = {
             equal: {
                 "pitchNumber": 12,
@@ -60,7 +82,7 @@ jest.mock("../../utils/musicutils", () => ({
         };
         return temperamentMap[entry] || null;
     },
-    _: (str) => str
+    _: str => str
 }));
 
 const { setupIntervalsActions } = require("../IntervalsActions");
@@ -90,7 +112,7 @@ describe("setupIntervalsActions", () => {
             }
         };
 
-        global.getTemperament = (entry) => {
+        global.getTemperament = entry => {
             return global.TEMPERAMENT[entry];
         };
 
@@ -117,15 +139,6 @@ describe("setupIntervalsActions", () => {
 
         global.MusicBlocks = { isRun: false };
         global.Mouse = { getMouseFromTurtle: jest.fn() };
-                "major 2": 1.122462,
-                "perfect 8": 2
-            },
-            custom31: {
-                "pitchNumber": 31,
-                "perfect 1": 1,
-                "perfect 8": 2
-            }
-        };
 
         var isCustomTemperament = temperament => {
             return ![
@@ -427,7 +440,7 @@ describe("setupIntervalsActions", () => {
         turtle.singer.defineMode.push(0, 4, 7);
         listener();
 
-        expect(MUSICALMODES.custom).toBeDefined();
+        expect(MUSICALMODES["custom31"]).toBeDefined();
     });
 
     test("defineMode error paths", () => {
