@@ -56,6 +56,15 @@ const jsTask = () => {
         .pipe(dest("dist"));
 };
 
+// Lint task for JS files
+const lintTask = () => {
+    return gulp
+        .src(["js/**/*.js", "!node_modules/**"])
+        .pipe(eslint())
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError());
+};
+
 // Cachebust
 const cbString = new Date().getTime();
 const cacheBustTask = () => {
