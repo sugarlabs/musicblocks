@@ -31,7 +31,7 @@ jobs:
       - name: Run Jest Tests
         id: jest
         run: |
-          npm test -- --json --outputFile=jest-results.json
+          npm test -- --json --outputFile=jest-results.json || echo "TESTS_FAILED=true" >> $GITHUB_ENV
 
       - name: Read Jest Results
         id: results
