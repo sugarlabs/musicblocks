@@ -29,6 +29,29 @@
  * JavaScript based Music Blocks code.
  */
 class ASTUtils {
+    static _isValidIdentifier(name) {
+        return typeof name === "string" && /^[A-Za-z_$][0-9A-Za-z_$]*$/.test(name);
+    }
+
+    static _getMouseCallExpression(methodName, args) {
+        return {
+            type: "CallExpression",
+            callee: {
+                type: "MemberExpression",
+                object: {
+                    type: "Identifier",
+                    name: "mouse"
+                },
+                computed: false,
+                property: {
+                    type: "Identifier",
+                    name: methodName
+                }
+            },
+            arguments: args
+        };
+    }
+
     /**
      * @static
      * Abstract Syntax Tree for the bare minimum program code
@@ -304,8 +327,33 @@ class ASTUtils {
      * @returns {Object} Abstract Syntax Tree of increment assignment statement
      */
     static _getIncrementStmntAST(args, isIncrement) {
-        const identifier = args[0].split("_")[1];
+        const identifier =
+            typeof args[0] === "string" && args[0].startsWith("box_") ? args[0].slice(4) : args[0];
         const arg = ASTUtils._getArgsAST([args[1]])[0];
+
+        if (!ASTUtils._isValidIdentifier(identifier)) {
+            const deltaAst = isIncrement
+                ? arg
+                : {
+                      type: "UnaryExpression",
+                      operator: "-",
+                      argument: arg,
+                      prefix: true
+                  };
+            return {
+                type: "ExpressionStatement",
+                expression: {
+                    type: "AwaitExpression",
+                    argument: ASTUtils._getMouseCallExpression("incrementBox", [
+                        {
+                            type: "Literal",
+                            value: identifier
+                        },
+                        deltaAst
+                    ])
+                }
+            };
+        }
 
         return {
             type: "ExpressionStatement",
@@ -353,6 +401,22 @@ class ASTUtils {
                             {
                                 type: "Identifier",
                                 name: "mouse"
+                            },
+                            {
+                                type: "AssignmentPattern",
+                                left: {
+                                    type: "Identifier",
+                                    name: "actionArgs"
+                                },
+                                right: {
+                                    type: "ArrayExpression",
+                                    elements: [
+                                        {
+                                            type: "Literal",
+                                            value: null
+                                        }
+                                    ]
+                                }
                             }
                         ],
                         body: {
@@ -430,6 +494,18 @@ class ASTUtils {
                         name: "mouse"
                     }
                 ];
+                if (args !== undefined && args !== null) {
+                    AST["expression"]["argument"]["arguments"].push({
+                        type: "ArrayExpression",
+                        elements: [
+                            {
+                                type: "Literal",
+                                value: null
+                            },
+                            ...ASTUtils._getArgsAST(args)
+                        ]
+                    });
+                }
             }
             if (props.statement === false) {
                 AST = AST["expression"];
@@ -448,6 +524,44 @@ class ASTUtils {
      * @returns {Object} - Abstract Syntax Tree of method call
      */
     static _getArgExpAST(methodName, args) {
+        if (methodName === "arg") {
+            const indexAst = ASTUtils._getArgsAST(args)[0] || {
+                type: "Literal",
+                value: 1
+            };
+            return {
+                type: "MemberExpression",
+                object: {
+                    type: "Identifier",
+                    name: "actionArgs"
+                },
+                property: indexAst,
+                computed: true
+            };
+        }
+
+        if (methodName === "box") {
+            const nameAst = ASTUtils._getArgsAST(args)[0];
+            if (nameAst && nameAst.type === "Identifier") {
+                return nameAst;
+            }
+            if (nameAst && nameAst.type === "Literal" && typeof nameAst.value === "string") {
+                if (ASTUtils._isValidIdentifier(nameAst.value)) {
+                    return {
+                        type: "Identifier",
+                        name: nameAst.value
+                    };
+                }
+            }
+            if (!nameAst) {
+                return {
+                    type: "Identifier",
+                    name: "undefined"
+                };
+            }
+            return ASTUtils._getMouseCallExpression("getBox", [nameAst]);
+        }
+
         const mathOps = {
             plus: ["binexp", "+"],
             minus: ["binexp", "-"],
@@ -457,8 +571,8 @@ class ASTUtils {
             equal: ["binexp", "=="],
             less: ["binexp", "<"],
             greater: ["binexp", ">"],
-            or: ["binexp", "|"],
-            and: ["binexp", "&"],
+            or: ["binexp", "||"],
+            and: ["binexp", "&&"],
             xor: ["binexp", "^"],
             not: ["unexp", "!"],
             neg: ["unexp", "-"],
@@ -470,7 +584,10 @@ class ASTUtils {
 
         function getBinaryExpAST(operator, operand1, operand2) {
             return {
-                type: "BinaryExpression",
+                type:
+                    operator === "&&" || operator === "||"
+                        ? "LogicalExpression"
+                        : "BinaryExpression",
                 left: ASTUtils._getArgsAST([operand1])[0],
                 right: ASTUtils._getArgsAST([operand2])[0],
                 operator: `${operator}`
@@ -538,17 +655,35 @@ class ASTUtils {
                     );
                 }
             } else {
-                if (typeof arg === "string" && arg.split("_").length > 1) {
-                    const [type, argVal] = arg.split("_");
+                if (typeof arg === "string" && arg.includes("_")) {
+                    const sepIndex = arg.indexOf("_");
+                    const type = arg.slice(0, sepIndex);
+                    const argVal = arg.slice(sepIndex + 1);
                     if (type === "bool") {
                         ASTs.push({
                             type: "Literal",
                             value: argVal === "true"
                         });
                     } else if (type === "box") {
+                        if (ASTUtils._isValidIdentifier(argVal)) {
+                            ASTs.push({
+                                type: "Identifier",
+                                name: argVal
+                            });
+                        } else {
+                            ASTs.push(
+                                ASTUtils._getMouseCallExpression("getBox", [
+                                    {
+                                        type: "Literal",
+                                        value: argVal
+                                    }
+                                ])
+                            );
+                        }
+                    } else {
                         ASTs.push({
-                            type: "Identifier",
-                            name: argVal
+                            type: "Literal",
+                            value: arg
                         });
                     }
                 } else {
@@ -674,23 +809,13 @@ class ASTUtils {
             } else if (flow[0] === "decrementOne") {
                 ASTs.push(ASTUtils._getIncrementStmntAST([flow[1][0], 1], false));
             } else if (flow[0] === "storein") {
-                ASTs.push({
-                    type: "VariableDeclaration",
-                    kind: "var",
-                    declarations: [
-                        {
-                            type: "VariableDeclarator",
-                            id: {
-                                type: "Identifier",
-                                name: flow[1][0]
-                            },
-                            init: ASTUtils._getArgsAST([flow[1][1]])[0]
-                        }
-                    ]
-                });
-            } else if (flow[0].split("_").length > 1) {
-                const [instruction, idName] = flow[0].split("_");
-                if (instruction === "storein2") {
+                const nameAst = ASTUtils._getArgsAST([flow[1][0]])[0];
+                const valueAst = ASTUtils._getArgsAST([flow[1][1]])[0];
+                if (
+                    nameAst &&
+                    nameAst.type === "Literal" &&
+                    ASTUtils._isValidIdentifier(nameAst.value)
+                ) {
                     ASTs.push({
                         type: "VariableDeclaration",
                         kind: "var",
@@ -699,13 +824,62 @@ class ASTUtils {
                                 type: "VariableDeclarator",
                                 id: {
                                     type: "Identifier",
-                                    name: idName
+                                    name: nameAst.value
                                 },
-                                init: ASTUtils._getArgsAST(flow[1])[0]
+                                init: valueAst
                             }
                         ]
                     });
+                } else {
+                    ASTs.push({
+                        type: "ExpressionStatement",
+                        expression: {
+                            type: "AwaitExpression",
+                            argument: ASTUtils._getMouseCallExpression("setBox", [
+                                nameAst,
+                                valueAst
+                            ])
+                        }
+                    });
+                }
+            } else if (flow[0].split("_").length > 1) {
+                const splitIndex = flow[0].indexOf("_");
+                const instruction = flow[0].slice(0, splitIndex);
+                const idName = flow[0].slice(splitIndex + 1);
+                if (instruction === "storein2") {
+                    if (ASTUtils._isValidIdentifier(idName)) {
+                        ASTs.push({
+                            type: "VariableDeclaration",
+                            kind: "var",
+                            declarations: [
+                                {
+                                    type: "VariableDeclarator",
+                                    id: {
+                                        type: "Identifier",
+                                        name: idName
+                                    },
+                                    init: ASTUtils._getArgsAST(flow[1])[0]
+                                }
+                            ]
+                        });
+                    } else {
+                        ASTs.push({
+                            type: "ExpressionStatement",
+                            expression: {
+                                type: "AwaitExpression",
+                                argument: ASTUtils._getMouseCallExpression("setBox", [
+                                    {
+                                        type: "Literal",
+                                        value: idName
+                                    },
+                                    ASTUtils._getArgsAST(flow[1])[0]
+                                ])
+                            }
+                        });
+                    }
                 } else if (instruction === "nameddo") {
+                    ASTs.push(ASTUtils._getMethodCallAST(idName, flow[1], { action: true }));
+                } else if (instruction === "nameddoArg") {
                     ASTs.push(ASTUtils._getMethodCallAST(idName, flow[1], { action: true }));
                 }
             } else {

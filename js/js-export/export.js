@@ -18,7 +18,7 @@
  * Internal functions' names are in PascalCase.
  */
 
-/* global JSEditor, last, importMembers, Singer, JSInterface, globalActivity */
+/* global JSEditor, last, importMembers, Singer, JSInterface, globalActivity, CAMERAVALUE */
 
 /**
  * @class
@@ -316,6 +316,25 @@ class MusicBlocks {
         }
     }
 
+    // ============================== BOXES ==================================
+
+    getBox(name) {
+        if (name in globalActivity.logo.boxes) {
+            return globalActivity.logo.boxes[name];
+        }
+        JSEditor.logConsole(`No box named "${name}"`, "maroon");
+        return 0;
+    }
+
+    setBox(name, value) {
+        globalActivity.logo.boxes[name] = value;
+    }
+
+    incrementBox(name, delta) {
+        const current = name in globalActivity.logo.boxes ? globalActivity.logo.boxes[name] : 0;
+        globalActivity.logo.boxes[name] = current + delta;
+    }
+
     // ========= Getters/Setters ===================================================================
 
     // ============================== GRAPHICS ================================
@@ -330,6 +349,19 @@ class MusicBlocks {
 
     get HEADING() {
         return this.turtle.orientation;
+    }
+
+    get BOTTOMPOS() {
+        const canvas = globalActivity.turtles._canvas;
+        const scale = globalActivity.turtles.scale;
+        if (!canvas || !canvas.height || !scale) {
+            return 0;
+        }
+        return -1 * (canvas.height / (2.0 * scale));
+    }
+
+    get CAMERA() {
+        return CAMERAVALUE;
     }
 
     // ================================ PEN ===================================
