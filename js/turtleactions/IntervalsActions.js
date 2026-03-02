@@ -287,6 +287,10 @@ function setupIntervalsActions(activity) {
                     if (temp && temp["pitchNumber"]) {
                         temperamentCardinality = temp["pitchNumber"];
                         maxPitchNumber = temperamentCardinality - 1;
+                    } else {
+                        // Default to 12-tone temperament if temperament not found
+                        temperamentCardinality = 12;
+                        maxPitchNumber = 11;
                     }
                 }
 
@@ -298,19 +302,25 @@ function setupIntervalsActions(activity) {
                 for (let i = 0; i < pitchNumbers.length; i++) {
                     const originalPitch = pitchNumbers[i];
                     originalPitchNumbers.push(originalPitch);
-                    
+
                     // Apply standard circular modulo (handles negative numbers correctly)
                     let wrappedPitch = originalPitch % temperamentCardinality;
                     if (wrappedPitch < 0) {
                         wrappedPitch += temperamentCardinality;
                     }
-                    
+
                     wrappedPitchNumbers.push(wrappedPitch);
 
                     // Show warning if pitch was wrapped
                     if (originalPitch < 0 || originalPitch > maxPitchNumber) {
                         activity.errorMsg(
-                            _("Pitch number ") + originalPitch + _(" wrapped to ") + wrappedPitch + _(" to fit in ") + temperamentCardinality + _(" tone temperament.")
+                            _("Pitch number ") +
+                                originalPitch +
+                                _(" wrapped to ") +
+                                wrappedPitch +
+                                _(" to fit in ") +
+                                temperamentCardinality +
+                                _(" tone temperament.")
                         );
                     }
 
@@ -322,13 +332,16 @@ function setupIntervalsActions(activity) {
                 }
 
                 // Remove duplicates and sort
-                const uniqueWrappedPitchNumbers = [...new Set(wrappedPitchNumbers)].sort((a, b) => a - b);
+                const uniqueWrappedPitchNumbers = [...new Set(wrappedPitchNumbers)].sort(
+                    (a, b) => a - b
+                );
 
                 // Build the mode using wrapped pitch numbers
                 for (let i = 0; i < uniqueWrappedPitchNumbers.length; i++) {
                     if (i < uniqueWrappedPitchNumbers.length - 1) {
                         // Calculate interval to next pitch
-                        let interval = uniqueWrappedPitchNumbers[i + 1] - uniqueWrappedPitchNumbers[i];
+                        let interval =
+                            uniqueWrappedPitchNumbers[i + 1] - uniqueWrappedPitchNumbers[i];
                         if (interval < 0) {
                             interval += temperamentCardinality;
                         }

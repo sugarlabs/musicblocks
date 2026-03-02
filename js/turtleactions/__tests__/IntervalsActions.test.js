@@ -54,26 +54,35 @@ describe("setupIntervalsActions", () => {
         global.Mouse = { getMouseFromTurtle: jest.fn() };
 
         global.window = {};
-        global._ = (text) => text;
+        global._ = text => text;
         global.TEMPERAMENT = {
-            "equal": {
+            equal: {
                 "pitchNumber": 12,
                 "perfect 1": 1,
                 "major 2": 1.122462,
                 "perfect 8": 2
             },
-            "custom31": {
+            custom31: {
                 "pitchNumber": 31,
                 "perfect 1": 1,
                 "perfect 8": 2
             }
         };
 
-        global.isCustomTemperament = (temperament) => {
-            return !["equal", "equal5", "equal7", "meantone", "werckmeister", "pythagorean", "just intonation", "custom31"].includes(temperament);
+        global.isCustomTemperament = temperament => {
+            return ![
+                "equal",
+                "equal5",
+                "equal7",
+                "meantone",
+                "werckmeister",
+                "pythagorean",
+                "just intonation",
+                "custom31"
+            ].includes(temperament);
         };
 
-        global.getTemperament = (entry) => {
+        global.getTemperament = entry => {
             return global.TEMPERAMENT[entry] || undefined;
         };
 
@@ -384,13 +393,13 @@ describe("setupIntervalsActions", () => {
     beforeEach(() => {
         // Ensure TEMPERAMENT is available globally for the test
         global.TEMPERAMENT = {
-            "equal": {
+            equal: {
                 "pitchNumber": 12,
                 "perfect 1": 1,
                 "major 2": 1.122462,
                 "perfect 8": 2
             },
-            "custom31": {
+            custom31: {
                 "pitchNumber": 31,
                 "perfect 1": 1,
                 "perfect 8": 2

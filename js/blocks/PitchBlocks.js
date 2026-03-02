@@ -434,7 +434,7 @@ function setupPitchBlocks(activity) {
         arg(logo, turtle, blk) {
             // Get the current active temperament
             const temperament = logo.synth.inTemperament;
-            
+
             // Check if it's a custom temperament
             if (isCustomTemperament(temperament)) {
                 // For custom temperaments, get the pitchNumber from the temperament object
