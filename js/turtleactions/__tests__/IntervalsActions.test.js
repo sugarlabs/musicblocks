@@ -3,10 +3,9 @@
  * MusicBlocks v3.6.2
  * Copyright (C) 2025 Anubhab
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -17,81 +16,52 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-// Set up globals before requiring IntervalsActions
-global._ = x => x;
-global.NOINPUTERRORMSG = "NOINPUT";
-global.window = {};
-global.TEMPERAMENT = {
-    equal: {
-        "pitchNumber": 12,
-        "perfect 1": 1,
-        "major 2": 1.122462,
-        "perfect 8": 2
+// Mock the entire musicutils module to prevent _ function ReferenceError
+jest.mock("../../utils/musicutils", () => ({
+    TEMPERAMENT: {
+        equal: {
+            "pitchNumber": 12,
+            "perfect 1": 1,
+            "major 2": 1.122462,
+            "perfect 8": 2
+        },
+        custom31: {
+            "pitchNumber": 31,
+            "perfect 1": 1,
+            "perfect 8": 2
+        },
+        custom: {
+            "pitchNumber": 31,
+            "perfect 1": 1,
+            "perfect 8": 2
+        }
     },
-    custom31: {
-        "pitchNumber": 31,
-        "perfect 1": 1,
-        "perfect 8": 2
-    }
-};
-
-global.PreDefinedTemperaments = {
-    equal: true,
-    major: true,
-    minor: true,
-    harmonicminor: true,
-    ionian: true,
-    dorian: true,
-    phrygian: true,
-    lydian: true,
-    mixolydian: true,
-    aeolian: true,
-    blues: true,
-    chromatic: true,
-    whole: true,
-    pentatonic: true,
-    pythagorean: true,
-    just: true,
-    quarter: true,
-    "31-EDO": true,
-    "19-EDO": true,
-    "5-EDO": true,
-    "7-EDO": true
-};
-
-global.isCustomTemperament = (temperament) => {
-    return !global.PreDefinedTemperaments[temperament];
-};
-        
-global.getTemperament = (entry) => {
-    return global.TEMPERAMENT[entry];
-};
-
-global.MUSICALMODES = {
-    major: [2, 2, 1, 2, 2, 2, 1],
-    minor: [2, 1, 2, 2, 1, 2, 2]
-};
-
-global.ALLNOTESTEP = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
-global.NOTENAMES = ["C", "D", "E", "F", "G", "A", "B"];
-
-global.SEMITONETOINTERVALMAP = Array(13)
-    .fill(null)
-    .map(() => Array(7).fill("perfect"));
-
-global.GetNotesForInterval = () => ({
-    firstNote: "C",
-    secondNote: "G",
-    octave: 0
-});
-
-global.getNote = () => ["C"];
-global.getModeLength = () => 7;
-
-global.MusicBlocks = { isRun: false };
-global.Mouse = { getMouseFromTurtle: () => {} };
-
-global.Singer = {};
+    isCustomTemperament: (temperament) => {
+        return !["equal", "major", "minor", "harmonicminor", "ionian", "dorian", "phrygian", "lydian", "mixolydian", "aeolian", "blues", "chromatic", "whole", "pentatonic", "pythagorean", "just", "quarter", "31-EDO", "19-EDO", "5-EDO", "7-EDO"].includes(temperament);
+    },
+    getTemperament: (entry) => {
+        const temperamentMap = {
+            equal: {
+                "pitchNumber": 12,
+                "perfect 1": 1,
+                "major 2": 1.122462,
+                "perfect 8": 2
+            },
+            custom31: {
+                "pitchNumber": 31,
+                "perfect 1": 1,
+                "perfect 8": 2
+            },
+            custom: {
+                "pitchNumber": 31,
+                "perfect 1": 1,
+                "perfect 8": 2
+            }
+        };
+        return temperamentMap[entry] || null;
+    },
+    _: (str) => str
+}));
 
 const { setupIntervalsActions } = require("../IntervalsActions");
 
@@ -103,35 +73,24 @@ describe("setupIntervalsActions", () => {
     beforeEach(() => {
         jest.resetModules();
 
-        global.PreDefinedTemperaments = {
-            equal: true,
-            major: true,
-            minor: true,
-            harmonicminor: true,
-            ionian: true,
-            dorian: true,
-            phrygian: true,
-            lydian: true,
-            mixolydian: true,
-            aeolian: true,
-            blues: true,
-            chromatic: true,
-            whole: true,
-            pentatonic: true,
-            pythagorean: true,
-            just: true,
-            quarter: true,
-            "31-EDO": true,
-            "19-EDO": true,
-            "5-EDO": true,
-            "7-EDO": true
+        global._ = x => x;
+        global.NOINPUTERRORMSG = "NOINPUT";
+        global.window = {};
+        global.TEMPERAMENT = {
+            equal: {
+                "pitchNumber": 12,
+                "perfect 1": 1,
+                "major 2": 1.122462,
+                "perfect 8": 2
+            },
+            custom31: {
+                "pitchNumber": 31,
+                "perfect 1": 1,
+                "perfect 8": 2
+            }
         };
 
-        var isCustomTemperament = (temperament) => {
-            return !global.PreDefinedTemperaments[temperament];
-        };
-        
-        var getTemperament = (entry) => {
+        global.getTemperament = (entry) => {
             return global.TEMPERAMENT[entry];
         };
 
@@ -158,13 +117,6 @@ describe("setupIntervalsActions", () => {
 
         global.MusicBlocks = { isRun: false };
         global.Mouse = { getMouseFromTurtle: jest.fn() };
-
-        global.window = {};
-        global._ = text => text;
-        global.TEMPERAMENT = {
-            equal: {
-                "pitchNumber": 12,
-                "perfect 1": 1,
                 "major 2": 1.122462,
                 "perfect 8": 2
             },

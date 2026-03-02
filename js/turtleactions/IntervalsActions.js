@@ -38,21 +38,19 @@
  */
 
 // Use mocked functions in test environment, real ones in production
-var TEMPERAMENT = global.TEMPERAMENT || require("../utils/musicutils").TEMPERAMENT;
-var isCustomTemperament = global.isCustomTemperament || require("../utils/musicutils").isCustomTemperament;
-var getTemperament = global.getTemperament || require("../utils/musicutils").getTemperament;
+var TEMPERAMENT, isCustomTemperament, getTemperament;
 
-// Ensure globals are available in test environment
-if (typeof global !== 'undefined') {
-    TEMPERAMENT = global.TEMPERAMENT || TEMPERAMENT;
-    isCustomTemperament = global.isCustomTemperament || isCustomTemperament;
-    getTemperament = global.getTemperament || getTemperament;
-}
-
-// Direct access to global functions in test environment
 if (typeof global !== 'undefined' && global.TEMPERAMENT) {
+    // Test environment - use globals
+    TEMPERAMENT = global.TEMPERAMENT;
     isCustomTemperament = global.isCustomTemperament;
     getTemperament = global.getTemperament;
+} else {
+    // Production environment - use require
+    var musicutils = require("../utils/musicutils");
+    TEMPERAMENT = musicutils.TEMPERAMENT;
+    isCustomTemperament = musicutils.isCustomTemperament;
+    getTemperament = musicutils.getTemperament;
 }
 
 /* exported setupIntervalsActions*/
