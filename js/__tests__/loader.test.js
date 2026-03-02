@@ -1,185 +1,192 @@
-describe("loader.js coverage", () => {
-    let mockRequireJS;
-    let mockRequireJSConfig;
+/**
+ * @jest-environment jsdom
+ */
+
+describe('loader.js', () => {
     let mockI18next;
-    let mockI18nextHttpBackend;
-    let consoleErrorSpy;
 
     beforeEach(() => {
+        // Clear the module cache so that `require('../loader.js')`
+        // reloads the module on every test.
         jest.resetModules();
 
-        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {
-            // Mock empty implementation
+        // --------------------------------------------------------------------
+        // 1. Default RequireJS stub – tests that need different behaviour
+        //    override `window.requirejs` again inside the test body.
+        // --------------------------------------------------------------------
+        window.requirejs = jest.fn((deps, callback, errCallback) => {
+            if (deps && deps.includes("i18next")) {
+                // pretend requirejs loaded i18next and invoke the
+                // factory with our mock object and an empty config
+                if (callback) callback(mockI18next, {});
+            } else if (deps && deps.includes("highlight")) {
+                // highlight.js is not essential; return a dummy object
+                if (callback) callback({});
+            } else if (callback) {
+                // any other dependency just calls the callback with no args
+                callback();
+            }
         });
+        window.requirejs.config = jest.fn();
+        window.requirejs.defined = jest.fn(() => false);
 
-        document.body.innerHTML = `
-            <div data-i18n="title">Original Title</div>
-            <span data-i18n="label">Original Label</span>
-        `;
-
+        // --------------------------------------------------------------------
+        // 2. Mock i18next with all of the methods accessed by loader.js.
+        //    We keep a flag so that tests can observe when init was called.
+        // --------------------------------------------------------------------
         mockI18next = {
             use: jest.fn().mockReturnThis(),
-            init: jest.fn(),
-            changeLanguage: jest.fn(),
-            t: jest.fn(key => `TRANSLATED_${key}`),
+            init: jest.fn((config, cb) => {
+                mockI18next.isInitialized = true;
+                cb(null);
+            }),
+            t: jest.fn((key) => `translated_${key}`),
+            changeLanguage: jest.fn((lng, cb) => cb(null)),
             on: jest.fn(),
+            language: 'en',
             isInitialized: false
         };
 
-        mockI18nextHttpBackend = {};
+        // --------------------------------------------------------------------
+        // 3. A small DOM fragment with `data-i18n` attributes so that the
+        //    translation logic can be exercised.
+        // --------------------------------------------------------------------
+        document.body.innerHTML = `
+            <div data-i18n="test_title">Original Title</div>
+            <button data-i18n="test_button">Original Button</button>
+        `;
 
-        mockRequireJSConfig = jest.fn();
-        mockRequireJS = jest.fn();
-        mockRequireJS.config = mockRequireJSConfig;
-        mockRequireJS.defined = jest.fn(() => false);
-
-        global.requirejs = mockRequireJS;
-        global.define = jest.fn();
-        global.window = document.defaultView;
-        global.window.createjs = {
-            Stage: jest.fn(),
-            Ticker: { framerate: 60, addEventListener: jest.fn() }
-        };
+        // --------------------------------------------------------------------
+        // 4. Silence console.error / warn during tests but allow us to spy on
+        //    the calls.
+        // --------------------------------------------------------------------
+        jest.spyOn(console, 'error').mockImplementation(() => {});
+        jest.spyOn(console, 'warn').mockImplementation(() => {});
     });
 
     afterEach(() => {
-        delete global.define;
+        // restore any mocked globals to avoid cross-test pollution
         jest.restoreAllMocks();
     });
 
-    const loadScript = async ({ initError = false, langError = false } = {}) => {
-        mockRequireJS.mockImplementation((deps, callback) => {
-            if (deps.includes("highlight")) {
-                if (callback) callback(null);
-            } else if (deps.includes("i18next")) {
-                mockI18next.init.mockImplementation((config, cb) => {
-                    if (initError) {
-                        cb("Init Failed");
-                    } else {
-                        mockI18next.isInitialized = true;
-                        cb(null);
-                    }
-                });
-                mockI18next.changeLanguage.mockImplementation((lang, cb) => {
-                    if (langError) cb("Lang Change Failed");
-                    else cb(null);
-                });
-                if (callback) {
-                    callback(mockI18next, mockI18nextHttpBackend);
-                }
-            } else if (deps.includes("easeljs.min")) {
-                // Phase 1 bootstrap
-                // Mock globals expected by verification
-                window.createDefaultStack = jest.fn();
-                window.Logo = jest.fn();
-                window.Blocks = jest.fn();
-                window.Turtles = jest.fn();
-                if (callback) callback();
-            } else if (deps.includes("activity/activity")) {
-                // Phase 2 bootstrap
-                if (callback) callback();
-            }
-            return null;
-        });
-
-        require("../loader.js");
-
-        await new Promise(resolve => setTimeout(resolve, 200)); // More time
-    }; // Allow async main() to proceed
-
-    test("Configures requirejs correctly", async () => {
-        await loadScript();
-        expect(mockRequireJSConfig).toHaveBeenCalledWith(
-            expect.objectContaining({
-                baseUrl: "./",
-                paths: expect.any(Object),
-                shim: expect.any(Object)
-            })
-        );
+    test('should configure requirejs with correct paths and baseUrl', () => {
+        require('../loader.js');
+        expect(window.requirejs.config).toHaveBeenCalledWith(expect.objectContaining({
+            baseUrl: "./",
+            paths: expect.any(Object)
+        }));
     });
 
-    test("Full success path: initializes i18n, updates DOM, and loads app", async () => {
-        Object.defineProperty(document, "readyState", {
-            value: "complete",
-            configurable: true
-        });
+    test('should translate DOM elements when main() runs', async () => {
+        // load the loader module and wait for the asynchronous work to finish
+        require('../loader.js');
+        await new Promise(resolve => setTimeout(resolve, 0));
+        const title = document.querySelector('[data-i18n="test_title"]');
+        const button = document.querySelector('[data-i18n="test_button"]');
+        expect(title.textContent).toBe('translated_test_title');
+        expect(button.textContent).toBe('translated_test_button');
+    });
 
-        await loadScript();
+    test('should set materialize globals and flags', async () => {
+        // simulate Materialize being available as `M` only
+        window.M = { AutoInit: jest.fn() };
+        delete window.Materialize;
+        require('../loader.js');
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(window.M).toBeDefined();
+        expect(window.Materialize).toBe(window.M);
+        expect(window._THIS_IS_MUSIC_BLOCKS_).toBe(true);
+        expect(window._THIS_IS_TURTLE_BLOCKS_).toBe(false);
+    });
 
-        expect(mockI18next.use).toHaveBeenCalledWith(mockI18nextHttpBackend);
-        expect(mockI18next.init).toHaveBeenCalledWith(
-            expect.objectContaining({ lng: "en" }),
-            expect.any(Function)
-        );
-        expect(window.i18next).toBe(mockI18next);
+    test('should call requirejs.defined for preloaded scripts', async () => {
+        // createjs defined before loader runs
+        window.createjs = {};
+        require('../loader.js');
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(window.requirejs.defined).toHaveBeenCalledWith("easeljs.min");
+        expect(window.requirejs.defined).toHaveBeenCalledWith("tweenjs.min");
+    });
 
-        expect(mockI18next.changeLanguage).toHaveBeenCalledWith("en", expect.any(Function));
+    test('should attach DOMContentLoaded listener if document not ready', async () => {
+        document.readyState = "loading";
+        const addListenerSpy = jest.spyOn(document, 'addEventListener');
+        require('../loader.js');
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(addListenerSpy).toHaveBeenCalledWith("DOMContentLoaded", expect.any(Function));
+    });
 
-        const title = document.querySelector('[data-i18n="title"]');
-        const label = document.querySelector('[data-i18n="label"]');
+    test('should log an error if i18next init fails (for 100% coverage)', async () => {
+        mockI18next.init = jest.fn((config, cb) => cb('Init Error'));
+        require('../loader.js');
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(console.error).toHaveBeenCalledWith("i18next init failed:", 'Init Error');
+    });
 
-        expect(mockI18next.t).toHaveBeenCalledWith("title");
-        expect(mockI18next.t).toHaveBeenCalledWith("label");
-        expect(title.textContent).toBe("TRANSLATED_title");
-        expect(label.textContent).toBe("TRANSLATED_label");
+    test('should log an error if changeLanguage fails (for 100% coverage)', async () => {
+        mockI18next.changeLanguage = jest.fn((lng, cb) => cb('Change Error'));
+        require('../loader.js');
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(console.error).toHaveBeenCalledWith("Error changing language:", 'Change Error');
+    });
 
+    test('should listen for languageChanged events', async () => {
+        require('../loader.js');
+        await new Promise(resolve => setTimeout(resolve, 0));
         expect(mockI18next.on).toHaveBeenCalledWith("languageChanged", expect.any(Function));
-
-        // Verify Phase 2 was reached
-        expect(mockRequireJS).toHaveBeenCalledWith(
-            ["activity/activity"],
-            expect.any(Function),
-            expect.any(Function)
-        );
     });
 
-    test("Handles i18next initialization error", async () => {
-        await loadScript({ initError: true });
-
-        expect(consoleErrorSpy).toHaveBeenCalledWith("i18next init failed:", "Init Failed");
-        expect(window.i18next).toBe(mockI18next);
-    });
-
-    test("Handles changeLanguage error", async () => {
-        await loadScript({ langError: true });
-
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-            "Error changing language:",
-            "Lang Change Failed"
-        );
-    });
-
-    test("Handles DOMContentLoaded when document is loading", async () => {
-        Object.defineProperty(document, "readyState", {
-            value: "loading",
-            configurable: true
+    test('should warn when highlight fails to load', async () => {
+        // override the requirejs stub to simulate a loading error for highlight
+        window.requirejs = jest.fn((deps, callback, errCallback) => {
+            if (deps.includes("i18next")) {
+                callback(mockI18next, {});
+            } else if (deps.includes("highlight")) {
+                if (errCallback) errCallback("highlight error");
+            } else if (callback) {
+                callback();
+            }
         });
-
-        const addEventListenerSpy = jest.spyOn(document, "addEventListener");
-
-        await loadScript();
-
-        expect(addEventListenerSpy).toHaveBeenCalledWith("DOMContentLoaded", expect.any(Function));
-
-        const eventHandler = addEventListenerSpy.mock.calls.find(
-            call => call[0] === "DOMContentLoaded"
-        )[1];
-
-        mockI18next.t.mockClear();
-        eventHandler();
-        expect(mockI18next.t).toHaveBeenCalled();
+        require('../loader.js');
+        await new Promise(r => setTimeout(r, 0));
+        expect(console.warn).toHaveBeenCalledWith(
+            "Highlight.js failed to load, moving on...",
+            "highlight error"
+        );
     });
 
-    test("Triggering languageChanged event updates content", async () => {
-        await loadScript();
+    test('should handle core bootstrap failure', async () => {
+        window.requirejs = jest.fn((deps, callback, errCallback) => {
+            if (deps.includes("i18next")) {
+                callback(mockI18next, {});
+            } else if (deps.includes("preloadjs.min")) {
+                if (errCallback) errCallback("core error");
+            } else if (callback) {
+                callback();
+            }
+        });
+        require('../loader.js');
+        await new Promise(r => setTimeout(r, 0));
+        expect(console.error).toHaveBeenCalledWith("Core bootstrap failed:", "core error");
+    });
 
-        const onCall = mockI18next.on.mock.calls.find(call => call[0] === "languageChanged");
-        const onHandler = onCall[1];
-
-        mockI18next.t.mockClear();
-
-        onHandler();
-
-        expect(mockI18next.t).toHaveBeenCalled();
+    test('should log fatal error and alert if createjs missing during bootstrap', async () => {
+        delete window.createjs;
+        jest.useFakeTimers();
+        window.alert = jest.fn();
+        window.requirejs = jest.fn((deps, callback, errCallback) => {
+            if (deps.includes("i18next")) {
+                callback(mockI18next, {});
+            } else if (callback) {
+                callback();
+            }
+        });
+        require('../loader.js');
+        jest.runAllTimers();
+        expect(console.error).toHaveBeenCalledWith(
+            "FATAL: createjs (EaselJS/TweenJS) not found. Cannot proceed."
+        );
+        expect(window.alert).toHaveBeenCalledWith("Failed to load EaselJS. Please refresh the page.");
+        jest.useRealTimers();
     });
 });
