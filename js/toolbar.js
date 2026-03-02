@@ -617,16 +617,17 @@ class Toolbar {
     }
 
     renderThemeSelectIcon(themeBox, themes) {
-        const icon = document.getElementById("themeSelectIcon");
+        const icon = docById("themeSelectIcon");
+        if (!icon) return;
+    
         themes.forEach(theme => {
             if (localStorage.themePreference === theme) {
-                icon.innerHTML = document.getElementById(theme).innerHTML;
+                icon.innerHTML = docById(theme).innerHTML;
             }
         });
-        const themeSelectIcon = docById("themeSelectIcon");
-        const themeList = themes;
-        themeSelectIcon.onclick = () => {
-            themeList.forEach(theme => {
+
+        icon.onclick = () => {
+            themes.forEach(theme => {
                 docById(theme).onclick = () => themeBox[`${theme}_onclick`](this.activity);
             });
         };
