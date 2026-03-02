@@ -16,8 +16,31 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-const { TEMPERAMENT, isCustomTemperament, getTemperament } = require("../../utils/musicutils");
 const { setupIntervalsActions } = require("../IntervalsActions");
+
+// Mock the entire musicutils module to prevent _ function ReferenceError
+jest.mock("../../utils/musicutils", () => ({
+    TEMPERAMENT: {
+        equal: {
+            "pitchNumber": 12,
+            "perfect 1": 1,
+            "major 2": 1.122462,
+            "perfect 8": 2
+        },
+        custom31: {
+            "pitchNumber": 31,
+            "perfect 1": 1,
+            "perfect 8": 2
+        }
+    },
+    isCustomTemperament: (temperament) => {
+        return !global.PreDefinedTemperaments[temperament];
+    },
+    getTemperament: (entry) => {
+        return global.TEMPERAMENT[entry];
+    },
+    _: (str) => str
+}));
 
 describe("setupIntervalsActions", () => {
     let activity;
@@ -43,7 +66,11 @@ describe("setupIntervalsActions", () => {
                 "perfect 8": 2
             }
         };
-        
+
+        // Mock the _ function to prevent ReferenceError
+        global._ = jest.fn((str) => str);
+        global._.mockImplementation = jest.fn(() => "_");
+
         global.PreDefinedTemperaments = {
             equal: true,
             major: true,
