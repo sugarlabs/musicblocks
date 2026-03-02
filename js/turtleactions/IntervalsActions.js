@@ -24,8 +24,6 @@
    getModeLength, isCustomTemperament, getTemperament, TEMPERAMENT
 */
 
-import { TEMPERAMENT, isCustomTemperament, getTemperament } from "../utils/musicutils";
-
 /*
    Global locations
     js/utils/utils.js
