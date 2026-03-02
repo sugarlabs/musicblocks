@@ -3278,15 +3278,28 @@ function Synth() {
                 });
             }
 
-            requestAnimationFrame(updatePitch);
+            // Only continue the loop if tuner is still running
+            if (this.tunerRunning) {
+                this.tunerAnimationId = requestAnimationFrame(updatePitch);
+            }
         };
 
-        updatePitch();
+        this.tunerRunning = true;
+        this.tunerAnimationId = requestAnimationFrame(updatePitch);
     };
 
     this.stopTuner = () => {
+        // Stop the animation loop
+        this.tunerRunning = false;
+        if (this.tunerAnimationId) {
+            cancelAnimationFrame(this.tunerAnimationId);
+            this.tunerAnimationId = null;
+        }
+
+        // Close the microphone
         if (this.tunerMic) {
             this.tunerMic.close();
+            this.tunerMic = null;
         }
     };
 
