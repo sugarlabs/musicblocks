@@ -132,6 +132,13 @@ class GlobalPlanet {
         const Planet = this.Planet;
 
         this.index = 0;
+
+        for (let i = 0; i < this.cards.length; i++) {
+            if (typeof this.cards[i].cleanup === "function") {
+                this.cards[i].cleanup();
+            }
+        }
+
         this.cards = [];
         document.getElementById("global-projects").innerHTML = "";
         this.showLoading();
@@ -196,6 +203,13 @@ class GlobalPlanet {
 
             this.oldSearchString = this.searchString;
             this.index = 0;
+
+            for (let i = 0; i < this.cards.length; i++) {
+                if (typeof this.cards[i].cleanup === "function") {
+                    this.cards[i].cleanup();
+                }
+            }
+
             this.cards = [];
             document.getElementById("global-projects").innerHTML = "";
             this.showLoading();
@@ -275,7 +289,7 @@ class GlobalPlanet {
                         this.addProjectToCache(tempid, d, callback);
                     }.bind(this)
                 );
-            }.bind(this)());
+            }).bind(this)();
         }
     }
 
