@@ -44,6 +44,25 @@
  */
 function setupMeterActions(activity) {
     /**
+     * Lightweight debug logger scoped to MeterActions.
+     *
+     * Silent in production. Enable at runtime via DevTools:
+     *   window._MB_METER_DEBUG = true;
+     *
+     * All parameters are passed lazily so that object serialisation
+     * only happens when the flag is on.
+     *
+     * @param {...*} args - Values forwarded to console.debug.
+     * @returns {void}
+     */
+    function _dbg(...args) {
+        if (window._MB_METER_DEBUG) {
+            // eslint-disable-next-line no-console
+            console.debug("[MeterActions]", ...args);
+        }
+    }
+
+    /**
      * Removes default numeric strong beats from the singer's beatList,
      * preserving user-defined "everybeat" and "offbeat" entries.
      * Resets the defaultStrongBeats flag to false.
@@ -69,8 +88,20 @@ function setupMeterActions(activity) {
         static setMeter(beatCount, noteValue, turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            tur.singer.beatsPerMeasure = beatCount <= 0 ? 4 : beatCount;
-            tur.singer.noteValuePerBeat = noteValue <= 0 ? 4 : 1 / noteValue;
+            // numerator  = beats per measure  (time-signature top number)
+            // denominator = note value per beat (time-signature bottom number)
+            const numerator = beatCount <= 0 ? 4 : beatCount;
+            const denominator = noteValue <= 0 ? 4 : 1 / noteValue;
+
+            tur.singer.beatsPerMeasure = numerator;
+            tur.singer.noteValuePerBeat = denominator;
+
+            _dbg(
+                "setMeter",
+                "turtle:", turtle,
+                "numerator (beatsPerMeasure):", numerator,
+                "denominator (noteValuePerBeat):", denominator
+            );
 
             // Clear previous default strong beats before setting new ones
             _clearDefaultStrongBeats(tur.singer);
@@ -107,79 +138,97 @@ function setupMeterActions(activity) {
         }
 
         static setBPM(bpm, beatValue, turtle, blk) {
-            let _bpm = (bpm * beatValue) / 0.25;
+            // tempo = effective BPM normalised to quarter-note beats
+            let tempo = (bpm * beatValue) / 0.25;
             let obj, target;
-            if (_bpm < 30) {
+            if (tempo < 30) {
                 obj = rationalToFraction(beatValue);
                 target = (30 * 0.25) / beatValue;
                 activity.errorMsg(
                     obj[0] +
-                        "/" +
-                        obj[1] +
-                        " " +
-                        _("beats per minute must be greater than") +
-                        " " +
-                        target,
+                    "/" +
+                    obj[1] +
+                    " " +
+                    _("beats per minute must be greater than") +
+                    " " +
+                    target,
                     blk
                 );
-                _bpm = 30;
-            } else if (_bpm > 1000) {
+                tempo = 30;
+            } else if (tempo > 1000) {
                 obj = rationalToFraction(beatValue);
                 target = (1000 * 0.25) / beatValue;
                 activity.errorMsg(
                     _("maximum") +
-                        " " +
-                        obj[0] +
-                        "/" +
-                        obj[1] +
-                        " " +
-                        _("beats per minute is") +
-                        " " +
-                        target,
+                    " " +
+                    obj[0] +
+                    "/" +
+                    obj[1] +
+                    " " +
+                    _("beats per minute is") +
+                    " " +
+                    target,
                     blk
                 );
-                _bpm = 1000;
+                tempo = 1000;
             }
 
-            activity.turtles.ithTurtle(turtle).singer.bpm.push(_bpm);
+            _dbg(
+                "setBPM",
+                "turtle:", turtle,
+                "bpm (raw):", bpm,
+                "beatValue:", beatValue,
+                "tempo (effective quarter-note BPM):", tempo
+            );
+
+            activity.turtles.ithTurtle(turtle).singer.bpm.push(tempo);
         }
 
         static setMasterBPM(bpm, beatValue, blk) {
-            const _bpm = (bpm * beatValue) / 0.25;
+            // tempo = effective master BPM normalised to quarter-note beats
+            const tempo = (bpm * beatValue) / 0.25;
             let obj, target;
-            if (_bpm < 30) {
+            if (tempo < 30) {
                 obj = rationalToFraction(beatValue);
                 target = (30 * 0.25) / beatValue;
                 activity.errorMsg(
                     obj[0] +
-                        "/" +
-                        obj[1] +
-                        " " +
-                        _("beats per minute must be greater than") +
-                        " " +
-                        target,
+                    "/" +
+                    obj[1] +
+                    " " +
+                    _("beats per minute must be greater than") +
+                    " " +
+                    target,
                     blk
                 );
                 Singer.masterBPM = 30;
-            } else if (_bpm > 1000) {
+            } else if (tempo > 1000) {
                 obj = rationalToFraction(beatValue);
                 target = (1000 * 0.25) / beatValue;
                 activity.errorMsg(
                     _("maximum") +
-                        " " +
-                        obj[0] +
-                        "/" +
-                        obj[1] +
-                        " " +
-                        _("beats per minute is") +
-                        " " +
-                        target,
+                    " " +
+                    obj[0] +
+                    "/" +
+                    obj[1] +
+                    " " +
+                    _("beats per minute is") +
+                    " " +
+                    target,
                     blk
                 );
                 Singer.masterBPM = 1000;
             } else {
-                Singer.masterBPM = _bpm;
+                Singer.masterBPM = tempo;
             }
+
+            _dbg(
+                "setMasterBPM",
+                "bpm (raw):", bpm,
+                "beatValue:", beatValue,
+                "tempo (effective quarter-note BPM):", tempo,
+                "Singer.masterBPM:", Singer.masterBPM
+            );
 
             Singer.defaultBPMFactor = TONEBPM / Singer.masterBPM;
         }
@@ -355,7 +404,7 @@ function setupMeterActions(activity) {
                 Math.floor(
                     ((tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] - tur.singer.pickup) *
                         tur.singer.noteValuePerBeat) /
-                        tur.singer.beatsPerMeasure
+                    tur.singer.beatsPerMeasure
                 ) + 1
             );
         }

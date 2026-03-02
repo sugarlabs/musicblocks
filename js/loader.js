@@ -86,6 +86,9 @@ requirejs.config({
             deps: ["utils/utils", "activity/activity-context"],
             exports: "Synth"
         },
+        "activity/logoconstants": {
+            deps: ["utils/utils"]
+        },
         "activity/logo": {
             deps: [
                 "activity/turtles",
@@ -342,7 +345,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                     console.error("Core bootstrap failed:", err);
                     alert(
                         "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: " +
-                            (err.message || err)
+                        (err.message || err)
                     );
                 }
             );

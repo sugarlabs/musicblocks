@@ -124,6 +124,12 @@ function _(text, options = {}) {
     }
 }
 
+// Expose _ as a global so logoconstants.js (and others) can call _() at
+// module-evaluation time, before RequireJS has wired up all shim dependencies.
+if (typeof window !== "undefined") {
+    window._ = _;
+}
+
 /**
  * A string formatting function using placeholder substitution.
  * @function
@@ -1612,10 +1618,10 @@ let hexToRGB = hex => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
         ? {
-              r: parseInt(result[1], 16),
-              g: parseInt(result[2], 16),
-              b: parseInt(result[3], 16)
-          }
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        }
         : null;
 };
 
