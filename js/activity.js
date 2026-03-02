@@ -2851,13 +2851,15 @@ class Activity {
 
             const bitmap = new createjs.Bitmap(img);
             container.addChild(bitmap);
-            bitmap.cache(0, 0, 1200, 900);
+            // Do NOT cache the bitmap here. Each cached grid allocates a
+            // 1200x900x4 = ~4.3 MB backing canvas, and with 8 grids that
+            // totals ~35 MB even though at most 1 grid is visible at a time.
+            // Instead, we cache lazily in _show*() and uncache in _hide*().
 
             bitmap.x = (this.canvas.width - 1200) / 2;
             bitmap.y = (this.canvas.height - 900) / 2;
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 1;
             bitmap.visible = false;
-            bitmap.updateCache();
 
             return bitmap;
         };
@@ -2993,7 +2995,19 @@ class Activity {
 
             // Expose activity instance for external checks
             if (typeof window !== "undefined") {
-                window.activity = this;
+                // Single authority: ActivityContext
+                // TODO: window.activity is deprecated; use ActivityContext instead
+                if (
+                    window.ActivityContext &&
+                    typeof window.ActivityContext.setActivity === "function"
+                ) {
+                    window.ActivityContext.setActivity(this);
+                }
+
+                // TEMP compatibility bridge
+                if (!window.activity) {
+                    window.activity = this;
+                }
             }
         };
 
@@ -4223,6 +4237,19 @@ class Activity {
                 const blk = this.blocks.dragGroup[b];
                 this.blocks.blockList[blk].trash = false;
                 this.blocks.moveBlockRelative(blk, dx, dy);
+
+                // Re-cache the container if it was uncached to save
+                // memory in sendStackToTrash().
+                const block = this.blocks.blockList[blk];
+                if (block.container && !block.container.bitmapCache) {
+                    block.container.cache(
+                        0,
+                        0,
+                        Math.max(block.width, 1),
+                        Math.max(block.height, 1)
+                    );
+                }
+
                 this.blocks.blockList[blk].show();
             }
 
@@ -4631,6 +4658,11 @@ class Activity {
          */
         this.clearCache = () => {
             this.blocks.blockList.forEach(block => {
+                // Skip trashed blocks — they are hidden and their backing
+                // canvases are freed in sendStackToTrash(). Re-caching them
+                // here would waste ~0.5–2 MB per trashed block.
+                if (block.trash) return;
+
                 if (block.container) {
                     block.container.uncache();
                     block.container.cache();
@@ -5814,7 +5846,7 @@ class Activity {
          */
         this._hideCartesian = () => {
             this.cartesianBitmap.visible = false;
-            this.cartesianBitmap.updateCache();
+            this.cartesianBitmap.uncache();
             this.update = true;
         };
 
@@ -5823,6 +5855,7 @@ class Activity {
          */
         this._showCartesian = () => {
             this.cartesianBitmap.visible = true;
+            this.cartesianBitmap.cache(0, 0, 1200, 900);
             this.cartesianBitmap.updateCache();
             this.update = true;
         };
@@ -5832,7 +5865,7 @@ class Activity {
          */
         this._hidePolar = () => {
             this.polarBitmap.visible = false;
-            this.polarBitmap.updateCache();
+            this.polarBitmap.uncache();
             this.update = true;
         };
 
@@ -5841,6 +5874,7 @@ class Activity {
          */
         this._showPolar = () => {
             this.polarBitmap.visible = true;
+            this.polarBitmap.cache(0, 0, 1200, 900);
             this.polarBitmap.updateCache();
             this.update = true;
         };
@@ -5853,45 +5887,33 @@ class Activity {
             for (let i = 0; i < 7; i++) {
                 this.grandSharpBitmap[i].visible = false;
                 this.grandSharpBitmap[i].x = newX;
-                this.grandSharpBitmap[i].updateCache();
                 this.grandFlatBitmap[i].visible = false;
                 this.grandFlatBitmap[i].x = newX;
-                this.grandFlatBitmap[i].updateCache();
 
                 this.trebleSharpBitmap[i].visible = false;
                 this.trebleSharpBitmap[i].x = newX;
-                this.trebleSharpBitmap[i].updateCache();
                 this.trebleFlatBitmap[i].visible = false;
                 this.trebleFlatBitmap[i].x = newX;
-                this.trebleFlatBitmap[i].updateCache();
 
                 this.sopranoSharpBitmap[i].visible = false;
                 this.sopranoSharpBitmap[i].x = newX;
-                this.sopranoSharpBitmap[i].updateCache();
                 this.sopranoFlatBitmap[i].visible = false;
                 this.sopranoFlatBitmap[i].x = newX;
-                this.sopranoFlatBitmap[i].updateCache();
 
                 this.altoSharpBitmap[i].visible = false;
                 this.altoSharpBitmap[i].x = newX;
-                this.altoSharpBitmap[i].updateCache();
                 this.altoFlatBitmap[i].visible = false;
                 this.altoFlatBitmap[i].x = newX;
-                this.altoFlatBitmap[i].updateCache();
 
                 this.tenorSharpBitmap[i].visible = false;
                 this.tenorSharpBitmap[i].x = newX;
-                this.tenorSharpBitmap[i].updateCache();
                 this.tenorFlatBitmap[i].visible = false;
                 this.tenorFlatBitmap[i].x = newX;
-                this.tenorFlatBitmap[i].updateCache();
 
                 this.bassSharpBitmap[i].visible = false;
                 this.bassSharpBitmap[i].x = newX;
-                this.bassSharpBitmap[i].updateCache();
                 this.bassFlatBitmap[i].visible = false;
                 this.bassFlatBitmap[i].x = newX;
-                this.bassFlatBitmap[i].updateCache();
             }
             this.update = true;
         };
@@ -5901,7 +5923,7 @@ class Activity {
          */
         this._hideTreble = () => {
             this.trebleBitmap.visible = false;
-            this.trebleBitmap.updateCache();
+            this.trebleBitmap.uncache();
             this._hideAccidentals();
             this.update = true;
         };
@@ -5911,6 +5933,7 @@ class Activity {
          */
         this._showTreble = () => {
             this.trebleBitmap.visible = true;
+            this.trebleBitmap.cache(0, 0, 1200, 900);
             this.trebleBitmap.updateCache();
             this._hideAccidentals();
             // eslint-disable-next-line no-console
@@ -5941,13 +5964,11 @@ class Activity {
                 if (scale.includes(_sharps[i])) {
                     this.trebleSharpBitmap[i].x += dx;
                     this.trebleSharpBitmap[i].visible = true;
-                    this.trebleSharpBitmap[i].updateCache();
                     dx += 15;
                 }
                 if (scale.includes(_flats[i])) {
                     this.trebleFlatBitmap[i].x += dx;
                     this.trebleFlatBitmap[i].visible = true;
-                    this.trebleFlatBitmap[i].updateCache();
                     dx += 15;
                 }
             }
@@ -5960,7 +5981,7 @@ class Activity {
          */
         this._hideGrand = () => {
             this.grandBitmap.visible = false;
-            this.grandBitmap.updateCache();
+            this.grandBitmap.uncache();
             this._hideAccidentals();
             this.update = true;
         };
@@ -5970,6 +5991,7 @@ class Activity {
          */
         this._showGrand = () => {
             this.grandBitmap.visible = true;
+            this.grandBitmap.cache(0, 0, 1200, 900);
             this.grandBitmap.updateCache();
             this._hideAccidentals();
             // eslint-disable-next-line no-console
@@ -6000,13 +6022,11 @@ class Activity {
                 if (scale.includes(_sharps[i])) {
                     this.grandSharpBitmap[i].x += dx;
                     this.grandSharpBitmap[i].visible = true;
-                    this.grandSharpBitmap[i].updateCache();
                     dx += 15;
                 }
                 if (scale.includes(_flats[i])) {
                     this.grandFlatBitmap[i].x += dx;
                     this.grandFlatBitmap[i].visible = true;
-                    this.grandFlatBitmap[i].updateCache();
                     dx += 15;
                 }
             }
@@ -6018,7 +6038,7 @@ class Activity {
          */
         this._hideSoprano = () => {
             this.sopranoBitmap.visible = false;
-            this.sopranoBitmap.updateCache();
+            this.sopranoBitmap.uncache();
             this.update = true;
         };
 
@@ -6027,6 +6047,7 @@ class Activity {
          */
         this._showSoprano = () => {
             this.sopranoBitmap.visible = true;
+            this.sopranoBitmap.cache(0, 0, 1200, 900);
             this.sopranoBitmap.updateCache();
             this._hideAccidentals();
             // eslint-disable-next-line no-console
@@ -6057,13 +6078,11 @@ class Activity {
                 if (scale.includes(_sharps[i])) {
                     this.sopranoSharpBitmap[i].x += dx;
                     this.sopranoSharpBitmap[i].visible = true;
-                    this.sopranoSharpBitmap[i].updateCache();
                     dx += 15;
                 }
                 if (scale.includes(_flats[i])) {
                     this.sopranoFlatBitmap[i].x += dx;
                     this.sopranoFlatBitmap[i].visible = true;
-                    this.sopranoFlatBitmap[i].updateCache();
                     dx += 15;
                 }
             }
@@ -6076,7 +6095,7 @@ class Activity {
          */
         this._hideAlto = () => {
             this.altoBitmap.visible = false;
-            this.altoBitmap.updateCache();
+            this.altoBitmap.uncache();
             this._hideAccidentals();
             this.update = true;
         };
@@ -6090,6 +6109,7 @@ class Activity {
          */
         this._showAlto = () => {
             this.altoBitmap.visible = true;
+            this.altoBitmap.cache(0, 0, 1200, 900);
             this.altoBitmap.updateCache();
             this._hideAccidentals();
             // eslint-disable-next-line no-console
@@ -6120,13 +6140,11 @@ class Activity {
                 if (scale.includes(_sharps[i])) {
                     this.altoSharpBitmap[i].x += dx;
                     this.altoSharpBitmap[i].visible = true;
-                    this.altoSharpBitmap[i].updateCache();
                     dx += 15;
                 }
                 if (scale.includes(_flats[i])) {
                     this.altoFlatBitmap[i].x += dx;
                     this.altoFlatBitmap[i].visible = true;
-                    this.altoFlatBitmap[i].updateCache();
                     dx += 15;
                 }
             }
@@ -6139,7 +6157,7 @@ class Activity {
          */
         this._hideTenor = () => {
             this.tenorBitmap.visible = false;
-            this.tenorBitmap.updateCache();
+            this.tenorBitmap.uncache();
             this.update = true;
         };
 
@@ -6148,6 +6166,7 @@ class Activity {
          */
         this._showTenor = () => {
             this.tenorBitmap.visible = true;
+            this.tenorBitmap.cache(0, 0, 1200, 900);
             this.tenorBitmap.updateCache();
             this._hideAccidentals();
             // eslint-disable-next-line no-console
@@ -6178,13 +6197,11 @@ class Activity {
                 if (scale.includes(_sharps[i])) {
                     this.tenorSharpBitmap[i].x += dx;
                     this.tenorSharpBitmap[i].visible = true;
-                    this.tenorSharpBitmap[i].updateCache();
                     dx += 15;
                 }
                 if (scale.includes(_flats[i])) {
                     this.tenorFlatBitmap[i].x += dx;
                     this.tenorFlatBitmap[i].visible = true;
-                    this.tenorFlatBitmap[i].updateCache();
                     dx += 15;
                 }
             }
@@ -6197,7 +6214,7 @@ class Activity {
          */
         this._hideBass = () => {
             this.bassBitmap.visible = false;
-            this.bassBitmap.updateCache();
+            this.bassBitmap.uncache();
             this._hideAccidentals();
             this.update = true;
         };
@@ -6207,6 +6224,7 @@ class Activity {
          */
         this._showBass = () => {
             this.bassBitmap.visible = true;
+            this.bassBitmap.cache(0, 0, 1200, 900);
             this.bassBitmap.updateCache();
             this._hideAccidentals();
             // eslint-disable-next-line no-console
@@ -6237,13 +6255,11 @@ class Activity {
                 if (scale.includes(_sharps[i])) {
                     this.bassSharpBitmap[i].x += dx;
                     this.bassSharpBitmap[i].visible = true;
-                    this.bassSharpBitmap[i].updateCache();
                     dx += 15;
                 }
                 if (scale.includes(_flats[i])) {
                     this.bassFlatBitmap[i].x += dx;
                     this.bassFlatBitmap[i].visible = true;
-                    this.bassFlatBitmap[i].updateCache();
                     dx += 15;
                 }
             }
@@ -8245,3 +8261,4 @@ define(["domReady!"].concat(MYDEFINES), doc => {
     };
     initialize();
 });
+
