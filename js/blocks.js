@@ -2970,9 +2970,13 @@ class Blocks {
                 thisBlock = this.highlightedBlock;
             }
 
-            if (thisBlock !== null) {
-                this.blockList[thisBlock].unhighlight();
-            }
+            if (
+    thisBlock !== null &&
+    this.blockList[thisBlock] &&
+    typeof this.blockList[thisBlock].unhighlight === "function"
+) {
+    this.blockList[thisBlock].unhighlight();
+}
 
             if (this.highlightedBlock === thisBlock) {
                 this.highlightedBlock = null;
