@@ -214,6 +214,8 @@ class Activity {
     constructor() {
         globalActivity = this;
         this._listeners = [];
+        this._idleWatcherIntervalId = null;
+        this._idleWatcherResetHandler = null;
 
         this.cellSize = 55;
         this.searchSuggestions = [];
@@ -2919,60 +2921,6 @@ class Activity {
             img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svgData));
         };
 
-        /**
-         * Initializes the Idle Watcher mechanism to throttle createjs.Ticker
-         * when the application is inactive and no music is playing.
-         * This significantly reduces CPU usage and improves battery life.
-         */
-        this._initIdleWatcher = () => {
-            const IDLE_THRESHOLD = 5000; // 5 seconds
-            const ACTIVE_FPS = 60;
-            const IDLE_FPS = 1;
-
-            let lastActivity = Date.now();
-            let isIdle = false;
-
-            // Wake up function - restores full framerate
-            const resetIdleTimer = () => {
-                lastActivity = Date.now();
-                if (isIdle) {
-                    isIdle = false;
-                    createjs.Ticker.framerate = ACTIVE_FPS;
-                    // Force immediate redraw for responsiveness
-                    if (this.stage) this.stage.update();
-                }
-            };
-
-            // Track user activity
-            window.addEventListener("mousemove", resetIdleTimer);
-            window.addEventListener("mousedown", resetIdleTimer);
-            window.addEventListener("keydown", resetIdleTimer);
-            window.addEventListener("touchstart", resetIdleTimer);
-            window.addEventListener("wheel", resetIdleTimer);
-
-            // Periodic check for idle state
-            setInterval(() => {
-                // Check if music/code is playing
-                const isMusicPlaying = this.logo?._alreadyRunning || false;
-
-                if (!isMusicPlaying && Date.now() - lastActivity > IDLE_THRESHOLD) {
-                    if (!isIdle) {
-                        isIdle = true;
-                        createjs.Ticker.framerate = IDLE_FPS;
-                        console.log("⚡ Idle mode: Throttling to 1 FPS to save battery");
-                    }
-                } else if (isIdle && isMusicPlaying) {
-                    // Music started playing - wake up immediately
-                    resetIdleTimer();
-                }
-            }, 1000);
-
-            // Expose activity instance for external checks
-            if (typeof window !== "undefined") {
-                window.activity = this;
-            }
-        };
-
         /*
          * Creates and renders error message containers with appropriate artwork.
          * Some error messages have special artwork.
@@ -2993,6 +2941,18 @@ class Activity {
             const IDLE_THRESHOLD = 5000; // 5 seconds
             const ACTIVE_FPS = 60;
             const IDLE_FPS = 1;
+            const idleEvents = ["mousemove", "mousedown", "keydown", "touchstart", "wheel"];
+
+            if (this._idleWatcherResetHandler) {
+                idleEvents.forEach(eventType => {
+                    window.removeEventListener(eventType, this._idleWatcherResetHandler);
+                });
+            }
+
+            if (this._idleWatcherIntervalId) {
+                clearInterval(this._idleWatcherIntervalId);
+                this._idleWatcherIntervalId = null;
+            }
 
             let lastActivity = Date.now();
             this.isAppIdle = false;
@@ -3009,14 +2969,13 @@ class Activity {
             };
 
             // Track user activity
-            window.addEventListener("mousemove", resetIdleTimer);
-            window.addEventListener("mousedown", resetIdleTimer);
-            window.addEventListener("keydown", resetIdleTimer);
-            window.addEventListener("touchstart", resetIdleTimer);
-            window.addEventListener("wheel", resetIdleTimer);
+            this._idleWatcherResetHandler = resetIdleTimer;
+            idleEvents.forEach(eventType => {
+                window.addEventListener(eventType, this._idleWatcherResetHandler);
+            });
 
             // Periodic check for idle state
-            setInterval(() => {
+            this._idleWatcherIntervalId = setInterval(() => {
                 // Check if music/code is playing
                 const isMusicPlaying = this.logo?._alreadyRunning || false;
 
@@ -8118,6 +8077,18 @@ class Activity {
             if (target && typeof target.removeEventListener === "function") {
                 target.removeEventListener(type, listener, options);
             }
+        }
+
+        if (this._idleWatcherResetHandler) {
+            ["mousemove", "mousedown", "keydown", "touchstart", "wheel"].forEach(eventType => {
+                window.removeEventListener(eventType, this._idleWatcherResetHandler);
+            });
+            this._idleWatcherResetHandler = null;
+        }
+
+        if (this._idleWatcherIntervalId) {
+            clearInterval(this._idleWatcherIntervalId);
+            this._idleWatcherIntervalId = null;
         }
     }
 
