@@ -68,4 +68,15 @@ export default [
             'no-loss-of-precision': 'off',
         },
     },
+    {
+        files: ['cypress/**/*.js'],
+        languageOptions: {
+            sourceType: 'module',
+            globals: {
+                ...globals.browser,
+                cy: 'readonly',
+                Cypress: 'readonly',
+            },
+        },
+    },
 ];
