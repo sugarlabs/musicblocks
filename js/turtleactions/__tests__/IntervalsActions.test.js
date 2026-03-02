@@ -42,6 +42,38 @@ describe("setupIntervalsActions", () => {
                 "perfect 8": 2
             }
         };
+        
+        global.PreDefinedTemperaments = {
+            equal: true,
+            major: true,
+            minor: true,
+            harmonicminor: true,
+            ionian: true,
+            dorian: true,
+            phrygian: true,
+            lydian: true,
+            mixolydian: true,
+            aeolian: true,
+            blues: true,
+            chromatic: true,
+            whole: true,
+            pentatonic: true,
+            pythagorean: true,
+            just: true,
+            quarter: true,
+            "31-EDO": true,
+            "19-EDO": true,
+            "5-EDO": true,
+            "7-EDO": true
+        };
+        
+        global.isCustomTemperament = (temperament) => {
+            return !global.PreDefinedTemperaments[temperament];
+        };
+        
+        global.getTemperament = (entry) => {
+            return global.TEMPERAMENT[entry];
+        };
 
         global.MUSICALMODES = {
             major: [2, 2, 1, 2, 2, 2, 1],
@@ -378,7 +410,7 @@ describe("setupIntervalsActions", () => {
         activity.blocks.blockList.blk = { connections: [null, "text1"] };
         activity.blocks.blockList.text1 = { name: "text" };
 
-        Singer.IntervalsActions.defineMode("custom", 0, "blk");
+        Singer.IntervalsActions.defineMode("custom31", 0, "blk");
 
         turtle.singer.defineMode.push(0, 4, 7);
         listener();
@@ -393,7 +425,7 @@ describe("setupIntervalsActions", () => {
         activity.blocks.blockList.blk = { connections: [null, "text1"] };
         activity.blocks.blockList.text1 = { name: "text" };
 
-        Singer.IntervalsActions.defineMode(null, 0, "blk");
+        Singer.IntervalsActions.defineMode("custom31", 0, "blk");
 
         turtle.singer.defineMode.push(4);
         turtle.singer.defineMode.push(12);
@@ -416,7 +448,7 @@ describe("setupIntervalsActions", () => {
         activity.blocks.blockList.blk = { connections: [null, "text1"] };
         activity.blocks.blockList.text1 = { name: "text" };
 
-        Singer.IntervalsActions.defineMode("custom", 0, "blk");
+        Singer.IntervalsActions.defineMode("custom31", 0, "blk");
 
         // Add pitch numbers that should be wrapped
         turtle.singer.defineMode.push(0, 5, 10, 15, 35);

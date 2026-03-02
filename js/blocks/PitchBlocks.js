@@ -435,18 +435,30 @@ function setupPitchBlocks(activity) {
             // Get the current active temperament
             const temperament = logo.synth.inTemperament;
 
+            // Guard against missing globals
+            if (!temperament) {
+                return 12; // Default to 12-tone temperament
+            }
+
             // Check if it's a custom temperament
-            if (isCustomTemperament(temperament)) {
+            if (typeof isCustomTemperament === 'function' && isCustomTemperament(temperament)) {
                 // For custom temperaments, get the pitchNumber from the temperament object
-                return TEMPERAMENT[temperament]["pitchNumber"];
+                if (typeof TEMPERAMENT !== 'undefined' && TEMPERAMENT[temperament] && TEMPERAMENT[temperament]["pitchNumber"]) {
+                    return TEMPERAMENT[temperament]["pitchNumber"];
+                } else {
+                    return 12; // Default if TEMPERAMENT not available
+                }
             } else {
                 // For predefined temperaments, get the temperament data
-                const temp = getTemperament(temperament);
-                if (temp && temp["pitchNumber"]) {
-                    return temp["pitchNumber"];
+                if (typeof getTemperament === 'function') {
+                    const temp = getTemperament(temperament);
+                    if (temp && temp["pitchNumber"]) {
+                        return temp["pitchNumber"];
+                    } else {
+                        return 12; // Default to 12 if temperament not found
+                    }
                 } else {
-                    // Default to 12 if temperament not found
-                    return 12;
+                    return 12; // Default if getTemperament not available
                 }
             }
         }

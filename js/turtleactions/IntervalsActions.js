@@ -24,6 +24,8 @@
    getModeLength, isCustomTemperament, getTemperament, TEMPERAMENT
 */
 
+import { TEMPERAMENT, isCustomTemperament, getTemperament } from "../utils/musicutils";
+
 /*
    Global locations
     js/utils/utils.js
@@ -294,11 +296,12 @@ function setupIntervalsActions(activity) {
                     }
                 }
 
-                const pitchNumbers = tur.singer.defineMode.sort((a, b) => a[0] - b[0]);
+                const pitchNumbers = tur.singer.defineMode.sort((a, b) => a - b);
                 const wrappedPitchNumbers = [];
                 const originalPitchNumbers = [];
 
                 // Process pitch numbers with modulo arithmetic
+                const seenPitches = new Set();
                 for (let i = 0; i < pitchNumbers.length; i++) {
                     const originalPitch = pitchNumbers[i];
                     originalPitchNumbers.push(originalPitch);
@@ -309,6 +312,12 @@ function setupIntervalsActions(activity) {
                         wrappedPitch += temperamentCardinality;
                     }
 
+                    // Skip duplicates after wrapping
+                    if (seenPitches.has(wrappedPitch)) {
+                        activity.errorMsg(_("Ignoring duplicate pitch numbers."));
+                        continue;
+                    }
+                    seenPitches.add(wrappedPitch);
                     wrappedPitchNumbers.push(wrappedPitch);
 
                     // Show warning if pitch was wrapped
@@ -322,12 +331,6 @@ function setupIntervalsActions(activity) {
                                 temperamentCardinality +
                                 _(" tone temperament.")
                         );
-                    }
-
-                    // Skip duplicates after wrapping
-                    if (i > 0 && wrappedPitchNumbers.includes(wrappedPitch)) {
-                        activity.errorMsg(_("Ignoring duplicate pitch numbers."));
-                        continue;
                     }
                 }
 
