@@ -258,8 +258,10 @@ function copyURLToClipboard() {
     });
 
     clipboard.on("error", e => {
-        alert("Failed to copy!");
+        // Non-blocking feedback instead of alert()
         // eslint-disable-next-line no-console
-        console.error("Failed to copy:", e.action);
+        console.warn("Failed to copy to clipboard:", e.action);
+
+        e.clearSelection();
     });
 }
