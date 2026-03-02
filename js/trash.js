@@ -204,6 +204,25 @@ class Trashcan {
                 this._makeBorderHighlight(true); // Make it active.
                 this.activity.refreshCanvas();
                 clearInterval(this._animationInterval); // Autostop animation.
+
+                // When the trash highlight completes we mark the blocks subsystem
+                // as "trashReady" and record the currently active block. This
+                // avoids a timing/race condition on touch devices where the
+                // highlight becomes visible slightly after the user's release.
+                // The actual deletion will be performed on the block's
+                // pressup/mouseout handler which will check this flag.
+                try {
+                    if (this.activity && this.activity.blocks) {
+                        const blkIndex = this.activity.blocks.activeBlock;
+                        if (typeof blkIndex !== "undefined" && blkIndex !== null) {
+                            this.activity.blocks.trashReady = true;
+                            this.activity.blocks.trashReadyBlock = blkIndex;
+                        }
+                    }
+                } catch (e) {
+                    // eslint-disable-next-line no-console
+                    console.error(e);
+                }
                 return;
             }
 
@@ -234,6 +253,17 @@ class Trashcan {
         this._highlightPower = 255;
         this._makeBorderHighlight(false);
         this._switchHighlightVisibility(false);
+
+        // Clear any pending trashReady flags when highlight animation stops.
+        try {
+            if (this.activity && this.activity.blocks) {
+                this.activity.blocks.trashReady = false;
+                this.activity.blocks.trashReadyBlock = null;
+            }
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error(e);
+        }
     }
 
     /**
