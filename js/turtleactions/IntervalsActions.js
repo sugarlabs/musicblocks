@@ -21,7 +21,7 @@
 
 /*
    global _, NOINPUTERRORMSG, Singer, MUSICALMODES, MusicBlocks, Mouse, getNote,
-   getModeLength
+   getModeLength, isCustomTemperament, getTemperament, TEMPERAMENT
 */
 
 /*
@@ -32,7 +32,8 @@
         NOINPUTERRORMSG
     js/utils/musicutils.js
         MUSICALMODES, MODE_PIE_MENUS, getNote, getModeLength, NOTESTEP,
-        GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP
+        GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
+        isCustomTemperament, getTemperament, TEMPERAMENT
     js/turtle-singer.js
         Singer
     js/js-export/export.js
@@ -273,25 +274,69 @@ function setupIntervalsActions(activity) {
                     activity.errorMsg(_("Adding missing pitch number 0."));
                 }
 
-                const pitchNumbers = tur.singer.defineMode.sort((a, b) => a[0] - b[0]);
+                // Get current temperament's pitch number range
+                const temperament = activity.logo.synth.inTemperament;
+                let maxPitchNumber = 11; // default for standard 12-tone temperament
+                let temperamentCardinality = 12;
 
+                if (isCustomTemperament(temperament)) {
+                    temperamentCardinality = TEMPERAMENT[temperament]["pitchNumber"];
+                    maxPitchNumber = temperamentCardinality - 1;
+                } else {
+                    const temp = getTemperament(temperament);
+                    if (temp && temp["pitchNumber"]) {
+                        temperamentCardinality = temp["pitchNumber"];
+                        maxPitchNumber = temperamentCardinality - 1;
+                    }
+                }
+
+                const pitchNumbers = tur.singer.defineMode.sort((a, b) => a[0] - b[0]);
+                const wrappedPitchNumbers = [];
+                const originalPitchNumbers = [];
+
+                // Process pitch numbers with modulo arithmetic
                 for (let i = 0; i < pitchNumbers.length; i++) {
-                    if (pitchNumbers[i] < 0 || pitchNumbers[i] > 11) {
+                    const originalPitch = pitchNumbers[i];
+                    originalPitchNumbers.push(originalPitch);
+                    
+                    // Apply standard circular modulo (handles negative numbers correctly)
+                    let wrappedPitch = originalPitch % temperamentCardinality;
+                    if (wrappedPitch < 0) {
+                        wrappedPitch += temperamentCardinality;
+                    }
+                    
+                    wrappedPitchNumbers.push(wrappedPitch);
+
+                    // Show warning if pitch was wrapped
+                    if (originalPitch < 0 || originalPitch > maxPitchNumber) {
                         activity.errorMsg(
-                            _("Ignoring pitch numbers less than zero or greater than eleven.")
+                            _("Pitch number ") + originalPitch + _(" wrapped to ") + wrappedPitch + _(" to fit in ") + temperamentCardinality + _(" tone temperament.")
                         );
-                        continue;
                     }
 
-                    if (i > 0 && pitchNumbers[i] === pitchNumbers[i - 1]) {
+                    // Skip duplicates after wrapping
+                    if (i > 0 && wrappedPitchNumbers.includes(wrappedPitch)) {
                         activity.errorMsg(_("Ignoring duplicate pitch numbers."));
                         continue;
                     }
+                }
 
-                    if (i < pitchNumbers.length - 1) {
-                        MUSICALMODES[modeName].push(pitchNumbers[i + 1] - pitchNumbers[i]);
+                // Remove duplicates and sort
+                const uniqueWrappedPitchNumbers = [...new Set(wrappedPitchNumbers)].sort((a, b) => a - b);
+
+                // Build the mode using wrapped pitch numbers
+                for (let i = 0; i < uniqueWrappedPitchNumbers.length; i++) {
+                    if (i < uniqueWrappedPitchNumbers.length - 1) {
+                        // Calculate interval to next pitch
+                        let interval = uniqueWrappedPitchNumbers[i + 1] - uniqueWrappedPitchNumbers[i];
+                        if (interval < 0) {
+                            interval += temperamentCardinality;
+                        }
+                        MUSICALMODES[modeName].push(interval);
                     } else {
-                        MUSICALMODES[modeName].push(12 - pitchNumbers[i]);
+                        // Calculate interval to complete the octave
+                        let interval = temperamentCardinality - uniqueWrappedPitchNumbers[i];
+                        MUSICALMODES[modeName].push(interval);
                     }
                 }
 

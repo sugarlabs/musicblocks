@@ -412,6 +412,46 @@ function setupPitchBlocks(activity) {
         }
     }
 
+    class TemperamentLengthBlock extends ValueBlock {
+        constructor() {
+            //.TRANS: number of pitches in current temperament system
+            super("temperamentlength", _("temperament length"));
+            this.setPalette("pitch", activity);
+            this.parameter = true;
+            this.setHelpString([
+                _(
+                    "The Temperament Length block returns the number of pitches in the current temperament system. For example, 12 for standard tuning, 31 for 31-EDO, etc."
+                ),
+                "documentation",
+                ""
+            ]);
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return activity.blocks.blockList[blk].value;
+        }
+
+        arg(logo, turtle, blk) {
+            // Get the current active temperament
+            const temperament = logo.synth.inTemperament;
+            
+            // Check if it's a custom temperament
+            if (isCustomTemperament(temperament)) {
+                // For custom temperaments, get the pitchNumber from the temperament object
+                return TEMPERAMENT[temperament]["pitchNumber"];
+            } else {
+                // For predefined temperaments, get the temperament data
+                const temp = getTemperament(temperament);
+                if (temp && temp["pitchNumber"]) {
+                    return temp["pitchNumber"];
+                } else {
+                    // Default to 12 if temperament not found
+                    return 12;
+                }
+            }
+        }
+    }
+
     class OutputToolsBlocks extends LeftBlock {
         constructor() {
             super("outputtools", _("pitch converter"));
@@ -2147,6 +2187,7 @@ function setupPitchBlocks(activity) {
     new CustomPitchBlock().setup(activity);
     new Pitch2Block().setup(activity);
     new PitchBlock().setup(activity);
+    new TemperamentLengthBlock().setup(activity);
 }
 
 if (typeof module !== "undefined" && module.exports) {
