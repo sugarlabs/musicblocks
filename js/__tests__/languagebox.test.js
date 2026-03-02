@@ -24,6 +24,7 @@ const mockActivity = {
         languagePreference: "enUS",
         kanaPreference: null
     },
+    saveLocally: jest.fn(),
     textMsg: jest.fn()
 };
 
@@ -31,6 +32,15 @@ Object.defineProperty(global, "localStorage", {
     value: {
         getItem: jest.fn(),
         setItem: jest.fn()
+    },
+    writable: true
+});
+
+// Mock window.location.reload
+const reloadMock = jest.fn();
+Object.defineProperty(window, "location", {
+    value: {
+        reload: reloadMock
     },
     writable: true
 });
@@ -47,240 +57,140 @@ describe("LanguageBox Class", () => {
         languageBox = new LanguageBox(mockActivity);
     });
 
-    it("should reload the window when OnClick is called", () => {
-        const reloadSpy = jest.spyOn(languageBox, "reload").mockImplementation(() => {});
-        languageBox.OnClick();
-        expect(reloadSpy).toHaveBeenCalled();
-        reloadSpy.mockRestore();
-    });
-
-    it("should display 'already set' message when the selected language is the same", () => {
-        localStorage.getItem.mockReturnValue("enUS");
-        mockActivity.textMsg.mockImplementation();
-
-        languageBox._language = "enUS";
+    it("should save project, update localStorage, and reload when hide is called", () => {
+        languageBox._language = "es";
         languageBox.hide();
 
-        expect(mockActivity.textMsg).toHaveBeenCalledWith(
-            "Music Blocks is already set to this language."
-        );
+        expect(mockActivity.saveLocally).toHaveBeenCalled();
+        expect(localStorage.setItem).toHaveBeenCalledWith("languagePreference", "es");
+        expect(reloadMock).toHaveBeenCalled();
     });
 
-    it("should display the refresh message when a new language is selected", () => {
-        localStorage.getItem.mockReturnValue("ja");
-        mockActivity.textMsg.mockImplementation();
-
-        languageBox._language = "enUS";
+    it("should handle Japanese variations correctly (ja-kanji truncates to ja)", () => {
+        languageBox._language = "ja-kanji";
         languageBox.hide();
 
-        expect(mockActivity.textMsg).toHaveBeenCalledWith(
-            expect.stringContaining("Refresh your browser to change your language preference.")
-        );
+        expect(mockActivity.saveLocally).toHaveBeenCalled();
+        expect(localStorage.setItem).toHaveBeenCalledWith("languagePreference", "ja");
+        expect(reloadMock).toHaveBeenCalled();
     });
 
-    it("should display the correct message when hide is called for 'ja'", () => {
-        localStorage.getItem.mockReturnValue("enUS");
-        mockActivity.textMsg.mockImplementation();
-
-        languageBox._language = "ja";
-        languageBox.hide();
-
-        expect(mockActivity.textMsg).toHaveBeenCalledWith(
-            expect.stringContaining("言語を変えるには、ブラウザをこうしんしてください。")
-        );
-    });
-
-    it("should attach click listeners to language links when hide is called", () => {
-        const mockLinks = [{ addEventListener: jest.fn() }, { addEventListener: jest.fn() }];
-        document.querySelectorAll.mockReturnValue(mockLinks);
-
-        languageBox.hide();
-
-        mockLinks.forEach(link => {
-            expect(link.addEventListener).toHaveBeenCalledWith("click", expect.any(Function));
-        });
-    });
-
-    // Test each language selection method
+    // Test each language selection method calls hide
     describe("Language selection methods", () => {
+        let hideSpy;
+        
+        beforeEach(() => {
+             hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
+        });
+
         it("should set language to enUS and call hide when enUS_onclick is called", () => {
-            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
-
             languageBox.enUS_onclick();
-
             expect(languageBox._language).toBe("enUS");
             expect(hideSpy).toHaveBeenCalled();
         });
 
         it("should set language to enUK and call hide when enUK_onclick is called", () => {
-            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
-
             languageBox.enUK_onclick();
-
             expect(languageBox._language).toBe("enUK");
             expect(hideSpy).toHaveBeenCalled();
         });
 
         it("should set language to ko and call hide when ko_onclick is called", () => {
-            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
-
             languageBox.ko_onclick();
-
             expect(languageBox._language).toBe("ko");
             expect(hideSpy).toHaveBeenCalled();
         });
 
         it("should set language to ja, set kanji preference, and call hide when ja_onclick is called", () => {
-            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
-
             languageBox.ja_onclick();
-
             expect(languageBox._language).toBe("ja-kanji");
             expect(mockActivity.storage.kanaPreference).toBe("kanji");
             expect(hideSpy).toHaveBeenCalled();
         });
 
         it("should set language to ja, set kana preference, and call hide when kana_onclick is called", () => {
-            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
-
             languageBox.kana_onclick();
-
             expect(languageBox._language).toBe("ja-kana");
             expect(mockActivity.storage.kanaPreference).toBe("kana");
             expect(hideSpy).toHaveBeenCalled();
         });
 
         it("should set language to es and call hide when es_onclick is called", () => {
-            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
-
             languageBox.es_onclick();
-
             expect(languageBox._language).toBe("es");
             expect(hideSpy).toHaveBeenCalled();
         });
 
         it("should set language to pt and call hide when pt_onclick is called", () => {
-            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
-
             languageBox.pt_onclick();
-
             expect(languageBox._language).toBe("pt");
             expect(hideSpy).toHaveBeenCalled();
         });
 
         it("should set language to zh_CN and call hide when zhCN_onclick is called", () => {
-            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
-
             languageBox.zhCN_onclick();
-
             expect(languageBox._language).toBe("zh_CN");
             expect(hideSpy).toHaveBeenCalled();
         });
 
         it("should set language to th and call hide when th_onclick is called", () => {
-            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
-
             languageBox.th_onclick();
-
             expect(languageBox._language).toBe("th");
             expect(hideSpy).toHaveBeenCalled();
         });
 
         it("should set language to hi and call hide when hi_onclick is called", () => {
-            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
-
             languageBox.hi_onclick();
-
             expect(languageBox._language).toBe("hi");
             expect(hideSpy).toHaveBeenCalled();
         });
 
         it("should set language to ibo and call hide when ibo_onclick is called", () => {
-            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
-
             languageBox.ibo_onclick();
-
             expect(languageBox._language).toBe("ibo");
             expect(hideSpy).toHaveBeenCalled();
         });
 
         it("should set language to ar and call hide when ar_onclick is called", () => {
-            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
-
             languageBox.ar_onclick();
-
             expect(languageBox._language).toBe("ar");
             expect(hideSpy).toHaveBeenCalled();
         });
 
         it("should set language to he and call hide when he_onclick is called", () => {
-            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
-
             languageBox.he_onclick();
-
             expect(languageBox._language).toBe("he");
             expect(hideSpy).toHaveBeenCalled();
         });
 
         it("should set language to te and call hide when te_onclick is called", () => {
-            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
-
             languageBox.te_onclick();
-
             expect(languageBox._language).toBe("te");
             expect(hideSpy).toHaveBeenCalled();
         });
 
         it("should set language to ayc and call hide when ayc_onclick is called", () => {
-            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
-
             languageBox.ayc_onclick();
-
             expect(languageBox._language).toBe("ayc");
             expect(hideSpy).toHaveBeenCalled();
         });
 
         it("should set language to quz and call hide when quz_onclick is called", () => {
-            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
-
             languageBox.quz_onclick();
-
             expect(languageBox._language).toBe("quz");
             expect(hideSpy).toHaveBeenCalled();
         });
 
         it("should set language to gug and call hide when gug_onclick is called", () => {
-            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
-
             languageBox.gug_onclick();
-
             expect(languageBox._language).toBe("gug");
             expect(hideSpy).toHaveBeenCalled();
         });
 
         it("should set language to ur and call hide when ur_onclick is called", () => {
-            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
-
             languageBox.ur_onclick();
-
             expect(languageBox._language).toBe("ur");
             expect(hideSpy).toHaveBeenCalled();
-        });
-    });
-
-    // Test Japanese kana preference
-    describe("Japanese kana handling", () => {
-        it("should display kana message when Japanese language is selected with kana preference", () => {
-            localStorage.getItem.mockReturnValue("enUS");
-            mockActivity.storage.kanaPreference = "kana";
-            mockActivity.textMsg.mockImplementation();
-
-            languageBox._language = "ja";
-            languageBox.hide();
-
-            expect(mockActivity.textMsg).toHaveBeenCalledWith(
-                expect.stringContaining("げんごを かえるには、ブラウザを こうしんしてください。")
-            );
         });
     });
 });
