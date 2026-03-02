@@ -1655,7 +1655,7 @@ class Activity {
 
         this._doFastButton = env => {
             // Prevent spam-clicking by checking if already running
-            if (this.logo._alreadyRunning) {
+            if (this.logo._alreadyRunning || this._restartPending) {
                 return;
             }
 
@@ -1691,11 +1691,17 @@ class Activity {
                     this.logo.step();
                 } else {
                     // Stop and restart.
+                    if (this._restartPending) {
+                        return;
+                    }
+
                     document.getElementById("stop").style.color = "white";
                     this.logo.doStopTurtles();
 
+                    this._restartPending = true;
                     const that = this;
                     setTimeout(() => {
+                        this._restartPending = false;
                         document.getElementById("stop").style.color = "#ea174c";
                         that.logo.runLogoCommands(null, env);
                     }, 500);
