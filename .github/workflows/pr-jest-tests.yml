@@ -23,14 +23,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci --ignore-scripts
 
       - name: Run Jest Tests
         id: jest
         run: |
-          npm test -- --json --outputFile=jest-results.json || echo "TESTS_FAILED=true" >> $GITHUB_ENV
+          npm test -- --json --outputFile=jest-results.json
 
       - name: Read Jest Results
         id: results
