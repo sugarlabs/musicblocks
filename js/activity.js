@@ -8040,7 +8040,11 @@ class Activity {
 
             this._perfMark("activity.init.end");
             this._perfMeasure("activity.init_total", "activity.init.start", "activity.init.end");
-            this._perfMeasure("activity.init_to_ui_ready", "activity.init.start", "activity.init.ui_ready");
+            this._perfMeasure(
+                "activity.init_to_ui_ready",
+                "activity.init.start",
+                "activity.init.ui_ready"
+            );
             this._perfMeasure(
                 "loader_to_activity_init_complete",
                 "loader.main.start",

@@ -185,21 +185,18 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
             try {
                 const params = new URLSearchParams(window.location.search || "");
                 return (
-                    params.get("mbPerf") === "1" ||
-                    window.localStorage.getItem("mbPerf") === "1"
+                    params.get("mbPerf") === "1" || window.localStorage.getItem("mbPerf") === "1"
                 );
             } catch (e) {
                 return false;
             }
         })();
 
-        const state =
-            window.__mbPerf ||
-            {
-                enabled: isEnabled,
-                marks: {},
-                measures: {}
-            };
+        const state = window.__mbPerf || {
+            enabled: isEnabled,
+            marks: {},
+            measures: {}
+        };
         window.__mbPerf = state;
 
         const mark = name => {
