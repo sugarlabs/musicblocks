@@ -199,6 +199,7 @@ class Logo {
         this.oscilloscopeTurtles = [];
         this.meterWidget = null;
         this.statusMatrix = null;
+        this.timeline = null;
         this.legobricks = null;
 
         this.evalFlowDict = {};
@@ -1200,6 +1201,16 @@ class Logo {
             }
 
             this.statusMatrix.init(this.activity);
+        }
+
+        // Set up timeline widget.
+        if (window.widgetWindows.isOpen("timeline")) {
+            // Ensure widget has been created before trying to initialize it
+            if (this.timeline === null) {
+                this.timeline = new Timeline();
+            }
+
+            this.timeline.init(this.activity);
         }
 
         // Execute turtle code here
