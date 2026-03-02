@@ -377,7 +377,7 @@ class Singer {
                     tur.singer.keySignature,
                     tur.singer.movable,
                     null,
-                    activity.logo.errorMsg,
+                    activity.errorMsg,
                     logo.synth.inTemperament
                 );
             }
