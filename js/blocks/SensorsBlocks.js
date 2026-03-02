@@ -344,14 +344,18 @@ function setupSensorsBlocks(activity) {
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _("The Cursor over block triggers an event when the cursor is moved over a mouse."),
+                    _(
+                        "The Cursor over block triggers an event when the cursor is moved over a mouse."
+                    ),
                     "documentation",
                     null,
                     "cursoroverhelp"
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Cursor over block triggers an event when the cursor is moved over a turtle."),
+                    _(
+                        "The Cursor over block triggers an event when the cursor is moved over a turtle."
+                    ),
                     "documentation",
                     null,
                     "cursoroverhelp"
@@ -386,7 +390,9 @@ function setupSensorsBlocks(activity) {
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
                     // TRANS: hover
-                    _("The Cursor out block triggers an event when the cursor is moved off of a mouse."),
+                    _(
+                        "The Cursor out block triggers an event when the cursor is moved off of a mouse."
+                    ),
                     "documentation",
                     null,
                     "cursorouthelp"
@@ -394,7 +400,9 @@ function setupSensorsBlocks(activity) {
             } else {
                 this.setHelpString([
                     // TRANS: hover
-                    _("The Cursor out block triggers an event when the cursor is moved off of a turtle."),
+                    _(
+                        "The Cursor out block triggers an event when the cursor is moved off of a turtle."
+                    ),
                     "documentation",
                     null,
                     "cursorouthelp"
@@ -427,14 +435,18 @@ function setupSensorsBlocks(activity) {
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _("The Cursor button down block triggers an event when the cursor button is pressed on a mouse."),
+                    _(
+                        "The Cursor button down block triggers an event when the cursor button is pressed on a mouse."
+                    ),
                     "documentation",
                     null,
                     "cursordownhelp"
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Cursor button down block triggers an event when the cursor button is pressed on a turtle."),
+                    _(
+                        "The Cursor button down block triggers an event when the cursor button is pressed on a turtle."
+                    ),
                     "documentation",
                     null,
                     "cursordownhelp"
@@ -467,14 +479,18 @@ function setupSensorsBlocks(activity) {
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _("The Cursor button up block triggers an event when the cursor button is released while over a mouse."),
+                    _(
+                        "The Cursor button up block triggers an event when the cursor button is released while over a mouse."
+                    ),
                     "documentation",
                     null,
                     "cursoruphelp"
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Cursor button up block triggers an event when the cursor button is released while over a turtle."),
+                    _(
+                        "The Cursor button up block triggers an event when the cursor button is released while over a turtle."
+                    ),
                     "documentation",
                     null,
                     "cursoruphelp"
@@ -494,10 +510,10 @@ function setupSensorsBlocks(activity) {
     }
 
     /**
-    * Base class for color component blocks (red, green, blue).
-    * Represents a block that returns the red, green or blue component of the pixel under the mouse or turtle.
-    * @extends {ValueBlock}
-    */
+     * Base class for color component blocks (red, green, blue).
+     * Represents a block that returns the red, green or blue component of the pixel under the mouse or turtle.
+     * @extends {ValueBlock}
+     */
     class GetColorComponentBlock extends ValueBlock {
         /**
          * Constructs a new color component block instance.
@@ -680,7 +696,9 @@ function setupSensorsBlocks(activity) {
             this.beginnerBlock(!(this.lang === "ja"));
 
             this.setHelpString([
-                _("The Time block returns the number of seconds that the program has been running."),
+                _(
+                    "The Time block returns the number of seconds that the program has been running."
+                ),
                 "documentation",
                 ""
             ]);
@@ -884,7 +902,7 @@ function setupSensorsBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                "print"
+                    "print"
             ) {
                 logo.statusFields.push([blk, "toascii"]);
             } else {
@@ -953,11 +971,47 @@ function setupSensorsBlocks(activity) {
     }
 
     [
-        { name: "getred", label: _("red"), index: 0, helpMouse: _("The Get red block returns the red component of the pixel under the mouse."), helpTurtle: _("The Get red block returns the red component of the pixel under the turtle.") },
-        { name: "getgreen", label: _("green"), index: 1, helpMouse: _("The Get green block returns the green component of the pixel under the mouse."), helpTurtle: _("The Get green block returns the green component of the pixel under the turtle.") },
-        { name: "getblue", label: _("blue"), index: 2, helpMouse: _("The Get blue block returns the blue component of the pixel under the mouse."), helpTurtle: _("The Get blue block returns the blue component of the pixel under the turtle.") }
+        {
+            name: "getred",
+            label: _("red"),
+            index: 0,
+            helpMouse: _(
+                "The Get red block returns the red component of the pixel under the mouse."
+            ),
+            helpTurtle: _(
+                "The Get red block returns the red component of the pixel under the turtle."
+            )
+        },
+        {
+            name: "getgreen",
+            label: _("green"),
+            index: 1,
+            helpMouse: _(
+                "The Get green block returns the green component of the pixel under the mouse."
+            ),
+            helpTurtle: _(
+                "The Get green block returns the green component of the pixel under the turtle."
+            )
+        },
+        {
+            name: "getblue",
+            label: _("blue"),
+            index: 2,
+            helpMouse: _(
+                "The Get blue block returns the blue component of the pixel under the mouse."
+            ),
+            helpTurtle: _(
+                "The Get blue block returns the blue component of the pixel under the turtle."
+            )
+        }
     ].forEach(cfg => {
-        new GetColorComponentBlock(cfg.name, cfg.label, cfg.index, cfg.helpMouse, cfg.helpTurtle).setup(activity);
+        new GetColorComponentBlock(
+            cfg.name,
+            cfg.label,
+            cfg.index,
+            cfg.helpMouse,
+            cfg.helpTurtle
+        ).setup(activity);
     });
     new GetColorPixelBlock().setup(activity);
     new ToASCIIBlock().setup(activity);
@@ -976,7 +1030,6 @@ function setupSensorsBlocks(activity) {
     new MouseYBlock().setup(activity);
     new MouseXBlock().setup(activity);
 }
-
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = { setupSensorsBlocks };

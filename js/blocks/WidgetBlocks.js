@@ -598,7 +598,8 @@ function setupWidgetBlocks(activity) {
                             blocks,
                             turtle,
                             Math.max(0, blocks.length - 2),
-                            turtle == activity.turtles.getTurtle(activity.turtles.getTurtleCount() - 1)
+                            turtle ==
+                                activity.turtles.getTurtle(activity.turtles.getTurtleCount() - 1)
                         );
                 }
                 blocks[0][4][2] = blocks.length;
@@ -647,7 +648,9 @@ function setupWidgetBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale)."),
+                _(
+                    "The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale)."
+                ),
                 "documentation",
                 ""
             ]);
@@ -893,7 +896,9 @@ function setupWidgetBlocks(activity) {
                     logo.pitchDrumMatrix.rowLabels.length === 0
                 ) {
                     activity.errorMsg(
-                        _("You must have at least one pitch block and one drum block in the matrix."),
+                        _(
+                            "You must have at least one pitch block and one drum block in the matrix."
+                        ),
                         blk
                     );
                 } else {
@@ -1064,14 +1069,18 @@ function setupWidgetBlocks(activity) {
 
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    _("The Music keyboard block opens a piano keyboard that can be used to create notes."),
+                    _(
+                        "The Music keyboard block opens a piano keyboard that can be used to create notes."
+                    ),
                     "documentation",
                     null,
                     "musickeyboardja"
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Music keyboard block opens a piano keyboard that can be used to create notes."),
+                    _(
+                        "The Music keyboard block opens a piano keyboard that can be used to create notes."
+                    ),
                     "documentation",
                     null,
                     "musickeyboard2"
@@ -1376,79 +1385,81 @@ function setupWidgetBlocks(activity) {
 
             //.TRANS: assigns pitch to a sequence of beats to generate a melody
             this.formBlock({ name: _("phrase maker"), canCollapse: true });
-            activity.beginnerMode ? this.makeMacro((x, y) => [
-                [0, "matrix", x, y, [null, 1, 33]],
-                [1, "pitch", 0, 0, [0, 2, 3, 4]],
-                [2, ["solfege", { value: "ti" }], 0, 0, [1]],
-                [3, ["number", { value: 4 }], 0, 0, [1]],
-                [4, "pitch", 0, 0, [1, 5, 6, 7]],
-                [5, ["solfege", { value: "la" }], 0, 0, [4]],
-                [6, ["number", { value: 4 }], 0, 0, [4]],
-                [7, "pitch", 0, 0, [4, 8, 9, 10]],
-                [8, ["solfege", { value: "sol" }], 0, 0, [7]],
-                [9, ["number", { value: 4 }], 0, 0, [7]],
-                [10, "pitch", 0, 0, [7, 11, 12, 13]],
-                [11, ["solfege", { value: "mi" }], 0, 0, [10]],
-                [12, ["number", { value: 4 }], 0, 0, [10]],
-                [13, "pitch", 0, 0, [10, 14, 15, 16]],
-                [14, ["solfege", { value: "re" }], 0, 0, [13]],
-                [15, ["number", { value: 4 }], 0, 0, [13]],
-                [16, "playdrum", 0, 0, [13, 17, 18]],
-                [17, ["drumname", { value: "snare drum" }], 0, 0, [16]],
-                [18, "forward", 0, 0, [16, 19, 20]],
-                [19, ["number", { value: 100 }], 0, 0, [18]],
-                [20, "right", 0, 0, [18, 21, 22]],
-                [21, ["number", { value: 90 }], 0, 0, [20]],
-                [22, "rhythm2", 0, 0, [20, 23, 24, 27]],
-                [23, ["number", { value: 6 }], 0, 0, [22]],
-                [24, "divide", 0, 0, [22, 25, 26]],
-                [25, ["number", { value: 1 }], 0, 0, [24]],
-                [26, ["number", { value: 4 }], 0, 0, [24]],
-                [27, "vspace", 0, 0, [22, 28]],
-                [28, "rhythm2", 0, 0, [27, 29, 30, null]],
-                [29, ["number", { value: 1 }], 0, 0, [28]],
-                [30, "divide", 0, 0, [28, 31, 32]],
-                [31, ["number", { value: 1 }], 0, 0, [30]],
-                [32, ["number", { value: 2 }], 0, 0, [30]],
-                [33, "hiddennoflow", 0, 0, [0, null]]
-            ]) : this.makeMacro((x, y) => [
-                [0, "matrix", x, y, [null, 1, 35]],
-                [1, "pitch", 0, 0, [0, 2, 3, 4]],
-                [2, ["solfege", { value: "ti" }], 0, 0, [1]],
-                [3, ["number", { value: 4 }], 0, 0, [1]],
-                [4, "pitch", 0, 0, [1, 5, 6, 7]],
-                [5, ["solfege", { value: "la" }], 0, 0, [4]],
-                [6, ["number", { value: 4 }], 0, 0, [4]],
-                [7, "pitch", 0, 0, [4, 8, 9, 10]],
-                [8, ["solfege", { value: "sol" }], 0, 0, [7]],
-                [9, ["number", { value: 4 }], 0, 0, [7]],
-                [10, "pitch", 0, 0, [7, 11, 12, 13]],
-                [11, ["solfege", { value: "mi" }], 0, 0, [10]],
-                [12, ["number", { value: 4 }], 0, 0, [10]],
-                [13, "pitch", 0, 0, [10, 14, 15, 16]],
-                [14, ["solfege", { value: "re" }], 0, 0, [13]],
-                [15, ["number", { value: 4 }], 0, 0, [13]],
-                [16, "playdrum", 0, 0, [13, 17, 18]],
-                [17, ["drumname", { value: "snare drum" }], 0, 0, [16]],
-                [18, "forward", 0, 0, [16, 19, 20]],
-                [19, ["number", { value: 100 }], 0, 0, [18]],
-                [20, "right", 0, 0, [18, 21, 22]],
-                [21, ["number", { value: 90 }], 0, 0, [20]],
-                [22, "print", 0, 0, [20, 23, 24]],
-                [23, ["text", { "value": _("lyrics") }], 0, 0, [22]],
-                [24, "rhythm2", 0, 0, [22, 25, 26, 29]],
-                [25, ["number", { value: 6 }], 0, 0, [24]],
-                [26, "divide", 0, 0, [24, 27, 28]],
-                [27, ["number", { value: 1 }], 0, 0, [26]],
-                [28, ["number", { value: 4 }], 0, 0, [26]],
-                [29, "vspace", 0, 0, [24, 30]],
-                [30, "rhythm2", 0, 0, [29, 31, 32, null]],
-                [31, ["number", { value: 1 }], 0, 0, [30]],
-                [32, "divide", 0, 0, [30, 33, 34]],
-                [33, ["number", { value: 1 }], 0, 0, [32]],
-                [34, ["number", { value: 2 }], 0, 0, [32]],
-                [35, "hiddennoflow", 0, 0, [0, null]]
-            ]);
+            activity.beginnerMode
+                ? this.makeMacro((x, y) => [
+                      [0, "matrix", x, y, [null, 1, 33]],
+                      [1, "pitch", 0, 0, [0, 2, 3, 4]],
+                      [2, ["solfege", { value: "ti" }], 0, 0, [1]],
+                      [3, ["number", { value: 4 }], 0, 0, [1]],
+                      [4, "pitch", 0, 0, [1, 5, 6, 7]],
+                      [5, ["solfege", { value: "la" }], 0, 0, [4]],
+                      [6, ["number", { value: 4 }], 0, 0, [4]],
+                      [7, "pitch", 0, 0, [4, 8, 9, 10]],
+                      [8, ["solfege", { value: "sol" }], 0, 0, [7]],
+                      [9, ["number", { value: 4 }], 0, 0, [7]],
+                      [10, "pitch", 0, 0, [7, 11, 12, 13]],
+                      [11, ["solfege", { value: "mi" }], 0, 0, [10]],
+                      [12, ["number", { value: 4 }], 0, 0, [10]],
+                      [13, "pitch", 0, 0, [10, 14, 15, 16]],
+                      [14, ["solfege", { value: "re" }], 0, 0, [13]],
+                      [15, ["number", { value: 4 }], 0, 0, [13]],
+                      [16, "playdrum", 0, 0, [13, 17, 18]],
+                      [17, ["drumname", { value: "snare drum" }], 0, 0, [16]],
+                      [18, "forward", 0, 0, [16, 19, 20]],
+                      [19, ["number", { value: 100 }], 0, 0, [18]],
+                      [20, "right", 0, 0, [18, 21, 22]],
+                      [21, ["number", { value: 90 }], 0, 0, [20]],
+                      [22, "rhythm2", 0, 0, [20, 23, 24, 27]],
+                      [23, ["number", { value: 6 }], 0, 0, [22]],
+                      [24, "divide", 0, 0, [22, 25, 26]],
+                      [25, ["number", { value: 1 }], 0, 0, [24]],
+                      [26, ["number", { value: 4 }], 0, 0, [24]],
+                      [27, "vspace", 0, 0, [22, 28]],
+                      [28, "rhythm2", 0, 0, [27, 29, 30, null]],
+                      [29, ["number", { value: 1 }], 0, 0, [28]],
+                      [30, "divide", 0, 0, [28, 31, 32]],
+                      [31, ["number", { value: 1 }], 0, 0, [30]],
+                      [32, ["number", { value: 2 }], 0, 0, [30]],
+                      [33, "hiddennoflow", 0, 0, [0, null]]
+                  ])
+                : this.makeMacro((x, y) => [
+                      [0, "matrix", x, y, [null, 1, 35]],
+                      [1, "pitch", 0, 0, [0, 2, 3, 4]],
+                      [2, ["solfege", { value: "ti" }], 0, 0, [1]],
+                      [3, ["number", { value: 4 }], 0, 0, [1]],
+                      [4, "pitch", 0, 0, [1, 5, 6, 7]],
+                      [5, ["solfege", { value: "la" }], 0, 0, [4]],
+                      [6, ["number", { value: 4 }], 0, 0, [4]],
+                      [7, "pitch", 0, 0, [4, 8, 9, 10]],
+                      [8, ["solfege", { value: "sol" }], 0, 0, [7]],
+                      [9, ["number", { value: 4 }], 0, 0, [7]],
+                      [10, "pitch", 0, 0, [7, 11, 12, 13]],
+                      [11, ["solfege", { value: "mi" }], 0, 0, [10]],
+                      [12, ["number", { value: 4 }], 0, 0, [10]],
+                      [13, "pitch", 0, 0, [10, 14, 15, 16]],
+                      [14, ["solfege", { value: "re" }], 0, 0, [13]],
+                      [15, ["number", { value: 4 }], 0, 0, [13]],
+                      [16, "playdrum", 0, 0, [13, 17, 18]],
+                      [17, ["drumname", { value: "snare drum" }], 0, 0, [16]],
+                      [18, "forward", 0, 0, [16, 19, 20]],
+                      [19, ["number", { value: 100 }], 0, 0, [18]],
+                      [20, "right", 0, 0, [18, 21, 22]],
+                      [21, ["number", { value: 90 }], 0, 0, [20]],
+                      [22, "print", 0, 0, [20, 23, 24]],
+                      [23, ["text", { value: _("lyrics") }], 0, 0, [22]],
+                      [24, "rhythm2", 0, 0, [22, 25, 26, 29]],
+                      [25, ["number", { value: 6 }], 0, 0, [24]],
+                      [26, "divide", 0, 0, [24, 27, 28]],
+                      [27, ["number", { value: 1 }], 0, 0, [26]],
+                      [28, ["number", { value: 4 }], 0, 0, [26]],
+                      [29, "vspace", 0, 0, [24, 30]],
+                      [30, "rhythm2", 0, 0, [29, 31, 32, null]],
+                      [31, ["number", { value: 1 }], 0, 0, [30]],
+                      [32, "divide", 0, 0, [30, 33, 34]],
+                      [33, ["number", { value: 1 }], 0, 0, [32]],
+                      [34, ["number", { value: 2 }], 0, 0, [32]],
+                      [35, "hiddennoflow", 0, 0, [0, null]]
+                  ]);
         }
 
         /**
@@ -1462,7 +1473,43 @@ function setupWidgetBlocks(activity) {
             logo.inMatrix = true;
 
             if (logo.phraseMaker === null) {
-                logo.phraseMaker = new PhraseMaker();
+                // Create explicit dependency object for PhraseMaker
+                const phraseMakerDeps = {
+                    activity: activity,
+                    _: _,
+                    platformColor: platformColor,
+                    docById: docById,
+                    docBySelector: docBySelector,
+                    MATRIXSOLFEHEIGHT: MATRIXSOLFEHEIGHT,
+                    MATRIXSOLFEWIDTH: MATRIXSOLFEWIDTH,
+                    toFraction: toFraction,
+                    Singer: Singer,
+                    SOLFEGECONVERSIONTABLE: SOLFEGECONVERSIONTABLE,
+                    slicePath: slicePath,
+                    wheelnav: wheelnav,
+                    delayExecution: delayExecution,
+                    DEFAULTVOICE: DEFAULTVOICE,
+                    getDrumName: getDrumName,
+                    getDrumIcon: getDrumIcon,
+                    noteIsSolfege: noteIsSolfege,
+                    isCustomTemperament: isCustomTemperament,
+                    i18nSolfege: i18nSolfege,
+                    getNote: getNote,
+                    DEFAULTDRUM: DEFAULTDRUM,
+                    last: last,
+                    DRUMS: DRUMS,
+                    SHARP: SHARP,
+                    FLAT: FLAT,
+                    PREVIEWVOLUME: PREVIEWVOLUME,
+                    DEFAULTVOLUME: DEFAULTVOLUME,
+                    noteToFrequency: noteToFrequency,
+                    LCD: LCD,
+                    calcNoteValueToDisplay: calcNoteValueToDisplay,
+                    NOTESYMBOLS: NOTESYMBOLS,
+                    EIGHTHNOTEWIDTH: EIGHTHNOTEWIDTH,
+                    getTemperament: getTemperament
+                };
+                logo.phraseMaker = new PhraseMaker(phraseMakerDeps);
             }
             logo.phraseMaker.blockNo = blk;
 
@@ -1484,7 +1531,9 @@ function setupWidgetBlocks(activity) {
             const __listener = () => {
                 if (logo.tupletRhythms.length === 0 || logo.phraseMaker.rowLabels.length === 0) {
                     activity.errorMsg(
-                        _("You must have at least one pitch block and one rhythm block in the matrix."),
+                        _(
+                            "You must have at least one pitch block and one rhythm block in the matrix."
+                        ),
                         blk
                     );
                 } else {
@@ -1543,7 +1592,9 @@ function setupWidgetBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Status block opens a tool for inspecting the status of Music Blocks as it is running."),
+                _(
+                    "The Status block opens a tool for inspecting the status of Music Blocks as it is running."
+                ),
                 "documentation",
                 null,
                 "status"
@@ -1588,60 +1639,60 @@ function setupWidgetBlocks(activity) {
      */
     class AIMusicBlocks extends StackClampBlock {
         /**
-             * Creates a SamplerBlock instance.
-             */
+         * Creates a SamplerBlock instance.
+         */
         constructor() {
             super("aimusic");
             this.setPalette("widgets", activity);
             this.parameter = true;
             this.beginnerBlock(false);
-    
+
             this.setHelpString([
                 _("Upload a sample and adjust its pitch center."),
                 "documentation",
                 null,
                 "aimusic"
             ]);
-    
+
             //.TRANS: AI-generated music
             this.formBlock({ name: _("AI Music"), canCollapse: true });
             this.makeMacro((x, y) => [
                 [0, "aimusic", x, y, [null, 1]],
-                    
-                [1, "print", 0, 0, [0,2,null]],
-                [2, ["text",{"value":"Music Generated By AI"}], 0, 0, [1]]
+
+                [1, "print", 0, 0, [0, 2, null]],
+                [2, ["text", { value: "Music Generated By AI" }], 0, 0, [1]]
             ]);
         }
-    
+
         /**
-             * Handles the flow of data for the sampler block.
-             * @param {any[]} args - The arguments passed to the block.
-             * @param {object} logo - The logo object.
-             * @param {object} turtle - The turtle object.
-             * @param {object} blk - The block object.
-             * @returns {number[]} - The output values.
-             */
+         * Handles the flow of data for the sampler block.
+         * @param {any[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         * @returns {number[]} - The output values.
+         */
         flow(args, logo, turtle, blk) {
             if (logo.sample === null) {
                 logo.sample = new AIWidget();
             }
             logo.inSample = true;
             logo.sample = new AIWidget();
-    
+
             const listenerName = "_sampler_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
-    
+
             // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 logo.sample.init(activity);
             };
-    
+
             logo.setTurtleListener(turtle, listenerName, __listener);
-    
+
             return [args[0], 1];
         }
     }
-    
+
     class ReflectionBlock extends StackClampBlock {
         /**
          * Creates a ReflectionBlock instance.
@@ -1660,8 +1711,8 @@ function setupWidgetBlocks(activity) {
             this.formBlock({ name: _("reflection"), canCollapse: true });
             this.makeMacro((x, y) => [
                 [0, "reflection", x, y, [null, 1]],
-                [1, "print", 0, 0, [0,2,null]],
-                [2, ["text",{"value":"Reflective Learning"}], 0, 0, [1]]
+                [1, "print", 0, 0, [0, 2, null]],
+                [2, ["text", { value: "Reflective Learning" }], 0, 0, [1]]
             ]);
         }
 
@@ -1696,11 +1747,10 @@ function setupWidgetBlocks(activity) {
         }
     }
 
-        
     /**
- * Represents a block for controlling LEGO brick parameters and visualization.
- * @extends StackClampBlock
- */
+     * Represents a block for controlling LEGO brick parameters and visualization.
+     * @extends StackClampBlock
+     */
     class LegoBricksBlock extends StackClampBlock {
         constructor() {
             super("legobricks");
@@ -1741,13 +1791,13 @@ function setupWidgetBlocks(activity) {
         }
 
         /**
-     * Handles the flow of data for the LEGO bricks block.
-     * @param {any[]} args - The arguments passed to the block.
-     * @param {object} logo - The logo object.
-     * @param {object} turtle - The turtle object.
-     * @param {object} blk - The block object.
-     * @returns {number[]} - The output values.
-     */
+         * Handles the flow of data for the LEGO bricks block.
+         * @param {any[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         * @returns {number[]} - The output values.
+         */
         flow(args, logo, turtle, blk) {
             logo.inLegoWidget = true;
 
@@ -1782,53 +1832,52 @@ function setupWidgetBlocks(activity) {
         }
     }
 
-
     class AIDebugger extends StackClampBlock {
         constructor() {
             super("aidebugger");
             this.setPalette("widgets", activity);
             this.parameter = true;
             this.beginnerBlock(true);
-    
+
             this.setHelpString([
                 _("Debug your music blocks project with new possibilities and more understanding."),
                 "documentation",
                 null,
                 "aidebugger"
             ]);
-    
+
             this.formBlock({ name: _("Debugger"), canCollapse: true });
             this.makeMacro((x, y) => [
                 [0, "aidebugger", x, y, [null, 1]],
-                [1, "print", 0, 0, [0,2,null]],
-                [2, ["text",{"value":"Debugger Initiated"}], 0, 0, [1]]
+                [1, "print", 0, 0, [0, 2, null]],
+                [2, ["text", { value: "Debugger Initiated" }], 0, 0, [1]]
             ]);
         }
-    
+
         /**
-             * Handles the flow of data for the sampler block.
-             * @param {any[]} args - The arguments passed to the block.
-             * @param {object} logo - The logo object.
-             * @param {object} turtle - The turtle object.
-             * @param {object} blk - The block object.
-             * @returns {number[]} - The output values.
-             */
+         * Handles the flow of data for the sampler block.
+         * @param {any[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         * @returns {number[]} - The output values.
+         */
         flow(args, logo, turtle, blk) {
             if (logo.sample === null) {
                 logo.sample = new AIDebuggerWidget();
             }
             logo.inSample = true;
             logo.sample = new AIDebuggerWidget();
-    
+
             const listenerName = "_sampler_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
-    
+
             const __listener = event => {
                 logo.sample.init(activity);
             };
-    
+
             logo.setTurtleListener(turtle, listenerName, __listener);
-    
+
             return [args[0], 1];
         }
     }
@@ -1863,4 +1912,8 @@ function setupWidgetBlocks(activity) {
     new AIDebugger().setup(activity);
     // Instantiate and set up the StatusBlock
     new StatusBlock().setup(activity);
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupWidgetBlocks };
 }

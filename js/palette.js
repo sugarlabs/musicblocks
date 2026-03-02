@@ -99,14 +99,13 @@ class Palettes {
     }
 
     deltaY(dy) {
-        const curr = parseInt(document.getElementById("palette").style.top);
-        document.getElementById("palette").style.top = curr + dy + "px";
+        // Cache DOM element reference to avoid multiple lookups and forced reflow
+        const palette = document.getElementById("palette");
+        const curr = parseInt(palette.style.top);
+        palette.style.top = curr + dy + "px";
     }
 
     _makeSelectorButton(i) {
-        // eslint-disable-next-line no-console
-        console.debug("makeSelectorButton " + i);
-
         if (!document.getElementById("palette")) {
             const element = document.createElement("div");
             element.id = "palette";
@@ -116,8 +115,7 @@ class Palettes {
                 "style",
                 "position: absolute; z-index: 1000; left :0px; top:" + this.top + "px"
             );
-            element.innerHTML =
-                `<div style="height:fit-content">
+            element.innerHTML = `<div style="height:fit-content">
                     <table width="${1.5 * this.cellSize}" bgcolor="white">
                         <thead>
                             <tr></tr>
@@ -135,6 +133,7 @@ class Palettes {
             element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
             document.body.appendChild(element);
         }
+
         const tr = docById("palette").children[0].children[0].children[0].children[0];
         const td = tr.insertCell();
         td.width = 1.5 * this.cellSize;
@@ -219,8 +218,6 @@ class Palettes {
     }
 
     getPluginMacroExpansion(blkname, x, y) {
-        // eslint-disable-next-line no-console
-        console.debug(this.pluginMacros[blkname]);
         const obj = this.pluginMacros[blkname];
         if (obj != null) {
             obj[0][2] = x;
@@ -350,7 +347,7 @@ class Palettes {
         if (this.mobile) {
             return;
         }
-        // In order to open the search widget and palette menu simulataneously
+        // In order to open the search widget and palette menu simultaneously
         // this.activity.hideSearchWidget(true);
         this.dict[name].showMenu(true);
         this.activePalette = name; // used to delete plugins
@@ -415,13 +412,13 @@ class Palettes {
                     }
                 }
             }
-    
+
             // Remove the palette DOM element if it exists
             const paletteElement = docById("palette");
             if (paletteElement) {
                 paletteElement.parentNode.removeChild(paletteElement);
             }
-    
+
             // Clear the dictionary and reset state
             this.dict = {};
             this.visible = false;
@@ -435,10 +432,11 @@ class Palettes {
             element.classList.add("flex-palette");
             element.setAttribute(
                 "style",
-                `position: fixed; z-index: 1000; left: 0px; top: ${60+this.top}px; overflow-y: auto;`
+                `position: fixed; z-index: 1000; left: 0px; top: ${
+                    60 + this.top
+                }px; overflow-y: auto;`
             );
-            element.innerHTML =
-                `<div style="height:fit-content">
+            element.innerHTML = `<div style="height:fit-content">
                     <table width="${1.5 * this.cellSize}" bgcolor="white">
                         <thead>
                             <tr></tr>
@@ -456,7 +454,6 @@ class Palettes {
                 </div>`;
             element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
             document.body.appendChild(element);
-
         } catch (e) {
             console.error("Error clearing palettes:", e);
         }
@@ -475,7 +472,6 @@ class Palettes {
 
     // Palette Button event handlers
     _loadPaletteButtonHandler(name, row) {
-        // eslint-disable-next-line no-unused-vars
         let timeout;
 
         row.onmouseover = () => {
@@ -490,8 +486,7 @@ class Palettes {
 
         row.onmouseout = () => clearTimeout(timeout);
 
-        // eslint-disable-next-line no-unused-vars
-        row.onclick = (event) => {
+        row.onclick = () => {
             if (name == "search") {
                 this._hideMenus();
                 this.activity.showSearchWidget();
@@ -500,13 +495,11 @@ class Palettes {
             }
         };
 
-        // eslint-disable-next-line no-unused-vars
-        row.onmouseup = (event) => {
+        row.onmouseup = () => {
             document.body.style.cursor = "default";
         };
 
-        // eslint-disable-next-line no-unused-vars
-        row.onmouseleave = (event) => {
+        row.onmouseleave = () => {
             document.body.style.cursor = "default";
         };
     }
@@ -643,9 +636,9 @@ class PaletteModel {
         }
 
         const protoBlock = this.activity.blocks.protoBlockDict[blkname];
+
         if (protoBlock === null) {
-            // eslint-disable-next-line no-console
-            console.debug("Could not find block " + blkname);
+            return;
         }
 
         let label = "";
@@ -830,8 +823,7 @@ class PaletteModel {
             actualHeight: height,
             label,
             artwork,
-            artwork64:
-                "data:image/svg+xml;base64," + window.btoa(base64Encode(artwork)),
+            artwork64: "data:image/svg+xml;base64," + window.btoa(base64Encode(artwork)),
             docks,
             image: block.image,
             scale: block.scale,
@@ -878,6 +870,10 @@ class Palette {
         docById(
             "palette"
         ).childNodes[0].style.borderRight = `1px solid ${platformColor.selectorSelected}`;
+        if (this._outsideClickListener) {
+            document.removeEventListener("click", this._outsideClickListener);
+            this._outsideClickListener = null;
+        }
         this._hideMenuItems();
     }
 
@@ -901,7 +897,7 @@ class Palette {
         palBody.style.float = "left";
 
         palBody.style.border = `1px solid ${platformColor.selectorSelected}`;
-        [palBody.childNodes[0], palBody.childNodes[1]].forEach((item) => {
+        [palBody.childNodes[0], palBody.childNodes[1]].forEach(item => {
             item.style.boxSizing = "border-box";
             item.style.padding = "8px";
         });
@@ -951,20 +947,22 @@ class Palette {
         this._showMenuItems();
 
         // Close palette menu on outside click
+        // Remove any existing outside-click listener
         if (this._outsideClickListener) {
-            // Remove any existing listener before attaching a new one
             document.removeEventListener("click", this._outsideClickListener);
+            this._outsideClickListener = null;
         }
 
-        this._outsideClickListener = (event) => {
-            if (!this.menuContainer.contains(event.target)) {
-                this.hideMenu(); // Calls your existing hideMenu() → _hideMenuItems()
-                document.removeEventListener("click", this._outsideClickListener);
-                this._outsideClickListener = null;
+        this._outsideClickListener = event => {
+            if (this.menuContainer && this.menuContainer.contains(event.target)) {
+                return;
             }
-        };
 
-        // Delay listener to avoid capturing the click that opened the menu
+            this.hideMenu();
+            document.removeEventListener("click", this._outsideClickListener);
+            this._outsideClickListener = null;
+        };
+        // Delay attachment to avoid capturing the opening click
         setTimeout(() => {
             document.addEventListener("click", this._outsideClickListener);
         }, 0);
@@ -1009,10 +1007,10 @@ class Palette {
             img.onmouseover = () => (document.body.style.cursor = "pointer");
             img.onmouseleave = () => (document.body.style.cursor = "default");
 
-            // Image Drag initiates a browser defined drag, which needs to be stoped.
+            // Image Drag initiates a browser defined drag, which needs to be stopped.
             img.ondragstart = () => false;
 
-            const down = (event) => {
+            const down = event => {
                 // (1) prepare to moving: make absolute and on top by z-index
                 const posit = img.style.position;
                 const zInd = img.style.zIndex;
@@ -1029,7 +1027,7 @@ class Palette {
                     img.style.top = pageY - img.offsetHeight / 2 + "px";
                 };
 
-                const onMouseMove = (e) => {
+                const onMouseMove = e => {
                     e.preventDefault();
                     let x, y;
                     if (e.type === "touchmove") {
@@ -1047,7 +1045,7 @@ class Palette {
                 document.addEventListener("mousemove", onMouseMove);
 
                 const that = this;
-                const up = (event) => {
+                const up = event => {
                     document.body.style.cursor = "default";
                     document.removeEventListener("mousemove", onMouseMove);
                     document.removeEventListener("touchmove", onMouseMove);
@@ -1069,8 +1067,10 @@ class Palette {
                         true,
                         b.modname,
                         event,
-                        (x || that.activity.blocksContainer.x + 100) - that.activity.blocksContainer.x,
-                        (y || that.activity.blocksContainer.y + 100) - that.activity.blocksContainer.y
+                        (x || that.activity.blocksContainer.x + 100) -
+                            that.activity.blocksContainer.x,
+                        (y || that.activity.blocksContainer.y + 100) -
+                            that.activity.blocksContainer.y
                     );
                 };
 
@@ -1094,19 +1094,18 @@ class Palette {
     setupGrabScroll(paletteList) {
         let posY, top;
 
-        // eslint-disable-next-line no-unused-vars
-        const mouseUpGrab = (event) => {
+        const mouseUpGrab = () => {
             // paletteList.onmousemove = null;
             document.body.style.cursor = "default";
         };
 
-        const mouseMoveGrab = (event) => {
+        const mouseMoveGrab = event => {
             const dy = event.clientY - posY;
             paletteList.scrollTop = top - dy;
             document.body.style.cursor = "grabbing";
         };
 
-        const mouseDownGrab = (event) => {
+        const mouseDownGrab = event => {
             posY = event.clientY;
             top = paletteList.scrollTop;
 
@@ -1169,8 +1168,6 @@ class Palette {
 
     _makeBlockFromPalette(protoblk, blkname, callback) {
         if (protoblk === null) {
-            // eslint-disable-next-line no-console
-            console.debug("null protoblk?");
             return;
         }
 
@@ -1190,10 +1187,7 @@ class Palette {
                 break;
             case "storein2":
                 // Use the name of the box in the label
-                // eslint-disable-next-line no-console
-                console.debug(
-                    "storein2" + " " + protoblk.defaults[0] + " " + protoblk.staticLabels[0]
-                );
+
                 blkname = "store in2 " + protoblk.defaults[0];
                 newBlk = protoblk.name;
                 arg = protoblk.staticLabels[0];
@@ -1210,8 +1204,6 @@ class Palette {
                     blkname = "namedbox";
                     arg = _("box");
                 } else {
-                    // eslint-disable-next-line no-console
-                    console.debug(protoblk.defaults[0]);
                     blkname = protoblk.defaults[0];
                     arg = protoblk.defaults[0];
                 }
@@ -1311,17 +1303,17 @@ class Palette {
         ) {
             this._makeBlockFromProtoblock(protoblk, true, blkname, null, 100, 100);
             callback(lastBlock);
-            return(lastBlock);
+            return lastBlock;
         } else {
             const newBlock = paletteBlockButtonPush(this.activity.blocks, newBlk, arg);
             callback(newBlock);
-            return(newBlock);
+            return newBlock;
         }
     }
 
     _makeBlockFromProtoblock(protoblk, moved, blkname, event, saveX, saveY) {
         let newBlock;
-        const __myCallback = (newBlock) => {
+        const __myCallback = newBlock => {
             // Move the drag group under the cursor.
             this.activity.blocks.findDragGroup(newBlock);
             for (const i in this.activity.blocks.dragGroup) {
@@ -1347,7 +1339,6 @@ class Palette {
                 for (let blk = 0; blk < this.activity.blocks.blockList.length; blk++) {
                     const block = this.activity.blocks.blockList[blk];
                     if (block.name === "status" && !block.trash) {
-                        console.log("Status block already exists, preventing creation of another one");
                         return;
                     }
                 }
@@ -1405,7 +1396,12 @@ class Palette {
                 const boxNames = new Set();
                 for (let blk = 0; blk < this.activity.blocks.blockList.length; blk++) {
                     const block = this.activity.blocks.blockList[blk];
-                    if (block.name === "namedbox" && !block.trash && block.overrideName && !boxNames.has(block.overrideName)) {
+                    if (
+                        block.name === "namedbox" &&
+                        !block.trash &&
+                        block.overrideName &&
+                        !boxNames.has(block.overrideName)
+                    ) {
                         if (this.activity.logo.statusFields) {
                             this.activity.logo.statusFields.push([blk, "namedbox"]);
                         }
@@ -1417,7 +1413,13 @@ class Palette {
                 // Create base status block structure
                 const statusBlocks = [
                     [0, "status", saveX, saveY, [null, 1, 2]],
-                    [1, "hidden", 0, 0, [0, foundVariables.length > 0 || boxBlocks.length > 0 ? 3 : null]],
+                    [
+                        1,
+                        "hidden",
+                        0,
+                        0,
+                        [0, foundVariables.length > 0 || boxBlocks.length > 0 ? 3 : null]
+                    ],
                     [2, "hiddennoflow", 0, 0, [0, null]]
                 ];
 
@@ -1437,14 +1439,18 @@ class Palette {
                         "print",
                         0,
                         0,
-                        [lastConnection, lastBlockIndex + 2, (!isLastVar || hasBoxes) ? lastBlockIndex + 3 : null]
+                        [
+                            lastConnection,
+                            lastBlockIndex + 2,
+                            !isLastVar || hasBoxes ? lastBlockIndex + 3 : null
+                        ]
                     ]);
                     lastConnection = lastBlockIndex + 1;
 
                     // Add variable value block
                     statusBlocks.push([
                         lastBlockIndex + 2,
-                        [blockType, { "value": block.value }],
+                        [blockType, { value: block.value }],
                         0,
                         0,
                         [lastBlockIndex + 1]
@@ -1456,28 +1462,31 @@ class Palette {
                 for (let i = 0; i < boxBlocks.length; i++) {
                     const boxBlockId = boxBlocks[i];
                     const boxBlock = activity.blocks.blockList[boxBlockId];
-                    console.log("Adding box block to status:", boxBlock);
 
                     statusBlocks.push([
                         lastBlockIndex + 1,
                         "print",
                         0,
                         0,
-                        [lastConnection, lastBlockIndex + 2, i < boxBlocks.length - 1 ? lastBlockIndex + 3 : null]
+                        [
+                            lastConnection,
+                            lastBlockIndex + 2,
+                            i < boxBlocks.length - 1 ? lastBlockIndex + 3 : null
+                        ]
                     ]);
                     lastConnection = lastBlockIndex + 1;
 
                     // Add box value block
                     statusBlocks.push([
                         lastBlockIndex + 2,
-                        ["namedbox", { "value": boxBlock.overrideName }],
+                        ["namedbox", { value: boxBlock.overrideName }],
                         0,
                         0,
                         [lastBlockIndex + 1]
                     ]);
                     lastBlockIndex += 2;
                 }
-                console.log("blocks");
+
                 macroExpansion = statusBlocks;
 
                 // Initialize the status matrix
@@ -1514,7 +1523,7 @@ class Palette {
                 // the palette.
                 if (
                     this.activity.blocks.blockList[topBlk].container.x <
-                        this.activity.palettes.paletteWidth * 2
+                    this.activity.palettes.paletteWidth * 2
                 ) {
                     this.activity.blocks.moveBlock(
                         topBlk,
@@ -1575,7 +1584,7 @@ class Palette {
                 // the palette.
                 if (
                     this.activity.blocks.blockList[topBlk].container.x <
-                        this.activity.palettes.paletteWidth * 2
+                    this.activity.palettes.paletteWidth * 2
                 ) {
                     this.activity.blocks.moveBlock(
                         topBlk,
@@ -1593,7 +1602,7 @@ class Palette {
                 // the palette.
                 if (
                     this.activity.blocks.blockList[newBlock].container.x <
-                        this.activity.palettes.paletteWidth * 2
+                    this.activity.palettes.paletteWidth * 2
                 ) {
                     this.activity.blocks.moveBlock(
                         newBlock,
@@ -1606,7 +1615,7 @@ class Palette {
     }
 }
 
-const initPalettes = async (palettes) => {
+const initPalettes = async palettes => {
     // Instantiate the palettes object on first load.
 
     for (let i = 0; i < BUILTINPALETTES.length; i++) {
@@ -1615,8 +1624,7 @@ const initPalettes = async (palettes) => {
 
     palettes.init_selectors();
     palettes.makePalettes(0);
-    // eslint-disable-next-line no-console
-    console.debug("Time to show the palettes.");
+
     palettes.show();
 };
 

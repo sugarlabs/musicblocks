@@ -56,7 +56,7 @@ class JSEditor {
 
         // setup editor window styles
         this._currentStyle = 0;
-        this._styles = ["dracula", "github", "railscasts", "vs"].map((name) => {
+        this._styles = ["dracula", "github", "railscasts", "vs"].map(name => {
             const link = document.createElement("link");
             link.href = `././lib/codejar/styles/${name}.min.css`;
             link.rel = "stylesheet";
@@ -184,7 +184,7 @@ class JSEditor {
             if (error.pos !== undefined) {
                 this._markErrorAtPosition(editor, error.pos, error.message);
             }
-            
+
             JSEditor.logConsole(`Syntax Error at position ${error.pos}: ${error.message}`);
         }
     }
@@ -198,30 +198,50 @@ class JSEditor {
      */
     _markErrorAtPosition(editor, position, message) {
         const text = editor.textContent;
-        
+
         let errorStart = position;
         let errorEnd = position;
-        
+
         while (errorStart > 0) {
             const char = text.charAt(errorStart - 1);
-            if (char === " " || char === "\n" || char === "\t" || char === ";" || char === "{" || char === "}" || char === "(" || char === ")" || char === ",") {
+            if (
+                char === " " ||
+                char === "\n" ||
+                char === "\t" ||
+                char === ";" ||
+                char === "{" ||
+                char === "}" ||
+                char === "(" ||
+                char === ")" ||
+                char === ","
+            ) {
                 break;
             }
             errorStart--;
         }
-        
+
         while (errorEnd < text.length) {
             const char = text.charAt(errorEnd);
-            if (char === " " || char === "\n" || char === "\t" || char === ";" || char === "{" || char === "}" || char === "(" || char === ")" || char === ",") {
+            if (
+                char === " " ||
+                char === "\n" ||
+                char === "\t" ||
+                char === ";" ||
+                char === "{" ||
+                char === "}" ||
+                char === "(" ||
+                char === ")" ||
+                char === ","
+            ) {
                 break;
             }
             errorEnd++;
         }
-        
+
         if (errorStart === errorEnd) {
             errorEnd = Math.min(errorStart + 1, text.length);
         }
-        
+
         this._markErrorSpan(editor, errorStart, errorEnd, message);
     }
 
@@ -236,14 +256,13 @@ class JSEditor {
     _markErrorSpan(editor, start, end, message) {
         const text = editor.textContent;
         const errorText = text.substring(start, end);
-        
+
         const beforeError = text.substring(0, start);
         const afterError = text.substring(end);
-        
-        const highlightedHTML = beforeError +
-            `<span class="error" title="${message}">${errorText}</span>` +
-            afterError;
-        
+
+        const highlightedHTML =
+            beforeError + `<span class="error" title="${message}">${errorText}</span>` + afterError;
+
         editor.innerHTML = highlightedHTML;
     }
 
@@ -308,9 +327,11 @@ class JSEditor {
                 tooltip.style.whiteSpace = "nowrap";
                 tooltip.textContent = tooltipText;
 
-                tooltip.style.top = `${rect.bottom + window.scrollY + (positionOfTooltip !== "bottom" ? -30 : 20)
+                tooltip.style.top = `${
+                    rect.bottom + window.scrollY + (positionOfTooltip !== "bottom" ? -30 : 20)
                 }px`;
-                tooltip.style.left = `${rect.left + window.scrollX + (positionOfTooltip !== "bottom" ? -135 : 0)
+                tooltip.style.left = `${
+                    rect.left + window.scrollX + (positionOfTooltip !== "bottom" ? -135 : 0)
                 }px`;
             });
 
@@ -528,16 +549,32 @@ class JSEditor {
         editorconsole.style.cursor = "text";
         this._editor.appendChild(editorconsole);
 
-        const highlight = (editor) => {
-            // Configure highlight.js for JavaScript
-            hljs.configure({
-                languages: ["javascript"]
-            });
-            
-            // Apply highlight.js syntax highlighting for JavaScript
-            hljs.highlightElement(editor);
-            
-            // Add error highlighting
+        const highlight = editor => {
+            // Apply syntax highlighting if highlight.js is available
+            if (window.hljs) {
+                try {
+                    // Remove any existing highlighting classes to ensure clean re-highlighting
+                    editor.removeAttribute("data-highlighted");
+
+                    // Configure highlight.js for JavaScript
+                    hljs.configure({
+                        languages: ["javascript"]
+                    });
+
+                    // Try modern API first (v11+), fallback to legacy API (v9-10)
+                    if (typeof hljs.highlightElement === "function") {
+                        hljs.highlightElement(editor);
+                    } else if (typeof hljs.highlightBlock === "function") {
+                        // Legacy API for older highlight.js versions
+                        hljs.highlightBlock(editor);
+                    }
+                } catch (e) {
+                    // Silently handle highlighting errors to prevent editor crashes
+                    console.warn("Syntax highlighting failed:", e);
+                }
+            }
+
+            // Always add error highlighting (works independently of hljs)
             this._highlightErrors(editor);
         };
 
@@ -552,7 +589,7 @@ class JSEditor {
             spellcheck: false, // default is false
             addClosing: true // default is true
         });
-        this._jar.onUpdate((code) => {
+        this._jar.onUpdate(code => {
             if (!this._showingHelp) this._code = code;
             this._setLinesCount(this._code);
         });
@@ -562,9 +599,10 @@ class JSEditor {
         this.widgetWindow.takeFocus();
 
         this._setupDividerResize(divider, editorContainer, editorconsole, consolelabel);
-        
+        this._setupWindowResize();
+
         window.jsEditor = this;
-        
+
         this._setupScrollSync();
     }
 
@@ -578,7 +616,7 @@ class JSEditor {
     _setupDividerResize(divider, editorContainer, editorconsole, consolelabel) {
         let isResizing = false;
 
-        const onMouseMove = (e) => {
+        const onMouseMove = e => {
             if (!isResizing) return;
             const parentRect = this._editor.getBoundingClientRect();
             const menubarHeight = this._menubar ? this._menubar.offsetHeight : 0;
@@ -588,7 +626,8 @@ class JSEditor {
             const newEditorHeight = e.clientY - dynamicTop;
             const dividerHeight = divider.offsetHeight;
             const consoleHeaderHeight = consolelabel.offsetHeight;
-            const newConsoleHeight = availableHeight - newEditorHeight - dividerHeight - consoleHeaderHeight;
+            const newConsoleHeight =
+                availableHeight - newEditorHeight - dividerHeight - consoleHeaderHeight;
 
             editorContainer.style.flexBasis = `${newEditorHeight}px`;
             editorconsole.style.flexBasis = `${newConsoleHeight}px`;
@@ -600,12 +639,174 @@ class JSEditor {
             document.removeEventListener("mouseup", onMouseUp);
         };
 
-        divider.addEventListener("mousedown", (e) => {
+        divider.addEventListener("mousedown", e => {
             isResizing = true;
             document.addEventListener("mousemove", onMouseMove);
             document.addEventListener("mouseup", onMouseUp);
             e.preventDefault();
         });
+    }
+
+    /**
+     * Setup resize handles for the entire editor window.
+     * Allows users to resize by dragging edges (left, right, bottom) and corners.
+     * @returns {void}
+     */
+    _setupWindowResize() {
+        const windowFrame = this.widgetWindow._frame;
+        const windowBody = this.widgetWindow._body;
+
+        // Create resize handles
+        const createHandle = (position, cursor) => {
+            const handle = document.createElement("div");
+            handle.className = `resize-handle resize-handle-${position}`;
+            handle.style.position = "absolute";
+            handle.style.zIndex = "1000";
+
+            // Common styles for all handles
+            const handleStyles = {
+                "right": {
+                    top: "32px",
+                    right: "0",
+                    width: "5px",
+                    height: "calc(100% - 32px)",
+                    cursor: "ew-resize"
+                },
+                "left": {
+                    top: "32px",
+                    left: "0",
+                    width: "5px",
+                    height: "calc(100% - 32px)",
+                    cursor: "ew-resize"
+                },
+                "bottom": {
+                    bottom: "0",
+                    left: "0",
+                    width: "100%",
+                    height: "5px",
+                    cursor: "ns-resize"
+                },
+                "bottom-right": {
+                    bottom: "0",
+                    right: "0",
+                    width: "15px",
+                    height: "15px",
+                    cursor: "nwse-resize"
+                },
+                "bottom-left": {
+                    bottom: "0",
+                    left: "0",
+                    width: "15px",
+                    height: "15px",
+                    cursor: "nesw-resize"
+                }
+            };
+
+            Object.assign(handle.style, handleStyles[position]);
+            handle.style.background = "transparent";
+            handle.style.transition = "background 0.2s";
+
+            // Visual feedback on hover
+            handle.addEventListener("mouseenter", () => {
+                handle.style.background = "rgba(33, 150, 243, 0.3)";
+            });
+            handle.addEventListener("mouseleave", () => {
+                handle.style.background = "transparent";
+            });
+
+            return handle;
+        };
+
+        // Add handles to window frame
+        const handles = {
+            right: createHandle("right"),
+            left: createHandle("left"),
+            bottom: createHandle("bottom"),
+            bottomRight: createHandle("bottom-right"),
+            bottomLeft: createHandle("bottom-left")
+        };
+
+        Object.values(handles).forEach(handle => windowFrame.appendChild(handle));
+
+        // Resize logic
+        let isResizing = false;
+        let resizeDirection = null;
+        let startX, startY, startWidth, startHeight, startLeft, startTop;
+
+        const startResize = (e, direction) => {
+            if (this.widgetWindow._maximized) return; // Don't resize when maximized
+
+            isResizing = true;
+            resizeDirection = direction;
+            startX = e.clientX;
+            startY = e.clientY;
+
+            const rect = windowFrame.getBoundingClientRect();
+            startWidth = rect.width;
+            startHeight = rect.height;
+            startLeft = rect.left;
+            startTop = rect.top;
+
+            e.preventDefault();
+            e.stopPropagation();
+        };
+
+        const doResize = e => {
+            if (!isResizing) return;
+
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+
+            let newWidth = startWidth;
+            let newHeight = startHeight;
+            let newLeft = startLeft;
+
+            // Calculate new dimensions based on direction
+            if (resizeDirection.includes("right")) {
+                newWidth = Math.max(400, startWidth + deltaX);
+            }
+            if (resizeDirection.includes("left")) {
+                const widthDelta = startWidth - deltaX;
+                if (widthDelta >= 400) {
+                    newWidth = widthDelta;
+                    newLeft = startLeft + deltaX;
+                }
+            }
+            if (resizeDirection.includes("bottom")) {
+                newHeight = Math.max(300, startHeight + deltaY);
+            }
+
+            // Apply new dimensions
+            windowFrame.style.width = newWidth + "px";
+            windowFrame.style.height = newHeight + "px";
+
+            if (resizeDirection.includes("left")) {
+                windowFrame.style.left = newLeft + "px";
+            }
+
+            // Update editor content size
+            const editorDiv = this._editor;
+            if (editorDiv) {
+                editorDiv.style.width = newWidth + "px";
+                editorDiv.style.height = newHeight - 32 + "px"; // Subtract title bar height
+            }
+        };
+
+        const stopResize = () => {
+            if (!isResizing) return;
+            isResizing = false;
+            resizeDirection = null;
+        };
+
+        // Attach event listeners
+        handles.right.addEventListener("mousedown", e => startResize(e, "right"));
+        handles.left.addEventListener("mousedown", e => startResize(e, "left"));
+        handles.bottom.addEventListener("mousedown", e => startResize(e, "bottom"));
+        handles.bottomRight.addEventListener("mousedown", e => startResize(e, "bottom-right"));
+        handles.bottomLeft.addEventListener("mousedown", e => startResize(e, "bottom-left"));
+
+        document.addEventListener("mousemove", doResize);
+        document.addEventListener("mouseup", stopResize);
     }
 
     /**
@@ -616,7 +817,7 @@ class JSEditor {
         const codebox = document.querySelector(".editor");
         const codeLines = docById("editorLines");
         const debugButtons = docById("debugButtons");
-        
+
         if (codebox && codeLines && debugButtons) {
             codebox.addEventListener("scroll", () => {
                 codeLines.scrollTop = codebox.scrollTop;
@@ -635,20 +836,24 @@ class JSEditor {
      */
     static logConsole(message, color) {
         if (color === undefined) color = "midnightblue";
-        if (docById("editorConsole")) {
-            if (docById("editorConsole").innerHTML !== "")
-                docById("editorConsole").innerHTML += "</br>";
-            docById("editorConsole").innerHTML += `<span style="color: ${color}">${message}</span>`;
+        const consoleEl = docById("editorConsole");
+        if (consoleEl) {
+            if (consoleEl.childNodes.length > 0) {
+                consoleEl.appendChild(document.createElement("br"));
+            }
+            const line = document.createElement("span");
+            line.style.color = color;
+            line.textContent = message;
+            consoleEl.appendChild(line);
         } else {
             // console.error("EDITOR MISSING!");
         }
-        // eslint-disable-next-line
-        console.log("%c" + message, `color: ${color}`);
     }
 
     static clearConsole() {
-        if (docById("editorConsole")) {
-            docById("editorConsole").innerHTML = "";
+        const consoleEl = docById("editorConsole");
+        if (consoleEl) {
+            consoleEl.textContent = "";
         }
     }
 
@@ -684,7 +889,7 @@ class JSEditor {
 
     /**
      * Update the blocks on canvas based on the JS code in editor.
-     * 
+     *
      * @returns {Void}
      */
     _codeToBlocks() {
@@ -695,7 +900,7 @@ class JSEditor {
             let blockList = AST2BlockList.toBlockList(ast, ast2blocklist_config);
             const activity = this.activity;
             // Wait for the old blocks to be removed, then load new blocks.
-            const __listener = (event) => {
+            const __listener = event => {
                 activity.blocks.loadNewBlocks(blockList);
                 activity.stage.removeAllEventListeners("trashsignal");
             };
@@ -704,7 +909,10 @@ class JSEditor {
             // Clear the canvas but leave the JS editor open
             activity.sendAllToTrash(false, false, false);
         } catch (e) {
-            JSEditor.logConsole("message" in e ? e.message : e.prefix + this._code.substring(e.start, e.end), "red");
+            JSEditor.logConsole(
+                "message" in e ? e.message : e.prefix + this._code.substring(e.start, e.end),
+                "red"
+            );
         }
     }
 
@@ -748,7 +956,7 @@ class JSEditor {
 
     /**
      * Updates debug buttons for each line of code
-     * 
+     *
      * @param {String} code - the code to create debug buttons for
      * @returns {void}
      */
@@ -779,25 +987,37 @@ class JSEditor {
 
     /**
      * Adds a debugger statement to a specific line
-     * 
+     *
      * @param {Number} lineNumber - the line number to add debugger to
      * @returns {void}
      */
     _addDebuggerToLine(lineNumber) {
         const lines = this._code.split("\n");
         const insertIndex = lineNumber - 1;
-        
+
         // Check if the line ends with '{' or ';'
         const currentLine = lines[insertIndex].trim();
         if (!currentLine.endsWith("{") && !currentLine.endsWith(";")) {
-            JSEditor.logConsole(`Cannot add breakpoint to line ${lineNumber + 1}. Breakpoints can only be added after lines ending with '{' or ';'`, "red");
+            JSEditor.logConsole(
+                `Cannot add breakpoint to line ${
+                    lineNumber + 1
+                }. Breakpoints can only be added after lines ending with '{' or ';'`,
+                "red"
+            );
             return;
         }
 
         // Prevent adding two breakpoints right next to each other
-        if ((lines[insertIndex] && lines[insertIndex].trim() === "debugger;") ||
-            (lines[insertIndex + 1] && lines[insertIndex + 1].trim() === "debugger;")) {
-            JSEditor.logConsole(`Cannot add breakpoint to line ${lineNumber + 1} because there is already a breakpoint on an adjacent line.`, "red");
+        if (
+            (lines[insertIndex] && lines[insertIndex].trim() === "debugger;") ||
+            (lines[insertIndex + 1] && lines[insertIndex + 1].trim() === "debugger;")
+        ) {
+            JSEditor.logConsole(
+                `Cannot add breakpoint to line ${
+                    lineNumber + 1
+                } because there is already a breakpoint on an adjacent line.`,
+                "red"
+            );
             return;
         }
 
@@ -823,7 +1043,7 @@ class JSEditor {
 
     /**
      * Removes a debugger statement from a specific line
-     * 
+     *
      * @param {Number} lineNumber - the line number to remove debugger from
      * @returns {void}
      */
@@ -938,11 +1158,15 @@ class JSEditor {
         if (this.activity.logo.statusMatrix === null) {
             this.activity.logo.statusMatrix = new StatusMatrix();
         }
-        
+
         this.activity.logo.statusMatrix.init(this.activity);
         // this.activity.logo.statusFields = [];
         this.activity.logo.inStatusMatrix = true;
-        
+
         JSEditor.logConsole("Status window opened.", "green");
     }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { JSEditor };
 }

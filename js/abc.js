@@ -44,7 +44,7 @@ const ACCIDENTAL_MAP = {
  * The ABC header includes metadata for a music composition.
  * @returns {string} The ABC header string.
  */
-const getABCHeader = function() {
+const getABCHeader = function () {
     return ABCHEADER;
 };
 
@@ -53,15 +53,21 @@ const getABCHeader = function() {
  * @param {object} logo - The logo object containing notationNotes to update.
  * @param {string} turtle - The identifier for the turtle.
  */
-const processABCNotes = function(logo, turtle) {
+const processABCNotes = function (logo, turtle) {
     // obj = [instructions] or
     // obj = [[notes], duration, dotCount, tupletValue, roundDown,
     //        insideChord, staccato]
     logo.notationNotes[turtle] = "";
 
-    const __convertDuration = function(duration) {
+    const __convertDuration = function (duration) {
         const durationMap = {
-            64: "1/4", 32: "1/2", 16: "1", 8: "2", 4: "4", 2: "8", 1: "16"
+            64: "1/4",
+            32: "1/2",
+            16: "1",
+            8: "2",
+            4: "4",
+            2: "8",
+            1: "16"
         };
         return durationMap[duration] || duration.toString();
     };
@@ -72,7 +78,7 @@ const processABCNotes = function(logo, turtle) {
      * @returns {string} The note converted to ABC notation.
      */
 
-    const __toABCnote = (note) => {
+    const __toABCnote = note => {
         // beams -- no space between notes
         // ties use ()
         // % comment
@@ -80,7 +86,7 @@ const processABCNotes = function(logo, turtle) {
         // Abc notes use is for sharp, es for flat,
         // , and ' for shifts in octave.
         // Also, notes must be lowercase.
-        // And the octave bounday is at C, not A.
+        // And the octave boundary is at C, not A.
 
         // Handle frequency conversion
         if (typeof note === "number") {
@@ -97,7 +103,7 @@ const processABCNotes = function(logo, turtle) {
         for (const [octave, notation] of Object.entries(OCTAVE_NOTATION_MAP)) {
             if (note.includes(octave)) {
                 note = note.replace(new RegExp(octave, "g"), notation);
-                break;  // Only one octave notation should apply
+                break; // Only one octave notation should apply
             }
         }
 
@@ -164,7 +170,7 @@ const processABCNotes = function(logo, turtle) {
                         const pickupDuration = logo.notation.notationStaging[turtle][i + 1];
                         logo.notationNotes[turtle] += `K: pickup=${pickupDuration}\n`;
                         i += 1;
-                    } // <- made a seperate block for this since js doesnt allow declaration of variables using let or const directly inside a case block
+                    } // <- made a separate block for this since JS doesn't allow declaration of variables using let or const directly inside a case block
                     break;
                 case "voice one":
                     logo.notationNotes[turtle] += "V:1\n";
@@ -204,10 +210,8 @@ const processABCNotes = function(logo, turtle) {
             // If it is a tuplet, look ahead to see if it is complete.
             // While you are at it, add up the durations.
             if (obj[NOTATIONTUPLETVALUE] != null) {
-                targetDuration =
-                    1 / logo.notation.notationStaging[turtle][i][NOTATIONDURATION];
-                tupletDuration =
-                    1 / logo.notation.notationStaging[turtle][i][NOTATIONROUNDDOWN];
+                targetDuration = 1 / logo.notation.notationStaging[turtle][i][NOTATIONDURATION];
+                tupletDuration = 1 / logo.notation.notationStaging[turtle][i][NOTATIONROUNDDOWN];
                 let j = 1;
                 let k = 1;
                 while (k < obj[NOTATIONTUPLETVALUE]) {
@@ -216,26 +220,24 @@ const processABCNotes = function(logo, turtle) {
                         break;
                     }
 
-                    if (logo.notation.notationStaging[turtle][i + j][
-                        NOTATIONINSIDECHORD] > 0 &&
-                        logo.notation.notationStaging[turtle][i + j][
-                            NOTATIONINSIDECHORD] ===
-                        logo.notation.notationStaging[turtle][i + j - 1][
-                            NOTATIONINSIDECHORD]) {
+                    if (
+                        logo.notation.notationStaging[turtle][i + j][NOTATIONINSIDECHORD] > 0 &&
+                        logo.notation.notationStaging[turtle][i + j][NOTATIONINSIDECHORD] ===
+                            logo.notation.notationStaging[turtle][i + j - 1][NOTATIONINSIDECHORD]
+                    ) {
                         // In a chord, so jump to next note.
                         j++;
                     } else if (
-                        logo.notation.notationStaging[turtle][i + j][
-                            NOTATIONTUPLETVALUE] !== obj[NOTATIONTUPLETVALUE]) {
+                        logo.notation.notationStaging[turtle][i + j][NOTATIONTUPLETVALUE] !==
+                        obj[NOTATIONTUPLETVALUE]
+                    ) {
                         incompleteTuplet = j;
                         break;
                     } else {
                         targetDuration +=
-                            1 / logo.notation.notationStaging[turtle][i + j][
-                                NOTATIONDURATION];
+                            1 / logo.notation.notationStaging[turtle][i + j][NOTATIONDURATION];
                         tupletDuration +=
-                            1 / logo.notation.notationStaging[turtle][i + j][
-                                NOTATIONROUNDDOWN];
+                            1 / logo.notation.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
                         j++; // Jump to next note.
                         k++; // Increment notes in tuplet.
                     }
@@ -243,14 +245,14 @@ const processABCNotes = function(logo, turtle) {
             }
 
             /**
-            * Processes an incomplete tuplet and appends the corresponding ABC notation to the notation string.
-            * @param {object} logo - The logo object containing notation information.
-            * @param {string} turtle - The identifier for the turtle.
-            * @param {number} i - The index of the current note within the notation staging.
-            * @param {number} count - The number of notes in the incomplete tuplet.
-            * @returns {number} The number of notes processed within the tuplet.
-            * @private
-            */
+             * Processes an incomplete tuplet and appends the corresponding ABC notation to the notation string.
+             * @param {object} logo - The logo object containing notation information.
+             * @param {string} turtle - The identifier for the turtle.
+             * @param {number} i - The index of the current note within the notation staging.
+             * @param {number} count - The number of notes in the incomplete tuplet.
+             * @returns {number} The number of notes processed within the tuplet.
+             * @private
+             */
             const __processTuplet = (logo, turtle, i, count) => {
                 let j = 0;
                 let k = 0;
@@ -266,8 +268,7 @@ const processABCNotes = function(logo, turtle) {
                         }
 
                         for (let ii = 0; ii < notes.length; ii++) {
-                            logo.notationNotes[turtle] += __toABCnote(
-                                notes[ii]);
+                            logo.notationNotes[turtle] += __toABCnote(notes[ii]);
                             logo.notationNotes[turtle] += " ";
                         }
 
@@ -280,29 +281,10 @@ const processABCNotes = function(logo, turtle) {
                         }
 
                         logo.notationNotes[turtle] +=
-                            logo.notation.notationStaging[turtle][i + j][
-                                NOTATIONROUNDDOWN];
-                        j++; // Jump to next note.
-                        k++; // Increment notes in tuplet.
-                    } else {
-                        // eslint-disable-next-line no-console
-                        console.debug("ignoring " + notes);
-                        j++; // Jump to next note.
-                        k++; // Increment notes in tuplet.
+                            logo.notation.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
                     }
-                }
-
-                // FIXME: Debug for ABC
-                if (i + j - 1 < logo.notation.notationStaging[turtle].length - 1) {
-                    const nextObj = logo.notation.notationStaging[turtle][i + j];
-                    if (typeof nextObj === "string" && nextObj === ")") {
-                        // logo.notationNotes[turtle] += '';
-                        i += 1;
-                    } else {
-                        logo.notationNotes[turtle] += " ";
-                    }
-                } else {
-                    logo.notationNotes[turtle] += " ";
+                    j++; // Jump to next note.
+                    k++; // Increment notes in tuplet.
                 }
 
                 return j;
@@ -310,15 +292,12 @@ const processABCNotes = function(logo, turtle) {
 
             if (obj[NOTATIONTUPLETVALUE] > 0) {
                 if (incompleteTuplet === 0) {
-                    const tupletFraction = toFraction(tupletDuration /
-                                                    targetDuration);
+                    const tupletFraction = toFraction(tupletDuration / targetDuration);
                     logo.notationNotes[turtle] +=
                         "(" + tupletFraction[0] + ":" + tupletFraction[1] + "";
-                    i += __processTuplet(
-                        logo, turtle, i, obj[NOTATIONTUPLETVALUE]) - 1;
+                    i += __processTuplet(logo, turtle, i, obj[NOTATIONTUPLETVALUE]) - 1;
                 } else {
-                    const tupletFraction = toFraction(
-                        obj[NOTATIONTUPLETVALUE] / incompleteTuplet);
+                    const tupletFraction = toFraction(obj[NOTATIONTUPLETVALUE] / incompleteTuplet);
                     logo.notationNotes[turtle] +=
                         "(" + tupletFraction[0] + ":" + tupletFraction[1] + "";
                     i += __processTuplet(logo, turtle, i, incompleteTuplet) - 1;
@@ -354,10 +333,11 @@ const processABCNotes = function(logo, turtle) {
 
                 if (obj[NOTATIONINSIDECHORD] > 0) {
                     // Is logo the first note in the chord?
-                    if (i === 0 ||
-                        logo.notation.notationStaging[turtle][i - 1][
-                            NOTATIONINSIDECHORD
-                        ] !== obj[NOTATIONINSIDECHORD]) {
+                    if (
+                        i === 0 ||
+                        logo.notation.notationStaging[turtle][i - 1][NOTATIONINSIDECHORD] !==
+                            obj[NOTATIONINSIDECHORD]
+                    ) {
                         // Open the chord.
                         logo.notationNotes[turtle] += "[";
                     }
@@ -365,13 +345,14 @@ const processABCNotes = function(logo, turtle) {
                     logo.notationNotes[turtle] += note;
 
                     // Is logo the last note in the chord?
-                    if (i === logo.notation.notationStaging[turtle].length - 1
-                        || logo.notation.notationStaging[turtle][i + 1][
-                            NOTATIONINSIDECHORD] !== obj[NOTATIONINSIDECHORD]) {
+                    if (
+                        i === logo.notation.notationStaging[turtle].length - 1 ||
+                        logo.notation.notationStaging[turtle][i + 1][NOTATIONINSIDECHORD] !==
+                            obj[NOTATIONINSIDECHORD]
+                    ) {
                         // Close the chord and add note duration.
                         logo.notationNotes[turtle] += "]";
-                        logo.notationNotes[turtle] += __convertDuration(
-                            obj[NOTATIONDURATION]);
+                        logo.notationNotes[turtle] += __convertDuration(obj[NOTATIONDURATION]);
                         for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
                             logo.notationNotes[turtle] += " ";
                         }
@@ -384,8 +365,7 @@ const processABCNotes = function(logo, turtle) {
                     }
                 } else {
                     logo.notationNotes[turtle] += note;
-                    logo.notationNotes[turtle] += __convertDuration(
-                        obj[NOTATIONDURATION]);
+                    logo.notationNotes[turtle] += __convertDuration(obj[NOTATIONDURATION]);
                     for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
                         logo.notationNotes[turtle] += ".";
                     }
@@ -418,7 +398,7 @@ const processABCNotes = function(logo, turtle) {
  * @param {object} activity - The activity object containing logo and notation information.
  * @returns {string} The generated ABC notation output.
  */
-const saveAbcOutput = function(activity) {
+const saveAbcOutput = function (activity) {
     // let turtleCount = 0;
 
     activity.logo.notationOutput = getABCHeader();
@@ -431,11 +411,14 @@ const saveAbcOutput = function(activity) {
 
     for (const t in activity.logo.notation.notationStaging) {
         activity.logo.notationOutput +=
-            "K:" + activity.turtles.ithTurtle(t).singer.keySignature
-                .toUpperCase()
+            "K:" +
+            activity.turtles
+                .ithTurtle(t)
+                .singer.keySignature.toUpperCase()
                 .replace(" ", "")
                 .replace("♭", "b")
-                .replace("♯", "#") + "\n";
+                .replace("♯", "#") +
+            "\n";
         processABCNotes(activity.logo, t);
         activity.logo.notationOutput += activity.logo.notationNotes[t];
     }
@@ -445,5 +428,11 @@ const saveAbcOutput = function(activity) {
 };
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { getABCHeader, processABCNotes, saveAbcOutput, ACCIDENTAL_MAP, OCTAVE_NOTATION_MAP };
+    module.exports = {
+        getABCHeader,
+        processABCNotes,
+        saveAbcOutput,
+        ACCIDENTAL_MAP,
+        OCTAVE_NOTATION_MAP
+    };
 }

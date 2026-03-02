@@ -27,7 +27,7 @@ describe("setupDrumActions", () => {
     beforeAll(() => {
         global.Singer = {
             DrumActions: {},
-            processNote: jest.fn(),
+            processNote: jest.fn()
         };
         global.DEFAULTDRUM = "defaultDrum";
         global.DRUMNAMES = { drum1: ["d1", "drum1"], drum2: ["d2", "drum2"] };
@@ -46,10 +46,10 @@ describe("setupDrumActions", () => {
     beforeEach(() => {
         activity = {
             turtles: {
-                ithTurtle: jest.fn(),
+                ithTurtle: jest.fn()
             },
             blocks: {
-                blockList: { 1: {} },
+                blockList: { 1: {} }
             },
             logo: {
                 setDispatchBlock: jest.fn(),
@@ -59,7 +59,7 @@ describe("setupDrumActions", () => {
                 rhythmRuler: { Drums: [], Rulers: [] },
                 _currentDrumBlock: null
             },
-            errorMsg: jest.fn(),
+            errorMsg: jest.fn()
         };
 
         targetTurtle = {
@@ -73,7 +73,7 @@ describe("setupDrumActions", () => {
                 beatFactor: 1,
                 pushedNote: false,
                 pitchDrumTable: {}
-            },
+            }
         };
 
         activity.turtles.ithTurtle.mockReturnValue(targetTurtle);
@@ -87,7 +87,7 @@ describe("setupDrumActions", () => {
             const result = Singer.DrumActions.GetDrumname("d1");
             expect(result).toBe("drum1");
         });
-        
+
         it("should return the default drum for unknown drums", () => {
             const result = Singer.DrumActions.GetDrumname("unknown");
             expect(result).toBe(DEFAULTDRUM);
@@ -122,7 +122,7 @@ describe("setupDrumActions", () => {
             expect(targetTurtle.singer.noteDrums[1]).toContain("drum1");
             expect(targetTurtle.singer.pushedNote).toBe(true);
         });
-        
+
         it("should add a drum to an existing note block", () => {
             targetTurtle.singer.inNoteBlock.push(2);
             targetTurtle.singer.noteDrums[2] = [];
@@ -134,9 +134,9 @@ describe("setupDrumActions", () => {
             targetTurtle.singer.inNoteBlock.push(2);
             targetTurtle.singer.noteDrums[2] = [];
             targetTurtle.singer.drumStyle.push("drum2");
-            
+
             Singer.DrumActions.playDrum("d1", 0, 1);
-            
+
             expect(targetTurtle.singer.noteDrums[2]).toContain("drum2");
             expect(targetTurtle.singer.noteDrums[2]).not.toContain("drum1");
         });
@@ -145,9 +145,9 @@ describe("setupDrumActions", () => {
             targetTurtle.singer.inNoteBlock.push(2);
             targetTurtle.singer.noteDrums[2] = [];
             targetTurtle.singer.synthVolume = {};
-            
+
             Singer.DrumActions.playDrum("d1", 0, 1);
-            
+
             expect(targetTurtle.singer.synthVolume["drum1"]).toEqual([DEFAULTVOLUME]);
             expect(targetTurtle.singer.crescendoInitialVolume["drum1"]).toEqual([DEFAULTVOLUME]);
         });
@@ -174,7 +174,7 @@ describe("setupDrumActions", () => {
 
     const actionConfigs = [
         ["setDrum", "_setdrum_0", true],
-        ["mapPitchToDrum", "_mapdrum_0", false],
+        ["mapPitchToDrum", "_mapdrum_0", false]
     ];
     describe.each(actionConfigs)("%s", (actionName, prefix, resetPitchDrumTable) => {
         beforeEach(() => {
@@ -190,7 +190,11 @@ describe("setupDrumActions", () => {
             Singer.DrumActions[actionName]("d1", 0, 1);
             expect(targetTurtle.singer.drumStyle).toContain("drum1");
             expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, prefix);
-            expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(0, prefix, expect.any(Function));
+            expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                prefix,
+                expect.any(Function)
+            );
         });
 
         it("handles MusicBlocks.isRun case", () => {
@@ -205,6 +209,11 @@ describe("setupDrumActions", () => {
         it("handles direct drum name input", () => {
             Singer.DrumActions[actionName]("drum2", 0, 1);
             expect(targetTurtle.singer.drumStyle).toContain("drum2");
+        });
+
+        it("uses default drum for unknown drum name", () => {
+            Singer.DrumActions[actionName]("unknownDrum", 0, 1);
+            expect(targetTurtle.singer.drumStyle).toContain(DEFAULTDRUM);
         });
 
         it("handles rhythm ruler", () => {
@@ -263,16 +272,19 @@ describe("setupDrumActions", () => {
 
         it("should throw an error for standalone noise block", () => {
             Singer.DrumActions.playNoise("n1", 0, 1);
-            expect(activity.errorMsg).toHaveBeenCalledWith("Noise Block: Did you mean to use a Note block?", 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Noise Block: Did you mean to use a Note block?",
+                1
+            );
         });
 
         it("should handle direct noise name input", () => {
             targetTurtle.singer.inNoteBlock.push(2);
             targetTurtle.singer.noteDrums[2] = [];
             targetTurtle.singer.noteBeatValues[2] = [];
-            
+
             Singer.DrumActions.playNoise("noise2", 0, 1);
-            
+
             expect(targetTurtle.singer.noteDrums[2]).toContain("noise2");
         });
 
@@ -281,9 +293,9 @@ describe("setupDrumActions", () => {
             targetTurtle.singer.noteDrums[2] = [];
             targetTurtle.singer.noteBeatValues[2] = [];
             targetTurtle.singer.synthVolume = {};
-            
+
             Singer.DrumActions.playNoise("n1", 0, 1);
-            
+
             expect(targetTurtle.singer.synthVolume["noise1"]).toEqual([DEFAULTVOLUME]);
             expect(targetTurtle.singer.crescendoInitialVolume["noise1"]).toEqual([DEFAULTVOLUME]);
         });

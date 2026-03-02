@@ -58,8 +58,7 @@ class PitchStaircase {
      */
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
-        cell.innerHTML =
-            `&nbsp;&nbsp;<img 
+        cell.innerHTML = `&nbsp;&nbsp;<img 
                 src="header-icons/play-button.svg" 
                 title="${label}" 
                 alt="${label}" 
@@ -129,8 +128,9 @@ class PitchStaircase {
                     this._cellScale) /
                     3 +
                 "px";
-            stepCell.innerHTML =
-                `${frequency.toFixed(2)}<br>${this.Stairs[i][0]}${this.Stairs[i][1]}`;
+            stepCell.innerHTML = `${frequency.toFixed(2)}<br>${this.Stairs[i][0]}${
+                this.Stairs[i][1]
+            }`;
             stepCell.style.minWidth = stepCell.style.width;
             stepCell.style.maxWidth = stepCell.style.width;
             stepCell.style.height = PitchStaircase.BUTTONSIZE + "px";
@@ -153,7 +153,7 @@ class PitchStaircase {
             stepCell.style.backgroundRepeat = "no-repeat";
             stepCell.style.backgroundPosition = "center center";
 
-            stepCell.addEventListener("click", (event) => {
+            stepCell.addEventListener("click", event => {
                 this._dissectStair(event);
             });
 
@@ -225,35 +225,20 @@ class PitchStaircase {
             return;
         }
 
-        /**
-         * @todo look to see if the same frequency is already in the list.
-         */
-        const obj = frequencyToPitch(parseFloat(frequency) / inputNum);
+        const newFrequency = parseFloat(frequency) / inputNum;
+        const obj = frequencyToPitch(newFrequency);
         let foundStep = false;
         let repeatStep = false;
         let isStepDeleted = true;
         let i;
 
         for (i = 0; i < this.Stairs.length; i++) {
-            if (this.Stairs[i][2] < parseFloat(frequency) / inputNum) {
-                this.Stairs.splice(i, 0, [
-                    obj[0],
-                    obj[1],
-                    parseFloat(frequency) / inputNum,
-                    this.Stairs[n][3] * parseFloat(inputNum2),
-                    this.Stairs[n][4] * parseFloat(inputNum1),
-                    this.Stairs[n][2],
-                    this.Stairs[n][6]
-                ]);
-                foundStep = true;
-                break;
-            }
-
-            if (this.Stairs[i][2] === parseFloat(frequency) / inputNum) {
+            // Check if the frequency is effectively the same (within epsilon)
+            if (Math.abs(this.Stairs[i][2] - newFrequency) < 0.001) {
                 this.Stairs.splice(i, 1, [
                     obj[0],
                     obj[1],
-                    parseFloat(frequency) / inputNum,
+                    newFrequency,
                     this.Stairs[n][3] * parseFloat(inputNum2),
                     this.Stairs[n][4] * parseFloat(inputNum1),
                     this.Stairs[n][2],
@@ -264,13 +249,27 @@ class PitchStaircase {
                 isStepDeleted = false;
                 break;
             }
+
+            if (this.Stairs[i][2] < newFrequency) {
+                this.Stairs.splice(i, 0, [
+                    obj[0],
+                    obj[1],
+                    newFrequency,
+                    this.Stairs[n][3] * parseFloat(inputNum2),
+                    this.Stairs[n][4] * parseFloat(inputNum1),
+                    this.Stairs[n][2],
+                    this.Stairs[n][6]
+                ]);
+                foundStep = true;
+                break;
+            }
         }
 
         if (!foundStep) {
             this.Stairs.push([
                 obj[0],
                 obj[1],
-                parseFloat(frequency) / inputNum,
+                newFrequency,
                 this.Stairs[n][3] * parseFloat(inputNum2),
                 this.Stairs[n][4] * parseFloat(inputNum1),
                 this.Stairs[n][2],
@@ -604,7 +603,12 @@ class PitchStaircase {
         const w = window.innerWidth;
         this._cellScale = w / 1200;
 
-        const widgetWindow = window.widgetWindows.windowFor(this, "pitch staircase", "pitch staircase", true);
+        const widgetWindow = window.widgetWindows.windowFor(
+            this,
+            "pitch staircase",
+            "pitch staircase",
+            true
+        );
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -616,37 +620,28 @@ class PitchStaircase {
 
         this.closed = false;
 
-        widgetWindow.addButton(
-            "play-chord.svg",
-            PitchStaircase.ICONSIZE,
-            _("Play chord")
-        ).onclick = () => {
-            this._playAll();
-        };
+        widgetWindow.addButton("play-chord.svg", PitchStaircase.ICONSIZE, _("Play chord")).onclick =
+            () => {
+                this._playAll();
+            };
 
-        widgetWindow.addButton(
-            "play-scale.svg",
-            PitchStaircase.ICONSIZE,
-            _("Play scale")
-        ).onclick = () => {
-            this.playUpAndDown();
-        };
+        widgetWindow.addButton("play-scale.svg", PitchStaircase.ICONSIZE, _("Play scale")).onclick =
+            () => {
+                this.playUpAndDown();
+            };
 
         this._save_lock = false;
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            PitchStaircase.ICONSIZE,
-            _("Save")
-        ).onclick = () => {
-            // Debounce button
-            if (!this._get_save_lock()) {
-                this._save_lock = true;
-                this._save();
-                setTimeout(() => {
-                    this._save_lock = false;
-                }, 1000);
-            }
-        };
+        widgetWindow.addButton("export-chunk.svg", PitchStaircase.ICONSIZE, _("Save")).onclick =
+            () => {
+                // Debounce button
+                if (!this._get_save_lock()) {
+                    this._save_lock = true;
+                    this._save();
+                    setTimeout(() => {
+                        this._save_lock = false;
+                    }, 1000);
+                }
+            };
         const wfbWidget = document.getElementsByClassName("wfbWidget")[0];
         wfbWidget.style.maxHeight = 10 * PitchStaircase.BUTTONSIZE + "px";
         wfbWidget.style.overflowY = "scroll";
@@ -654,37 +649,15 @@ class PitchStaircase {
         widgetWindow.addDivider();
         this._musicRatio2 = widgetWindow.addInputButton("2");
 
-        // TODO: THIS
-        // DO NOT COMMIT WITH THIS COMMENTED
-        /*
-        let cell = row.insertCell();
-        cell.innerHTML = '<h2>:</h2>';
-        cell.style.backgroundColor = platformColor.selectorBackground;
+        widgetWindow.addButton("restore-button.svg", PitchStaircase.ICONSIZE, _("Undo")).onclick =
+            () => {
+                this._undo();
+            };
 
-        let cell = row.insertCell();
-        cell.innerHTML = '<input id="musicratio2" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="musicratio2" type="musicratio2" value="' + 2 + '" />';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.backgroundColor = platformColor.selectorBackground;
-        docById('musicratio2').classList.add('hasKeyboard');
-        */
-
-        widgetWindow.addButton(
-            "restore-button.svg",
-            PitchStaircase.ICONSIZE,
-            _("Undo")
-        ).onclick = () => {
-            this._undo();
-        };
-
-        widgetWindow.addButton(
-            "erase-button.svg",
-            PitchStaircase.ICONSIZE,
-            _("Clear")
-        ).onclick = () => {
-            while (this._undo());
-        };
+        widgetWindow.addButton("erase-button.svg", PitchStaircase.ICONSIZE, _("Clear")).onclick =
+            () => {
+                while (this._undo());
+            };
 
         // The pitch-staircase (psc) table
         this._pscTable = document.createElement("table");
@@ -709,4 +682,7 @@ class PitchStaircase {
     _refresh() {
         this._makeStairs(true);
     }
+}
+if (typeof module !== "undefined") {
+    module.exports = PitchStaircase;
 }

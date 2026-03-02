@@ -97,6 +97,8 @@ function setupVolumeActions(activity) {
                     );
                     tur.singer.crescendoInitialVolume[synth].pop();
                 }
+
+                tur.singer.inCrescendo.pop();
             };
 
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
@@ -172,7 +174,7 @@ function setupVolumeActions(activity) {
 
             if (volume === 0) activity.errorMsg(_("Setting volume to 0."), blk);
 
-            if(Singer.masterVolume.length === 2) {
+            if (Singer.masterVolume.length === 2) {
                 Singer.masterVolume.pop();
             }
 
@@ -219,7 +221,7 @@ function setupVolumeActions(activity) {
             let synth = null;
             let firstConnection = null;
             let lastConnection = null;
-    
+
             if (activity.logo.blockList && activity.logo.blockList[blk]) {
                 firstConnection = activity.logo.blockList[blk].connections[0];
                 lastConnection = last(activity.logo.blockList[blk].connections);
@@ -275,12 +277,11 @@ function setupVolumeActions(activity) {
             tur.singer.synthVolume[synth].push(volume);
             if (!tur.singer.suppressOutput) {
                 Singer.setSynthVolume(activity.logo, turtle, synth, volume);
-                if(firstConnection === null && lastConnection === null) {
-                    setTimeout(()=>{
+                if (firstConnection === null && lastConnection === null) {
+                    setTimeout(() => {
                         activity.logo.synth.trigger(0, "G4", 1 / 4, synthname, null, null, false);
-                    },250);
+                    }, 250);
                 }
-             
             }
         }
 

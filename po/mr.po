@@ -37,7 +37,7 @@ msgstr ""
 #: js/SaveInterface.js:93
 #: js/languagebox.js:208
 msgid "Refresh your browser to change your language preference."
-msgstr "अपनी भाषा बदलने के लिए अपने ब्राउज़र को रीफ़्रेश करें"
+msgstr "भाषा बदलण्यासाठी तुमचा ब्राउझर रिफ्रेश करा"
 
 #: js/languagebox.js:229
 msgid "Music Blocks is already set to this language."
@@ -104,7 +104,7 @@ msgstr "क्रिया"
 #: js/utils/synthutils.js:204
 #. TRANS: animal sound effect
 msgid "duck"
-msgstr "बत्तख"
+msgstr "बदक"
 
 #: js/themebox.js:66
 msgid "Music Blocks is already set to this theme."
@@ -316,7 +316,7 @@ msgstr "पैमाने की डिग्री"
 #: js/activity.js:2606
 #: js/palette.js:681
 msgid "voice name"
-msgstr "आवाज का नाम"
+msgstr "आवाजाचे नाव"
 
 #: js/activity.js:2609
 #: js/palette.js:678
@@ -489,7 +489,7 @@ msgstr "मिटवा"
 #: js/widgets/phrasemaker.js:4722
 #: plugins/rodi.rtp:191
 msgid "Play"
-msgstr "चलायें"
+msgstr "वाजवा"
 
 #: js/activity.js:3080
 #: js/toolbar.js:50
@@ -1073,7 +1073,7 @@ msgstr "नमूना"
 #: js/lilypond.js:948
 #: js/rubrics.js:526
 msgid "mouse"
-msgstr "चूहा"
+msgstr "उंदीर"
 
 #: js/lilypond.js:606
 msgid "brown rat"
@@ -1175,7 +1175,7 @@ msgstr "प्रवाह"
 #: js/turtledefs.js:240
 #: planet/js/GlobalTag.js:48
 #. TRANS: On the Planet, we use labels to tag projects.
-msgid "Sensors"
+msgid "sensors"
 msgstr "संवेदी"
 
 #: js/rubrics.js:532
@@ -1184,7 +1184,7 @@ msgstr "संवेदी"
 #: js/blocks/MediaBlocks.js:930
 #: planet/js/GlobalTag.js:46
 #. TRANS: On the Planet, we use labels to tag projects.
-msgid "Media"
+msgid "media"
 msgstr "मीडिया"
 
 #: js/rubrics.js:533
@@ -2063,7 +2063,7 @@ msgid "Expand/collapse option toolbar"
 msgstr "साधनपट्टी दाखवायसाठी / लपवायसाठी पर्याय"
 
 #: js/turtledefs.js:587
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxiliary toolbar."
 msgstr "या बटणावर क्लिक करून सहाय्यक टूलबार विस्तारित किंवा संकुचित करा."
 
 #: js/turtledefs.js:593

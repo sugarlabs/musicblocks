@@ -77,8 +77,7 @@ class StatusMatrix {
             cell.style.backgroundColor = "#FFFFFF";
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
-                cell.innerHTML =
-                    `&nbsp;&nbsp;<img 
+                cell.innerHTML = `&nbsp;&nbsp;<img 
                         src="images/mouse.svg" 
                         title="${turtle.name}" 
                         alt="${turtle.name}" 
@@ -86,8 +85,7 @@ class StatusMatrix {
                         width="${iconSize}"
                     >&nbsp;&nbsp;`;
             } else {
-                cell.innerHTML =
-                    `&nbsp;&nbsp;<img 
+                cell.innerHTML = `&nbsp;&nbsp;<img 
                         src="header-icons/turtle-button.svg" 
                         title="${turtle.name}" 
                         alt="${turtle.name}" 
@@ -345,4 +343,7 @@ class StatusMatrix {
 
         this.activity.logo.updatingStatusMatrix = false;
     }
+}
+if (typeof module !== "undefined") {
+    module.exports = StatusMatrix;
 }

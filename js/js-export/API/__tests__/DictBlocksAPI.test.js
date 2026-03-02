@@ -18,14 +18,14 @@
  */
 
 const JSInterface = {
-    validateArgs: jest.fn(),
+    validateArgs: jest.fn()
 };
 global.JSInterface = JSInterface;
 
 global.globalActivity = {
     turtles: {
-        ithTurtle: jest.fn(() => ({ name: "defaultDict" })),
-    },
+        ithTurtle: jest.fn(() => ({ name: "defaultDict" }))
+    }
 };
 
 const DictBlocksAPI = require("../DictBlocksAPI");
@@ -84,8 +84,17 @@ describe("DictBlocksAPI", () => {
 
         dictBlocksAPI.setValue("key", "value", "testDict");
 
-        expect(JSInterface.validateArgs).toHaveBeenCalledWith("setValue", ["key", "value", "testDict"]);
-        expect(dictBlocksAPI.runCommand).toHaveBeenCalledWith("setValue", ["testDict", "key", "value", 0]);
+        expect(JSInterface.validateArgs).toHaveBeenCalledWith("setValue", [
+            "key",
+            "value",
+            "testDict"
+        ]);
+        expect(dictBlocksAPI.runCommand).toHaveBeenCalledWith("setValue", [
+            "testDict",
+            "key",
+            "value",
+            0
+        ]);
     });
 
     test("setValue uses default dict when no dict is provided", () => {
@@ -94,8 +103,17 @@ describe("DictBlocksAPI", () => {
 
         dictBlocksAPI.setValue("key", "value");
 
-        expect(JSInterface.validateArgs).toHaveBeenCalledWith("setValue", ["key", "value", "defaultDict"]);
-        expect(dictBlocksAPI.runCommand).toHaveBeenCalledWith("setValue", ["defaultDict", "key", "value", 0]);
+        expect(JSInterface.validateArgs).toHaveBeenCalledWith("setValue", [
+            "key",
+            "value",
+            "defaultDict"
+        ]);
+        expect(dictBlocksAPI.runCommand).toHaveBeenCalledWith("setValue", [
+            "defaultDict",
+            "key",
+            "value",
+            0
+        ]);
     });
 
     test("getValue calls runCommand with correct arguments", () => {
@@ -114,6 +132,10 @@ describe("DictBlocksAPI", () => {
         dictBlocksAPI.getValue("key");
 
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("getValue", ["key", "defaultDict"]);
-        expect(dictBlocksAPI.runCommand).toHaveBeenCalledWith("getValue", ["defaultDict", "key", 0]);
+        expect(dictBlocksAPI.runCommand).toHaveBeenCalledWith("getValue", [
+            "defaultDict",
+            "key",
+            0
+        ]);
     });
 });

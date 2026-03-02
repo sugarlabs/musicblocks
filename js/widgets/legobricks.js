@@ -21,16 +21,40 @@ function LegoWidget() {
     // Matrix data structure with pitch mappings
     this.matrixData = {
         rows: [
-            { type: "pitch", label: "High C (Do)", icon: "HighC.png", color: "pitch-row", note: "C5" },
+            {
+                type: "pitch",
+                label: "High C (Do)",
+                icon: "HighC.png",
+                color: "pitch-row",
+                note: "C5"
+            },
             { type: "pitch", label: "B (Ti)", icon: "B.png", color: "pitch-row", note: "B4" },
             { type: "pitch", label: "A (La)", icon: "A.png", color: "pitch-row", note: "A4" },
             { type: "pitch", label: "G (So)", icon: "G.png", color: "pitch-row", note: "G4" },
             { type: "pitch", label: "F (Fa)", icon: "F.png", color: "pitch-row", note: "F4" },
             { type: "pitch", label: "E (Mi)", icon: "E.png", color: "pitch-row", note: "E4" },
             { type: "pitch", label: "D (Re)", icon: "D.png", color: "pitch-row", note: "D4" },
-            { type: "pitch", label: "Middle C (Do)", icon: "MiddleC.png", color: "pitch-row", note: "C4" },
-            { type: "pitch", label: "B (Low Ti)", icon: "LowB.png", color: "pitch-row", note: "B3" },
-            { type: "pitch", label: "Low C (Low Do)", icon: "LowC.png", color: "pitch-row", note: "C3" },
+            {
+                type: "pitch",
+                label: "Middle C (Do)",
+                icon: "MiddleC.png",
+                color: "pitch-row",
+                note: "C4"
+            },
+            {
+                type: "pitch",
+                label: "B (Low Ti)",
+                icon: "LowB.png",
+                color: "pitch-row",
+                note: "B3"
+            },
+            {
+                type: "pitch",
+                label: "Low C (Low Do)",
+                icon: "LowC.png",
+                color: "pitch-row",
+                note: "C3"
+            },
             { type: "pitch", label: "Zoom Controls", icon: "LowC.png", color: "pitch-row" }
         ],
         columns: 8,
@@ -67,7 +91,7 @@ function LegoWidget() {
      * Clears block references within the LegoWidget.
      * Resets arrays used to track row blocks.
      */
-    this.clearBlocks = function() {
+    this.clearBlocks = function () {
         this._rowBlocks = [];
         this._rowMap = [];
         this._rowOffset = [];
@@ -78,7 +102,7 @@ function LegoWidget() {
      * This method is called when encountering a pitch block during matrix creation.
      * @param {number} rowBlock - The pitch block identifier to add to the matrix row.
      */
-    this.addRowBlock = function(rowBlock) {
+    this.addRowBlock = function (rowBlock) {
         this._rowMap.push(this._rowBlocks.length);
         this._rowOffset.push(0);
         // In case there is a repeat block, use a unique block number
@@ -93,23 +117,23 @@ function LegoWidget() {
      * Generates rows based on the pitch blocks received from the LEGO bricks block.
      * @private
      */
-    this._generateRowsFromPitchBlocks = function() {
+    this._generateRowsFromPitchBlocks = function () {
         // Clear existing matrix data
         this.matrixData.rows = [];
-        
+
         // Create a list of pitch entries for sorting
         const pitchEntries = [];
-        
+
         // Generate rows based on the pitch blocks
         for (let i = 0; i < this.rowLabels.length; i++) {
             const pitchName = this.rowLabels[i];
             const octave = this.rowArgs[i];
-            
+
             // Only process pitch blocks (skip drum blocks)
             if (octave !== -1) {
                 // This is a pitch block
                 const noteLabel = pitchName + octave;
-                
+
                 // Convert pitch to display name
                 let displayName = pitchName;
                 if (pitchName === "do") displayName = "Do";
@@ -120,12 +144,15 @@ function LegoWidget() {
                 else if (pitchName === "la") displayName = "La";
                 else if (pitchName === "ti") displayName = "Ti";
                 else displayName = pitchName.toUpperCase();
-                
+
                 // Calculate frequency for sorting (same as phrasemaker)
                 let frequency = 0;
                 try {
                     if (typeof noteToFrequency !== "undefined") {
-                        frequency = noteToFrequency(noteLabel, this.activity.turtles.ithTurtle(0).singer.keySignature);
+                        frequency = noteToFrequency(
+                            noteLabel,
+                            this.activity.turtles.ithTurtle(0).singer.keySignature
+                        );
                     } else {
                         // Fallback frequency calculation if noteToFrequency is not available
                         frequency = this._calculateFallbackFrequency(pitchName, octave);
@@ -134,7 +161,7 @@ function LegoWidget() {
                     // Fallback frequency calculation
                     frequency = this._calculateFallbackFrequency(pitchName, octave);
                 }
-                
+
                 pitchEntries.push({
                     frequency: frequency,
                     type: "pitch",
@@ -147,13 +174,13 @@ function LegoWidget() {
                 });
             }
         }
-        
+
         // Sort pitch entries by frequency (highest first, like phrasemaker)
         pitchEntries.sort((a, b) => b.frequency - a.frequency);
-        
+
         // Add sorted pitch entries to matrix data
         this.matrixData.rows = pitchEntries;
-        
+
         // Add a control row at the end
         this.matrixData.rows.push({
             type: "control",
@@ -161,13 +188,31 @@ function LegoWidget() {
             icon: "zoom.svg",
             color: "control-row"
         });
-        
+
         // If no pitch blocks were provided, add some default rows for testing (already sorted)
         if (this.rowLabels.length === 0) {
             this.matrixData.rows = [
-                { type: "pitch", label: "E4 (Mi)", icon: "pitch.svg", color: "pitch-row", note: "E4" },
-                { type: "pitch", label: "D4 (Re)", icon: "pitch.svg", color: "pitch-row", note: "D4" },
-                { type: "pitch", label: "C4 (Middle C)", icon: "pitch.svg", color: "pitch-row", note: "C4" },
+                {
+                    type: "pitch",
+                    label: "E4 (Mi)",
+                    icon: "pitch.svg",
+                    color: "pitch-row",
+                    note: "E4"
+                },
+                {
+                    type: "pitch",
+                    label: "D4 (Re)",
+                    icon: "pitch.svg",
+                    color: "pitch-row",
+                    note: "D4"
+                },
+                {
+                    type: "pitch",
+                    label: "C4 (Middle C)",
+                    icon: "pitch.svg",
+                    color: "pitch-row",
+                    note: "C4"
+                },
                 { type: "control", label: "Zoom Controls", icon: "zoom.svg", color: "control-row" }
             ];
         }
@@ -180,19 +225,29 @@ function LegoWidget() {
      * @param {number} octave - The octave number
      * @returns {number} The calculated frequency
      */
-    this._calculateFallbackFrequency = function(pitchName, octave) {
+    this._calculateFallbackFrequency = function (pitchName, octave) {
         // Handle both letter names and solfege
         const noteFreqs = {
-            "C": 261.63, "do": 261.63,
-            "D": 293.66, "re": 293.66,
-            "E": 329.63, "mi": 329.63,
-            "F": 349.23, "fa": 349.23,
-            "G": 392.00, "sol": 392.00,
-            "A": 440.00, "la": 440.00,
-            "B": 493.88, "ti": 493.88
+            C: 261.63,
+            do: 261.63,
+            D: 293.66,
+            re: 293.66,
+            E: 329.63,
+            mi: 329.63,
+            F: 349.23,
+            fa: 349.23,
+            G: 392.0,
+            sol: 392.0,
+            A: 440.0,
+            la: 440.0,
+            B: 493.88,
+            ti: 493.88
         };
-        
-        const baseFreq = noteFreqs[pitchName.toLowerCase()] || noteFreqs[pitchName.toUpperCase()] || noteFreqs["C"];
+
+        const baseFreq =
+            noteFreqs[pitchName.toLowerCase()] ||
+            noteFreqs[pitchName.toUpperCase()] ||
+            noteFreqs["C"];
         return baseFreq * Math.pow(2, octave - 4);
     };
 
@@ -201,19 +256,17 @@ function LegoWidget() {
      * @param {object} activity - The activity object.
      * @returns {void}
      */
-    this.init = function(activity) {
+    this.init = function (activity) {
         this.activity = activity;
         this.running = true;
 
         // Initialize audio synthesizer
         this._initAudio();
-        
+
         const widgetWindow = window.widgetWindows.windowFor(this, "LEGO BRICKS");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
-
-        var that = this;
 
         widgetWindow.onclose = () => {
             this._stopWebcam();
@@ -240,7 +293,11 @@ function LegoWidget() {
             this._exportPhrase();
         };
 
-        this.uploadButton = widgetWindow.addButton("upload-button.svg", ICONSIZE, _("Upload Image"));
+        this.uploadButton = widgetWindow.addButton(
+            "upload-button.svg",
+            ICONSIZE,
+            _("Upload Image")
+        );
         this.uploadButton.onclick = () => {
             this._uploadImage();
         };
@@ -263,23 +320,34 @@ function LegoWidget() {
 
         // Generate rows based on pitch blocks
         this._generateRowsFromPitchBlocks();
-        
+
         // Re-initialize row headers with the dynamic rows
         this._initializeRowHeaders();
-        
+
         this._scale();
-        this.activity.textMsg(_("LEGO Bricks - Phrase Maker with") + " " + this.rowLabels.length + " " + _("pitch rows (sorted by frequency, Instrument:" + " " + this.selectedInstrument + ")"));
+        this.activity.textMsg(
+            _("LEGO Bricks - Phrase Maker with") +
+                " " +
+                this.rowLabels.length +
+                " " +
+                _(
+                    "pitch rows (sorted by frequency, Instrument:" +
+                        " " +
+                        this.selectedInstrument +
+                        ")"
+                )
+        );
     };
 
     /**
      * Initializes the audio synthesizer.
      * @private
      */
-    this._initAudio = function() {
+    this._initAudio = function () {
         // Create a new synthesizer instance
         this.synth = new Synth();
         this.synth.loadSamples();
-        
+
         // Create the default electronic synth for all pitch playback
         this.synth.createSynth(0, this.selectedInstrument, this.selectedInstrument, null);
     };
@@ -290,9 +358,9 @@ function LegoWidget() {
      * @param {string} note - The note to play (e.g., "C4")
      * @param {number} duration - Duration in seconds (default 0.5)
      */
-    this._playNote = function(note, duration = 0.5) {
+    this._playNote = function (note, duration = 0.5) {
         if (!this.synth) return;
-        
+
         try {
             // Play the note using the selected instrument
             this.synth.trigger(0, note, duration, this.selectedInstrument, null, null, false, 0);
@@ -306,19 +374,19 @@ function LegoWidget() {
      * @private
      * @returns {void}
      */
-    this._initializeRowHeaders = function() {
+    this._initializeRowHeaders = function () {
         this.rowHeaderTable.innerHTML = "";
         this.rowHeaderTable.style.margin = "0";
         this.rowHeaderTable.style.padding = "0";
         this.rowHeaderTable.style.borderSpacing = "0";
-        
+
         this.matrixData.rows.forEach((rowData, rowIndex) => {
             const row = this.rowHeaderTable.insertRow();
             row.style.height = "40px"; // ROW_HEIGHT + "px";
             row.style.margin = "0";
             row.style.padding = "0";
             row.style.position = "relative"; // Needed for absolute positioning of line
-            
+
             const labelCell = row.insertCell();
             labelCell.style.display = "flex";
             labelCell.style.alignItems = "center";
@@ -339,24 +407,24 @@ function LegoWidget() {
                 labelCell.onclick = () => {
                     this._playNote(rowData.note);
                 };
-                
+
                 // Visual feedback on click
                 labelCell.onmousedown = () => {
                     labelCell.style.transform = "scale(0.98)";
                     labelCell.style.boxShadow = "inset 0 0 8px rgba(0,0,0,0.2)";
                 };
-                
+
                 labelCell.onmouseup = () => {
                     labelCell.style.transform = "";
                     labelCell.style.boxShadow = "";
                 };
-                
+
                 labelCell.onmouseleave = () => {
                     labelCell.style.transform = "";
                     labelCell.style.boxShadow = "";
                 };
             }
-            
+
             // Create icon
             const icon = document.createElement("div");
             icon.style.width = "24px";
@@ -365,10 +433,10 @@ function LegoWidget() {
             icon.style.borderRadius = "50%";
             icon.style.marginRight = "6px";
             icon.style.flexShrink = "0";
-            
+
             labelCell.appendChild(icon);
             labelCell.appendChild(document.createTextNode(rowData.label));
-            
+
             // Add red line at the bottom of each row (except last)
             if (rowIndex < this.matrixData.rows.length - 1) {
                 const line = document.createElement("div");
@@ -388,7 +456,7 @@ function LegoWidget() {
      * Creates the main container with matrix and image canvas.
      * @returns {void}
      */
-    this.createMainContainer = function() {
+    this.createMainContainer = function () {
         const mainContainer = document.createElement("div");
         mainContainer.style.display = "flex";
         mainContainer.style.height = "100%";
@@ -477,7 +545,7 @@ function LegoWidget() {
         this.fileInput.type = "file";
         this.fileInput.accept = "image/*";
         this.fileInput.style.display = "none";
-        this.fileInput.onchange = (e) => this._handleImageUpload(e);
+        this.fileInput.onchange = e => this._handleImageUpload(e);
         document.body.appendChild(this.fileInput);
 
         // Initialize row headers
@@ -488,7 +556,7 @@ function LegoWidget() {
      * Creates zoom controls with precise adjustments.
      * @returns {void}
      */
-    this.createZoomControls = function() {
+    this.createZoomControls = function () {
         this.zoomControls = document.createElement("div");
         this.zoomControls.style.position = "absolute"; // Changed to absolute positioning
         this.zoomControls.style.bottom = "0";
@@ -509,7 +577,8 @@ function LegoWidget() {
         instrumentLabel.style.fontWeight = "bold";
 
         this.instrumentButton = document.createElement("button");
-        this.instrumentButton.textContent = this.selectedInstrument.charAt(0).toUpperCase() + this.selectedInstrument.slice(1);
+        this.instrumentButton.textContent =
+            this.selectedInstrument.charAt(0).toUpperCase() + this.selectedInstrument.slice(1);
         this.instrumentButton.style.fontSize = "12px";
         this.instrumentButton.style.marginRight = "16px";
         this.instrumentButton.style.padding = "4px 8px";
@@ -619,8 +688,12 @@ function LegoWidget() {
         this.backgroundColorDisplay.style.padding = "4px 8px";
         this.backgroundColorDisplay.style.border = "1px solid #ccc";
         this.backgroundColorDisplay.style.borderRadius = "4px";
-        this.backgroundColorDisplay.style.backgroundColor = this._getColorHex(this.selectedBackgroundColor.name);
-        this.backgroundColorDisplay.style.color = this._getContrastColor(this.selectedBackgroundColor.name);
+        this.backgroundColorDisplay.style.backgroundColor = this._getColorHex(
+            this.selectedBackgroundColor.name
+        );
+        this.backgroundColorDisplay.style.color = this._getContrastColor(
+            this.selectedBackgroundColor.name
+        );
         this.backgroundColorDisplay.style.minWidth = "60px";
         this.backgroundColorDisplay.style.textAlign = "center";
 
@@ -650,12 +723,12 @@ function LegoWidget() {
      * @private
      * @returns {void}
      */
-    this._initializeMatrix = function() {
+    this._initializeMatrix = function () {
         this.matrixTable.innerHTML = "";
-        
+
         this.matrixData.rows.forEach((rowData, rowIndex) => {
             const row = this.matrixTable.insertRow();
-            
+
             // Row label cell
             const labelCell = row.insertCell();
             labelCell.style.width = "180px";
@@ -671,7 +744,7 @@ function LegoWidget() {
             labelCell.style.zIndex = "10";
             labelCell.style.gap = "8px";
             labelCell.style.backgroundColor = rowData.type === "pitch" ? "#77C428" : "#87ceeb";
-            
+
             // Create icon (placeholder since we don't have actual icons)
             const icon = document.createElement("div");
             icon.style.width = "24px";
@@ -679,10 +752,9 @@ function LegoWidget() {
             icon.style.backgroundColor = "#fff";
             icon.style.borderRadius = "50%";
             icon.style.marginRight = "6px";
-            
+
             labelCell.appendChild(icon);
             labelCell.appendChild(document.createTextNode(rowData.label));
-
         });
     };
 
@@ -691,7 +763,7 @@ function LegoWidget() {
      * @private
      * @returns {void}
      */
-    this._savePhrase = function() {
+    this._savePhrase = function () {
         if (!this.colorData || this.colorData.length === 0) {
             this.activity.textMsg(_("No color data to save. Please scan an image first."));
             return;
@@ -699,7 +771,7 @@ function LegoWidget() {
 
         // Collect notes to play from color detection data
         this._collectNotesToPlay();
-        
+
         if (this._notesToPlay.length === 0) {
             this.activity.textMsg(_("No notes detected from color scanning."));
             return;
@@ -721,12 +793,12 @@ function LegoWidget() {
         // Process each note in the sequence
         for (let i = 0; i < this._notesToPlay.length; i++) {
             const note = this._notesToPlay[i];
-            
+
             // Add the Note block and its value
             const idx = newStack.length;
             newStack.push([idx, "newnote", 0, 0, [endOfStackIdx, idx + 1, idx + 2, null]]);
             const n = newStack[idx][4].length;
-            
+
             if (i === 0) {
                 // Connect to action block
                 newStack[endOfStackIdx][4][n - 2] = idx;
@@ -739,10 +811,10 @@ function LegoWidget() {
 
             // Add note duration (note value as fraction)
             const delta = 5; // We're adding 4 blocks: vspace, divide, number, number
-            
+
             // Add vspace to prevent divide block from obscuring the pitch block
             newStack.push([idx + 1, "vspace", 0, 0, [idx, idx + delta]]);
-            
+
             // Note value saved as a fraction
             let numerator, denominator;
             if (note.noteValue === 1.5) {
@@ -762,7 +834,7 @@ function LegoWidget() {
                 numerator = 1;
                 denominator = Math.round(1 / note.noteValue);
             }
-            
+
             newStack.push([idx + 2, "divide", 0, 0, [idx, idx + 3, idx + 4]]);
             newStack.push([idx + 3, ["number", { value: numerator }], 0, 0, [idx + 2]]);
             newStack.push([idx + 4, ["number", { value: denominator }], 0, 0, [idx + 2]]);
@@ -782,7 +854,7 @@ function LegoWidget() {
                 // Add pitch blocks for each note
                 for (let j = 0; j < note.pitches.length; j++) {
                     const pitch = note.pitches[j];
-                    
+
                     // Determine if this is the last pitch block
                     if (j === note.pitches.length - 1) {
                         lastConnection = null;
@@ -798,7 +870,7 @@ function LegoWidget() {
                         0,
                         [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]
                     ]);
-                    
+
                     // Add pitch name
                     newStack.push([
                         thisBlock + 1,
@@ -807,7 +879,7 @@ function LegoWidget() {
                         0,
                         [thisBlock]
                     ]);
-                    
+
                     // Add octave number
                     newStack.push([
                         thisBlock + 2,
@@ -825,69 +897,81 @@ function LegoWidget() {
 
         // Load the new blocks
         this.activity.blocks.loadNewBlocks(newStack);
-        this.activity.textMsg(_("LEGO phrase saved as action blocks with ") + this._notesToPlay.length + _(" notes"));
+        this.activity.textMsg(
+            _("LEGO phrase saved as action blocks with ") + this._notesToPlay.length + _(" notes")
+        );
     };
 
     /**
      * Collects notes to play from color detection data.
      * @private
      */
-    this._collectNotesToPlay = function() {
+    this._collectNotesToPlay = function () {
         this._notesToPlay = [];
-        
+
         if (!this.colorData || this.colorData.length === 0) {
             return;
         }
 
         // Analyze column boundaries to determine note timing
         const columnBoundaries = this._analyzeColumnBoundaries();
-        
+
         // Filter and merge small segments to meet minimum 1/8 note duration
         const filteredBoundaries = this._filterSmallSegments(columnBoundaries);
-        
+
         // For each time column, collect the notes that should play
         for (let colIndex = 0; colIndex < filteredBoundaries.length - 1; colIndex++) {
             const startTime = filteredBoundaries[colIndex];
             const endTime = filteredBoundaries[colIndex + 1];
             const duration = endTime - startTime;
-            
+
             // Calculate note value based on duration - updated mapping per requirements
             // <350ms ignored completely (handled in filtering)
             // 350-750ms: 1/8 note, 750-1500ms: 1/4 note, 1500-3000ms: 1/2 note, 3000+ms: full note
             let noteValue;
-            if (duration < 750) noteValue = 8;         // eighth note (350-750ms)
-            else if (duration < 1500) noteValue = 4;   // quarter note (750-1500ms)
-            else if (duration < 3000) noteValue = 2;   // half note (1500-3000ms)
-            else noteValue = 1;                        // whole note (3000ms+)
+            if (duration < 750) noteValue = 8;
+            // eighth note (350-750ms)
+            else if (duration < 1500) noteValue = 4;
+            // quarter note (750-1500ms)
+            else if (duration < 3000) noteValue = 2;
+            // half note (1500-3000ms)
+            else noteValue = 1; // whole note (3000ms+)
             let hasNonBackgroundColor = false;
-            let pitches = [];  // Array to collect pitches for this time column
+            let pitches = []; // Array to collect pitches for this time column
 
             // Check each row for non-background colors in this time range
             this.colorData.forEach((rowData, rowIndex) => {
                 if (rowData.colorSegments) {
                     let currentTime = 0;
-                    
+
                     for (const segment of rowData.colorSegments) {
                         const segmentStart = currentTime;
                         const segmentEnd = currentTime + segment.duration;
-                        
+
                         // Check if this segment overlaps with our time column
                         if (segmentStart < endTime && segmentEnd > startTime) {
                             // Calculate the actual overlap duration
                             const overlapStart = Math.max(segmentStart, startTime);
                             const overlapEnd = Math.min(segmentEnd, endTime);
                             const overlapDuration = overlapEnd - overlapStart;
-                            
+
                             // Only count as significant if overlap is substantial (>350ms)
                             // This prevents spillovers <350ms across blue lines from creating duplicate notes
                             if (overlapDuration > 1000) {
                                 // Check if color is not the selected background color (meaning note should play)
                                 if (segment.color !== this.selectedBackgroundColor.name) {
                                     hasNonBackgroundColor = true;
-                                    
+
                                     // Convert row data to pitch information
                                     const pitch = this._convertRowToPitch(rowData);
-                                    if (pitch && !pitches.some(p => p.solfege === pitch.solfege && p.octave === pitch.octave)) {
+                                    if (
+                                        pitch &&
+                                        !pitches.some(
+                                            p =>
+                                                p.solfege === pitch.solfege &&
+                                                p.octave === pitch.octave
+                                        )
+                                    ) {
                                         pitches.push(pitch);
                                     }
                                 }
@@ -895,7 +979,7 @@ function LegoWidget() {
                                 // Ignore small overlaps without logging
                             }
                         }
-                        
+
                         currentTime += segment.duration;
                     }
                 }
@@ -918,16 +1002,17 @@ function LegoWidget() {
      * @param {Array} boundaries - Array of time boundaries
      * @returns {Array} Filtered boundaries with only segments >= 350ms duration
      */
-    this._filterSmallSegments = function(boundaries) {
+    this._filterSmallSegments = function (boundaries) {
         if (boundaries.length <= 2) return boundaries;
-        
+
         const minDuration = 1000; // Much larger minimum duration (1 second)
         const filteredBoundaries = [boundaries[0]]; // Always keep the start boundary
-        
+
         // Process each potential segment
         for (let i = 1; i < boundaries.length; i++) {
-            const segmentDuration = boundaries[i] - filteredBoundaries[filteredBoundaries.length - 1];
-            
+            const segmentDuration =
+                boundaries[i] - filteredBoundaries[filteredBoundaries.length - 1];
+
             // Only add this boundary if it creates a segment that meets the minimum duration
             if (segmentDuration >= minDuration) {
                 filteredBoundaries.push(boundaries[i]);
@@ -935,13 +1020,13 @@ function LegoWidget() {
             // If segment is too small (<1000ms), we skip this boundary entirely
             // The time gets absorbed into the adjacent larger segment
         }
-        
+
         // Ensure we have at least start and end boundaries
         if (filteredBoundaries.length === 1 && boundaries.length > 1) {
             // If we filtered out everything, add the final boundary to create one long segment
             filteredBoundaries.push(boundaries[boundaries.length - 1]);
         }
-        
+
         return filteredBoundaries;
     };
 
@@ -950,9 +1035,9 @@ function LegoWidget() {
      * @private
      * @returns {Array} Array of time boundaries in milliseconds
      */
-    this._analyzeColumnBoundaries = function() {
+    this._analyzeColumnBoundaries = function () {
         const boundaries = new Set([0]); // Start with 0
-        
+
         // Collect all segment end times
         this.colorData.forEach(rowData => {
             if (rowData.colorSegments) {
@@ -963,10 +1048,10 @@ function LegoWidget() {
                 });
             }
         });
-        
+
         // Convert to sorted array
         const sortedBoundaries = Array.from(boundaries).sort((a, b) => a - b);
-        
+
         // Merge boundaries that are very close together (within 500ms for much larger blocks)
         const mergedBoundaries = [sortedBoundaries[0]];
         for (let i = 1; i < sortedBoundaries.length; i++) {
@@ -974,7 +1059,7 @@ function LegoWidget() {
                 mergedBoundaries.push(sortedBoundaries[i]);
             }
         }
-        
+
         return mergedBoundaries;
     };
 
@@ -984,34 +1069,39 @@ function LegoWidget() {
      * @param {Object} rowData - Row data containing note information
      * @returns {Object} Pitch object with solfege and octave
      */
-    this._convertRowToPitch = function(rowData) {
+    this._convertRowToPitch = function (rowData) {
         if (!rowData.note) return null;
-        
+
         // Parse note string (e.g., "C4", "D5", etc.)
         const noteMatch = rowData.note.match(/^([A-G][#b]?)(\d+)$/);
         if (!noteMatch) return null;
-        
+
         const noteName = noteMatch[1];
         const octave = parseInt(noteMatch[2]);
-        
+
         // Convert note name to solfege
         const noteToSolfege = {
             "C": "do",
-            "C#": "do♯", "Db": "re♭",
+            "C#": "do♯",
+            "Db": "re♭",
             "D": "re",
-            "D#": "re♯", "Eb": "mi♭",
+            "D#": "re♯",
+            "Eb": "mi♭",
             "E": "mi",
             "F": "fa",
-            "F#": "fa♯", "Gb": "sol♭",
+            "F#": "fa♯",
+            "Gb": "sol♭",
             "G": "sol",
-            "G#": "sol♯", "Ab": "la♭",
+            "G#": "sol♯",
+            "Ab": "la♭",
             "A": "la",
-            "A#": "la♯", "Bb": "ti♭",
+            "A#": "la♯",
+            "Bb": "ti♭",
             "B": "ti"
         };
-        
+
         const solfege = noteToSolfege[noteName] || "do";
-        
+
         return {
             solfege: solfege,
             octave: octave
@@ -1023,12 +1113,12 @@ function LegoWidget() {
      * @private
      * @returns {void}
      */
-    this._exportPhrase = function() {
+    this._exportPhrase = function () {
         const phraseData = {
             selectedCells: Array.from(this.matrixData.selectedCells),
             rows: this.matrixData.rows.map(row => ({ type: row.type, label: row.label }))
         };
-        
+
         this.activity.textMsg(_("Exporting phrase data: ") + JSON.stringify(phraseData));
     };
 
@@ -1037,7 +1127,7 @@ function LegoWidget() {
      * @private
      * @returns {void}
      */
-    this._clearPhrase = function() {
+    this._clearPhrase = function () {
         this.matrixData.selectedCells.clear();
         const selectedCells = this.matrixTable.querySelectorAll("[data-cell-id]");
         selectedCells.forEach(cell => {
@@ -1053,7 +1143,7 @@ function LegoWidget() {
      * @private
      * @returns {void}
      */
-    this._uploadImage = function() {
+    this._uploadImage = function () {
         this.fileInput.click();
     };
 
@@ -1063,20 +1153,20 @@ function LegoWidget() {
      * @param {Event} event - The file input change event.
      * @returns {void}
      */
-    this._handleImageUpload = function(event) {
+    this._handleImageUpload = function (event) {
         const file = event.target.files[0];
         if (file && file.type.startsWith("image/")) {
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = e => {
                 this.imageDisplayArea.innerHTML = "";
-                
+
                 this.imageWrapper = document.createElement("div");
                 this.imageWrapper.style.position = "absolute";
                 this.imageWrapper.style.left = "0px";
                 this.imageWrapper.style.top = "0px";
                 this.imageWrapper.style.transformOrigin = "top left";
                 this.imageWrapper.style.cursor = "grab";
-                
+
                 const img = document.createElement("img");
                 img.src = e.target.result;
                 img.style.maxWidth = "100%";
@@ -1084,14 +1174,14 @@ function LegoWidget() {
                 img.style.objectFit = "contain";
                 img.style.borderRadius = "8px";
                 img.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
-                
+
                 this.imageWrapper.appendChild(img);
                 this.imageDisplayArea.appendChild(this.imageWrapper);
-                
+
                 this._makeImageDraggable(this.imageWrapper);
                 this._showZoomControls();
                 this._drawGridLines();
-                
+
                 this.activity.textMsg(_("Image uploaded successfully"));
             };
             reader.readAsDataURL(file);
@@ -1103,34 +1193,35 @@ function LegoWidget() {
      * @private
      * @returns {void}
      */
-    this._startWebcam = function() {
+    this._startWebcam = function () {
         this.imageDisplayArea.innerHTML = "";
-        
+
         this.imageWrapper = document.createElement("div");
         this.imageWrapper.style.position = "absolute";
         this.imageWrapper.style.left = "0px";
         this.imageWrapper.style.top = "0px";
         this.imageWrapper.style.transformOrigin = "top left";
         this.imageWrapper.style.cursor = "grab";
-        
+
         this.webcamVideo = document.createElement("video");
         this.webcamVideo.autoplay = true;
         this.webcamVideo.playsInline = true;
         this.webcamVideo.style.maxWidth = "100%";
         this.webcamVideo.style.maxHeight = "100%";
-        
+
         this.imageWrapper.appendChild(this.webcamVideo);
         this.imageDisplayArea.appendChild(this.imageWrapper);
-        
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then((stream) => {
+
+        navigator.mediaDevices
+            .getUserMedia({ video: true })
+            .then(stream => {
                 this.webcamVideo.srcObject = stream;
                 this._makeImageDraggable(this.imageWrapper);
                 this._showZoomControls();
                 this._drawGridLines();
                 this.activity.textMsg(_("Webcam started"));
             })
-            .catch((err) => {
+            .catch(err => {
                 this.activity.textMsg(_("Webcam access denied: ") + err.message);
             });
     };
@@ -1140,7 +1231,7 @@ function LegoWidget() {
      * @private
      * @returns {void}
      */
-    this._stopWebcam = function() {
+    this._stopWebcam = function () {
         if (this.webcamVideo && this.webcamVideo.srcObject) {
             const tracks = this.webcamVideo.srcObject.getTracks();
             tracks.forEach(track => track.stop());
@@ -1152,9 +1243,9 @@ function LegoWidget() {
      * @private
      * @returns {void}
      */
-    this._toggleEyeDropper = function() {
+    this._toggleEyeDropper = function () {
         this.eyeDropperMode = !this.eyeDropperMode;
-        
+
         if (this.eyeDropperMode) {
             this._activateEyeDropper();
         } else {
@@ -1167,27 +1258,31 @@ function LegoWidget() {
      * @private
      * @returns {void}
      */
-    this._activateEyeDropper = function() {
+    this._activateEyeDropper = function () {
         // Change cursor to crosshair for eye dropper mode
         if (this.imageDisplayArea) {
             this.imageDisplayArea.style.cursor = "crosshair";
         }
-        
+
         // Update button appearance
         this.eyeDropperButton.style.backgroundColor = "#4CAF50";
         this.eyeDropperButton.style.color = "white";
-        
+
         // Add event listeners for hover preview and click selection
         if (this.imageDisplayArea) {
             this.imageDisplayArea.addEventListener("mousemove", this._handleEyeDropperHover);
             this.imageDisplayArea.addEventListener("click", this._handleEyeDropperClick);
             this.imageDisplayArea.addEventListener("mouseleave", this._handleEyeDropperLeave);
         }
-        
+
         // Create color preview tooltip
         this._createColorPreviewTooltip();
-        
-        this.activity.textMsg(_("Eye dropper active - hover over image to preview colors, click to select background color"));
+
+        this.activity.textMsg(
+            _(
+                "Eye dropper active - hover over image to preview colors, click to select background color"
+            )
+        );
     };
 
     /**
@@ -1195,23 +1290,23 @@ function LegoWidget() {
      * @private
      * @returns {void}
      */
-    this._deactivateEyeDropper = function() {
+    this._deactivateEyeDropper = function () {
         // Reset cursor
         if (this.imageDisplayArea) {
             this.imageDisplayArea.style.cursor = "default";
         }
-        
+
         // Reset button appearance
         this.eyeDropperButton.style.backgroundColor = "";
         this.eyeDropperButton.style.color = "";
-        
+
         // Remove event listeners
         if (this.imageDisplayArea) {
             this.imageDisplayArea.removeEventListener("mousemove", this._handleEyeDropperHover);
             this.imageDisplayArea.removeEventListener("click", this._handleEyeDropperClick);
             this.imageDisplayArea.removeEventListener("mouseleave", this._handleEyeDropperLeave);
         }
-        
+
         // Remove color preview tooltip
         this._removeColorPreviewTooltip();
     };
@@ -1222,26 +1317,26 @@ function LegoWidget() {
      * @param {Event} event - The click event
      * @returns {void}
      */
-    this._handleEyeDropperClick = function(event) {
+    this._handleEyeDropperClick = function (event) {
         event.preventDefault();
         event.stopPropagation();
-        
+
         // Hide the preview tooltip
         if (this.colorPreviewTooltip) {
             this.colorPreviewTooltip.style.display = "none";
         }
-        
+
         // Get the clicked position relative to the image
         const clickedColor = this._sampleColorAtPosition(event.clientX, event.clientY);
-        
+
         if (clickedColor) {
             this.selectedBackgroundColor = clickedColor;
             this._deactivateEyeDropper();
             this.eyeDropperMode = false;
-            
+
             // Update UI to show selected color
             this._updateBackgroundColorDisplay();
-            
+
             this.activity.textMsg(_("Background color selected: ") + clickedColor.name);
         } else {
             this.activity.textMsg(_("Could not sample color - please try clicking on the image"));
@@ -1255,11 +1350,12 @@ function LegoWidget() {
      * @param {number} screenY - Screen Y coordinate
      * @returns {object|null} Color family object or null
      */
-    this._sampleColorAtPosition = function(screenX, screenY) {
+    this._sampleColorAtPosition = function (screenX, screenY) {
         // Get the image or video element
         let mediaElement = null;
         if (this.imageWrapper) {
-            mediaElement = this.imageWrapper.querySelector("img") || this.imageWrapper.querySelector("video");
+            mediaElement =
+                this.imageWrapper.querySelector("img") || this.imageWrapper.querySelector("video");
         }
 
         if (!mediaElement) {
@@ -1271,8 +1367,10 @@ function LegoWidget() {
         const ctx = tempCanvas.getContext("2d");
 
         // Set canvas size to match the media element's natural size
-        tempCanvas.width = mediaElement.naturalWidth || mediaElement.videoWidth || mediaElement.width;
-        tempCanvas.height = mediaElement.naturalHeight || mediaElement.videoHeight || mediaElement.height;
+        tempCanvas.width =
+            mediaElement.naturalWidth || mediaElement.videoWidth || mediaElement.width;
+        tempCanvas.height =
+            mediaElement.naturalHeight || mediaElement.videoHeight || mediaElement.height;
 
         // Draw the media element to the canvas
         try {
@@ -1308,11 +1406,11 @@ function LegoWidget() {
      * @private
      * @returns {void}
      */
-    this._createColorPreviewTooltip = function() {
+    this._createColorPreviewTooltip = function () {
         if (this.colorPreviewTooltip) {
             this._removeColorPreviewTooltip();
         }
-        
+
         this.colorPreviewTooltip = document.createElement("div");
         this.colorPreviewTooltip.style.position = "absolute";
         this.colorPreviewTooltip.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
@@ -1325,7 +1423,7 @@ function LegoWidget() {
         this.colorPreviewTooltip.style.zIndex = "1000";
         this.colorPreviewTooltip.style.display = "none";
         this.colorPreviewTooltip.style.boxShadow = "0 2px 8px rgba(0,0,0,0.3)";
-        
+
         // Add color swatch inside tooltip
         this.colorSwatch = document.createElement("div");
         this.colorSwatch.style.width = "20px";
@@ -1335,13 +1433,13 @@ function LegoWidget() {
         this.colorSwatch.style.display = "inline-block";
         this.colorSwatch.style.marginRight = "8px";
         this.colorSwatch.style.verticalAlign = "middle";
-        
+
         this.colorPreviewTooltip.appendChild(this.colorSwatch);
-        
+
         this.colorPreviewText = document.createElement("span");
         this.colorPreviewText.style.verticalAlign = "middle";
         this.colorPreviewTooltip.appendChild(this.colorPreviewText);
-        
+
         document.body.appendChild(this.colorPreviewTooltip);
     };
 
@@ -1350,7 +1448,7 @@ function LegoWidget() {
      * @private
      * @returns {void}
      */
-    this._removeColorPreviewTooltip = function() {
+    this._removeColorPreviewTooltip = function () {
         if (this.colorPreviewTooltip) {
             document.body.removeChild(this.colorPreviewTooltip);
             this.colorPreviewTooltip = null;
@@ -1365,20 +1463,21 @@ function LegoWidget() {
      * @param {Event} event - The mouse move event
      * @returns {void}
      */
-    this._handleEyeDropperHover = function(event) {
+    this._handleEyeDropperHover = function (event) {
         if (!this.eyeDropperMode || !this.colorPreviewTooltip) return;
-        
+
         // Get the color at the current position
         const hoveredColor = this._sampleColorAtPosition(event.clientX, event.clientY);
-        
+
         if (hoveredColor) {
             // Update tooltip content
             this.colorSwatch.style.backgroundColor = this._getColorHex(hoveredColor.name);
-            this.colorPreviewText.textContent = hoveredColor.name.charAt(0).toUpperCase() + hoveredColor.name.slice(1);
-            
+            this.colorPreviewText.textContent =
+                hoveredColor.name.charAt(0).toUpperCase() + hoveredColor.name.slice(1);
+
             // Position tooltip near cursor
-            this.colorPreviewTooltip.style.left = (event.clientX + 15) + "px";
-            this.colorPreviewTooltip.style.top = (event.clientY - 40) + "px";
+            this.colorPreviewTooltip.style.left = event.clientX + 15 + "px";
+            this.colorPreviewTooltip.style.top = event.clientY - 40 + "px";
             this.colorPreviewTooltip.style.display = "block";
         } else {
             this.colorPreviewTooltip.style.display = "none";
@@ -1391,7 +1490,7 @@ function LegoWidget() {
      * @param {Event} event - The mouse leave event
      * @returns {void}
      */
-    this._handleEyeDropperLeave = function(event) {
+    this._handleEyeDropperLeave = function (event) {
         if (this.colorPreviewTooltip) {
             this.colorPreviewTooltip.style.display = "none";
         }
@@ -1402,11 +1501,15 @@ function LegoWidget() {
      * @private
      * @returns {void}
      */
-    this._updateBackgroundColorDisplay = function() {
+    this._updateBackgroundColorDisplay = function () {
         if (this.backgroundColorDisplay) {
             this.backgroundColorDisplay.textContent = this.selectedBackgroundColor.name;
-            this.backgroundColorDisplay.style.backgroundColor = this._getColorHex(this.selectedBackgroundColor.name);
-            this.backgroundColorDisplay.style.color = this._getContrastColor(this.selectedBackgroundColor.name);
+            this.backgroundColorDisplay.style.backgroundColor = this._getColorHex(
+                this.selectedBackgroundColor.name
+            );
+            this.backgroundColorDisplay.style.color = this._getContrastColor(
+                this.selectedBackgroundColor.name
+            );
         }
     };
 
@@ -1416,20 +1519,20 @@ function LegoWidget() {
      * @param {string} colorName - The color name
      * @returns {string} Hex color code
      */
-    this._getColorHex = function(colorName) {
+    this._getColorHex = function (colorName) {
         const colorMap = {
-            "red": "#FF0000",
-            "orange": "#FFA500",
-            "yellow": "#FFFF00",
-            "green": "#00FF00",
-            "blue": "#0000FF",
-            "purple": "#800080",
-            "pink": "#FFC0CB",
-            "cyan": "#00FFFF",
-            "magenta": "#FF00FF",
-            "white": "#FFFFFF",
-            "black": "#000000",
-            "gray": "#808080"
+            red: "#FF0000",
+            orange: "#FFA500",
+            yellow: "#FFFF00",
+            green: "#00FF00",
+            blue: "#0000FF",
+            purple: "#800080",
+            pink: "#FFC0CB",
+            cyan: "#00FFFF",
+            magenta: "#FF00FF",
+            white: "#FFFFFF",
+            black: "#000000",
+            gray: "#808080"
         };
         return colorMap[colorName] || "#808080";
     };
@@ -1440,7 +1543,7 @@ function LegoWidget() {
      * @param {string} colorName - The color name
      * @returns {string} Contrasting text color
      */
-    this._getContrastColor = function(colorName) {
+    this._getContrastColor = function (colorName) {
         const lightColors = ["white", "yellow", "cyan", "pink", "orange"];
         return lightColors.includes(colorName) ? "#000000" : "#FFFFFF";
     };
@@ -1451,7 +1554,7 @@ function LegoWidget() {
      * @param {HTMLElement} wrapper - The image wrapper element.
      * @returns {void}
      */
-    this._makeImageDraggable = function(wrapper) {
+    this._makeImageDraggable = function (wrapper) {
         let isDragging = false;
         let startX, startY, initialX, initialY;
 
@@ -1460,7 +1563,7 @@ function LegoWidget() {
         wrapper.style.height = "100%";
         wrapper.style.overflow = "hidden";
 
-        wrapper.onmousedown = (e) => {
+        wrapper.onmousedown = e => {
             isDragging = true;
             startX = e.clientX;
             startY = e.clientY;
@@ -1470,7 +1573,7 @@ function LegoWidget() {
             e.preventDefault();
         };
 
-        document.onmousemove = (e) => {
+        document.onmousemove = e => {
             if (!isDragging) return;
             const dx = e.clientX - startX;
             const dy = e.clientY - startY;
@@ -1490,27 +1593,29 @@ function LegoWidget() {
      * Converts RGB values to a named color category with improved accuracy.
      * @private
      */
-    this._getColorFamily = function(r, g, b) {
+    this._getColorFamily = function (r, g, b) {
         const hsl = this._rgbToHsl(r, g, b);
         const [hue, saturation, lightness] = hsl;
 
         // Simple and accurate color detection
-        
+
         // Handle very dark colors first
         if (lightness < 15) {
             return { name: "black", hue: hue, saturation: saturation, lightness: lightness };
         }
-        
+
         // Handle grayscale colors (low saturation) - keep it simple
         if (saturation < 20) {
-            if (lightness > 85) return { name: "white", hue: hue, saturation: saturation, lightness: lightness };
-            if (lightness < 25) return { name: "black", hue: hue, saturation: saturation, lightness: lightness };
+            if (lightness > 85)
+                return { name: "white", hue: hue, saturation: saturation, lightness: lightness };
+            if (lightness < 25)
+                return { name: "black", hue: hue, saturation: saturation, lightness: lightness };
             return { name: "gray", hue: hue, saturation: saturation, lightness: lightness };
         }
 
         // Improved hue-based detection with clear boundaries to prevent orange/purple confusion
         let colorName = "unknown";
-        
+
         if (hue >= 345 || hue < 15) {
             colorName = "red";
         } else if (hue >= 15 && hue < 45) {
@@ -1539,22 +1644,24 @@ function LegoWidget() {
             saturation: saturation,
             lightness: lightness
         };
-    };    /**
- * Gets color family from HSL values
- * @private
- * @param {number} h - Hue (0-360)
- * @param {number} s - Saturation (0-100)
- * @param {number} l - Lightness (0-100)
- * @returns {object} Color family object
- */
-    this._getColorFamily = function(h, s, l) {
-    // Handle grayscale first
-        if (s < 15) { // Low saturation = grayscale
+    };
+    /**
+     * Gets color family from HSL values
+     * @private
+     * @param {number} h - Hue (0-360)
+     * @param {number} s - Saturation (0-100)
+     * @param {number} l - Lightness (0-100)
+     * @returns {object} Color family object
+     */
+    this._getColorFamily = function (h, s, l) {
+        // Handle grayscale first
+        if (s < 15) {
+            // Low saturation = grayscale
             if (l > 85) return { name: "white", hue: 0 };
             if (l < 15) return { name: "black", hue: 0 };
             return { name: "gray", hue: 0 };
         }
-    
+
         // For saturated colors, determine by hue
         if (h >= 345 || h < 15) return { name: "red", hue: 0 };
         if (h >= 15 && h < 45) return { name: "orange", hue: 30 };
@@ -1565,7 +1672,7 @@ function LegoWidget() {
         if (h >= 255 && h < 285) return { name: "purple", hue: 270 };
         if (h >= 285 && h < 315) return { name: "magenta", hue: 300 };
         if (h >= 315 && h < 345) return { name: "pink", hue: 330 };
-    
+
         return { name: "unknown", hue: h };
     };
 
@@ -1575,44 +1682,53 @@ function LegoWidget() {
      * @param {string} colorName - The color name
      * @returns {object} Color family object
      */
-    this._getColorFamilyByName = function(colorName) {
+    this._getColorFamilyByName = function (colorName) {
         const colorFamilies = {
-            "red": { name: "red", hue: 0, saturation: 80, lightness: 50 },
-            "orange": { name: "orange", hue: 30, saturation: 80, lightness: 50 },
-            "yellow": { name: "yellow", hue: 60, saturation: 80, lightness: 50 },
-            "green": { name: "green", hue: 120, saturation: 80, lightness: 50 },
-            "cyan": { name: "cyan", hue: 180, saturation: 80, lightness: 50 },
-            "blue": { name: "blue", hue: 240, saturation: 80, lightness: 50 },
-            "purple": { name: "purple", hue: 270, saturation: 80, lightness: 50 },
-            "magenta": { name: "magenta", hue: 300, saturation: 80, lightness: 50 },
-            "pink": { name: "pink", hue: 330, saturation: 70, lightness: 75 },
-            "white": { name: "white", hue: 0, saturation: 0, lightness: 95 },
-            "gray": { name: "gray", hue: 0, saturation: 5, lightness: 50 },
-            "black": { name: "black", hue: 0, saturation: 0, lightness: 5 }
+            red: { name: "red", hue: 0, saturation: 80, lightness: 50 },
+            orange: { name: "orange", hue: 30, saturation: 80, lightness: 50 },
+            yellow: { name: "yellow", hue: 60, saturation: 80, lightness: 50 },
+            green: { name: "green", hue: 120, saturation: 80, lightness: 50 },
+            cyan: { name: "cyan", hue: 180, saturation: 80, lightness: 50 },
+            blue: { name: "blue", hue: 240, saturation: 80, lightness: 50 },
+            purple: { name: "purple", hue: 270, saturation: 80, lightness: 50 },
+            magenta: { name: "magenta", hue: 300, saturation: 80, lightness: 50 },
+            pink: { name: "pink", hue: 330, saturation: 70, lightness: 75 },
+            white: { name: "white", hue: 0, saturation: 0, lightness: 95 },
+            gray: { name: "gray", hue: 0, saturation: 5, lightness: 50 },
+            black: { name: "black", hue: 0, saturation: 0, lightness: 5 }
         };
         return colorFamilies[colorName] || null;
     };
 
     /**
- * Converts RGB to HSL.
- * @private
- */
-    this._rgbToHsl = function(r, g, b) {
+     * Converts RGB to HSL.
+     * @private
+     */
+    this._rgbToHsl = function (r, g, b) {
         r /= 255;
         g /= 255;
         b /= 255;
-    
-        const max = Math.max(r, g, b), min = Math.min(r, g, b);
-        let h = 0, s = 0, l = (max + min) / 2;
+
+        const max = Math.max(r, g, b),
+            min = Math.min(r, g, b);
+        let h = 0,
+            s = 0,
+            l = (max + min) / 2;
 
         if (max !== min) {
             const d = max - min;
             s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-        
+
             switch (max) {
-                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-                case g: h = (b - r) / d + 2; break;
-                case b: h = (r - g) / d + 4; break;
+                case r:
+                    h = (g - b) / d + (g < b ? 6 : 0);
+                    break;
+                case g:
+                    h = (b - r) / d + 2;
+                    break;
+                case b:
+                    h = (r - g) / d + 4;
+                    break;
             }
 
             h *= 60;
@@ -1621,7 +1737,6 @@ function LegoWidget() {
         return [Math.round(h), Math.round(s * 100), Math.round(l * 100)];
     };
 
-    
     /**
      * Checks if two colors are similar enough to be considered the same.
      * @private
@@ -1629,28 +1744,31 @@ function LegoWidget() {
      * @param {object} color2 - Second color family object.
      * @returns {boolean} True if colors are similar.
      */
-    this._colorsAreSimilar = function(color1, color2) {
+    this._colorsAreSimilar = function (color1, color2) {
         if (!color1 || !color2) return false;
-        
+
         // Exact name match
         if (color1.name === color2.name) return true;
-        
+
         // Handle gray variations (keep simple)
         const grayColors = ["white", "gray", "black"];
         if (grayColors.includes(color1.name) && grayColors.includes(color2.name)) {
             // Allow some flexibility between white/gray/black based on lightness
             return Math.abs(color1.lightness - color2.lightness) < 30;
         }
-        
+
         // For colored objects, use HSL distance
         if (color1.saturation > 20 && color2.saturation > 20) {
-            const hueDiff = Math.min(Math.abs(color1.hue - color2.hue), 360 - Math.abs(color1.hue - color2.hue));
+            const hueDiff = Math.min(
+                Math.abs(color1.hue - color2.hue),
+                360 - Math.abs(color1.hue - color2.hue)
+            );
             const satDiff = Math.abs(color1.saturation - color2.saturation);
             const lightDiff = Math.abs(color1.lightness - color2.lightness);
-            
+
             return hueDiff < 25 && satDiff < 20 && lightDiff < 20;
         }
-        
+
         return false;
     };
 
@@ -1668,45 +1786,44 @@ function LegoWidget() {
      * @param {HTMLElement} mediaElement - The image or video element
      * @returns {object|null} Color family object or null if should continue with normal sampling
      */
-    this._getColorForCanvasRow = function(line, mediaElement) {
+    this._getColorForCanvasRow = function (line, mediaElement) {
         // Get the actual image display area
         const imageRect = mediaElement.getBoundingClientRect();
         const overlayRect = this.gridOverlay.getBoundingClientRect();
-        
+
         // Calculate if this row is within the image bounds
         const rowTopInOverlay = line.topPos;
         const rowBottomInOverlay = line.bottomPos;
-        
+
         // Get image position relative to overlay (account for positioning/dragging)
         const imageTop = imageRect.top - overlayRect.top;
         const imageBottom = imageTop + imageRect.height;
-        
+
         // Check if row is completely outside image bounds (underflow/overflow)
         if (rowBottomInOverlay <= imageTop || rowTopInOverlay >= imageBottom) {
             // Row is outside image - return selected background color for empty canvas areas
             return this.selectedBackgroundColor || this._getColorFamilyByName("green");
         }
-        
+
         // Row is within or partially within image bounds - continue with normal color sampling
         return null;
     };
-
 
     /**
      * Shows zoom controls.
      * @private
      * @returns {void}
      */
-    this._showZoomControls = function() {
+    this._showZoomControls = function () {
         // Controls are now always visible, just initialize their values
         this.currentZoom = 1;
         this.zoomSlider.value = "1";
         this.zoomValue.textContent = "100%";
-        
+
         // Initialize vertical spacing controls
         this.spacingSlider.value = this.verticalSpacing.toString();
         this.spacingValue.textContent = this.verticalSpacing + "px";
-        
+
         // No need to redraw lines here since zoom controls are absolutely positioned
     };
 
@@ -1716,7 +1833,7 @@ function LegoWidget() {
      * @param {number} delta - The zoom adjustment.
      * @returns {void}
      */
-    this._adjustZoom = function(delta) {
+    this._adjustZoom = function (delta) {
         let newVal = parseFloat(this.zoomSlider.value) + delta;
         newVal = Math.max(0.1, Math.min(3, newVal));
         this.zoomSlider.value = newVal.toFixed(2);
@@ -1729,7 +1846,7 @@ function LegoWidget() {
      * @param {number} delta - The spacing adjustment.
      * @returns {void}
      */
-    this._adjustVerticalSpacing = function(delta) {
+    this._adjustVerticalSpacing = function (delta) {
         let newVal = parseFloat(this.spacingSlider.value) + delta;
         newVal = Math.max(2, Math.min(200, newVal));
         this.spacingSlider.value = newVal.toString();
@@ -1741,10 +1858,10 @@ function LegoWidget() {
      * @private
      * @returns {void}
      */
-    this._handleVerticalSpacing = function() {
+    this._handleVerticalSpacing = function () {
         this.verticalSpacing = parseFloat(this.spacingSlider.value);
         this.spacingValue.textContent = this.verticalSpacing + "px";
-        
+
         setTimeout(() => this._drawGridLines(), 50);
     };
 
@@ -1753,14 +1870,14 @@ function LegoWidget() {
      * @private
      * @returns {void}
      */
-    this._changeInstrument = function() {
+    this._changeInstrument = function () {
         this.selectedInstrument = this.instrumentSelect.value;
-        
+
         // Recreate the synth with the new instrument
         if (this.synth) {
             this.synth.createSynth(0, this.selectedInstrument, this.selectedInstrument, null);
         }
-        
+
         // Show a message indicating the instrument change
         this.activity.textMsg(_("Instrument changed to: ") + this.selectedInstrument);
     };
@@ -1770,7 +1887,7 @@ function LegoWidget() {
      * @private
      * @returns {void}
      */
-    this._createInstrumentPieMenu = function() {
+    this._createInstrumentPieMenu = function () {
         // Define instrument options
         const voiceLabels = [
             _("Electronic Synth"),
@@ -1820,7 +1937,7 @@ function LegoWidget() {
             "triangle"
         ];
 
-        const categories = [];  // No categories needed for instruments
+        const categories = []; // No categories needed for instruments
 
         // Create a mock block object for the pie menu
         const mockBlock = {
@@ -1831,7 +1948,7 @@ function LegoWidget() {
                 children: [], // Mock children array for setChildIndex
                 setChildIndex: (child, index) => {} // Mock function
             },
-            
+
             // Mock text object that the pie menu expects
             text: {
                 _text: this.selectedInstrument,
@@ -1847,9 +1964,9 @@ function LegoWidget() {
                 },
                 _updateCallback: null
             },
-            
+
             value: this.selectedInstrument,
-            
+
             activity: {
                 canvas: {
                     offsetLeft: 0,
@@ -1864,7 +1981,7 @@ function LegoWidget() {
                     synth: this.synth
                 },
                 turtles: {
-                    ithTurtle: (index) => {
+                    ithTurtle: index => {
                         return {
                             singer: {
                                 instrumentNames: [this.selectedInstrument]
@@ -1873,7 +1990,7 @@ function LegoWidget() {
                     }
                 }
             },
-            
+
             blocks: {
                 blockScale: 1,
                 turtles: {
@@ -1883,22 +2000,28 @@ function LegoWidget() {
                     }
                 }
             },
-            
+
             // Mock methods needed by piemenu
             updateCache: () => {},
-            updateValue: (newValue) => {
+            updateValue: newValue => {
                 // Update the instrument when selection is made
                 this.selectedInstrument = newValue;
-                this.instrumentButton.textContent = newValue.charAt(0).toUpperCase() + newValue.slice(1);
-                
+                this.instrumentButton.textContent =
+                    newValue.charAt(0).toUpperCase() + newValue.slice(1);
+
                 // Recreate the synth with the new instrument
                 if (this.synth) {
-                    this.synth.createSynth(0, this.selectedInstrument, this.selectedInstrument, null);
+                    this.synth.createSynth(
+                        0,
+                        this.selectedInstrument,
+                        this.selectedInstrument,
+                        null
+                    );
                 }
-                
+
                 // Show a message indicating the instrument change
                 this.activity.textMsg(_("Instrument changed to: ") + this.selectedInstrument);
-                
+
                 // Update the mock block's value and text
                 mockBlock.value = newValue;
                 mockBlock.text.text = newValue;
@@ -1906,44 +2029,52 @@ function LegoWidget() {
         };
 
         // Set up the text update callback to update our button
-        mockBlock.text._updateCallback = (newText) => {
+        mockBlock.text._updateCallback = newText => {
             // Update the instrument when text is set by pie menu
-            const newInstrument = voiceValues[voiceLabels.findIndex(label =>
-                label.toLowerCase() === newText.toLowerCase()
-            )] || newText.toLowerCase();
-            
+            const newInstrument =
+                voiceValues[
+                    voiceLabels.findIndex(label => label.toLowerCase() === newText.toLowerCase())
+                ] || newText.toLowerCase();
+
             this.selectedInstrument = newInstrument;
-            this.instrumentButton.textContent = newInstrument.charAt(0).toUpperCase() + newInstrument.slice(1);
-            
+            this.instrumentButton.textContent =
+                newInstrument.charAt(0).toUpperCase() + newInstrument.slice(1);
+
             // Recreate the synth with the new instrument
             if (this.synth) {
                 this.synth.createSynth(0, this.selectedInstrument, this.selectedInstrument, null);
             }
-            
+
             // Show a message indicating the instrument change
             this.activity.textMsg(_("Instrument changed to: ") + this.selectedInstrument);
         };
 
         // Call the pie menu function
-        piemenuVoices(mockBlock, voiceLabels, voiceValues, categories, this.selectedInstrument, false);
+        piemenuVoices(
+            mockBlock,
+            voiceLabels,
+            voiceValues,
+            categories,
+            this.selectedInstrument,
+            false
+        );
     };
-
 
     /**
      * Handles zoom changes.
      * @private
      * @returns {void}
      */
-    this._handleZoom = function() {
+    this._handleZoom = function () {
         if (this.imageWrapper) {
             this.currentZoom = parseFloat(this.zoomSlider.value);
             this.imageWrapper.style.transform = `scale(${this.currentZoom})`;
             this.zoomValue.textContent = Math.round(this.currentZoom * 100) + "%";
-            
+
             // Ensure the image wrapper maintains its dimensions
             this.imageWrapper.style.width = "100%";
             this.imageWrapper.style.height = "100%";
-            
+
             setTimeout(() => this._drawGridLines(), 50);
         }
     };
@@ -1953,13 +2084,13 @@ function LegoWidget() {
      * @private
      * @returns {void}
      */
-    this._drawGridLines = function() {
+    this._drawGridLines = function () {
         if (!this.rowHeaderTable.rows.length || !this.gridOverlay) return;
 
         this.gridOverlay.innerHTML = "";
-        
+
         const numRows = this.matrixData.rows.length;
-        
+
         // Draw horizontal lines at each row boundary
         for (let i = 0; i < numRows; i++) {
             const line = document.createElement("div");
@@ -1969,21 +2100,21 @@ function LegoWidget() {
             line.style.height = "2px";
             line.style.backgroundColor = "red";
             line.style.zIndex = "5";
-            
+
             // Position line at the bottom of each row
             const position = (i + 1) * ROW_HEIGHT;
             line.style.top = `${position}px`;
-            
+
             this.gridOverlay.appendChild(line);
         }
-        
+
         // Draw vertical lines based on spacing
         const overlayRect = this.gridOverlay.getBoundingClientRect();
         const overlayWidth = overlayRect.width || this.gridOverlay.offsetWidth || 800; // fallback width
-        
+
         if (overlayWidth > 0) {
             const numVerticalLines = Math.floor(overlayWidth / this.verticalSpacing);
-            
+
             for (let i = 1; i <= numVerticalLines; i++) {
                 const vline = document.createElement("div");
                 vline.style.position = "absolute";
@@ -1992,11 +2123,11 @@ function LegoWidget() {
                 vline.style.width = "2px";
                 vline.style.backgroundColor = "blue";
                 vline.style.zIndex = "5";
-                
+
                 // Position vertical line
                 const position = i * this.verticalSpacing;
                 vline.style.left = `${position}px`;
-                
+
                 this.gridOverlay.appendChild(vline);
             }
         }
@@ -2007,7 +2138,7 @@ function LegoWidget() {
      * @private
      * @returns {void}
      */
-    this._scale = function() {
+    this._scale = function () {
         // Redraw grid lines after scaling
         setTimeout(() => this._drawGridLines(), 300);
     };
@@ -2016,7 +2147,7 @@ function LegoWidget() {
      * Shows the widget.
      * @returns {void}
      */
-    this.show = function() {
+    this.show = function () {
         if (this.widgetWindow) {
             this.widgetWindow.show();
         }
@@ -2027,7 +2158,7 @@ function LegoWidget() {
      * @param {object} params - The parameters to update.
      * @returns {void}
      */
-    this.updateParams = function(params) {
+    this.updateParams = function (params) {
         // Handle parameter updates if needed
         if (params.zoom && this.zoomSlider) {
             this.zoomSlider.value = params.zoom;
@@ -2036,17 +2167,17 @@ function LegoWidget() {
     };
 
     /**
- * Plays the current musical phrase with vertical scanning lines.
- * @private
- */
-    this._playPhrase = function() {
-    // Clear any existing animation
+     * Plays the current musical phrase with vertical scanning lines.
+     * @private
+     */
+    this._playPhrase = function () {
+        // Clear any existing animation
         this._stopPlayback();
         this.activity.textMsg(_("Scanning image with vertical lines..."));
-        
+
         // Reset the visualization flag to allow new download
         this.hasGeneratedVisualization = false;
-    
+
         // Get all grid lines (sorted by position)
         const gridLines = Array.from(this.gridOverlay.querySelectorAll("div"))
             .filter(el => el.style.backgroundColor === "red")
@@ -2055,37 +2186,37 @@ function LegoWidget() {
                 const bTop = parseFloat(b.style.top);
                 return aTop - bTop;
             });
-    
+
         // Create scanning lines for each musical note row
         this.scanningLines = [];
         this.colorData = [];
-    
+
         // Get the actual canvas/overlay dimensions
         const overlayRect = this.gridOverlay.getBoundingClientRect();
-        const canvasHeight = overlayRect.height || (this.matrixData.rows.length * ROW_HEIGHT);
+        const canvasHeight = overlayRect.height || this.matrixData.rows.length * ROW_HEIGHT;
         const totalNoteRows = this.matrixData.rows.filter(row => row.note).length;
-    
+
         // Create entries and scanning lines for each musical note
         this.matrixData.rows.forEach((row, index) => {
             if (!row.note) return; // Skip non-note rows
-        
+
             this.colorData.push({
                 note: row.note,
                 label: row.label,
                 colorSegments: []
             });
-        
+
             // Calculate vertical position for this note - fixed to canvas grid
             const topPos = index * ROW_HEIGHT;
             const bottomPos = (index + 1) * ROW_HEIGHT;
-        
+
             // Ensure we don't go beyond canvas boundaries
             const clampedTopPos = Math.max(0, Math.min(topPos, canvasHeight));
             const clampedBottomPos = Math.max(0, Math.min(bottomPos, canvasHeight));
-        
+
             // Skip if this row is completely outside canvas bounds
             if (clampedTopPos >= canvasHeight || clampedBottomPos <= 0) {
-            // Fill this row with selected background color for the entire duration
+                // Fill this row with selected background color for the entire duration
                 this.colorData[this.colorData.length - 1].colorSegments.push({
                     color: this.selectedBackgroundColor.name,
                     duration: 5000, // Default scan duration
@@ -2093,19 +2224,19 @@ function LegoWidget() {
                 });
                 return;
             }
-        
+
             // Create vertical scanning line
             const line = document.createElement("div");
             line.style.position = "absolute";
             line.style.width = "3px"; // Slightly thicker line for better visibility
-            line.style.height = (clampedBottomPos - clampedTopPos) + "px";
+            line.style.height = clampedBottomPos - clampedTopPos + "px";
             line.style.backgroundColor = "rgba(255, 0, 0, 0.7)";
             line.style.zIndex = "20";
             line.style.left = "0px";
             line.style.top = clampedTopPos + "px";
             line.dataset.lineId = index;
             this.gridOverlay.appendChild(line);
-        
+
             this.scanningLines.push({
                 element: line,
                 topPos: clampedTopPos,
@@ -2118,49 +2249,50 @@ function LegoWidget() {
                 rowIndex: index
             });
         });
-    
+
         // Animation variables
         this.isPlaying = true;
         this.startTime = performance.now();
         this.lastFrameTime = this.startTime;
-    
+
         // Start animation
         this._animateLines();
     };
 
     /**
- * Animates all scanning lines with improved color detection
- * @private
- */
-    this._animateLines = function() {
+     * Animates all scanning lines with improved color detection
+     * @private
+     */
+    this._animateLines = function () {
         if (!this.isPlaying) return;
-    
+
         const now = performance.now();
         const deltaTime = (now - this.lastFrameTime) / 1000;
         this.lastFrameTime = now;
-    
+
         const containerRect = this.gridOverlay.getBoundingClientRect();
         // Keep consistent time between vertical blue lines (column spacing)
         // Target: 500ms between each vertical line for instructor predictability
         const timeBetweenColumns = 0.5; // seconds per column spacing
         const scanSpeed = this.verticalSpacing / timeBetweenColumns; // pixels per second
-    
+
         let allLinesCompleted = true;
-    
+
         this.scanningLines.forEach(line => {
             if (line.completed) return;
-        
+
             // Update horizontal position
             line.currentX += scanSpeed * deltaTime;
             const maxX = containerRect.width;
-        
+
             // Check if we've reached the container boundary
             if (line.currentX > maxX) {
                 line.completed = true;
                 // Record final color segment if it existed
                 if (line.lastSignificantColor && line.colorStartTime) {
                     const duration = (now - line.colorStartTime) / 1000;
-                    if (duration > 1.0) { // Only save segments longer than 1000ms
+                    if (duration > 1.0) {
+                        // Only save segments longer than 1000ms
                         this.colorData[line.rowIndex].colorSegments.push({
                             color: line.lastSignificantColor.name,
                             duration: duration,
@@ -2170,14 +2302,15 @@ function LegoWidget() {
                 }
                 return;
             }
-        
+
             // Check if we've reached the right edge of the actual image
             if (this._isLineBeyondImageHorizontally(line)) {
                 line.completed = true;
                 // Record final color segment if it existed
                 if (line.lastSignificantColor && line.colorStartTime) {
                     const duration = (now - line.colorStartTime) / 1000;
-                    if (duration > 1.0) { // Only save segments longer than 1000ms
+                    if (duration > 1.0) {
+                        // Only save segments longer than 1000ms
                         this.colorData[line.rowIndex].colorSegments.push({
                             color: line.lastSignificantColor.name,
                             duration: duration,
@@ -2187,16 +2320,16 @@ function LegoWidget() {
                 }
                 return;
             }
-        
+
             allLinesCompleted = false;
-        
+
             // Update line position
             line.element.style.left = line.currentX + "px";
-        
+
             // Sample colors across the entire vertical line
             this._sampleAndDetectColor(line, now);
         });
-    
+
         if (allLinesCompleted) {
             this._stopPlayback();
         } else {
@@ -2205,59 +2338,61 @@ function LegoWidget() {
     };
 
     /**
- * Checks if the scanning line has moved beyond the right edge of the actual image
- * @private
- * @param {object} line - The scanning line object
- * @returns {boolean} True if line is beyond image's right edge
- */
-    this._isLineBeyondImageHorizontally = function(line) {
-    // Get the image or video element
+     * Checks if the scanning line has moved beyond the right edge of the actual image
+     * @private
+     * @param {object} line - The scanning line object
+     * @returns {boolean} True if line is beyond image's right edge
+     */
+    this._isLineBeyondImageHorizontally = function (line) {
+        // Get the image or video element
         let mediaElement = null;
         if (this.imageWrapper) {
-            mediaElement = this.imageWrapper.querySelector("img") || this.imageWrapper.querySelector("video");
+            mediaElement =
+                this.imageWrapper.querySelector("img") || this.imageWrapper.querySelector("video");
         }
-    
+
         if (!mediaElement) {
             return false; // If no image, let it continue scanning the container
         }
-    
+
         // Get the actual image display area
         const imageRect = mediaElement.getBoundingClientRect();
         const overlayRect = this.gridOverlay.getBoundingClientRect();
-    
+
         // Calculate image position relative to overlay (account for positioning/dragging)
         const imageLeft = imageRect.left - overlayRect.left;
         const imageRight = imageLeft + imageRect.width;
-    
+
         // Check if the scanning line is beyond the right edge of the image
         const lineX = line.currentX;
-    
+
         if (lineX >= imageRight) {
             return true;
         }
-    
+
         return false;
     };
 
     /**
- * Stops the current playback animation.
- * @private
- */
-    this._stopPlayback = function() {
+     * Stops the current playback animation.
+     * @private
+     */
+    this._stopPlayback = function () {
         this.isPlaying = false;
 
         // Save final color segments for all lines
         if (this.scanningLines) {
             const now = performance.now();
             this.scanningLines.forEach(line => {
-            // Save the final color segment if it exists
+                // Save the final color segment if it exists
                 if (line.currentColor && line.colorStartTime) {
                     const duration = now - line.colorStartTime;
-                    if (duration > 1000) { // Save final segment if long enough (increased from 400ms)
+                    if (duration > 1000) {
+                        // Save final segment if long enough (increased from 400ms)
                         this._addColorSegment(line.rowIndex, line.currentColor, duration);
                     }
                 }
-            
+
                 // Remove the scanning line element
                 if (line.element && line.element.parentNode) {
                     line.element.parentNode.removeChild(line.element);
@@ -2270,12 +2405,14 @@ function LegoWidget() {
         // This prevents the double download issue where _stopPlayback() is called at the start for cleanup
         if (!this.hasGeneratedVisualization && this.colorData && this.colorData.length > 0) {
             // Check if any colorData actually has color segments (indicating scanning occurred)
-            const hasScannedData = this.colorData.some(row => row.colorSegments && row.colorSegments.length > 0);
-            
+            const hasScannedData = this.colorData.some(
+                row => row.colorSegments && row.colorSegments.length > 0
+            );
+
             if (hasScannedData) {
                 // Merge consecutive segments with same colors
                 this._mergeConsecutiveColorSegments();
-                
+
                 this.hasGeneratedVisualization = true; // Set flag to prevent double generation
                 setTimeout(() => {
                     this._generateColorVisualization();
@@ -2289,13 +2426,13 @@ function LegoWidget() {
      * Merges consecutive color segments with the same color to reduce fragmentation
      * @private
      */
-    this._mergeConsecutiveColorSegments = function() {
+    this._mergeConsecutiveColorSegments = function () {
         this.colorData.forEach(rowData => {
             if (!rowData.colorSegments || rowData.colorSegments.length <= 1) return;
-            
+
             const mergedSegments = [];
             let currentSegment = null;
-            
+
             for (const segment of rowData.colorSegments) {
                 if (!currentSegment) {
                     // First segment
@@ -2318,12 +2455,12 @@ function LegoWidget() {
                     };
                 }
             }
-            
+
             // Don't forget to add the last segment
             if (currentSegment) {
                 mergedSegments.push(currentSegment);
             }
-            
+
             // Replace the original segments with merged ones
             rowData.colorSegments = mergedSegments;
         });
@@ -2333,51 +2470,56 @@ function LegoWidget() {
      * Determines if two colors should be merged together
      * @private
      * @param {string} color1 - First color name
-     * @param {string} color2 - Second color name  
+     * @param {string} color2 - Second color name
      * @returns {boolean} True if colors should be merged
      */
-    this._shouldMergeColors = function(color1, color2) {
+    this._shouldMergeColors = function (color1, color2) {
         // Exact match
         if (color1 === color2) return true;
-        
+
         // Merge all gray variants (white, gray, black)
         const grayColors = ["white", "gray", "black"];
         if (grayColors.includes(color1) && grayColors.includes(color2)) {
             return true;
         }
-        
+
         // Don't merge other distinct colors
         return false;
     };
 
     /**
- * Samples and detects colors along a vertical line
- * @private
- * @param {object} line - The scanning line object
- * @param {number} now - Current timestamp
- */
-    this._sampleAndDetectColor = function(line, now) {
-    // Get the image or video element
+     * Samples and detects colors along a vertical line
+     * @private
+     * @param {object} line - The scanning line object
+     * @param {number} now - Current timestamp
+     */
+    this._sampleAndDetectColor = function (line, now) {
+        // Get the image or video element
         let mediaElement = null;
         if (this.imageWrapper) {
-            mediaElement = this.imageWrapper.querySelector("img") || this.imageWrapper.querySelector("video");
+            mediaElement =
+                this.imageWrapper.querySelector("img") || this.imageWrapper.querySelector("video");
         }
-    
+
         if (!mediaElement) {
             console.warn("No image or video element found for color sampling");
             return;
         }
-    
+
         // Check if this row is outside image bounds - if so, use selected background color
         const boundColor = this._getColorForCanvasRow(line, mediaElement);
         if (boundColor) {
-        // Row is outside image bounds, force selected background color
+            // Row is outside image bounds, force selected background color
             if (!line.currentColor || line.currentColor.name !== boundColor.name) {
-                const timeSinceLastChange = line.lastColorChangeTime ? (now - line.lastColorChangeTime) : 1000;
-                if (timeSinceLastChange > 500) { // Increased from 200ms for consistency
+                const timeSinceLastChange = line.lastColorChangeTime
+                    ? now - line.lastColorChangeTime
+                    : 1000;
+                if (timeSinceLastChange > 500) {
+                    // Increased from 200ms for consistency
                     if (line.currentColor && line.colorStartTime) {
                         const duration = now - line.colorStartTime;
-                        if (duration > 1000) { // Increased from 400ms to match main detection
+                        if (duration > 1000) {
+                            // Increased from 400ms to match main detection
                             this._addColorSegment(line.rowIndex, line.currentColor, duration);
                         }
                     }
@@ -2388,18 +2530,19 @@ function LegoWidget() {
             }
             return; // Don't sample pixels, just use the bound color
         }
-    
+
         // Create a temporary canvas to sample pixel data
         const tempCanvas = document.createElement("canvas");
-        const ctx = tempCanvas.getContext("2d");
-    
+        const ctx = tempCanvas.getContext("2d", { willReadFrequently: true });
+
         // Set canvas size to match the media element's display size
         const mediaRect = mediaElement.getBoundingClientRect();
         const overlayRect = this.gridOverlay.getBoundingClientRect();
-    
+
         tempCanvas.width = mediaElement.naturalWidth || mediaElement.videoWidth || mediaRect.width;
-        tempCanvas.height = mediaElement.naturalHeight || mediaElement.videoHeight || mediaRect.height;
-    
+        tempCanvas.height =
+            mediaElement.naturalHeight || mediaElement.videoHeight || mediaRect.height;
+
         // Draw the media element to the canvas
         try {
             ctx.drawImage(mediaElement, 0, 0, tempCanvas.width, tempCanvas.height);
@@ -2407,59 +2550,59 @@ function LegoWidget() {
             console.error("Error drawing image to canvas:", e);
             return;
         }
-    
+
         // Get overlay and image positioning
         const imageRect = mediaElement.getBoundingClientRect();
-    
+
         // Calculate image position relative to overlay
         const imageOffsetX = imageRect.left - overlayRect.left;
         const imageOffsetY = imageRect.top - overlayRect.top;
-    
+
         // Convert overlay coordinates to image coordinates
         const overlayX = line.currentX;
         const overlayY1 = line.topPos;
         const overlayY2 = line.bottomPos;
-    
+
         // Check if sampling area is within image bounds horizontally
         const imageX = overlayX - imageOffsetX;
         const imageY1 = overlayY1 - imageOffsetY;
         const imageY2 = overlayY2 - imageOffsetY;
-    
+
         // Early return if we're outside the horizontal image bounds
         // (The animation loop will handle stopping the line when it reaches the edge)
         if (imageX < 0 || imageX >= imageRect.width) {
-        // We're outside the image horizontally - no need to sample
+            // We're outside the image horizontally - no need to sample
             return;
         }
-    
+
         // Calculate canvas coordinates with proper scaling
         const scaleX = tempCanvas.width / imageRect.width;
         const scaleY = tempCanvas.height / imageRect.height;
-    
+
         const canvasX = Math.floor(imageX * scaleX);
         const canvasY1 = Math.max(0, Math.floor(imageY1 * scaleY));
         const canvasY2 = Math.min(tempCanvas.height, Math.floor(imageY2 * scaleY));
-    
+
         // Sample multiple points along the vertical line
         const samplePoints = 32;
         const colorCounts = {};
         let totalSamples = 0;
-    
+
         for (let i = 0; i < samplePoints; i++) {
-            const y = canvasY1 + (i * (canvasY2 - canvasY1) / (samplePoints - 1));
-        
+            const y = canvasY1 + (i * (canvasY2 - canvasY1)) / (samplePoints - 1);
+
             if (canvasX >= 0 && canvasX < tempCanvas.width && y >= 0 && y < tempCanvas.height) {
                 try {
                     const imageData = ctx.getImageData(canvasX, y, 1, 1);
                     const [r, g, b] = imageData.data;
-                
+
                     // Skip very transparent pixels
                     if (imageData.data[3] < 128) continue;
-                
+
                     // Convert RGB to HSL and get color family
                     const [h, s, l] = this._rgbToHsl(r, g, b);
                     const colorFamily = this._getColorFamily(h, s, l);
-                
+
                     // FIXED: Include ALL colors - don't filter out ANY colors!
                     if (colorFamily && colorFamily.name !== "unknown") {
                         colorCounts[colorFamily.name] = (colorCounts[colorFamily.name] || 0) + 1;
@@ -2470,36 +2613,43 @@ function LegoWidget() {
                 }
             }
         }
-    
+
         // Only proceed if we have enough color samples
         if (totalSamples < 1) return;
-    
+
         // Find dominant color (must be at least 25% of samples)
         let dominantColor = null;
         let maxCount = 0;
         const minThreshold = Math.max(1, Math.floor(totalSamples * 0.25));
-    
+
         for (const [colorName, count] of Object.entries(colorCounts)) {
             if (count > maxCount && count >= minThreshold) {
                 maxCount = count;
                 dominantColor = this._getColorFamilyByName(colorName);
             }
         }
-    
+
         // Only record significant color changes
-        if (dominantColor && (!line.currentColor || !this._colorsAreSimilar(line.currentColor, dominantColor))) {
-        // Require a minimum time gap between color changes (reduces noise)
-            const timeSinceLastChange = line.lastColorChangeTime ? (now - line.lastColorChangeTime) : 1000;
-        
-            if (timeSinceLastChange > 500) { // Increased from 200ms to 500ms for much less sensitivity
-            // Color changed - save previous segment if it existed
+        if (
+            dominantColor &&
+            (!line.currentColor || !this._colorsAreSimilar(line.currentColor, dominantColor))
+        ) {
+            // Require a minimum time gap between color changes (reduces noise)
+            const timeSinceLastChange = line.lastColorChangeTime
+                ? now - line.lastColorChangeTime
+                : 1000;
+
+            if (timeSinceLastChange > 500) {
+                // Increased from 200ms to 500ms for much less sensitivity
+                // Color changed - save previous segment if it existed
                 if (line.currentColor && line.colorStartTime) {
                     const duration = now - line.colorStartTime;
-                    if (duration > 1000) { // Increased minimum duration from 400ms to 1000ms
+                    if (duration > 1000) {
+                        // Increased minimum duration from 400ms to 1000ms
                         this._addColorSegment(line.rowIndex, line.currentColor, duration);
                     }
                 }
-            
+
                 // Start new color segment
                 line.currentColor = dominantColor;
                 line.colorStartTime = now;
@@ -2509,37 +2659,37 @@ function LegoWidget() {
     };
 
     /**
- * Gets color family by name
- * @private
- * @param {string} colorName - The color name
- * @returns {object} Color family object
- */
-    this._getColorFamilyByName = function(colorName) {
+     * Gets color family by name
+     * @private
+     * @param {string} colorName - The color name
+     * @returns {object} Color family object
+     */
+    this._getColorFamilyByName = function (colorName) {
         const colorFamilies = {
-            "red": { name: "red", hue: 0 },
-            "orange": { name: "orange", hue: 30 },
-            "yellow": { name: "yellow", hue: 60 },
-            "green": { name: "green", hue: 120 },     // FIXED: Added green!
-            "cyan": { name: "cyan", hue: 180 },      // FIXED: Added cyan!
-            "blue": { name: "blue", hue: 240 },
-            "purple": { name: "purple", hue: 270 },
-            "magenta": { name: "magenta", hue: 300 }, // FIXED: Added magenta!
-            "pink": { name: "pink", hue: 330 },
-            "white": { name: "white", hue: 0 },      // FIXED: Added white!
-            "black": { name: "black", hue: 0 },      // FIXED: Added black!
-            "gray": { name: "gray", hue: 0 }         // FIXED: Added gray!
+            red: { name: "red", hue: 0 },
+            orange: { name: "orange", hue: 30 },
+            yellow: { name: "yellow", hue: 60 },
+            green: { name: "green", hue: 120 }, // FIXED: Added green!
+            cyan: { name: "cyan", hue: 180 }, // FIXED: Added cyan!
+            blue: { name: "blue", hue: 240 },
+            purple: { name: "purple", hue: 270 },
+            magenta: { name: "magenta", hue: 300 }, // FIXED: Added magenta!
+            pink: { name: "pink", hue: 330 },
+            white: { name: "white", hue: 0 }, // FIXED: Added white!
+            black: { name: "black", hue: 0 }, // FIXED: Added black!
+            gray: { name: "gray", hue: 0 } // FIXED: Added gray!
         };
         return colorFamilies[colorName] || null;
     };
 
     /**
- * Adds a color segment to the data
- * @private
- * @param {number} rowIndex - Row index
- * @param {object} color - Color object
- * @param {number} duration - Duration in milliseconds
- */
-    this._addColorSegment = function(rowIndex, color, duration) {
+     * Adds a color segment to the data
+     * @private
+     * @param {number} rowIndex - Row index
+     * @param {object} color - Color object
+     * @param {number} duration - Duration in milliseconds
+     */
+    this._addColorSegment = function (rowIndex, color, duration) {
         if (!this.colorData[rowIndex]) {
             this.colorData[rowIndex] = {
                 note: this.this.matrixData.rows[rowIndex].note,
@@ -2547,7 +2697,7 @@ function LegoWidget() {
                 colorSegments: []
             };
         }
-    
+
         this.colorData[rowIndex].colorSegments.push({
             color: color.name,
             duration: duration,
@@ -2556,34 +2706,35 @@ function LegoWidget() {
     };
 
     /**
- * Draws column edge lines on the overlay canvas during scanning
- * @private
- */
-    this._drawColumnLinesOnCanvas = function() {
+     * Draws column edge lines on the overlay canvas during scanning
+     * @private
+     */
+    this._drawColumnLinesOnCanvas = function () {
         if (!this.colorData || this.colorData.length === 0) return;
-    
+
         // Find existing column lines to avoid duplicates
         const existingColumnLines = this.gridOverlay.querySelectorAll(".column-line");
         existingColumnLines.forEach(line => line.remove());
-    
+
         // Get filtered column boundaries (same as used for note export)
         const columnBoundaries = this._analyzeColumnBoundaries();
         const filteredBoundaries = this._filterSmallSegments(columnBoundaries);
-    
+
         const overlayRect = this.gridOverlay.getBoundingClientRect();
         const availableWidth = overlayRect.width || 800;
-    
+
         // Calculate total duration for proportional positioning
-        const totalDuration = filteredBoundaries[filteredBoundaries.length - 1] - filteredBoundaries[0];
-    
+        const totalDuration =
+            filteredBoundaries[filteredBoundaries.length - 1] - filteredBoundaries[0];
+
         // Draw blue vertical lines at filtered boundary positions
         filteredBoundaries.forEach((boundaryTime, index) => {
             if (index === 0) return; // Skip the first boundary (start)
-        
+
             // Calculate position based on time proportion
             const timeFromStart = boundaryTime - filteredBoundaries[0];
             const x = Math.round((timeFromStart / totalDuration) * availableWidth);
-        
+
             if (x > 0 && x < availableWidth) {
                 const vline = document.createElement("div");
                 vline.className = "column-line";
@@ -2594,40 +2745,41 @@ function LegoWidget() {
                 vline.style.backgroundColor = "#0066FF";
                 vline.style.zIndex = "15"; // Above grid lines but below scanning lines
                 vline.style.left = `${x}px`;
-            
+
                 this.gridOverlay.appendChild(vline);
             }
         });
     };
 
     /**
- * Detects column edges across all rows and draws vertical lines on the canvas
- * @private
- * @param {CanvasRenderingContext2D} ctx - Canvas context
- * @param {number} canvasWidth - Width of the canvas
- * @param {number} canvasHeight - Height of the canvas
- * @param {number} startX - X position where segments start (after labels)
- * @param {number} availableWidth - Available width for segments
- */
-    this._drawColumnLines = function(ctx, canvasWidth, canvasHeight, startX, availableWidth) {
-    // Get filtered column boundaries (same as used for note export and overlay)
+     * Detects column edges across all rows and draws vertical lines on the canvas
+     * @private
+     * @param {CanvasRenderingContext2D} ctx - Canvas context
+     * @param {number} canvasWidth - Width of the canvas
+     * @param {number} canvasHeight - Height of the canvas
+     * @param {number} startX - X position where segments start (after labels)
+     * @param {number} availableWidth - Available width for segments
+     */
+    this._drawColumnLines = function (ctx, canvasWidth, canvasHeight, startX, availableWidth) {
+        // Get filtered column boundaries (same as used for note export and overlay)
         const columnBoundaries = this._analyzeColumnBoundaries();
         const filteredBoundaries = this._filterSmallSegments(columnBoundaries);
-    
+
         // Calculate total duration for proportional positioning
-        const totalDuration = filteredBoundaries[filteredBoundaries.length - 1] - filteredBoundaries[0];
-    
+        const totalDuration =
+            filteredBoundaries[filteredBoundaries.length - 1] - filteredBoundaries[0];
+
         // Draw blue vertical lines at filtered boundary positions
         ctx.strokeStyle = "#0066FF";
         ctx.lineWidth = 3; // Slightly thicker for PNG visibility
-    
+
         filteredBoundaries.forEach((boundaryTime, index) => {
             if (index === 0) return; // Skip the first boundary (start)
-        
+
             // Calculate X position based on time proportion
             const timeFromStart = boundaryTime - filteredBoundaries[0];
             const x = startX + Math.round((timeFromStart / totalDuration) * availableWidth);
-        
+
             if (x >= startX && x <= startX + availableWidth) {
                 ctx.beginPath();
                 ctx.moveTo(x, 0);
@@ -2638,112 +2790,127 @@ function LegoWidget() {
     };
 
     /**
- * Generates a PNG image visualization of detected color data (for testing)
- * @private
- */
-    this._generateColorVisualization = function() {
+     * Generates a PNG image visualization of detected color data (for testing)
+     * @private
+     */
+    this._generateColorVisualization = function () {
         if (!this.colorData || this.colorData.length === 0) {
             return;
         }
-    
+
         // Canvas dimensions
         const canvasWidth = 800;
         const rowHeight = 50;
         const canvasHeight = this.colorData.length * rowHeight;
-    
+
         // Create canvas
         const canvas = document.createElement("canvas");
         canvas.width = canvasWidth;
         canvas.height = canvasHeight;
         const ctx = canvas.getContext("2d");
-    
+
         // Fill background
         ctx.fillStyle = "#f0f0f0";
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-    
+
         // Color mapping
         const colorMap = {
-            "red": "#FF0000",
-            "orange": "#FFA500",
-            "yellow": "#FFFF00",
-            "green": "#00FF00",
-            "blue": "#0000FF",
-            "purple": "#800080",
-            "pink": "#FFC0CB",
-            "cyan": "#00FFFF",
-            "magenta": "#FF00FF",
-            "white": "#FFFFFF",
-            "black": "#000000",
-            "gray": "#808080",
-            "unknown": "#C0C0C0"
+            red: "#FF0000",
+            orange: "#FFA500",
+            yellow: "#FFFF00",
+            green: "#00FF00",
+            blue: "#0000FF",
+            purple: "#800080",
+            pink: "#FFC0CB",
+            cyan: "#00FFFF",
+            magenta: "#FF00FF",
+            white: "#FFFFFF",
+            black: "#000000",
+            gray: "#808080",
+            unknown: "#C0C0C0"
         };
-    
+
         // Draw each row
         this.colorData.forEach((rowData, rowIndex) => {
             const y = rowIndex * rowHeight;
-        
+
             // Draw row background
             ctx.fillStyle = rowIndex % 2 === 0 ? "#ffffff" : "#f8f8f8";
             ctx.fillRect(0, y, canvasWidth, rowHeight);
-        
+
             // Draw row label
             ctx.fillStyle = "#000000";
             ctx.font = "12px Arial";
             ctx.textAlign = "left";
             ctx.fillText(`${rowData.label} (${rowData.note})`, 10, y + 20);
-        
+
             // Draw color segments
             if (rowData.colorSegments && rowData.colorSegments.length > 0) {
                 let currentX = 150; // Start after label
                 const segmentHeight = 30;
                 const segmentY = y + 10;
                 const availableWidth = canvasWidth - 150 - 20; // Space for segments
-            
+
                 // Calculate total duration for proportional sizing
-                const totalDuration = rowData.colorSegments.reduce((sum, segment) => sum + segment.duration, 0);
-            
+                const totalDuration = rowData.colorSegments.reduce(
+                    (sum, segment) => sum + segment.duration,
+                    0
+                );
+
                 rowData.colorSegments.forEach((segment, segmentIndex) => {
-                // Calculate segment width proportional to its duration
-                    const segmentWidth = Math.max(20, (segment.duration / totalDuration) * availableWidth);
-                
+                    // Calculate segment width proportional to its duration
+                    const segmentWidth = Math.max(
+                        20,
+                        (segment.duration / totalDuration) * availableWidth
+                    );
+
                     // Draw color segment
                     ctx.fillStyle = colorMap[segment.color] || colorMap["unknown"];
                     ctx.fillRect(currentX, segmentY, segmentWidth, segmentHeight);
-                
+
                     // Draw segment border
                     ctx.strokeStyle = "#333333";
                     ctx.lineWidth = 1;
                     ctx.strokeRect(currentX, segmentY, segmentWidth, segmentHeight);
-                
+
                     // Draw color name if segment is wide enough
                     if (segmentWidth > 40) {
-                        ctx.fillStyle = segment.color === "white" || segment.color === "yellow" ? "#000000" : "#ffffff";
+                        ctx.fillStyle =
+                            segment.color === "white" || segment.color === "yellow"
+                                ? "#000000"
+                                : "#ffffff";
                         ctx.font = "10px Arial";
                         ctx.textAlign = "center";
-                        ctx.fillText(segment.color, currentX + segmentWidth/2, segmentY + segmentHeight/2 + 3);
+                        ctx.fillText(
+                            segment.color,
+                            currentX + segmentWidth / 2,
+                            segmentY + segmentHeight / 2 + 3
+                        );
                     }
-                
+
                     // Draw duration text below
                     ctx.fillStyle = "#666666";
                     ctx.font = "8px Arial";
                     ctx.textAlign = "center";
-                    ctx.fillText(`${Math.round(segment.duration)}ms`, currentX + segmentWidth/2, segmentY + segmentHeight + 12);
-                
+                    ctx.fillText(
+                        `${Math.round(segment.duration)}ms`,
+                        currentX + segmentWidth / 2,
+                        segmentY + segmentHeight + 12
+                    );
+
                     currentX += segmentWidth + 2; // Small gap between segments
                 });
-
             } else {
-
                 // No colors detected
-                ctx.fillStyle =  "#cccccc";
-                ctx.font =   "12px Arial";
-                ctx.textAlign =  "left";
+                ctx.fillStyle = "#cccccc";
+                ctx.font = "12px Arial";
+                ctx.textAlign = "left";
                 ctx.fillText("No colors were detected", 150, y + 25);
             }
-        
+
             // Draw the red lines
             ctx.strokeStyle = "#dddddd";
-        
+
             ctx.lineWidth = 1;
 
             ctx.beginPath();
@@ -2753,18 +2920,18 @@ function LegoWidget() {
             ctx.lineTo(canvasWidth, y + rowHeight);
             ctx.stroke();
         });
-    
+
         // Draw column edge lines after all rows are drawn
         this._drawColumnLines(ctx, canvasWidth, canvasHeight, 150, canvasWidth - 150 - 20);
-    
+
         // Add title
         ctx.fillStyle = "#000000";
         ctx.font = "bold 16px Arial";
         ctx.textAlign = "center";
-        ctx.fillText("Color Detection Visualization", canvasWidth/2, -10);
-    
+        ctx.fillText("Color Detection Visualization", canvasWidth / 2, -10);
+
         // Convert canvas to PNG and download
-        canvas.toBlob((blob) => {
+        canvas.toBlob(blob => {
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.href = url;
@@ -2780,57 +2947,63 @@ function LegoWidget() {
     };
 
     /**
- * Plays all detected notes simultaneously, using filtered column boundaries.
- * Only plays when color is NOT the selected background color.
- * Updated to use same filtering logic as export (350ms minimum).
- * @param {Array} colorData - The colorData array from scanning.
- */
-    this.playColorMusicPolyphonic = async function(colorData) {
+     * Plays all detected notes simultaneously, using filtered column boundaries.
+     * Only plays when color is NOT the selected background color.
+     * Updated to use same filtering logic as export (350ms minimum).
+     * @param {Array} colorData - The colorData array from scanning.
+     */
+    this.playColorMusicPolyphonic = async function (colorData) {
         if (!this.synth) this._initAudio();
-    
+
         // Use the same boundary analysis and filtering as export
         const columnBoundaries = this._analyzeColumnBoundaries();
         const filteredBoundaries = this._filterSmallSegments(columnBoundaries);
-    
+
         // Build timeline using filtered boundaries instead of raw segments
         let events = [];
-    
+
         // For each filtered time column, check which notes should play
         for (let colIndex = 0; colIndex < filteredBoundaries.length - 1; colIndex++) {
             const startTime = filteredBoundaries[colIndex];
             const endTime = filteredBoundaries[colIndex + 1];
             const duration = endTime - startTime;
-        
+
             // Check each row for non-background colors in this time range
             colorData.forEach((rowData, rowIndex) => {
                 if (rowData.colorSegments && rowData.note) {
                     let currentTime = 0;
                     let hasNonBackgroundColor = false;
-                
+
                     // Check if this time column overlaps with any non-background segments
                     for (const segment of rowData.colorSegments) {
                         const segmentStart = currentTime;
                         const segmentEnd = currentTime + segment.duration;
-                    
+
                         // Check if this segment overlaps with our time column
                         if (segmentStart < endTime && segmentEnd > startTime) {
-                        // Calculate the actual overlap duration
+                            // Calculate the actual overlap duration
                             const overlapStart = Math.max(segmentStart, startTime);
                             const overlapEnd = Math.min(segmentEnd, endTime);
                             const overlapDuration = overlapEnd - overlapStart;
-                        
+
                             // Only count as significant if overlap is substantial (>350ms)
                             // This prevents spillovers <350ms across blue lines from creating duplicate notes
-                            if (overlapDuration > 1000 && segment.color !== this.selectedBackgroundColor.name) {
+                            if (
+                                overlapDuration > 1000 &&
+                                segment.color !== this.selectedBackgroundColor.name
+                            ) {
                                 hasNonBackgroundColor = true;
                                 break;
-                            } else if (overlapDuration <= 350 && segment.color !== this.selectedBackgroundColor.name) {
-                            // Ignore small overlaps during playback
+                            } else if (
+                                overlapDuration <= 350 &&
+                                segment.color !== this.selectedBackgroundColor.name
+                            ) {
+                                // Ignore small overlaps during playback
                             }
                         }
                         currentTime += segment.duration;
                     }
-                
+
                     // If we found non-background color, add note on/off events
                     if (hasNonBackgroundColor) {
                         events.push({
@@ -2861,17 +3034,26 @@ function LegoWidget() {
             const evt = events[i];
             const waitTime = evt.time - lastTime;
             if (waitTime > 0) {
-            // Wait for the time until the next event
+                // Wait for the time until the next event
                 await new Promise(resolve => setTimeout(resolve, waitTime));
             }
             if (evt.type === "on") {
-            // Start note (if not already playing)
+                // Start note (if not already playing)
                 if (!playingNotes.has(evt.note)) {
-                    this.synth.trigger(0, evt.note, 999, this.selectedInstrument, null, null, false, 0); // Long duration, will stop manually
+                    this.synth.trigger(
+                        0,
+                        evt.note,
+                        999,
+                        this.selectedInstrument,
+                        null,
+                        null,
+                        false,
+                        0
+                    ); // Long duration, will stop manually
                     playingNotes.add(evt.note);
                 }
             } else if (evt.type === "off") {
-            // Stop note
+                // Stop note
                 this.synth.stopSound(0, this.selectedInstrument, evt.note);
                 playingNotes.delete(evt.note);
             }
@@ -2882,5 +3064,4 @@ function LegoWidget() {
             this.synth.stopSound(0, this.selectedInstrument, note);
         });
     };
-
 }

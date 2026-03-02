@@ -314,7 +314,9 @@ function setupToneBlocks(activity) {
             super("harmonic");
             this.setPalette("tone", activity);
             this.setHelpString([
-                _("The Weighted partials block is used to specify the partials associated with a timbre."),
+                _(
+                    "The Weighted partials block is used to specify the partials associated with a timbre."
+                ),
                 "documentation",
                 ""
             ]);
@@ -352,7 +354,7 @@ function setupToneBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = (event) => {
+            const __listener = event => {
                 tur.singer.inHarmonic.pop();
                 tur.singer.partials.pop();
             };
@@ -482,7 +484,13 @@ function setupToneBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Tremolo block adds a wavering effect."),
+                _("The Tremolo block adds a wavering effect.") +
+                    " " +
+                    _("Tremolo makes the sound pulse louder and quieter.") +
+                    " " +
+                    _("The rate controls how fast the sound pulses.") +
+                    " " +
+                    _("The depth controls the strength of the pulsing effect."),
                 "documentation",
                 null,
                 "tremolohelp"
@@ -551,7 +559,21 @@ function setupToneBlocks(activity) {
             this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 20];
             this.piemenuValuesC2 = [1, 2, 3];
             this.piemenuValuesC3 = [
-                220, 247, 262, 294, 330, 349, 392, 440, 494, 523, 587, 659, 698, 783, 880
+                220,
+                247,
+                262,
+                294,
+                330,
+                349,
+                392,
+                440,
+                494,
+                523,
+                587,
+                659,
+                698,
+                783,
+                880
             ];
             this.setHelpString([
                 _("The Phaser block adds a sweeping sound."),
@@ -779,7 +801,7 @@ function setupToneBlocks(activity) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
                 // eslint-disable-next-line no-unused-vars
-                const __listener = (event) => tur.singer.voices.pop();
+                const __listener = event => tur.singer.voices.pop();
 
                 logo.setTurtleListener(turtle, listenerName, __listener);
             }
@@ -840,7 +862,9 @@ function setupToneBlocks(activity) {
             super("setdefaultinstrument", _("set default instrument"));
             this.setPalette("tone", activity);
             this.setHelpString([
-                _("The set default instrument block changes the default instrument from electronic synth to the instrument of your choice."),
+                _(
+                    "The set default instrument block changes the default instrument from electronic synth to the instrument of your choice."
+                ),
                 "documentation",
                 ""
             ]);
@@ -1148,7 +1172,6 @@ function setupToneBlocks(activity) {
     new VoiceNameBlock().setup(activity);
     new SetTimbreBlock().setup(activity);
 }
-
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = { setupToneBlocks };

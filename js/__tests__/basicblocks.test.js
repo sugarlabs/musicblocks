@@ -28,18 +28,34 @@ const mockActivity = {
             blockWithoutPalette: {}
         }
     },
-    palettes: {},
+    palettes: {}
 };
 
 const setupFunctions = [
-    "setupRhythmBlockPaletteBlocks", "setupRhythmBlocks", "setupMeterBlocks",
-    "setupPitchBlocks", "setupIntervalsBlocks", "setupToneBlocks",
-    "setupOrnamentBlocks", "setupVolumeBlocks", "setupDrumBlocks",
-    "setupWidgetBlocks", "setupFlowBlocks", "setupNumberBlocks",
-    "setupActionBlocks", "setupBoxesBlocks", "setupBooleanBlocks",
-    "setupHeapBlocks", "setupDictBlocks", "setupExtrasBlocks",
-    "setupProgramBlocks", "setupGraphicsBlocks", "setupPenBlocks",
-    "setupMediaBlocks", "setupSensorsBlocks", "setupEnsembleBlocks"
+    "setupRhythmBlockPaletteBlocks",
+    "setupRhythmBlocks",
+    "setupMeterBlocks",
+    "setupPitchBlocks",
+    "setupIntervalsBlocks",
+    "setupToneBlocks",
+    "setupOrnamentBlocks",
+    "setupVolumeBlocks",
+    "setupDrumBlocks",
+    "setupWidgetBlocks",
+    "setupFlowBlocks",
+    "setupNumberBlocks",
+    "setupActionBlocks",
+    "setupBoxesBlocks",
+    "setupBooleanBlocks",
+    "setupHeapBlocks",
+    "setupDictBlocks",
+    "setupExtrasBlocks",
+    "setupProgramBlocks",
+    "setupGraphicsBlocks",
+    "setupPenBlocks",
+    "setupMediaBlocks",
+    "setupSensorsBlocks",
+    "setupEnsembleBlocks"
 ];
 
 setupFunctions.forEach(fnName => {

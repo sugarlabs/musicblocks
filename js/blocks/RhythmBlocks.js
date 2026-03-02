@@ -35,7 +35,9 @@ function setupRhythmBlocks(activity) {
             this.parameter = true;
             this.beginnerBlock(true);
             this.setHelpString([
-                _("The Note value block is the value of the duration of the note currently being played."),
+                _(
+                    "The Note value block is the value of the duration of the note currently being played."
+                ),
                 "documentation",
                 null,
                 "everybeathelp"
@@ -134,7 +136,9 @@ function setupRhythmBlocks(activity) {
             super("osctime");
             this.setPalette("rhythm", activity);
             this.setHelpString([
-                _("The Milliseconds block is similar to a Note block except that it uses time (in MS) to specify the note duration."),
+                _(
+                    "The Milliseconds block is similar to a Note block except that it uses time (in MS) to specify the note duration."
+                ),
                 "documentation",
                 null,
                 "osctimehelp"
@@ -240,7 +244,7 @@ function setupRhythmBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = (event) => {
+            const __listener = event => {
                 if (!tur.singer.suppressOutput) {
                     tur.singer.swingTarget.pop();
                     tur.singer.swing.pop();
@@ -306,7 +310,7 @@ function setupRhythmBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = (event) => {
+            const __listener = event => {
                 if (!tur.singer.suppressOutput) {
                     tur.singer.swingTarget.pop();
                     tur.singer.swing.pop();
@@ -334,7 +338,9 @@ function setupRhythmBlocks(activity) {
             super("newswing2");
             this.setPalette("rhythm", activity);
             this.setHelpString([
-                _("The Swing block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note."),
+                _(
+                    "The Swing block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note."
+                ),
                 "documentation",
                 null,
                 "swinghelp"
@@ -447,7 +453,7 @@ function setupRhythmBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = (event) => {
+            const __listener = event => {
                 tur.singer.skipFactor -= arg;
             };
 
@@ -470,7 +476,9 @@ function setupRhythmBlocks(activity) {
             super("multiplybeatfactor");
             this.setPalette("rhythm", activity);
             this.setHelpString([
-                _("The Multiply note value block changes the duration of notes by changing their note values."),
+                _(
+                    "The Multiply note value block changes the duration of notes by changing their note values."
+                ),
                 "documentation",
                 null,
                 "multiplybeathelp"
@@ -621,7 +629,7 @@ function setupRhythmBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = (event) => {
+            const __listener = event => {
                 const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
                 tur.singer.beatFactor *= currentDotFactor;
                 tur.singer.dotCount -= arg >= 0 ? arg : 1 / arg;
@@ -705,7 +713,9 @@ function setupRhythmBlocks(activity) {
             this.setPalette("rhythm", activity);
             this.beginnerBlock(true);
             this.setHelpString([
-                _("A rest of the specified note value duration can be constructed using a Silence block."),
+                _(
+                    "A rest of the specified note value duration can be constructed using a Silence block."
+                ),
                 "documentation",
                 null,
                 "rest2"
@@ -752,7 +762,7 @@ function setupRhythmBlocks(activity) {
                 name:
                     this.lang === "ja"
                         ? //.TRANS: Japanese only: note value block for drum
-                        _("note value drum")
+                          _("note value drum")
                         : _("note value") + " " + _("drum"),
                 args: 1,
                 canCollapse: true
@@ -1240,4 +1250,8 @@ function setupRhythmBlocks(activity) {
     new NewNoteBlock().setup(activity);
     new DefineFrequencyBlock().setup(activity);
     new OctaveSpaceBlock().setup(activity);
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupRhythmBlocks };
 }

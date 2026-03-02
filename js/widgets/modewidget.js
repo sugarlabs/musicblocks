@@ -81,8 +81,7 @@ class ModeWidget {
             if (this._playingStatus()) {
                 this._playing = false;
 
-                this._playButton.innerHTML =
-                    `&nbsp;&nbsp;<img 
+                this._playButton.innerHTML = `&nbsp;&nbsp;<img 
                         src="header-icons/play-button.svg" 
                         title="${_("Play all")}" 
                         alt="${_("Play all")}" 
@@ -93,8 +92,7 @@ class ModeWidget {
             } else {
                 this._playing = true;
 
-                this._playButton.innerHTML =
-                    `&nbsp;&nbsp;<img 
+                this._playButton.innerHTML = `&nbsp;&nbsp;<img 
                         src="header-icons/stop-button.svg" 
                         title="${_("Stop")}" 
                         alt="${_("Stop")}" 
@@ -107,17 +105,11 @@ class ModeWidget {
             }
         };
 
-        this.widgetWindow.addButton(
-            "export-chunk.svg",
-            ModeWidget.ICONSIZE,
-            _("Save")
-        ).onclick = this._save.bind(this);
+        this.widgetWindow.addButton("export-chunk.svg", ModeWidget.ICONSIZE, _("Save")).onclick =
+            this._save.bind(this);
 
-        this.widgetWindow.addButton(
-            "erase-button.svg",
-            ModeWidget.ICONSIZE,
-            _("Clear")
-        ).onclick = this._clear.bind(this);
+        this.widgetWindow.addButton("erase-button.svg", ModeWidget.ICONSIZE, _("Clear")).onclick =
+            this._clear.bind(this);
 
         this.widgetWindow.addButton(
             "rotate-left.svg",
@@ -131,17 +123,11 @@ class ModeWidget {
             _("Rotate clockwise")
         ).onclick = this._rotateRight.bind(this);
 
-        this.widgetWindow.addButton(
-            "invert.svg",
-            ModeWidget.ICONSIZE,
-            _("Invert")
-        ).onclick = this._invert.bind(this);
+        this.widgetWindow.addButton("invert.svg", ModeWidget.ICONSIZE, _("Invert")).onclick =
+            this._invert.bind(this);
 
-        this.widgetWindow.addButton(
-            "restore-button.svg",
-            ModeWidget.ICONSIZE,
-            _("Undo")
-        ).onclick = this._undo.bind(this);
+        this.widgetWindow.addButton("restore-button.svg", ModeWidget.ICONSIZE, _("Undo")).onclick =
+            this._undo.bind(this);
 
         this._piemenuMode();
 
@@ -159,7 +145,7 @@ class ModeWidget {
 
         //.TRANS: A circle of notes represents the musical mode.
         activity.textMsg(_("Click in the circle to select notes for the mode."), 3000);
-        setTimeout(this.widgetWindow.sendToCenter, 0);
+        setTimeout(() => this.widgetWindow.sendToCenter(), 0);
     }
 
     /**
@@ -175,8 +161,7 @@ class ModeWidget {
      */
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
-        cell.innerHTML =
-            `&nbsp;&nbsp;<img 
+        cell.innerHTML = `&nbsp;&nbsp;<img 
                 src="header-icons/${icon}" 
                 title="${label}" 
                 alt="${label}" 
@@ -633,8 +618,7 @@ class ModeWidget {
                     if (note_key !== null) {
                         note_key.src = highlightImgs[0];
                     }
-                    this._playButton.innerHTML =
-                        `&nbsp;&nbsp;<img 
+                    this._playButton.innerHTML = `&nbsp;&nbsp;<img 
                             src="header-icons/play-button.svg" 
                             title="${_("Play all")}" 
                             alt="${_("Play all")}" 
@@ -693,7 +677,7 @@ class ModeWidget {
                     this.__playNextNote(i + 1);
                 } else {
                     this._locked = false;
-                    setTimeout(this._resetNotes(), 500);
+                    setTimeout(() => this._resetNotes(), 500);
                     return;
                 }
             }, 1000 * time);
@@ -702,8 +686,7 @@ class ModeWidget {
                 setTimeout(() => {
                     // Did we just play the last note?
                     this._playing = false;
-                    this._playButton.innerHTML =
-                        `&nbsp;&nbsp;<img 
+                    this._playButton.innerHTML = `&nbsp;&nbsp;<img 
                             src="header-icons/play-button.svg" 
                             title="${_("Play all")}" 
                             alt="${_("Play all")}" 
@@ -749,7 +732,7 @@ class ModeWidget {
                     this.__playNextNote(i + 1);
                 } else {
                     this._locked = false;
-                    setTimeout(this._resetNotes(), 500);
+                    setTimeout(() => this._resetNotes(), 500);
                     return;
                 }
             }, 1000 * time);
@@ -1012,9 +995,18 @@ class ModeWidget {
 
         // And save a stack of pitchnumbers to be used with the define mode
         newStack = [
-            [0, ["definemode", {
-                collapsed: true
-            }], 150, 150, [null, 1, 3, 2]],
+            [
+                0,
+                [
+                    "definemode",
+                    {
+                        collapsed: true
+                    }
+                ],
+                150,
+                150,
+                [null, 1, 3, 2]
+            ],
             [
                 1,
                 [
@@ -1198,4 +1190,8 @@ class ModeWidget {
             this._noteWheel.navItems[i].navItem.hide();
         }
     }
+}
+
+if (typeof module !== "undefined") {
+    module.exports = ModeWidget;
 }

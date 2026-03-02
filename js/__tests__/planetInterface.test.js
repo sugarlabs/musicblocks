@@ -56,7 +56,7 @@ document.body.innerHTML = `
   <input id="myOpenFile" type="file">
 `;
 
-const docById = jest.fn((id) => document.getElementById(id));
+const docById = jest.fn(id => document.getElementById(id));
 global.docById = docById;
 
 beforeAll(() => {
@@ -65,7 +65,7 @@ beforeAll(() => {
     };
     window.widgetWindows = {
         hideAllWindows: jest.fn(),
-        showWindows: jest.fn(),
+        showWindows: jest.fn()
     };
     window.scroll = jest.fn();
 });
@@ -140,9 +140,11 @@ describe("PlanetInterface", () => {
         planetInterface.onConverterLoad();
         expect(window.Converter).toBe("mockConverter");
     });
-    
+
     test("getCurrentProjectName returns name from ProjectStorage", () => {
-        planetInterface.planet = { ProjectStorage: { getCurrentProjectName: jest.fn(() => "ProjectX") } };
+        planetInterface.planet = {
+            ProjectStorage: { getCurrentProjectName: jest.fn(() => "ProjectX") }
+        };
         expect(planetInterface.getCurrentProjectName()).toBe("ProjectX");
     });
     test("initialiseNewProject should reset project state", () => {
@@ -150,14 +152,15 @@ describe("PlanetInterface", () => {
             ProjectStorage: { initialiseNewProject: jest.fn() }
         };
         planetInterface.initialiseNewProject("New Name");
-        expect(planetInterface.planet.ProjectStorage.initialiseNewProject).toHaveBeenCalledWith("New Name");
+        expect(planetInterface.planet.ProjectStorage.initialiseNewProject).toHaveBeenCalledWith(
+            "New Name"
+        );
         expect(mockActivity.sendAllToTrash).toHaveBeenCalled();
         expect(mockActivity.refreshCanvas).toHaveBeenCalled();
         expect(mockActivity.blocks.trashStacks).toEqual([]);
     });
 
     test("loadProjectFromData: default merge=false", () => {
-
         planetInterface.iframe = { style: { display: "block" } };
         mockActivity.blocks.loadNewBlocks.mockClear();
 
@@ -174,9 +177,9 @@ describe("PlanetInterface", () => {
         const input = document.getElementById("myOpenFile");
         input.focus = jest.fn();
         input.click = jest.fn();
-    
+
         planetInterface.loadProjectFromFile();
-    
+
         expect(input.focus).toHaveBeenCalled();
         expect(input.click).toHaveBeenCalled();
         expect(window.scroll).toHaveBeenCalledWith(0, 0);
@@ -186,15 +189,15 @@ describe("PlanetInterface", () => {
         doSVG.mockReturnValue("");
         const D = { x: 1 };
         mockActivity.prepareExport.mockReturnValue(D);
-    
+
         planetInterface.planet = { ProjectStorage: { saveLocally: jest.fn() } };
         planetInterface.saveLocally();
-    
+
         expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(D, null);
     });
 
     test("getCurrentProjectDescription/Image/TimeLastSaved", () => {
-        const D = new Date(2020,1,1);
+        const D = new Date(2020, 1, 1);
         planetInterface.planet = {
             ProjectStorage: {
                 getCurrentProjectDescription: () => "desc",
@@ -207,7 +210,9 @@ describe("PlanetInterface", () => {
         expect(planetInterface.getTimeLastSaved()).toBe(D);
     });
     test("openCurrentProject returns promise data", async () => {
-        planetInterface.planet = { ProjectStorage: { getCurrentProjectData: jest.fn(async () => 123) } };
+        planetInterface.planet = {
+            ProjectStorage: { getCurrentProjectData: jest.fn(async () => 123) }
+        };
         await expect(planetInterface.openCurrentProject()).resolves.toBe(123);
     });
     test("openProjectFromPlanet proxies arguments", () => {
@@ -218,21 +223,20 @@ describe("PlanetInterface", () => {
     test("hideMusicBlocks also calls widgetWindows.hideAllWindows and disables DOM events after 250ms", () => {
         jest.useFakeTimers();
         planetInterface.hideMusicBlocks();
-    
+
         expect(window.widgetWindows.hideAllWindows).toHaveBeenCalled();
 
         expect(mockActivity.stage.enableDOMEvents).not.toHaveBeenCalledWith(false);
-    
+
         jest.advanceTimersByTime(250);
-        expect(mockActivity.stage.enableDOMEvents)
-            .toHaveBeenCalledWith(false);
-    
+        expect(mockActivity.stage.enableDOMEvents).toHaveBeenCalledWith(false);
+
         jest.useRealTimers();
     });
-      
+
     test("init(): success wires up planet, Converter, handlers, and mainCanvas", async () => {
         global._THIS_IS_MUSIC_BLOCKS_ = {};
-      
+
         const iframe = document.getElementById("planet-iframe");
         const win = iframe.contentWindow;
         const stubPlanet = {
@@ -241,23 +245,22 @@ describe("PlanetInterface", () => {
             setPlanetClose: jest.fn(),
             setLoadNewProject: jest.fn(),
             setLoadProjectFromFile: jest.fn(),
-            setOnConverterLoad: jest.fn(),
+            setOnConverterLoad: jest.fn()
         };
-      
+
         win.makePlanet = jest.fn(async () => {});
         win.p = stubPlanet;
-      
+
         await planetInterface.init();
-      
+
         expect(planetInterface.planet).toBe(stubPlanet);
-      
 
         expect(stubPlanet.setLoadProjectFromData).toHaveBeenCalledWith(expect.any(Function));
         expect(stubPlanet.setPlanetClose).toHaveBeenCalledWith(expect.any(Function));
         expect(stubPlanet.setLoadNewProject).toHaveBeenCalledWith(expect.any(Function));
         expect(stubPlanet.setLoadProjectFromFile).toHaveBeenCalledWith(expect.any(Function));
         expect(stubPlanet.setOnConverterLoad).toHaveBeenCalledWith(expect.any(Function));
-      
+
         expect(window.Converter).toBe("CONV");
         expect(planetInterface.mainCanvas).toBe(mockActivity.canvas);
     });
@@ -270,46 +273,45 @@ describe("PlanetInterface", () => {
             document: { getElementById: () => null }
         };
         console.error = jest.fn();
-    
+
         planetInterface.showPlanet();
-    
+
         expect(console.error).toHaveBeenCalled();
     });
-    test("saveLocally: non-empty SVG triggers image‑onload path", (done) => {
-
+    test("saveLocally: non-empty SVG triggers image‑onload path", done => {
         doSVG.mockReturnValue("<svg/>");
         mockActivity.prepareExport.mockReturnValue("EXPORT");
-        global.base64Encode = jest.fn((s) => s);
+        global.base64Encode = jest.fn(s => s);
         planetInterface.planet = {
             ProjectStorage: { saveLocally: jest.fn() }
         };
-      
+
         global.Image = class {
-            set src(_v) { this.onload(); }
+            set src(_v) {
+                this.onload();
+            }
         };
-      
+
         global.createjs = {
             Bitmap: class {
-                constructor(img) { }
-                getBounds() { return { x: 0, y: 0, width: 1, height: 1 }; }
+                constructor(img) {}
+                getBounds() {
+                    return { x: 0, y: 0, width: 1, height: 1 };
+                }
                 cache(x, y, w, h) {
-
                     this.bitmapCache = { getCacheDataURL: () => "DATAURL" };
                 }
             }
         };
-      
 
         planetInterface.saveLocally();
-      
 
         setTimeout(() => {
-            expect(
-                planetInterface.planet.ProjectStorage.saveLocally
-            ).toHaveBeenCalledWith("EXPORT", "DATAURL");
+            expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(
+                "EXPORT",
+                "DATAURL"
+            );
             done();
         }, 0);
     });
-      
-    
 });

@@ -144,8 +144,7 @@ class TimbreWidget {
      */
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
-        cell.innerHTML =
-            `&nbsp;&nbsp;<img 
+        cell.innerHTML = `&nbsp;&nbsp;<img 
                 src="header-icons/${icon}" 
                 title="${label}" 
                 alt="${label}" 
@@ -210,24 +209,21 @@ class TimbreWidget {
         }
 
         if (this.isActive["noisesynth"] === true && this.NoiseSynthesizer[i] != null) {
-            updateParams[0] = this.activity.blocks.blockList[
-                this.NoiseSynthesizer[i]
-            ].connections[1];
+            updateParams[0] =
+                this.activity.blocks.blockList[this.NoiseSynthesizer[i]].connections[1];
         }
 
         if (this.isActive["duosynth"] === true && this.duoSynthesizer[i] != null) {
             for (let j = 0; j < 2; j++) {
-                updateParams[j] = this.activity.blocks.blockList[
-                    this.duoSynthesizer[i]
-                ].connections[j + 1];
+                updateParams[j] =
+                    this.activity.blocks.blockList[this.duoSynthesizer[i]].connections[j + 1];
             }
         }
 
         if (this.isActive["tremolo"] === true && this.tremoloEffect[i] != null) {
             for (let j = 0; j < 2; j++) {
-                updateParams[j] = this.activity.blocks.blockList[this.tremoloEffect[i]].connections[
-                    j + 1
-                ];
+                updateParams[j] =
+                    this.activity.blocks.blockList[this.tremoloEffect[i]].connections[j + 1];
             }
         }
 
@@ -281,24 +277,21 @@ class TimbreWidget {
 
         if (this.isActive["chorus"] === true && this.chorusEffect[i] != null) {
             for (let j = 0; j < 3; j++) {
-                updateParams[j] = this.activity.blocks.blockList[this.chorusEffect[i]].connections[
-                    j + 1
-                ];
+                updateParams[j] =
+                    this.activity.blocks.blockList[this.chorusEffect[i]].connections[j + 1];
             }
         }
 
         if (this.isActive["phaser"] === true && this.phaserEffect[i] != null) {
             for (let j = 0; j < 3; j++) {
-                updateParams[j] = this.activity.blocks.blockList[this.phaserEffect[i]].connections[
-                    j + 1
-                ];
+                updateParams[j] =
+                    this.activity.blocks.blockList[this.phaserEffect[i]].connections[j + 1];
             }
         }
 
         if (this.isActive["distortion"] === true && this.distortionEffect[i] != null) {
-            updateParams[0] = this.activity.blocks.blockList[
-                this.distortionEffect[i]
-            ].connections[1];
+            updateParams[0] =
+                this.activity.blocks.blockList[this.distortionEffect[i]].connections[1];
         }
 
         if (updateParams[0] != null) {
@@ -313,7 +306,7 @@ class TimbreWidget {
             this.activity.refreshCanvas();
             this.activity.saveLocally();
         }
-    }
+    };
 
     /**
      * @private
@@ -424,8 +417,7 @@ class TimbreWidget {
         } else {
             this.activity.logo.synth.setMasterVolume(0);
             this.activity.logo.synth.stop();
-            cell.innerHTML =
-                `&nbsp;&nbsp;<img 
+            cell.innerHTML = `&nbsp;&nbsp;<img 
                     src="header-icons/play-button.svg" 
                     title="${_("Play")}" 
                     alt="${_("Play")}" 
@@ -444,7 +436,7 @@ class TimbreWidget {
             ];
         }
 
-        const __playLoop = (i) => {
+        const __playLoop = i => {
             if (this._playing) {
                 this._playNote(this.notesToPlay[i][0], this.notesToPlay[i][1]);
             }
@@ -455,8 +447,7 @@ class TimbreWidget {
                     __playLoop(i);
                 }, Singer.defaultBPMFactor * 1000 * this.notesToPlay[i - 1][1]);
             } else {
-                cell.innerHTML =
-                    `&nbsp;&nbsp;<img 
+                cell.innerHTML = `&nbsp;&nbsp;<img 
                         src="header-icons/play-button.svg" 
                         title="${_("Play")}" 
                         alt="${_("Play")}" 
@@ -609,9 +600,8 @@ class TimbreWidget {
                     platformColor.selectorBackground;
                 docById("sel" + i).value = this.filterParams[i * 3];
                 this._update(i, this.filterParams[i * 3], 0);
-                instrumentsFilters[0][this.instrumentName][i]["filterType"] = this.filterParams[
-                    i * 3
-                ];
+                instrumentsFilters[0][this.instrumentName][i]["filterType"] =
+                    this.filterParams[i * 3];
 
                 const radioIDs = [i * 4, i * 4 + 1, i * 4 + 2, i * 4 + 3];
                 if (this.filterParams[i * 3 + 1] === -12) {
@@ -696,7 +686,7 @@ class TimbreWidget {
         } else if (this.isActive["distortion"] === true) {
             docById("effectsButtonCell").style.backgroundColor = platformColor.selectorBackground;
             if (this.distortionEffect.length !== 1) {
-                blockValue = this.dstortionEffect.length - 1;
+                blockValue = this.distortionEffect.length - 1;
             }
 
             docById("myRangeFx0").value = parseFloat(this.distortionParams[0]);
@@ -747,13 +737,10 @@ class TimbreWidget {
             this._play();
         };
 
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            TimbreWidget.ICONSIZE,
-            _("Save")
-        ).onclick = () => {
-            this._save();
-        };
+        widgetWindow.addButton("export-chunk.svg", TimbreWidget.ICONSIZE, _("Save")).onclick =
+            () => {
+                this._save();
+            };
 
         let _unhighlightButtons; // defined later to avoid circular dependency
 
@@ -954,13 +941,10 @@ class TimbreWidget {
 
         addFilterButtonCell.onmouseout = () => {};
 
-        widgetWindow.addButton(
-            "restore-button.svg",
-            TimbreWidget.ICONSIZE,
-            _("Undo")
-        ).onclick = () => {
-            this._undo();
-        };
+        widgetWindow.addButton("restore-button.svg", TimbreWidget.ICONSIZE, _("Undo")).onclick =
+            () => {
+                this._undo();
+            };
 
         // let cell = this._addButton(row, 'close-button.svg', TimbreWidget.ICONSIZE, _('Close'));
 
@@ -972,7 +956,7 @@ class TimbreWidget {
         //     this.activity.logo.hideMsgs();
         // };
 
-        _unhighlightButtons = (button) => {
+        _unhighlightButtons = button => {
             addFilterButtonCell.style.backgroundColor = platformColor.widgetButton;
             synthButtonCell.style.backgroundColor = platformColor.widgetButton;
             oscillatorButtonCell.style.backgroundColor = platformColor.widgetButton;
@@ -1012,7 +996,7 @@ class TimbreWidget {
         await delayExecution(500);
         this.activity.blocks.adjustExpandableClampBlock();
         this.activity.blocks.adjustDocks(this.blockNo, true);
-    }
+    };
 
     /**
      * @public
@@ -1040,7 +1024,7 @@ class TimbreWidget {
         await delayExecution(500);
         this.activity.blocks.adjustExpandableClampBlock();
         this.activity.blocks.adjustDocks(this.blockNo, true);
-    }
+    };
 
     /**
      * @private
@@ -1176,7 +1160,7 @@ class TimbreWidget {
         this.activity.blocks.adjustExpandableClampBlock();
         this.activity.blocks.adjustDocks(this.blockNo, true);
         this.activity.refreshCanvas();
-    }
+    };
 
     /**
      * @private
@@ -1185,7 +1169,6 @@ class TimbreWidget {
      */
     _synth = () => {
         let blockValue = 0;
-
 
         this.timbreTableDiv.style.display = "inline";
         this.timbreTableDiv.style.visibility = "visible";
@@ -1211,8 +1194,7 @@ class TimbreWidget {
         env.append(envAppend);
 
         const mainDiv = docById("synth0");
-        mainDiv.innerHTML =
-            `<p>
+        mainDiv.innerHTML = `<p>
                 <input type="radio" name="synthsName" value="AMSynth"/>${_("AM synth")}<br>
                 <input type="radio" name="synthsName" value="FMSynth"/>${_("FM synth")}<br>
                 <input type="radio" name="synthsName" value="DuoSynth"/>${_("duo synth")}<br>
@@ -1222,7 +1204,7 @@ class TimbreWidget {
         const synthsName = docByName("synthsName");
         let synthChosen;
         for (let i = 0; i < synthsName.length; i++) {
-            synthsName[i].onclick = async (event) => {
+            synthsName[i].onclick = async event => {
                 synthChosen = event.target.value;
                 let subHtmlElements = '<div id="chosen">' + synthChosen + "</div>";
                 for (let j = 0; j < this.activeParams.length; j++) {
@@ -1236,8 +1218,8 @@ class TimbreWidget {
                     this.isActive["duosynth"] = false;
 
                     if (this.AMSynthesizer.length === 0) {
-                        const topOfClamp = this.activity.blocks.blockList[this.blockNo]
-                            .connections[2];
+                        const topOfClamp =
+                            this.activity.blocks.blockList[this.blockNo].connections[2];
                         const bottomOfClamp = this.activity.blocks.findBottomBlock(topOfClamp);
 
                         const AMSYNTHOBJ = [
@@ -1280,7 +1262,7 @@ class TimbreWidget {
                         blockValue = this.AMSynthesizer.length - 1;
                     }
 
-                    document.getElementById("wrapperS0").addEventListener("change", (event) => {
+                    document.getElementById("wrapperS0").addEventListener("change", event => {
                         const elem = event.target;
                         docById("myRangeS0").value = parseFloat(elem.value);
                         this.amSynthParamvals["harmonicity"] = parseFloat(elem.value);
@@ -1300,8 +1282,8 @@ class TimbreWidget {
                     this.isActive["duosynth"] = false;
 
                     if (this.FMSynthesizer.length === 0) {
-                        const topOfClamp = this.activity.blocks.blockList[this.blockNo]
-                            .connections[2];
+                        const topOfClamp =
+                            this.activity.blocks.blockList[this.blockNo].connections[2];
                         const bottomOfClamp = this.activity.blocks.findBottomBlock(topOfClamp);
 
                         const FMSYNTHOBJ = [
@@ -1346,7 +1328,7 @@ class TimbreWidget {
                         blockValue = this.FMSynthesizer.length - 1;
                     }
 
-                    document.getElementById("wrapperS0").addEventListener("change", (event) => {
+                    document.getElementById("wrapperS0").addEventListener("change", event => {
                         const elem = event.target;
                         docById("myRangeS0").value = parseFloat(elem.value);
                         docById("myspanS0").textContent = elem.value;
@@ -1367,8 +1349,8 @@ class TimbreWidget {
                     this.isActive["duosynth"] = false;
 
                     if (this.NoiseSynthesizer.length === 0) {
-                        const topOfClamp = this.activity.blocks.blockList[this.blockNo]
-                            .connections[2];
+                        const topOfClamp =
+                            this.activity.blocks.blockList[this.blockNo].connections[2];
                         const bottomOfClamp = this.activity.blocks.findBottomBlock(topOfClamp);
 
                         const NOISESYNTHOBJ = [
@@ -1411,7 +1393,7 @@ class TimbreWidget {
                         blockValue = this.NoiseSynthesizer.length - 1;
                     }
 
-                    document.getElementById("wrapperS0").addEventListener("change", (event) => {
+                    document.getElementById("wrapperS0").addEventListener("change", event => {
                         const elem = event.target;
                         docById("myRangeS0").value = parseFloat(elem.value);
                         docById("myspanS0").textContent = elem.value;
@@ -1431,8 +1413,8 @@ class TimbreWidget {
                     this.isActive["duosynth"] = true;
 
                     if (this.duoSynthesizer.length === 0) {
-                        const topOfClamp = this.activity.blocks.blockList[this.blockNo]
-                            .connections[2];
+                        const topOfClamp =
+                            this.activity.blocks.blockList[this.blockNo].connections[2];
                         const bottomOfClamp = this.activity.blocks.findBottomBlock(topOfClamp);
 
                         const DUOSYNTHOBJ = [
@@ -1489,7 +1471,7 @@ class TimbreWidget {
                     for (let i = 0; i < 2; i++) {
                         document
                             .getElementById("wrapperS" + i)
-                            .addEventListener("change", (event) => {
+                            .addEventListener("change", event => {
                                 const elem = event.target;
                                 const m = elem.id.slice(-1);
                                 docById("myRangeS" + m).value = parseFloat(elem.value);
@@ -1515,7 +1497,7 @@ class TimbreWidget {
                 }
             };
         }
-    }
+    };
 
     /**
      * @private
@@ -1596,7 +1578,7 @@ class TimbreWidget {
 
         myDiv.innerHTML = selectOpt;
 
-        document.getElementById("wrapperOsc0").addEventListener("change", (event) => {
+        document.getElementById("wrapperOsc0").addEventListener("change", event => {
             const elem = event.target;
             this.oscParams[0] = elem.value;
             this.synthVals["oscillator"]["type"] = elem.value + this.oscParams[1].toString();
@@ -1611,7 +1593,7 @@ class TimbreWidget {
             this._playNote("G4", 1 / 8);
         });
 
-        document.getElementById("wrapperOsc1").addEventListener("change", (event) => {
+        document.getElementById("wrapperOsc1").addEventListener("change", event => {
             const elem = event.target;
             this.oscParams[1] = parseFloat(elem.value);
             this.synthVals["oscillator"]["type"] = this.oscParams[0] + parseFloat(elem.value);
@@ -1698,7 +1680,7 @@ class TimbreWidget {
         }
 
         for (let i = 0; i < 4; i++) {
-            document.getElementById("wrapperEnv" + i).addEventListener("change", (event) => {
+            document.getElementById("wrapperEnv" + i).addEventListener("change", event => {
                 const elem = event.target;
                 const m = elem.id.slice(-1);
                 docById("myRange" + m).value = parseFloat(elem.value);
@@ -1731,7 +1713,6 @@ class TimbreWidget {
      * Adds and updates filters
      */
     _filter() {
-
         this.timbreTableDiv.style.display = "inline";
         this.timbreTableDiv.style.visibility = "visible";
         this.timbreTableDiv.style.border = "0px";
@@ -1762,9 +1743,9 @@ class TimbreWidget {
     _createFilter(f, env) {
         const wrapperIDs = [f * 3, f * 3 + 1, f * 3 + 2];
         const radioIDs = [f * 4, f * 4 + 1, f * 4 + 2, f * 4 + 3];
-    
+
         const fragment = document.createDocumentFragment();
-        
+
         const containerDiv = document.createElement("div");
         if (f % 2 === 1) {
             containerDiv.className = "rectangle";
@@ -1776,48 +1757,48 @@ class TimbreWidget {
             spacer.innerHTML = "&nbsp;";
             containerDiv.appendChild(spacer);
         }
-        
+
         const typeWrapper = document.createElement("div");
         typeWrapper.className = "wrapper";
         typeWrapper.id = "wrapper" + wrapperIDs[0];
-        
+
         const typeLabel = document.createElement("div");
         typeLabel.className = "s";
         typeLabel.id = "s" + wrapperIDs[0];
-        
+
         const typeSpan = document.createElement("span");
         typeSpan.textContent = _("type");
         typeLabel.appendChild(typeSpan);
-        
+
         const selectorID = "selector" + f;
         const selID = "sel" + f;
-        
+
         const filterSelector = document.createElement("div");
         filterSelector.className = "filterselector";
         filterSelector.id = selectorID;
-        
+
         typeWrapper.appendChild(typeLabel);
         typeWrapper.appendChild(filterSelector);
         containerDiv.appendChild(typeWrapper);
-        
+
         // wrapper
         const rolloffWrapper = document.createElement("div");
         rolloffWrapper.className = "wrapper";
         rolloffWrapper.id = "wrapper" + wrapperIDs[1];
-        
+
         const rolloffLabel = document.createElement("div");
         rolloffLabel.className = "s";
         rolloffLabel.id = "s" + wrapperIDs[1];
-        
+
         const rolloffSpan = document.createElement("span");
         rolloffSpan.textContent = _("rolloff");
         rolloffLabel.appendChild(rolloffSpan);
-        
+
         const insideDivRolloff = document.createElement("div");
         insideDivRolloff.className = "insideDivFilter";
-        
+
         const rolloffP = document.createElement("p");
-        
+
         const radioValues = ["-12", "-24", "-48", "-96"];
         for (let i = 0; i < 4; i++) {
             const radio = document.createElement("input");
@@ -1828,32 +1809,32 @@ class TimbreWidget {
             if (i === 0) {
                 radio.checked = true;
             }
-            
+
             rolloffP.appendChild(radio);
             rolloffP.appendChild(document.createTextNode(radioValues[i]));
         }
-        
+
         insideDivRolloff.appendChild(rolloffP);
         rolloffWrapper.appendChild(rolloffLabel);
         rolloffWrapper.appendChild(insideDivRolloff);
         containerDiv.appendChild(rolloffWrapper);
-        
+
         // wrapper
         const freqWrapper = document.createElement("div");
         freqWrapper.className = "wrapper";
         freqWrapper.id = "wrapper" + wrapperIDs[2];
-        
+
         const freqLabel = document.createElement("div");
         freqLabel.className = "s";
         freqLabel.id = "s" + wrapperIDs[2];
-        
+
         const freqSpan = document.createElement("span");
         freqSpan.textContent = _("frequency");
         freqLabel.appendChild(freqSpan);
-        
+
         const insideDivFreq = document.createElement("div");
         insideDivFreq.className = "insideDivFilter";
-        
+
         const slider = document.createElement("input");
         slider.type = "range";
         slider.id = "myRangeF" + f;
@@ -1861,35 +1842,35 @@ class TimbreWidget {
         slider.style.marginTop = "20px";
         slider.max = "7050";
         slider.value = parseFloat(this.filterParams[f * 3 + 2]);
-        
+
         const sliderValue = document.createElement("span");
         sliderValue.id = "myspanF" + f;
         sliderValue.className = "rangeslidervalue";
         sliderValue.textContent = this.filterParams[f * 3 + 2];
-        
+
         insideDivFreq.appendChild(slider);
         insideDivFreq.appendChild(sliderValue);
         freqWrapper.appendChild(freqLabel);
         freqWrapper.appendChild(insideDivFreq);
         containerDiv.appendChild(freqWrapper);
-        
+
         fragment.appendChild(containerDiv);
-        
+
         env.appendChild(fragment);
-        
+
         const select = document.createElement("select");
         select.className = "sel";
         select.id = selID;
-        
+
         let selectedFilter = null;
-        
+
         for (let i = 0; i < FILTERTYPES.length; i++) {
             const option = document.createElement("option");
-            
+
             if (FILTERTYPES[i][0].length === 0) {
                 option.value = FILTERTYPES[i][1];
                 option.textContent = FILTERTYPES[i][1];
-                
+
                 if (FILTERTYPES[i][1] === this.filterParams[f * 3]) {
                     option.selected = true;
                     selectedFilter = FILTERTYPES[i][1];
@@ -1897,13 +1878,13 @@ class TimbreWidget {
             } else {
                 option.value = FILTERTYPES[i][0];
                 option.textContent = FILTERTYPES[i][0];
-                
+
                 if (FILTERTYPES[i][0] === this.filterParams[f * 3]) {
                     option.selected = true;
                     selectedFilter = FILTERTYPES[i][0];
                 }
             }
-            
+
             select.appendChild(option);
         }
         const selectorDiv = docById(selectorID);
@@ -1930,76 +1911,68 @@ class TimbreWidget {
      */
     _setupEventDelegation() {
         const timbreTable = docById("timbreTable");
-        
+
         // Clean up
         this._cleanupEventListeners();
-        
+
         // Cache button
         const filterButtonCell = docById("filterButtonCell");
-        
+
         // single event handler
-        this._eventHandler = (event) => {
+        this._eventHandler = event => {
             const target = event.target;
             const targetId = target.id || "";
-            
+
             if (targetId.startsWith("sel") && event.type === "change") {
                 filterButtonCell.style.backgroundColor = "#C8C8C0";
                 const m = targetId.slice(-1);
                 instrumentsFilters[0][this.instrumentName][m]["filterType"] = target.value;
                 this._update(m, target.value, 0);
-                
+
                 const error = instrumentsFilters[0][this.instrumentName].filter(
-                    (el) => el.filterType === target.value
+                    el => el.filterType === target.value
                 );
                 if (error.length > 1) {
                     activity.errorMsg(_("Filter already present."), 3000);
                 }
                 this._playNote("G4", 1 / 8);
-            }
-            else if (targetId.startsWith("radio") && event.type === "click") {
+            } else if (targetId.startsWith("radio") && event.type === "click") {
                 const m = Number(targetId.replace("radio", ""));
-                instrumentsFilters[0][this.instrumentName][Math.floor(m / 4)][
-                    "filterRolloff"
-                ] = parseFloat(target.value);
+                instrumentsFilters[0][this.instrumentName][Math.floor(m / 4)]["filterRolloff"] =
+                    parseFloat(target.value);
                 this._update(Math.floor(m / 4), target.value, 1);
                 this._playNote("G4", 1 / 8);
-            }
-            else if (targetId.startsWith("myRangeF") && (event.type === "change" || event.type === "input")) {
+            } else if (
+                targetId.startsWith("myRangeF") &&
+                (event.type === "change" || event.type === "input")
+            ) {
                 filterButtonCell.style.backgroundColor = "#C8C0C8";
                 const m = targetId.slice(-1);
                 const spanElement = docById("myspanF" + m);
                 if (spanElement) {
                     spanElement.textContent = target.value;
                 }
-                
+
                 instrumentsFilters[0][this.instrumentName][m]["filterFrequency"] = parseFloat(
                     target.value
                 );
                 this._update(m, target.value, 2);
                 this._playNote("G4", 1 / 8);
-            }
-            
-            else if (targetId.startsWith("wrapperS") && event.type === "change") {
+            } else if (targetId.startsWith("wrapperS") && event.type === "change") {
                 this._playNote("G4", 1 / 8);
-            }
-            
-            else if (targetId.startsWith("wrapperOsc") && event.type === "change") {
+            } else if (targetId.startsWith("wrapperOsc") && event.type === "change") {
                 this._playNote("G4", 1 / 8);
-            }
-            
-            else if (targetId.startsWith("wrapperEnv") && event.type === "change") {
+            } else if (targetId.startsWith("wrapperEnv") && event.type === "change") {
                 this._playNote("G4", 1 / 8);
-            }
-            
-            else if (targetId.startsWith("wrapperFx") && event.type === "change") {
+            } else if (targetId.startsWith("wrapperFx") && event.type === "change") {
                 this._playNote("G4", 1 / 8);
             }
         };
-        
+
         timbreTable.addEventListener("change", this._eventHandler);
         timbreTable.addEventListener("click", this._eventHandler);
         timbreTable.addEventListener("input", this._eventHandler);
-        
+
         this._eventListeners = {
             element: timbreTable,
             listeners: [
@@ -2009,7 +1982,7 @@ class TimbreWidget {
             ]
         };
     }
-    
+
     /**
      * Cleans up all event listeners
      * @private
@@ -2018,15 +1991,12 @@ class TimbreWidget {
     _cleanupEventListeners() {
         if (this._eventListeners && this._eventListeners.element) {
             this._eventListeners.listeners.forEach(listener => {
-                this._eventListeners.element.removeEventListener(
-                    listener.type,
-                    listener.handler
-                );
+                this._eventListeners.element.removeEventListener(listener.type, listener.handler);
             });
             this._eventListeners = {};
         }
     }
-    
+
     /**
      * event delegation
      * @private
@@ -2088,7 +2058,7 @@ class TimbreWidget {
         this.fil.push(this.activity.blocks.blockList.length);
 
         const selectedFilters = instrumentsFilters[0][this.instrumentName].slice();
-        const filterType = FILTERTYPES.slice().filter((filter) => {
+        const filterType = FILTERTYPES.slice().filter(filter => {
             for (const i in selectedFilters) {
                 if (selectedFilters[i].filterType === filter[1]) {
                     return false;
@@ -2123,7 +2093,7 @@ class TimbreWidget {
 
         // No need addFilterListeners() using event delega
         this._updateFilters();
-    }
+    };
 
     /**
      * @private
@@ -2163,8 +2133,11 @@ class TimbreWidget {
         const mainDiv = docById("effect0");
         const effects = ["Tremolo", "Vibrato", "Chorus", "Phaser", "Distortion"];
         const effectsHtml = effects
-            .map(effect =>
-                `<input type="radio" name="effectsName" value="${effect}"/>${_(effect.toLowerCase())}<br>`
+            .map(
+                effect =>
+                    `<input type="radio" name="effectsName" value="${effect}"/>${_(
+                        effect.toLowerCase()
+                    )}<br>`
             )
             .join("");
         mainDiv.innerHTML = `<p>${effectsHtml}</p>`;
@@ -2174,7 +2147,7 @@ class TimbreWidget {
         let effectChosen;
 
         for (let i = 0; i < effectsName.length; i++) {
-            effectsName[i].onclick = async (event) => {
+            effectsName[i].onclick = async event => {
                 effectChosen = event.target.value;
                 let subHtmlElements = '<div id="chosen">' + effectChosen + "</div>";
                 if (effectChosen === "Tremolo") {
@@ -2219,8 +2192,8 @@ class TimbreWidget {
                     if (this.tremoloEffect.length === 0) {
                         // This is the first block in the child stack
                         // of the Timbre clamp.
-                        const topOfClamp = this.activity.blocks.blockList[this.blockNo]
-                            .connections[2];
+                        const topOfClamp =
+                            this.activity.blocks.blockList[this.blockNo].connections[2];
 
                         const n = this.activity.blocks.blockList.length;
                         const TREMOLOOBJ = [
@@ -2242,16 +2215,15 @@ class TimbreWidget {
                     for (let i = 0; i < 2; i++) {
                         document
                             .getElementById("wrapperFx" + i)
-                            .addEventListener("change", (event) => {
+                            .addEventListener("change", event => {
                                 const elem = event.target;
                                 const m = elem.id.slice(-1);
                                 docById("myRangeFx" + m).value = parseFloat(elem.value);
                                 docById("myspanFx" + m).textContent = elem.value;
 
                                 if (m === 0) {
-                                    instrumentsEffects[0][this.instrumentName][
-                                        "tremoloFrequency"
-                                    ] = parseFloat(elem.value);
+                                    instrumentsEffects[0][this.instrumentName]["tremoloFrequency"] =
+                                        parseFloat(elem.value);
                                 }
 
                                 if (m === 1) {
@@ -2298,8 +2270,8 @@ class TimbreWidget {
                         docById("myspanFx1").textContent = obj[0] + "/" + obj[1]; // this.vibratoParams[1];
                     } else {
                         // If necessary, add a vibrato block.
-                        const topOfTimbreClamp = this.activity.blocks.blockList[this.blockNo]
-                            .connections[2];
+                        const topOfTimbreClamp =
+                            this.activity.blocks.blockList[this.blockNo].connections[2];
 
                         const vibratoBlock = this.activity.blocks.blockList.length;
                         const VIBRATOOBJ = [
@@ -2334,7 +2306,7 @@ class TimbreWidget {
                     }
 
                     // Add the listeners for the sliders.
-                    document.getElementById("wrapperFx0").addEventListener("change", (event) => {
+                    document.getElementById("wrapperFx0").addEventListener("change", event => {
                         const elem = event.target;
                         docById("myRangeFx0").value = parseFloat(elem.value);
                         docById("myspanFx0").textContent = elem.value;
@@ -2345,7 +2317,7 @@ class TimbreWidget {
                         this._playNote("G4", 1 / 8);
                     });
 
-                    document.getElementById("wrapperFx1").addEventListener("change", (event) => {
+                    document.getElementById("wrapperFx1").addEventListener("change", event => {
                         const elem = event.target;
                         docById("myRangeFx1").value = parseFloat(elem.value);
                         const obj = oneHundredToFraction(elem.value);
@@ -2390,7 +2362,6 @@ class TimbreWidget {
                     docById("myspanFx1").textContent = "4";
                     instrumentsEffects[0][this.instrumentName]["delayTime"] = 4;
 
-
                     docById("sFx2").textContent = _("depth");
                     docById("myRangeFx2").value = 70;
                     docById("myspanFx2").textContent = "70";
@@ -2406,8 +2377,8 @@ class TimbreWidget {
                     }
 
                     if (this.chorusEffect.length === 0) {
-                        const topOfClamp = this.activity.blocks.blockList[this.blockNo]
-                            .connections[2];
+                        const topOfClamp =
+                            this.activity.blocks.blockList[this.blockNo].connections[2];
 
                         const n = this.activity.blocks.blockList.length;
                         const CHORUSOBJ = [
@@ -2431,22 +2402,20 @@ class TimbreWidget {
                     for (let i = 0; i < 3; i++) {
                         document
                             .getElementById("wrapperFx" + i)
-                            .addEventListener("change", (event) => {
+                            .addEventListener("change", event => {
                                 const elem = event.target;
                                 const m = elem.id.slice(-1);
                                 docById("myRangeFx" + m).value = parseFloat(elem.value);
                                 docById("myspanFx" + m).textContent = elem.value;
 
                                 if (m === 0) {
-                                    instrumentsEffects[0][this.instrumentName][
-                                        "chorusRate"
-                                    ] = parseFloat(elem.value);
+                                    instrumentsEffects[0][this.instrumentName]["chorusRate"] =
+                                        parseFloat(elem.value);
                                 }
 
                                 if (m === 1) {
-                                    instrumentsEffects[0][this.instrumentName][
-                                        "delayTime"
-                                    ] = parseFloat(elem.value);
+                                    instrumentsEffects[0][this.instrumentName]["delayTime"] =
+                                        parseFloat(elem.value);
                                 }
 
                                 if (m === 2) {
@@ -2471,7 +2440,6 @@ class TimbreWidget {
                     instrumentsEffects[0][this.instrumentName]["rate"] = 5;
                     instrumentsEffects[0][this.instrumentName]["octaves"] = 3;
                     instrumentsEffects[0][this.instrumentName]["baseFrequency"] = 100;
-                    
 
                     for (let i = 0; i < 3; i++) {
                         subHtmlElements +=
@@ -2507,8 +2475,8 @@ class TimbreWidget {
                     }
 
                     if (this.phaserEffect.length === 0) {
-                        const topOfClamp = this.activity.blocks.blockList[this.blockNo]
-                            .connections[2];
+                        const topOfClamp =
+                            this.activity.blocks.blockList[this.blockNo].connections[2];
 
                         const n = this.activity.blocks.blockList.length;
                         const PHASEROBJ = [
@@ -2532,7 +2500,7 @@ class TimbreWidget {
                     for (let i = 0; i < 3; i++) {
                         document
                             .getElementById("wrapperFx" + i)
-                            .addEventListener("change", (event) => {
+                            .addEventListener("change", event => {
                                 const elem = event.target;
                                 const m = elem.id.slice(-1);
                                 docById("myRangeFx" + m).value = parseFloat(elem.value);
@@ -2545,15 +2513,13 @@ class TimbreWidget {
                                 }
 
                                 if (m === 1) {
-                                    instrumentsEffects[0][this.instrumentName][
-                                        "octaves"
-                                    ] = parseFloat(elem.value);
+                                    instrumentsEffects[0][this.instrumentName]["octaves"] =
+                                        parseFloat(elem.value);
                                 }
 
                                 if (m === 2) {
-                                    instrumentsEffects[0][this.instrumentName][
-                                        "baseFrequency"
-                                    ] = parseFloat(elem.value);
+                                    instrumentsEffects[0][this.instrumentName]["baseFrequency"] =
+                                        parseFloat(elem.value);
                                 }
 
                                 this._update(blockValue, parseFloat(elem.value), Number(m));
@@ -2586,8 +2552,8 @@ class TimbreWidget {
                     }
 
                     if (this.distortionEffect.length === 0) {
-                        const topOfClamp = this.activity.blocks.blockList[this.blockNo]
-                            .connections[2];
+                        const topOfClamp =
+                            this.activity.blocks.blockList[this.blockNo].connections[2];
 
                         const n = this.activity.blocks.blockList.length;
                         const DISTORTIONOBJ = [
@@ -2604,7 +2570,7 @@ class TimbreWidget {
                         this.clampConnection(n, 2, topOfClamp);
                     }
 
-                    document.getElementById("wrapperFx0").addEventListener("change", (event) => {
+                    document.getElementById("wrapperFx0").addEventListener("change", event => {
                         const elem = event.target;
                         docById("myRangeFx0").value = parseFloat(elem.value);
                         docById("myspanFx0").textContent = elem.value;
@@ -2616,5 +2582,8 @@ class TimbreWidget {
                 }
             };
         }
-    }
+    };
+}
+if (typeof module !== "undefined") {
+    module.exports = TimbreWidget;
 }

@@ -20,7 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-global._ = jest.fn((str) => str);
+global._ = jest.fn(str => str);
 global._THIS_IS_TURTLE_BLOCKS_ = false;
 global.DEFAULTDRUM = "drum";
 
@@ -65,7 +65,7 @@ global.FlowBlock = DummyFlowBlock;
 global.FlowClampBlock = DummyFlowClampBlock;
 global.LeftBlock = DummyLeftBlock;
 
-global.last = (arr) => arr[arr.length - 1];
+global.last = arr => arr[arr.length - 1];
 global.NOINPUTERRORMSG = "No input provided";
 global.TONEBPM = 120;
 global._THIS_IS_MUSIC_BLOCKS_ = true;

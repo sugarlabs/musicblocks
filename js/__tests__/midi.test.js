@@ -27,7 +27,12 @@ const mockMidi = {
     },
     tracks: [
         {
-            instrument: { name: "acoustic grand piano", family: "piano", number: 0, percussion: false },
+            instrument: {
+                name: "acoustic grand piano",
+                family: "piano",
+                number: 0,
+                percussion: false
+            },
             channel: 1,
             notes: [
                 { name: "C4", midi: 60, time: 0, duration: 0.5, velocity: 0.8 },
@@ -36,7 +41,12 @@ const mockMidi = {
             ]
         },
         {
-            instrument: { name: "acoustic guitar (nylon)", family: "guitar", number: 24, percussion: false },
+            instrument: {
+                name: "acoustic guitar (nylon)",
+                family: "guitar",
+                number: 24,
+                percussion: false
+            },
             channel: 2,
             notes: [
                 { name: "G3", midi: 55, time: 0, duration: 0.6, velocity: 0.7 },
@@ -74,7 +84,7 @@ describe("transcribeMidi", () => {
 
         global.VOICENAMES = [
             ["piano", "acoustic grand piano"],
-            ["guitar", "acoustic guitar (nylon)"],
+            ["guitar", "acoustic guitar (nylon)"]
         ];
 
         global.activity = {
@@ -114,13 +124,11 @@ describe("transcribeMidi", () => {
         await transcribeMidi(midiWithoutTempo);
         expect(loadNewBlocksSpy).toHaveBeenCalled();
         const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
-        const bpmBlock = loadedBlocks.find(block =>
-            Array.isArray(block[1]) && block[1][0] === "setbpm3"
+        const bpmBlock = loadedBlocks.find(
+            block => Array.isArray(block[1]) && block[1][0] === "setbpm3"
         );
         expect(bpmBlock).toBeDefined();
-        const tempoValueBlock = loadedBlocks.find(block =>
-            block[0] === bpmBlock[4][1]
-        );
+        const tempoValueBlock = loadedBlocks.find(block => block[0] === bpmBlock[4][1]);
         expect(tempoValueBlock).toBeDefined();
         expect(tempoValueBlock[1][1].value).toBe(90);
     });
@@ -134,8 +142,8 @@ describe("transcribeMidi", () => {
         await transcribeMidi(emptyTrackMidi);
         expect(loadNewBlocksSpy).toHaveBeenCalled();
         const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
-        const trackBlocks = loadedBlocks.filter(block =>
-            Array.isArray(block[1]) && block[1][0] === "setturtlename2"
+        const trackBlocks = loadedBlocks.filter(
+            block => Array.isArray(block[1]) && block[1][0] === "setturtlename2"
         );
         expect(trackBlocks.length).toBe(0);
     });
@@ -144,9 +152,7 @@ describe("transcribeMidi", () => {
         await transcribeMidi(mockMidi);
         expect(loadNewBlocksSpy).toHaveBeenCalled();
         const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
-        const drumBlocks = loadedBlocks.filter(block =>
-            block[1] === "playdrum"
-        );
+        const drumBlocks = loadedBlocks.filter(block => block[1] === "playdrum");
         expect(drumBlocks.length).toBeGreaterThan(0);
     });
 
@@ -155,8 +161,8 @@ describe("transcribeMidi", () => {
         expect(loadNewBlocksSpy).toHaveBeenCalled();
 
         const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
-        const instrumentBlocks = loadedBlocks.filter(block =>
-            Array.isArray(block[1]) && block[1][0] === "settimbre"
+        const instrumentBlocks = loadedBlocks.filter(
+            block => Array.isArray(block[1]) && block[1][0] === "settimbre"
         );
         const nonPercussionTracks = mockMidi.tracks.filter(track => !track.instrument.percussion);
         instrumentBlocks.forEach((block, index) => {
@@ -170,8 +176,8 @@ describe("transcribeMidi", () => {
         expect(loadNewBlocksSpy).toHaveBeenCalled();
 
         const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
-        const noteBlocks = loadedBlocks.filter(block =>
-            Array.isArray(block[1]) && block[1][0] === "newnote"
+        const noteBlocks = loadedBlocks.filter(
+            block => Array.isArray(block[1]) && block[1][0] === "newnote"
         );
 
         noteBlocks.forEach(block => {
@@ -192,9 +198,7 @@ describe("transcribeMidi", () => {
         await transcribeMidi(mockMidi);
         expect(loadNewBlocksSpy).toHaveBeenCalled();
         const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
-        const restBlocks = loadedBlocks.filter(block =>
-            block[1] === "rest2"
-        );
+        const restBlocks = loadedBlocks.filter(block => block[1] === "rest2");
         expect(restBlocks.length).toBeGreaterThan(0);
     });
 });

@@ -20,17 +20,17 @@ function AIDebuggerWidget() {
     const ICONSIZE = 32;
     const CHATWIDTH = 900;
     const CHATHEIGHT = 600;
-    
+
     const BACKEND_CONFIG = {
         BASE_URL: (() => {
-
-            if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+            if (
+                window.location.hostname === "localhost" ||
+                window.location.hostname === "127.0.0.1"
+            ) {
                 return "http://localhost:8000";
-            }
-            else if (window.location.hostname.includes("musicblocks.sugarlabs.org")) {
+            } else if (window.location.hostname.includes("musicblocks.sugarlabs.org")) {
                 return `${window.location.protocol}//api.musicblocks.sugarlabs.org`;
-            }
-            else {
+            } else {
                 return `${window.location.protocol}//${window.location.hostname}:8000`;
             }
         })(),
@@ -39,51 +39,49 @@ function AIDebuggerWidget() {
         },
         TIMEOUT: 30000
     };
-    
-    console.log("AI Debugger Backend URL:", BACKEND_CONFIG.BASE_URL);
-    
+
     /**
      * Chat history array to store conversation
      * @type {Array}
      */
     this.chatHistory = [];
-    
+
     /**
      * Prompt count for tracking conversation progression
      * @type {number}
      */
     this.promptCount = 0;
-    
+
     /**
      * Current conversation ID for tracking sessions
      * @type {string}
      */
     this.conversationId = null;
-    
+
     /**
      * Reference to the activity object
      * @type {object}
      */
     this.activity = null;
-    
+
     /**
      * Widget window reference
      * @type {object}
      */
     this.widgetWindow = null;
-    
+
     /**
      * Chat log container
      * @type {HTMLElement}
      */
     this.chatLog = null;
-    
+
     /**
      * Input field for messages
      * @type {HTMLElement}
      */
     this.messageInput = null;
-    
+
     /**
      * Send button
      * @type {HTMLElement}
@@ -95,8 +93,8 @@ function AIDebuggerWidget() {
      * @returns {string} Unique conversation identifier
      * @private
      */
-    this._generateConversationId = function() {
-        return "conv_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+    this._generateConversationId = function () {
+        return "conv_" + Date.now() + "_" + Math.random().toString(36).substring(2, 11);
     };
 
     this.conversationId = this._generateConversationId();
@@ -106,10 +104,10 @@ function AIDebuggerWidget() {
      * @param {object} activity
      * @returns {void}
      */
-    this.init = function(activity) {
+    this.init = function (activity) {
         this.activity = activity;
         this.activity.isInputON = true;
-        
+
         if (!this.conversationId) {
             this.conversationId = this._generateConversationId();
         }
@@ -118,35 +116,27 @@ function AIDebuggerWidget() {
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
-        
+
         widgetWindow.getWidgetBody().style.width = CHATWIDTH + "px";
         widgetWindow.getWidgetBody().style.height = CHATHEIGHT + "px";
-        
+
         widgetWindow.onclose = () => {
             widgetWindow.destroy();
             this.activity.isInputON = false;
         };
-        
+
         widgetWindow.onmaximize = this._scale.bind(this);
-        
-        this._resetButton = widgetWindow.addButton(
-            "reload.svg",
-            ICONSIZE,
-            _("Reset conversation")
-        );
+
+        this._resetButton = widgetWindow.addButton("reload.svg", ICONSIZE, _("Reset conversation"));
         this._resetButton.onclick = () => {
             this._resetConversation();
         };
 
-        this._exportButton = widgetWindow.addButton(
-            "download.svg",
-            ICONSIZE,
-            _("Export chat")
-        );
+        this._exportButton = widgetWindow.addButton("download.svg", ICONSIZE, _("Export chat"));
         this._exportButton.onclick = () => {
             this._exportChat();
         };
-        
+
         this._createLayout();
         this._loadProjectAndInitialize();
         widgetWindow.sendToCenter();
@@ -157,7 +147,7 @@ function AIDebuggerWidget() {
      * Creates the main layout structure
      * @private
      */
-    this._createLayout = function() {
+    this._createLayout = function () {
         const mainContainer = document.createElement("div");
         mainContainer.style.display = "flex";
         mainContainer.style.height = "100%";
@@ -169,17 +159,17 @@ function AIDebuggerWidget() {
 
     /**
      * Creates the main chat area
-     * 
+     *
      * @param {HTMLElement} container
      * @private
      */
-    this._createChatArea = function(container) {
+    this._createChatArea = function (container) {
         const chatContainer = document.createElement("div");
         chatContainer.style.width = "100%";
         chatContainer.style.display = "flex";
         chatContainer.style.flexDirection = "column";
         chatContainer.style.height = "100%";
-        
+
         // Chat log area
         this.chatLog = document.createElement("div");
         this.chatLog.className = "chatLog";
@@ -190,9 +180,9 @@ function AIDebuggerWidget() {
         this.chatLog.style.display = "flex";
         this.chatLog.style.flexDirection = "column";
         this.chatLog.style.gap = "10px";
-        
+
         chatContainer.appendChild(this.chatLog);
-        
+
         // Input area
         const inputContainer = document.createElement("div");
         inputContainer.style.display = "flex";
@@ -200,7 +190,7 @@ function AIDebuggerWidget() {
         inputContainer.style.backgroundColor = "#fff";
         inputContainer.style.borderTop = "1px solid #ddd";
         inputContainer.style.gap = "10px";
-        
+
         // Message input
         this.messageInput = document.createElement("input");
         this.messageInput.type = "text";
@@ -211,17 +201,17 @@ function AIDebuggerWidget() {
         this.messageInput.style.borderRadius = "25px";
         this.messageInput.style.fontSize = "14px";
         this.messageInput.style.outline = "none";
-        
+
         // Focus styling
-        this.messageInput.onfocus = function() {
+        this.messageInput.onfocus = function () {
             this.style.borderColor = "#2196F3";
             this.style.boxShadow = "0 0 5px rgba(33, 150, 243, 0.3)";
         };
-        this.messageInput.onblur = function() {
+        this.messageInput.onblur = function () {
             this.style.borderColor = "#ddd";
             this.style.boxShadow = "none";
         };
-        
+
         // Send button
         this.sendButton = document.createElement("button");
         this.sendButton.textContent = "Send";
@@ -234,25 +224,25 @@ function AIDebuggerWidget() {
         this.sendButton.style.fontSize = "14px";
         this.sendButton.style.fontWeight = "bold";
         this.sendButton.style.transition = "background-color 0.3s";
-        
-        this.sendButton.onmouseover = function() {
+
+        this.sendButton.onmouseover = function () {
             this.style.backgroundColor = "#1976D2";
         };
-        this.sendButton.onmouseout = function() {
+        this.sendButton.onmouseout = function () {
             this.style.backgroundColor = "#2196F3";
         };
-        
+
         // Event listeners
         this.sendButton.onclick = () => {
             this._sendMessage();
         };
-        
-        this.messageInput.onkeypress = (e) => {
+
+        this.messageInput.onkeypress = e => {
             if (e.key === "Enter") {
                 this._sendMessage();
             }
         };
-        
+
         inputContainer.appendChild(this.messageInput);
         inputContainer.appendChild(this.sendButton);
         chatContainer.appendChild(inputContainer);
@@ -263,12 +253,12 @@ function AIDebuggerWidget() {
      * Adds welcome message to chat
      * @private
      */
-    this._addWelcomeMessage = function() {
+    this._addWelcomeMessage = function () {
         const welcomeMessage = {
             type: "system",
-            content: _THIS_IS_MUSIC_BLOCKS_ ?
-                "Welcome to Music Blocks Debugger! I can help you with music composition, Music Blocks programming, and general music theory questions." :
-                "Welcome to Turtle Blocks Debugger! I can help you with programming, turtle graphics, and general coding questions.",
+            content: _THIS_IS_MUSIC_BLOCKS_
+                ? "Welcome to Music Blocks Debugger! I can help you with music composition, Music Blocks programming, and general music theory questions."
+                : "Welcome to Turtle Blocks Debugger! I can help you with programming, turtle graphics, and general coding questions.",
             timestamp: new Date().toISOString()
         };
         this._addMessageToUI(welcomeMessage);
@@ -278,16 +268,16 @@ function AIDebuggerWidget() {
      * Sends a message
      * @private
      */
-    this._sendMessage = function() {
+    this._sendMessage = function () {
         const messageText = this.messageInput.value.trim();
         if (messageText === "") return;
-        
+
         const userMessage = {
             type: "user",
             content: messageText,
             timestamp: new Date().toISOString()
         };
-        
+
         this.chatHistory.push(userMessage);
         this._addMessageToUI(userMessage);
         this.messageInput.value = "";
@@ -300,7 +290,7 @@ function AIDebuggerWidget() {
      * @param {object} message
      * @private
      */
-    this._addMessageToUI = function(message) {
+    this._addMessageToUI = function (message) {
         const messageDiv = document.createElement("div");
         messageDiv.style.maxWidth = "80%";
         messageDiv.style.padding = "12px 16px";
@@ -309,13 +299,13 @@ function AIDebuggerWidget() {
         messageDiv.style.wordWrap = "break-word";
         messageDiv.style.fontSize = "14px";
         messageDiv.style.lineHeight = "1.4";
-        
+
         const timeDiv = document.createElement("div");
         timeDiv.style.fontSize = "11px";
         timeDiv.style.opacity = "0.7";
         timeDiv.style.marginTop = "4px";
         timeDiv.textContent = new Date(message.timestamp).toLocaleTimeString();
-        
+
         if (message.type === "user") {
             messageDiv.style.alignSelf = "flex-end";
             messageDiv.style.backgroundColor = "#2196F3";
@@ -337,7 +327,7 @@ function AIDebuggerWidget() {
             messageDiv.textContent = message.content;
             messageDiv.appendChild(timeDiv);
         }
-        
+
         this.chatLog.appendChild(messageDiv);
         this.chatLog.scrollTop = this.chatLog.scrollHeight;
     };
@@ -347,7 +337,7 @@ function AIDebuggerWidget() {
      * @param {string} message
      * @private
      */
-    this._sendToBackend = function(message) {
+    this._sendToBackend = function (message) {
         this._showTypingIndicator();
         this.promptCount++;
         let projectData;
@@ -360,25 +350,25 @@ function AIDebuggerWidget() {
             this.activity.textMsg(_("Debugger error: Could not prepare project data."));
             projectData = "[]";
         }
-        
+
         const history = this.chatHistory
             .filter(msg => msg.type !== "system")
             .map(msg => ({
                 role: msg.type === "user" ? "user" : "assistant",
                 content: msg.content
             }));
-        
+
         const payload = {
             code: projectData,
             prompt: message,
             history: history,
             prompt_count: this.promptCount
         };
-        
+
         fetch(`${BACKEND_CONFIG.BASE_URL}${BACKEND_CONFIG.ENDPOINTS.ANALYZE}`, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
+                "Content-Type": "application/json"
             },
             body: JSON.stringify(payload)
         })
@@ -390,14 +380,14 @@ function AIDebuggerWidget() {
             })
             .then(data => {
                 this._hideTypingIndicator();
-                
+
                 if (data && data.response) {
                     const botResponse = {
                         type: "bot",
                         content: data.response,
                         timestamp: new Date().toISOString()
                     };
-                    
+
                     this.chatHistory.push(botResponse);
                     this._addMessageToUI(botResponse);
                     this._updateMessageCount();
@@ -409,19 +399,19 @@ function AIDebuggerWidget() {
             .catch(error => {
                 this._hideTypingIndicator();
                 console.error("Backend connection error:", error.message);
-                
+
                 this.activity.textMsg(_("Server error: Unable to connect to AI backend."));
-                
+
                 if (error instanceof TypeError && error.message.includes("fetch")) {
                     console.error("Network/CORS error. Backend connection failed");
                 }
-                
+
                 const fallbackResponse = {
                     type: "bot",
                     content: `I'm sorry, I'm having trouble connecting to the AI backend. Error: ${error.message}. Please check your connection and try again.`,
                     timestamp: new Date().toISOString()
                 };
-                
+
                 this.chatHistory.push(fallbackResponse);
                 this._addMessageToUI(fallbackResponse);
                 this._updateMessageCount();
@@ -432,7 +422,7 @@ function AIDebuggerWidget() {
      * Shows typing indicator
      * @private
      */
-    this._showTypingIndicator = function() {
+    this._showTypingIndicator = function () {
         const typingDiv = document.createElement("div");
         typingDiv.className = "typing-indicator";
         typingDiv.style.alignSelf = "flex-start";
@@ -444,16 +434,16 @@ function AIDebuggerWidget() {
         typingDiv.style.fontSize = "14px";
         typingDiv.style.fontStyle = "italic";
         typingDiv.textContent = "Debugger is typing...";
-        
+
         // Add animation
         let dots = 0;
         const animateTyping = setInterval(() => {
             dots = (dots + 1) % 4;
             typingDiv.textContent = "Debugger is typing" + ".".repeat(dots);
         }, 500);
-        
+
         typingDiv.setAttribute("data-animation-id", animateTyping);
-        
+
         this.chatLog.appendChild(typingDiv);
         this.chatLog.scrollTop = this.chatLog.scrollHeight;
     };
@@ -462,7 +452,7 @@ function AIDebuggerWidget() {
      * Hides typing indicator
      * @private
      */
-    this._hideTypingIndicator = function() {
+    this._hideTypingIndicator = function () {
         const typingIndicator = this.chatLog.querySelector(".typing-indicator");
         if (typingIndicator) {
             const animationId = typingIndicator.getAttribute("data-animation-id");
@@ -477,7 +467,7 @@ function AIDebuggerWidget() {
      * Updates message count
      * @private
      */
-    this._updateMessageCount = function() {
+    this._updateMessageCount = function () {
         // removed message count display
         // This method is kept for compatibility with existing calls
     };
@@ -486,18 +476,18 @@ function AIDebuggerWidget() {
      * Loads current project data and initializes conversation with backend
      * @private
      */
-    this._loadProjectAndInitialize = function() {
+    this._loadProjectAndInitialize = function () {
         try {
             // Get current project data as JSON
             const projectData = this.activity.prepareExport();
-            
+
             try {
                 const parsedData = JSON.parse(projectData);
             } catch (parseError) {
                 console.error("Error parsing project data:", parseError);
                 this.activity.textMsg(_("Debugger error: Invalid project data format."));
             }
-            
+
             // Show loading message
             const loadingMessage = {
                 type: "system",
@@ -505,16 +495,15 @@ function AIDebuggerWidget() {
                 timestamp: new Date().toISOString()
             };
             this._addMessageToUI(loadingMessage);
-            
+
             // Send project data to backend for initialization
             this._initializeBackendWithProject(projectData);
-            
         } catch (error) {
             console.error("Error loading project data:", error);
-            
+
             // Show error message to user
             this.activity.textMsg(_("Debugger error: Could not load project data."));
-            
+
             // Show error message and fall back to simple welcome
             const errorMessage = {
                 type: "system",
@@ -522,7 +511,7 @@ function AIDebuggerWidget() {
                 timestamp: new Date().toISOString()
             };
             this._addMessageToUI(errorMessage);
-            
+
             // Fallback to simple welcome
             this._addWelcomeMessage();
         }
@@ -533,27 +522,27 @@ function AIDebuggerWidget() {
      * @param {string} projectData
      * @private
      */
-    this._initializeBackendWithProject = function(projectData) {
+    this._initializeBackendWithProject = function (projectData) {
         // convert chat history to the format expected by the backend
         const history = this.chatHistory.map(msg => ({
             role: msg.type === "user" ? "user" : "assistant",
             content: msg.content
         }));
-        
+
         const initPayload = {
             code: projectData,
             prompt: "", // Empty prompt for initial analysis
             history: history,
             prompt_count: 1
         };
-        
+
         // Show typing indicator during initialization
         this._showTypingIndicator();
 
         fetch(`${BACKEND_CONFIG.BASE_URL}${BACKEND_CONFIG.ENDPOINTS.ANALYZE}`, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
+                "Content-Type": "application/json"
             },
             body: JSON.stringify(initPayload)
         })
@@ -565,7 +554,7 @@ function AIDebuggerWidget() {
             })
             .then(data => {
                 this._hideTypingIndicator();
-                
+
                 if (data.response) {
                     // Add the backend's initial response
                     const botResponse = {
@@ -573,7 +562,7 @@ function AIDebuggerWidget() {
                         content: data.response,
                         timestamp: new Date().toISOString()
                     };
-                    
+
                     this.chatHistory.push(botResponse);
                     this._addMessageToUI(botResponse);
                     this._updateMessageCount();
@@ -587,18 +576,18 @@ function AIDebuggerWidget() {
                 this._hideTypingIndicator();
                 console.error("Backend initialization error:", error.message);
                 this.activity.textMsg(_("Server error: Failed to initialize AI debugger."));
-                
+
                 if (error instanceof TypeError && error.message.includes("fetch")) {
                     console.error("Network/CORS error. Backend connection failed");
                 }
-                
+
                 const errorMessage = {
                     type: "system",
                     content: `Could not connect to AI backend: ${error.message}. Please check your connection and try again.`,
                     timestamp: new Date().toISOString()
                 };
                 this._addMessageToUI(errorMessage);
-                
+
                 this._addWelcomeMessage();
             });
     };
@@ -607,12 +596,12 @@ function AIDebuggerWidget() {
      * Resets the conversation and initializes with project data
      * @private
      */
-    this._resetConversation = function() {
+    this._resetConversation = function () {
         this.chatHistory = [];
         this.promptCount = 0; // Reset prompt count
         this.conversationId = this._generateConversationId();
         this.chatLog.innerHTML = "";
-        
+
         this._loadProjectAndInitialize();
         this._updateMessageCount();
         this.activity.textMsg(_("Conversation reset."));
@@ -622,12 +611,12 @@ function AIDebuggerWidget() {
      * Exports the chat conversation as a text file
      * @private
      */
-    this._exportChat = function() {
+    this._exportChat = function () {
         if (this.chatHistory.length === 0) {
             this.activity.textMsg(_("No conversation to export."));
             return;
         }
-        
+
         let convertedText = "";
         try {
             const projectData = this.activity.prepareExport();
@@ -642,30 +631,35 @@ function AIDebuggerWidget() {
             this.activity.textMsg(_("Debugger error: Could not retrieve project data for export."));
             convertedText = "Could not convert project to readable format";
         }
-        
+
         const appName = _THIS_IS_MUSIC_BLOCKS_ ? "Music Blocks" : "Turtle Blocks";
         let exportContent = `${appName} Debugger Chat Export\n`;
         exportContent += "Generated at: " + new Date().toLocaleString() + "\n\n";
         exportContent += "Project Code (Human Readable Format):\n";
         exportContent += convertedText + "\n\n";
         exportContent += "Chat History:\n\n";
-        
-        this.chatHistory.forEach((message) => {
+
+        this.chatHistory.forEach(message => {
             const role = message.type === "user" ? "User" : `${appName} Debugger`;
             exportContent += role + ":\n";
             exportContent += message.content + "\n\n";
         });
-        
+
         const blob = new Blob([exportContent], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "music_blocks_chat_" + new Date().toISOString().replace(/[:.]/g, "-").split("T")[0] + "_" + new Date().toTimeString().split(" ")[0].replace(/:/g, "") + ".txt";
+        a.download =
+            "music_blocks_chat_" +
+            new Date().toISOString().replace(/[:.]/g, "-").split("T")[0] +
+            "_" +
+            new Date().toTimeString().split(" ")[0].replace(/:/g, "") +
+            ".txt";
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        
+
         this.activity.textMsg(_("Chat exported successfully."));
     };
 
@@ -675,7 +669,7 @@ function AIDebuggerWidget() {
      * @returns {string}
      * @private
      */
-    this._convertProjectToLLMFormat = function(projectData) {
+    this._convertProjectToLLMFormat = function (projectData) {
         if (!Array.isArray(projectData)) {
             return "Invalid JSON format: Expected a list at the root.";
         }
@@ -687,11 +681,12 @@ function AIDebuggerWidget() {
         const outputLines = ["Start of Project"];
         const blockMap = Object.fromEntries(projectData.map(block => [block[0], block]));
         const visited = new Set();
-        
-        const rootBlock = projectData.find(block => {
-            const blockType = Array.isArray(block[1]) ? block[1][0] : block[1];
-            return blockType === "start";
-        }) || projectData[0];
+
+        const rootBlock =
+            projectData.find(block => {
+                const blockType = Array.isArray(block[1]) ? block[1][0] : block[1];
+                return blockType === "start";
+            }) || projectData[0];
 
         outputLines.push(...this._processBlock(rootBlock, blockMap, visited, 1));
 
@@ -712,23 +707,30 @@ function AIDebuggerWidget() {
      * Clears the chat display
      * @private
      */
-    this._clearChat = function() {
+    this._clearChat = function () {
         this.chatLog.innerHTML = "";
         this.activity.textMsg(_("Chat cleared."));
     };
 
     /**
      * Processes a block and its children recursively
-     * @param {Array} block 
+     * @param {Array} block
      * @param {Object} blockMap
      * @param {Set} visited
      * @param {number} indent
-     * @param {boolean} isClamp 
-     * @param {string} parentBlockType 
-     * @returns {Array} 
+     * @param {boolean} isClamp
+     * @param {string} parentBlockType
+     * @returns {Array}
      * @private
      */
-    this._processBlock = function(block, blockMap, visited, indent = 1, isClamp = false, parentBlockType = null) {
+    this._processBlock = function (
+        block,
+        blockMap,
+        visited,
+        indent = 1,
+        isClamp = false,
+        parentBlockType = null
+    ) {
         const output = [];
         const blockId = block[0];
 
@@ -754,10 +756,21 @@ function AIDebuggerWidget() {
         }
 
         if (["vspace", "hidden"].includes(blockType)) {
-            const connections = Array.isArray(block[block.length - 1]) ? block[block.length - 1] : [];
+            const connections = Array.isArray(block[block.length - 1])
+                ? block[block.length - 1]
+                : [];
             for (const childId of connections) {
                 if (blockMap[childId]) {
-                    output.push(...this._processBlock(blockMap[childId], blockMap, visited, indent, isClamp, blockType));
+                    output.push(
+                        ...this._processBlock(
+                            blockMap[childId],
+                            blockMap,
+                            visited,
+                            indent,
+                            isClamp,
+                            blockType
+                        )
+                    );
                 }
             }
             return output;
@@ -767,7 +780,15 @@ function AIDebuggerWidget() {
             return output;
         }
 
-        const blockRepresentation = this._getBlockRepresentation(blockType, blockArgs, block, blockMap, indent, isClamp, parentBlockType);
+        const blockRepresentation = this._getBlockRepresentation(
+            blockType,
+            blockArgs,
+            block,
+            blockMap,
+            indent,
+            isClamp,
+            parentBlockType
+        );
         if (!blockRepresentation) {
             return output;
         }
@@ -780,10 +801,27 @@ function AIDebuggerWidget() {
         for (let i = 0; i < connections.length - 1; i++) {
             const childId = connections[i];
             if (childId !== null && blockMap[childId]) {
-                const childBlockType = Array.isArray(blockMap[childId][1]) ? blockMap[childId][1][0] : blockMap[childId][1];
-                if (!(childBlockType === "divide" &&
-                     (parentBlockType === "newnote" || parentBlockType === "setmasterbpm2" || parentBlockType === "arc"))) {
-                    output.push(...this._processBlock(blockMap[childId], blockMap, visited, indent + 1, true, blockType));
+                const childBlockType = Array.isArray(blockMap[childId][1])
+                    ? blockMap[childId][1][0]
+                    : blockMap[childId][1];
+                if (
+                    !(
+                        childBlockType === "divide" &&
+                        (parentBlockType === "newnote" ||
+                            parentBlockType === "setmasterbpm2" ||
+                            parentBlockType === "arc")
+                    )
+                ) {
+                    output.push(
+                        ...this._processBlock(
+                            blockMap[childId],
+                            blockMap,
+                            visited,
+                            indent + 1,
+                            true,
+                            blockType
+                        )
+                    );
                 }
             }
         }
@@ -791,7 +829,16 @@ function AIDebuggerWidget() {
         if (connections.length > 0 && connections[connections.length - 1] !== null) {
             const childId = connections[connections.length - 1];
             if (blockMap[childId]) {
-                output.push(...this._processBlock(blockMap[childId], blockMap, visited, indent, false, blockType));
+                output.push(
+                    ...this._processBlock(
+                        blockMap[childId],
+                        blockMap,
+                        visited,
+                        indent,
+                        false,
+                        blockType
+                    )
+                );
             }
         }
 
@@ -814,9 +861,17 @@ function AIDebuggerWidget() {
      * @returns {string}
      * @private
      */
-    this._getBlockRepresentation = function(blockType, blockArgs, block, blockMap, indent, isClamp, parentBlockType) {
+    this._getBlockRepresentation = function (
+        blockType,
+        blockArgs,
+        block,
+        blockMap,
+        indent,
+        isClamp,
+        parentBlockType
+    ) {
         const connections = block[block.length - 1] || [];
-        
+
         switch (blockType) {
             case "start": {
                 const turtleInfo = [
@@ -828,22 +883,36 @@ function AIDebuggerWidget() {
                 ].join(", ");
                 return `Start Block --> {${turtleInfo}}`;
             }
-                
+
             case "setmasterbpm2": {
                 const bpmValue = this._getNumericValue(connections[1], blockMap);
                 let bpmOutput = `Set Master BPM → ${bpmValue || "?"} BPM`;
-                
-                if (connections[2] && blockMap[connections[2]] && blockMap[connections[2]][1] === "divide") {
+
+                if (
+                    connections[2] &&
+                    blockMap[connections[2]] &&
+                    blockMap[connections[2]][1] === "divide"
+                ) {
                     const divideBlock = blockMap[connections[2]];
-                    const numerator = this._getNumericValue(divideBlock[divideBlock.length - 1][1], blockMap);
-                    const denominator = this._getNumericValue(divideBlock[divideBlock.length - 1][2], blockMap);
+                    const numerator = this._getNumericValue(
+                        divideBlock[divideBlock.length - 1][1],
+                        blockMap
+                    );
+                    const denominator = this._getNumericValue(
+                        divideBlock[divideBlock.length - 1][2],
+                        blockMap
+                    );
                     if (numerator !== null && denominator !== null && denominator !== 0) {
-                        bpmOutput += `\n${"│   ".repeat(indent)}├── beat value --> ${numerator}/${denominator} = ${(numerator / denominator).toFixed(2)}`;
+                        bpmOutput += `\n${"│   ".repeat(
+                            indent
+                        )}├── beat value --> ${numerator}/${denominator} = ${(
+                            numerator / denominator
+                        ).toFixed(2)}`;
                     }
                 }
                 return bpmOutput;
             }
-                
+
             case "divide": {
                 const numerator = this._getNumericValue(connections[1], blockMap);
                 const denominator = this._getNumericValue(connections[2], blockMap);
@@ -851,36 +920,42 @@ function AIDebuggerWidget() {
                 if (numerator !== null && denominator !== null && denominator !== 0) {
                     result = (numerator / denominator).toFixed(2);
                 }
-                
+
                 if (parentBlockType === "newnote") {
                     return `Duration --> ${numerator || "?"}/${denominator || "?"} = ${result}`;
                 }
                 return `Divide Block --> ${numerator || "?"}/${denominator || "?"} = ${result}`;
             }
-                       
+
             case "storein2": {
                 const varName = blockArgs?.value || "unnamed";
                 const varValue = this._getNumericValue(connections[1], blockMap);
                 return `Store Variable "${varName}" → ${varValue !== null ? varValue : "?"}`;
             }
-                
+
             case "namedbox":
                 return `Variable: "${blockArgs?.value || "unnamed"}"`;
-                
+
             case "action": {
                 const actionName = this._getTextValue(connections[1], blockMap);
                 return `Action: "${actionName || "unnamed"}"`;
             }
-                
+
             case "repeat": {
                 let repeatCount = "?";
                 let repeatText = "?";
-                
+
                 if (connections[1] && blockMap[connections[1]]) {
                     const countBlock = blockMap[connections[1]];
                     if (Array.isArray(countBlock[1]) && countBlock[1][0] === "divide") {
-                        const num = this._getNumericValue(countBlock[countBlock.length - 1][1], blockMap);
-                        const den = this._getNumericValue(countBlock[countBlock.length - 1][2], blockMap);
+                        const num = this._getNumericValue(
+                            countBlock[countBlock.length - 1][1],
+                            blockMap
+                        );
+                        const den = this._getNumericValue(
+                            countBlock[countBlock.length - 1][2],
+                            blockMap
+                        );
                         if (num !== null && den !== null && den !== 0) {
                             repeatCount = (num / den).toFixed(2);
                             repeatText = `${num}/${den} = ${repeatCount}`;
@@ -892,72 +967,78 @@ function AIDebuggerWidget() {
                 }
                 return `Repeat (${repeatText}) Times`;
             }
-                
+
             case "forever":
                 return "Forever Loop (Repeats Indefinitely)";
-                
+
             case "penup":
                 return "Pen Up (Lifts Pen from Canvas)";
-                
+
             case "pendown":
                 return "Pen Down";
-                
+
             case "forward": {
                 const forwardDist = this._getNumericValue(connections[1], blockMap);
                 return `Move Forward → ${forwardDist || "?"} Steps`;
             }
-                
+
             case "back": {
                 const backDist = this._getNumericValue(connections[1], blockMap);
                 return `Move Backward → ${backDist || "?"} Steps`;
             }
-                
+
             case "right": {
                 const rightAngle = this._getNumericValue(connections[1], blockMap);
                 return `Rotate Right → ${rightAngle || "?"}°`;
             }
-                
+
             case "left": {
                 const leftAngle = this._getNumericValue(connections[1], blockMap);
                 return `Rotate Left → ${leftAngle || "?"}°`;
             }
-                
+
             case "setheading": {
                 const heading = this._getNumericValue(connections[1], blockMap);
                 return `Set Heading → ${heading || "0"}°`;
             }
-                
+
             case "show": {
                 const showValue = this._getNumericValue(connections[2], blockMap);
                 return `Show Number: ${showValue || "?"}`;
             }
-                
+
             case "increment": {
                 const incColor = this._getNumericValue(connections[1], blockMap);
                 const incAmount = this._getNumericValue(connections[2], blockMap);
                 return `Increment --> Color: ${incColor || "?"}, Amount: ${incAmount || "?"}`;
             }
-                
+
             case "incrementOne": {
                 const incOneVar = this._getNamedBoxValue(connections[1], blockMap);
                 return `Increment Variable: "${incOneVar || "?"}"`;
             }
-                
+
             case "newnote":
                 return "Note";
-                
+
             case "playdrum": {
                 const drumName = this._getDrumName(connections[1], blockMap);
                 return `Play Drum → ${drumName || "?"}`;
             }
-                
+
             case "arc": {
                 let angle = "?";
                 if (connections[3] && blockMap[connections[3]]) {
                     const angleBlock = blockMap[connections[3]];
                     if (Array.isArray(angleBlock[1]) && angleBlock[1][0] === "divide") {
-                        const num = this._getNumericValue(angleBlock[angleBlock.length - 1][1], blockMap);
-                        const den = this._getNumericValue(angleBlock[angleBlock.length - 1][2], blockMap);
+                        const num = this._getNumericValue(
+                            angleBlock[angleBlock.length - 1][1],
+                            blockMap
+                        );
+                        const den = this._getNumericValue(
+                            angleBlock[angleBlock.length - 1][2],
+                            blockMap
+                        );
                         if (num !== null && den !== null && den !== 0) {
                             angle = (num / den).toFixed(2);
                         }
@@ -968,52 +1049,56 @@ function AIDebuggerWidget() {
                 const radius = this._getNumericValue(connections[2], blockMap);
                 return `Draw Arc --> Angle: ${angle}°, Radius: ${radius || "?"}`;
             }
-                
+
             case "print": {
                 const printText = this._getTextValue(connections[2], blockMap);
                 return `Print: "${printText || ""}"`;
             }
-                
+
             case "plus": {
                 const add1 = this._getNumericValue(connections[1], blockMap);
                 const add2 = this._getNumericValue(connections[2], blockMap);
-                return `Add --> ${add1 || "?"} + ${add2 || "?"} = ${add1 !== null && add2 !== null ? (add1 + add2).toFixed(2) : "?"}`;
+                return `Add --> ${add1 || "?"} + ${add2 || "?"} = ${
+                    add1 !== null && add2 !== null ? (add1 + add2).toFixed(2) : "?"
+                }`;
             }
-                
+
             case "text":
                 return `"${blockArgs?.value || ""}"`;
-                
+
             case "pitch": {
                 let solfege = "?";
                 let octave = this._getNumericValue(connections[2], blockMap);
-                
+
                 if (connections[1] && blockMap[connections[1]]) {
                     const solfegeBlock = blockMap[connections[1]];
-                    const solfegeBlockType = Array.isArray(solfegeBlock[1]) ? solfegeBlock[1][0] : solfegeBlock[1];
-                    
+                    const solfegeBlockType = Array.isArray(solfegeBlock[1])
+                        ? solfegeBlock[1][0]
+                        : solfegeBlock[1];
+
                     if (solfegeBlockType === "text" && Array.isArray(solfegeBlock[1])) {
                         solfege = solfegeBlock[1][1]?.value || "?";
                     } else if (solfegeBlockType === "solfege" && Array.isArray(solfegeBlock[1])) {
                         solfege = solfegeBlock[1][1]?.value || "?";
                     }
                 }
-                
+
                 return `Pitch --> Solfege: ${solfege}, Octave: ${octave || "?"}`;
             }
-                
+
             case "solfege":
                 return null;
-                
+
             case "nameddo": {
                 const actionCalled = blockArgs?.value || "unnamed";
                 return `Do action --> "${actionCalled}"`;
             }
-                
+
             case "settransposition": {
                 const transpositionValue = this._getNumericValue(connections[1], blockMap);
                 return `Set Transposition --> ${transpositionValue || "?"}`;
             }
-                
+
             default:
                 if (blockArgs?.value !== undefined) {
                     return `${blockType}: ${blockArgs.value}`;
@@ -1021,7 +1106,7 @@ function AIDebuggerWidget() {
                 return blockType.charAt(0).toUpperCase() + blockType.slice(1);
         }
     };
-    
+
     /**
      * Gets numeric value from a block
      * @param {string} blockId
@@ -1029,12 +1114,12 @@ function AIDebuggerWidget() {
      * @returns {number}
      * @private
      */
-    this._getNumericValue = function(blockId, blockMap) {
+    this._getNumericValue = function (blockId, blockMap) {
         if (blockId === null || !blockMap[blockId]) return null;
-        
+
         const block = blockMap[blockId];
         const blockType = Array.isArray(block[1]) ? block[1][0] : block[1];
-        
+
         if (blockType === "number") {
             return Array.isArray(block[1]) ? block[1][1]?.value : block[1];
         }
@@ -1048,12 +1133,12 @@ function AIDebuggerWidget() {
      * @returns {string}
      * @private
      */
-    this._getTextValue = function(blockId, blockMap) {
+    this._getTextValue = function (blockId, blockMap) {
         if (blockId === null || !blockMap[blockId]) return null;
-        
+
         const block = blockMap[blockId];
         const blockType = Array.isArray(block[1]) ? block[1][0] : block[1];
-        
+
         if (blockType === "text" && Array.isArray(block[1])) {
             return block[1][1]?.value;
         }
@@ -1067,12 +1152,12 @@ function AIDebuggerWidget() {
      * @returns {string}
      * @private
      */
-    this._getDrumName = function(blockId, blockMap) {
+    this._getDrumName = function (blockId, blockMap) {
         if (blockId === null || !blockMap[blockId]) return null;
-        
+
         const block = blockMap[blockId];
         const blockType = Array.isArray(block[1]) ? block[1][0] : block[1];
-        
+
         if (blockType === "drumname" && Array.isArray(block[1])) {
             return block[1][1]?.value;
         }
@@ -1086,25 +1171,25 @@ function AIDebuggerWidget() {
      * @returns {string}
      * @private
      */
-    this._getNamedBoxValue = function(blockId, blockMap) {
+    this._getNamedBoxValue = function (blockId, blockMap) {
         if (blockId === null || !blockMap[blockId]) return null;
-        
+
         const block = blockMap[blockId];
         const blockType = Array.isArray(block[1]) ? block[1][0] : block[1];
-        
+
         if ((blockType === "namedbox" || blockType === "namedarg") && Array.isArray(block[1])) {
             return block[1][1]?.value;
         }
         return null;
     };
-    
+
     /**
      * Checks if string is base64 data
      * @param {string} str
      * @returns {boolean}
      * @private
      */
-    this._isBase64Data = function(str) {
+    this._isBase64Data = function (str) {
         return typeof str === "string" && /^data:(image|audio)\/[a-zA-Z0-9+.-]+;base64,/.test(str);
     };
 
@@ -1112,7 +1197,7 @@ function AIDebuggerWidget() {
      * Scales the widget window
      * @private
      */
-    this._scale = function() {
+    this._scale = function () {
         if (this.widgetWindow.isMaximized()) {
             const body = this.widgetWindow.getWidgetBody();
             body.style.width = "100%";

@@ -11,8 +11,6 @@
 
 // Based on ta-stats.py by Walter Bender
 
-// TODO: CLEAN UP THIS LIST
-
 /*
    globals
 
@@ -35,9 +33,13 @@ Globals location
 
 /* eslint-disable no-dupe-keys */
 
-// Assign each block to a bin.
+/**
+ * TACAT (Turtle Art Category)
+ * Maps individual block names to their category bins.
+ * Deprecated blocks are mapped to "ignore" to exclude them from scoring.
+ */
 const TACAT = {
-    // deprecated blocks
+    // Deprecated blocks (no longer in use, mapped to "ignore")
     rest: "ignore",
     square: "ignore",
     triangle: "ignore",
@@ -187,7 +189,7 @@ const TACAT = {
     doubly: "pitchchord",
     intervalname: "ignore",
     intervalnumber: "ignore",
-    currentinterval:"ignore",
+    currentinterval: "ignore",
     measureintervalsemitones: "pitchfactor",
     measureintervalscalar: "pitchfactor",
     arpeggio: "pitchchord",
@@ -434,7 +436,10 @@ const TACAT = {
     crescendo: "tone"
 };
 
-// Assign each bin to a palette.
+/**
+ * TAPAL (Turtle Art Palette)
+ * Maps category bins to their corresponding palette names.
+ */
 const TAPAL = {
     beat: "notesp",
     note: "notesp",
@@ -465,10 +470,15 @@ const TAPAL = {
     ignore: "numberp"
 };
 
-// Assign a score for each bin.
+/**
+ * TASCORE (Turtle Art Score)
+ * Assigns scores to both category bins and palettes.
+ * Note: This object intentionally contains entries for both bins (e.g., "note", "rhythm")
+ * and palettes (e.g., "notesp", "pitchp") to support the scoring algorithm.
+ */
 const TASCORE = {
+    // Bin scores
     note: 1,
-    rhythmfactor: 1,
     beat: 10,
     rhythm: 5,
     rhythmfactor: 5,
@@ -528,12 +538,12 @@ const PALLABELS = [
     _("number"),
     _("flow"),
     _("action"),
-    _("Sensors").toLowerCase(),
-    _("Media").toLowerCase(),
+    _("sensors"),
+    _("media"),
     _("mice")
 ];
 
-const analyzeProject = (activity) => {
+const analyzeProject = activity => {
     // Parse block data and generate score based on rubric
 
     const blockList = [];
@@ -641,7 +651,7 @@ const analyzeProject = (activity) => {
     return scores;
 };
 
-const scoreToChartData = (scores) => {
+const scoreToChartData = scores => {
     const normalizedScores = [];
     let maxScore = 0;
     for (let i = 0; i < scores.length; i++) {
@@ -680,7 +690,7 @@ const scoreToChartData = (scores) => {
     };
 };
 
-const getChartOptions = (callback) => {
+const getChartOptions = callback => {
     return {
         // Callback for rendering chart into a bitmap
         onAnimationComplete: callback,
@@ -742,7 +752,7 @@ const getChartOptions = (callback) => {
     };
 };
 
-const runAnalytics = (activity) => {
+const runAnalytics = activity => {
     const logo = activity.logo;
     const turtles = activity.turtles;
     // Using lilypond output to run through code and get some stats.
@@ -758,7 +768,7 @@ const runAnalytics = (activity) => {
     logo.runLogoCommands();
 };
 
-const getStatsFromNotation = (activity) => {
+const getStatsFromNotation = activity => {
     const projectStats = {};
     // since we use the lilypond output to generate stats , please make sure to change these rules if
     // we ever change the lilypond notation structure.
@@ -785,9 +795,11 @@ const getStatsFromNotation = (activity) => {
                     let freq;
                     if (isCustomTemperament(activity.logo.synth.inTemperament)) {
                         freq = activity.logo.synth.getCustomFrequency(
-                            note, activity.logo.synth.inTemperament);
+                            note,
+                            activity.logo.synth.inTemperament
+                        );
                         const test = getTemperament(activity.logo.synth.inTemperament).filter(
-                            (ele) => ele[3] === note.slice(0, note.length - 1)
+                            ele => ele[3] === note.slice(0, note.length - 1)
                         );
                         if (test.length > 0) {
                             note = test[0][1] + note[note.length - 1];

@@ -20,7 +20,6 @@
 
 /** This widget displays the status of selected parameters and notes as they are being played. */
 class StatsWindow {
-
     /**
      * @constructor
      */
@@ -55,7 +54,7 @@ class StatsWindow {
 
     /**
      * Renders and carries out analysis of the MB project.
-     * @public 
+     * @public
      * @returns {void}
      */
     doAnalytics() {
@@ -94,21 +93,30 @@ class StatsWindow {
 
     /**
      * @public
-     * @param {Array} stats 
+     * @param {Array} stats
      * @returns {void}
      */
     displayInfo(stats) {
         const lowHertz = stats["lowestNote"][2] + 0.5;
         const highHertz = stats["highestNote"][2] + 0.5;
-        this.jsonObject.innerHTML =
-            `<li>duples: ${stats["duples"]}</li>
+        this.jsonObject.innerHTML = `<li>duples: ${stats["duples"]}</li>
             <li>triplets: ${stats["triplets"]}</li>
             <li>quintuplets: ${stats["quintuplets"]}</li>
-            <li style=\"white-space: pre-wrap; width: 150px\">pitch names: ${Array.from(stats["pitchNames"]).join(", ")}</li>
+            <li style=\"white-space: pre-wrap; width: 150px\">pitch names: ${Array.from(
+                stats["pitchNames"]
+            ).join(", ")}</li>
             <li>number of notes: ${stats["numberOfNotes"]}</li>
-            <li style=\"white-space: pre-wrap; width: 150px\">lowest note: ${stats["lowestNote"][0]},${lowHertz.toFixed(0)}Hz</li>
-            <li style=\"white-space: pre-wrap; width: 150px\">highest note: ${stats["highestNote"][0]},${highHertz.toFixed(0)}Hz</li>
+            <li style=\"white-space: pre-wrap; width: 150px\">lowest note: ${
+                stats["lowestNote"][0]
+            },${lowHertz.toFixed(0)}Hz</li>
+            <li style=\"white-space: pre-wrap; width: 150px\">highest note: ${
+                stats["highestNote"][0]
+            },${highHertz.toFixed(0)}Hz</li>
             <li>rests used: ${stats["rests"]}</li>
             <li>ornaments used: ${stats["ornaments"]}</li>`;
     }
+}
+/* istanbul ignore next */
+if (typeof module !== "undefined") {
+    module.exports = StatsWindow;
 }

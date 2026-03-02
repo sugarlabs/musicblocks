@@ -39,15 +39,27 @@ describe("JSInterface._methodArgConstraints", () => {
 
             if (constraint.constraints) {
                 if (constraint.constraints.min !== undefined && arg < constraint.constraints.min) {
-                    throw new Error(`Argument ${index} is less than the minimum value ${constraint.constraints.min}`);
+                    throw new Error(
+                        `Argument ${index} is less than the minimum value ${constraint.constraints.min}`
+                    );
                 }
                 if (constraint.constraints.max !== undefined && arg > constraint.constraints.max) {
-                    throw new Error(`Argument ${index} is greater than the maximum value ${constraint.constraints.max}`);
+                    throw new Error(
+                        `Argument ${index} is greater than the maximum value ${constraint.constraints.max}`
+                    );
                 }
-                if (constraint.constraints.integer !== undefined && constraint.constraints.integer && !Number.isInteger(arg)) {
+                if (
+                    constraint.constraints.integer !== undefined &&
+                    constraint.constraints.integer &&
+                    !Number.isInteger(arg)
+                ) {
                     throw new Error(`Argument ${index} is not an integer`);
                 }
-                if (constraint.constraints.async !== undefined && constraint.constraints.async && typeof arg !== "function") {
+                if (
+                    constraint.constraints.async !== undefined &&
+                    constraint.constraints.async &&
+                    typeof arg !== "function"
+                ) {
                     throw new Error(`Argument ${index} is not an async function`);
                 }
                 if (constraint.constraints.type === "solfegeorletter" && typeof arg !== "string") {
@@ -68,7 +80,10 @@ describe("JSInterface._methodArgConstraints", () => {
                 if (constraint.constraints.type === "letterkey" && typeof arg !== "string") {
                     throw new Error(`Argument ${index} is not a valid letter key`);
                 }
-                if (constraint.constraints.type === "oneof" && !constraint.constraints.values.includes(arg)) {
+                if (
+                    constraint.constraints.type === "oneof" &&
+                    !constraint.constraints.values.includes(arg)
+                ) {
                     throw new Error(`Argument ${index} is not one of the allowed values`);
                 }
             }

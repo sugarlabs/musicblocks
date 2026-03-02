@@ -17,7 +17,7 @@
  */
 
 const { setupDictBlocks } = require("../DictBlocks");
-global._ = jest.fn((str) => str);
+global._ = jest.fn(str => str);
 
 global.FlowBlock = class FlowBlock {
     constructor(type) {
@@ -54,8 +54,8 @@ global.Turtle = {
         showDict: jest.fn(),
         getDict: jest.fn().mockReturnValue({ key: "value" }),
         getValue: jest.fn().mockReturnValue("value"),
-        setValue: jest.fn(),
-    },
+        setValue: jest.fn()
+    }
 };
 
 class DictBlock extends global.LeftBlock {
@@ -190,7 +190,11 @@ class SetDictBlock2 extends global.FlowBlock {
                 this.activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
-            Turtle.DictActions.setValue(this.activity.turtles.ithTurtle(turtle).name, ...args, turtle);
+            Turtle.DictActions.setValue(
+                this.activity.turtles.ithTurtle(turtle).name,
+                ...args,
+                turtle
+            );
         });
     }
 
@@ -217,7 +221,7 @@ describe("setupDictBlocks", () => {
             errorMsg: jest.fn(),
             blocks: {
                 blockList: {
-                    "block1": {
+                    block1: {
                         connections: [null, "block2", "block3"]
                     }
                 }
@@ -317,7 +321,12 @@ describe("setupDictBlocks", () => {
         const getDictBlock = new GetDictBlock(activity);
         getDictBlock.setup();
         const result = getDictBlock.arg(logo, turtle, blk, "receivedArg");
-        expect(Turtle.DictActions.getValue).toHaveBeenCalledWith("My Dictionary", "key", turtle, blk);
+        expect(Turtle.DictActions.getValue).toHaveBeenCalledWith(
+            "My Dictionary",
+            "key",
+            turtle,
+            blk
+        );
         expect(result).toBe("value");
     });
 
@@ -343,7 +352,12 @@ describe("setupDictBlocks", () => {
         const setDictBlock = new SetDictBlock(activity);
         setDictBlock.setup();
         setDictBlock.flow(["My Dictionary", "key", "value"], logo, turtle, blk);
-        expect(Turtle.DictActions.setValue).toHaveBeenCalledWith("My Dictionary", "key", "value", turtle);
+        expect(Turtle.DictActions.setValue).toHaveBeenCalledWith(
+            "My Dictionary",
+            "key",
+            "value",
+            turtle
+        );
     });
 
     test("should setup GetDictBlock2 correctly", () => {
@@ -412,7 +426,12 @@ describe("setupDictBlocks", () => {
         const getDictBlock = new GetDictBlock(activity);
         getDictBlock.setup();
         const result = getDictBlock.arg(logo, turtle, blk, "receivedArg");
-        expect(Turtle.DictActions.getValue).toHaveBeenCalledWith("My Dictionary", "key", turtle, blk);
+        expect(Turtle.DictActions.getValue).toHaveBeenCalledWith(
+            "My Dictionary",
+            "key",
+            turtle,
+            blk
+        );
         expect(result).toBe("value");
     });
 
@@ -421,7 +440,12 @@ describe("setupDictBlocks", () => {
         const setDictBlock = new SetDictBlock(activity);
         setDictBlock.setup();
         setDictBlock.flow(["My Dictionary", "key", "value"], logo, turtle, blk);
-        expect(Turtle.DictActions.setValue).toHaveBeenCalledWith("My Dictionary", "key", "value", turtle);
+        expect(Turtle.DictActions.setValue).toHaveBeenCalledWith(
+            "My Dictionary",
+            "key",
+            "value",
+            turtle
+        );
     });
 
     test("SetDictBlock2 flow should handle non-null args", () => {

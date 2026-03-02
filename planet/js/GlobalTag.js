@@ -12,16 +12,14 @@
 /*
    global
 
-   _
+   _, toTitleCase
 */
 /*
    exported
 
    GlobalTag
 */
-
 class GlobalTag {
-
     /* 
      this.tagNames = [
             //.TRANS: On the Planet, we use labels to tag projects.
@@ -43,9 +41,9 @@ class GlobalTag {
             //.TRANS: On the Planet, we use labels to tag projects.
             _("Game"),
             //.TRANS: On the Planet, we use labels to tag projects.
-            _("Media"),
+            _("media"),
             //.TRANS: On the Planet, we use labels to tag projects.
-            _("Sensors"),
+            _("sensors"),
             //.TRANS: On the Planet, we use labels to tag projects.
             _("Effects"),
             //.TRANS: On the Planet, we use labels to tag projects.
@@ -54,7 +52,7 @@ class GlobalTag {
     */
 
     constructor(Planet) {
-        this.Planet = Planet ;
+        this.Planet = Planet;
         this.id = null;
         this.name = null;
         this.func = null;
@@ -68,56 +66,52 @@ class GlobalTag {
 
     render() {
         const tag = document.createElement("div");
-        tag.classList.add("chipselect", "cursor") ;
+        tag.classList.add("chipselect", "cursor");
 
-        if (this.selected)
-            tag.classList.add(this.selectedClass) ;
+        if (this.selected) tag.classList.add(this.selectedClass);
 
-        tag.textContent = _(this.name);
+        tag.textContent = toTitleCase(_(this.name));
 
         // eslint-disable-next-line no-unused-vars
-        tag.addEventListener("click",  (evt) => {
+        tag.addEventListener("click", evt => {
             this.onTagClick();
         });
 
-        const elementTag = `${this.IsDisplayTag ? "primary" : "more"}chips` ;
+        const elementTag = `${this.IsDisplayTag ? "primary" : "more"}chips`;
         document.getElementById(elementTag).appendChild(tag);
 
         this.tagElement = tag;
-    };
+    }
 
     onTagClick() {
-        if (this.specialTag && !this.selected)
-            this.globalPlanet.selectSpecialTag(this);
-                 
+        if (this.specialTag && !this.selected) this.globalPlanet.selectSpecialTag(this);
         else {
-            this.selected ? this.unselect() : this.select() ;
+            this.selected ? this.unselect() : this.select();
             this.globalPlanet.refreshTagList();
         }
-    };
+    }
 
     select() {
         this.tagElement.classList.add(this.selectedClass);
         this.selected = true;
-    };
+    }
 
     unselect() {
         this.tagElement.classList.remove(this.selectedClass);
         this.selected = false;
-    };
+    }
 
     init(obj) {
-        const Planet = this.Planet ;
+        const Planet = this.Planet;
 
         if (obj.id !== undefined) {
             this.specialTag = false;
             this.id = obj.id;
             this.name = Planet.TagsManifest[this.id].TagName;
             this.func = null;
-            this.IsDisplayTag = Planet.TagsManifest[this.id].IsDisplayTag === "1" ; // ? "true":"false";
+            this.IsDisplayTag = Planet.TagsManifest[this.id].IsDisplayTag === "1"; // ? "true":"false";
             this.selectedClass = "selected";
-        }
-        else {
+        } else {
             this.specialTag = true;
             this.IsDisplayTag = true;
             this.id = null;
@@ -127,6 +121,5 @@ class GlobalTag {
         }
 
         this.render();
-    };
-
+    }
 }

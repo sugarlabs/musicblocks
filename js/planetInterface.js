@@ -33,8 +33,8 @@ class PlanetInterface {
         this.activity = activity;
 
         /**
-        * Hides music blocks and related elements.
-        */
+         * Hides music blocks and related elements.
+         */
         this.hideMusicBlocks = () => {
             this.activity.hideSearchWidget();
             window.widgetWindows.hideAllWindows();
@@ -77,9 +77,9 @@ class PlanetInterface {
          */
         this.showPlanet = () => {
             const png = docById("overlayCanvas").toDataURL("image/png");
-            this.planet.open(png);  // this.mainCanvas.toDataURL("image/png"));
+            this.planet.open(png); // this.mainCanvas.toDataURL("image/png"));
             this.iframe.style.display = "block";
-            this.iframe.style.zIndex = "9999" ;
+            this.iframe.style.zIndex = "9999";
             try {
                 this.iframe.contentWindow.document.getElementById("local-tab").click();
             } catch (e) {
@@ -188,7 +188,7 @@ class PlanetInterface {
          * Clears the canvas, resets project data, and refreshes the canvas.
          * @param {string} [name] - The name of the new project.
          */
-        this.initialiseNewProject = (name) => {
+        this.initialiseNewProject = name => {
             this.planet.ProjectStorage.initialiseNewProject(name);
             this.activity.sendAllToTrash();
             this.activity.refreshCanvas();
@@ -220,11 +220,12 @@ class PlanetInterface {
                         const bitmap = new createjs.Bitmap(img);
                         const bounds = bitmap.getBounds();
                         bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-                        t.planet.ProjectStorage.saveLocally(data, bitmap.bitmapCache.getCacheDataURL());
+                        t.planet.ProjectStorage.saveLocally(
+                            data,
+                            bitmap.bitmapCache.getCacheDataURL()
+                        );
                     };
-                    img.src =
-                        "data:image/svg+xml;base64," +
-                        window.btoa(base64Encode(svgData));
+                    img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svgData));
                 }
             } catch (e) {
                 if (

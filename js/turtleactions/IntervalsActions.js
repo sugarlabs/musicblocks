@@ -76,17 +76,19 @@ function setupIntervalsActions(activity) {
             let { firstNote, secondNote, octave } = GetNotesForInterval(tur);
             let totalIntervals = Math.abs(ALLNOTESTEP[firstNote] - ALLNOTESTEP[secondNote]);
 
-            if (ALLNOTESTEP[secondNote] < ALLNOTESTEP[firstNote] && octave !== 0) totalIntervals = 12 - totalIntervals;
+            if (ALLNOTESTEP[secondNote] < ALLNOTESTEP[firstNote] && octave !== 0)
+                totalIntervals = 12 - totalIntervals;
 
-            if (octave < 0 && totalIntervals !== 0 && totalIntervals !== 12) totalIntervals = 12 - totalIntervals;
-            
+            if (octave < 0 && totalIntervals !== 0 && totalIntervals !== 12)
+                totalIntervals = 12 - totalIntervals;
+
             if (octave < -1 || totalIntervals === 0) octave = Math.abs(octave);
-            
+
             while (octave > 0) {
                 totalIntervals += 12;
                 octave--;
             }
-            
+
             return totalIntervals;
         }
 
@@ -105,14 +107,24 @@ function setupIntervalsActions(activity) {
             const index2 = NOTENAMES.indexOf(secondNote.substring(0, 1));
             let lastWord = "";
             let letterGap = Math.abs(index2 - index1);
-            
+
             if (index1 > index2 && octave !== 0) letterGap = NOTENAMES.length - letterGap;
 
             let totalIntervals = this.GetIntervalNumber(turtle);
-            
-            const numberToStringMap = [_("one"), _("two"), _("three"), _("four"), _("five"), _("six"), _("seven"), _("eight"), _("nine")];
-            const plural = (Math.abs(octave) > 1) ? _("octaves") : _("octave");
-            
+
+            const numberToStringMap = [
+                _("one"),
+                _("two"),
+                _("three"),
+                _("four"),
+                _("five"),
+                _("six"),
+                _("seven"),
+                _("eight"),
+                _("nine")
+            ];
+            const plural = Math.abs(octave) > 1 ? _("octaves") : _("octave");
+
             let os = numberToStringMap[Math.abs(octave) - 1] || Math.abs(octave);
             if (totalIntervals % 12 === 0 && letterGap === 0) {
                 if (octave < 0) {
@@ -125,25 +137,28 @@ function setupIntervalsActions(activity) {
                     return a.charAt(0).toUpperCase() + a.slice(1);
                 }
             }
-            
+
             if (totalIntervals > 21) {
                 if (octave >= 1) {
                     lastWord = ", " + _("plus") + " " + os + " " + plural;
                 }
                 while (totalIntervals > 12) totalIntervals -= 12;
             }
-            
+
             if (octave < 0) {
-                letterGap = (letterGap !== 0) ? NOTENAMES.length - letterGap : letterGap;
+                letterGap = letterGap !== 0 ? NOTENAMES.length - letterGap : letterGap;
                 if (octave < -1) lastWord = `,  ${os} ${plural}`;
                 lastWord += " ";
                 lastWord += _("below");
             }
-            
-            const interval = (totalIntervals % 12 === 0 && letterGap === 0) ? SEMITONETOINTERVALMAP[totalIntervals][letterGap] : SEMITONETOINTERVALMAP[totalIntervals][letterGap] + lastWord;
+
+            const interval =
+                totalIntervals % 12 === 0 && letterGap === 0
+                    ? SEMITONETOINTERVALMAP[totalIntervals][letterGap]
+                    : SEMITONETOINTERVALMAP[totalIntervals][letterGap] + lastWord;
             return interval;
         }
-        
+
         /**
          * "set key" block.
          * Sets the key and mode.
@@ -417,7 +432,7 @@ function setupIntervalsActions(activity) {
             }
 
             const tur = activity.turtles.ithTurtle(turtle);
-            tur.singer.ratioIntervals.push(value);
+            tur.singer.ratioIntervals.push(arg);
             const listenerName = "_ratio_interval_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
@@ -449,11 +464,14 @@ function setupIntervalsActions(activity) {
             const len = activity.logo.temperamentSelected.length;
 
             if (
-                activity.logo.temperamentSelected[len - 1]
-                    !== activity.logo.temperamentSelected[len - 2]
+                activity.logo.temperamentSelected[len - 1] !==
+                activity.logo.temperamentSelected[len - 2]
             ) {
                 activity.logo.synth.changeInTemperament = true;
             }
         }
     };
+}
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupIntervalsActions };
 }

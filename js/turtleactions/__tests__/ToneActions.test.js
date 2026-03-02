@@ -26,29 +26,29 @@ describe("setupToneActions", () => {
 
     beforeAll(() => {
         global.Singer = {
-            ToneActions: {},
+            ToneActions: {}
         };
         global.instrumentsEffects = {
             0: {
                 "default-voice": {
                     vibratoActive: false,
                     vibratoIntensity: [],
-                    vibratoFrequency: 0,
-                },
-            },
+                    vibratoFrequency: 0
+                }
+            }
         };
         global.VOICENAMES = {
             Piano: ["piano", "grand-piano"],
-            Violin: ["violin", "acoustic-violin"],
+            Violin: ["violin", "acoustic-violin"]
         };
         global.CUSTOMSAMPLES = {};
         global.DEFAULTVOICE = "default-voice";
-        global.last = (array) => array[array.length - 1];
-        global._= (msg) => msg;
+        global.last = array => array[array.length - 1];
+        global._ = msg => msg;
         global.NOINPUTERRORMSG = "Missing input";
         global.MusicBlocks = { isRun: true };
         global.Mouse = {
-            getMouseFromTurtle: (_tur) => {
+            getMouseFromTurtle: _tur => {
                 return _tur ? { MB: { listeners: [] } } : null;
             }
         };
@@ -59,36 +59,36 @@ describe("setupToneActions", () => {
 
         global.VOICENAMES = {
             Piano: ["piano", "grand-piano"],
-            Violin: ["violin", "acoustic-violin"],
+            Violin: ["violin", "acoustic-violin"]
         };
 
         const sharedMouse = { MB: { listeners: [] } };
-        global.Mouse.getMouseFromTurtle = jest.fn((_tur) => sharedMouse);
+        global.Mouse.getMouseFromTurtle = jest.fn(_tur => sharedMouse);
 
         activity = {
             turtles: {
-                ithTurtle: () => targetTurtle,
+                ithTurtle: () => targetTurtle
             },
             blocks: {
-                blockList: { 1: {}, 2: {} },
+                blockList: { 1: {}, 2: {} }
             },
             logo: {
-                setDispatchBlock: jest.fn((_name) => {}),
+                setDispatchBlock: jest.fn(_name => {}),
                 setTurtleListener: jest.fn((_, _name, callback) => {
                     listenerCallbacks[_name] = callback;
                 }),
                 synth: {
                     loadSynth: jest.fn(),
-                    createSynth: jest.fn(),
+                    createSynth: jest.fn()
                 },
                 phraseMaker: {
-                    _instrumentName: null,
+                    _instrumentName: null
                 },
                 notation: {
                     notationSwing: jest.fn(),
                     notationVoices: jest.fn(),
                     notationBeginHarmonics: jest.fn(),
-                    notationEndHarmonics: jest.fn(),
+                    notationEndHarmonics: jest.fn()
                 },
                 timbre: {
                     instrumentName: "default-voice",
@@ -103,13 +103,13 @@ describe("setupToneActions", () => {
                     AMSynthesizer: [],
                     duoSynthesizer: [],
                     vibratoEffect: [],
-                    vibratoParams: [],
+                    vibratoParams: []
                 },
                 inTimbre: true,
                 stopTurtle: false,
-                inMatrix: false,
+                inMatrix: false
             },
-            errorMsg: jest.fn(),
+            errorMsg: jest.fn()
         };
 
         targetTurtle = {
@@ -129,9 +129,9 @@ describe("setupToneActions", () => {
                 tremoloDepth: [],
                 distortionAmount: [],
                 inHarmonic: [],
-                partials: [],
+                partials: []
             },
-            inSetTimbre: false,
+            inSetTimbre: false
         };
 
         global.instrumentsEffects = {
@@ -139,11 +139,11 @@ describe("setupToneActions", () => {
                 "default-voice": {
                     vibratoActive: false,
                     vibratoIntensity: [],
-                    vibratoFrequency: [],
-                },
-            },
+                    vibratoFrequency: []
+                }
+            }
         };
-        
+
         setupToneActions(activity);
     });
 
@@ -152,7 +152,7 @@ describe("setupToneActions", () => {
             Singer.ToneActions.setTimbre("piano", 0, 1);
             expect(targetTurtle.singer.instrumentNames).toContain("grand-piano");
             expect(activity.logo.synth.loadSynth).toHaveBeenCalledWith(0, "grand-piano");
-            
+
             if (listenerCallbacks["_settimbre_0"]) {
                 listenerCallbacks["_settimbre_0"]();
                 expect(targetTurtle.inSetTimbre).toBe(false);
@@ -168,7 +168,11 @@ describe("setupToneActions", () => {
         it("should handle custom sample timbres correctly", () => {
             const customSample = ["custom1", "sample1", "sample2", "sample3"];
             Singer.ToneActions.setTimbre(customSample, 0, 1);
-            expect(global.CUSTOMSAMPLES["customsample_custom1"]).toEqual(["sample1", "sample2", "sample3"]);
+            expect(global.CUSTOMSAMPLES["customsample_custom1"]).toEqual([
+                "sample1",
+                "sample2",
+                "sample3"
+            ]);
             expect(targetTurtle.singer.instrumentNames).toContain("customsample_custom1");
         });
 
@@ -195,16 +199,16 @@ describe("setupToneActions", () => {
             const synthName = global.VOICENAMES.Piano[1];
             expect(activity.logo.phraseMaker._instrumentName).toBe(synthName);
         });
-        
+
         it("should initialize synthVolume when undefined", () => {
             targetTurtle.singer.instrumentNames = [];
 
             const synthName = global.VOICENAMES.Piano[1];
             delete targetTurtle.singer.synthVolume[synthName];
             delete targetTurtle.singer.crescendoInitialVolume[synthName];
-            
+
             Singer.ToneActions.setTimbre("piano", 0, 1);
-            
+
             expect(targetTurtle.singer.synthVolume[synthName]).toBeDefined();
             expect(targetTurtle.singer.synthVolume[synthName]).toEqual([1]);
             expect(targetTurtle.singer.crescendoInitialVolume[synthName]).toEqual([1]);
@@ -239,15 +243,15 @@ describe("setupToneActions", () => {
             const intensity = 50;
             const rate = 10;
             const blk = 1;
-            
+
             Singer.ToneActions.doVibrato(intensity, rate, 0, blk);
-            
+
             expect(targetTurtle.singer.vibratoIntensity).toContain(intensity / 100);
             expect(targetTurtle.singer.vibratoRate).toContain(1 / rate);
             expect(activity.logo.timbre.vibratoEffect).toContain(blk);
             expect(activity.logo.timbre.vibratoParams).toContain(intensity);
             expect(global.instrumentsEffects[0]["default-voice"].vibratoActive).toBe(true);
-            
+
             if (listenerCallbacks["_vibrato_0"]) {
                 listenerCallbacks["_vibrato_0"]();
                 expect(targetTurtle.singer.vibratoIntensity.length).toBe(0);
@@ -257,21 +261,27 @@ describe("setupToneActions", () => {
 
         it("should show error for invalid vibrato intensity", () => {
             Singer.ToneActions.doVibrato(150, 5, 0, 1);
-            expect(activity.errorMsg).toHaveBeenCalledWith("Vibrato intensity must be between 1 and 100.", 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Vibrato intensity must be between 1 and 100.",
+                1
+            );
             expect(activity.logo.stopTurtle).toBe(true);
         });
 
         it("should show error for invalid vibrato rate", () => {
             Singer.ToneActions.doVibrato(50, 0, 0, 1);
-            expect(activity.errorMsg).toHaveBeenCalledWith("Vibrato rate must be greater than 0.", 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Vibrato rate must be greater than 0.",
+                1
+            );
             expect(activity.logo.stopTurtle).toBe(true);
         });
-        
+
         it("should use last vibrato intensity in timbre mode", () => {
             activity.logo.inTimbre = true;
-            
+
             Singer.ToneActions.doVibrato(50, 10, 0, 1);
-            
+
             expect(global.instrumentsEffects[0]["default-voice"].vibratoActive).toBe(true);
             expect(activity.logo.timbre.vibratoParams).toContain(50);
             expect(activity.logo.timbre.vibratoParams).toContain(0.1);
@@ -309,7 +319,7 @@ describe("setupToneActions", () => {
             expect(targetTurtle.singer.chorusRate).toContain(1.5);
             expect(targetTurtle.singer.delayTime).toContain(20);
             expect(targetTurtle.singer.chorusDepth).toContain(0.5);
-            
+
             if (listenerCallbacks["_chorus_0"]) {
                 listenerCallbacks["_chorus_0"]();
                 expect(targetTurtle.singer.chorusRate.length).toBe(0);
@@ -323,7 +333,7 @@ describe("setupToneActions", () => {
             expect(activity.errorMsg).toHaveBeenCalledWith("Depth is out of range.", 1);
             expect(activity.logo.stopTurtle).toBe(true);
         });
-        
+
         it("should show error for negative chorus depth", () => {
             Singer.ToneActions.doChorus(1.5, 20, -10, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Depth is out of range.", 1);
@@ -355,7 +365,7 @@ describe("setupToneActions", () => {
             expect(targetTurtle.singer.rate).toContain(2);
             expect(targetTurtle.singer.octaves).toContain(3);
             expect(targetTurtle.singer.baseFrequency).toContain(100);
-            
+
             if (listenerCallbacks["_phaser_0"]) {
                 listenerCallbacks["_phaser_0"]();
                 expect(targetTurtle.singer.rate.length).toBe(0);
@@ -401,7 +411,7 @@ describe("setupToneActions", () => {
             expect(activity.errorMsg).toHaveBeenCalledWith("Depth is out of range.", 1);
             expect(activity.logo.stopTurtle).toBe(true);
         });
-        
+
         it("should show error for negative tremolo depth", () => {
             Singer.ToneActions.doTremolo(5, -50, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Depth is out of range.", 1);
@@ -443,7 +453,7 @@ describe("setupToneActions", () => {
             expect(activity.errorMsg).toHaveBeenCalledWith("Distortion must be from 0 to 100.", 1);
             expect(activity.logo.stopTurtle).toBe(true);
         });
-        
+
         it("should show error for negative distortion amount", () => {
             Singer.ToneActions.doDistortion(-10, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Distortion must be from 0 to 100.", 1);
@@ -473,14 +483,14 @@ describe("setupToneActions", () => {
         it("should apply harmonic effect correctly", () => {
             const blk = 1;
             const harmonic = 2;
-            
+
             Singer.ToneActions.doHarmonic(harmonic, 0, blk);
-            
+
             expect(activity.logo.notation.notationBeginHarmonics).toHaveBeenCalledWith(0);
             expect(targetTurtle.singer.partials).toHaveLength(1);
             expect(targetTurtle.singer.partials[0]).toEqual([0, 0, 1]);
             expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_harmonic_0_1");
-            
+
             if (listenerCallbacks["_harmonic_0_1"]) {
                 listenerCallbacks["_harmonic_0_1"]();
                 expect(targetTurtle.singer.inHarmonic.length).toBe(0);
@@ -491,16 +501,20 @@ describe("setupToneActions", () => {
 
         it("should show error for invalid harmonic value", () => {
             Singer.ToneActions.doHarmonic(-1, 0, 1);
-            expect(activity.errorMsg).toHaveBeenCalledWith("Partial must be greater than or equal to 0.");
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Partial must be greater than or equal to 0."
+            );
             expect(activity.logo.stopTurtle).toBe(true);
         });
-        
+
         it("should show error for non-numeric harmonic value", () => {
             Singer.ToneActions.doHarmonic("not a number", 0, 1);
-            expect(activity.errorMsg).toHaveBeenCalledWith("Partial must be greater than or equal to 0.");
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Partial must be greater than or equal to 0."
+            );
             expect(activity.logo.stopTurtle).toBe(true);
         });
-        
+
         it("should handle zero harmonic value", () => {
             Singer.ToneActions.doHarmonic(0, 0, 1);
             expect(targetTurtle.singer.partials).toHaveLength(1);
@@ -535,7 +549,7 @@ describe("setupToneActions", () => {
                 0,
                 "default-voice",
                 "fmsynth",
-                { "modulationIndex": 10 }
+                { modulationIndex: 10 }
             );
         });
 
@@ -550,13 +564,15 @@ describe("setupToneActions", () => {
             expect(activity.errorMsg).toHaveBeenCalledWith("The input cannot be negative.");
             expect(activity.logo.timbre.FMSynthParams).toContain(10);
         });
-        
+
         it("should show error when oscillators exist", () => {
             activity.logo.timbre.osc = [{}];
             Singer.ToneActions.defFMSynth(10, 0, 1);
-            expect(activity.errorMsg).toHaveBeenCalledWith("Unable to use synth due to existing oscillator");
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Unable to use synth due to existing oscillator"
+            );
         });
-        
+
         it("should not create parameters when not in timbre mode", () => {
             activity.logo.inTimbre = false;
             Singer.ToneActions.defFMSynth(10, 0, 1);
@@ -572,7 +588,7 @@ describe("setupToneActions", () => {
                 0,
                 "default-voice",
                 "amsynth",
-                { "harmonicity": 5 }
+                { harmonicity: 5 }
             );
         });
 
@@ -593,13 +609,15 @@ describe("setupToneActions", () => {
             expect(activity.errorMsg).toHaveBeenCalledWith("The input cannot be negative.");
             expect(activity.logo.timbre.AMSynthParams).toContain(5);
         });
-        
+
         it("should show error when oscillators exist", () => {
             activity.logo.timbre.osc = [{}];
             Singer.ToneActions.defAMSynth(5, 0, 1);
-            expect(activity.errorMsg).toHaveBeenCalledWith("Unable to use synth due to existing oscillator");
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Unable to use synth due to existing oscillator"
+            );
         });
-        
+
         it("should not create parameters when not in timbre mode", () => {
             activity.logo.inTimbre = false;
             Singer.ToneActions.defAMSynth(5, 0, 1);
@@ -616,7 +634,7 @@ describe("setupToneActions", () => {
                 0,
                 "default-voice",
                 "duosynth",
-                { "vibratoRate": 10, "vibratoAmount": 0.2 }
+                { vibratoRate: 10, vibratoAmount: 0.2 }
             );
         });
 
@@ -637,25 +655,27 @@ describe("setupToneActions", () => {
             expect(activity.errorMsg).toHaveBeenCalledWith("Missing input", 1);
             expect(activity.logo.timbre.duoSynthParams).toContain(0.5);
         });
-        
+
         it("should handle non-numeric vibratoAmount", () => {
             Singer.ToneActions.defDuoSynth(10, "string", 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Missing input", 1);
             expect(activity.logo.timbre.duoSynthParams).toContain(0.5);
         });
-        
+
         it("should handle negative inputs correctly", () => {
             Singer.ToneActions.defDuoSynth(-10, -20, 0, 1);
             expect(activity.logo.timbre.duoSynthParams).toContain(10);
             expect(activity.logo.timbre.duoSynthParams).toContain(0.2);
         });
-        
+
         it("should show error when oscillators exist", () => {
             activity.logo.timbre.osc = [{}];
             Singer.ToneActions.defDuoSynth(10, 20, 0, 1);
-            expect(activity.errorMsg).toHaveBeenCalledWith("Unable to use synth due to existing oscillator");
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Unable to use synth due to existing oscillator"
+            );
         });
-        
+
         it("should not create parameters when not in timbre mode", () => {
             activity.logo.inTimbre = false;
             Singer.ToneActions.defDuoSynth(10, 20, 0, 1);

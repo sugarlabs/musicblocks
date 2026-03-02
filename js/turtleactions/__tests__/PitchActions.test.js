@@ -34,6 +34,7 @@ Object.assign(global, {
     nthDegreeToPitch: musicUtils.nthDegreeToPitch,
     keySignatureToMode: musicUtils.keySignatureToMode,
     frequencyToPitch: musicUtils.frequencyToPitch,
+    pitchToFrequency: musicUtils.pitchToFrequency,
     numberToPitch: musicUtils.numberToPitch,
     isCustomTemperament: musicUtils.isCustomTemperament,
     ACCIDENTALNAMES: musicUtils.ACCIDENTALNAMES,
@@ -43,7 +44,7 @@ Object.assign(global, {
     NOTESTEP: musicUtils.NOTESTEP,
     MUSICALMODES: musicUtils.MUSICALMODES,
     SHARP: musicUtils.SHARP,
-    FLAT: musicUtils.FLAT,
+    FLAT: musicUtils.FLAT
 });
 
 global.NANERRORMSG = require("../../logo").NANERRORMSG;
@@ -92,14 +93,21 @@ describe("Tests for Singer.PitchActions setup", () => {
                 inMusicKeyboard: false,
                 synth: { inTemperament: "equal", startingPitch: "A0" },
                 runningLilypond: false,
-                setDispatchBlock(name, t, l) { /* record listener */ },
-                setTurtleListener() { /* record cleanup */ },
+                setDispatchBlock(name, t, l) {
+                    /* record listener */
+                },
+                setTurtleListener() {
+                    /* record cleanup */
+                },
                 stopTurtle: false,
                 notation: { notationMarkup() {} }
             },
-            errorMsg() { /* record error */ }
+            errorMsg() {
+                /* record error */
+            }
         };
         setupPitchActions(activity);
+        Singer.processPitch.mockImplementation(() => {});
     });
 
     test("playPitch → always calls processPitch", () => {
@@ -185,7 +193,6 @@ describe("Tests for Singer.PitchActions setup", () => {
                 Singer.PitchActions.playNthModalPitch(5.2, 3, 0, blkId);
             }).not.toThrow();
         });
-
     });
 
     describe("Tests for playPitchNumber", () => {
@@ -220,29 +227,88 @@ describe("Tests for Singer.PitchActions setup", () => {
         });
     });
 
-    test("Tests for playHertz", () => {
+    test("Tests for playHertz (symbolic/440Hz)", () => {
+        turtle.singer.notePitches = { 1: [] };
+        turtle.singer.noteOctaves = { 1: [] };
+        turtle.singer.noteCents = { 1: [] };
         turtle.singer.inNoteBlock = [1];
         activity.logo.runningLilypond = true;
+
+        // Mock processPitch to simulate adding a symbolic note (0 cents)
+        Singer.processPitch.mockImplementation(() => {
+            turtle.singer.notePitches[1].push("A");
+            turtle.singer.noteOctaves[1].push(4);
+            turtle.singer.noteCents[1].push(0);
+        });
+
         jest.spyOn(activity.logo.notation, "notationMarkup");
         Singer.PitchActions.playHertz(440, 0, blkId);
-        expect(activity.logo.notation.notationMarkup).toHaveBeenCalled();
+
+        // Should NOT call markup for symbolic note
+        expect(activity.logo.notation.notationMarkup).not.toHaveBeenCalled();
     });
 
-    test("playHertz notationMarkup occurs only when both inNoteBlock AND runningLilypond", () => {
-        const spyMark = jest.spyOn(activity.logo.notation, "notationMarkup");
+    test("Tests for playHertz (microtonal/445Hz)", () => {
+        turtle.singer.notePitches = { 1: [] };
+        turtle.singer.noteOctaves = { 1: [] };
+        turtle.singer.noteCents = { 1: [] };
         turtle.singer.inNoteBlock = [1];
         activity.logo.runningLilypond = true;
-        Singer.PitchActions.playHertz(440, 0, blkId);
-        expect(spyMark).toHaveBeenCalledWith(0, 440);
+
+        // Mock processPitch to simulate adding a microtonal note (e.g. 20 cents)
+        Singer.processPitch.mockImplementation(() => {
+            turtle.singer.notePitches[1].push("A");
+            turtle.singer.noteOctaves[1].push(4);
+            turtle.singer.noteCents[1].push(20);
+        });
+
+        const spyMark = jest.spyOn(activity.logo.notation, "notationMarkup");
+        Singer.PitchActions.playHertz(445, 0, blkId);
+
+        // Should call markup for microtonal note
+        // transformedHertz calculated from A4 + 20 cents
+        expect(spyMark).toHaveBeenCalled();
+    });
+
+    test("playHertz notationMarkup occurs only when both inNoteBlock AND runningLilypond AND microtonal", () => {
+        const spyMark = jest.spyOn(activity.logo.notation, "notationMarkup");
+        turtle.singer.inNoteBlock = [1];
+        turtle.singer.notePitches = { 1: [] };
+        turtle.singer.noteOctaves = { 1: [] };
+        turtle.singer.noteCents = { 1: [] };
+
+        // Microtonal setup
+        Singer.processPitch.mockImplementation(() => {
+            turtle.singer.notePitches[1].push("A");
+            turtle.singer.noteOctaves[1].push(4);
+            turtle.singer.noteCents[1].push(50);
+        });
+
+        activity.logo.runningLilypond = true;
+        Singer.PitchActions.playHertz(440, 0, blkId); // 440 input doesn't matter, mock storage dictates 50 cents
+        expect(spyMark).toHaveBeenCalled(); // Called because cents=50
+
         spyMark.mockClear();
+        // Reset storage for next case
+        turtle.singer.notePitches[1] = [];
+        turtle.singer.noteOctaves[1] = [];
+        turtle.singer.noteCents[1] = [];
+
         activity.logo.runningLilypond = false;
         Singer.PitchActions.playHertz(440, 0, blkId);
         expect(spyMark).not.toHaveBeenCalled();
+
         spyMark.mockClear();
-        turtle.singer.inNoteBlock = [];
+        // Reset storage
+        turtle.singer.notePitches[1] = [];
+        turtle.singer.noteOctaves[1] = [];
+        turtle.singer.noteCents[1] = [];
+
+        turtle.singer.inNoteBlock = []; // No note block
         activity.logo.runningLilypond = true;
         Singer.PitchActions.playHertz(440, 0, blkId);
         expect(spyMark).not.toHaveBeenCalled();
+
         spyMark.mockRestore();
     });
 
@@ -333,13 +399,15 @@ describe("Tests for Singer.PitchActions setup", () => {
     describe("Tests for consonantStepSize", () => {
         test("with lastNote → uses slice path", () => {
             turtle.singer.lastNotePlayed = ["F#4", 4];
-            expect(Singer.PitchActions.consonantStepSize("down", 0))
-                .toEqual(musicUtils.getStepSizeDown("C", "F#"));
+            expect(Singer.PitchActions.consonantStepSize("down", 0)).toEqual(
+                musicUtils.getStepSizeDown("C", "F#")
+            );
         });
         test("no lastNote → default G", () => {
             turtle.singer.lastNotePlayed = null;
-            expect(Singer.PitchActions.consonantStepSize("up", 0))
-                .toEqual(musicUtils.getStepSizeUp("C", "G"));
+            expect(Singer.PitchActions.consonantStepSize("up", 0)).toEqual(
+                musicUtils.getStepSizeUp("C", "G")
+            );
         });
     });
 
@@ -422,7 +490,7 @@ describe("Tests for Singer.PitchActions setup", () => {
             expect(tl).toHaveBeenCalledWith(0, "_transposition_ratio_0", expect.any(Function));
         });
     });
-  
+
     describe("low‑level listener callbacks for Accidental / Transpose / Invert", () => {
         let fakeMouse;
 
@@ -439,7 +507,7 @@ describe("Tests for Singer.PitchActions setup", () => {
         test('setAccidental early‑return for _("sharp") & _("flat")', () => {
             const before = turtle.singer.transposition;
             Singer.PitchActions.setAccidental(_("sharp"), 0, blkId);
-            Singer.PitchActions.setAccidental(_("flat"),  0, blkId);
+            Singer.PitchActions.setAccidental(_("flat"), 0, blkId);
             expect(turtle.singer.transposition).toBe(before);
         });
 
@@ -486,7 +554,7 @@ describe("Tests for Singer.PitchActions setup", () => {
             expect(turtle.singer.transposition).toBe(before);
         });
     });
-  
+
     describe("playNthModalPitch unicode FLAT/SHARP ref‑adjustment", () => {
         test("FLAT symbol branch", () => {
             global.keySignatureToMode = () => ["B" + FLAT, "major"];
@@ -516,11 +584,11 @@ describe("Tests for Singer.PitchActions setup", () => {
             MusicBlocks.isRun = false;
         });
         test("pushes listenerName into Mouse.MB.listeners", () => {
-            Singer.PitchActions.invert("C", 4, "even", 0 /*turtle*/, /*blk*/);
+            Singer.PitchActions.invert("C", 4, "even", 0 /*turtle*/ /*blk*/);
             expect(fakeMouse.MB.listeners).toContain("_invert_0");
         });
     });
-  
+
     describe("default listener‑only path", () => {
         let tl;
         beforeEach(() => {
@@ -534,47 +602,27 @@ describe("Tests for Singer.PitchActions setup", () => {
         test("setAccidental registers listener only", () => {
             const acc = ACCIDENTALNAMES[0];
             Singer.PitchActions.setAccidental(acc, 0 /*turtle*/);
-            expect(tl).toHaveBeenCalledWith(
-                0,
-                "_accidental_0_undefined",
-                expect.any(Function)
-            );
+            expect(tl).toHaveBeenCalledWith(0, "_accidental_0_undefined", expect.any(Function));
         });
 
         test("setScalarTranspose registers listener only", () => {
             Singer.PitchActions.setScalarTranspose(3, 0);
-            expect(tl).toHaveBeenCalledWith(
-                0,
-                "_scalar_transposition_0",
-                expect.any(Function)
-            );
+            expect(tl).toHaveBeenCalledWith(0, "_scalar_transposition_0", expect.any(Function));
         });
 
         test("setSemitoneTranspose registers listener only", () => {
             Singer.PitchActions.setSemitoneTranspose(2, 0);
-            expect(tl).toHaveBeenCalledWith(
-                0,
-                "_transposition_0",
-                expect.any(Function)
-            );
+            expect(tl).toHaveBeenCalledWith(0, "_transposition_0", expect.any(Function));
         });
 
         test("setRatioTranspose registers listener only", () => {
             Singer.PitchActions.setRatioTranspose(5, 0);
-            expect(tl).toHaveBeenCalledWith(
-                0,
-                "_transposition_ratio_0",
-                expect.any(Function)
-            );
+            expect(tl).toHaveBeenCalledWith(0, "_transposition_ratio_0", expect.any(Function));
         });
-    
+
         test("invert registers listener only", () => {
             Singer.PitchActions.invert("C", 4, "even", 0);
-            expect(tl).toHaveBeenCalledWith(
-                0,
-                "_invert_0",
-                expect.any(Function)
-            );
+            expect(tl).toHaveBeenCalledWith(0, "_invert_0", expect.any(Function));
         });
     });
 });

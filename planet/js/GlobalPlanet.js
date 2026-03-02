@@ -9,7 +9,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-
 /*
    global
 
@@ -23,16 +22,19 @@
 */
 
 class GlobalPlanet {
-    
     constructor(Planet) {
-        this.Planet = Planet ;
+        this.Planet = Planet;
         this.ProjectViewer = null;
 
         this.offlineHTML = `<div class= "container center-align">
-                            ${_(`Feature unavailable - cannot connect to server. Reload ${Planet.IsMusicBlocks ? "Music" : "Turtle"} Blocks to try again.`)}
+                            ${_(
+                                `Feature unavailable - cannot connect to server. Reload ${
+                                    Planet.IsMusicBlocks ? "Music" : "Turtle"
+                                } Blocks to try again.`
+                            )}
                             </div>`;
-    
-        this.noProjects  = `<div class= "container center-align">${_("No results found.")}</div>` ;
+
+        this.noProjects = `<div class= "container center-align">${_("No results found.")}</div>`;
         this.tags = [];
         this.specialTags = null;
         this.defaultTag = false;
@@ -52,7 +54,7 @@ class GlobalPlanet {
     }
 
     initTagList() {
-        const Planet = this.Planet ;
+        const Planet = this.Planet;
         let t;
 
         for (let i = 0; i < this.specialTags.length; i++) {
@@ -60,8 +62,7 @@ class GlobalPlanet {
             t.init(this.specialTags[i]);
             this.tags.push(t);
 
-            if (this.specialTags[i].defaultTag === true)
-                this.defaultTag = t;
+            if (this.specialTags[i].defaultTag === true) this.defaultTag = t;
         }
 
         const tagsToInitialise = [];
@@ -69,38 +70,34 @@ class GlobalPlanet {
         const keys = Object.keys(Planet.TagsManifest);
         for (let i = 0; i < keys.length; i++) {
             t = new GlobalTag(Planet);
-            t.init({"id": keys[i]});
+            t.init({ id: keys[i] });
             this.tags.push(t);
-            if (this.defaultMainTags.indexOf(Planet.TagsManifest[keys[i]].TagName)!=-1){
-                t.selected=true;
+            if (this.defaultMainTags.indexOf(Planet.TagsManifest[keys[i]].TagName) != -1) {
+                t.selected = true;
                 tagsToInitialise.push(t);
             }
         }
 
         this.sortBy = document.getElementById("sort-select").value;
 
-        if (this.defaultTag!=false)
-            this.selectSpecialTag(this.defaultTag);
+        if (this.defaultTag != false) this.selectSpecialTag(this.defaultTag);
 
-        for (let i = 0; i<tagsToInitialise.length; i++)
-            tagsToInitialise[i].select();
-        
+        for (let i = 0; i < tagsToInitialise.length; i++) tagsToInitialise[i].select();
+
         this.refreshTagList();
-    };
+    }
 
     selectSpecialTag(tag) {
-        for (let i = 0; i < this.tags.length; i++)
-            this.tags[i].unselect();
+        for (let i = 0; i < this.tags.length; i++) this.tags[i].unselect();
 
         tag.select();
         tag.func();
-    };
+    }
 
     unselectSpecialTags() {
         for (let i = 0; i < this.tags.length; i++)
-            if (this.tags[i].specialTag)
-                this.tags[i].unselect();
-    };
+            if (this.tags[i].specialTag) this.tags[i].unselect();
+    }
 
     refreshTagList() {
         const tagids = [];
@@ -109,32 +106,30 @@ class GlobalPlanet {
             if (this.tags[i].specialTag === false && this.tags[i].selected === true)
                 tagids.push(this.tags[i].id);
 
-        if (tagids.length === 0)
-            this.selectSpecialTag(this.defaultTag);
-
+        if (tagids.length === 0) this.selectSpecialTag(this.defaultTag);
         else {
             this.unselectSpecialTags();
             this.searchTags(tagids);
         }
-    };
+    }
 
     searchAllProjects() {
         this.searchMode = "ALL_PROJECTS";
         this.refreshProjects();
-    };
+    }
 
     searchMyProjects() {
         this.searchMode = "USER_PROJECTS";
         this.refreshProjects();
-    };
+    }
 
     searchTags(tagids) {
         this.searchMode = JSON.stringify(tagids);
         this.refreshProjects();
-    };
+    }
 
     refreshProjects() {
-        const Planet = this.Planet ;
+        const Planet = this.Planet;
 
         this.index = 0;
         this.cards = [];
@@ -150,8 +145,7 @@ class GlobalPlanet {
                 this.index + this.page + 1,
                 this.afterRefreshProjects.bind(this)
             );
-        }
-        else {
+        } else {
             Planet.ServerInterface.downloadProjectList(
                 this.searchMode,
                 this.sortBy,
@@ -160,10 +154,10 @@ class GlobalPlanet {
                 this.afterRefreshProjects.bind(this)
             );
         }
-    };
-    
+    }
+
     loadMoreProjects() {
-        const Planet = this.Planet ;
+        const Planet = this.Planet;
 
         this.showLoading();
         this.hideLoadMore();
@@ -176,8 +170,7 @@ class GlobalPlanet {
                 this.index + this.page + 1,
                 this.afterRefreshProjects.bind(this)
             );
-        }
-        else {
+        } else {
             Planet.ServerInterface.downloadProjectList(
                 this.searchMode,
                 this.sortBy,
@@ -186,18 +179,17 @@ class GlobalPlanet {
                 this.afterRefreshProjects.bind(this)
             );
         }
-    };
+    }
 
     search() {
-        const Planet = this.Planet ;
+        const Planet = this.Planet;
 
         if (!this.searching) {
             if (this.searchString === "") {
                 this.oldSearchString = "";
                 this.searching = false;
                 this.showTags();
-            }
-            else {
+            } else {
                 this.searching = true;
                 this.hideTags();
             }
@@ -216,75 +208,76 @@ class GlobalPlanet {
                 this.afterRefreshProjects.bind(this)
             );
         }
-    };
+    }
 
     afterSearch() {
         this.searching = false;
 
-        if (this.searchString !== this.oldSearchString)
-            this.search();
-    };
+        if (this.searchString !== this.oldSearchString) this.search();
+    }
 
     afterRefreshProjects(data) {
-        data.success ? this.addProjects(data.data) : this.throwOfflineError() ;
-    };
+        data.success ? this.addProjects(data.data) : this.throwOfflineError();
+    }
 
     addProjects(data) {
         const toDownload = [];
 
         for (let i = 0; i < data.length; i++) {
             // eslint-disable-next-line no-prototype-builtins
-            if (this.cache.hasOwnProperty(data[i][0])){
+            if (this.cache.hasOwnProperty(data[i][0])) {
                 if (this.cache[data[i][0]].ProjectLastUpdated !== data[i][1])
                     toDownload.push(data[i]);
-            }
-            
-            else toDownload.push(data[i]);
+            } else toDownload.push(data[i]);
         }
 
         this.loadCount = toDownload.length;
         const l = data.length;
 
-        if (l === this.page + 1)
-            data.pop();
+        if (l === this.page + 1) data.pop();
 
         if (l === 0) {
             this.throwNoProjectsError();
             this.afterAddProjects();
-        }
-
-        else if (this.loadCount === 0) {
+        } else if (this.loadCount === 0) {
             this.render(data);
-            (l === this.page + 1) ? this.showLoadMore() : this.hideLoadMore();
+            l === this.page + 1 ? this.showLoadMore() : this.hideLoadMore();
+        } else if (l === this.page + 1) {
+            this.downloadProjectsToCache(
+                toDownload,
+                function () {
+                    this.render(data);
+                    this.showLoadMore();
+                }.bind(this)
+            );
+        } else {
+            this.downloadProjectsToCache(
+                toDownload,
+                function () {
+                    this.render(data);
+                    this.hideLoadMore();
+                }.bind(this)
+            );
         }
-
-        else if (l === this.page + 1) {
-            this.downloadProjectsToCache(toDownload, function() {
-                this.render(data);this.showLoadMore();
-            }.bind(this));
-        }
-
-        else {
-            this.downloadProjectsToCache(toDownload, function() {
-                this.render(data);this.hideLoadMore();
-            }.bind(this));
-        }
-    };
+    }
 
     downloadProjectsToCache(data, callback) {
-        const Planet = this.Planet ;
+        const Planet = this.Planet;
         this.loadCount = data.length;
 
         for (let i = 0; i < data.length; i++) {
-            (function() {
+            (function () {
                 const id = data[i][0];
-                Planet.ServerInterface.getProjectDetails(id, function(d) {
-                    const tempid = id;
-                    this.addProjectToCache(tempid, d, callback);
-                }.bind(this));
-            }.bind(this))();
+                Planet.ServerInterface.getProjectDetails(
+                    id,
+                    function (d) {
+                        const tempid = id;
+                        this.addProjectToCache(tempid, d, callback);
+                    }.bind(this)
+                );
+            }.bind(this)());
         }
-    };
+    }
 
     addProjectToCache(id, data, callback) {
         if (data.success) {
@@ -292,86 +285,78 @@ class GlobalPlanet {
             this.cache[id].ProjectData = null;
             this.loadCount -= 1;
 
-            if (this.loadCount <= 0)
-                callback();
-        }
-        else this.throwOfflineError();
-    };
+            if (this.loadCount <= 0) callback();
+        } else this.throwOfflineError();
+    }
 
     forceAddToCache(id, callback) {
-        this.Planet.ServerInterface.getProjectDetails(id, function(d) {
-            this.addProjectToCache(id, d, callback);
-        }.bind(this));
-    };
+        this.Planet.ServerInterface.getProjectDetails(
+            id,
+            function (d) {
+                this.addProjectToCache(id, d, callback);
+            }.bind(this)
+        );
+    }
 
-    afterForceAddToCache (id, data, callback) {
+    afterForceAddToCache(id, data, callback) {
         if (data.success) {
             this.cache[id] = data.data;
             this.cache[id].ProjectData = null;
             callback();
-        }
-        
-        else this.throwOfflineError();
-    };
+        } else this.throwOfflineError();
+    }
 
     getData(id, callback, error) {
-        if (error === undefined)
-            error = null;
+        if (error === undefined) error = null;
 
         if (this.cache[id] === undefined || this.cache[id].ProjectData === null)
             this.downloadDataToCache(id, callback, error);
-
-        else  callback(this.cache[id].ProjectData);
-    };
+        else callback(this.cache[id].ProjectData);
+    }
 
     downloadDataToCache(id, callback, error) {
-        if (error === undefined)
-            error = null;
-    
-        this.Planet.ServerInterface.downloadProject(id, function(data) {
-            this.afterDownloadData(id, data, callback, error);
-        }.bind(this));
-    };
+        if (error === undefined) error = null;
+
+        this.Planet.ServerInterface.downloadProject(
+            id,
+            function (data) {
+                this.afterDownloadData(id, data, callback, error);
+            }.bind(this)
+        );
+    }
 
     afterDownloadData(id, data, callback, error) {
-        const Planet = this.Planet ;
+        const Planet = this.Planet;
 
-        if (error === undefined)
-            error = null;
+        if (error === undefined) error = null;
 
         if (data.success) {
             if (id in this.cache) {
                 this.cache[id].ProjectData = Planet.ProjectStorage.decodeTB(data.data);
                 callback(this.cache[id].ProjectData);
-            }
-
-            else callback(Planet.ProjectStorage.decodeTB(data.data));
+            } else callback(Planet.ProjectStorage.decodeTB(data.data));
+        } else {
+            if (error !== null) error();
         }
-        
-        else {
-            if (error !== null)
-                error();
-        }
-    };
+    }
 
     cleanContainer() {
-        const element = document.getElementById("global-projects").firstElementChild ;
-        const list = element?.classList ?? "empty" ;
+        const element = document.getElementById("global-projects").firstElementChild;
+        const list = element?.classList ?? "empty";
 
-        if (list === "empty")
-            return ;
+        if (list === "empty") return;
 
         list.forEach(name => {
             if (name === "container" || name === "center-align") {
-                element.remove() ;
-                return ;
+                element.remove();
+                return;
             }
         });
-    } ;
+    }
 
     render(data) {
         // Make sure the container doesn't display the offlineHTML or noProjectsHTML even when cards are being rendered.
-        this.cleanContainer() ;
+        this.cleanContainer();
 
         for (let i = 0; i < data.length; i++) {
             // eslint-disable-next-line no-prototype-builtins
@@ -386,156 +371,176 @@ class GlobalPlanet {
             }
         }
 
-        jQuery(".tooltipped").tooltip({delay: 50});
+        jQuery(".tooltipped").tooltip({ delay: 50 });
         this.afterAddProjects();
-    };
+    }
 
     afterAddProjects() {
         this.index += this.page;
         this.hideLoading();
 
-        if (this.oldSearchString !== "")
-            this.afterSearch();
-    };
+        if (this.oldSearchString !== "") this.afterSearch();
+    }
 
     throwOfflineError() {
         this.hideLoading();
         this.hideLoadMore();
 
-        const element = document.getElementById("global-projects") ;
+        const element = document.getElementById("global-projects");
         element.innerHTML = "";
         element.insertAdjacentHTML("afterbegin", this.offlineHTML);
-    };
+    }
 
     throwNoProjectsError() {
         this.hideLoading();
         this.hideLoadMore();
 
-        const element = document.getElementById("global-projects") ;
+        const element = document.getElementById("global-projects");
         element.innerHTML = "";
         element.insertAdjacentHTML("afterbegin", this.noProjects);
-    };
+    }
 
     hideLoading() {
         document.getElementById("global-load").style.display = "none";
-    };
+    }
 
     showLoading() {
         document.getElementById("global-load").style.display = "block";
-    };
+    }
 
     hideLoadMore() {
         document.getElementById("load-more-projects").style.display = "none";
         this.loadButtonShown = false;
-    };
+    }
 
     showLoadMore() {
         const l = document.getElementById("load-more-projects");
         l.style.display = "block";
         l.classList.remove("disabled");
         this.loadButtonShown = true;
-    };
+    }
 
     hideTags() {
         document.getElementById("tagscontainer").style.display = "none";
-    };
+    }
 
     showTags() {
         document.getElementById("tagscontainer").style.display = "block";
-    };
+    }
 
-    openGlobalProject (id, error) {
-        const Planet = this.Planet ;
+    openGlobalProject(id, error) {
+        const Planet = this.Planet;
 
-        if (error === undefined)
-            error = null;
+        if (error === undefined) error = null;
 
-        this.getData(id, (data) => {
-            let remixedName;
-            let language = localStorage.languagePreference;
-            if (id in this.cache) {
-                if (language === "ja") {
-                    remixedName = `「${this.cache[id].ProjectName}」${this.remixPrefix}`;
+        this.getData(
+            id,
+            data => {
+                let remixedName;
+                let language = localStorage.languagePreference;
+                if (id in this.cache) {
+                    if (language === "ja") {
+                        remixedName = `「${this.cache[id].ProjectName}」${this.remixPrefix}`;
+                    } else {
+                        remixedName = `${this.remixPrefix} ${this.cache[id].ProjectName}`;
+                    }
+                    Planet.ProjectStorage.initialiseNewProject(
+                        remixedName,
+                        data,
+                        this.cache[id].ProjectImage
+                    );
                 } else {
-                    remixedName = `${this.remixPrefix} ${this.cache[id].ProjectName}`;
+                    if (language === "ja") {
+                        remixedName = `「${_("My Project")}」${this.remixPrefix}`;
+                    } else {
+                        remixedName = `${this.remixPrefix}  ${_("My Project")}`;
+                    }
+                    Planet.ProjectStorage.initialiseNewProject(remixedName, data, null);
                 }
-                Planet.ProjectStorage.initialiseNewProject(
-                    remixedName, data, this.cache[id].ProjectImage
-                );
-            } else {
-                if (language === "ja") {
-                    remixedName = `「${_("My Project")}」${this.remixPrefix}` ;
+
+                Planet.loadProjectFromData(data);
+            },
+            error
+        );
+    }
+
+    mergeGlobalProject(id, error) {
+        const Planet = this.Planet;
+
+        if (error === undefined) error = null;
+
+        this.getData(
+            id,
+            data => {
+                let remixedName;
+                if (id in this.cache) {
+                    remixedName = Planet.ProjectStorage.getCurrentProjectName();
+                    Planet.ProjectStorage.initialiseNewProject(
+                        remixedName,
+                        data,
+                        this.cache[id].ProjectImage
+                    );
                 } else {
-                    remixedName = `${this.remixPrefix}  ${_("My Project")}` ;
+                    remixedName = `${this.remixPrefix}  ${_("My Project")}`;
+                    Planet.ProjectStorage.initialiseNewProject(remixedName, data, null);
                 }
-                Planet.ProjectStorage.initialiseNewProject(
-                    remixedName, data, null
-                );
-            }
 
-            Planet.loadProjectFromData(data);
-        }, error);
-    };
+                Planet.loadProjectFromData(data, true);
+            },
+            error
+        );
+    }
 
-    mergeGlobalProject (id, error) {
-        const Planet = this.Planet ;
-
-        if (error === undefined)
-            error = null;
-
-        this.getData(id, (data) => {
-            let remixedName;
-            if (id in this.cache) {
-                remixedName = Planet.ProjectStorage.getCurrentProjectName();
-                Planet.ProjectStorage.initialiseNewProject(
-                    remixedName, data, this.cache[id].ProjectImage
-                );
-            }
-            else {
-                remixedName = `${this.remixPrefix}  ${_("My Project")}` ;
-                Planet.ProjectStorage.initialiseNewProject(
-                    remixedName, data, null
-                );
-            }
-
-            Planet.loadProjectFromData(data, true);
-        }, error);
-    };
-    
     init() {
-        const Planet = this.Planet ;
-        
+        const Planet = this.Planet;
+
         if (!Planet.ConnectedToServer) {
             document.getElementById("globaltitle").textContent = _("Cannot connect to server");
-            document.getElementById("globalcontents").innerHTML = "" ;
-            document.getElementById("globalcontents").insertAdjacentHTML("afterbegin",this.offlineHTML);
-        }
-        else {
+            document.getElementById("globalcontents").innerHTML = "";
+            document
+                .getElementById("globalcontents")
+                .insertAdjacentHTML("afterbegin", this.offlineHTML);
+        } else {
             // eslint-disable-next-line no-unused-vars
-            jQuery("#sort-select").material_select( (evt) => {
+            jQuery("#sort-select").material_select(evt => {
                 this.sortBy = document.getElementById("sort-select").value;
                 this.refreshProjects();
             });
 
-
-            if (Planet.IsMusicBlocks){
+            if (Planet.IsMusicBlocks) {
                 this.defaultMainTags = ["Music"];
                 this.specialTags = [
-                    {"name": "All Projects", "func": this.searchAllProjects.bind(this), "defaultTag": true},
-                    {"name": "My Projects", "func": this.searchMyProjects.bind(this), "defaultTag": false}
+                    {
+                        name: "All Projects",
+                        func: this.searchAllProjects.bind(this),
+                        defaultTag: true
+                    },
+                    {
+                        name: "My Projects",
+                        func: this.searchMyProjects.bind(this),
+                        defaultTag: false
+                    }
                 ];
             } else {
                 this.defaultMainTags = [];
                 this.specialTags = [
-                    {"name": "All Projects", "func": this.searchAllProjects.bind(this), "defaultTag": true},
-                    {"name": "My Projects", "func": this.searchMyProjects.bind(this), "defaultTag": false}
+                    {
+                        name: "All Projects",
+                        func: this.searchAllProjects.bind(this),
+                        defaultTag: true
+                    },
+                    {
+                        name: "My Projects",
+                        func: this.searchMyProjects.bind(this),
+                        defaultTag: false
+                    }
                 ];
             }
 
             this.initTagList();
 
             // eslint-disable-next-line no-unused-vars
-            document.getElementById("load-more-projects").addEventListener("click",  (evt) => {
+            document.getElementById("load-more-projects").addEventListener("click", evt => {
                 if (this.loadButtonShown) {
                     this.loadMoreProjects();
                 }
@@ -544,43 +549,43 @@ class GlobalPlanet {
             const debouncedfunction = debounce(this.search.bind(this), 250);
 
             // eslint-disable-next-line no-unused-vars
-            document.getElementById("global-search").addEventListener("input",  (evt) => {
+            document.getElementById("global-search").addEventListener("input", evt => {
                 this.searchString = document.getElementById("global-search").value;
                 debouncedfunction();
             });
 
-            document.getElementById("global-search-2").addEventListener("input",  (evt) => {
+            document.getElementById("global-search-2").addEventListener("input", evt => {
                 this.searchString = document.getElementById("global-search-2").value;
                 debouncedfunction();
             });
 
             // eslint-disable-next-line no-unused-vars
-            document.getElementById("search-close").addEventListener("click",  (evt) => {
+            document.getElementById("search-close").addEventListener("click", evt => {
                 document.getElementById("global-search").value = "";
                 this.searchString = "";
                 document.getElementById("search-close").style.display = "none";
                 debouncedfunction();
             });
 
-            document.getElementById("search-close-2").addEventListener("click",  (evt) => {
+            document.getElementById("search-close-2").addEventListener("click", evt => {
                 document.getElementById("global-search-2").value = "";
                 this.searchString = "";
                 document.getElementById("search-close-2").style.display = "none";
                 debouncedfunction();
             });
 
-            document.getElementById("global-tab").addEventListener("click", (evt) => {
+            document.getElementById("global-tab").addEventListener("click", evt => {
                 document.getElementById("searchcontainer-one").style.display = "block";
             });
 
-            document.getElementById("local-tab").addEventListener("click", (evt) => {
+            document.getElementById("local-tab").addEventListener("click", evt => {
                 document.getElementById("searchcontainer-one").style.display = "none";
                 // document.getElementById("two_header").style.display = "none";
             });
-            
+
             document.body.onscroll = () => {
-                const currentUserScrollPos = window.pageYOffset ||
-                                                    document.documentElement.scrollTop;
+                const currentUserScrollPos =
+                    window.pageYOffset || document.documentElement.scrollTop;
 
                 const maxScrollPos = Math.max(
                     document.body.scrollHeight,
@@ -589,14 +594,13 @@ class GlobalPlanet {
                     document.documentElement.scrollHeight,
                     document.documentElement.offsetHeight
                 );
-                
-                if (((currentUserScrollPos/maxScrollPos) * 100 >= 75) && this.loadButtonShown)
+
+                if ((currentUserScrollPos / maxScrollPos) * 100 >= 75 && this.loadButtonShown)
                     this.loadMoreProjects();
             };
 
             this.ProjectViewer = new ProjectViewer(Planet);
             this.ProjectViewer.init();
         }
-    };
-
+    }
 }

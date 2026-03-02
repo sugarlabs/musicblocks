@@ -43,8 +43,9 @@ You can run it from
     2. [A Quick Tour of Selected Blocks](#2-a-quick-tour-of-selected-blocks)
 6. [Flow Palette](#6-flow-palette)
 7. [Widget Palette](#7-widget-palette)
-8. [Stats](#8-stats)
-9. [Planet View](#9-planet-view)
+8. [Program Palette](#8-program-palette)
+9. [Stats](#9-stats)
+10. [Planet View](#10-planet-view)
 
 ## <a>1. Getting Started</a>
 
@@ -54,9 +55,9 @@ You can run it from
 ![Default blocks](./getting_started_blocks.svg "default blocks")
 
 When you first launch Music Blocks in your browser, you'll see a stack
-of blocks representing the notes: `Sol 4`, `Mi 4`and `Sol 4`. The first two notes are `1/4` note; third note is 
-`1/2` note. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1731947644713000&run=True)
-
+of blocks representing the notes: `Sol 4`, `Mi 4`and `Sol 4`. The
+first two notes are `1/4` note; third note is `1/2` note. [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1731947644713000&run=True)
 
 ![The Play button](./play.png "play button")
 
@@ -92,27 +93,33 @@ To maximize screen real estate, Music Blocks overlays the program
 elements (stacks of blocks) on top of the canvas. These blocks can be
 hidden at any time while running the program.
 
-
 ## <a>2. Toolbars</a>
 
 [Back to Table of Contents](#table-of-contents)
 
-
-There are five toolbars in Music Blocks, each serving a specific purpose to help you navigate and interact with the application. Below is a detailed description of each toolbar along with images to visually illustrate their functions:
+There are five toolbars in Music Blocks, each serving a specific
+purpose to help you navigate and interact with the application. Below
+is a detailed description of each toolbar along with images to
+visually illustrate their functions:
 
 ### 1. Main Toolbar
 
-The **Main** toolbar is located across the top of the screen. It contains several essential buttons for managing your project, controlling playback, and accessing various settings.
+The **Main** toolbar is located across the top of the screen. It
+contains several essential buttons for managing your project,
+controlling playback, and accessing various settings.
 
--   **Play Button**: Starts playing the project.
--   **Stop Button**: Stops the current project playback.
--   **Fullscreen Button**: Toggles fullscreen mode on or off.
--   **New Project Button**: Creates a new project from scratch.
--   **Load Project from File Button**: Opens an existing project file.
--   **Save Project Button**: Saves the current project.
--   **Find and Share Project Button**: Opens the Planet view where you can explore and share projects with the community.
--   **Auxiliary Menu**: Provides additional tools for project settings and configuration.
--   **Help Button**: Opens the help menu, providing access to instructions and guidance.
+- **Play Button**: Starts playing the project.
+- **Stop Button**: Stops the current project playback.
+- **Fullscreen Button**: Toggles fullscreen mode on or off.
+- **New Project Button**: Creates a new project from scratch.
+- **Load Project from File Button**: Opens an existing project file.
+- **Save Project Button**: Saves the current project.
+- **Find and Share Project Button**: Opens the Planet view where you
+      can explore and share projects with the community.
+- **Auxiliary Menu**: Provides additional tools for project settings
+      and configuration.
+- **Help Button**: Opens the help menu, providing access to
+      instructions and guidance.
 
 ---
 
@@ -120,52 +127,86 @@ The **Main** toolbar is located across the top of the screen. It contains severa
 
 The **Secondary** toolbar appears when you click the **hamburger button** (three horizontal lines) in the main toolbar. This toolbar provides several options to control the execution of your project and adjust your work environment.
 
--   **Run Slowly**: Executes the program slowly to allow you to follow the process step by step.
--   **Run Step by Step**: Runs the program one step at a time, ideal for debugging and analysis.
--   **Change theme**: Switch between light and dark mode for a customized workspace.
--   **Merge with Current Project**: Combines the current project with another, promoting collaboration and reusability.
--   **Turtle Wrap**: Enables wrapping of the turtle's position to seamlessly continue from the opposite edge of the canvas.
--   **Set Pitch Preview**: Lets users preview pitches while composing, providing instant feedback.
--   **Restore**: Resets changes and restores the project to its last saved state
--   **Switch to Advanced Mode**: Quickly transition from Beginner to Advanced mode for more tools and customization options.
-        <h4>These are the extra options you get when you access the advanced mode:</h4>
-        1. *Display Statistics*: Provides insights into project performance, such as usage and execution metrics.<br>
-        2. *Load Plugin*: Integrates external plugins to enhance functionality and extend features.<br>
-        3. *Delete Plugin*: Allows the removal of plugins that are no longer needed.<br>
-        4. *Horizontal Scrolling*: Enables horizontal navigation for easier handling of large projects.<br>
-        5. *JavaScript Editor*: Includes an editor for writing and embedding custom JavaScript code.<br>
-        6. *Record*: Adds a "Record" button to the main palette, enabling users to record their compositions directly (Not supported on Firefox and Safari browsers).
+- **Run Slowly**: Executes the program slowly to allow you to follow
+      the process step by step.
+- **Run Step by Step**: Runs the program one step at a time, ideal for
+      debugging and analysis.
+- **Change theme**: Switch between light and dark mode for a
+      customized workspace.
+- **Merge with Current Project**: Combines the current project with
+      another, promoting collaboration and reusability.
+- **Turtle Wrap**: Enables wrapping of the turtle's position to
+      seamlessly continue from the opposite edge of the canvas.
+- **Set Pitch Preview**: Lets users preview pitches while composing,
+      providing instant feedback.
+- **Restore**: Resets changes and restores the project to its last
+      saved state
+- **Switch to Advanced Mode**: Quickly transition from Beginner to
+      Advanced mode for more tools and customization options.
 
--   **Select Language**: Offers a multilingual interface, allowing users to change the language as per their preference.
+<h4>These are the extra options you get when you access the advanced
+        mode:</h4>
+
+1. *Display Statistics*: Provides insights into project performance,
+        such as usage and execution metrics.<br>
+2. *Load Plugin*: Integrates external plugins to enhance functionality
+        and extend features.<br>
+3. *Delete Plugin*: Allows the removal of plugins that are no longer
+        needed.<br>
+4. *Horizontal Scrolling*: Enables horizontal navigation for easier
+        handling of large projects.<br>
+5. *JavaScript Editor*: Includes an editor for writing and embedding
+        custom JavaScript code.<br>
+6. *Record*: Adds a "Record" button to the main palette, enabling
+        users to record their compositions directly (Not supported on
+        Firefox and Safari browsers).
+
+- **Select Language**: Offers a multilingual interface, allowing users
+      to change the language as per their preference.
 
 ---
 
 ### 3. Palette Toolbar
 
-The **Palette** toolbar is located on the left side of the screen. It contains various categories of blocks, such as numbers, media, and actions, which you can drag and drop onto the canvas to build your project.
+The **Palette** toolbar is located on the left side of the screen. It
+contains various categories of blocks, such as numbers, media, and
+actions, which you can drag and drop onto the canvas to build your
+project.
 
-The palette is dynamic, switching between different categories based on your selection. When you hover over the palette, it reveals the specific blocks related to your chosen category.
+The palette is dynamic, switching between different categories based
+on your selection. When you hover over the palette, it reveals the
+specific blocks related to your chosen category.
 
 ---
 
 ### 4. Canvas Toolbar (Upper Right)
 
-On the upper right of the canvas is a small toolbar with options for managing the workspace. It allows you to adjust the display and clear the canvas.
+On the upper right of the canvas is a small toolbar with options for
+managing the workspace. It allows you to adjust the display and clear
+the canvas.
 
--   **Show Grids**: Displays a grid overlay on the canvas for alignment and organization.
--   **Clear Screen**: Clears the entire canvas, removing all blocks and drawings.
--   **Toggle Display Size**: Adjusts the size of the canvas or blocks for a better viewing experience.
+- **Show Grids**: Displays a grid overlay on the canvas for alignment
+      and organization.
+- **Clear Screen**: Clears the entire canvas, removing all blocks and
+      drawings.
+- **Toggle Display Size**: Adjusts the size of the canvas or blocks
+      for a better viewing experience.
 
 ---
 
 ### 5. Canvas Toolbar (Lower Right)
 
-Located at the lower right of the canvas, this small toolbar provides additional control over block visibility and size.
+Located at the lower right of the canvas, this small toolbar provides
+additional control over block visibility and size.
 
--   **Home Button**: Takes you back to the initial view or project start screen.
--   **Show/Hide Blocks**: Toggles the visibility of the blocks you’ve added to the canvas.
--   **Expand/Collapse Blocks**: Allows you to expand or collapse the view of blocks for better organization.
--   **Decrease/Increase Block Size**: Changes the size of the blocks on the canvas to suit your preference.
+- **Home Button**: Takes you back to the initial view or project start
+      screen.
+- **Show/Hide Blocks**: Toggles the visibility of the blocks you’ve
+      added to the canvas.
+- **Expand/Collapse Blocks**: Allows you to expand or collapse the
+      view of blocks for better organization.
+- **Decrease/Increase Block Size**: Changes the size of the blocks on
+      the canvas to suit your preference.
 
 ---
 
@@ -173,7 +214,12 @@ Located at the lower right of the canvas, this small toolbar provides additional
 
 [Back to Table of Contents](#table-of-contents)
 
-Context menus are an important part of user interfaces that provide users with quick access to a set of actions relevant to the context in which they are working.The right-click context menu in Music Blocks provides several options for working with blocks and the workspace. To access the right-click context menu, simply right-click anywhere in the workspace.
+Context menus are an important part of user interfaces that provide
+users with quick access to a set of actions relevant to the context in
+which they are working.The right-click context menu in Music Blocks
+provides several options for working with blocks and the workspace. To
+access the right-click context menu, simply right-click anywhere in
+the workspace.
 
 ### <a>1. Contextual Menu for Blocks:</a>
 
@@ -181,51 +227,87 @@ When you **right-click on a block**, the following options are available:
 
 ![Right-click context menu](./block_context.png "Right-click context menu")
 
-**Extract**: The Extract option allows you to break down a nested block into its individual components or sub-blocks. This is useful for isolating parts of a block that you want to modify or reuse in other sections of your project, without affecting the original structure. It simplifies the process of working with complex, multi-layered blocks.
+**Extract**: The Extract option allows you to break down a nested
+  block into its individual components or sub-blocks. This is useful
+  for isolating parts of a block that you want to modify or reuse in
+  other sections of your project, without affecting the original
+  structure. It simplifies the process of working with complex,
+  multi-layered blocks.
 
 ![Extract the selected block](./extract.png "Extract the selected block" )
 
-**Move to Trash**: The Move to Trash option deletes the selected block by sending it to the trash. This action removes the block from your workspace, is a way of cleaning up the environment or removing blocks you no longer need.
+**Move to Trash**: The Move to Trash option deletes the selected block
+  by sending it to the trash. This action removes the block from your
+  workspace, is a way of cleaning up the environment or removing
+  blocks you no longer need.
 
 ![Delete](./delete.png "Delete")
 
-**Duplicate**: The Duplicate option creates an exact copy of the selected block. This is especially helpful for reusing blocks with the same configurations or settings in multiple places in your project, saving time and effort in recreating similar blocks.
+**Duplicate**: The Duplicate option creates an exact copy of the
+  selected block. This is especially helpful for reusing blocks with
+  the same configurations or settings in multiple places in your
+  project, saving time and effort in recreating similar blocks.
 
 ![Duplicate](./duplicate.png "Duplicate")
 
-**Help**: The Help option displays a detailed help screen for the selected block. This screen provides valuable information about the block’s functionality, purpose, and usage instructions, making it easier for users to understand and effectively incorporate the block into their projects. Additionally, the help screen allows you to insert blocks from the help examples directly into your program by clicking on the download icon (labeled "Load this block" in the image below).
+**Help**: The Help option displays a detailed help screen for the
+  selected block. This screen provides valuable information about the
+  block’s functionality, purpose, and usage instructions, making it
+  easier for users to understand and effectively incorporate the block
+  into their projects. Additionally, the help screen allows you to
+  insert blocks from the help examples directly into your program by
+  clicking on the download icon (labeled "Load this block" in the
+  image below).
 
 ![Help](./help.png "Help")
 
-**Close**: The Close option exits the context menu, allowing you to return to your workspace without making any changes or selections. This is useful for dismissing the menu if you opened it by mistake or decided not to perform any action.
+**Close**: The Close option exits the context menu, allowing you to
+  return to your workspace without making any changes or
+  selections. This is useful for dismissing the menu if you opened it
+  by mistake or decided not to perform any action.
 
-By using the right-click context menu in Music Blocks, you can quickly perform common tasks and manipulate blocks on the workspace. This can help you to work more efficiently and effectively in your projects.
+By using the right-click context menu in Music Blocks, you can quickly
+perform common tasks and manipulate blocks on the workspace. This can
+help you to work more efficiently and effectively in your projects.
 
 ### <a>2. Contextual Menu for Background:</a>
 
-When you **right-click on the background**, the following options are available:
+When you **right-click on the background**, the following options are
+available:
 
 ![Context-Menu-For-Workspace](./context-menu-workspace.png "Context Menu for Workspace")
 
-- **Grid**: Toggles the display of a grid in the workspace for better alignment and organization.
-- **Set Pitch Preview**: Adjusts and previews pitches while working on a composition.
-- **Enable Horizontal Scrolling**: Allows horizontal navigation for easier management of large projects.
-- **Turtle Wrap Off**: Toggles the turtle wrap feature, which determines whether the turtle wraps around the canvas edges.
+- **Grid**: Toggles the display of a grid in the workspace for better
+    alignment and organization.
+- **Set Pitch Preview**: Adjusts and previews pitches while working on
+    a composition.
+- **Enable Horizontal Scrolling**: Allows horizontal navigation for
+    easier management of large projects.
+- **Turtle Wrap Off**: Toggles the turtle wrap feature, which
+    determines whether the turtle wraps around the canvas edges.
 - **Restore**: Reverts the workspace to its last saved state.
-- **Increase Block Size**: Enlarges the size of all blocks for better visibility.
+- **Increase Block Size**: Enlarges the size of all blocks for better
+    visibility.
 - **Decrease Block Size**: Shrinks the size of all blocks to save space.
-- **Expand/Collapse Block**: Expands or collapses individual blocks to show or hide their details.
-- **Show/Hide Block**: Toggles the visibility of selected blocks in the workspace.
+- **Expand/Collapse Block**: Expands or collapses individual blocks to
+    show or hide their details.
+- **Show/Hide Block**: Toggles the visibility of selected blocks in
+    the workspace.
 - **Home**: Centers the workspace view on the initial starting point.
 - **Close**: Exits the contextual menu.
-- **Search for Blocks**: Opens a search bar to locate specific blocks within the workspace.
+- **Search for Blocks**: Opens a search bar to locate specific blocks
+    within the workspace.
 - **Collapse**: Collapses all blocks to their minimal state.
-- **Clean**: Organizes and tidies up the workspace by aligning blocks systematically.
-- **Select**: Enables selection mode for selecting multiple blocks or elements in the workspace.
+- **Clean**: Organizes and tidies up the workspace by aligning blocks
+    systematically.
+- **Select**: Enables selection mode for selecting multiple blocks or
+    elements in the workspace.
 
 ###  <a>3. Pie Menus </a>
 
-Many blocks in Music Blocks also feature "pie menus" that allow you to change block parameters quickly by selecting options from a circular menu that appears when you hover over the block.
+Many blocks in Music Blocks also feature "pie menus" that allow you to
+change block parameters quickly by selecting options from a circular
+menu that appears when you hover over the block.
 
 For further details on how to use these toolbars effectively, you can refer to the [Turtle Blocks Documentation](https://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
 
@@ -282,12 +364,9 @@ For further details on how to use these toolbars effectively, you can refer to t
 | `\`                        | `\`                  | Scroll blocks container to the left (In Horizontal mode).   |
 | `DEL`                      | `Delete`             | Extract the selected block.                                 |
 
-
 ## 5. Block Palettes
 
-
 [Back to Table of Contents](#table-of-contents)
-
 
 The block palettes are displayed on the left side of the screen. These
 palettes contain the blocks used to create programs.
@@ -306,7 +385,6 @@ _Tone_, _Ornament_, _Volume_, _Drum_, and _Widget_.
 
 All of the other palettes are described in the
 [Turtle Blocks documentation pages](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
-
 
 ### 1. Defining a note
 
@@ -356,16 +434,15 @@ you can put as many _Pitch_ blocks inside a note as you'd like. They
 will play together as a chord. You can also insert graphics blocks
 inside a note in order to create sound-sync animations.
 
-
 ### 2. A quick tour of selected blocks
-
 
 ![The Set Instrument block](./settimbre_block.svg "Set instrument block")
 
-The _Set instrument_ block, found on the _Tone_ palette, lets you choose a
-timbre for a note. In the above example, a guitar model is used to
-make any notes contained within the block's clamp will sound as if
-they are being played on a guitar. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1731948356610795&run=True)
+The _Set instrument_ block, found on the _Tone_ palette, lets you
+choose a timbre for a note. In the above example, a guitar model is
+used to make any notes contained within the block's clamp will sound
+as if they are being played on a guitar. [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1731948356610795&run=True)
 
 ![The Set Volume block](./setsynthvolume_block.svg "Set synth volume")
 
@@ -378,7 +455,8 @@ volume), of any notes contained with the block's clamp.
 
 The *Set drum* block, which is used inside of the clamp of a *Note
 value* block is used to add drum sounds to a note. It is found on the
-*Drum* palette. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732000719242159&run=True)
+*Drum* palette. [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732000719242159&run=True)
 
 
 ![The Repeat block](./repeat_block.svg "Repeat Block")
@@ -386,7 +464,8 @@ value* block is used to add drum sounds to a note. It is found on the
 The _Repeat_ block, found on the _Flow_ palette, is used to create
 loops. Whatever stack of blocks are placed inside its clamp will be
 repeated. It can be used to repeat individual notes, or entire phrases
-of music. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732003682836455&run=True)
+of music. [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732003682836455&run=True)
 
 ![The Duplicate block](./duplicatenotes_block.svg "Duplicate Block")
 
@@ -394,13 +473,14 @@ The _Duplicate_ block, found on the _Rhythms_ palette, is used to
 repeat any contained notes. Similar to using a _Repeat_ block, but
 rather than repeating a sequence of notes multiple times, each note is
 repeated in turn, e.g. duplicate x2 of `4 4 8` would result in `4 4 4
-4 8 8`, where as repeat x2 of `4 4 8` would result in `4 4 8 4 4 8`. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732003870740637&run=True)
-
+4 8 8`, where as repeat x2 of `4 4 8` would result in `4 4 8 4 4
+8`. [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732003870740637&run=True)
 
 The *Start* block, found on the *Action* palette, is tied to the *Run*
 button. Anything inside of the clamp of the *Start* button will be run
-when the button is pressed. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732004679481517&run=True)
-
+when the button is pressed. [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732004679481517&run=True)
 
 ![The Start block](./multiple_start_blocks.svg "Start Block")
 
@@ -420,12 +500,14 @@ create an _Action_ block, a new block corresponding to that action is
 added to the palette. The name given to the action is the name
 associated with the new block. (It is common practice to use _Action_
 blocks to define short phrases of music that can be repeated and
-modified.) [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732004679481517&run=True)
+modified.) [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732004679481517&run=True)
 
 Actions are a powerful organizational element for your program and can
 be used in many powerful ways, e.g., an action can be associated with
-an event, such as an on beat or off beat or mouse click. See
-[Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md),
+an event, such as an on beat or off beat or mouse click. See [Music
+Blocks Programming
+Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md),
 for further details and examples.
 
 ![The Storein Box block](./storebox1_block.svg "Store in box & Add 1 to Block")
@@ -434,83 +516,86 @@ The _Store in_ block, found on the _Boxes_ palette, is used to store a
 value. That value can be retrieved using the _Box_ block. The value
 can be modified using the _Add one_ block. These blocks are the
 typical way in which variables are stored and retrieved in Music
-Blocks. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732020971700880&run=True)
+Blocks. [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732020971700880&run=True)
 
 ![Forward](./forward_block.svg "Forward Block")
 
-
-The *Forward* block, found on the *Graphics/Mouse* palette, is used to draw
-straight lines. (Note that if this block is used inside of a *Note
-value* block&mdash;the line will be drawn as the note plays; otherwise
-the line is drawn "instantly".) [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1730651293282088&run=True)
-
+The *Forward* block, found on the *Graphics/Mouse* palette, is used to
+draw straight lines. (Note that if this block is used inside of a
+*Note value* block&mdash;the line will be drawn as the note plays;
+otherwise the line is drawn "instantly".) [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1730651293282088&run=True)
 
 ![Right](./left_block.svg "Right/Left Block")
 
-
-The *Right/Left* block, found on the *Graphics/Mouse* palette, is used to rotate the
-mouse heading. (Note that if this block is used inside of a *Note
-value* block&mdash;the heading will change as the note plays;
-otherwise the heading is changed "instantly".) [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732023891064703&run=True)
-
+The *Right/Left* block, found on the *Graphics/Mouse* palette, is used
+to rotate the mouse heading. (Note that if this block is used inside
+of a *Note value* block&mdash;the heading will change as the note
+plays; otherwise the heading is changed "instantly".) [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732023891064703&run=True)
 
 ![Pen Up](./mousebutton_block.svg "Pen up and Pen down Block")
 
-
 The *Pen up* and *Pen down* blocks, found on the *Pen* palette,
-determine whether or not the mouse draws as it moves. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732030390164543&run=True)
-
+determine whether or not the mouse draws as it moves. [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732030390164543&run=True)
 
 ![Set Shade](./setshade_block.svg "Set shade Block")
 
 The _Set shade_ block, also found on the _Pen_ palette, is used to set
 the lightness or darkness of the "ink" used in the mouse pen. `set
-shade 0` is black. `set shade 100` is white. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732096229605656&run=True)
+shade 0` is black. `set shade 100` is white. [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732096229605656&run=True)
 
 ![Set Color](./setcolor_block.svg "Set color Block")
 
 The _Set color_ block, also found on the _Pen_ palette, is used to set
 the color of the "ink" used in the mouse pen. `set color 0` is
-red. `set color 70` is blue. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732096675098636&run=True)
+red. `set color 70` is blue. [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732096675098636&run=True)
 
 ![Random](./random_block.svg "Random Block")
 
 The _Random_ block, found on the _Numbers_ palette, is used to
 generate a random number, because sometimes being unpredictable is
-nice. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732097168390186&run=True)
+nice. [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732097168390186&run=True)
 
 ![One of This or That](./oneOf_block.svg "One of this or that Block")
 
 The _One of_ block, also found on the _Numbers_ palette, is used to
 generate a binary choice, one of "this" or "that", because sometimes
-being unpredictable is nice. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732113139904914&run=True)
+being unpredictable is nice. [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732113139904914&run=True)
 
 ![alt tag](./show_block.svg "Show media Block")
 
-
 The *Show* block, found on the *Media* palette, is used to display
-text and images. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732117445989018&run=True)
+text and images. [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732117445989018&run=True)
 
 ![Mouse Button](./mousebutton_block.svg "Mouse button Block")
 
 The _Mouse button_ block, found on the _Sensors_ palette, returns true
 if the mouse button is clicked. The mouse button block can be used to
-create some interactivity in your program. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732030390164543&run=True)
+create some interactivity in your program. [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732030390164543&run=True)
 
 ![Cursor XY](./x_block.svg "Cursor x - Cursor y Block")
 
-
-The _Cursor x_ and _Cursor y_ blocks, also found on the _Sensors_ palette, return the X and Y coordinates of the cursor. These blocks can also be used to create interactive programs.
+The _Cursor x_ and _Cursor y_ blocks, also found on the _Sensors_
+palette, return the X and Y coordinates of the cursor. These blocks
+can also be used to create interactive programs.
 
 ![alt tag](./input_block.svg "Input Block")
-
 
 Prompting the user for input is done with the *Input* block. This
 block will display a message with a prompt and open an input form at
 the current position of the mouse. Program execution is paused until
 the user types into the form and types RETURN (or Enter). The contents
-of the input form are then transferred to *Input-value* block. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732171497274793&run=True)
-
+of the input form are then transferred to *Input-value* block. [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732171497274793&run=True)
 
 ![Push](./push_block.svg "Push Block")
 
@@ -518,8 +603,8 @@ of the input form are then transferred to *Input-value* block. [RUN LIVE](https:
 
 The _Push_ and _Pop_ blocks, found on the _Heap_ palette, are used to
 store and retrieve values on/from a first-in, last-out (FILO) programx
-heap. There is a separate heap maintained for each *Start* block. <!-- [RUN LIVE]() -->
-
+heap. There is a separate heap maintained for each *Start* block. <!--
+[RUN LIVE]() -->
 
 ![Get Value](./getDict_block.svg "Get value Block")
 
@@ -539,24 +624,23 @@ number, and note value. <!-- [RUN LIVE]() -->
 The _Print_ block, found on the _Extras_ palette, is used to print
 messages during program execution. It is very useful as a debugging
 tool and also as a means of adding lyrics to your music&mdash;think
-karaoke. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732172483377262&run=True)
-
-
-
+karaoke. [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732172483377262&run=True)
 
 ## 6. Flow Palette
 [Back to Table of Contents](#table-of-contents)
 
-
 The Flow palette is described in more detail in the [Turtle Blocks
-documentation](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation). Here we review a few ways to approach taking different
-actions on different beats.
+documentation](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation). Here
+we review a few ways to approach taking different actions on different
+beats.
 
 The _Switch_ block will take the action defined in the _Case_ that
 matches the argument passed to the _Switch_ block. In the figure
 below, it will take a different action based on the beat value: "on
 case 1 run action1", "on case 2, run action2", ..., "on case 4 run
-action4". You can also define a default action. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732173207750796&run=True)
+action4". You can also define a default action. [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732173207750796&run=True)
 
 ![Switch](./switch-on-beat.svg "Switch on Beat")
 
@@ -565,16 +649,14 @@ action4". You can also define a default action. [RUN LIVE](https://musicblocks.s
 Another way to do the same thing is with the _Do_ block found on the
 Action palette. In the figure below, we add the beat count to "action"
 to create a series of strings: "action1", "action2", ...,
-"action4". We then "do" that action. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732830205442211&run=True)
+"action4". We then "do" that action. [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732830205442211&run=True)
 
 ![Do](./do-actions.svg "Do actions")
 
-
 ## 7. Widget Palette
 
-
 [Back to Table of Contents](#table-of-contents)
-
 
 Music Blocks has various Widgets that can be used within Music Blocks
 to enhance your experience. The _Pitch-time matrix_ is described here.
@@ -594,12 +676,11 @@ familiar with math).
 
 ![Matrix](./matrix_block.svg "Pitch-time Matrix blocks")
 
-
-*Pitch-time Matrix* blocks clamp is used to define the matrix:
-A row in the matrix is created for each *Pitch* block and columns are
+*Pitch-time Matrix* blocks clamp is used to define the matrix: A row
+in the matrix is created for each *Pitch* block and columns are
 created for individual notes, which are created by using *Rhythm*
-blocks, individual note blocks, or the *Tuplet* block. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732180386380311&run=True)
-
+blocks, individual note blocks, or the *Tuplet* block. [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732180386380311&run=True)
 
 ![Rhythm](./rhythmruler2_block.svg "Rhythm block")
 
@@ -644,7 +725,8 @@ notes, etc. This design choice allows for maximum flexibility) You can
 mix and match _Rhythm_ and individual _Note_ blocks within a _Tuplet_
 block to generate complex rhythms (e.g. two quarter notes plus an
 eighth note is possible within the tuplet). Each note is represented
-by a column in the matrix. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732191858479236&run=True)
+by a column in the matrix. [RUN
+LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732191858479236&run=True)
 
 Note: Each time you open the matrix, it tries to reconstruct the notes
 marked from the previous matrix. If you modify the _Pitch_ and
@@ -654,28 +736,147 @@ try to make a corresponding change in the matrix.
 Note: You can construct a matrix from a chuck of blocks by including
 the chunk in the clamp of the _Pitch-time Marix_ block.
 
-
 ![LEGO Bricks](./legobricks_block.svg "LEGO Bricks block")
 
-The _LEGO Bricks_ widget provides an innovative way to create music by analyzing colored LEGO brick patterns from images or live webcam feeds. This widget transforms visual art into musical compositions by detecting color changes and converting them into musical notes.
+The _LEGO Bricks_ widget provides an innovative way to create music by
+analyzing colored LEGO brick patterns from images or live webcam
+feeds. This widget transforms visual art into musical compositions by
+detecting color changes and converting them into musical notes.
 
-The widget features an interactive interface where users can upload images of LEGO brick arrangements or use their webcam to capture live constructions. An eye dropper tool allows users to select the background color (such as green baseplates, white surfaces, or any colored background), ensuring accurate color detection regardless of the surface the LEGO bricks are placed on.
+The widget features an interactive interface where users can upload
+images of LEGO brick arrangements or use their webcam to capture live
+constructions. An eye dropper tool allows users to select the
+background color (such as green baseplates, white surfaces, or any
+colored background), ensuring accurate color detection regardless of
+the surface the LEGO bricks are placed on.
 
-As the widget scans the image with vertical lines, it detects different colored LEGO bricks and maps them to corresponding musical pitches. The scanning speed and column spacing can be adjusted for precise timing control. Non-background colors trigger musical notes, while areas matching the selected background color remain silent, creating natural rests in the composition.
+As the widget scans the image with vertical lines, it detects
+different colored LEGO bricks and maps them to corresponding musical
+pitches. The scanning speed and column spacing can be adjusted for
+precise timing control. Non-background colors trigger musical notes,
+while areas matching the selected background color remain silent,
+creating natural rests in the composition.
 
 ![LEGO Bricks Widget](./legobricks_widget.svg "LEGO Bricks Widget")
 
-The _LEGO Bricks_ widget supports multiple output formats: real-time audio playback during scanning, export as Music Blocks action blocks for further editing, and downloadable visualizations of the detected color patterns. This makes it an excellent tool for combining physical construction play with musical creativity, allowing users to literally build their melodies with LEGO bricks.
+The _LEGO Bricks_ widget supports multiple output formats: real-time
+audio playback during scanning, export as Music Blocks action blocks
+for further editing, and downloadable visualizations of the detected
+color patterns. This makes it an excellent tool for combining physical
+construction play with musical creativity, allowing users to literally
+build their melodies with LEGO bricks.
 
 ![LEGO Bricks Demo](./legobricks_demo.svg "LEGO Bricks Widget Demo")
 
-If you want to read more about the LEGO Bricks widget, including detailed usage instructions and educational applications, see the [Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md#427-lego-bricks-widget).
+If you want to read more about the LEGO Bricks widget, including
+detailed usage instructions and educational applications, see the
+[Music Blocks Programming
+Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md#427-lego-bricks-widget).
 
-More details about all of the widgets are available in the
-[Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md).
+More details about all of the widgets are available in the [Music
+Blocks Programming
+Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md).
 
-## 8. Stats
+## 8. Program Palette
 
+[Back to Table of Contents](#table-of-contents)
+
+The *Program* palette contains blocks that allow you to manipulate the
+program itself, manage data (heaps and dictionaries), and interact
+with the project environment. These blocks are powerful tools for
+meta-programming and managing the state of your Music Blocks project.
+
+### 1. Block Manipulation
+
+These blocks allow you to dynamically create, modify, and run blocks
+within your program.
+
+* **Run Block**
+
+The *Run block* block executes a specific block. It accepts either a
+block number or a block name as an argument.
+
+ * If a **block name** is provided, it searches for a block with that
+    label and runs it.
+ * If a **block number** is provided, it runs the block with that
+    specific ID.
+ * *Example*: You can use this to trigger a specific stack of code
+     programmatically.
+
+* **Move Block**
+
+The *Move block* block moves a block to a specific position on the screen.
+
+ * **Arguments**:
+        1.  Block number
+        2.  X-coordinate
+        3.  Y-coordinate
+
+ * *Example*: `Move block (10, 100, 200)` moves block #10 to position
+      (100, 200).
+
+* **Delete Block**
+    The *Delete block* block removes a block from the workspace.
+    *   **Argument**: Block number.
+    *   *Example*: `Delete block (5)` removes block #5.
+
+* **Connect Blocks**
+
+The *Connect blocks* block (internally known as DockBlock) connects one block to another.
+ *   **Arguments**:
+        1.  Target block number
+        2.  Connection number (which dock on the target block to connect to)
+        3.  Block number to connect (the block being attached)
+ *   *Example*: This allows you to assemble code structures dynamically.
+
+* **Make Block**
+The *Make block* block creates a new block of a specified type.
+    *   **Argument**: Name of the block to create (e.g., "note", "start",
+        "rhythm").
+    *   **Returns**: The block number of the newly created block.
+    *   *Example*: `Make block ("note")` creates a new note block and
+        returns its ID, which you can then use with *Move block* or
+	*Connect blocks*.
+
+### 2. Data Management (Heaps and Dictionaries)
+
+These blocks are used for saving and loading data structures like
+heaps and dictionaries. This is useful for saving the state of your
+program or loading configuration data.
+
+* **Heap Operations**:
+    *   **Save Heap**: Saves the current heap (variable storage) to a
+        file (JSON format).
+    *   **Load Heap**: Loads a heap from a file.
+    *   **Set Heap**: Sets the heap content directly from a JSON string.
+    *   **Save Heap to App**: Saves the heap to a web service (requires a URL).
+    *   **Load Heap from App**: Loads the heap from a web service (requires
+        a URL).
+
+* **Dictionary Operations**:
+    *   **Save Dictionary**: Saves a dictionary to a file.
+    *   **Load Dictionary**: Loads a dictionary from a file.
+    *   **Set Dictionary**: Sets a dictionary directly from a JSON string.
+
+### 3. Project and UI
+
+* **Open Project**
+The *Open project* block opens a new Music Blocks project from a URL.
+    *   **Argument**: URL of the project.
+    *   *Example*: Useful for linking multiple projects together.
+
+* **Save Project**
+The *Save project* block saves the current project state, typically
+    prompting the user for a filename or location.
+    *   *Example*: Used to save your work.
+
+* **Open Palette**
+The *Open palette* block opens a specific palette in the UI.
+    *   **Argument**: Name of the palette (e.g., "rhythm", "pitch", "program").
+    *   *Example*: You can guide the user to the correct palette during a
+        tutorial.
+
+## 9. Stats
 
 [Back to Table of Contents](#table-of-contents)
 
@@ -684,12 +885,9 @@ toolbar in advanced mode.
 
 ![Stats](./stats.svg "Stats Details")
 
-
-## 9. Planet View
-
+## 10. Planet View
 
 [Back to Table of Contents](#table-of-contents)
-
 
 Music Blocks also provides a Planet view to find and share
 projects. It has options to load project from file locally and make

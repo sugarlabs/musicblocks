@@ -1296,10 +1296,10 @@ const getMacroExpansion = (activity, blkname, x, y) => {
         [10, ["number", { value: 4 }], 0, 0, [9]]
     ];
     const SAMPLERHELP = [
-        [0, ["customsample", { value: ["", "" ,"do", 4] }], x, y, [null, 1, 2, 3]],
-        [1, ["audiofile", {value: ["", ""]}], 0 ,0, [0]],
-        [2, ["solfege", {value: "do"}], 0, 0, [0]],
-        [3, ["number", {value: 4}], 0, 0, [0]]
+        [0, ["customsample", { value: ["", "", "do", 4] }], x, y, [null, 1, 2, 3]],
+        [1, ["audiofile", { value: ["", ""] }], 0, 0, [0]],
+        [2, ["solfege", { value: "do" }], 0, 0, [0]],
+        [3, ["number", { value: 4 }], 0, 0, [0]]
     ];
     const SETDRUMHELP = [
         [0, ["newnote", { collapsed: false }], 0, 0, [9, 1, 4, 8]],
@@ -1758,6 +1758,5 @@ const getMacroExpansion = (activity, blkname, x, y) => {
     }
 };
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = blockIsMacro;
-    module.exports = getMacroExpansion;
+    module.exports = { blockIsMacro, getMacroExpansion };
 }
