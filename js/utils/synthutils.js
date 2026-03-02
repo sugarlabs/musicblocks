@@ -48,11 +48,13 @@
 
 /**
  * The number of voices in polyphony.
+ * Raised from 3 to 6 to prevent voice exhaustion and audio engine crashes
+ * during infinite-loop playback with chords or multiple turtles.
  * @constant
  * @type {number}
- * @default 3
+ * @default 6
  */
-const POLYCOUNT = 3;
+const POLYCOUNT = 6;
 
 /**
  * Array of names and details for various noise synthesizers.
@@ -1727,6 +1729,59 @@ function Synth() {
                     console.debug("Error triggering note:", e);
                 }
             } else {
+                // ── Perf fix: fast-path for notes with no real graph-level effect nodes ──
+                // doPartials and doPortamento only mutate synth properties in-place and
+                // do NOT require new audio graph nodes.  Skipping disconnect/reconnect
+                // for every plain note eliminates per-note audio-graph rewiring, which
+                // is the primary cause of buffer underruns in long/infinite sessions.
+                const _needsGraphRewire =
+                    (paramsFilters !== null &&
+                        paramsFilters !== undefined &&
+                        paramsFilters.length > 0) ||
+                    (paramsEffects !== null &&
+                        paramsEffects !== undefined &&
+                        (paramsEffects.doVibrato ||
+                            paramsEffects.doDistortion ||
+                            paramsEffects.doTremolo ||
+                            paramsEffects.doPhaser ||
+                            paramsEffects.doChorus ||
+                            paramsEffects.doNeighbor));
+
+                if (!_needsGraphRewire) {
+                    // Apply in-place property mutations then take the fast path.
+                    if (paramsEffects !== null && paramsEffects !== undefined) {
+                        if (paramsEffects.doPartials) {
+                            if (synth.oscillator !== undefined) {
+                                synth.oscillator.partials = paramsEffects.partials;
+                            } else if (synth.voices !== undefined) {
+                                for (let i = 0; i < synth.voices.length; i++) {
+                                    if (synth.voices[i].oscillator) {
+                                        synth.voices[i].oscillator.partials =
+                                            paramsEffects.partials;
+                                    }
+                                }
+                            }
+                        }
+                        if (paramsEffects.doPortamento) {
+                            if (synth.oscillator !== undefined) {
+                                synth.portamento = paramsEffects.portamento;
+                            } else if (synth.voices !== undefined) {
+                                for (let i = 0; i < synth.voices.length; i++) {
+                                    synth.voices[i].portamento = paramsEffects.portamento;
+                                }
+                            }
+                        }
+                    }
+                    try {
+                        await Tone.ToneAudioBuffer.loaded();
+                        synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
+                    } catch (e) {
+                        console.debug("Error triggering note (no-graph-rewire fast path):", e);
+                    }
+                    return;
+                }
+                // ─────────────────────────────────────────────────────────────────────
+
                 // Remove the dry path so effects are routed serially, not in parallel
                 synth.disconnect(Tone.Destination);
                 const chainNodes = [];
@@ -1871,7 +1926,10 @@ function Synth() {
                     }
                 }
 
-                // Schedule cleanup after the note duration
+                // Schedule cleanup after the note duration.
+                // A 500 ms safety buffer is added beyond the note duration to prevent
+                // premature disposal caused by audio-clock drift or scheduler jitter,
+                // which would otherwise produce crackling artefacts in long sessions.
                 setTimeout(() => {
                     try {
                         // Dispose of effects
@@ -1892,7 +1950,7 @@ function Synth() {
                     } catch (e) {
                         console.debug("Error disposing effects:", e);
                     }
-                }, beatValue * 1000);
+                }, beatValue * 1000 + 500);
             }
         } catch (e) {
             console.error("Error in _performNotes:", e);
