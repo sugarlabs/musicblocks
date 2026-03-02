@@ -6977,7 +6977,14 @@ class Activity {
             this.update = true;
 
             // Get things started
+            this._perfMark("activity.domReady.start");
             await this.init();
+            this._perfMark("activity.domReady.end");
+            this._perfMeasure(
+                "activity.domReady_total",
+                "activity.domReady.start",
+                "activity.domReady.end"
+            );
         };
 
         this.__saveLocally = () => {
@@ -7319,6 +7326,7 @@ class Activity {
          * Inits everything. The main function.
          */
         this.init = async () => {
+            this._perfMark("activity.init.start");
             this._clientWidth = document.body.clientWidth;
             this._clientHeight = document.body.clientHeight;
             this._innerWidth = window.innerWidth;
@@ -7483,6 +7491,7 @@ class Activity {
             this.toolbar.renderJavaScriptIcon(toggleJSWindow);
             this.toolbar.renderLanguageSelectIcon(this.languageBox);
             this.toolbar.renderWrapIcon();
+            this._perfMark("activity.init.ui_ready");
 
             initPalettes(this.palettes);
 
@@ -8028,7 +8037,67 @@ class Activity {
             if (this.planet !== undefined) {
                 this.planet.planet.setAnalyzeProject(doAnalyzeProject);
             }
+
+            this._perfMark("activity.init.end");
+            this._perfMeasure("activity.init_total", "activity.init.start", "activity.init.end");
+            this._perfMeasure("activity.init_to_ui_ready", "activity.init.start", "activity.init.ui_ready");
+            this._perfMeasure(
+                "loader_to_activity_init_complete",
+                "loader.main.start",
+                "activity.init.end"
+            );
+
+            if (
+                typeof window !== "undefined" &&
+                window.__mbPerf &&
+                typeof window.__mbPerf.report === "function"
+            ) {
+                window.__mbPerf.report();
+            }
         };
+    }
+
+    /**
+     * Record a named performance mark in the global mbPerf tracker.
+     * @param {string} markName - The mark identifier.
+     * @returns {void}
+     */
+    _perfMark(markName) {
+        if (
+            typeof window === "undefined" ||
+            !window.__mbPerf ||
+            !window.__mbPerf.enabled ||
+            !window.__mbPerf.marks
+        ) {
+            return;
+        }
+        if (typeof performance === "undefined" || typeof performance.now !== "function") {
+            return;
+        }
+        window.__mbPerf.marks[markName] = performance.now();
+    }
+
+    /**
+     * Measure elapsed milliseconds between two mbPerf marks.
+     * @param {string} measureName - The measure identifier.
+     * @param {string} startMark - Start mark name.
+     * @param {string} endMark - End mark name.
+     * @returns {void}
+     */
+    _perfMeasure(measureName, startMark, endMark) {
+        if (
+            typeof window === "undefined" ||
+            !window.__mbPerf ||
+            !window.__mbPerf.enabled ||
+            !window.__mbPerf.marks ||
+            !window.__mbPerf.measures
+        ) {
+            return;
+        }
+        const start = window.__mbPerf.marks[startMark];
+        const end = window.__mbPerf.marks[endMark];
+        if (typeof start !== "number" || typeof end !== "number") return;
+        window.__mbPerf.measures[measureName] = +(end - start).toFixed(2);
     }
 
     /**
