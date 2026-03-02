@@ -53,6 +53,30 @@ describe("setupIntervalsActions", () => {
         global.MusicBlocks = { isRun: false };
         global.Mouse = { getMouseFromTurtle: jest.fn() };
 
+        global.window = {};
+        global._ = (text) => text;
+        global.TEMPERAMENT = {
+            "equal": {
+                "pitchNumber": 12,
+                "perfect 1": 1,
+                "major 2": 1.122462,
+                "perfect 8": 2
+            },
+            "custom31": {
+                "pitchNumber": 31,
+                "perfect 1": 1,
+                "perfect 8": 2
+            }
+        };
+
+        global.isCustomTemperament = (temperament) => {
+            return !["equal", "equal5", "equal7", "meantone", "werckmeister", "pythagorean", "just intonation", "custom31"].includes(temperament);
+        };
+
+        global.getTemperament = (entry) => {
+            return global.TEMPERAMENT[entry] || undefined;
+        };
+
         global.Singer = {};
 
         turtle = {
@@ -357,7 +381,44 @@ describe("setupIntervalsActions", () => {
         expect(activity.errorMsg).toHaveBeenCalled();
     });
 
-    test("setTemperament state changes", () => {
+    beforeEach(() => {
+        // Ensure TEMPERAMENT is available globally for the test
+        global.TEMPERAMENT = {
+            "equal": {
+                "pitchNumber": 12,
+                "perfect 1": 1,
+                "major 2": 1.122462,
+                "perfect 8": 2
+            },
+            "custom31": {
+                "pitchNumber": 31,
+                "perfect 1": 1,
+                "perfect 8": 2
+            }
+        };
+    });
+
+    test("defineMode with custom temperament wrapping", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+
+        // Mock custom temperament with 31 pitches
+        const originalTemperament = logo.synth.inTemperament;
+        logo.synth.inTemperament = "custom31";
+        logo.synth.changeInTemperament = true;
+
+        activity.blocks.blockList.blk = { connections: [null, "text1"] };
+        activity.blocks.blockList.text1 = { name: "text" };
+
+        Singer.IntervalsActions.defineMode("custom", 0, "blk");
+
+        // Add pitch numbers that should be wrapped
+        turtle.singer.defineMode.push(0, 5, 10, 15, 35);
+
+        listener();
+
+        // Restore original temperament
+        logo.synth.inTemperament = originalTemperament;
         Singer.IntervalsActions.setTemperament("equal", "C", 4);
         expect(logo.synth.inTemperament).toBe("equal");
         expect(logo.synth.startingPitch).toBe("C4");
