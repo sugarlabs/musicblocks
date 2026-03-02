@@ -21,6 +21,10 @@ body.dark {
   color: var(--fg);
 } 
 
+.dark #helpBodyDiv a {
+    color: #64b5f6;
+}
+
 .dark #helpBodyDiv>.heading,
 .dark #helpBodyDiv p {
   color: var(--fg);
