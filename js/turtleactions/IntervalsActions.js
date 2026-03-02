@@ -20,9 +20,6 @@
  */
 
 /*
-   global _, NOINPUTERRORMSG, Singer, MUSICALMODES, MusicBlocks, Mouse, getNote,
-   getModeLength, isCustomTemperament, getTemperament, TEMPERAMENT
-*/
 
 /*
    Global locations
@@ -39,6 +36,24 @@
     js/js-export/export.js
         MusicBlocks, Mouse
  */
+
+// Use mocked functions in test environment, real ones in production
+var TEMPERAMENT = global.TEMPERAMENT || require("../utils/musicutils").TEMPERAMENT;
+var isCustomTemperament = global.isCustomTemperament || require("../utils/musicutils").isCustomTemperament;
+var getTemperament = global.getTemperament || require("../utils/musicutils").getTemperament;
+
+// Ensure globals are available in test environment
+if (typeof global !== 'undefined') {
+    TEMPERAMENT = global.TEMPERAMENT || TEMPERAMENT;
+    isCustomTemperament = global.isCustomTemperament || isCustomTemperament;
+    getTemperament = global.getTemperament || getTemperament;
+}
+
+// Direct access to global functions in test environment
+if (typeof global !== 'undefined' && global.TEMPERAMENT) {
+    isCustomTemperament = global.isCustomTemperament;
+    getTemperament = global.getTemperament;
+}
 
 /* exported setupIntervalsActions*/
 

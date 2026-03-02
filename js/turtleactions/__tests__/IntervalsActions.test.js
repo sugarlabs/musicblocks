@@ -16,31 +16,84 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-const { setupIntervalsActions } = require("../IntervalsActions");
 
-// Mock the entire musicutils module to prevent _ function ReferenceError
-jest.mock("../../utils/musicutils", () => ({
-    TEMPERAMENT: {
-        equal: {
-            "pitchNumber": 12,
-            "perfect 1": 1,
-            "major 2": 1.122462,
-            "perfect 8": 2
-        },
-        custom31: {
-            "pitchNumber": 31,
-            "perfect 1": 1,
-            "perfect 8": 2
-        }
+// Set up globals before requiring IntervalsActions
+global._ = x => x;
+global.NOINPUTERRORMSG = "NOINPUT";
+global.window = {};
+global.TEMPERAMENT = {
+    equal: {
+        "pitchNumber": 12,
+        "perfect 1": 1,
+        "major 2": 1.122462,
+        "perfect 8": 2
     },
-    isCustomTemperament: (temperament) => {
-        return !global.PreDefinedTemperaments[temperament];
-    },
-    getTemperament: (entry) => {
-        return global.TEMPERAMENT[entry];
-    },
-    _: (str) => str
-}));
+    custom31: {
+        "pitchNumber": 31,
+        "perfect 1": 1,
+        "perfect 8": 2
+    }
+};
+
+global.PreDefinedTemperaments = {
+    equal: true,
+    major: true,
+    minor: true,
+    harmonicminor: true,
+    ionian: true,
+    dorian: true,
+    phrygian: true,
+    lydian: true,
+    mixolydian: true,
+    aeolian: true,
+    blues: true,
+    chromatic: true,
+    whole: true,
+    pentatonic: true,
+    pythagorean: true,
+    just: true,
+    quarter: true,
+    "31-EDO": true,
+    "19-EDO": true,
+    "5-EDO": true,
+    "7-EDO": true
+};
+
+global.isCustomTemperament = (temperament) => {
+    return !global.PreDefinedTemperaments[temperament];
+};
+        
+global.getTemperament = (entry) => {
+    return global.TEMPERAMENT[entry];
+};
+
+global.MUSICALMODES = {
+    major: [2, 2, 1, 2, 2, 2, 1],
+    minor: [2, 1, 2, 2, 1, 2, 2]
+};
+
+global.ALLNOTESTEP = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+global.NOTENAMES = ["C", "D", "E", "F", "G", "A", "B"];
+
+global.SEMITONETOINTERVALMAP = Array(13)
+    .fill(null)
+    .map(() => Array(7).fill("perfect"));
+
+global.GetNotesForInterval = () => ({
+    firstNote: "C",
+    secondNote: "G",
+    octave: 0
+});
+
+global.getNote = () => ["C"];
+global.getModeLength = () => 7;
+
+global.MusicBlocks = { isRun: false };
+global.Mouse = { getMouseFromTurtle: () => {} };
+
+global.Singer = {};
+
+const { setupIntervalsActions } = require("../IntervalsActions");
 
 describe("setupIntervalsActions", () => {
     let activity;
@@ -49,27 +102,6 @@ describe("setupIntervalsActions", () => {
 
     beforeEach(() => {
         jest.resetModules();
-
-        global._ = x => x;
-        global.NOINPUTERRORMSG = "NOINPUT";
-        global.window = {};
-        global.TEMPERAMENT = {
-            equal: {
-                "pitchNumber": 12,
-                "perfect 1": 1,
-                "major 2": 1.122462,
-                "perfect 8": 2
-            },
-            custom31: {
-                "pitchNumber": 31,
-                "perfect 1": 1,
-                "perfect 8": 2
-            }
-        };
-
-        // Mock the _ function to prevent ReferenceError
-        global._ = jest.fn((str) => str);
-        global._.mockImplementation = jest.fn(() => "_");
 
         global.PreDefinedTemperaments = {
             equal: true,
@@ -94,12 +126,12 @@ describe("setupIntervalsActions", () => {
             "5-EDO": true,
             "7-EDO": true
         };
-        
-        global.isCustomTemperament = (temperament) => {
+
+        var isCustomTemperament = (temperament) => {
             return !global.PreDefinedTemperaments[temperament];
         };
         
-        global.getTemperament = (entry) => {
+        var getTemperament = (entry) => {
             return global.TEMPERAMENT[entry];
         };
 
@@ -143,7 +175,7 @@ describe("setupIntervalsActions", () => {
             }
         };
 
-        global.isCustomTemperament = temperament => {
+        var isCustomTemperament = temperament => {
             return ![
                 "equal",
                 "equal5",
