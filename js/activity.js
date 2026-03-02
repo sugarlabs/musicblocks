@@ -3111,8 +3111,8 @@ class Activity {
         };
 
         /*
-          Prepare a list of blocks for the search bar autocompletion.
-         */
+             Prepare a list of blocks for the search bar autocompletion.
+            */
         this.prepSearchWidget = () => {
             //searchWidget.style.visibility = "hidden";
             this.searchBlockPosition = [100, 100];
@@ -3136,9 +3136,11 @@ class Activity {
                     if (block.deprecated) {
                         this.deprecatedBlockNames.push(blockLabel);
                     } else {
-                        if (blockLabel.length === 0) {
-                            // Swap in a preferred name when there is no label.
-                            let label = _(block.name);
+                        // Determine the primary label to display for this block.
+                        let label = blockLabel;
+                        if (label.length === 0) {
+                            // Swap in a preferred, localized name when there is no label.
+                            label = _(block.name);
                             switch (block.name) {
                                 case "scaledegree2":
                                     label = _("scale degree");
@@ -3201,30 +3203,30 @@ class Activity {
                                     label = _("load file");
                                     break;
                             }
-                            this.searchSuggestions.push({
-                                label: label,
-                                value: block.name,
-                                specialDict: block,
-                                artwork: artwork
-                            });
-                        } else {
-                            this.searchSuggestions.push({
-                                label: blockLabel,
-                                value: block.name,
-                                specialDict: block,
-                                artwork: artwork
-                            });
                         }
-                        if (block.extraSearchTerms !== undefined) {
-                            for (let i = 0; i < block.extraSearchTerms.length; i++) {
-                                this.searchSuggestions.push({
-                                    label: block.extraSearchTerms[i],
-                                    value: block.name,
-                                    specialDict: block,
-                                    artwork: artwork
-                                });
+
+                        // Build a list of lowercased search terms (primary label + extra terms)
+                        // so we can match synonyms without duplicating the visual entry.
+                        const searchTerms = [];
+                        if (label && label.length > 0) {
+                            searchTerms.push(label.toLowerCase());
+                        }
+                        if (block.extraSearchTerms && Array.isArray(block.extraSearchTerms)) {
+                            for (let j = 0; j < block.extraSearchTerms.length; j++) {
+                                const term = block.extraSearchTerms[j];
+                                if (typeof term === "string" && term.length > 0) {
+                                    searchTerms.push(term.toLowerCase());
+                                }
                             }
                         }
+
+                        this.searchSuggestions.push({
+                            label: label,
+                            value: block.name,
+                            specialDict: block,
+                            artwork: artwork,
+                            searchTerms: searchTerms
+                        });
                     }
                 }
             }
@@ -3328,7 +3330,29 @@ class Activity {
 
             if (!$search.data("autocomplete-init")) {
                 $search.autocomplete({
-                    source: that.searchSuggestions,
+                    // Custom source so we can match on extraSearchTerms but show each block only once.
+                    source: (request, response) => {
+                        const term = (request.term || "").toLowerCase();
+                        const results = that.searchSuggestions.filter(item => {
+                            // If there is no active term, show all items.
+                            if (!term || term.length === 0) {
+                                return true;
+                            }
+
+                            // Prefer matching against searchTerms when present.
+                            if (item.searchTerms && Array.isArray(item.searchTerms)) {
+                                return item.searchTerms.some(t => t && t.indexOf(term) !== -1);
+                            }
+
+                            // Fallback to label matching for legacy entries.
+                            return (
+                                item.label &&
+                                typeof item.label === "string" &&
+                                item.label.toLowerCase().indexOf(term) !== -1
+                            );
+                        });
+                        response(results);
+                    },
                     appendTo: "body",
                     select: (event, ui) => {
                         event.preventDefault();
@@ -3976,21 +4000,21 @@ class Activity {
             if (smallSide < this.cellSize * 9) {
                 mobileSize = false;
                 /*
-                if (w < this.cellSize * 10) {
-                    this.turtleBlocksScale = smallSide / (this.cellSize * 11);
-                } else {
-                    this.turtleBlocksScale = Math.max(smallSide / (this.cellSize * 11), 0.75);
-                }
-                */
+                   if (w < this.cellSize * 10) {
+                       this.turtleBlocksScale = smallSide / (this.cellSize * 11);
+                   } else {
+                       this.turtleBlocksScale = Math.max(smallSide / (this.cellSize * 11), 0.75);
+                   }
+                   */
             } else {
                 mobileSize = false;
                 /*
-                if (w / 1200 > h / 900) {
-                    this.turtleBlocksScale = w / 1200;
-                } else {
-                    this.turtleBlocksScale = h / 900;
-                }
-                */
+                   if (w / 1200 > h / 900) {
+                       this.turtleBlocksScale = w / 1200;
+                   } else {
+                       this.turtleBlocksScale = h / 900;
+                   }
+                   */
             }
 
             this.turtleBlocksScale = 1.0;
@@ -5124,14 +5148,14 @@ class Activity {
         }
 
         /*
-          The parseABC function converts ABC notation to Music Blocks
-          and is able to convert almost all the ABC notation to Music
-          Blocks. However, the following aspects need work:
-
-          Hammers, pulls, and sliding offs grace notes (breaking the
-          conversion) Alternate endings (not failing but not showing
-          correctly) and DS al coda Bass voicing (failing)
-        */
+             The parseABC function converts ABC notation to Music Blocks
+             and is able to convert almost all the ABC notation to Music
+             Blocks. However, the following aspects need work:
+   
+             Hammers, pulls, and sliding offs grace notes (breaking the
+             conversion) Alternate endings (not failing but not showing
+             correctly) and DS al coda Bass voicing (failing)
+           */
         this.parseABC = async function (tune) {
             const musicBlocksJSON = [];
             const staffBlocksMap = {};
@@ -6807,7 +6831,25 @@ class Activity {
 
             if (!$helpfulSearch.data("autocomplete-init")) {
                 $helpfulSearch.autocomplete({
-                    source: that.searchSuggestions,
+                    source: (request, response) => {
+                        const term = (request.term || "").toLowerCase();
+                        const results = that.searchSuggestions.filter(item => {
+                            if (!term || term.length === 0) {
+                                return true;
+                            }
+
+                            if (item.searchTerms && Array.isArray(item.searchTerms)) {
+                                return item.searchTerms.some(t => t && t.indexOf(term) !== -1);
+                            }
+
+                            return (
+                                item.label &&
+                                typeof item.label === "string" &&
+                                item.label.toLowerCase().indexOf(term) !== -1
+                            );
+                        });
+                        response(results);
+                    },
                     appendTo: "body",
                     select: (event, ui) => {
                         event.preventDefault();
@@ -8070,9 +8112,9 @@ class Activity {
             this._create2Ddrag();
 
             /*
-            document.addEventListener("mousewheel", scrollEvent, false);
-            document.addEventListener("DOMMouseScroll", scrollEvent, false);
-            */
+               document.addEventListener("mousewheel", scrollEvent, false);
+               document.addEventListener("DOMMouseScroll", scrollEvent, false);
+               */
 
             // Named event handler for proper cleanup
             const activity = this;
