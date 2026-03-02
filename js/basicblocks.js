@@ -81,32 +81,13 @@ const BACKWARDCOMPATIBILIYDICT = {
  * @param  {Object} blocks
  * @returns {void}
  */
-const initBasicProtoBlocks = activity => {
+const initCoreProtoBlocks = activity => {
     activity.blocks.palettes = activity.palettes;
-    setupRhythmBlockPaletteBlocks(activity);
-    setupRhythmBlocks(activity);
-    setupMeterBlocks(activity);
-    setupPitchBlocks(activity);
-    setupIntervalsBlocks(activity);
-    setupToneBlocks(activity);
-    setupOrnamentBlocks(activity);
-    setupVolumeBlocks(activity);
-    setupDrumBlocks(activity);
-    setupWidgetBlocks(activity);
     setupFlowBlocks(activity);
     setupNumberBlocks(activity);
     setupActionBlocks(activity);
     setupBoxesBlocks(activity);
     setupBooleanBlocks(activity);
-    setupHeapBlocks(activity);
-    setupDictBlocks(activity);
-    setupExtrasBlocks(activity);
-    setupProgramBlocks(activity);
-    setupGraphicsBlocks(activity);
-    setupPenBlocks(activity);
-    setupMediaBlocks(activity);
-    setupSensorsBlocks(activity);
-    setupEnsembleBlocks(activity);
 
     // Push protoblocks onto their palettes.
     for (const protoblock in activity.blocks.protoBlockDict) {
@@ -117,9 +98,51 @@ const initBasicProtoBlocks = activity => {
         }
     }
 };
+
+/**
+ * Initialize advanced / heavy blocks (deferred).
+ */
+const initAdvancedProtoBlocks = activity => {
+    setupRhythmBlockPaletteBlocks(activity);
+    setupRhythmBlocks(activity);
+    setupMeterBlocks(activity);
+    setupPitchBlocks(activity);
+    setupIntervalsBlocks(activity);
+    setupToneBlocks(activity);
+    setupOrnamentBlocks(activity);
+    setupVolumeBlocks(activity);
+    setupDrumBlocks(activity);
+    setupWidgetBlocks(activity);
+    setupHeapBlocks(activity);
+    setupDictBlocks(activity);
+    setupExtrasBlocks(activity);
+    setupProgramBlocks(activity);
+    setupGraphicsBlocks(activity);
+    setupPenBlocks(activity);
+    setupMediaBlocks(activity);
+    setupSensorsBlocks(activity);
+    setupEnsembleBlocks(activity);
+
+    // Push newly added protoblocks onto palettes
+    for (const protoblock in activity.blocks.protoBlockDict) {
+        if (activity.blocks.protoBlockDict[protoblock].palette != null) {
+            activity.blocks.protoBlockDict[protoblock].palette.add(
+                activity.blocks.protoBlockDict[protoblock]
+            );
+        }
+    }
+};
+
+const initBasicProtoBlocks = activity => {
+    initCoreProtoBlocks(activity);
+    initAdvancedProtoBlocks(activity);
+};
+
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         initBasicProtoBlocks,
+        initCoreProtoBlocks,
+        initAdvancedProtoBlocks,
         BACKWARDCOMPATIBILIYDICT
     };
 }
