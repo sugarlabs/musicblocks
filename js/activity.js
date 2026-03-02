@@ -8261,4 +8261,3 @@ define(["domReady!"].concat(MYDEFINES), doc => {
     };
     initialize();
 });
-
