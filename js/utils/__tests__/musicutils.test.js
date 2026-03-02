@@ -1753,6 +1753,20 @@ describe("getSolfege", () => {
     it("should return undefined for invalid notes not present in the conversion table", () => {
         expect(getSolfege("X")).toBe("X");
     });
+
+    it("should accept keySignature parameter for future mode-specific conversion", () => {
+        // Currently uses standard C major conversion regardless of key signature
+        // Parameters are accepted for API compatibility and future enhancement
+        expect(getSolfege("D", "D major")).toBe("re");
+        expect(getSolfege("E", "D major")).toBe("mi");
+        expect(getSolfege("F♯", "D major")).toBe("fa" + SHARP);
+    });
+
+    it("should accept movable parameter for API compatibility", () => {
+        // movable parameter accepted but not yet implemented
+        expect(getSolfege("C", "C major", false)).toBe("do");
+        expect(getSolfege("C", "C major", true)).toBe("do");
+    });
 });
 
 describe("splitSolfege", () => {
