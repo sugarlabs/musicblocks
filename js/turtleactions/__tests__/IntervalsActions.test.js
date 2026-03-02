@@ -28,6 +28,20 @@ describe("setupIntervalsActions", () => {
 
         global._ = x => x;
         global.NOINPUTERRORMSG = "NOINPUT";
+        global.window = {};
+        global.TEMPERAMENT = {
+            equal: {
+                "pitchNumber": 12,
+                "perfect 1": 1,
+                "major 2": 1.122462,
+                "perfect 8": 2
+            },
+            custom31: {
+                "pitchNumber": 31,
+                "perfect 1": 1,
+                "perfect 8": 2
+            }
+        };
 
         global.MUSICALMODES = {
             major: [2, 2, 1, 2, 2, 2, 1],
@@ -388,23 +402,6 @@ describe("setupIntervalsActions", () => {
         listener();
 
         expect(activity.errorMsg).toHaveBeenCalled();
-    });
-
-    beforeEach(() => {
-        // Ensure TEMPERAMENT is available globally for the test
-        global.TEMPERAMENT = {
-            equal: {
-                "pitchNumber": 12,
-                "perfect 1": 1,
-                "major 2": 1.122462,
-                "perfect 8": 2
-            },
-            custom31: {
-                "pitchNumber": 31,
-                "perfect 1": 1,
-                "perfect 8": 2
-            }
-        };
     });
 
     test("defineMode with custom temperament wrapping", () => {
