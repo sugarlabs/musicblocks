@@ -48,7 +48,12 @@ class Player {
         this.toDestination = jest.fn().mockReturnThis();
         this.connect = jest.fn().mockReturnThis();
         this.start = jest.fn().mockReturnThis();
+        this.stop = jest.fn().mockReturnThis();
         this.triggerAttackRelease = jest.fn().mockReturnThis();
+        this.volume = {
+            value: 0,
+            rampTo: jest.fn()
+        };
     }
 }
 
@@ -106,6 +111,15 @@ class Synth {
 class NoiseSynth {
     constructor(synthOptions) {
         this.synthOptions = synthOptions;
+        this.triggerAttack = jest.fn().mockReturnThis();
+        this.triggerRelease = jest.fn().mockReturnThis();
+        this.triggerAttackRelease = jest.fn().mockReturnThis();
+        this.start = jest.fn().mockReturnThis();
+        this.stop = jest.fn().mockReturnThis();
+        this.volume = {
+            value: 0,
+            rampTo: jest.fn()
+        };
     }
     toDestination() {
         return this;
@@ -118,6 +132,8 @@ class PolySynth {
         this.count = count;
         this.triggerAttack = jest.fn().mockReturnThis();
         this.start = jest.fn().mockReturnThis();
+        this.triggerRelease = jest.fn().mockReturnThis();
+        this.stop = jest.fn().mockReturnThis();
         this.triggerAttackRelease = jest.fn().mockReturnThis();
         this.volume = {
             value: 0,
@@ -145,8 +161,8 @@ class context {
 }
 
 class Transport {
-    static start() {}
-    static stop() {}
+    static start = jest.fn();
+    static stop = jest.fn();
 }
 
 class ToneAudioBuffer {
