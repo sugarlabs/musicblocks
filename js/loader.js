@@ -53,6 +53,9 @@ requirejs.config({
             deps: ["utils/platformstyle"],
             exports: "_"
         },
+        "activity/logoconstants": {
+            deps: ["utils/utils"]
+        },
         "activity/turtledefs": {
             deps: ["utils/utils"],
             exports: "createDefaultStack"
