@@ -508,6 +508,28 @@ function TemperamentWidget() {
     };
 
     /**
+     * Convert frequency to cents relative to the base frequency.
+     * @private
+     * @param {number} frequency - The frequency to convert.
+     * @param {number} baseFrequency - The base frequency for comparison.
+     * @returns {number} The cents value.
+     */
+    this._frequencyToCents = function (frequency, baseFrequency) {
+        const ratio = frequency / baseFrequency;
+        return 1200 * (Math.log10(ratio) / Math.log10(this.powerBase));
+    };
+
+    /**
+     * Convert cents to frequency ratio.
+     * @private
+     * @param {number} cents - The cents value.
+     * @returns {number} The frequency ratio.
+     */
+    this._centsToRatio = function (cents) {
+        return Math.pow(this.powerBase, cents / 1200);
+    };
+
+    /**
      * Allows editing the frequency of a note on the temperament widget.
      * @param {Event} event - The event triggering the frequency edit.
      * @returns {void}
@@ -516,27 +538,70 @@ function TemperamentWidget() {
         const i = Number(event.target.dataset.message);
         const that = this;
 
-        docById("noteInfo").style.width = "180px";
-        docById("noteInfo").style.height = "130px";
+        // Calculate initial cents value
+        const initialCents = this._frequencyToCents(this.frequencies[i], this.frequencies[0]);
+
+        docById("noteInfo").style.width = "220px";
+        docById("noteInfo").style.height = "200px";
         docById("note").innerHTML = "";
         docById("frequency").innerHTML = "";
+
+        // Frequency slider
         docById(
             "noteInfo"
-        ).innerHTML += `<center><input type="range" class="sliders" id="frequencySlider1" style="width:170px; background:white; border:0;" min="${
+        ).innerHTML += `<center><input type="range" class="sliders" id="frequencySlider1" style="width:200px; background:white; border:0;" min="${
             this.frequencies[i - 1]
-        }" max="${this.frequencies[i + 1]}"></center>`;
+        }" max="${this.frequencies[i + 1]}" step="0.1"></center>`;
+
+        // Frequency display
         docById("noteInfo").innerHTML += `<br>&nbsp;&nbsp;${_(
             "frequency"
-        )}<span class="rangeslidervalue" id="frequencydiv1">${this.frequencies[i]}</span>`;
+        )}&nbsp;<span class="rangeslidervalue" id="frequencydiv1">${this.frequencies[i]}</span> Hz`;
+
+        // Cents display and input
+        docById("noteInfo").innerHTML += `<br>&nbsp;&nbsp;${_(
+            "cents"
+        )}&nbsp;<input type="number" id="centsInput1" style="width:60px; text-align:center;" value="${initialCents.toFixed(
+            1
+        )}" step="0.1" min="-50" max="50">¢`;
+
+        // Fine adjustment buttons
+        docById("noteInfo").innerHTML += `<br><center>`;
+        docById(
+            "noteInfo"
+        ).innerHTML += `<button id="centsMinus10" style="margin:2px; width:30px;">-10</button>`;
+        docById(
+            "noteInfo"
+        ).innerHTML += `<button id="centsMinus5" style="margin:2px; width:30px;">-5</button>`;
+        docById(
+            "noteInfo"
+        ).innerHTML += `<button id="centsMinus1" style="margin:2px; width:30px;">-1</button>`;
+        docById(
+            "noteInfo"
+        ).innerHTML += `<button id="centsPlus1" style="margin:2px; width:30px;">+1</button>`;
+        docById(
+            "noteInfo"
+        ).innerHTML += `<button id="centsPlus5" style="margin:2px; width:30px;">+5</button>`;
+        docById(
+            "noteInfo"
+        ).innerHTML += `<button id="centsPlus10" style="margin:2px; width:30px;">+10</button>`;
+        docById("noteInfo").innerHTML += `</center>`;
+
+        // Done button
         docById(
             "noteInfo"
         ).innerHTML += `<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>${_(
             "done"
-        )}</center><div>`;
+        )}</center></div>`;
 
         docById("frequencySlider1").oninput = function () {
-            docById("frequencydiv1").innerHTML = docById("frequencySlider1").value;
-            const frequency = docById("frequencySlider1").value;
+            const frequency = parseFloat(docById("frequencySlider1").value);
+            docById("frequencydiv1").innerHTML = frequency.toFixed(2);
+
+            // Update cents display when frequency changes
+            const cents = that._frequencyToCents(frequency, that.frequencies[0]);
+            docById("centsInput1").value = cents.toFixed(1);
+
             const ratio = frequency / that.frequencies[0];
             that.temporaryRatios = that.ratios.slice();
             that.temporaryRatios[i] = ratio;
@@ -550,6 +615,57 @@ function TemperamentWidget() {
                 null
             );
             that.createMainWheel(that.temporaryRatios);
+        };
+
+        // Cents input handler
+        docById("centsInput1").oninput = function () {
+            const cents = parseFloat(docById("centsInput1").value);
+            const ratio = that._centsToRatio(cents);
+            const frequency = that.frequencies[0] * ratio;
+
+            // Update frequency slider and display
+            docById("frequencySlider1").value = frequency;
+            docById("frequencydiv1").innerHTML = frequency.toFixed(2);
+
+            that.temporaryRatios = that.ratios.slice();
+            that.temporaryRatios[i] = ratio;
+            that._logo.resetSynth(0);
+            that._logo.synth.trigger(
+                0,
+                frequency,
+                Singer.defaultBPMFactor * 0.01,
+                "electronic synth",
+                null,
+                null
+            );
+            that.createMainWheel(that.temporaryRatios);
+        };
+
+        // Fine adjustment button handlers
+        const adjustCents = function (delta) {
+            const currentCents = parseFloat(docById("centsInput1").value);
+            const newCents = Math.max(-50, Math.min(50, currentCents + delta));
+            docById("centsInput1").value = newCents.toFixed(1);
+            docById("centsInput1").oninput();
+        };
+
+        docById("centsMinus10").onclick = function () {
+            adjustCents(-10);
+        };
+        docById("centsMinus5").onclick = function () {
+            adjustCents(-5);
+        };
+        docById("centsMinus1").onclick = function () {
+            adjustCents(-1);
+        };
+        docById("centsPlus1").onclick = function () {
+            adjustCents(1);
+        };
+        docById("centsPlus5").onclick = function () {
+            adjustCents(5);
+        };
+        docById("centsPlus10").onclick = function () {
+            adjustCents(10);
         };
 
         docById("done").onclick = function () {

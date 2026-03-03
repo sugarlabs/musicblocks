@@ -512,4 +512,56 @@ describe("TemperamentWidget basic tests", () => {
 
         expect(widget.activity.blocks.loadNewBlocks).toHaveBeenCalled();
     });
+
+    test("_frequencyToCents converts frequency to cents correctly", () => {
+        widget.frequencies = [440, 880];
+        widget.powerBase = 2;
+
+        const cents = widget._frequencyToCents(880, 440);
+
+        // One octave should be 1200 cents
+        expect(cents).toBeCloseTo(1200, 1);
+    });
+
+    test("_centsToRatio converts cents to ratio correctly", () => {
+        widget.powerBase = 2;
+
+        const ratio = widget._centsToRatio(1200);
+
+        // 1200 cents should be ratio of 2 (one octave)
+        expect(ratio).toBeCloseTo(2, 3);
+    });
+
+    test("_frequencyToCents handles microtonal adjustments", () => {
+        widget.frequencies = [440, 880];
+        widget.powerBase = 2;
+
+        // Test 50 cents adjustment (quarter tone)
+        const cents = widget._frequencyToCents(440 * Math.pow(2, 50 / 1200), 440);
+        expect(cents).toBeCloseTo(50, 1);
+    });
+
+    test("_centsToRatio handles negative cents", () => {
+        widget.powerBase = 2;
+
+        const ratio = widget._centsToRatio(-50);
+
+        // -50 cents should be slightly less than 1
+        expect(ratio).toBeLessThan(1);
+        expect(ratio).toBeCloseTo(Math.pow(2, -50 / 1200), 5);
+    });
+
+    test("cents conversion functions are bidirectional", () => {
+        widget.frequencies = [440];
+        widget.powerBase = 2;
+
+        const testCents = [0, 50, -50, 100, -100, 1200];
+
+        testCents.forEach(cents => {
+            const ratio = widget._centsToRatio(cents);
+            const frequency = 440 * ratio;
+            const convertedCents = widget._frequencyToCents(frequency, 440);
+            expect(convertedCents).toBeCloseTo(cents, 1);
+        });
+    });
 });
