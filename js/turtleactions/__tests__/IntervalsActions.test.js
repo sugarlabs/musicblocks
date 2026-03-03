@@ -16,6 +16,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
+// Setup globals before importing modules
+global.TextEncoder = require("util").TextEncoder;
+global.TextDecoder = require("util").TextDecoder;
+global._ = x => x;
+global.NOINPUTERRORMSG = "NOINPUT";
+
 const { setupIntervalsActions } = require("../IntervalsActions");
 
 describe("setupIntervalsActions", () => {
@@ -25,9 +32,6 @@ describe("setupIntervalsActions", () => {
 
     beforeEach(() => {
         jest.resetModules();
-
-        global._ = x => x;
-        global.NOINPUTERRORMSG = "NOINPUT";
 
         global.MUSICALMODES = {
             major: [2, 2, 1, 2, 2, 2, 1],

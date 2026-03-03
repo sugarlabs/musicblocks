@@ -25,8 +25,10 @@
    nthDegreeToPitch, SHARP, FLAT, _, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    numberToPitch, ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
    keySignatureToMode, getInterval, EFFECTSNAMES, NANERRORMSG, frequencyToPitch,
-   MusicBlocks, Mouse, isCustomTemperament
+   MusicBlocks, Mouse, isCustomTemperament, getTemperament, TEMPERAMENT
 */
+
+const { isCustomTemperament, getTemperament, TEMPERAMENT } = require("../utils/musicutils");
 
 /*
    Global locations
@@ -44,7 +46,7 @@
         pitchToNumber, getStepSizeUp, getStepSizeDown, calcOctave, getNote, nthDegreeToPitch,
         SHARP, FLAT, _, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE, numberToPitch,
         ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
-        keySignatureToMode, getInterval, frequencyToPitch, isCustomTemperament
+        keySignatureToMode, getInterval, frequencyToPitch, isCustomTemperament, getTemperament, TEMPERAMENT
 */
 
 /*exported setupPitchActions*/
@@ -184,7 +186,23 @@ function setupPitchActions(activity) {
             number = Math.abs(number);
 
             const obj = keySignatureToMode(tur.singer.keySignature);
-            const modeLength = MUSICALMODES[obj[1]].length;
+
+            // Get temperament length for proper modulo arithmetic
+            let modeLength = 7; // Default for standard modes
+            const currentTemperament = activity.logo.synth.inTemperament;
+
+            if (isCustomTemperament(currentTemperament)) {
+                const customTemperament = getTemperament(currentTemperament);
+                if (customTemperament && customTemperament.pitchNumber) {
+                    modeLength = customTemperament.pitchNumber;
+                }
+            } else {
+                // For standard temperament, check if mode exists in MUSICALMODES
+                if (obj && obj[1] && MUSICALMODES[obj[1]]) {
+                    modeLength = MUSICALMODES[obj[1]].length;
+                }
+            }
+
             let scaleDegree = (Math.floor(number - 1) % modeLength) + 1;
 
             // Choose a reference based on the key selected.

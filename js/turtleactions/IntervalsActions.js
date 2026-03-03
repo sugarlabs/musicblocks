@@ -21,8 +21,10 @@
 
 /*
    global _, NOINPUTERRORMSG, Singer, MUSICALMODES, MusicBlocks, Mouse, getNote,
-   getModeLength
+   getModeLength, isCustomTemperament, getTemperament, TEMPERAMENT
 */
+
+const { isCustomTemperament, getTemperament, TEMPERAMENT } = require("../utils/musicutils");
 
 /*
    Global locations
@@ -32,7 +34,8 @@
         NOINPUTERRORMSG
     js/utils/musicutils.js
         MUSICALMODES, MODE_PIE_MENUS, getNote, getModeLength, NOTESTEP,
-        GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP
+        GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
+        isCustomTemperament, getTemperament, TEMPERAMENT
     js/turtle-singer.js
         Singer
     js/js-export/export.js
@@ -275,11 +278,31 @@ function setupIntervalsActions(activity) {
 
                 const pitchNumbers = tur.singer.defineMode.sort((a, b) => a[0] - b[0]);
 
+                // Get temperament length for modulo arithmetic
+                let temperamentLength = 12; // Default for standard temperament
+                const currentTemperament = activity.logo.synth.inTemperament;
+
+                if (isCustomTemperament(currentTemperament)) {
+                    const customTemperament = getTemperament(currentTemperament);
+                    if (customTemperament && customTemperament.pitchNumber) {
+                        temperamentLength = customTemperament.pitchNumber;
+                    }
+                } else {
+                    const temperamentData = TEMPERAMENT[currentTemperament];
+                    if (temperamentData && temperamentData.pitchNumber) {
+                        temperamentLength = temperamentData.pitchNumber;
+                    }
+                }
+
+                // Apply modulo arithmetic to wrap pitch numbers within temperament range
+                const wrappedPitchNumbers = pitchNumbers.map(
+                    pitch => ((pitch % temperamentLength) + temperamentLength) % temperamentLength
+                );
+
                 for (let i = 0; i < pitchNumbers.length; i++) {
-                    if (pitchNumbers[i] < 0 || pitchNumbers[i] > 11) {
-                        activity.errorMsg(
-                            _("Ignoring pitch numbers less than zero or greater than eleven.")
-                        );
+                    // Only check for negative values if they're unreasonably low
+                    if (pitchNumbers[i] < -100) {
+                        activity.errorMsg(_("Ignoring extremely low pitch numbers."));
                         continue;
                     }
 
@@ -289,9 +312,11 @@ function setupIntervalsActions(activity) {
                     }
 
                     if (i < pitchNumbers.length - 1) {
-                        MUSICALMODES[modeName].push(pitchNumbers[i + 1] - pitchNumbers[i]);
+                        MUSICALMODES[modeName].push(
+                            wrappedPitchNumbers[i + 1] - wrappedPitchNumbers[i]
+                        );
                     } else {
-                        MUSICALMODES[modeName].push(12 - pitchNumbers[i]);
+                        MUSICALMODES[modeName].push(temperamentLength - wrappedPitchNumbers[i]);
                     }
                 }
 
