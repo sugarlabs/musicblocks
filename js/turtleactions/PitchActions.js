@@ -196,7 +196,12 @@ function setupPitchActions(activity) {
                 if (customTemperament?.pitchNumber) {
                     modeLength = customTemperament.pitchNumber;
                 }
-            } else if (currentTemperament && TEMPERAMENT?.[currentTemperament]?.pitchNumber) {
+            } else if (
+                TEMPERAMENT &&
+                currentTemperament &&
+                TEMPERAMENT[currentTemperament] &&
+                TEMPERAMENT[currentTemperament].pitchNumber
+            ) {
                 // For standard temperament, check if mode exists in MUSICALMODES
                 const obj = keySignatureToMode(tur.singer.keySignature);
                 if (obj && obj[1] && MUSICALMODES[obj[1]]) {
