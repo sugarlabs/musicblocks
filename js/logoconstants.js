@@ -3,6 +3,13 @@
    _
 */
 
+// Ensure _ is always defined to prevent initialization crashes
+if (typeof _ === "undefined") {
+    window._ = function (x) {
+        return x;
+    };
+}
+
 /*
    exported
    DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY,
