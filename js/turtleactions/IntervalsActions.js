@@ -24,13 +24,12 @@
    getModeLength, isCustomTemperament, getTemperament, TEMPERAMENT
 */
 
-const { isCustomTemperament, getTemperament, TEMPERAMENT } = require("../utils/musicutils");
-
 /*
    Global locations
     js/utils/utils.js
         _
     js/logo.js
+        NOINPUTERRORMSG, Singer
         NOINPUTERRORMSG
     js/utils/musicutils.js
         MUSICALMODES, MODE_PIE_MENUS, getNote, getModeLength, NOTESTEP,

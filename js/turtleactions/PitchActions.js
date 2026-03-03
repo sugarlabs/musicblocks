@@ -17,18 +17,14 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335
  * USA.
-
  */
 
 /*
-   globals Singer, pitchToNumber, getStepSizeUp, getStepSizeDown, calcOctave, last, getNote,
-   nthDegreeToPitch, SHARP, FLAT, _, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
-   numberToPitch, ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
+   global _, pitchToNumber, getStepSizeUp, getStepSizeDown, calcOctave, getNote,
+   nthDegreeToPitch, SHARP, FLAT, _, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE, numberToPitch, ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
    keySignatureToMode, getInterval, EFFECTSNAMES, NANERRORMSG, frequencyToPitch,
    MusicBlocks, Mouse, isCustomTemperament, getTemperament, TEMPERAMENT
 */
-
-const { isCustomTemperament, getTemperament, TEMPERAMENT } = require("../utils/musicutils");
 
 /*
    Global locations
