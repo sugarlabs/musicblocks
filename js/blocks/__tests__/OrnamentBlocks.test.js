@@ -259,6 +259,45 @@ describe("setupOrnamentBlocks", () => {
             expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, "blkGlide");
             expect(result).toEqual([8, 1]);
         });
+        it("should call notationEndSlur in __listener when justCounting is empty", () => {
+            const glideBlock = createdBlocks["glide"];
+            const turtleIndex = 0;
+            const turtleObj = activity.turtles.ithTurtle(turtleIndex);
+            turtleObj.singer.glide = []; // ← empty, flow() will push 0.1
+            turtleObj.singer.justCounting = [];
+
+            let capturedListener = null;
+            logo.setTurtleListener = jest.fn((turtle, name, fn) => {
+                capturedListener = fn;
+            });
+
+            glideBlock.flow([0.1, 8], logo, turtleIndex, "blkGlide");
+            expect(capturedListener).not.toBeNull();
+            capturedListener({});
+
+            expect(logo.notation.notationEndSlur).toHaveBeenCalledWith(turtleIndex);
+            expect(turtleObj.singer.glide).toHaveLength(0); // pushed 0.1 then popped
+        });
+
+        it("should skip notationEndSlur in __listener when justCounting is non-empty", () => {
+            const glideBlock = createdBlocks["glide"];
+            const turtleIndex = 0;
+            const turtleObj = activity.turtles.ithTurtle(turtleIndex);
+            turtleObj.singer.glide = []; // ← empty, flow() will push 0.1
+            turtleObj.singer.justCounting = [true];
+
+            let capturedListener = null;
+            logo.setTurtleListener = jest.fn((turtle, name, fn) => {
+                capturedListener = fn;
+            });
+
+            glideBlock.flow([0.1, 8], logo, turtleIndex, "blkGlide");
+            expect(capturedListener).not.toBeNull();
+            capturedListener({});
+
+            expect(logo.notation.notationEndSlur).not.toHaveBeenCalled();
+            expect(turtleObj.singer.glide).toHaveLength(0); // pushed 0.1 then popped
+        });
     });
 
     describe("SlurBlock", () => {
