@@ -111,9 +111,8 @@ describe("loader.js coverage", () => {
             expect.objectContaining({ lng: "en" }),
             expect.any(Function)
         );
-        expect(window.i18next).toBe(mockI18next);
-
         expect(mockI18next.changeLanguage).toHaveBeenCalledWith("en", expect.any(Function));
+        expect(window.i18next).toBe(mockI18next);
 
         const title = document.querySelector('[data-i18n="title"]');
         const label = document.querySelector('[data-i18n="label"]');
