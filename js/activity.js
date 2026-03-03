@@ -1258,11 +1258,10 @@ class Activity {
             }
 
             let i = 0;
-            for (const name in blockHelpList) {
-                this.__saveHelpBlock(blockHelpList[name], i * 2000);
-                i += 1;
+            for (const name of blockHelpList) {
+                this.__saveHelpBlock(name, i * 2000);
+                i++;
             }
-
             this.sendAllToTrash(true, true);
         };
 
