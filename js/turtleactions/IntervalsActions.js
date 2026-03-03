@@ -287,11 +287,13 @@ function setupIntervalsActions(activity) {
                     if (customTemperament?.pitchNumber) {
                         temperamentLength = customTemperament.pitchNumber;
                     }
-                } else if (currentTemperament && TEMPERAMENT?.[currentTemperament]?.pitchNumber) {
-                    const temperamentData = TEMPERAMENT[currentTemperament];
-                    if (temperamentData && temperamentData.pitchNumber) {
-                        temperamentLength = temperamentData.pitchNumber;
-                    }
+                } else if (
+                    TEMPERAMENT &&
+                    currentTemperament &&
+                    TEMPERAMENT[currentTemperament] &&
+                    TEMPERAMENT[currentTemperament].pitchNumber
+                ) {
+                    temperamentLength = TEMPERAMENT[currentTemperament].pitchNumber;
                 }
 
                 // Apply modulo arithmetic to wrap pitch numbers within temperament range
@@ -299,7 +301,7 @@ function setupIntervalsActions(activity) {
                     pitch => ((pitch % temperamentLength) + temperamentLength) % temperamentLength
                 );
 
-                for (let i = 0; i < pitchNumbers.length; i++) {
+                for (let i = 0; i < wrappedPitchNumbers.length; i++) {
                     // Only check for negative values if they're unreasonably low
                     if (pitchNumbers[i] < -100) {
                         activity.errorMsg(_("Ignoring extremely low pitch numbers."));
@@ -311,7 +313,7 @@ function setupIntervalsActions(activity) {
                         continue;
                     }
 
-                    if (i < pitchNumbers.length - 1) {
+                    if (i < wrappedPitchNumbers.length - 1) {
                         MUSICALMODES[modeName].push(
                             wrappedPitchNumbers[i + 1] - wrappedPitchNumbers[i]
                         );
