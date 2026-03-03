@@ -21,7 +21,7 @@ jobs:
           node-version: '20'
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run npm Audit
-        run: npm audit --audit-level=high || echo "npm audit failed"
+        run: npm audit --omit=dev --audit-level=high
