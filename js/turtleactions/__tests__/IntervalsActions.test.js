@@ -23,6 +23,14 @@ global.TextDecoder = require("util").TextDecoder;
 global._ = x => x;
 global.NOINPUTERRORMSG = "NOINPUT";
 
+// Add temperament-related globals
+global.isCustomTemperament = jest.fn(() => false);
+global.getTemperament = jest.fn(() => ({ pitchNumber: 12 }));
+global.TEMPERAMENT = {
+    equal: { pitchNumber: 12 },
+    custom: { pitchNumber: 31 }
+};
+
 const { setupIntervalsActions } = require("../IntervalsActions");
 
 describe("setupIntervalsActions", () => {
