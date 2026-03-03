@@ -189,15 +189,16 @@ function setupPitchActions(activity) {
 
             // Get temperament length for proper modulo arithmetic
             let modeLength = 7; // Default for standard modes
-            const currentTemperament = activity.logo.synth.inTemperament;
+            const currentTemperament = activity?.logo?.synth?.inTemperament || "equal";
 
-            if (isCustomTemperament(currentTemperament)) {
+            if (currentTemperament && isCustomTemperament(currentTemperament)) {
                 const customTemperament = getTemperament(currentTemperament);
-                if (customTemperament && customTemperament.pitchNumber) {
+                if (customTemperament?.pitchNumber) {
                     modeLength = customTemperament.pitchNumber;
                 }
-            } else {
+            } else if (currentTemperament && TEMPERAMENT?.[currentTemperament]?.pitchNumber) {
                 // For standard temperament, check if mode exists in MUSICALMODES
+                const obj = keySignatureToMode(tur.singer.keySignature);
                 if (obj && obj[1] && MUSICALMODES[obj[1]]) {
                     modeLength = MUSICALMODES[obj[1]].length;
                 }
@@ -282,6 +283,7 @@ function setupPitchActions(activity) {
                 return;
             } else {
                 if (
+                    activity?.logo?.synth?.inTemperament &&
                     isCustomTemperament(activity.logo.synth.inTemperament) &&
                     tur.singer.scalarTransposition + tur.singer.transposition !== 0
                 ) {
