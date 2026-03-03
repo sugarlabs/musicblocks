@@ -91,14 +91,14 @@ var meSpeakFlashFallback = new function() {
 
     function swfIsAvailable(leastMajorVersion) {
         // returns Boolean: flashplayer and version at least 10.x
-        var sf="Shockwave Flash", sfm="application/x-shockwave-flash";
-        if (navigator.plugins !== undefined && typeof navigator.plugins[sf] == "object") {
-            var d=navigator.plugins[sf].description;
-            if (d && !(typeof navigator.mimeTypes !==undefined && navigator.mimeTypes[sfm] && !navigator.mimeTypes[sfm].enabledPlugin)) {
-                d=d.replace(/^.*\s+(\S+\s+\S+$)/, "$1");
-                if (leastMajorVersion<= parseInt(d.replace(/^(.*)\..*$/, "$1"), 10)) return true;
-            }
-        }
+      var sf = "Shockwave Flash", sfm = "application/x-shockwave-flash";
+if (navigator.plugins !== undefined && typeof navigator.plugins[sf] == "object") {
+    var d = navigator.plugins[sf].description;
+    if (d && !(typeof navigator.mimeTypes !== "undefined" && navigator.mimeTypes[sfm] && !navigator.mimeTypes[sfm].enabledPlugin)) {
+        d = d.replace(/^.*\s+(\S+\s+\S+$)/, "$1");
+        if (leastMajorVersion <= parseInt(d.replace(/^(.*)\..*$/, "$1"), 10)) return true;
+    }
+}
         else if (window.ActiveXObject) {
             try {
                 var a=new ActiveXObject("ShockwaveFlash.ShockwaveFlash");
