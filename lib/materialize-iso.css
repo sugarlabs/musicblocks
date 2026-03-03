@@ -1,5 +1,5 @@
 .materialize-iso {
-  
+
   /*!
  * Materialize v0.100.2 (http://materializecss.com)
  * Copyright 2014-2017 Materialize
@@ -18,7 +18,7 @@
  * Default mobile-first, responsive styling for pickadate.js
  * Demo: http://amsul.github.io/pickadate.js
  */
- 
+
 
  -webkit-touch-callout: none; /* iOS Safari */
  -webkit-user-select: none; /* Safari */
@@ -3360,7 +3360,7 @@ i.left {
   .materialize-iso nav a.button-collapse {
     display: none;
   }
-  
+
 }
 
 @media only screen and (max-width:1100px) {
@@ -3370,7 +3370,7 @@ i.left {
   }
 
   .materialize-iso nav .aux i.material-icons {
-    font-size: 32px;  
+    font-size: 32px;
     position: relative;
     margin: 0;
     padding: 0;
@@ -3382,14 +3382,14 @@ i.left {
     display: none;
   }
   .materialize-iso nav i.material-icons {
-    font-size: 28px;  
+    font-size: 28px;
     position: relative;
     margin: 0;
     padding: 0;
   }
 
   .materialize-iso nav .aux i.material-icons {
-    font-size: 23px;  
+    font-size: 23px;
     position: relative;
     margin: 0;
     padding: 0;
@@ -3401,14 +3401,14 @@ i.left {
     display: none;
   }
   .materialize-iso nav .main i.material-icons {
-    font-size: 26px;  
+    font-size: 26px;
     position: relative;
     margin: 0;
     padding: 0;
   }
 
   .materialize-iso nav .aux i.material-icons {
-    font-size: 23px;  
+    font-size: 23px;
     position: relative;
     margin: 0;
     padding: 0;
@@ -3645,26 +3645,31 @@ i.left {
   font-family: "Roboto";
   src: local(Roboto Thin), url("../fonts/roboto/Roboto-Thin.woff2") format("woff2"), url("../fonts/roboto/Roboto-Thin.woff") format("woff");
   font-weight: 100;
+  font-display: swap;
 }
 @font-face {
   font-family: "Roboto";
   src: local(Roboto Light), url("../fonts/roboto/Roboto-Light.woff2") format("woff2"), url("../fonts/roboto/Roboto-Light.woff") format("woff");
   font-weight: 300;
+  font-display: swap;
 }
 @font-face {
   font-family: "Roboto";
   src: local(Roboto Regular), url("../fonts/roboto/Roboto-Regular.woff2") format("woff2"), url("../fonts/roboto/Roboto-Regular.woff") format("woff");
   font-weight: 400;
+  font-display: swap;
 }
 @font-face {
   font-family: "Roboto";
   src: local(Roboto Medium), url("../fonts/roboto/Roboto-Medium.woff2") format("woff2"), url("../fonts/roboto/Roboto-Medium.woff") format("woff");
   font-weight: 500;
+  font-display: swap;
 }
 @font-face {
   font-family: "Roboto";
   src: local(Roboto Bold), url("../fonts/roboto/Roboto-Bold.woff2") format("woff2"), url("../fonts/roboto/Roboto-Bold.woff") format("woff");
   font-weight: 700;
+  font-display: swap;
 }
 .materialize-iso a {
   text-decoration: none;
