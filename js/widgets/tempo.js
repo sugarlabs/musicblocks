@@ -14,15 +14,19 @@
 
 /*
    global
-   _, getDrumSynthName
+   _, getDrumSynthName, Singer, TONEBPM
  */
 
 /*
    Global locations
     js/utils/musicutils.js
         getDrumSynthName
+    js/turtle-singer.js
+        Singer
     js/utils/utils.js
         _
+    js/activity.js
+        TONEBPM
 */
 
 /* exported Tempo */
@@ -103,19 +107,15 @@ class Tempo {
         };
 
         this._save_lock = false;
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            Tempo.ICONSIZE,
-            _("Save tempo"),
-            ""
-        ).onclick = () => {
-            // Debounce button
-            if (!this._get_save_lock()) {
-                this._save_lock = true;
-                this._saveTempo();
-                setTimeout(() => (this._save_lock = false), 1000);
-            }
-        };
+        widgetWindow.addButton("export-chunk.svg", Tempo.ICONSIZE, _("Save tempo"), "").onclick =
+            () => {
+                // Debounce button
+                if (!this._get_save_lock()) {
+                    this._save_lock = true;
+                    this._saveTempo();
+                    setTimeout(() => (this._save_lock = false), 1000);
+                }
+            };
 
         this.bodyTable = document.createElement("table");
         this.widgetWindow.getWidgetBody().appendChild(this.bodyTable);
@@ -139,13 +139,19 @@ class Tempo {
                 Tempo.ICONSIZE,
                 _("speed up"),
                 r1.insertCell()
-            ).onclick = (i => () => this.speedUp(i))(i);
+            ).onclick = (
+                i => () =>
+                    this.speedUp(i)
+            )(i);
             widgetWindow.addButton(
                 "down.svg",
                 Tempo.ICONSIZE,
                 _("slow down"),
                 r2.insertCell()
-            ).onclick = (i => () => this.slowDown(i))(i);
+            ).onclick = (
+                i => () =>
+                    this.slowDown(i)
+            )(i);
 
             this.BPMInputs[i] = widgetWindow.addInputButton(this.BPMs[i], r3.insertCell());
             this.tempoCanvases[i] = document.createElement("canvas");
@@ -201,15 +207,27 @@ class Tempo {
     _updateBPM(i) {
         this._intervals[i] = (60 / this.BPMs[i]) * 1000;
 
-        let blockNumber;
-        if (this.BPMBlocks[i] != null) {
-            blockNumber = this.activity.blocks.blockList[this.BPMBlocks[i]].connections[1];
-            if (blockNumber != null) {
-                this.activity.blocks.blockList[blockNumber].value = parseFloat(this.BPMs[i]);
-                this.activity.blocks.blockList[blockNumber].text.text = this.BPMs[i];
-                this.activity.blocks.blockList[blockNumber].updateCache();
-                this.activity.refreshCanvas();
-                this.activity.saveLocally();
+        if (this.BPMBlocks[i] == null) return;
+
+        const bpmBlock = this.activity.blocks.blockList[this.BPMBlocks[i]];
+        const blockNumber = bpmBlock.connections[1];
+        if (blockNumber != null) {
+            this.activity.blocks.blockList[blockNumber].value = parseFloat(this.BPMs[i]);
+            this.activity.blocks.blockList[blockNumber].text.text = this.BPMs[i];
+            this.activity.blocks.blockList[blockNumber].updateCache();
+            this.activity.refreshCanvas();
+            this.activity.saveLocally();
+        }
+
+        const bpmValue = parseFloat(this.BPMs[i]);
+        if (bpmBlock.name === "setmasterbpm2" || bpmBlock.name === "setmasterbpm") {
+            Singer.masterBPM = bpmValue;
+            Singer.defaultBPMFactor = TONEBPM / bpmValue;
+        } else if (bpmBlock.name === "setbpm3" || bpmBlock.name === "setbpm2") {
+            for (const tur of this.activity.turtles.turtleList) {
+                if (tur.singer.bpm.length > 0) {
+                    tur.singer.bpm[tur.singer.bpm.length - 1] = bpmValue;
+                }
             }
         }
     }
