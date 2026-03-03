@@ -280,14 +280,14 @@ function setupIntervalsActions(activity) {
 
                 // Get temperament length for modulo arithmetic
                 let temperamentLength = 12; // Default for standard temperament
-                const currentTemperament = activity.logo.synth.inTemperament;
+                const currentTemperament = activity?.logo?.synth?.inTemperament || "equal";
 
-                if (isCustomTemperament(currentTemperament)) {
+                if (currentTemperament && isCustomTemperament(currentTemperament)) {
                     const customTemperament = getTemperament(currentTemperament);
-                    if (customTemperament && customTemperament.pitchNumber) {
+                    if (customTemperament?.pitchNumber) {
                         temperamentLength = customTemperament.pitchNumber;
                     }
-                } else {
+                } else if (currentTemperament && TEMPERAMENT?.[currentTemperament]?.pitchNumber) {
                     const temperamentData = TEMPERAMENT[currentTemperament];
                     if (temperamentData && temperamentData.pitchNumber) {
                         temperamentLength = temperamentData.pitchNumber;
