@@ -4789,7 +4789,7 @@ class Blocks {
                 this.blockList[dblk].name === "divide"
             ) {
                 /** Are we the denominator (c == 2) or numerator (c == 1)? */
-                if (this.blockList[dblk].connections[c] === this.blockList.indexOf(myBlock)) {
+                if (this.blockList[dblk].connections[c] === blk) {
                     /** Is the divide block connected to a note value block? */
                     const cblk = this.blockList[dblk].connections[0];
                     if (cblk !== null) {
