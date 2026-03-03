@@ -422,8 +422,6 @@ function setupOrnamentBlocks(activity) {
             }
 
             tur.singer.glideOverride = Singer.noteCounter(logo, turtle, args[1]);
-            // eslint-disable-next-line no-console
-            console.debug("length of glide " + tur.singer.glideOverride);
 
             const listenerName = "_glide_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);

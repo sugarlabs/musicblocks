@@ -536,7 +536,7 @@ Turtles.TurtlesModel = class {
      * @returns {void}
      */
     addTurtleGraphicProps(turtle, blkInfoAvailable, infoDict) {
-        setTimeout(() => {
+        requestAnimationFrame(() => {
             if (blkInfoAvailable) {
                 if ("heading" in infoDict) {
                     turtle.painter.doSetHeading(infoDict["heading"]);
@@ -562,7 +562,7 @@ Turtles.TurtlesModel = class {
                     turtle.rename(infoDict["name"]);
                 }
             }
-        }, 2000);
+        });
     }
 
     /**
@@ -571,7 +571,8 @@ Turtles.TurtlesModel = class {
      * @return {Boolean} - running
      */
     running() {
-        for (let i = 0; i < this.getTurtleCount(); i++) {
+        const turtleCount = this.getTurtleCount();
+        for (let i = 0; i < turtleCount; i++) {
             if (this.getTurtle(i).running) {
                 return true;
             }
@@ -592,7 +593,8 @@ Turtles.TurtlesModel = class {
      * @returns index number of companion turtle or i
      */
     companionTurtle(i) {
-        for (let t = 0; t < this.getTurtleCount(); t++) {
+        const turtleCount = this.getTurtleCount();
+        for (let t = 0; t < turtleCount; t++) {
             if (this.getTurtle(t).companionTurtle === i) {
                 return t;
             }
@@ -606,7 +608,8 @@ Turtles.TurtlesModel = class {
      */
     turtleCount() {
         let count = 0;
-        for (let t = 0; t < this.getTurtleCount(); t++) {
+        const totalTurtles = this.getTurtleCount();
+        for (let t = 0; t < totalTurtles; t++) {
             if (this.companionTurtle(t) === t && !this.getTurtle(t).inTrash) {
                 count += 1;
             }
@@ -654,28 +657,50 @@ Turtles.TurtlesView = class {
 
         this.currentGrid = null; // currently selected grid
 
-        // Attach an event listener to the 'resize' event
+        // Debounce timer for resize events
+        this._resizeTimer = null;
+
+        // Attach a debounced event listener to the 'resize' event
+        // This prevents rapid-fire resize calculations that can cause
+        // crashes when toggling DevTools or switching tabs.
         window.addEventListener("resize", () => {
-            // Call the updateDimensions function when resizing occurs
-            var screenWidth =
-                window.innerWidth ||
-                document.documentElement.clientWidth ||
-                document.body.clientWidth;
-            var screenHeight =
-                window.innerHeight ||
-                document.documentElement.clientHeight ||
-                document.body.clientHeight;
+            if (this._resizeTimer) {
+                clearTimeout(this._resizeTimer);
+            }
 
-            // Set a scaling factor to adjust the dimensions based on the screen size
-            var scale = Math.min(screenWidth / 1200, screenHeight / 900);
+            this._resizeTimer = setTimeout(() => {
+                // Skip dimension updates when the tab is hidden
+                // (canvas reports 0x0 in background tabs)
+                if (document.hidden) {
+                    return;
+                }
 
-            // Calculate the new dimensions
-            var newWidth = Math.round(1200 * scale);
-            var newHeight = Math.round(900 * scale);
+                // Call the updateDimensions function when resizing occurs
+                const screenWidth =
+                    window.innerWidth ||
+                    document.documentElement.clientWidth ||
+                    document.body.clientWidth;
+                const screenHeight =
+                    window.innerHeight ||
+                    document.documentElement.clientHeight ||
+                    document.body.clientHeight;
 
-            // Update the dimensions
-            this._w = newWidth;
-            this._h = newHeight;
+                // Guard against zero or invalid dimensions
+                if (screenWidth <= 0 || screenHeight <= 0) {
+                    return;
+                }
+
+                // Set a scaling factor to adjust the dimensions based on the screen size
+                const scale = Math.min(screenWidth / 1200, screenHeight / 900);
+
+                // Calculate the new dimensions
+                const newWidth = Math.round(1200 * scale);
+                const newHeight = Math.round(900 * scale);
+
+                // Update the dimensions
+                this._w = newWidth;
+                this._h = newHeight;
+            }, 150);
         });
     }
 
@@ -839,6 +864,17 @@ Turtles.TurtlesView = class {
         // Remove any old background containers
         borderContainer.removeAllChildren();
 
+        // Update the canvas background color
+        const canvas = this.canvas;
+        if (canvas) {
+            canvas.style.backgroundColor = this._backgroundColor;
+        }
+
+        // Also update body background if available
+        if (typeof document !== "undefined") {
+            document.body.style.backgroundColor = this._backgroundColor;
+        }
+
         const turtlesStage = this.stage;
         // We put the buttons on the stage so they will be on top
 
@@ -848,7 +884,7 @@ Turtles.TurtlesView = class {
             container.setAttribute("class", "tooltipped");
             container.setAttribute("data-tooltip", object.label);
             container.setAttribute("data-position", "bottom");
-            jQuery.noConflict()(".tooltipped").tooltip({
+            window.jQuery(".tooltipped").tooltip({
                 html: true,
                 delay: 100
             });
@@ -1138,7 +1174,7 @@ Turtles.TurtlesView = class {
         const __makeAllButtons = () => {
             let second = false;
             if (docById("buttoncontainerTOP")) {
-                jQuery.noConflict()(".tooltipped").tooltip("close");
+                window.jQuery(".tooltipped").tooltip("close");
                 docById("buttoncontainerTOP").parentElement.removeChild(
                     docById("buttoncontainerTOP")
                 );
@@ -1155,7 +1191,7 @@ Turtles.TurtlesView = class {
             jQuery
                 .noConflict()(".tooltipped")
                 .each(function () {
-                    jQuery.noConflict()(this).tooltip({
+                    window.jQuery(this).tooltip({
                         html: true,
                         delay: 100
                     });
@@ -1291,4 +1327,8 @@ Turtles.TurtlesView = class {
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = Turtles;
+}
+
+if (typeof window !== "undefined") {
+    window.Turtles = Turtles;
 }

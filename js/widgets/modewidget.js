@@ -105,17 +105,11 @@ class ModeWidget {
             }
         };
 
-        this.widgetWindow.addButton(
-            "export-chunk.svg",
-            ModeWidget.ICONSIZE,
-            _("Save")
-        ).onclick = this._save.bind(this);
+        this.widgetWindow.addButton("export-chunk.svg", ModeWidget.ICONSIZE, _("Save")).onclick =
+            this._save.bind(this);
 
-        this.widgetWindow.addButton(
-            "erase-button.svg",
-            ModeWidget.ICONSIZE,
-            _("Clear")
-        ).onclick = this._clear.bind(this);
+        this.widgetWindow.addButton("erase-button.svg", ModeWidget.ICONSIZE, _("Clear")).onclick =
+            this._clear.bind(this);
 
         this.widgetWindow.addButton(
             "rotate-left.svg",
@@ -129,17 +123,11 @@ class ModeWidget {
             _("Rotate clockwise")
         ).onclick = this._rotateRight.bind(this);
 
-        this.widgetWindow.addButton(
-            "invert.svg",
-            ModeWidget.ICONSIZE,
-            _("Invert")
-        ).onclick = this._invert.bind(this);
+        this.widgetWindow.addButton("invert.svg", ModeWidget.ICONSIZE, _("Invert")).onclick =
+            this._invert.bind(this);
 
-        this.widgetWindow.addButton(
-            "restore-button.svg",
-            ModeWidget.ICONSIZE,
-            _("Undo")
-        ).onclick = this._undo.bind(this);
+        this.widgetWindow.addButton("restore-button.svg", ModeWidget.ICONSIZE, _("Undo")).onclick =
+            this._undo.bind(this);
 
         this._piemenuMode();
 
@@ -157,7 +145,7 @@ class ModeWidget {
 
         //.TRANS: A circle of notes represents the musical mode.
         activity.textMsg(_("Click in the circle to select notes for the mode."), 3000);
-        setTimeout(this.widgetWindow.sendToCenter, 0);
+        setTimeout(() => this.widgetWindow.sendToCenter(), 0);
     }
 
     /**
@@ -689,7 +677,7 @@ class ModeWidget {
                     this.__playNextNote(i + 1);
                 } else {
                     this._locked = false;
-                    setTimeout(this._resetNotes(), 500);
+                    setTimeout(() => this._resetNotes(), 500);
                     return;
                 }
             }, 1000 * time);
@@ -744,7 +732,7 @@ class ModeWidget {
                     this.__playNextNote(i + 1);
                 } else {
                     this._locked = false;
-                    setTimeout(this._resetNotes(), 500);
+                    setTimeout(() => this._resetNotes(), 500);
                     return;
                 }
             }, 1000 * time);
@@ -1202,4 +1190,8 @@ class ModeWidget {
             this._noteWheel.navItems[i].navItem.hide();
         }
     }
+}
+
+if (typeof module !== "undefined") {
+    module.exports = ModeWidget;
 }
