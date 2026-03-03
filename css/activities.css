@@ -1103,9 +1103,11 @@ table {
 #left-arrow {
   position: absolute;
   background-size: 40px;
-  top: 195px;
+  top: 50%;
+  transform: translateY(-50%);
   height: 40px;
   width: 40px;
+  z-index: 2000;
 }
 
 .hover:hover {
@@ -1139,6 +1141,17 @@ table {
     height: 20px;
     width: 20px;
     background-size: 20px;
+  }
+}
+
+@media (min-width: 900px) {
+
+  #left-arrow {
+    left: 20px;
+  }
+
+  #right-arrow {
+    right: 20px;
   }
 }
 
@@ -2132,46 +2145,6 @@ table {
 }
 
 /* ... more sizes ... */
-/* ======================================================
-   FIX: Responsive Tour Arrows (Mobile vs Desktop)
-   This overrides the static positions set earlier in the file.
-   ====================================================== */
-
-#left-arrow,
-#right-arrow {
-  /* 1. Center Vertically */
-  top: 50% !important;
-  transform: translateY(-50%);
-
-  /* 2. Ensure visibility */
-  z-index: 2000;
-  position: absolute;
-}
-
-/* --- Mobile / Default View --- */
-#left-arrow {
-  left: 10px !important;
-}
-
-#right-arrow {
-  left: auto !important;
-  /* Unset the old fixed pixel value */
-  right: 25px !important;
-  /* Stick to the right edge */
-}
-
-/* --- Desktop View (Screens wider than 900px) --- */
-@media screen and (min-width: 900px) {
-  #left-arrow {
-    left: 20px !important;
-    /* More space from the edge on desktop */
-  }
-
-  #right-arrow {
-    right: 20px !important;
-  }
-}
-
 /* ======================================================
    FIX: Center the Welcome Modal on Mobile
    ====================================================== */
