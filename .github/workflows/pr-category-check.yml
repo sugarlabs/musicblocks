@@ -2,6 +2,7 @@ name: PR Category Check
 
 # Ensures every PR has at least one category checkbox checked.
 # Automatically applies matching GitHub labels to the PR.
+# Creates labels with custom colors if they don't exist yet.
 # Uses pull_request_target so it works for fork PRs too (runs in base repo context).
 # This is safe because we only read the PR body from the event payload — no fork code is checked out or executed.
 
@@ -25,13 +26,43 @@ jobs:
             const prBody = context.payload.pull_request.body || '';
             const prNumber = context.payload.pull_request.number;
 
-            // Category checkboxes mapped to their GitHub label names
+            // Category checkboxes mapped to their GitHub label names, colors, and descriptions
             const categories = [
-              { label: 'Issue-Bug', emoji: '🐛', displayName: '🐛 Bug Fix', pattern: /-\s*\[x\]\s*🐛\s*Bug Fix/i },
-              { label: 'Issue-Enhancement', emoji: '✨', displayName: '✨ Feature', pattern: /-\s*\[x\]\s*✨\s*Feature/i },
-              { label: 'Issue-Performance', emoji: '⚡', displayName: '⚡ Performance', pattern: /-\s*\[x\]\s*⚡\s*Performance/i },
-              { label: 'Issue-Testing', emoji: '🧪', displayName: '🧪 Tests', pattern: /-\s*\[x\]\s*🧪\s*Tests/i },
-              { label: 'Issue-Documentation', emoji: '📝', displayName: '📝 Documentation', pattern: /-\s*\[x\]\s*📝\s*Documentation/i },
+              {
+                label: 'bug fix',
+                color: 'D73A4A',
+                description: 'Fixes a bug or incorrect behavior',
+                displayName: '🐛 Bug Fix',
+                pattern: /-\s*\[x\]\s*🐛\s*Bug Fix/i,
+              },
+              {
+                label: 'feature',
+                color: '9333EA',
+                description: 'Adds new functionality',
+                displayName: '✨ Feature',
+                pattern: /-\s*\[x\]\s*✨\s*Feature/i,
+              },
+              {
+                label: 'performance',
+                color: 'F97316',
+                description: 'Improves performance (load time, memory, rendering)',
+                displayName: '⚡ Performance',
+                pattern: /-\s*\[x\]\s*⚡\s*Performance/i,
+              },
+              {
+                label: 'tests',
+                color: '3B82F6',
+                description: 'Adds or updates test coverage',
+                displayName: '🧪 Tests',
+                pattern: /-\s*\[x\]\s*🧪\s*Tests/i,
+              },
+              {
+                label: 'documentation',
+                color: '10B981',
+                description: 'Updates to docs, comments, or README',
+                displayName: '📝 Documentation',
+                pattern: /-\s*\[x\]\s*📝\s*Documentation/i,
+              },
             ];
 
             const checkedCategories = categories.filter(cat => cat.pattern.test(prBody));
@@ -62,7 +93,32 @@ jobs:
               return;
             }
 
-            // --- Step 2: Auto-apply labels for checked categories ---
+            // --- Step 2: Ensure labels exist with proper colors ---
+            const { data: existingLabels } = await github.rest.issues.listLabelsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100,
+            });
+            const existingLabelNames = existingLabels.map(l => l.name);
+
+            for (const cat of categories) {
+              if (!existingLabelNames.includes(cat.label)) {
+                try {
+                  await github.rest.issues.createLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name: cat.label,
+                    color: cat.color,
+                    description: cat.description,
+                  });
+                  core.info(`🎨 Created label: "${cat.label}" with color #${cat.color}`);
+                } catch (error) {
+                  core.warning(`⚠️ Could not create label "${cat.label}". Error: ${error.message}`);
+                }
+              }
+            }
+
+            // --- Step 3: Auto-apply labels for checked categories ---
             const labelsToAdd = checkedCategories.map(cat => cat.label);
             const labelsToRemove = uncheckedCategories.map(cat => cat.label);
 
@@ -86,7 +142,7 @@ jobs:
                   });
                   core.info(`🏷️ Added label: "${label}"`);
                 } catch (error) {
-                  core.warning(`⚠️ Could not add label "${label}". Make sure it exists in the repo. Error: ${error.message}`);
+                  core.warning(`⚠️ Could not add label "${label}". Error: ${error.message}`);
                 }
               }
             }
