@@ -200,3 +200,4 @@ anything. Begin to fix the problem, test, make your commits, push your
 commits, then make a pull request. Mention an issue number in the pull
 request, but not the commit message. These practices allow the
 competition of ideas (Sugar Labs is a meritocracy)._
+
