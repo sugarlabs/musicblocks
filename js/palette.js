@@ -58,6 +58,7 @@ class Palettes {
         this.activity = activity;
         // this.blocks = null;
         this.cellSize = Math.floor(this.activity.cellSize * PALETTE_SCALE_FACTOR + 0.5);
+        this.collapsed = false;
         this.paletteWidth = 55 * PALETTE_WIDTH_FACTOR;
         this.scrollDiff = 0;
         this.originalSize = 55; // this is the original svg size
@@ -105,16 +106,40 @@ class Palettes {
         palette.style.top = curr + dy + "px";
     }
 
+    toggleCollapse() {
+        const palette = document.getElementById("palette");
+
+        if (!palette) return;
+
+        this.collapsed = !this.collapsed;
+
+        if (this.collapsed) {
+            palette.style.transform = "translateX(-100%)";
+            document.getElementById("paletteToggle").innerHTML = "▶";
+            palette.style.transition = "transform 0.3s ease";
+            this.paletteWidth = 0;
+        } else {
+            palette.style.transform = "translateX(0)";
+            document.getElementById("paletteToggle").innerHTML = "◀";
+            this.paletteWidth = 55 * PALETTE_WIDTH_FACTOR;
+        }
+
+        window.dispatchEvent(new Event("resize"));
+    }
+
     _makeSelectorButton(i) {
         if (!document.getElementById("palette")) {
             const element = document.createElement("div");
             element.id = "palette";
             element.setAttribute("class", "disable_highlighting");
             element.classList.add("flex-palette");
-            element.setAttribute(
-                "style",
-                "position: absolute; z-index: 1000; left :0px; top:" + this.top + "px"
-            );
+
+            element.style.position = "absolute";
+            element.style.zIndex = "1000";
+            element.style.left = "0px";
+            element.style.top = this.top + "px";
+            element.style.transition = "transform 0.3s ease";
+
             element.innerHTML = `<div style="height:fit-content">
                     <table width="${1.5 * this.cellSize}" bgcolor="white">
                         <thead>
@@ -124,22 +149,77 @@ class Palettes {
                     <table width ="${4.5 * this.cellSize}" bgcolor="white">
                         <thead>
                             <tr>
-                                <td style= "width:28px"></td>
+                                <td style="width:28px"></td>
                             </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
                 </div>`;
+
             element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
+
             document.body.appendChild(element);
+
+            const toggleBtn = document.createElement("div");
+            toggleBtn.innerHTML = "◀";
+            toggleBtn.id = "paletteToggle";
+
+            toggleBtn.style.position = "absolute";
+            toggleBtn.style.top = "10px";
+            toggleBtn.style.right = "-30px";
+            toggleBtn.style.width = "30px";
+            toggleBtn.style.height = "30px";
+            toggleBtn.style.display = "flex";
+            toggleBtn.style.alignItems = "center";
+            toggleBtn.style.justifyContent = "center";
+            toggleBtn.style.cursor = "pointer";
+
+            toggleBtn.style.color = "white";
+            toggleBtn.style.backgroundColor = platformColor.paletteBackground;
+            toggleBtn.addEventListener("mouseover", () => {
+                toggleBtn.style.backgroundColor = platformColor.selectorSelected;
+            });
+            toggleBtn.addEventListener("mouseout", () => {
+                toggleBtn.style.backgroundColor = platformColor.paletteLabelBackground;
+            });
+
+            toggleBtn.style.borderRadius = "0 4px 4px 0";
+            toggleBtn.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
+
+            toggleBtn.onclick = () => this.toggleCollapse();
+
+            element.appendChild(toggleBtn);
+            toggleBtn.style.position = "absolute";
+            toggleBtn.style.top = "50%";
+            toggleBtn.style.right = "-25px";
+            toggleBtn.style.transform = "translateY(-50%)";
+
+            toggleBtn.style.height = "52px";
+            toggleBtn.style.width = "24px";
+
+            toggleBtn.style.display = "flex";
+            toggleBtn.style.alignItems = "center";
+            toggleBtn.style.justifyContent = "center";
+
+            toggleBtn.style.cursor = "pointer";
+            toggleBtn.style.background = platformColor.paletteLabelBackground;
+            toggleBtn.style.color = "white";
+
+            toggleBtn.style.borderRadius = "0 30px 30px 0";
+            toggleBtn.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
+
+            toggleBtn.style.fontWeight = "bold";
+            toggleBtn.style.fontSize = "14px";
         }
 
         const tr = docById("palette").children[0].children[0].children[0].children[0];
+
         const td = tr.insertCell();
         td.width = 1.5 * this.cellSize;
         td.height = 1.5 * this.cellSize;
         td.style.position = "relative";
         td.style.backgroundColor = platformColor.paletteBackground;
+
         td.appendChild(
             makePaletteIcons(
                 PALETTEICONS[MULTIPALETTEICONS[i]]
@@ -150,6 +230,7 @@ class Palettes {
                 1.5 * this.cellSize
             )
         );
+
         const cover = document.createElement("div");
         cover.style.position = "absolute";
         cover.style.zIndex = "10";
@@ -157,7 +238,9 @@ class Palettes {
         cover.style.width = "100%";
         cover.style.height = "1px";
         cover.style.background = platformColor.paletteLabelBackground;
+
         td.appendChild(cover);
+
         td.onmouseover = () => {
             this.showSelection(i, tr);
             this.makePalettes(i);
@@ -454,6 +537,31 @@ class Palettes {
                 </div>`;
             element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
             document.body.appendChild(element);
+
+            const toggleBtn = document.createElement("div");
+            toggleBtn.innerHTML = "◀";
+            toggleBtn.id = "paletteToggle";
+
+            toggleBtn.style.position = "absolute";
+            toggleBtn.style.top = "12px";
+            toggleBtn.style.right = "-18px";
+            toggleBtn.style.width = "22px";
+            toggleBtn.style.height = "40px";
+            toggleBtn.style.display = "flex";
+            toggleBtn.style.alignItems = "center";
+            toggleBtn.style.justifyContent = "center";
+            toggleBtn.style.cursor = "pointer";
+            toggleBtn.style.background = platformColor.selectorSelected;
+            toggleBtn.style.color = "white";
+
+            toggleBtn.style.borderRadius = "0 6px 6px 0";
+            toggleBtn.style.boxShadow = "0 2px 4px rgba(0,0,0,0.15)";
+            toggleBtn.style.fontWeight = "bold";
+            toggleBtn.style.fontSize = "14px";
+
+            toggleBtn.onclick = () => this.toggleCollapse();
+
+            element.appendChild(toggleBtn);
         } catch (e) {
             console.error("Error clearing palettes:", e);
         }
