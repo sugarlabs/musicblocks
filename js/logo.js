@@ -324,6 +324,16 @@ class Logo {
         // Midi Data
         this._midiData = {};
 
+        // Async yield mechanism: prevent infinite recursion from freezing the UI.
+        // _syncCounter tracks consecutive synchronous block executions.
+        // When it exceeds _YIELD_AFTER_SYNC_RUNS, we yield to the event loop
+        // via setTimeout(0) so the browser can process paint/input events.
+        // _totalIterations is a per-run safety limit to catch true infinite loops.
+        this._syncCounter = 0;
+        this._YIELD_AFTER_SYNC_RUNS = 1000;
+        this._totalIterations = 0;
+        this._MAX_ITERATIONS = 1000000;
+
         // When running in step-by-step mode, the next command to run
         // is queued here.
         this.stepQueue = {};
@@ -1118,6 +1128,10 @@ class Logo {
 
         this.stopTurtle = false;
 
+        // Reset async yield counters for this run.
+        this._syncCounter = 0;
+        this._totalIterations = 0;
+
         this.activity.blocks.unhighlightAll();
         this.activity.blocks.bringToTop(); // Draw under the blocks.
 
@@ -1370,6 +1384,10 @@ class Logo {
 
         this.receivedArg = receivedArg;
 
+        // Reset async yield counters – execution will go through
+        // setTimeout below, giving the event loop a chance to breathe.
+        logo._syncCounter = 0;
+
         const tur = logo.activity.turtles.ithTurtle(turtle);
 
         const delay = logo.turtleDelay + tur.waitTime;
@@ -1407,6 +1425,22 @@ class Logo {
         this._alreadyRunning = true;
 
         this.receivedArg = receivedArg;
+
+        // Safety check: stop execution if we have exceeded the maximum
+        // iteration limit, which indicates an infinite loop (e.g., an
+        // Action block that calls itself with no delay).
+        logo._totalIterations++;
+        if (logo._totalIterations > logo._MAX_ITERATIONS) {
+            logo.activity.errorMsg(
+                _("Infinite loop detected. Execution stopped to prevent browser freeze."),
+                blk
+            );
+            logo.stopTurtle = true;
+            logo._alreadyRunning = false;
+            logo._syncCounter = 0;
+            logo._totalIterations = 0;
+            return;
+        }
 
         // Sometimes we don't want to unwind the entire queue.
         if (queueStart === undefined) queueStart = 0;
@@ -1750,7 +1784,27 @@ class Logo {
             }
 
             if (isflow) {
-                logo.runFromBlockNow(logo, turtle, nextBlock, isflow, passArg, queueStart);
+                // Async yield: periodically yield to the event loop so the
+                // browser can process paint/input events and the UI does not
+                // freeze during long-running or infinitely-recursive programs.
+                logo._syncCounter++;
+                if (logo._syncCounter >= logo._YIELD_AFTER_SYNC_RUNS) {
+                    logo._syncCounter = 0;
+                    setTimeout(() => {
+                        if (!logo.stopTurtle) {
+                            logo.runFromBlockNow(
+                                logo,
+                                turtle,
+                                nextBlock,
+                                isflow,
+                                passArg,
+                                queueStart
+                            );
+                        }
+                    }, 0);
+                } else {
+                    logo.runFromBlockNow(logo, turtle, nextBlock, isflow, passArg, queueStart);
+                }
             } else {
                 logo.runFromBlock(logo, turtle, nextBlock, isflow, passArg);
             }
