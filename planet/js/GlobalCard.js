@@ -62,6 +62,10 @@ class GlobalCard {
                                 <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_(
                                     "Share project"
                                 )}" id="global-project-share-{ID}"><i class="material-icons">share</i></a> 
+                                
+                                <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_(
+                                    "Share on social media"
+                                )}" id="global-project-viral-share-{ID}"><i class="material-icons">ios_share</i></a>
                             
                                 <div class="card share-card" id="global-sharebox-{ID}" style="display:none;"> 
                                     <div class="card-content shareurltext"> 
@@ -177,6 +181,16 @@ class GlobalCard {
                     `global-sharebox-${this.id}`
                 );
             } else s.style.display = "none";
+        });
+
+        // set viral share button listener
+        // eslint-disable-next-line no-unused-vars
+        frag.getElementById(`global-project-viral-share-${this.id}`).addEventListener("click", evt => {
+            if (typeof window.viralLoops !== 'undefined') {
+                const projectTitle = this.ProjectData.ProjectName || 'Music Blocks Project';
+                const projectImage = this.ProjectData.ProjectImage;
+                window.viralLoops.showShareModal(projectTitle, this.id, projectImage);
+            }
         });
 
         // set share checkbox listener
