@@ -81,6 +81,7 @@ describe("logoconstants", () => {
             "TARGETBPM",
             "TURTLESTEP",
             "NOTEDIV",
+            "MIN_HIGHLIGHT_DURATION_MS",
             "NOMICERRORMSG",
             "NANERRORMSG",
             "NOSTRINGERRORMSG",

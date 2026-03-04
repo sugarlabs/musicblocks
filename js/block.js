@@ -399,6 +399,13 @@ class Block {
     updateCache() {
         const that = this;
         return new Promise((resolve, reject) => {
+            // If the container has no active bitmap cache (e.g., trashed
+            // blocks whose cache was freed), skip the update silently.
+            if (that.container && !that.container.bitmapCache) {
+                resolve();
+                return;
+            }
+
             let loopCount = 0;
             const MAX_RETRIES = 15;
             const INITIAL_DELAY = 100;
