@@ -80,6 +80,32 @@ When using AI tools, please follow these guidelines:
 Mentioning AI assistance in your pull request description is optional but encouraged
 for transparency.
 
+#### Using AI/LLM tools for code changes
+
+AI tools such as ChatGPT, Copilot, or other LLMs may assist contributors
+in understanding the codebase or drafting code changes. However,
+contributors remain fully responsible for the code they submit.
+
+When using AI tools:
+
+- Ensure you understand the generated code before including it in a pull request.
+- Verify that the code follows project style and architecture.
+- Avoid submitting large AI-generated patches without manual review.
+- Run linting, formatting, and tests before submitting changes.
+- Ensure the generated code does not introduce licensing issues.
+
+#### AI-assisted pull requests
+
+If AI tools were used while preparing a pull request:
+
+- Clearly review and test all generated changes.
+- Keep pull requests small and focused.
+- Avoid submitting unrelated modifications suggested by AI.
+- Be prepared to explain the reasoning behind the changes during review.
+
+AI tools should assist development, but they should not replace
+understanding of the codebase.
+
 ### Before You Push
 
 Run these commands locally before submitting a PR:
