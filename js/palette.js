@@ -71,6 +71,7 @@ class Palettes {
         this.visible = true;
         this.scale = 1.0;
         this.mobile = false;
+        this.isCollapsed = false;
         // Top of the palette
         this.top = 55 + 20 + LEADING;
         this.current = DEFAULTPALETTE;
@@ -90,6 +91,53 @@ class Palettes {
 
     init() {
         this.halfCellSize = Math.floor(this.cellSize / 2);
+        this.initFromStorage();
+        this.checkResponsive();
+        window.addEventListener("resize", () => this.checkResponsive());
+    }
+
+    toggleCollapse() {
+        if (this.isCollapsed) {
+            this.expand();
+        } else {
+            this.collapse();
+        }
+    }
+
+    collapse() {
+        const paletteEl = docById("palette");
+        if (paletteEl) {
+            paletteEl.classList.add("palette-collapsed");
+        }
+        this.isCollapsed = true;
+        localStorage.setItem("paletteCollapsed", "true");
+        setTimeout(() => {
+            window.dispatchEvent(new Event("resize"));
+        }, 350);
+    }
+
+    expand() {
+        const paletteEl = docById("palette");
+        if (paletteEl) {
+            paletteEl.classList.remove("palette-collapsed");
+        }
+        this.isCollapsed = false;
+        localStorage.removeItem("paletteCollapsed");
+        setTimeout(() => {
+            window.dispatchEvent(new Event("resize"));
+        }, 350);
+    }
+
+    initFromStorage() {
+        if (localStorage.getItem("paletteCollapsed") === "true") {
+            this.isCollapsed = true;
+        }
+    }
+
+    checkResponsive() {
+        if (window.innerWidth < 900 && !this.isCollapsed) {
+            this.collapse();
+        }
     }
 
     init_selectors() {
@@ -111,6 +159,9 @@ class Palettes {
             element.id = "palette";
             element.setAttribute("class", "disable_highlighting");
             element.classList.add("flex-palette");
+            if (this.isCollapsed) {
+                element.classList.add("palette-collapsed");
+            }
             element.setAttribute(
                 "style",
                 "position: absolute; z-index: 1000; left :0px; top:" + this.top + "px"
@@ -430,6 +481,9 @@ class Palettes {
             element.id = "palette";
             element.setAttribute("class", "disable_highlighting");
             element.classList.add("flex-palette");
+            if (this.isCollapsed) {
+                element.classList.add("palette-collapsed");
+            }
             element.setAttribute(
                 "style",
                 `position: fixed; z-index: 1000; left: 0px; top: ${
@@ -867,9 +921,8 @@ class Palette {
     }
 
     hideMenu() {
-        docById(
-            "palette"
-        ).childNodes[0].style.borderRight = `1px solid ${platformColor.selectorSelected}`;
+        docById("palette").childNodes[0].style.borderRight =
+            `1px solid ${platformColor.selectorSelected}`;
         if (this._outsideClickListener) {
             document.removeEventListener("click", this._outsideClickListener);
             this._outsideClickListener = null;

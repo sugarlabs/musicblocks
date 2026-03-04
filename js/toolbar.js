@@ -59,6 +59,7 @@ class Toolbar {
                 ["planetIcon", _("Find and share projects")],
                 ["planetIconDisabled", _("Offline. Sharing is unavailable")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
+                ["paletteToggleIcon", _("Toggle palette")],
                 ["helpIcon", _("Help")],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
@@ -201,6 +202,7 @@ class Toolbar {
                 ["planetIcon", _("Find and share projects")],
                 ["planetIconDisabled", _("Offline. Sharing is unavailable")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
+                ["paletteToggleIcon", _("Toggle palette")],
                 ["helpIcon", _("Help")],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
@@ -1076,6 +1078,26 @@ class Toolbar {
     /**
      * Renders the help icon with the provided onclick handler.
      *
+     * @public
+     * @param {Function} onclick - The onclick handler for the help icon.
+     * @returns {void}
+     */
+    renderPaletteToggle(onclick) {
+        const paletteToggleIcon = docById("paletteToggleIcon");
+
+        paletteToggleIcon.onclick = () => {
+            onclick(this.activity);
+        };
+
+        paletteToggleIcon.onkeydown = (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onclick(this.activity);
+            }
+        };
+    }
+
+    /**
      * @public
      * @param {Function} onclick - The onclick handler for the help icon.
      * @returns {void}

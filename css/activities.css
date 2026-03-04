@@ -2003,6 +2003,44 @@ table {
   flex-direction: row !important;
 }
 
+#palette {
+  transition: transform 0.3s ease-in-out;
+  will-change: transform;
+}
+
+#palette.palette-collapsed {
+  transform: translateX(-100%);
+}
+
+.palette-toggle-btn {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1001;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  padding: 12px 8px;
+  cursor: pointer;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s, left 0.3s ease-in-out;
+}
+
+.palette-toggle-btn:hover {
+  background-color: #1976d2;
+}
+
+.palette-toggle-btn:focus {
+  outline: 2px solid #ff9800;
+  outline-offset: 2px;
+}
+
+.palette-toggle-btn.collapsed {
+  left: 0;
+}
+
 @media (max-width: 390px) {
 
   #right-arrow,

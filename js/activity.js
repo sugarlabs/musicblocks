@@ -6848,6 +6848,23 @@ class Activity {
         };
 
         /*
+         * Updates the palette toggle icon based on collapsed state
+         */
+        this.updatePaletteToggleIcon = () => {
+            const toggleIcon = docById("paletteToggleIcon");
+            if (toggleIcon) {
+                const iconElement = toggleIcon.querySelector("i");
+                if (iconElement) {
+                    if (this.palettes.isCollapsed) {
+                        iconElement.textContent = "chevron_right";
+                    } else {
+                        iconElement.textContent = "chevron_left";
+                    }
+                }
+            }
+        };
+
+        /*
          * Makes non-toolbar buttons, e.g., the palette menu buttons
          */
         this._makeButton = (name, label, x, y) => {
@@ -7407,6 +7424,7 @@ class Activity {
             this.blocks = new Blocks(this);
             this.palettes = new Palettes(this);
             this.palettes.init();
+            this.updatePaletteToggleIcon();
             this.logo = new Logo(this);
 
             this.pasteBox = new PasteBox(this);
@@ -7451,6 +7469,10 @@ class Activity {
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
             this.toolbar.renderMenuIcon(showHideAuxMenu);
             this.toolbar.renderHelpIcon(showHelp);
+            this.toolbar.renderPaletteToggle(() => {
+                this.palettes.toggleCollapse();
+                this.updatePaletteToggleIcon();
+            });
             this.toolbar.renderModeSelectIcon(
                 doSwitchMode,
                 () => doRecordButton(this),
