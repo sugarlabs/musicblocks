@@ -699,7 +699,7 @@ class Blocks {
          * @private
          * @returns void
          */
-        this._addRemoveVspaceBlock = blk => {
+        this._addRemoveVspaceBlock = (blk) => {
             const myBlock = this.blockList[blk];
 
             const c = myBlock.connections[myBlock.connections.length - 2];
@@ -996,14 +996,14 @@ class Blocks {
                     // eslint-disable-next-line no-console
                     console.debug(
                         "Did not find match for " +
-                            myBlock.name +
-                            " (" +
-                            blk +
-                            ") and " +
-                            this.blockList[cblk].name +
-                            " (" +
-                            cblk +
-                            ")"
+                        myBlock.name +
+                        " (" +
+                        blk +
+                        ") and " +
+                        this.blockList[cblk].name +
+                        " (" +
+                        cblk +
+                        ")"
                     );
                     // eslint-disable-next-line no-console
                     console.debug(myBlock.connections);
@@ -1155,7 +1155,7 @@ class Blocks {
             } else if (this.blockList[parentblk].name === "temperament1") {
                 cblk = this.blockList[parentblk].connections[1];
                 if (cblk == null) {
-                    const postProcess = args => {
+                    const postProcess = (args) => {
                         const parentblk = args[0];
                         const oldBlock = args[1];
 
@@ -1401,6 +1401,7 @@ class Blocks {
             if (thisBlock == undefined) {
                 return;
             }
+            if (this._isUndoingMove) return;
 
             let thisBlockobj = this.blockList[thisBlock];
 
@@ -1465,7 +1466,8 @@ class Blocks {
          * @public
          * @returns {void}
          */
-        this.deletePreviousDefault = thisBlock => {
+        this.deletePreviousDefault = (thisBlock) => {
+            if (this._isUndoingMove) return;
             let thisBlockobj = this.blockList[thisBlock];
 
             // Do not remove the silence block if only a vspace block is inserted after the silence block.
@@ -1533,606 +1535,156 @@ class Blocks {
          * @public
          * @returns {void}
          */
-        this.blockMoved = async thisBlock => {
-            /**
-             * When a block is moved, we have to check the following:
-             * (0) Is it inside of a expandable block?
-             *     Is it connected to a collapsed block?
-             *     Is it an arg inside an arg clamp?
-             * (1) Is it an arg block connected to a two-arg block?
-             * (2) Disconnect its connection[0];
-             * (3) Look for a new connection;
-             *     Is it potentially an arg inside an arg clamp?
-             * (4) Is it an arg block connected to a 2-arg block?
-             * (5) Is it a pitch block being inserted or removed from
-             *     a Note clamp? In which case, we may have to remove
-             *     or add a silence block.
-             * (6) Is it the name of an action block? In which case we
-             *     need to check to see if we need to rename it.
-             * (7) Is it the name of a storein block? In which case we
-             *     need to check to see if we need to add a palette entry.
-             * (8) Is it a case or default block? We need to make sure that
-             *     they are inside a switch block.
-             * (9) And we need to recheck if it inside of a expandable block.
-             */
-            const initialTopBlock = this.findTopBlock(thisBlock);
-            /** Find any containing expandable blocks. */
-            this.clampBlocksToCheck = [];
-            if (thisBlock == null) {
-                // eslint-disable-next-line no-console
-                console.debug("blockMoved called with null block.");
-                return;
-            }
-
-            let blk = this.insideExpandableBlock(thisBlock);
-            let expandableLoopCounter = 0;
-
-            let parentblk = null;
-            if (blk != null) {
-                parentblk = blk;
-            }
-
-            let actionCheck = false;
-
-            while (blk != null) {
-                expandableLoopCounter += 1;
-                if (expandableLoopCounter > 2 * this.blockList.length) {
+        try {
+            this.blockMoved = async (thisBlock) => {
+                /**
+                 * When a block is moved, we have to check the following:
+                 * (0) Is it inside of a expandable block?
+                 *     Is it connected to a collapsed block?
+                 *     Is it an arg inside an arg clamp?
+                 * (1) Is it an arg block connected to a two-arg block?
+                 * (2) Disconnect its connection[0];
+                 * (3) Look for a new connection;
+                 *     Is it potentially an arg inside an arg clamp?
+                 * (4) Is it an arg block connected to a 2-arg block?
+                 * (5) Is it a pitch block being inserted or removed from
+                 *     a Note clamp? In which case, we may have to remove
+                 *     or add a silence block.
+                 * (6) Is it the name of an action block? In which case we
+                 *     need to check to see if we need to rename it.
+                 * (7) Is it the name of a storein block? In which case we
+                 *     need to check to see if we need to add a palette entry.
+                 * (8) Is it a case or default block? We need to make sure that
+                 *     they are inside a switch block.
+                 * (9) And we need to recheck if it inside of a expandable block.
+                 */
+                const initialTopBlock = this.findTopBlock(thisBlock);
+                /** Find any containing expandable blocks. */
+                this.clampBlocksToCheck = [];
+                if (thisBlock == null) {
                     // eslint-disable-next-line no-console
-                    console.debug("Infinite loop encountered checking for expandables?");
-                    break;
+                    console.debug("blockMoved called with null block.");
+                    return;
                 }
 
-                if (this.blockList[blk].name === "ifthenelse") {
-                    this.clampBlocksToCheck.push([blk, 0]);
-                    this.clampBlocksToCheck.push([blk, 1]);
-                } else {
-                    this.clampBlocksToCheck.push([blk, 0]);
-                }
-                blk = this.insideExpandableBlock(blk);
-            }
+                let blk = this.insideExpandableBlock(thisBlock);
+                let expandableLoopCounter = 0;
 
-            this._checkTwoArgBlocks = [];
-            const checkArgBlocks = [];
-            const myBlock = this.blockList[thisBlock];
-            if (myBlock == null) {
-                // eslint-disable-next-line no-console
-                console.debug("null block found in blockMoved method: " + thisBlock);
-                return;
-            }
-
-            const c = myBlock.connections[0];
-            let cBlock;
-            if (c != null) {
-                cBlock = this.blockList[c];
-            }
-
-            /** If it is an arg block, where is it coming from? */
-            if (myBlock.isArgBlock() && c != null) {
-                /**
-                 * We care about twoarg (2arg) blocks with
-                 * connections to the first arg;
-                 */
-                if (this.blockList[c].isTwoArgBlock() || this.blockList[c].isArgClamp()) {
-                    if (cBlock.connections[1] === thisBlock) {
-                        this._checkTwoArgBlocks.push(c);
-                    }
-                } else if (
-                    (this.blockList[c].isArgBlock() && this.blockList[c].isExpandableBlock()) ||
-                    this.blockList[c].isArgClamp()
-                ) {
-                    if (cBlock.connections[1] === thisBlock) {
-                        this._checkTwoArgBlocks.push(c);
-                    }
-                }
-            }
-
-            /** Get widget window's title */
-            const widgetTitle = document.getElementsByClassName("wftTitle");
-
-            /** Disconnect from connection[0] (both sides of the connection). */
-            if (c != null) {
-                /** Disconnect both ends of the connection. */
-                for (let i = 1; i < cBlock.connections.length; i++) {
-                    if (cBlock.connections[i] === thisBlock) {
-                        cBlock.connections[i] = null;
-                        break;
-                    }
+                let parentblk = null;
+                if (blk != null) {
+                    parentblk = blk;
                 }
 
-                myBlock.connections[0] = null;
-                this.raiseStackToTop(thisBlock);
+                let actionCheck = false;
 
-                /**
-                 * Check if we are disconnecting blocks from widget blocks;
-                 * then reinit if widget windows is open.
-                 */
-                let lockInit = false;
-                for (let x = 0; x < widgetTitle.length; x++) {
-                    if (lockInit === false) {
-                        switch (widgetTitle[x].innerHTML) {
-                            case "oscilloscope":
-                            case "tempo":
-                            case "rhythm maker":
-                            case "pitch slider":
-                            case "pitch staircase":
-                            case "status":
-                            case "phrase maker":
-                            case "lego bricks":
-                            case "custom mode":
-                            case "music keyboard":
-                            case "pitch drum":
-                            case "meter":
-                            case "temperament":
-                            case "timbre":
-                                lockInit = true;
-                                if (
-                                    this.blockList[initialTopBlock].protoblock.staticLabels[0] ===
-                                    widgetTitle[x].innerHTML
-                                ) {
-                                    this.reInitWidget(initialTopBlock, 1500);
-                                }
-                                break;
-                        }
-                    }
-                }
-            }
-
-            /** Look for a new connection. */
-            const x1 = myBlock.container.x + myBlock.docks[0][0];
-            const y1 = myBlock.container.y + myBlock.docks[0][1];
-
-            /** Find the nearest dock; if it is close enough, make the connection. */
-            let newBlock = null;
-            let newConnection = null;
-            let min = (MINIMUMDOCKDISTANCE / DEFAULTBLOCKSCALE) * this.blockScale;
-            const blkType = myBlock.docks[0][2];
-
-            /** Is the added block above or below? */
-            let insertAfterDefault = true;
-
-            for (let b = 0; b < this.blockList.length; b++) {
-                /** Don't connect to yourself. */
-                if (b === thisBlock) {
-                    continue;
-                }
-
-                /** Don't connect to a collapsed block. */
-                if (this.blockList[b].inCollapsed) {
-                    continue;
-                }
-
-                if (COLLAPSIBLES.includes(this.blockList[b].name)) {
-                    if (!INLINECOLLAPSIBLES.includes(this.blockList[b].name)) {
-                        if (this.blockList[b].collapsed) {
-                            continue;
-                        }
-                    }
-                }
-
-                /** Don't connect to a block in the trash. */
-                if (this.blockList[b].trash) {
-                    continue;
-                }
-
-                /** Does this every happen? Or is there always a hidden block below? */
-
-                let start = 1;
-                if (this.blockList[b].isInlineCollapsible() && this.blockList[b].collapsed) {
-                    /** Only try docking to last connection of inline collapsed blocks. */
-                    start = this.blockList[b].connections.length - 1;
-                }
-
-                const ILLEGAL_BOUNCE_DIST = 400; // squared distance (20px)
-                let bounced = false;
-
-                for (let i = start; i < this.blockList[b].connections.length; i++) {
-                    /**
-                     * When converting from Python projects to JS format,
-                     * sometimes extra null connections are added. We need
-                     * to ignore them.
-                     */
-                    if (i === this.blockList[b].docks.length) {
-                        break;
-                    }
-
-                    if (
-                        i === this.blockList[b].connections.length - 1 &&
-                        this.blockList[b].connections[i] != null &&
-                        this.blockList[this.blockList[b].connections[i]].isNoHitBlock()
-                    ) {
-                        /**
-                         * Don't break the connection between a block and
-                         * a hidden block below it.
-                         */
-                        continue;
-                    } else if (
-                        ["backward", "status"].includes(this.blockList[b].name) &&
-                        i === 1 &&
-                        this.blockList[b].connections[1] != null &&
-                        this.blockList[this.blockList[b].connections[1]].isNoHitBlock()
-                    ) {
-                        /**
-                         * Don't break the connection between a backward
-                         * block and a hidden block attached to its clamp.
-                         */
-                        continue;
-                    } else if (
-                        this.blockList[b].name === "action" &&
-                        i === 2 &&
-                        this.blockList[b].connections[2] != null &&
-                        this.blockList[this.blockList[b].connections[2]].isNoHitBlock()
-                    ) {
-                        /**
-                         * Don't break the connection between an action
-                         * block and a hidden block attached to its clamp.
-                         */
-                        continue;
-                    }
-
-                    /** Look for available connections. */
-                    if (this._testConnectionType(blkType, this.blockList[b].docks[i][2])) {
-                        const x2 = this.blockList[b].container.x + this.blockList[b].docks[i][0];
-                        const y2 = this.blockList[b].container.y + this.blockList[b].docks[i][1];
-                        const dist = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
-                        if (dist < min) {
-                            newBlock = b;
-                            newConnection = i;
-                            min = dist;
-                        }
-                    } else {
-                        // Bounce away from illegal connection if the distance was small.
-                        if (!myBlock.isDragging) {
-                            const x2 =
-                                this.blockList[b].container.x + this.blockList[b].docks[i][0];
-                            const y2 =
-                                this.blockList[b].container.y + this.blockList[b].docks[i][1];
-
-                            const dx = x2 - x1;
-                            const dy = y2 - y1;
-                            const dist = dx * dx + dy * dy;
-
-                            if (!bounced && dist < ILLEGAL_BOUNCE_DIST) {
-                                console.debug("cannot connect these two block types");
-
-                                const distance = Math.sqrt(dist) || 0.0001;
-                                const bounceFactor = 60;
-
-                                // Snap back first
-                                if (myBlock.lastGoodX !== undefined) {
-                                    myBlock.container.x = myBlock.lastGoodX;
-                                    myBlock.container.y = myBlock.lastGoodY;
-                                }
-
-                                // Directional push away from illegal dock based on block type
-                                if (myBlock.isArgBlock()) {
-                                    // Arg blocks bounce to the right
-                                    myBlock.container.x += bounceFactor;
-                                } else {
-                                    // Flow blocks bounce below and to the right
-                                    myBlock.container.x += bounceFactor * 0.7;
-                                    myBlock.container.y += bounceFactor;
-                                }
-
-                                bounced = true;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (newBlock != null) {
-                const n = this._countBlocksInStack(this.findTopBlock(newBlock));
-                if (n > LONGSTACK) {
-                    this.activity.errorMsg(_("Consider breaking this stack into parts."));
-                }
-
-                /** We found a match. */
-                myBlock.connections[0] = newBlock;
-                const connection = this.blockList[newBlock].connections[newConnection];
-                let bottom;
-
-                if (connection == null) {
-                    if (this.blockList[newBlock].isArgClamp()) {
-                        /** If it is an arg clamp, we may have to adjust the slot size. */
-                        if (this.blockList[newBlock].isArgumentLikeBlock() && newConnection === 1) {
-                            /** pass */
-                        } else if (
-                            ["doArg", "nameddoArg"].includes(this.blockList[newBlock].name) &&
-                            newConnection === this.blockList[newBlock].connections.length - 1
-                        ) {
-                            /** pass */
-                        } else {
-                            /** Get the size of the block we are inserting adding. */
-
-                            const size = this._getBlockSize(thisBlock);
-                            /** Get the current slot list. */
-                            const slotList = this.blockList[newBlock].argClampSlots;
-                            let si = newConnection - 1;
-                            /** Which slot is this block in? */
-                            if (this.blockList[newBlock].isArgumentLikeBlock()) {
-                                si = newConnection - 2;
-                            }
-
-                            if (slotList[si] !== size) {
-                                slotList[si] = size;
-                                this.blockList[newBlock].updateArgSlots(slotList);
-                            }
-                        }
-                    }
-                } else {
-                    /**
-                     * Three scenarios in which we may be overriding an
-                     * existing connection:
-                     * (1) if it is an argClamp, add a new slot below the
-                     *     current block;
-                     * (2) if it is an arg block, replace it; or
-                     * (3) if it is a flow block, insert it into the flow.
-                     * A few corner cases: Whenever we connect (or disconnect)
-                     * from an action block (c[1] arg), we need to ensure we have
-                     * a unique action name; Whenever we connect to a newnote
-                     * block (c[2] flow), we need to ensure we have either a silence
-                     * block or a pitch block. And if we are connecting to a
-                     * storein block, we need to ensure that there is a palette
-                     * entry for the new namedbox.
-                     */
-                    insertAfterDefault = false;
-                    if (this.blockList[newBlock].isArgClamp()) {
-                        if (this.blockList[newBlock].isArgumentLikeBlock() && newConnection === 1) {
-                            /**
-                             * If it is the action name then treat it like
-                             * a standard replacement.
-                             */
-                            this.blockList[connection].connections[0] = null;
-                            this.findDragGroup(connection);
-                            for (let c = 0; c < this.dragGroup.length; c++) {
-                                this.moveBlockRelative(this.dragGroup[c], 40, 40);
-                            }
-                        } else if (
-                            ["doArg", "nameddoArg"].includes(this.blockList[newBlock].name) &&
-                            newConnection === this.blockList[newBlock].connections.length - 1
-                        ) {
-                            /** If it is the bottom of the flow, insert as usual. */
-                            bottom = this.findBottomBlock(thisBlock);
-                            this.blockList[connection].connections[0] = bottom;
-                            this.blockList[bottom].connections[
-                                this.blockList[bottom].connections.length - 1
-                            ] = connection;
-                        } else {
-                            /**
-                             * Move the block in the current slot down one
-                             * slot (cascading and creating a new slot if
-                             * necessary).
-                             */
-                            /** Get the size of the block we are inserting adding. */
-                            const size = this._getBlockSize(thisBlock);
-
-                            /** Get the current slot list. */
-                            const slotList = this.blockList[newBlock].argClampSlots;
-                            /** Which slot is this block in? */
-                            const ci = this.blockList[newBlock].connections.indexOf(connection);
-                            let si = ci - 1;
-                            if (this.blockList[newBlock].isArgumentLikeBlock()) {
-                                si = ci - 2;
-                            }
-
-                            const emptySlot = null;
-                            let emptyConnection = null;
-                            /** Is there an empty slot below? */
-                            for (let emptySlot = si; emptySlot < slotList.length; emptySlot++) {
-                                if (
-                                    this.blockList[newBlock].connections[ci + emptySlot - si] ==
-                                    null
-                                ) {
-                                    emptyConnection = ci + emptySlot - si;
-                                    break;
-                                }
-                            }
-
-                            if (emptyConnection == null) {
-                                slotList.push(1);
-                                if (this.blockList[newBlock].name !== "makeblock") {
-                                    this._newLocalArgBlock(slotList.length);
-                                }
-
-                                emptyConnection = ci + emptySlot - si;
-                                this.blockList[newBlock].connections.push(null);
-
-                                /** Slide everything down one slot. */
-                                for (let i = slotList.length - 1; i > si + 1; i--) {
-                                    slotList[i] = slotList[i - 1];
-                                }
-
-                                for (
-                                    let i = this.blockList[newBlock].connections.length - 1;
-                                    i > ci + 1;
-                                    i--
-                                ) {
-                                    this.blockList[newBlock].connections[i] =
-                                        this.blockList[newBlock].connections[i - 1];
-                                }
-                            }
-                            /** The new block is added below the current connection... */
-                            newConnection += 1;
-                            /** Set its slot size too. */
-                            slotList[si + 1] = size;
-
-                            this.blockList[newBlock].updateArgSlots(slotList);
-                        }
-                    } else if (myBlock.isArgBlock()) {
-                        this.blockList[connection].connections[0] = null;
-
-                        /** If we are replacing a number block, put it in the trash */
-                        if (this.blockList[connection].name === "number") {
-                            this.sendStackToTrash(this.blockList[connection]);
-                        } else {
-                            this.findDragGroup(connection);
-                            for (let c = 0; c < this.dragGroup.length; c++) {
-                                this.moveBlockRelative(this.dragGroup[c], 40, 40);
-                            }
-                        }
-
-                        /** We need to rename the action stack. */
-                        if (this.blockList[newBlock].name === "action") {
-                            actionCheck = true;
-
-                            if (myBlock.value !== this.blockList[connection].value) {
-                                /**
-                                 * Temporarily disconnect to ensure we don't
-                                 * find myBlock when looking for a unique name.
-                                 */
-                                const c = myBlock.connections[0];
-                                myBlock.connections[0] = null;
-                                let name = this.findUniqueActionName(myBlock.value);
-                                myBlock.connections[0] = c;
-
-                                if (name !== myBlock.value) {
-                                    myBlock.value = name;
-                                    let label = name;
-                                    if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                                        label = label.substr(0, STRINGLEN) + "...";
-                                    }
-                                    myBlock.text.text = label;
-                                    myBlock.container.updateCache();
-                                }
-
-                                await delayExecution(75);
-                                /**
-                                 * A previously disconnected name may have left
-                                 * an entry in the palette we need to remove.
-                                 */
-                                name = this.blockList[connection].value;
-                                if (this.protoBlockDict["myDo_" + name] != undefined) {
-                                    delete this.protoBlockDict["myDo_" + name];
-                                    this.activity.palettes.dict["action"].hideMenu(true);
-                                }
-
-                                const metadata = this.actionMetadata(newBlock);
-                                this.newNameddoBlock(
-                                    myBlock.value,
-                                    metadata.hasReturn,
-                                    metadata.hasArgs
-                                );
-                                const blockPalette = this.activity.palettes.dict["action"];
-                                for (let b = 0; b < blockPalette.protoList.length; b++) {
-                                    const protoblock = blockPalette.protoList[b];
-                                    if (
-                                        protoblock.name === "nameddo" &&
-                                        protoblock.staticLabels[0] ===
-                                            this.blockList[connection].value
-                                    ) {
-                                        await delayExecution(50);
-                                        blockPalette.remove(
-                                            protoblock,
-                                            this.blockList[connection].value
-                                        );
-                                        delete this.protoBlockDict[
-                                            "myDo_" + this.blockList[connection].value
-                                        ];
-                                        this.activity.palettes.hide();
-                                        this.activity.palettes.updatePalettes("action");
-
-                                        await delayExecution(500);
-                                        this.activity.palettes.show();
-                                        break;
-                                    }
-                                }
-
-                                this.renameNameddos(
-                                    this.blockList[connection].value,
-                                    myBlock.value
-                                );
-                                this.renameDos(this.blockList[connection].value, myBlock.value);
-                            }
-                        } else if (this.blockList[newBlock].name === "storein") {
-                            /** We may need to add new storein and namedo blocks to the palette. */
-                            if (newConnection === 1 && myBlock.value !== "box") {
-                                /** this.newStoreinBlock(myBlock.value); */
-                                this.newStorein2Block(myBlock.value);
-                                this.newNamedboxBlock(myBlock.value);
-                                await delayExecution(50);
-                                this.activity.palettes.updatePalettes("boxes");
-                            }
-                        }
-                    } else if (myBlock.protoblock.style === "argclamparg") {
-                        /** We don't need to do anything special with argclamparg blocks. */
-                        /** console.debug("skipping argclamparg"); */
-                    } else if (!this.blockList[thisBlock].isArgFlowClampBlock()) {
-                        bottom = this.findBottomBlock(thisBlock);
-                        this.blockList[connection].connections[0] = bottom;
-                        this.blockList[bottom].connections[
-                            this.blockList[bottom].connections.length - 1
-                        ] = connection;
-                    } else {
+                while (blk != null) {
+                    expandableLoopCounter += 1;
+                    if (expandableLoopCounter > 2 * this.blockList.length) {
                         // eslint-disable-next-line no-console
-                        console.debug("HOW DID WE GET HERE?");
+                        console.debug("Infinite loop encountered checking for expandables?");
+                        break;
+                    }
+
+                    if (this.blockList[blk].name === "ifthenelse") {
+                        this.clampBlocksToCheck.push([blk, 0]);
+                        this.clampBlocksToCheck.push([blk, 1]);
+                    } else {
+                        this.clampBlocksToCheck.push([blk, 0]);
+                    }
+                    blk = this.insideExpandableBlock(blk);
+                }
+
+                this._checkTwoArgBlocks = [];
+                const checkArgBlocks = [];
+                const myBlock = this.blockList[thisBlock];
+                if (myBlock == null) {
+                    // eslint-disable-next-line no-console
+                    console.debug("null block found in blockMoved method: " + thisBlock);
+                    return;
+                }
+                this.findDragGroup(thisBlock);
+                const movedGroup = [...this.dragGroup];
+
+                // Get the original position from when drag started (stored in mousedown)
+                // If not available, use current position as fallback
+                // Capture old positions (before move) from stored drag positions
+                const oldPositions = new Map();
+                const oldConnections = new Map();
+                const oldArgClampSlots = new Map();
+                const oldClampCounts = new Map();
+
+                for (const idx of movedGroup) {
+                    const blk = this.blockList[idx];
+                    if (!blk || blk.trash || !blk.container) continue;
+
+                    // Get original position from when drag started
+                    let x = blk.container.x;
+                    let y = blk.container.y;
+                    if (blk._originalDragPosition) {
+                        x = blk._originalDragPosition.x;
+                        y = blk._originalDragPosition.y;
+                    }
+
+                    oldPositions.set(idx, { x: x, y: y });
+                    oldConnections.set(idx, [...blk.connections]);
+                    if (blk.argClampSlots) {
+                        oldArgClampSlots.set(idx, [...blk.argClampSlots]);
+                    }
+                    if(blk.clampCount) {
+                        oldClampCounts.set(idx, [...blk.clampCount]);
                     }
                 }
 
-                this.blockList[newBlock].connections[newConnection] = thisBlock;
-
-                /**
-                 * Remove the silence block (if it is present) after
-                 * adding a new block inside of a note block.
-                 */
-                if (
-                    this._insideNoteBlock(thisBlock) != null &&
-                    this.blockList[thisBlock].connections.length > 1
-                ) {
-                    /** If blocks are inserted above the silence block. */
-                    if (insertAfterDefault) {
-                        newBlock = this.deletePreviousDefault(thisBlock);
-                    } else if (bottom) {
-                        this.deleteNextDefault(bottom);
-                    }
+                const c = myBlock.connections[0];
+                let cBlock;
+                if (c != null) {
+                    cBlock = this.blockList[c];
                 }
 
-                /** If we attached a name to an action block, see if we need to rename it. */
-                if (this.blockList[newBlock].name === "action" && !actionCheck) {
-                    // Is there already another action block with this name?
-                    for (let b = 0; b < this.blockList.length; b++) {
-                        if (b === newBlock) {
-                            continue;
+                /** If it is an arg block, where is it coming from? */
+                if (myBlock.isArgBlock() && c != null) {
+                    /**
+                     * We care about twoarg (2arg) blocks with
+                     * connections to the first arg;
+                     */
+                    if (this.blockList[c].isTwoArgBlock() || this.blockList[c].isArgClamp()) {
+                        if (cBlock.connections[1] === thisBlock) {
+                            this._checkTwoArgBlocks.push(c);
                         }
-
-                        if (this.blockList[b].name === "action") {
-                            if (this.blockList[b].connections[1] != null) {
-                                if (
-                                    this.blockList[this.blockList[b].connections[1]].value ===
-                                    this.blockList[thisBlock].value
-                                ) {
-                                    this.blockList[thisBlock].value = this.findUniqueActionName(
-                                        this.blockList[thisBlock].value
-                                    );
-                                    let label = this.blockList[thisBlock].value;
-                                    if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                                        label = label.substr(0, STRINGLEN) + "...";
-                                    }
-                                    this.blockList[thisBlock].text.text = label;
-                                    this.blockList[thisBlock].container.updateCache();
-                                    const metadata = this.actionMetadata(b);
-                                    this.newNameddoBlock(
-                                        this.blockList[thisBlock].value,
-                                        metadata.hasReturn,
-                                        metadata.hasArgs
-                                    );
-                                    this.setActionProtoVisibility(false);
-                                }
-                            }
+                    } else if (
+                        (this.blockList[c].isArgBlock() && this.blockList[c].isExpandableBlock()) ||
+                        this.blockList[c].isArgClamp()
+                    ) {
+                        if (cBlock.connections[1] === thisBlock) {
+                            this._checkTwoArgBlocks.push(c);
                         }
                     }
                 }
 
-                this.adjustDocks(newBlock, true);
-                /** TODO: some graphical feedback re new connection? */
+                /** Get widget window's title */
+                const widgetTitle = document.getElementsByClassName("wftTitle");
 
-                /** Check if top block is one of the widget blocks. */
-                let lockInit = false;
-                if (c === null) {
-                    for (let i = 0; i < widgetTitle.length; i++) {
-                        const that = this;
+                /** Disconnect from connection[0] (both sides of the connection). */
+                if (c != null) {
+                    /** Disconnect both ends of the connection. */
+                    for (let i = 1; i < cBlock.connections.length; i++) {
+                        if (cBlock.connections[i] === thisBlock) {
+                            cBlock.connections[i] = null;
+                            break;
+                        }
+                    }
+
+                    myBlock.connections[0] = null;
+                    this.raiseStackToTop(thisBlock);
+
+                    /**
+                     * Check if we are disconnecting blocks from widget blocks;
+                     * then reinit if widget windows is open.
+                     */
+                    let lockInit = false;
+                    for (let x = 0; x < widgetTitle.length; x++) {
                         if (lockInit === false) {
-                            let newTopBlock;
-                            switch (widgetTitle[i].innerHTML) {
+                            switch (widgetTitle[x].innerHTML) {
                                 case "oscilloscope":
                                 case "tempo":
                                 case "rhythm maker":
@@ -2148,101 +1700,660 @@ class Blocks {
                                 case "temperament":
                                 case "timbre":
                                     lockInit = true;
-                                    newTopBlock = that.findTopBlock(thisBlock);
                                     if (
-                                        this.blockList[newTopBlock].protoblock.staticLabels[0] ==
-                                        widgetTitle[i].innerHTML
+                                        this.blockList[initialTopBlock].protoblock.staticLabels[0] ===
+                                        widgetTitle[x].innerHTML
                                     ) {
-                                        this.reInitWidget(newTopBlock, 1500);
+                                        this.reInitWidget(initialTopBlock, 1500);
                                     }
                                     break;
                             }
                         }
                     }
                 }
-            }
 
-            /** If it is an arg block, where is it coming from? */
-            if (myBlock.isArgumentLikeBlock() && newBlock != null) {
-                const parentBlock = this.blockList[newBlock];
+                /** Look for a new connection. */
+                const x1 = myBlock.container.x + myBlock.docks[0][0];
+                const y1 = myBlock.container.y + myBlock.docks[0][1];
 
-                // Find which connection index this block is attached to
-                const connectionIndex = parentBlock.connections.indexOf(thisBlock);
+                /** Find the nearest dock; if it is close enough, make the connection. */
+                let newBlock = null;
+                let newConnection = null;
+                let min = (MINIMUMDOCKDISTANCE / DEFAULTBLOCKSCALE) * this.blockScale;
+                const blkType = myBlock.docks[0][2];
 
-                // Guard against invalid index (can happen during drag/undo/intermediate states)
-                if (connectionIndex !== -1) {
-                    // Ask the parent block what type of layout update it needs for this connection
-                    const updateType = parentBlock.getLayoutUpdateType(connectionIndex);
+                /** Is the added block above or below? */
+                let insertAfterDefault = true;
 
-                    if (updateType === "ARG") {
-                        if (!this._checkTwoArgBlocks.includes(newBlock)) {
-                            this._checkTwoArgBlocks.push(newBlock);
+                for (let b = 0; b < this.blockList.length; b++) {
+                    /** Don't connect to yourself. */
+                    if (b === thisBlock) {
+                        continue;
+                    }
+
+                    /** Don't connect to a collapsed block. */
+                    if (this.blockList[b].inCollapsed) {
+                        continue;
+                    }
+
+                    if (COLLAPSIBLES.includes(this.blockList[b].name)) {
+                        if (!INLINECOLLAPSIBLES.includes(this.blockList[b].name)) {
+                            if (this.blockList[b].collapsed) {
+                                continue;
+                            }
                         }
-                    } else if (updateType === "FLOW") {
-                        if (!checkArgBlocks.includes(newBlock)) {
-                            checkArgBlocks.push(newBlock);
+                    }
+
+                    /** Don't connect to a block in the trash. */
+                    if (this.blockList[b].trash) {
+                        continue;
+                    }
+
+                    /** Does this every happen? Or is there always a hidden block below? */
+
+                    let start = 1;
+                    if (this.blockList[b].isInlineCollapsible() && this.blockList[b].collapsed) {
+                        /** Only try docking to last connection of inline collapsed blocks. */
+                        start = this.blockList[b].connections.length - 1;
+                    }
+
+                    const ILLEGAL_BOUNCE_DIST = 400; // squared distance (20px)
+                    let bounced = false;
+
+                    for (let i = start; i < this.blockList[b].connections.length; i++) {
+                        /**
+                         * When converting from Python projects to JS format,
+                         * sometimes extra null connections are added. We need
+                         * to ignore them.
+                         */
+                        if (i === this.blockList[b].docks.length) {
+                            break;
+                        }
+
+                        if (
+                            i === this.blockList[b].connections.length - 1 &&
+                            this.blockList[b].connections[i] != null &&
+                            this.blockList[this.blockList[b].connections[i]].isNoHitBlock()
+                        ) {
+                            /**
+                             * Don't break the connection between a block and
+                             * a hidden block below it.
+                             */
+                            continue;
+                        } else if (
+                            ["backward", "status"].includes(this.blockList[b].name) &&
+                            i === 1 &&
+                            this.blockList[b].connections[1] != null &&
+                            this.blockList[this.blockList[b].connections[1]].isNoHitBlock()
+                        ) {
+                            /**
+                             * Don't break the connection between a backward
+                             * block and a hidden block attached to its clamp.
+                             */
+                            continue;
+                        } else if (
+                            this.blockList[b].name === "action" &&
+                            i === 2 &&
+                            this.blockList[b].connections[2] != null &&
+                            this.blockList[this.blockList[b].connections[2]].isNoHitBlock()
+                        ) {
+                            /**
+                             * Don't break the connection between an action
+                             * block and a hidden block attached to its clamp.
+                             */
+                            continue;
+                        }
+
+                        /** Look for available connections. */
+                        if (this._testConnectionType(blkType, this.blockList[b].docks[i][2])) {
+                            const x2 = this.blockList[b].container.x + this.blockList[b].docks[i][0];
+                            const y2 = this.blockList[b].container.y + this.blockList[b].docks[i][1];
+                            const dist = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+                            if (dist < min) {
+                                newBlock = b;
+                                newConnection = i;
+                                min = dist;
+                            }
+                        } else {
+                            // Bounce away from illegal connection if the distance was small.
+                            if (!myBlock.isDragging) {
+                                const x2 =
+                                    this.blockList[b].container.x + this.blockList[b].docks[i][0];
+                                const y2 =
+                                    this.blockList[b].container.y + this.blockList[b].docks[i][1];
+
+                                const dx = x2 - x1;
+                                const dy = y2 - y1;
+                                const dist = dx * dx + dy * dy;
+
+                                if (!bounced && dist < ILLEGAL_BOUNCE_DIST) {
+                                    console.debug("cannot connect these two block types");
+
+                                    const distance = Math.sqrt(dist) || 0.0001;
+                                    const bounceFactor = 60;
+
+                                    // Snap back first
+                                    if (myBlock.lastGoodX !== undefined) {
+                                        myBlock.container.x = myBlock.lastGoodX;
+                                        myBlock.container.y = myBlock.lastGoodY;
+                                    }
+
+                                    // Directional push away from illegal dock based on block type
+                                    if (myBlock.isArgBlock()) {
+                                        // Arg blocks bounce to the right
+                                        myBlock.container.x += bounceFactor;
+                                    } else {
+                                        // Flow blocks bounce below and to the right
+                                        myBlock.container.x += bounceFactor * 0.7;
+                                        myBlock.container.y += bounceFactor;
+                                    }
+
+                                    bounced = true;
+                                }
+                            }
                         }
                     }
                 }
-            }
 
-            this.addDefaultBlock(parentblk, thisBlock, actionCheck);
+                if (newBlock != null) {
+                    const n = this._countBlocksInStack(this.findTopBlock(newBlock));
+                    if (n > LONGSTACK) {
+                        this.activity.errorMsg(_("Consider breaking this stack into parts."));
+                    }
 
-            /**
-             * Put block adjustments inside a slight delay to make the
-             * addition/subtraction of vspace and changes of block shape
-             * appear less abrupt (and it can be a little racy).
-             * If we changed the contents of a arg block, we may need a vspace.
-             */
-            if (checkArgBlocks.length > 0) {
+                    /** We found a match. */
+                    myBlock.connections[0] = newBlock;
+                    const connection = this.blockList[newBlock].connections[newConnection];
+                    let bottom;
+
+                    if (connection == null) {
+                        if (this.blockList[newBlock].isArgClamp()) {
+                            /** If it is an arg clamp, we may have to adjust the slot size. */
+                            if (this.blockList[newBlock].isArgumentLikeBlock() && newConnection === 1) {
+                                /** pass */
+                            } else if (
+                                ["doArg", "nameddoArg"].includes(this.blockList[newBlock].name) &&
+                                newConnection === this.blockList[newBlock].connections.length - 1
+                            ) {
+                                /** pass */
+                            } else {
+                                /** Get the size of the block we are inserting adding. */
+
+                                const size = this._getBlockSize(thisBlock);
+                                /** Get the current slot list. */
+                                const slotList = this.blockList[newBlock].argClampSlots;
+                                let si = newConnection - 1;
+                                /** Which slot is this block in? */
+                                if (this.blockList[newBlock].isArgumentLikeBlock()) {
+                                    si = newConnection - 2;
+                                }
+
+                                if (slotList[si] !== size) {
+                                    slotList[si] = size;
+                                    this.blockList[newBlock].updateArgSlots(slotList);
+                                }
+                            }
+                        }
+                    } else {
+                        /**
+                         * Three scenarios in which we may be overriding an
+                         * existing connection:
+                         * (1) if it is an argClamp, add a new slot below the
+                         *     current block;
+                         * (2) if it is an arg block, replace it; or
+                         * (3) if it is a flow block, insert it into the flow.
+                         * A few corner cases: Whenever we connect (or disconnect)
+                         * from an action block (c[1] arg), we need to ensure we have
+                         * a unique action name; Whenever we connect to a newnote
+                         * block (c[2] flow), we need to ensure we have either a silence
+                         * block or a pitch block. And if we are connecting to a
+                         * storein block, we need to ensure that there is a palette
+                         * entry for the new namedbox.
+                         */
+                        insertAfterDefault = false;
+                        if (this.blockList[newBlock].isArgClamp()) {
+                            if (this.blockList[newBlock].isArgumentLikeBlock() && newConnection === 1) {
+                                /**
+                                 * If it is the action name then treat it like
+                                 * a standard replacement.
+                                 */
+                                this.blockList[connection].connections[0] = null;
+                                this.findDragGroup(connection);
+                                for (let c = 0; c < this.dragGroup.length; c++) {
+                                    this.moveBlockRelative(this.dragGroup[c], 40, 40);
+                                }
+                            } else if (
+                                ["doArg", "nameddoArg"].includes(this.blockList[newBlock].name) &&
+                                newConnection === this.blockList[newBlock].connections.length - 1
+                            ) {
+                                /** If it is the bottom of the flow, insert as usual. */
+                                bottom = this.findBottomBlock(thisBlock);
+                                this.blockList[connection].connections[0] = bottom;
+                                this.blockList[bottom].connections[
+                                    this.blockList[bottom].connections.length - 1
+                                ] = connection;
+                            } else {
+                                /**
+                                 * Move the block in the current slot down one
+                                 * slot (cascading and creating a new slot if
+                                 * necessary).
+                                 */
+                                /** Get the size of the block we are inserting adding. */
+                                const size = this._getBlockSize(thisBlock);
+
+                                /** Get the current slot list. */
+                                const slotList = this.blockList[newBlock].argClampSlots;
+                                /** Which slot is this block in? */
+                                const ci = this.blockList[newBlock].connections.indexOf(connection);
+                                let si = ci - 1;
+                                if (this.blockList[newBlock].isArgumentLikeBlock()) {
+                                    si = ci - 2;
+                                }
+
+                                const emptySlot = null;
+                                let emptyConnection = null;
+                                /** Is there an empty slot below? */
+                                for (let emptySlot = si; emptySlot < slotList.length; emptySlot++) {
+                                    if (
+                                        this.blockList[newBlock].connections[ci + emptySlot - si] ==
+                                        null
+                                    ) {
+                                        emptyConnection = ci + emptySlot - si;
+                                        break;
+                                    }
+                                }
+
+                                if (emptyConnection == null) {
+                                    slotList.push(1);
+                                    if (this.blockList[newBlock].name !== "makeblock") {
+                                        this._newLocalArgBlock(slotList.length);
+                                    }
+
+                                    emptyConnection = ci + emptySlot - si;
+                                    this.blockList[newBlock].connections.push(null);
+
+                                    /** Slide everything down one slot. */
+                                    for (let i = slotList.length - 1; i > si + 1; i--) {
+                                        slotList[i] = slotList[i - 1];
+                                    }
+
+                                    for (
+                                        let i = this.blockList[newBlock].connections.length - 1;
+                                        i > ci + 1;
+                                        i--
+                                    ) {
+                                        this.blockList[newBlock].connections[i] =
+                                            this.blockList[newBlock].connections[i - 1];
+                                    }
+                                }
+                                /** The new block is added below the current connection... */
+                                newConnection += 1;
+                                /** Set its slot size too. */
+                                slotList[si + 1] = size;
+
+                                this.blockList[newBlock].updateArgSlots(slotList);
+                            }
+                        } else if (myBlock.isArgBlock()) {
+                            this.blockList[connection].connections[0] = null;
+
+                            /** If we are replacing a number block, put it in the trash */
+                            if (this.blockList[connection].name === "number") {
+                                this.sendStackToTrash(this.blockList[connection]);
+                            } else {
+                                this.findDragGroup(connection);
+                                for (let c = 0; c < this.dragGroup.length; c++) {
+                                    this.moveBlockRelative(this.dragGroup[c], 40, 40);
+                                }
+                            }
+
+                            /** We need to rename the action stack. */
+                            if (this.blockList[newBlock].name === "action") {
+                                actionCheck = true;
+
+                                if (myBlock.value !== this.blockList[connection].value) {
+                                    /**
+                                     * Temporarily disconnect to ensure we don't
+                                     * find myBlock when looking for a unique name.
+                                     */
+                                    const c = myBlock.connections[0];
+                                    myBlock.connections[0] = null;
+                                    let name = this.findUniqueActionName(myBlock.value);
+                                    myBlock.connections[0] = c;
+
+                                    if (name !== myBlock.value) {
+                                        myBlock.value = name;
+                                        let label = name;
+                                        if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+                                            label = label.substr(0, STRINGLEN) + "...";
+                                        }
+                                        myBlock.text.text = label;
+                                        myBlock.container.updateCache();
+                                    }
+
+                                    await delayExecution(75);
+                                    /**
+                                     * A previously disconnected name may have left
+                                     * an entry in the palette we need to remove.
+                                     */
+                                    name = this.blockList[connection].value;
+                                    if (this.protoBlockDict["myDo_" + name] != undefined) {
+                                        delete this.protoBlockDict["myDo_" + name];
+                                        this.activity.palettes.dict["action"].hideMenu(true);
+                                    }
+
+                                    const metadata = this.actionMetadata(newBlock);
+                                    this.newNameddoBlock(
+                                        myBlock.value,
+                                        metadata.hasReturn,
+                                        metadata.hasArgs
+                                    );
+                                    const blockPalette = this.activity.palettes.dict["action"];
+                                    for (let b = 0; b < blockPalette.protoList.length; b++) {
+                                        const protoblock = blockPalette.protoList[b];
+                                        if (
+                                            protoblock.name === "nameddo" &&
+                                            protoblock.staticLabels[0] ===
+                                            this.blockList[connection].value
+                                        ) {
+                                            await delayExecution(50);
+                                            blockPalette.remove(
+                                                protoblock,
+                                                this.blockList[connection].value
+                                            );
+                                            delete this.protoBlockDict[
+                                                "myDo_" + this.blockList[connection].value
+                                            ];
+                                            this.activity.palettes.hide();
+                                            this.activity.palettes.updatePalettes("action");
+
+                                            await delayExecution(500);
+                                            this.activity.palettes.show();
+                                            break;
+                                        }
+                                    }
+
+                                    this.renameNameddos(
+                                        this.blockList[connection].value,
+                                        myBlock.value
+                                    );
+                                    this.renameDos(this.blockList[connection].value, myBlock.value);
+                                }
+                            } else if (this.blockList[newBlock].name === "storein") {
+                                /** We may need to add new storein and namedo blocks to the palette. */
+                                if (newConnection === 1 && myBlock.value !== "box") {
+                                    /** this.newStoreinBlock(myBlock.value); */
+                                    this.newStorein2Block(myBlock.value);
+                                    this.newNamedboxBlock(myBlock.value);
+                                    await delayExecution(50);
+                                    this.activity.palettes.updatePalettes("boxes");
+                                }
+                            }
+                        } else if (myBlock.protoblock.style === "argclamparg") {
+                            /** We don't need to do anything special with argclamparg blocks. */
+                            /** console.debug("skipping argclamparg"); */
+                        } else if (!this.blockList[thisBlock].isArgFlowClampBlock()) {
+                            bottom = this.findBottomBlock(thisBlock);
+                            this.blockList[connection].connections[0] = bottom;
+                            this.blockList[bottom].connections[
+                                this.blockList[bottom].connections.length - 1
+                            ] = connection;
+                        } else {
+                            // eslint-disable-next-line no-console
+                            console.debug("HOW DID WE GET HERE?");
+                        }
+                    }
+
+                    this.blockList[newBlock].connections[newConnection] = thisBlock;
+
+                    /**
+                     * Remove the silence block (if it is present) after
+                     * adding a new block inside of a note block.
+                     */
+                    if (
+                        this._insideNoteBlock(thisBlock) != null &&
+                        this.blockList[thisBlock].connections.length > 1
+                    ) {
+                        /** If blocks are inserted above the silence block. */
+                        if (insertAfterDefault) {
+                            newBlock = this.deletePreviousDefault(thisBlock);
+                        } else if (bottom) {
+                            this.deleteNextDefault(bottom);
+                        }
+                    }
+
+                    /** If we attached a name to an action block, see if we need to rename it. */
+                    if (this.blockList[newBlock].name === "action" && !actionCheck) {
+                        // Is there already another action block with this name?
+                        for (let b = 0; b < this.blockList.length; b++) {
+                            if (b === newBlock) {
+                                continue;
+                            }
+
+                            if (this.blockList[b].name === "action") {
+                                if (this.blockList[b].connections[1] != null) {
+                                    if (
+                                        this.blockList[this.blockList[b].connections[1]].value ===
+                                        this.blockList[thisBlock].value
+                                    ) {
+                                        this.blockList[thisBlock].value = this.findUniqueActionName(
+                                            this.blockList[thisBlock].value
+                                        );
+                                        let label = this.blockList[thisBlock].value;
+                                        if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+                                            label = label.substr(0, STRINGLEN) + "...";
+                                        }
+                                        this.blockList[thisBlock].text.text = label;
+                                        this.blockList[thisBlock].container.updateCache();
+                                        const metadata = this.actionMetadata(b);
+                                        this.newNameddoBlock(
+                                            this.blockList[thisBlock].value,
+                                            metadata.hasReturn,
+                                            metadata.hasArgs
+                                        );
+                                        this.setActionProtoVisibility(false);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    this.adjustDocks(newBlock, true);
+                    /** TODO: some graphical feedback re new connection? */
+
+                    /** Check if top block is one of the widget blocks. */
+                    let lockInit = false;
+                    if (c === null) {
+                        for (let i = 0; i < widgetTitle.length; i++) {
+                            const that = this;
+                            if (lockInit === false) {
+                                let newTopBlock;
+                                switch (widgetTitle[i].innerHTML) {
+                                    case "oscilloscope":
+                                    case "tempo":
+                                    case "rhythm maker":
+                                    case "pitch slider":
+                                    case "pitch staircase":
+                                    case "status":
+                                    case "phrase maker":
+                                    case "lego bricks":
+                                    case "custom mode":
+                                    case "music keyboard":
+                                    case "pitch drum":
+                                    case "meter":
+                                    case "temperament":
+                                    case "timbre":
+                                        lockInit = true;
+                                        newTopBlock = that.findTopBlock(thisBlock);
+                                        if (
+                                            this.blockList[newTopBlock].protoblock.staticLabels[0] ==
+                                            widgetTitle[i].innerHTML
+                                        ) {
+                                            this.reInitWidget(newTopBlock, 1500);
+                                        }
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                /** If it is an arg block, where is it coming from? */
+                if (myBlock.isArgumentLikeBlock() && newBlock != null) {
+                    const parentBlock = this.blockList[newBlock];
+
+                    // Find which connection index this block is attached to
+                    const connectionIndex = parentBlock.connections.indexOf(thisBlock);
+
+                    // Guard against invalid index (can happen during drag/undo/intermediate states)
+                    if (connectionIndex !== -1) {
+                        // Ask the parent block what type of layout update it needs for this connection
+                        const updateType = parentBlock.getLayoutUpdateType(connectionIndex);
+
+                        if (updateType === "ARG") {
+                            if (!this._checkTwoArgBlocks.includes(newBlock)) {
+                                this._checkTwoArgBlocks.push(newBlock);
+                            }
+                        } else if (updateType === "FLOW") {
+                            if (!checkArgBlocks.includes(newBlock)) {
+                                checkArgBlocks.push(newBlock);
+                            }
+                        }
+                    }
+                }
+
+                this.addDefaultBlock(parentblk, thisBlock, actionCheck);
+
+                /**
+                 * Put block adjustments inside a slight delay to make the
+                 * addition/subtraction of vspace and changes of block shape
+                 * appear less abrupt (and it can be a little racy).
+                 * If we changed the contents of a arg block, we may need a vspace.
+                 */
+                if (checkArgBlocks.length > 0) {
+                    for (let i = 0; i < checkArgBlocks.length; i++) {
+                        this._addRemoveVspaceBlock(checkArgBlocks[i]);
+                    }
+                }
+
+                /** If we changed the contents of a two-arg block, we need to adjust it. */
+                if (this._checkTwoArgBlocks.length > 0) {
+                    this._adjustExpandableTwoArgBlock(this._checkTwoArgBlocks);
+                }
+
+                /** First, adjust the docks for any blocks that may have had a vspace added. */
                 for (let i = 0; i < checkArgBlocks.length; i++) {
-                    this._addRemoveVspaceBlock(checkArgBlocks[i]);
-                }
-            }
-
-            /** If we changed the contents of a two-arg block, we need to adjust it. */
-            if (this._checkTwoArgBlocks.length > 0) {
-                this._adjustExpandableTwoArgBlock(this._checkTwoArgBlocks);
-            }
-
-            /** First, adjust the docks for any blocks that may have had a vspace added. */
-            for (let i = 0; i < checkArgBlocks.length; i++) {
-                this.adjustDocks(checkArgBlocks[i], true);
-            }
-
-            /** Next, recheck if the connection is inside of a expandable block. */
-            blk = this.insideExpandableBlock(thisBlock);
-            expandableLoopCounter = 0;
-            while (blk != null) {
-                /** Extra check for malformed data. */
-                expandableLoopCounter += 1;
-                if (expandableLoopCounter > 2 * this.blockList.length) {
-                    // eslint-disable-next-line no-console
-                    console.debug("Infinite loop checking for expandables?");
-                    // eslint-disable-next-line no-console
-                    console.debug(this.blockList);
-                    break;
+                    this.adjustDocks(checkArgBlocks[i], true);
                 }
 
-                if (this.blockList[blk].name === "ifthenelse") {
-                    this.clampBlocksToCheck.push([blk, 0]);
-                    this.clampBlocksToCheck.push([blk, 1]);
+                /** Next, recheck if the connection is inside of a expandable block. */
+                blk = this.insideExpandableBlock(thisBlock);
+                expandableLoopCounter = 0;
+                while (blk != null) {
+                    /** Extra check for malformed data. */
+                    expandableLoopCounter += 1;
+                    if (expandableLoopCounter > 2 * this.blockList.length) {
+                        // eslint-disable-next-line no-console
+                        console.debug("Infinite loop checking for expandables?");
+                        // eslint-disable-next-line no-console
+                        console.debug(this.blockList);
+                        break;
+                    }
+
+                    if (this.blockList[blk].name === "ifthenelse") {
+                        this.clampBlocksToCheck.push([blk, 0]);
+                        this.clampBlocksToCheck.push([blk, 1]);
+                    } else {
+                        this.clampBlocksToCheck.push([blk, 0]);
+                    }
+
+                    blk = this.insideExpandableBlock(blk);
+                }
+                this.isBlockMoving = false;
+                this.adjustExpandableClampBlock();
+                this.activity.refreshCanvas();
+
+                if (this.activity.turtles.running()) {
+                    this.activity.logo.doStopTurtles();
+                    const stopBtn = document.getElementById("stop");
+                    if (stopBtn) stopBtn.style.color = "white";
+                }
+
+                // Capture new positions (after move and docking adjustments)
+                const newPositions = new Map();
+                const newConnections = new Map();
+                const newArgClampSlots = new Map();
+                const newClampCounts = new Map();
+
+                for (const idx of movedGroup) {
+                    const blk = this.blockList[idx];
+                    if (!blk || blk.trash || !blk.container) continue;
+
+                    newPositions.set(idx, { x: blk.container.x, y: blk.container.y });
+                    newConnections.set(idx, [...blk.connections]);
+                    if (blk.argClampSlots) {
+                        newArgClampSlots.set(idx, [...blk.argClampSlots]);
+                    }
+                    if (blk.clampCount){
+                        newClampCounts.set(idx, [...blk.clampCount]);
+                    }
+                }
+
+                // Check if any block actually moved
+                let moved = false;
+                for (const idx of movedGroup) {
+                    const oldPos = oldPositions.get(idx);
+                    const newPos = newPositions.get(idx);
+                    if (oldPos && newPos && (oldPos.x !== newPos.x || oldPos.y !== newPos.y)) {
+                        moved = true;
+                        break;
+                    }
+                }
+
+                // Only create command if blocks actually moved
+                if (moved) {
+                    try {
+                        // Create MoveBlockCommand using the Command pattern
+                        if (!this._isUndoingMove) {
+                            const moveCommand = new MoveBlockCommand(
+                                this,
+                                movedGroup,
+                                oldPositions,
+                                newPositions,
+                                oldConnections,
+                                newConnections,
+                                oldArgClampSlots,
+                                newArgClampSlots,
+                                oldClampCounts,
+                                newClampCounts
+                            );
+
+                            // Execute the command through the command manager
+                            UndoRedo.executeCommand(moveCommand);
+                        }
+
+                        // Clear stored drag positions after command is created
+                        for (const idx of movedGroup) {
+                            const blk = this.blockList[idx];
+                            if (blk && blk._originalDragPosition) {
+                                delete blk._originalDragPosition;
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Error creating move command:", e);
+                    }
                 } else {
-                    this.clampBlocksToCheck.push([blk, 0]);
+                    // Clear stored drag positions if no move occurred
+                    for (const idx of movedGroup) {
+                        const blk = this.blockList[idx];
+                        if (blk && blk._originalDragPosition) {
+                            delete blk._originalDragPosition;
+                        }
+                    }
                 }
-
-                blk = this.insideExpandableBlock(blk);
-            }
-            this.isBlockMoving = false;
-            this.adjustExpandableClampBlock();
-            this.activity.refreshCanvas();
-
-            if (this.activity.turtles.running()) {
-                this.activity.logo.doStopTurtles();
-                const stopBtn = document.getElementById("stop");
-                if (stopBtn) stopBtn.style.color = "white";
-            }
-        };
+            };
+        } catch (e) {
+            console.error(e);
+        }
 
         /**
          * Test for a valid connection between two dock types.
@@ -2338,7 +2449,10 @@ class Blocks {
                 myBlock.container.x = Math.floor(x + 0.5);
                 myBlock.container.y = Math.floor(y + 0.5);
 
-                this.checkBounds();
+                // Don't check bounds during undo/redo operations
+                if (!this._isUndoingMove) {
+                    this.checkBounds();
+                }
             } else {
                 // eslint-disable-next-line no-console
                 console.debug("No container yet for block " + myBlock.name);
@@ -2621,14 +2735,14 @@ class Blocks {
                 // eslint-disable-next-line no-console
                 console.debug(
                     "WARNING: CORRUPTED BLOCK DATA. Block " +
-                        myBlock.name +
-                        " (" +
-                        blk +
-                        ") is connected to the same block " +
-                        this.blockList[myBlock.connections[0]].name +
-                        " (" +
-                        myBlock.connections[0] +
-                        ") twice."
+                    myBlock.name +
+                    " (" +
+                    blk +
+                    ") is connected to the same block " +
+                    this.blockList[myBlock.connections[0]].name +
+                    " (" +
+                    myBlock.connections[0] +
+                    ") twice."
                 );
                 return blk;
             }
@@ -3362,7 +3476,7 @@ class Blocks {
 
                 postProcessArg = [thisBlock, arg];
             } else if (name === "newnote") {
-                postProcess = () => {};
+                postProcess = () => { };
                 postProcessArg = [thisBlock, null];
             } else {
                 postProcess = null;
@@ -4077,7 +4191,7 @@ class Blocks {
                 const block = actionsPalette.protoList[blockId];
                 if (
                     ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(block.name) !==
-                        -1 /** && block.defaults[0] !== _('action') */ &&
+                    -1 /** && block.defaults[0] !== _('action') */ &&
                     block.defaults[0] === oldName
                 ) {
                     block.defaults[0] = newName;
@@ -4420,32 +4534,27 @@ class Blocks {
          * @public
          * @returns expandable block
          */
-        this.insideExpandableBlock = blk => {
+        this.insideExpandableBlock = (blk, visited = new Set()) => {
             if (this.blockList[blk] == null) {
                 /** race condition? */
                 // eslint-disable-next-line no-console
                 console.debug("null block in blockList? " + blk);
                 return null;
-            } else if (this.blockList[blk].connections[0] == null) {
-                return null;
-            } else {
-                const cblk = this.blockList[blk].connections[0];
-                if (this.blockList[cblk].isExpandableBlock()) {
-                    /** If it is the last connection, keep searching. */
-                    if (
-                        this.blockList[cblk].isArgFlowClampBlock() ||
-                        this.blockList[cblk].isLeftClampBlock()
-                    ) {
-                        return cblk;
-                    } else if (blk === last(this.blockList[cblk].connections)) {
-                        return this.insideExpandableBlock(cblk);
-                    } else {
-                        return cblk;
-                    }
-                } else {
-                    return this.insideExpandableBlock(cblk);
-                }
             }
+            if (visited.has(blk)) return null;
+            visited.add(blk);
+
+            const block = this.blockList[blk];
+            if (!block || !block.connections || block.connections[0] == null) {
+                return null;
+            }
+
+            const parent = block.connections[0];
+            if (this.blockList[parent]?.isExpandableBlock?.()) {
+                return parent;
+            }
+
+            return this.insideExpandableBlock(parent, visited);
         };
 
         /**
@@ -4454,7 +4563,8 @@ class Blocks {
          * @public
          * @returns note block
          */
-        this._insideNoteBlock = blk => {
+        this._insideNoteBlock = (blk) => {
+            if (this._isUndoingMove) return;
             if (this.blockList[blk] == null) {
                 // eslint-disable-next-line no-console
                 console.debug("null block in blockList? " + blk);
@@ -5278,6 +5388,7 @@ class Blocks {
              * may still have playback blocks appended, which we will
              * remove.
              */
+            const beforeCount = this.blockList.length;
             let playbackQueueStartsHere = null;
             for (let b = 0; b < blockObjs.length; b++) {
                 const blkData = blockObjs[b];
@@ -5621,10 +5732,10 @@ class Blocks {
                                 // eslint-disable-next-line no-console
                                 console.debug(
                                     "last connection of " +
-                                        name +
-                                        " is " +
-                                        nextName +
-                                        ": adding hidden block"
+                                    name +
+                                    " is " +
+                                    nextName +
+                                    ": adding hidden block"
                                 );
                                 /** If the next block is not a hidden block, add one. */
                                 blockObjs[b][4][len - 1] = blockObjsLength + extraBlocksLength;
@@ -5759,10 +5870,10 @@ class Blocks {
                                 // eslint-disable-next-line no-console
                                 console.debug(
                                     "last connection of " +
-                                        name +
-                                        " is " +
-                                        nextName +
-                                        ": adding hidden block"
+                                    name +
+                                    " is " +
+                                    nextName +
+                                    ": adding hidden block"
                                 );
                                 /** If the next block is not a hidden block, add one. */
                                 blockObjs[b][4][2] = blockObjsLength + extraBlocksLength;
@@ -6523,7 +6634,7 @@ class Blocks {
                                     if (this.protoBlockDict[blockObjs[c][1][0]] !== undefined) {
                                         if (
                                             this.protoBlockDict[blockObjs[c][1][0]].dockTypes[
-                                                cc
+                                            cc
                                             ] !== "in"
                                         ) {
                                             flowBlock = false;
@@ -6539,7 +6650,7 @@ class Blocks {
                                         if (this.protoBlockDict[blockObjs[c][1]] !== undefined) {
                                             if (
                                                 this.protoBlockDict[blockObjs[c][1]].dockTypes[
-                                                    cc
+                                                cc
                                                 ] !== "out"
                                             ) {
                                                 flowBlock = false;
@@ -6632,6 +6743,37 @@ class Blocks {
                         }
                     }
                 }
+            }
+            const afterCount = this.blockList.length;
+            if (afterCount > beforeCount) {
+                const createdIndices = [];
+                for (let i = beforeCount; i < afterCount; i++) {
+                    const blk = this.blockList[i];
+                    if (blk) createdIndices.push(i);
+                }
+                UndoRedo.addAction(
+                    new Action(
+                        () => {
+                            createdIndices.forEach(index => {
+                                const blk = this.blockList[index];
+                                if (!blk) return;
+                                blk.trash = false;
+                                blk.show();
+                            });
+                            this.activity.refreshCanvas();
+                        },
+                        () => {
+                            for (let i = createdIndices.length - 1; i >= 0; i--) {
+                                const blk = this.blockList[createdIndices[i]];
+                                if (!blk) continue;
+                                blk.trash = true;
+                                blk.hide();
+                            }
+                            this.activity.refreshCanvas();
+                        },
+                        "Add blocks"
+                    )
+                );
             }
         };
 
@@ -6932,23 +7074,108 @@ class Blocks {
          */
         this.sendStackToTrash = myBlock => {
             /** First, hide the palettes as they may need updating. */
+            if (this._isUndoingMove) return;
+
+            const thisBlock = this.blockList.indexOf(myBlock);
+            if (thisBlock === -1 || myBlock.trash) {
+                return;
+            }
+
+            // Don't create undo/redo action if we're already in an undo/redo operation
+            const isUndoRedoOperation = this._isUndoingDelete || this._isRedoingDelete;
+
+            this.findDragGroup(thisBlock);
+            const deletedBlocks = [...this.dragGroup];
+
+            const snapshot = deletedBlocks.map(b => {
+                const blk = this.blockList[b];
+                return {
+                    index: b,
+                    x: blk.container.x,
+                    y: blk.container.y
+                };
+            });
+
+            // Store connections and other state before deletion
+            const fullSnapshot = deletedBlocks.map(b => {
+                const blk = this.blockList[b];
+                return {
+                    index: b,
+                    x: blk.container.x,
+                    y: blk.container.y,
+                    connections: [...blk.connections],
+                    argClampSlots: blk.argClampSlots ? [...blk.argClampSlots] : null
+                };
+            });
+
+            // Check if this is the top block of a stack (before we disconnect it)
+            // If so, we need to add it to trashStacks for restoration from trash can
+            const isTopBlock = myBlock.connections[0] === null;
+
+            // Only create undo/redo action if not already in an undo/redo operation
+            if (!isUndoRedoOperation) {
+                UndoRedo.addAction(
+                    new Action(
+                        // doFunc (redo) - delete blocks again
+                        () => {
+                            this._isRedoingDelete = true;
+                            deletedBlocks.forEach(b => {
+                                const blk = this.blockList[b];
+                                if (blk && !blk.trash) {
+                                    blk.trash = true;
+                                    blk.hide();
+                                }
+                            });
+                            // If this was a top block, add it back to trashStacks on redo
+                            if (isTopBlock && thisBlock !== -1) {
+                                if (this.trashStacks.indexOf(thisBlock) === -1) {
+                                    this.trashStacks.push(thisBlock);
+                                }
+                            }
+                            this._isRedoingDelete = false;
+                            this.activity.refreshCanvas();
+                        },
+                        // undoFunc (undo) - restore blocks
+                        () => {
+                            this._isUndoingDelete = true;
+                            fullSnapshot.forEach(b => {
+                                const blk = this.blockList[b.index];
+                                if (blk) {
+                                    blk.trash = false;
+                                    blk.show();
+                                    blk.container.x = b.x;
+                                    blk.container.y = b.y;
+                                    if (b.connections) {
+                                        blk.connections = [...b.connections];
+                                    }
+                                    if (b.argClampSlots) {
+                                        blk.argClampSlots = [...b.argClampSlots];
+                                        if (blk.updateArgSlots) {
+                                            blk.updateArgSlots(blk.argClampSlots);
+                                        }
+                                    }
+                                }
+                            });
+                            // If this was a top block, remove it from trashStacks on undo
+                            if (isTopBlock && thisBlock !== -1) {
+                                const trashIndex = this.trashStacks.indexOf(thisBlock);
+                                if (trashIndex !== -1) {
+                                    this.trashStacks.splice(trashIndex, 1);
+                                }
+                            }
+                            this._isUndoingDelete = false;
+                            this.activity.refreshCanvas();
+                        },
+                        "Delete Block"
+                    )
+                );
+            }
+
             for (const name in this.activity.palettes.dict) {
                 this.activity.palettes.dict[name].hideMenu(true);
             }
 
             this.activity.refreshCanvas();
-
-            const thisBlock = this.blockList.indexOf(myBlock);
-
-            /** Add this block to the list of blocks in the trash so we can undo this action. */
-            this.trashStacks.push(thisBlock);
-
-            // Cap the undo history to prevent unbounded memory growth.
-            // Keep the 100 most recent trashed stacks.
-            const MAX_TRASH_UNDO = 100;
-            if (this.trashStacks.length > MAX_TRASH_UNDO) {
-                this.trashStacks = this.trashStacks.slice(-MAX_TRASH_UNDO);
-            }
 
             /** Disconnect block. */
             const parentBlock = myBlock.connections[0];
@@ -7015,6 +7242,14 @@ class Blocks {
                 this.activity.refreshCanvas();
             }
 
+            // If this is the top block of a stack, add it to trashStacks for restoration from trash can
+            // Only do this if not in an undo/redo operation (to avoid duplicates)
+            if (isTopBlock && !isUndoRedoOperation && thisBlock !== -1) {
+                if (this.trashStacks.indexOf(thisBlock) === -1) {
+                    this.trashStacks.push(thisBlock);
+                }
+            }
+
             /** Adjust the stack from which we just deleted blocks. */
             if (parentBlock != null) {
                 const topBlk = this.findTopBlock(parentBlock);
@@ -7055,6 +7290,8 @@ class Blocks {
             this.activity.refreshCanvas();
             this.activity.trashcan.stopHighlightAnimation();
             document.getElementById("hideContents").click();
+
+
         };
 
         /***
