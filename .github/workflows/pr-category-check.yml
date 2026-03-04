@@ -27,11 +27,11 @@ jobs:
 
             // Category checkboxes mapped to their GitHub label names
             const categories = [
-              { label: 'Issue-Bug', emoji: '🐛', displayName: '🐛 Bug Fix', pattern: /- \[x\]\s*🐛\s*Bug Fix/i },
-              { label: 'Issue-Enhancement', emoji: '✨', displayName: '✨ Feature', pattern: /- \[x\]\s*✨\s*Feature/i },
-              { label: 'Issue-Performance', emoji: '⚡', displayName: '⚡ Performance', pattern: /- \[x\]\s*⚡\s*Performance/i },
-              { label: 'Issue-Testing', emoji: '🧪', displayName: '🧪 Tests', pattern: /- \[x\]\s*🧪\s*Tests/i },
-              { label: 'Issue-Documentation', emoji: '📝', displayName: '📝 Documentation', pattern: /- \[x\]\s*📝\s*Documentation/i },
+              { label: 'Issue-Bug', emoji: '🐛', displayName: '🐛 Bug Fix', pattern: /-\s*\[x\]\s*🐛\s*Bug Fix/i },
+              { label: 'Issue-Enhancement', emoji: '✨', displayName: '✨ Feature', pattern: /-\s*\[x\]\s*✨\s*Feature/i },
+              { label: 'Issue-Performance', emoji: '⚡', displayName: '⚡ Performance', pattern: /-\s*\[x\]\s*⚡\s*Performance/i },
+              { label: 'Issue-Testing', emoji: '🧪', displayName: '🧪 Tests', pattern: /-\s*\[x\]\s*🧪\s*Tests/i },
+              { label: 'Issue-Documentation', emoji: '📝', displayName: '📝 Documentation', pattern: /-\s*\[x\]\s*📝\s*Documentation/i },
             ];
 
             const checkedCategories = categories.filter(cat => cat.pattern.test(prBody));
