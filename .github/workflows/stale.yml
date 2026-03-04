@@ -9,7 +9,7 @@ jobs:
   stale:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/stale@v3
+      - uses: actions/stale@v9
         with:
           stale-pr-message: 'This pull request has been open for more than 60 days without any activity. It will be closed in 3 days unless the `stale` label is removed or commented on.'
           close-pr-message: 'Closed pull request due to inactivity for more than 63 days.'
