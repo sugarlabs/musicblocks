@@ -34,7 +34,7 @@ HTMLCanvasElement.prototype.getContext = function (type) {
         measureText: jest.fn(() => ({
             width: 0,
             actualBoundingBoxAscent: 0,
-            actualBoundingBoxDescent: 0,
+            actualBoundingBoxDescent: 0
         })),
         scale: jest.fn(),
         setTransform: jest.fn(),
@@ -45,6 +45,6 @@ HTMLCanvasElement.prototype.getContext = function (type) {
         lineWidth: 1,
         lineCap: "butt",
         font: "10px sans-serif",
-        canvas: this, // Use actual element reference instead of hardcoded dimensions
+        canvas: this // Use actual element reference instead of hardcoded dimensions
     };
 };
