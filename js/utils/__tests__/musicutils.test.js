@@ -161,7 +161,7 @@ describe("Temperament Functions", () => {
             [_("Equal (31EDO)"), "equal31", "equal31"],
             [_("5-limit Just Intonation"), "just intonation", "just intonation"],
             [_("Pythagorean (3-limit JI)"), "Pythagorean", "Pythagorean"],
-            [_ ("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
+            [_("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
             [_("Meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"],
             [_("custom"), "custom", "custom"]
         ]);
@@ -2491,16 +2491,15 @@ describe("frequencyToPitch - missing branches", () => {
 // ====== Added: numberToPitch - custom temperament ======
 describe("numberToPitch - custom temperament", () => {
     beforeEach(() => {
-
         // Avoid reassigning the imported TEMPERAMENT binding (it's a const import).
         // Instead, mutate the object so tests can add a custom temperament entry.
         if (typeof TEMPERAMENT === "object" && TEMPERAMENT !== null) {
             // Remove existing keys (keep the same object reference) and add our custom entry
-            Object.keys(TEMPERAMENT).forEach((k) => delete TEMPERAMENT[k]);
+            Object.keys(TEMPERAMENT).forEach(k => delete TEMPERAMENT[k]);
             TEMPERAMENT.myCustom = {
                 pitchNumber: 12,
                 0: [1, "C", 4],
-                1: [1.1, "C#", 4],
+                1: [1.1, "C#", 4]
             };
         } else {
             // If TEMPERAMENT isn't present as an object, fall back to attaching to global
@@ -2508,7 +2507,7 @@ describe("numberToPitch - custom temperament", () => {
                 myCustom: {
                     pitchNumber: 12,
                     0: [1, "C", 4],
-                    1: [1.1, "C#", 4],
+                    1: [1.1, "C#", 4]
                 }
             };
         }
@@ -2517,7 +2516,9 @@ describe("numberToPitch - custom temperament", () => {
         // We get the module object and spy on the exported function.
         const musicutils = require("../musicutils");
         if (musicutils && musicutils.isCustomTemperament) {
-            jest.spyOn(musicutils, "isCustomTemperament").mockImplementation((temp) => temp === "myCustom");
+            jest.spyOn(musicutils, "isCustomTemperament").mockImplementation(
+                temp => temp === "myCustom"
+            );
         }
     });
 
