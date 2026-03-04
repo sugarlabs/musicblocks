@@ -1,0 +1,113 @@
+name: PR Category Check
+
+# Ensures every PR has at least one category checkbox checked.
+# Automatically applies matching GitHub labels to the PR.
+# Uses pull_request_target so it works for fork PRs too (runs in base repo context).
+# This is safe because we only read the PR body from the event payload — no fork code is checked out or executed.
+
+on:
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  check-pr-category:
+    name: Validate PR Category & Auto-Label
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check categories and apply labels
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prBody = context.payload.pull_request.body || '';
+            const prNumber = context.payload.pull_request.number;
+
+            // Category checkboxes mapped to their GitHub label names
+            const categories = [
+              { label: 'Issue-Bug', emoji: '🐛', displayName: '🐛 Bug Fix', pattern: /- \[x\]\s*🐛\s*Bug Fix/i },
+              { label: 'Issue-Enhancement', emoji: '✨', displayName: '✨ Feature', pattern: /- \[x\]\s*✨\s*Feature/i },
+              { label: 'Issue-Performance', emoji: '⚡', displayName: '⚡ Performance', pattern: /- \[x\]\s*⚡\s*Performance/i },
+              { label: 'Issue-Testing', emoji: '🧪', displayName: '🧪 Tests', pattern: /- \[x\]\s*🧪\s*Tests/i },
+              { label: 'Issue-Documentation', emoji: '📝', displayName: '📝 Documentation', pattern: /- \[x\]\s*📝\s*Documentation/i },
+            ];
+
+            const checkedCategories = categories.filter(cat => cat.pattern.test(prBody));
+            const uncheckedCategories = categories.filter(cat => !cat.pattern.test(prBody));
+
+            // --- Step 1: Fail CI if no category is selected ---
+            if (checkedCategories.length === 0) {
+              const message = [
+                '## ❌ PR Category Required',
+                '',
+                'This pull request does not have any **PR Category** selected.',
+                'Please edit your PR description and check **at least one** category checkbox:',
+                '',
+                '| Category | Description |',
+                '|----------|-------------|',
+                '| 🐛 Bug Fix | Fixes a bug or incorrect behavior |',
+                '| ✨ Feature | Adds new functionality |',
+                '| ⚡ Performance | Improves performance |',
+                '| 🧪 Tests | Adds or updates test coverage |',
+                '| 📝 Documentation | Updates to docs, comments, or README |',
+                '',
+                'Example: Change `- [ ] 🐛 Bug Fix` to `- [x] 🐛 Bug Fix`',
+                '',
+                '> **Tip:** You can select multiple categories if your PR spans several areas.',
+              ].join('\n');
+
+              core.setFailed(message);
+              return;
+            }
+
+            // --- Step 2: Auto-apply labels for checked categories ---
+            const labelsToAdd = checkedCategories.map(cat => cat.label);
+            const labelsToRemove = uncheckedCategories.map(cat => cat.label);
+
+            // Get current labels on the PR
+            const { data: currentLabels } = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            const currentLabelNames = currentLabels.map(l => l.name);
+
+            // Add labels that are checked but not yet on the PR
+            for (const label of labelsToAdd) {
+              if (!currentLabelNames.includes(label)) {
+                try {
+                  await github.rest.issues.addLabels({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: prNumber,
+                    labels: [label],
+                  });
+                  core.info(`🏷️ Added label: "${label}"`);
+                } catch (error) {
+                  core.warning(`⚠️ Could not add label "${label}". Make sure it exists in the repo. Error: ${error.message}`);
+                }
+              }
+            }
+
+            // Remove labels that are unchecked but still on the PR
+            for (const label of labelsToRemove) {
+              if (currentLabelNames.includes(label)) {
+                try {
+                  await github.rest.issues.removeLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: prNumber,
+                    name: label,
+                  });
+                  core.info(`🗑️ Removed label: "${label}"`);
+                } catch (error) {
+                  core.warning(`⚠️ Could not remove label "${label}". Error: ${error.message}`);
+                }
+              }
+            }
+
+            const selected = checkedCategories.map(c => c.displayName).join(', ');
+            core.info(`✅ PR categories selected: ${selected}`);
+            core.info(`🏷️ Labels synced: ${labelsToAdd.join(', ')}`);

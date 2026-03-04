@@ -17,8 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const blockIsMacro = require("../macros");
-const getMacroExpansion = require("../macros");
+const { blockIsMacro, getMacroExpansion } = require("../macros");
 global._ = jest.fn(str => str);
 
 describe("blockIsMacro", () => {
@@ -34,6 +33,16 @@ describe("blockIsMacro", () => {
 
     test("should return false if block is neither in protoBlockDict nor BLOCKISMACRO", () => {
         expect(Boolean(blockIsMacro(mockActivity, "nonExistentBlock"))).toBe(false);
+    });
+    test("should return true if protoBlock has macroFunc even if not in builtin list", () => {
+        const mockFunc = jest.fn();
+        mockActivity.blocks.protoBlockDict["custom"] = { macroFunc: mockFunc };
+        expect(blockIsMacro(mockActivity, "custom")).toBe(true);
+    });
+
+    test("should return false if protoBlock exists but has no macroFunc", () => {
+        mockActivity.blocks.protoBlockDict["fake"] = {};
+        expect(blockIsMacro(mockActivity, "fake")).toBe(false);
     });
 });
 
@@ -61,5 +70,22 @@ describe("getMacroExpansion", () => {
 
     test("should return null for unknown macros", () => {
         expect(getMacroExpansion(mockActivity, "unknownMacro", 10, 20)).toBeNull();
+    });
+    test("protoBlock macroFunc should override builtin macro", () => {
+        const mockFunc = jest.fn(() => [["override"]]);
+        mockActivity.blocks.protoBlockDict["actionhelp"] = { macroFunc: mockFunc };
+
+        const expansion = getMacroExpansion(mockActivity, "actionhelp", 5, 10);
+        expect(expansion).toEqual([["override"]]);
+    });
+    test("should return null for namedbox even if in BUILTINMACROS", () => {
+        const result = getMacroExpansion(mockActivity, "namedbox", 0, 0);
+        expect(result).toBeNull();
+    });
+    test("builtin macro should use provided x and y coordinates", () => {
+        const expansion = getMacroExpansion(mockActivity, "archelp", 100, 200);
+
+        expect(expansion[0][2]).toBe(100);
+        expect(expansion[0][3]).toBe(200);
     });
 });

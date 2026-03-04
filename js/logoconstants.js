@@ -7,6 +7,7 @@
    exported
    DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY,
    OSCVOLUMEADJUSTMENT, TONEBPM, TARGETBPM, TURTLESTEP, NOTEDIV,
+   MIN_HIGHLIGHT_DURATION_MS,
    NOMICERRORMSG, NANERRORMSG, NOSTRINGERRORMSG, NOBOXERRORMSG,
    NOACTIONERRORMSG, NOINPUTERRORMSG, NOSQRTERRORMSG,
    ZERODIVIDEERRORMSG, EMPTYHEAPERRORMSG, INVALIDPITCH, POSNUMBER,
@@ -25,6 +26,8 @@ const TONEBPM = 240; // seems to be the default
 const TARGETBPM = 90; // what we'd like to use for beats per minute
 const TURTLESTEP = -1; // run in step-by-step mode
 const NOTEDIV = 8; // number of steps to divide turtle graphics
+/** Minimum time (ms) to keep a block highlighted during execution so users can see which block is active. */
+const MIN_HIGHLIGHT_DURATION_MS = 400;
 
 // These error messages don't need translation since they are
 // converted into artwork w/o text.
@@ -50,33 +53,38 @@ const NOTATIONROUNDDOWN = 4;
 const NOTATIONINSIDECHORD = 5; // deprecated
 const NOTATIONSTACCATO = 6;
 
+const exportsObj = {
+    DEFAULTVOLUME,
+    PREVIEWVOLUME,
+    DEFAULTDELAY,
+    OSCVOLUMEADJUSTMENT,
+    TONEBPM,
+    TARGETBPM,
+    TURTLESTEP,
+    NOTEDIV,
+    MIN_HIGHLIGHT_DURATION_MS,
+    NOMICERRORMSG,
+    NANERRORMSG,
+    NOSTRINGERRORMSG,
+    NOBOXERRORMSG,
+    NOACTIONERRORMSG,
+    NOINPUTERRORMSG,
+    NOSQRTERRORMSG,
+    ZERODIVIDEERRORMSG,
+    EMPTYHEAPERRORMSG,
+    POSNUMBER,
+    INVALIDPITCH,
+    NOTATIONNOTE,
+    NOTATIONDURATION,
+    NOTATIONDOTCOUNT,
+    NOTATIONTUPLETVALUE,
+    NOTATIONROUNDDOWN,
+    NOTATIONINSIDECHORD,
+    NOTATIONSTACCATO
+};
+
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = {
-        DEFAULTVOLUME,
-        PREVIEWVOLUME,
-        DEFAULTDELAY,
-        OSCVOLUMEADJUSTMENT,
-        TONEBPM,
-        TARGETBPM,
-        TURTLESTEP,
-        NOTEDIV,
-        NOMICERRORMSG,
-        NANERRORMSG,
-        NOSTRINGERRORMSG,
-        NOBOXERRORMSG,
-        NOACTIONERRORMSG,
-        NOINPUTERRORMSG,
-        NOSQRTERRORMSG,
-        ZERODIVIDEERRORMSG,
-        EMPTYHEAPERRORMSG,
-        POSNUMBER,
-        INVALIDPITCH,
-        NOTATIONNOTE,
-        NOTATIONDURATION,
-        NOTATIONDOTCOUNT,
-        NOTATIONTUPLETVALUE,
-        NOTATIONROUNDDOWN,
-        NOTATIONINSIDECHORD,
-        NOTATIONSTACCATO
-    };
+    module.exports = exportsObj;
+} else if (typeof window !== "undefined") {
+    Object.assign(window, exportsObj);
 }
