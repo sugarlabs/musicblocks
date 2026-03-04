@@ -205,23 +205,23 @@ const doAnalyzeProject = function () {
 };
 
 class Action {
-  constructor(doFunc, undoFunc, description = "") {
-    this.doFunc = doFunc;
-    this.undoFunc = undoFunc;
-    this.description = description;
-  }
-
-  undo() {
-    if (typeof this.undoFunc === "function") {
-      this.undoFunc();
+    constructor(doFunc, undoFunc, description = "") {
+        this.doFunc = doFunc;
+        this.undoFunc = undoFunc;
+        this.description = description;
     }
-  }
 
-  do() {
-    if (typeof this.doFunc === "function") {
-      this.doFunc();
+    undo() {
+        if (typeof this.undoFunc === "function") {
+            this.undoFunc();
+        }
     }
-  }
+
+    do() {
+        if (typeof this.doFunc === "function") {
+            this.doFunc();
+        }
+    }
 }
 
 /**
@@ -229,455 +229,463 @@ class Action {
  * Implements the Command pattern for undo/redo functionality.
  */
 class MoveBlockCommand {
-  constructor(blocks, blockIndices, oldPositions, newPositions, oldConnections, newConnections, oldArgClampSlots, newArgClampSlots) {
-    this.blocks = blocks;
-    this.blockIndices = blockIndices; // Array of block indices that were moved
-    this.oldPositions = oldPositions; // Map of index -> {x, y}
-    this.newPositions = newPositions; // Map of index -> {x, y}
-    this.oldConnections = oldConnections; // Map of index -> connections array
-    this.newConnections = newConnections; // Map of index -> connections array
-    this.oldArgClampSlots = oldArgClampSlots; // Map of index -> argClampSlots
-    this.newArgClampSlots = newArgClampSlots; // Map of index -> argClampSlots
-  }
-
-  /**
-   * Execute the command (redo) - move blocks to new positions
-   */
-  execute() {
-    this._restoreState(
-      this.newPositions,
-      this.newConnections,
-      this.newArgClampSlots
-    )
-  }
-
-  /**
-   * Undo the command - move blocks back to old positions
-   */
-  undo() {
-    this._restoreState(
-      this.oldPositions,
-      this.oldConnections,
-      this.oldArgClampSlots
-    )
-  }
-
-  _restoreState(positions, connections, argSlots) {
-    this.blocks._isUndoingMove = true;
-    this.blocks._isRebuildingLayout = false;
-    try {
-      // First, restore positions
-      for (const index of this.blockIndices) {
-        const blk = this.blocks.blockList[index];
-        const pos = positions.get(index);
-
-        if (!blk || blk.trash || !blk.container || !pos) continue;
-        blk.container.x = pos.x;
-        blk.container.y = pos.y;
-      }
-
-      // First disconnect current connections to avoid conflicts
-      for (const index of this.blockIndices) {
-        const blk = this.blocks.blockList[index];
-        if (!blk || blk.trash) continue;
-
-        // Disconnect from current parent
-        const currentParent = blk.connections[0];
-        if (currentParent != null && currentParent >= 0 && currentParent < this.blocks.blockList.length) {
-          const parentBlk = this.blocks.blockList[currentParent];
-          if (parentBlk && !parentBlk.trash && Array.isArray(parentBlk.connections)) {
-            for (let i = 1; i < parentBlk.connections.length; i++) {
-              if (parentBlk.connections[i] === index) {
-                parentBlk.connections[i] = null;
-                break;
-              }
-            }
-          }
-        }
-
-        // Disconnect from current children
-        if (Array.isArray(blk.connections)) {
-          for (let i = 1; i < blk.connections.length; i++) {
-            const childIndex = blk.connections[i];
-            if (childIndex != null && childIndex >= 0 && childIndex < this.blocks.blockList.length) {
-              const childBlk = this.blocks.blockList[childIndex];
-              if (childBlk && !childBlk.trash && childBlk.connections[0] === index) {
-                childBlk.connections[0] = null;
-              }
-            }
-          }
-        }
-      }
-
-      // Now restore connections arrays
-      for (const index of this.blockIndices) {
-        const blk = this.blocks.blockList[index];
-        const conn = connections.get(index);
-        if (!blk || blk.trash || !conn || !Array.isArray(conn)) continue;
-        blk.connections = [...conn];
-      }
-
-      // Restore bidirectional connections
-
-      for (const index of this.blockIndices) {
-        const blk = this.blocks.blockList[index];
-        if (!blk || blk.trash || !Array.isArray(blk.connections)) continue;
-
-        const oldConn = connections.get(index);
-        if (!oldConn) continue;
-
-        // Restore parent connection (bidirectional)
-        const parent = oldConn[0];
-        if (parent != null && parent >= 0 && parent < this.blocks.blockList.length) {
-          const parentBlk = this.blocks.blockList[parent];
-          if (parentBlk && !parentBlk.trash && Array.isArray(parentBlk.connections)) {
-            // Find which dock index in parent's old connections pointed to this block
-            // We need to check the parent's old connections if it was also moved
-            const oldParentConn = connections.get(parent);
-            let connectionRestored = false;
-
-            if (oldParentConn && Array.isArray(oldParentConn)) {
-              // Parent was also moved, use its old connections to find the right dock index
-              for (let i = 1; i < oldParentConn.length; i++) {
-                if (oldParentConn[i] === index) {
-                  parentBlk.connections[i] = index;
-                  // If parent is an expandable/clamp block, add it to clampBlocksToCheck
-                  if ((typeof parentBlk.isClampBlock === 'function' && parentBlk.isClampBlock()) ||
-                    (typeof parentBlk.isExpandableBlock === 'function' && parentBlk.isExpandableBlock())) {
-                  }
-                  connectionRestored = true;
-                  break;
-                }
-              }
-            }
-
-            // If parent wasn't moved or connection not found, search for the right slot
-            if (!connectionRestored) {
-              // Try to find where it should be connected based on connection type
-              // First check if it's already connected (shouldn't happen after disconnect, but safety check)
-              for (let i = 1; i < parentBlk.connections.length; i++) {
-                if (parentBlk.connections[i] === index) {
-                  // If parent is an expandable/clamp block, add it to clampBlocksToCheck
-                  if ((typeof parentBlk.isClampBlock === 'function' && parentBlk.isClampBlock()) ||
-                    (typeof parentBlk.isExpandableBlock === 'function' && parentBlk.isExpandableBlock())) {
-                  }
-                  connectionRestored = true;
-                  break;
-                }
-              }
-
-              // If still not found, find an appropriate empty slot
-              if (!connectionRestored) {
-                for (let i = 1; i < parentBlk.connections.length; i++) {
-                  if (parentBlk.connections[i] == null) {
-                    parentBlk.connections[i] = index;
-                    // If parent is an expandable/clamp block, add it to clampBlocksToCheck
-                    if (parentBlk.isClampBlock && parentBlk.isClampBlock() ||
-                      parentBlk.isExpandableBlock && parentBlk.isExpandableBlock()) {
-                    }
-                    break;
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        // Restore child connections (bidirectional)
-        for (let i = 1; i < oldConn.length; i++) {
-          const child = oldConn[i];
-          if (child != null && child >= 0 && child < this.blocks.blockList.length) {
-            const childBlk = this.blocks.blockList[child];
-            if (childBlk && !childBlk.trash) {
-              childBlk.connections[0] = index;
-            }
-          }
-        }
-      }
-
-      for (const index of this.blockIndices) {
-        const blk = this.blocks.blockList[index];
-        const slots = argSlots.get(index);
-        if (!blk || blk.trash || !slots) continue;
-        blk.argClampSlots = [...slots];
-        if (blk.updateArgSlots) {
-          blk.updateArgSlots(blk.argClampSlots);
-        }
-      }
-      
-      const topBlocks = new Set();
-      for (const index of this.blockIndices){
-        topBlocks.add(this.blocks.findTopBlock(index));
-      }
-      
-      this.blocks._isUndoingMove = true;
-      for (const top of topBlocks){
-        this.blocks.blockMoved(top);
-      }
-    } finally {
-      this.blocks._isUndoingMove = false;
-      this.blocks.activity.refreshCanvas();
+    constructor(blocks, blockIndices, oldPositions, newPositions, oldConnections, newConnections, oldArgClampSlots, newArgClampSlots, oldClampCounts, newClampCounts) {
+        this.blocks = blocks;
+        this.blockIndices = blockIndices; // Array of block indices that were moved
+        this.oldPositions = oldPositions; // Map of index -> {x, y}
+        this.newPositions = newPositions; // Map of index -> {x, y}
+        this.oldConnections = oldConnections; // Map of index -> connections array
+        this.newConnections = newConnections; // Map of index -> connections array
+        this.oldArgClampSlots = oldArgClampSlots; // Map of index -> argClampSlots
+        this.newArgClampSlots = newArgClampSlots; // Map of index -> argClampSlots
+        this.oldClampCounts = oldClampCounts; // Map of index -> clamp count
+        this.newClampCounts = newClampCounts; // Map of index -> clamp count
     }
-  }
+
+    /**
+     * Execute the command (redo) - move blocks to new positions
+     */
+    execute() {
+        this._restoreState(
+            this.newPositions,
+            this.newConnections,
+            this.newArgClampSlots,
+            this.newClampCounts
+        )
+    }
+
+    /**
+     * Undo the command - move blocks back to old positions
+     */
+    undo() {
+        this._restoreState(
+            this.oldPositions,
+            this.oldConnections,
+            this.oldArgClampSlots,
+            this.oldClampCounts
+        )
+    }
+
+    _restoreState(positions, connections, argSlots, clampCounts) {
+        this.blocks._isUndoingMove = true;
+        this.blocks._isRebuildingLayout = false;
+        try {
+            // First, restore positions
+            for (const index of this.blockIndices) {
+                const blk = this.blocks.blockList[index];
+                const pos = positions.get(index);
+                ``
+                if (!blk || blk.trash || !blk.container || !pos) continue;
+                blk.container.x = pos.x;
+                blk.container.y = pos.y;
+            }
+
+            // First disconnect current connections to avoid conflicts
+            for (const index of this.blockIndices) {
+                const blk = this.blocks.blockList[index];
+                if (!blk || blk.trash) continue;
+
+                // Disconnect from current parent
+                const currentParent = blk.connections[0];
+                if (currentParent != null && currentParent >= 0 && currentParent < this.blocks.blockList.length) {
+                    const parentBlk = this.blocks.blockList[currentParent];
+                    if (parentBlk && !parentBlk.trash && Array.isArray(parentBlk.connections)) {
+                        for (let i = 1; i < parentBlk.connections.length; i++) {
+                            if (parentBlk.connections[i] === index) {
+                                parentBlk.connections[i] = null;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // Disconnect from current children
+                if (Array.isArray(blk.connections)) {
+                    for (let i = 1; i < blk.connections.length; i++) {
+                        const childIndex = blk.connections[i];
+                        if (childIndex != null && childIndex >= 0 && childIndex < this.blocks.blockList.length) {
+                            const childBlk = this.blocks.blockList[childIndex];
+                            if (childBlk && !childBlk.trash && childBlk.connections[0] === index) {
+                                childBlk.connections[0] = null;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Now restore connections arrays
+            for (const index of this.blockIndices) {
+                const blk = this.blocks.blockList[index];
+                const conn = connections.get(index);
+                if (!blk || blk.trash || !conn || !Array.isArray(conn)) continue;
+                blk.connections = [...conn];
+            }
+
+            // Restore bidirectional connections
+
+            for (const index of this.blockIndices) {
+                const blk = this.blocks.blockList[index];
+                if (!blk || blk.trash || !Array.isArray(blk.connections)) continue;
+
+                const oldConn = connections.get(index);
+                if (!oldConn) continue;
+
+                // Restore parent connection (bidirectional)
+                const parent = oldConn[0];
+                if (parent != null && parent >= 0 && parent < this.blocks.blockList.length) {
+                    const parentBlk = this.blocks.blockList[parent];
+                    if (parentBlk && !parentBlk.trash && Array.isArray(parentBlk.connections)) {
+                        // Find which dock index in parent's old connections pointed to this block
+                        // We need to check the parent's old connections if it was also moved
+                        const oldParentConn = connections.get(parent);
+                        let connectionRestored = false;
+
+                        if (oldParentConn && Array.isArray(oldParentConn)) {
+                            // Parent was also moved, use its old connections to find the right dock index
+                            for (let i = 1; i < oldParentConn.length; i++) {
+                                if (oldParentConn[i] === index) {
+                                    parentBlk.connections[i] = index;
+                                    // If parent is an expandable/clamp block, add it to clampBlocksToCheck
+                                    if ((typeof parentBlk.isClampBlock === 'function' && parentBlk.isClampBlock()) ||
+                                        (typeof parentBlk.isExpandableBlock === 'function' && parentBlk.isExpandableBlock())) {
+                                    }
+                                    connectionRestored = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        // If parent wasn't moved or connection not found, search for the right slot
+                        if (!connectionRestored) {
+                            // Try to find where it should be connected based on connection type
+                            // First check if it's already connected (shouldn't happen after disconnect, but safety check)
+                            for (let i = 1; i < parentBlk.connections.length; i++) {
+                                if (parentBlk.connections[i] === index) {
+                                    // If parent is an expandable/clamp block, add it to clampBlocksToCheck
+                                    if ((typeof parentBlk.isClampBlock === 'function' && parentBlk.isClampBlock()) ||
+                                        (typeof parentBlk.isExpandableBlock === 'function' && parentBlk.isExpandableBlock())) {
+                                    }
+                                    connectionRestored = true;
+                                    break;
+                                }
+                            }
+
+                            // If still not found, find an appropriate empty slot
+                            if (!connectionRestored) {
+                                for (let i = 1; i < parentBlk.connections.length; i++) {
+                                    if (parentBlk.connections[i] == null) {
+                                        parentBlk.connections[i] = index;
+                                        // If parent is an expandable/clamp block, add it to clampBlocksToCheck
+                                        if (parentBlk.isClampBlock && parentBlk.isClampBlock() ||
+                                            parentBlk.isExpandableBlock && parentBlk.isExpandableBlock()) {
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Restore child connections (bidirectional)
+                for (let i = 1; i < oldConn.length; i++) {
+                    const child = oldConn[i];
+                    if (child != null && child >= 0 && child < this.blocks.blockList.length) {
+                        const childBlk = this.blocks.blockList[child];
+                        if (childBlk && !childBlk.trash) {
+                            childBlk.connections[0] = index;
+                        }
+                    }
+                }
+            }
+
+            for (const index of this.blockIndices) {
+                const blk = this.blocks.blockList[index];
+                const slots = argSlots.get(index);
+                if (!blk || blk.trash || !slots) continue;
+                blk.argClampSlots = [...slots];
+                if (blk.updateArgSlots) {
+                    blk.updateArgSlots(blk.argClampSlots);
+                }
+            }
+
+            // Restore clampCount
+            for (const index of this.blockIndices) {
+                const blk = this.blocks.blockList[index];
+                const savedClamp = clampCounts?.get(index);
+                if (!blk || blk.trash || !savedClamp) continue;
+
+                blk.clampCount = [...savedClamp];
+            }
+
+            for (const index of this.blockIndices) {
+                this.blocks.blockMoved(index);
+            }
+
+        } finally {
+            this.blocks._isUndoingMove = false;
+            this.blocks.activity.refreshCanvas();
+        }
+    }
 }
 
 class UndoRedoManager {
-  constructor() {
-    this.undoStack = [];
-    this.redoStack = [];
-  }
-
-  addAction(action) {
-    // Ensure stacks are arrays
-    if (!Array.isArray(this.undoStack)) {
-      this.undoStack = [];
-    }
-    if (!Array.isArray(this.redoStack)) {
-      this.redoStack = [];
-    }
-
-    this.undoStack.push(action);
-    this.redoStack = []; // Clear redo stack when new action is performed
-    this.updateButtons();
-  }
-
-  executeCommand(command) {
-    // Ensure stacks are arrays
-    if (!Array.isArray(this.undoStack)) {
-      this.undoStack = [];
-    }
-    if (!Array.isArray(this.redoStack)) {
-      this.redoStack = [];
-    }
-
-    // For command pattern - execute the command and add to undo stack
-    if (command && typeof command.execute === 'function') {
-      command.execute();
-      this.undoStack.push(command);
-      this.redoStack = []; // Clear redo stack when new action is performed
-      this.updateButtons();
-      if (globalActivity) {
-        try {
-          globalActivity.refreshCanvas();
-        } catch (e) {
-          console.error('Error refreshing canvas after executeCommand:', e);
-        }
-      }
-    } else {
-      console.warn('Invalid command passed to executeCommand');
-    }
-  }
-
-  undo() {
-    // Multiple safety checks to prevent execution when stack is empty
-    if (!Array.isArray(this.undoStack)) {
-      this.undoStack = [];
-      this.updateButtons();
-      return;
-    }
-
-    if (this.undoStack.length === 0) {
-      this.updateButtons();
-      return;
-    }
-
-    if (!this.canUndo()) {
-      this.updateButtons();
-      return;
-    }
-
-    const command = this.undoStack.pop();
-    if (!command) {
-      // Safety check - if pop returned undefined, something went wrong
-      this.updateButtons();
-      return;
-    }
-
-    try {
-      if (typeof command.undo !== 'function') {
-        console.warn('Command does not have undo method');
-        // Push back to stack to maintain consistency
-        if (!Array.isArray(this.undoStack)) {
-          this.undoStack = [];
-        }
-        this.undoStack.push(command);
-        this.updateButtons();
-        return;
-      }
-
-      // Execute undo
-      command.undo();
-
-      // Only push to redo stack if undo succeeded
-      if (!Array.isArray(this.redoStack)) {
-        this.redoStack = [];
-      }
-      this.redoStack.push(command);
-      this.updateButtons();
-
-      // Refresh canvas with error handling
-      if (globalActivity) {
-        try {
-          if (typeof globalActivity.refreshCanvas === 'function') {
-            globalActivity.refreshCanvas();
-          }
-        } catch (e) {
-          console.error('Error refreshing canvas after undo:', e);
-          // Don't crash, but try to recover
-          try {
-            if (globalActivity.stage && typeof globalActivity.stage.update === 'function') {
-              globalActivity.stage.update();
-            }
-          } catch (e2) {
-            console.error('Error updating stage during recovery:', e2);
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error during undo operation:', error);
-      // Push command back to undo stack on error to maintain consistency
-      this.undoStack.push(command);
-      // Try to refresh canvas anyway to prevent white screen
-      if (globalActivity) {
-        try {
-          if (typeof globalActivity.refreshCanvas === 'function') {
-            globalActivity.refreshCanvas();
-          } else if (globalActivity.stage && typeof globalActivity.stage.update === 'function') {
-            globalActivity.stage.update();
-          }
-        } catch (e) {
-          console.error('Error refreshing canvas during error recovery:', e);
-          // Last resort - try to update stage directly
-          try {
-            if (globalActivity.stage) {
-              globalActivity.stage.update();
-            }
-          } catch (e2) {
-            console.error('Critical error - unable to refresh display:', e2);
-          }
-        }
-      }
-    }
-  }
-
-  redo() {
-    // Multiple safety checks to prevent execution when stack is empty
-    if (!Array.isArray(this.redoStack)) {
-      this.redoStack = [];
-      this.updateButtons();
-      return;
-    }
-
-    if (this.redoStack.length === 0) {
-      this.updateButtons();
-      return;
-    }
-
-    if (!this.canRedo()) {
-      this.updateButtons();
-      return;
-    }
-
-    const command = this.redoStack.pop();
-    if (!command) {
-      // Safety check - if pop returned undefined, something went wrong
-      this.updateButtons();
-      return;
-    }
-
-    try {
-      // Handle both Command pattern (execute) and Action pattern (do)
-      let executed = false;
-      if (typeof command.execute === 'function') {
-        command.execute();
-        executed = true;
-      } else if (typeof command.do === 'function') {
-        command.do();
-        executed = true;
-      } else if (typeof command.doFunc === 'function') {
-        command.doFunc();
-        executed = true;
-      }
-
-      if (!executed) {
-        console.warn('Command does not have execute, do, or doFunc method');
-        // Push back to stack to maintain consistency
-        if (!Array.isArray(this.redoStack)) {
-          this.redoStack = [];
-        }
-        this.redoStack.push(command);
-        this.updateButtons();
-        return;
-      }
-
-      // Only push to undo stack if redo succeeded
-      if (!Array.isArray(this.undoStack)) {
+    constructor() {
         this.undoStack = [];
-      }
-      this.undoStack.push(command);
-      this.updateButtons();
-
-      // Refresh canvas with error handling
-      if (globalActivity) {
-        try {
-          if (typeof globalActivity.refreshCanvas === 'function') {
-            globalActivity.refreshCanvas();
-          }
-        } catch (e) {
-          console.error('Error refreshing canvas after redo:', e);
-          // Don't crash, but try to recover
-          try {
-            if (globalActivity.stage && typeof globalActivity.stage.update === 'function') {
-              globalActivity.stage.update();
-            }
-          } catch (e2) {
-            console.error('Error updating stage during recovery:', e2);
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error during redo operation:', error);
-      // Push command back to redo stack on error to maintain consistency
-      this.redoStack.push(command);
-      // Try to refresh canvas anyway to prevent white screen
-      if (globalActivity) {
-        try {
-          if (typeof globalActivity.refreshCanvas === 'function') {
-            globalActivity.refreshCanvas();
-          } else if (globalActivity.stage && typeof globalActivity.stage.update === 'function') {
-            globalActivity.stage.update();
-          }
-        } catch (e) {
-          console.error('Error refreshing canvas during error recovery:', e);
-          // Last resort - try to update stage directly
-          try {
-            if (globalActivity.stage) {
-              globalActivity.stage.update();
-            }
-          } catch (e2) {
-            console.error('Critical error - unable to refresh display:', e2);
-          }
-        }
-      }
+        this.redoStack = [];
     }
-  }
 
-  canUndo() {
-    // Robust check: ensure stack is an array and has items
-    return Array.isArray(this.undoStack) && this.undoStack.length > 0;
-  }
+    addAction(action) {
+        // Ensure stacks are arrays
+        if (!Array.isArray(this.undoStack)) {
+            this.undoStack = [];
+        }
+        if (!Array.isArray(this.redoStack)) {
+            this.redoStack = [];
+        }
 
-  canRedo() {
-    // Robust check: ensure stack is an array and has items
-    return Array.isArray(this.redoStack) && this.redoStack.length > 0;
-  }
-
-  updateButtons() {
-    // Update button states
-    if (globalActivity && globalActivity.toolbar) {
-      globalActivity.toolbar.updateUndoRedoButton();
+        this.undoStack.push(action);
+        this.redoStack = []; // Clear redo stack when new action is performed
+        this.updateButtons();
     }
-  }
+
+    executeCommand(command) {
+        // Ensure stacks are arrays
+        if (!Array.isArray(this.undoStack)) {
+            this.undoStack = [];
+        }
+        if (!Array.isArray(this.redoStack)) {
+            this.redoStack = [];
+        }
+
+        // For command pattern - execute the command and add to undo stack
+        if (command && typeof command.execute === 'function') {
+            command.execute();
+            this.undoStack.push(command);
+            this.redoStack = []; // Clear redo stack when new action is performed
+            this.updateButtons();
+            if (globalActivity) {
+                try {
+                    globalActivity.refreshCanvas();
+                } catch (e) {
+                    console.error('Error refreshing canvas after executeCommand:', e);
+                }
+            }
+        } else {
+            console.warn('Invalid command passed to executeCommand');
+        }
+    }
+
+    undo() {
+        // Multiple safety checks to prevent execution when stack is empty
+        if (!Array.isArray(this.undoStack)) {
+            this.undoStack = [];
+            this.updateButtons();
+            return;
+        }
+
+        if (this.undoStack.length === 0) {
+            this.updateButtons();
+            return;
+        }
+
+        if (!this.canUndo()) {
+            this.updateButtons();
+            return;
+        }
+
+        const command = this.undoStack.pop();
+        if (!command) {
+            // Safety check - if pop returned undefined, something went wrong
+            this.updateButtons();
+            return;
+        }
+
+        try {
+            if (typeof command.undo !== 'function') {
+                console.warn('Command does not have undo method');
+                // Push back to stack to maintain consistency
+                if (!Array.isArray(this.undoStack)) {
+                    this.undoStack = [];
+                }
+                this.undoStack.push(command);
+                this.updateButtons();
+                return;
+            }
+
+            // Execute undo
+            command.undo();
+
+            // Only push to redo stack if undo succeeded
+            if (!Array.isArray(this.redoStack)) {
+                this.redoStack = [];
+            }
+            this.redoStack.push(command);
+            this.updateButtons();
+
+            // Refresh canvas with error handling
+            if (globalActivity) {
+                try {
+                    if (typeof globalActivity.refreshCanvas === 'function') {
+                        globalActivity.refreshCanvas();
+                    }
+                } catch (e) {
+                    console.error('Error refreshing canvas after undo:', e);
+                    // Don't crash, but try to recover
+                    try {
+                        if (globalActivity.stage && typeof globalActivity.stage.update === 'function') {
+                            globalActivity.stage.update();
+                        }
+                    } catch (e2) {
+                        console.error('Error updating stage during recovery:', e2);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error during undo operation:', error);
+            // Push command back to undo stack on error to maintain consistency
+            this.undoStack.push(command);
+            // Try to refresh canvas anyway to prevent white screen
+            if (globalActivity) {
+                try {
+                    if (typeof globalActivity.refreshCanvas === 'function') {
+                        globalActivity.refreshCanvas();
+                    } else if (globalActivity.stage && typeof globalActivity.stage.update === 'function') {
+                        globalActivity.stage.update();
+                    }
+                } catch (e) {
+                    console.error('Error refreshing canvas during error recovery:', e);
+                    // Last resort - try to update stage directly
+                    try {
+                        if (globalActivity.stage) {
+                            globalActivity.stage.update();
+                        }
+                    } catch (e2) {
+                        console.error('Critical error - unable to refresh display:', e2);
+                    }
+                }
+            }
+        }
+    }
+
+    redo() {
+        // Multiple safety checks to prevent execution when stack is empty
+        if (!Array.isArray(this.redoStack)) {
+            this.redoStack = [];
+            this.updateButtons();
+            return;
+        }
+
+        if (this.redoStack.length === 0) {
+            this.updateButtons();
+            return;
+        }
+
+        if (!this.canRedo()) {
+            this.updateButtons();
+            return;
+        }
+
+        const command = this.redoStack.pop();
+        if (!command) {
+            // Safety check - if pop returned undefined, something went wrong
+            this.updateButtons();
+            return;
+        }
+
+        try {
+            // Handle both Command pattern (execute) and Action pattern (do)
+            let executed = false;
+            if (typeof command.execute === 'function') {
+                command.execute();
+                executed = true;
+            } else if (typeof command.do === 'function') {
+                command.do();
+                executed = true;
+            } else if (typeof command.doFunc === 'function') {
+                command.doFunc();
+                executed = true;
+            }
+
+            if (!executed) {
+                console.warn('Command does not have execute, do, or doFunc method');
+                // Push back to stack to maintain consistency
+                if (!Array.isArray(this.redoStack)) {
+                    this.redoStack = [];
+                }
+                this.redoStack.push(command);
+                this.updateButtons();
+                return;
+            }
+
+            // Only push to undo stack if redo succeeded
+            if (!Array.isArray(this.undoStack)) {
+                this.undoStack = [];
+            }
+            this.undoStack.push(command);
+            this.updateButtons();
+
+            // Refresh canvas with error handling
+            if (globalActivity) {
+                try {
+                    if (typeof globalActivity.refreshCanvas === 'function') {
+                        globalActivity.refreshCanvas();
+                    }
+                } catch (e) {
+                    console.error('Error refreshing canvas after redo:', e);
+                    // Don't crash, but try to recover
+                    try {
+                        if (globalActivity.stage && typeof globalActivity.stage.update === 'function') {
+                            globalActivity.stage.update();
+                        }
+                    } catch (e2) {
+                        console.error('Error updating stage during recovery:', e2);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error during redo operation:', error);
+            // Push command back to redo stack on error to maintain consistency
+            this.redoStack.push(command);
+            // Try to refresh canvas anyway to prevent white screen
+            if (globalActivity) {
+                try {
+                    if (typeof globalActivity.refreshCanvas === 'function') {
+                        globalActivity.refreshCanvas();
+                    } else if (globalActivity.stage && typeof globalActivity.stage.update === 'function') {
+                        globalActivity.stage.update();
+                    }
+                } catch (e) {
+                    console.error('Error refreshing canvas during error recovery:', e);
+                    // Last resort - try to update stage directly
+                    try {
+                        if (globalActivity.stage) {
+                            globalActivity.stage.update();
+                        }
+                    } catch (e2) {
+                        console.error('Critical error - unable to refresh display:', e2);
+                    }
+                }
+            }
+        }
+    }
+
+    canUndo() {
+        // Robust check: ensure stack is an array and has items
+        return Array.isArray(this.undoStack) && this.undoStack.length > 0;
+    }
+
+    canRedo() {
+        // Robust check: ensure stack is an array and has items
+        return Array.isArray(this.redoStack) && this.redoStack.length > 0;
+    }
+
+    updateButtons() {
+        // Update button states
+        if (globalActivity && globalActivity.toolbar) {
+            globalActivity.toolbar.updateUndoRedoButton();
+        }
+    }
 }
 
 // Global instance
@@ -2002,27 +2010,27 @@ class Activity {
             });
             modal.appendChild(cancelBtn);
 
-      document.body.appendChild(modal);
-    };
+            document.body.appendChild(modal);
+        };
 
-    document.addEventListener("keydown", (e) => {
-      // Handle undo/redo keyboard shortcuts
-      if (e.ctrlKey || e.metaKey) { // Ctrl on Windows/Linux, Cmd on Mac
-        if (e.key === "z" && !e.shiftKey) {
-          e.preventDefault(); // Prevent default browser undo
-          // Only undo if stack is not empty
-          if (window.UndoRedo && window.UndoRedo.canUndo()) {
-            window.UndoRedo.undo();
-          }
-        } else if (e.key === "y" || (e.shiftKey && e.key === "Z")) {
-          e.preventDefault(); // Prevent default browser redo
-          // Only redo if stack is not empty
-          if (window.UndoRedo && window.UndoRedo.canRedo()) {
-            window.UndoRedo.redo();
-          }
-        }
-      }
-    });
+        document.addEventListener("keydown", (e) => {
+            // Handle undo/redo keyboard shortcuts
+            if (e.ctrlKey || e.metaKey) { // Ctrl on Windows/Linux, Cmd on Mac
+                if (e.key === "z" && !e.shiftKey) {
+                    e.preventDefault(); // Prevent default browser undo
+                    // Only undo if stack is not empty
+                    if (window.UndoRedo && window.UndoRedo.canUndo()) {
+                        window.UndoRedo.undo();
+                    }
+                } else if (e.key === "y" || (e.shiftKey && e.key === "Z")) {
+                    e.preventDefault(); // Prevent default browser redo
+                    // Only redo if stack is not empty
+                    if (window.UndoRedo && window.UndoRedo.canRedo()) {
+                        window.UndoRedo.redo();
+                    }
+                }
+            }
+        });
 
 
         /*
@@ -2749,7 +2757,7 @@ class Activity {
             const changeText = () => {
                 const randomLoadMessage =
                     messages.load_messages[
-                        Math.floor(Math.random() * messages.load_messages.length)
+                    Math.floor(Math.random() * messages.load_messages.length)
                     ];
                 document.getElementById("messageText").innerHTML = randomLoadMessage + "...";
                 counter++;
@@ -3923,9 +3931,9 @@ class Activity {
                                         that.blocks.moveBlock(
                                             newBlock,
                                             (x || that.blocksContainer.x + 100) -
-                                                that.blocksContainer.x,
+                                            that.blocksContainer.x,
                                             (y || that.blocksContainer.y + 100) -
-                                                that.blocksContainer.y
+                                            that.blocksContainer.y
                                         );
                                     }
                                 );
@@ -5398,8 +5406,8 @@ class Activity {
                         console.log(
                             "%cMusic Blocks",
                             "font-size: 24px; font-weight: bold; font-family: sans-serif; padding:20px 0 0 110px; background: url(" +
-                                imgUrl +
-                                ") no-repeat;"
+                            imgUrl +
+                            ") no-repeat;"
                         );
                         // eslint-disable-next-line no-console
                         console.log(
@@ -5471,10 +5479,10 @@ class Activity {
                 typeof flags !== "undefined"
                     ? flags
                     : {
-                          run: false,
-                          show: false,
-                          collapse: false
-                      };
+                        run: false,
+                        show: false,
+                        collapse: false
+                    };
             this.loading = true;
             document.body.style.cursor = "wait";
             this.doLoadAnimation();
@@ -5837,9 +5845,8 @@ class Activity {
                                 [
                                     "nameddo",
                                     {
-                                        value: `V: ${parseInt(lineId) + 1} Line ${
-                                            staffBlocksMap[lineId]?.baseBlocks?.length + 1
-                                        }`
+                                        value: `V: ${parseInt(lineId) + 1} Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1
+                                            }`
                                     }
                                 ],
                                 0,
@@ -5848,12 +5855,12 @@ class Activity {
                                     staffBlocksMap[lineId].baseBlocks.length === 0
                                         ? null
                                         : staffBlocksMap[lineId].baseBlocks[
-                                              staffBlocksMap[lineId].baseBlocks.length - 1
-                                          ][0][
-                                              staffBlocksMap[lineId].baseBlocks[
-                                                  staffBlocksMap[lineId].baseBlocks.length - 1
-                                              ][0].length - 4
-                                          ][0],
+                                        staffBlocksMap[lineId].baseBlocks.length - 1
+                                        ][0][
+                                        staffBlocksMap[lineId].baseBlocks[
+                                            staffBlocksMap[lineId].baseBlocks.length - 1
+                                        ][0].length - 4
+                                        ][0],
                                     null
                                 ]
                             ],
@@ -5869,9 +5876,8 @@ class Activity {
                                 [
                                     "text",
                                     {
-                                        value: `V: ${parseInt(lineId) + 1} Line ${
-                                            staffBlocksMap[lineId]?.baseBlocks?.length + 1
-                                        }`
+                                        value: `V: ${parseInt(lineId) + 1} Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1
+                                            }`
                                     }
                                 ],
                                 0,
@@ -5906,14 +5912,14 @@ class Activity {
                     staffBlocksMap[staffIndex].startBlock.length - 3
                 ][4][2] =
                     staffBlocksMap[staffIndex].baseBlocks[0][0][
-                        staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4
+                    staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4
                     ][0];
                 // Update the first namedo block with settimbre
                 staffBlocksMap[staffIndex].baseBlocks[0][0][
                     staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4
                 ][4][0] =
                     staffBlocksMap[staffIndex].startBlock[
-                        staffBlocksMap[staffIndex].startBlock.length - 3
+                    staffBlocksMap[staffIndex].startBlock.length - 3
                     ][0];
                 const repeatblockids = staffBlocksMap[staffIndex].repeatArray;
                 for (const repeatId of repeatblockids) {
@@ -5925,7 +5931,7 @@ class Activity {
                             0,
                             [
                                 staffBlocksMap[staffIndex].startBlock[
-                                    staffBlocksMap[staffIndex].startBlock.length - 3
+                                staffBlocksMap[staffIndex].startBlock.length - 3
                                 ][0] /*setribmre*/,
                                 blockId + 1,
                                 staffBlocksMap[staffIndex].nameddoArray[staffIndex][0],
@@ -5934,8 +5940,8 @@ class Activity {
                                 ] === null
                                     ? null
                                     : staffBlocksMap[staffIndex].nameddoArray[staffIndex][
-                                          repeatId.end + 1
-                                      ]
+                                    repeatId.end + 1
+                                    ]
                             ]
                         ]);
                         staffBlocksMap[staffIndex].repeatBlock.push([
@@ -5969,7 +5975,7 @@ class Activity {
                             const secondnammedo = _searchIndexForMusicBlock(
                                 staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0],
                                 staffBlocksMap[staffIndex].nameddoArray[staffIndex][
-                                    repeatId.end + 1
+                                repeatId.end + 1
                                 ]
                             );
 
@@ -5992,13 +5998,13 @@ class Activity {
                         const prevnameddo = _searchIndexForMusicBlock(
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start - 1][0],
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                currentnammeddo
+                            currentnammeddo
                             ][4][0]
                         );
                         const afternamedo = _searchIndexForMusicBlock(
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                currentnammeddo
+                            currentnammeddo
                             ][4][1]
                         );
                         let prevrepeatnameddo = -1;
@@ -6006,17 +6012,17 @@ class Activity {
                             prevrepeatnameddo = _searchIndexForMusicBlock(
                                 staffBlocksMap[staffIndex].repeatBlock,
                                 staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                    currentnammeddo
+                                currentnammeddo
                                 ][4][0]
                             );
                         }
                         const prevBlockId =
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                currentnammeddo
+                            currentnammeddo
                             ][4][0];
                         const currentBlockId =
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                currentnammeddo
+                            currentnammeddo
                             ][0];
 
                         // Needs null checking optmizie
@@ -6030,7 +6036,7 @@ class Activity {
                             0,
                             [
                                 staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                    currentnammeddo
+                                currentnammeddo
                                 ][4][0],
                                 blockId + 1,
                                 currentBlockId,
@@ -7328,12 +7334,12 @@ class Activity {
                         return $j("<li></li>")
                             .append(
                                 '<img src="' +
-                                    (item.artwork || "") +
-                                    '" height = "20px">' +
-                                    "<a>" +
-                                    " " +
-                                    item.label +
-                                    "</a>"
+                                (item.artwork || "") +
+                                '" height = "20px">' +
+                                "<a>" +
+                                " " +
+                                item.label +
+                                "</a>"
                             )
                             .appendTo(ul.css("z-index", 35000));
                     };
@@ -7457,10 +7463,10 @@ class Activity {
             container.setAttribute(
                 "style",
                 "position: absolute; right:" +
-                    (document.body.clientWidth - x) +
-                    "px;  top: " +
-                    y +
-                    "px;"
+                (document.body.clientWidth - x) +
+                "px;  top: " +
+                y +
+                "px;"
             );
             document.getElementById("buttoncontainerBOTTOM").appendChild(container);
             return container;
@@ -8042,7 +8048,7 @@ class Activity {
             this.toolbar.renderJavaScriptIcon(toggleJSWindow);
             this.toolbar.renderLanguageSelectIcon(this.languageBox);
             this.toolbar.renderWrapIcon();
-      this.toolbar.renderUndoRedoButtons();
+            this.toolbar.renderUndoRedoButtons();
 
             initPalettes(this.palettes);
 
