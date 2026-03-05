@@ -857,7 +857,7 @@ Turtles.TurtlesView = class {
     makeBackground(setCollapsed) {
         const activity = this.activity;
 
-        const doCollapse = setCollapsed === undefined ? false : setCollapsed;
+        const _doCollapse = setCollapsed === undefined ? false : setCollapsed;
 
         const borderContainer = this.borderContainer;
 

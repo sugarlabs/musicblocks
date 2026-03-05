@@ -94,7 +94,7 @@ class Turtle {
     _createCache() {
         this.bounds = this.container.getBounds();
 
-        if (this.bounds == null) {
+        if (this.bounds === null) {
             setTimeout(() => {
                 this._createCache();
             }, 200);
@@ -115,7 +115,7 @@ class Turtle {
      * @async
      */
     async updateCache() {
-        if (this.bounds == null) {
+        if (this.bounds === null) {
             // eslint-disable-next-line no-console
             console.debug("Block container for " + this.name + " not yet ready.");
             await delayExecution(300);
@@ -132,7 +132,7 @@ class Turtle {
      * (if they have not been already changed).
      */
     stopBlink() {
-        if (this._blinkTimeout != null || !this._blinkFinished) {
+        if (this._blinkTimeout !== null || !this._blinkFinished) {
             clearTimeout(this._blinkTimeout);
             this._blinkTimeout = null;
 
@@ -655,7 +655,7 @@ Turtle.TurtleModel = class {
 
         const startBlock = this._startBlock;
         // Use the name on the label of the start block
-        if (startBlock != null) {
+        if (startBlock !== null) {
             startBlock.overrideName = this._name;
             startBlock.collapseText.text = this._name;
             startBlock.regenerateArtwork(false);
@@ -851,7 +851,7 @@ Turtle.TurtleView = class {
             this.container.hitArea = hitArea;
 
             const startBlock = this._startBlock;
-            if (startBlock != null) {
+            if (startBlock !== null) {
                 startBlock.container.removeChild(this._decorationBitmap);
                 this._decorationBitmap = new createjs.Bitmap(myImage);
                 startBlock.container.addChild(this._decorationBitmap);
@@ -959,7 +959,7 @@ Turtle.TurtleView = class {
             this._createCache();
 
             const startBlock = this._startBlock;
-            if (useTurtleArtwork && startBlock != null) {
+            if (useTurtleArtwork && startBlock !== null) {
                 startBlock.updateCache();
                 this._decorationBitmap = this._bitmap.clone();
                 startBlock.container.addChild(this._decorationBitmap);
