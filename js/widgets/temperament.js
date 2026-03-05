@@ -899,9 +899,10 @@ function TemperamentWidget() {
             pitchNumber2 = Number(docById("octaveOut").value);
             divisions = Number(docById("divisions").value);
 
-            // Validate input to prevent performance issues
+            // Validate input to prevent UI performance issues
+            // Limit to 200 divisions to prevent excessive DOM elements and slow rendering
             if (isNaN(divisions) || divisions < 1 || divisions > 200) {
-                throw new Error("Invalid divisions");
+                throw new Error("Invalid divisions: must be between 1 and 200");
             }
 
             this.tempRatios = this.ratios.slice();

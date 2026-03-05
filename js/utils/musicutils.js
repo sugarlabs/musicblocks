@@ -2354,8 +2354,10 @@ const addTemperamentToDictionary = (entryName, entryValue) => {
  * @returns {Object} Temperament object with interval ratios
  */
 const generateEqualTemperament = divisions => {
+    // Limit to 200 divisions to prevent UI performance issues
+    // Each division creates DOM elements in the temperament widget
     if (divisions < 1 || divisions > 200) {
-        throw new Error("Invalid number of divisions");
+        throw new Error("Invalid number of divisions: must be between 1 and 200");
     }
 
     const temperament = {
