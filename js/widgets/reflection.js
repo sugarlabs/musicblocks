@@ -307,6 +307,8 @@ class ReflectionMatrix {
             if (data.algorithm !== "unchanged") {
                 this.projectAlgorithm = data.algorithm; // update algorithm
                 this.code = code;
+            } else {
+                // No changes in algorithm detected
             }
             this.botReplyDiv(data, false, false);
         } else {

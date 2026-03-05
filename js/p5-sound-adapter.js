@@ -1,27 +1,22 @@
 /* global define, window */
 define(["p5.sound.min"], function () {
-    console.log("p5-sound-adapter: p5.sound loaded");
-
     // Restore AudioContext if it was overwritten
     if (window.OriginalAudioContext && window.AudioContext !== window.OriginalAudioContext) {
-        console.log("p5-sound-adapter: Restoring AudioContext");
         window.AudioContext = window.OriginalAudioContext;
     }
     if (
         window.OriginalWebkitAudioContext &&
         window.webkitAudioContext !== window.OriginalWebkitAudioContext
     ) {
-        console.log("p5-sound-adapter: Restoring webkitAudioContext");
         window.webkitAudioContext = window.OriginalWebkitAudioContext;
     }
 
     // Restore Tone.js
     if (window.OriginalTone) {
         if (window.Tone !== window.OriginalTone) {
-            console.log("p5-sound-adapter: Restoring MusicBlocks Tone.js");
             window.Tone = window.OriginalTone;
         } else {
-            console.log("p5-sound-adapter: Tone was not overwritten by p5.sound");
+            // p5.sound  is not overwriting by Tone
         }
     } else {
         console.warn("p5-sound-adapter: No OriginalTone to restore!");
@@ -36,10 +31,6 @@ define(["p5.sound.min"], function () {
 
         // Avoid double-patching if we already did it
         if (!currentConnect.isP5AdapterPatched) {
-            console.log(
-                "p5-sound-adapter: Forcing patch of AudioNode.prototype.connect to support chaining"
-            );
-
             window.AudioNode.prototype.connect = function () {
                 const result = currentConnect.apply(this, arguments);
                 // If the result is undefined (which breaks Tone.js chaining), return the destination (arguments[0])
@@ -51,8 +42,6 @@ define(["p5.sound.min"], function () {
 
             // Mark as patched
             window.AudioNode.prototype.connect.isP5AdapterPatched = true;
-        } else {
-            console.log("p5-sound-adapter: AudioNode.prototype.connect already patched");
         }
     }
 });
