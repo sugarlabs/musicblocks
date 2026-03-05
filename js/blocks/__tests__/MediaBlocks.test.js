@@ -205,6 +205,14 @@ describe("setupMediaBlocks", () => {
             expect(rightPosBlock.updateParameter()).toEqual(toFixed2(expected));
             expect(rightPosBlock.arg()).toEqual(expected);
         });
+        it("should return 0 for updateParameter and arg if canvas is null", () => {
+            const saved = activity.turtles._canvas;
+            activity.turtles._canvas = null;
+            const rightPosBlock = createdBlocks["rightpos"];
+            expect(rightPosBlock.updateParameter()).toEqual(0);
+            expect(rightPosBlock.arg()).toEqual(0);
+            activity.turtles._canvas = saved;
+        });
     });
 
     describe("LeftPosBlock", () => {
@@ -213,6 +221,14 @@ describe("setupMediaBlocks", () => {
             const expected = -1 * (800 / (2 * 1));
             expect(leftPosBlock.updateParameter()).toEqual(toFixed2(expected));
             expect(leftPosBlock.arg()).toEqual(expected);
+        });
+        it("should return 0 for updateParameter and arg if canvas is null", () => {
+            const saved = activity.turtles._canvas;
+            activity.turtles._canvas = null;
+            const leftPosBlock = createdBlocks["leftpos"];
+            expect(leftPosBlock.updateParameter()).toEqual(0);
+            expect(leftPosBlock.arg()).toEqual(0);
+            activity.turtles._canvas = saved;
         });
     });
 
@@ -223,6 +239,14 @@ describe("setupMediaBlocks", () => {
             expect(topPosBlock.updateParameter()).toEqual(toFixed2(expected));
             expect(topPosBlock.arg()).toEqual(expected);
         });
+        it("should return 0 for updateParameter and arg if canvas is null", () => {
+            const saved = activity.turtles._canvas;
+            activity.turtles._canvas = null;
+            const topPosBlock = createdBlocks["toppos"];
+            expect(topPosBlock.updateParameter()).toEqual(0);
+            expect(topPosBlock.arg()).toEqual(0);
+            activity.turtles._canvas = saved;
+        });
     });
 
     describe("BottomPosBlock", () => {
@@ -231,6 +255,14 @@ describe("setupMediaBlocks", () => {
             const expected = -1 * (600 / (2 * 1));
             expect(bottomPosBlock.updateParameter()).toEqual(toFixed2(expected));
             expect(bottomPosBlock.arg()).toEqual(expected);
+        });
+        it("should return 0 for updateParameter and arg if canvas is null", () => {
+            const saved = activity.turtles._canvas;
+            activity.turtles._canvas = null;
+            const bottomPosBlock = createdBlocks["bottompos"];
+            expect(bottomPosBlock.updateParameter()).toEqual(0);
+            expect(bottomPosBlock.arg()).toEqual(0);
+            activity.turtles._canvas = saved;
         });
     });
 
@@ -241,6 +273,14 @@ describe("setupMediaBlocks", () => {
             expect(widthBlock.updateParameter()).toEqual(toFixed2(expected));
             expect(widthBlock.arg()).toEqual(expected);
         });
+        it("should return 0 for updateParameter and arg if canvas is null", () => {
+            const saved = activity.turtles._canvas;
+            activity.turtles._canvas = null;
+            const widthBlock = createdBlocks["width"];
+            expect(widthBlock.updateParameter()).toEqual(0);
+            expect(widthBlock.arg()).toEqual(0);
+            activity.turtles._canvas = saved;
+        });
     });
 
     describe("HeightBlock", () => {
@@ -249,6 +289,14 @@ describe("setupMediaBlocks", () => {
             const expected = 600;
             expect(heightBlock.updateParameter()).toEqual(toFixed2(expected));
             expect(heightBlock.arg()).toEqual(expected);
+        });
+        it("should return 0 for updateParameter and arg if canvas is null", () => {
+            const saved = activity.turtles._canvas;
+            activity.turtles._canvas = null;
+            const heightBlock = createdBlocks["height"];
+            expect(heightBlock.updateParameter()).toEqual(0);
+            expect(heightBlock.arg()).toEqual(0);
+            activity.turtles._canvas = saved;
         });
     });
 
@@ -301,6 +349,14 @@ describe("setupMediaBlocks", () => {
             const speakBlock = createdBlocks["speak"];
             speakBlock.flow(["Hello world"], logo, turtleIndex, 400);
             expect(logo.processSpeak).toHaveBeenCalledWith("Hello world");
+        });
+        it("should push block id to embeddedGraphics if executed inside a note block", () => {
+            const turtle = activity.turtles.ithTurtle(turtleIndex);
+            turtle.singer.inNoteBlock = [999];
+            turtle.singer.embeddedGraphics[999] = [];
+            const speakBlock = createdBlocks["speak"];
+            speakBlock.flow(["Hello world"], logo, turtleIndex, 400);
+            expect(turtle.singer.embeddedGraphics[999]).toContain(400);
         });
     });
 
@@ -366,6 +422,15 @@ describe("setupMediaBlocks", () => {
             const result = toFrequencyBlock.arg(logo, turtleIndex, 440, null);
             expect(activity.errorMsg).toHaveBeenCalledWith("No input provided", 440);
         });
+        it("should use Japanese label when lang is ja", () => {
+            const orig = global.LeftBlock.prototype.lang;
+            global.LeftBlock.prototype.lang = "ja";
+            createdBlocks = {};
+            setupMediaBlocks(activity);
+            const toFrequencyBlock = createdBlocks["tofrequency"];
+            expect(toFrequencyBlock.config.argLabels[0]).toEqual("name2");
+            global.LeftBlock.prototype.lang = orig;
+        });
     });
 
     describe("TurtleShellBlock", () => {
@@ -420,6 +485,33 @@ describe("setupMediaBlocks", () => {
             const textBlock = createdBlocks["text"];
             const result = textBlock.arg(logo, turtleIndex, 620);
             expect(result).toEqual("hello world");
+        });
+    });
+    describe("Non-MusicBlocks Environment", () => {
+        beforeEach(() => {
+            global._THIS_IS_MUSIC_BLOCKS_ = false;
+        });
+
+        afterEach(() => {
+            global._THIS_IS_MUSIC_BLOCKS_ = true;
+        });
+
+        it("should use turtle terminology in help strings", () => {
+            const valueSpy = jest.spyOn(global.ValueBlock.prototype, "setHelpString");
+            const flowSpy = jest.spyOn(global.FlowBlock.prototype, "setHelpString");
+            setupMediaBlocks(activity);
+            const valueCalls = valueSpy.mock.calls;
+            const hasTurtleValueHelp = valueCalls.some(
+                call => call[0] && call[0][0] && call[0][0].includes("turtle moves")
+            );
+            expect(hasTurtleValueHelp).toBe(true);
+            const flowCalls = flowSpy.mock.calls;
+            const hasTurtleFlowHelp = flowCalls.some(
+                call => call[0] && call[0][0] && call[0][0].includes("appearance of the turtle")
+            );
+            expect(hasTurtleFlowHelp).toBe(true);
+            valueSpy.mockRestore();
+            flowSpy.mockRestore();
         });
     });
 });
