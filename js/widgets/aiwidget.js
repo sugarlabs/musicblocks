@@ -42,7 +42,7 @@ function AIWidget() {
     const SAMPLEANALYSERSIZE = 8192;
     const SAMPLEOSCCOLORS = ["#3030FF", "#FF3050"];
     let abcNotationSong = "";
-    var midiBuffer;
+    let midiBuffer;
     /**
      * Reference to the timbre block.
      * @type {number | null}
@@ -665,9 +665,8 @@ function AIWidget() {
                         staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3] = blockId;
                     }
                     if (afternamedo != -1) {
-                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
-                            afternamedo
-                        ][4][1] = null;
+                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][afternamedo][4][1] =
+                            null;
                     }
 
                     staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
@@ -782,7 +781,7 @@ function AIWidget() {
         widgetWindow.show();
 
         // For the button callbacks
-        var that = this;
+        const that = this;
 
         widgetWindow.onclose = () => {
             if (this.drawVisualIDs) {
@@ -794,10 +793,16 @@ function AIWidget() {
             this.running = false;
 
             docById("wheelDivptm").style.display = "none";
-            if (!this.pitchWheel === undefined) {
+            if (this._pitchWheel !== undefined) {
                 this._pitchWheel.removeWheel();
+            }
+            if (this._exitWheel !== undefined) {
                 this._exitWheel.removeWheel();
+            }
+            if (this._accidentalsWheel !== undefined) {
                 this._accidentalsWheel.removeWheel();
+            }
+            if (this._octavesWheel !== undefined) {
                 this._octavesWheel.removeWheel();
             }
             this.pitchAnalysers = {};
@@ -828,21 +833,17 @@ function AIWidget() {
         };
 
         this._save_lock = false;
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            ICONSIZE,
-            _("Save sample"),
-            ""
-        ).onclick = function () {
-            // Debounce button
-            if (!that._get_save_lock()) {
-                that._save_lock = true;
-                that._saveSample();
-                setTimeout(function () {
-                    that._save_lock = false;
-                }, 1000);
-            }
-        };
+        widgetWindow.addButton("export-chunk.svg", ICONSIZE, _("Save sample"), "").onclick =
+            function () {
+                // Debounce button
+                if (!that._get_save_lock()) {
+                    that._save_lock = true;
+                    that._saveSample();
+                    setTimeout(function () {
+                        that._save_lock = false;
+                    }, 1000);
+                }
+            };
 
         widgetWindow.sendToCenter();
         this.widgetWindow = widgetWindow;
@@ -873,10 +874,10 @@ function AIWidget() {
      * @returns {void}
      */
     this._playABCSong = function () {
-        var abc = abcNotationSong;
-        var stopAudioButton = document.querySelector(".stop-audio");
+        const abc = abcNotationSong;
+        const stopAudioButton = document.querySelector(".stop-audio");
 
-        var visualObj = ABCJS.renderAbc("*", abc, {
+        const visualObj = ABCJS.renderAbc("*", abc, {
             responsive: "resize"
         })[0];
 
@@ -890,7 +891,7 @@ function AIWidget() {
                 window.webkitAudioContext ||
                 navigator.mozAudioContext ||
                 navigator.msAudioContext;
-            var audioContext = new window.AudioContext();
+            const audioContext = new window.AudioContext();
             audioContext.resume().then(function () {
                 // In theory the AC shouldn't start suspended because it is being initialized in a click handler, but iOS seems to anyway.
 
@@ -917,13 +918,13 @@ function AIWidget() {
                     .catch(function (error) {
                         if (error.status === "NotSupported") {
                             stopAudioButton.setAttribute("style", "display:none;");
-                            var audioError = document.querySelector(".audio-error");
+                            const audioError = document.querySelector(".audio-error");
                             audioError.setAttribute("style", "");
                         } else console.warn("synth error", error);
                     });
             });
         } else {
-            var audioError = document.querySelector(".audio-error");
+            const audioError = document.querySelector(".audio-error");
             audioError.setAttribute("style", "");
         }
     };

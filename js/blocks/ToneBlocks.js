@@ -484,7 +484,13 @@ function setupToneBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Tremolo block adds a wavering effect."),
+                _("The Tremolo block adds a wavering effect.") +
+                    " " +
+                    _("Tremolo makes the sound pulse louder and quieter.") +
+                    " " +
+                    _("The rate controls how fast the sound pulses.") +
+                    " " +
+                    _("The depth controls the strength of the pulsing effect."),
                 "documentation",
                 null,
                 "tremolohelp"

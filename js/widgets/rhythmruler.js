@@ -398,10 +398,6 @@ class RhythmRuler {
          * @private
          */
         widgetWindow.onclose = () => {
-            // If the piemenu was open, close it.
-            // docById('wheelDiv').style.display = 'none';
-            // docById('contextWheelDiv').style.display = 'none';
-
             if (this._playing) {
                 this.__pause();
             }
@@ -424,9 +420,11 @@ class RhythmRuler {
             }
 
             // Look for any old entries that we may have missed.
+            // Use Set for O(1) lookup instead of Array.includes() O(n)
+            const drumsSet = new Set(drums);
             for (let i = 0; i < this._dissectHistory.length; i++) {
                 const drum = this._dissectHistory[i][1];
-                if (!drums.includes(drum)) {
+                if (!drumsSet.has(drum)) {
                     const history = JSON.parse(JSON.stringify(this._dissectHistory[i][0]));
                     dissectHistory.push([history, drum]);
                 }
@@ -479,25 +477,22 @@ class RhythmRuler {
          * @private
          * @returns {void}
          */
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            iconSize,
-            _("Save rhythms")
-        ).onclick = async () => {
-            // this._save(0);
-            // Debounce button
-            if (!this._get_save_lock()) {
-                this._save_lock = true;
+        widgetWindow.addButton("export-chunk.svg", iconSize, _("Save rhythms")).onclick =
+            async () => {
+                // this._save(0);
+                // Debounce button
+                if (!this._get_save_lock()) {
+                    this._save_lock = true;
 
-                // Save a merged version of the rulers.
-                this._saveTupletsMerged(this._mergeRulers());
+                    // Save a merged version of the rulers.
+                    this._saveTupletsMerged(this._mergeRulers());
 
-                // Rather than each ruler individually.
-                // this._saveTuplets(0);
-                await delayExecution(1000);
-                this._save_lock = false;
-            }
-        };
+                    // Rather than each ruler individually.
+                    // this._saveTuplets(0);
+                    await delayExecution(1000);
+                    this._save_lock = false;
+                }
+            };
 
         /**
          * Event handler for the click event of the save drum machine button.
@@ -505,74 +500,48 @@ class RhythmRuler {
          * @private
          * @returns {void}
          */
-        widgetWindow.addButton(
-            "export-drums.svg",
-            iconSize,
-            _("Save drum machine")
-        ).onclick = async () => {
-            // Debounce button
-            if (!this._get_save_lock()) {
-                this._save_lock = true;
-                this._saveMachine(0);
-                await delayExecution(1000);
-                this._save_lock = false;
-            }
-        };
+        widgetWindow.addButton("export-drums.svg", iconSize, _("Save drum machine")).onclick =
+            async () => {
+                // Debounce button
+                if (!this._get_save_lock()) {
+                    this._save_lock = true;
+                    this._saveMachine(0);
+                    await delayExecution(1000);
+                    this._save_lock = false;
+                }
+            };
 
         // An input for setting the dissect number
         this._dissectNumber = widgetWindow.addInputButton("2");
 
-        this._dissectNumber.onfocus = () => {
-            // this._piemenuNumber(['2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16'], numberInput.value);
-        };
+        // Make the input editable and handle keyboard input
+        this._dissectNumber.readOnly = false;
+        this._dissectNumber.classList.add("hasKeyboard");
+        this._dissectNumber.style.cursor = "text";
 
-        this._dissectNumber.onkeydown = event => {
-            if (event.keyCode === RhythmRuler.DEL) {
-                this._dissectNumber.value = this._dissectNumber.value.substring(
-                    0,
-                    this._dissectNumber.value.length - 1
-                );
-            }
-            if (event.keyCode === RhythmRuler.BACK) {
-                // Get the cursor position
-                const cursorPosition = this._dissectNumber.selectionStart;
-                // If there is a selection, delete the selected text
-                if (this._dissectNumber.selectionStart !== this._dissectNumber.selectionEnd) {
-                    const start = this._dissectNumber.selectionStart;
-                    const end = this._dissectNumber.selectionEnd;
-                    this._dissectNumber.value =
-                        this._dissectNumber.value.substring(0, start) +
-                        this._dissectNumber.value.substring(start, end + 1);
-                } else if (this._dissectNumber.value.length == 1 && cursorPosition == 1) {
-                    // If there is only a single digit in the input then replace it with an empty string
-                    this._dissectNumber.value = "";
-                } else if (cursorPosition > 0) {
-                    // If there is no selection and the cursor is not at the beginning, delete the character before the cursor
-                    const newValue =
-                        this._dissectNumber.value.substring(0, cursorPosition) +
-                        this._dissectNumber.value.substring(
-                            cursorPosition,
-                            this._dissectNumber.value
-                        );
-                    this._dissectNumber.value = newValue;
+        // Handle Enter key to validate and blur (prevent any play action)
+        this._dissectNumber.addEventListener("keydown", event => {
+            if (event.keyCode === 13 || event.key === "Enter") {
+                event.preventDefault();
+                event.stopPropagation();
+                const inputValue = parseInt(this._dissectNumber.value);
+                if (!isNaN(inputValue) && inputValue > 0) {
+                    // Validate the input value - allow any number from 2 to 128
+                    const validatedValue = Math.min(Math.max(inputValue, 2), 128);
+                    this._dissectNumber.value = validatedValue;
                 }
-                // If the cursor is at the beginning, do nothing
+                this._dissectNumber.blur();
             }
-        };
+        });
 
         /**
-         * Event handler for the input event of the dissect number input.
-         * Limits the dissect number value to the range 2 to 128.
+         * Event handler for the click event of the dissect number input.
+         * Shows a pie menu for selecting the rhythm division number.
          * @private
          * @returns {void}
          */
-        this._dissectNumber.oninput = () => {
-            // Put a limit on the size (2 <--> 128).
-            this._dissectNumber.onmouseout = () => {
-                this._dissectNumber.value = Math.max(this._dissectNumber.value, 2);
-            };
-
-            this._dissectNumber.value = Math.max(Math.min(this._dissectNumber.value, 128), 2);
+        this._dissectNumber.onclick = () => {
+            this._showDissectNumberPieMenu();
         };
 
         /**
@@ -666,7 +635,7 @@ class RhythmRuler {
                                 this._startingTime = null;
                                 this._elapsedTimes[id] = 0;
                                 this._offsets[id] = 0;
-                                setTimeout(this._calculateZebraStripes(id), 1000);
+                                setTimeout(() => this._calculateZebraStripes(id), 1000);
                             }
                         } else if (this._playingOne === false) {
                             this._rulerSelected = id;
@@ -814,7 +783,6 @@ class RhythmRuler {
         }
 
         activity.textMsg(_("Click on the ruler to divide it."), 3000);
-        // this._piemenuRuler(this._rulerSelected);
     }
 
     /**
@@ -862,6 +830,16 @@ class RhythmRuler {
                 });
             }
         });
+    }
+
+    /**
+     * Shows a pie menu for selecting the rhythm dissect number.
+     * Displays different options based on beginner mode.
+     * @private
+     * @returns {void}
+     */
+    _showDissectNumberPieMenu() {
+        piemenuDissectNumber(this);
     }
 
     /**
@@ -964,14 +942,18 @@ class RhythmRuler {
                 if (this.Drums[this._rulerSelected] === null) {
                     drum = "snare drum";
                 } else {
-                    const drumBlockNo = this.activity.blocks.blockList[
-                        this.Drums[this._rulerSelected]
-                    ].connections[1];
+                    const drumBlockNo =
+                        this.activity.blocks.blockList[this.Drums[this._rulerSelected]]
+                            .connections[1];
                     drum = this.activity.blocks.blockList[drumBlockNo].value;
                 }
 
-                // FIXME: Should be based on meter
-                for (let i = 0; i < 4; i++) {
+                // Get the meter from the current turtle's singer
+                const turtle = this.activity.turtles.ithTurtle(0);
+                const beatsPerMeasure = turtle.singer.beatsPerMeasure || 4;
+
+                // Play count-off based on meter (e.g., 4 beats for 4/4, 3 beats for 3/4)
+                for (let i = 0; i < beatsPerMeasure; i++) {
                     setTimeout(() => {
                         this.activity.logo.synth.trigger(
                             0,
@@ -981,7 +963,7 @@ class RhythmRuler {
                             null,
                             null
                         );
-                    }, (interval * i) / 4);
+                    }, (interval * i) / beatsPerMeasure);
                 }
 
                 setTimeout(() => {
@@ -1001,8 +983,6 @@ class RhythmRuler {
             this._rulerSelected = cell.parentNode.getAttribute("data-row");
             this.__dissectByNumber(cell, inputNum, true);
         }
-
-        // this._piemenuRuler(this._rulerSelected);
 
         //Save dissect history everytime user dissects ruler
         this.saveDissectHistory();
@@ -1365,8 +1345,6 @@ class RhythmRuler {
 
             divisionHistory.push(cell.cellIndex);
         }
-
-        // this._piemenuRuler(this._rulerSelected);
     }
 
     /**
@@ -1422,8 +1400,6 @@ class RhythmRuler {
 
             this._calculateZebraStripes(this._rulerSelected);
         }
-
-        // this._piemenuRuler(this._rulerSelected);
     }
 
     /**
@@ -1493,8 +1469,6 @@ class RhythmRuler {
 
             this._calculateZebraStripes(this._rulerSelected);
         }
-
-        // this._piemenuRuler(this._rulerSelected);
     }
 
     /**
@@ -1520,8 +1494,6 @@ class RhythmRuler {
             this._rulerSelected = cell.parentNode.getAttribute("data-row");
             this.__tie(true);
         }
-
-        // this._piemenuRuler(this._rulerSelected);
     }
 
     /**
@@ -1742,8 +1714,6 @@ class RhythmRuler {
 
         divisionHistory.pop();
         this._calculateZebraStripes(lastRuler);
-
-        // this._piemenuRuler(this._rulerSelected);
     }
 
     /**
@@ -1791,8 +1761,6 @@ class RhythmRuler {
                 this._undo();
             }
         }
-
-        // this._piemenuRuler(this._rulerSelected);
     }
 
     /**
@@ -2252,8 +2220,8 @@ class RhythmRuler {
         if (this.Drums[selectedRuler] === null) {
             drum = "snare drum";
         } else {
-            const drumBlockNo = this.activity.blocks.blockList[this.Drums[selectedRuler]]
-                .connections[1];
+            const drumBlockNo =
+                this.activity.blocks.blockList[this.Drums[selectedRuler]].connections[1];
             drum = this.activity.blocks.blockList[drumBlockNo].value;
         }
 
@@ -2757,64 +2725,17 @@ class RhythmRuler {
         }
 
         // Look for any old entries that we may have missed.
+        // Use Set for O(1) lookup instead of Array.includes() O(n)
+        const drumsSet = new Set(drums);
         for (let i = 0; i < this._dissectHistory.length; i++) {
             drum = this._dissectHistory[i][1];
-            if (!drums.includes(drum)) {
+            if (!drumsSet.has(drum)) {
                 history = JSON.parse(JSON.stringify(this._dissectHistory[i][0]));
                 dissectHistory.push([history, drum]);
             }
         }
 
         this._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
-    }
-
-    _piemenuRuler() {
-        return; // In progress
-        /*
-        // piemenu version of ruler
-        docById('wheelDiv2').style.display = '';
-        docById('wheelDiv2').style.position = 'absolute';
-        docById('wheelDiv2').style.left = '600px';
-        docById('wheelDiv2').style.top = '300px';
-
-        if (selectedRuler === undefined) {
-            selectedRuler = 0;
-        }
-
-        if (this._wheel !== null) {
-            this._wheel.removeWheel();
-        }
-
-        console.debug(this.Rulers[selectedRuler]);
-        this._wheel = new wheelnav('wheelDiv2', null, 600, 600);
-        this._wheel.wheelRadius = 200;
-        this._wheel.maxPercent = 1.6;
-        this._wheel.colors = [platformColor.selectorBackground, platformColor.selectorSelected];
-        this._wheel.navItemsContinuous = true;
-        this._wheel.markerPathFunction = markerPath().PieLineMarker;
-        this._wheel.clickModeRotate = false;
-        this._wheel.markerEnable = true;
-        this._wheel.slicePathFunction = slicePath().DonutSlice;
-        this._wheel.slicePathCustom = slicePath().DonutSliceCustomization();
-
-        let labels = [];
-        for (let i = 0; i < this.Rulers[selectedRuler][0].length; i++) {
-            if (this.Rulers[selectedRuler][0][i] < 17 && this.Rulers[selectedRuler][0][i] > 0) {
-                labels.push('1/' + this.Rulers[selectedRuler][0][i]);
-            } else {
-                labels.push(' ');
-            }
-        }
-
-        console.debug(labels);
-        this._wheel.initWheel(labels);
-
-        for (let i = 0; i < this.Rulers[selectedRuler][0].length; i++) {
-            this._wheel.navItems[i].sliceAngle = 360 / Math.abs(this.Rulers[selectedRuler][0][i]);
-        }
-
-        this._wheel.createWheel();
-        */
     }
 
     /**
@@ -2845,4 +2766,7 @@ class RhythmRuler {
             docById("wheelDiv").style.top = y - 300 + "px";
         }
     }
+}
+if (typeof module !== "undefined") {
+    module.exports = RhythmRuler;
 }

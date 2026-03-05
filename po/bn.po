@@ -2151,11 +2151,11 @@ msgstr ""
 #: js/SaveInterface.js:93
 #: js/languagebox.js:208
 msgid "Refresh your browser to change your language preference."
-msgstr ""
+msgstr "ভাষা পরিবর্তন করতে আপনার ব্রাউজার রিফ্রেশ করুন।"
 
 #: js/languagebox.js:229
 msgid "Music Blocks is already set to this language."
-msgstr ""
+msgstr "মিউজিক ব্লকস ইতিমধ্যে এই ভাষায় সেট করা আছে।"
 
 #: js/planetInterface.js:131
 msgid "project undefined"
@@ -2211,14 +2211,14 @@ msgstr ""
 #: js/widgets/rhythmruler.js:2508
 #: js/widgets/phrasemaker.js:4996
 msgid "action"
-msgstr ""
+msgstr "অ্যাকশন"
 
 #: js/macros.js:711
 #: js/utils/musicutils.js:1157
 #: js/utils/synthutils.js:204
 #. TRANS: animal sound effect
 msgid "duck"
-msgstr ""
+msgstr "হাঁস"
 
 #: js/themebox.js:66
 msgid "Music Blocks is already set to this theme."
@@ -2228,7 +2228,7 @@ msgstr ""
 #: js/SaveInterface.js:61
 #: js/SaveInterface.js:93
 msgid "Music Blocks Project"
-msgstr ""
+msgstr "মিউজিক ব্লকস প্রজেক্ট"
 
 #: js/SaveInterface.js:63
 msgid "This project was created in Music Blocks"
@@ -2267,11 +2267,11 @@ msgstr ""
 #: js/blocks.js:5091
 #: js/blocks/MediaBlocks.js:888
 msgid "Show"
-msgstr ""
+msgstr "দেখাও"
 
 #: js/SaveInterface.js:91
 msgid "Hide"
-msgstr ""
+msgstr "লুকিয়ে রাখো"
 
 #: js/SaveInterface.js:131
 #: js/SaveInterface.js:204
@@ -2285,12 +2285,12 @@ msgstr ""
 #: planet/js/ProjectStorage.js:27
 #. TRANS: default project title when saving as Lilypond
 msgid "My Project"
-msgstr ""
+msgstr "আমার প্রজেক্ট"
 
 #: js/SaveInterface.js:197
 #: planet/js/SaveInterface.js:58
 msgid "No description provided"
-msgstr ""
+msgstr "কোনো বর্ণনা দেওয়া হয়নি"
 
 #: js/SaveInterface.js:346
 msgid "Your recording is in progress."
@@ -2299,13 +2299,13 @@ msgstr ""
 #: js/SaveInterface.js:415
 #. TRANS: File name prompt for save as Lilypond
 msgid "File name"
-msgstr ""
+msgstr "ফাইলের নাম"
 
 #: js/SaveInterface.js:417
 #: planet/js/StringHelper.js:39
 #. TRANS: Project title prompt for save as Lilypond
 msgid "Project title"
-msgstr ""
+msgstr "প্রজেক্টের শিরোনাম"
 
 #: js/SaveInterface.js:419
 #. TRANS: Project title prompt for save as Lilypond
@@ -2347,7 +2347,7 @@ msgstr ""
 #: js/blocks/EnsembleBlocks.js:1283
 #. TRANS: default project author when saving as Lilypond
 msgid "Mr. Mouse"
-msgstr ""
+msgstr "মিস্টার মাউস"
 
 #: js/SaveInterface.js:589
 msgid "The Lilypond code is copied to clipboard. You can paste it here: "
@@ -2356,7 +2356,7 @@ msgstr ""
 #: js/activity.js:411
 #: js/activity.js:416
 msgid "Search for blocks"
-msgstr ""
+msgstr "ব্লক খুঁজুন"
 
 #: js/activity.js:1358
 msgid "Are you sure you want to clear the workspace?"
@@ -2364,7 +2364,7 @@ msgstr ""
 
 #: js/activity.js:1577
 msgid "Enter file name"
-msgstr ""
+msgstr "ফাইলের নাম লিখুন"
 
 #: js/activity.js:1579
 msgid "File save canceled"
@@ -2533,11 +2533,11 @@ msgstr ""
 #: js/turtledefs.js:708
 #: planet/js/LocalCard.js:31
 msgid "Copy"
-msgstr ""
+msgstr "কপি"
 
 #: js/activity.js:3052
 msgid "Erase"
-msgstr ""
+msgstr "মুছে ফেলুন"
 
 #: js/activity.js:3056
 #: js/activity.js:3072
@@ -2634,12 +2634,12 @@ msgstr ""
 #: plugins/rodi.rtp:73
 #: plugins/rodi.rtp:413
 msgid "Stop"
-msgstr "ধাপ"
+msgstr "থামুন"
 
 #: js/activity.js:3084
 #: js/activity.js:3106
 msgid "Paste"
-msgstr ""
+msgstr "পেস্ট"
 
 #: js/activity.js:3088
 msgid "Save block help"
@@ -2723,7 +2723,7 @@ msgstr ""
 #: js/activity.js:6201
 #: js/turtledefs.js:756
 msgid "Home"
-msgstr ""
+msgstr "হোম"
 
 #: js/activity.js:6209
 #: js/turtledefs.js:762
@@ -2831,7 +2831,7 @@ msgstr ""
 #: js/blocks/IntervalsBlocks.js:1464
 #. TRANS: mode, e.g., Major in C Major
 msgid "mode"
-msgstr ""
+msgstr "মোড"
 
 #: js/block.js:1646
 msgid "slider"
@@ -3289,7 +3289,7 @@ msgstr ""
 #: js/turtledefs.js:240
 #: planet/js/GlobalTag.js:48
 #. TRANS: On the Planet, we use labels to tag projects.
-msgid "Sensors"
+msgid "sensors"
 msgstr ""
 
 #: js/rubrics.js:532
@@ -3298,7 +3298,7 @@ msgstr ""
 #: js/blocks/MediaBlocks.js:930
 #: planet/js/GlobalTag.js:46
 #. TRANS: On the Planet, we use labels to tag projects.
-msgid "Media"
+msgid "media"
 msgstr ""
 
 #: js/rubrics.js:533
@@ -4177,7 +4177,7 @@ msgid "Expand/collapse option toolbar"
 msgstr ""
 
 #: js/turtledefs.js:587
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxiliary toolbar."
 msgstr ""
 
 #: js/turtledefs.js:593

@@ -104,7 +104,6 @@ class LocalCard {
     render() {
         const Planet = this.Planet;
 
-        // TODO: Have a TB placeholder image specific to TB projects
         const html = this.renderData.replace(new RegExp("{ID}", "g"), this.id);
         const frag = document.createRange().createContextualFragment(html);
 
@@ -176,7 +175,6 @@ class LocalCard {
             frag.getElementById(`local-project-cloud-${this.id}`).style.display = "initial";
             // eslint-disable-next-line no-unused-vars
             frag.getElementById(`local-project-cloud-${this.id}`).addEventListener("click", evt => {
-                // TODO: Implement view-published-project thing
                 document.getElementById("global-tab").click();
                 Planet.GlobalPlanet.forceAddToCache(this.id, () => {
                     Planet.GlobalPlanet.ProjectViewer.open(this.id);

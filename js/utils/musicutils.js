@@ -54,7 +54,8 @@
   addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
   DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
   INTERVALVALUES, getIntervalRatio, frequencyToPitch, NOTESTEP,
-  GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP
+  GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
+  SEMITONES
 */
 
 /**
@@ -842,6 +843,19 @@ const DEGREES = _("1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th");
 const SEMITONES = 12;
 
 /**
+ * Number of cents per semitone in 12-TET tuning.
+ * @constant {number}
+ */
+const CENTS_PER_SEMITONE = 100;
+
+/**
+ * Number of cents in an octave.
+ * Derived from SEMITONES for future temperament support.
+ * @constant {number}
+ */
+const CENTS_PER_OCTAVE = SEMITONES * CENTS_PER_SEMITONE;
+
+/**
  * Array representing powers of 2.
  * @constant {number[]}
  */
@@ -851,8 +865,24 @@ const POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
 const TWELTHROOT2 = 1.0594630943592953;
 // eslint-disable-next-line no-loss-of-precision
 const TWELVEHUNDRETHROOT2 = 1.0005777895065549;
+
+/**
+ * Frequency of A in octave 0, in Hz.
+ * @constant {number}
+ */
 const A0 = 27.5;
+
+/**
+ * Frequency of C in octave 8, in Hz.
+ * @constant {number}
+ */
 const C8 = 4186.01;
+
+/**
+ * Frequency of C in octave 10, in Hz.
+ * @constant {number}
+ */
+const C10 = 16744.04;
 
 /**
  * Octave ratio.
@@ -2525,7 +2555,6 @@ const getDrumName = name => {
         }
     }
 
-    // console.debug(name + ' not found in DRUMNAMES');
     return null;
 };
 
@@ -2668,7 +2697,6 @@ const getNoiseName = name => {
         }
     }
 
-    // console.debug(name + " not found in NOISENAMES");
     return DEFAULTNOISE;
 };
 
@@ -2741,7 +2769,6 @@ const getVoiceName = name => {
         }
     }
 
-    // console.debug(name + " not found in VOICENAMES");
     return DEFAULTVOICE;
 };
 
@@ -2860,25 +2887,26 @@ const frequencyToPitch = hz => {
 
     if (hz < A0) {
         return ["A", 0, 0];
-    } else if (hz > C8) {
-        // FIXME: set upper bound of C10
-        return ["C", 8, 0];
+    } else if (hz > C10) {
+        return ["C", 10, 0];
     }
 
     // Calculate cents to keep track of drift
     let cents = 0;
-    for (let i = 0; i < 8 * 1200; i++) {
+    // Standard tuning uses CENTS_PER_OCTAVE cents per octave.
+
+    for (let i = 0; i < 10 * CENTS_PER_OCTAVE; i++) {
         const f = A0 * Math.pow(TWELVEHUNDRETHROOT2, i);
         if (hz < f * 1.0003 && hz > f * 0.9997) {
-            cents = i % 100;
-            let j = Math.floor(i / 100);
+            cents = i % CENTS_PER_SEMITONE;
+            let j = Math.floor(i / CENTS_PER_SEMITONE);
             if (cents > 50) {
-                cents -= 100;
+                cents -= CENTS_PER_SEMITONE;
                 j += 1;
             }
             return [
-                PITCHES[(j + PITCHES.indexOf("A")) % 12],
-                Math.floor((j + PITCHES.indexOf("A")) / 12),
+                PITCHES[(j + PITCHES.indexOf("A")) % SEMITONES],
+                Math.floor((j + PITCHES.indexOf("A")) / SEMITONES),
                 cents
             ];
         }
@@ -5394,15 +5422,17 @@ const nthDegreeToPitch = (keySignature, scaleDegree) => {
     // Returns note corresponding to scale degree in current key
     // signature. Used for movable solfege.
     const scale = buildScale(keySignature)[0];
+    const modeLength = scale.length - 1;
+
     // Scale degree is specified as do === 1, re === 2, etc., so we need
     // to subtract 1 to make it zero-based.
-    // scaleDegree -= 1;
+    scaleDegree = Math.floor(Number(scaleDegree));
+    const degree = scaleDegree - 1;
 
-    // We mod to ensure we don't run out of notes.
-    // FixMe: bump octave if we wrap.
+    const octaveOffset = Math.floor(degree / modeLength);
+    const index = ((degree % modeLength) + modeLength) % modeLength;
 
-    scaleDegree %= scale.length - 1;
-    return scale[scaleDegree];
+    return [scale[index], octaveOffset];
 };
 
 /**
@@ -5771,7 +5801,7 @@ const noteIsSolfege = note => {
  * @returns {string} The solfege representation.
  */
 const getSolfege = note => {
-    // FIXME: Use mode-specific conversion.
+    // TODO: Use mode-specific conversion.
     if (noteIsSolfege(note)) {
         return note;
     } else {

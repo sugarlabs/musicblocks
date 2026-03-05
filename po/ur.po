@@ -1088,13 +1088,13 @@ msgstr "بہاؤ"
 #. TRANS: On the Planet, we use labels to tag projects.
 #: js/rubrics.js:531 js/turtledefs.js:139 js/turtledefs.js:240
 #: planet/js/GlobalTag.js:48
-msgid "Sensors"
+msgid "sensors"
 msgstr "سینسر"
 
 #. TRANS: On the Planet, we use labels to tag projects.
 #: js/rubrics.js:532 js/turtledefs.js:138 js/turtledefs.js:239
 #: js/blocks/MediaBlocks.js:930 planet/js/GlobalTag.js:46
-msgid "Media"
+msgid "media"
 msgstr "میڈیا"
 
 #: js/rubrics.js:533
@@ -1714,7 +1714,7 @@ msgid "Expand/collapse option toolbar"
 msgstr "توسیع / جمع آپشن ٹول بار"
 
 #: js/turtledefs.js:587
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxiliary toolbar."
 msgstr "آکسلیری ٹول بار کو وسعت دینے یا اسے ختم کرنے کے لئے اس بٹن پر کلک کریں۔"
 
 #: js/turtledefs.js:593

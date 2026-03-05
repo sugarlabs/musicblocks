@@ -30,9 +30,9 @@ is audio-visual; it produces graphics, artwork and music. Here are a
 couple of screenshots to give you an idea of how the application looks
 like:
 
-![alt tag](./screenshots/Screenshot-1.png)
+![Music Blocks workspace showing block-based music programming](./screenshots/Screenshot-1.png)
 
-![alt tag](./screenshots/Screenshot-2.png)
+![Music Blocks rhythm and melody blocks interface](./screenshots/Screenshot-2.png)
 
 Visit the Music Blocks website for a hands on experience:
 [https://musicblocks.sugarlabs.org](https://musicblocks.sugarlabs.org).
@@ -164,6 +164,20 @@ Before you begin, ensure you have Docker installed on your machine. You can down
 
 To stop the Docker container, use `Ctrl + C` in your terminal. This
 will stop the container and free up the port it was using.
+
+## Troubleshooting
+When running Music Blocks locally using `npm run dev`, the UI may load successfully even if some interactions appear unresponsive.
+
+New contributors may observe console errors such as:
+- `$ is not defined`
+- `lang is not defined`
+- `p5 is not defined`
+
+These errors can occur due to script loading order and initialization differences in local environments.
+
+If the UI loads and assets render correctly, the setup is generally considered successful for development purposes.
+
+Future improvements may address these issues as part of ongoing refactoring efforts.
 
 ## Additional Notes
 
