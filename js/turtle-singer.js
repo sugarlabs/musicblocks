@@ -242,6 +242,8 @@ class Singer {
             }
         });
         this.activeVoices.clear();
+
+        document.getElementById("stop").style.display = "none";
     }
 
     // ========= Class variables ==============================================
@@ -2152,6 +2154,8 @@ class Singer {
                     }
 
                     if (notes.length > 0) {
+                        // Show stop button when audio actually plays
+                        document.getElementById("stop").style.display = "inline-block";
                         const len = notes[0].length;
                         if (typeof notes[0] === "number") {
                             tur.singer.currentOctave = frequencyToPitch(notes[0])[1];

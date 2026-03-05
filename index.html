@@ -949,19 +949,6 @@
             window.addEventListener("resize", togglePlayOnlyMode);
         });
 
-// Stop button visibility fix (Issue #5778)
-        const stopBtn = document.getElementById('stop');
-        stopBtn.style.display = 'none'; 
-
-        const playBtn = document.getElementById('play');
-        playBtn.addEventListener('click', () => {
-            stopBtn.style.display = 'inline-block';
-        });
-
-        stopBtn.addEventListener('click', () => {
-            stopBtn.style.display = 'none';
-        });
-
     </script>
 
     <script>
