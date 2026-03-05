@@ -1376,7 +1376,7 @@ function LegoWidget() {
         try {
             ctx.drawImage(mediaElement, 0, 0, tempCanvas.width, tempCanvas.height);
         } catch (e) {
-            console.log("Could not draw media element to canvas for color sampling:", e);
+            console.warn("Could not draw media element to canvas for color sampling:", e);
             return null;
         }
 

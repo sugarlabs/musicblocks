@@ -2140,7 +2140,7 @@ function MusicKeyboard(activity) {
                     break;
                 default:
                     // eslint-disable-next-line no-console
-                    console.log("Nothing to do for " + label);
+                    // console.log("Nothing to do for " + label);
             }
 
             let aboveBlock = -1;
