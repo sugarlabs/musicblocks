@@ -104,6 +104,17 @@ class Palettes {
         }
     }
 
+    _updateDrawerHandleIcon() {
+        const handle = docById("paletteToggleHandle");
+        if (handle) {
+            if (this.isCollapsed) {
+                handle.innerHTML = "&#9654;";
+            } else {
+                handle.innerHTML = "&#9664;";
+            }
+        }
+    }
+
     collapse() {
         const paletteEl = docById("palette");
         if (paletteEl) {
@@ -111,6 +122,7 @@ class Palettes {
         }
         this.isCollapsed = true;
         localStorage.setItem("paletteCollapsed", "true");
+        this._updateDrawerHandleIcon();
         setTimeout(() => {
             window.dispatchEvent(new Event("resize"));
         }, 350);
@@ -123,6 +135,7 @@ class Palettes {
         }
         this.isCollapsed = false;
         localStorage.removeItem("paletteCollapsed");
+        this._updateDrawerHandleIcon();
         setTimeout(() => {
             window.dispatchEvent(new Event("resize"));
         }, 350);
@@ -183,6 +196,24 @@ class Palettes {
                 </div>`;
             element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
             document.body.appendChild(element);
+            
+            const handle = document.createElement("div");
+            handle.id = "paletteToggleHandle";
+            handle.setAttribute("title", _("Toggle palette"));
+            handle.setAttribute("aria-label", _("Toggle palette"));
+            handle.setAttribute("tabindex", "0");
+            handle.setAttribute("role", "button");
+            handle.onclick = () => {
+                this.toggleCollapse();
+            };
+            handle.onkeydown = (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    this.toggleCollapse();
+                }
+            };
+            element.appendChild(handle);
+            this._updateDrawerHandleIcon();
         }
 
         const tr = docById("palette").children[0].children[0].children[0].children[0];
