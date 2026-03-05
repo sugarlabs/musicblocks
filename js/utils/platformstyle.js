@@ -187,7 +187,7 @@ const platformThemes = {
         ],
         modePieMenusIfColorPush: "#66BB6A",
         modePieMenusElseColorPush: "#81C784",
-        wheelcolors: ["#757575", "#9E9E9E", "#757575", "#9E9E9E", "#616161"]
+        wheelcolors: ["#424242", "#616161", "#424242", "#616161", "#424242"]
     },
     light: {
         textColor: "black",
@@ -348,7 +348,7 @@ const platformThemes = {
         ],
         modePieMenusIfColorPush: "#4b8b0e",
         modePieMenusElseColorPush: "#66a62d",
-        wheelcolors: ["#808080", "#909090", "#808080", "#909090", "#707070"]
+        wheelcolors: ["#424242", "#616161", "#424242", "#616161", "#424242"]
     },
     highcontrast: {
         textColor: "#FFFFFF",
@@ -438,10 +438,10 @@ const platformThemes = {
             "#33FF33"
         ],
         gridWheelcolors: {
-            wheel: ["#000000"],
+            wheel: ["#FFFFFF"],
             selected: {
-                fill: "#333333",
-                stroke: "#FFFFFF"
+                fill: "#dedede",
+                stroke: "#000000"
             }
         },
         drumWheelcolors: ["#00CCCC", "#00FFFF"],
@@ -505,7 +505,7 @@ const platformThemes = {
         ],
         modePieMenusIfColorPush: "#009900",
         modePieMenusElseColorPush: "#33FF33",
-        wheelcolors: ["#FFFFFF", "#CCCCCC", "#FFFFFF", "#CCCCCC", "#999999"]
+        wheelcolors: ["#424242", "#616161", "#424242", "#616161", "#424242"]
     }
 };
 
