@@ -39,7 +39,7 @@ jobs:
               run: |
                   echo "Linting the following files:"
                   echo "$files"
-                  echo "$files" | xargs npx eslint
+                  echo "$files" | xargs npx eslint --no-warn-ignored
             - name: Run Prettier check on changed files
               if: env.files != ''
               run: |
