@@ -114,8 +114,9 @@ function setupVolumeActions(activity) {
          */
         static setRelativeVolume(volume, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
+            const synthList = Object.keys(tur.singer.synthVolume);
 
-            for (const synth in tur.singer.synthVolume) {
+            for (const synth of synthList) {
                 let newVolume = (last(tur.singer.synthVolume[synth]) * (100 + volume)) / 100;
                 newVolume = Math.max(Math.min(newVolume, 100), -100);
 
@@ -143,7 +144,7 @@ function setupVolumeActions(activity) {
             }
 
             const __listener = () => {
-                for (const synth in tur.singer.synthVolume) {
+                for (const synth of synthList) {
                     tur.singer.synthVolume[synth].pop();
                     Singer.setSynthVolume(
                         activity.logo,
