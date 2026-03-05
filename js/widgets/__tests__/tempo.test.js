@@ -865,6 +865,65 @@ describe("Tempo Widget", () => {
             expect(() => tempoWidget.pause()).not.toThrow();
         });
     });
+    describe("Targeted coverage for specific uncovered lines", () => {
+        test("should call clearInterval if loadSynth synchronously sets _intervalID (line 63)", () => {
+            const clearIntervalSpy = jest.spyOn(global, "clearInterval");
+            mockActivity.logo.synth.loadSynth.mockImplementationOnce(() => {
+                tempoWidget._intervalID = 999;
+            });
+            tempoWidget.init(mockActivity);
+            expect(clearIntervalSpy).toHaveBeenCalledWith(999);
+            clearIntervalSpy.mockRestore();
+        });
+
+        test("pause button onclick should toggle isMoving, call pause/resume, and update innerHTML (lines 80-101)", () => {
+            const pauseBtnMock = { innerHTML: "" };
+            const mockWindow = window.widgetWindows.windowFor();
+            mockWindow.addButton.mockImplementation(icon => {
+                if (icon === "pause-button.svg") return pauseBtnMock;
+                return { onclick: jest.fn() };
+            });
+            tempoWidget.init(mockActivity);
+            const pauseSpy = jest.spyOn(tempoWidget, "pause").mockImplementation(() => {});
+            const resumeSpy = jest.spyOn(tempoWidget, "resume").mockImplementation(() => {});
+            expect(tempoWidget.isMoving).toBe(true);
+            pauseBtnMock.onclick();
+            expect(pauseSpy).toHaveBeenCalled();
+            expect(tempoWidget.isMoving).toBe(false);
+            expect(pauseBtnMock.innerHTML).toContain('src="header-icons/play-button.svg"');
+            pauseBtnMock.onclick();
+            expect(resumeSpy).toHaveBeenCalled();
+            expect(tempoWidget.isMoving).toBe(true);
+            expect(pauseBtnMock.innerHTML).toContain('src="header-icons/pause-button.svg"');
+            pauseSpy.mockRestore();
+            resumeSpy.mockRestore();
+        });
+
+        test("init should initialize _widgetFirstTimes and set BPMs <= 0 to 30 (lines 113-116)", () => {
+            tempoWidget.BPMs = [0, -15];
+            tempoWidget._save_lock = false;
+            tempoWidget.init(mockActivity);
+            const mockWindow = window.widgetWindows.windowFor();
+            const addButtonCalls = mockWindow.addButton.mock.calls;
+            const saveCall = addButtonCalls.find(call => call[0] === "export-chunk.svg");
+            const saveBtn = mockWindow.addButton.mock.results[addButtonCalls.indexOf(saveCall)].value;
+            saveBtn.onclick();
+            expect(tempoWidget._get_save_lock()).toBe(true);
+            jest.advanceTimersByTime(1000);
+            expect(tempoWidget._get_save_lock()).toBe(false);
+        });
+
+        test("_useBPM should show specific error message when BPM < 30 (line 244)", () => {
+            tempoWidget.BPMs = [100];
+            tempoWidget.BPMInputs = [{ value: 15 }];
+            tempoWidget._useBPM(0);
+            expect(tempoWidget.BPMs[0]).toBe(30);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "The beats per minute must be between 30 and 1000.",
+                3000
+            );
+        });
+    });
 });
 
 describe("Tempo._useBPM validation logic", () => {
