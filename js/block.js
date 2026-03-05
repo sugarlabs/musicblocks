@@ -127,6 +127,13 @@ const COLLAPSIBLES = [
 const NOHIT = ["hidden", "hiddennoflow"];
 
 /**
+ * List of blocks that behave like argument blocks even though they are not
+ * strictly classified as arg/value blocks.
+ * @type {string[]}
+ */
+const ARG_LIKE_BLOCKS = ["doArg", "calcArg", "namedcalcArg", "makeblock"];
+
+/**
  * List of special input types.
  * @type {string[]}
  */
@@ -392,6 +399,13 @@ class Block {
     updateCache() {
         const that = this;
         return new Promise((resolve, reject) => {
+            // If the container has no active bitmap cache (e.g., trashed
+            // blocks whose cache was freed), skip the update silently.
+            if (that.container && !that.container.bitmapCache) {
+                resolve();
+                return;
+            }
+
             let loopCount = 0;
             const MAX_RETRIES = 15;
             const INITIAL_DELAY = 100;
@@ -797,10 +811,14 @@ class Block {
              * @returns {void}
              */
             const _postProcess = that => {
-                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
-                    scale / 3;
-                that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale =
-                    scale / 3;
+                that.collapseButtonBitmap.scaleX =
+                    that.collapseButtonBitmap.scaleY =
+                    that.collapseButtonBitmap.scale =
+                        scale / 3;
+                that.expandButtonBitmap.scaleX =
+                    that.expandButtonBitmap.scaleY =
+                    that.expandButtonBitmap.scale =
+                        scale / 3;
                 that.updateCache();
                 that._calculateBlockHitArea();
             };
@@ -1401,7 +1419,7 @@ class Block {
             } else if (this.name === "grid") {
                 label = _(this.value);
             } else {
-                if (this.value !== null) {
+                if (this.value != null) {
                     label = this.value.toString();
                 } else {
                     label = "???";
@@ -1458,7 +1476,7 @@ class Block {
             const postProcess = that => {
                 that.loadComplete = true;
 
-                if (that.postProcess !== null) {
+                if (that.postProcess != null) {
                     that.postProcess(that.postProcessArg);
                     that.postProcess = null;
                 }
@@ -1510,8 +1528,10 @@ class Block {
             const image = new Image();
             image.onload = () => {
                 that.collapseButtonBitmap = new createjs.Bitmap(image);
-                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
-                    that.protoblock.scale / 3;
+                that.collapseButtonBitmap.scaleX =
+                    that.collapseButtonBitmap.scaleY =
+                    that.collapseButtonBitmap.scale =
+                        that.protoblock.scale / 3;
                 that.container.addChild(that.collapseButtonBitmap);
                 that.collapseButtonBitmap.x = 2 * that.protoblock.scale;
                 if (that.isInlineCollapsible()) {
@@ -1538,8 +1558,10 @@ class Block {
             const image = new Image();
             image.onload = () => {
                 that.expandButtonBitmap = new createjs.Bitmap(image);
-                that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale =
-                    that.protoblock.scale / 3;
+                that.expandButtonBitmap.scaleX =
+                    that.expandButtonBitmap.scaleY =
+                    that.expandButtonBitmap.scale =
+                        that.protoblock.scale / 3;
 
                 that.container.addChild(that.expandButtonBitmap);
                 that.expandButtonBitmap.visible = that.collapsed;
@@ -1931,6 +1953,17 @@ class Block {
     }
 
     /**
+     * Checks if the block behaves like an argument block.
+     * Some blocks (e.g., doArg, calcArg, namedcalcArg, makeblock) are not styled
+     * strictly as arg/value blocks but are treated as argument blocks in
+     * certain contexts.
+     * @returns {boolean} - True if the block is argument-like, false otherwise.
+     */
+    isArgumentLikeBlock() {
+        return this.isArgBlock() || ARG_LIKE_BLOCKS.includes(this.name);
+    }
+
+    /**
      * Checks if the block is a two-argument block.
      * @returns {boolean} - True if the block is a two-argument block, false otherwise.
      */
@@ -2004,6 +2037,44 @@ class Block {
      */
     isExpandableBlock() {
         return this.protoblock.expandable;
+    }
+
+    /**
+     * Determines what type of layout update this block requires when a child is connected
+     * at the specified connection index.
+     *
+     * This is a behavioral abstraction that encapsulates the logic of which blocks
+     * need pre-layout updates based on their child connections, rather than having
+     * the engine infer this from block type categories.
+     *
+     * @param {number} connectionIndex - The index of the connection where a child was attached
+     * @returns {string|null} - "ARG" for argument layout updates, "FLOW" for flow layout updates, null otherwise
+     */
+    getLayoutUpdateType(connectionIndex) {
+        // Guard against invalid indices (can occur during drag/undo/intermediate states)
+        if (connectionIndex < 0) {
+            return null;
+        }
+
+        // Two-argument blocks and expandable argument blocks need ARG layout updates
+        // when a child connects to their first argument slot (connection index 1)
+        if (connectionIndex === 1) {
+            if (this.isTwoArgBlock() || (this.isArgBlock() && this.isExpandableBlock())) {
+                return "ARG";
+            }
+        }
+
+        const n = this.connections.length;
+        if (
+            connectionIndex === n - 2 &&
+            !this.isArgClamp() &&
+            this.docks[n - 1] &&
+            this.docks[n - 1][2] === "in"
+        ) {
+            return "FLOW";
+        }
+
+        return null;
     }
 
     /**
@@ -2102,7 +2173,7 @@ class Block {
      */
     _doOpenMedia(thisBlock) {
         const that = this;
-        const fileChooser = that.name == "media" ? docById("myMedia") : docById("audio");
+        const fileChooser = that.name === "media" ? docById("myMedia") : docById("audio");
 
         const __readerAction = () => {
             window.scroll(0, 0);
@@ -2747,11 +2818,15 @@ class Block {
      */
     _positionMedia(bitmap, width, height, blockScale) {
         if (width > height) {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale =
-                ((MEDIASAFEAREA[2] / width) * blockScale) / 2;
+            bitmap.scaleX =
+                bitmap.scaleY =
+                bitmap.scale =
+                    ((MEDIASAFEAREA[2] / width) * blockScale) / 2;
         } else {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale =
-                ((MEDIASAFEAREA[3] / height) * blockScale) / 2;
+            bitmap.scaleX =
+                bitmap.scaleY =
+                bitmap.scale =
+                    ((MEDIASAFEAREA[3] / height) * blockScale) / 2;
         }
         bitmap.x = ((MEDIASAFEAREA[0] - 10) * blockScale) / 2;
         bitmap.y = (MEDIASAFEAREA[1] * blockScale) / 2;
@@ -2835,7 +2910,7 @@ class Block {
             }
             // We might be able to check which button was clicked.
             if ("nativeEvent" in event) {
-                if ("button" in event.nativeEvent && event.nativeEvent.button == 2) {
+                if ("button" in event.nativeEvent && event.nativeEvent.button === 2) {
                     that.blocks.stageClick = true;
                     _getStatic("wheelDiv").style.display = "none";
                     that.blocks.activeBlock = thisBlock;
@@ -3013,7 +3088,7 @@ class Block {
 
             // Do not allow a stack of blocks to be dragged if the stack contains a silence block.
             let block = that.blocks.blockList[that.connections[1]];
-            while (block != undefined) {
+            while (block != null) {
                 if (block?.name === "rest2") {
                     this.activity.errorMsg(_("Silence block cannot be removed."), block);
                     return;
@@ -3535,7 +3610,7 @@ class Block {
                     selectedCustom = customLabels[0];
                 }
 
-                if (this.value !== null) {
+                if (this.value != null) {
                     selectedNote = this.value;
                 } else {
                     selectedNote = getTemperament(selectedCustom)["0"][1];
@@ -3994,7 +4069,7 @@ class Block {
                         for (let i = 0; i < this.blocks.blockList.length; i++) {
                             if (
                                 this.blocks.blockList[i].name === "settemperament" &&
-                                this.blocks.blockList[i].connections[0] !== null
+                                this.blocks.blockList[i].connections[0] != null
                             ) {
                                 const index = this.blocks.blockList[i].connections[1];
                                 temperament = this.blocks.blockList[index].value;
@@ -4182,7 +4257,6 @@ class Block {
         return new Date().getTime() - this._piemenuExitTime > 200;
     }
 
-
     /**
      * Checks and reinitializes widget windows if their labels are changed.
      * @param {boolean} closeInput - Flag indicating whether to close input.
@@ -4348,7 +4422,7 @@ class Block {
             const cblk1 = this.connections[0];
             let cblk2;
 
-            if (cblk1 !== null) {
+            if (cblk1 != null) {
                 cblk2 = this.blocks.blockList[cblk1].connections[0];
             } else {
                 cblk2 = null;
@@ -4360,7 +4434,7 @@ class Block {
                 cblk2 !== null &&
                 newValue < 0 &&
                 (this.blocks.blockList[cblk1].name === "newnote" ||
-                    this.blocks.blockList[cblk2].name == "newnote")
+                    this.blocks.blockList[cblk2].name === "newnote")
             ) {
                 this.label.value = 0;
                 this.value = 0;
@@ -4460,20 +4534,14 @@ class Block {
                     // Rename both do <- name and nameddo blocks.
                     this.blocks.renameDos(oldValue, newValue);
 
+                    // eslint-disable-next-line no-case-declarations
+                    const metadata = this.blocks.actionMetadata(c);
                     if (oldValue === _("action")) {
-                        this.blocks.newNameddoBlock(
-                            newValue,
-                            this.blocks.actionHasReturn(c),
-                            this.blocks.actionHasArgs(c)
-                        );
+                        this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
                         this.blocks.setActionProtoVisibility(false);
                     }
 
-                    this.blocks.newNameddoBlock(
-                        newValue,
-                        this.blocks.actionHasReturn(c),
-                        this.blocks.actionHasArgs(c)
-                    );
+                    this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
                     // eslint-disable-next-line no-case-declarations
                     const blockPalette = this.blocks.palettes.dict["action"];
                     for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
@@ -4490,11 +4558,7 @@ class Block {
                     }
 
                     if (oldValue === _("action")) {
-                        this.blocks.newNameddoBlock(
-                            newValue,
-                            this.blocks.actionHasReturn(c),
-                            this.blocks.actionHasArgs(c)
-                        );
+                        this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
                         this.blocks.setActionProtoVisibility(false);
                     }
                     this.blocks.renameNameddos(oldValue, newValue);

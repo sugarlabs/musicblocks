@@ -40,6 +40,8 @@ class WidgetWindow {
         // Drag offset for correct positioning
         this._dx = this._dy = 0;
         this._dragging = false;
+        // RAF throttle flag for mousemove performance
+        this._rafTicking = false;
 
         this._createUIelements();
         this._setupLanguage();
@@ -108,6 +110,7 @@ class WidgetWindow {
             };
         }
         const closeButton = this._create("div", "wftButton close", this._drag);
+        closeButton.title = _("Close");
         closeButton.onclick = e => {
             this.onclose();
             e.preventDefault();
@@ -152,6 +155,7 @@ class WidgetWindow {
         this._nonclosebuttons.style.display = "flex";
         this._rollButton = this._create("div", "wftButton rollup", this._nonclosebuttons);
         const rollButton = this._rollButton;
+        rollButton.title = _("Minimize");
         rollButton.onclick = e => {
             if (this._rolled) {
                 this.unroll();
@@ -212,15 +216,22 @@ class WidgetWindow {
     _docMouseMoveHandler(e) {
         if (!this._dragging) return;
 
-        if (this._fullscreenEnabled && this._frame.style.top === "64px") {
-            this._overlay(true);
-        } else {
-            this._overlay(false);
-        }
-        const x = e.clientX - this._dx,
-            y = e.clientY - this._dy;
+        // Throttle using requestAnimationFrame to prevent layout thrashing
+        if (this._rafTicking) return;
+        this._rafTicking = true;
 
-        this.setPosition(x, y);
+        requestAnimationFrame(() => {
+            if (this._fullscreenEnabled && this._frame.style.top === "64px") {
+                this._overlay(true);
+            } else {
+                this._overlay(false);
+            }
+            const x = e.clientX - this._dx,
+                y = e.clientY - this._dy;
+
+            this.setPosition(x, y);
+            this._rafTicking = false;
+        });
     }
 
     _overlay(add) {

@@ -249,6 +249,22 @@ describe("setupIntervalsActions", () => {
         expect(turtle.singer.chordIntervals.length).toBe(0);
     });
 
+    test("setChordInterval error on null", () => {
+        Singer.IntervalsActions.setChordInterval(null, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
+        expect(turtle.singer.chordIntervals).toContainEqual([1, 0]);
+    });
+
+    test("setChordInterval MusicBlocks.isRun adds to mouse listeners", () => {
+        const mockMouse = { MB: { listeners: [] } };
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+
+        Singer.IntervalsActions.setChordInterval([2, 1], 0, undefined);
+
+        expect(mockMouse.MB.listeners).toContain("_chord_interval_0");
+    });
+
     test("setSemitoneInterval zero ignored", () => {
         Singer.IntervalsActions.setSemitoneInterval(0, 0);
         expect(turtle.singer.semitoneIntervals.length).toBe(0);
@@ -263,6 +279,25 @@ describe("setupIntervalsActions", () => {
         expect(turtle.singer.semitoneIntervals.length).toBe(0);
     });
 
+    test("setSemitoneInterval error on null", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        Singer.IntervalsActions.setSemitoneInterval(null, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
+        // Default value of 1 should be used
+        expect(turtle.singer.semitoneIntervals.length).toBe(1);
+    });
+
+    test("setSemitoneInterval MusicBlocks.isRun adds to mouse listeners", () => {
+        const mockMouse = { MB: { listeners: [] } };
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+
+        Singer.IntervalsActions.setSemitoneInterval(3, 0, undefined);
+
+        expect(mockMouse.MB.listeners).toContain("_semitone_interval_0");
+    });
+
     test("setRatioInterval push + pop", () => {
         let listener;
         logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
@@ -270,6 +305,23 @@ describe("setupIntervalsActions", () => {
         expect(turtle.singer.ratioIntervals.length).toBe(1);
         listener();
         expect(turtle.singer.ratioIntervals.length).toBe(0);
+    });
+
+    test("setRatioInterval error on null", () => {
+        Singer.IntervalsActions.setRatioInterval(null, 0, "blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith("NOINPUT", "blk");
+        // Default value of 1 should be used
+        expect(turtle.singer.ratioIntervals).toContain(1);
+    });
+
+    test("setRatioInterval MusicBlocks.isRun adds to mouse listeners", () => {
+        const mockMouse = { MB: { listeners: [] } };
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+
+        Singer.IntervalsActions.setRatioInterval(2.0, 0, undefined);
+
+        expect(mockMouse.MB.listeners).toContain("_ratio_interval_0");
     });
 
     test("defineMode success path", () => {

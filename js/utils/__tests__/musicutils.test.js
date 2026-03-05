@@ -99,7 +99,12 @@ const {
     getNoteFromInterval,
     numberToPitch,
     GetNotesForInterval,
-    base64Encode
+    base64Encode,
+    NOTESFLAT,
+    NOTESSHARP,
+    MUSICALMODES,
+    getStepSizeUp,
+    getStepSizeDown
 } = require("../musicutils");
 
 describe("musicutils", () => {
@@ -1398,32 +1403,32 @@ describe("getModeLength", () => {
 describe("nthDegreeToPitch", () => {
     it("should return the correct note for the 2nd scale degree in C major", () => {
         const result = nthDegreeToPitch("C major", 2);
-        expect(result).toBe("E");
+        expect(result).toEqual(["D", 0]);
     });
 
     it("should handle a scale degree larger than the scale length (wrapping case)", () => {
         const result = nthDegreeToPitch("C major", 8);
-        expect(result).toBe("D");
+        expect(result).toEqual(["C", 1]);
     });
 
-    it("should return the root note for scale degree 0 in C major", () => {
+    it("should return the note below the root for scale degree 0 in C major (downward wrapping)", () => {
         const result = nthDegreeToPitch("C major", 0);
-        expect(result).toBe("C");
+        expect(result).toEqual(["B", -1]);
     });
 
     it("should return the correct note for the 5th scale degree in A minor", () => {
         const result = nthDegreeToPitch("A minor", 5);
-        expect(result).toBe("F");
+        expect(result).toEqual(["E", 0]);
     });
 
     it("should handle negative scale degrees (reverse wrapping)", () => {
         const result = nthDegreeToPitch("C major", -1);
-        expect(result).toBeUndefined();
+        expect(result).toEqual(["A", -1]);
     });
 
-    it("should return undefined for a scale degree when the scale is empty", () => {
+    it("should fallback to C major for a scale degree when the key signature is unknown", () => {
         const result = nthDegreeToPitch("Unknown", 2); //default keysignature will be C major
-        expect(result).toBe("E");
+        expect(result).toEqual(["D", 0]);
     });
 });
 
@@ -1481,6 +1486,45 @@ describe("toFraction", () => {
     });
     it("should return array with numerator and denomrator from floating point number", () => {
         expect(toFraction(0.0)).toEqual([0, 2]);
+    });
+
+    it("should handle common musical note fractions correctly", () => {
+        expect(toFraction(0.5)).toEqual([1, 2]);
+        expect(toFraction(0.25)).toEqual([1, 4]);
+        expect(toFraction(0.125)).toEqual([1, 8]);
+    });
+
+    it("should handle whole numbers by flipping numerator and denominator", () => {
+        expect(toFraction(2)).toEqual([2, 1]);
+        expect(toFraction(4)).toEqual([4, 1]);
+        expect(toFraction(8)).toEqual([8, 1]);
+    });
+
+    it("should handle thirds correctly", () => {
+        const result = toFraction(1 / 3);
+        expect(result[0]).toBe(1);
+        expect(result[1]).toBe(3);
+    });
+
+    it("should handle dotted note values (1.5 = 3/2)", () => {
+        expect(toFraction(1.5)).toEqual([3, 2]);
+        expect(toFraction(0.75)).toEqual([3, 4]);
+    });
+
+    it("should handle value equal to 1", () => {
+        expect(toFraction(1)).toEqual([1, 1]);
+    });
+
+    it("should handle very small positive decimals", () => {
+        const result = toFraction(0.0625);
+        expect(result[0]).toBe(1);
+        expect(result[1]).toBe(16);
+    });
+
+    it("should handle sixths correctly", () => {
+        const result = toFraction(1 / 6);
+        expect(result[0]).toBe(1);
+        expect(result[1]).toBe(6);
     });
 });
 
@@ -2227,5 +2271,136 @@ describe("_calculate_pitch_number", () => {
         const valC4 = _calculate_pitch_number(activity, "C4", tur);
         const valC5 = _calculate_pitch_number(activity, "C5", tur);
         expect(valC5).toBeGreaterThan(valC4);
+    });
+});
+
+describe("NOTESFLAT", () => {
+    it("should contain 12 chromatic notes", () => {
+        expect(NOTESFLAT.length).toBe(12);
+    });
+
+    it("should start with C and end with B", () => {
+        expect(NOTESFLAT[0]).toBe("C");
+        expect(NOTESFLAT[11]).toBe("B");
+    });
+
+    it("should contain flats for black keys", () => {
+        expect(NOTESFLAT[1]).toContain("♭");
+        expect(NOTESFLAT[3]).toContain("♭");
+        expect(NOTESFLAT[6]).toContain("♭");
+    });
+
+    it("should have correct positions for natural notes", () => {
+        expect(NOTESFLAT[0]).toBe("C");
+        expect(NOTESFLAT[2]).toBe("D");
+        expect(NOTESFLAT[4]).toBe("E");
+        expect(NOTESFLAT[5]).toBe("F");
+        expect(NOTESFLAT[7]).toBe("G");
+        expect(NOTESFLAT[9]).toBe("A");
+    });
+
+    it("should be an array of strings", () => {
+        expect(Array.isArray(NOTESFLAT)).toBe(true);
+        NOTESFLAT.forEach(note => expect(typeof note).toBe("string"));
+    });
+});
+
+describe("NOTESSHARP", () => {
+    it("should contain 12 chromatic notes", () => {
+        expect(NOTESSHARP.length).toBe(12);
+    });
+    it("should start with C and end with B", () => {
+        expect(NOTESSHARP[0]).toBe("C");
+        expect(NOTESSHARP[11]).toBe("B");
+    });
+
+    it("should contain sharps for black keys", () => {
+        expect(NOTESSHARP[1]).toContain("♯");
+        expect(NOTESSHARP[3]).toContain("♯");
+        expect(NOTESSHARP[6]).toContain("♯");
+    });
+
+    it("should have correct positions for natural notes", () => {
+        expect(NOTESSHARP[0]).toBe("C");
+        expect(NOTESSHARP[2]).toBe("D");
+        expect(NOTESSHARP[4]).toBe("E");
+        expect(NOTESSHARP[5]).toBe("F");
+        expect(NOTESSHARP[7]).toBe("G");
+        expect(NOTESSHARP[9]).toBe("A");
+    });
+
+    it("should have same natural notes as NOTESFLAT", () => {
+        [0, 2, 4, 5, 7, 9, 11].forEach(i => {
+            expect(NOTESSHARP[i]).toBe(NOTESFLAT[i]);
+        });
+    });
+
+    it("should be an array of strings", () => {
+        expect(Array.isArray(NOTESSHARP)).toBe(true);
+        NOTESSHARP.forEach(note => expect(typeof note).toBe("string"));
+    });
+});
+
+describe("MUSICALMODES", () => {
+    it("should contain major mode with correct intervals", () => {
+        expect(MUSICALMODES["major"]).toEqual([2, 2, 1, 2, 2, 2, 1]);
+    });
+
+    it("should contain minor mode with correct intervals", () => {
+        expect(MUSICALMODES["minor"]).toEqual([2, 1, 2, 2, 1, 2, 2]);
+    });
+
+    it("should have chromatic mode with 12 semitones", () => {
+        expect(MUSICALMODES["chromatic"]).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+        expect(MUSICALMODES["chromatic"].length).toBe(12);
+    });
+
+    it("should have pentatonic modes with 5 notes", () => {
+        expect(MUSICALMODES["major pentatonic"].length).toBe(5);
+        expect(MUSICALMODES["minor pentatonic"].length).toBe(5);
+    });
+
+    it("should have all mode intervals sum to 12 semitones", () => {
+        const sum = arr => arr.reduce((a, b) => a + b, 0);
+        expect(sum(MUSICALMODES["major"])).toBe(12);
+        expect(sum(MUSICALMODES["minor"])).toBe(12);
+        expect(sum(MUSICALMODES["dorian"])).toBe(12);
+        expect(sum(MUSICALMODES["whole tone"])).toBe(12);
+    });
+
+    it("should contain custom mode for user definitions", () => {
+        expect(MUSICALMODES["custom"]).toBeDefined();
+        expect(Array.isArray(MUSICALMODES["custom"])).toBe(true);
+    });
+
+    it("should have ionian equivalent to major", () => {
+        expect(MUSICALMODES["ionian"]).toEqual(MUSICALMODES["major"]);
+    });
+
+    it("should have aeolian equivalent to minor", () => {
+        expect(MUSICALMODES["aeolian"]).toEqual(MUSICALMODES["minor"]);
+    });
+});
+describe("getStepSizeDown", () => {
+    it("should return the correct step size for D in C major going down", () => {
+        const result = getStepSizeDown("C major", "D", 0, "equal");
+        expect(result).toBe(-2);
+    });
+
+    it("should return 0 for an invalid temperament", () => {
+        const result = getStepSizeDown("C major", "D", 0, "invalid");
+        expect(result).toBe(0);
+    });
+});
+
+describe("getStepSizeUp", () => {
+    it("should return the correct step size for C in C major going up", () => {
+        const result = getStepSizeUp("C major", "C", 0, "equal");
+        expect(result).toBe(2);
+    });
+
+    it("should return 0 for an invalid temperament", () => {
+        const result = getStepSizeUp("C major", "C", 0, "invalid");
+        expect(result).toBe(0);
     });
 });

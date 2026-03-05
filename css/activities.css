@@ -14,8 +14,13 @@
 
 @import url("play-only-mode.css");
 
-*:focus {
+*:focus:not(:focus-visible) {
   outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid #0066FF !important;
+  outline-offset: 2px;
 }
 
 body:not(.dark) #helpfulSearch,
@@ -509,6 +514,8 @@ div.back:active {
   position: absolute;
   top: 0;
   left: 0;
+
+  height: calc(var(--vh, 1vh) * 100);
 }
 
 .canvasHolder.hide {
@@ -623,7 +630,7 @@ nav ul li {
 
 #planet-iframe {
   width: 100vw;
-  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
   background-color: #fff;
   position: absolute;
   top: 0;
@@ -633,6 +640,8 @@ nav ul li {
 iframe,
 canvas {
   overflow: clip !important;
+  width: 100%;
+  height: 100%;
 }
 
 .projectname {
@@ -1199,7 +1208,7 @@ table {
   left: 0 !important;
   border: 0 !important;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow: visible;
   width: calc(100% - 130px) !important;
   max-width: 350px;
   padding: 1rem 1rem 0 1rem;
@@ -1207,6 +1216,10 @@ table {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+#helpScrollWrapper {
+  overflow-y: auto;
 }
 
 #helpBodyDiv .heading,

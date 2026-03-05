@@ -191,11 +191,24 @@ function setupMeterBlocks(activity) {
         setter(logo, value, turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
 
+            // Validate and clamp BPM to safe range [30, 1000]
+            let bpm = Number(value);
+            if (isNaN(bpm)) {
+                bpm = 60; // Default to 60 BPM
+                activity.errorMsg(_("BPM must be a number, defaulting to 60."));
+            } else if (bpm < 30) {
+                bpm = 30;
+                activity.errorMsg(_("BPM must be at least 30, clamping to 30."));
+            } else if (bpm > 1000) {
+                bpm = 1000;
+                activity.errorMsg(_("BPM must be at most 1000, clamping to 1000."));
+            }
+
             const len = tur.singer.bpm.length;
             if (len > 0) {
-                tur.singer.bpm[len - 1] = value;
+                tur.singer.bpm[len - 1] = bpm;
             } else {
-                tur.singer.bpm.push(value);
+                tur.singer.bpm.push(bpm);
             }
         }
 
@@ -931,25 +944,7 @@ function setupMeterBlocks(activity) {
             // Set palette, activity, piemenuValuesC1, and beginnerBlock for the block
             this.setPalette("meter", activity);
             this.piemenuValuesC1 = [
-                42,
-                46,
-                50,
-                54,
-                58,
-                63,
-                69,
-                76,
-                84,
-                90,
-                96,
-                104,
-                112,
-                120,
-                132,
-                144,
-                160,
-                176,
-                192,
+                42, 46, 50, 54, 58, 63, 69, 76, 84, 90, 96, 104, 112, 120, 132, 144, 160, 176, 192,
                 208
             ];
             this.beginnerBlock(true);
@@ -1077,25 +1072,7 @@ function setupMeterBlocks(activity) {
             // Set palette, piemenuValuesC1, beginnerBlock, and activity for the block
             this.setPalette("meter", activity);
             this.piemenuValuesC1 = [
-                42,
-                46,
-                50,
-                54,
-                58,
-                63,
-                69,
-                76,
-                84,
-                90,
-                96,
-                104,
-                112,
-                120,
-                132,
-                144,
-                160,
-                176,
-                192,
+                42, 46, 50, 54, 58, 63, 69, 76, 84, 90, 96, 104, 112, 120, 132, 144, 160, 176, 192,
                 208
             ];
             this.beginnerBlock(true);
