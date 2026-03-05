@@ -16,7 +16,7 @@ app.get("/env.js", (req, res) => {
     res.setHeader("Surrogate-Control", "no-store");
     res.send(
         `window.MB_ENV=${JSON.stringify(process.env.NODE_ENV || "development")};` +
-        `window.MB_IS_DEV=${JSON.stringify(isDev)};`
+            `window.MB_IS_DEV=${JSON.stringify(isDev)};`
     );
 });
 
