@@ -209,24 +209,21 @@ class TimbreWidget {
         }
 
         if (this.isActive["noisesynth"] === true && this.NoiseSynthesizer[i] != null) {
-            updateParams[0] = this.activity.blocks.blockList[
-                this.NoiseSynthesizer[i]
-            ].connections[1];
+            updateParams[0] =
+                this.activity.blocks.blockList[this.NoiseSynthesizer[i]].connections[1];
         }
 
         if (this.isActive["duosynth"] === true && this.duoSynthesizer[i] != null) {
             for (let j = 0; j < 2; j++) {
-                updateParams[j] = this.activity.blocks.blockList[
-                    this.duoSynthesizer[i]
-                ].connections[j + 1];
+                updateParams[j] =
+                    this.activity.blocks.blockList[this.duoSynthesizer[i]].connections[j + 1];
             }
         }
 
         if (this.isActive["tremolo"] === true && this.tremoloEffect[i] != null) {
             for (let j = 0; j < 2; j++) {
-                updateParams[j] = this.activity.blocks.blockList[this.tremoloEffect[i]].connections[
-                    j + 1
-                ];
+                updateParams[j] =
+                    this.activity.blocks.blockList[this.tremoloEffect[i]].connections[j + 1];
             }
         }
 
@@ -280,24 +277,21 @@ class TimbreWidget {
 
         if (this.isActive["chorus"] === true && this.chorusEffect[i] != null) {
             for (let j = 0; j < 3; j++) {
-                updateParams[j] = this.activity.blocks.blockList[this.chorusEffect[i]].connections[
-                    j + 1
-                ];
+                updateParams[j] =
+                    this.activity.blocks.blockList[this.chorusEffect[i]].connections[j + 1];
             }
         }
 
         if (this.isActive["phaser"] === true && this.phaserEffect[i] != null) {
             for (let j = 0; j < 3; j++) {
-                updateParams[j] = this.activity.blocks.blockList[this.phaserEffect[i]].connections[
-                    j + 1
-                ];
+                updateParams[j] =
+                    this.activity.blocks.blockList[this.phaserEffect[i]].connections[j + 1];
             }
         }
 
         if (this.isActive["distortion"] === true && this.distortionEffect[i] != null) {
-            updateParams[0] = this.activity.blocks.blockList[
-                this.distortionEffect[i]
-            ].connections[1];
+            updateParams[0] =
+                this.activity.blocks.blockList[this.distortionEffect[i]].connections[1];
         }
 
         if (updateParams[0] != null) {
@@ -606,9 +600,8 @@ class TimbreWidget {
                     platformColor.selectorBackground;
                 docById("sel" + i).value = this.filterParams[i * 3];
                 this._update(i, this.filterParams[i * 3], 0);
-                instrumentsFilters[0][this.instrumentName][i]["filterType"] = this.filterParams[
-                    i * 3
-                ];
+                instrumentsFilters[0][this.instrumentName][i]["filterType"] =
+                    this.filterParams[i * 3];
 
                 const radioIDs = [i * 4, i * 4 + 1, i * 4 + 2, i * 4 + 3];
                 if (this.filterParams[i * 3 + 1] === -12) {
@@ -744,13 +737,10 @@ class TimbreWidget {
             this._play();
         };
 
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            TimbreWidget.ICONSIZE,
-            _("Save")
-        ).onclick = () => {
-            this._save();
-        };
+        widgetWindow.addButton("export-chunk.svg", TimbreWidget.ICONSIZE, _("Save")).onclick =
+            () => {
+                this._save();
+            };
 
         let _unhighlightButtons; // defined later to avoid circular dependency
 
@@ -951,13 +941,10 @@ class TimbreWidget {
 
         addFilterButtonCell.onmouseout = () => {};
 
-        widgetWindow.addButton(
-            "restore-button.svg",
-            TimbreWidget.ICONSIZE,
-            _("Undo")
-        ).onclick = () => {
-            this._undo();
-        };
+        widgetWindow.addButton("restore-button.svg", TimbreWidget.ICONSIZE, _("Undo")).onclick =
+            () => {
+                this._undo();
+            };
 
         // let cell = this._addButton(row, 'close-button.svg', TimbreWidget.ICONSIZE, _('Close'));
 
@@ -1231,8 +1218,8 @@ class TimbreWidget {
                     this.isActive["duosynth"] = false;
 
                     if (this.AMSynthesizer.length === 0) {
-                        const topOfClamp = this.activity.blocks.blockList[this.blockNo]
-                            .connections[2];
+                        const topOfClamp =
+                            this.activity.blocks.blockList[this.blockNo].connections[2];
                         const bottomOfClamp = this.activity.blocks.findBottomBlock(topOfClamp);
 
                         const AMSYNTHOBJ = [
@@ -1295,8 +1282,8 @@ class TimbreWidget {
                     this.isActive["duosynth"] = false;
 
                     if (this.FMSynthesizer.length === 0) {
-                        const topOfClamp = this.activity.blocks.blockList[this.blockNo]
-                            .connections[2];
+                        const topOfClamp =
+                            this.activity.blocks.blockList[this.blockNo].connections[2];
                         const bottomOfClamp = this.activity.blocks.findBottomBlock(topOfClamp);
 
                         const FMSYNTHOBJ = [
@@ -1362,8 +1349,8 @@ class TimbreWidget {
                     this.isActive["duosynth"] = false;
 
                     if (this.NoiseSynthesizer.length === 0) {
-                        const topOfClamp = this.activity.blocks.blockList[this.blockNo]
-                            .connections[2];
+                        const topOfClamp =
+                            this.activity.blocks.blockList[this.blockNo].connections[2];
                         const bottomOfClamp = this.activity.blocks.findBottomBlock(topOfClamp);
 
                         const NOISESYNTHOBJ = [
@@ -1426,8 +1413,8 @@ class TimbreWidget {
                     this.isActive["duosynth"] = true;
 
                     if (this.duoSynthesizer.length === 0) {
-                        const topOfClamp = this.activity.blocks.blockList[this.blockNo]
-                            .connections[2];
+                        const topOfClamp =
+                            this.activity.blocks.blockList[this.blockNo].connections[2];
                         const bottomOfClamp = this.activity.blocks.findBottomBlock(topOfClamp);
 
                         const DUOSYNTHOBJ = [
@@ -1951,9 +1938,8 @@ class TimbreWidget {
                 this._playNote("G4", 1 / 8);
             } else if (targetId.startsWith("radio") && event.type === "click") {
                 const m = Number(targetId.replace("radio", ""));
-                instrumentsFilters[0][this.instrumentName][Math.floor(m / 4)][
-                    "filterRolloff"
-                ] = parseFloat(target.value);
+                instrumentsFilters[0][this.instrumentName][Math.floor(m / 4)]["filterRolloff"] =
+                    parseFloat(target.value);
                 this._update(Math.floor(m / 4), target.value, 1);
                 this._playNote("G4", 1 / 8);
             } else if (
@@ -2206,8 +2192,8 @@ class TimbreWidget {
                     if (this.tremoloEffect.length === 0) {
                         // This is the first block in the child stack
                         // of the Timbre clamp.
-                        const topOfClamp = this.activity.blocks.blockList[this.blockNo]
-                            .connections[2];
+                        const topOfClamp =
+                            this.activity.blocks.blockList[this.blockNo].connections[2];
 
                         const n = this.activity.blocks.blockList.length;
                         const TREMOLOOBJ = [
@@ -2236,9 +2222,8 @@ class TimbreWidget {
                                 docById("myspanFx" + m).textContent = elem.value;
 
                                 if (m === 0) {
-                                    instrumentsEffects[0][this.instrumentName][
-                                        "tremoloFrequency"
-                                    ] = parseFloat(elem.value);
+                                    instrumentsEffects[0][this.instrumentName]["tremoloFrequency"] =
+                                        parseFloat(elem.value);
                                 }
 
                                 if (m === 1) {
@@ -2285,8 +2270,8 @@ class TimbreWidget {
                         docById("myspanFx1").textContent = obj[0] + "/" + obj[1]; // this.vibratoParams[1];
                     } else {
                         // If necessary, add a vibrato block.
-                        const topOfTimbreClamp = this.activity.blocks.blockList[this.blockNo]
-                            .connections[2];
+                        const topOfTimbreClamp =
+                            this.activity.blocks.blockList[this.blockNo].connections[2];
 
                         const vibratoBlock = this.activity.blocks.blockList.length;
                         const VIBRATOOBJ = [
@@ -2392,8 +2377,8 @@ class TimbreWidget {
                     }
 
                     if (this.chorusEffect.length === 0) {
-                        const topOfClamp = this.activity.blocks.blockList[this.blockNo]
-                            .connections[2];
+                        const topOfClamp =
+                            this.activity.blocks.blockList[this.blockNo].connections[2];
 
                         const n = this.activity.blocks.blockList.length;
                         const CHORUSOBJ = [
@@ -2424,15 +2409,13 @@ class TimbreWidget {
                                 docById("myspanFx" + m).textContent = elem.value;
 
                                 if (m === 0) {
-                                    instrumentsEffects[0][this.instrumentName][
-                                        "chorusRate"
-                                    ] = parseFloat(elem.value);
+                                    instrumentsEffects[0][this.instrumentName]["chorusRate"] =
+                                        parseFloat(elem.value);
                                 }
 
                                 if (m === 1) {
-                                    instrumentsEffects[0][this.instrumentName][
-                                        "delayTime"
-                                    ] = parseFloat(elem.value);
+                                    instrumentsEffects[0][this.instrumentName]["delayTime"] =
+                                        parseFloat(elem.value);
                                 }
 
                                 if (m === 2) {
@@ -2492,8 +2475,8 @@ class TimbreWidget {
                     }
 
                     if (this.phaserEffect.length === 0) {
-                        const topOfClamp = this.activity.blocks.blockList[this.blockNo]
-                            .connections[2];
+                        const topOfClamp =
+                            this.activity.blocks.blockList[this.blockNo].connections[2];
 
                         const n = this.activity.blocks.blockList.length;
                         const PHASEROBJ = [
@@ -2530,15 +2513,13 @@ class TimbreWidget {
                                 }
 
                                 if (m === 1) {
-                                    instrumentsEffects[0][this.instrumentName][
-                                        "octaves"
-                                    ] = parseFloat(elem.value);
+                                    instrumentsEffects[0][this.instrumentName]["octaves"] =
+                                        parseFloat(elem.value);
                                 }
 
                                 if (m === 2) {
-                                    instrumentsEffects[0][this.instrumentName][
-                                        "baseFrequency"
-                                    ] = parseFloat(elem.value);
+                                    instrumentsEffects[0][this.instrumentName]["baseFrequency"] =
+                                        parseFloat(elem.value);
                                 }
 
                                 this._update(blockValue, parseFloat(elem.value), Number(m));
@@ -2571,8 +2552,8 @@ class TimbreWidget {
                     }
 
                     if (this.distortionEffect.length === 0) {
-                        const topOfClamp = this.activity.blocks.blockList[this.blockNo]
-                            .connections[2];
+                        const topOfClamp =
+                            this.activity.blocks.blockList[this.blockNo].connections[2];
 
                         const n = this.activity.blocks.blockList.length;
                         const DISTORTIONOBJ = [
@@ -2602,4 +2583,7 @@ class TimbreWidget {
             };
         }
     };
+}
+if (typeof module !== "undefined") {
+    module.exports = TimbreWidget;
 }

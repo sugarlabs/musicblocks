@@ -61,3 +61,6 @@ class IntervalsBlocksAPI {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = IntervalsBlocksAPI;
 }
+if (typeof window !== "undefined") {
+    window.IntervalsBlocksAPI = IntervalsBlocksAPI;
+}

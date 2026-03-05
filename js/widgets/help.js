@@ -96,8 +96,10 @@ class HelpWidget {
                     <div id="right-arrow" class="hover" tabindex="-1"></div>
                     <div id="left-arrow" class="hover" tabindex="-1"></div>
                     <div id="helpButtonsDiv" tabindex="-1"></div>
-                    <div id="helpBodyDiv" tabindex="-1"></div>
-                         `;
+                    <div id="helpScrollWrapper">
+                        <div id="helpBodyDiv" tabindex="-1"></div>
+                    </div>
+                          `;
 
         this._helpDiv.insertAdjacentHTML("afterbegin", innerHTML);
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
@@ -112,10 +114,14 @@ class HelpWidget {
             rightArrow = document.getElementById("right-arrow");
             rightArrow.style.display = "block";
             rightArrow.classList.add("hover");
+            rightArrow.setAttribute("title", _("Next"));
+            rightArrow.setAttribute("aria-label", _("Next"));
 
             leftArrow = document.getElementById("left-arrow");
             leftArrow.style.display = "block";
             leftArrow.classList.add("hover");
+            leftArrow.setAttribute("title", _("Previous"));
+            leftArrow.setAttribute("aria-label", _("Previous"));
 
             document.onkeydown = function handleArrowKeys(event) {
                 if (event.key === "ArrowLeft") {
@@ -148,22 +154,21 @@ class HelpWidget {
             cell = docById("right-arrow");
 
             cell.onclick = () => {
+                if (page >= HELPCONTENT.length - 1) {
+                    return;
+                }
+
                 page = page + 1;
                 leftArrow.classList.remove("disabled");
-                if (page === HELPCONTENT.length) {
-                    page = 0;
-                }
-                if (page == 0) {
-                    this.widgetWindow.updateTitle(_("Take a tour"));
-                } else {
-                    this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
-                }
+
+                this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
                 this._showPage(page);
             };
         } else {
             if (this.activity.blocks.activeBlock.name !== null) {
-                const label = this.activity.blocks.blockList[this.activity.blocks.activeBlock]
-                    .protoblock.staticLabels[0];
+                const label =
+                    this.activity.blocks.blockList[this.activity.blocks.activeBlock].protoblock
+                        .staticLabels[0];
                 if (page == 0) {
                     this.widgetWindow.updateTitle(_("Take a tour"));
                 } else {
@@ -174,10 +179,14 @@ class HelpWidget {
             rightArrow = document.getElementById("right-arrow");
             rightArrow.style.display = "none";
             rightArrow.classList.remove("hover");
+            rightArrow.setAttribute("title", _("Next"));
+            rightArrow.setAttribute("aria-label", _("Next"));
 
             leftArrow = document.getElementById("left-arrow");
             leftArrow.style.display = "none";
             leftArrow.classList.remove("hover");
+            leftArrow.setAttribute("title", _("Previous"));
+            leftArrow.setAttribute("aria-label", _("Previous"));
         }
 
         if (!useActiveBlock) {
@@ -216,8 +225,9 @@ class HelpWidget {
                 // svg file, and an optional macro name for generating
                 // the help output.
 
-                const message = this.activity.blocks.blockList[this.activity.blocks.activeBlock]
-                    .protoblock.helpString;
+                const message =
+                    this.activity.blocks.blockList[this.activity.blocks.activeBlock].protoblock
+                        .helpString;
 
                 if (message) {
                     const helpBody = docById("helpBodyDiv");
@@ -340,6 +350,11 @@ class HelpWidget {
         helpBody.innerHTML = "";
         const totalPages = HELPCONTENT.length;
         const pageCount = `${page + 1}/${totalPages}`;
+        const rightArrow = docById("right-arrow");
+        const leftArrow = docById("left-arrow");
+
+        rightArrow.classList.toggle("disabled", page === HELPCONTENT.length - 1);
+        leftArrow.classList.toggle("disabled", page === 0);
 
         // Previous HTML content is removed, and new one is generated.
         let body = "";
@@ -380,16 +395,14 @@ class HelpWidget {
             const cell = docById("right-arrow");
             const leftArrow = docById("left-arrow");
             cell.onclick = () => {
+                if (page >= HELPCONTENT.length - 1) {
+                    return;
+                }
+
                 page = page + 1;
                 leftArrow.classList.remove("disabled");
-                if (page === HELPCONTENT.length) {
-                    page = 0;
-                }
-                if (page == 0) {
-                    this.widgetWindow.updateTitle(_("Take a tour"));
-                } else {
-                    this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
-                }
+
+                this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
                 this._showPage(page);
             };
             if (page === 0) {
@@ -470,7 +483,7 @@ class HelpWidget {
         // this._helpDiv.style.backgroundColor = "#e8e8e8";
 
         const helpDivHTML =
-            '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
+            '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpScrollWrapper"><div id="helpBodyDiv" tabindex="-1"></div></div>';
         this._helpDiv.insertAdjacentHTML("afterbegin", helpDivHTML);
 
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
