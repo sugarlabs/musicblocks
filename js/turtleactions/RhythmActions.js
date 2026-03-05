@@ -281,7 +281,7 @@ function setupRhythmActions(activity) {
                 if (tur.singer.tieCarryOver > 0) {
                     if (tur.singer.justCounting.length === 0) {
                         const lastNote = last(tur.singer.inNoteBlock);
-                        if (lastNote != null && lastNote in tur.singer.notePitches) {
+                        if (lastNote !== null && lastNote in tur.singer.notePitches) {
                             // Remove the note from the Lilypond list
                             for (
                                 let i = 0;
@@ -295,7 +295,7 @@ function setupRhythmActions(activity) {
 
                     // Restore the extra note and play it
                     const saveBlk = tur.singer.tieNoteExtras[0];
-                    const noteValue = tur.singer.tieCarryOver;
+                    const _noteValue = tur.singer.tieCarryOver;
                     tur.singer.tieCarryOver = 0;
 
                     tur.singer.inNoteBlock.push(saveBlk);
