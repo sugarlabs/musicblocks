@@ -5659,6 +5659,30 @@ class Activity {
             }, duration);
         };
 
+        this.zoomOverlayTimeout = null;
+        this.showZoomOverlay = scale => {
+            const percentage = Math.round(scale * 100);
+            let zoomOverlay = document.getElementById("zoomOverlay");
+            if (zoomOverlay === null) {
+                zoomOverlay = document.createElement("div");
+                zoomOverlay.id = "zoomOverlay";
+                document.body.appendChild(zoomOverlay);
+            }
+
+            if (this.zoomOverlayTimeout !== null) {
+                clearTimeout(this.zoomOverlayTimeout);
+            }
+
+            zoomOverlay.textContent = percentage + "%";
+            zoomOverlay.style.visibility = "visible";
+
+            const that = this;
+            this.zoomOverlayTimeout = setTimeout(() => {
+                zoomOverlay.style.visibility = "hidden";
+                that.zoomOverlayTimeout = null;
+            }, 1500);
+        };
+
         this.errorMsg = (msg, blk, text, timeout) => {
             if (this.errorMsgTimeoutID !== null) {
                 clearTimeout(this.errorMsgTimeoutID);

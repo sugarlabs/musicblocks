@@ -1935,6 +1935,23 @@ input.timbreName {
   color: black;
 }
 
+#zoomOverlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 20px 40px;
+  border-radius: 10px;
+  font-family: "Roboto", sans-serif;
+  font-size: 32px;
+  font-weight: bold;
+  pointer-events: none;
+  visibility: hidden;
+  z-index: 1000;
+}
+
 #palette td,
 thead,
 tr,

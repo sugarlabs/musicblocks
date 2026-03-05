@@ -303,6 +303,7 @@ class Blocks {
             /** Force a refresh. */
             await delayExecution(100);
             this.activity.refreshCanvas();
+            this.activity.showZoomOverlay(scale);
         };
 
         /**
