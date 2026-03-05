@@ -521,6 +521,15 @@ describe("PitchSlider Widget", () => {
                 expect.any(Function)
             );
         });
+        test("mousedown event sets activeSlider to slider id", () => {
+            const mousedownCall = slider.sliders[0].addEventListener.mock.calls.find(
+                call => call[0] === "mousedown"
+            );
+            const mousedownHandler = mousedownCall[1];
+            slider.activeSlider = null;
+            mousedownHandler();
+            expect(slider.activeSlider).toBe("0");
+        });
     });
 
     describe("Block Generation (_save)", () => {
