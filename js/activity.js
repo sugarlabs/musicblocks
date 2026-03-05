@@ -5650,7 +5650,7 @@ class Activity {
             }
 
             this.printText.classList.add("show");
-            this.printTextContent.innerHTML = msg;
+            this.printTextContent.textContent = msg;
 
             const that = this;
             this.msgTimeoutID = setTimeout(() => {
@@ -5787,7 +5787,7 @@ class Activity {
                 default:
                     // Show and populate errorText div
                     this.errorText.classList.add("show");
-                    this.errorTextContent.innerHTML = msg;
+                    this.errorTextContent.textContent = msg;
                     break;
             }
 
