@@ -56,6 +56,7 @@ window.GuideValidator = {
         const initialCounter = LG.initialCounts[LG.step] ?? 0;
         const currentCounter = window._lgPaletteCounter;
 
+        if (window._lgRunningDemo) return false;
         const result =
             window._lgLastPalette === paletteName &&
             currentCounter > initialCounter;
@@ -90,6 +91,7 @@ window.GuideValidator = {
                 block &&
                 block.name === blockName &&
                 !block.trash &&
+                !window._lgDemoBlocks.includes(id) &&
                 block.container?.visible !== false
             ) {
                 current++;
@@ -120,6 +122,7 @@ window.GuideValidator = {
                 block.name === "pitch" &&
                 !block.trash &&
                 block.container?.visible !== false &&
+                !window._lgDemoBlocks.includes(id) &&
                 this.isPitchInsideNote(block, blockList)
             ) {
                 current++;
@@ -182,6 +185,7 @@ window.GuideValidator = {
     },
 
     validateOctaveChange() {
+        if (window._lgRunningDemo) return false;
         const activity = getRealActivity();
         if (!activity) return false;
 
@@ -221,6 +225,7 @@ window.GuideValidator = {
     },
 
     validateConnection() {
+        if (window._lgRunningDemo) return false;
         const activity = this.getActivitySafely();
         if (!activity) return false;
 
@@ -260,6 +265,7 @@ window.GuideValidator = {
     },
 
     validateMelody() {
+        if (window._lgRunningDemo) return false;
         const activity = this.getActivitySafely();
         if (!activity) return false;
 
@@ -273,6 +279,7 @@ window.GuideValidator = {
                 block.name &&
                 block.name.toLowerCase().includes("note") &&
                 !block.trash &&
+                !window._lgDemoBlocks.includes(id) &&
                 block.container?.visible !== false
             ) {
                 current++;
@@ -290,6 +297,7 @@ window.GuideValidator = {
         return result;
     },
     validateToneBlock() {
+        if (window._lgRunningDemo) return false;
         const activity = this.getActivitySafely();
         if (!activity) return false;
 

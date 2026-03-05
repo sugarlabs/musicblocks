@@ -152,6 +152,24 @@ body.lg-step-done #lg-status {
     z-index: 10002 !important;
 }
 
+.lg-demo-highlight {
+    outline: 4px solid #ffcc00;
+    animation: lgPulse 1s infinite;
+}
+
+@keyframes lgPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+
+.lg-palette-highlight {
+    outline: 4px solid #ff9800;
+    border-radius: 10px;
+    box-shadow: 0 0 12px rgba(255,152,0,0.8);
+    animation: lgPulse 1s infinite;
+}
+
 /* Responsive design */
 @media (max-width: 480px) {
     #lg-panel {

@@ -2,18 +2,35 @@ window.GuideUI = {
     show(step) {
         console.log(`Showing step: ${step.id}`);
         this.clearHighlights();
-        
+
         // Create or update overlay first
         this.createOverlay(step);
-        
+
         // Highlight target elements before opening palette (so user can see what to click)
         this.highlightElements(step);
-        
+
         // Handle palette opening - but don't mark as complete, user needs to actually open it
         // Only try to open if the activity is fully loaded and palette system is ready
-        
+
         // Create or update panel
         this.createPanel(step);
+        const demoBtn = document.getElementById("lg-demo");
+
+        if (demoBtn) {
+            demoBtn.onclick = () => {
+                const step = GuideSteps[LG.step];
+
+                if (step.demo && GuideDemos[step.demo]) {
+                    window._lgRunningDemo = true;
+
+                    GuideDemos[step.demo]();
+
+                    setTimeout(() => {
+                        window._lgRunningDemo = false;
+                    }, 2000);
+                }
+            };
+        }
         document.body.classList.remove("lg-step-done");
     },
 
@@ -53,7 +70,7 @@ window.GuideUI = {
             }
         }
 
-        if (step.action === "octave_change"){
+        if (step.action === "octave_change") {
             document.querySelectorAll('.number').forEach(el => {
                 el.classList.add('lg-highlight');
             });
@@ -88,11 +105,11 @@ window.GuideUI = {
         const arrow = document.createElement("div");
         arrow.className = "lg-arrow";
         arrow.id = "lg-arrow";
-        
+
         const rect = button.getBoundingClientRect();
         arrow.style.top = rect.top + rect.height / 2 - 10 + "px";
         arrow.style.left = rect.right + 8 + "px";
-        
+
         document.body.appendChild(arrow);
     },
 
@@ -105,7 +122,7 @@ window.GuideUI = {
         }
 
         const isCompleted = GuideValidator.check(step);
-        
+
         panel.innerHTML = `
             <div class="lg-header">
                 <span>Step ${LG.step + 1} / ${GuideSteps.length}</span>
@@ -123,6 +140,9 @@ window.GuideUI = {
                         ${isCompleted ? '' : 'style="pointer-events: none;"'}
                         onclick="LG.next()">
                     ${LG.step === GuideSteps.length - 1 ? '🎉 Finish' : 'Next →'}
+                </button>
+                <button id="lg-demo" class="lg-btn lg-demo">
+                    🎬 Show Me
                 </button>
                 <button class="lg-btn lg-close" onclick="LG.stop()">Close</button>
             </div>
@@ -155,14 +175,14 @@ window.GuideUI = {
         const btn = document.getElementById("lg-next");
         const status = document.getElementById("lg-status");
         document.body.classList.add("lg-step-done");
-        
+
         if (btn) {
             btn.disabled = false;
             btn.removeAttribute("style");
             btn.style.pointerEvents = "auto";
             btn.classList.add("lg-ready");
         }
-        
+
         if (status) {
             status.innerHTML = `
                 <span class="lg-status-icon">✅</span>
@@ -203,7 +223,7 @@ window.GuideUI = {
             ">Close</button>
         `;
         document.body.appendChild(finishMsg);
-        
+
         setTimeout(() => finishMsg.remove(), 5000);
     }
 };

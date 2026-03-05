@@ -657,8 +657,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const original = activity.blocks.palettes.showPalette;
                 activity.blocks.palettes.showPalette = function (name) {
-                    window._lgLastPalette = name;
-                    window._lgPaletteCounter++;
+                    if (!window._lgRunningDemo) {
+                        window._lgLastPalette = name;
+                        window._lgPaletteCounter++;
+                    }
                     return original.call(this, name);
                 };
 
