@@ -975,13 +975,14 @@
     });
   }
 
+  resizeCanvasesToScreen();
+
   window.addEventListener("resize", resizeCanvasesToScreen);
   document.addEventListener("fullscreenchange", resizeCanvasesToScreen);
 
   setTimeout(resizeCanvasesToScreen, 150);
 })();
-
-</script>
+    </script>
 
 </body>
 

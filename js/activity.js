@@ -1692,6 +1692,7 @@ class Activity {
                 }
 
                 this.logo.runLogoCommands(null, env);
+                document.getElementById("stop").style.display = "inline-block";
             } else {
                 if (currentDelay !== 0) {
                     // Keep playing at full speed.
@@ -2144,6 +2145,7 @@ class Activity {
             }
 
             this.logo.doStopTurtles();
+            document.getElementById("stop").style.display = "none";
 
             const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
@@ -7317,6 +7319,11 @@ class Activity {
          * Inits everything. The main function.
          */
         this.init = async () => {
+            // Hide stop button on startup
+            const stopBtn = document.getElementById("stop");
+            if (stopBtn) {
+                stopBtn.style.display = "none";
+            }
             this._clientWidth = document.body.clientWidth;
             this._clientHeight = document.body.clientHeight;
             this._innerWidth = window.innerWidth;
