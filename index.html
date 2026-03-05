@@ -8,7 +8,9 @@
     <meta name="description"
         content="Learn to code through music with Music Blocks. Arrange colorful blocks to create everything from simple melodies to interactive games.">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta id="theme-color" name="theme-color" content="#2196F3">
 
     <!-- Icons & PWA -->
@@ -28,6 +30,7 @@
     <link rel="preload" href="dist/css/windows.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="lib/materialize-iso.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="css/darkmode.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/mobile.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="prefetch" as="video" href="loading-animation.webm" type="video/webm">
     <link rel="prefetch" as="video" href="loading-animation.mp4" type="video/mp4">
 
@@ -109,6 +112,7 @@
     <script src="lib/astring.min.js" defer></script>
     <script src="lib/acorn.min.js" defer></script>
     <script src="env.js"></script>
+    <script src="js/mobile-enhancements.js" defer></script>
 
 
     <script data-main="js/loader" src="lib/require.js" defer></script>
