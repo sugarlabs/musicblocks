@@ -2970,7 +2970,7 @@ class Blocks {
                 thisBlock = this.highlightedBlock;
             }
 
-            if (thisBlock !== null) {
+            if (thisBlock !== null && this.blockList[thisBlock]) {
                 this.blockList[thisBlock].unhighlight();
             }
 

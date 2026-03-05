@@ -1098,6 +1098,7 @@ class Logo {
      */
     runLogoCommands(startHere, env) {
         this._prematureRestart = this._alreadyRunning;
+        this._alreadyRunning = true;
         if (this._alreadyRunning && this._runningBlock !== null) {
             this._ignoringBlock = this._runningBlock;
         } else {
@@ -1404,8 +1405,6 @@ class Logo {
      * @returns {void}
      */
     runFromBlockNow(logo, turtle, blk, isflow, receivedArg, queueStart) {
-        this._alreadyRunning = true;
-
         this.receivedArg = receivedArg;
 
         // Sometimes we don't want to unwind the entire queue.
@@ -1760,7 +1759,7 @@ class Logo {
             if (!logo._prematureRestart) {
                 // Make sure any unissued signals are dispatched.
                 for (const b in tur.endOfClampSignals) {
-                    const signalsLength = tur.endOfClampSignals[b].length;
+                    const signalsLength = (tur.endOfClampSignals[b] && tur.endOfClampSignals[b].length) || 0;
                     for (let i = 0; i < signalsLength; i++) {
                         if (tur.endOfClampSignals[b][i] != null) {
                             if (
