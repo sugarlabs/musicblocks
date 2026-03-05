@@ -311,8 +311,155 @@ class Palettes {
         row.style.alignItems = "center";
         row.style.width = "126px";
         row.style.backgroundColor = platformColor.paletteBackground;
+        row.addEventListener("mouseover", () => {
+            row.style.backgroundColor = platformColor.hoverColor;
+        });
+        row.addEventListener("mouseout", () => {
+            row.style.backgroundColor = platformColor.paletteBackground;
+        });
+
+        // Overlay an interactive search input on top of the label
+        if (typeof label.appendChild === "function") {
+            const searchInput = document.createElement("input");
+            searchInput.type = "text";
+            searchInput.placeholder = toTitleCase(_(name));
+            searchInput.style.width = "100%";
+            searchInput.style.border = "none";
+            searchInput.style.outline = "none";
+            searchInput.style.background = "transparent";
+            searchInput.style.color = platformColor.paletteText;
+            searchInput.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
+            searchInput.style.padding = "0";
+            searchInput.style.margin = "0";
+            searchInput.style.boxSizing = "border-box";
+            label.textContent = "";
+            label.appendChild(searchInput);
+
+            this._paletteSearchInput = searchInput;
+
+            // Wire up inline palette filtering on input
+            const that = this;
+            searchInput.addEventListener("input", () => {
+                that._filterPaletteBlocks(searchInput.value);
+            });
+
+            searchInput.addEventListener("focus", () => {
+                if (docById("PaletteBody")) {
+                    docById("PaletteBody").parentNode.removeChild(docById("PaletteBody"));
+                }
+            });
+
+            searchInput.addEventListener("click", e => {
+                e.stopPropagation();
+            });
+        }
 
         this._loadPaletteButtonHandler(name, row);
+    }
+
+    /**
+     * Filters palette blocks inline based on the search query.
+     * Shows matching blocks from ALL palettes inside the palette body.
+     * @param {string} query - The search text typed by the user.
+     */
+    _filterPaletteBlocks(query) {
+        const palDiv = docById("palette");
+        if (!palDiv) return;
+
+        // Remove any existing search results panel
+        if (docById("PaletteBody")) {
+            palDiv.removeChild(docById("PaletteBody"));
+        }
+
+        const trimmed = query.trim().toLowerCase();
+        if (trimmed.length === 0) {
+            return;
+        }
+
+        // Create the results container (same structure as showMenu)
+        const palBody = document.createElement("table");
+        palBody.id = "PaletteBody";
+        const palBodyHeight = window.innerHeight - this.top - this.cellSize - 26;
+        palBody.insertAdjacentHTML(
+            "afterbegin",
+            `<thead></thead><tbody style="display: block; width: 100%; height: auto; max-height: ${palBodyHeight}px; overflow: auto; overflow-x: hidden;" id="PaletteBody_items" class="PalScrol"></tbody>`
+        );
+        palBody.style.minWidth = "180px";
+        palBody.style.background = platformColor.paletteBackground;
+        palBody.style.float = "left";
+        palBody.style.border = `1px solid ${platformColor.selectorSelected}`;
+        [palBody.childNodes[0], palBody.childNodes[1]].forEach(item => {
+            item.style.boxSizing = "border-box";
+            item.style.padding = "8px";
+        });
+        palDiv.appendChild(palBody);
+
+        const paletteList = docById("PaletteBody_items");
+
+        // Iterate through ALL palettes and find matching blocks
+        for (const paletteName in this.dict) {
+            if (!this.dict.hasOwnProperty(paletteName)) continue;
+            const palette = this.dict[paletteName];
+            if (!palette.protoList) continue;
+
+            palette.model.update();
+            const blocks = palette.model.blocks;
+
+            for (const b of blocks) {
+                if (b.hidden) continue;
+
+                // Match block name against search query
+                const blockLabel = (b.label || b.blkname || "").toLowerCase();
+                if (!blockLabel.includes(trimmed)) continue;
+
+                // Render the matching block row
+                const itemRow = paletteList.insertRow();
+                const itemCell = itemRow.insertCell();
+                let blockImg = makePaletteIcons(b.artwork);
+
+                if (b.image) {
+                    if (["media", "camera", "video"].includes(b.blkname)) {
+                        blockImg = makePaletteIcons(eval(b.blkname + "PALETTE"));
+                    } else if (
+                        this.activity.pluginsImages &&
+                        this.activity.pluginsImages[b.blkname]
+                    ) {
+                        blockImg = makePaletteIcons(this.activity.pluginsImages[b.blkname]);
+                    }
+                }
+
+                blockImg.onmouseover = () => (document.body.style.cursor = "pointer");
+                blockImg.onmouseleave = () => (document.body.style.cursor = "default");
+                blockImg.ondragstart = () => false;
+
+                // Click to create block on canvas
+                const protoblk = this.activity.blocks.protoBlockDict[b.blkname];
+                if (protoblk) {
+                    blockImg.onclick = () => {
+                        const pName = protoblk.palette.name;
+                        this.dict[pName].makeBlockFromSearch(protoblk, b.blkname, newBlock => {
+                            this.activity.blocks.moveBlock(
+                                newBlock,
+                                100 - this.activity.blocksContainer.x,
+                                100 - this.activity.blocksContainer.y
+                            );
+                        });
+                    };
+                }
+
+                itemCell.appendChild(blockImg);
+            }
+        }
+
+        // If no results found, show a message
+        if (paletteList.rows.length === 0) {
+            const emptyRow = paletteList.insertRow();
+            const emptyCell = emptyRow.insertCell();
+            emptyCell.textContent = _("No blocks found");
+            emptyCell.style.padding = "8px";
+            emptyCell.style.color = platformColor.paletteText;
+            emptyCell.style.fontStyle = "italic";
+        }
     }
 
     makeButton(name, icon, listBody) {
@@ -487,9 +634,13 @@ class Palettes {
         row.onmouseout = () => clearTimeout(timeout);
 
         row.onclick = () => {
-            if (name == "search") {
+            if (name === "search") {
                 this._hideMenus();
                 this.activity.showSearchWidget();
+                // Also focus the inline search input if available
+                if (this._paletteSearchInput) {
+                    this._paletteSearchInput.focus();
+                }
             } else {
                 this.showPalette(name);
             }
