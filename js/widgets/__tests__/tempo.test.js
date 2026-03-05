@@ -906,7 +906,8 @@ describe("Tempo Widget", () => {
             const mockWindow = window.widgetWindows.windowFor();
             const addButtonCalls = mockWindow.addButton.mock.calls;
             const saveCall = addButtonCalls.find(call => call[0] === "export-chunk.svg");
-            const saveBtn = mockWindow.addButton.mock.results[addButtonCalls.indexOf(saveCall)].value;
+            const saveBtn =
+                mockWindow.addButton.mock.results[addButtonCalls.indexOf(saveCall)].value;
             saveBtn.onclick();
             expect(tempoWidget._get_save_lock()).toBe(true);
             jest.advanceTimersByTime(1000);
