@@ -6943,6 +6943,13 @@ class Blocks {
             /** Add this block to the list of blocks in the trash so we can undo this action. */
             this.trashStacks.push(thisBlock);
 
+            // Cap the undo history to prevent unbounded memory growth.
+            // Keep the 100 most recent trashed stacks.
+            const MAX_TRASH_UNDO = 100;
+            if (this.trashStacks.length > MAX_TRASH_UNDO) {
+                this.trashStacks = this.trashStacks.slice(-MAX_TRASH_UNDO);
+            }
+
             /** Disconnect block. */
             const parentBlock = myBlock.connections[0];
             if (parentBlock != null) {
@@ -6988,6 +6995,21 @@ class Blocks {
                 const blk = this.dragGroup[b];
                 this.blockList[blk].trash = true;
                 this.blockList[blk].hide();
+
+                // Free the backing canvas memory for trashed blocks.
+                // Each cached block holds a bitmap canvas (~0.5-2 MB).
+                if (this.blockList[blk].container) {
+                    this.blockList[blk].container.uncache();
+                }
+
+                // Clean up SVG art strings for trashed blocks to free memory.
+                if (this.blockArt[blk]) {
+                    delete this.blockArt[blk];
+                }
+                if (this.blockCollapseArt[blk]) {
+                    delete this.blockCollapseArt[blk];
+                }
+
                 const title = this.blockList[blk].protoblock.staticLabels[0];
                 closeBlkWidgets(_(title));
                 this.activity.refreshCanvas();
