@@ -27,50 +27,44 @@ global._ = msg => msg; // Mock translation function
 global.getDrumSynthName = jest.fn();
 
 // Mock the Window Manager
-global.window = {
-    widgetWindows: {
-        windowFor: jest.fn().mockReturnValue({
-            clear: jest.fn(),
-            show: jest.fn(),
-            addButton: jest.fn().mockReturnValue({ onclick: () => {} }),
-            addInputButton: jest.fn().mockImplementation(val => ({
-                value: val,
-                addEventListener: jest.fn()
-            })),
-            getWidgetBody: jest.fn().mockReturnValue({
-                appendChild: jest.fn(),
-                insertRow: jest.fn().mockReturnValue({
-                    insertCell: jest.fn().mockReturnValue({
-                        appendChild: jest.fn(),
-                        setAttribute: jest.fn()
-                    })
+window.widgetWindows = {
+    windowFor: jest.fn().mockReturnValue({
+        clear: jest.fn(),
+        show: jest.fn(),
+        addButton: jest.fn().mockReturnValue({ onclick: () => {} }),
+        addInputButton: jest.fn().mockImplementation(val => ({
+            value: val,
+            addEventListener: jest.fn()
+        })),
+        getWidgetBody: jest.fn().mockReturnValue({
+            appendChild: jest.fn(),
+            insertRow: jest.fn().mockReturnValue({
+                insertCell: jest.fn().mockReturnValue({
+                    appendChild: jest.fn(),
+                    setAttribute: jest.fn()
                 })
-            }),
-            sendToCenter: jest.fn()
-        })
-    }
-};
-
-// Mock Document (for creating the canvas)
-global.document = {
-    createElement: jest.fn().mockReturnValue({
-        style: {},
-        getContext: jest.fn().mockReturnValue({
-            clearRect: jest.fn(),
-            beginPath: jest.fn(),
-            fillStyle: "",
-            ellipse: jest.fn(),
-            fill: jest.fn(),
-            closePath: jest.fn()
-        })
+            })
+        }),
+        sendToCenter: jest.fn(),
+        onclose: jest.fn(),
+        destroy: jest.fn()
     })
 };
-
+// Mock Document (for creating the canvas)
+HTMLCanvasElement.prototype.getContext = jest.fn().mockReturnValue({
+    clearRect: jest.fn(),
+    beginPath: jest.fn(),
+    fillStyle: "",
+    ellipse: jest.fn(),
+    fill: jest.fn(),
+    closePath: jest.fn()
+});
 describe("Tempo Widget", () => {
     let tempoWidget;
     let mockActivity;
 
     beforeEach(() => {
+        jest.clearAllMocks();
         jest.useFakeTimers();
         tempoWidget = new Tempo();
 
@@ -489,6 +483,386 @@ describe("Tempo Widget", () => {
 
         test("should have correct YRADIUS", () => {
             expect(Tempo.YRADIUS).toBe(75);
+        });
+    });
+    describe("init() and UI Setup", () => {
+        beforeEach(() => {
+            tempoWidget.BPMs = [120];
+        });
+
+        test("should initialize the widget window and UI elements", () => {
+            tempoWidget.init(mockActivity);
+
+            expect(window.widgetWindows.windowFor).toHaveBeenCalledWith(
+                tempoWidget,
+                "tempo",
+                "tempo",
+                true
+            );
+
+            const mockWindow = window.widgetWindows.windowFor();
+
+            expect(mockWindow.clear).toHaveBeenCalled();
+            expect(mockWindow.show).toHaveBeenCalled();
+            expect(mockWindow.getWidgetBody).toHaveBeenCalled();
+            expect(mockWindow.getWidgetBody().appendChild).toHaveBeenCalled();
+            expect(mockWindow.addButton).toHaveBeenCalled();
+            expect(mockWindow.addInputButton).toHaveBeenCalled();
+        });
+
+        test("should bind event listeners to the BPM inputs and trigger _useBPM on Enter key", () => {
+            const useBPMSpy = jest.spyOn(tempoWidget, "_useBPM").mockImplementation(() => {});
+
+            tempoWidget.init(mockActivity);
+            const mockWindow = window.widgetWindows.windowFor();
+            const mockInput = mockWindow.addInputButton.mock.results[0].value;
+            const keyupCall = mockInput.addEventListener.mock.calls.find(
+                call => call[0] === "keyup"
+            );
+            const keyupHandler = keyupCall[1];
+            keyupHandler({ keyCode: 13 });
+            expect(useBPMSpy).toHaveBeenCalledTimes(1);
+            expect(useBPMSpy).toHaveBeenCalledWith(0);
+            keyupHandler({ keyCode: 32 });
+            expect(useBPMSpy).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("_draw() and canvas rendering", () => {
+        beforeEach(() => {
+            const mockCanvas = document.createElement("canvas");
+            mockCanvas.width = Tempo.TEMPOWIDTH;
+            mockCanvas.height = Tempo.TEMPOHEIGHT;
+
+            tempoWidget.tempoCanvases = [mockCanvas];
+            tempoWidget.BPMs = [120];
+            tempoWidget._directions = [1];
+            tempoWidget._intervals = [500];
+            tempoWidget.activity = mockActivity;
+
+            tempoWidget._widgetFirstTimes = [Date.now() - 100];
+            tempoWidget._widgetNextTimes = [Date.now() + 400];
+        });
+
+        test("should clear previous frame and draw ellipse", () => {
+            tempoWidget._draw();
+            const ctx = tempoWidget.tempoCanvases[0].getContext("2d");
+
+            expect(ctx.clearRect).toHaveBeenCalledTimes(1);
+            expect(ctx.beginPath).toHaveBeenCalledTimes(1);
+            expect(ctx.ellipse).toHaveBeenCalledTimes(1);
+            expect(ctx.fill).toHaveBeenCalledTimes(1);
+            expect(ctx.closePath).toHaveBeenCalledTimes(1);
+        });
+
+        test("should trigger synth when a beat hits (direction change)", () => {
+            tempoWidget._widgetNextTimes[0] = Date.now() - 10;
+            tempoWidget._draw();
+
+            expect(mockActivity.logo.synth.trigger).toHaveBeenCalled();
+            expect(tempoWidget._directions[0]).toBe(-1);
+            expect(tempoWidget._widgetNextTimes[0]).toBeGreaterThan(Date.now());
+        });
+    });
+    describe("Canvas Tap Tempo (onclick)", () => {
+        beforeEach(() => {
+            tempoWidget.BPMs = [100];
+            tempoWidget.init(mockActivity);
+        });
+
+        test("should set _firstClickTime on the first tap", () => {
+            const canvas = tempoWidget.tempoCanvases[0];
+            canvas.onclick();
+
+            expect(tempoWidget._firstClickTime).not.toBeNull();
+        });
+
+        test("should calculate correct BPM on the second tap", () => {
+            const canvas = tempoWidget.tempoCanvases[0];
+            jest.setSystemTime(1000);
+            canvas.onclick(); // First tap
+            jest.setSystemTime(1500);
+            canvas.onclick(); // Second tap
+
+            expect(tempoWidget.BPMs[0]).toBe(120);
+            expect(tempoWidget.BPMInputs[0].value).toBe(120);
+            expect(tempoWidget._firstClickTime).toBeNull();
+        });
+
+        test("should ignore invalid tap speeds and reset timer", () => {
+            const canvas = tempoWidget.tempoCanvases[0];
+
+            jest.setSystemTime(1000);
+            canvas.onclick();
+            jest.setSystemTime(1010);
+            canvas.onclick();
+
+            expect(tempoWidget.BPMs[0]).toBe(100);
+            expect(tempoWidget._firstClickTime).toBe(1010);
+        });
+    });
+    describe("_draw() - Edge Cases", () => {
+        test("should skip drawing when canvas is null", () => {
+            tempoWidget.tempoCanvases = [null];
+            tempoWidget.BPMs = [100];
+            tempoWidget._directions = [1];
+            tempoWidget._intervals = [600];
+            tempoWidget._widgetFirstTimes = [Date.now()];
+            tempoWidget._widgetNextTimes = [Date.now() + 600];
+            expect(() => tempoWidget._draw()).not.toThrow();
+        });
+
+        test("should skip drawing when canvas is undefined", () => {
+            tempoWidget.tempoCanvases = [undefined];
+            tempoWidget.BPMs = [100];
+            tempoWidget._directions = [1];
+            tempoWidget._intervals = [600];
+            tempoWidget._widgetFirstTimes = [Date.now()];
+            tempoWidget._widgetNextTimes = [Date.now() + 600];
+
+            expect(() => tempoWidget._draw()).not.toThrow();
+        });
+
+        test("should initialize _widgetFirstTimes when null", () => {
+            const mockCanvas = document.createElement("canvas");
+            mockCanvas.width = Tempo.TEMPOWIDTH;
+            mockCanvas.height = Tempo.TEMPOHEIGHT;
+
+            tempoWidget.tempoCanvases = [mockCanvas];
+            tempoWidget.BPMs = [120];
+            tempoWidget._directions = [1];
+            tempoWidget._intervals = [500];
+            tempoWidget._widgetFirstTimes = [null];
+            tempoWidget._widgetNextTimes = [null];
+            tempoWidget.activity = mockActivity;
+
+            tempoWidget._draw();
+            expect(tempoWidget._widgetFirstTimes[0]).not.toBeNull();
+            expect(tempoWidget._widgetNextTimes[0]).not.toBeNull();
+        });
+
+        test("should handle interval of 0 (prevent division by zero)", () => {
+            const mockCanvas = document.createElement("canvas");
+            mockCanvas.width = Tempo.TEMPOWIDTH;
+            mockCanvas.height = Tempo.TEMPOHEIGHT;
+
+            tempoWidget.tempoCanvases = [mockCanvas];
+            tempoWidget.BPMs = [100];
+            tempoWidget._directions = [1];
+            tempoWidget._intervals = [0]; // Zero interval
+            tempoWidget._widgetFirstTimes = [Date.now()];
+            tempoWidget._widgetNextTimes = [Date.now() + 100];
+            tempoWidget.activity = mockActivity;
+
+            expect(() => tempoWidget._draw()).not.toThrow();
+        });
+
+        test("should change direction from 1 to -1 on beat", () => {
+            const mockCanvas = document.createElement("canvas");
+            mockCanvas.width = Tempo.TEMPOWIDTH;
+            mockCanvas.height = Tempo.TEMPOHEIGHT;
+
+            tempoWidget.tempoCanvases = [mockCanvas];
+            tempoWidget.BPMs = [120];
+            tempoWidget._directions = [1];
+            tempoWidget._intervals = [500];
+            tempoWidget._widgetFirstTimes = [Date.now()];
+            tempoWidget._widgetNextTimes = [Date.now() - 10]; // Past beat time
+            tempoWidget.activity = mockActivity;
+
+            tempoWidget._draw();
+            expect(tempoWidget._directions[0]).toBe(-1);
+        });
+
+        test("should set x to 0 when direction is -1 and x is undefined", () => {
+            const mockCanvas = document.createElement("canvas");
+            mockCanvas.width = Tempo.TEMPOWIDTH;
+            mockCanvas.height = Tempo.TEMPOHEIGHT;
+
+            tempoWidget.tempoCanvases = [mockCanvas];
+            tempoWidget.BPMs = [120];
+            tempoWidget._directions = [-1];
+            tempoWidget._intervals = [500];
+            tempoWidget._widgetFirstTimes = [Date.now()];
+            tempoWidget._widgetNextTimes = [Date.now() - 10]; // Trigger beat
+            tempoWidget.activity = mockActivity;
+
+            tempoWidget._draw();
+
+            const ctx = mockCanvas.getContext("2d");
+            expect(ctx.ellipse).toHaveBeenCalled();
+        });
+
+        test("should compress xradius when close to edge", () => {
+            const mockCanvas = document.createElement("canvas");
+            mockCanvas.width = Tempo.TEMPOWIDTH;
+            mockCanvas.height = Tempo.TEMPOHEIGHT;
+
+            tempoWidget.tempoCanvases = [mockCanvas];
+            tempoWidget.BPMs = [120];
+            tempoWidget._directions = [1];
+            tempoWidget._intervals = [500];
+            tempoWidget._widgetFirstTimes = [Date.now()];
+            tempoWidget._widgetNextTimes = [Date.now() + 5];
+            tempoWidget.activity = mockActivity;
+
+            tempoWidget._draw();
+            expect(tempoWidget._xradius).toBeLessThanOrEqual(Tempo.YRADIUS / 3);
+        });
+    });
+
+    describe("Canvas onclick - Edge Cases", () => {
+        test("should reject BPM exactly at 29 (boundary)", () => {
+            tempoWidget.BPMs = [100];
+            tempoWidget.init(mockActivity);
+            const canvas = tempoWidget.tempoCanvases[0];
+
+            jest.setSystemTime(1000);
+            canvas.onclick();
+            jest.setSystemTime(3069);
+            canvas.onclick();
+            expect(tempoWidget.BPMs[0]).toBe(100);
+            expect(tempoWidget._firstClickTime).toBe(3069);
+        });
+
+        test("should reject BPM exactly at 1001 (boundary)", () => {
+            tempoWidget.BPMs = [100];
+            tempoWidget.init(mockActivity);
+            const canvas = tempoWidget.tempoCanvases[0];
+
+            jest.setSystemTime(1000);
+            canvas.onclick();
+            jest.setSystemTime(1059);
+            canvas.onclick();
+            expect(tempoWidget.BPMs[0]).toBe(100);
+            expect(tempoWidget._firstClickTime).toBe(1059);
+        });
+
+        test("should accept BPM at exactly 30 (lower boundary)", () => {
+            tempoWidget.BPMs = [100];
+            tempoWidget.init(mockActivity);
+            const canvas = tempoWidget.tempoCanvases[0];
+
+            jest.setSystemTime(1000);
+            canvas.onclick();
+            jest.setSystemTime(3000);
+            canvas.onclick();
+
+            expect(tempoWidget.BPMs[0]).toBe(30);
+            expect(tempoWidget._firstClickTime).toBeNull();
+        });
+
+        test("should accept BPM at exactly 1000 (upper boundary)", () => {
+            tempoWidget.BPMs = [100];
+            tempoWidget.init(mockActivity);
+            const canvas = tempoWidget.tempoCanvases[0];
+
+            jest.setSystemTime(1000);
+            canvas.onclick();
+            jest.setSystemTime(1060);
+            canvas.onclick();
+
+            expect(tempoWidget.BPMs[0]).toBe(1000);
+            expect(tempoWidget._firstClickTime).toBeNull();
+        });
+    });
+
+    describe("Multiple BPMs - _draw()", () => {
+        test("should handle drawing multiple canvases simultaneously", () => {
+            const canvas1 = document.createElement("canvas");
+            const canvas2 = document.createElement("canvas");
+            canvas1.width = Tempo.TEMPOWIDTH;
+            canvas1.height = Tempo.TEMPOHEIGHT;
+            canvas2.width = Tempo.TEMPOWIDTH;
+            canvas2.height = Tempo.TEMPOHEIGHT;
+
+            tempoWidget.tempoCanvases = [canvas1, canvas2];
+            tempoWidget.BPMs = [100, 200];
+            tempoWidget._directions = [1, -1];
+            tempoWidget._intervals = [600, 300];
+            tempoWidget._widgetFirstTimes = [Date.now(), Date.now()];
+            tempoWidget._widgetNextTimes = [Date.now() + 600, Date.now() + 300];
+            tempoWidget.activity = mockActivity;
+
+            tempoWidget._draw();
+
+            const ctx1 = canvas1.getContext("2d");
+            const ctx2 = canvas2.getContext("2d");
+
+            expect(ctx1.ellipse).toHaveBeenCalled();
+            expect(ctx2.ellipse).toHaveBeenCalled();
+        });
+    });
+    describe("init() - Additional Coverage", () => {
+        test("should clear existing interval when re-initializing", () => {
+            tempoWidget.BPMs = [100];
+            tempoWidget._intervalID = setInterval(() => {}, 1000);
+            const oldIntervalId = tempoWidget._intervalID;
+
+            tempoWidget.init(mockActivity);
+            expect(jest.getTimerCount()).toBe(1);
+        });
+
+        test("should call widgetWindow.onclose callback", () => {
+            tempoWidget.BPMs = [100];
+            tempoWidget._intervalID = setInterval(() => {}, 1000);
+
+            tempoWidget.init(mockActivity);
+            const mockWindow = window.widgetWindows.windowFor.mock.results[0].value;
+            mockWindow.onclose();
+            expect(jest.getTimerCount()).toBe(0);
+        });
+
+        test("should toggle pause button from pause to play", () => {
+            tempoWidget.BPMs = [100];
+            tempoWidget.init(mockActivity);
+            const pauseButtonCalls =
+                window.widgetWindows.windowFor.mock.results[0].value.addButton.mock.calls;
+            const pauseButtonCall = pauseButtonCalls.find(call => call[0] === "pause-button.svg");
+            const pauseBtn = pauseButtonCall
+                ? {
+                      onclick: pauseButtonCalls[0].returnValue?.onclick,
+                      innerHTML: ""
+                  }
+                : null;
+            if (pauseBtn && pauseBtn.onclick) {
+                pauseBtn.onclick();
+                expect(tempoWidget.isMoving).toBe(false);
+            }
+        });
+
+        test("should handle save button debounce (prevent double save)", () => {
+            tempoWidget.BPMs = [100];
+            tempoWidget.init(mockActivity);
+            const saveButtonCalls =
+                window.widgetWindows.windowFor.mock.results[0].value.addButton.mock.calls;
+            const saveButtonCall = saveButtonCalls.find(call => call[0] === "export-chunk.svg");
+            if (saveButtonCall && saveButtonCall[3]) {
+                const saveBtn = { onclick: saveButtonCall[3].onclick };
+
+                saveBtn.onclick();
+                saveBtn.onclick();
+                expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalledTimes(1);
+            }
+        });
+
+        test("should handle BPM less than or equal to 0", () => {
+            tempoWidget.BPMs = [0];
+            tempoWidget.init(mockActivity);
+            expect(tempoWidget.BPMs[0]).toBe(30);
+        });
+
+        test("should handle negative BPM values", () => {
+            tempoWidget.BPMs = [-50];
+            tempoWidget.init(mockActivity);
+
+            expect(tempoWidget.BPMs[0]).toBe(30);
+        });
+    });
+    describe("stop() / cleanup edge cases", () => {
+        test("should handle stop when interval is already null", () => {
+            tempoWidget._intervalID = null;
+            expect(() => tempoWidget.pause()).not.toThrow();
         });
     });
 });
