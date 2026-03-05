@@ -1,0 +1,21 @@
+name: PR Size Warning
+
+on:
+  pull_request_target:
+
+jobs:
+  size-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check PR size
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const additions = context.payload.pull_request.additions;
+            const deletions = context.payload.pull_request.deletions;
+            const total = additions + deletions;
+
+            if (total > 500) {
+              core.warning(`⚠️ This PR is quite large (${total} lines changed). Consider splitting it.`);
+            }
