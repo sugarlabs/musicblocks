@@ -27,14 +27,19 @@ let _mockImpl = jest.fn();
 
 // Proxy is installed at file-parse time, before any describe/test runs.
 global.requirejs = new Proxy(
-    function (...args) { return _mockImpl(...args); },
+    function (...args) {
+        return _mockImpl(...args);
+    },
     {
         get(_, prop) {
-            if (prop === "config")  return _mockImpl.config;
+            if (prop === "config") return _mockImpl.config;
             if (prop === "defined") return _mockImpl.defined;
             return _mockImpl[prop];
         },
-        set(_, prop, value) { _mockImpl[prop] = value; return true; }
+        set(_, prop, value) {
+            _mockImpl[prop] = value;
+            return true;
+        }
     }
 );
 global.define = jest.fn();
@@ -52,8 +57,8 @@ describe("loader.js coverage", () => {
         jest.resetModules();
 
         consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-        consoleWarnSpy  = jest.spyOn(console, "warn").mockImplementation(() => {});
-        alertSpy        = jest.spyOn(global, "alert").mockImplementation(() => {});
+        consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+        alertSpy = jest.spyOn(global, "alert").mockImplementation(() => {});
 
         document.body.innerHTML = `
             <div data-i18n="title">Original Title</div>
@@ -61,25 +66,25 @@ describe("loader.js coverage", () => {
         `;
 
         mockI18next = {
-            use:            jest.fn().mockReturnThis(),
-            init:           jest.fn(),
+            use: jest.fn().mockReturnThis(),
+            init: jest.fn(),
             changeLanguage: jest.fn(),
-            t:              jest.fn(key => `TRANSLATED_${key}`),
-            on:             jest.fn(),
-            isInitialized:  false
+            t: jest.fn(key => `TRANSLATED_${key}`),
+            on: jest.fn(),
+            isInitialized: false
         };
         mockI18nextHttpBackend = {};
 
         // Fresh mock for each test
-        _mockImpl         = jest.fn();
-        _mockImpl.config  = jest.fn();
+        _mockImpl = jest.fn();
+        _mockImpl.config = jest.fn();
         _mockImpl.defined = jest.fn(() => false);
 
         global.define = jest.fn();
 
         global.window = document.defaultView;
         global.window.createjs = {
-            Stage:  jest.fn(),
+            Stage: jest.fn(),
             Ticker: { framerate: 60, addEventListener: jest.fn() }
         };
 
@@ -101,18 +106,18 @@ describe("loader.js coverage", () => {
     // ─── loadScript helper ────────────────────────────────────────────────────
 
     const loadScript = async ({
-        initError            = false,
-        langError            = false,
-        hljsAvailable        = false,
-        hljsFails            = false,
-        i18nNotInitialized   = false,
-        materializeAutoInit  = false,
-        missingCreatejs      = false,
-        coreBootstrapFails   = false,
-        activityFails        = false,
-        preloadedDefined     = false,
-        readyState           = "complete",
-        waitMs               = 400
+        initError = false,
+        langError = false,
+        hljsAvailable = false,
+        hljsFails = false,
+        i18nNotInitialized = false,
+        materializeAutoInit = false,
+        missingCreatejs = false,
+        coreBootstrapFails = false,
+        activityFails = false,
+        preloadedDefined = false,
+        readyState = "complete",
+        waitMs = 400
     } = {}) => {
         Object.defineProperty(document, "readyState", {
             value: readyState,
@@ -154,7 +159,7 @@ describe("loader.js coverage", () => {
                 });
                 mockI18next.changeLanguage.mockImplementation((lang, cb) => {
                     if (langError) cb("Lang Change Failed");
-                    else           cb(null);
+                    else cb(null);
                 });
                 if (callback) callback(mockI18next, mockI18nextHttpBackend);
                 return null;
@@ -166,9 +171,9 @@ describe("loader.js coverage", () => {
                     if (errback) errback(new Error("Core bootstrap error"));
                 } else {
                     window.createDefaultStack = jest.fn();
-                    window.Logo               = jest.fn();
-                    window.Blocks             = jest.fn();
-                    window.Turtles            = jest.fn();
+                    window.Logo = jest.fn();
+                    window.Blocks = jest.fn();
+                    window.Turtles = jest.fn();
                     if (callback) callback();
                 }
                 return null;
@@ -199,8 +204,8 @@ describe("loader.js coverage", () => {
         expect(_mockImpl.config).toHaveBeenCalledWith(
             expect.objectContaining({
                 baseUrl: "./",
-                paths:   expect.any(Object),
-                shim:    expect.any(Object)
+                paths: expect.any(Object),
+                shim: expect.any(Object)
             })
         );
     });
@@ -209,10 +214,10 @@ describe("loader.js coverage", () => {
         await loadScript();
         const config = _mockImpl.config.mock.calls[0][0];
         expect(config.paths).toMatchObject({
-            utils:    "js/utils",
-            widgets:  "js/widgets",
+            utils: "js/utils",
+            widgets: "js/widgets",
             activity: "js",
-            Tone:     "lib/Tone"
+            Tone: "lib/Tone"
         });
     });
 
@@ -295,14 +300,9 @@ describe("loader.js coverage", () => {
 
         await loadScript({ readyState: "loading" });
 
-        expect(addEventListenerSpy).toHaveBeenCalledWith(
-            "DOMContentLoaded",
-            expect.any(Function)
-        );
+        expect(addEventListenerSpy).toHaveBeenCalledWith("DOMContentLoaded", expect.any(Function));
 
-        const handler = addEventListenerSpy.mock.calls.find(
-            c => c[0] === "DOMContentLoaded"
-        )?.[1];
+        const handler = addEventListenerSpy.mock.calls.find(c => c[0] === "DOMContentLoaded")?.[1];
 
         expect(handler).toBeDefined();
         mockI18next.t.mockClear();
@@ -315,7 +315,7 @@ describe("loader.js coverage", () => {
     test("Triggering languageChanged event updates content", async () => {
         await loadScript();
 
-        const onCall    = mockI18next.on.mock.calls.find(c => c[0] === "languageChanged");
+        const onCall = mockI18next.on.mock.calls.find(c => c[0] === "languageChanged");
         const onHandler = onCall?.[1];
 
         expect(onHandler).toBeDefined();
@@ -423,7 +423,10 @@ describe("loader.js coverage", () => {
 
         _mockImpl.mockImplementation((deps, callback, errback) => {
             if (!Array.isArray(deps)) return null;
-            if (deps.includes("highlight")) { if (callback) callback(null); return null; }
+            if (deps.includes("highlight")) {
+                if (callback) callback(null);
+                return null;
+            }
             if (deps.includes("i18next")) {
                 mockI18next.init.mockImplementation((_, cb) => {
                     mockI18next.isInitialized = true;
@@ -455,12 +458,8 @@ describe("loader.js coverage", () => {
         // Restore real timers for the rest of the test suite
         jest.useRealTimers();
 
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-            expect.stringContaining("FATAL: createjs")
-        );
-        expect(alertSpy).toHaveBeenCalledWith(
-            expect.stringContaining("Failed to load EaselJS")
-        );
+        expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining("FATAL: createjs"));
+        expect(alertSpy).toHaveBeenCalledWith(expect.stringContaining("Failed to load EaselJS"));
     });
 
     // ───  activity/activity errback ─────────────────────────────
