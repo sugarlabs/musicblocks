@@ -63,6 +63,13 @@ jobs:
                 displayName: 'Documentation',
                 pattern: /-\s*\[x\]\s*Documentation/i,
               },
+              {
+                label: 'ci / workflow',
+                color: '64748B',
+                description: 'Updates to CI/CD pipelines, GitHub Actions, or configurations',
+                displayName: 'CI / Workflow',
+                pattern: /-\s*\[x\]\s*CI \/ Workflow/i,
+              },
             ];
 
             const checkedCategories = categories.filter(cat => cat.pattern.test(prBody));
@@ -83,6 +90,7 @@ jobs:
                 '| Performance | Improves performance |',
                 '| Tests | Adds or updates test coverage |',
                 '| Documentation | Updates to docs, comments, or README |',
+                '| CI / Workflow | Updates to CI/CD pipelines or GitHub Actions |',
                 '',
                 'Example: Change `- [ ] Bug Fix` to `- [x] Bug Fix`',
                 '',
