@@ -373,7 +373,8 @@ class AST2BlockList {
                 const block_name = Array.isArray(block[1]) ? block[1][0] : block[1];
                 const entry = entryByBlockName.get(block_name);
                 if (entry) {
-                    const connectionsArray = entry.blocklist_connections || config.default_connections;
+                    const connectionsArray =
+                        entry.blocklist_connections || config.default_connections;
                     const connections = _getConnectionIndices(connectionsArray);
 
                     // Use default_vspaces if not specified in the block
