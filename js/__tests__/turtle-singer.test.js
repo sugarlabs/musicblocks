@@ -922,26 +922,23 @@ describe("processNote regression behavior", () => {
         expect(singer.bpm.length).toBe(originalLength);
     });
 
-    test("should execute safely with empty bpm stack", () => {
-        expect(() => {
-            Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
-        }).not.toThrow();
+    test("should execute without mutating bpm stack", () => {
+        singer.bpm = [120];
+        const before = [...singer.bpm];
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+        expect(singer.bpm).toEqual(before);
     });
 
-    test("should respect bpm value when present", () => {
-        singer.bpm.push(90);
-        expect(() => {
-            Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
-        }).not.toThrow();
-    });
-
-    test("should execute using default BPM when bpm stack is empty", () => {
-        singer.bpm = [];
+    test("should trigger stage update after processing note", () => {
         const callback = jest.fn();
-        expect(() => {
-            Singer.processNote(activityMock, 4, false, "mockBlk", 0, callback);
-        }).not.toThrow();
-        expect(activityMock.stage.update).toHaveBeenCalled();
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, callback);
+        expect(activityMock.stage.update).toHaveBeenCalledTimes(1);
+    });
+
+    test("should use default BPM when bpm stack is empty", () => {
+        singer.bpm = [];
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+        expect(activityMock.stage.update).toHaveBeenCalledTimes(1);
     });
 });
 
