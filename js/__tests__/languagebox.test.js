@@ -367,21 +367,21 @@ describe("LanguageBox Class", () => {
     describe("Language preference updates", () => {
         it("should update storage.languagePreference when language changes", () => {
             jest.spyOn(languageBox, "hide").mockImplementation();
-            
+
             languageBox.enUS_onclick();
             expect(mockActivity.storage.languagePreference).toBe("enUS");
         });
 
         it("should store kanji preference when ja_onclick is called", () => {
             jest.spyOn(languageBox, "hide").mockImplementation();
-            
+
             languageBox.ja_onclick();
             expect(mockActivity.storage.kanaPreference).toBe("kanji");
         });
 
         it("should store kana preference when kana_onclick is called", () => {
             jest.spyOn(languageBox, "hide").mockImplementation();
-            
+
             languageBox.kana_onclick();
             expect(mockActivity.storage.kanaPreference).toBe("kana");
         });
