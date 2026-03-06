@@ -981,8 +981,38 @@
 })();
 
 </script>
+<script>
+    function showZoomOverlay(scale) {
+    let overlay = document.getElementById("zoomOverlay");
 
+    if (!overlay) {
+        overlay = document.createElement("div");
+        overlay.id = "zoomOverlay";
+        overlay.style.position = "fixed";
+        overlay.style.top = "50%";
+        overlay.style.left = "50%";
+        overlay.style.transform = "translate(-50%, -50%)";
+        overlay.style.fontSize = "42px";
+        overlay.style.fontWeight = "600";
+        overlay.style.color = "#fff";
+        overlay.style.background = "rgba(0,0,0,0.45)";
+        overlay.style.padding = "18px 36px";
+        overlay.style.borderRadius = "14px";
+        overlay.style.zIndex = "9999";
+        overlay.style.pointerEvents = "none";
+        overlay.style.transition = "opacity 0.2s ease";
+        document.body.appendChild(overlay);
+    }
 
+    overlay.textContent = Math.round(scale * 100) + "%";
+    overlay.style.opacity = "1";
+
+    clearTimeout(overlay.hideTimeout);
+    overlay.hideTimeout = setTimeout(() => {
+        overlay.style.opacity = "0";
+    }, 1500);
+}
+</script>
 </body>
 
 </html>

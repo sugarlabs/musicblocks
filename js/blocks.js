@@ -303,6 +303,9 @@ class Blocks {
             /** Force a refresh. */
             await delayExecution(100);
             this.activity.refreshCanvas();
+            
+            //Show zoom percentage
+            showZoomOverlay(scale);
         };
 
         /**
