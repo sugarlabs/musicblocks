@@ -317,54 +317,78 @@ class AST2BlockList {
          * @returns {Array} a blockList that can loaded by musicblocks by calling `blocks.loadNewBlocks(blockList)`
          */
         function _treeToBlockList(trees, config) {
+            const entryByBlockName = new Map();
+            const connectionIndicesByArray = new WeakMap();
+
+            for (const entry of config.body_blocks) {
+                if ("name" in entry && !entryByBlockName.has(entry.name)) {
+                    entryByBlockName.set(entry.name, entry);
+                }
+
+                if ("name_map" in entry) {
+                    for (const mappedName of Object.values(entry.name_map)) {
+                        if (typeof mappedName === "string" && !entryByBlockName.has(mappedName)) {
+                            entryByBlockName.set(mappedName, entry);
+                        }
+                    }
+                }
+            }
+
+            function _getConnectionIndices(connectionsArray) {
+                if (connectionIndicesByArray.has(connectionsArray)) {
+                    return connectionIndicesByArray.get(connectionsArray);
+                }
+
+                const connectionIndices = {
+                    count: connectionsArray.length
+                };
+
+                const prevIndex = connectionsArray.indexOf("parent_or_previous_sibling");
+                if (prevIndex !== -1) {
+                    connectionIndices.prev = prevIndex;
+                }
+
+                const childIndex = connectionsArray.indexOf("first_child");
+                if (childIndex !== -1) {
+                    connectionIndices.child = childIndex;
+                }
+
+                const nextIndex = connectionsArray.indexOf("next_sibling");
+                if (nextIndex !== -1) {
+                    connectionIndices.next = nextIndex;
+                }
+
+                const secondChildIndex = connectionsArray.indexOf("second_child");
+                if (secondChildIndex !== -1) {
+                    connectionIndices.second_child = secondChildIndex;
+                }
+
+                connectionIndicesByArray.set(connectionsArray, connectionIndices);
+                return connectionIndices;
+            }
+
             // [1,"settimbre",0,0,[0,2,3,null]] or
             // [21,["nameddo",{"value":"action"}],421,82,[20]]
             function _propertyOf(block) {
                 const block_name = Array.isArray(block[1]) ? block[1][0] : block[1];
-                for (const entry of config.body_blocks) {
-                    if (
-                        ("name" in entry && entry.name === block_name) ||
-                        ("name_map" in entry && Object.values(entry.name_map).includes(block_name))
-                    ) {
-                        // Use default_connections if blocklist_connections is not specified
-                        const connections = {
-                            count: entry.blocklist_connections
-                                ? entry.blocklist_connections.length
-                                : config.default_connections.length
-                        };
+                const entry = entryByBlockName.get(block_name);
+                if (entry) {
+                    const connectionsArray = entry.blocklist_connections || config.default_connections;
+                    const connections = _getConnectionIndices(connectionsArray);
 
-                        // Get the connections array to use
-                        const connectionsArray =
-                            entry.blocklist_connections || config.default_connections;
-
-                        // Only add connection indices that exist
-                        const prevIndex = connectionsArray.indexOf("parent_or_previous_sibling");
-                        if (prevIndex !== -1) connections.prev = prevIndex;
-
-                        const childIndex = connectionsArray.indexOf("first_child");
-                        if (childIndex !== -1) connections.child = childIndex;
-
-                        const nextIndex = connectionsArray.indexOf("next_sibling");
-                        if (nextIndex !== -1) connections.next = nextIndex;
-
-                        const secondChildIndex = connectionsArray.indexOf("second_child");
-                        if (secondChildIndex !== -1) connections.second_child = secondChildIndex;
-
-                        // Use default_vspaces if not specified in the block
-                        const vspaces = entry.default_vspaces ||
-                            config.default_vspaces || { body: 1 };
-                        return "body" in vspaces
-                            ? {
-                                  type: "block",
-                                  connections: connections,
-                                  vspaces: vspaces.body
-                              }
-                            : {
-                                  type: "block",
-                                  connections: connections,
-                                  argument_v_spaces: vspaces.argument
-                              };
-                    }
+                    // Use default_vspaces if not specified in the block
+                    const vspaces = entry.default_vspaces || config.default_vspaces || { body: 1 };
+                    return "body" in vspaces
+                        ? {
+                              type: "block",
+                              connections: connections,
+                              vspaces: vspaces.body
+                          }
+                        : {
+                              type: "block",
+                              connections: connections,
+                              argument_v_spaces: vspaces.argument
+                          };
                 }
                 // doesn't match means it is a vspace block
                 return {
