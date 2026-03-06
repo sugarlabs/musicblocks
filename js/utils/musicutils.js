@@ -2348,6 +2348,72 @@ const addTemperamentToDictionary = (entryName, entryValue) => {
 };
 
 /**
+ * Generate an equal temperament dynamically.
+ * @function
+ * @param {number} divisions - Number of equal divisions per octave
+ * @returns {Object} Temperament object with interval ratios
+ */
+const generateEqualTemperament = divisions => {
+    // Limit to 200 divisions to prevent UI performance issues
+    // Each division creates DOM elements in the temperament widget
+    if (divisions < 1 || divisions > 200) {
+        throw new Error("Invalid number of divisions: must be between 1 and 200");
+    }
+
+    const temperament = {
+        pitchNumber: divisions,
+        interval: []
+    };
+
+    // Generate equal temperament ratios
+    for (let i = 0; i < divisions; i++) {
+        const ratio = Math.pow(2, i / divisions);
+
+        // Map to standard interval names for common divisions
+        if (divisions === 12) {
+            const intervalNames = [
+                "perfect 1",
+                "minor 2",
+                "major 2",
+                "minor 3",
+                "major 3",
+                "perfect 4",
+                "augmented 4",
+                "perfect 5",
+                "minor 6",
+                "major 6",
+                "minor 7",
+                "major 7",
+                "perfect 8"
+            ];
+            if (i < intervalNames.length) {
+                temperament[intervalNames[i]] = ratio;
+                temperament.interval.push(intervalNames[i]);
+            }
+        } else if (divisions === 5) {
+            const intervalNames = [
+                "perfect 1",
+                "minor 2",
+                "major 2",
+                "major 3",
+                "augmented 4",
+                "perfect 5"
+            ];
+            if (i < intervalNames.length) {
+                temperament[intervalNames[i]] = ratio;
+                temperament.interval.push(intervalNames[i]);
+            }
+        } else {
+            // For arbitrary divisions, use generic naming
+            temperament[`step ${i}`] = ratio;
+            temperament.interval.push(`step ${i}`);
+        }
+    }
+
+    return temperament;
+};
+
+/**
  * Update the list of available temperaments.
  * @function
  * @returns {void}
@@ -6275,6 +6341,7 @@ if (typeof module !== "undefined" && module.exports) {
         deleteTemperamentFromList,
         addTemperamentToDictionary,
         updateTemperaments,
+        generateEqualTemperament,
         DEFAULTINVERT,
         DEFAULTMODE,
         customMode,
