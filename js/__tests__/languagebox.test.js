@@ -44,64 +44,159 @@ describe("LanguageBox Class", () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        // Reset storage to initial state
+        mockActivity.storage.languagePreference = "enUS";
+        mockActivity.storage.kanaPreference = null;
         languageBox = new LanguageBox(mockActivity);
     });
 
-    it("should reload the window when OnClick is called", () => {
-        const reloadSpy = jest.spyOn(languageBox, "reload").mockImplementation(() => {});
-        languageBox.OnClick();
-        expect(reloadSpy).toHaveBeenCalled();
-        reloadSpy.mockRestore();
-    });
+    // ===== CONSTRUCTOR TESTS =====
+    describe("Constructor", () => {
+        it("should initialize successfully", () => {
+            expect(languageBox).toBeDefined();
+        });
 
-    it("should display 'already set' message when the selected language is the same", () => {
-        localStorage.getItem.mockReturnValue("enUS");
-        mockActivity.textMsg.mockImplementation();
-
-        languageBox._language = "enUS";
-        languageBox.hide();
-
-        expect(mockActivity.textMsg).toHaveBeenCalledWith(
-            "Music Blocks is already set to this language."
-        );
-    });
-
-    it("should display the refresh message when a new language is selected", () => {
-        localStorage.getItem.mockReturnValue("ja");
-        mockActivity.textMsg.mockImplementation();
-
-        languageBox._language = "enUS";
-        languageBox.hide();
-
-        expect(mockActivity.textMsg).toHaveBeenCalledWith(
-            expect.stringContaining("Refresh your browser to change your language preference.")
-        );
-    });
-
-    it("should display the correct message when hide is called for 'ja'", () => {
-        localStorage.getItem.mockReturnValue("enUS");
-        mockActivity.textMsg.mockImplementation();
-
-        languageBox._language = "ja";
-        languageBox.hide();
-
-        expect(mockActivity.textMsg).toHaveBeenCalledWith(
-            expect.stringContaining("言語を変えるには、ブラウザをこうしんしてください。")
-        );
-    });
-
-    it("should attach click listeners to language links when hide is called", () => {
-        const mockLinks = [{ addEventListener: jest.fn() }, { addEventListener: jest.fn() }];
-        document.querySelectorAll.mockReturnValue(mockLinks);
-
-        languageBox.hide();
-
-        mockLinks.forEach(link => {
-            expect(link.addEventListener).toHaveBeenCalledWith("click", expect.any(Function));
+        it("should have language property initialized", () => {
+            expect(languageBox._language).toBeDefined();
         });
     });
 
-    // Test each language selection method
+    // ===== ONCLICK TEST =====
+    describe("OnClick method", () => {
+        it("should call reload method when OnClick is called", () => {
+            const reloadSpy = jest.spyOn(languageBox, "reload").mockImplementation(() => {});
+            languageBox.OnClick();
+            expect(reloadSpy).toHaveBeenCalled();
+            reloadSpy.mockRestore();
+        });
+    });
+
+    // ===== HIDE METHOD - BASIC TESTS =====
+    describe("hide method", () => {
+        it("should display 'already set' message when the selected language is the same", () => {
+            localStorage.getItem.mockReturnValue("enUS");
+            mockActivity.textMsg.mockImplementation();
+
+            languageBox._language = "enUS";
+            languageBox.hide();
+
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                "Music Blocks is already set to this language."
+            );
+        });
+
+        it("should display the refresh message when a new language is selected", () => {
+            localStorage.getItem.mockReturnValue("ja");
+            mockActivity.textMsg.mockImplementation();
+
+            languageBox._language = "enUS";
+            languageBox.hide();
+
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                expect.stringContaining("Refresh your browser to change your language preference.")
+            );
+        });
+
+        it("should display the correct message when hide is called for 'ja'", () => {
+            localStorage.getItem.mockReturnValue("enUS");
+            mockActivity.textMsg.mockImplementation();
+
+            languageBox._language = "ja";
+            languageBox.hide();
+
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                expect.stringContaining("言語を変えるには、ブラウザをこうしんしてください。")
+            );
+        });
+
+        it("should display kana message when Japanese language is selected with kana preference", () => {
+            localStorage.getItem.mockReturnValue("enUS");
+            mockActivity.storage.kanaPreference = "kana";
+            mockActivity.textMsg.mockImplementation();
+
+            languageBox._language = "ja";
+            languageBox.hide();
+
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                expect.stringContaining("げんごを かえるには、ブラウザを こうしんしてください。")
+            );
+        });
+
+        it("should display kanji message when Japanese language is selected with kanji preference", () => {
+            localStorage.getItem.mockReturnValue("enUS");
+            mockActivity.storage.kanaPreference = "kanji";
+            mockActivity.textMsg.mockImplementation();
+
+            languageBox._language = "ja-kanji";
+            languageBox.hide();
+
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                expect.stringContaining("言語を変えるには、ブラウザをこうしんしてください。")
+            );
+        });
+
+        it("should handle when localStorage.getItem returns null", () => {
+            localStorage.getItem.mockReturnValue(null);
+            mockActivity.textMsg.mockImplementation();
+
+            languageBox._language = "enUS";
+            languageBox.hide();
+
+            expect(mockActivity.textMsg).toHaveBeenCalled();
+        });
+
+        it("should handle French (fr) language correctly", () => {
+            localStorage.getItem.mockReturnValue("enUS");
+            mockActivity.textMsg.mockImplementation();
+
+            languageBox._language = "fr";
+            languageBox.hide();
+
+            expect(mockActivity.textMsg).toHaveBeenCalled();
+        });
+
+        it("should handle German (de) language correctly", () => {
+            localStorage.getItem.mockReturnValue("enUS");
+            mockActivity.textMsg.mockImplementation();
+
+            languageBox._language = "de";
+            languageBox.hide();
+
+            expect(mockActivity.textMsg).toHaveBeenCalled();
+        });
+
+        it("should call activity.textMsg exactly once per hide() call", () => {
+            localStorage.getItem.mockReturnValue("enUS");
+            mockActivity.textMsg.mockImplementation();
+
+            languageBox._language = "enUS";
+            languageBox.hide();
+
+            expect(mockActivity.textMsg).toHaveBeenCalledTimes(1);
+        });
+
+        it("should attach click listeners to language links when hide is called", () => {
+            const mockLinks = [{ addEventListener: jest.fn() }, { addEventListener: jest.fn() }];
+            document.querySelectorAll.mockReturnValue(mockLinks);
+
+            languageBox.hide();
+
+            mockLinks.forEach(link => {
+                expect(link.addEventListener).toHaveBeenCalledWith("click", expect.any(Function));
+            });
+        });
+
+        it("should query for language elements in the DOM", () => {
+            const mockLinks = [{ addEventListener: jest.fn() }];
+            document.querySelectorAll.mockReturnValue(mockLinks);
+
+            languageBox.hide();
+
+            expect(document.querySelectorAll).toHaveBeenCalled();
+        });
+    });
+
+    // ===== LANGUAGE SELECTION TESTS =====
     describe("Language selection methods", () => {
         it("should set language to enUS and call hide when enUS_onclick is called", () => {
             const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
@@ -268,19 +363,75 @@ describe("LanguageBox Class", () => {
         });
     });
 
-    // Test Japanese kana preference
+    // ===== LANGUAGE PREFERENCE TESTS =====
+    describe("Language preference updates", () => {
+        it("should update storage.languagePreference when language changes", () => {
+            jest.spyOn(languageBox, "hide").mockImplementation();
+            
+            languageBox.enUS_onclick();
+            expect(mockActivity.storage.languagePreference).toBe("enUS");
+        });
+
+        it("should store kanji preference when ja_onclick is called", () => {
+            jest.spyOn(languageBox, "hide").mockImplementation();
+            
+            languageBox.ja_onclick();
+            expect(mockActivity.storage.kanaPreference).toBe("kanji");
+        });
+
+        it("should store kana preference when kana_onclick is called", () => {
+            jest.spyOn(languageBox, "hide").mockImplementation();
+            
+            languageBox.kana_onclick();
+            expect(mockActivity.storage.kanaPreference).toBe("kana");
+        });
+    });
+
+    // ===== JAPANESE VARIANT HANDLING =====
     describe("Japanese kana handling", () => {
-        it("should display kana message when Japanese language is selected with kana preference", () => {
-            localStorage.getItem.mockReturnValue("enUS");
-            mockActivity.storage.kanaPreference = "kana";
-            mockActivity.textMsg.mockImplementation();
+        it("should switch between ja-kanji and ja-kana correctly", () => {
+            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
 
-            languageBox._language = "ja";
-            languageBox.hide();
+            languageBox.ja_onclick();
+            expect(languageBox._language).toBe("ja-kanji");
+            expect(mockActivity.storage.kanaPreference).toBe("kanji");
 
-            expect(mockActivity.textMsg).toHaveBeenCalledWith(
-                expect.stringContaining("げんごを かえるには、ブラウザを こうしんしてください。")
-            );
+            languageBox.kana_onclick();
+            expect(languageBox._language).toBe("ja-kana");
+            expect(mockActivity.storage.kanaPreference).toBe("kana");
+        });
+    });
+
+    // ===== SEQUENTIAL LANGUAGE CHANGES =====
+    describe("Sequential language changes", () => {
+        it("should update language correctly when changing multiple times", () => {
+            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
+
+            languageBox.enUS_onclick();
+            expect(languageBox._language).toBe("enUS");
+
+            languageBox.ja_onclick();
+            expect(languageBox._language).toBe("ja-kanji");
+
+            languageBox.es_onclick();
+            expect(languageBox._language).toBe("es");
+
+            expect(hideSpy).toHaveBeenCalledTimes(3);
+        });
+
+        it("should handle switching from Spanish to Korean and back", () => {
+            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
+
+            languageBox.es_onclick();
+            expect(languageBox._language).toBe("es");
+
+            languageBox.ko_onclick();
+            expect(languageBox._language).toBe("ko");
+
+            languageBox.es_onclick();
+            expect(languageBox._language).toBe("es");
+
+            expect(hideSpy).toHaveBeenCalledTimes(3);
         });
     });
 });
