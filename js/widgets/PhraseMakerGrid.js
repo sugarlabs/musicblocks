@@ -214,35 +214,43 @@ const PhraseMakerGrid = {
     syncMarkedBlocks(pm) {
         const newBlockMap = [];
         const blk = pm.blockNo;
+        const helperColsByRhythmKey = new Map();
+
+        const getRhythmKey = rhythmRef => `${rhythmRef[0]}:${rhythmRef[1]}`;
+        for (let i = 0; i < pm._blockMapHelper.length; i++) {
+            const helper = pm._blockMapHelper[i];
+            helperColsByRhythmKey.set(getRhythmKey(helper[0]), helper[1]);
+        }
+
         for (let i = 0; i < pm._blockMap[blk].length; i++) {
             if (pm._blockMap[blk][i][0] === -1) {
                 continue;
             }
 
-            for (let j = 0; j < pm._blockMapHelper.length; j++) {
-                if (
-                    JSON.stringify(pm._blockMap[blk][i][1]) ===
-                    JSON.stringify(pm._blockMapHelper[j][0])
-                ) {
-                    for (let k = 0; k < pm._blockMapHelper[j][1].length; k++) {
-                        newBlockMap.push([
-                            pm._blockMap[blk][i][0],
-                            pm._colBlocks[pm._blockMapHelper[j][1][k]],
-                            pm._blockMap[blk][i][2]
-                        ]);
-                    }
-                }
+            const mapEntry = pm._blockMap[blk][i];
+            const matchingColumns = helperColsByRhythmKey.get(getRhythmKey(mapEntry[1]));
+            if (!matchingColumns) {
+                continue;
+            }
+
+            for (let k = 0; k < matchingColumns.length; k++) {
+                newBlockMap.push([mapEntry[0], pm._colBlocks[matchingColumns[k]], mapEntry[2]]);
             }
         }
 
-        pm._blockMap[blk] = newBlockMap.filter((el, i) => {
-            return (
-                i ===
-                newBlockMap.findIndex(ele => {
-                    return JSON.stringify(ele) === JSON.stringify(el);
-                })
-            );
-        });
+        const seenEntries = new Set();
+        const dedupedBlockMap = [];
+        for (let i = 0; i < newBlockMap.length; i++) {
+            const key = JSON.stringify(newBlockMap[i]);
+            if (seenEntries.has(key)) {
+                continue;
+            }
+
+            seenEntries.add(key);
+            dedupedBlockMap.push(newBlockMap[i]);
+        }
+
+        pm._blockMap[blk] = dedupedBlockMap;
     }
 };
 
