@@ -39,6 +39,7 @@ function createMockWidgetWindow() {
     return {
         clear: jest.fn(),
         show: jest.fn(),
+        sendToCenter: jest.fn(),
         onclose: null,
         addButton: jest.fn(() => {
             const btn = document.createElement("button");
