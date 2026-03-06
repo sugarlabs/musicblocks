@@ -167,6 +167,77 @@ requirejs.config({
 });
 
 requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBackend) {
+    const perfTracker = (() => {
+        const canUsePerformance =
+            typeof window !== "undefined" &&
+            typeof window.performance !== "undefined" &&
+            typeof window.performance.now === "function";
+        if (!canUsePerformance) {
+            return {
+                enabled: false,
+                mark: () => {},
+                measure: () => {},
+                report: () => {}
+            };
+        }
+
+        const isEnabled = (() => {
+            try {
+                const params = new URLSearchParams(window.location.search || "");
+                return (
+                    params.get("mbPerf") === "1" || window.localStorage.getItem("mbPerf") === "1"
+                );
+            } catch (e) {
+                return false;
+            }
+        })();
+
+        const state = window.__mbPerf || {
+            enabled: isEnabled,
+            marks: {},
+            measures: {}
+        };
+        window.__mbPerf = state;
+
+        const mark = name => {
+            if (!state.enabled) return;
+            state.marks[name] = performance.now();
+        };
+
+        const measure = (name, startMark, endMark) => {
+            if (!state.enabled) return;
+            const start = state.marks[startMark];
+            const end = state.marks[endMark];
+            if (typeof start !== "number" || typeof end !== "number") return;
+            state.measures[name] = +(end - start).toFixed(2);
+        };
+
+        const report = () => {
+            if (!state.enabled) return;
+            // eslint-disable-next-line no-console
+            console.log("[mbPerf] Startup measures (ms):", state.measures);
+            if (typeof console.table === "function") {
+                const rows = Object.keys(state.measures).map(name => ({
+                    measure: name,
+                    ms: state.measures[name]
+                }));
+                // eslint-disable-next-line no-console
+                console.table(rows);
+            }
+        };
+
+        state.report = report;
+
+        return {
+            enabled: state.enabled,
+            mark,
+            measure,
+            report
+        };
+    })();
+
+    perfTracker.mark("loader.main.start");
+
     // Use globally-loaded jQuery and Materialize (avoids AMD conflicts)
     const $ = window.jQuery;
     // Materialize v0.100.2 (bundled) uses 'Materialize' as global, not 'M'
@@ -234,6 +305,12 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
     async function main() {
         try {
             await initializeI18next();
+            perfTracker.mark("loader.i18n.ready");
+            perfTracker.measure(
+                "loader.main_to_i18n_ready",
+                "loader.main.start",
+                "loader.i18n.ready"
+            );
 
             if (typeof M !== "undefined" && M.AutoInit) {
                 M.AutoInit();
@@ -305,6 +382,13 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
             requirejs(
                 CORE_BOOTSTRAP_MODULES,
                 function () {
+                    perfTracker.mark("loader.core_modules.ready");
+                    perfTracker.measure(
+                        "loader.i18n_to_core_modules_ready",
+                        "loader.i18n.ready",
+                        "loader.core_modules.ready"
+                    );
+
                     // Give scripts a moment to finish executing and set globals
                     setTimeout(function () {
                         // Verify core dependencies are loaded
@@ -330,6 +414,18 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                             ["activity/activity"],
                             function () {
                                 // Activity loaded successfully
+                                perfTracker.mark("loader.activity_module.ready");
+                                perfTracker.measure(
+                                    "loader.core_modules_to_activity_module_ready",
+                                    "loader.core_modules.ready",
+                                    "loader.activity_module.ready"
+                                );
+                                perfTracker.measure(
+                                    "loader.total_bootstrap",
+                                    "loader.main.start",
+                                    "loader.activity_module.ready"
+                                );
+                                perfTracker.report();
                             },
                             function (err) {
                                 console.error("Failed to load activity/activity:", err);
