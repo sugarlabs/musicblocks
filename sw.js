@@ -6,7 +6,8 @@
 
 // This is the "Offline page" service worker
 
-const CACHE = "pwabuilder-precache";
+const CACHE_VERSION = "v1";
+const CACHE_NAME = `musicblocks-cache-${CACHE_VERSION}`;
 const precacheFiles = [
     /* Add an array of files to precache for your app */
     "./index.html"
@@ -20,7 +21,7 @@ self.addEventListener("install", function (event) {
     self.skipWaiting();
 
     event.waitUntil(
-        caches.open(CACHE).then(function (cache) {
+        caches.open(CACHE_NAME).then(function (cache) {
             // eslint-disable-next-line no-console
             console.log("[PWA Builder] Caching pages during install");
             return cache.addAll(precacheFiles);
@@ -28,11 +29,68 @@ self.addEventListener("install", function (event) {
     );
 });
 
-// Allow sw to control of current page
+// Allow sw to control of current page and clean up old caches
 self.addEventListener("activate", function (event) {
     // eslint-disable-next-line no-console
     console.log("[PWA Builder] Claiming clients for current page");
-    event.waitUntil(self.clients.claim());
+
+    // Cleanup: remove any previously-cached non-static GET responses.
+    // This prevents serving stale / user-specific / poisoned cache entries
+    // that older SW versions may have cached.
+    event.waitUntil(
+        (async () => {
+            await self.clients.claim();
+
+            // Delete old caches (including the previous generic 'pwabuilder-precache')
+            const cacheNames = await caches.keys();
+            await Promise.all(
+                cacheNames
+                    .filter(function (cacheName) {
+                        return cacheName !== CACHE_NAME;
+                    })
+                    .map(function (cacheName) {
+                        // eslint-disable-next-line no-console
+                        console.log("[PWA Builder] Deleting old cache:", cacheName);
+                        return caches.delete(cacheName);
+                    })
+            );
+
+            // Entry-level cleanup for the current cache
+            const cache = await caches.open(CACHE_NAME);
+            const keys = await cache.keys();
+            const keepUrls = new Set(precacheFiles.map(path => new URL(path, self.location).href));
+
+            for (const request of keys) {
+                try {
+                    const url = new URL(request.url);
+                    if (keepUrls.has(url.href)) continue;
+                    if (url.origin !== self.location.origin) {
+                        await cache.delete(request);
+                        continue;
+                    }
+                    if (url.search) {
+                        await cache.delete(request);
+                        continue;
+                    }
+
+                    const pathname = url.pathname.toLowerCase();
+                    const isStaticPath =
+                        pathname === "/" ||
+                        pathname.endsWith("/index.html") ||
+                        /\.(css|js|mjs|json|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|otf|eot|mp3|wav|webm|mp4)$/i.test(
+                            pathname
+                        );
+
+                    if (!isStaticPath) {
+                        await cache.delete(request);
+                    }
+                } catch {
+                    // If the URL can't be parsed, treat it as unsafe.
+                    await cache.delete(request);
+                }
+            }
+        })()
+    );
 });
 /*
 function isPrecachedRequest(request) {
@@ -83,10 +141,17 @@ function isAppShellNavigation(request) {
     const url = new URL(request.url);
     if (url.origin !== self.location.origin) return false;
 
-    // Only treat the root and index.html as app-shell.
-    // Do not cache arbitrary documents.
+    // Only treat the root index.html as app-shell.
+    // Avoid intercepting sub-pages like /planet/ which have their own index.html
     if (url.search) return false;
-    return url.pathname === "/" || url.pathname.toLowerCase().endsWith("/index.html");
+    const pathname = url.pathname.toLowerCase();
+    const isRootIndex =
+        pathname === "/" ||
+        pathname === "/index.html" ||
+        pathname.endsWith("/musicblocks/") ||
+        pathname.endsWith("/musicblocks/index.html");
+
+    return isRootIndex && !pathname.includes("/planet/");
 }
 
 function shouldCacheResponse(request, response) {
@@ -109,7 +174,7 @@ function updateCache(request, response) {
         console.log("Partial response is unsupported for caching.");
         return Promise.resolve();
     }
-    return caches.open(CACHE).then(function (cache) {
+    return caches.open(CACHE_NAME).then(function (cache) {
         return cache.put(request, response);
     });
 }
@@ -118,7 +183,7 @@ function fromCache(request) {
     // Check to see if you have it in the cache
     // Return response
     // If not in the cache, then return
-    return caches.open(CACHE).then(function (cache) {
+    return caches.open(CACHE_NAME).then(function (cache) {
         return cache.match(request).then(function (matching) {
             if (!matching || matching.status === 404) {
                 return Promise.reject("no-match");
@@ -191,7 +256,7 @@ self.addEventListener("refreshOffline", function () {
     const offlinePageRequest = new Request(offlineFallbackPage);
 
     return fetch(offlineFallbackPage).then(function (response) {
-        return caches.open(CACHE).then(function (cache) {
+        return caches.open(CACHE_NAME).then(function (cache) {
             // eslint-disable-next-line no-console
             console.log(
                 "[PWA Builder] Offline page updated from refreshOffline event: " + response.url
