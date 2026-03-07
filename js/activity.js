@@ -4398,12 +4398,10 @@ class Activity {
                     this._restoreTrashById(blockId);
                     trashView.classList.add("hidden");
                 });
+                handleClickOutsideTrashView(trashView);
 
                 trashView.appendChild(listItem);
             });
-
-            // Attach outside-click listener once, after all items are rendered
-            handleClickOutsideTrashView(trashView);
 
             const existingView = document.getElementById("trashView");
             if (existingView) {

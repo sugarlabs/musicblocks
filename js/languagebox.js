@@ -278,14 +278,8 @@ class LanguageBox {
         }
 
         const languageLinks = document.querySelectorAll(".language-link");
-
         languageLinks.forEach(link => {
-            if (link && (!link.dataset || !link.dataset.listenerAttached)) {
-                link.addEventListener("click", () => this.OnClick());
-                if (link.dataset) {
-                    link.dataset.listenerAttached = "true";
-                }
-            }
+            link.addEventListener("click", () => this.OnClick());
         });
     }
 }

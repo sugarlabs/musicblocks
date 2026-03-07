@@ -45,7 +45,7 @@ class StatsWindow {
                 this.widgetWindow.getWidgetBody().style.justifyContent = "space-between";
                 this.widgetWindow.getWidgetBody().style.padding = "0px 2vw";
             } else {
-                this.widgetWindow.getWidgetBody().style.padding = "0px";
+                this.widgetWindow.getWidgetBody().style.padding = "0px 0px";
             }
             this.doAnalytics();
         };
