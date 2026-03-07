@@ -333,6 +333,8 @@ class Activity {
         // Dirty flag for canvas rendering optimization
         // When true, the stage needs to be redrawn on the next animation frame
         this.stageDirty = false;
+        this._renderLoopRafId = null;
+        this._renderLoopRunning = false;
 
         this.themes = ["light", "dark"];
         try {
@@ -411,6 +413,7 @@ class Activity {
          * Sets up the initial state and dependencies of the activity.
          */
         this.setupDependencies = () => {
+            this._stopRenderLoop();
             this.cleanupEventListeners();
             createDefaultStack();
             createHelpContent(this);
@@ -501,19 +504,35 @@ class Activity {
          * 3. GIF animations are playing
          * This eliminates unnecessary 60fps updates when idle.
          */
-        const renderLoop = () => {
-            if (this.stage) {
-                const hasActiveTweens = createjs.Tween.hasActiveTweens();
-                const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
+        this._startRenderLoop = () => {
+            if (this._renderLoopRunning) return;
+            this._renderLoopRunning = true;
 
-                if (this.stageDirty || hasActiveTweens || hasActiveGifs) {
-                    this.stage.update();
-                    this.stageDirty = false;
+            const renderLoop = () => {
+                if (!this._renderLoopRunning) return;
+
+                if (this.stage) {
+                    const hasActiveTweens = createjs.Tween.hasActiveTweens();
+                    const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
+
+                    if (this.stageDirty || hasActiveTweens || hasActiveGifs) {
+                        this.stage.update();
+                        this.stageDirty = false;
+                    }
                 }
-            }
-            requestAnimationFrame(renderLoop);
+                this._renderLoopRafId = requestAnimationFrame(renderLoop);
+            };
+
+            this._renderLoopRafId = requestAnimationFrame(renderLoop);
         };
-        requestAnimationFrame(renderLoop);
+
+        this._stopRenderLoop = () => {
+            this._renderLoopRunning = false;
+            if (this._renderLoopRafId !== null) {
+                cancelAnimationFrame(this._renderLoopRafId);
+                this._renderLoopRafId = null;
+            }
+        };
 
         /*
          * creates helpfulSearchDiv for search
@@ -7334,6 +7353,7 @@ class Activity {
 
             this.stage = new createjs.Stage(this.canvas);
             createjs.Touch.enable(this.stage);
+            this._startRenderLoop();
 
             // Initialize Ticker with optimal framerate
             createjs.Ticker.framerate = 60;
@@ -7364,6 +7384,7 @@ class Activity {
             // Use managed addEventListener for automatic cleanup
             this.addEventListener(document, "mousemove", this.handleMouseMove);
             this.addEventListener(document, "click", this.handleDocumentClick);
+            this.addEventListener(window, "beforeunload", this._stopRenderLoop);
 
             this._createMsgContainer(
                 "#ffffff",
