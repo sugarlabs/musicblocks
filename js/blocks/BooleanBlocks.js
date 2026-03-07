@@ -91,18 +91,19 @@ function setupBooleanBlocks(activity) {
         arg(logo, turtle, blk, receivedArg) {
             const cblk = activity.blocks.blockList[blk].connections[1];
 
-            if (!cblk) {
-            activity.errorMsg(NOINPUTERRORMSG, blk);
-            return false;
-}
+            if (cblk === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            }
 
             const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
 
             try {
                 return !a;
             } catch (e) {
-                
-                activity.errorMsg(e.message || NOINPUTERRORMSG, blk);
+                // eslint-disable-next-line no-console
+                console.debug(e);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
         }
@@ -180,14 +181,15 @@ function setupBooleanBlocks(activity) {
         arg(logo, turtle, blk, receivedArg) {
             const cblk1 = activity.blocks.blockList[blk].connections[1];
             const cblk2 = activity.blocks.blockList[blk].connections[2];
-if (!cblk1 || !cblk2) {
-    activity.errorMsg(NOINPUTERRORMSG, blk);
-    return false;
-} 
+
+            if (cblk1 === null || cblk2 === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            } else {
                 const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 return a && b;
-            
+            }
         }
     }
     /**
@@ -261,19 +263,18 @@ if (!cblk1 || !cblk2) {
          * @returns {boolean} - The result of the argument handling.
          */
         arg(logo, turtle, blk, receivedArg) {
-    const cblk1 = activity.blocks.blockList[blk].connections[1];
-    const cblk2 = activity.blocks.blockList[blk].connections[2];
+            const cblk1 = activity.blocks.blockList[blk].connections[1];
+            const cblk2 = activity.blocks.blockList[blk].connections[2];
 
-    if (!cblk1 || !cblk2) {
-        activity.errorMsg("Missing input connection: OR block requires two inputs.", blk);
-        return false;
-    }
-
-    const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-    const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-
-    return a || b;
-}
+            if (cblk1 === null || cblk2 === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            } else {
+                const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                return a || b;
+            }
+        }
     }
     /**
      * Represents a block for the logical XOR operator.
@@ -349,14 +350,14 @@ if (!cblk1 || !cblk2) {
             const cblk1 = activity.blocks.blockList[blk].connections[1];
             const cblk2 = activity.blocks.blockList[blk].connections[2];
 
-            if (!cblk1 || !cblk2) {
-                activity.errorMsg("Missing input connection: XOR block requires two inputs.", blk);
+            if (cblk1 === null || cblk2 === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
-            } 
+            } else {
                 const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 return (a && !b) || (!a && b);
-            
+            }
         }
     }
     /**
@@ -447,10 +448,10 @@ if (!cblk1 || !cblk2) {
             const cblk1 = activity.blocks.blockList[blk].connections[1];
             const cblk2 = activity.blocks.blockList[blk].connections[2];
 
-            if (!cblk1 || !cblk2) {
-    activity.errorMsg(NOINPUTERRORMSG, blk);
-    return false;
-}
+            if (cblk1 === null || cblk2 === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            }
 
             const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
             const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
@@ -458,8 +459,9 @@ if (!cblk1 || !cblk2) {
             try {
                 return Number(a) > Number(b);
             } catch (e) {
-                
-                activity.errorMsg(e.message || NOINPUTERRORMSG, blk);
+                // eslint-disable-next-line no-console
+                console.debug(e);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
         }
@@ -552,10 +554,10 @@ if (!cblk1 || !cblk2) {
             const cblk1 = activity.blocks.blockList[blk].connections[1];
             const cblk2 = activity.blocks.blockList[blk].connections[2];
 
-            if (!cblk1 || !cblk2) {
-    activity.errorMsg(NOINPUTERRORMSG, blk);
-    return false;
-}
+            if (cblk1 === null || cblk2 === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            }
 
             const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
             const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
@@ -563,8 +565,9 @@ if (!cblk1 || !cblk2) {
             try {
                 return Number(a) < Number(b);
             } catch (e) {
-                
-                activity.errorMsg(e.message || NOINPUTERRORMSG, blk);
+                // eslint-disable-next-line no-console
+                console.debug(e);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
         }
@@ -652,10 +655,10 @@ if (!cblk1 || !cblk2) {
             const cblk1 = activity.blocks.blockList[blk].connections[1];
             const cblk2 = activity.blocks.blockList[blk].connections[2];
 
-            if (!cblk1 || !cblk2) {
-    activity.errorMsg(NOINPUTERRORMSG, blk);
-    return false;
-}
+            if (cblk1 === null || cblk2 === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            }
 
             const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
             const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
@@ -663,8 +666,9 @@ if (!cblk1 || !cblk2) {
             try {
                 return Number(a) <= Number(b);
             } catch (e) {
-                
-                activity.errorMsg(e.message || NOINPUTERRORMSG, blk);
+                // eslint-disable-next-line no-console
+                console.debug(e);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
         }
@@ -752,10 +756,10 @@ if (!cblk1 || !cblk2) {
             const cblk1 = activity.blocks.blockList[blk].connections[1];
             const cblk2 = activity.blocks.blockList[blk].connections[2];
 
-            if (!cblk1 || !cblk2) {
-    activity.errorMsg(NOINPUTERRORMSG, blk);
-    return false;
-}
+            if (cblk1 === null || cblk2 === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            }
 
             const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
             const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
@@ -763,8 +767,9 @@ if (!cblk1 || !cblk2) {
             try {
                 return Number(a) >= Number(b);
             } catch (e) {
-                
-                activity.errorMsg(e.message || NOINPUTERRORMSG, blk);
+                // eslint-disable-next-line no-console
+                console.debug(e);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
         }
@@ -856,10 +861,10 @@ if (!cblk1 || !cblk2) {
             const cblk1 = activity.blocks.blockList[blk].connections[1];
             const cblk2 = activity.blocks.blockList[blk].connections[2];
 
-            if (!cblk1 || !cblk2) {
-    activity.errorMsg(NOINPUTERRORMSG, blk);
-    return false;
-}
+            if (cblk1 === null || cblk2 === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            }
 
             const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
             const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
@@ -867,8 +872,9 @@ if (!cblk1 || !cblk2) {
             try {
                 return a === b;
             } catch (e) {
-                
-                activity.errorMsg(e.message || NOINPUTERRORMSG, blk);
+                // eslint-disable-next-line no-console
+                console.debug(e);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
         }
@@ -957,10 +963,10 @@ if (!cblk1 || !cblk2) {
             const cblk1 = activity.blocks.blockList[blk].connections[1];
             const cblk2 = activity.blocks.blockList[blk].connections[2];
 
-            if (!cblk1 || !cblk2) {
-    activity.errorMsg(NOINPUTERRORMSG, blk);
-    return false;
-}
+            if (cblk1 === null || cblk2 === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            }
 
             const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
             const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
@@ -968,11 +974,10 @@ if (!cblk1 || !cblk2) {
             try {
                 return a !== b;
             } catch (e) {
-                
-                activity.errorMsg(e.message || NOINPUTERRORMSG, blk);
+                // eslint-disable-next-line no-console
+                console.debug(e);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
-                
-                
             }
         }
     }
