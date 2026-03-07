@@ -31,7 +31,7 @@
 /* exported
 
    canvasPixelRatio, changeImage, closeBlkWidgets, closeWidgets,
-   delayExecution, displayMsg, doBrowserCheck, docByClass, docByName,
+   delayExecution, displayMsg, docByClass, docByName,
    docBySelector, docByTagName, doPublish, doStopVideoCam, doSVG,
    doUseCamera, fileBasename, fileExt, format, getTextWidth, hex2rgb,
    hexToRGB, hideDOMLabel, httpGet, httpPost, HttpRequest,
@@ -182,16 +182,7 @@ function fnBrowserDetect() {
  * @returns {number} The canvas pixel ratio.
  */
 function canvasPixelRatio() {
-    const devicePixelRatio = window.devicePixelRatio || 1;
-    const context = document.querySelector("#myCanvas").getContext("2d");
-    const backingStoreRatio =
-        context.webkitBackingStorePixelRatio ||
-        context.mozBackingStorePixelRatio ||
-        context.msBackingStorePixelRatio ||
-        context.oBackingStorePixelRatio ||
-        context.backingStorePixelRatio ||
-        1;
-    return devicePixelRatio / backingStoreRatio;
+    return window.devicePixelRatio || 1;
 }
 
 /**
@@ -309,46 +300,6 @@ function HttpRequest(url, loadCallback, userCallback) {
 }
 
 /**
- * Checks the browser type and version.
- * Sets properties in the jQuery.browser object based on the user agent.
- * @function
- */
-function doBrowserCheck() {
-    jQuery.uaMatch = ua => {
-        ua = ua.toLowerCase();
-
-        const match =
-            /(chrome)[ /]([\w.]+)/.exec(ua) ||
-            /(webkit)[ /]([\w.]+)/.exec(ua) ||
-            /(opera)(?:.*version|)[ /]([\w.]+)/.exec(ua) ||
-            /(msie) ([\w.]+)/.exec(ua) ||
-            (ua.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua)) ||
-            [];
-
-        return {
-            browser: match[1] || "",
-            version: match[2] || "0"
-        };
-    };
-
-    const matched = jQuery.uaMatch(navigator.userAgent);
-    const browser = {};
-
-    if (matched.browser) {
-        browser[matched.browser] = true;
-        browser.version = matched.version;
-    }
-
-    if (browser.chrome) {
-        browser.webkit = true;
-    } else if (browser.webkit) {
-        browser.safari = true;
-    }
-
-    jQuery.browser = browser;
-}
-
-/**
  * Wait for critical dependencies to be ready before calling callback.
  * Uses polling with exponential backoff and maximum timeout.
  * This replaces the arbitrary 5-second delay for Firefox with actual readiness checks.
@@ -409,57 +360,6 @@ function waitForReadiness(callback, options = {}) {
     // Start the readiness check loop
     requestAnimationFrame(check);
 }
-
-// Check for Internet Explorer
-
-window.onload = () => {
-    const userAgent = window.navigator.userAgent;
-    // For IE 10 or older
-    const MSIE = userAgent.indexOf("MSIE ");
-    let DetectVersionOfIE;
-    if (MSIE > 0) {
-        DetectVersionOfIE = parseInt(
-            userAgent.substring(MSIE + 5, userAgent.indexOf(".", MSIE)),
-            10
-        );
-    }
-
-    // For IE 11
-    const IETrident = userAgent.indexOf("Trident/");
-    if (IETrident > 0) {
-        const IERv = userAgent.indexOf("rv:");
-        DetectVersionOfIE = parseInt(
-            userAgent.substring(IERv + 3, userAgent.indexOf(".", IERv)),
-            10
-        );
-    }
-
-    // For IE 12
-    const IEEDGE = userAgent.indexOf("Edge/");
-    if (IEEDGE > 0) {
-        DetectVersionOfIE = parseInt(
-            userAgent.substring(IEEDGE + 5, userAgent.indexOf(".", IEEDGE)),
-            10
-        );
-    }
-
-    if (typeof DetectVersionOfIE != "undefined") {
-        document.body.innerHTML = "<div style='margin: 200px;'>";
-        document.body.innerHTML +=
-            "<h1 style='font-size: 100px; font-family: Arial; text-align: center; color: #F00;'>Music Blocks</h1>";
-        document.body.innerHTML +=
-            "<h3 style='font-size: 40px; font-family: Arial; text-align: center;'>Music Blocks will not work in Internet Explorer, you can use:</h3>";
-        document.body.innerHTML +=
-            "<div style='width: 550px; margin: 0 auto;'><a href='https://www.chromium.org/getting-involved/download-chromium' style='float: left; display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Chromium</a>";
-        document.body.innerHTML +=
-            "<a href='https://www.google.com/chrome/' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Chrome</a>";
-        document.body.innerHTML +=
-            "<a href='https://support.apple.com/downloads/safari' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Safari</a>";
-        document.body.innerHTML +=
-            "<a href='https://www.mozilla.org/en-US/firefox/new/' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Firefox</a>";
-        document.body.innerHTML += "</div></div>";
-    }
-};
 
 /**
  * Retrieves a collection of elements by class name.
