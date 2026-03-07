@@ -921,8 +921,8 @@ class Toolbar {
             }
             RecordDropdownArrow.innerHTML = `<i class="material-icons main" style="font-size: 28px;">arrow_drop_down</i>`;
 
-            // Toggle arrow on click
-            RecordDropdownArrow.addEventListener("click", function () {
+            // Create handler function for arrow click
+            const arrowClickHandler = function () {
                 setTimeout(() => {
                     const dropdown = docById("recorddropdown");
                     const arrowIcon = RecordDropdownArrow.querySelector("i");
@@ -936,7 +936,19 @@ class Toolbar {
                         arrowIcon.textContent = "arrow_drop_down";
                     }
                 }, 50);
-            });
+            };
+
+            // Remove old listener to prevent accumulation
+            if (RecordDropdownArrow._arrowClickHandler) {
+                RecordDropdownArrow.removeEventListener(
+                    "click",
+                    RecordDropdownArrow._arrowClickHandler
+                );
+            }
+
+            // Store reference and attach fresh listener
+            RecordDropdownArrow._arrowClickHandler = arrowClickHandler;
+            RecordDropdownArrow.addEventListener("click", arrowClickHandler);
 
             // Reset arrow when clicking outside (close dropdown)
             document.addEventListener("click", function (e) {
