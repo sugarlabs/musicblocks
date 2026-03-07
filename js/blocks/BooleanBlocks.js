@@ -101,9 +101,8 @@ function setupBooleanBlocks(activity) {
             try {
                 return !a;
             } catch (e) {
-                // eslint-disable-next-line no-console
-                console.debug(e);
-                activity.errorMsg(NOINPUTERRORMSG, blk);
+                
+                activity.errorMsg(e.message || NOINPUTERRORMSG, blk);
                 return false;
             }
         }
@@ -459,9 +458,8 @@ if (!cblk1 || !cblk2) {
             try {
                 return Number(a) > Number(b);
             } catch (e) {
-                // eslint-disable-next-line no-console
-                console.debug(e);
-                activity.errorMsg(NOINPUTERRORMSG, blk);
+                
+                activity.errorMsg(e.message || NOINPUTERRORMSG, blk);
                 return false;
             }
         }
@@ -565,9 +563,8 @@ if (!cblk1 || !cblk2) {
             try {
                 return Number(a) < Number(b);
             } catch (e) {
-                // eslint-disable-next-line no-console
-                console.debug(e);
-                activity.errorMsg(NOINPUTERRORMSG, blk);
+                
+                activity.errorMsg(e.message || NOINPUTERRORMSG, blk);
                 return false;
             }
         }
@@ -666,9 +663,8 @@ if (!cblk1 || !cblk2) {
             try {
                 return Number(a) <= Number(b);
             } catch (e) {
-                // eslint-disable-next-line no-console
-                console.debug(e);
-                activity.errorMsg(NOINPUTERRORMSG, blk);
+                
+                activity.errorMsg(e.message || NOINPUTERRORMSG, blk);
                 return false;
             }
         }
@@ -767,9 +763,8 @@ if (!cblk1 || !cblk2) {
             try {
                 return Number(a) >= Number(b);
             } catch (e) {
-                // eslint-disable-next-line no-console
-                console.debug(e);
-                activity.errorMsg(NOINPUTERRORMSG, blk);
+                
+                activity.errorMsg(e.message || NOINPUTERRORMSG, blk);
                 return false;
             }
         }
@@ -872,9 +867,8 @@ if (!cblk1 || !cblk2) {
             try {
                 return a === b;
             } catch (e) {
-                // eslint-disable-next-line no-console
-                console.debug(e);
-                activity.errorMsg(NOINPUTERRORMSG, blk);
+                
+                activity.errorMsg(e.message || NOINPUTERRORMSG, blk);
                 return false;
             }
         }
@@ -974,10 +968,11 @@ if (!cblk1 || !cblk2) {
             try {
                 return a !== b;
             } catch (e) {
-                // eslint-disable-next-line no-console
-                console.debug(e);
-                activity.errorMsg(NOINPUTERRORMSG, blk);
+                
+                activity.errorMsg(e.message || NOINPUTERRORMSG, blk);
                 return false;
+                
+                
             }
         }
     }
