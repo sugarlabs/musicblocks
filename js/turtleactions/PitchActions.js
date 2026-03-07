@@ -17,15 +17,13 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335
  * USA.
-
  */
 
 /*
-   globals Singer, pitchToNumber, getStepSizeUp, getStepSizeDown, calcOctave, last, getNote,
-   nthDegreeToPitch, SHARP, FLAT, _, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
-   numberToPitch, ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
+   global _, pitchToNumber, getStepSizeUp, getStepSizeDown, calcOctave, getNote,
+   nthDegreeToPitch, SHARP, FLAT, _, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE, numberToPitch, ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
    keySignatureToMode, getInterval, EFFECTSNAMES, NANERRORMSG, frequencyToPitch,
-   MusicBlocks, Mouse, isCustomTemperament
+   MusicBlocks, Mouse, isCustomTemperament, getTemperament, TEMPERAMENT
 */
 
 /*
@@ -44,7 +42,7 @@
         pitchToNumber, getStepSizeUp, getStepSizeDown, calcOctave, getNote, nthDegreeToPitch,
         SHARP, FLAT, _, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE, numberToPitch,
         ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
-        keySignatureToMode, getInterval, frequencyToPitch, isCustomTemperament
+        keySignatureToMode, getInterval, frequencyToPitch, isCustomTemperament, getTemperament, TEMPERAMENT
 */
 
 /*exported setupPitchActions*/
@@ -184,7 +182,29 @@ function setupPitchActions(activity) {
             number = Math.abs(number);
 
             const obj = keySignatureToMode(tur.singer.keySignature);
-            const modeLength = MUSICALMODES[obj[1]].length;
+
+            // Get temperament length for proper modulo arithmetic
+            let modeLength = 7; // Default for standard modes
+            const currentTemperament = activity?.logo?.synth?.inTemperament || "equal";
+
+            if (currentTemperament && isCustomTemperament(currentTemperament)) {
+                const customTemperament = getTemperament(currentTemperament);
+                if (customTemperament?.pitchNumber) {
+                    modeLength = customTemperament.pitchNumber;
+                }
+            } else if (
+                TEMPERAMENT &&
+                currentTemperament &&
+                TEMPERAMENT[currentTemperament] &&
+                TEMPERAMENT[currentTemperament].pitchNumber
+            ) {
+                // For standard temperament, check if mode exists in MUSICALMODES
+                const obj = keySignatureToMode(tur.singer.keySignature);
+                if (obj && obj[1] && MUSICALMODES[obj[1]]) {
+                    modeLength = MUSICALMODES[obj[1]].length;
+                }
+            }
+
             let scaleDegree = (Math.floor(number - 1) % modeLength) + 1;
 
             // Choose a reference based on the key selected.
@@ -264,6 +284,7 @@ function setupPitchActions(activity) {
                 return;
             } else {
                 if (
+                    activity?.logo?.synth?.inTemperament &&
                     isCustomTemperament(activity.logo.synth.inTemperament) &&
                     tur.singer.scalarTransposition + tur.singer.transposition !== 0
                 ) {

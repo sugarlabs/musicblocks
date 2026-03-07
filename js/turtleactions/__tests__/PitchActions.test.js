@@ -37,6 +37,8 @@ Object.assign(global, {
     pitchToFrequency: musicUtils.pitchToFrequency,
     numberToPitch: musicUtils.numberToPitch,
     isCustomTemperament: musicUtils.isCustomTemperament,
+    getTemperament: musicUtils.getTemperament,
+    TEMPERAMENT: musicUtils.TEMPERAMENT,
     ACCIDENTALNAMES: musicUtils.ACCIDENTALNAMES,
     ACCIDENTALVALUES: musicUtils.ACCIDENTALVALUES,
     NOTESFLAT: musicUtils.NOTESFLAT,
@@ -216,7 +218,15 @@ describe("Tests for Singer.PitchActions setup", () => {
             turtle.singer.inDefineMode = false;
             turtle.singer.scalarTransposition = 1;
             turtle.singer.transposition = 0;
-            global.isCustomTemperament = () => true;
+
+            // Set up custom temperament
+            activity.logo.synth.inTemperament = "custom";
+
+            // Mock the imported function by temporarily replacing it
+            const musicUtils = require("../../utils/musicutils");
+            const originalIsCustomTemperament = musicUtils.isCustomTemperament;
+            musicUtils.isCustomTemperament = () => true;
+
             const expected = _(
                 "Scalar transpositions are equal to Semitone transpositions for custom temperament."
             );
@@ -224,6 +234,9 @@ describe("Tests for Singer.PitchActions setup", () => {
             Singer.PitchActions.playPitchNumber(5, 0, blkId);
             expect(spyErr).toHaveBeenCalledWith(expected);
             spyErr.mockRestore();
+
+            // Restore original function
+            musicUtils.isCustomTemperament = originalIsCustomTemperament;
         });
     });
 

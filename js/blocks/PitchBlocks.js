@@ -20,7 +20,7 @@
    YSTAFFNOTEHEIGHT, MUSICALMODES, keySignatureToMode, ALLNOTENAMES,
    nthDegreeToPitch, A0, C8, calcOctave, SOLFEGECONVERSIONTABLE,
    NOTESFLAT, NOTESSHARP, NOTESTEP, scaleDegreeToPitchMapping,
-   INTERVALVALUES
+   INTERVALVALUES, isCustomTemperament, getTemperament, TEMPERAMENT
  */
 
 /* exported setupPitchBlocks */
@@ -132,6 +132,58 @@ function setupPitchBlocks(activity) {
             this.setPalette("pitch", activity);
             this.formBlock({ outType: "textout" });
             this.hidden = true;
+        }
+    }
+
+    class TemperamentLengthBlock extends ValueBlock {
+        constructor() {
+            //.TRANS: number of pitches in current temperament system
+            super("temperamentlength", _("temperament length"));
+            this.setPalette("pitch", activity);
+            this.beginnerBlock(true);
+            this.parameter = true;
+            this.setHelpString([
+                _(
+                    "The Temperament length block returns the number of pitches in the current temperament system."
+                ),
+                "documentation",
+                ""
+            ]);
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return activity.blocks.blockList[blk].value;
+        }
+
+        arg(logo, turtle, blk) {
+            if (
+                logo.inStatusMatrix &&
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
+            ) {
+                logo.statusFields.push([blk, "temperamentlength"]);
+            } else {
+                const temperament = logo.synth.inTemperament;
+
+                // Check if it's a custom temperament
+                if (isCustomTemperament(temperament)) {
+                    // For custom temperaments, get the pitchNumber from the temperament definition
+                    const customTemperament = getTemperament(temperament);
+                    if (customTemperament && customTemperament.pitchNumber) {
+                        return customTemperament.pitchNumber;
+                    }
+                    // Fallback to 12 if not properly defined
+                    return 12;
+                } else {
+                    // For predefined temperaments, get the pitchNumber from TEMPERAMENT object
+                    const temperamentData = TEMPERAMENT[temperament];
+                    if (temperamentData && temperamentData.pitchNumber) {
+                        return temperamentData.pitchNumber;
+                    }
+                    // Fallback to 12 for equal temperament
+                    return 12;
+                }
+            }
         }
     }
 
@@ -2100,6 +2152,7 @@ function setupPitchBlocks(activity) {
     new SawtoothBlock().setup(activity);
     new InvertModeBlock().setup(activity);
     new TranspositionFactorBlock().setup(activity);
+    new TemperamentLengthBlock().setup(activity);
     new DeltaPitchBlock().setup(activity);
     new DeltaPitch2Block().setup(activity);
     new MyPitchBlock().setup(activity);
