@@ -559,21 +559,7 @@ function setupToneBlocks(activity) {
             this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 20];
             this.piemenuValuesC2 = [1, 2, 3];
             this.piemenuValuesC3 = [
-                220,
-                247,
-                262,
-                294,
-                330,
-                349,
-                392,
-                440,
-                494,
-                523,
-                587,
-                659,
-                698,
-                783,
-                880
+                220, 247, 262, 294, 330, 349, 392, 440, 494, 523, 587, 659, 698, 783, 880
             ];
             this.setHelpString([
                 _("The Phaser block adds a sweeping sound."),
@@ -636,7 +622,15 @@ function setupToneBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Chorus block adds a chorus effect."),
+                _("The Chorus block makes a sound richer.") +
+                    " " +
+                    _("Chorus layers the sound with slightly delayed copies.") +
+                    " " +
+                    _("The rate controls the frequency of the delay.") +
+                    " " +
+                    _("The delay (ms) controls the base delay time.") +
+                    " " +
+                    _("The depth controls the intensity of the effect."),
                 "documentation",
                 null,
                 "chorushelp"
@@ -647,7 +641,7 @@ function setupToneBlocks(activity) {
                 name: _("chorus"),
                 args: 3,
                 defaults: [1.5, 3.5, 70],
-                argLabels: [_("rate"), _("delay (MS)"), _("depth")]
+                argLabels: [_("rate"), _("delay (ms)"), _("depth")]
             });
         }
 
@@ -695,7 +689,13 @@ function setupToneBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Vibrato block adds a rapid, slight variation in pitch."),
+                _("The Vibrato block adds a pulsating pitch.") +
+                    " " +
+                    _("Vibrato varies the pitch rapidly and slightly.") +
+                    " " +
+                    _("The intensity controls how much the pitch varies.") +
+                    " " +
+                    _("The rate controls how fast the pitch varies."),
                 "documentation",
                 null,
                 "vibratohelp"
