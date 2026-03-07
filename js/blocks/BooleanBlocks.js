@@ -92,8 +92,8 @@ function setupBooleanBlocks(activity) {
             const cblk = activity.blocks.blockList[blk].connections[1];
 
             if (!cblk) {
-    activity.errorMsg("Missing input connection: expected a connected block.", blk);
-    return false;
+            activity.errorMsg(NOINPUTERRORMSG, blk);
+            return false;
 }
 
             const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
@@ -181,7 +181,7 @@ function setupBooleanBlocks(activity) {
             const cblk1 = activity.blocks.blockList[blk].connections[1];
             const cblk2 = activity.blocks.blockList[blk].connections[2];
 if (!cblk1 || !cblk2) {
-    activity.errorMsg("Missing input connection: AND block requires two inputs.", blk);
+    activity.errorMsg(NOINPUTERRORMSG, blk);
     return false;
 } 
                 const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
@@ -448,7 +448,7 @@ if (!cblk1 || !cblk2) {
             const cblk2 = activity.blocks.blockList[blk].connections[2];
 
             if (!cblk1 || !cblk2) {
-    activity.errorMsg("Missing input connection.", blk);
+    activity.errorMsg(NOINPUTERRORMSG, blk);
     return false;
 }
 
@@ -553,7 +553,7 @@ if (!cblk1 || !cblk2) {
             const cblk2 = activity.blocks.blockList[blk].connections[2];
 
             if (!cblk1 || !cblk2) {
-    activity.errorMsg("Missing input connection.", blk);
+    activity.errorMsg(NOINPUTERRORMSG, blk);
     return false;
 }
 
@@ -653,7 +653,7 @@ if (!cblk1 || !cblk2) {
             const cblk2 = activity.blocks.blockList[blk].connections[2];
 
             if (!cblk1 || !cblk2) {
-    activity.errorMsg("Missing input connection.", blk);
+    activity.errorMsg(NOINPUTERRORMSG, blk);
     return false;
 }
 
@@ -753,7 +753,7 @@ if (!cblk1 || !cblk2) {
             const cblk2 = activity.blocks.blockList[blk].connections[2];
 
             if (!cblk1 || !cblk2) {
-    activity.errorMsg("Missing input connection.", blk);
+    activity.errorMsg(NOINPUTERRORMSG, blk);
     return false;
 }
 
@@ -857,7 +857,7 @@ if (!cblk1 || !cblk2) {
             const cblk2 = activity.blocks.blockList[blk].connections[2];
 
             if (!cblk1 || !cblk2) {
-    activity.errorMsg("Missing input connection.", blk);
+    activity.errorMsg(NOINPUTERRORMSG, blk);
     return false;
 }
 
@@ -958,7 +958,7 @@ if (!cblk1 || !cblk2) {
             const cblk2 = activity.blocks.blockList[blk].connections[2];
 
             if (!cblk1 || !cblk2) {
-    activity.errorMsg("Missing input connection.", blk);
+    activity.errorMsg(NOINPUTERRORMSG, blk);
     return false;
 }
 
