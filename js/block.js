@@ -205,7 +205,7 @@ const TooltipManager = {
         this.init();
         clearTimeout(this.timeout);
         this.timeout = setTimeout(() => {
-            this.element.textContent = text;
+            this.element.textContent = _(text);
             this.element.classList.add("show");
             this.position(x, y);
         }, 200);
