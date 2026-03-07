@@ -180,7 +180,7 @@ class SVG {
      * @returns {void}
      */
     setClampSlots(clamp, number) {
-        if (clamp > this._clampCount.length - 1) {
+        if (clamp > this._clampCount - 1) {
             this.setClampCount(clamp + 1);
         }
         this._clampSlots[clamp] = number;
