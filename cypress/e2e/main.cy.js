@@ -1,11 +1,11 @@
-Cypress.on("uncaught:exception", (err) => {
+Cypress.on("uncaught:exception", err => {
     const ignored = [
         "ResizeObserver loop limit exceeded",
         "Cannot read properties of undefined (reading 'postMessage')",
         "_ is not defined",
         "Permissions check failed"
     ];
-    return !ignored.some((msg) => err.message.includes(msg));
+    return !ignored.some(msg => err.message.includes(msg));
 });
 
 describe("MusicBlocks Application", () => {
@@ -32,7 +32,7 @@ describe("MusicBlocks Application", () => {
     describe("Audio Controls", () => {
         it("should have a functional play button", () => {
             cy.get("#play").should("be.visible").click();
-            cy.window().then((win) => {
+            cy.window().then(win => {
                 const audioContext = win.Tone.context;
                 cy.wrap(audioContext.state).should("eq", "running");
             });
@@ -95,7 +95,7 @@ describe("MusicBlocks Application", () => {
                 "#Increase\\ block\\ size > img"
             ];
 
-            bottomBarElements.forEach((selector) => {
+            bottomBarElements.forEach(selector => {
                 cy.get(selector).should("exist").and("be.visible");
             });
         });
@@ -107,14 +107,14 @@ describe("MusicBlocks Application", () => {
                 "tr > :nth-child(3) > img"
             ];
 
-            sidebarElements.forEach((selector) => {
+            sidebarElements.forEach(selector => {
                 cy.get(selector).should("exist").and("be.visible").click();
             });
         });
 
         it("should verify that Grid, Clear, and Collapse elements exist and are visible", () => {
             const elements = ["#Grid > img", "#Clear", "#Collapse > img"];
-            elements.forEach((selector) => {
+            elements.forEach(selector => {
                 cy.get(selector).should("exist").and("be.visible");
             });
         });
