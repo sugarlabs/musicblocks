@@ -949,39 +949,43 @@
             window.addEventListener("resize", togglePlayOnlyMode);
         });
 
-    (function () {
-        function setAppHeight() {
-            const vh = window.innerHeight * 0.01;
-            document.documentElement.style.setProperty('--vh', `${vh}px`);
-        }
+    </script>
 
-        window.addEventListener('resize', setAppHeight);
-        document.addEventListener('fullscreenchange', setAppHeight);
-        setAppHeight();
-    })();
+    <script>
+        // Canvas and viewport height management
+        (function () {
+            function setAppHeight() {
+                const vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            }
 
-(function () {
-  function resizeCanvasesToScreen() {
-    const canvases = document.querySelectorAll("canvas");
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+            window.addEventListener('resize', setAppHeight);
+            document.addEventListener('fullscreenchange', setAppHeight);
+            setAppHeight();
+        })();
 
-    canvases.forEach(c => {
-      c.width = width;
-      c.height = height;
-      c.style.width = "100%";
-      c.style.height = "100%";
-    });
-  }
+        (function () {
+          function resizeCanvasesToScreen() {
+            const canvases = document.querySelectorAll("canvas");
+            const width = window.innerWidth;
+            const height = window.innerHeight;
 
-  window.addEventListener("resize", resizeCanvasesToScreen);
-  document.addEventListener("fullscreenchange", resizeCanvasesToScreen);
+            canvases.forEach(c => {
+              c.width = width;
+              c.height = height;
+              c.height = height;
+              c.style.width = "100%";
+              c.style.height = "100%";
+            });
+          }
 
-  setTimeout(resizeCanvasesToScreen, 150);
-})();
+          window.addEventListener("resize", resizeCanvasesToScreen);
+          document.addEventListener("fullscreenchange", resizeCanvasesToScreen);
 
-</script>
+          setTimeout(resizeCanvasesToScreen, 150);
+        })();
 
+    </script>
 
 </body>
 
