@@ -1132,12 +1132,12 @@ class PhraseMaker {
             }
 
             if (aboveBlock === this.blockNo) {
-                setTimeout(this._addNotesBlockBetween(aboveBlock, newBlock, true), 500);
+                setTimeout(() => this._addNotesBlockBetween(aboveBlock, newBlock, true), 500);
                 this.rowLabels.splice(0, 0, rLabel);
                 this.rowArgs.splice(0, 0, rArg);
                 this._rowBlocks.splice(0, 0, newBlock);
             } else {
-                setTimeout(this._addNotesBlockBetween(aboveBlock, newBlock, false), 500);
+                setTimeout(() => this._addNotesBlockBetween(aboveBlock, newBlock, false), 500);
                 let i;
                 for (i = 0; i < this.columnBlocksMap.length; i++) {
                     if (this.columnBlocksMap[i][0] === aboveBlock) {
@@ -1205,7 +1205,7 @@ class PhraseMaker {
             }
         }
 
-        setTimeout(this._createColumnPieSubmenu(i, "pitchblocks", true), 500);
+        setTimeout(() => this._createColumnPieSubmenu(i, "pitchblocks", true), 500);
     }
 
     /**
@@ -3156,9 +3156,9 @@ class PhraseMaker {
         }
         this.activity.blocks.loadNewBlocks(RHYTHMOBJ);
         if (this.activity.blocks.blockList[bottomOfClamp].name === "vspace") {
-            setTimeout(this.blockConnection(6, bottomOfClamp), 500);
+            setTimeout(() => this.blockConnection(6, bottomOfClamp), 500);
         } else {
-            setTimeout(this.blockConnection(7, bottomOfClamp), 500);
+            setTimeout(() => this.blockConnection(7, bottomOfClamp), 500);
         }
         this.activity.refreshCanvas();
     }
