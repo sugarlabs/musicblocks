@@ -278,7 +278,6 @@ class HelpWidget {
                         loadButton.onclick = () => {
                             if (message.length < 4) {
                                 // If there is nothing specified, just load the block.
-                                // console.debug("CLICK: " + name);
 
                                 const protoblk = object[0];
                                 const paletteName = object[1];
@@ -304,12 +303,10 @@ class HelpWidget {
                                     100,
                                     100
                                 );
-                                // console.debug("CLICK: " + blocksToLoad);
                                 this.activity.blocks.loadNewBlocks(blocksToLoad);
                             } else {
                                 // Load the blocks.
                                 const blocksToLoad = message[3];
-                                // console.debug("CLICK: " + blocksToLoad);
                                 this.activity.blocks.loadNewBlocks(blocksToLoad);
                             }
                         };
@@ -367,7 +364,6 @@ class HelpWidget {
 
         if (HELPCONTENT[page].length > 3) {
             const link = HELPCONTENT[page][3];
-            // console.debug(page + " " + link);
             body += `<p><a href="${link}" target="_blank">${HELPCONTENT[page][4]}</a></p>`;
         }
 
@@ -612,7 +608,6 @@ class HelpWidget {
                         if (message.length < 4) {
                             // If there is nothing specified, just
                             // load the block.
-                            // console.debug("CLICK: " + name);
                             const obj = this.activity.blocks.palettes.getProtoNameAndPalette(name);
                             const protoblk = obj[0];
                             const paletteName = obj[1];
@@ -640,12 +635,10 @@ class HelpWidget {
                                 100,
                                 100
                             );
-                            // console.debug("CLICK: " + blocksToLoad);
                             this.activity.blocks.loadNewBlocks(blocksToLoad);
                         } else {
                             // Load the blocks.
                             const blocksToLoad = message[3];
-                            // console.debug("CLICK: " + blocksToLoad);
                             this.activity.blocks.loadNewBlocks(blocksToLoad);
                         }
                     };
