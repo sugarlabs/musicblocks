@@ -187,6 +187,64 @@ const WIDENAMES = [
 const EXTRAWIDENAMES = [];
 
 /**
+ * TooltipManager handles the display and positioning of block tooltips.
+ */
+const TooltipManager = {
+    element: null,
+    timeout: null,
+
+    init() {
+        if (this.element) return;
+        this.element = document.createElement("div");
+        this.element.className = "block-tooltip";
+        document.body.appendChild(this.element);
+    },
+
+    show(text, x, y) {
+        if (!text) return;
+        this.init();
+        clearTimeout(this.timeout);
+        this.timeout = setTimeout(() => {
+            this.element.textContent = text;
+            this.element.classList.add("show");
+            this.position(x, y);
+        }, 200);
+    },
+
+    hide() {
+        clearTimeout(this.timeout);
+        if (this.element) {
+            this.element.classList.remove("show");
+        }
+    },
+
+    position(x, y) {
+        if (!this.element) return;
+        const rect = this.element.getBoundingClientRect();
+        let top = y - rect.height - 15;
+        let left = x - rect.width / 2;
+
+        // Boundary checks
+        if (top < 10) {
+            top = y + 25;
+            this.element.classList.remove("top");
+            this.element.classList.add("bottom");
+        } else {
+            this.element.classList.remove("bottom");
+            this.element.classList.add("top");
+        }
+
+        if (left < 10) left = 10;
+        if (left + rect.width > window.innerWidth - 10) {
+            left = window.innerWidth - rect.width - 10;
+        }
+
+        this.element.style.top = top + "px";
+        this.element.style.left = left + "px";
+    }
+};
+
+/**
  * List of block types with pie menus.
  * @type {string[]}
  */
@@ -2879,7 +2937,7 @@ class Block {
 
         this._calculateBlockHitArea();
 
-        this.container.on("mouseover", () => {
+        this.container.on("mouseover", event => {
             _getStatic("contextWheelDiv").style.display = "none";
 
             if (!that.activity.logo.runningLilypond) {
@@ -2890,6 +2948,46 @@ class Block {
             }
             that.blocks.activeBlock = thisBlock;
             // that.activity.refreshCanvas();
+
+            // Tooltip Logic
+            let tooltipText = "";
+
+            // 1. Check if this is an argument of a parent block
+            if (that.connections && that.connections[0] !== null) {
+                const parentBlock = that.blocks.blockList[that.connections[0]];
+                if (
+                    parentBlock &&
+                    parentBlock.protoblock &&
+                    parentBlock.protoblock._style.argLabels
+                ) {
+                    // Find which connection index we are
+                    const myIndex = parentBlock.connections.indexOf(thisBlock);
+                    // The first connection is usually the parent connection, args start from index 1.
+                    if (myIndex > 0) {
+                        const label = parentBlock.protoblock._style.argLabels[myIndex - 1];
+                        if (label && TooltipsData.parameters[label.toLowerCase()]) {
+                            tooltipText = TooltipsData.parameters[label.toLowerCase()];
+                        }
+                    }
+                }
+            }
+
+            // 2. If no parameter tooltip, check for block tooltip
+            if (!tooltipText) {
+                if (that.protoblock.tooltip) {
+                    tooltipText = that.protoblock.tooltip;
+                } else if (TooltipsData.blocks[that.name]) {
+                    tooltipText = TooltipsData.blocks[that.name];
+                }
+            }
+
+            if (tooltipText) {
+                TooltipManager.show(tooltipText, event.stageX, event.stageY);
+            }
+        });
+
+        this.container.on("mousemove", event => {
+            TooltipManager.position(event.stageX, event.stageY);
         });
 
         let haveClick = false;
@@ -3186,6 +3284,7 @@ class Block {
          * @param {Event} event - The mouseout event object.
          */
         this.container.on("mouseout", event => {
+            TooltipManager.hide();
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false);
             } else {

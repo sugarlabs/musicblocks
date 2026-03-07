@@ -1615,6 +1615,14 @@ class BaseBlock extends ProtoBlock {
     }
 
     /**
+     * Set the tooltip string for the block.
+     * @param {string} tooltip - The tooltip text.
+     */
+    setTooltip(tooltip) {
+        this.tooltip = tooltip;
+    }
+
+    /**
      * Forms the block with the given style.
      * @param {object} style - The style properties of the block.
      */
