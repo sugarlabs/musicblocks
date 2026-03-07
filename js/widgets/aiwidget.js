@@ -1138,7 +1138,7 @@ function AIWidget() {
                 return;
             }
 
-            const apiUrl = "https://api.groq.com/openai/v1/chat/completions";
+            const apiUrl = "/api/groq";
             const prompt_eng = `
             Generate an ABC notation song based on the following description:
             
@@ -1184,8 +1184,7 @@ function AIWidget() {
             fetch(apiUrl, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${env.GROQ_API_KEY}` // Replace with your actual API key
+                    "Content-Type": "application/json"
                 },
                 body: requestBody
             })
