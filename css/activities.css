@@ -135,7 +135,7 @@ body:not(.dark) #helpfulSearchDiv {
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  background-color: #f1f1f1;
+  background-color: #e0e0e0;
   color: black;
 }
 
