@@ -450,6 +450,7 @@ class Activity {
             this.themeBox = null;
             this.planet = null;
             window.converter = null;
+            this.programExplorer = null;
             this.buttonsVisible = true;
             this.headerContainer = null;
             this.swiping = false;
@@ -4843,6 +4844,11 @@ class Activity {
                     }
                     // Set flag to 1 to enable keyboard after MB finishes loading
                     that.keyboardEnableFlag = 1;
+
+                    // Initialize Program Explorer
+                    if (typeof ProgramExplorer !== "undefined") {
+                        that.programExplorer = new ProgramExplorer(that);
+                    }
                 }
 
                 document.removeEventListener("finishedLoading", __afterLoad);

@@ -126,6 +126,10 @@ requirejs.config({
         },
         "activity/js-export/generate": {
             deps: ["activity/js-export/ASTutils"]
+        },
+        "program-explorer": {
+            deps: ["activity/activity"],
+            exports: "ProgramExplorer"
         }
     },
     paths: {
