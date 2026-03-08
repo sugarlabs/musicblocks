@@ -570,6 +570,15 @@ class Blocks {
 
                 /** Adjust the clamp size to match the size of the child flow. */
                 const plusMinus = childFlowSize - myBlock.clampCount[clamp];
+                console.log(
+                    "ClampCheck",
+                    blk,
+                    "connections:",
+                    myBlock.connections,
+                    "clampCount:",
+                    myBlock.clampCount
+                );
+
                 if (plusMinus !== 0) {
                     if (!(childFlowSize === 0 && myBlock.clampCount[clamp] === 1)) {
                         myBlock.updateSlots(clamp, plusMinus);
@@ -580,8 +589,19 @@ class Blocks {
                 if (that.clampBlocksToCheck.length > 0) {
                     that.adjustExpandableClampBlock();
                 }
+                console.log(
+                    "ClampAdjust",
+                    blk,
+                    "childStack:",
+                    myBlock.connections[c],
+                    "childFlowSize:",
+                    childFlowSize,
+                    "clampCount:",
+                    myBlock.clampCount[clamp],
+                    "plusMinus:",
+                    plusMinus
+                );
             };
-
             __clampAdjuster(blk, myBlock, clamp);
         };
 

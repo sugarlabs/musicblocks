@@ -403,6 +403,7 @@ class MoveBlockCommand {
                 }
             }
 
+            //Restore argClampSlots
             for (const index of this.blockIndices) {
                 const blk = this.blocks.blockList[index];
                 const slots = argSlots.get(index);
@@ -417,15 +418,57 @@ class MoveBlockCommand {
             for (const index of this.blockIndices) {
                 const blk = this.blocks.blockList[index];
                 const savedClamp = clampCounts?.get(index);
-                if (!blk || blk.trash || !savedClamp) continue;
+                if (!blk || blk.trash || savedClamp == null) continue;
 
                 blk.clampCount = [...savedClamp];
             }
 
+            // Recompute docks
             for (const index of this.blockIndices) {
-                this.blocks.blockMoved(index);
+                const blk = this.blocks.blockList[index];
+                if (!blk || blk.trash) continue;
+
+                const parent = blk.connections[0];
+
+                if (parent != null) {
+                    this.blocks.adjustDocks(parent, true);
+                }
+
+                this.blocks.adjustDocks(index, true);
+            }
+            
+            // Recompute stack topology
+            this.blocks._cleanupStacks();
+
+            // Rebuild clamp checks
+            this.blocks.clampBlocksToCheck = [];
+
+            for (const index of this.blockIndices) {
+                const blk = this.blocks.blockList[index];
+                if (!blk || blk.trash) continue;
+
+                const parent = blk.connections[0];
+
+                if (
+                    parent != null &&
+                    parent >= 0 &&
+                    parent < this.blocks.blockList.length
+                ) {
+                    const parentBlk = this.blocks.blockList[parent];
+
+                    if (
+                        parentBlk &&
+                        !parentBlk.trash &&
+                        (parentBlk.isClampBlock?.() ||
+                            parentBlk.isExpandableBlock?.())
+                    ) {
+                        this.blocks.clampBlocksToCheck.push([parent, 0]);
+                    }
+                }
             }
 
+            // Resize clamps
+            this.blocks.adjustExpandableClampBlock();
         } finally {
             this.blocks._isUndoingMove = false;
             this.blocks.activity.refreshCanvas();
