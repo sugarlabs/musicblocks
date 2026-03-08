@@ -233,7 +233,18 @@ class Action {
  * Implements the Command pattern for undo/redo functionality.
  */
 class MoveBlockCommand {
-    constructor(blocks, blockIndices, oldPositions, newPositions, oldConnections, newConnections, oldArgClampSlots, newArgClampSlots, oldClampCounts, newClampCounts) {
+    constructor(
+        blocks,
+        blockIndices,
+        oldPositions,
+        newPositions,
+        oldConnections,
+        newConnections,
+        oldArgClampSlots,
+        newArgClampSlots,
+        oldClampCounts,
+        newClampCounts
+    ) {
         this.blocks = blocks;
         this.blockIndices = blockIndices; // Array of block indices that were moved
         this.oldPositions = oldPositions; // Map of index -> {x, y}
@@ -255,7 +266,7 @@ class MoveBlockCommand {
             this.newConnections,
             this.newArgClampSlots,
             this.newClampCounts
-        )
+        );
     }
 
     /**
@@ -267,7 +278,7 @@ class MoveBlockCommand {
             this.oldConnections,
             this.oldArgClampSlots,
             this.oldClampCounts
-        )
+        );
     }
 
     _restoreState(positions, connections, argSlots, clampCounts) {
@@ -278,7 +289,7 @@ class MoveBlockCommand {
             for (const index of this.blockIndices) {
                 const blk = this.blocks.blockList[index];
                 const pos = positions.get(index);
-                ``
+                ``;
                 if (!blk || blk.trash || !blk.container || !pos) continue;
                 blk.container.x = pos.x;
                 blk.container.y = pos.y;
@@ -291,7 +302,11 @@ class MoveBlockCommand {
 
                 // Disconnect from current parent
                 const currentParent = blk.connections[0];
-                if (currentParent != null && currentParent >= 0 && currentParent < this.blocks.blockList.length) {
+                if (
+                    currentParent != null &&
+                    currentParent >= 0 &&
+                    currentParent < this.blocks.blockList.length
+                ) {
                     const parentBlk = this.blocks.blockList[currentParent];
                     if (parentBlk && !parentBlk.trash && Array.isArray(parentBlk.connections)) {
                         for (let i = 1; i < parentBlk.connections.length; i++) {
@@ -307,7 +322,11 @@ class MoveBlockCommand {
                 if (Array.isArray(blk.connections)) {
                     for (let i = 1; i < blk.connections.length; i++) {
                         const childIndex = blk.connections[i];
-                        if (childIndex != null && childIndex >= 0 && childIndex < this.blocks.blockList.length) {
+                        if (
+                            childIndex != null &&
+                            childIndex >= 0 &&
+                            childIndex < this.blocks.blockList.length
+                        ) {
                             const childBlk = this.blocks.blockList[childIndex];
                             if (childBlk && !childBlk.trash && childBlk.connections[0] === index) {
                                 childBlk.connections[0] = null;
@@ -350,8 +369,12 @@ class MoveBlockCommand {
                                 if (oldParentConn[i] === index) {
                                     parentBlk.connections[i] = index;
                                     // If parent is an expandable/clamp block, add it to clampBlocksToCheck
-                                    if ((typeof parentBlk.isClampBlock === 'function' && parentBlk.isClampBlock()) ||
-                                        (typeof parentBlk.isExpandableBlock === 'function' && parentBlk.isExpandableBlock())) {
+                                    if (
+                                        (typeof parentBlk.isClampBlock === "function" &&
+                                            parentBlk.isClampBlock()) ||
+                                        (typeof parentBlk.isExpandableBlock === "function" &&
+                                            parentBlk.isExpandableBlock())
+                                    ) {
                                     }
                                     connectionRestored = true;
                                     break;
@@ -366,8 +389,12 @@ class MoveBlockCommand {
                             for (let i = 1; i < parentBlk.connections.length; i++) {
                                 if (parentBlk.connections[i] === index) {
                                     // If parent is an expandable/clamp block, add it to clampBlocksToCheck
-                                    if ((typeof parentBlk.isClampBlock === 'function' && parentBlk.isClampBlock()) ||
-                                        (typeof parentBlk.isExpandableBlock === 'function' && parentBlk.isExpandableBlock())) {
+                                    if (
+                                        (typeof parentBlk.isClampBlock === "function" &&
+                                            parentBlk.isClampBlock()) ||
+                                        (typeof parentBlk.isExpandableBlock === "function" &&
+                                            parentBlk.isExpandableBlock())
+                                    ) {
                                     }
                                     connectionRestored = true;
                                     break;
@@ -380,8 +407,11 @@ class MoveBlockCommand {
                                     if (parentBlk.connections[i] == null) {
                                         parentBlk.connections[i] = index;
                                         // If parent is an expandable/clamp block, add it to clampBlocksToCheck
-                                        if (parentBlk.isClampBlock && parentBlk.isClampBlock() ||
-                                            parentBlk.isExpandableBlock && parentBlk.isExpandableBlock()) {
+                                        if (
+                                            (parentBlk.isClampBlock && parentBlk.isClampBlock()) ||
+                                            (parentBlk.isExpandableBlock &&
+                                                parentBlk.isExpandableBlock())
+                                        ) {
                                         }
                                         break;
                                     }
@@ -436,7 +466,7 @@ class MoveBlockCommand {
 
                 this.blocks.adjustDocks(index, true);
             }
-            
+
             // Recompute stack topology
             this.blocks._cleanupStacks();
 
@@ -449,18 +479,13 @@ class MoveBlockCommand {
 
                 const parent = blk.connections[0];
 
-                if (
-                    parent != null &&
-                    parent >= 0 &&
-                    parent < this.blocks.blockList.length
-                ) {
+                if (parent != null && parent >= 0 && parent < this.blocks.blockList.length) {
                     const parentBlk = this.blocks.blockList[parent];
 
                     if (
                         parentBlk &&
                         !parentBlk.trash &&
-                        (parentBlk.isClampBlock?.() ||
-                            parentBlk.isExpandableBlock?.())
+                        (parentBlk.isClampBlock?.() || parentBlk.isExpandableBlock?.())
                     ) {
                         this.blocks.clampBlocksToCheck.push([parent, 0]);
                     }
@@ -506,7 +531,7 @@ class UndoRedoManager {
         }
 
         // For command pattern - execute the command and add to undo stack
-        if (command && typeof command.execute === 'function') {
+        if (command && typeof command.execute === "function") {
             command.execute();
             this.undoStack.push(command);
             this.redoStack = []; // Clear redo stack when new action is performed
@@ -515,11 +540,11 @@ class UndoRedoManager {
                 try {
                     globalActivity.refreshCanvas();
                 } catch (e) {
-                    console.error('Error refreshing canvas after executeCommand:', e);
+                    console.error("Error refreshing canvas after executeCommand:", e);
                 }
             }
         } else {
-            console.warn('Invalid command passed to executeCommand');
+            console.warn("Invalid command passed to executeCommand");
         }
     }
 
@@ -549,8 +574,8 @@ class UndoRedoManager {
         }
 
         try {
-            if (typeof command.undo !== 'function') {
-                console.warn('Command does not have undo method');
+            if (typeof command.undo !== "function") {
+                console.warn("Command does not have undo method");
                 // Push back to stack to maintain consistency
                 if (!Array.isArray(this.undoStack)) {
                     this.undoStack = [];
@@ -573,42 +598,48 @@ class UndoRedoManager {
             // Refresh canvas with error handling
             if (globalActivity) {
                 try {
-                    if (typeof globalActivity.refreshCanvas === 'function') {
+                    if (typeof globalActivity.refreshCanvas === "function") {
                         globalActivity.refreshCanvas();
                     }
                 } catch (e) {
-                    console.error('Error refreshing canvas after undo:', e);
+                    console.error("Error refreshing canvas after undo:", e);
                     // Don't crash, but try to recover
                     try {
-                        if (globalActivity.stage && typeof globalActivity.stage.update === 'function') {
+                        if (
+                            globalActivity.stage &&
+                            typeof globalActivity.stage.update === "function"
+                        ) {
                             globalActivity.stage.update();
                         }
                     } catch (e2) {
-                        console.error('Error updating stage during recovery:', e2);
+                        console.error("Error updating stage during recovery:", e2);
                     }
                 }
             }
         } catch (error) {
-            console.error('Error during undo operation:', error);
+            console.error("Error during undo operation:", error);
             // Push command back to undo stack on error to maintain consistency
             this.undoStack.push(command);
             // Try to refresh canvas anyway to prevent white screen
             if (globalActivity) {
                 try {
-                    if (typeof globalActivity.refreshCanvas === 'function') {
+                    if (typeof globalActivity.refreshCanvas === "function") {
                         globalActivity.refreshCanvas();
-                    } else if (globalActivity.stage && typeof globalActivity.stage.update === 'function') {
+                    } else if (
+                        globalActivity.stage &&
+                        typeof globalActivity.stage.update === "function"
+                    ) {
                         globalActivity.stage.update();
                     }
                 } catch (e) {
-                    console.error('Error refreshing canvas during error recovery:', e);
+                    console.error("Error refreshing canvas during error recovery:", e);
                     // Last resort - try to update stage directly
                     try {
                         if (globalActivity.stage) {
                             globalActivity.stage.update();
                         }
                     } catch (e2) {
-                        console.error('Critical error - unable to refresh display:', e2);
+                        console.error("Critical error - unable to refresh display:", e2);
                     }
                 }
             }
@@ -643,19 +674,19 @@ class UndoRedoManager {
         try {
             // Handle both Command pattern (execute) and Action pattern (do)
             let executed = false;
-            if (typeof command.execute === 'function') {
+            if (typeof command.execute === "function") {
                 command.execute();
                 executed = true;
-            } else if (typeof command.do === 'function') {
+            } else if (typeof command.do === "function") {
                 command.do();
                 executed = true;
-            } else if (typeof command.doFunc === 'function') {
+            } else if (typeof command.doFunc === "function") {
                 command.doFunc();
                 executed = true;
             }
 
             if (!executed) {
-                console.warn('Command does not have execute, do, or doFunc method');
+                console.warn("Command does not have execute, do, or doFunc method");
                 // Push back to stack to maintain consistency
                 if (!Array.isArray(this.redoStack)) {
                     this.redoStack = [];
@@ -675,42 +706,48 @@ class UndoRedoManager {
             // Refresh canvas with error handling
             if (globalActivity) {
                 try {
-                    if (typeof globalActivity.refreshCanvas === 'function') {
+                    if (typeof globalActivity.refreshCanvas === "function") {
                         globalActivity.refreshCanvas();
                     }
                 } catch (e) {
-                    console.error('Error refreshing canvas after redo:', e);
+                    console.error("Error refreshing canvas after redo:", e);
                     // Don't crash, but try to recover
                     try {
-                        if (globalActivity.stage && typeof globalActivity.stage.update === 'function') {
+                        if (
+                            globalActivity.stage &&
+                            typeof globalActivity.stage.update === "function"
+                        ) {
                             globalActivity.stage.update();
                         }
                     } catch (e2) {
-                        console.error('Error updating stage during recovery:', e2);
+                        console.error("Error updating stage during recovery:", e2);
                     }
                 }
             }
         } catch (error) {
-            console.error('Error during redo operation:', error);
+            console.error("Error during redo operation:", error);
             // Push command back to redo stack on error to maintain consistency
             this.redoStack.push(command);
             // Try to refresh canvas anyway to prevent white screen
             if (globalActivity) {
                 try {
-                    if (typeof globalActivity.refreshCanvas === 'function') {
+                    if (typeof globalActivity.refreshCanvas === "function") {
                         globalActivity.refreshCanvas();
-                    } else if (globalActivity.stage && typeof globalActivity.stage.update === 'function') {
+                    } else if (
+                        globalActivity.stage &&
+                        typeof globalActivity.stage.update === "function"
+                    ) {
                         globalActivity.stage.update();
                     }
                 } catch (e) {
-                    console.error('Error refreshing canvas during error recovery:', e);
+                    console.error("Error refreshing canvas during error recovery:", e);
                     // Last resort - try to update stage directly
                     try {
                         if (globalActivity.stage) {
                             globalActivity.stage.update();
                         }
                     } catch (e2) {
-                        console.error('Critical error - unable to refresh display:', e2);
+                        console.error("Critical error - unable to refresh display:", e2);
                     }
                 }
             }
@@ -2068,9 +2105,10 @@ class Activity {
             document.body.appendChild(modal);
         };
 
-        document.addEventListener("keydown", (e) => {
+        document.addEventListener("keydown", e => {
             // Handle undo/redo keyboard shortcuts
-            if (e.ctrlKey || e.metaKey) { // Ctrl on Windows/Linux, Cmd on Mac
+            if (e.ctrlKey || e.metaKey) {
+                // Ctrl on Windows/Linux, Cmd on Mac
                 if (e.key === "z" && !e.shiftKey) {
                     e.preventDefault(); // Prevent default browser undo
                     // Only undo if stack is not empty
@@ -2086,7 +2124,6 @@ class Activity {
                 }
             }
         });
-
 
         /*
          * Clears "canvas"
@@ -2812,7 +2849,7 @@ class Activity {
             const changeText = () => {
                 const randomLoadMessage =
                     messages.load_messages[
-                    Math.floor(Math.random() * messages.load_messages.length)
+                        Math.floor(Math.random() * messages.load_messages.length)
                     ];
                 document.getElementById("messageText").innerHTML = randomLoadMessage + "...";
                 counter++;
@@ -3903,9 +3940,9 @@ class Activity {
                                         that.blocks.moveBlock(
                                             newBlock,
                                             (x || that.blocksContainer.x + 100) -
-                                            that.blocksContainer.x,
+                                                that.blocksContainer.x,
                                             (y || that.blocksContainer.y + 100) -
-                                            that.blocksContainer.y
+                                                that.blocksContainer.y
                                         );
                                     }
                                 );
@@ -5378,8 +5415,8 @@ class Activity {
                         console.log(
                             "%cMusic Blocks",
                             "font-size: 24px; font-weight: bold; font-family: sans-serif; padding:20px 0 0 110px; background: url(" +
-                            imgUrl +
-                            ") no-repeat;"
+                                imgUrl +
+                                ") no-repeat;"
                         );
                         // eslint-disable-next-line no-console
                         console.log(
@@ -5451,10 +5488,10 @@ class Activity {
                 typeof flags !== "undefined"
                     ? flags
                     : {
-                        run: false,
-                        show: false,
-                        collapse: false
-                    };
+                          run: false,
+                          show: false,
+                          collapse: false
+                      };
             this.loading = true;
             document.body.style.cursor = "wait";
             this.doLoadAnimation();
@@ -5817,8 +5854,9 @@ class Activity {
                                 [
                                     "nameddo",
                                     {
-                                        value: `V: ${parseInt(lineId) + 1} Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1
-                                            }`
+                                        value: `V: ${parseInt(lineId) + 1} Line ${
+                                            staffBlocksMap[lineId]?.baseBlocks?.length + 1
+                                        }`
                                     }
                                 ],
                                 0,
@@ -5827,12 +5865,12 @@ class Activity {
                                     staffBlocksMap[lineId].baseBlocks.length === 0
                                         ? null
                                         : staffBlocksMap[lineId].baseBlocks[
-                                        staffBlocksMap[lineId].baseBlocks.length - 1
-                                        ][0][
-                                        staffBlocksMap[lineId].baseBlocks[
-                                            staffBlocksMap[lineId].baseBlocks.length - 1
-                                        ][0].length - 4
-                                        ][0],
+                                              staffBlocksMap[lineId].baseBlocks.length - 1
+                                          ][0][
+                                              staffBlocksMap[lineId].baseBlocks[
+                                                  staffBlocksMap[lineId].baseBlocks.length - 1
+                                              ][0].length - 4
+                                          ][0],
                                     null
                                 ]
                             ],
@@ -5848,8 +5886,9 @@ class Activity {
                                 [
                                     "text",
                                     {
-                                        value: `V: ${parseInt(lineId) + 1} Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1
-                                            }`
+                                        value: `V: ${parseInt(lineId) + 1} Line ${
+                                            staffBlocksMap[lineId]?.baseBlocks?.length + 1
+                                        }`
                                     }
                                 ],
                                 0,
@@ -5884,14 +5923,14 @@ class Activity {
                     staffBlocksMap[staffIndex].startBlock.length - 3
                 ][4][2] =
                     staffBlocksMap[staffIndex].baseBlocks[0][0][
-                    staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4
+                        staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4
                     ][0];
                 // Update the first namedo block with settimbre
                 staffBlocksMap[staffIndex].baseBlocks[0][0][
                     staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4
                 ][4][0] =
                     staffBlocksMap[staffIndex].startBlock[
-                    staffBlocksMap[staffIndex].startBlock.length - 3
+                        staffBlocksMap[staffIndex].startBlock.length - 3
                     ][0];
                 const repeatblockids = staffBlocksMap[staffIndex].repeatArray;
                 for (const repeatId of repeatblockids) {
@@ -5903,7 +5942,7 @@ class Activity {
                             0,
                             [
                                 staffBlocksMap[staffIndex].startBlock[
-                                staffBlocksMap[staffIndex].startBlock.length - 3
+                                    staffBlocksMap[staffIndex].startBlock.length - 3
                                 ][0] /*setribmre*/,
                                 blockId + 1,
                                 staffBlocksMap[staffIndex].nameddoArray[staffIndex][0],
@@ -5912,8 +5951,8 @@ class Activity {
                                 ] === null
                                     ? null
                                     : staffBlocksMap[staffIndex].nameddoArray[staffIndex][
-                                    repeatId.end + 1
-                                    ]
+                                          repeatId.end + 1
+                                      ]
                             ]
                         ]);
                         staffBlocksMap[staffIndex].repeatBlock.push([
@@ -5947,7 +5986,7 @@ class Activity {
                             const secondnammedo = _searchIndexForMusicBlock(
                                 staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0],
                                 staffBlocksMap[staffIndex].nameddoArray[staffIndex][
-                                repeatId.end + 1
+                                    repeatId.end + 1
                                 ]
                             );
 
@@ -5970,13 +6009,13 @@ class Activity {
                         const prevnameddo = _searchIndexForMusicBlock(
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start - 1][0],
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                            currentnammeddo
+                                currentnammeddo
                             ][4][0]
                         );
                         const afternamedo = _searchIndexForMusicBlock(
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                            currentnammeddo
+                                currentnammeddo
                             ][4][1]
                         );
                         let prevrepeatnameddo = -1;
@@ -5984,17 +6023,17 @@ class Activity {
                             prevrepeatnameddo = _searchIndexForMusicBlock(
                                 staffBlocksMap[staffIndex].repeatBlock,
                                 staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                currentnammeddo
+                                    currentnammeddo
                                 ][4][0]
                             );
                         }
                         const prevBlockId =
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                            currentnammeddo
+                                currentnammeddo
                             ][4][0];
                         const currentBlockId =
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                            currentnammeddo
+                                currentnammeddo
                             ][0];
 
                         // Needs null checking optmizie
@@ -6008,7 +6047,7 @@ class Activity {
                             0,
                             [
                                 staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                currentnammeddo
+                                    currentnammeddo
                                 ][4][0],
                                 blockId + 1,
                                 currentBlockId,
@@ -7306,12 +7345,12 @@ class Activity {
                         return $j("<li></li>")
                             .append(
                                 '<img src="' +
-                                (item.artwork || "") +
-                                '" height = "20px">' +
-                                "<a>" +
-                                " " +
-                                item.label +
-                                "</a>"
+                                    (item.artwork || "") +
+                                    '" height = "20px">' +
+                                    "<a>" +
+                                    " " +
+                                    item.label +
+                                    "</a>"
                             )
                             .appendTo(ul.css("z-index", 35000));
                     };
@@ -7435,10 +7474,10 @@ class Activity {
             container.setAttribute(
                 "style",
                 "position: absolute; right:" +
-                (document.body.clientWidth - x) +
-                "px;  top: " +
-                y +
-                "px;"
+                    (document.body.clientWidth - x) +
+                    "px;  top: " +
+                    y +
+                    "px;"
             );
             document.getElementById("buttoncontainerBOTTOM").appendChild(container);
             return container;
