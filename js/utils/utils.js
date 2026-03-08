@@ -802,7 +802,10 @@ const processPluginData = (activity, pluginData, pluginSource) => {
     try {
         obj = JSON.parse(pluginData);
     } catch (error) {
-        console.error(`PluginProcessor: Failed to parse plugin data from source "${pluginSource}":`, error);
+        console.error(
+            `PluginProcessor: Failed to parse plugin data from source "${pluginSource}":`,
+            error
+        );
         console.debug("Malformed plugin data:", pluginData);
         return null;
     }
@@ -1351,24 +1354,22 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
     }
 
     CameraManager.setCanplayListener(video, () => {
-            // console.debug("canplay", streaming, CameraManager.isSetup);
-            if (!streaming) {
-                video.setAttribute("width", w);
-                video.setAttribute("height", h);
-                canvas.setAttribute("width", w);
-                canvas.setAttribute("height", h);
-                streaming = true;
+        // console.debug("canplay", streaming, CameraManager.isSetup);
+        if (!streaming) {
+            video.setAttribute("width", w);
+            video.setAttribute("height", h);
+            canvas.setAttribute("width", w);
+            canvas.setAttribute("height", h);
+            streaming = true;
 
-                if (isVideo) {
-                    CameraManager.startCapture(draw, setCameraID);
-                } else {
-                    CameraManager.stopCapture(setCameraID);
-                    draw();
-                }
+            if (isVideo) {
+                CameraManager.startCapture(draw, setCameraID);
             } else {
+                CameraManager.stopCapture(setCameraID);
                 draw();
             }
-        });
+        }
+    });
 };
 
 /**
