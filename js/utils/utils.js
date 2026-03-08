@@ -1243,13 +1243,48 @@ let prepareMacroExports = (name, stack, macroDict) => {
 // Encapsulates camera-related operations for video/image capture
 const CameraManager = {
     isSetup: false,
-    canPlayHandler: null,
-    intervalId: null,
+    captureIntervalId: null,
+    canplayHandler: null,
+    listenerVideoElement: null,
+
+    startCapture(draw, setCameraID) {
+        this.stopCapture(setCameraID);
+        this.captureIntervalId = window.setInterval(draw, 100);
+        setCameraID(this.captureIntervalId);
+    },
+
+    stopCapture(setCameraID) {
+        if (this.captureIntervalId !== null) {
+            window.clearInterval(this.captureIntervalId);
+            this.captureIntervalId = null;
+        }
+
+        if (typeof setCameraID === "function") {
+            setCameraID(null);
+        }
+    },
+
+    setCanplayListener(video, handler) {
+        this.clearCanplayListener();
+        this.canplayHandler = handler;
+        this.listenerVideoElement = video;
+        video.addEventListener("canplay", handler, false);
+    },
+
+    clearCanplayListener() {
+        if (this.listenerVideoElement && this.canplayHandler) {
+            this.listenerVideoElement.removeEventListener("canplay", this.canplayHandler, false);
+        }
+        this.canplayHandler = null;
+        this.listenerVideoElement = null;
+    },
 
     /**
      * Resets the camera setup state
      */
     reset() {
+        this.stopCapture();
+        this.clearCanplayListener();
         this.isSetup = false;
     }
 };
@@ -1308,48 +1343,32 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
         streaming = true;
         video.play();
         if (isVideo) {
-            if (CameraManager.intervalId !== null) {
-                window.clearInterval(CameraManager.intervalId);
-                CameraManager.intervalId = null;
-            }
-            cameraID = window.setInterval(draw, 100);
-            CameraManager.intervalId = cameraID;
-            setCameraID(cameraID);
+            CameraManager.startCapture(draw, setCameraID);
         } else {
+            CameraManager.stopCapture(setCameraID);
             draw();
         }
     }
 
-    if (CameraManager.canPlayHandler) {
-        video.removeEventListener("canplay", CameraManager.canPlayHandler, false);
-    }
+    CameraManager.setCanplayListener(video, () => {
+            // console.debug("canplay", streaming, CameraManager.isSetup);
+            if (!streaming) {
+                video.setAttribute("width", w);
+                video.setAttribute("height", h);
+                canvas.setAttribute("width", w);
+                canvas.setAttribute("height", h);
+                streaming = true;
 
-    function handleCanPlay() {
-        // console.debug("canplay", streaming, CameraManager.isSetup);
-        if (!streaming) {
-            video.setAttribute("width", w);
-            video.setAttribute("height", h);
-            canvas.setAttribute("width", w);
-            canvas.setAttribute("height", h);
-            streaming = true;
-
-            if (isVideo) {
-                if (CameraManager.intervalId !== null) {
-                    window.clearInterval(CameraManager.intervalId);
-                    CameraManager.intervalId = null;
+                if (isVideo) {
+                    CameraManager.startCapture(draw, setCameraID);
+                } else {
+                    CameraManager.stopCapture(setCameraID);
+                    draw();
                 }
-                cameraID = window.setInterval(draw, 100);
-                CameraManager.intervalId = cameraID;
-                setCameraID(cameraID);
             } else {
                 draw();
             }
-        }
-    }
-
-    CameraManager.canPlayHandler = handleCanPlay;
-
-    video.addEventListener("canplay", CameraManager.canPlayHandler, false);
+        });
 };
 
 /**
@@ -1358,11 +1377,12 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
  * @param {function} setCameraID - Function to set the camera interval ID.
  */
 function doStopVideoCam(cameraID, setCameraID) {
-    if (cameraID !== null) {
+    if (cameraID !== null && cameraID !== CameraManager.captureIntervalId) {
         window.clearInterval(cameraID);
     }
 
-    setCameraID(null);
+    CameraManager.stopCapture(setCameraID);
+    CameraManager.clearCanplayListener();
     const video = document.querySelector("#camVideo");
     if (video) {
         video.pause();
