@@ -1,0 +1,85 @@
+# =============================================
+# Git & version control
+# =============================================
+.git
+.gitignore
+.gitattributes
+.github/               # optional: remove if CI/CD files are needed in image
+
+# =============================================
+# Node.js dependencies & package managers
+# =============================================
+node_modules
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+.pnp.*
+.pnpm-debug.log
+.npmrc                 # can contain tokens → security risk if copied
+
+# =============================================
+# Build outputs & caches
+# =============================================
+dist/
+build/
+coverage/
+.cache/
+.next/                 # Next.js
+.nuxt/                 # Nuxt.js
+out/                   # static exports
+
+# =============================================
+# Logs, temp files & local development
+# =============================================
+*.log
+*.logs
+npm-debug.log.*
+yarn-debug.log.*
+yarn-error.log.*
+tmp/
+temp/
+.env
+.env.local
+.env.*.local
+.DS_Store
+Thumbs.db
+
+# =============================================
+# Editor / IDE / OS files
+# =============================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+.project
+.classpath
+.settings/
+
+# =============================================
+# Testing & coverage artifacts
+# =============================================
+cypress/                # if using Cypress – usually not needed in prod image
+playwright-report/
+
+# =============================================
+# Documentation (usually safe to keep – small files)
+# =============================================
+# docs/                 # uncomment if docs are large or not needed
+# *.md
+# README*
+# LICENSE*
+
+# =============================================
+# Keep these if needed (examples – rarely needed in final image)
+# =============================================
+# !package.json          # usually copied explicitly in Dockerfile
+# !yarn.lock             # or package-lock.json
+# !tsconfig.json         # if TypeScript
+
+# =============================================
+# Monorepo / workspace safety (if applicable)
+# =============================================
+**/node_modules
+**/dist
+**/build
