@@ -3667,7 +3667,11 @@ class Block {
                 const noteLabels = {};
                 const customLabels = [];
                 for (let i = 0; i < keys.length; i++) {
-                    noteLabels[keys[i]] = getTemperament(keys[i]);
+                    const temperament = getTemperament(keys[i]);
+                    // Only add valid temperaments to noteLabels
+                    if (temperament && typeof temperament === 'object') {
+                        noteLabels[keys[i]] = temperament;
+                    }
                     if (isCustomTemperament(keys[i])) {
                         customLabels.push(keys[i]);
                     }
@@ -3682,7 +3686,14 @@ class Block {
                 if (this.value != null) {
                     selectedNote = this.value;
                 } else {
-                    selectedNote = getTemperament(selectedCustom)["0"][1];
+                    // Ensure we have a valid temperament before accessing its properties
+                    const selectedTemperament = getTemperament(selectedCustom);
+                    if (selectedTemperament && selectedTemperament["0"] && selectedTemperament["0"][1]) {
+                        selectedNote = selectedTemperament["0"][1];
+                    } else {
+                        // Fallback to a default note
+                        selectedNote = "C";
+                    }
                 }
 
                 piemenuCustomNotes(this, noteLabels, customLabels, selectedCustom, selectedNote);
