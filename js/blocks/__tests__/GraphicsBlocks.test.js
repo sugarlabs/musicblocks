@@ -83,8 +83,8 @@ describe("GraphicsBlocks", () => {
             blocks: {
                 blockList: [
                     { connections: [1] }, // Block 0 with connection to block 1
-                    { connections: [2] }, // Block 1 with connection to block 2  
-                    { connections: [0] }  // Block 2 with connection to block 0
+                    { connections: [2] }, // Block 1 with connection to block 2
+                    { connections: [0] } // Block 2 with connection to block 0
                 ]
             },
             errorMsg: jest.fn(),
