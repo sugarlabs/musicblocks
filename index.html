@@ -272,6 +272,46 @@
                         </svg>
                     </div>
                 </a>
+    <script src="js/gif-animator.js" defer></script>
+    <script defer>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (window.hljs) hljs.highlightAll();
+        });
+    </script>
+    <script src="lib/astring.min.js" defer></script>
+    <script src="js/utils/mb-dialog.js" defer></script>
+    <script src="lib/acorn.min.js" defer></script>
+    <script src="env.js"></script>
+
+
+    <script data-main="js/loader" src="lib/require.js" defer></script>
+    <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
+    <link rel="preload" href="/fonts/material-icons.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="stylesheet" href="lib/materialize-iso.css">
+    <link rel="stylesheet" href="css/themes.css?v=fixed">
+    <script src="lib/easeljs.min.js" defer></script>
+    <script src="lib/tweenjs.min.js" defer></script>
+    <script>
+        let ast2blocklist_config;
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("js/js-export/ast2blocks.min.json")
+                .then(response => response.json())
+                .then(data => { ast2blocklist_config = data });
+        });
+    </script>
+</head>
+
+<body id="body" data-title="index" style="background: #f9f9f9;">
+    <!-- Fallback for browsers that don't support preload -->
+    <noscript>
+        JavaScript is required to view this page.
+    </noscript>
+    <header>
+        <div id="loading-image-container"
+            style="position: fixed; top: 0; left: 0; width: 100%; height: calc(var(--vh) * 100); display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #FFFFFF; z-index: 9999; contain: paint;">
+            <div id="loading-media" style="width: 100%; padding: 0 20px; box-sizing: border-box;"></div>
+            <div class="loading-text" id="loadingText"
+                style="color:#333; margin-top: 2rem; min-height: 1.5em; font-size: 1.2rem;">
             </div>
         </header>
 
