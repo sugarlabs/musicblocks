@@ -26,6 +26,9 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Validate package-lock sync
+        run: bash .github/scripts/validate-lockfile-sync.sh
+
       - name: Install Dependencies
         run: npm install
 
