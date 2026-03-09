@@ -1087,6 +1087,38 @@ class Toolbar {
             docById("stop").style.color = this.stopIconColorWhenPlaying;
         };
     }
+    /**
+     * Renders the high contrast mode toggle button.
+     * Adds keyboard support and persists preference via localStorage.
+     *
+     * @public
+     * @returns {void}
+     */
+    renderHighContrastToggle() {
+        const btn = docById("highContrastToggle");
+        if (!btn) return;
+
+        // Restore saved preference
+        if (localStorage.getItem("highContrast") === "true") {
+            document.body.classList.add("high-contrast");
+            btn.setAttribute("aria-pressed", "true");
+        } else {
+            btn.setAttribute("aria-pressed", "false");
+        }
+
+        btn.addEventListener("click", () => {
+            const isOn = document.body.classList.toggle("high-contrast");
+            btn.setAttribute("aria-pressed", String(isOn));
+            localStorage.setItem("highContrast", String(isOn));
+        });
+
+        btn.addEventListener("keydown", e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                btn.click();
+            }
+        });
+    }
 
     /**
      * Renders the help icon with the provided onclick handler.

@@ -7552,6 +7552,7 @@ class Activity {
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
             this.toolbar.renderMenuIcon(showHideAuxMenu);
             this.toolbar.renderHelpIcon(showHelp);
+            this.toolbar.renderHighContrastToggle();
             this.toolbar.renderModeSelectIcon(
                 doSwitchMode,
                 () => doRecordButton(this),
