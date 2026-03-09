@@ -340,8 +340,6 @@ class ReflectionMatrix {
         } else {
             this.activity.errorMsg(_(data.error), 3000);
         }
-
-        this.projectAlgorithm = data.algorithm;
     }
 
     /**
@@ -526,6 +524,8 @@ class ReflectionMatrix {
      * @returns {void}
      */
     sendMessage() {
+        // Prevent sending while bot is still processing (concurrency guard)
+        if (this.typingDiv) return;
         const text = this.input.value.trim();
         if (text === "") return;
 
