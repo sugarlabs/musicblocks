@@ -4623,18 +4623,18 @@ function getNote(
                             pitchNumber = Number(number);
                         } else {
                             pitchNumber = number;
+                        }
+                        break;
+                    } else if (note === TEMPERAMENT[temperament][number][1]) {
+                        if (typeof number === "string") {
+                            pitchNumber = Number(number);
+                        } else {
+                            pitchNumber = number;
+                        }
+                        break;
                     }
-                    break;
-                } else if (note === TEMPERAMENT[temperament][number][1]) {
-                    if (typeof number === "string") {
-                        pitchNumber = Number(number);
-                    } else {
-                        pitchNumber = number;
-                    }
-                    break;
                 }
             }
-        }
         }
 
         if (pitchNumber === null || pitchNumber === "null") {
