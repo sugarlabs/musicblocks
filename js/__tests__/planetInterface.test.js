@@ -29,7 +29,7 @@ const mockActivity = {
     prepSearchWidget: jest.fn(),
     sendAllToTrash: jest.fn(),
     refreshCanvas: jest.fn(),
-    _loadStart: jest.fn(),
+    justLoadStart: jest.fn(),
     doLoadAnimation: jest.fn(),
     textMsg: jest.fn(),
     stage: { enableDOMEvents: jest.fn(), update: jest.fn() },
@@ -108,9 +108,9 @@ describe("PlanetInterface", () => {
     });
 
     test("openPlanet calls saveLocally, hideMusicBlocks, and showPlanet", () => {
-        jest.spyOn(planetInterface, "saveLocally").mockImplementation(() => {});
-        jest.spyOn(planetInterface, "hideMusicBlocks").mockImplementation(() => {});
-        jest.spyOn(planetInterface, "showPlanet").mockImplementation(() => {});
+        jest.spyOn(planetInterface, "saveLocally").mockImplementation(() => { });
+        jest.spyOn(planetInterface, "hideMusicBlocks").mockImplementation(() => { });
+        jest.spyOn(planetInterface, "showPlanet").mockImplementation(() => { });
         planetInterface.openPlanet();
         expect(planetInterface.saveLocally).toHaveBeenCalled();
         expect(planetInterface.hideMusicBlocks).toHaveBeenCalled();
@@ -118,21 +118,21 @@ describe("PlanetInterface", () => {
     });
 
     test("closePlanet calls hidePlanet and showMusicBlocks", () => {
-        jest.spyOn(planetInterface, "hidePlanet").mockImplementation(() => {});
-        jest.spyOn(planetInterface, "showMusicBlocks").mockImplementation(() => {});
+        jest.spyOn(planetInterface, "hidePlanet").mockImplementation(() => { });
+        jest.spyOn(planetInterface, "showMusicBlocks").mockImplementation(() => { });
         planetInterface.closePlanet();
         expect(planetInterface.hidePlanet).toHaveBeenCalled();
         expect(planetInterface.showMusicBlocks).toHaveBeenCalled();
     });
 
-    test("newProject calls closePlanet, initialiseNewProject, _loadStart, and saveLocally", () => {
-        jest.spyOn(planetInterface, "closePlanet").mockImplementation(() => {});
-        jest.spyOn(planetInterface, "initialiseNewProject").mockImplementation(() => {});
-        jest.spyOn(planetInterface, "saveLocally").mockImplementation(() => {});
+    test("newProject calls closePlanet, initialiseNewProject, justLoadStart, and saveLocally", () => {
+        jest.spyOn(planetInterface, "closePlanet").mockImplementation(() => { });
+        jest.spyOn(planetInterface, "initialiseNewProject").mockImplementation(() => { });
+        jest.spyOn(planetInterface, "saveLocally").mockImplementation(() => { });
         planetInterface.newProject();
         expect(planetInterface.closePlanet).toHaveBeenCalled();
         expect(planetInterface.initialiseNewProject).toHaveBeenCalled();
-        expect(mockActivity._loadStart).toHaveBeenCalled();
+        expect(mockActivity.justLoadStart).toHaveBeenCalled();
         expect(planetInterface.saveLocally).toHaveBeenCalled();
     });
     test("onConverterLoad sets window.Converter", () => {
@@ -248,7 +248,7 @@ describe("PlanetInterface", () => {
             setOnConverterLoad: jest.fn()
         };
 
-        win.makePlanet = jest.fn(async () => {});
+        win.makePlanet = jest.fn(async () => { });
         win.p = stubPlanet;
 
         await planetInterface.init();
@@ -294,7 +294,7 @@ describe("PlanetInterface", () => {
 
         global.createjs = {
             Bitmap: class {
-                constructor(img) {}
+                constructor(img) { }
                 getBounds() {
                     return { x: 0, y: 0, width: 1, height: 1 };
                 }
