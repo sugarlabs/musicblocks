@@ -18,6 +18,7 @@
    globals
 
    _, ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON,
+   ActivityContext,
    Blocks, Boundary, CARTESIAN, changeImage, closeWidgets,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
@@ -192,8 +193,11 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
     MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
 }
 
-// Create a global variable from the Activity obj to provide access to
-// blocks, logo, palettes, and turtles for plugins and js-export.
+// Module-scoped singleton reference to the active Activity instance.
+// • Used by plugins (weather.rtp, etc.) that are eval()'d inside this module's
+//   closure scope and therefore can close over `globalActivity` directly.
+// • External modules (synthutils, etc.) should use ActivityContext.getActivity()
+//   instead of reaching through window.* globals.
 let globalActivity;
 
 /**
@@ -213,6 +217,14 @@ class Activity {
      */
     constructor() {
         globalActivity = this;
+
+        // Register with ActivityContext – the single authority for the Activity singleton.
+        // activity-context.js is declared as a RequireJS dep of this module (loader.js shim),
+        // so window.ActivityContext is guaranteed to exist before this constructor runs.
+        if (window.ActivityContext && typeof window.ActivityContext.setActivity === "function") {
+            window.ActivityContext.setActivity(this);
+        }
+
         this._listeners = [];
 
         this.cellSize = 55;
@@ -2921,72 +2933,6 @@ class Activity {
             img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svgData));
         };
 
-        /**
-         * Initializes the Idle Watcher mechanism to throttle createjs.Ticker
-         * when the application is inactive and no music is playing.
-         * This significantly reduces CPU usage and improves battery life.
-         */
-        this._initIdleWatcher = () => {
-            const IDLE_THRESHOLD = 5000; // 5 seconds
-            const ACTIVE_FPS = 60;
-            const IDLE_FPS = 1;
-
-            let lastActivity = Date.now();
-            let isIdle = false;
-
-            // Wake up function - restores full framerate
-            const resetIdleTimer = () => {
-                lastActivity = Date.now();
-                if (isIdle) {
-                    isIdle = false;
-                    createjs.Ticker.framerate = ACTIVE_FPS;
-                    // Force immediate redraw for responsiveness
-                    if (this.stage) this.stage.update();
-                }
-            };
-
-            // Track user activity
-            window.addEventListener("mousemove", resetIdleTimer);
-            window.addEventListener("mousedown", resetIdleTimer);
-            window.addEventListener("keydown", resetIdleTimer);
-            window.addEventListener("touchstart", resetIdleTimer);
-            window.addEventListener("wheel", resetIdleTimer);
-
-            // Periodic check for idle state
-            setInterval(() => {
-                // Check if music/code is playing
-                const isMusicPlaying = this.logo?._alreadyRunning || false;
-
-                if (!isMusicPlaying && Date.now() - lastActivity > IDLE_THRESHOLD) {
-                    if (!isIdle) {
-                        isIdle = true;
-                        createjs.Ticker.framerate = IDLE_FPS;
-                        console.log("⚡ Idle mode: Throttling to 1 FPS to save battery");
-                    }
-                } else if (isIdle && isMusicPlaying) {
-                    // Music started playing - wake up immediately
-                    resetIdleTimer();
-                }
-            }, 1000);
-
-            // Expose activity instance for external checks
-            if (typeof window !== "undefined") {
-                // Single authority: ActivityContext
-                // TODO: window.activity is deprecated; use ActivityContext instead
-                if (
-                    window.ActivityContext &&
-                    typeof window.ActivityContext.setActivity === "function"
-                ) {
-                    window.ActivityContext.setActivity(this);
-                }
-
-                // TEMP compatibility bridge
-                if (!window.activity) {
-                    window.activity = this;
-                }
-            }
-        };
-
         /*
          * Creates and renders error message containers with appropriate artwork.
          * Some error messages have special artwork.
@@ -3045,23 +2991,6 @@ class Activity {
                     resetIdleTimer();
                 }
             }, 1000);
-
-            // Expose activity instance for external checks
-            if (typeof window !== "undefined") {
-                // Single authority: ActivityContext
-                // TODO: window.activity is deprecated; use ActivityContext instead
-                if (
-                    window.ActivityContext &&
-                    typeof window.ActivityContext.setActivity === "function"
-                ) {
-                    window.ActivityContext.setActivity(this);
-                }
-
-                // TEMP compatibility bridge
-                if (!window.activity) {
-                    window.activity = this;
-                }
-            }
         };
 
         /**
@@ -6326,6 +6255,7 @@ class Activity {
          */
         this.prepareExport = () => {
             const blockMap = [];
+            const blockIndexById = new Map();
             this.hasMatrixDataBlock = false;
             for (let blk = 0; blk < this.blocks.blockList.length; blk++) {
                 const myBlock = this.blocks.blockList[blk];
@@ -6334,6 +6264,7 @@ class Activity {
                     continue;
                 }
 
+                blockIndexById.set(blk, blockMap.length);
                 blockMap.push(blk);
             }
 
@@ -6477,17 +6408,19 @@ class Activity {
 
                 const connections = [];
                 for (let c = 0; c < myBlock.connections.length; c++) {
-                    const mapConnection = blockMap.indexOf(myBlock.connections[c]);
-                    if (myBlock.connections[c] === null || mapConnection === -1) {
+                    const connection = myBlock.connections[c];
+                    const mapConnection = blockIndexById.get(connection);
+                    if (connection === null || mapConnection === undefined) {
                         connections.push(null);
                     } else {
                         connections.push(mapConnection);
                     }
                 }
 
+                const blockIndex = blockIndexById.get(blk);
                 if (args === null) {
                     data.push([
-                        blockMap.indexOf(blk),
+                        blockIndex,
                         myBlock.name,
                         myBlock.container.x,
                         myBlock.container.y,
@@ -6495,7 +6428,7 @@ class Activity {
                     ]);
                 } else {
                     data.push([
-                        blockMap.indexOf(blk),
+                        blockIndex,
                         [myBlock.name, args],
                         myBlock.container.x,
                         myBlock.container.y,
@@ -8257,6 +8190,44 @@ class Activity {
         }
     }
 }
+
+// ---------------------------------------------------------------------------
+// Hard Deprecation Guard — window.activity
+//
+// The Activity singleton is no longer exposed on window.activity.
+// All code must use ActivityContext.getActivity() instead.
+// This guard ensures:
+//   • Silent-regression safety (warns loudly in console, not silently undefined)
+//   • A migration window — replace with a hard removal in the next major version
+// ---------------------------------------------------------------------------
+(function installActivityDeprecationGuard() {
+    if (typeof window === "undefined") return; // safety for SSR / Node test runners
+    try {
+        Object.defineProperty(window, "activity", {
+            configurable: true, // allow removal in the next major version
+            enumerable: false,
+            get() {
+                // eslint-disable-next-line no-console
+                console.warn(
+                    "[Deprecated] window.activity is removed. " +
+                        "Use ActivityContext.getActivity() instead."
+                );
+                return undefined;
+            },
+            set() {
+                // eslint-disable-next-line no-console
+                console.error(
+                    "[Deprecated] window.activity is removed and cannot be set. " +
+                        "Use ActivityContext.setActivity() via activity-context.js."
+                );
+            }
+        });
+    } catch (e) {
+        // Fail silently — defining the property must never break the app.
+        // eslint-disable-next-line no-console
+        console.warn("[ActivityDeprecationGuard] Could not install guard:", e);
+    }
+})();
 
 const activity = new Activity();
 

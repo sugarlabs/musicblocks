@@ -422,7 +422,8 @@ class Block {
 
                     if (that.bounds === null) {
                         const delayTime = INITIAL_DELAY * Math.pow(2, loopCount);
-                        await that.pause(delayTime);
+                        await delayExecution(delayTime);
+                        await new Promise(resolve => setTimeout(resolve, delayTime));
                         updateBounds(loopCount + 1);
                     } else {
                         that.container.updateCache();
