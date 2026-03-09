@@ -25,7 +25,7 @@
         Singer
     js/utils/utils.js
         _
-    js/activity.js
+    js/logoconstants.js
         TONEBPM
 */
 
