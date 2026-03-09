@@ -439,7 +439,6 @@ class ReflectionMatrix {
         let reply;
         // check if message is from user or bot
         if (user_query === true) {
-            if (this.typingDiv) return;
             reply = await this.generateBotReply(
                 message,
                 this.chatHistory,
@@ -498,6 +497,9 @@ class ReflectionMatrix {
     sendMessage() {
         const text = this.input.value.trim();
         if (text === "") return;
+
+        // Prevent sending while the bot is still processing a previous query
+        if (this.typingDiv) return;
         this.chatHistory.push({
             role: "user",
             content: text
