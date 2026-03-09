@@ -18,7 +18,6 @@
 */
 
 /* exported Abhijeet Singh */
-import { ensureABCJS } from "../utils/abcLoader.js";
 
 /**
  * Represents a AI Widget.
@@ -31,23 +30,6 @@ function AIWidget() {
     // Don't include natural when construcing the note name...
     const EXPORTACCIDENTALNAMES = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP];
 
-    /**
-     * Ensures the ABCJS library is loaded.
-     * Dynamically appends the script if not already present.
-     * @returns {Promise<void>}
-     */
-    function ensureABCJS() {
-        if (typeof window !== "undefined" && window.ABCJS) return Promise.resolve();
-        if (typeof window === "undefined") return Promise.resolve();
-
-        return new Promise((resolve, reject) => {
-            const script = document.createElement("script");
-            script.src = "lib/abc.min.js";
-            script.onload = resolve;
-            script.onerror = reject;
-            document.head.appendChild(script);
-        });
-    }
     // ...but display it in the selector.
     const ACCIDENTALNAMES = [DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP];
     const SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti", "do"];
@@ -895,7 +877,7 @@ function AIWidget() {
      * @returns {void}
      */
     this._playABCSong = async function () {
-        await ensureABCJS();
+        await window.ensureABCJS();
         const abc = abcNotationSong;
         const stopAudioButton = document.querySelector(".stop-audio");
 

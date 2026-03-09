@@ -49,8 +49,6 @@
    globalActivity, hideArrows, doAnalyzeProject
  */
 
-import { ensureABCJS } from "./utils/abcLoader.js";
-
 const LEADING = 0;
 const BLOCKSCALES = [1, 1.5, 2, 3, 4];
 const _THIS_IS_MUSIC_BLOCKS_ = true;
@@ -202,25 +200,6 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
 // • External modules (synthutils, etc.) should use ActivityContext.getActivity()
 //   instead of reaching through window.* globals.
 let globalActivity;
-
-/**
- * Ensures the ABCJS library is loaded.
- * If already loaded, resolves immediately.
- * Otherwise, dynamically appends the script and resolves on load.
- * @returns {Promise<void>}
- */
-function ensureABCJS() {
-    if (typeof window !== "undefined" && window.ABCJS) return Promise.resolve();
-    if (typeof window === "undefined") return Promise.resolve();
-
-    return new Promise((resolve, reject) => {
-        const script = document.createElement("script");
-        script.src = "lib/abc.min.js";
-        script.onload = resolve;
-        script.onerror = reject;
-        document.head.appendChild(script);
-    });
-}
 
 /**
  * Performs analysis on the project using the global activity.
