@@ -42,7 +42,7 @@ global.ValueBlock = class {
     }
 };
 
-global.FlowBlock = class extends global.ValueBlock {};
+global.FlowBlock = class extends global.ValueBlock { };
 global.FlowClampBlock = class extends global.FlowBlock {
     makeMacro = jest.fn();
 };
@@ -80,7 +80,9 @@ describe("GraphicsBlocks", () => {
         };
 
         activity = {
-            blocks: {},
+            blocks: {
+                blockList: []
+            },
             errorMsg: jest.fn(),
             turtles: {
                 companionTurtle: jest.fn(() => 0),
