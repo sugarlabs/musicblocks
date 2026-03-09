@@ -401,7 +401,7 @@ class Toolbar {
         playIcon.setAttribute("role", "button");
         playIcon.setAttribute("aria-label", "Play project");
         playIcon.setAttribute("tabindex", "0");
-        playIcon.addEventListener("keydown", (e) => {
+        playIcon.addEventListener("keydown", e => {
             if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 playIcon.click();
@@ -464,7 +464,7 @@ class Toolbar {
         stopIcon.setAttribute("role", "button");
         stopIcon.setAttribute("aria-label", "Stop project");
         stopIcon.setAttribute("tabindex", "0");
-        stopIcon.addEventListener("keydown", (e) => {
+        stopIcon.addEventListener("keydown", e => {
             if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 stopIcon.click();
