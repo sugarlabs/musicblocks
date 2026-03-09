@@ -26,6 +26,25 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Validate lock file sync
+        run: |
+          echo "Validating package-lock.json is in sync with package.json..."
+          if ! npm ci --dry-run > /dev/null 2>&1; then
+            echo ""
+            echo "ERROR: package-lock.json is out of sync with package.json"
+            echo ""
+            echo "This usually means package.json was modified but package-lock.json was not updated."
+            echo ""
+            echo "To fix this, run the following commands locally and commit the changes:"
+            echo "  1. npm install"
+            echo "  2. git add package-lock.json"
+            echo "  3. git commit -m 'chore: update lock file'"
+            echo "  4. git push"
+            echo ""
+            exit 1
+          fi
+          echo "Lock file is in sync. Proceeding with Jest tests..."
+
       - name: Install Dependencies
         run: npm install
 
