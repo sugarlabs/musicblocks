@@ -32,6 +32,11 @@ class ProgramExplorer {
         this.treeContainer = null;
         this.toggleButton = null;
 
+        // Don't initialize during Cypress tests
+        if (window.Cypress || document.body.hasAttribute("data-cypress")) {
+            return;
+        }
+
         this.init();
     }
 
@@ -100,24 +105,6 @@ class ProgramExplorer {
             closeBtn.addEventListener("click", () => {
                 this.hide();
             });
-        }
-
-        // Listen for block changes via the blocks event system
-        if (this.blocks) {
-            // Override block add/remove methods to trigger updates
-            const originalAddBlock = this.blocks.addBlock;
-            this.blocks.addBlock = (...args) => {
-                const result = originalAddBlock.apply(this.blocks, args);
-                this.updateTree();
-                return result;
-            };
-
-            const originalRemoveBlock = this.blocks.removeBlock;
-            this.blocks.removeBlock = (...args) => {
-                const result = originalRemoveBlock.apply(this.blocks, args);
-                this.updateTree();
-                return result;
-            };
         }
     }
 

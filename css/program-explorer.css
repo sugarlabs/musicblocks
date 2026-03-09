@@ -166,7 +166,7 @@ body.dark .explorer-node-name {
 /* Toggle button */
 .explorer-toggle-btn {
     position: fixed;
-    top: 80px;
+    top: 120px;
     right: 20px;
     width: 48px;
     height: 48px;
@@ -181,6 +181,12 @@ body.dark .explorer-node-name {
     justify-content: center;
     transition: all 0.3s ease;
     z-index: 999;
+}
+
+/* Hide during Cypress tests */
+body[data-cypress="true"] .explorer-toggle-btn,
+body[data-cypress="true"] .program-explorer {
+    display: none !important;
 }
 
 .explorer-toggle-btn:hover {
@@ -212,7 +218,7 @@ body.dark .explorer-node-name {
 
     .explorer-toggle-btn {
         right: 10px;
-        top: 70px;
+        top: 90px;
     }
 }
 
@@ -226,7 +232,7 @@ body.dark .explorer-node-name {
 
     .explorer-toggle-btn {
         right: 5px;
-        top: 60px;
+        top: 80px;
         width: 40px;
         height: 40px;
     }

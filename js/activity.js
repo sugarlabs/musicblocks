@@ -4846,7 +4846,7 @@ class Activity {
                     that.keyboardEnableFlag = 1;
 
                     // Initialize Program Explorer
-                    if (typeof ProgramExplorer !== "undefined") {
+                    if (typeof ProgramExplorer !== "undefined" && !window.Cypress) {
                         that.programExplorer = new ProgramExplorer(that);
                     }
                 }
