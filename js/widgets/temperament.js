@@ -1595,6 +1595,11 @@ function TemperamentWidget() {
             const temperament = keys[i];
             if (!isCustomTemperament(temperament)) {
                 const t = getTemperament(temperament);
+                // Ensure we have a valid temperament object with intervals
+                if (!t || !t.interval || !Array.isArray(t.interval)) {
+                    console.warn("Invalid temperament in checkTemperament, skipping:", temperament);
+                    continue;
+                }
                 const temperamentRatios = [];
                 for (let j = 0; j < t.interval.length; j++) {
                     intervals[j] = t.interval[j];
@@ -2222,6 +2227,11 @@ function TemperamentWidget() {
         const noteCell = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Table"));
 
         let t = getTemperament(this.inTemperament);
+        // Ensure we have a valid temperament object
+        if (!t || !t.pitchNumber) {
+            console.warn("Invalid temperament, falling back to equal temperament");
+            t = getTemperament("equal");
+        }
         this.pitchNumber = t.pitchNumber;
         this.octaveChanged = false;
         this.scale = this.scale[0] + " " + this.scale[1];
@@ -2267,6 +2277,11 @@ function TemperamentWidget() {
                     // yet defined by the user then custom temperament
                     // behaves like equal temperament.
                     t = getTemperament("equal");
+                }
+                // Ensure t has a valid interval array before accessing it
+                if (!t || !t.interval || i >= t.interval.length) {
+                    console.warn("Invalid temperament interval data, skipping note:", i);
+                    continue;
                 }
                 str[i] = getNoteFromInterval(startingPitch, t.interval[i]);
                 this.notes[i] = str[i];
