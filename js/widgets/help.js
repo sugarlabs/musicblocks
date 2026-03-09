@@ -79,8 +79,8 @@ class HelpWidget {
         // this._helpDiv.style.overflowY = "auto";
 
         const innerHTML = `
-                    <div id="right-arrow" class="hover" tabindex="-1"></div>
-                    <div id="left-arrow" class="hover" tabindex="-1"></div>
+                    <div id="right-arrow" class="hover" tabindex="0" role="button"></div>
+                    <div id="left-arrow" class="hover" tabindex="0" role="button"></div>
                     <div id="helpButtonsDiv" tabindex="-1"></div>
                     <div id="helpScrollWrapper">
                         <div id="helpBodyDiv" tabindex="-1"></div>
@@ -102,12 +102,16 @@ class HelpWidget {
             rightArrow.classList.add("hover");
             rightArrow.setAttribute("title", _("Next"));
             rightArrow.setAttribute("aria-label", _("Next"));
+            rightArrow.setAttribute("role", "button");
+            rightArrow.setAttribute("tabindex", "0");
 
             leftArrow = document.getElementById("left-arrow");
             leftArrow.style.display = "block";
             leftArrow.classList.add("hover");
             leftArrow.setAttribute("title", _("Previous"));
             leftArrow.setAttribute("aria-label", _("Previous"));
+            leftArrow.setAttribute("role", "button");
+            leftArrow.setAttribute("tabindex", "0");
 
             document.onkeydown = function handleArrowKeys(event) {
                 if (event.key === "ArrowLeft") {
@@ -469,7 +473,7 @@ class HelpWidget {
         // this._helpDiv.style.backgroundColor = "#e8e8e8";
 
         const helpDivHTML =
-            '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpScrollWrapper"><div id="helpBodyDiv" tabindex="-1"></div></div>';
+            '<div id="right-arrow" class="hover" tabindex="0" role="button"></div><div id="left-arrow" class="hover" tabindex="0" role="button"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpScrollWrapper"><div id="helpBodyDiv" tabindex="-1"></div></div>';
         this._helpDiv.insertAdjacentHTML("afterbegin", helpDivHTML);
 
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
