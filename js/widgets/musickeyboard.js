@@ -3072,7 +3072,7 @@ function MusicKeyboard(activity) {
             return ans;
         };
         const actionGroupInterval = 50;
-        var actionGroups = parseInt(selectedNotes.length / actionGroupInterval) + 1;
+        const actionGroups = parseInt(selectedNotes.length / actionGroupInterval) + 1;
 
         for (let actionGroup = 0; actionGroup < actionGroups; actionGroup++) {
             const currentSelectedNotes = selectedNotes.slice(
