@@ -814,11 +814,11 @@ class Block {
                 that.collapseButtonBitmap.scaleX =
                     that.collapseButtonBitmap.scaleY =
                     that.collapseButtonBitmap.scale =
-                    scale / 3;
+                        scale / 3;
                 that.expandButtonBitmap.scaleX =
                     that.expandButtonBitmap.scaleY =
                     that.expandButtonBitmap.scale =
-                    scale / 3;
+                        scale / 3;
                 that.updateCache();
                 that._calculateBlockHitArea();
             };
@@ -1531,7 +1531,7 @@ class Block {
                 that.collapseButtonBitmap.scaleX =
                     that.collapseButtonBitmap.scaleY =
                     that.collapseButtonBitmap.scale =
-                    that.protoblock.scale / 3;
+                        that.protoblock.scale / 3;
                 that.container.addChild(that.collapseButtonBitmap);
                 that.collapseButtonBitmap.x = 2 * that.protoblock.scale;
                 if (that.isInlineCollapsible()) {
@@ -1561,7 +1561,7 @@ class Block {
                 that.expandButtonBitmap.scaleX =
                     that.expandButtonBitmap.scaleY =
                     that.expandButtonBitmap.scale =
-                    that.protoblock.scale / 3;
+                        that.protoblock.scale / 3;
 
                 that.container.addChild(that.expandButtonBitmap);
                 that.expandButtonBitmap.visible = that.collapsed;
@@ -2821,12 +2821,12 @@ class Block {
             bitmap.scaleX =
                 bitmap.scaleY =
                 bitmap.scale =
-                ((MEDIASAFEAREA[2] / width) * blockScale) / 2;
+                    ((MEDIASAFEAREA[2] / width) * blockScale) / 2;
         } else {
             bitmap.scaleX =
                 bitmap.scaleY =
                 bitmap.scale =
-                ((MEDIASAFEAREA[3] / height) * blockScale) / 2;
+                    ((MEDIASAFEAREA[3] / height) * blockScale) / 2;
         }
         bitmap.x = ((MEDIASAFEAREA[0] - 10) * blockScale) / 2;
         bitmap.y = (MEDIASAFEAREA[1] * blockScale) / 2;
@@ -3103,10 +3103,10 @@ class Block {
                 setTimeout(() => {
                     moved =
                         Math.abs(event.stageX / that.activity.getStageScale() - that.original.x) +
-                        Math.abs(
-                            event.stageY / that.activity.getStageScale() - that.original.y
-                        ) >
-                        20 && !window.hasMouse;
+                            Math.abs(
+                                event.stageY / that.activity.getStageScale() - that.original.y
+                            ) >
+                            20 && !window.hasMouse;
                     getInput = !moved;
                 }, 200);
             }
