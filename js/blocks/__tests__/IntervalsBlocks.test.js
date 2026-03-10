@@ -32,6 +32,7 @@ describe("setupIntervalsBlocks", () => {
     let logo;
     let createdBlocks;
     let turtleIndex;
+    let turtleObjs;
 
     class DummyValueBlock {
         constructor(name) {
@@ -58,12 +59,16 @@ describe("setupIntervalsBlocks", () => {
         }
     }
 
-    class DummyFlowBlock extends DummyValueBlock { }
-    class DummyFlowClampBlock extends DummyValueBlock { }
-    class DummyLeftBlock extends DummyValueBlock { }
+    class DummyFlowBlock extends DummyValueBlock {}
+    class DummyFlowClampBlock extends DummyValueBlock {}
+    class DummyLeftBlock extends DummyValueBlock {}
 
     beforeEach(() => {
+        turtleIndex = 0;
+        turtleObjs = {};
         createdBlocks = {};
+
+        jest.clearAllMocks();
 
         global._ = jest.fn(msg => msg);
         global.last = jest.fn(arr => arr[arr.length - 1]);
@@ -114,8 +119,6 @@ describe("setupIntervalsBlocks", () => {
             },
             scalarDistance: jest.fn(() => 3)
         };
-
-        const turtleObjs = {};
         activity = {
             errorMsg: jest.fn(),
             blocks: {
@@ -168,7 +171,6 @@ describe("setupIntervalsBlocks", () => {
             connectionStore: { [turtleIndex]: {} }
         };
 
-        turtleIndex = 0;
         setupIntervalsBlocks(activity);
     });
 
@@ -218,13 +220,27 @@ describe("setupIntervalsBlocks", () => {
     });
 
     it("SemitoneIntervalBlock sets interval and returns child block", () => {
-        const result = createdBlocks.semitoneinterval.flow([5, "childBlk"], logo, turtleIndex, "blk");
-        expect(Singer.IntervalsActions.setSemitoneInterval).toHaveBeenCalledWith(5, turtleIndex, "blk");
+        const result = createdBlocks.semitoneinterval.flow(
+            [5, "childBlk"],
+            logo,
+            turtleIndex,
+            "blk"
+        );
+        expect(Singer.IntervalsActions.setSemitoneInterval).toHaveBeenCalledWith(
+            5,
+            turtleIndex,
+            "blk"
+        );
         expect(result).toEqual(["childBlk", 1]);
     });
 
     it("SemitoneIntervalBlock returns early when args[1] undefined", () => {
-        const result = createdBlocks.semitoneinterval.flow([5, undefined], logo, turtleIndex, "blk");
+        const result = createdBlocks.semitoneinterval.flow(
+            [5, undefined],
+            logo,
+            turtleIndex,
+            "blk"
+        );
         expect(result).toBeUndefined();
     });
 
@@ -348,5 +364,4 @@ describe("setupIntervalsBlocks", () => {
         expect(tur.singer.duplicateFactor).toBeGreaterThan(1);
         expect(logo.setDispatchBlock).toHaveBeenCalled();
     });
-
 });
