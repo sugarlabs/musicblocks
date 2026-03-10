@@ -173,6 +173,19 @@ class ThemeBox {
         // Refresh UI components that depend on platformColor
         this.refreshUIComponents();
 
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                const topRightButtons = document.querySelectorAll(
+                    "#buttoncontainerTOP .tooltipped"
+                );
+                const navHeight = document.querySelector("nav")?.offsetHeight || 64;
+                const BASE_TOP = navHeight + 12;
+                topRightButtons.forEach(btn => {
+                    btn.style.top = BASE_TOP + globalActivity.toolbarHeight + "px";
+                });
+            });
+        });
+
         // Notify user
         this.activity.textMsg(_("Theme switched to " + this._theme + " mode."), 2000);
     }
