@@ -97,11 +97,12 @@ function setupGraphicsBlocks(activity) {
          * @returns {number} - The heading value.
          */
         arg(logo, turtle, blk) {
-            const connections = activity.blocks.blockList[blk]?.connections;
+            const connections = activity.blocks.blockList?.[blk]?.connections;
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
                 parentId != null &&
+                activity.blocks.blockList &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -182,11 +183,12 @@ function setupGraphicsBlocks(activity) {
          * @returns {number} - The Y-coordinate value.
          */
         arg(logo, turtle, blk) {
-            const connections = activity.blocks.blockList[blk]?.connections;
+            const connections = activity.blocks.blockList?.[blk]?.connections;
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
                 parentId != null &&
+                activity.blocks.blockList &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -268,11 +270,12 @@ function setupGraphicsBlocks(activity) {
          * @returns {number} - The X-coordinate value.
          */
         arg(logo, turtle, blk) {
-            const connections = activity.blocks.blockList[blk]?.connections;
+            const connections = activity.blocks.blockList?.[blk]?.connections;
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
                 parentId != null &&
+                activity.blocks.blockList &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -335,7 +338,9 @@ function setupGraphicsBlocks(activity) {
                     if (!logo.pitchBlocks.includes(blk)) {
                         logo.pitchBlocks.push(blk);
                     }
-                    logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                    if (activity.blocks.blockList && blk in activity.blocks.blockList) {
+                        logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                    }
                     logo.phraseMaker.rowArgs.push([args[0], args[1]]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -630,7 +635,9 @@ function setupGraphicsBlocks(activity) {
                         if (!logo.pitchBlocks.includes(blk)) {
                             logo.pitchBlocks.push(blk);
                         }
-                        logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                        if (activity.blocks.blockList && blk in activity.blocks.blockList) {
+                            logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                        }
                         logo.phraseMaker.rowArgs.push([args[0], args[1]]);
                     } else if (tur.singer.inNoteBlock.length > 0) {
                         tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -702,7 +709,9 @@ function setupGraphicsBlocks(activity) {
                     if (!logo.pitchBlocks.includes(blk)) {
                         logo.pitchBlocks.push(blk);
                     }
-                    logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                    if (activity.blocks.blockList && blk in activity.blocks.blockList) {
+                        logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                    }
                     logo.phraseMaker.rowArgs.push(args[0]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -789,7 +798,9 @@ function setupGraphicsBlocks(activity) {
                         if (!logo.pitchBlocks.includes(blk)) {
                             logo.pitchBlocks.push(blk);
                         }
-                        logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                        if (activity.blocks.blockList && blk in activity.blocks.blockList) {
+                            logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                        }
                         logo.phraseMaker.rowArgs.push([args[0], args[1]]);
                     } else if (tur.singer.inNoteBlock.length > 0) {
                         tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -870,7 +881,9 @@ function setupGraphicsBlocks(activity) {
                     if (!logo.pitchBlocks.includes(blk)) {
                         logo.pitchBlocks.push(blk);
                     }
-                    logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                    if (activity.blocks.blockList && blk in activity.blocks.blockList) {
+                        logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                    }
                     logo.phraseMaker.rowArgs.push(args[0]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -950,7 +963,9 @@ function setupGraphicsBlocks(activity) {
                     if (!logo.pitchBlocks.includes(blk)) {
                         logo.pitchBlocks.push(blk);
                     }
-                    logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                    if (activity.blocks.blockList && blk in activity.blocks.blockList) {
+                        logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                    }
                     logo.phraseMaker.rowArgs.push(args[0]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -1038,7 +1053,9 @@ function setupGraphicsBlocks(activity) {
                         if (!logo.pitchBlocks.includes(blk)) {
                             logo.pitchBlocks.push(blk);
                         }
-                        logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                        if (activity.blocks.blockList && blk in activity.blocks.blockList) {
+                            logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                        }
                         logo.phraseMaker.rowArgs.push(args[0]);
                     } else if (tur.singer.inNoteBlock.length > 0) {
                         tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -1127,7 +1144,9 @@ function setupGraphicsBlocks(activity) {
                         if (!logo.pitchBlocks.includes(blk)) {
                             logo.pitchBlocks.push(blk);
                         }
-                        logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                        if (activity.blocks.blockList && blk in activity.blocks.blockList) {
+                            logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                        }
                         logo.phraseMaker.rowArgs.push(args[0]);
                     } else if (tur.singer.inNoteBlock.length > 0) {
                         tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -1226,7 +1245,11 @@ function setupGraphicsBlocks(activity) {
             const listenerName = "_wrap_" + turtle;
             tur.painter.wrap = arg0 === "on";
 
-            if (blk !== undefined && blk in activity.blocks.blockList) {
+            if (
+                blk !== undefined &&
+                activity.blocks.blockList &&
+                blk in activity.blocks.blockList
+            ) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
