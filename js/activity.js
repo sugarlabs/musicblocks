@@ -2954,12 +2954,12 @@ class Activity {
             const ACTIVE_FPS = 60;
             const IDLE_FPS = 1;
 
-            let lastActivity = Date.now();
+            this._idleLastActivity = Date.now();
             this.isAppIdle = false;
 
-            // Wake up function - restores full framerate
-            const resetIdleTimer = () => {
-                lastActivity = Date.now();
+            // Store on instance for cleanup on re-initialization
+            this._resetIdleTimer = () => {
+                this._idleLastActivity = Date.now();
                 if (this.isAppIdle) {
                     this.isAppIdle = false;
                     createjs.Ticker.framerate = ACTIVE_FPS;
@@ -2968,19 +2968,33 @@ class Activity {
                 }
             };
 
-            // Track user activity
-            window.addEventListener("mousemove", resetIdleTimer);
-            window.addEventListener("mousedown", resetIdleTimer);
-            window.addEventListener("keydown", resetIdleTimer);
-            window.addEventListener("touchstart", resetIdleTimer);
-            window.addEventListener("wheel", resetIdleTimer);
+            // Remove old listeners from previous initialization
+            if (this._resetIdleTimer) {
+                window.removeEventListener("mousemove", this._resetIdleTimer);
+                window.removeEventListener("mousedown", this._resetIdleTimer);
+                window.removeEventListener("keydown", this._resetIdleTimer);
+                window.removeEventListener("touchstart", this._resetIdleTimer);
+                window.removeEventListener("wheel", this._resetIdleTimer);
+            }
+
+            // Clear old interval if it exists
+            if (this._idleWatcherInterval) {
+                clearInterval(this._idleWatcherInterval);
+            }
+
+            // Track user activity with instance method
+            window.addEventListener("mousemove", this._resetIdleTimer);
+            window.addEventListener("mousedown", this._resetIdleTimer);
+            window.addEventListener("keydown", this._resetIdleTimer);
+            window.addEventListener("touchstart", this._resetIdleTimer);
+            window.addEventListener("wheel", this._resetIdleTimer);
 
             // Periodic check for idle state
-            setInterval(() => {
+            this._idleWatcherInterval = setInterval(() => {
                 // Check if music/code is playing
                 const isMusicPlaying = this.logo?._alreadyRunning || false;
 
-                if (!isMusicPlaying && Date.now() - lastActivity > IDLE_THRESHOLD) {
+                if (!isMusicPlaying && Date.now() - this._idleLastActivity > IDLE_THRESHOLD) {
                     if (!this.isAppIdle) {
                         this.isAppIdle = true;
                         createjs.Ticker.framerate = IDLE_FPS;
@@ -2988,7 +3002,7 @@ class Activity {
                     }
                 } else if (this.isAppIdle && isMusicPlaying) {
                     // Music started playing - wake up immediately
-                    resetIdleTimer();
+                    this._resetIdleTimer();
                 }
             }, 1000);
         };
