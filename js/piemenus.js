@@ -662,10 +662,9 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                 return;
             }
 
-            // TRIGGER LOGIC FIXED
+            // Trigger note with proper error handling
             if (!that._triggerLock) {
                 that._triggerLock = true;
-
                 try {
                     await that.activity.logo.synth.trigger(
                         0,
@@ -686,8 +685,11 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                 }, 125);
             }
         } catch (e) {
-            console.error("Error in pitch preview:", e);
-        }
+    // Ensure trigger lock is released after a delay
+    setTimeout(() => {
+        that._triggerLock = false;
+    }, 125); // 1/8 second in milliseconds
+}
     };
 
     const __selectionChangedSolfege = () => {
