@@ -7,7 +7,6 @@
  */
 function showZoomOverlay(scale) {
 
-    // Check if the zoom overlay already exists in the DOM
     let overlay = document.getElementById("zoomOverlay");
 
     // If it doesn't exist, create it and append it to the document body
@@ -15,10 +14,8 @@ function showZoomOverlay(scale) {
         overlay = document.createElement("div");
         overlay.id = "zoomOverlay";
 
-        // Apply predefined CSS styling
         overlay.classList.add("zoom-overlay");
 
-        // Accessibility: informs screen readers that this content may update
         overlay.setAttribute("aria-live", "polite");
 
         // Add overlay to the page
@@ -28,10 +25,8 @@ function showZoomOverlay(scale) {
     // Convert scale value to percentage and display it
     overlay.textContent = Math.round(scale * 100) + "%";
 
-    // Make the overlay visible
     overlay.classList.add("visible");
 
-    // Clear any existing hide timeout to prevent overlap
     clearTimeout(overlay.hideTimeout);
 
     // Hide the overlay after 1.5 seconds
