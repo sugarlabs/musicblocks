@@ -7192,7 +7192,6 @@ class Blocks {
                 }
 
                 this.blockList[blk].container.updateCache();
-                this.activity.refreshCanvas();
             }
         };
 

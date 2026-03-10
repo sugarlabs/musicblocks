@@ -1826,12 +1826,18 @@ class Logo {
 
             // We don't update parameter blocks when running full speed.
             if (logo.turtleDelay !== 0) {
+                let updatedParameterBlocks = false;
                 for (const pblk in tur.parameterQueue) {
                     logo.activity.blocks.updateParameterBlock(
                         logo,
                         turtle,
                         tur.parameterQueue[pblk]
                     );
+                    updatedParameterBlocks = true;
+                }
+
+                if (updatedParameterBlocks) {
+                    logo.activity.refreshCanvas();
                 }
             }
 
