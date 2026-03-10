@@ -791,11 +791,27 @@ const processPluginData = (activity, pluginData, pluginSource) => {
         }
     }
 
-    // Populate the arg-block dictionary, i.e., the code that is
-    // eval'd by this block.
+    // Populate the arg-block dictionary
     if ("ARGPLUGINS" in obj) {
         for (const arg in obj["ARGPLUGINS"]) {
-            activity.logo.evalArgDict[arg] = obj["ARGPLUGINS"][arg];
+            try {
+                // Pre-compile the plugin code into a function to avoid eval() in parseArg
+                // Standard scope exposure: logo, turtle, blk, parentBlk, receivedArg, tur
+                // eslint-disable-next-line no-new-func
+                activity.logo.evalArgDict[arg] = new Function(
+                    "logo",
+                    "turtle",
+                    "blk",
+                    "parentBlk",
+                    "receivedArg",
+                    "tur",
+                    obj["ARGPLUGINS"][arg]
+                );
+            } catch (e) {
+                // eslint-disable-next-line no-console
+                console.error("Failed to compile ARGPLUGIN:", arg, e);
+                activity.logo.evalArgDict[arg] = null;
+            }
         }
     }
 
