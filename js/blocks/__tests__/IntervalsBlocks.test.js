@@ -58,9 +58,9 @@ describe("setupIntervalsBlocks", () => {
         }
     }
 
-    class DummyFlowBlock extends DummyValueBlock {}
-    class DummyFlowClampBlock extends DummyValueBlock {}
-    class DummyLeftBlock extends DummyValueBlock {}
+    class DummyFlowBlock extends DummyValueBlock { }
+    class DummyFlowClampBlock extends DummyValueBlock { }
+    class DummyLeftBlock extends DummyValueBlock { }
 
     beforeEach(() => {
         createdBlocks = {};
@@ -87,6 +87,14 @@ describe("setupIntervalsBlocks", () => {
         global.INTERVALVALUES = {
             fifth: [0, 0, 1.5]
         };
+        global.Queue = class {
+            constructor(child, factor, blk, receivedArg) {
+                this.child = child;
+                this.factor = factor;
+                this.blk = blk;
+                this.receivedArg = receivedArg;
+            }
+        };
 
         global.Singer = {
             IntervalsActions: {
@@ -107,6 +115,7 @@ describe("setupIntervalsBlocks", () => {
             scalarDistance: jest.fn(() => 3)
         };
 
+        const turtleObjs = {};
         activity = {
             errorMsg: jest.fn(),
             blocks: {
@@ -114,28 +123,32 @@ describe("setupIntervalsBlocks", () => {
                 findBottomBlock: jest.fn()
             },
             turtles: {
-                ithTurtle() {
-                    return {
-                        singer: {
-                            suppressOutput: false,
-                            justCounting: [],
-                            justMeasuring: [],
-                            firstPitch: [],
-                            lastPitch: [],
-                            notesPlayed: 0,
-                            duplicateFactor: 1,
-                            arpeggio: []
-                        },
-                        painter: {
-                            doPenUp: jest.fn(),
-                            doSetXY: jest.fn(),
-                            doSetHeading: jest.fn()
-                        },
-                        endOfClampSignals: {},
-                        butNotThese: {},
-                        queue: [],
-                        parentFlowQueue: []
-                    };
+                ithTurtle(i) {
+                    if (!turtleObjs[i]) {
+                        turtleObjs[i] = {
+                            singer: {
+                                suppressOutput: false,
+                                justCounting: [],
+                                justMeasuring: [],
+                                firstPitch: [],
+                                lastPitch: [],
+                                notesPlayed: 0,
+                                duplicateFactor: 1,
+                                arpeggio: [],
+                                keySignature: "C major"
+                            },
+                            painter: {
+                                doPenUp: jest.fn(),
+                                doSetXY: jest.fn(),
+                                doSetHeading: jest.fn()
+                            },
+                            endOfClampSignals: {},
+                            butNotThese: {},
+                            queue: [],
+                            parentFlowQueue: []
+                        };
+                    }
+                    return turtleObjs[i];
                 }
             }
         };
@@ -148,7 +161,11 @@ describe("setupIntervalsBlocks", () => {
             setTurtleListener: jest.fn(),
             notation: {
                 notationKey: jest.fn()
-            }
+            },
+            boxes: {},
+            turtleHeaps: { [turtleIndex]: {} },
+            turtleDicts: { [turtleIndex]: {} },
+            connectionStore: { [turtleIndex]: {} }
         };
 
         turtleIndex = 0;
@@ -256,6 +273,80 @@ describe("setupIntervalsBlocks", () => {
         activity.blocks.blockList.print1 = { name: "print" };
         createdBlocks.currentinterval.arg(logo, turtleIndex, "blk1");
         expect(logo.statusFields).toContainEqual(["blk1", "currentinterval"]);
+    });
+    it("ScalarIntervalBlock calls setScalarInterval", () => {
+        const blk = "blkScalar";
+        activity.blocks.blockList[blk] = { connections: [null, "child"] };
+        const result = createdBlocks.interval.flow([5, "child"], logo, turtleIndex, blk);
+        expect(Singer.IntervalsActions.setScalarInterval).toHaveBeenCalledWith(5, turtleIndex, blk);
+        expect(result).toEqual(["child", 1]);
+    });
+
+    it("CurrentModeBlock returns current mode", () => {
+        const blk = "blkMode";
+        activity.blocks.blockList[blk] = { connections: [null] };
+        expect(createdBlocks.currentmode.arg(logo, turtleIndex, blk)).toBe("major");
+    });
+
+    it("CurrentModeBlock handles status matrix", () => {
+        logo.inStatusMatrix = true;
+        const blk = "blkMode";
+        activity.blocks.blockList[blk] = { connections: ["printBlk"] };
+        activity.blocks.blockList["printBlk"] = { name: "print" };
+        createdBlocks.currentmode.arg(logo, turtleIndex, blk);
+        expect(logo.statusFields).toContainEqual([blk, "currentmode"]);
+    });
+
+    it("SetKey2Block calls setKey", () => {
+        const blk = "blkSetKey";
+        activity.blocks.blockList[blk] = { connections: [null, "keyConn", "modeConn"] };
+        Singer.IntervalsActions.GetModename = jest.fn(() => "major");
+        createdBlocks.setkey2.flow(["C", "major"], logo, turtleIndex, blk);
+        expect(Singer.IntervalsActions.setKey).toHaveBeenCalledWith("C", "major", turtleIndex, blk);
+    });
+
+    it("MeasureIntervalSemitonesBlock measures distance", () => {
+        const blk = "blkMeasure";
+        activity.blocks.blockList[blk] = { connections: [null, "child"] };
+        const tur = activity.turtles.ithTurtle(turtleIndex);
+        tur.singer.firstPitch = [60];
+        tur.singer.lastPitch = [64];
+        logo.runFromBlockNow = jest.fn();
+        const result = createdBlocks.measureintervalsemitones.arg(logo, turtleIndex, blk);
+        expect(result).toBe(4);
+    });
+
+    it("MeasureIntervalScalarBlock measures scalar distance", () => {
+        const blk = "blkMeasureScalar";
+        activity.blocks.blockList[blk] = { connections: [null, "child"] };
+        const tur = activity.turtles.ithTurtle(turtleIndex);
+        tur.singer.firstPitch = [60];
+        tur.singer.lastPitch = [64];
+        logo.runFromBlockNow = jest.fn();
+        const result = createdBlocks.measureintervalscalar.arg(logo, turtleIndex, blk);
+        expect(Singer.scalarDistance).toHaveBeenCalled();
+        expect(result).toBe(3); // Singer.scalarDistance mock returns 3
+    });
+
+    it("DefineModeBlock calls defineMode", () => {
+        const blk = "blkDefineMode";
+        activity.blocks.blockList[blk] = { connections: [null, "child"] };
+        const result = createdBlocks.definemode.flow(["custom", "child"], logo, turtleIndex, blk);
+        expect(Singer.IntervalsActions.defineMode).toHaveBeenCalledWith("custom", turtleIndex, blk);
+        expect(result).toEqual(["child", 1]);
+    });
+
+    it("ArpeggioBlock sets arpeggio parameters", () => {
+        const blk = "blkArpeggio";
+        global.CHORDNAMES = ["major"];
+        global.CHORDVALUES = [[0, 4, 7]];
+        activity.blocks.blockList[blk] = { connections: [null, "child"] };
+        activity.blocks.blockList["child"] = { name: "note", connections: [blk] };
+        activity.blocks.findBottomBlock = jest.fn(() => "child");
+        const result = createdBlocks.arpeggio.flow(["major", "child"], logo, turtleIndex, blk);
+        const tur = activity.turtles.ithTurtle(turtleIndex);
+        expect(tur.singer.duplicateFactor).toBeGreaterThan(1);
+        expect(logo.setDispatchBlock).toHaveBeenCalled();
     });
 
 });
