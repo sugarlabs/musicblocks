@@ -108,7 +108,6 @@ class RequestManager {
                 if (settled) return;
                 settled = true;
                 this.stats.timeouts++;
-                this.stats.failures++;
                 this.pendingRequests.delete(key);
                 reject(
                     new Error(
