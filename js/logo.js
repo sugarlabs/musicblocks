@@ -1117,6 +1117,9 @@ class Logo {
      * @returns {void}
      */
     runLogoCommands(startHere, env) {
+        // Reset running flags when starting a new program
+        this._alreadyRunning = false;
+        this._prematureRestart = false;
         this._prematureRestart = this._alreadyRunning;
         if (this._alreadyRunning && this._runningBlock !== null) {
             this._ignoringBlock = this._runningBlock;
@@ -1887,6 +1890,13 @@ class Logo {
                     queueStart === 0 &&
                     tur.singer.justCounting.length === 0
                 ) {
+                    if (!logo._prematureRestart) {
+                        // Add delay before automatically stopping (don't stop immediately)
+                        const stopBtn = document.getElementById("stop");
+                        if (stopBtn) {
+                            stopBtn.click(); // Simulate the stop button click
+                        }
+                    }
                     if (logo.runningLilypond) {
                         if (logo.collectingStats) {
                             // console.debug("stats collection completed");

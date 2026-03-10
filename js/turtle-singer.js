@@ -2160,6 +2160,7 @@ class Singer {
                         const stopBtn = document.getElementById("stop");
                         if (stopBtn) {
                             stopBtn.style.display = "inline-block";
+                            stopBtn.style.color = "#ea174c";
                         }
                         const len = notes[0].length;
                         if (typeof notes[0] === "number") {
