@@ -94,20 +94,28 @@ class StatusMatrix {
                     >&nbsp;&nbsp;`;
             }
             cell.style.width = "212.5px";
-            this.widgetWindow.onmaximize = () => {
-                this.isMaximized = !this.isMaximized;
-                cell.style.width = "100vw";
-                cell.style.paddingLeft = "30px";
-                cell.style.fontSize =
-                    Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
-                if (!this.isMaximized) {
-                    cell.style.width = "212.5px";
-                }
-            };
             // cell.style.width = StatusMatrix.BUTTONSIZE * this._cellScale*2 + "px";
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
             cell.className = "headcol";
         }
+
+        this.widgetWindow.onmaximize = () => {
+            this.isMaximized = !this.isMaximized;
+            const headerFontSize =
+                Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
+            const headerCells = this._statusTable.querySelectorAll("thead .headcol");
+            headerCells.forEach(headerCell => {
+                if (this.isMaximized) {
+                    headerCell.style.width = "100vw";
+                    headerCell.style.paddingLeft = "30px";
+                    headerCell.style.fontSize = headerFontSize;
+                } else {
+                    headerCell.style.width = "212.5px";
+                    headerCell.style.paddingLeft = "";
+                    headerCell.style.fontSize = "";
+                }
+            });
+        };
 
         // console.debug("active turtles: " + turtles.turtleList.length);
 
