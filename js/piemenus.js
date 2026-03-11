@@ -103,11 +103,20 @@ const getPieMenuSize = block => {
 
 // Debounce resize handler for performance
 let wheelResizeTimeout;
+let wheelResizeListenerActive = false;
 const debouncedSetWheelSize = () => {
     clearTimeout(wheelResizeTimeout);
     wheelResizeTimeout = setTimeout(setWheelSize, 150);
 };
+const enableWheelResizeHandling = () => {
+    if (wheelResizeListenerActive) return;
+    wheelResizeListenerActive = true;
+};
 
+const disableWheelResizeHandling = () => {
+    window.removeEventListener("resize", debouncedSetWheelSize);
+    wheelResizeListenerActive = false;
+};
 // Call the function initially and whenever the window is resized
 setWheelSize();
 window.addEventListener("resize", debouncedSetWheelSize);
@@ -257,6 +266,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
 
     const wheelDiv = docById("wheelDiv");
     wheelDiv.style.display = ""; // Show the div but keep it invisible initially
+    enableWheelResizeHandling();
     wheelDiv.style.opacity = "0";
 
     // The pitch selector
@@ -900,6 +910,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
         that.updateCache();
         // Hide the pie menu and remove the wheels
         docById("wheelDiv").style.display = "none";
+        disableWheelResizeHandling();
         that._pitchWheel.removeWheel();
         if (!custom) {
             that._accidentalsWheel.removeWheel();
@@ -928,6 +939,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     }
 
     docById("wheelDiv").style.display = "";
+    enableWheelResizeHandling();
 
     // Some blocks have both pitch and octave, so we can modify
     // both at once.
@@ -1191,6 +1203,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
+        disableWheelResizeHandling();
     };
 
     const __selectionChanged = () => {
@@ -1280,6 +1293,7 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
     noteLabels.push(null);
 
     docById("wheelDiv").style.display = "";
+    enableWheelResizeHandling();
 
     const wheelSize = getPieMenuSize(block);
     block._pitchWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
@@ -1507,6 +1521,7 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
     block._exitWheel.navItems[0].navigateFunction = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
+        disableWheelResizeHandling();
         that._pitchWheel.removeWheel();
         that._exitWheel.removeWheel();
         that._octavesWheel.removeWheel();
@@ -1530,6 +1545,7 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
     }
 
     docById("wheelDiv").style.display = "";
+    enableWheelResizeHandling();
 
     // the accidental selector
     const wheelSize = getPieMenuSize(block);
@@ -1599,6 +1615,7 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
+        disableWheelResizeHandling();
         that._accidentalWheel.removeWheel();
         that._exitWheel.removeWheel();
     };
@@ -1672,7 +1689,7 @@ const piemenuNoteValue = (block, noteValue) => {
     }
 
     docById("wheelDiv").style.display = "";
-
+    enableWheelResizeHandling();
     // We want powers of two on the bottom, nearest the input box
     // as it is most common.
     const WHEELVALUES = [3, 2, 7, 5];
@@ -1788,6 +1805,7 @@ const piemenuNoteValue = (block, noteValue) => {
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
+        disableWheelResizeHandling();
         that._noteValueWheel.removeWheel();
         that._exitWheel.removeWheel();
         that.label.style.display = "none";
@@ -1920,6 +1938,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         return;
     }
     docById("wheelDiv").style.display = "";
+    enableWheelResizeHandling();
     // the number selector
     const wheelSize = getPieMenuSize(block);
     block._numberWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
@@ -2027,6 +2046,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
+        disableWheelResizeHandling();
         that._numberWheel.removeWheel();
         that._exitWheel.removeWheel();
         that.label.style.display = "none";
@@ -2248,7 +2268,7 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     }
 
     docById("wheelDiv").style.display = "";
-
+    enableWheelResizeHandling();
     // the number selector
     const wheelSize = getPieMenuSize(block);
     block._numberWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
@@ -2335,6 +2355,7 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
+        disableWheelResizeHandling();
         that._numberWheel.removeWheel();
         that._exitWheel.removeWheel();
         that.label.style.display = "none";
@@ -2435,6 +2456,7 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     }
 
     docById("wheelDiv").style.display = "";
+    enableWheelResizeHandling();
 
     // reference to diameter of the basic wheel
     let size = 800;
@@ -2510,6 +2532,7 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
+        disableWheelResizeHandling();
         that._basicWheel.removeWheel();
     };
 
@@ -2583,6 +2606,7 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
     }
 
     docById("wheelDiv").style.display = "";
+    enableWheelResizeHandling();
 
     // the boolean selector
     const wheelSize = getPieMenuSize(block);
@@ -2624,6 +2648,7 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
+        disableWheelResizeHandling();
         that._booleanWheel.removeWheel();
     };
 
@@ -2694,6 +2719,7 @@ const piemenuChords = (block, selectedChord) => {
     }
 
     docById("wheelDiv").style.display = "";
+    enableWheelResizeHandling();
 
     // the chord selector
     block._chordWheel = new wheelnav("wheelDiv", null, 1000, 1000);
@@ -2759,6 +2785,7 @@ const piemenuChords = (block, selectedChord) => {
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
+        disableWheelResizeHandling();
         that._chordWheel.removeWheel();
     };
 
@@ -2844,6 +2871,7 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
     }
 
     docById("wheelDiv").style.display = "";
+    enableWheelResizeHandling();
 
     // the voice selector
     if (localStorage.kanaPreference === "kana") {
@@ -3005,6 +3033,7 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
     block._exitWheel.navItems[0].navigateFunction = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
+        disableWheelResizeHandling();
     };
 };
 
@@ -3022,6 +3051,7 @@ const piemenuIntervals = (block, selectedInterval) => {
     }
 
     docById("wheelDiv").style.display = "";
+    enableWheelResizeHandling();
 
     // Use advanced constructor for more wheelnav on same div
     const language = localStorage.languagePreference;
@@ -3183,6 +3213,7 @@ const piemenuIntervals = (block, selectedInterval) => {
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
+        disableWheelResizeHandling();
     };
 
     const __selectionChanged = () => {
@@ -3272,6 +3303,7 @@ const piemenuModes = (block, selectedMode) => {
     }
 
     docById("wheelDiv").style.display = "";
+    enableWheelResizeHandling();
 
     //Use advanced constructor for more wheelnav on same div
     block._modeWheel = new wheelnav("wheelDiv", null, 1200, 1200);
@@ -3510,6 +3542,7 @@ const piemenuModes = (block, selectedMode) => {
         }
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
+        disableWheelResizeHandling();
         if (that._modeNameWheel !== null) {
             that._modeNameWheel.removeWheel();
         }
@@ -4343,6 +4376,7 @@ const piemenuDissectNumber = widget => {
 
     // Show the wheel div
     docById("wheelDiv").style.display = "";
+    enableWheelResizeHandling();
 
     // Create the number wheel
     const wheelSize = getPieMenuSize({ blocks: widget.activity.logo.blocks });
@@ -4400,6 +4434,7 @@ const piemenuDissectNumber = widget => {
     // Handle exit
     const __exitMenu = () => {
         docById("wheelDiv").style.display = "none";
+        disableWheelResizeHandling();
         numberWheel.removeWheel();
         exitWheel.removeWheel();
     };
