@@ -68,6 +68,7 @@ const createMockElement = id => ({
 
 global.document.getElementById = jest.fn(createMockElement);
 global.docById = jest.fn(createMockElement);
+global.setScroller = jest.fn();
 
 global._ = jest.fn(str => str);
 
@@ -962,5 +963,224 @@ describe("Toolbar Class", () => {
         expect(elements["aux-toolbar"].style.display).toBe("none");
         expect(elements.menu.innerHTML).toBe("menu");
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, false);
+    });
+    test("renderLanguageSelectIcon highlights Japanese kana variant correctly", () => {
+        const mockLangElement = {
+            onclick: null,
+            classList: { add: jest.fn(), remove: jest.fn() }
+        };
+        const languageSelectIcon = { onclick: null, ...mockLangElement };
+        global.docById.mockImplementation(id => {
+            if (id === "languageSelectIcon") return languageSelectIcon;
+            return mockLangElement;
+        });
+        global.localStorage.languagePreference = "ja-kana";
+        const languageBox = {};
+        [
+            "enUS",
+            "enUK",
+            "es",
+            "pt",
+            "ko",
+            "ja",
+            "kana",
+            "zhCN",
+            "th",
+            "tr",
+            "ayc",
+            "quz",
+            "gug",
+            "hi",
+            "ibo",
+            "ar",
+            "te",
+            "bn",
+            "he",
+            "ur"
+        ].forEach(l => {
+            languageBox[`${l}_onclick`] = jest.fn();
+        });
+        toolbar.renderLanguageSelectIcon(languageBox);
+        languageSelectIcon.onclick();
+        expect(mockLangElement.classList.remove).toHaveBeenCalledWith("selected-language");
+    });
+
+    test("renderLanguageSelectIcon maps zh_CN to zhCN correctly", () => {
+        const mockLangElement = {
+            onclick: null,
+            classList: { add: jest.fn(), remove: jest.fn() }
+        };
+        const languageSelectIcon = { onclick: null, ...mockLangElement };
+        global.docById.mockImplementation(id => {
+            if (id === "languageSelectIcon") return languageSelectIcon;
+            return mockLangElement;
+        });
+        global.localStorage.languagePreference = "zh_CN";
+        const languageBox = {};
+        [
+            "enUS",
+            "enUK",
+            "es",
+            "pt",
+            "ko",
+            "ja",
+            "kana",
+            "zhCN",
+            "th",
+            "tr",
+            "ayc",
+            "quz",
+            "gug",
+            "hi",
+            "ibo",
+            "ar",
+            "te",
+            "bn",
+            "he",
+            "ur"
+        ].forEach(l => {
+            languageBox[`${l}_onclick`] = jest.fn();
+        });
+        toolbar.renderLanguageSelectIcon(languageBox);
+        languageSelectIcon.onclick();
+        expect(mockLangElement.classList.remove).toHaveBeenCalledWith("selected-language");
+    });
+
+    test("renderLanguageSelectIcon maps en-US browser code to enUS", () => {
+        const mockLangElement = {
+            onclick: null,
+            classList: { add: jest.fn(), remove: jest.fn() }
+        };
+        const languageSelectIcon = { onclick: null, ...mockLangElement };
+        global.docById.mockImplementation(id => {
+            if (id === "languageSelectIcon") return languageSelectIcon;
+            return mockLangElement;
+        });
+        global.localStorage.languagePreference = "en-US";
+        const languageBox = {};
+        [
+            "enUS",
+            "enUK",
+            "es",
+            "pt",
+            "ko",
+            "ja",
+            "kana",
+            "zhCN",
+            "th",
+            "tr",
+            "ayc",
+            "quz",
+            "gug",
+            "hi",
+            "ibo",
+            "ar",
+            "te",
+            "bn",
+            "he",
+            "ur"
+        ].forEach(l => {
+            languageBox[`${l}_onclick`] = jest.fn();
+        });
+        toolbar.renderLanguageSelectIcon(languageBox);
+        languageSelectIcon.onclick();
+        expect(mockLangElement.classList.remove).toHaveBeenCalledWith("selected-language");
+    });
+
+    test("renderLanguageSelectIcon falls back to enUS for unmapped en- variant", () => {
+        const mockLangElement = {
+            onclick: null,
+            classList: { add: jest.fn(), remove: jest.fn() }
+        };
+        const languageSelectIcon = { onclick: null, ...mockLangElement };
+        global.docById.mockImplementation(id => {
+            if (id === "languageSelectIcon") return languageSelectIcon;
+            return mockLangElement;
+        });
+        global.localStorage.languagePreference = "en-AU";
+        const languageBox = {};
+        [
+            "enUS",
+            "enUK",
+            "es",
+            "pt",
+            "ko",
+            "ja",
+            "kana",
+            "zhCN",
+            "th",
+            "tr",
+            "ayc",
+            "quz",
+            "gug",
+            "hi",
+            "ibo",
+            "ar",
+            "te",
+            "bn",
+            "he",
+            "ur"
+        ].forEach(l => {
+            languageBox[`${l}_onclick`] = jest.fn();
+        });
+        toolbar.renderLanguageSelectIcon(languageBox);
+        languageSelectIcon.onclick();
+        expect(mockLangElement.classList.remove).toHaveBeenCalledWith("selected-language");
+    });
+
+    test("renderModeSelectIcon toggles beginnerMode on click", () => {
+        const activity = {
+            beginnerMode: false,
+            scrollBlockContainer: null,
+            palettes: { updatePalettes: jest.fn() },
+            refreshCanvas: jest.fn(),
+            toolbar: { renderSaveIcons: jest.fn() },
+            save: {
+                saveHTML: jest.fn(),
+                saveSVG: jest.fn(),
+                savePNG: jest.fn(),
+                saveMIDI: jest.fn(),
+                saveWAV: jest.fn(),
+                saveLilypond: jest.fn(),
+                saveAbc: jest.fn(),
+                saveMxml: jest.fn(),
+                saveBlockArtwork: jest.fn(),
+                saveThumbnail: jest.fn(),
+                saveBlockArtworkSVG: jest.fn(),
+                saveBlockArtworkPNG: jest.fn()
+            }
+        };
+        global.setScroller = jest.fn();
+        toolbar.activity = activity;
+        toolbar.activity.scrollBlockContainer = null;
+        toolbar.activity.palettes = { updatePalettes: jest.fn() };
+        toolbar.activity.refreshCanvas = jest.fn();
+        const begIcon = {
+            onclick: null,
+            classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn(() => false) },
+            style: { display: "block" },
+            innerHTML: ""
+        };
+        const genericEl = {
+            onclick: null,
+            classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn(() => false) },
+            style: { display: "block" },
+            innerHTML: ""
+        };
+        global.docById.mockImplementation(id => {
+            if (id === "beginnerMode") return begIcon;
+            return genericEl;
+        });
+        global.$j = jest.fn(() => ({ tooltip: jest.fn(), dropdown: jest.fn() }));
+        toolbar.renderModeSelectIcon(
+            jest.fn(),
+            jest.fn(),
+            jest.fn(),
+            jest.fn(),
+            jest.fn(),
+            jest.fn()
+        );
+        begIcon.onclick();
+        expect(toolbar.activity.beginnerMode).toBe(true);
     });
 });
