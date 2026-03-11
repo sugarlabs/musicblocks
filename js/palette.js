@@ -1093,15 +1093,26 @@ class Palette {
 
     setupGrabScroll(paletteList) {
         let posY, top;
+        let lastMoveTime = 0;
+        const THROTTLE_MS = 16; // ~60 FPS cap for scroll updates
 
         const mouseUpGrab = () => {
             // paletteList.onmousemove = null;
             document.body.style.cursor = "default";
+            lastMoveTime = 0; // Reset throttle timer on mouse up
         };
 
         const mouseMoveGrab = event => {
-            const dy = event.clientY - posY;
-            paletteList.scrollTop = top - dy;
+            const now = Date.now();
+            
+            // Throttle: only update scroll position every THROTTLE_MS milliseconds
+            // This prevents excessive DOM updates during rapid mouse movements
+            if (now - lastMoveTime >= THROTTLE_MS) {
+                const dy = event.clientY - posY;
+                paletteList.scrollTop = top - dy;
+                lastMoveTime = now;
+            }
+            
             document.body.style.cursor = "grabbing";
         };
 
