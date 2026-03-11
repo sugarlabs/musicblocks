@@ -291,8 +291,8 @@ describe("Toolbar Class", () => {
             id === "stop"
                 ? stopIcon
                 : id === "record"
-                ? recordButton
-                : { addEventListener: jest.fn(), querySelectorAll: jest.fn() }
+                  ? recordButton
+                  : { addEventListener: jest.fn(), querySelectorAll: jest.fn() }
         );
 
         const mockOnClick = jest.fn();
