@@ -87,7 +87,6 @@
         "@isaacs/brace-expansion": "^5.0.1",
         "immutable": "^5.1.5",
         "svgo": "^4.0.1",
-        "replace-ext": "2.0.0",
         "@gulp-sourcemaps/identity-map": {
             "postcss": "^8.4.31"
         }
