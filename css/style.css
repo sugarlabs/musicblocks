@@ -104,6 +104,33 @@ input[type="range"]:focus::-ms-fill-upper {
   background: #90c100;
 }
 
+/* ===== Toggle Button Visual States ===== */
+/* Visual indicator for active toggle buttons (ON state) */
+.toggle-button-active {
+    opacity: 1 !important;
+    background-color: rgba(0, 150, 136, 0.2) !important;
+    border: 2px solid rgba(0, 150, 136, 0.6) !important;
+    border-radius: 4px;
+    box-shadow: 0 0 8px rgba(0, 150, 136, 0.3) inset;
+    transition: all 0.3s ease;
+}
+
+/* Visual indicator for inactive toggle buttons (OFF state) */
+.toggle-button-inactive {
+    opacity: 0.6;
+    background-color: transparent !important;
+    border: 2px solid transparent !important;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+/* Hover effect for better UX */
+.toggle-button-active:hover,
+.toggle-button-inactive:hover {
+    opacity: 1;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
 .lego-brick {
     display: inline-block;
     background-color: #FF0000;

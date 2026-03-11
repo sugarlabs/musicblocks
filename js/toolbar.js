@@ -643,6 +643,8 @@ class Toolbar {
         let wrapButtonTooltipData = _("Turtle Wrap Off");
 
         wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
+        wrapIcon.setAttribute("aria-pressed", "false");
+        wrapIcon.classList.add("toggle-button-inactive");
         $j(".tooltipped").tooltip({
             html: true,
             delay: 100
@@ -652,6 +654,9 @@ class Toolbar {
             WRAP = !WRAP;
             if (WRAP) {
                 wrapButtonTooltipData = _("Turtle Wrap Off");
+                wrapIcon.setAttribute("aria-pressed", "true");
+                wrapIcon.classList.remove("toggle-button-inactive");
+                wrapIcon.classList.add("toggle-button-active");
                 this.activity.textMsg(_("Turtle Wrap On"), 3000);
                 this.activity.helpfulWheelItems.forEach(ele => {
                     if (ele.label === "Turtle Wrap Off") {
@@ -662,6 +667,9 @@ class Toolbar {
                 });
             } else {
                 wrapButtonTooltipData = _("Turtle Wrap On");
+                wrapIcon.setAttribute("aria-pressed", "false");
+                wrapIcon.classList.remove("toggle-button-active");
+                wrapIcon.classList.add("toggle-button-inactive");
                 this.activity.textMsg(_("Turtle Wrap Off"), 3000);
                 this.activity.helpfulWheelItems.forEach(ele => {
                     if (ele.label === "Turtle Wrap Off") {
@@ -694,6 +702,9 @@ class Toolbar {
         WRAP = !WRAP;
         if (WRAP) {
             wrapButtonTooltipData = _("Turtle Wrap Off");
+            wrapIcon.setAttribute("aria-pressed", "true");
+            wrapIcon.classList.remove("toggle-button-inactive");
+            wrapIcon.classList.add("toggle-button-active");
             activity.textMsg(_("Turtle Wrap On"), 3000);
             activity.helpfulWheelItems.forEach(ele => {
                 if (ele.label === "Turtle Wrap Off") {
@@ -704,6 +715,9 @@ class Toolbar {
             });
         } else {
             wrapButtonTooltipData = _("Turtle Wrap On");
+            wrapIcon.setAttribute("aria-pressed", "false");
+            wrapIcon.classList.remove("toggle-button-active");
+            wrapIcon.classList.add("toggle-button-inactive");
             activity.textMsg(_("Turtle Wrap Off"), 3000);
             activity.helpfulWheelItems.forEach(ele => {
                 if (ele.label === "Turtle Wrap Off") {
