@@ -136,7 +136,10 @@ requirejs.config({
         "tweenjs.min": "lib/tweenjs.min",
         "preloadjs.min": "lib/preloadjs.min",
         "prefixfree.min": "lib/prefixfree.min",
-        "howler": "lib/howler",
+        "howler": [
+            "node_modules/howler/howler",
+            "https://cdn.jsdelivr.net/npm/howler@1/howler"
+        ],
         "Chart": "lib/Chart",
         "samples": "sounds/samples",
         "planet": "js/planet",
@@ -342,7 +345,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                     console.error("Core bootstrap failed:", err);
                     alert(
                         "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: " +
-                            (err.message || err)
+                        (err.message || err)
                     );
                 }
             );

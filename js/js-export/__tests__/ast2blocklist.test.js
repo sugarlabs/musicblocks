@@ -20,7 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const acorn = require("../../../lib/acorn.min");
+const acorn = require("acorn");
 const { AST2BlockList } = require("../ast2blocklist");
 const fs = require("fs");
 const path = require("path");
