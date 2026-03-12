@@ -14,25 +14,20 @@
 /*
    global
 
-   _, Notation, Synth, instruments, instrumentsFilters,
+   Notation, Synth, instruments, instrumentsFilters,
    instrumentsEffects, Singer, Tone, CAMERAVALUE, doUseCamera,
    VIDEOVALUE, last, getIntervalDirection, getIntervalNumber,
    mixedNumber, rationalToFraction, doStopVideoCam, StatusMatrix,
-   getStatsFromNotation, delayExecution, DEFAULTVOICE, performanceTracker, window
- */
-
-/*
-   exported
-
-   Queue, Logo, LogoDependencies, DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY,
-   OSCVOLUMEADJUSTMENT, TONEBPM, TARGETBPM, TURTLESTEP, NOTEDIV,
-   MIN_HIGHLIGHT_DURATION_MS,
+   getStatsFromNotation, delayExecution, DEFAULTVOICE, performanceTracker, window,
+   define, DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY, OSCVOLUMEADJUSTMENT,
+   TONEBPM, TARGETBPM, TURTLESTEP, NOTEDIV, MIN_HIGHLIGHT_DURATION_MS,
    NOMICERRORMSG, NANERRORMSG, NOSTRINGERRORMSG, NOBOXERRORMSG,
    NOACTIONERRORMSG, NOINPUTERRORMSG, NOSQRTERRORMSG,
    ZERODIVIDEERRORMSG, EMPTYHEAPERRORMSG, INVALIDPITCH, POSNUMBER,
    NOTATIONNOTE, NOTATIONDURATION, NOTATIONDOTCOUNT,
    NOTATIONTUPLETVALUE, NOTATIONROUNDDOWN, NOTATIONINSIDECHORD,
-   NOTATIONSTACCATO
+   NOTATIONSTACCATO,
+   Queue, Logo, LogoDependencies
  */
 
 // Constants moved to js/logoconstants.js to resolve circular dependency
@@ -57,6 +52,7 @@ class Queue {
     }
 }
 
+// eslint-disable-next-line no-redeclare
 class Logo {
     /**
      * @constructor
@@ -1624,6 +1620,7 @@ class Logo {
             let res = null;
             // Is it a plugin?
             if (logo.blockList[blk].name in logo.evalFlowDict) {
+                console.log("running eval on " + logo.blockList[blk].name);
                 logo.pluginReturnValue = null;
                 eval(logo.evalFlowDict[logo.blockList[blk].name]);
                 // Clamp blocks will return the child flow.
@@ -1796,7 +1793,7 @@ class Logo {
                         tur.parentFlowQueue.length > 0 &&
                         tur.queue.length > 0 &&
                         logo.deps.utils.last(tur.queue).parentBlk !==
-                            logo.deps.utils.last(tur.parentFlowQueue)
+                        logo.deps.utils.last(tur.parentFlowQueue)
                     ) {
                         tur.unhighlightQueue.push(logo.deps.utils.last(tur.parentFlowQueue));
                     } else if (tur.unhighlightQueue.length > 0) {
