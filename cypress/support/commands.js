@@ -23,7 +23,3 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-Cypress.Commands.add("waitForAppReady", () => {
-    cy.get("#loading-image-container", { timeout: 30000 }).should("not.be.visible");
-    cy.get("#canvas", { timeout: 30000 }).should("be.visible");
-});
