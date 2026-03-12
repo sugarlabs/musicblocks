@@ -16,7 +16,7 @@
 
    DEFAULTOSCILLATORTYPE, platformColor, rationalToFraction, last,
    Singer, instrumentsEffects:writeable, instrumentsFilters:writeable,
-   _, docById, DEFAULTFILTERTYPE, docByName, OSCTYPES, FILTERTYPES,
+   docById, DEFAULTFILTERTYPE, docByName, OSCTYPES, FILTERTYPES,
    oneHundredToFraction, delayExecution
  */
 
@@ -1933,7 +1933,7 @@ class TimbreWidget {
                     el => el.filterType === target.value
                 );
                 if (error.length > 1) {
-                    activity.errorMsg(_("Filter already present."), 3000);
+                    this.activity.errorMsg(_("Filter already present."), 3000);
                 }
                 this._playNote("G4", 1 / 8);
             } else if (targetId.startsWith("radio") && event.type === "click") {

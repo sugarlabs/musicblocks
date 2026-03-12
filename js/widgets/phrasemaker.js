@@ -13,7 +13,7 @@
 /*
    global
 
-   _, PhraseMakerUtils, PhraseMakerGrid, PhraseMakerUI, PhraseMakerAudio, platformColor, docById, MATRIXSOLFEHEIGHT, toFraction, Singer,
+   PhraseMakerUtils, PhraseMakerGrid, PhraseMakerUI, PhraseMakerAudio, platformColor, docById, MATRIXSOLFEHEIGHT, toFraction, Singer,
    SOLFEGECONVERSIONTABLE, slicePath, wheelnav, delayExecution,
    DEFAULTVOICE, getDrumName, MATRIXSOLFEWIDTH, getDrumIcon,
    noteIsSolfege, isCustomTemperament, i18nSolfege, getNote, DEFAULTDRUM, last,
@@ -4747,7 +4747,7 @@ class PhraseMaker {
 
         // Create a new stack for the chunk.
         this.activity.blocks.loadNewBlocks(newStack);
-        activity.textMsg(this._("New action block generated."), 3000);
+        this.activity.textMsg(this._("New action block generated."), 3000);
     }
 }
 if (typeof module !== "undefined") {
