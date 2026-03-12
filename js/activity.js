@@ -17,9 +17,9 @@
 /*
    globals
 
-   _, ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON,
+   ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON,
    ActivityContext,
-   Blocks, Boundary, CARTESIAN, changeImage, closeWidgets,
+   Boundary, CARTESIAN, changeImage, closeWidgets,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
    DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
@@ -27,19 +27,21 @@
    getMacroExpansion, getOctaveRatio, getTemperament, transcribeMidi,
    GOHOMEBUTTON, GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
    hideDOMLabel, initBasicProtoBlocks, initPalettes,
-   INLINECOLLAPSIBLES, jQuery, JSEditor, LanguageBox, ThemeBox, Logo, MSGBLOCK,
+   INLINECOLLAPSIBLES, JSEditor, LanguageBox, ThemeBox, MSGBLOCK,
    NANERRORMSG, NOACTIONERRORMSG, NOBOXERRORMSG, NOINPUTERRORMSG,
    NOMICERRORMSG, NOSQRTERRORMSG, NOSTRINGERRORMSG, PALETTEFILLCOLORS,
    PALETTESTROKECOLORS, PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
    Palettes, PasteBox, PlanetInterface, platform, platformColor,
    piemenuKey, POLAR, preparePluginExports, processMacroData,
-   processPluginData, processRawPluginData, require, SaveInterface,
+   processPluginData, processRawPluginData, SaveInterface,
    SHOWBLOCKSBUTTON, SMALLERBUTTON, SMALLERDISABLEBUTTON, SOPRANO,
    SPECIALINPUTS, STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
-   TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, Turtles, TURTLESVG,
+   TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, TURTLESVG,
    updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_F,
    SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
-   MUSICALMODES, waitForReadiness
+   MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
+   base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
+   SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS
  */
 
 /*
@@ -211,6 +213,7 @@ const doAnalyzeProject = function () {
 /**
  * Represents an activity in the application.
  */
+// eslint-disable-next-line no-redeclare
 class Activity {
     /**
      * Creates an Activity instance.
@@ -352,9 +355,9 @@ class Activity {
 
             for (let i = 0; i < this.themes.length; i++) {
                 if (this.themes[i] === activeTheme) {
-                    body.classList.add(this.themes[i]);
+                    document.body.classList.add(this.themes[i]);
                 } else {
-                    body.classList.remove(this.themes[i]);
+                    document.body.classList.remove(this.themes[i]);
                 }
             }
         } catch (e) {
@@ -5074,7 +5077,7 @@ class Activity {
 
             tune.lines?.forEach(line => {
                 line.staff?.forEach((staff, staffIndex) => {
-                    if (!organizeBlock.hasOwnProperty(staffIndex)) {
+                    if (!Object.prototype.hasOwnProperty.call(organizeBlock, staffIndex)) {
                         organizeBlock[staffIndex] = {
                             arrangedBlocks: []
                         };
@@ -5085,7 +5088,7 @@ class Activity {
             });
             for (const lineId in organizeBlock) {
                 organizeBlock[lineId].arrangedBlocks?.forEach(staff => {
-                    if (!staffBlocksMap.hasOwnProperty(lineId)) {
+                    if (!Object.prototype.hasOwnProperty.call(staffBlocksMap, lineId)) {
                         staffBlocksMap[lineId] = {
                             meterNum: staff?.meter?.value[0]?.num || 4,
                             meterDen: staff?.meter?.value[0]?.den || 4,
@@ -7836,72 +7839,50 @@ class Activity {
             // Enabled mouse over and mouse out events.
             this.stage.enableMouseOver(10); // default is 20
 
-            this.cartesianBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(base64Encode(CARTESIAN))
-            );
-            this.polarBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(base64Encode(POLAR))
-            );
-            this.trebleBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE))
-            );
-            this.grandBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(base64Encode(GRAND))
-            );
-            this.sopranoBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(base64Encode(SOPRANO))
-            );
-            this.altoBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(base64Encode(ALTO))
-            );
-            this.tenorBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(base64Encode(TENOR))
-            );
-            this.bassBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(base64Encode(BASS))
-            );
+            // Cache encoded SVG data URIs to avoid re-encoding identical artwork on startup.
+            const gridDataUri = svg =>
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(svg));
+            const encodedGridUris = {
+                cartesian: gridDataUri(CARTESIAN),
+                polar: gridDataUri(POLAR),
+                treble: gridDataUri(TREBLE),
+                grand: gridDataUri(GRAND),
+                soprano: gridDataUri(SOPRANO),
+                alto: gridDataUri(ALTO),
+                tenor: gridDataUri(TENOR),
+                bass: gridDataUri(BASS),
+                grandG: gridDataUri(GRAND_G),
+                grandF: gridDataUri(GRAND_F),
+                trebleG: gridDataUri(TREBLE_G),
+                trebleF: gridDataUri(TREBLE_F)
+            };
+
+            this.cartesianBitmap = this._createGrid(encodedGridUris.cartesian);
+            this.polarBitmap = this._createGrid(encodedGridUris.polar);
+            this.trebleBitmap = this._createGrid(encodedGridUris.treble);
+            this.grandBitmap = this._createGrid(encodedGridUris.grand);
+            this.sopranoBitmap = this._createGrid(encodedGridUris.soprano);
+            this.altoBitmap = this._createGrid(encodedGridUris.alto);
+            this.tenorBitmap = this._createGrid(encodedGridUris.tenor);
+            this.bassBitmap = this._createGrid(encodedGridUris.bass);
 
             // We use G (one sharp) and F (one flat) as prototypes for all
             // of the accidentals. When applied, these graphics are offset
             // vertically to rendering different sharps and flats and
             // horizontally so as not to overlap.
             for (let i = 0; i < 7; i++) {
-                this.grandSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(GRAND_G))
-                );
-                this.grandFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(GRAND_F))
-                );
-                this.trebleSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_G))
-                );
-                this.trebleFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_F))
-                );
-                this.sopranoSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_G))
-                );
-                this.sopranoFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_F))
-                );
-                this.altoSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_G))
-                );
-                this.altoFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_F))
-                );
-                this.tenorSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_G))
-                );
-                this.tenorFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_F))
-                );
-                this.bassSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_G))
-                );
-                this.bassFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_F))
-                );
+                this.grandSharpBitmap[i] = this._createGrid(encodedGridUris.grandG);
+                this.grandFlatBitmap[i] = this._createGrid(encodedGridUris.grandF);
+                this.trebleSharpBitmap[i] = this._createGrid(encodedGridUris.trebleG);
+                this.trebleFlatBitmap[i] = this._createGrid(encodedGridUris.trebleF);
+                this.sopranoSharpBitmap[i] = this._createGrid(encodedGridUris.trebleG);
+                this.sopranoFlatBitmap[i] = this._createGrid(encodedGridUris.trebleF);
+                this.altoSharpBitmap[i] = this._createGrid(encodedGridUris.trebleG);
+                this.altoFlatBitmap[i] = this._createGrid(encodedGridUris.trebleF);
+                this.tenorSharpBitmap[i] = this._createGrid(encodedGridUris.trebleG);
+                this.tenorFlatBitmap[i] = this._createGrid(encodedGridUris.trebleF);
+                this.bassSharpBitmap[i] = this._createGrid(encodedGridUris.trebleG);
+                this.bassFlatBitmap[i] = this._createGrid(encodedGridUris.trebleF);
             }
 
             const URL = window.location.href;
