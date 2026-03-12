@@ -41,6 +41,12 @@ function AIDebuggerWidget() {
     };
 
     /**
+     * Flag to track if the backend is currently processing a request
+     * @type {boolean}
+     */
+    this.isProcessing = false;
+
+    /**
      * Chat history array to store conversation
      * @type {Array}
      */
@@ -269,6 +275,8 @@ function AIDebuggerWidget() {
      * @private
      */
     this._sendMessage = function () {
+        if (this.isProcessing) return;
+
         const messageText = this.messageInput.value.trim();
         if (messageText === "") return;
 
@@ -338,6 +346,7 @@ function AIDebuggerWidget() {
      * @private
      */
     this._sendToBackend = function (message) {
+        this.isProcessing = true;
         this._showTypingIndicator();
         this.promptCount++;
         let projectData;
@@ -379,6 +388,7 @@ function AIDebuggerWidget() {
                 return response.json();
             })
             .then(data => {
+                this.isProcessing = false;
                 this._hideTypingIndicator();
 
                 if (data && data.response) {
@@ -397,6 +407,7 @@ function AIDebuggerWidget() {
                 }
             })
             .catch(error => {
+                this.isProcessing = false;
                 this._hideTypingIndicator();
                 console.error("Backend connection error:", error.message);
 
@@ -453,14 +464,14 @@ function AIDebuggerWidget() {
      * @private
      */
     this._hideTypingIndicator = function () {
-        const typingIndicator = this.chatLog.querySelector(".typing-indicator");
-        if (typingIndicator) {
+        const typingIndicators = this.chatLog.querySelectorAll(".typing-indicator");
+        typingIndicators.forEach(typingIndicator => {
             const animationId = typingIndicator.getAttribute("data-animation-id");
             if (animationId) {
                 clearInterval(parseInt(animationId));
             }
             typingIndicator.remove();
-        }
+        });
     };
 
     /**
@@ -537,6 +548,7 @@ function AIDebuggerWidget() {
         };
 
         // Show typing indicator during initialization
+        this.isProcessing = true;
         this._showTypingIndicator();
 
         fetch(`${BACKEND_CONFIG.BASE_URL}${BACKEND_CONFIG.ENDPOINTS.ANALYZE}`, {
@@ -553,6 +565,7 @@ function AIDebuggerWidget() {
                 return response.json();
             })
             .then(data => {
+                this.isProcessing = false;
                 this._hideTypingIndicator();
 
                 if (data.response) {
@@ -573,6 +586,7 @@ function AIDebuggerWidget() {
                 }
             })
             .catch(error => {
+                this.isProcessing = false;
                 this._hideTypingIndicator();
                 console.error("Backend initialization error:", error.message);
                 this.activity.textMsg(_("Server error: Failed to initialize AI debugger."));
