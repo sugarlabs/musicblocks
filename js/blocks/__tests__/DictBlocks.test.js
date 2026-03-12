@@ -1,3 +1,4 @@
+/* global NOINPUTERRORMSG, Turtle */
 /**
  * @license
  * MusicBlocks v3.4.1
