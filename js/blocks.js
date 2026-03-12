@@ -2711,7 +2711,6 @@ class Blocks {
                 topBlockLoop += 1;
                 if (topBlockLoop > 2 * this.blockList.length) {
                     /** Could happen if the block data is malformed. */
-
                     console.debug("infinite loop finding topBlock?");
                     if (myBlock.garbage) {
                         console.debug(myBlock.blockIndex + " " + myBlock.name);

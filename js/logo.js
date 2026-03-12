@@ -43,6 +43,12 @@
    NOTATIONSTACCATO
  */
 
+/*
+   exported
+
+   Queue, Logo, LogoDependencies
+ */
+
 // Constants moved to js/logoconstants.js to resolve circular dependency
 
 /**
