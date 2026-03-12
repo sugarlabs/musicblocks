@@ -12,9 +12,9 @@
 /*
    globals
 
-   jQuery, PALETTEICONS, PALETTEFILLCOLORS, PALETTESTROKECOLORS,
+   PALETTEICONS, PALETTEFILLCOLORS, PALETTESTROKECOLORS,
    PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS, MULTIPALETTES,
-   platformColor
+   platformColor, base64Encode, i18next, createjs
 */
 
 /*
@@ -64,6 +64,7 @@ const changeImage = (imgElement, from, to) => {
  * @param {string} text - The input text to be translated.
  * @returns {string} The translated text.
  */
+// eslint-disable-next-line no-redeclare
 function _(text, options = {}) {
     if (!text) return "";
 
