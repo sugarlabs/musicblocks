@@ -15,7 +15,7 @@
 // scratch. -- Walter Bender, October 2014.
 
 /*
-   globals
+   global
 
    _, ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON,
    ActivityContext,

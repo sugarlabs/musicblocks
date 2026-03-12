@@ -12,7 +12,11 @@
 //A dropdown for selecting theme
 
 /*
-   global _, platformColor
+   global platformColor, getSystemThemePreference,
+   PALETTEFILLCOLORS, PALETTESTROKECOLORS,
+   PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
+   MULTIPALETTEICONS, PALETTEICONS, makePaletteIcons,
+   globalActivity
 */
 
 /* exported ThemeBox, themeConfigs */

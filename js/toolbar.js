@@ -10,9 +10,9 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /*
-  global _, jQuery, _THIS_IS_MUSIC_BLOCKS_, docById, doSVG, fnBrowserDetect,
-  RECORDBUTTON
- */
+  global _THIS_IS_MUSIC_BLOCKS_, docById, doSVG, fnBrowserDetect,
+  RECORDBUTTON, saveButton, saveButtonAdvanced
+*/
 
 /* exported Toolbar */
 
