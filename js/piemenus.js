@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 // Copyright (c) 2014-23 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
@@ -14,7 +13,7 @@
 /*
    global
 
-   _, platformColor, docById, Singer, slicePath, wheelnav,
+   platformColor, docById, Singer, Synth, Tone, slicePath, wheelnav,
    DEFAULTVOICE, getDrumName, getNote, MUSICALMODES last, SHARP, FLAT,
    PREVIEWVOLUME, DEFAULTVOLUME, MODE_PIE_MENUS, HelpWidget,
    INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName,
@@ -3603,18 +3602,15 @@ const piemenuModes = (block, selectedMode) => {
         docById("wheelnav-_exitWheel-title-1").style.fill = "#ffffff";
         docById("wheelnav-_exitWheel-title-1").style.pointerEvents = "none";
         docById("wheelnav-_exitWheel-slice-1").style.pointerEvents = "none";
-        setTimeout(
-            () => {
-                const playButtonTitle = docById("wheelnav-_exitWheel-title-1");
-                const playButtonSlice = docById("wheelnav-_exitWheel-slice-1");
-                if (playButtonTitle && playButtonSlice) {
-                    playButtonTitle.style.fill = "#000000";
-                    playButtonTitle.style.pointerEvents = "auto";
-                    playButtonSlice.style.pointerEvents = "auto";
-                }
-            },
-            (20 * 1000) / 10
-        );
+        setTimeout(() => {
+            const playButtonTitle = docById("wheelnav-_exitWheel-title-1");
+            const playButtonSlice = docById("wheelnav-_exitWheel-slice-1");
+            if (playButtonTitle && playButtonSlice) {
+                playButtonTitle.style.fill = "#000000";
+                playButtonTitle.style.pointerEvents = "auto";
+                playButtonSlice.style.pointerEvents = "auto";
+            }
+        }, (20 * 1000) / 10);
 
         __playScale(activeTabs, 0);
     };
@@ -3832,7 +3828,7 @@ const piemenuBlockContext = block => {
         that.blocks.sendStackToTrash(that.blocks.blockList[blockBlock]);
         docById("contextWheelDiv").style.display = "none";
         // prompting a notification on deleting any block
-        activity.textMsg(
+        that.activity.textMsg(
             _("You can restore deleted blocks from the trash with the Restore From Trash button."),
             3000
         );
