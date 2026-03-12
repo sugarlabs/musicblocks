@@ -17,9 +17,9 @@
 /*
    globals
 
-   _, ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON,
+   ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON,
    ActivityContext,
-   Blocks, Boundary, CARTESIAN, changeImage, closeWidgets,
+   Boundary, CARTESIAN, changeImage, closeWidgets,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
    DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
@@ -27,19 +27,21 @@
    getMacroExpansion, getOctaveRatio, getTemperament, transcribeMidi,
    GOHOMEBUTTON, GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
    hideDOMLabel, initBasicProtoBlocks, initPalettes,
-   INLINECOLLAPSIBLES, jQuery, JSEditor, LanguageBox, ThemeBox, Logo, MSGBLOCK,
+   INLINECOLLAPSIBLES, JSEditor, LanguageBox, ThemeBox, MSGBLOCK,
    NANERRORMSG, NOACTIONERRORMSG, NOBOXERRORMSG, NOINPUTERRORMSG,
    NOMICERRORMSG, NOSQRTERRORMSG, NOSTRINGERRORMSG, PALETTEFILLCOLORS,
    PALETTESTROKECOLORS, PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
    Palettes, PasteBox, PlanetInterface, platform, platformColor,
    piemenuKey, POLAR, preparePluginExports, processMacroData,
-   processPluginData, processRawPluginData, require, SaveInterface,
+   processPluginData, processRawPluginData, SaveInterface,
    SHOWBLOCKSBUTTON, SMALLERBUTTON, SMALLERDISABLEBUTTON, SOPRANO,
    SPECIALINPUTS, STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
-   TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, Turtles, TURTLESVG,
+   TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, TURTLESVG,
    updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_F,
    SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
-   MUSICALMODES, waitForReadiness
+   MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
+   base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
+   SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS
  */
 
 /*
@@ -211,6 +213,7 @@ const doAnalyzeProject = function () {
 /**
  * Represents an activity in the application.
  */
+// eslint-disable-next-line no-redeclare
 class Activity {
     /**
      * Creates an Activity instance.
@@ -352,9 +355,9 @@ class Activity {
 
             for (let i = 0; i < this.themes.length; i++) {
                 if (this.themes[i] === activeTheme) {
-                    body.classList.add(this.themes[i]);
+                    document.body.classList.add(this.themes[i]);
                 } else {
-                    body.classList.remove(this.themes[i]);
+                    document.body.classList.remove(this.themes[i]);
                 }
             }
         } catch (e) {
@@ -5074,7 +5077,7 @@ class Activity {
 
             tune.lines?.forEach(line => {
                 line.staff?.forEach((staff, staffIndex) => {
-                    if (!organizeBlock.hasOwnProperty(staffIndex)) {
+                    if (!Object.prototype.hasOwnProperty.call(organizeBlock, staffIndex)) {
                         organizeBlock[staffIndex] = {
                             arrangedBlocks: []
                         };
@@ -5085,7 +5088,7 @@ class Activity {
             });
             for (const lineId in organizeBlock) {
                 organizeBlock[lineId].arrangedBlocks?.forEach(staff => {
-                    if (!staffBlocksMap.hasOwnProperty(lineId)) {
+                    if (!Object.prototype.hasOwnProperty.call(staffBlocksMap, lineId)) {
                         staffBlocksMap[lineId] = {
                             meterNum: staff?.meter?.value[0]?.num || 4,
                             meterDen: staff?.meter?.value[0]?.den || 4,
@@ -6977,7 +6980,14 @@ class Activity {
             this.update = true;
 
             // Get things started
+            this._perfMark("activity.domReady.start");
             await this.init();
+            this._perfMark("activity.domReady.end");
+            this._perfMeasure(
+                "activity.domReady_total",
+                "activity.domReady.start",
+                "activity.domReady.end"
+            );
         };
 
         this.__saveLocally = () => {
@@ -7319,6 +7329,7 @@ class Activity {
          * Inits everything. The main function.
          */
         this.init = async () => {
+            this._perfMark("activity.init.start");
             this._clientWidth = document.body.clientWidth;
             this._clientHeight = document.body.clientHeight;
             this._innerWidth = window.innerWidth;
@@ -7483,6 +7494,7 @@ class Activity {
             this.toolbar.renderJavaScriptIcon(toggleJSWindow);
             this.toolbar.renderLanguageSelectIcon(this.languageBox);
             this.toolbar.renderWrapIcon();
+            this._perfMark("activity.init.ui_ready");
 
             initPalettes(this.palettes);
 
@@ -8028,7 +8040,71 @@ class Activity {
             if (this.planet !== undefined) {
                 this.planet.planet.setAnalyzeProject(doAnalyzeProject);
             }
+
+            this._perfMark("activity.init.end");
+            this._perfMeasure("activity.init_total", "activity.init.start", "activity.init.end");
+            this._perfMeasure(
+                "activity.init_to_ui_ready",
+                "activity.init.start",
+                "activity.init.ui_ready"
+            );
+            this._perfMeasure(
+                "loader_to_activity_init_complete",
+                "loader.main.start",
+                "activity.init.end"
+            );
+
+            if (
+                typeof window !== "undefined" &&
+                window.__mbPerf &&
+                typeof window.__mbPerf.report === "function"
+            ) {
+                window.__mbPerf.report();
+            }
         };
+    }
+
+    /**
+     * Record a named performance mark in the global mbPerf tracker.
+     * @param {string} markName - The mark identifier.
+     * @returns {void}
+     */
+    _perfMark(markName) {
+        if (
+            typeof window === "undefined" ||
+            !window.__mbPerf ||
+            !window.__mbPerf.enabled ||
+            !window.__mbPerf.marks
+        ) {
+            return;
+        }
+        if (typeof performance === "undefined" || typeof performance.now !== "function") {
+            return;
+        }
+        window.__mbPerf.marks[markName] = performance.now();
+    }
+
+    /**
+     * Measure elapsed milliseconds between two mbPerf marks.
+     * @param {string} measureName - The measure identifier.
+     * @param {string} startMark - Start mark name.
+     * @param {string} endMark - End mark name.
+     * @returns {void}
+     */
+    _perfMeasure(measureName, startMark, endMark) {
+        if (
+            typeof window === "undefined" ||
+            !window.__mbPerf ||
+            !window.__mbPerf.enabled ||
+            !window.__mbPerf.marks ||
+            !window.__mbPerf.measures
+        ) {
+            return;
+        }
+        const start = window.__mbPerf.marks[startMark];
+        const end = window.__mbPerf.marks[endMark];
+        if (typeof start !== "number" || typeof end !== "number") return;
+        window.__mbPerf.measures[measureName] = +(end - start).toFixed(2);
     }
 
     /**
