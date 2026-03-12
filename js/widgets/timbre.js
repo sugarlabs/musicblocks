@@ -443,9 +443,12 @@ class TimbreWidget {
 
             i += 1;
             if (i < this.notesToPlay.length && this._playing) {
-                setTimeout(() => {
-                    __playLoop(i);
-                }, Singer.defaultBPMFactor * 1000 * this.notesToPlay[i - 1][1]);
+                setTimeout(
+                    () => {
+                        __playLoop(i);
+                    },
+                    Singer.defaultBPMFactor * 1000 * this.notesToPlay[i - 1][1]
+                );
             } else {
                 cell.innerHTML = `&nbsp;&nbsp;<img 
                         src="header-icons/play-button.svg" 
