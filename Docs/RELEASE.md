@@ -17,7 +17,7 @@ This triggers the **Publish Docker Image** workflow, which will:
 
 - Build the Docker image
 - Run a **smoke test** (starts the container and verifies it responds on port 3000)
-- Run a **Trivy vulnerability scan** (fails the build on CRITICAL/HIGH CVEs)
+- Run a **Trivy vulnerability scan** (reports CRITICAL/HIGH CVEs in the build log)
 - Push to GHCR if all checks pass
 
 The following image tags are produced for a stable release:
