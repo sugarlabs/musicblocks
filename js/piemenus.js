@@ -110,6 +110,8 @@ const debouncedSetWheelSize = () => {
 };
 const enableWheelResizeHandling = () => {
     if (wheelResizeListenerActive) return;
+    setWheelSize();
+    window.addEventListener("resize", debouncedSetWheelSize);
     wheelResizeListenerActive = true;
 };
 
@@ -117,9 +119,6 @@ const disableWheelResizeHandling = () => {
     window.removeEventListener("resize", debouncedSetWheelSize);
     wheelResizeListenerActive = false;
 };
-// Call the function initially and whenever the window is resized
-setWheelSize();
-window.addEventListener("resize", debouncedSetWheelSize);
 
 /**
  * Enables mouse-wheel scrolling to rotate a wheelnav instance
