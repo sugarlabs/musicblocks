@@ -1,3 +1,4 @@
+/* global Singer */
 /**
  * MusicBlocks v3.6.2
  *
