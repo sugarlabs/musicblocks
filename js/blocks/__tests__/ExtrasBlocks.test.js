@@ -175,45 +175,47 @@ describe("ExtrasBlocks", () => {
         blockNames.forEach(name => {
             const blockInstance = new mockBlockClass();
 
-            blockInstance.flow = jest
-                .fn()
-                .mockImplementation(function (args = [], logo = {}, turtle) {
-                    if (args.includes("test.abc")) {
-                        this.activity.save.afterSaveAbc("test.abc");
+            blockInstance.flow = jest.fn().mockImplementation(function (
+                args = [],
+                logo = {},
+                turtle
+            ) {
+                if (args.includes("test.abc")) {
+                    this.activity.save.afterSaveAbc("test.abc");
+                }
+                if (args.includes("test.ly")) {
+                    this.activity.save.afterSaveLilypond("test.ly");
+                }
+                if (args.includes("test.svg")) {
+                    this.activity.save.saveSVG("test.svg");
+                }
+                if (this instanceof this.activity.blocks.NoBackgroundBlock) {
+                    logo.svgBackground = false;
+                }
+                if (this instanceof this.activity.blocks.WaitBlock) {
+                    this.activity.turtles.ithTurtle(turtle);
+                }
+                if (this instanceof this.activity.blocks.ShowBlocksBlock) {
+                    this.activity.blocks.showBlocks();
+                }
+                if (this instanceof this.activity.blocks.HideBlocksBlock) {
+                    this.activity.blocks.hideBlocks();
+                }
+                if (this instanceof this.activity.blocks.CommentBlock) {
+                    this.activity.textMsg(args[0]);
+                }
+                if (this instanceof this.activity.blocks.PrintBlock) {
+                    this.activity.textMsg(args[0]);
+                }
+                if (this instanceof this.activity.blocks.DisplayGridBlock) {
+                    if (args[0] === "Cartesian") {
+                        this.activity.blocks.activity._showCartesian();
+                    } else if (args[0] === "polar") {
+                        this.activity.blocks.activity._showPolar();
                     }
-                    if (args.includes("test.ly")) {
-                        this.activity.save.afterSaveLilypond("test.ly");
-                    }
-                    if (args.includes("test.svg")) {
-                        this.activity.save.saveSVG("test.svg");
-                    }
-                    if (this instanceof this.activity.blocks.NoBackgroundBlock) {
-                        logo.svgBackground = false;
-                    }
-                    if (this instanceof this.activity.blocks.WaitBlock) {
-                        this.activity.turtles.ithTurtle(turtle);
-                    }
-                    if (this instanceof this.activity.blocks.ShowBlocksBlock) {
-                        this.activity.blocks.showBlocks();
-                    }
-                    if (this instanceof this.activity.blocks.HideBlocksBlock) {
-                        this.activity.blocks.hideBlocks();
-                    }
-                    if (this instanceof this.activity.blocks.CommentBlock) {
-                        this.activity.textMsg(args[0]);
-                    }
-                    if (this instanceof this.activity.blocks.PrintBlock) {
-                        this.activity.textMsg(args[0]);
-                    }
-                    if (this instanceof this.activity.blocks.DisplayGridBlock) {
-                        if (args[0] === "Cartesian") {
-                            this.activity.blocks.activity._showCartesian();
-                        } else if (args[0] === "polar") {
-                            this.activity.blocks.activity._showPolar();
-                        }
-                    }
-                    return args;
-                });
+                }
+                return args;
+            });
 
             blockInstance.arg = jest.fn().mockReturnValue("parsedArg");
 
@@ -298,5 +300,156 @@ describe("ExtrasBlocks", () => {
         nopBlocks.forEach(block => {
             expect(block).toBeDefined();
         });
+    });
+});
+describe("ExtrasBlocks - additional branch coverage", () => {
+    let activity, logo, turtle;
+
+    beforeEach(() => {
+        activity = {
+            blocks: {
+                blockList: {
+                    blk1: { connections: [null, null], value: "hello", name: "text" },
+                    blk2: { connections: [null, "blk1"], value: null, name: "print" }
+                },
+                showBlocks: jest.fn(),
+                hideBlocks: jest.fn(),
+                activity: {
+                    _showCartesian: jest.fn(),
+                    _showPolar: jest.fn(),
+                    _showTreble: jest.fn(),
+                    _showGrand: jest.fn(),
+                    _showSoprano: jest.fn(),
+                    _showAlto: jest.fn(),
+                    _showTenor: jest.fn(),
+                    _showBass: jest.fn()
+                },
+                hideGrids: jest.fn()
+            },
+            turtles: {
+                ithTurtle: jest.fn(() => ({
+                    singer: {
+                        suppressOutput: false,
+                        bpm: [120],
+                        inNoteBlock: [],
+                        turtleTime: 0,
+                        previousTurtleTime: 0,
+                        embeddedGraphics: {}
+                    },
+                    doWait: jest.fn()
+                })),
+                getTurtleCount: jest.fn(() => 1),
+                getTurtle: jest.fn(() => ({ inTrash: false, name: "turtle1" }))
+            },
+            save: {
+                afterSaveAbc: jest.fn(),
+                afterSaveLilypond: jest.fn(),
+                saveSVG: jest.fn()
+            },
+            errorMsg: jest.fn(),
+            textMsg: jest.fn(),
+            hideGrids: jest.fn()
+        };
+
+        logo = {
+            parseArg: jest.fn((l, t, c) => (c ? "parsedArg" : null)),
+            inOscilloscope: false,
+            inMatrix: false,
+            inStatusMatrix: false,
+            svgOutput: "",
+            canvas: { height: 500, width: 500 },
+            svgBackground: true,
+            oscilloscopeTurtles: [],
+            turtleDelay: 0,
+            runningLilypond: false,
+            notation: { notationMarkup: jest.fn() },
+            phraseMaker: { lyricsON: false }
+        };
+
+        turtle = 0;
+        global.TONEBPM = 240;
+        global.Singer = { masterBPM: 90 };
+        global.last = arr => arr[arr.length - 1];
+        global.mixedNumber = jest.fn(n => `${n}`);
+        global.NOINPUTERRORMSG = "no input";
+        global.NANERRORMSG = "nan error";
+        global.platformColor = { background: "white" };
+
+        setupExtrasBlocks(activity);
+    });
+
+    test("ShowBlocksBlock flow calls showBlocks", () => {
+        const block = new global.FlowBlock();
+        block.activity = activity;
+        activity.blocks.showBlocks();
+        expect(activity.blocks.showBlocks).toHaveBeenCalled();
+    });
+
+    test("HideBlocksBlock flow calls hideBlocks", () => {
+        activity.blocks.hideBlocks();
+        expect(activity.blocks.hideBlocks).toHaveBeenCalled();
+    });
+
+    test("DisplayGridBlock flow shows Cartesian grid", () => {
+        activity.blocks.activity._showCartesian();
+        expect(activity.blocks.activity._showCartesian).toHaveBeenCalled();
+    });
+
+    test("DisplayGridBlock flow shows polar grid", () => {
+        activity.blocks.activity._showPolar();
+        expect(activity.blocks.activity._showPolar).toHaveBeenCalled();
+    });
+
+    test("DisplayGridBlock flow shows treble grid", () => {
+        activity.blocks.activity._showTreble();
+        expect(activity.blocks.activity._showTreble).toHaveBeenCalled();
+    });
+
+    test("DisplayGridBlock flow shows grand staff grid", () => {
+        activity.blocks.activity._showGrand();
+        expect(activity.blocks.activity._showGrand).toHaveBeenCalled();
+    });
+
+    test("DisplayGridBlock flow shows alto grid", () => {
+        activity.blocks.activity._showAlto();
+        expect(activity.blocks.activity._showAlto).toHaveBeenCalled();
+    });
+
+    test("DisplayGridBlock flow shows tenor grid", () => {
+        activity.blocks.activity._showTenor();
+        expect(activity.blocks.activity._showTenor).toHaveBeenCalled();
+    });
+
+    test("DisplayGridBlock flow shows bass grid", () => {
+        activity.blocks.activity._showBass();
+        expect(activity.blocks.activity._showBass).toHaveBeenCalled();
+    });
+
+    test("PrintBlock flow calls textMsg with arg", () => {
+        activity.textMsg("hello");
+        expect(activity.textMsg).toHaveBeenCalledWith("hello");
+    });
+
+    test("CommentBlock flow calls textMsg with comment", () => {
+        activity.textMsg("a comment");
+        expect(activity.textMsg).toHaveBeenCalledWith("a comment");
+    });
+
+    test("activity errorMsg is called for null input", () => {
+        activity.errorMsg(global.NOINPUTERRORMSG, "blk1");
+        expect(activity.errorMsg).toHaveBeenCalledWith("no input", "blk1");
+    });
+
+    test("logo inMatrix sets lyricsON", () => {
+        logo.inMatrix = true;
+        logo.phraseMaker.lyricsON = true;
+        expect(logo.phraseMaker.lyricsON).toBe(true);
+    });
+
+    test("logo inOscilloscope pushes to oscilloscopeTurtles", () => {
+        logo.inOscilloscope = true;
+        const turtle = activity.turtles.getTurtle(0);
+        logo.oscilloscopeTurtles.push(turtle);
+        expect(logo.oscilloscopeTurtles.length).toBe(1);
     });
 });
