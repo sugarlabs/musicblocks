@@ -12,7 +12,7 @@
 /* global requirejs, define */
 
 // Localization helper for early bootstrap
-const t_ = typeof _ === "function" ? _ : s => s;
+const t_ = typeof _ === "function" ? _ : (s) => s;
 
 requirejs.config({
     baseUrl: "./",

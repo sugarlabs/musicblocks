@@ -218,7 +218,6 @@ const doAnalyzeProject = function () {
 /**
  * Represents an activity in the application.
  */
-
 class Activity {
     /**
      * Creates an Activity instance.
