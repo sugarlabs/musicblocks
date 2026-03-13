@@ -1,0 +1,296 @@
+/* Mobile Improvements for Music Blocks */
+
+/* Touch-friendly interactions */
+* {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    -webkit-touch-callout: none;
+}
+
+/* Prevent text selection on UI elements */
+button, .button, [role="button"], .tooltipped {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Allow text selection in inputs and content areas */
+input, textarea, [contenteditable="true"] {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+/* Mobile-specific adjustments */
+@media only screen and (max-width: 768px) {
+    
+    /* Larger touch targets */
+    button, .btn, a.project-icon, .tooltipped {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 12px;
+    }
+    
+    /* Better spacing for mobile */
+    .card-action .flexcontainer {
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    
+    /* Toolbar adjustments */
+    #toolbars {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Palette adjustments */
+    #palette {
+        width: 100%;
+        max-width: none;
+        position: relative;
+    }
+    
+    /* Canvas adjustments */
+    #canvas {
+        touch-action: pan-x pan-y pinch-zoom;
+    }
+    
+    /* Modal improvements */
+    .modal {
+        max-width: 95%;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    /* Input fields */
+    input[type="text"],
+    input[type="number"],
+    textarea {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 12px;
+    }
+    
+    /* Block workspace */
+    .blocklyWorkspace {
+        touch-action: none;
+    }
+    
+    /* Scrollable areas */
+    .scrollable {
+        -webkit-overflow-scrolling: touch;
+        overflow-y: auto;
+    }
+}
+
+/* Small mobile devices */
+@media only screen and (max-width: 480px) {
+    
+    /* Even larger touch targets */
+    button, .btn {
+        min-height: 48px;
+        min-width: 48px;
+        font-size: 14px;
+    }
+    
+    /* Compact toolbar */
+    #buttoncontainerTOP,
+    #buttoncontainerBOTTOM {
+        padding: 4px;
+    }
+    
+    /* Stack elements vertically */
+    .flexcontainer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    /* Full-width cards */
+    .card {
+        margin: 8px 0;
+    }
+    
+    /* Simplified navigation */
+    nav {
+        height: auto;
+        min-height: 56px;
+    }
+}
+
+/* Landscape mobile */
+@media only screen and (max-height: 500px) and (orientation: landscape) {
+    
+    /* Compact header */
+    #toolbars {
+        height: 48px;
+    }
+    
+    /* Maximize workspace */
+    #palette {
+        max-height: calc(100vh - 48px);
+    }
+    
+    /* Hide non-essential elements */
+    .hide-on-landscape {
+        display: none !important;
+    }
+}
+
+/* Tablet adjustments */
+@media only screen and (min-width: 769px) and (max-width: 1024px) {
+    
+    /* Balanced layout */
+    #palette {
+        width: 30%;
+    }
+    
+    .canvasHolder {
+        width: 70%;
+    }
+    
+    /* Touch-friendly but not oversized */
+    button, .btn {
+        min-height: 40px;
+        min-width: 40px;
+    }
+}
+
+/* Touch device specific */
+@media (hover: none) and (pointer: coarse) {
+    
+    /* Remove hover effects */
+    .tooltipped:hover::after,
+    .tooltipped:hover::before {
+        display: none;
+    }
+    
+    /* Show tooltips on tap instead */
+    .tooltipped:active::after,
+    .tooltipped:active::before {
+        display: block;
+    }
+    
+    /* Larger click areas */
+    a, button, .clickable {
+        padding: 8px;
+    }
+    
+    /* Prevent accidental double-tap zoom */
+    * {
+        touch-action: manipulation;
+    }
+    
+    /* Allow specific gestures on canvas */
+    #canvas, .blocklyWorkspace {
+        touch-action: pan-x pan-y pinch-zoom;
+    }
+}
+
+/* iOS specific fixes */
+@supports (-webkit-touch-callout: none) {
+    
+    /* Fix iOS input zoom */
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+    
+    /* Fix iOS safe area */
+    body {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+    
+    /* Fix iOS scroll bounce */
+    .no-bounce {
+        overscroll-behavior: none;
+    }
+}
+
+/* Android specific fixes */
+@media screen and (-webkit-min-device-pixel-ratio: 0) and (min-resolution: .001dpcm) {
+    
+    /* Fix Android input focus */
+    input:focus, textarea:focus {
+        font-size: 16px;
+    }
+}
+
+/* Accessibility improvements for mobile */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High contrast mode for mobile */
+@media (prefers-contrast: high) {
+    button, .btn {
+        border: 2px solid currentColor;
+    }
+    
+    .card {
+        border: 1px solid #000;
+    }
+}
+
+/* Dark mode adjustments for mobile */
+@media (prefers-color-scheme: dark) {
+    @media only screen and (max-width: 768px) {
+        body {
+            background: #121212;
+            color: #e0e0e0;
+        }
+        
+        .card {
+            background: #1e1e1e;
+        }
+        
+        input, textarea {
+            background: #2a2a2a;
+            color: #e0e0e0;
+            border-color: #444;
+        }
+    }
+}
+
+/* Loading state for mobile */
+.mobile-loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+}
+
+/* Mobile-specific utilities */
+.mobile-only {
+    display: none;
+}
+
+@media only screen and (max-width: 768px) {
+    .mobile-only {
+        display: block;
+    }
+    
+    .desktop-only {
+        display: none !important;
+    }
+}
+
+/* Improve scrolling performance */
+.smooth-scroll {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+/* Better focus indicators for mobile */
+@media only screen and (max-width: 768px) {
+    *:focus {
+        outline: 3px solid #2196F3;
+        outline-offset: 2px;
+    }
+    
+    button:focus, .btn:focus {
+        box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3);
+    }
+}
