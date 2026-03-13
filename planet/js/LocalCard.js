@@ -61,6 +61,9 @@ class LocalCard {
                                     "Download project"
                                 )}" id="local-project-download-{ID}"><i class="material-icons">file_download</i></a> 
                                 <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_(
+                                    "Share on social media"
+                                )}" id="local-project-viral-share-{ID}"><i class="material-icons">ios_share</i></a> 
+                                <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_(
                                     "Merge with current project"
                                 )}" id="local-project-merge-{ID}"><i class="material-icons">merge_type</i></a> 
                                 <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_(
@@ -162,6 +165,17 @@ class LocalCard {
         // eslint-disable-next-line no-unused-vars
         frag.getElementById(`local-project-download-${this.id}`).addEventListener("click", evt => {
             this.download();
+        });
+
+        // set viral share button listener
+        // eslint-disable-next-line no-unused-vars
+        frag.getElementById(`local-project-viral-share-${this.id}`).addEventListener("click", evt => {
+            if (typeof window.viralLoops !== 'undefined') {
+                const projectTitle = this.ProjectData.ProjectName || 'Music Blocks Project';
+                const projectImage = this.ProjectData.ProjectImage;
+                const projectId = this.ProjectData.PublishedData ? this.id : null;
+                window.viralLoops.showShareModal(projectTitle, projectId, projectImage);
+            }
         });
 
         // set duplicate button listener
