@@ -2955,7 +2955,16 @@ class Activity {
             const IDLE_FPS = 1;
 
             let lastActivity = Date.now();
-            this.isAppIdle = false;
+            let isIdle = false;
+
+            document.addEventListener("visibilitychange", () => {
+                if (document.hidden) {
+                    createjs.Ticker.paused = true;
+                } else {
+                    createjs.Ticker.paused = false;
+                    resetIdleTimer();
+                }
+            });
 
             // Wake up function - restores full framerate
             const resetIdleTimer = () => {
@@ -2976,8 +2985,7 @@ class Activity {
             window.addEventListener("wheel", resetIdleTimer);
 
             // Periodic check for idle state
-            setInterval(() => {
-                // Check if music/code is playing
+            const idleCheck = () => {
                 const isMusicPlaying = this.logo?._alreadyRunning || false;
 
                 if (!isMusicPlaying && Date.now() - lastActivity > IDLE_THRESHOLD) {
@@ -2986,11 +2994,30 @@ class Activity {
                         createjs.Ticker.framerate = IDLE_FPS;
                         console.log("⚡ Idle mode: Throttling to 1 FPS to save battery");
                     }
-                } else if (this.isAppIdle && isMusicPlaying) {
-                    // Music started playing - wake up immediately
+                } else if (isIdle && isMusicPlaying) {
                     resetIdleTimer();
                 }
-            }, 1000);
+
+                setTimeout(idleCheck, 1000);
+            };
+
+            setTimeout(idleCheck, 1000);
+
+            // Expose activity instance for external checks
+            if (typeof window !== "undefined") {
+                window.activity = this;
+            }
+        };
+
+        /*
+         * Creates and renders error message containers with appropriate artwork.
+         * Some error messages have special artwork.
+         */
+        this._createErrorContainers = () => {
+            for (let i = 0; i < ERRORARTWORK.length; i++) {
+                const name = ERRORARTWORK[i];
+                this._makeErrorArtwork(name);
+            }
         };
 
         /**
@@ -7350,6 +7377,7 @@ class Activity {
 
             // Initialize Ticker with optimal framerate
             createjs.Ticker.framerate = 60;
+            createjs.Ticker.timingMode = createjs.Ticker.RAF;
 
             // ===== Idle Ticker Optimization =====
             // Throttle rendering when user is inactive and no music is playing
