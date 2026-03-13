@@ -15,11 +15,11 @@
 // scratch. -- Walter Bender, October 2014.
 
 /*
-   globals
+   global
 
-   _, ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON,
+   ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON,
    ActivityContext,
-   Blocks, Boundary, CARTESIAN, changeImage, closeWidgets,
+   Boundary, CARTESIAN, changeImage, closeWidgets,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
    DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
@@ -27,19 +27,22 @@
    getMacroExpansion, getOctaveRatio, getTemperament, transcribeMidi,
    GOHOMEBUTTON, GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
    hideDOMLabel, initBasicProtoBlocks, initPalettes,
-   INLINECOLLAPSIBLES, jQuery, JSEditor, LanguageBox, ThemeBox, Logo, MSGBLOCK,
+   INLINECOLLAPSIBLES, JSEditor, LanguageBox, ThemeBox, MSGBLOCK,
    NANERRORMSG, NOACTIONERRORMSG, NOBOXERRORMSG, NOINPUTERRORMSG,
    NOMICERRORMSG, NOSQRTERRORMSG, NOSTRINGERRORMSG, PALETTEFILLCOLORS,
    PALETTESTROKECOLORS, PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
    Palettes, PasteBox, PlanetInterface, platform, platformColor,
    piemenuKey, POLAR, preparePluginExports, processMacroData,
-   processPluginData, processRawPluginData, require, SaveInterface,
+   processPluginData, processRawPluginData, SaveInterface,
    SHOWBLOCKSBUTTON, SMALLERBUTTON, SMALLERDISABLEBUTTON, SOPRANO,
    SPECIALINPUTS, STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
-   TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, Turtles, TURTLESVG,
+   TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, TURTLESVG,
    updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_F,
    SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
-   MUSICALMODES, waitForReadiness
+   MUSICALMODES, waitForReadiness, body, i18next, wheelnav, slicePath,
+   base64Encode, disableHorizScrollIcon,
+   toFraction, CARTESIANBUTTON, piemenuGrid,
+   SELECTBUTTON, CLEARBUTTON, Midi, ABCJS
  */
 
 /*
@@ -211,6 +214,7 @@ const doAnalyzeProject = function () {
 /**
  * Represents an activity in the application.
  */
+/* eslint-disable-next-line no-redeclare */
 class Activity {
     /**
      * Creates an Activity instance.
@@ -334,7 +338,7 @@ class Activity {
         // When true, the stage needs to be redrawn on the next animation frame
         this.stageDirty = false;
 
-        this.themes = ["light", "dark"];
+        this.themes = ["light", "dark", "highcontrast"];
         try {
             // Detect system theme preference (using same logic as ThemeBox)
             const getSystemTheme = () => {
@@ -3398,7 +3402,7 @@ class Activity {
             const protoName = protoblk.name;
 
             // eslint-disable-next-line no-prototype-builtins
-            if (this.blocks.protoBlockDict.hasOwnProperty(protoName)) {
+            if (Object.prototype.hasOwnProperty.call(this.blocks.protoBlockDict, protoName)) {
                 this.palettes.dict[paletteName].makeBlockFromSearch(
                     protoblk,
                     protoName,
@@ -5074,7 +5078,7 @@ class Activity {
 
             tune.lines?.forEach(line => {
                 line.staff?.forEach((staff, staffIndex) => {
-                    if (!organizeBlock.hasOwnProperty(staffIndex)) {
+                    if (!Object.prototype.hasOwnProperty.call(organizeBlock, staffIndex)) {
                         organizeBlock[staffIndex] = {
                             arrangedBlocks: []
                         };
@@ -5085,7 +5089,7 @@ class Activity {
             });
             for (const lineId in organizeBlock) {
                 organizeBlock[lineId].arrangedBlocks?.forEach(staff => {
-                    if (!staffBlocksMap.hasOwnProperty(lineId)) {
+                    if (!Object.prototype.hasOwnProperty.call(staffBlocksMap, lineId)) {
                         staffBlocksMap[lineId] = {
                             meterNum: staff?.meter?.value[0]?.num || 4,
                             meterDen: staff?.meter?.value[0]?.den || 4,
@@ -6788,7 +6792,7 @@ class Activity {
             const protoName = protoblk.name;
 
             // eslint-disable-next-line no-prototype-builtins
-            if (this.blocks.protoBlockDict.hasOwnProperty(protoName)) {
+            if (Object.prototype.hasOwnProperty.call(that.blocks.protoBlockDict, protoName)) {
                 this.palettes.dict[paletteName].makeBlockFromSearch(
                     protoblk,
                     protoName,
