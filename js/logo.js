@@ -1117,12 +1117,16 @@ class Logo {
      * @returns {void}
      */
     runLogoCommands(startHere, env) {
-        this._prematureRestart = this._alreadyRunning;
+        // Check if we're already running BEFORE resetting
         if (this._alreadyRunning && this._runningBlock !== null) {
             this._ignoringBlock = this._runningBlock;
         } else {
             this._ignoringBlock = null;
         }
+
+        // NOW reset the flags for the new run
+        this._alreadyRunning = false;
+        this._prematureRestart = false;
 
         if (this._lastNoteTimeout != null) {
             clearTimeout(this._lastNoteTimeout);
@@ -1887,6 +1891,13 @@ class Logo {
                     queueStart === 0 &&
                     tur.singer.justCounting.length === 0
                 ) {
+                    if (!logo._prematureRestart) {
+                        // Add delay before automatically stopping (don't stop immediately)
+                        const stopBtn = document.getElementById("stop");
+                        if (stopBtn && typeof stopBtn.click === "function") {
+                            stopBtn.click(); // Simulate the stop button click
+                        }
+                    }
                     if (logo.runningLilypond) {
                         if (logo.collectingStats) {
                             // console.debug("stats collection completed");

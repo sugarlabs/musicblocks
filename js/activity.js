@@ -1670,6 +1670,16 @@ class Activity {
             this.blocks.activeBlock = null;
             hideDOMLabel();
 
+            // If music is currently playing, stop it first
+            if (this.turtles.running()) {
+                this.logo.doStopTurtles();
+            }
+
+            // Reset turtle running state before starting new run
+            for (let i = 0; i < this.turtles.turtleList.length; i++) {
+                this.turtles.getTurtle(i).running = false;
+            }
+
             const currentDelay = this.logo.turtleDelay;
             this.logo.turtleDelay = 0;
             this.logo.synth.resume();
@@ -1692,18 +1702,29 @@ class Activity {
                 }
 
                 this.logo.runLogoCommands(null, env);
+                const stopBtn = document.getElementById("stop");
+                if (stopBtn) {
+                    stopBtn.style.display = "inline-block";
+                    stopBtn.style.color = "#ea174c";
+                }
             } else {
                 if (currentDelay !== 0) {
                     // Keep playing at full speed.
                     this.logo.step();
                 } else {
                     // Stop and restart.
-                    document.getElementById("stop").style.color = "white";
+                    const stopBtn = document.getElementById("stop");
+                    if (stopBtn) {
+                        stopBtn.style.color = "white";
+                    }
                     this.logo.doStopTurtles();
 
                     const that = this;
                     setTimeout(() => {
-                        document.getElementById("stop").style.color = "#ea174c";
+                        const stopBtnDelay = document.getElementById("stop");
+                        if (stopBtnDelay) {
+                            stopBtnDelay.style.color = "#ea174c";
+                        }
                         that.logo.runLogoCommands(null, env);
                     }, 500);
                 }
@@ -2144,6 +2165,7 @@ class Activity {
             }
 
             this.logo.doStopTurtles();
+            document.getElementById("stop").style.display = "none";
 
             const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
@@ -7319,6 +7341,11 @@ class Activity {
          * Inits everything. The main function.
          */
         this.init = async () => {
+            // Hide stop button on startup
+            const stopBtn = document.getElementById("stop");
+            if (stopBtn) {
+                stopBtn.style.display = "none";
+            }
             this._clientWidth = document.body.clientWidth;
             this._clientHeight = document.body.clientHeight;
             this._innerWidth = window.innerWidth;
