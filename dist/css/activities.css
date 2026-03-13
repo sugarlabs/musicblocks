@@ -445,20 +445,22 @@ table {
   box-shadow: 0 1px 10px #8080808f;
 }
 #right-arrow {
-  left: 410px;
+  right: 25px;
   background: url(../header-icons/right-arrow.png);
 }
 #left-arrow {
-  left: 5px;
+  left: 10px;
   background: url(../header-icons/left-arrow.png);
 }
 #left-arrow,
 #right-arrow {
   position: absolute;
-  top: 195px;
+  top: 50%;
+  transform: translateY(-50%);
   background-size: 40px;
   height: 40px;
   width: 40px;
+  z-index: 2000;
 }
 .hover:hover {
   cursor: pointer;
