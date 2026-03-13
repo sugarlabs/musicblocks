@@ -67,7 +67,7 @@ class GIFAnimator {
             img.style.display = "none";
             document.body.appendChild(img);
 
-            const gifPlayer = new SuperGif({ gif: img });
+            const gifPlayer = new window.SuperGif({ gif: img });
             await new Promise(resolve => gifPlayer.load(resolve));
 
             const totalFrames = gifPlayer.get_length();

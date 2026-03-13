@@ -41,7 +41,7 @@ class StatsWindow {
         // This saves ~3-5 MB of heap memory when the statistics widget
         // is never opened (the common case).
         // If Chart is already loaded (e.g. previously used), call synchronously.
-        if (typeof Chart !== "undefined") {
+        if (typeof window.Chart !== "undefined") {
             this.doAnalytics();
         } else {
             this._ensureChartLoaded()
@@ -49,7 +49,6 @@ class StatsWindow {
                     this.doAnalytics();
                 })
                 .catch(err => {
-                    // eslint-disable-next-line no-console
                     console.error("Failed to load Chart.js:", err);
                 });
         }
@@ -73,13 +72,12 @@ class StatsWindow {
      * @returns {Promise<void>}
      */
     _ensureChartLoaded() {
-        if (typeof Chart !== "undefined") {
+        if (typeof window.Chart !== "undefined") {
             return Promise.resolve();
         }
         return new Promise((resolve, reject) => {
-            // eslint-disable-next-line no-undef
             require(["Chart"], () => {
-                if (typeof Chart !== "undefined") {
+                if (typeof window.Chart !== "undefined") {
                     resolve();
                 } else {
                     reject(new Error("Chart global not found after loading"));
@@ -120,7 +118,7 @@ class StatsWindow {
             document.body.style.cursor = "default";
         };
         const options = getChartOptions(__callback);
-        myRadarChart = new Chart(ctx).Radar(data, options);
+        myRadarChart = new window.Chart(ctx).Radar(data, options);
 
         this.jsonObject = document.createElement("ul");
         this.jsonObject.style.float = "left";
@@ -138,14 +136,14 @@ class StatsWindow {
         this.jsonObject.innerHTML = `<li>duples: ${stats["duples"]}</li>
             <li>triplets: ${stats["triplets"]}</li>
             <li>quintuplets: ${stats["quintuplets"]}</li>
-            <li style=\"white-space: pre-wrap; width: 150px\">pitch names: ${Array.from(
+            <li style="white-space: pre-wrap; width: 150px">pitch names: ${Array.from(
                 stats["pitchNames"]
             ).join(", ")}</li>
             <li>number of notes: ${stats["numberOfNotes"]}</li>
-            <li style=\"white-space: pre-wrap; width: 150px\">lowest note: ${
+            <li style="white-space: pre-wrap; width: 150px">lowest note: ${
                 stats["lowestNote"][0]
             },${lowHertz.toFixed(0)}Hz</li>
-            <li style=\"white-space: pre-wrap; width: 150px\">highest note: ${
+            <li style="white-space: pre-wrap; width: 150px">highest note: ${
                 stats["highestNote"][0]
             },${highHertz.toFixed(0)}Hz</li>
             <li>rests used: ${stats["rests"]}</li>
