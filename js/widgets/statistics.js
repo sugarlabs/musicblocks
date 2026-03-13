@@ -59,9 +59,9 @@ class StatsWindow {
             if (this.widgetWindow.isMaximized()) {
                 this.widgetWindow.getWidgetBody().style.display = "flex";
                 this.widgetWindow.getWidgetBody().style.justifyContent = "space-between";
-                this.widgetWindow.getWidgetBody().style.padding = "0 2vw";
+                this.widgetWindow.getWidgetBody().style.padding = "0px 2vw";
             } else {
-                this.widgetWindow.getWidgetBody().style.padding = "0 0";
+                this.widgetWindow.getWidgetBody().style.padding = "0px";
             }
             this.doAnalytics();
         };
