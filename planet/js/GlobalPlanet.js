@@ -12,7 +12,7 @@
 /*
    global
 
-   _, GlobalTag, GlobalCard, jQuery, currentUserScrollPos:true,
+   GlobalTag, GlobalCard, currentUserScrollPos:true,
    maxScrollPos:true, ProjectViewer, debounce
 */
 /*
@@ -401,7 +401,7 @@ class GlobalPlanet {
     }
 
     renderSingleProject(id) {
-        if (this.cache.hasOwnProperty(id)) {
+        if (Object.prototype.hasOwnProperty.call(this.cache, id)) {
             const g = new GlobalCard(this.Planet);
             g.init(id);
             g.render();
@@ -541,7 +541,6 @@ class GlobalPlanet {
                 .getElementById("globalcontents")
                 .insertAdjacentHTML("afterbegin", this.offlineHTML);
         } else {
-            // eslint-disable-next-line no-unused-vars
             jQuery("#sort-select").material_select(evt => {
                 this.sortBy = document.getElementById("sort-select").value;
                 this.refreshProjects();
@@ -579,7 +578,6 @@ class GlobalPlanet {
 
             this.initTagList();
 
-            // eslint-disable-next-line no-unused-vars
             document.getElementById("load-more-projects").addEventListener("click", evt => {
                 if (this.loadButtonShown) {
                     this.loadMoreProjects();
@@ -588,7 +586,6 @@ class GlobalPlanet {
 
             const debouncedfunction = debounce(this.search.bind(this), 250);
 
-            // eslint-disable-next-line no-unused-vars
             document.getElementById("global-search").addEventListener("input", evt => {
                 this.searchString = document.getElementById("global-search").value;
                 debouncedfunction();
@@ -599,7 +596,6 @@ class GlobalPlanet {
                 debouncedfunction();
             });
 
-            // eslint-disable-next-line no-unused-vars
             document.getElementById("search-close").addEventListener("click", evt => {
                 document.getElementById("global-search").value = "";
                 this.searchString = "";
