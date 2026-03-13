@@ -14,12 +14,12 @@
 
 @import url("play-only-mode.css");
 
-*:focus:not(:focus-visible) {
+:focus:not(:focus-visible) {
   outline: none;
 }
 
-*:focus-visible {
-  outline: 2px solid #0066FF !important;
+:focus-visible {
+  outline: 2px solid #0066ff;
   outline-offset: 2px;
 }
 
@@ -72,7 +72,7 @@ body:not(.dark) #helpfulSearchDiv {
   line-height: normal;
   font-size: 24px;
   text-align: left;
-  color: #0066FF;
+  color: #0066ff;
 }
 
 #confirmation-message {
@@ -96,7 +96,7 @@ body:not(.dark) #helpfulSearchDiv {
 }
 
 .modal-title {
-  color: #0066FF;
+  color: #0066ff;
   font-size: 24px;
   margin: 0 0 16px 0;
 }
@@ -118,7 +118,7 @@ body:not(.dark) #helpfulSearchDiv {
   padding: 8px 16px;
   font-weight: bold;
   cursor: pointer;
-  background-color: #0066FF;
+  background-color: #0066ff;
   color: white;
   margin-right: 16px;
   transition: background-color 0.2s ease;
@@ -279,7 +279,7 @@ body:not(.dark) #helpfulSearchDiv {
   z-index: 10;
   display: flex;
   gap: 10px;
-  background: #2196F3;
+  background: #2196f3;
   margin: 0;
   padding: 5px;
   border-bottom: 1px solid #d9d9d9;
@@ -313,11 +313,9 @@ body:not(.dark) #helpfulSearchDiv {
   cursor: pointer;
 }
 
-
 .material-icons.md-48 {
   font-size: 32px;
 }
-
 
 .hidden {
   display: none;
@@ -2038,8 +2036,8 @@ table {
 }
 
 .color-change {
-  fill: #033CD2;
-  stroke: #78E600;
+  fill: #033cd2;
+  stroke: #78e600;
   stroke-width: 3;
 }
 
@@ -2048,7 +2046,7 @@ table {
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #1E88E5;
+  background-color: #1e88e5;
   color: white;
   padding: 15px 20px;
   border-radius: 8px;
@@ -2060,8 +2058,6 @@ table {
   min-width: 250px;
   max-width: 80%;
 }
-
-
 
 .chatInterface {
   display: flex;
@@ -2110,13 +2106,12 @@ table {
 
 .message-container.user {
   align-self: flex-end;
-  background-color: #DCF8C6;
+  background-color: #dcf8c6;
 }
-
 
 .lego-brick {
   display: inline-block;
-  background-color: #FF0000;
+  background-color: #ff0000;
   border: 1px solid #880000;
   margin: 2px;
 }
