@@ -343,4 +343,3 @@ remix projects created by other Music Blocks users. Use of the Planet
 is anonymous and not required in order to enjoy Music Blocks.
 
 Have fun, play hard, and learn.
-

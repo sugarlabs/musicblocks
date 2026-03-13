@@ -32,36 +32,36 @@ jobs:
                 label: 'bug fix',
                 color: 'D73A4A',
                 description: 'Fixes a bug or incorrect behavior',
-                displayName: '🐛 Bug Fix',
-                pattern: /-\s*\[x\]\s*🐛\s*Bug Fix/i,
+                displayName: 'Bug Fix',
+                pattern: /-\s*\[x\]\s*Bug Fix/i,
               },
               {
                 label: 'feature',
                 color: '9333EA',
                 description: 'Adds new functionality',
-                displayName: '✨ Feature',
-                pattern: /-\s*\[x\]\s*✨\s*Feature/i,
+                displayName: 'Feature',
+                pattern: /-\s*\[x\]\s*Feature/i,
               },
               {
                 label: 'performance',
                 color: 'F97316',
                 description: 'Improves performance (load time, memory, rendering)',
-                displayName: '⚡ Performance',
-                pattern: /-\s*\[x\]\s*⚡\s*Performance/i,
+                displayName: 'Performance',
+                pattern: /-\s*\[x\]\s*Performance/i,
               },
               {
                 label: 'tests',
                 color: '3B82F6',
                 description: 'Adds or updates test coverage',
-                displayName: '🧪 Tests',
-                pattern: /-\s*\[x\]\s*🧪\s*Tests/i,
+                displayName: 'Tests',
+                pattern: /-\s*\[x\]\s*Tests/i,
               },
               {
                 label: 'documentation',
                 color: '10B981',
                 description: 'Updates to docs, comments, or README',
-                displayName: '📝 Documentation',
-                pattern: /-\s*\[x\]\s*📝\s*Documentation/i,
+                displayName: 'Documentation',
+                pattern: /-\s*\[x\]\s*Documentation/i,
               },
             ];
 
@@ -71,20 +71,20 @@ jobs:
             // --- Step 1: Fail CI if no category is selected ---
             if (checkedCategories.length === 0) {
               const message = [
-                '## ❌ PR Category Required',
+                '## PR Category Required',
                 '',
                 'This pull request does not have any **PR Category** selected.',
                 'Please edit your PR description and check **at least one** category checkbox:',
                 '',
                 '| Category | Description |',
                 '|----------|-------------|',
-                '| 🐛 Bug Fix | Fixes a bug or incorrect behavior |',
-                '| ✨ Feature | Adds new functionality |',
-                '| ⚡ Performance | Improves performance |',
-                '| 🧪 Tests | Adds or updates test coverage |',
-                '| 📝 Documentation | Updates to docs, comments, or README |',
+                '| Bug Fix | Fixes a bug or incorrect behavior |',
+                '| Feature | Adds new functionality |',
+                '| Performance | Improves performance |',
+                '| Tests | Adds or updates test coverage |',
+                '| Documentation | Updates to docs, comments, or README |',
                 '',
-                'Example: Change `- [ ] 🐛 Bug Fix` to `- [x] 🐛 Bug Fix`',
+                'Example: Change `- [ ] Bug Fix` to `- [x] Bug Fix`',
                 '',
                 '> **Tip:** You can select multiple categories if your PR spans several areas.',
               ].join('\n');
@@ -111,9 +111,9 @@ jobs:
                     color: cat.color,
                     description: cat.description,
                   });
-                  core.info(`🎨 Created label: "${cat.label}" with color #${cat.color}`);
+                  core.info(`Created label: "${cat.label}" with color #${cat.color}`);
                 } catch (error) {
-                  core.warning(`⚠️ Could not create label "${cat.label}". Error: ${error.message}`);
+                  core.warning(`Could not create label "${cat.label}". Error: ${error.message}`);
                 }
               }
             }
@@ -140,9 +140,9 @@ jobs:
                     issue_number: prNumber,
                     labels: [label],
                   });
-                  core.info(`🏷️ Added label: "${label}"`);
+                  core.info(`Added label: "${label}"`);
                 } catch (error) {
-                  core.warning(`⚠️ Could not add label "${label}". Error: ${error.message}`);
+                  core.warning(`Could not add label "${label}". Error: ${error.message}`);
                 }
               }
             }
@@ -157,13 +157,13 @@ jobs:
                     issue_number: prNumber,
                     name: label,
                   });
-                  core.info(`🗑️ Removed label: "${label}"`);
+                  core.info(`Removed label: "${label}"`);
                 } catch (error) {
-                  core.warning(`⚠️ Could not remove label "${label}". Error: ${error.message}`);
+                  core.warning(`Could not remove label "${label}". Error: ${error.message}`);
                 }
               }
             }
 
             const selected = checkedCategories.map(c => c.displayName).join(', ');
-            core.info(`✅ PR categories selected: ${selected}`);
-            core.info(`🏷️ Labels synced: ${labelsToAdd.join(', ')}`);
+            core.info(`PR categories selected: ${selected}`);
+            core.info(`Labels synced: ${labelsToAdd.join(', ')}`);

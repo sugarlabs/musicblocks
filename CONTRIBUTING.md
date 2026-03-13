@@ -56,6 +56,56 @@ contributions](https://github.com/sugarlabs/sugar-docs/blob/master/src/contribut
 
 Follow [AI guidelines for Sugar Labs](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md#ai-guidelines-for-sugar-labs)
 
+AI-assisted development tools (such as GitHub Copilot, ChatGPT, Cursor, Claude,
+or similar systems) may be used to support contributions. However, contributors
+remain fully responsible for any code they submit.
+
+When using AI tools, please follow these guidelines:
+
+- **Understand the code** - Do not submit code that you do not fully understand.
+  Contributors must be able to explain and maintain their changes.
+- **Review carefully** - AI-generated code can contain errors, security issues,
+  or incorrect assumptions. Always review outputs critically.
+- **Follow project conventions** - Ensure that generated code matches the existing
+  coding style, architecture, and design patterns used in the repository.
+- **Test thoroughly** - AI-assisted changes must pass all project checks. Run
+  linting, formatting, and test commands before submitting.
+- **Avoid large blind changes** - Large-scale automated modifications should be
+  reviewed incrementally and preferably split into smaller, focused pull requests.
+- **Licensing awareness** - Ensure that generated content does not introduce
+  incompatible licensed material or copied external code without attribution.
+- **Architecture awareness** - Prefer small, incremental AI-assisted changes that
+  align with existing architecture rather than large structural rewrites.
+
+Mentioning AI assistance in your pull request description is optional but encouraged
+for transparency.
+
+#### Using AI/LLM tools for code changes
+
+AI tools such as ChatGPT, Copilot, or other LLMs may assist contributors
+in understanding the codebase or drafting code changes. However,
+contributors remain fully responsible for the code they submit.
+
+When using AI tools:
+
+- Ensure you understand the generated code before including it in a pull request.
+- Verify that the code follows project style and architecture.
+- Avoid submitting large AI-generated patches without manual review.
+- Run linting, formatting, and tests before submitting changes.
+- Ensure the generated code does not introduce licensing issues.
+
+#### AI-assisted pull requests
+
+If AI tools were used while preparing a pull request:
+
+- Clearly review and test all generated changes.
+- Keep pull requests small and focused.
+- Avoid submitting unrelated modifications suggested by AI.
+- Be prepared to explain the reasoning behind the changes during review.
+
+AI tools should assist development, but they should not replace
+understanding of the codebase.
+
 ### Before You Push
 
 Run these commands locally before submitting a PR:
@@ -66,9 +116,49 @@ npx prettier --check .    # Formatting
 npm test                  # Jest
 ```
 
-NOTE: Only run ```prettier``` on the files you have modified.
+NOTE: Only run `prettier` on the files you have modified.
 
 If formatting fails, run `npx prettier --write .` to fix it.
+
+### Creating Pull Requests
+
+Follow these steps when contributing:
+
+1.  **Create a new branch**
+
+    ```
+    git checkout -b docs/issue-number-short-description
+    ```
+
+2.  Make your changes following project guidelines.
+
+3.  Run required checks before pushing:
+
+    ```
+    npm run lint
+    npx prettier --check .
+    npm test
+    ```
+
+4.  Commit with clear, descriptive messages:
+
+    ```
+    git commit -m "docs: add AI contribution guidelines (Related to #XXXX)"
+    ```
+
+5.  Push your branch:
+
+    ```
+    git push origin branch-name
+    ```
+
+6.  **Open a Pull Request:**
+    - Use a clear and descriptive title.
+    - Link the related issue using `Related to #XXXX` or `Partially addresses #XXXX`.
+    - Explain what changed and why.
+    - Keep pull requests focused on a single topic or feature.
+
+7.  Respond to review feedback and update your branch as needed.
 
 ### After your PR is merged
 
@@ -200,4 +290,3 @@ anything. Begin to fix the problem, test, make your commits, push your
 commits, then make a pull request. Mention an issue number in the pull
 request, but not the commit message. These practices allow the
 competition of ideas (Sugar Labs is a meritocracy)._
-
