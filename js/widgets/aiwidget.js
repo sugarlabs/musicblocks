@@ -18,6 +18,7 @@
 */
 
 /* exported Abhijeet Singh */
+
 /**
  * Represents a AI Widget.
  * @constructor
@@ -28,6 +29,7 @@ function AIWidget() {
     const SAMPLEHEIGHT = 400;
     // Don't include natural when construcing the note name...
     const EXPORTACCIDENTALNAMES = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP];
+
     // ...but display it in the selector.
     const ACCIDENTALNAMES = [DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP];
     const SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti", "do"];
@@ -720,7 +722,8 @@ function AIWidget() {
      * @private
      * @returns {void}
      */
-    this.__save = function () {
+    this.__save = async function () {
+        await ensureABCJS();
         const tunebook = new ABCJS.parseOnly(abcNotationSong);
 
         tunebook.forEach(tune => {
@@ -873,7 +876,8 @@ function AIWidget() {
      * Plays the reference pitch based on the current sample's pitch, accidental, and octave.
      * @returns {void}
      */
-    this._playABCSong = function () {
+    this._playABCSong = async function () {
+        await window.ensureABCJS();
         const abc = abcNotationSong;
         const stopAudioButton = document.querySelector(".stop-audio");
 

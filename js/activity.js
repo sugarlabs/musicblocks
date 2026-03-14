@@ -51,6 +51,7 @@
    Activity, LEADING, _THIS_IS_MUSIC_BLOCKS_, _THIS_IS_TURTLE_BLOCKS_,
    globalActivity, hideArrows, doAnalyzeProject
  */
+
 const LEADING = 0;
 const BLOCKSCALES = [1, 1.5, 2, 3, 4];
 const _THIS_IS_MUSIC_BLOCKS_ = true;
@@ -7732,11 +7733,12 @@ class Activity {
                 };
 
                 // Music Block Parser from abc to MB
-                abcReader.onload = event => {
+                abcReader.onload = async event => {
                     //get the abc data and replace the / so that the block does not break
                     let abcData = event.target.result;
                     abcData = abcData.replace(/\\/g, "");
 
+                    await ensureABCJS();
                     const tunebook = new ABCJS.parseOnly(abcData);
                     // eslint-disable-next-line no-console
                     console.log(tunebook);
@@ -8286,3 +8288,8 @@ define(["domReady!"].concat(MYDEFINES), doc => {
     };
     initialize();
 });
+
+// Export Activity for Node/Jest tests
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Activity;
+}
