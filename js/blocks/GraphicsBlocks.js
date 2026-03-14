@@ -97,6 +97,12 @@ function setupGraphicsBlocks(activity) {
          * @returns {number} - The heading value.
          */
         arg(logo, turtle, blk) {
+            // Check if blockList exists and blk is valid
+            if (!activity.blocks?.blockList || blk == null || !(blk in activity.blocks.blockList)) {
+                return activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle))
+                    .orientation;
+            }
+
             const connections = activity.blocks.blockList[blk]?.connections;
             const parentId = connections?.[0];
             if (
@@ -182,6 +188,13 @@ function setupGraphicsBlocks(activity) {
          * @returns {number} - The Y-coordinate value.
          */
         arg(logo, turtle, blk) {
+            // Check if blockList exists and blk is valid
+            if (!activity.blocks?.blockList || blk == null || !(blk in activity.blocks.blockList)) {
+                return activity.turtles.screenY2turtleY(
+                    activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).container.y
+                );
+            }
+
             const connections = activity.blocks.blockList[blk]?.connections;
             const parentId = connections?.[0];
             if (
@@ -268,6 +281,13 @@ function setupGraphicsBlocks(activity) {
          * @returns {number} - The X-coordinate value.
          */
         arg(logo, turtle, blk) {
+            // Check if blockList exists and blk is valid
+            if (!activity.blocks?.blockList || blk == null || !(blk in activity.blocks.blockList)) {
+                return activity.turtles.screenX2turtleX(
+                    activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).container.x
+                );
+            }
+
             const connections = activity.blocks.blockList[blk]?.connections;
             const parentId = connections?.[0];
             if (

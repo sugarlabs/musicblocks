@@ -51,11 +51,10 @@
  * for the music related actions of the Turtle, including playing them while using utility functions
  * in utils/musicutils.js.
  *
- * @todo move music related states from logo.js to here eventually.
- * As of now, the state variables are completely present in logo.js. To ensure modularity and
- * independence of components, Logo should contain members only related to execution of blocks while
- * the logic of execution of blocks should be present in respective files in blocks/ directory,
- * which should eventually use members of this file and turtle-painter.js to proceed.
+ * @done move music related states from logo.js to here.
+ * Music widget state variables (pitchDrumMatrix, arpeggio, rhythmRuler, timbre, etc.) have been successfully migrated from logo.js.
+ * Logo now delegates to this class for these properties via getter/setter methods for backward compatibility.
+ * Components should use members of this file and turtle-painter.js for better modularity.
  *
  * Private methods' names begin with underscore '_".
  * Unused methods' names begin with double underscore '__'.
@@ -211,8 +210,253 @@ class Singer {
 
         this.inverted = false; // tracks if the notes being played are inverted
 
+        // Music widget state variables moved from logo.js for better modularity
+        this._pitchDrumMatrix = null;
+        this._arpeggio = null;
+        this._rhythmRuler = null;
+        this._timbre = null;
+        this._pitchStaircase = null;
+        this._temperament = null;
+        this._tempo = null;
+        this._pitchSlider = null;
+        this._musicKeyboard = null;
+        this._modeWidget = null;
+        this._Oscilloscope = null;
+        this._oscilloscopeTurtles = [];
+        this._meterWidget = null;
+        this._statusMatrix = null;
+        this._legobricks = null;
+
+        // Related widget state flags
+        this.showPitchDrumMatrix = false;
+        this.inPitchDrumMatrix = false;
+        this.inRhythmRuler = false;
+        this.rhythmRulerMeasure = null;
+        this.inPitchStaircase = false;
+        this.inTempo = false;
+        this.inPitchSlider = false;
+        this.temperamentSelected = [];
+        this.customTemperamentDefined = false;
+        this.pitchBlocks = [];
+        this.drumBlocks = [];
+
         // Voice Manager: Track active audio sources for proper cleanup
         this.activeVoices = new Set();
+    }
+
+    // ========= Setters, Getters =============================================
+
+    // Music widget state getters/setters for backward compatibility
+    // These properties were moved from logo.js to improve modularity
+
+    /**
+     * @param {Object} pitchDrumMatrix - Pitch drum matrix widget
+     */
+    set pitchDrumMatrix(pitchDrumMatrix) {
+        this._pitchDrumMatrix = pitchDrumMatrix;
+    }
+
+    /**
+     * @returns {Object} Pitch drum matrix widget
+     */
+    get pitchDrumMatrix() {
+        return this._pitchDrumMatrix;
+    }
+
+    /**
+     * @param {Object} arpeggio - Arpeggio widget
+     */
+    set arpeggio(arpeggio) {
+        this._arpeggio = arpeggio;
+    }
+
+    /**
+     * @returns {Object} Arpeggio widget
+     */
+    get arpeggio() {
+        return this._arpeggio;
+    }
+
+    /**
+     * @param {Object} rhythmRuler - Rhythm ruler widget
+     */
+    set rhythmRuler(rhythmRuler) {
+        this._rhythmRuler = rhythmRuler;
+    }
+
+    /**
+     * @returns {Object} Rhythm ruler widget
+     */
+    get rhythmRuler() {
+        return this._rhythmRuler;
+    }
+
+    /**
+     * @param {Object} timbre - Timbre widget
+     */
+    set timbre(timbre) {
+        this._timbre = timbre;
+    }
+
+    /**
+     * @returns {Object} Timbre widget
+     */
+    get timbre() {
+        return this._timbre;
+    }
+
+    /**
+     * @param {Object} pitchStaircase - Pitch staircase widget
+     */
+    set pitchStaircase(pitchStaircase) {
+        this._pitchStaircase = pitchStaircase;
+    }
+
+    /**
+     * @returns {Object} Pitch staircase widget
+     */
+    get pitchStaircase() {
+        return this._pitchStaircase;
+    }
+
+    /**
+     * @param {Object} temperament - Temperament widget
+     */
+    set temperament(temperament) {
+        this._temperament = temperament;
+    }
+
+    /**
+     * @returns {Object} Temperament widget
+     */
+    get temperament() {
+        return this._temperament;
+    }
+
+    /**
+     * @param {Object} tempo - Tempo widget
+     */
+    set tempo(tempo) {
+        this._tempo = tempo;
+    }
+
+    /**
+     * @returns {Object} Tempo widget
+     */
+    get tempo() {
+        return this._tempo;
+    }
+
+    /**
+     * @param {Object} pitchSlider - Pitch slider widget
+     */
+    set pitchSlider(pitchSlider) {
+        this._pitchSlider = pitchSlider;
+    }
+
+    /**
+     * @returns {Object} Pitch slider widget
+     */
+    get pitchSlider() {
+        return this._pitchSlider;
+    }
+
+    /**
+     * @param {Object} musicKeyboard - Music keyboard widget
+     */
+    set musicKeyboard(musicKeyboard) {
+        this._musicKeyboard = musicKeyboard;
+    }
+
+    /**
+     * @returns {Object} Music keyboard widget
+     */
+    get musicKeyboard() {
+        return this._musicKeyboard;
+    }
+
+    /**
+     * @param {Object} modeWidget - Mode widget
+     */
+    set modeWidget(modeWidget) {
+        this._modeWidget = modeWidget;
+    }
+
+    /**
+     * @returns {Object} Mode widget
+     */
+    get modeWidget() {
+        return this._modeWidget;
+    }
+
+    /**
+     * @param {Object} Oscilloscope - Oscilloscope widget
+     */
+    set Oscilloscope(Oscilloscope) {
+        this._Oscilloscope = Oscilloscope;
+    }
+
+    /**
+     * @returns {Object} Oscilloscope widget
+     */
+    get Oscilloscope() {
+        return this._Oscilloscope;
+    }
+
+    /**
+     * @param {Array} oscilloscopeTurtles - Oscilloscope turtles list
+     */
+    set oscilloscopeTurtles(oscilloscopeTurtles) {
+        this._oscilloscopeTurtles = oscilloscopeTurtles;
+    }
+
+    /**
+     * @returns {Array} Oscilloscope turtles list
+     */
+    get oscilloscopeTurtles() {
+        return this._oscilloscopeTurtles;
+    }
+
+    /**
+     * @param {Object} meterWidget - Meter widget
+     */
+    set meterWidget(meterWidget) {
+        this._meterWidget = meterWidget;
+    }
+
+    /**
+     * @returns {Object} Meter widget
+     */
+    get meterWidget() {
+        return this._meterWidget;
+    }
+
+    /**
+     * @param {Object} statusMatrix - Status matrix widget
+     */
+    set statusMatrix(statusMatrix) {
+        this._statusMatrix = statusMatrix;
+    }
+
+    /**
+     * @returns {Object} Status matrix widget
+     */
+    get statusMatrix() {
+        return this._statusMatrix;
+    }
+
+    /**
+     * @param {Object} legobricks - Legobricks widget
+     */
+    set legobricks(legobricks) {
+        this._legobricks = legobricks;
+    }
+
+    /**
+     * @returns {Object} Legobricks widget
+     */
+    get legobricks() {
+        return this._legobricks;
     }
 
     /**
@@ -863,7 +1107,7 @@ class Singer {
             for (let i = 0; i < duplicateFactor; i++) {
                 // Apply transpositions
                 const transposition = 2 * delta + tur.singer.transposition;
-                const alen = tur.singer.arpeggio.length;
+                const alen = tur.singer.arpeggio ? tur.singer.arpeggio.length : 0;
                 let atrans = transposition + cents;
                 if (alen > 0 && i < alen) {
                     atrans += tur.singer.arpeggio[i];
@@ -902,7 +1146,7 @@ class Singer {
             for (let i = 0; i < duplicateFactor; i++) {
                 // Apply transpositions
                 const transposition = 2 * delta + tur.singer.transposition;
-                const alen = tur.singer.arpeggio.length;
+                const alen = tur.singer.arpeggio ? tur.singer.arpeggio.length : 0;
                 let atrans = transposition + cents;
                 if (alen > 0 && i < alen) {
                     atrans += tur.singer.arpeggio[i];
@@ -965,7 +1209,7 @@ class Singer {
             for (let i = 0; i < duplicateFactor; i++) {
                 // Apply transpositions
                 const transposition = 2 * delta + tur.singer.transposition;
-                const alen = tur.singer.arpeggio.length;
+                const alen = tur.singer.arpeggio ? tur.singer.arpeggio.length : 0;
                 let atrans = transposition + cents;
                 if (alen > 0 && i < alen) {
                     atrans += tur.singer.arpeggio[i];
@@ -1007,7 +1251,7 @@ class Singer {
             const addPitch = (note, octave, cents, direction) => {
                 // Apply transpositions
                 const transposition = 2 * delta + tur.singer.transposition;
-                const alen = tur.singer.arpeggio.length;
+                const alen = tur.singer.arpeggio ? tur.singer.arpeggio.length : 0;
                 let atrans = transposition;
                 let anote = note;
                 let noteObj;
