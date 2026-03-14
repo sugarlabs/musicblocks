@@ -285,13 +285,6 @@ describe("setupDictActions", () => {
             Turtle.DictActions.setValue("newDict", "key", "value", turtle);
             expect(activity.logo.turtleDicts[turtle].newDict.key).toBe("value");
         });
-
-        it("should log to console when setting a value", () => {
-            console.log = jest.fn();
-            activity.logo.turtleDicts[turtle] = {};
-            Turtle.DictActions.setValue("testDict", "key", "value", turtle);
-            expect(console.log).toHaveBeenCalled();
-        });
     });
 
     describe("getValue", () => {

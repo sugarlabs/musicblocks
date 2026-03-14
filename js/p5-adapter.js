@@ -1,11 +1,9 @@
 /* global define, window */
 define(["p5.min"], function (p5) {
-    console.log("p5-adapter: p5 loaded");
     if (!window.p5 && p5) {
         window.p5 = p5;
     }
     if (window.Tone) {
-        console.log("p5-adapter: Saving OriginalTone");
         window.OriginalTone = window.Tone;
     } else {
         console.warn("p5-adapter: window.Tone not found!");

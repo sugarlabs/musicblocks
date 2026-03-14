@@ -431,13 +431,12 @@ describe("setupPitchBlocks", () => {
     describe("Transposition Blocks", () => {
         it("SetRatioTranspositionBlock", () => {
             const block = createdBlocks["setratio"];
-            const spy = jest.spyOn(console, "log").mockImplementation(() => {});
 
             activity.blocks.blockList[10].connections[1] = 20;
 
             activity.blocks.blockList[20] = { name: "intervalname", value: "invalid" };
             block.flow([0, 0], logo, 0, 10);
-            expect(spy).toHaveBeenCalled();
+            // Invalid interval names default to r = 1
 
             activity.blocks.blockList[20].value = "major third";
             block.flow([0, 0], logo, 0, 10);
@@ -445,8 +444,6 @@ describe("setupPitchBlocks", () => {
             activity.blocks.blockList[10].connections[1] = null;
             block.flow([0, 0], logo, 0, 10);
             expect(activity.errorMsg).toHaveBeenCalled();
-
-            spy.mockRestore();
         });
         it("SetTranspositionBlock", () => {
             const block = createdBlocks["settransposition"];
