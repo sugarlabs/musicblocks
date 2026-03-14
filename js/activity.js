@@ -6491,7 +6491,13 @@ class Activity {
 
             const ButtonHolder = document.createElement("div");
             ButtonHolder.setAttribute("id", "buttoncontainerBOTTOM");
-            ButtonHolder.style.display = "block";
+            ButtonHolder.style.display = "flex";
+            ButtonHolder.style.flexDirection = "row";
+            ButtonHolder.style.alignItems = "center";
+            ButtonHolder.style.position = "fixed";
+            ButtonHolder.style.bottom = "10px";
+            ButtonHolder.style.right = "10px";
+            ButtonHolder.style.zIndex = "100";
             document.body.appendChild(ButtonHolder);
 
             this.homeButtonContainer = createButton(
@@ -6860,7 +6866,7 @@ class Activity {
         /*
          * Makes non-toolbar buttons, e.g., the palette menu buttons
          */
-        this._makeButton = (name, label, x, y) => {
+        this._makeButton = (name, label) => {
             const container = document.createElement("div");
             container.setAttribute("id", "" + label);
             container.setAttribute("class", "tooltipped");
@@ -6892,14 +6898,10 @@ class Activity {
             img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(name));
 
             container.appendChild(img);
-            container.setAttribute(
-                "style",
-                "position: absolute; right:" +
-                    (document.body.clientWidth - x) +
-                    "px;  top: " +
-                    y +
-                    "px;"
-            );
+            container.style.position = "relative";
+            container.style.display = "inline-flex";
+            container.style.alignItems = "center";
+            container.style.justifyContent = "center";
             document.getElementById("buttoncontainerBOTTOM").appendChild(container);
             return container;
         };
