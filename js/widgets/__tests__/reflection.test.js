@@ -20,15 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const fs = require("fs");
-const path = require("path");
-
-// Load the ReflectionMatrix class by reading the source and evaluating it
-const source = fs.readFileSync(path.resolve(__dirname, "../reflection.js"), "utf-8");
-// We put ReflectionMatrix in global scope
-new Function(
-    source + "\nif (typeof global !== 'undefined') { global.ReflectionMatrix = ReflectionMatrix; }"
-)();
+const ReflectionMatrix = require("../reflection");
 
 // Mock globals
 global._ = str => str;
