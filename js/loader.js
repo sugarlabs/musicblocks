@@ -11,9 +11,11 @@
 
 /* global requirejs */
 
+const APP_VERSION = window.location.protocol === "file:" ? "" : "v=999999_fix7";
+
 requirejs.config({
     baseUrl: "./",
-    urlArgs: window.location.protocol === "file:" ? "" : "v=999999_fix7",
+    urlArgs: APP_VERSION,
     waitSeconds: 60,
     shim: {
         "easeljs.min": {
@@ -198,6 +200,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
 
     function updateContent() {
         if (!i18next.isInitialized) return;
+
         const elements = document.querySelectorAll("[data-i18n]");
         elements.forEach(element => {
             const key = element.getAttribute("data-i18n");
@@ -217,7 +220,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                         escapeValue: false
                     },
                     backend: {
-                        loadPath: "locales/{{lng}}.json?v=" + Date.now()
+                        loadPath: "locales/{{lng}}.json" + (APP_VERSION ? "?" + APP_VERSION : "")
                     }
                 },
                 function (err) {
@@ -342,7 +345,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                     console.error("Core bootstrap failed:", err);
                     alert(
                         "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: " +
-                            (err.message || err)
+                        (err.message || err)
                     );
                 }
             );
