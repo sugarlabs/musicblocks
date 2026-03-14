@@ -244,7 +244,7 @@ describe("ASTUtils", () => {
 
     describe("_getIncrementStmntAST", () => {
         it("should return the AST for an increment statement", () => {
-            const args = ["var_testIdentifier", "testArg"];
+            const args = ["box_testIdentifier", "testArg"];
             const isIncrement = true;
             const result = ASTUtils._getIncrementStmntAST(args, isIncrement);
             expect(result).toEqual({
@@ -270,7 +270,7 @@ describe("ASTUtils", () => {
         });
 
         it("should return the AST for a decrement statement", () => {
-            const args = ["var_testIdentifier", "testArg"];
+            const args = ["box_testIdentifier", "testArg"];
             const isIncrement = false;
             const result = ASTUtils._getIncrementStmntAST(args, isIncrement);
             expect(result).toEqual({
@@ -316,6 +316,22 @@ describe("ASTUtils", () => {
                                 {
                                     type: "Identifier",
                                     name: "mouse"
+                                },
+                                {
+                                    type: "AssignmentPattern",
+                                    left: {
+                                        type: "Identifier",
+                                        name: "actionArgs"
+                                    },
+                                    right: {
+                                        type: "ArrayExpression",
+                                        elements: [
+                                            {
+                                                type: "Literal",
+                                                value: null
+                                            }
+                                        ]
+                                    }
                                 }
                             ],
                             body: {
@@ -397,6 +413,16 @@ describe("ASTUtils", () => {
                             {
                                 type: "Identifier",
                                 name: "mouse"
+                            },
+                            {
+                                type: "ArrayExpression",
+                                elements: [
+                                    {
+                                        type: "Literal",
+                                        value: null
+                                    },
+                                    ...ASTUtils._getArgsAST(args)
+                                ]
                             }
                         ]
                     }
@@ -796,6 +822,22 @@ describe("ASTUtils", () => {
                                 {
                                     type: "Identifier",
                                     name: "mouse"
+                                },
+                                {
+                                    type: "AssignmentPattern",
+                                    left: {
+                                        type: "Identifier",
+                                        name: "actionArgs"
+                                    },
+                                    right: {
+                                        type: "ArrayExpression",
+                                        elements: [
+                                            {
+                                                type: "Literal",
+                                                value: null
+                                            }
+                                        ]
+                                    }
                                 }
                             ],
                             body: {

@@ -162,7 +162,7 @@ class JSGenerate {
             while (nextBlk !== undefined) {
                 // ignore vertical spacers and hidden blocks
                 if (nextBlk.name !== "hidden" && nextBlk.name !== "vspace") {
-                    if (["storein2", "nameddo"].includes(nextBlk.name)) {
+                    if (["storein2", "nameddo", "nameddoArg"].includes(nextBlk.name)) {
                         tree.push([nextBlk.name + "_" + nextBlk.privateData]);
                     } else {
                         tree.push([nextBlk.name]);
