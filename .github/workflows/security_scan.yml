@@ -1,16 +1,17 @@
-name: Security Scans
-
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   security-scans:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 10
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
