@@ -67,6 +67,66 @@
  * @param diameter Base diameter of the wheel in pixels
  * @returns void
  */
+// ===============================
+// Accessibility: Speech Support
+// ===============================
+
+let speechEnabled = false;
+
+/**
+ * Toggle speech feedback for pie menus
+ * @param {boolean} enabled
+ */
+export function setPieMenuSpeech(enabled) {
+    speechEnabled = enabled;
+}
+
+/**
+ * Speak a label using Web Speech API
+ * Safe wrapper with fallbacks
+ * @param {string} text
+ */
+function speakLabel(text) {
+    if (!speechEnabled) return;
+    if (!("speechSynthesis" in window)) return;
+    if (!text) return;
+
+    try {
+        // Cancel any ongoing speech to prevent overlap
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1;
+        utterance.pitch = 1;
+        utterance.volume = 1;
+
+        window.speechSynthesis.speak(utterance);
+
+        updateAriaLiveRegion(text);
+    } catch (err) {
+        console.warn("Speech synthesis error:", err);
+    }
+}
+
+/**
+ * Update aria-live region for screen readers
+ * @param {string} text
+ */
+function updateAriaLiveRegion(text) {
+    let region = document.getElementById("pie-menu-live-region");
+
+    if (!region) {
+        region = document.createElement("div");
+        region.id = "pie-menu-live-region";
+        region.setAttribute("aria-live", "polite");
+        region.setAttribute("aria-atomic", "true");
+        region.style.position = "absolute";
+        region.style.left = "-9999px";
+        document.body.appendChild(region);
+    }
+
+    region.textContent = text;
+}
 const setWheelSize = (i = 400) => {
     const wheelDiv = document.getElementById("wheelDiv");
     const screenWidth = window.innerWidth;
