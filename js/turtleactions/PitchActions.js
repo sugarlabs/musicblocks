@@ -25,7 +25,7 @@
    nthDegreeToPitch, SHARP, FLAT, _, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    numberToPitch, ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
    keySignatureToMode, getInterval, EFFECTSNAMES, NANERRORMSG, frequencyToPitch,
-   MusicBlocks, Mouse, isCustomTemperament
+   MusicBlocks, Mouse, isCustomTemperament, TEMPERAMENT
 */
 
 /*
@@ -56,6 +56,21 @@
  */
 function setupPitchActions(activity) {
     Singer.PitchActions = class {
+        /**
+         * Helper function to get the number of pitches in the current temperament.
+         *
+         * @static
+         * @returns {Number}
+         */
+        static getTemperamentLength() {
+            const currentTemperament = activity.logo.synth.inTemperament;
+            if (isCustomTemperament(currentTemperament)) {
+                return TEMPERAMENT[currentTemperament]["pitchNumber"];
+            } else {
+                return 12; // Standard equal temperament
+            }
+        }
+
         /**
          * Processes (and/or plays) a pitch.
          *
@@ -184,7 +199,16 @@ function setupPitchActions(activity) {
             number = Math.abs(number);
 
             const obj = keySignatureToMode(tur.singer.keySignature);
-            const modeLength = MUSICALMODES[obj[1]].length;
+            let modeLength;
+
+            // For custom temperaments, we need to handle differently
+            if (isCustomTemperament(activity.logo.synth.inTemperament)) {
+                // For custom temperaments, use the temperament length instead of mode length
+                modeLength = Singer.PitchActions.getTemperamentLength();
+            } else {
+                modeLength = MUSICALMODES[obj[1]].length;
+            }
+
             let scaleDegree = (Math.floor(number - 1) % modeLength) + 1;
 
             // Choose a reference based on the key selected.
