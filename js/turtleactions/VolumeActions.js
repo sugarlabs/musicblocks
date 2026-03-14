@@ -17,7 +17,7 @@
  */
 
 /*
-   global _, Singer, MusicBlocks, Mouse, last, VOICENAMES, DRUMNAMES,
+   global Singer, MusicBlocks, Mouse, last, VOICENAMES, DRUMNAMES,
    Tone, instruments, DEFAULTVOLUME, DEFAULTVOICE
 */
 
@@ -97,8 +97,6 @@ function setupVolumeActions(activity) {
                     );
                     tur.singer.crescendoInitialVolume[synth].pop();
                 }
-
-                tur.singer.inCrescendo.pop();
             };
 
             activity.logo.setTurtleListener(turtle, listenerName, __listener);

@@ -23,18 +23,34 @@
     outline-offset: 2px;
 }
 
-body:not(.dark) #helpfulSearch,
-body:not(.dark) .ui-autocomplete {
+body:not(.dark):not(.highcontrast) #helpfulSearch,
+body:not(.dark):not(.highcontrast) .ui-autocomplete {
     background-color: #fff !important;
     color: #000 !important;
 }
 
-body:not(.dark) .ui-autocomplete li:hover {
+body:not(.dark):not(.highcontrast) .ui-autocomplete li:hover {
     background-color: #ddd !important;
 }
 
-body:not(.dark) #helpfulSearchDiv {
+body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     background-color: #f9f9f9 !important;
+}
+
+/* High Contrast Mode Search Suggestions */
+.highcontrast .ui-menu {
+    background-color: #000000 !important;
+    border: 1px solid #ffffff !important;
+}
+
+.highcontrast .ui-menu .ui-menu-item {
+    color: #ffffff !important;
+}
+
+.highcontrast .ui-menu .ui-menu-item:hover,
+.highcontrast .ui-menu .ui-state-focus {
+    background-color: #333333 !important;
+    color: #00ffff !important;
 }
 
 #newdropdown {
@@ -129,14 +145,14 @@ body:not(.dark) #helpfulSearchDiv {
 }
 
 .cancel-button {
-    border: none;
-    border-radius: 4px;
-    padding: 8px 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    background-color: #f1f1f1;
-    color: black;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  background-color: #e0e0e0;
+  color: black;
 }
 
 .cancel-button:hover {
@@ -1213,16 +1229,6 @@ table {
     align-items: center;
 }
 
-#helpBodyDiv a {
-    color: #1976d2 !important;
-    text-decoration: underline;
-    font-weight: 600;
-}
-
-#helpBodyDiv a:hover {
-    color: #1565c0 !important;
-}
-
 #helpScrollWrapper {
     overflow-y: auto;
 }
@@ -2177,25 +2183,25 @@ table {
    FIX: Center the Welcome Modal on Mobile
    ====================================================== */
 @media screen and (max-width: 600px) {
-    #helpDiv {
-        /* 1. Fit the screen width */
-        width: 90% !important;
+  #helpDiv {
+    /* 1. Fit the screen width */
+    width: 90% !important;
 
-        /* 2. Center Horizontally */
-        left: 50% !important;
-        transform: translateX(-50%);
-        /* Moves it back by half its width to center it */
+    /* 2. Center Horizontally */
+    left: 50% !important;
+    transform: translateX(-50%);
+    /* Moves it back by half its width to center it */
 
-        /* 3. Reset Top position if needed */
-        top: 15% !important;
-    }
+    /* 3. Reset Top position if needed */
+    top: 15% !important;
+  }
 
-    /* Fix the inner text box width so it doesn't overflow */
-    #helpBodyDiv {
-        width: calc(100% - 110px) !important;
-        margin: 0 auto !important;
-        left: 0 !important;
-        padding: 0 10px;
-        box-sizing: border-box;
-    }
+  /* Fix the inner text box width so it doesn't overflow */
+  #helpBodyDiv {
+    width: calc(100% - 110px) !important;
+    margin: 0 auto !important;
+    left: 0 !important;
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
 }
