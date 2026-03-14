@@ -2014,6 +2014,42 @@ table {
     flex-direction: row !important;
 }
 
+#palette {
+  transition: transform 0.3s ease-in-out;
+  will-change: transform;
+}
+
+#palette.palette-collapsed {
+  transform: translateX(-100%);
+}
+
+#paletteToggleHandle {
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 50px;
+  background: #2196f3;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 0 4px 4px 0;
+  z-index: 1002;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+#paletteToggleHandle:hover {
+  background: #1976d2;
+}
+
+#paletteToggleHandle:focus {
+  outline: none;
+}
+
 @media (max-width: 390px) {
     #right-arrow,
     #left-arrow {
