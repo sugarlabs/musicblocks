@@ -766,5 +766,13 @@ describe("Utility Functions (logic-only)", () => {
             expect(obj.modelMethod()).toBe("model");
             expect(obj.viewMethod()).toBe("view");
         });
+        it("should return empty string for missing nested property", () => {
+            const result = format("User: {user.age}", { user: { name: "Alice" } });
+            expect(result).toBe("User: ");
+        });
+        it("should return original string if no placeholders exist", () => {
+            const result = format("Hello world", { name: "User" });
+            expect(result).toBe("Hello world");
+        });
     });
 });
