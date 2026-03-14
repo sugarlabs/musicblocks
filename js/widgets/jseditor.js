@@ -273,18 +273,32 @@ class JSEditor {
      */
 
     _setup() {
+        let previoussize = null; 
         this.widgetWindow.onmaximize = () => {
             const editor = this.widgetWindow.getWidgetBody().childNodes[0];
-            editor.style.width = this.widgetWindow._maximized ? "100%" : "39rem";
-            editor.style.height = this.widgetWindow._maximized
-                ? `calc(100vh - ${64 + 33}px)`
-                : `${docById("overlayCanvas").height - 33 - 128 - 12}px`;
+            if(this.widgetWindow._maximized){
+                previoussize = {
+                    width: editor.style.width,
+                    height: editor.style.height
+                };
+           
+            editor.style.width = "100%"; 
+            editor.style.height = `calc(100vh - ${64 + 33}px)`;
+            }
+            else if(previoussize){
+                 editor.style.width = previoussize.width;
+                 editor.style.height = previoussize.height;
+            }
+            
+              
         };
 
         this._editor.style.width = "39rem";
         this._editor.style.height = `${docById("overlayCanvas").height - 33 - 128 - 12}px`;
         this._editor.style.display = "flex";
         this._editor.style.flexDirection = "column";
+
+      
 
         const menubar = document.createElement("div");
         menubar.style.width = "100%";
