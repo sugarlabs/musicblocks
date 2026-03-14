@@ -398,6 +398,15 @@ class Toolbar {
         const playIcon = docById("play");
         const stopIcon = docById("stop");
         const recordButton = docById("record");
+        playIcon.setAttribute("role", "button");
+        playIcon.setAttribute("aria-label", "Play project");
+        playIcon.setAttribute("tabindex", "0");
+        playIcon.addEventListener("keydown", e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                playIcon.click();
+            }
+        });
         let isPlayIconRunning = false;
 
         function handleClick() {
@@ -452,6 +461,15 @@ class Toolbar {
     renderStopIcon(onclick) {
         const stopIcon = docById("stop");
         const recordButton = docById("record");
+        stopIcon.setAttribute("role", "button");
+        stopIcon.setAttribute("aria-label", "Stop project");
+        stopIcon.setAttribute("tabindex", "0");
+        stopIcon.addEventListener("keydown", e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                stopIcon.click();
+            }
+        });
         stopIcon.onclick = () => {
             onclick(this.activity);
             stopIcon.style.color = "white";
