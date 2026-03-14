@@ -6125,6 +6125,7 @@ const getPitchInfo = (activity, type, currentNote, tur) => {
     let pitch;
     let octave;
     let obj;
+    let cents;
     if (Number(currentNote)) {
         // If it is a frequency, convert it to a pitch/octave.
         obj = frequencyToPitch(currentNote);
