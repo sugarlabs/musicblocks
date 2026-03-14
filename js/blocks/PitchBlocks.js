@@ -1806,6 +1806,43 @@ function setupPitchBlocks(activity) {
         }
     }
 
+    class TemperamentLengthBlock extends ValueBlock {
+        constructor() {
+            //.TRANS: the number of pitches in the current temperament system
+            super("temperamentlength", _("temperament length"));
+            this.setPalette("pitch", activity);
+            this.beginnerBlock(true);
+            this.parameter = true;
+            this.setHelpString([
+                _(
+                    "The Temperament length block returns the number of pitches in the current temperament system. For example, 12 for standard equal temperament or 31 for a 31-tone temperament."
+                ),
+                "documentation",
+                ""
+            ]);
+            this.formBlock({ outType: "numberout" });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return activity.blocks.blockList[blk].value;
+        }
+
+        arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
+            if (
+                logo.inStatusMatrix &&
+                parentId != null &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
+            ) {
+                logo.statusFields.push([blk, "temperamentlength"]);
+            } else {
+                return Singer.IntervalsActions.getTemperamentLength();
+            }
+        }
+    }
+
     class ScaleDegree2Block extends ValueBlock {
         constructor() {
             //.TRANS: a numeric mapping of the notes in an octave based on the musical mode
@@ -1990,8 +2027,8 @@ function setupPitchBlocks(activity) {
                             ? 1
                             : 0
                         : semitones < ref
-                        ? 1
-                        : 0;
+                          ? 1
+                          : 0;
 
                     octave =
                         (isNegativeArg ? -1 : 1) * (deltaOctave + deltaSemi) +
@@ -2136,6 +2173,7 @@ function setupPitchBlocks(activity) {
     new SharpBlock().setup(activity);
     new OneOfPitchBlock().setup(activity);
     new ScaleDegree2Block().setup(activity);
+    new TemperamentLengthBlock().setup(activity);
     new EastIndianSolfegeBlock().setup(activity);
     new NoteNameBlock().setup(activity);
     new SolfegeBlock().setup(activity);

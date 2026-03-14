@@ -28,6 +28,8 @@ describe("setupIntervalsActions", () => {
 
         global._ = x => x;
         global.NOINPUTERRORMSG = "NOINPUT";
+        global.isCustomTemperament = jest.fn(() => false);
+        global.TEMPERAMENT = { equal: { pitchNumber: 12 } };
 
         global.MUSICALMODES = {
             major: [2, 2, 1, 2, 2, 2, 1],

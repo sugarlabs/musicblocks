@@ -37,6 +37,7 @@ Object.assign(global, {
     pitchToFrequency: musicUtils.pitchToFrequency,
     numberToPitch: musicUtils.numberToPitch,
     isCustomTemperament: musicUtils.isCustomTemperament,
+    TEMPERAMENT: musicUtils.TEMPERAMENT,
     ACCIDENTALNAMES: musicUtils.ACCIDENTALNAMES,
     ACCIDENTALVALUES: musicUtils.ACCIDENTALVALUES,
     NOTESFLAT: musicUtils.NOTESFLAT,
