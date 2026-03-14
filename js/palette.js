@@ -1010,7 +1010,34 @@ class Palette {
             // Image Drag initiates a browser defined drag, which needs to be stopped.
             img.ondragstart = () => false;
 
-            const down = event => {
+            const down = (event) => {
+                // Preview pitch
+                if (b.blkname === 'pitch' || b.blkname === 'custompitch') {
+                    let note = 'sol';
+                    let octave = 4;
+                    if (b.blkname === 'custompitch') {
+                        const protoblk = protoListScope[blk];
+                        if (protoblk.macro) {
+                             const macroData = protoblk.macro(0, 0);
+                             if (Array.isArray(macroData)) {
+                                for (let i = 0; i < macroData.length; i++) {
+                                    const mb = macroData[i];
+                                    if (mb[1] && Array.isArray(mb[1])) {
+                                        if (mb[1][0] === 'customNote') {
+                                            note = mb[1][1].value;
+                                        } else if (mb[1][0] === 'number') {
+                                            octave = mb[1][1].value;
+                                        }
+                                    }
+                                }
+                             }
+                        }
+                    }
+                    
+                    if (typeof Singer !== 'undefined' && Singer.PitchActions && Singer.PitchActions.playPitch) {
+                         Singer.PitchActions.playPitch(note, octave, 0, 0, null);
+                    }
+                }
                 // (1) prepare to moving: make absolute and on top by z-index
                 const posit = img.style.position;
                 const zInd = img.style.zIndex;
