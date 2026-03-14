@@ -1,0 +1,14 @@
+Issue-Bug:
+    - '(?i)^\s*\[bug\]'
+
+Issue-Documentation:
+    - '(?i)^\s*\[docs\]'
+
+Issue-Enhancement:
+    - '(?i)^\s*\[(feature|chore|ui/ux)\]'
+
+Issue-Performance:
+    - '(?i)^\s*\[performance\]'
+
+Issue-Testing:
+    - '(?i)^\s*\[test\]'
