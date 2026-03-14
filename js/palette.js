@@ -486,6 +486,16 @@ class Palettes {
 
         row.onmouseout = () => clearTimeout(timeout);
 
+        row.setAttribute("role", "button");
+        row.setAttribute("tabindex", "0");
+        row.setAttribute("aria-label", `${name} palette`);
+        row.addEventListener("keydown", e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                row.click();
+            }
+        });
+
         row.onclick = () => {
             if (name == "search") {
                 this._hideMenus();
