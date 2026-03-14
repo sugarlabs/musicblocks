@@ -7363,6 +7363,10 @@ class Activity {
          * Inits everything. The main function.
          */
         this.init = async () => {
+            // Guard against double initialization
+            if (this._initialized) return;
+            this._initialized = true;
+
             // Batch DOM reads before any writes to avoid forced synchronous layout
             this._clientWidth = document.body.clientWidth;
             this._clientHeight = document.body.clientHeight;
