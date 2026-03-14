@@ -236,6 +236,138 @@ function setupNumberBlocks(activity) {
         }
     }
 
+    class SinBlock extends LeftBlock {
+        constructor() {
+            super("sin");
+            this.setPalette("number", activity);
+            this.setHelpString([_("The Sin block returns the sine of an angle in degrees."), "documentation", ""]);
+
+            this.formBlock({
+                name: _("sin"),
+                args: 1,
+                defaults: [90]
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return toFixed2(activity.blocks.blockList[blk].value);
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            if (
+                logo.inStatusMatrix &&
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
+            ) {
+                logo.statusFields.push([blk, activity.blocks.blockList[blk].name]);
+            } else {
+                const cblk = activity.blocks.blockList[blk].connections[1];
+
+                if (cblk === null) {
+                    activity.errorMsg(NOINPUTERRORMSG, blk);
+                    return 0;
+                } else {
+                    const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                    try {
+                        return MathUtility.doSin(a);
+                    } catch (e) {
+                        logo.stopTurtle = true;
+                        activity.errorMsg(NANERRORMSG, blk);
+                        return 0;
+                    }
+                }
+            }
+        }
+    }
+
+    class CosBlock extends LeftBlock {
+        constructor() {
+            super("cos");
+            this.setPalette("number", activity);
+            this.setHelpString([_("The Cos block returns the cosine of an angle in degrees."), "documentation", ""]);
+
+            this.formBlock({
+                name: _("cos"),
+                args: 1,
+                defaults: [0]
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return toFixed2(activity.blocks.blockList[blk].value);
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            if (
+                logo.inStatusMatrix &&
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
+            ) {
+                logo.statusFields.push([blk, activity.blocks.blockList[blk].name]);
+            } else {
+                const cblk = activity.blocks.blockList[blk].connections[1];
+
+                if (cblk === null) {
+                    activity.errorMsg(NOINPUTERRORMSG, blk);
+                    return 0;
+                } else {
+                    const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                    try {
+                        return MathUtility.doCos(a);
+                    } catch (e) {
+                        logo.stopTurtle = true;
+                        activity.errorMsg(NANERRORMSG, blk);
+                        return 0;
+                    }
+                }
+            }
+        }
+    }
+
+    class LogBlock extends LeftBlock {
+        constructor() {
+            super("log");
+            this.setPalette("number", activity);
+            this.setHelpString([_("The Log block returns the natural logarithm."), "documentation", ""]);
+
+            this.formBlock({
+                name: _("log"),
+                args: 1,
+                defaults: [10]
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return toFixed2(activity.blocks.blockList[blk].value);
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            if (
+                logo.inStatusMatrix &&
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
+            ) {
+                logo.statusFields.push([blk, activity.blocks.blockList[blk].name]);
+            } else {
+                const cblk = activity.blocks.blockList[blk].connections[1];
+
+                if (cblk === null) {
+                    activity.errorMsg(NOINPUTERRORMSG, blk);
+                    return 0;
+                } else {
+                    const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                    try {
+                        return MathUtility.doLog(a);
+                    } catch (e) {
+                        logo.stopTurtle = true;
+                        activity.errorMsg(NANERRORMSG, blk);
+                        return 0;
+                    }
+                }
+            }
+        }
+    }
+
     class AbsBlock extends LeftBlock {
         constructor() {
             super("abs");
@@ -993,6 +1125,9 @@ function setupNumberBlocks(activity) {
     new ModBlock().setup(activity);
     new PowerBlock().setup(activity);
     new SqrtBlock().setup(activity);
+    new SinBlock().setup(activity);
+    new CosBlock().setup(activity);
+    new LogBlock().setup(activity);
     new AbsBlock().setup(activity);
     new DivideBlock().setup(activity);
     new MultiplyBlock().setup(activity);
