@@ -182,6 +182,135 @@ const enableWheelScroll = (wheel, itemCount) => {
     wheelDiv.addEventListener("wheel", scrollHandler, { passive: false });
 };
 
+// Accessibility helpers for pie menus (screen reader announcements)
+/**
+ * this function is to ensure that the pie menu live region is created and returned
+*/
+const __ensurePieMenuLiveRegion = () => {
+    let liveRegion = docById("pieMenuLiveRegion");
+    if (liveRegion) {
+        return liveRegion;
+    }
+    liveRegion = document.createElement("div");
+    liveRegion.id = "pieMenuLiveRegion";
+    liveRegion.setAttribute("role", "status");
+    liveRegion.setAttribute("aria-live", "polite");
+    liveRegion.setAttribute("aria-atomic", "true");
+    liveRegion.style.position = "absolute";
+    liveRegion.style.left = "-9999px";
+    liveRegion.style.width = "1px";
+    liveRegion.style.height = "1px";
+    liveRegion.style.overflow = "hidden";
+    document.body.appendChild(liveRegion);
+    return liveRegion;
+};
+
+
+/**
+ * this function is to get the aria label from the title of the pie menu item
+*/
+const __pieMenuA11yLabelFromTitle = title => {
+    if (title === null || title === undefined) {
+        return "";
+    }
+
+    const text = String(title).trim();
+    if (text.length === 0) {
+        return "";
+    }
+
+    if (text === "×") {
+        return _("Close");
+    }
+    if (text === "+") {
+        return _("Increase");
+    }
+    if (text === "-") {
+        return _("Decrease");
+    }
+    if (text === "▶") {
+        return _("Play");
+    }
+
+    if (text.startsWith("imgsrc:")) {
+        const raw = text.slice("imgsrc:".length);
+        const file = raw.split("/").pop() || raw;
+        const base = file.replace(/\.[^/.]+$/, "");
+        return base.replace(/[-_]+/g, " ").trim();
+    }
+
+    return text;
+};
+
+const __announcePieMenuLabel = label => {
+    const trimmed = String(label || "").trim();
+    if (!trimmed) {
+        return;
+    }
+    /**
+     * this logic is to prevent any duplicate announcements
+    * i.e if the same label is announced within 400ms, it will not be announced again
+    */
+    const now = Date.now();
+    if (
+        window.__wheelnavA11yLastLabel === trimmed &&
+        window.__wheelnavA11yLastTime &&
+        now - window.__wheelnavA11yLastTime < 400
+    ) {
+        return;
+    }
+
+    window.__wheelnavA11yLastLabel = trimmed;
+    window.__wheelnavA11yLastTime = now;
+    __ensurePieMenuLiveRegion().textContent = trimmed;
+};
+
+/**
+ * this function is to speak the pie menu label to the screen reader
+*/
+const __speakPieMenuLabel = label => {
+    const trimmed = String(label || "").trim();
+    if (!trimmed) {
+        return;
+    }
+    //If the browser doesn’t support TTS, do nothing.
+    if (!("speechSynthesis" in window)) {
+        return;
+    }
+    //If the user toggled speech off, do nothing.
+    if (window.__wheelnavA11ySpeakEnabled === false) {
+        return;
+    }
+    
+    try {
+        window.speechSynthesis.cancel(); //Stop any current speech so the new label replaces it immediately.
+        const utterance = new SpeechSynthesisUtterance(trimmed);
+        utterance.rate = 1;
+        utterance.pitch = 1;
+        window.speechSynthesis.speak(utterance);
+    } catch (e) {
+        // Ignore speech synthesis errors
+    }
+};
+
+// Expose hooks for the wheelnav library to call
+if (window.__wheelnavA11ySpeakEnabled === undefined) {
+    window.__wheelnavA11ySpeakEnabled = true;
+}
+
+window.__wheelnavA11yLabelForItem = navItem =>
+    __pieMenuA11yLabelFromTitle(navItem && navItem.title);
+
+// When called, it writes the label into the live region so screen readers announce it.
+window.__wheelnavA11yAnnounce = navItem => {
+    const label = __pieMenuA11yLabelFromTitle(navItem && navItem.title);
+    __announcePieMenuLabel(label);
+};
+
+//When called (on click), it speaks the label using speechSynthesis
+window.__wheelnavA11ySpeak = navItem => {
+    const label = __pieMenuA11yLabelFromTitle(navItem && navItem.title);
+    __speakPieMenuLabel(label);
 // Ensure exit wheels behave like stateless buttons (no sticky selection)
 const configureExitWheel = exitWheel => {
     if (!exitWheel || !exitWheel.navItems) {
