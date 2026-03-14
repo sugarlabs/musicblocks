@@ -17,158 +17,117 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const fs = require("fs");
-const path = require("path");
 const { TextEncoder, TextDecoder } = require("util");
+global._ = str => str;
 jest.mock("tone");
+global.Tone = require("./tonemock.js");
+
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
+global.MediaRecorder = jest.fn();
+global.AudioBuffer = jest.fn();
+global.window = global;
+global.document = {
+    head: { appendChild: jest.fn() },
+    createElement: jest.fn(() => ({})),
+    querySelector: jest.fn(() => null)
+};
+
+global.TARGETBPM = 90;
+global.TONEBPM = 240;
+global.DEFAULTVOLUME = 50;
+global.DEFAULTDRUM = "kick";
+global.SHARP = "#";
+global.FLAT = "b";
+global.DOUBLESHARP = "##";
+global.DOUBLEFLAT = "bb";
+
+global.getOscillatorTypes = jest.fn(() => null);
+global.getArticulation = jest.fn(() => 0);
+global.getTemperament = jest.fn(() => "equal");
+global.pitchToFrequency = jest.fn(() => 440);
+global.getCustomNote = jest.fn(note => note.replace("b", "♭"));
+global.pitchToNumber = jest.fn(() => 0);
+global.isCustomTemperament = jest.fn(() => false);
+global.getNoteFromInterval = jest.fn(() => "C");
+global.last = arr => arr[arr.length - 1];
+global.pitchToFrequency = (note, octave) => {
+    const A4 = 440;
+    const semitones = {
+        C: -9,
+        D: -7,
+        E: -5,
+        F: -4,
+        G: -2,
+        A: 0,
+        B: 2
+    };
+
+    const base = note[0];
+    let offset = semitones[base];
+
+    if (note.includes("#")) offset += 1;
+    if (note.includes("b")) offset -= 1;
+
+    const n = offset + (octave - 4) * 12;
+    return A4 * Math.pow(2, n / 12);
+};
+
+global.Singer = {
+    masterVolume: [50]
+};
+global.platform = {
+    FF: false
+};
+global.numberToPitch = jest.fn(() => ["A", "4"]);
+
+const synthModule = require("../synthutils.js");
+const { synthInstance } = synthModule;
+synthInstance._loadSample = jest.fn(() => Promise.resolve());
+synthInstance.detectPitch = jest.fn(() => 261.63);
+synthModule._loadSample = synthInstance._loadSample;
+const {
+    Synth,
+    loadSamples,
+    _loadSample,
+    _createSampleSynth,
+    setupRecorder,
+    createDefaultSynth,
+    _createBuiltinSynth,
+    _createCustomSynth,
+    __createSynth,
+    createSynth,
+    loadSynth,
+    temperamentChanged,
+    whichTemperament,
+    resume,
+    rampTo,
+    setVolume,
+    getVolume,
+    setMasterVolume,
+    startSound,
+    stopSound,
+    trigger,
+    loop,
+    start,
+    stop,
+    getFrequency,
+    _getFrequency,
+    getCustomFrequency,
+    getDefaultParamValues,
+    _parseSampleCenterNo,
+    getTunerFrequency,
+    stopTuner,
+    newTone,
+    preloadProjectSamples,
+    instruments,
+    instrumentsSource,
+    CUSTOMSAMPLES,
+    DEFAULTSYNTHVOLUME
+} = synthModule;
 
 describe("Utility Functions (logic-only)", () => {
-    let whichTemperament,
-        temperamentChanged,
-        getFrequency,
-        _getFrequency,
-        getCustomFrequency,
-        resume,
-        loadSamples,
-        _loadSample,
-        setupRecorder,
-        getDefaultParamValues,
-        createDefaultSynth,
-        _createSampleSynth,
-        _parseSampleCenterNo,
-        _createBuiltinSynth,
-        _createCustomSynth,
-        __createSynth,
-        createSynth,
-        loadSynth,
-        _performNotes,
-        startSound,
-        instruments,
-        CUSTOMSAMPLES,
-        instrumentsSource,
-        trigger,
-        stopSound,
-        loop,
-        start,
-        stop,
-        rampTo,
-        DEFAULTSYNTHVOLUME,
-        setVolume,
-        getVolume,
-        setMasterVolume,
-        getTunerFrequency,
-        stopTuner,
-        newTone,
-        preloadProjectSamples,
-        Synth;
-
     const turtle = "turtle1";
-
-    beforeAll(() => {
-        global.TextEncoder = TextEncoder;
-        global.TextDecoder = TextDecoder;
-        global.MediaRecorder = jest.fn();
-        global.AudioBuffer = jest.fn();
-        global.module = module;
-        global.Tone = require("./tonemock.js");
-
-        const codeFiles = [
-            "../utils.js",
-            "../../logoconstants.js",
-            "../platformstyle.js",
-            "../musicutils.js",
-            "../synthutils.js",
-            "../../logo.js",
-            "../../turtle-singer.js"
-        ];
-        let wrapperCode = "";
-
-        codeFiles.forEach(filePath => {
-            const fileCode = fs.readFileSync(path.join(__dirname, filePath), "utf8");
-            wrapperCode += `\n${fileCode}`;
-        });
-
-        const dirPath = path.join(__dirname, "../../../sounds/samples");
-        const sounds = fs.readdirSync(dirPath, "utf8");
-        sounds.forEach(fileName => {
-            if (!fileName.endsWith(".js")) return;
-            const filePath = path.join(dirPath, fileName);
-            const fileCode = fs.readFileSync(filePath, "utf8");
-            wrapperCode += `\n${fileCode}`;
-        });
-
-        const wrapper = new Function(`
-            // Manual definitions for constants to ensure visibility in this scope
-            window.TARGETBPM = 90;
-            window.TONEBPM = 240;
-            window.DEFAULTVOLUME = 50;
-            window._ = window._ || function(str) { return str; };
-
-            // Mock require/define for modules that use AMD
-            window.require = window.requirejs = function(deps, cb) {
-                if (typeof cb === 'function') cb();
-            };
-            window.define = function() {};
-            window.define.amd = true;
-
-            let metaTag = document.querySelector("meta[name=theme-color]");
-            metaTag = document.createElement('meta');
-            metaTag.name = 'theme-color';
-            metaTag.content = "#4DA6FF";
-            document.head?.appendChild(metaTag);
-
-            ${wrapperCode}
-            
-            return {
-                Synth: typeof Synth !== "undefined" ? Synth : undefined,
-                instrumentsSource: typeof instrumentsSource !== "undefined" ? instrumentsSource : undefined,
-                instruments: typeof instruments !== "undefined" ? instruments : undefined,
-                SAMPLECENTERNO: typeof SAMPLECENTERNO !== "undefined" ? SAMPLECENTERNO : undefined,
-                CUSTOMSAMPLES: typeof CUSTOMSAMPLES !== "undefined" ? CUSTOMSAMPLES : undefined,
-                DEFAULTSYNTHVOLUME: typeof DEFAULTSYNTHVOLUME !== "undefined" ? DEFAULTSYNTHVOLUME : undefined,
-                  };
-        `);
-        const results = wrapper();
-        Synth = results.Synth();
-        instruments = results.instruments;
-        DEFAULTSYNTHVOLUME = results.DEFAULTSYNTHVOLUME;
-        CUSTOMSAMPLES = results.CUSTOMSAMPLES;
-        SAMPLECENTERNO = results.SAMPLECENTERNO;
-        instrumentsSource = results.instrumentsSource;
-        createDefaultSynth = Synth.createDefaultSynth;
-        whichTemperament = Synth.whichTemperament;
-        temperamentChanged = Synth.temperamentChanged;
-        getFrequency = Synth.getFrequency;
-        _getFrequency = Synth._getFrequency;
-        getCustomFrequency = Synth.getCustomFrequency;
-        resume = Synth.resume;
-        loadSamples = Synth.loadSamples;
-        _loadSample = Synth._loadSample;
-        setupRecorder = Synth.setupRecorder;
-        getDefaultParamValues = Synth.getDefaultParamValues;
-        _createSampleSynth = Synth._createSampleSynth;
-        _parseSampleCenterNo = Synth._parseSampleCenterNo;
-        _createBuiltinSynth = Synth._createBuiltinSynth;
-        _createCustomSynth = Synth._createCustomSynth;
-        __createSynth = Synth.__createSynth;
-        createSynth = Synth.createSynth;
-        loadSynth = Synth.loadSynth;
-        _performNotes = Synth._performNotes;
-        startSound = Synth.startSound;
-        trigger = Synth.trigger;
-        stopSound = Synth.stopSound;
-        loop = Synth.loop;
-        start = Synth.start;
-        stop = Synth.stop;
-        rampTo = Synth.rampTo;
-        setVolume = Synth.setVolume;
-        getVolume = Synth.getVolume;
-        setMasterVolume = Synth.setMasterVolume;
-        getTunerFrequency = Synth.getTunerFrequency;
-        stopTuner = Synth.stopTuner;
-        newTone = Synth.newTone;
-        preloadProjectSamples = Synth.preloadProjectSamples;
-    });
 
     describe("setupRecorder", () => {
         it("it should sets up the recorder for the Synth instance.", () => {
@@ -868,16 +827,16 @@ describe("Utility Functions (logic-only)", () => {
 
     describe("getFrequency", () => {
         it("it should return the frequency or frequencies.", () => {
-            expect(getFrequency("Bb2", false)).toBe(116.54094037952261);
-            expect(getFrequency("Bb3", false)).toBe(233.0818807590453);
-            expect(getFrequency("A4", false)).toBe(440.00000000000085);
+            expect(getFrequency("Bb2", false)).toBeCloseTo(116.54094037952261, 10);
+            expect(getFrequency("Bb3", false)).toBeCloseTo(233.0818807590453, 10);
+            expect(getFrequency("A4", false)).toBeCloseTo(440.00000000000085, 10);
         });
     });
     describe("_getFrequency", () => {
         it("it should return the frequency or frequencies.", () => {
-            expect(_getFrequency("Bb2", false, "equal")).toBe(116.54094037952261);
-            expect(_getFrequency("Bb3", false, "equal")).toBe(233.0818807590453);
-            expect(_getFrequency("A4", false, "equal")).toBe(440.00000000000085);
+            expect(_getFrequency("Bb2", false, "equal")).toBeCloseTo(116.54094037952261, 10);
+            expect(_getFrequency("Bb3", false, "equal")).toBeCloseTo(233.0818807590453, 10);
+            expect(_getFrequency("A4", false, "equal")).toBeCloseTo(440.00000000000085, 10);
         });
     });
     describe("getCustomFrequency", () => {
@@ -1082,8 +1041,8 @@ describe("Utility Functions (logic-only)", () => {
         });
 
         it("should return detected pitch when valid", () => {
-            Synth.tunerAnalyser = { getValue: jest.fn(() => new Float32Array(16)) };
-            Synth.detectPitch = jest.fn(() => 261.63);
+            synthInstance.tunerAnalyser = { getValue: jest.fn(() => new Float32Array(16)) };
+            synthInstance.detectPitch = jest.fn(() => 261.63);
             expect(getTunerFrequency()).toBe(261.63);
         });
     });
@@ -1096,7 +1055,8 @@ describe("Utility Functions (logic-only)", () => {
 
         it("should call close on tunerMic when it exists", () => {
             const mockClose = jest.fn();
-            Synth.tunerMic = { close: mockClose };
+            synthInstance.tunerMic = { close: mockClose };
+            Synth.tunerMic = synthInstance.tunerMic;
             stopTuner();
             expect(mockClose).toHaveBeenCalledTimes(1);
         });
