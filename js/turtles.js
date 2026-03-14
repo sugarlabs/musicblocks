@@ -906,15 +906,14 @@ Turtles.TurtlesView = class {
             };
             const img = new Image();
             img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svg));
+            img.setAttribute("alt", object.label || object.name || "Canvas button");
 
+            // Batch DOM reads before writes to avoid forced synchronous layout
+            const rightPos = document.body.clientWidth - x;
             container.appendChild(img);
             container.setAttribute(
                 "style",
-                "position: absolute; right:" +
-                    (document.body.clientWidth - x) +
-                    "px;  top: " +
-                    y +
-                    "px;"
+                "position: absolute; right:" + rightPos + "px;  top: " + y + "px;"
             );
             docById("buttoncontainerTOP").appendChild(container);
             return container;
