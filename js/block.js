@@ -13,7 +13,7 @@
 /*
    global
 
-   _, ACCIDENTALLABELS, ACCIDENTALNAMES, addTemperamentToDictionary,
+    ACCIDENTALLABELS, ACCIDENTALNAMES, addTemperamentToDictionary,
    blockBlocks, COLLAPSEBUTTON, COLLAPSETEXTX, COLLAPSETEXTY,
    createjs, DEFAULTACCIDENTAL, DEFAULTDRUM, DEFAULTEFFECT,
    DEFAULTFILTERTYPE, DEFAULTINTERVAL, DEFAULTINVERT, DEFAULTMODE,
@@ -21,9 +21,9 @@
    DEFAULTVOICE, DEGREES, delayExecution, deleteTemperamentFromList,
    DISABLEDFILLCOLOR, DISABLEDSTROKECOLOR, docById, DOUBLEFLAT,
    DOUBLESHARP, DRUMNAMES, EASTINDIANSOLFNOTES, EFFECTSNAMES,
-   EXPANDBUTTON, FILTERTYPES, FLAT, getDrumName, getDrumSynthName,
+    EXPANDBUTTON, FILTERTYPES, FLAT, getDrumName, getDrumSynthName,
    getModeNumbers, getNoiseName, getTemperament, getTemperamentKeys,
-   getTemperamentsList, getTextWidth, hideDOMLabel, HIGHLIGHTSTROKECOLORS,
+    getTemperamentsList, getTextWidth, hideDOMLabel, HIGHLIGHTSTROKECOLORS,
    i18nSolfege, INVERTMODES, isCustomTemperament, last, MEDIASAFEAREA,
    NATURAL, NOISENAMES, NSYMBOLS, NUMBERBLOCKDEFAULT, OSCTYPES,
    PALETTEFILLCOLORS, PALETTEHIGHLIGHTCOLORS, PALETTESTROKECOLORS,
@@ -31,9 +31,9 @@
    piemenuBoolean, piemenuColor, piemenuCustomNotes, piemenuIntervals,
    piemenuModes, piemenuNoteValue, piemenuNumber, piemenuPitches,
    piemenuVoices, piemenuChords, platformColor, ProtoBlock, RSYMBOLS,
-   safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
+    safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
    splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
-   topBlock, updateTemperaments, VALUETEXTX, DEFAULTCHORD,
+    topBlock, updateTemperaments, VALUETEXTX, DEFAULTCHORD, base64Encode,
    VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_
  */
 
@@ -71,7 +71,7 @@
         platformColor
  */
 
-/* exported Block, $ */
+/* exported Block */
 
 // Length of a long touch
 
@@ -4686,30 +4686,6 @@ class Block {
         }
     }
 }
-
-/**
- * Set elements to an array; if element is string, then set element's id to element.
- * @public
- * @returns {Array|HTMLElement} - An array of elements or a single element.
- */
-const $ = () => {
-    const elements = new Array();
-
-    for (let i = 0; i < elements.length; i++) {
-        let element = elements[i];
-        if (typeof element === "string") {
-            element = docById(element);
-        }
-
-        if (elements.length === 1) {
-            return element;
-        }
-
-        elements.push(element);
-    }
-
-    return elements;
-};
 
 // Track mouse presence
 window.hasMouse = false;
