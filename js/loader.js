@@ -14,9 +14,11 @@
 // Localization helper for early bootstrap
 const t_ = typeof _ === "function" ? _ : s => s;
 
+const ASSET_VERSION = window.location.protocol === "file:" ? "" : "v=999999_fix7";
+
 requirejs.config({
     baseUrl: "./",
-    urlArgs: window.location.protocol === "file:" ? "" : "v=999999_fix7",
+    urlArgs: ASSET_VERSION,
     waitSeconds: 60,
     shim: {
         "easeljs.min": {
@@ -240,7 +242,9 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                         escapeValue: false
                     },
                     backend: {
-                        loadPath: "locales/{{lng}}.json?v=" + Date.now()
+                        loadPath: ASSET_VERSION
+                            ? `locales/{{lng}}.json?${ASSET_VERSION}`
+                            : "locales/{{lng}}.json"
                     }
                 },
                 function (err) {
