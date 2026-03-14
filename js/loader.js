@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global requirejs */
+/* global define, requirejs */
 
 const ASSET_VERSION = window.location.protocol === "file:" ? "" : "v=999999_fix7";
 
