@@ -2880,12 +2880,20 @@ class Block {
 
         this._calculateBlockHitArea();
 
-        this.container.on("mouseover", () => {
+        this.container.on("mouseover", event => {
             _getStatic("contextWheelDiv").style.display = "none";
 
             if (!that.activity.logo.runningLilypond) {
                 document.body.style.cursor = "pointer";
             }
+            
+            // Show tooltip if help string is available
+            if (that.protoblock.helpString && that.protoblock.helpString.length > 0 && event.nativeEvent) {
+                let tipText = that.protoblock.helpString[0];
+
+                that.activity.showTooltip(tipText, event.nativeEvent.clientX, event.nativeEvent.clientY);
+            }
+
             if (!that.blocks.selectionModeOn) {
                 that.blocks.highlight(thisBlock, true);
             }
@@ -3225,6 +3233,7 @@ class Block {
          * @param {Event} event - The mouseout event object.
          */
         this.container.on("mouseout", event => {
+            that.activity.hideTooltip();
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false);
             } else {
