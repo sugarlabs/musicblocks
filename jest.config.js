@@ -9,4 +9,5 @@ module.exports = {
         "!js/vendor/**",
     ],
     coverageReporters: ["text-summary", "text", "lcov"],
+    setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
 };
