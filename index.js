@@ -19,6 +19,30 @@ app.get("/env.js", (req, res) => {
             `window.MB_IS_DEV=${JSON.stringify(isDev)};`
     );
 });
+// Proxy endpoint for GROQ API — keeps the API key server-side only.
+// The client calls /api/groq instead of the GROQ API directly,
+// so the API key is never exposed in the browser.
+app.post("/api/groq", express.json(), async (req, res) => {
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) {
+        return res.status(503).json({ error: "GROQ API key not configured on the server." });
+    }
+
+    try {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${apiKey}`
+            },
+            body: JSON.stringify(req.body)
+        });
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        res.status(502).json({ error: "Failed to reach GROQ API" });
+    }
+});
 
 // Enable compression for all responses
 app.use(
