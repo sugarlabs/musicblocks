@@ -637,6 +637,8 @@ function MusicKeyboard(activity) {
                 document.getElementById("keyboardHolder2").style.display = "none";
             }
 
+            this.stopMetronome();
+
             myNode = document.getElementById("myrow");
             if (myNode != null) {
                 myNode.innerHTML = "";
@@ -647,12 +649,7 @@ function MusicKeyboard(activity) {
                 myNode.innerHTML = "";
             }
 
-            this.tick = false;
-            this.firstNote = false;
-            this.metronomeON = false;
-
             selectedNotes = [];
-            if (this.loopTick) this.loopTick.stop();
             docById("wheelDivptm").style.display = "none";
             docById("wheelDivptm").style.display = "none";
             if (this._menuWheel) this._menuWheel.removeWheel();
