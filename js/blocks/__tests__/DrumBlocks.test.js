@@ -1,3 +1,4 @@
+/* global Singer */
 /**
  * MusicBlocks v3.6.2
  *
@@ -442,5 +443,198 @@ describe("setupDrumBlocks", () => {
 
         playDrumBlock.flow(["snare"], global.logo, 0, 0);
         expect(global.Singer.DrumActions.playDrum).toHaveBeenCalledWith("snare", 0, 0);
+    });
+});
+
+describe("real DrumBlocks instances - direct method coverage", () => {
+    let instances;
+    let activity;
+
+    beforeEach(() => {
+        instances = {};
+        activity = {
+            errorMsg: jest.fn(),
+            turtles: {
+                ithTurtle: jest.fn(() => ({
+                    singer: {
+                        drumStyle: [],
+                        inNoteBlock: [],
+                        noteBeatValues: { push: jest.fn() },
+                        beatFactor: 1,
+                        pushedNote: false
+                    }
+                }))
+            },
+            beginnerMode: false,
+            blocks: {
+                blockList: {
+                    blk1: { connections: [null, null], value: "snare", name: "drumname" }
+                }
+            }
+        };
+
+        global.Singer = {
+            DrumActions: {
+                playNoise: jest.fn(),
+                mapPitchToDrum: jest.fn(),
+                setDrum: jest.fn(),
+                playDrum: jest.fn(),
+                GetDrumname: jest.fn(name => name)
+            }
+        };
+        global.last = jest.fn(arr => arr[arr.length - 1]);
+        global.DEFAULTDRUM = "kick";
+        global.DEFAULTEFFECT = "clap";
+        global.NOINPUTERRORMSG = "No input provided";
+        global.DEFAULTNOISE = "white noise";
+
+        const origFlowBlock = global.FlowBlock;
+        const origFlowClampBlock = global.FlowClampBlock;
+        const origValueBlock = global.ValueBlock;
+
+        global.FlowBlock = class {
+            constructor(name) {
+                this.name = name;
+                instances[name] = this;
+            }
+            setPalette() {}
+            setHelpString() {}
+            formBlock() {}
+            setup() {}
+            beginnerBlock() {}
+            makeMacro() {}
+        };
+        global.FlowClampBlock = class {
+            constructor(name) {
+                this.name = name;
+                instances[name] = this;
+            }
+            setPalette() {}
+            setHelpString() {}
+            formBlock() {}
+            setup() {}
+            beginnerBlock() {}
+            makeMacro() {}
+        };
+        global.ValueBlock = class {
+            constructor(name) {
+                this.name = name;
+                instances[name] = this;
+            }
+            setPalette() {}
+            setHelpString() {}
+            formBlock() {}
+            setup() {}
+            beginnerBlock() {}
+            makeMacro() {}
+        };
+
+        setupDrumBlocks(activity);
+
+        global.FlowBlock = origFlowBlock;
+        global.FlowClampBlock = origFlowClampBlock;
+        global.ValueBlock = origValueBlock;
+    });
+
+    test("real PlayNoiseBlock flow() calls errorMsg for invalid args", () => {
+        instances["playnoise"].flow([], {}, 0, "blk1");
+        expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, "blk1");
+    });
+
+    test("real PlayNoiseBlock flow() calls playNoise for valid args", () => {
+        instances["playnoise"].flow(["white noise"], {}, 0, "blk1");
+        expect(global.Singer.DrumActions.playNoise).toHaveBeenCalledWith("white noise", 0, "blk1");
+    });
+
+    test("real MapDrumBlock flow() calls mapPitchToDrum and returns array", () => {
+        const result = instances["mapdrum"].flow(["C4", null], {}, 0, "blk1");
+        expect(global.Singer.DrumActions.mapPitchToDrum).toHaveBeenCalledWith("C4", 0, "blk1");
+        expect(result).toEqual([null, 1]);
+    });
+
+    test("real SetDrumBlock flow() calls setDrum and returns array", () => {
+        const result = instances["setdrum"].flow(["kick", null], {}, 0, "blk1");
+        expect(global.Singer.DrumActions.setDrum).toHaveBeenCalledWith("kick", 0, "blk1");
+        expect(result).toEqual([null, 1]);
+    });
+
+    test("real PlayDrumBlock flow() calls errorMsg for invalid args", () => {
+        const logo = {
+            inPitchDrumMatrix: false,
+            inMatrix: false,
+            inMusicKeyboard: false,
+            drumBlocks: [],
+            pitchDrumMatrix: { drums: [], addColBlock: jest.fn() },
+            phraseMaker: { rowLabels: [], rowArgs: [], addRowBlock: jest.fn() },
+            musicKeyboard: { instruments: [], noteNames: [], octaves: [], addRowBlock: jest.fn() }
+        };
+        instances["playdrum"].flow([null], logo, 0, "blk1");
+        expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, "blk1");
+    });
+
+    test("real PlayDrumBlock flow() calls playDrum in note context", () => {
+        activity.turtles.ithTurtle = jest.fn(() => ({
+            singer: {
+                drumStyle: [],
+                inNoteBlock: [1],
+                noteBeatValues: { [1]: [], push: jest.fn() },
+                beatFactor: 1,
+                pushedNote: false
+            }
+        }));
+        activity.blocks.blockList["blk1"].connections = [null, null];
+        const logo = {
+            inPitchDrumMatrix: false,
+            inMatrix: false,
+            inMusicKeyboard: false,
+            drumBlocks: [],
+            pitchDrumMatrix: { drums: [], addColBlock: jest.fn() },
+            phraseMaker: { rowLabels: [], rowArgs: [], addRowBlock: jest.fn() },
+            musicKeyboard: { instruments: [], noteNames: [], octaves: [], addRowBlock: jest.fn() }
+        };
+        instances["playdrum"].flow(["snare"], logo, 0, "blk1");
+        expect(global.Singer.DrumActions.playDrum).toHaveBeenCalledWith("snare", 0, "blk1");
+    });
+
+    test("real PlayDrumBlock flow() pushes to pitchDrumMatrix", () => {
+        const logo = {
+            inPitchDrumMatrix: true,
+            inMatrix: false,
+            inMusicKeyboard: false,
+            drumBlocks: [],
+            pitchDrumMatrix: { drums: [], addColBlock: jest.fn() },
+            phraseMaker: { rowLabels: [], rowArgs: [], addRowBlock: jest.fn() },
+            musicKeyboard: { instruments: [], noteNames: [], octaves: [], addRowBlock: jest.fn() }
+        };
+        instances["playdrum"].flow(["snare"], logo, 0, "blk1");
+        expect(logo.pitchDrumMatrix.drums).toContain("snare");
+    });
+
+    test("real PlayDrumBlock flow() pushes to phraseMaker in matrix context", () => {
+        const logo = {
+            inPitchDrumMatrix: false,
+            inMatrix: true,
+            inMusicKeyboard: false,
+            drumBlocks: [],
+            pitchDrumMatrix: { drums: [], addColBlock: jest.fn() },
+            phraseMaker: { rowLabels: [], rowArgs: [], addRowBlock: jest.fn() },
+            musicKeyboard: { instruments: [], noteNames: [], octaves: [], addRowBlock: jest.fn() }
+        };
+        instances["playdrum"].flow(["snare"], logo, 0, "blk1");
+        expect(logo.phraseMaker.rowLabels).toContain("snare");
+    });
+
+    test("real PlayDrumBlock flow() pushes to musicKeyboard", () => {
+        const logo = {
+            inPitchDrumMatrix: false,
+            inMatrix: false,
+            inMusicKeyboard: true,
+            drumBlocks: [],
+            pitchDrumMatrix: { drums: [], addColBlock: jest.fn() },
+            phraseMaker: { rowLabels: [], rowArgs: [], addRowBlock: jest.fn() },
+            musicKeyboard: { instruments: [], noteNames: [], octaves: [], addRowBlock: jest.fn() }
+        };
+        instances["playdrum"].flow(["snare"], logo, 0, "blk1");
+        expect(logo.musicKeyboard.instruments).toContain("snare");
     });
 });
