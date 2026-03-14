@@ -241,14 +241,17 @@
             "name_map": {
                 "MODELENGTH": "modelength",
                 "SCALARCHANGEINPITCH": "deltapitch2",
-                "CHANGEINPITCH": "deltapitch",
-                "CURRENTKEY": "currentkey",
-                "CURRENTMODE": "currentmode",
-                "X": "x",
-                "Y": "y",
-                "GREY": "grey",
-                "SHADE": "shade",
-                "PENSIZE": "pensize",
+                    "CHANGEINPITCH": "deltapitch",
+                    "CURRENTKEY": "currentkey",
+                    "CURRENTMODE": "currentmode",
+                    "X": "x",
+                    "Y": "y",
+                    "HEAP": "heap",
+                    "HEAPLENGTH": "heapLength",
+                    "HEAPEMPTY": "heapEmpty",
+                    "GREY": "grey",
+                    "SHADE": "shade",
+                    "PENSIZE": "pensize",
                 "COLOR": "color",
                 "BEATCOUNT": "nopValueBlock",
                 "MEASURECOUNT": "nopValueBlock",
@@ -3698,6 +3701,221 @@
                 "argument",
                 "next_sibling"
             ]
+        },
+        {
+            "name": "emptyHeap",
+            "comment": "Empty heap block",
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "emptyHeap"
+                    }
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "next_sibling"
+            ]
+        },
+        {
+            "name": "reverseHeap",
+            "comment": "Reverse heap block",
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "reverseHeap"
+                    }
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "next_sibling"
+            ]
+        },
+        {
+            "name": "push",
+            "comment": "Push heap block",
+            "arguments": [
+                {
+                    "type": "ValueExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "push"
+                    },
+                    {
+                        "property": "expression.argument.arguments",
+                        "size": 1
+                    }
+                ],
+                "argument_properties": [
+                    "expression.argument.arguments[0]"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "next_sibling"
+            ]
+        },
+        {
+            "name": "setHeapEntry",
+            "comment": "Set heap entry block",
+            "arguments": [
+                {
+                    "type": "NumberExpression"
+                },
+                {
+                    "type": "NumberExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "setHeapEntry"
+                    },
+                    {
+                        "property": "expression.argument.arguments",
+                        "size": 2
+                    }
+                ],
+                "argument_properties": [
+                    "expression.argument.arguments[0]",
+                    "expression.argument.arguments[1]"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "argument",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "body": 2
+            }
+        },
+        {
+            "name": "setHeapEntry",
+            "comment": "Set heap entry block (alias)",
+            "arguments": [
+                {
+                    "type": "NumberExpression"
+                },
+                {
+                    "type": "NumberExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "setHeap"
+                    },
+                    {
+                        "property": "expression.argument.arguments",
+                        "size": 2
+                    }
+                ],
+                "argument_properties": [
+                    "expression.argument.arguments[0]",
+                    "expression.argument.arguments[1]"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "argument",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "body": 2
+            }
         },
         {
             "name": "debugger",
