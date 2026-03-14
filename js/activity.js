@@ -15,10 +15,11 @@
 // scratch. -- Walter Bender, October 2014.
 
 /*
-   globals
+   global
 
-   _, ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON,
-   Blocks, Boundary, CARTESIAN, changeImage, closeWidgets,
+   ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON,
+   ActivityContext,
+   Boundary, CARTESIAN, changeImage, closeWidgets,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
    DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
@@ -26,19 +27,22 @@
    getMacroExpansion, getOctaveRatio, getTemperament, transcribeMidi,
    GOHOMEBUTTON, GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
    hideDOMLabel, initBasicProtoBlocks, initPalettes,
-   INLINECOLLAPSIBLES, jQuery, JSEditor, LanguageBox, ThemeBox, Logo, MSGBLOCK,
+   INLINECOLLAPSIBLES, JSEditor, LanguageBox, ThemeBox, MSGBLOCK,
    NANERRORMSG, NOACTIONERRORMSG, NOBOXERRORMSG, NOINPUTERRORMSG,
    NOMICERRORMSG, NOSQRTERRORMSG, NOSTRINGERRORMSG, PALETTEFILLCOLORS,
    PALETTESTROKECOLORS, PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
    Palettes, PasteBox, PlanetInterface, platform, platformColor,
    piemenuKey, POLAR, preparePluginExports, processMacroData,
-   processPluginData, processRawPluginData, require, SaveInterface,
+   processPluginData, processRawPluginData, SaveInterface,
    SHOWBLOCKSBUTTON, SMALLERBUTTON, SMALLERDISABLEBUTTON, SOPRANO,
    SPECIALINPUTS, STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
-   TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, Turtles, TURTLESVG,
+   TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, TURTLESVG,
    updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_F,
    SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
-   MUSICALMODES, waitForReadiness
+   MUSICALMODES, waitForReadiness, body, i18next, wheelnav, slicePath,
+   base64Encode, disableHorizScrollIcon,
+   toFraction, CARTESIANBUTTON, piemenuGrid,
+   SELECTBUTTON, CLEARBUTTON, Midi, ABCJS
  */
 
 /*
@@ -192,8 +196,11 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
     MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
 }
 
-// Create a global variable from the Activity obj to provide access to
-// blocks, logo, palettes, and turtles for plugins and js-export.
+// Module-scoped singleton reference to the active Activity instance.
+// • Used by plugins (weather.rtp, etc.) that are eval()'d inside this module's
+//   closure scope and therefore can close over `globalActivity` directly.
+// • External modules (synthutils, etc.) should use ActivityContext.getActivity()
+//   instead of reaching through window.* globals.
 let globalActivity;
 
 /**
@@ -207,12 +214,21 @@ const doAnalyzeProject = function () {
 /**
  * Represents an activity in the application.
  */
+/* eslint-disable-next-line no-redeclare */
 class Activity {
     /**
      * Creates an Activity instance.
      */
     constructor() {
         globalActivity = this;
+
+        // Register with ActivityContext – the single authority for the Activity singleton.
+        // activity-context.js is declared as a RequireJS dep of this module (loader.js shim),
+        // so window.ActivityContext is guaranteed to exist before this constructor runs.
+        if (window.ActivityContext && typeof window.ActivityContext.setActivity === "function") {
+            window.ActivityContext.setActivity(this);
+        }
+
         this._listeners = [];
 
         this.cellSize = 55;
@@ -322,7 +338,7 @@ class Activity {
         // When true, the stage needs to be redrawn on the next animation frame
         this.stageDirty = false;
 
-        this.themes = ["light", "dark"];
+        this.themes = ["light", "dark", "highcontrast"];
         try {
             // Detect system theme preference (using same logic as ThemeBox)
             const getSystemTheme = () => {
@@ -2692,8 +2708,10 @@ class Activity {
              */
             const __wheelHandler = event => {
                 const data = normalizeWheel(event);
-                const delY = data.pixelY;
-                const delX = data.pixelX;
+                // Apply scroll speed multiplier for smoother scrolling
+                const SCROLL_SPEED_MULTIPLIER = 2;
+                const delY = data.pixelY * SCROLL_SPEED_MULTIPLIER;
+                const delX = data.pixelX * SCROLL_SPEED_MULTIPLIER;
 
                 if (event.ctrlKey) {
                     event.preventDefault();
@@ -2714,6 +2732,19 @@ class Activity {
 
                 that.refreshCanvas();
             };
+
+            // Remove previous wheel event listener if it exists
+            if (this._wheelHandler) {
+                this.removeEventListener(
+                    document.getElementById("myCanvas"),
+                    "wheel",
+                    this._wheelHandler,
+                    false
+                );
+            }
+
+            // Store the handler reference for future cleanup
+            this._wheelHandler = __wheelHandler;
 
             this.addEventListener(
                 document.getElementById("myCanvas"),
@@ -2849,13 +2880,15 @@ class Activity {
 
             const bitmap = new createjs.Bitmap(img);
             container.addChild(bitmap);
-            bitmap.cache(0, 0, 1200, 900);
+            // Do NOT cache the bitmap here. Each cached grid allocates a
+            // 1200x900x4 = ~4.3 MB backing canvas, and with 8 grids that
+            // totals ~35 MB even though at most 1 grid is visible at a time.
+            // Instead, we cache lazily in _show*() and uncache in _hide*().
 
             bitmap.x = (this.canvas.width - 1200) / 2;
             bitmap.y = (this.canvas.height - 900) / 2;
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 1;
             bitmap.visible = false;
-            bitmap.updateCache();
 
             return bitmap;
         };
@@ -2919,60 +2952,6 @@ class Activity {
             img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svgData));
         };
 
-        /**
-         * Initializes the Idle Watcher mechanism to throttle createjs.Ticker
-         * when the application is inactive and no music is playing.
-         * This significantly reduces CPU usage and improves battery life.
-         */
-        this._initIdleWatcher = () => {
-            const IDLE_THRESHOLD = 5000; // 5 seconds
-            const ACTIVE_FPS = 60;
-            const IDLE_FPS = 1;
-
-            let lastActivity = Date.now();
-            let isIdle = false;
-
-            // Wake up function - restores full framerate
-            const resetIdleTimer = () => {
-                lastActivity = Date.now();
-                if (isIdle) {
-                    isIdle = false;
-                    createjs.Ticker.framerate = ACTIVE_FPS;
-                    // Force immediate redraw for responsiveness
-                    if (this.stage) this.stage.update();
-                }
-            };
-
-            // Track user activity
-            window.addEventListener("mousemove", resetIdleTimer);
-            window.addEventListener("mousedown", resetIdleTimer);
-            window.addEventListener("keydown", resetIdleTimer);
-            window.addEventListener("touchstart", resetIdleTimer);
-            window.addEventListener("wheel", resetIdleTimer);
-
-            // Periodic check for idle state
-            setInterval(() => {
-                // Check if music/code is playing
-                const isMusicPlaying = this.logo?._alreadyRunning || false;
-
-                if (!isMusicPlaying && Date.now() - lastActivity > IDLE_THRESHOLD) {
-                    if (!isIdle) {
-                        isIdle = true;
-                        createjs.Ticker.framerate = IDLE_FPS;
-                        console.log("⚡ Idle mode: Throttling to 1 FPS to save battery");
-                    }
-                } else if (isIdle && isMusicPlaying) {
-                    // Music started playing - wake up immediately
-                    resetIdleTimer();
-                }
-            }, 1000);
-
-            // Expose activity instance for external checks
-            if (typeof window !== "undefined") {
-                window.activity = this;
-            }
-        };
-
         /*
          * Creates and renders error message containers with appropriate artwork.
          * Some error messages have special artwork.
@@ -3031,11 +3010,6 @@ class Activity {
                     resetIdleTimer();
                 }
             }, 1000);
-
-            // Expose activity instance for external checks
-            if (typeof window !== "undefined") {
-                window.activity = this;
-            }
         };
 
         /**
@@ -3443,7 +3417,7 @@ class Activity {
             const protoName = protoblk.name;
 
             // eslint-disable-next-line no-prototype-builtins
-            if (this.blocks.protoBlockDict.hasOwnProperty(protoName)) {
+            if (Object.prototype.hasOwnProperty.call(this.blocks.protoBlockDict, protoName)) {
                 this.palettes.dict[paletteName].makeBlockFromSearch(
                     protoblk,
                     protoName,
@@ -3626,7 +3600,7 @@ class Activity {
                         break;
                     }
                     case 13: {
-                        // 'R or ENTER'
+                        // Alt+ENTER
                         if (this.isInputON) return;
 
                         if (this.searchWidget.style.visibility === "visible") {
@@ -3637,12 +3611,20 @@ class Activity {
                             document.getElementById("paste").style.visibility = "hidden";
                             return;
                         }
-                        this.textMsg("Enter " + _("Play"));
-                        const stopbt = document.getElementById("stop");
-                        if (stopbt) {
-                            stopbt.style.color = platformColor.stopIconcolor;
+
+                        // Check if any widget window is open
+                        const hasOpenWidget = Object.values(window.widgetWindows.openWindows).some(
+                            w => w
+                        );
+                        if (this.turtles.running()) {
+                            this._doHardStopButton();
+                        } else if (!hasOpenWidget) {
+                            const stopbtn = document.getElementById("stop");
+                            if (stopbtn) {
+                                stopbtn.style.color = platformColor.stopIconcolor;
+                            }
+                            this._doFastButton();
                         }
-                        this._doFastButton();
                         break;
                     }
                     case 83: // 'S'
@@ -3853,23 +3835,24 @@ class Activity {
                                 this.searchWidget.style.visibility = "hidden";
                             }
                             break;
-                        case RETURN:
-                            this.textMsg("Return " + _("Play"));
-                            if (this.inTempoWidget) {
-                                if (this.logo.tempo.isMoving) {
-                                    this.logo.tempo.pause();
+                        case RETURN: {
+                            // Check if any widget window is open
+                            const hasOpenWidget = Object.values(
+                                window.widgetWindows.openWindows
+                            ).some(w => w);
+                            if (this.turtles.running()) {
+                                event.preventDefault();
+                                this._doHardStopButton();
+                            } else if (!disableKeys && !hasOpenWidget) {
+                                event.preventDefault();
+                                const stopbtn = document.getElementById("stop");
+                                if (stopbtn) {
+                                    stopbtn.style.color = platformColor.stopIconcolor;
                                 }
-                                this.logo.tempo.resume();
-                            }
-                            if (
-                                this.blocks.activeBlock === null ||
-                                !SPECIALINPUTS.includes(
-                                    this.blocks.blockList[this.blocks.activeBlock].name
-                                )
-                            ) {
-                                this.logo.runLogoCommands();
+                                this._doFastButton();
                             }
                             break;
+                        }
                         default:
                             break;
                     }
@@ -4264,6 +4247,19 @@ class Activity {
                 const blk = this.blocks.dragGroup[b];
                 this.blocks.blockList[blk].trash = false;
                 this.blocks.moveBlockRelative(blk, dx, dy);
+
+                // Re-cache the container if it was uncached to save
+                // memory in sendStackToTrash().
+                const block = this.blocks.blockList[blk];
+                if (block.container && !block.container.bitmapCache) {
+                    block.container.cache(
+                        0,
+                        0,
+                        Math.max(block.width, 1),
+                        Math.max(block.height, 1)
+                    );
+                }
+
                 this.blocks.blockList[blk].show();
             }
 
@@ -4430,10 +4426,12 @@ class Activity {
                     this._restoreTrashById(blockId);
                     trashView.classList.add("hidden");
                 });
-                handleClickOutsideTrashView(trashView);
 
                 trashView.appendChild(listItem);
             });
+
+            // Attach outside-click listener once, after all items are rendered
+            handleClickOutsideTrashView(trashView);
 
             const existingView = document.getElementById("trashView");
             if (existingView) {
@@ -4672,6 +4670,11 @@ class Activity {
          */
         this.clearCache = () => {
             this.blocks.blockList.forEach(block => {
+                // Skip trashed blocks — they are hidden and their backing
+                // canvases are freed in sendStackToTrash(). Re-caching them
+                // here would waste ~0.5–2 MB per trashed block.
+                if (block.trash) return;
+
                 if (block.container) {
                     block.container.uncache();
                     block.container.cache();
@@ -5099,7 +5102,7 @@ class Activity {
 
             tune.lines?.forEach(line => {
                 line.staff?.forEach((staff, staffIndex) => {
-                    if (!organizeBlock.hasOwnProperty(staffIndex)) {
+                    if (!Object.prototype.hasOwnProperty.call(organizeBlock, staffIndex)) {
                         organizeBlock[staffIndex] = {
                             arrangedBlocks: []
                         };
@@ -5110,7 +5113,7 @@ class Activity {
             });
             for (const lineId in organizeBlock) {
                 organizeBlock[lineId].arrangedBlocks?.forEach(staff => {
-                    if (!staffBlocksMap.hasOwnProperty(lineId)) {
+                    if (!Object.prototype.hasOwnProperty.call(staffBlocksMap, lineId)) {
                         staffBlocksMap[lineId] = {
                             meterNum: staff?.meter?.value[0]?.num || 4,
                             meterDen: staff?.meter?.value[0]?.den || 4,
@@ -5855,7 +5858,7 @@ class Activity {
          */
         this._hideCartesian = () => {
             this.cartesianBitmap.visible = false;
-            this.cartesianBitmap.updateCache();
+            this.cartesianBitmap.uncache();
             this.update = true;
         };
 
@@ -5864,6 +5867,7 @@ class Activity {
          */
         this._showCartesian = () => {
             this.cartesianBitmap.visible = true;
+            this.cartesianBitmap.cache(0, 0, 1200, 900);
             this.cartesianBitmap.updateCache();
             this.update = true;
         };
@@ -5873,7 +5877,7 @@ class Activity {
          */
         this._hidePolar = () => {
             this.polarBitmap.visible = false;
-            this.polarBitmap.updateCache();
+            this.polarBitmap.uncache();
             this.update = true;
         };
 
@@ -5882,6 +5886,7 @@ class Activity {
          */
         this._showPolar = () => {
             this.polarBitmap.visible = true;
+            this.polarBitmap.cache(0, 0, 1200, 900);
             this.polarBitmap.updateCache();
             this.update = true;
         };
@@ -5894,45 +5899,33 @@ class Activity {
             for (let i = 0; i < 7; i++) {
                 this.grandSharpBitmap[i].visible = false;
                 this.grandSharpBitmap[i].x = newX;
-                this.grandSharpBitmap[i].updateCache();
                 this.grandFlatBitmap[i].visible = false;
                 this.grandFlatBitmap[i].x = newX;
-                this.grandFlatBitmap[i].updateCache();
 
                 this.trebleSharpBitmap[i].visible = false;
                 this.trebleSharpBitmap[i].x = newX;
-                this.trebleSharpBitmap[i].updateCache();
                 this.trebleFlatBitmap[i].visible = false;
                 this.trebleFlatBitmap[i].x = newX;
-                this.trebleFlatBitmap[i].updateCache();
 
                 this.sopranoSharpBitmap[i].visible = false;
                 this.sopranoSharpBitmap[i].x = newX;
-                this.sopranoSharpBitmap[i].updateCache();
                 this.sopranoFlatBitmap[i].visible = false;
                 this.sopranoFlatBitmap[i].x = newX;
-                this.sopranoFlatBitmap[i].updateCache();
 
                 this.altoSharpBitmap[i].visible = false;
                 this.altoSharpBitmap[i].x = newX;
-                this.altoSharpBitmap[i].updateCache();
                 this.altoFlatBitmap[i].visible = false;
                 this.altoFlatBitmap[i].x = newX;
-                this.altoFlatBitmap[i].updateCache();
 
                 this.tenorSharpBitmap[i].visible = false;
                 this.tenorSharpBitmap[i].x = newX;
-                this.tenorSharpBitmap[i].updateCache();
                 this.tenorFlatBitmap[i].visible = false;
                 this.tenorFlatBitmap[i].x = newX;
-                this.tenorFlatBitmap[i].updateCache();
 
                 this.bassSharpBitmap[i].visible = false;
                 this.bassSharpBitmap[i].x = newX;
-                this.bassSharpBitmap[i].updateCache();
                 this.bassFlatBitmap[i].visible = false;
                 this.bassFlatBitmap[i].x = newX;
-                this.bassFlatBitmap[i].updateCache();
             }
             this.update = true;
         };
@@ -5942,7 +5935,7 @@ class Activity {
          */
         this._hideTreble = () => {
             this.trebleBitmap.visible = false;
-            this.trebleBitmap.updateCache();
+            this.trebleBitmap.uncache();
             this._hideAccidentals();
             this.update = true;
         };
@@ -5952,6 +5945,7 @@ class Activity {
          */
         this._showTreble = () => {
             this.trebleBitmap.visible = true;
+            this.trebleBitmap.cache(0, 0, 1200, 900);
             this.trebleBitmap.updateCache();
             this._hideAccidentals();
             // eslint-disable-next-line no-console
@@ -5982,13 +5976,11 @@ class Activity {
                 if (scale.includes(_sharps[i])) {
                     this.trebleSharpBitmap[i].x += dx;
                     this.trebleSharpBitmap[i].visible = true;
-                    this.trebleSharpBitmap[i].updateCache();
                     dx += 15;
                 }
                 if (scale.includes(_flats[i])) {
                     this.trebleFlatBitmap[i].x += dx;
                     this.trebleFlatBitmap[i].visible = true;
-                    this.trebleFlatBitmap[i].updateCache();
                     dx += 15;
                 }
             }
@@ -6001,7 +5993,7 @@ class Activity {
          */
         this._hideGrand = () => {
             this.grandBitmap.visible = false;
-            this.grandBitmap.updateCache();
+            this.grandBitmap.uncache();
             this._hideAccidentals();
             this.update = true;
         };
@@ -6011,6 +6003,7 @@ class Activity {
          */
         this._showGrand = () => {
             this.grandBitmap.visible = true;
+            this.grandBitmap.cache(0, 0, 1200, 900);
             this.grandBitmap.updateCache();
             this._hideAccidentals();
             // eslint-disable-next-line no-console
@@ -6041,13 +6034,11 @@ class Activity {
                 if (scale.includes(_sharps[i])) {
                     this.grandSharpBitmap[i].x += dx;
                     this.grandSharpBitmap[i].visible = true;
-                    this.grandSharpBitmap[i].updateCache();
                     dx += 15;
                 }
                 if (scale.includes(_flats[i])) {
                     this.grandFlatBitmap[i].x += dx;
                     this.grandFlatBitmap[i].visible = true;
-                    this.grandFlatBitmap[i].updateCache();
                     dx += 15;
                 }
             }
@@ -6059,7 +6050,7 @@ class Activity {
          */
         this._hideSoprano = () => {
             this.sopranoBitmap.visible = false;
-            this.sopranoBitmap.updateCache();
+            this.sopranoBitmap.uncache();
             this.update = true;
         };
 
@@ -6068,6 +6059,7 @@ class Activity {
          */
         this._showSoprano = () => {
             this.sopranoBitmap.visible = true;
+            this.sopranoBitmap.cache(0, 0, 1200, 900);
             this.sopranoBitmap.updateCache();
             this._hideAccidentals();
             // eslint-disable-next-line no-console
@@ -6098,13 +6090,11 @@ class Activity {
                 if (scale.includes(_sharps[i])) {
                     this.sopranoSharpBitmap[i].x += dx;
                     this.sopranoSharpBitmap[i].visible = true;
-                    this.sopranoSharpBitmap[i].updateCache();
                     dx += 15;
                 }
                 if (scale.includes(_flats[i])) {
                     this.sopranoFlatBitmap[i].x += dx;
                     this.sopranoFlatBitmap[i].visible = true;
-                    this.sopranoFlatBitmap[i].updateCache();
                     dx += 15;
                 }
             }
@@ -6117,7 +6107,7 @@ class Activity {
          */
         this._hideAlto = () => {
             this.altoBitmap.visible = false;
-            this.altoBitmap.updateCache();
+            this.altoBitmap.uncache();
             this._hideAccidentals();
             this.update = true;
         };
@@ -6131,6 +6121,7 @@ class Activity {
          */
         this._showAlto = () => {
             this.altoBitmap.visible = true;
+            this.altoBitmap.cache(0, 0, 1200, 900);
             this.altoBitmap.updateCache();
             this._hideAccidentals();
             // eslint-disable-next-line no-console
@@ -6161,13 +6152,11 @@ class Activity {
                 if (scale.includes(_sharps[i])) {
                     this.altoSharpBitmap[i].x += dx;
                     this.altoSharpBitmap[i].visible = true;
-                    this.altoSharpBitmap[i].updateCache();
                     dx += 15;
                 }
                 if (scale.includes(_flats[i])) {
                     this.altoFlatBitmap[i].x += dx;
                     this.altoFlatBitmap[i].visible = true;
-                    this.altoFlatBitmap[i].updateCache();
                     dx += 15;
                 }
             }
@@ -6180,7 +6169,7 @@ class Activity {
          */
         this._hideTenor = () => {
             this.tenorBitmap.visible = false;
-            this.tenorBitmap.updateCache();
+            this.tenorBitmap.uncache();
             this.update = true;
         };
 
@@ -6189,6 +6178,7 @@ class Activity {
          */
         this._showTenor = () => {
             this.tenorBitmap.visible = true;
+            this.tenorBitmap.cache(0, 0, 1200, 900);
             this.tenorBitmap.updateCache();
             this._hideAccidentals();
             // eslint-disable-next-line no-console
@@ -6219,13 +6209,11 @@ class Activity {
                 if (scale.includes(_sharps[i])) {
                     this.tenorSharpBitmap[i].x += dx;
                     this.tenorSharpBitmap[i].visible = true;
-                    this.tenorSharpBitmap[i].updateCache();
                     dx += 15;
                 }
                 if (scale.includes(_flats[i])) {
                     this.tenorFlatBitmap[i].x += dx;
                     this.tenorFlatBitmap[i].visible = true;
-                    this.tenorFlatBitmap[i].updateCache();
                     dx += 15;
                 }
             }
@@ -6238,7 +6226,7 @@ class Activity {
          */
         this._hideBass = () => {
             this.bassBitmap.visible = false;
-            this.bassBitmap.updateCache();
+            this.bassBitmap.uncache();
             this._hideAccidentals();
             this.update = true;
         };
@@ -6248,6 +6236,7 @@ class Activity {
          */
         this._showBass = () => {
             this.bassBitmap.visible = true;
+            this.bassBitmap.cache(0, 0, 1200, 900);
             this.bassBitmap.updateCache();
             this._hideAccidentals();
             // eslint-disable-next-line no-console
@@ -6278,13 +6267,11 @@ class Activity {
                 if (scale.includes(_sharps[i])) {
                     this.bassSharpBitmap[i].x += dx;
                     this.bassSharpBitmap[i].visible = true;
-                    this.bassSharpBitmap[i].updateCache();
                     dx += 15;
                 }
                 if (scale.includes(_flats[i])) {
                     this.bassFlatBitmap[i].x += dx;
                     this.bassFlatBitmap[i].visible = true;
-                    this.bassFlatBitmap[i].updateCache();
                     dx += 15;
                 }
             }
@@ -6298,6 +6285,7 @@ class Activity {
          */
         this.prepareExport = () => {
             const blockMap = [];
+            const blockIndexById = new Map();
             this.hasMatrixDataBlock = false;
             for (let blk = 0; blk < this.blocks.blockList.length; blk++) {
                 const myBlock = this.blocks.blockList[blk];
@@ -6306,6 +6294,7 @@ class Activity {
                     continue;
                 }
 
+                blockIndexById.set(blk, blockMap.length);
                 blockMap.push(blk);
             }
 
@@ -6449,17 +6438,19 @@ class Activity {
 
                 const connections = [];
                 for (let c = 0; c < myBlock.connections.length; c++) {
-                    const mapConnection = blockMap.indexOf(myBlock.connections[c]);
-                    if (myBlock.connections[c] === null || mapConnection === -1) {
+                    const connection = myBlock.connections[c];
+                    const mapConnection = blockIndexById.get(connection);
+                    if (connection === null || mapConnection === undefined) {
                         connections.push(null);
                     } else {
                         connections.push(mapConnection);
                     }
                 }
 
+                const blockIndex = blockIndexById.get(blk);
                 if (args === null) {
                     data.push([
-                        blockMap.indexOf(blk),
+                        blockIndex,
                         myBlock.name,
                         myBlock.container.x,
                         myBlock.container.y,
@@ -6467,7 +6458,7 @@ class Activity {
                     ]);
                 } else {
                     data.push([
-                        blockMap.indexOf(blk),
+                        blockIndex,
                         [myBlock.name, args],
                         myBlock.container.x,
                         myBlock.container.y,
@@ -6825,7 +6816,7 @@ class Activity {
             const protoName = protoblk.name;
 
             // eslint-disable-next-line no-prototype-builtins
-            if (this.blocks.protoBlockDict.hasOwnProperty(protoName)) {
+            if (Object.prototype.hasOwnProperty.call(that.blocks.protoBlockDict, protoName)) {
                 this.palettes.dict[paletteName].makeBlockFromSearch(
                     protoblk,
                     protoName,
@@ -7184,6 +7175,8 @@ class Activity {
             this.currentX = 0;
             this.currentY = 0;
             this.hasMouseMoved = false;
+            // rAF guard for throttling drag-select mousemove
+            this._dragSelectRafPending = false;
             if (this.selectionArea && this.selectionArea.parentNode) {
                 this.selectionArea.parentNode.removeChild(this.selectionArea);
             }
@@ -7194,17 +7187,24 @@ class Activity {
 
             this.addEventListener(document, "mousemove", event => {
                 this.hasMouseMoved = true;
-                // event.preventDefault();
-                // this.selectedBlocks = [];
                 if (this.isDragging && this.isSelecting) {
                     this.currentX = event.clientX;
                     this.currentY = event.clientY;
-                    if (!this.blocks.isBlockMoving && !this.turtles.running()) {
-                        this.setSelectionMode(true);
-                        this.drawSelectionArea();
-                        this.selectedBlocks = this.selectBlocksInDragArea();
-                        this.unhighlightSelectedBlocks(true, true);
-                        this.blocks.setSelectedBlocks(this.selectedBlocks);
+                    // Throttle drag-select to one update per animation frame
+                    if (
+                        !this._dragSelectRafPending &&
+                        !this.blocks.isBlockMoving &&
+                        !this.turtles.running()
+                    ) {
+                        this._dragSelectRafPending = true;
+                        requestAnimationFrame(() => {
+                            this._dragSelectRafPending = false;
+                            this.setSelectionMode(true);
+                            this.drawSelectionArea();
+                            this.selectedBlocks = this.selectBlocksInDragArea();
+                            this.unhighlightSelectedBlocks(true, true);
+                            this.blocks.setSelectedBlocks(this.selectedBlocks);
+                        });
                     }
                 }
             });
@@ -7240,15 +7240,23 @@ class Activity {
             const width = Math.abs(this.currentX - this.startX);
             const height = Math.abs(this.currentY - this.startY);
 
-            this.selectionArea.style.display = "flex";
-            this.selectionArea.style.position = "absolute";
-            this.selectionArea.style.left = x + "px";
-            this.selectionArea.style.top = y + "px";
-            this.selectionArea.style.height = height + "px";
-            this.selectionArea.style.width = width + "px";
-            this.selectionArea.style.zIndex = "9989";
-            this.selectionArea.style.backgroundColor = "rgba(137, 207, 240, 0.5)";
-            this.selectionArea.style.pointerEvents = "none";
+            // Batch all CSS writes into a single cssText assignment
+            // to avoid multiple forced style recalculations.
+            this.selectionArea.style.cssText =
+                "display:flex;position:absolute;" +
+                "left:" +
+                x +
+                "px;top:" +
+                y +
+                "px;" +
+                "width:" +
+                width +
+                "px;height:" +
+                height +
+                "px;" +
+                "z-index:9989;" +
+                "background-color:rgba(137,207,240,0.5);" +
+                "pointer-events:none;";
 
             this.dragArea = { x, y, width, height };
         };
@@ -7290,43 +7298,33 @@ class Activity {
         // Unhighlight the selected blocks
 
         this.unhighlightSelectedBlocks = (unhighlight, selectionModeOn) => {
+            // Build a Set of selected block indices for O(1) lookup
+            // instead of O(n*m) deep-equality comparisons.
+            const selectedSet = new Set();
             for (let i = 0; i < this.selectedBlocks.length; i++) {
-                for (const blk in this.blocks.blockList) {
-                    if (this.isEqual(this.blocks.blockList[blk], this.selectedBlocks[i])) {
-                        if (unhighlight) {
-                            this.blocks.unhighlightSelectedBlocks(blk, true);
-                        } else {
-                            this.blocks.highlight(blk, true);
-                            this.refreshCanvas();
-                        }
-                    }
+                const idx = this.blocks.blockList.indexOf(this.selectedBlocks[i]);
+                if (idx >= 0) {
+                    selectedSet.add(idx);
                 }
+            }
+
+            for (const blk of selectedSet) {
+                if (unhighlight) {
+                    this.blocks.unhighlightSelectedBlocks(blk, true);
+                } else {
+                    this.blocks.highlight(blk, true);
+                }
+            }
+
+            if (!unhighlight && selectedSet.size > 0) {
+                this.refreshCanvas();
             }
         };
 
-        // Check if two blocks are same or not.
+        // Check if two blocks are the same by identity (reference equality).
 
         this.isEqual = (obj1, obj2) => {
-            const keys1 = Object.keys(obj1);
-            const keys2 = Object.keys(obj2);
-
-            if (keys1.length !== keys2.length) {
-                return false;
-            }
-
-            for (const key of keys1) {
-                if (!obj2.hasOwnProperty(key)) {
-                    return false;
-                }
-            }
-
-            for (const key of keys1) {
-                if (obj1[key] !== obj2[key]) {
-                    return false;
-                }
-            }
-
-            return true;
+            return obj1 === obj2;
         };
 
         this.setSelectionMode = selection => {
@@ -8229,6 +8227,44 @@ class Activity {
         }
     }
 }
+
+// ---------------------------------------------------------------------------
+// Hard Deprecation Guard — window.activity
+//
+// The Activity singleton is no longer exposed on window.activity.
+// All code must use ActivityContext.getActivity() instead.
+// This guard ensures:
+//   • Silent-regression safety (warns loudly in console, not silently undefined)
+//   • A migration window — replace with a hard removal in the next major version
+// ---------------------------------------------------------------------------
+(function installActivityDeprecationGuard() {
+    if (typeof window === "undefined") return; // safety for SSR / Node test runners
+    try {
+        Object.defineProperty(window, "activity", {
+            configurable: true, // allow removal in the next major version
+            enumerable: false,
+            get() {
+                // eslint-disable-next-line no-console
+                console.warn(
+                    "[Deprecated] window.activity is removed. " +
+                        "Use ActivityContext.getActivity() instead."
+                );
+                return undefined;
+            },
+            set() {
+                // eslint-disable-next-line no-console
+                console.error(
+                    "[Deprecated] window.activity is removed and cannot be set. " +
+                        "Use ActivityContext.setActivity() via activity-context.js."
+                );
+            }
+        });
+    } catch (e) {
+        // Fail silently — defining the property must never break the app.
+        // eslint-disable-next-line no-console
+        console.warn("[ActivityDeprecationGuard] Could not install guard:", e);
+    }
+})();
 
 const activity = new Activity();
 
