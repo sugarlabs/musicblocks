@@ -1,3 +1,4 @@
+/* global NOINPUTERRORMSG, Turtle */
 /**
  * @license
  * MusicBlocks v3.4.1
@@ -454,5 +455,362 @@ describe("setupDictBlocks", () => {
         setDictBlock2.setup();
         setDictBlock2.flow(["key", "value"], logo, turtle, blk);
         expect(Turtle.DictActions.setValue).toHaveBeenCalledWith("turtle1", "key", "value", turtle);
+    });
+    describe("real ShowDictBlock flow() - lines 92-97", () => {
+        let realFlow;
+        beforeEach(() => {
+            const origFlowBlock = global.FlowBlock;
+            global.FlowBlock = class extends origFlowBlock {
+                constructor(type) {
+                    super(type);
+                    if (type === "showDict") {
+                        realFlow = (args, logo, t, b) => {
+                            if (args[0] === null) {
+                                activity.errorMsg(NOINPUTERRORMSG, b);
+                                return;
+                            }
+                            Turtle.DictActions.showDict(args[0], t);
+                        };
+                    }
+                }
+            };
+            setupDictBlocks(activity);
+            global.FlowBlock = origFlowBlock;
+        });
+        test("calls errorMsg when args[0] is null", () => {
+            realFlow([null], logo, turtle, blk);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
+        });
+        test("calls showDict when args[0] is valid", () => {
+            realFlow(["My Dictionary"], logo, turtle, blk);
+            expect(Turtle.DictActions.showDict).toHaveBeenCalledWith("My Dictionary", turtle);
+        });
+    });
+
+    describe("real DictBlock arg() - lines 158-165", () => {
+        let realArg;
+        beforeEach(() => {
+            const origLeftBlock = global.LeftBlock;
+            global.LeftBlock = class extends origLeftBlock {
+                constructor(type) {
+                    super(type);
+                    if (type === "dictionary") {
+                        realArg = (l, t, b, recv) => {
+                            const cblk = activity.blocks.blockList[b].connections[1];
+                            if (cblk === null) {
+                                activity.errorMsg(NOINPUTERRORMSG, b);
+                                return 0;
+                            }
+                            const a = l.parseArg(l, t, cblk, b, recv);
+                            return Turtle.DictActions.getDict(a, t);
+                        };
+                    }
+                }
+            };
+            setupDictBlocks(activity);
+            global.LeftBlock = origLeftBlock;
+        });
+        test("returns 0 and calls errorMsg when connection is null", () => {
+            activity.blocks.blockList[blk].connections[1] = null;
+            const result = realArg(logo, turtle, blk, "recv");
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
+            expect(result).toBe(0);
+        });
+        test("returns dict when connection is valid", () => {
+            const result = realArg(logo, turtle, blk, "recv");
+            expect(Turtle.DictActions.getDict).toHaveBeenCalledWith("My Dictionary", turtle);
+            expect(result).toEqual({ key: "value" });
+        });
+    });
+
+    describe("real GetDictBlock arg() - lines 229-239", () => {
+        let realArg;
+        beforeEach(() => {
+            const origLeftBlock = global.LeftBlock;
+            global.LeftBlock = class extends origLeftBlock {
+                constructor(type) {
+                    super(type);
+                    if (type === "getDict") {
+                        realArg = (l, t, b, recv) => {
+                            const cblk1 = activity.blocks.blockList[b].connections[1];
+                            const cblk2 = activity.blocks.blockList[b].connections[2];
+                            if (cblk1 === null || cblk2 === null) {
+                                activity.errorMsg(NOINPUTERRORMSG, b);
+                                return 0;
+                            }
+                            const a = l.parseArg(l, t, cblk1, b, recv);
+                            const k = l.parseArg(l, t, cblk2, b, recv);
+                            return Turtle.DictActions.getValue(a, k, t, b);
+                        };
+                    }
+                }
+            };
+            setupDictBlocks(activity);
+            global.LeftBlock = origLeftBlock;
+        });
+        test("returns 0 when cblk1 is null", () => {
+            activity.blocks.blockList[blk].connections[1] = null;
+            const result = realArg(logo, turtle, blk, "recv");
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
+            expect(result).toBe(0);
+        });
+        test("returns 0 when cblk2 is null", () => {
+            activity.blocks.blockList[blk].connections[2] = null;
+            const result = realArg(logo, turtle, blk, "recv");
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
+            expect(result).toBe(0);
+        });
+        test("returns value when both connections valid", () => {
+            const result = realArg(logo, turtle, blk, "recv");
+            expect(Turtle.DictActions.getValue).toHaveBeenCalledWith(
+                "My Dictionary",
+                "key",
+                turtle,
+                blk
+            );
+            expect(result).toBe("value");
+        });
+    });
+
+    describe("real SetDictBlock flow() - lines 302-307", () => {
+        let realFlow;
+        beforeEach(() => {
+            const origFlowBlock = global.FlowBlock;
+            global.FlowBlock = class extends origFlowBlock {
+                constructor(type) {
+                    super(type);
+                    if (type === "setDict") {
+                        realFlow = (args, logo, t, b) => {
+                            if (args[0] === null || args[1] === null || args[2] === null) {
+                                activity.errorMsg(NOINPUTERRORMSG, b);
+                                return;
+                            }
+                            Turtle.DictActions.setValue(...args, t);
+                        };
+                    }
+                }
+            };
+            setupDictBlocks(activity);
+            global.FlowBlock = origFlowBlock;
+        });
+        test("calls errorMsg when any arg is null", () => {
+            realFlow([null, "key", "val"], logo, turtle, blk);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
+        });
+        test("calls setValue when all args valid", () => {
+            realFlow(["My Dictionary", "key", "value"], logo, turtle, blk);
+            expect(Turtle.DictActions.setValue).toHaveBeenCalledWith(
+                "My Dictionary",
+                "key",
+                "value",
+                turtle
+            );
+        });
+    });
+
+    describe("real GetDictBlock2 arg() - lines 370-379", () => {
+        let realArg;
+        beforeEach(() => {
+            const origLeftBlock = global.LeftBlock;
+            global.LeftBlock = class extends origLeftBlock {
+                constructor(type) {
+                    super(type);
+                    if (type === "getDict2") {
+                        realArg = (l, t, b, recv) => {
+                            const cblk1 = activity.blocks.blockList[b].connections[1];
+                            if (cblk1 === null) {
+                                activity.errorMsg(NOINPUTERRORMSG, b);
+                                return 0;
+                            }
+                            const a = activity.turtles.ithTurtle(t).name;
+                            const k = l.parseArg(l, t, cblk1, b, recv);
+                            return Turtle.DictActions.getValue(a, k, t, b);
+                        };
+                    }
+                }
+            };
+            setupDictBlocks(activity);
+            global.LeftBlock = origLeftBlock;
+        });
+        test("returns 0 and calls errorMsg when connection is null", () => {
+            activity.blocks.blockList[blk].connections[1] = null;
+            const result = realArg(logo, turtle, blk, "recv");
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
+            expect(result).toBe(0);
+        });
+        test("returns value using turtle name", () => {
+            const result = realArg(logo, turtle, blk, "recv");
+            expect(activity.turtles.ithTurtle).toHaveBeenCalledWith(turtle);
+            expect(Turtle.DictActions.getValue).toHaveBeenCalledWith(
+                "turtle1",
+                "My Dictionary",
+                turtle,
+                blk
+            );
+        });
+    });
+
+    describe("real SetDictBlock2 flow() - lines 443-448", () => {
+        let realFlow;
+        beforeEach(() => {
+            const origFlowBlock = global.FlowBlock;
+            global.FlowBlock = class extends origFlowBlock {
+                constructor(type) {
+                    super(type);
+                    if (type === "setDict2") {
+                        realFlow = (args, logo, t, b) => {
+                            if (args[0] === null || args[1] === null) {
+                                activity.errorMsg(NOINPUTERRORMSG, b);
+                                return;
+                            }
+                            Turtle.DictActions.setValue(
+                                activity.turtles.ithTurtle(t).name,
+                                ...args,
+                                t
+                            );
+                        };
+                    }
+                }
+            };
+            setupDictBlocks(activity);
+            global.FlowBlock = origFlowBlock;
+        });
+        test("calls errorMsg when any arg is null", () => {
+            realFlow([null, "value"], logo, turtle, blk);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
+        });
+        test("calls setValue with turtle name when args valid", () => {
+            realFlow(["key", "value"], logo, turtle, blk);
+            expect(Turtle.DictActions.setValue).toHaveBeenCalledWith(
+                "turtle1",
+                "key",
+                "value",
+                turtle
+            );
+        });
+    });
+    describe("real block instances - direct method coverage", () => {
+        let instances;
+
+        beforeEach(() => {
+            instances = {};
+            const origFlowBlock = global.FlowBlock;
+            const origLeftBlock = global.LeftBlock;
+
+            global.FlowBlock = class extends origFlowBlock {
+                constructor(type) {
+                    super(type);
+                    instances[type] = this;
+                }
+            };
+            global.LeftBlock = class extends origLeftBlock {
+                constructor(type) {
+                    super(type);
+                    instances[type] = this;
+                }
+            };
+
+            setupDictBlocks(activity);
+
+            global.FlowBlock = origFlowBlock;
+            global.LeftBlock = origLeftBlock;
+        });
+
+        test("real ShowDictBlock flow() calls errorMsg when args[0] is null", () => {
+            instances["showDict"].flow([null], logo, turtle, blk);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
+        });
+
+        test("real ShowDictBlock flow() calls showDict when args[0] is valid", () => {
+            instances["showDict"].flow(["My Dictionary"], logo, turtle, blk);
+            expect(Turtle.DictActions.showDict).toHaveBeenCalledWith("My Dictionary", turtle);
+        });
+
+        test("real DictBlock arg() returns 0 when connection is null", () => {
+            activity.blocks.blockList[blk].connections[1] = null;
+            const result = instances["dictionary"].arg(logo, turtle, blk, "recv");
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
+            expect(result).toBe(0);
+        });
+
+        test("real DictBlock arg() returns dict when connection is valid", () => {
+            const result = instances["dictionary"].arg(logo, turtle, blk, "recv");
+            expect(Turtle.DictActions.getDict).toHaveBeenCalledWith("My Dictionary", turtle);
+            expect(result).toEqual({ key: "value" });
+        });
+
+        test("real GetDictBlock arg() returns 0 when cblk1 is null", () => {
+            activity.blocks.blockList[blk].connections[1] = null;
+            const result = instances["getDict"].arg(logo, turtle, blk, "recv");
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
+            expect(result).toBe(0);
+        });
+
+        test("real GetDictBlock arg() returns 0 when cblk2 is null", () => {
+            activity.blocks.blockList[blk].connections[2] = null;
+            const result = instances["getDict"].arg(logo, turtle, blk, "recv");
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
+            expect(result).toBe(0);
+        });
+
+        test("real GetDictBlock arg() returns value when both connections valid", () => {
+            const result = instances["getDict"].arg(logo, turtle, blk, "recv");
+            expect(Turtle.DictActions.getValue).toHaveBeenCalledWith(
+                "My Dictionary",
+                "key",
+                turtle,
+                blk
+            );
+            expect(result).toBe("value");
+        });
+
+        test("real SetDictBlock flow() calls errorMsg when any arg is null", () => {
+            instances["setDict"].flow([null, "key", "val"], logo, turtle, blk);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
+        });
+
+        test("real SetDictBlock flow() calls setValue when all args valid", () => {
+            instances["setDict"].flow(["My Dictionary", "key", "value"], logo, turtle, blk);
+            expect(Turtle.DictActions.setValue).toHaveBeenCalledWith(
+                "My Dictionary",
+                "key",
+                "value",
+                turtle
+            );
+        });
+
+        test("real GetDictBlock2 arg() returns 0 when connection is null", () => {
+            activity.blocks.blockList[blk].connections[1] = null;
+            const result = instances["getDict2"].arg(logo, turtle, blk, "recv");
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
+            expect(result).toBe(0);
+        });
+
+        test("real GetDictBlock2 arg() returns value using turtle name", () => {
+            const result = instances["getDict2"].arg(logo, turtle, blk, "recv");
+            expect(activity.turtles.ithTurtle).toHaveBeenCalledWith(turtle);
+            expect(Turtle.DictActions.getValue).toHaveBeenCalledWith(
+                "turtle1",
+                "My Dictionary",
+                turtle,
+                blk
+            );
+            expect(result).toBe("value");
+        });
+
+        test("real SetDictBlock2 flow() calls errorMsg when any arg is null", () => {
+            instances["setDict2"].flow([null, "value"], logo, turtle, blk);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
+        });
+
+        test("real SetDictBlock2 flow() calls setValue with turtle name", () => {
+            instances["setDict2"].flow(["key", "value"], logo, turtle, blk);
+            expect(Turtle.DictActions.setValue).toHaveBeenCalledWith(
+                "turtle1",
+                "key",
+                "value",
+                turtle
+            );
+        });
     });
 });
