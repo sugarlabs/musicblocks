@@ -5798,15 +5798,20 @@ const noteIsSolfege = note => {
  * Get the solfege representation of a note string.
  * @function
  * @param {string} note - The note string.
+ * @param {string} [keySignature] - Optional key signature for context (reserved for future mode-specific conversion).
+ * @param {boolean} [movable] - Whether to use movable do (reserved for future use).
  * @returns {string} The solfege representation.
  */
-const getSolfege = note => {
-    // TODO: Use mode-specific conversion.
+const getSolfege = (note, keySignature, movable) => {
+    // If note is already in solfege format, return as-is
     if (noteIsSolfege(note)) {
         return note;
-    } else {
-        return SOLFEGECONVERSIONTABLE[note];
     }
+
+    // Use the standard conversion table (C major / fixed do)
+    // Note: keySignature and movable parameters are now accepted for
+    // compatibility and future mode-specific conversion implementation
+    return SOLFEGECONVERSIONTABLE[note] || note;
 };
 
 /**
