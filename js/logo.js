@@ -14,25 +14,25 @@
 /*
    global
 
-   _, Notation, Synth, instruments, instrumentsFilters,
+   Notation, Synth, instruments, instrumentsFilters,
    instrumentsEffects, Singer, Tone, CAMERAVALUE, doUseCamera,
    VIDEOVALUE, last, getIntervalDirection, getIntervalNumber,
    mixedNumber, rationalToFraction, doStopVideoCam, StatusMatrix,
-   getStatsFromNotation, delayExecution, DEFAULTVOICE, window
- */
-
-/*
-   exported
-
-   Queue, Logo, LogoDependencies, DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY,
-   OSCVOLUMEADJUSTMENT, TONEBPM, TARGETBPM, TURTLESTEP, NOTEDIV,
-   MIN_HIGHLIGHT_DURATION_MS,
+   getStatsFromNotation, delayExecution, DEFAULTVOICE, define,
+   DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY, OSCVOLUMEADJUSTMENT,
+   TONEBPM, TARGETBPM, TURTLESTEP, NOTEDIV, MIN_HIGHLIGHT_DURATION_MS,
    NOMICERRORMSG, NANERRORMSG, NOSTRINGERRORMSG, NOBOXERRORMSG,
    NOACTIONERRORMSG, NOINPUTERRORMSG, NOSQRTERRORMSG,
    ZERODIVIDEERRORMSG, EMPTYHEAPERRORMSG, INVALIDPITCH, POSNUMBER,
    NOTATIONNOTE, NOTATIONDURATION, NOTATIONDOTCOUNT,
    NOTATIONTUPLETVALUE, NOTATIONROUNDDOWN, NOTATIONINSIDECHORD,
    NOTATIONSTACCATO
+ */
+
+/*
+   exported
+
+   Queue, Logo, LogoDependencies
  */
 
 // Constants moved to js/logoconstants.js to resolve circular dependency
@@ -57,6 +57,7 @@ class Queue {
     }
 }
 
+// eslint-disable-next-line no-redeclare
 class Logo {
     /**
      * @constructor
@@ -789,7 +790,6 @@ class Logo {
                         // Debug logging removed to avoid console noise in production
                         eval(logo.evalArgDict[logo.blockList[blk].name]);
                     } else {
-                        // eslint-disable-next-line no-console
                         console.error("I do not know how to " + logo.blockList[blk].name);
                     }
                     break;
@@ -1604,7 +1604,6 @@ class Logo {
             let res = null;
             // Is it a plugin?
             if (logo.blockList[blk].name in logo.evalFlowDict) {
-                // eslint-disable-next-line no-console
                 console.log("running eval on " + logo.blockList[blk].name);
                 logo.pluginReturnValue = null;
                 eval(logo.evalFlowDict[logo.blockList[blk].name]);
@@ -1803,12 +1802,18 @@ class Logo {
 
             // We don't update parameter blocks when running full speed.
             if (logo.turtleDelay !== 0) {
+                let updatedParameterBlocks = false;
                 for (const pblk in tur.parameterQueue) {
                     logo.activity.blocks.updateParameterBlock(
                         logo,
                         turtle,
                         tur.parameterQueue[pblk]
                     );
+                    updatedParameterBlocks = true;
+                }
+
+                if (updatedParameterBlocks) {
+                    logo.activity.refreshCanvas();
                 }
             }
 
