@@ -201,7 +201,7 @@ function setupActionBlocks(activity) {
                 // Call a function when the state changes.
                 xmlHttp.onreadystatechange = () => {
                     if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
-                        alert(xmlHttp.responseText);
+                        activity.textMsg(xmlHttp.responseText);
                     }
                 };
 
