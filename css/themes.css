@@ -376,3 +376,92 @@ body.highcontrast {
 .dark .material-tooltip span {
     color: #ffffff !important;
 }
+
+body.high-contrast {
+    --border: #ffffff;
+    --bg: #000000;
+    --fg: #ffffff;
+    --panel-bg: #000000;
+    --accent: #ffff00;
+}
+
+.high-contrast .blue {
+    background-color: #000000 !important;
+    border-bottom: 2px solid #ffffff !important;
+}
+.high-contrast .blue.darken-1 {
+    background-color: #000000 !important;
+    border-bottom: 2px solid #ffffff !important;
+}
+
+
+.high-contrast .material-icons {
+    color: #ffffff !important;
+}
+
+
+.high-contrast #canvas {
+    background-color: #000000 !important;
+}
+
+
+.high-contrast #palette-list li {
+    background-color: #000000 !important;
+    color: #ffff00 !important;
+    border: 1px solid #ffffff !important;
+}
+.high-contrast #palette-list li:hover {
+    background-color: #333333 !important;
+}
+
+
+.high-contrast #floatingWindows > .windowFrame {
+    border: 2px solid #ffffff !important;
+    background-color: #000000 !important;
+}
+.high-contrast #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
+    color: #ffff00 !important;
+}
+.high-contrast #floatingWindows > .windowFrame > .wfWinBody .wfbWidget {
+    color: #ffffff !important;
+    background-color: #000000 !important;
+}
+
+
+.high-contrast .dropdown-content {
+    background-color: #000000 !important;
+}
+.high-contrast .dropdown-content li > a {
+    background-color: #000000 !important;
+    color: #ffff00 !important;
+}
+.high-contrast .dropdown-content li > a:hover {
+    background-color: #333333 !important;
+}
+
+
+.high-contrast *:focus {
+    outline: 3px solid #ffff00 !important;
+    outline-offset: 2px !important;
+}
+
+
+.high-contrast .material-tooltip {
+    background-color: #000000 !important;
+    color: #ffff00 !important;
+    border: 1px solid #ffffff !important;
+}
+
+
+.high-contrast .modal-content {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+}
+
+.high-contrast #search,
+.high-contrast #helpfulSearch {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+}
