@@ -1072,6 +1072,8 @@ let prepareMacroExports = (name, stack, macroDict) => {
 // Encapsulates camera-related operations for video/image capture
 const CameraManager = {
     isSetup: false,
+    canPlayHandler: null,
+    intervalId: null,
 
     /**
      * Resets the camera setup state
@@ -1125,40 +1127,52 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
                 // eslint-disable-next-line no-console
                 console.debug(error);
             });
-
-        video.oncanplay = () => {
-            // console.debug("canplay", streaming, CameraManager.isSetup);
-            if (!streaming) {
-                video.setAttribute("width", w);
-                video.setAttribute("height", h);
-                canvas.setAttribute("width", w);
-                canvas.setAttribute("height", h);
-                streaming = true;
-
-                if (isVideo) {
-                    if (cameraID !== null) {
-                        window.clearInterval(cameraID);
-                    }
-                    cameraID = window.setInterval(draw, 100);
-                    setCameraID(cameraID);
-                } else {
-                    draw();
-                }
-            }
-        };
     } else {
         streaming = true;
         video.play();
         if (isVideo) {
-            if (cameraID !== null) {
-                window.clearInterval(cameraID);
+            if (CameraManager.intervalId !== null) {
+                window.clearInterval(CameraManager.intervalId);
+                CameraManager.intervalId = null;
             }
             cameraID = window.setInterval(draw, 100);
+            CameraManager.intervalId = cameraID;
             setCameraID(cameraID);
         } else {
             draw();
         }
     }
+
+    if (CameraManager.canPlayHandler) {
+        video.removeEventListener("canplay", CameraManager.canPlayHandler, false);
+    }
+
+    function handleCanPlay() {
+        // console.debug("canplay", streaming, CameraManager.isSetup);
+        if (!streaming) {
+            video.setAttribute("width", w);
+            video.setAttribute("height", h);
+            canvas.setAttribute("width", w);
+            canvas.setAttribute("height", h);
+            streaming = true;
+
+            if (isVideo) {
+                if (CameraManager.intervalId !== null) {
+                    window.clearInterval(CameraManager.intervalId);
+                    CameraManager.intervalId = null;
+                }
+                cameraID = window.setInterval(draw, 100);
+                CameraManager.intervalId = cameraID;
+                setCameraID(cameraID);
+            } else {
+                draw();
+            }
+        }
+    }
+
+    CameraManager.canPlayHandler = handleCanPlay;
+
+    video.addEventListener("canplay", CameraManager.canPlayHandler, false);
 };
 
 /**
@@ -1782,8 +1796,15 @@ if (typeof module !== "undefined" && module.exports) {
         nearestBeat,
         oneHundredToFraction,
         rationalToFraction,
+        rationalSum,
         rgbToHex,
         hexToRGB,
-        hex2rgb
+        hex2rgb,
+        format,
+        delayExecution,
+        closeWidgets,
+        closeBlkWidgets,
+        resolveObject,
+        importMembers
     };
 }

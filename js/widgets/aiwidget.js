@@ -42,7 +42,7 @@ function AIWidget() {
     const SAMPLEANALYSERSIZE = 8192;
     const SAMPLEOSCCOLORS = ["#3030FF", "#FF3050"];
     let abcNotationSong = "";
-    var midiBuffer;
+    let midiBuffer;
     /**
      * Reference to the timbre block.
      * @type {number | null}
@@ -665,9 +665,8 @@ function AIWidget() {
                         staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3] = blockId;
                     }
                     if (afternamedo != -1) {
-                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
-                            afternamedo
-                        ][4][1] = null;
+                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][afternamedo][4][1] =
+                            null;
                     }
 
                     staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
@@ -834,21 +833,17 @@ function AIWidget() {
         };
 
         this._save_lock = false;
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            ICONSIZE,
-            _("Save sample"),
-            ""
-        ).onclick = function () {
-            // Debounce button
-            if (!that._get_save_lock()) {
-                that._save_lock = true;
-                that._saveSample();
-                setTimeout(function () {
-                    that._save_lock = false;
-                }, 1000);
-            }
-        };
+        widgetWindow.addButton("export-chunk.svg", ICONSIZE, _("Save sample"), "").onclick =
+            function () {
+                // Debounce button
+                if (!that._get_save_lock()) {
+                    that._save_lock = true;
+                    that._saveSample();
+                    setTimeout(function () {
+                        that._save_lock = false;
+                    }, 1000);
+                }
+            };
 
         widgetWindow.sendToCenter();
         this.widgetWindow = widgetWindow;

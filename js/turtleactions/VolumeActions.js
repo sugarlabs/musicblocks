@@ -17,7 +17,7 @@
  */
 
 /*
-   global _, Singer, MusicBlocks, Mouse, last, VOICENAMES, DRUMNAMES,
+   global Singer, MusicBlocks, Mouse, last, VOICENAMES, DRUMNAMES,
    Tone, instruments, DEFAULTVOLUME, DEFAULTVOICE
 */
 
