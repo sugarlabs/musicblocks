@@ -5657,12 +5657,38 @@ class Activity {
 
             this.printText.classList.add("show");
             this.printTextContent.innerHTML = msg;
+            this._announceToScreenReader(msg);
 
             const that = this;
             this.msgTimeoutID = setTimeout(() => {
                 that.printText.classList.remove("show");
                 that.msgTimeoutID = null;
             }, duration);
+        };
+        /**
+         * Announces a message to screen readers via ARIA live region.
+         * @param {string} msg - The message to announce.
+         */
+        this._announceToScreenReader = msg => {
+            let liveRegion = document.getElementById("a11y-live-region");
+            if (!liveRegion) {
+                liveRegion = document.createElement("div");
+                liveRegion.id = "a11y-live-region";
+                liveRegion.setAttribute("aria-live", "polite");
+                liveRegion.setAttribute("aria-atomic", "true");
+                liveRegion.setAttribute("role", "status");
+                liveRegion.style.position = "absolute";
+                liveRegion.style.width = "1px";
+                liveRegion.style.height = "1px";
+                liveRegion.style.overflow = "hidden";
+                liveRegion.style.clip = "rect(0,0,0,0)";
+                liveRegion.style.whiteSpace = "nowrap";
+                document.body.appendChild(liveRegion);
+            }
+            liveRegion.textContent = "";
+            setTimeout(() => {
+                liveRegion.textContent = msg;
+            }, 50);
         };
 
         this.errorMsg = (msg, blk, text, timeout) => {
