@@ -29,7 +29,7 @@ const mockActivity = {
     prepSearchWidget: jest.fn(),
     sendAllToTrash: jest.fn(),
     refreshCanvas: jest.fn(),
-    _loadStart: jest.fn(),
+    justLoadStart: jest.fn(),
     doLoadAnimation: jest.fn(),
     textMsg: jest.fn(),
     stage: { enableDOMEvents: jest.fn(), update: jest.fn() },
@@ -125,14 +125,14 @@ describe("PlanetInterface", () => {
         expect(planetInterface.showMusicBlocks).toHaveBeenCalled();
     });
 
-    test("newProject calls closePlanet, initialiseNewProject, _loadStart, and saveLocally", () => {
+    test("newProject calls closePlanet, initialiseNewProject, justLoadStart, and saveLocally", () => {
         jest.spyOn(planetInterface, "closePlanet").mockImplementation(() => {});
         jest.spyOn(planetInterface, "initialiseNewProject").mockImplementation(() => {});
         jest.spyOn(planetInterface, "saveLocally").mockImplementation(() => {});
         planetInterface.newProject();
         expect(planetInterface.closePlanet).toHaveBeenCalled();
         expect(planetInterface.initialiseNewProject).toHaveBeenCalled();
-        expect(mockActivity._loadStart).toHaveBeenCalled();
+        expect(mockActivity.justLoadStart).toHaveBeenCalled();
         expect(planetInterface.saveLocally).toHaveBeenCalled();
     });
     test("onConverterLoad sets window.Converter", () => {
