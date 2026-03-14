@@ -76,7 +76,7 @@ class ReflectionMatrix {
         this.isOpen = true;
         this.isMaximized = false;
         this.activity.isInputON = true;
-        this.PORT = "http://3.105.177.138:8000"; // http://127.0.0.1:8000
+        this.PORT = resolveReflectionBackendBaseUrl();
 
         const widgetWindow = window.widgetWindows.windowFor(this, "reflection", "reflection");
         this.widgetWindow = widgetWindow;
@@ -706,4 +706,35 @@ class ReflectionMatrix {
         // Step 3: Sanitize the generated HTML using DOMParser
         return this.sanitizeHTML(html);
     }
+}
+
+/**
+ * Resolves reflection backend URL using host-aware rules.
+ * Keeps behavior aligned with AI Debugger backend selection.
+ *
+ * @param {object} [locationObj] - Optional location-like object for testing.
+ * @returns {string} Resolved base backend URL.
+ */
+const resolveReflectionBackendBaseUrl = locationObj => {
+    const loc =
+        locationObj ||
+        (typeof window !== "undefined"
+            ? window.location
+            : { protocol: "http:", hostname: "localhost" });
+    const hostname = loc.hostname || "localhost";
+    const protocol = loc.protocol || "http:";
+
+    if (hostname === "localhost" || hostname === "127.0.0.1") {
+        return "http://localhost:8000";
+    }
+
+    if (hostname.includes("musicblocks.sugarlabs.org")) {
+        return `${protocol}//api.musicblocks.sugarlabs.org`;
+    }
+
+    return `${protocol}//${hostname}:8000`;
+};
+
+if (typeof module !== "undefined") {
+    module.exports = { ReflectionMatrix, resolveReflectionBackendBaseUrl };
 }
