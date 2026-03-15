@@ -13,7 +13,7 @@
 /*
    global
 
-   _, PhraseMakerUtils, PhraseMakerGrid, PhraseMakerUI, PhraseMakerAudio, platformColor, docById, MATRIXSOLFEHEIGHT, toFraction, Singer,
+   PhraseMakerUtils, PhraseMakerGrid, PhraseMakerUI, PhraseMakerAudio, platformColor, docById, MATRIXSOLFEHEIGHT, toFraction, Singer,
    SOLFEGECONVERSIONTABLE, slicePath, wheelnav, delayExecution,
    DEFAULTVOICE, getDrumName, MATRIXSOLFEWIDTH, getDrumIcon,
    noteIsSolfege, isCustomTemperament, i18nSolfege, getNote, DEFAULTDRUM, last,
@@ -1138,12 +1138,12 @@ class PhraseMaker {
             }
 
             if (aboveBlock === this.blockNo) {
-                setTimeout(this._addNotesBlockBetween(aboveBlock, newBlock, true), 500);
+                setTimeout(() => this._addNotesBlockBetween(aboveBlock, newBlock, true), 500);
                 this.rowLabels.splice(0, 0, rLabel);
                 this.rowArgs.splice(0, 0, rArg);
                 this._rowBlocks.splice(0, 0, newBlock);
             } else {
-                setTimeout(this._addNotesBlockBetween(aboveBlock, newBlock, false), 500);
+                setTimeout(() => this._addNotesBlockBetween(aboveBlock, newBlock, false), 500);
                 let i;
                 for (i = 0; i < this.columnBlocksMap.length; i++) {
                     if (this.columnBlocksMap[i][0] === aboveBlock) {
@@ -1211,7 +1211,7 @@ class PhraseMaker {
             }
         }
 
-        setTimeout(this._createColumnPieSubmenu(i, "pitchblocks", true), 500);
+        setTimeout(() => this._createColumnPieSubmenu(i, "pitchblocks", true), 500);
     }
 
     /**
@@ -3156,9 +3156,9 @@ class PhraseMaker {
         }
         this.activity.blocks.loadNewBlocks(RHYTHMOBJ);
         if (this.activity.blocks.blockList[bottomOfClamp].name === "vspace") {
-            setTimeout(this.blockConnection(6, bottomOfClamp), 500);
+            setTimeout(() => this.blockConnection(6, bottomOfClamp), 500);
         } else {
-            setTimeout(this.blockConnection(7, bottomOfClamp), 500);
+            setTimeout(() => this.blockConnection(7, bottomOfClamp), 500);
         }
         this.activity.refreshCanvas();
     }
@@ -4744,7 +4744,7 @@ class PhraseMaker {
 
         // Create a new stack for the chunk.
         this.activity.blocks.loadNewBlocks(newStack);
-        activity.textMsg(this._("New action block generated."), 3000);
+        this.activity.textMsg(this._("New action block generated."), 3000);
     }
 }
 if (typeof module !== "undefined") {
