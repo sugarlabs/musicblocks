@@ -17,14 +17,15 @@
    DEFAULTFILTERTYPE, DEFAULTINTERVAL, DEFAULTINVERT, DEFAULTMODE,
    DEFAULTNOISE, DEFAULTOSCILLATORTYPE, DEFAULTTEMPERAMENT,
    DEFAULTVOICE, INLINECOLLAPSIBLES, NATURAL, NUMBERBLOCKDEFAULT,
-   SPECIALINPUTS, STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH,
-   WESTERN2EISOLFEGENAMES, WIDENAMES, _, addTemperamentToDictionary,
+    SPECIALINPUTS, STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH,
+    WESTERN2EISOLFEGENAMES, WIDENAMES, addTemperamentToDictionary,
    Block, closeBlkWidgets, createjs, delayExecution, DEFAULTCHORD,
    deleteTemperamentFromList, getDrumSynthName, getNoiseName,
    getNoiseSynthName, getTemperamentsList, getTextWidth,
    getVoiceSynthName, i18nSolfege, last, MathUtility, mixedNumber,
    piemenuBlockContext, prepareMacroExports, ProtoBlock,
-   setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments
+    setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments,
+    docById, define
 */
 
 /*
@@ -49,10 +50,6 @@
         setOctaveRatio, splitScaleDegree, splitSolfege,
         updateTemperaments
 */
-/*
-   exported Blocks
-*/
-
 /**
  * Minimum distance (squared) between two docks required before
  * connecting them.
@@ -150,6 +147,7 @@ const ALLOWED_CONNECTIONS = new Set([
  * @public
  * @returns {void}
  */
+// eslint-disable-next-line no-redeclare
 class Blocks {
     constructor(activity) {
         this.activity = activity;
@@ -164,6 +162,10 @@ class Blocks {
 
         /** We keep a list of stacks in the trash. */
         this.trashStacks = [];
+
+        /** When true, checkBounds() calls are suppressed until
+         *  _endDeferCheckBounds() runs one final check. */
+        this._deferCheckBounds = false;
 
         /** We keep a dictionary for the proto blocks, */
         this.protoBlockDict = {};
@@ -776,7 +778,7 @@ class Blocks {
                     vspaceBlock.container.x = thisBlock.container.x + dx;
                     /** Math.floor(thisBlock.container.y + dy + 0.5); */
                     vspaceBlock.container.y = thisBlock.container.y + dy;
-                    vspaceBlock.connections[0] = that.blockList.indexOf(thisBlock);
+                    vspaceBlock.connections[0] = thisBlock.blockIndex;
                     vspaceBlock.connections[1] = nextBlock;
                     thisBlock.connections[thisBlock.connections.length - 1] = vspace;
                     if (nextBlock) {
@@ -1510,7 +1512,7 @@ class Blocks {
                                 silenceBlock
                             ) {
                                 this.blockList[silenceBlockobj.connections[0]].connections[c] =
-                                    this.blockList.indexOf(thisBlockobj);
+                                    thisBlockobj.blockIndex;
                                 break;
                             }
                         }
@@ -2304,6 +2306,8 @@ class Blocks {
          * @returns {void}
          */
         this.checkBounds = () => {
+            if (this._deferCheckBounds) return;
+
             let onScreen = true;
             for (const block of this.blockList) {
                 if (block.connections[0] == null) {
@@ -2704,8 +2708,10 @@ class Blocks {
                     /** Could happen if the block data is malformed. */
                     // eslint-disable-next-line no-console
                     console.debug("infinite loop finding topBlock?");
-                    // eslint-disable-next-line no-console
-                    console.debug(this.blockList.indexOf(myBlock) + " " + myBlock.name);
+                    if (myBlock.garbage) {
+                        // eslint-disable-next-line no-console
+                        console.debug(myBlock.blockIndex + " " + myBlock.name);
+                    }
                     break;
                 }
                 blk = myBlock.connections[0];
@@ -3175,6 +3181,9 @@ class Blocks {
 
             /** We copy the dock because expandable blocks modify it. */
             const myBlock = last(this.blockList);
+            // Cache the block's index for O(1) lookups instead of
+            // O(N) blockList.indexOf() scans.
+            myBlock.blockIndex = this.blockList.length - 1;
             myBlock.copySize();
 
             /** We may need to do some postProcessing to the block */
@@ -7064,7 +7073,7 @@ class Blocks {
 
             this.activity.refreshCanvas();
 
-            const thisBlock = this.blockList.indexOf(myBlock);
+            const thisBlock = myBlock.blockIndex;
 
             /** Add this block to the list of blocks in the trash so we can undo this action. */
             this.trashStacks.push(thisBlock);
