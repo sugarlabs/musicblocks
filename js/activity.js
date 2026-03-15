@@ -2978,7 +2978,7 @@ class Activity {
          * Initialize an idle watcher that throttles the application's framerate
          * when the application is inactive and no music is playing.
          * This significantly reduces CPU usage and improves battery life.
-         * 
+         *
          * Listeners and intervals are properly cleaned up via stopIdleWatcher()
          * to prevent accumulation on re-initialization.
          */
