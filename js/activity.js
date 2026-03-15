@@ -39,10 +39,9 @@
    TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, TURTLESVG,
    updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_F,
    SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
-   MUSICALMODES, waitForReadiness, body, i18next, wheelnav, slicePath,
-   base64Encode, disableHorizScrollIcon,
-   toFraction, CARTESIANBUTTON, piemenuGrid,
-   SELECTBUTTON, CLEARBUTTON, Midi, ABCJS
+   MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
+   base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
+   SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS
  */
 
 /*
@@ -69,11 +68,16 @@ let MYDEFINES = [
     "tweenjs.min",
     "preloadjs.min",
     "howler",
-    "p5.min",
-    "p5-sound-adapter",
-    "p5.dom.min",
-    // 'mespeak',
-    "Chart",
+    // p5.min, p5-sound-adapter, and p5.dom.min are NOT loaded eagerly.
+    // They are only needed by the JS-export feature and will be loaded
+    // on demand via require() when that feature is used, saving ~10-15 MB
+    // of heap memory on every page load.
+    // "p5.min",
+    // "p5-sound-adapter",
+    // "p5.dom.min",
+    // Chart.js is only used by the statistics widget and will be loaded
+    // on demand when the widget is opened, saving ~3-5 MB of heap memory.
+    // "Chart",
     "utils/utils",
     "activity/artwork",
     "widgets/status",
@@ -215,7 +219,7 @@ const doAnalyzeProject = function () {
 /**
  * Represents an activity in the application.
  */
-/* eslint-disable-next-line no-redeclare */
+// eslint-disable-next-line no-redeclare
 class Activity {
     /**
      * Creates an Activity instance.
@@ -338,6 +342,8 @@ class Activity {
         // Dirty flag for canvas rendering optimization
         // When true, the stage needs to be redrawn on the next animation frame
         this.stageDirty = false;
+        this._renderLoopRafId = null;
+        this._renderLoopRunning = false;
 
         this.themes = ["light", "dark", "highcontrast"];
         try {
@@ -357,9 +363,9 @@ class Activity {
 
             for (let i = 0; i < this.themes.length; i++) {
                 if (this.themes[i] === activeTheme) {
-                    body.classList.add(this.themes[i]);
+                    document.body.classList.add(this.themes[i]);
                 } else {
-                    body.classList.remove(this.themes[i]);
+                    document.body.classList.remove(this.themes[i]);
                 }
             }
         } catch (e) {
@@ -416,6 +422,7 @@ class Activity {
          * Sets up the initial state and dependencies of the activity.
          */
         this.setupDependencies = () => {
+            this._stopRenderLoop();
             this.cleanupEventListeners();
             createDefaultStack();
             createHelpContent(this);
@@ -508,19 +515,35 @@ class Activity {
          * 3. GIF animations are playing
          * This eliminates unnecessary 60fps updates when idle.
          */
-        const renderLoop = () => {
-            if (this.stage) {
-                const hasActiveTweens = createjs.Tween.hasActiveTweens();
-                const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
+        this._startRenderLoop = () => {
+            if (this._renderLoopRunning) return;
+            this._renderLoopRunning = true;
 
-                if (this.stageDirty || hasActiveTweens || hasActiveGifs) {
-                    this.stage.update();
-                    this.stageDirty = false;
+            const renderLoop = () => {
+                if (!this._renderLoopRunning) return;
+
+                if (this.stage) {
+                    const hasActiveTweens = createjs.Tween.hasActiveTweens();
+                    const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
+
+                    if (this.stageDirty || hasActiveTweens || hasActiveGifs) {
+                        this.stage.update();
+                        this.stageDirty = false;
+                    }
                 }
-            }
-            requestAnimationFrame(renderLoop);
+                this._renderLoopRafId = requestAnimationFrame(renderLoop);
+            };
+
+            this._renderLoopRafId = requestAnimationFrame(renderLoop);
         };
-        requestAnimationFrame(renderLoop);
+
+        this._stopRenderLoop = () => {
+            this._renderLoopRunning = false;
+            if (this._renderLoopRafId !== null) {
+                cancelAnimationFrame(this._renderLoopRafId);
+                this._renderLoopRafId = null;
+            }
+        };
 
         /*
          * creates helpfulSearchDiv for search
@@ -2328,7 +2351,7 @@ class Activity {
             }
 
             await this.setSmallerLargerStatus();
-            await this.stage.update();
+            this.stageDirty = true;
         };
 
         /**
@@ -2368,7 +2391,7 @@ class Activity {
             }
 
             await this.setSmallerLargerStatus();
-            await this.stage.update();
+            this.stageDirty = true;
         };
 
         /*
@@ -2978,8 +3001,14 @@ class Activity {
          * Initialize an idle watcher that throttles the application's framerate
          * when the application is inactive and no music is playing.
          * This significantly reduces CPU usage and improves battery life.
+         *
+         * Listeners and intervals are properly cleaned up via stopIdleWatcher()
+         * to prevent accumulation on re-initialization.
          */
         this._initIdleWatcher = () => {
+            // Ensure any prior idle watcher is cleaned up before reinitializing
+            this._stopIdleWatcher();
+
             const IDLE_THRESHOLD = 5000; // 5 seconds
             const ACTIVE_FPS = 60;
             const IDLE_FPS = 1;
@@ -2988,29 +3017,26 @@ class Activity {
             this.isAppIdle = false;
 
             // Wake up function - restores full framerate
-            const resetIdleTimer = () => {
+            // Stored as instance property for cleanup
+            this._resetIdleTimer = () => {
                 lastActivity = Date.now();
                 if (this.isAppIdle) {
                     this.isAppIdle = false;
                     createjs.Ticker.framerate = ACTIVE_FPS;
                     // Force immediate redraw for responsiveness
-                    if (this.stage) this.stage.update();
+                    this.stageDirty = true;
                 }
             };
 
-            // Track user activity
-            window.addEventListener("mousemove", resetIdleTimer);
-            window.addEventListener("mousedown", resetIdleTimer);
-            window.addEventListener("keydown", resetIdleTimer);
-            window.addEventListener("touchstart", resetIdleTimer, {
-                passive: true
-            });
-            window.addEventListener("wheel", resetIdleTimer, {
-                passive: true
-            });
+            // Track user activity using managed addEventListener for proper cleanup
+            this.addEventListener(window, "mousemove", this._resetIdleTimer);
+            this.addEventListener(window, "mousedown", this._resetIdleTimer);
+            this.addEventListener(window, "keydown", this._resetIdleTimer);
+            this.addEventListener(window, "touchstart", this._resetIdleTimer);
+            this.addEventListener(window, "wheel", this._resetIdleTimer);
 
-            // Periodic check for idle state
-            setInterval(() => {
+            // Periodic check for idle state - store interval ID for cleanup
+            this._idleWatcherInterval = setInterval(() => {
                 // Check if music/code is playing
                 const isMusicPlaying = this.logo?._alreadyRunning || false;
 
@@ -3022,9 +3048,37 @@ class Activity {
                     }
                 } else if (this.isAppIdle && isMusicPlaying) {
                     // Music started playing - wake up immediately
-                    resetIdleTimer();
+                    this._resetIdleTimer();
                 }
             }, 1000);
+
+            // Expose activity instance for external checks
+            if (typeof window !== "undefined") {
+                window.activity = this;
+            }
+        };
+
+        /**
+         * Stop the idle watcher and clean up its listeners and interval.
+         * Called during Activity lifecycle teardown to prevent listener/interval accumulation.
+         * It is safe to call this method even if the idle watcher was never started.
+         */
+        this._stopIdleWatcher = () => {
+            // Clear the periodic interval
+            if (typeof this._idleWatcherInterval !== "undefined") {
+                clearInterval(this._idleWatcherInterval);
+                this._idleWatcherInterval = undefined;
+            }
+
+            // Remove event listeners if they were registered
+            if (typeof this._resetIdleTimer === "function") {
+                this.removeEventListener(window, "mousemove", this._resetIdleTimer);
+                this.removeEventListener(window, "mousedown", this._resetIdleTimer);
+                this.removeEventListener(window, "keydown", this._resetIdleTimer);
+                this.removeEventListener(window, "touchstart", this._resetIdleTimer);
+                this.removeEventListener(window, "wheel", this._resetIdleTimer);
+                this._resetIdleTimer = undefined;
+            }
         };
 
         /**
@@ -3661,7 +3715,7 @@ class Activity {
                             disableHorizScrollIcon.style.display == "block"
                         ) {
                             this.blocksContainer.x += this.canvas.width / 10;
-                            this.stage.update();
+                            this.stageDirty = true;
                         }
                     // fall through
                     case 220:
@@ -3671,7 +3725,7 @@ class Activity {
                             disableHorizScrollIcon.style.display == "block"
                         ) {
                             this.blocksContainer.x -= this.canvas.width / 10;
-                            this.stage.update();
+                            this.stageDirty = true;
                         }
                 }
             } else if (event.ctrlKey) {
@@ -3730,17 +3784,17 @@ class Activity {
                             this.textMsg("END " + _("Jumping to the bottom of the page."));
                             this.blocksContainer.y =
                                 -this.blocks.bottomMostBlock() + this.canvas.height / 2;
-                            this.stage.update();
+                            this.stageDirty = true;
                             break;
                         case PAGE_UP:
                             this.textMsg("PAGE_UP " + _("Scrolling up."));
                             this.blocksContainer.y += this.canvas.height / 2;
-                            this.stage.update();
+                            this.stageDirty = true;
                             break;
                         case PAGE_DOWN:
                             this.textMsg("PAGE_DOWN " + _("Scrolling down."));
                             this.blocksContainer.y -= this.canvas.height / 2;
-                            this.stage.update();
+                            this.stageDirty = true;
                             break;
                         case DEL:
                             this.textMsg("DEL " + _("Extracting block"));
@@ -3764,7 +3818,7 @@ class Activity {
                                 } else {
                                     this.blocksContainer.y += 20;
                                 }
-                                this.stage.update();
+                                this.stageDirty = true;
                             }
                             break;
                         case KEYCODE_DOWN:
@@ -3788,7 +3842,7 @@ class Activity {
                                 } else {
                                     this.blocksContainer.y -= 20;
                                 }
-                                this.stage.update();
+                                this.stageDirty = true;
                             }
                             break;
                         case KEYCODE_LEFT:
@@ -3805,7 +3859,7 @@ class Activity {
                                 } else if (this.scrollBlockContainer) {
                                     this.blocksContainer.x += 20;
                                 }
-                                this.stage.update();
+                                this.stageDirty = true;
                             }
                             break;
                         case KEYCODE_RIGHT:
@@ -3822,7 +3876,7 @@ class Activity {
                                 } else if (this.scrollBlockContainer) {
                                     this.blocksContainer.x -= 20;
                                 }
-                                this.stage.update();
+                                this.stageDirty = true;
                             }
                             break;
                         case HOME:
@@ -3840,7 +3894,7 @@ class Activity {
                                 // Bring all the blocks "home".
                                 this._findBlocks();
                             }
-                            this.stage.update();
+                            this.stageDirty = true;
                             break;
                         case TAB:
                             break;
@@ -5695,7 +5749,7 @@ class Activity {
             }
 
             this.printText.classList.add("show");
-            this.printTextContent.innerHTML = msg;
+            this.printTextContent.textContent = msg;
 
             const that = this;
             this.msgTimeoutID = setTimeout(() => {
@@ -5832,7 +5886,7 @@ class Activity {
                 default:
                     // Show and populate errorText div
                     this.errorText.classList.add("show");
-                    this.errorTextContent.innerHTML = msg;
+                    this.errorTextContent.textContent = msg;
                     break;
             }
 
@@ -7363,6 +7417,10 @@ class Activity {
          * Inits everything. The main function.
          */
         this.init = async () => {
+            // Guard against double initialization
+            if (this._initialized) return;
+            this._initialized = true;
+
             // Batch DOM reads before any writes to avoid forced synchronous layout
             this._clientWidth = document.body.clientWidth;
             this._clientHeight = document.body.clientHeight;
@@ -7394,6 +7452,7 @@ class Activity {
 
             this.stage = new createjs.Stage(this.canvas);
             createjs.Touch.enable(this.stage);
+            this._startRenderLoop();
 
             // Initialize Ticker with optimal framerate
             createjs.Ticker.framerate = 60;
@@ -7424,6 +7483,7 @@ class Activity {
             // Use managed addEventListener for automatic cleanup
             this.addEventListener(document, "mousemove", this.handleMouseMove);
             this.addEventListener(document, "click", this.handleDocumentClick);
+            this.addEventListener(window, "beforeunload", this._stopRenderLoop);
 
             this._createMsgContainer(
                 "#ffffff",

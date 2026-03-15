@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 // Copyright (c) 2014-23 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
@@ -676,11 +675,11 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                         false
                     );
                 } catch (e) {
-                    // Ensure trigger lock is released after a delay
-                    setTimeout(() => {
-                        that._triggerLock = false;
-                    }, 125); // 1/8 second in milliseconds
+                    console.error("Synth trigger error:", e);
                 }
+                setTimeout(() => {
+                    that._triggerLock = false;
+                }, 125);
             }
         } catch (e) {
             console.error("Error in pitch preview:", e);
@@ -3816,20 +3815,22 @@ const piemenuBlockContext = block => {
         docById("contextWheelDiv").style.display = "none";
     };
 
-    // Named function for proper cleanup
-    const hideContextWheelOnClick = event => {
+    // Use a named handler stored globally so we can remove the previous one
+    // before adding a new one, preventing accumulation of click listeners.
+    if (window._contextWheelClickHandler) {
+        document.body.removeEventListener("click", window._contextWheelClickHandler);
+    }
+
+    window._contextWheelClickHandler = event => {
         const wheelElement = document.getElementById("contextWheelDiv");
         const displayStyle = window.getComputedStyle(wheelElement).display;
         if (displayStyle === "block") {
             wheelElement.style.display = "none";
-            // Remove listener after hiding to prevent memory leak
-            document.body.removeEventListener("click", hideContextWheelOnClick);
+            document.body.removeEventListener("click", window._contextWheelClickHandler);
         }
     };
 
-    // Remove any existing listener before adding a new one
-    document.body.removeEventListener("click", hideContextWheelOnClick);
-    document.body.addEventListener("click", hideContextWheelOnClick);
+    document.body.addEventListener("click", window._contextWheelClickHandler);
 
     if (
         ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].includes(
