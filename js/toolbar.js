@@ -2089,19 +2089,19 @@ class FocusCycleManager {
         this._liveRegion = null;
 
         // Bind handlers so they can be removed if needed.
-        this._onKeyDown  = this._onKeyDown.bind(this);
+        this._onKeyDown = this._onKeyDown.bind(this);
         this._onMouseDown = this._onMouseDown.bind(this);
-        this._onFocusIn  = this._onFocusIn.bind(this);
+        this._onFocusIn = this._onFocusIn.bind(this);
     }
 
     init() {
         // Capture phase so we intercept Tab before anything else.
-        document.addEventListener("keydown",  this._onKeyDown,   true);
+        document.addEventListener("keydown", this._onKeyDown, true);
         // BUBBLE phase for mousedown — canvas and other elements receive
         // the click first; we only clean up keyboard state afterwards.
         document.addEventListener("mousedown", this._onMouseDown, false);
         // Track last-focused toolbar button for memory restoration.
-        document.addEventListener("focusin",  this._onFocusIn,   true);
+        document.addEventListener("focusin", this._onFocusIn, true);
 
         // Visually-hidden ARIA live region for screen readers.
         if (!document.getElementById("fcm-announcer")) {
@@ -2109,9 +2109,14 @@ class FocusCycleManager {
             r.id = "fcm-announcer";
             r.setAttribute("aria-live", "polite");
             Object.assign(r.style, {
-                position: "absolute", width: "1px", height: "1px",
-                margin: "-1px", overflow: "hidden",
-                clip: "rect(0,0,0,0)", whiteSpace: "nowrap", border: "0"
+                position: "absolute",
+                width: "1px",
+                height: "1px",
+                margin: "-1px",
+                overflow: "hidden",
+                clip: "rect(0,0,0,0)",
+                whiteSpace: "nowrap",
+                border: "0"
             });
             document.body.appendChild(r);
             this._liveRegion = r;
@@ -2200,10 +2205,7 @@ class FocusCycleManager {
         const { holder, overlay } = this._workspaceElements();
         if (!holder) return;
 
-        if (
-            typeof holder.hasAttribute !== "function" ||
-            !holder.hasAttribute("tabindex")
-        ) {
+        if (typeof holder.hasAttribute !== "function" || !holder.hasAttribute("tabindex")) {
             holder.setAttribute("tabindex", "-1");
         }
 
@@ -2309,8 +2311,8 @@ class FocusCycleManager {
         const active = document.activeElement;
         if (!active) return false;
         const tag = active.nodeName.toLowerCase();
-        if ((tag === "input" && active.type !== "file") ||
-            tag === "textarea" || tag === "select") return true;
+        if ((tag === "input" && active.type !== "file") || tag === "textarea" || tag === "select")
+            return true;
         if (active.isContentEditable) return true;
         if (active.closest('.sweet-alert, .modal, [role="dialog"], .widget, .dropdown-content')) {
             return true;
@@ -2331,11 +2333,12 @@ class FocusCycleManager {
         }
 
         const idx = this._zones.indexOf(this._currentZone);
-        const nextIdx = idx === -1
-            ? 1  // safety fallback → toolbar
-            : (reverse
-                ? (idx - 1 + this._zones.length) % this._zones.length
-                : (idx + 1) % this._zones.length);
+        const nextIdx =
+            idx === -1
+                ? 1 // safety fallback → toolbar
+                : reverse
+                  ? (idx - 1 + this._zones.length) % this._zones.length
+                  : (idx + 1) % this._zones.length;
 
         // Clean up the zone we are leaving.
         this._leaveZone(this._currentZone);
@@ -2348,9 +2351,9 @@ class FocusCycleManager {
     _zoneOf(el) {
         if (!el) return null;
         const toolbars = document.getElementById("toolbars");
-        const palette  = document.getElementById("palette");
+        const palette = document.getElementById("palette");
         if (toolbars && toolbars.contains(el)) return "toolbar";
-        if (palette  && palette.contains(el))  return "palette";
+        if (palette && palette.contains(el)) return "palette";
         if (["canvasHolder", "canvas", "canvasContainer"].includes(el.id)) return "workspace";
         return null;
     }
@@ -2392,10 +2395,7 @@ class FocusCycleManager {
             const ws = document.getElementById("canvasHolder");
             const cv = document.getElementById("canvas");
             if (ws) {
-                if (
-                    typeof ws.hasAttribute !== "function" ||
-                    !ws.hasAttribute("tabindex")
-                ) {
+                if (typeof ws.hasAttribute !== "function" || !ws.hasAttribute("tabindex")) {
                     ws.setAttribute("tabindex", "-1");
                 }
                 if (container) container.classList.add("focus-zone-active");
@@ -2408,7 +2408,7 @@ class FocusCycleManager {
                 if (cv && typeof cv.dispatchEvent === "function") {
                     const opts = { bubbles: true, cancelable: false };
                     cv.dispatchEvent(new PointerEvent("pointerdown", opts));
-                    cv.dispatchEvent(new PointerEvent("pointerup",   opts));
+                    cv.dispatchEvent(new PointerEvent("pointerup", opts));
                 }
                 this._announce("Workspace active");
             }
@@ -2467,8 +2467,8 @@ class FocusCycleManager {
     // ------------------------------------------------------------------
     _containerEl(zone) {
         if (zone === "workspace") return document.getElementById("canvasHolder");
-        if (zone === "toolbar")   return document.getElementById("toolbars");
-        if (zone === "palette")   return document.getElementById("palette");
+        if (zone === "toolbar") return document.getElementById("toolbars");
+        if (zone === "palette") return document.getElementById("palette");
         return null;
     }
 
