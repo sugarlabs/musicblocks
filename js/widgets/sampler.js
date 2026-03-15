@@ -2176,10 +2176,13 @@ function SampleWidget() {
 
     /**
      * Start pitch detection
+     * @param {HTMLElement} pitchElement - Widget-local span for displaying detected pitch
+     * @param {HTMLElement} noteElement - Widget-local span for displaying detected note
      * @returns {Promise<void>}
      */
     // accepts pre-built element references
     const startPitchDetection = async (cachedPitchEl = null, cachedNoteEl = null) => {
+    const startPitchDetection = async (pitchElement, noteElement) => {
         // Stop any existing pitch detection first to avoid multiple instances
         this.stopPitchDetection();
 
@@ -2216,6 +2219,7 @@ function SampleWidget() {
                 const pitch = detectPitch(buffer);
 
                 // Use cached references
+                // Update widget-local DOM elements (passed in from makeTuner — no global query)
                 if (pitchElement && noteElement) {
                     if (pitch > 0) {
                         const { note, cents } = frequencyToNote(pitch);
@@ -2301,6 +2305,7 @@ function SampleWidget() {
         document.getElementById("start").addEventListener("click", () => {
             startPitchDetection(pitchSpan, noteSpan);
         });
+        startButton.addEventListener("click", () => startPitchDetection(pitchSpan, noteSpan));
     };
 
     /**

@@ -681,6 +681,8 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                 }
 
                 // Always release the lock When success or failure
+                    console.error("Synth trigger error:", e);
+                }
                 setTimeout(() => {
                     that._triggerLock = false;
                 }, 125);
