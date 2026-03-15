@@ -17,7 +17,7 @@
  */
 
 /*
-   globals
+   global
 
    createjs, DEFAULTVOLUME, delayExecution, importMembers, Painter, Singer,
    DEFAULTVOICE, retryWithBackoff, base64Encode
