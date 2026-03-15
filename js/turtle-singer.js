@@ -2563,7 +2563,7 @@ class Singer {
             callback();
         }
 
-        activity.stage.update();
+        activity.stageDirty = true;
     }
 }
 
