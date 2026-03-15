@@ -1546,7 +1546,8 @@ class Block {
                 __finishCollapse(that);
             };
 
-            image.src = "data:image/svg+xml;base64," + window.btoa(window.base64Encode(COLLAPSEBUTTON));
+            image.src =
+                "data:image/svg+xml;base64," + window.btoa(window.base64Encode(COLLAPSEBUTTON));
         };
 
         /**
@@ -1577,7 +1578,8 @@ class Block {
                 __processCollapseButton(that);
             };
 
-            image.src = "data:image/svg+xml;base64," + window.btoa(window.base64Encode(EXPANDBUTTON));
+            image.src =
+                "data:image/svg+xml;base64," + window.btoa(window.base64Encode(EXPANDBUTTON));
         };
 
         /**
@@ -3645,7 +3647,7 @@ class Block {
                 for (let i = 0; i < keys.length; i++) {
                     const temperament = getTemperament(keys[i]);
                     // Only add valid temperaments to noteLabels
-                    if (temperament && typeof temperament === 'object') {
+                    if (temperament && typeof temperament === "object") {
                         noteLabels[keys[i]] = temperament;
                     }
                     if (isCustomTemperament(keys[i])) {
@@ -3664,7 +3666,11 @@ class Block {
                 } else {
                     // Ensure we have a valid temperament before accessing its properties
                     const selectedTemperament = getTemperament(selectedCustom);
-                    if (selectedTemperament && selectedTemperament["0"] && selectedTemperament["0"][1]) {
+                    if (
+                        selectedTemperament &&
+                        selectedTemperament["0"] &&
+                        selectedTemperament["0"][1]
+                    ) {
                         selectedNote = selectedTemperament["0"][1];
                     } else {
                         // Fallback to a default note
@@ -4682,7 +4688,7 @@ class Block {
  * @public
  * @returns {Array|HTMLElement} - An array of elements or a single element.
  */
-const $ = function() {
+const $ = function () {
     const elements = new Array();
 
     for (let i = 0; i < arguments.length; i++) {
