@@ -125,6 +125,7 @@ describe("Palettes Class", () => {
                                             appendChild: jest.fn(),
                                             style: {}
                                         })),
+                                        dataset: {},
                                         style: {},
                                         addEventListener: jest.fn()
                                     }))
@@ -202,6 +203,7 @@ describe("Palettes Class", () => {
                                                     style: {},
                                                     textContent: ""
                                                 })),
+                                                dataset: {},
                                                 style: {},
                                                 addEventListener: jest.fn()
                                             }))
@@ -318,6 +320,7 @@ describe("Palettes Class", () => {
                 const handlers = {};
                 const row = {
                     insertCell: jest.fn(),
+                    dataset: {},
                     style: {},
                     addEventListener: jest.fn((event, handler) => {
                         handlers[event] = handler;
@@ -354,6 +357,7 @@ describe("Palettes Class", () => {
                 const handlers = {};
                 const row = {
                     insertCell: jest.fn(),
+                    dataset: {},
                     style: {},
                     dataset: {},
                     addEventListener: jest.fn((event, handler) => {
@@ -2170,6 +2174,59 @@ describe("Palettes Class", () => {
             document.body.style.cursor = "pointer";
             row.onmouseleave();
             expect(document.body.style.cursor).toBe("default");
+        });
+    });
+
+    describe("resetKeyboardNavigation method", () => {
+        test("closes menus, clears keyboard focus, and cancels pending submenu opens", () => {
+            jest.useFakeTimers();
+
+            const row = {};
+            const focused = {
+                style: { backgroundColor: platformColor.hoverColor },
+                dataset: { keyboardFocus: "true" }
+            };
+            const paletteElement = { blur: jest.fn() };
+            const hideMenu = jest.fn();
+
+            global.document.querySelectorAll = jest.fn(() => [focused]);
+            global.docById = jest.fn(id => {
+                if (id === "palette") {
+                    return paletteElement;
+                }
+                return null;
+            });
+
+            palettes.dict = { rhythm: { hideMenu } };
+            palettes._keyboardNavActive = true;
+            palettes._navSection = "palette";
+            palettes._navTypeIndex = 2;
+            palettes._navBlockIndex = 3;
+            palettes._navPaletteBlockIndex = 4;
+            palettes.activePalette = "rhythm";
+
+            const showSpy = jest.spyOn(palettes, "showPalette").mockImplementation(() => {});
+            const hideMenusSpy = jest.spyOn(palettes, "_hideMenus").mockImplementation(() => {});
+
+            palettes._loadPaletteButtonHandler("rhythm", row);
+            row.onmouseover();
+            palettes.resetKeyboardNavigation({ closeMenus: true, blur: true });
+            jest.advanceTimersByTime(400);
+
+            expect(hideMenu).toHaveBeenCalled();
+            expect(hideMenusSpy).toHaveBeenCalled();
+            expect(showSpy).not.toHaveBeenCalled();
+            expect(focused.style.backgroundColor).toBe(platformColor.paletteBackground);
+            expect(focused.dataset.keyboardFocus).toBeUndefined();
+            expect(palettes._keyboardNavActive).toBe(false);
+            expect(palettes._navSection).toBe("type");
+            expect(palettes._navTypeIndex).toBe(0);
+            expect(palettes._navBlockIndex).toBe(0);
+            expect(palettes._navPaletteBlockIndex).toBe(0);
+            expect(palettes.activePalette).toBeNull();
+            expect(paletteElement.blur).toHaveBeenCalled();
+
+            jest.useRealTimers();
         });
     });
 

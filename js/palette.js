@@ -102,6 +102,7 @@ class Palettes {
         this._navBlockIndex = 0;
         this._navPaletteBlockIndex = 0; // For navigating actual blocks in the right panel
         this._keyboardNavActive = false;
+        this._menuOpenTimeout = null;
     }
 
     init() {
@@ -326,6 +327,50 @@ class Palettes {
             el.style.backgroundColor = platformColor.paletteBackground;
             delete el.dataset.keyboardFocus;
         });
+    }
+
+    /**
+     * Clears any delayed hover-triggered palette open so it cannot fire
+     * after keyboard focus has already moved to another zone.
+     */
+    _clearPendingMenuOpen() {
+        if (this._menuOpenTimeout !== null) {
+            clearTimeout(this._menuOpenTimeout);
+            this._menuOpenTimeout = null;
+        }
+    }
+
+    /**
+     * Resets palette keyboard navigation and optionally closes open menus.
+     * Used when focus leaves the palette via Tab or mouse interaction.
+     *
+     * @param {{closeMenus?: boolean, blur?: boolean}} options
+     * @returns {void}
+     */
+    resetKeyboardNavigation(options = {}) {
+        const { closeMenus = false, blur = false } = options;
+
+        this._keyboardNavActive = false;
+        this._navSection = "type";
+        this._navTypeIndex = 0;
+        this._navBlockIndex = 0;
+        this._navPaletteBlockIndex = 0;
+        this.activePalette = null;
+        this._clearPendingMenuOpen();
+        this._clearKeyboardFocus();
+
+        if (closeMenus) {
+            for (const name in this.dict) {
+                if (this.dict[name] && typeof this.dict[name].hideMenu === "function") {
+                    this.dict[name].hideMenu();
+                }
+            }
+            this._hideMenus();
+        }
+
+        if (blur) {
+            docById("palette")?.blur?.();
+        }
     }
 
     /**
@@ -771,6 +816,7 @@ class Palettes {
         // Hide the menu buttons and the palettes themselves.
 
         this.activity.hideSearchWidget(true);
+        this.activePalette = null;
 
         if (docById("PaletteBody"))
             docById("PaletteBody").parentNode.removeChild(docById("PaletteBody"));
@@ -882,19 +928,20 @@ class Palettes {
 
     // Palette Button event handlers
     _loadPaletteButtonHandler(name, row) {
-        let timeout;
-
         row.onmouseover = () => {
             if (name === "search") {
                 document.body.style.cursor = "text";
             } else {
                 document.body.style.cursor = "pointer";
-                clearTimeout(timeout);
-                timeout = setTimeout(() => this.showPalette(name), 400);
+                this._clearPendingMenuOpen();
+                this._menuOpenTimeout = setTimeout(() => {
+                    this._menuOpenTimeout = null;
+                    this.showPalette(name);
+                }, 400);
             }
         };
 
-        row.onmouseout = () => clearTimeout(timeout);
+        row.onmouseout = () => this._clearPendingMenuOpen();
 
         row.onclick = () => {
             if (name == "search") {
