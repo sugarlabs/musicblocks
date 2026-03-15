@@ -273,7 +273,7 @@ describe("afterSaveMIDI", () => {
         global.activity = {
             logo: {
                 _midiData: {
-                    "0": [
+                    0: [
                         {
                             note: ["G4"],
                             duration: 4,
@@ -514,8 +514,13 @@ describe("saveWAV & saveABC methods", () => {
 
 describe("saveLilypond Methods", () => {
     let activity, saveInterface, mockActivity, mockDocById;
+    let originalClipboard;
+    let originalSecureContext;
 
     beforeEach(() => {
+        jest.useRealTimers();
+        originalClipboard = navigator.clipboard;
+        originalSecureContext = window.isSecureContext;
         // Set up the DOM structure
         document.body.innerHTML = `
             <div id="lilypondModal" style="display: none;">
@@ -553,6 +558,7 @@ describe("saveLilypond Methods", () => {
                 return { on: jest.fn() };
             }
             return {
+                0: { setSelectionRange: jest.fn() },
                 appendTo: jest.fn().mockReturnThis(),
                 val: jest.fn().mockReturnThis(),
                 select: jest.fn(),
@@ -661,6 +667,15 @@ describe("saveLilypond Methods", () => {
 
     afterEach(() => {
         jest.clearAllMocks();
+        if (originalClipboard === undefined) {
+            delete navigator.clipboard;
+        } else {
+            navigator.clipboard = originalClipboard;
+        }
+        Object.defineProperty(window, "isSecureContext", {
+            value: originalSecureContext,
+            configurable: true
+        });
     });
 
     it("should save a Lilypond file with default settings", () => {
@@ -748,6 +763,58 @@ describe("saveLilypond Methods", () => {
         );
         // Verify activity.save.download is not called
         expect(activity.save.download).not.toHaveBeenCalled();
+    });
+
+    it("should show copied message when Clipboard API succeeds", async () => {
+        const writeText = jest.fn().mockResolvedValue();
+        navigator.clipboard = { writeText };
+        Object.defineProperty(window, "isSecureContext", { value: true, configurable: true });
+
+        saveInterface.afterSaveLilypondLY(lydata, filename);
+        await writeText.mock.results[0].value;
+
+        expect(writeText).toHaveBeenCalledWith(lydata);
+        expect(document.execCommand).not.toHaveBeenCalled();
+        expect(mockActivity.textMsg).toHaveBeenCalled();
+    });
+
+    it("should fall back to legacy copy when Clipboard API fails", async () => {
+        const writeText = jest.fn().mockRejectedValue(new Error("denied"));
+        navigator.clipboard = { writeText };
+        Object.defineProperty(window, "isSecureContext", { value: true, configurable: true });
+        document.execCommand.mockReturnValue(true);
+
+        saveInterface.afterSaveLilypondLY(lydata, filename);
+        await writeText.mock.results[0].value.catch(() => {});
+
+        expect(writeText).toHaveBeenCalledWith(lydata);
+        expect(document.execCommand).toHaveBeenCalledWith("copy");
+        expect(mockActivity.textMsg).toHaveBeenCalled();
+    });
+
+    it("should not show copied message when all copy methods fail", async () => {
+        const writeText = jest.fn().mockRejectedValue(new Error("denied"));
+        navigator.clipboard = { writeText };
+        Object.defineProperty(window, "isSecureContext", { value: true, configurable: true });
+        document.execCommand.mockReturnValue(false);
+
+        saveInterface.afterSaveLilypondLY(lydata, filename);
+        await writeText.mock.results[0].value.catch(() => {});
+
+        expect(writeText).toHaveBeenCalledWith(lydata);
+        expect(document.execCommand).toHaveBeenCalledWith("copy");
+        expect(mockActivity.textMsg).not.toHaveBeenCalled();
+    });
+
+    it("should use legacy copy when Clipboard API is unavailable", () => {
+        delete navigator.clipboard;
+        Object.defineProperty(window, "isSecureContext", { value: true, configurable: true });
+        document.execCommand.mockReturnValue(true);
+
+        saveInterface.afterSaveLilypondLY(lydata, filename);
+
+        expect(document.execCommand).toHaveBeenCalledWith("copy");
+        expect(mockActivity.textMsg).toHaveBeenCalled();
     });
 });
 

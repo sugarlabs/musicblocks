@@ -7,6 +7,19 @@ const app = express();
 // Detect environment (default to development for safety)
 const isDev = process.env.NODE_ENV !== "production";
 
+// runtime environment for browser
+app.get("/env.js", (req, res) => {
+    res.type("application/javascript");
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+    res.setHeader("Surrogate-Control", "no-store");
+    res.send(
+        `window.MB_ENV=${JSON.stringify(process.env.NODE_ENV || "development")};` +
+            `window.MB_IS_DEV=${JSON.stringify(isDev)};`
+    );
+});
+
 // Enable compression for all responses
 app.use(
     compression({

@@ -160,28 +160,22 @@ class PitchDrumMatrix {
          * @private
          */
         this._save_lock = false;
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            PitchDrumMatrix.ICONSIZE,
-            _("Save")
-        ).onclick = () => {
-            // Debounce button
-            if (!this._get_save_lock()) {
-                this._save_lock = true;
-                this._save();
-                setTimeout(() => {
-                    this._save_lock = false;
-                }, 1000);
-            }
-        };
+        widgetWindow.addButton("export-chunk.svg", PitchDrumMatrix.ICONSIZE, _("Save")).onclick =
+            () => {
+                // Debounce button
+                if (!this._get_save_lock()) {
+                    this._save_lock = true;
+                    this._save();
+                    setTimeout(() => {
+                        this._save_lock = false;
+                    }, 1000);
+                }
+            };
 
-        widgetWindow.addButton(
-            "erase-button.svg",
-            PitchDrumMatrix.ICONSIZE,
-            _("Clear")
-        ).onclick = () => {
-            this._clear();
-        };
+        widgetWindow.addButton("erase-button.svg", PitchDrumMatrix.ICONSIZE, _("Clear")).onclick =
+            () => {
+                this._clear();
+            };
 
         /**
          * The container for the pitch/drum matrix.
@@ -1067,4 +1061,7 @@ class PitchDrumMatrix {
         // console.debug(newStack);
         this.activity.blocks.loadNewBlocks(newStack);
     }
+}
+if (typeof module !== "undefined") {
+    module.exports = PitchDrumMatrix;
 }

@@ -399,6 +399,13 @@ class Block {
     updateCache() {
         const that = this;
         return new Promise((resolve, reject) => {
+            // If the container has no active bitmap cache (e.g., trashed
+            // blocks whose cache was freed), skip the update silently.
+            if (that.container && !that.container.bitmapCache) {
+                resolve();
+                return;
+            }
+
             let loopCount = 0;
             const MAX_RETRIES = 15;
             const INITIAL_DELAY = 100;
@@ -415,7 +422,8 @@ class Block {
 
                     if (that.bounds === null) {
                         const delayTime = INITIAL_DELAY * Math.pow(2, loopCount);
-                        await that.pause(delayTime);
+                        await delayExecution(delayTime);
+                        await new Promise(resolve => setTimeout(resolve, delayTime));
                         updateBounds(loopCount + 1);
                     } else {
                         that.container.updateCache();
@@ -2033,6 +2041,44 @@ class Block {
     }
 
     /**
+     * Determines what type of layout update this block requires when a child is connected
+     * at the specified connection index.
+     *
+     * This is a behavioral abstraction that encapsulates the logic of which blocks
+     * need pre-layout updates based on their child connections, rather than having
+     * the engine infer this from block type categories.
+     *
+     * @param {number} connectionIndex - The index of the connection where a child was attached
+     * @returns {string|null} - "ARG" for argument layout updates, "FLOW" for flow layout updates, null otherwise
+     */
+    getLayoutUpdateType(connectionIndex) {
+        // Guard against invalid indices (can occur during drag/undo/intermediate states)
+        if (connectionIndex < 0) {
+            return null;
+        }
+
+        // Two-argument blocks and expandable argument blocks need ARG layout updates
+        // when a child connects to their first argument slot (connection index 1)
+        if (connectionIndex === 1) {
+            if (this.isTwoArgBlock() || (this.isArgBlock() && this.isExpandableBlock())) {
+                return "ARG";
+            }
+        }
+
+        const n = this.connections.length;
+        if (
+            connectionIndex === n - 2 &&
+            !this.isArgClamp() &&
+            this.docks[n - 1] &&
+            this.docks[n - 1][2] === "in"
+        ) {
+            return "FLOW";
+        }
+
+        return null;
+    }
+
+    /**
      * Gets the unique identifier for the block.
      * @returns {string} - The unique identifier for the block.
      */
@@ -3018,10 +3064,20 @@ class Block {
                 x: Math.round(that.container.x - that.original.x),
                 y: Math.round(that.container.y - that.original.y)
             };
+
+            // Cache the drag group once on mousedown instead of
+            // recomputing the tree traversal on every pressmove.
+            that.blocks.cacheDragGroup(thisBlock);
+            // Invalidate the top-block cache since a drag may
+            // disconnect blocks, changing the topology.
+            that.blocks.invalidateTopBlockCache();
         });
 
         /**
          * Handles the pressmove event on the block container.
+         * Performance-optimized: uses cached drag group, batched block
+         * moves, throttled edge scroll, and a single deferred
+         * checkBounds + refreshCanvas per frame.
          * @param {Event} event - The pressmove event.
          */
         this.container.on("pressmove", event => {
@@ -3081,14 +3137,27 @@ class Block {
                 dy += 45 - finalPos;
             }
 
-            // scroll when reached edges.
-            if (event.stageX < 10 && that.activity.scrollBlockContainer)
-                that.blocks.moveAllBlocksExcept(that, 10, 0);
-            else if (event.stageX > window.innerWidth - 10 && that.activity.scrollBlockContainer)
-                that.blocks.moveAllBlocksExcept(that, -10, 0);
-            else if (event.stageY > window.innerHeight - 10)
-                that.blocks.moveAllBlocksExcept(that, 0, -10);
-            else if (event.stageY < 60) that.blocks.moveAllBlocksExcept(that, 0, 10);
+            // Edge-scroll: throttled to ~60fps (16ms) to avoid
+            // running moveAllBlocksExcept on every mouse event.
+            const now = Date.now();
+            if (now - that.blocks._lastEdgeScrollTime >= 16) {
+                if (event.stageX < 10 && that.activity.scrollBlockContainer) {
+                    that.blocks.moveAllBlocksExcept(that, 10, 0);
+                    that.blocks._lastEdgeScrollTime = now;
+                } else if (
+                    event.stageX > window.innerWidth - 10 &&
+                    that.activity.scrollBlockContainer
+                ) {
+                    that.blocks.moveAllBlocksExcept(that, -10, 0);
+                    that.blocks._lastEdgeScrollTime = now;
+                } else if (event.stageY > window.innerHeight - 10) {
+                    that.blocks.moveAllBlocksExcept(that, 0, -10);
+                    that.blocks._lastEdgeScrollTime = now;
+                } else if (event.stageY < 60) {
+                    that.blocks.moveAllBlocksExcept(that, 0, 10);
+                    that.blocks._lastEdgeScrollTime = now;
+                }
+            }
 
             if (that.blocks.longPressTimeout != null) {
                 clearTimeout(that.blocks.longPressTimeout);
@@ -3100,7 +3169,8 @@ class Block {
                 that.label.style.display = "none";
             }
 
-            that.blocks.moveBlockRelative(thisBlock, dx, dy);
+            // Move the dragged block itself (batched — no checkBounds).
+            that.blocks.moveBlockRelativeBatched(thisBlock, dx, dy);
 
             // If we are over the trash, warn the user.
             if (
@@ -3119,17 +3189,31 @@ class Block {
                 that.container.setChildIndex(that.text, that.container.children.length - 1);
             }
 
-            // ...and move any connected blocks.
-            that.blocks.findDragGroup(thisBlock);
-            if (that.blocks.dragGroup.length > 0) {
-                for (let b = 0; b < that.blocks.dragGroup.length; b++) {
-                    const blk = that.blocks.dragGroup[b];
-                    if (b !== 0) {
-                        that.blocks.moveBlockRelative(blk, dx, dy);
+            // Move connected blocks using the cached drag group
+            // (computed once on mousedown, not every pressmove).
+            const cachedGroup = that.blocks._cachedDragGroup;
+            if (cachedGroup != null && cachedGroup.length > 0) {
+                for (let b = 0; b < cachedGroup.length; b++) {
+                    const blk = cachedGroup[b];
+                    if (blk !== thisBlock) {
+                        that.blocks.moveBlockRelativeBatched(blk, dx, dy);
+                    }
+                }
+            } else {
+                // Fallback: recompute if cache is missing
+                that.blocks.findDragGroup(thisBlock);
+                if (that.blocks.dragGroup.length > 0) {
+                    for (let b = 0; b < that.blocks.dragGroup.length; b++) {
+                        const blk = that.blocks.dragGroup[b];
+                        if (b !== 0) {
+                            that.blocks.moveBlockRelativeBatched(blk, dx, dy);
+                        }
                     }
                 }
             }
 
+            // Single deferred checkBounds + single canvas refresh per frame
+            that.blocks.scheduleCheckBounds();
             that.activity.refreshCanvas();
         });
 
@@ -3152,6 +3236,9 @@ class Block {
                 that.blocks.unhighlight(thisBlock, true);
             }
             that.blocks.activeBlock = null;
+            // Release cached drag group and top-block map
+            that.blocks.clearCachedDragGroup();
+            that.blocks.invalidateTopBlockCache();
 
             moved = false;
         });
@@ -3174,6 +3261,9 @@ class Block {
 
             that.blocks.unhighlight(thisBlock, true);
             that.blocks.activeBlock = null;
+            // Release cached drag group and top-block map
+            that.blocks.clearCachedDragGroup();
+            that.blocks.invalidateTopBlockCache();
 
             moved = false;
         });
@@ -4489,20 +4579,14 @@ class Block {
                     // Rename both do <- name and nameddo blocks.
                     this.blocks.renameDos(oldValue, newValue);
 
+                    // eslint-disable-next-line no-case-declarations
+                    const metadata = this.blocks.actionMetadata(c);
                     if (oldValue === _("action")) {
-                        this.blocks.newNameddoBlock(
-                            newValue,
-                            this.blocks.actionHasReturn(c),
-                            this.blocks.actionHasArgs(c)
-                        );
+                        this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
                         this.blocks.setActionProtoVisibility(false);
                     }
 
-                    this.blocks.newNameddoBlock(
-                        newValue,
-                        this.blocks.actionHasReturn(c),
-                        this.blocks.actionHasArgs(c)
-                    );
+                    this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
                     // eslint-disable-next-line no-case-declarations
                     const blockPalette = this.blocks.palettes.dict["action"];
                     for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
@@ -4519,11 +4603,7 @@ class Block {
                     }
 
                     if (oldValue === _("action")) {
-                        this.blocks.newNameddoBlock(
-                            newValue,
-                            this.blocks.actionHasReturn(c),
-                            this.blocks.actionHasArgs(c)
-                        );
+                        this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
                         this.blocks.setActionProtoVisibility(false);
                     }
                     this.blocks.renameNameddos(oldValue, newValue);
