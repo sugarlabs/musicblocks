@@ -15,37 +15,6 @@
 // scratch. -- Walter Bender, October 2014.
 
 /*
-   global
-
-   ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON,
-   ActivityContext,
-   Boundary, CARTESIAN, changeImage, closeWidgets,
-   COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
-   createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
-   DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
-   doSVG, EMPTYHEAPERRORMSG, EXPANDBUTTON, FILLCOLORS,
-   getMacroExpansion, getOctaveRatio, getTemperament, transcribeMidi,
-   GOHOMEBUTTON, GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
-   hideDOMLabel, initBasicProtoBlocks, initPalettes,
-   INLINECOLLAPSIBLES, JSEditor, LanguageBox, ThemeBox, MSGBLOCK,
-   NANERRORMSG, NOACTIONERRORMSG, NOBOXERRORMSG, NOINPUTERRORMSG,
-   NOMICERRORMSG, NOSQRTERRORMSG, NOSTRINGERRORMSG, PALETTEFILLCOLORS,
-   PALETTESTROKECOLORS, PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
-   Palettes, PasteBox, PlanetInterface, platform, platformColor,
-   piemenuKey, POLAR, preparePluginExports, processMacroData,
-   processPluginData, processRawPluginData, SaveInterface,
-   SHOWBLOCKSBUTTON, SMALLERBUTTON, SMALLERDISABLEBUTTON, SOPRANO,
-   SPECIALINPUTS, STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
-   TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, TURTLESVG,
-   updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_F,
-   SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
-   MUSICALMODES, waitForReadiness, body, i18next, wheelnav, slicePath,
-   base64Encode, disableHorizScrollIcon,
-   toFraction, CARTESIANBUTTON, piemenuGrid,
-   SELECTBUTTON, CLEARBUTTON, Midi, ABCJS
- */
-
-/*
    exported
 
    Activity, LEADING, _THIS_IS_MUSIC_BLOCKS_, _THIS_IS_TURTLE_BLOCKS_,
