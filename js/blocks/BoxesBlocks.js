@@ -452,10 +452,13 @@ function setupBoxesBlocks(activity) {
         arg(logo, turtle, blk) {
             const name = activity.blocks.blockList[blk].privateData;
 
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId != null &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, activity.blocks.blockList[blk].name]);
             } else if (!logo.updatingStatusMatrix) {
