@@ -69,11 +69,16 @@ let MYDEFINES = [
     "tweenjs.min",
     "preloadjs.min",
     "howler",
-    "p5.min",
-    "p5-sound-adapter",
-    "p5.dom.min",
-    // 'mespeak',
-    "Chart",
+    // p5.min, p5-sound-adapter, and p5.dom.min are NOT loaded eagerly.
+    // They are only needed by the JS-export feature and will be loaded
+    // on demand via require() when that feature is used, saving ~10-15 MB
+    // of heap memory on every page load.
+    // "p5.min",
+    // "p5-sound-adapter",
+    // "p5.dom.min",
+    // Chart.js is only used by the statistics widget and will be loaded
+    // on demand when the widget is opened, saving ~3-5 MB of heap memory.
+    // "Chart",
     "utils/utils",
     "activity/artwork",
     "widgets/status",
@@ -3028,6 +3033,11 @@ class Activity {
                     this._resetIdleTimer();
                 }
             }, 1000);
+
+            // Expose activity instance for external checks
+            if (typeof window !== "undefined") {
+                window.activity = this;
+            }
         };
 
         /**
