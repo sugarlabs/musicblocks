@@ -1917,16 +1917,25 @@ class Logo {
                     }
 
                     if (logo.runningLilypond) {
-                        if (logo.collectingStats) {
-                            // console.debug("stats collection completed");
-                            logo.projectStats = logo.deps.utils.getStatsFromNotation(logo.activity);
-                            logo.activity.statsWindow.displayInfo(logo.projectStats);
-                        } else {
-                            // console.debug("saving lilypond output:");
-                            logo.activity.save.afterSaveLilypond();
+                        try {
+                            if (logo.collectingStats) {
+                                logo.projectStats = logo.deps.utils.getStatsFromNotation(
+                                    logo.activity
+                                );
+                                logo.activity.statsWindow.displayInfo(logo.projectStats);
+                            } else {
+                                logo.activity.save.afterSaveLilypond();
+                            }
+                        } catch (e) {
+                            console.error("Error generating Lilypond output:", e);
+                            logo.activity.errorMsg(
+                                _("Error generating Lilypond output. ") + e.message
+                            );
+                        } finally {
+                            logo.collectingStats = false;
+                            logo.runningLilypond = false;
+                            document.body.style.cursor = "default";
                         }
-                        logo.collectingStats = false;
-                        logo.runningLilypond = false;
                     } else if (logo.runningAbc) {
                         // console.debug("saving abc output:");
                         logo.activity.save.afterSaveAbc();

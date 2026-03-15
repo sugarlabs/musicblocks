@@ -733,7 +733,14 @@ class SaveInterface {
 
             // Trigger save after a short delay to let UI update
             setTimeout(() => {
-                this.afterSaveLilypond();
+                try {
+                    this.afterSaveLilypond();
+                } catch (e) {
+                    console.error("Error generating Lilypond output:", e);
+                    this.activity.errorMsg(_("Error generating Lilypond output. ") + e.message);
+                } finally {
+                    document.body.style.cursor = "default";
+                }
             }, 100);
         } else {
             // No buffered data - run the program to generate notation (original behavior)
@@ -772,16 +779,23 @@ class SaveInterface {
      */
     afterSaveLilypond(filename) {
         filename = docById("fileName").value;
-        const ly = saveLilypondOutput(this.activity);
-        switch (this.notationConvert) {
-            case "pdf":
-                this.afterSaveLilypondPDF(ly, filename);
-                break;
-            default:
-                this.afterSaveLilypondLY(ly, filename);
-                break;
+        try {
+            const ly = saveLilypondOutput(this.activity);
+            switch (this.notationConvert) {
+                case "pdf":
+                    this.afterSaveLilypondPDF(ly, filename);
+                    break;
+                default:
+                    this.afterSaveLilypondLY(ly, filename);
+                    break;
+            }
+        } catch (e) {
+            console.error("Error in Lilypond output generation:", e);
+            this.activity.errorMsg(_("Error generating Lilypond output. ") + e.message);
+        } finally {
+            this.notationConvert = "";
+            document.body.style.cursor = "default";
         }
-        this.notationConvert = "";
     }
 
     /**
