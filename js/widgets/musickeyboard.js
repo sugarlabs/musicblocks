@@ -1885,9 +1885,9 @@ function MusicKeyboard(activity) {
             let oldcurValue, newcurValue;
             if (parseInt(curValue.startTime) === start) {
                 prevValue = prevValue.concat([curValue]);
-                oldcurValue = JSON.parse(JSON.stringify(curValue));
+                oldcurValue = Object.assign({}, curValue);
                 for (let i = 0; i < divideNoteBy; i++) {
-                    newcurValue = JSON.parse(JSON.stringify(oldcurValue));
+                    newcurValue = Object.assign({}, oldcurValue);
                     newcurValue.startTime = oldcurValue.startTime + oldcurValue.duration * 1000;
                     prevValue = prevValue.concat([newcurValue]);
                     oldcurValue = newcurValue;
@@ -1940,12 +1940,12 @@ function MusicKeyboard(activity) {
                     }
                 }
 
-                newcurValue = JSON.parse(JSON.stringify(curValue));
+                newcurValue = Object.assign({}, curValue);
                 newcurValue.duration = curValue.duration / divideNoteBy;
                 prevValue = prevValue.concat([newcurValue]);
                 oldcurValue = newcurValue;
                 for (let i = 0; i < divideNoteBy - 1; i++) {
-                    newcurValue2 = JSON.parse(JSON.stringify(oldcurValue));
+                    newcurValue2 = Object.assign({}, oldcurValue);
                     newcurValue2.startTime = parseInt(
                         newcurValue2.startTime + newcurValue2.duration * 1000
                     );
