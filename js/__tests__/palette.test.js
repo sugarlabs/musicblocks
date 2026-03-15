@@ -2468,3 +2468,44 @@ describe("Palettes edge cases", () => {
         expect(palettes.cellSize).toBe(0); // Math.floor(0 * 0.5 + 0.5) = Math.floor(0.5) = 0
     });
 });
+
+describe("Drum Palette Tests", () => {
+    let mockActivity;
+    let palettes;
+
+    beforeEach(() => {
+        mockActivity = {
+            cellSize: 50,
+            blocks: {
+                protoBlockDict: {
+                    drumBlock1: { palette: { name: "drum" } },
+                    drumBlock2: { palette: { name: "drum" } }
+                }
+            },
+            hideSearchWidget: jest.fn(),
+            showSearchWidget: jest.fn(),
+            beginnerMode: false
+        };
+
+        palettes = new Palettes(mockActivity);
+        palettes.add("drum"); // add drum palette
+    });
+
+    test("drum palette should be created", () => {
+        expect(palettes.dict["drum"]).toBeDefined();
+    });
+
+    test("drum palette should count drum blocks", () => {
+        const count = palettes.countProtoBlocks("drum");
+        expect(count).toBe(2);
+    });
+
+    test("showPalette should activate drum palette", () => {
+        palettes.dict["drum"].showMenu = jest.fn();
+
+        palettes.showPalette("drum");
+
+        expect(palettes.dict["drum"].showMenu).toHaveBeenCalledWith(true);
+        expect(palettes.activePalette).toBe("drum");
+    });
+});
