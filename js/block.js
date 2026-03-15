@@ -391,7 +391,7 @@ class Block {
         const INITIAL_DELAY = 100;
 
         return retryWithBackoff({
-            check: () => that.bounds !== null,
+            check: () => that.bounds !== null && that.container && that.container.bitmapCache,
             onSuccess: () => {
                 that.container.updateCache();
                 that.activity.refreshCanvas();
