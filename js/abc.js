@@ -436,3 +436,9 @@ if (typeof module !== "undefined" && module.exports) {
         OCTAVE_NOTATION_MAP
     };
 }
+
+if (typeof window !== "undefined") {
+    window.saveAbcOutput = saveAbcOutput;
+    window.processABCNotes = processABCNotes;
+    window.getABCHeader = getABCHeader;
+}
