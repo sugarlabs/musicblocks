@@ -16,6 +16,7 @@
  * MA 02110-1335 USA.
  */
 
+/* eslint-disable no-redeclare */
 /*
    global
 
