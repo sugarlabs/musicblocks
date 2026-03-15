@@ -9,8 +9,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/* eslint-disable no-redeclare */
+
 /*
-   global
+   global docById, define,
 
    BACKWARDCOMPATIBILIYDICT, COLLAPSIBLES, DEFAULTACCIDENTAL,
    DEFAULTBLOCKSCALE, DEFAULTDRUM, DEFAULTEFFECT, DEFAULTFILTER,
@@ -2303,7 +2305,14 @@ class Blocks {
          * @public
          * @returns {void}
          */
+        let checkBoundsCount = 0;
+        let totalCheckBoundsTime = 0;
+        let maxCheckBoundsTime = 0;
+        let lastCheckBoundsReport = performance.now();
+
         this.checkBounds = () => {
+            const start = window.__ENABLE_REFRESH_PROFILING__ ? performance.now() : 0;
+
             let onScreen = true;
             for (const block of this.blockList) {
                 if (block.connections[0] == null) {
@@ -2320,6 +2329,27 @@ class Blocks {
             if (onScreen) {
                 this.activity.setHomeContainers(false);
                 this.boundary.hide();
+            }
+
+            if (start > 0) {
+                const duration = performance.now() - start;
+                checkBoundsCount++;
+                totalCheckBoundsTime += duration;
+                maxCheckBoundsTime = Math.max(maxCheckBoundsTime, duration);
+
+                if (checkBoundsCount % 25 === 0) {
+                    const now = performance.now();
+                    const cps = (25 / (now - lastCheckBoundsReport)) * 1000;
+                    console.log(
+                        `checkBounds | Avg: ${(totalCheckBoundsTime / checkBoundsCount).toFixed(
+                            2
+                        )}ms | Max: ${maxCheckBoundsTime.toFixed(2)}ms | Rate: ${cps.toFixed(
+                            1
+                        )} calls/sec`
+                    );
+                    maxCheckBoundsTime = 0;
+                    lastCheckBoundsReport = now;
+                }
             }
         };
 

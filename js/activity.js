@@ -14,6 +14,8 @@
 // (https://github.com/walterbender/turtleart), but implemented from
 // scratch. -- Walter Bender, October 2014.
 
+window.__ENABLE_REFRESH_PROFILING__ = false;
+
 /*
    global
 
@@ -4741,13 +4743,19 @@ class Activity {
          * Updates all canvas elements by marking stage as dirty.
          * The actual render will happen on the next animation frame.
          */
+        let refreshCount = 0;
+        let totalRefreshTime = 0;
+        let maxRefreshTime = 0;
+        let lastRefreshReport = performance.now();
+
         this.refreshCanvas = () => {
             if (this.blockRefreshCanvas) {
                 return;
             }
 
+            const start = window.__ENABLE_REFRESH_PROFILING__ ? performance.now() : 0;
+
             this.blockRefreshCanvas = true;
-            // Mark stage as needing update
             this.stageDirty = true;
             this.update = true;
 
@@ -4755,6 +4763,27 @@ class Activity {
             setTimeout(() => {
                 that.blockRefreshCanvas = false;
                 that.stageDirty = true;
+
+                if (window.__ENABLE_REFRESH_PROFILING__) {
+                    const duration = performance.now() - start;
+                    refreshCount++;
+                    totalRefreshTime += duration;
+                    maxRefreshTime = Math.max(maxRefreshTime, duration);
+
+                    if (refreshCount % 25 === 0) {
+                        const now = performance.now();
+                        const cps = (25 / (now - lastRefreshReport)) * 1000;
+                        console.log(
+                            `refreshCanvas | Avg: ${(totalRefreshTime / refreshCount).toFixed(
+                                2
+                            )}ms | Max: ${maxRefreshTime.toFixed(2)}ms | Rate: ${cps.toFixed(
+                                1
+                            )} calls/sec`
+                        );
+                        maxRefreshTime = 0;
+                        lastRefreshReport = now;
+                    }
+                }
             }, 5);
         };
 
