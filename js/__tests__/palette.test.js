@@ -1,3 +1,4 @@
+/* global MULTIPALETTES, platformColor, docById, TEXTWIDTH */
 /**
  * @license
  * MusicBlocks v3.7.0
@@ -130,7 +131,9 @@ describe("Palettes Class", () => {
                     ],
                     style: { border: "" }
                 }
-            ]
+            ],
+            setAttribute: jest.fn(),
+            addEventListener: jest.fn()
         };
 
         global.document = {
@@ -315,6 +318,7 @@ describe("Palettes Class", () => {
                 const row = {
                     insertCell: jest.fn(),
                     style: {},
+                    dataset: {},
                     addEventListener: jest.fn((event, handler) => {
                         handlers[event] = handler;
                     })
@@ -351,6 +355,7 @@ describe("Palettes Class", () => {
                 const row = {
                     insertCell: jest.fn(),
                     style: {},
+                    dataset: {},
                     addEventListener: jest.fn((event, handler) => {
                         handlers[event] = handler;
                     })

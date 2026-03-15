@@ -1,6 +1,6 @@
 /*
    global
-   _
+   define
 */
 
 /*
@@ -97,6 +97,6 @@ if (typeof define === "function" && define.amd) {
 }
 
 // Preserve existing global exposure exactly as before
-if (typeof window !== "undefined") {
+if (typeof window !== "undefined" && typeof module === "undefined") {
     Object.assign(window, logoconstants);
 }
