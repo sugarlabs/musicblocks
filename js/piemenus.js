@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 // Copyright (c) 2014-23 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
@@ -14,7 +13,7 @@
 /*
    global
 
-   _, platformColor, docById, Singer, slicePath, wheelnav,
+    platformColor, docById, Singer, slicePath, wheelnav,
    DEFAULTVOICE, getDrumName, getNote, MUSICALMODES last, SHARP, FLAT,
    PREVIEWVOLUME, DEFAULTVOLUME, MODE_PIE_MENUS, HelpWidget,
    INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName,
@@ -22,7 +21,7 @@
    DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
    FIXEDSOLFEGE, NOTENAMES, FIXEDSOLFEGE, NOTENAMES, numberToPitch,
    nthDegreeToPitch, SOLFEGENAMES, buildScale, _THIS_IS_TURTLE_BLOCKS_,
-   CHORDNAMES
+    CHORDNAMES, Synth, Tone, activity
 */
 
 /*
@@ -676,11 +675,11 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                         false
                     );
                 } catch (e) {
-                    // Ensure trigger lock is released after a delay
-                    setTimeout(() => {
-                        that._triggerLock = false;
-                    }, 125); // 1/8 second in milliseconds
+                    console.error("Synth trigger error:", e);
                 }
+                setTimeout(() => {
+                    that._triggerLock = false;
+                }, 125);
             }
         } catch (e) {
             console.error("Error in pitch preview:", e);
@@ -3577,15 +3576,18 @@ const piemenuModes = (block, selectedMode) => {
         docById("wheelnav-_exitWheel-title-1").style.fill = "#ffffff";
         docById("wheelnav-_exitWheel-title-1").style.pointerEvents = "none";
         docById("wheelnav-_exitWheel-slice-1").style.pointerEvents = "none";
-        setTimeout(() => {
-            const playButtonTitle = docById("wheelnav-_exitWheel-title-1");
-            const playButtonSlice = docById("wheelnav-_exitWheel-slice-1");
-            if (playButtonTitle && playButtonSlice) {
-                playButtonTitle.style.fill = "#000000";
-                playButtonTitle.style.pointerEvents = "auto";
-                playButtonSlice.style.pointerEvents = "auto";
-            }
-        }, (20 * 1000) / 10);
+        setTimeout(
+            () => {
+                const playButtonTitle = docById("wheelnav-_exitWheel-title-1");
+                const playButtonSlice = docById("wheelnav-_exitWheel-slice-1");
+                if (playButtonTitle && playButtonSlice) {
+                    playButtonTitle.style.fill = "#000000";
+                    playButtonTitle.style.pointerEvents = "auto";
+                    playButtonSlice.style.pointerEvents = "auto";
+                }
+            },
+            (20 * 1000) / 10
+        );
 
         __playScale(activeTabs, 0);
     };
@@ -3813,20 +3815,22 @@ const piemenuBlockContext = block => {
         docById("contextWheelDiv").style.display = "none";
     };
 
-    // Named function for proper cleanup
-    const hideContextWheelOnClick = event => {
+    // Use a named handler stored globally so we can remove the previous one
+    // before adding a new one, preventing accumulation of click listeners.
+    if (window._contextWheelClickHandler) {
+        document.body.removeEventListener("click", window._contextWheelClickHandler);
+    }
+
+    window._contextWheelClickHandler = event => {
         const wheelElement = document.getElementById("contextWheelDiv");
         const displayStyle = window.getComputedStyle(wheelElement).display;
         if (displayStyle === "block") {
             wheelElement.style.display = "none";
-            // Remove listener after hiding to prevent memory leak
-            document.body.removeEventListener("click", hideContextWheelOnClick);
+            document.body.removeEventListener("click", window._contextWheelClickHandler);
         }
     };
 
-    // Remove any existing listener before adding a new one
-    document.body.removeEventListener("click", hideContextWheelOnClick);
-    document.body.addEventListener("click", hideContextWheelOnClick);
+    document.body.addEventListener("click", window._contextWheelClickHandler);
 
     if (
         ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].includes(
