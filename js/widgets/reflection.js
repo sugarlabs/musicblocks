@@ -67,7 +67,7 @@ class ReflectionMatrix {
         this.code = "";
 
         /**
-         * Conversation summary 
+         * Conversation summary
          * @type {string}
          */
         this.conversationSummary = "";
