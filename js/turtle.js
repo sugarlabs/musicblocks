@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 /**
  * @file This contains the prototype of the Turtle component.
  * @author Walter Bender
@@ -21,7 +20,7 @@
    globals
 
    createjs, DEFAULTVOLUME, delayExecution, importMembers, Painter, Singer,
-   DEFAULTVOICE, retryWithBackoff
+   DEFAULTVOICE, retryWithBackoff, base64Encode
  */
 /* exported Turtle */
 /**
@@ -134,7 +133,6 @@ class Turtle {
                 that.activity.refreshCanvas();
             },
             onRetry: attempt => {
-                // eslint-disable-next-line no-console
                 console.debug(
                     "Turtle container for " +
                         that.name +
@@ -171,7 +169,6 @@ class Turtle {
     /**
      * Causes turtle to blink (toggle turtle's visibility) every 100 ms.
      */
-    // eslint-disable-next-line no-unused-vars
     async blink(duration, volume) {
         // Suppress blinking when using cursorout and cursorover
         // sensors to prevent multiple triggers.

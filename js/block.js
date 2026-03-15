@@ -13,7 +13,7 @@
 /*
    global
 
-   _, addTemperamentToDictionary,
+   addTemperamentToDictionary, base64Encode,
    ACCIDENTALLABELS, ACCIDENTALNAMES, blockBlocks, COLLAPSEBUTTON, COLLAPSETEXTX, COLLAPSETEXTY,
    createjs, DEFAULTACCIDENTAL, DEFAULTDRUM, DEFAULTEFFECT,
    DEFAULTFILTERTYPE, DEFAULTINTERVAL, DEFAULTINVERT, DEFAULTMODE,
@@ -71,7 +71,7 @@
         platformColor
  */
 
-/* exported Block, $ */
+/* exported Block */
 
 // Length of a long touch
 
@@ -4165,7 +4165,6 @@ class Block {
                 labelElem.classList.remove("hasKeyboard");
 
                 window.scroll(0, 0);
-                // eslint-disable-next-line no-use-before-define
                 that.label.removeEventListener("keypress", __keypress);
 
                 if (movedStage) {
@@ -4629,30 +4628,6 @@ class Block {
         }
     }
 }
-
-/**
- * Set elements to an array; if element is string, then set element's id to element.
- * @public
- * @returns {Array|HTMLElement} - An array of elements or a single element.
- */
-const $ = () => {
-    const elements = new Array();
-
-    for (let i = 0; i < elements.length; i++) {
-        let element = elements[i];
-        if (typeof element === "string") {
-            element = docById(element);
-        }
-
-        if (elements.length === 1) {
-            return element;
-        }
-
-        elements.push(element);
-    }
-
-    return elements;
-};
 
 // Track mouse presence
 window.hasMouse = false;

@@ -1,6 +1,6 @@
 /*
    global
-   _
+   define
 */
 
 /*
@@ -87,16 +87,12 @@ const logoconstants = {
 // Maintain CommonJS compatibility for tests
 if (typeof module !== "undefined" && module.exports) {
     module.exports = logoconstants;
-}
-
-// Implement additive AMD define
-if (typeof define === "function" && define.amd) {
+} else if (typeof define === "function" && define.amd) {
+    // Implement additive AMD define
     define(function () {
         return logoconstants;
     });
-}
-
-// Preserve existing global exposure exactly as before
-if (typeof window !== "undefined") {
+} else if (typeof window !== "undefined") {
+    // Preserve existing global exposure exactly as before
     Object.assign(window, logoconstants);
 }
