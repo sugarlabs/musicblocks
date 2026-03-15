@@ -10,8 +10,8 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 //
 
-/*
-   global
+/* eslint-disable no-redeclare */
+/* global
 
    _, ACCIDENTALLABELS, ACCIDENTALNAMES, addTemperamentToDictionary,
    blockBlocks, COLLAPSEBUTTON, COLLAPSETEXTX, COLLAPSETEXTY,
@@ -231,7 +231,7 @@ const _blockMakeBitmap = (data, callback, args) => {
         callback(bitmap, args);
     };
 
-    img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
+    img.src = "data:image/svg+xml;base64," + window.btoa(window.base64Encode(data));
 };
 
 // Optimization: Cache static DOM elements to avoid repetitive querySelector/getElementById calls
@@ -1546,7 +1546,7 @@ class Block {
                 __finishCollapse(that);
             };
 
-            image.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBUTTON));
+            image.src = "data:image/svg+xml;base64," + window.btoa(window.base64Encode(COLLAPSEBUTTON));
         };
 
         /**
@@ -1577,7 +1577,7 @@ class Block {
                 __processCollapseButton(that);
             };
 
-            image.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(EXPANDBUTTON));
+            image.src = "data:image/svg+xml;base64," + window.btoa(window.base64Encode(EXPANDBUTTON));
         };
 
         /**
@@ -4682,11 +4682,11 @@ class Block {
  * @public
  * @returns {Array|HTMLElement} - An array of elements or a single element.
  */
-const $ = () => {
+const $ = function() {
     const elements = new Array();
 
-    for (let i = 0; i < elements.length; i++) {
-        let element = elements[i];
+    for (let i = 0; i < arguments.length; i++) {
+        let element = arguments[i];
         if (typeof element === "string") {
             element = docById(element);
         }
