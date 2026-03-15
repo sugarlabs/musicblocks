@@ -2978,8 +2978,14 @@ class Activity {
          * Initialize an idle watcher that throttles the application's framerate
          * when the application is inactive and no music is playing.
          * This significantly reduces CPU usage and improves battery life.
+         *
+         * Listeners and intervals are properly cleaned up via stopIdleWatcher()
+         * to prevent accumulation on re-initialization.
          */
         this._initIdleWatcher = () => {
+            // Ensure any prior idle watcher is cleaned up before reinitializing
+            this._stopIdleWatcher();
+
             const IDLE_THRESHOLD = 5000; // 5 seconds
             const ACTIVE_FPS = 60;
             const IDLE_FPS = 1;
@@ -2988,7 +2994,8 @@ class Activity {
             this.isAppIdle = false;
 
             // Wake up function - restores full framerate
-            const resetIdleTimer = () => {
+            // Stored as instance property for cleanup
+            this._resetIdleTimer = () => {
                 lastActivity = Date.now();
                 if (this.isAppIdle) {
                     this.isAppIdle = false;
@@ -2998,19 +3005,15 @@ class Activity {
                 }
             };
 
-            // Track user activity
-            window.addEventListener("mousemove", resetIdleTimer);
-            window.addEventListener("mousedown", resetIdleTimer);
-            window.addEventListener("keydown", resetIdleTimer);
-            window.addEventListener("touchstart", resetIdleTimer, {
-                passive: true
-            });
-            window.addEventListener("wheel", resetIdleTimer, {
-                passive: true
-            });
+            // Track user activity using managed addEventListener for proper cleanup
+            this.addEventListener(window, "mousemove", this._resetIdleTimer);
+            this.addEventListener(window, "mousedown", this._resetIdleTimer);
+            this.addEventListener(window, "keydown", this._resetIdleTimer);
+            this.addEventListener(window, "touchstart", this._resetIdleTimer);
+            this.addEventListener(window, "wheel", this._resetIdleTimer);
 
-            // Periodic check for idle state
-            setInterval(() => {
+            // Periodic check for idle state - store interval ID for cleanup
+            this._idleWatcherInterval = setInterval(() => {
                 // Check if music/code is playing
                 const isMusicPlaying = this.logo?._alreadyRunning || false;
 
@@ -3022,9 +3025,32 @@ class Activity {
                     }
                 } else if (this.isAppIdle && isMusicPlaying) {
                     // Music started playing - wake up immediately
-                    resetIdleTimer();
+                    this._resetIdleTimer();
                 }
             }, 1000);
+        };
+
+        /**
+         * Stop the idle watcher and clean up its listeners and interval.
+         * Called during Activity lifecycle teardown to prevent listener/interval accumulation.
+         * It is safe to call this method even if the idle watcher was never started.
+         */
+        this._stopIdleWatcher = () => {
+            // Clear the periodic interval
+            if (typeof this._idleWatcherInterval !== "undefined") {
+                clearInterval(this._idleWatcherInterval);
+                this._idleWatcherInterval = undefined;
+            }
+
+            // Remove event listeners if they were registered
+            if (typeof this._resetIdleTimer === "function") {
+                this.removeEventListener(window, "mousemove", this._resetIdleTimer);
+                this.removeEventListener(window, "mousedown", this._resetIdleTimer);
+                this.removeEventListener(window, "keydown", this._resetIdleTimer);
+                this.removeEventListener(window, "touchstart", this._resetIdleTimer);
+                this.removeEventListener(window, "wheel", this._resetIdleTimer);
+                this._resetIdleTimer = undefined;
+            }
         };
 
         /**
