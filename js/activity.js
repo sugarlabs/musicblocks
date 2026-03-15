@@ -3285,12 +3285,23 @@ class Activity {
                 this.prepSearchWidget();
             }
 
+            this.searchCache = {}; // Cache for filtered results to improve performance
+
             const that = this;
             const $search = $j("#search");
 
             if (!$search.data("autocomplete-init")) {
                 $search.autocomplete({
-                    source: that.searchSuggestions,
+                    source: (request, response) => {
+                        const term = request.term.toLowerCase();
+                        if (that.searchCache[term]) {
+                            response(that.searchCache[term]);
+                            return;
+                        }
+                        const filtered = $j.ui.autocomplete.filter(that.searchSuggestions, term);
+                        that.searchCache[term] = filtered;
+                        response(filtered);
+                    },
                     appendTo: "body",
                     select: (event, ui) => {
                         event.preventDefault();
@@ -6779,12 +6790,23 @@ class Activity {
                 this.prepSearchWidget();
             }
 
+            this.searchCache = {}; // Cache for filtered results to improve performance
+
             const that = this;
             const $helpfulSearch = $j("#helpfulSearch");
 
             if (!$helpfulSearch.data("autocomplete-init")) {
                 $helpfulSearch.autocomplete({
-                    source: that.searchSuggestions,
+                    source: (request, response) => {
+                        const term = request.term.toLowerCase();
+                        if (that.searchCache[term]) {
+                            response(that.searchCache[term]);
+                            return;
+                        }
+                        const filtered = $j.ui.autocomplete.filter(that.searchSuggestions, term);
+                        that.searchCache[term] = filtered;
+                        response(filtered);
+                    },
                     appendTo: "body",
                     select: (event, ui) => {
                         event.preventDefault();
