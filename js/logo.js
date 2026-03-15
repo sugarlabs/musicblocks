@@ -18,7 +18,7 @@
    instrumentsEffects, Singer, Tone, CAMERAVALUE, doUseCamera,
    VIDEOVALUE, last, getIntervalDirection, getIntervalNumber,
    mixedNumber, rationalToFraction, doStopVideoCam, StatusMatrix,
-   getStatsFromNotation, delayExecution, DEFAULTVOICE, window
+   getStatsFromNotation, delayExecution, DEFAULTVOICE, performanceTracker, window
  */
 
 /*
@@ -323,6 +323,16 @@ class Logo {
 
         // Midi Data
         this._midiData = {};
+
+        // Async yield mechanism: prevent infinite recursion from freezing the UI.
+        // _syncCounter tracks consecutive synchronous block executions.
+        // When it exceeds _YIELD_AFTER_SYNC_RUNS, we yield to the event loop
+        // via setTimeout(0) so the browser can process paint/input events.
+        // _totalIterations is a per-run safety limit to catch true infinite loops.
+        this._syncCounter = 0;
+        this._YIELD_AFTER_SYNC_RUNS = 1000;
+        this._totalIterations = 0;
+        this._MAX_ITERATIONS = 1000000;
 
         // When running in step-by-step mode, the next command to run
         // is queued here.
@@ -1107,6 +1117,18 @@ class Logo {
      * @returns {void}
      */
     runLogoCommands(startHere, env) {
+        // Performance instrumentation: enable/disable based on URL flag
+        if (typeof performanceTracker !== "undefined") {
+            if (
+                typeof window !== "undefined" &&
+                window.location.search.includes("performance=true")
+            ) {
+                performanceTracker.enable();
+            } else {
+                performanceTracker.disable();
+            }
+        }
+
         this._prematureRestart = this._alreadyRunning;
         if (this._alreadyRunning && this._runningBlock !== null) {
             this._ignoringBlock = this._runningBlock;
@@ -1127,6 +1149,10 @@ class Logo {
         }
 
         this.stopTurtle = false;
+
+        // Reset async yield counters for this run.
+        this._syncCounter = 0;
+        this._totalIterations = 0;
 
         this.activity.blocks.unhighlightAll();
         this.activity.blocks.bringToTop(); // Draw under the blocks.
@@ -1297,6 +1323,11 @@ class Logo {
             this.activity.turtles.getTurtle(turtle).running = false;
         }
 
+        // Performance instrumentation: begin tracking
+        if (typeof performanceTracker !== "undefined") {
+            performanceTracker.startRun();
+        }
+
         /*
         ===========================================================================
         (2) Execute the stack. (A bit complicated due to lots of corner cases.)
@@ -1399,6 +1430,10 @@ class Logo {
 
         this.receivedArg = receivedArg;
 
+        // Reset async yield counters – execution will go through
+        // setTimeout below, giving the event loop a chance to breathe.
+        logo._syncCounter = 0;
+
         const tur = logo.activity.turtles.ithTurtle(turtle);
 
         const delay = logo.turtleDelay + tur.waitTime;
@@ -1433,9 +1468,29 @@ class Logo {
      * @returns {void}
      */
     runFromBlockNow(logo, turtle, blk, isflow, receivedArg, queueStart) {
+        if (typeof performanceTracker !== "undefined") {
+            performanceTracker.enterBlock();
+        }
+
         this._alreadyRunning = true;
 
         this.receivedArg = receivedArg;
+
+        // Safety check: stop execution if we have exceeded the maximum
+        // iteration limit, which indicates an infinite loop (e.g., an
+        // Action block that calls itself with no delay).
+        logo._totalIterations++;
+        if (logo._totalIterations > logo._MAX_ITERATIONS) {
+            logo.activity.errorMsg(
+                _("Infinite loop detected. Execution stopped to prevent browser freeze."),
+                blk
+            );
+            logo.stopTurtle = true;
+            logo._alreadyRunning = false;
+            logo._syncCounter = 0;
+            logo._totalIterations = 0;
+            return;
+        }
 
         // Sometimes we don't want to unwind the entire queue.
         if (queueStart === undefined) queueStart = 0;
@@ -1570,8 +1625,6 @@ class Logo {
             let res = null;
             // Is it a plugin?
             if (logo.blockList[blk].name in logo.evalFlowDict) {
-                // eslint-disable-next-line no-console
-                console.log("running eval on " + logo.blockList[blk].name);
                 logo.pluginReturnValue = null;
                 eval(logo.evalFlowDict[logo.blockList[blk].name]);
                 // Clamp blocks will return the child flow.
@@ -1592,7 +1645,12 @@ class Logo {
                 const [cf, cfc, ret] = res;
                 if (cf !== undefined) childFlow = cf;
                 if (cfc !== undefined) childFlowCount = cfc;
-                if (ret) return ret;
+                if (ret) {
+                    if (typeof performanceTracker !== "undefined") {
+                        performanceTracker.exitBlock();
+                    }
+                    return ret;
+                }
             }
         } else {
             if (
@@ -1779,7 +1837,27 @@ class Logo {
             }
 
             if (isflow) {
-                logo.runFromBlockNow(logo, turtle, nextBlock, isflow, passArg, queueStart);
+                // Async yield: periodically yield to the event loop so the
+                // browser can process paint/input events and the UI does not
+                // freeze during long-running or infinitely-recursive programs.
+                logo._syncCounter++;
+                if (logo._syncCounter >= logo._YIELD_AFTER_SYNC_RUNS) {
+                    logo._syncCounter = 0;
+                    setTimeout(() => {
+                        if (!logo.stopTurtle) {
+                            logo.runFromBlockNow(
+                                logo,
+                                turtle,
+                                nextBlock,
+                                isflow,
+                                passArg,
+                                queueStart
+                            );
+                        }
+                    }, 0);
+                } else {
+                    logo.runFromBlockNow(logo, turtle, nextBlock, isflow, passArg, queueStart);
+                }
             } else {
                 logo.runFromBlock(logo, turtle, nextBlock, isflow, passArg);
             }
@@ -1833,6 +1911,12 @@ class Logo {
                     queueStart === 0 &&
                     tur.singer.justCounting.length === 0
                 ) {
+                    // Performance instrumentation: end tracking and log stats
+                    if (typeof performanceTracker !== "undefined") {
+                        performanceTracker.endRun();
+                        performanceTracker.logStats();
+                    }
+
                     if (logo.runningLilypond) {
                         if (logo.collectingStats) {
                             // console.debug("stats collection completed");
@@ -1906,6 +1990,10 @@ class Logo {
             };
 
             setTimeout(__checkCompletionState, 100);
+        }
+
+        if (typeof performanceTracker !== "undefined") {
+            performanceTracker.exitBlock();
         }
     }
 

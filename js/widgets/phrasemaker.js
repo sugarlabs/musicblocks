@@ -936,6 +936,14 @@ class PhraseMaker {
         }
     }
 
+    _setupWheelDiv(size, left, top) {
+        this.docById("wheelDivptm").style.position = "absolute";
+        this.docById("wheelDivptm").style.height = size + "px";
+        this.docById("wheelDivptm").style.width = size + "px";
+        this.docById("wheelDivptm").style.left = left + "px";
+        this.docById("wheelDivptm").style.top = top + "px";
+    }
+
     /**
      * Creates a pie submenu for adding new rows to the matrix.
      * This method initializes a wheel menu with options for adding different types of rows (e.g., pitch, drum, graphics).
@@ -1010,19 +1018,17 @@ class PhraseMaker {
         const x = this.docById("addnotes").getBoundingClientRect().x;
         const y = this.docById("addnotes").getBoundingClientRect().y;
 
-        this.docById("wheelDivptm").style.position = "absolute";
-        this.docById("wheelDivptm").style.height = "300px";
-        this.docById("wheelDivptm").style.width = "300px";
-        this.docById("wheelDivptm").style.left =
+        this._setupWheelDiv(
+            300,
             Math.min(
                 this.activity.canvas.width - 200,
                 Math.max(0, x * this.activity.getStageScale())
-            ) + "px";
-        this.docById("wheelDivptm").style.top =
+            ),
             Math.min(
                 this.activity.canvas.height - 250,
                 Math.max(0, y * this.activity.getStageScale())
-            ) + "px";
+            )
+        );
 
         this._exitWheel.navItems[0].navigateFunction = () => {
             this.docById("wheelDivptm").style.display = "none";
@@ -1281,19 +1287,17 @@ class PhraseMaker {
         const x = this._labelcols[blockIndex].getBoundingClientRect().x;
         const y = this._labelcols[blockIndex].getBoundingClientRect().y;
 
-        this.docById("wheelDivptm").style.position = "absolute";
-        this.docById("wheelDivptm").style.height = "300px";
-        this.docById("wheelDivptm").style.width = "300px";
-        this.docById("wheelDivptm").style.left =
+        this._setupWheelDiv(
+            300,
             Math.min(
                 this.activity.canvas.width - 200,
                 Math.max(0, x * this.activity.getStageScale())
-            ) + "px";
-        this.docById("wheelDivptm").style.top =
+            ),
             Math.min(
                 this.activity.canvas.height - 250,
                 Math.max(0, y * this.activity.getStageScale())
-            ) + "px";
+            )
+        );
 
         let thisBlock = this.columnBlocksMap[blockIndex][0];
         if (blk !== null) {
@@ -1555,19 +1559,17 @@ class PhraseMaker {
         const x = this._labelcols[blockIndex].getBoundingClientRect().x;
         const y = this._labelcols[blockIndex].getBoundingClientRect().y;
 
-        this.docById("wheelDivptm").style.position = "absolute";
-        this.docById("wheelDivptm").style.height = "300px";
-        this.docById("wheelDivptm").style.width = "300px";
-        this.docById("wheelDivptm").style.left =
+        this._setupWheelDiv(
+            300,
             Math.min(
                 this.activity.canvas.width - 200,
                 Math.max(0, x * this.activity.getStageScale())
-            ) + "px";
-        this.docById("wheelDivptm").style.top =
+            ),
             Math.min(
                 this.activity.canvas.height - 250,
                 Math.max(0, y * this.activity.getStageScale())
-            ) + "px";
+            )
+        );
 
         let thisBlock = this.columnBlocksMap[blockIndex][0];
         if (blk !== null) {
@@ -1905,19 +1907,17 @@ class PhraseMaker {
         const x = this._labelcols[index].getBoundingClientRect().x;
         const y = this._labelcols[index].getBoundingClientRect().y;
 
-        this.docById("wheelDivptm").style.position = "absolute";
-        this.docById("wheelDivptm").style.height = "300px";
-        this.docById("wheelDivptm").style.width = "300px";
-        this.docById("wheelDivptm").style.left =
+        this._setupWheelDiv(
+            300,
             Math.min(
                 this.activity.canvas.width - 200,
                 Math.max(0, x * this.activity.getStageScale())
-            ) + "px";
-        this.docById("wheelDivptm").style.top =
+            ),
             Math.min(
                 this.activity.canvas.height - 250,
                 Math.max(0, y * this.activity.getStageScale())
-            ) + "px";
+            )
+        );
 
         if (!this._noteBlocks) {
             block = this.columnBlocksMap[index][0];
@@ -3685,10 +3685,6 @@ class PhraseMaker {
         this._menuWheel.createWheel(mainTabsLabels);
         this._exitWheel.createWheel(exitTabLabel);
 
-        this.docById("wheelDivptm").style.position = "absolute";
-        this.docById("wheelDivptm").style.height = "250px";
-        this.docById("wheelDivptm").style.width = "250px";
-
         let x = 0,
             y = 0;
         if (noteToDivide !== null) {
@@ -3697,16 +3693,17 @@ class PhraseMaker {
             y = ntd.getBoundingClientRect().y;
         }
 
-        this.docById("wheelDivptm").style.left =
+        this._setupWheelDiv(
+            250,
             Math.min(
                 this.activity.canvas.width - 200,
                 Math.max(0, x * this.activity.getStageScale())
-            ) + "px";
-        this.docById("wheelDivptm").style.top =
+            ),
             Math.min(
                 this.activity.canvas.height - 250,
                 Math.max(0, y * this.activity.getStageScale())
-            ) + "px";
+            )
+        );
 
         this._exitWheel.navItems[0].navigateFunction = () => {
             this.docById("wheelDivptm").style.display = "none";
