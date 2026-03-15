@@ -37,7 +37,7 @@
   EIGHTHNOTEWIDTH, MATRIXBUTTONHEIGHT, MATRIXBUTTONHEIGHT2,
   MATRIXSOLFEHEIGHT, NOTESYMBOLS, SELECTORSTRINGS, ACCIDENTALLABELS,
   ACCIDENTALNAMES, ACCIDENTALVALUES, INTERVALS, MODE_PIE_MENUS,
-  updateTemperaments, DEFAULTINVERT, DEFAULTINTERVAL, DEFAULTEFFECT,
+  DEFAULTINVERT, DEFAULTINTERVAL, DEFAULTEFFECT,
   DEFAULTMODE, DEFAULTOSCILLATORTYPE, DEFAULTACCIDENTAL,
   getInvertMode, getIntervalNumber, getIntervalDirection,
   getModeNumbers, getDrumIndex, getDrumName, getDrumSymbol,
@@ -880,7 +880,6 @@ const CENTS_PER_OCTAVE = SEMITONES * CENTS_PER_SEMITONE;
  */
 const POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
 
-// eslint-disable-next-line no-loss-of-precision
 const TWELTHROOT2 = 1.0594630943592953;
 // eslint-disable-next-line no-loss-of-precision
 const TWELVEHUNDRETHROOT2 = 1.0005777895065549;
@@ -3013,10 +3012,9 @@ const keySignatureToMode = keySignature => {
         key = "F" + FLAT;
     } else if (SOLFEGENAMES1.includes(key)) {
         // This conversion will be a bit iffy depending upon the current mode.
-        // eslint-disable-next-line no-use-before-define
+
         key = getNote(key, 4, 0, "C Major", false)[0];
     } else if (!NOTESSHARP.includes(key) && !NOTESFLAT.includes(key)) {
-        // eslint-disable-next-line no-console
         console.debug("Invalid key or missing name; reverting to C.");
         // Is is possible that the key was left out?
         keySignature = "C " + keySignature;
@@ -3049,7 +3047,6 @@ const keySignatureToMode = keySignature => {
     if (mode in MUSICALMODES) {
         return [key, mode];
     } else {
-        // eslint-disable-next-line no-console
         console.debug("Invalid mode name: " + mode + " reverting to major.");
         return [key, "major"];
     }
@@ -3605,7 +3602,6 @@ const pitchToNumber = (pitch, octave, keySignature) => {
         if (obj[1].includes(pitch.toLowerCase())) {
             pitchNumber = obj[1].indexOf(pitch.toLowerCase());
         } else {
-            // eslint-disable-next-line no-console
             console.debug("pitch " + pitch + " not found in mode.");
             // Try an equivalent pitch.
             if (pitch.toLowerCase() in FIXEDSOLFEGE1) {
@@ -3720,7 +3716,7 @@ const getNoteFromInterval = (pitch, interval) => {
         //Same technique is used to code the findMajorInterval.
         const halfSteps = INTERVALVALUES[interval][0];
         // const direction = INTERVALVALUES[interval][1];
-        // eslint-disable-next-line no-use-before-define
+
         let note = numberToPitch(number + halfSteps);
         const num = interval.split(" ");
         const pitchIndex = pitches.indexOf(pitch1);
@@ -4218,7 +4214,7 @@ function getNote(
             }
             if (kOffset === -1) {
                 kOffset = 0;
-                // eslint-disable-next-line no-console
+
                 console.log("Cannot find " + keySignature.split(" ")[0] + ". Reverting to C");
             }
         }
@@ -4318,7 +4314,6 @@ function getNote(
                 // Ensure it is a valid key signature.
                 offset = thisScale.indexOf(myKeySignature);
                 if (offset === -1) {
-                    // eslint-disable-next-line no-console
                     console.debug(
                         "WARNING: Key " +
                             myKeySignature +
@@ -4481,7 +4476,6 @@ function getNote(
 
                 note = thisScale[index];
             } else {
-                // eslint-disable-next-line no-console
                 console.debug(
                     "WARNING: Note [" + noteArg + "] not found in " + halfSteps + ". Returning REST"
                 );
@@ -4536,7 +4530,6 @@ function getNote(
 
                     note = NOTESFLAT[i];
                 } else {
-                    // eslint-disable-next-line no-console
                     console.debug("note not found? " + note);
                 }
             } else if (deltaNote < 0) {
@@ -4565,7 +4558,6 @@ function getNote(
 
                     note = NOTESSHARP[i];
                 } else {
-                    // eslint-disable-next-line no-console
                     console.debug("note not found? " + note);
                 }
             }
@@ -4660,7 +4652,7 @@ function getNote(
         }
 
         let inOctave = octave;
-        const octaveLength = TEMPERAMENT[temperamentFloor]["pitchNumber"];
+        const octaveLength = TEMPERAMENT[temperament]["pitchNumber"];
         let deltaOctave, deltaNote;
         if (transpositionFloor !== 0) {
             if (transpositionFloor < 0) {
@@ -5179,7 +5171,7 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
     }
 
     // Should never get here, but just in case.
-    // eslint-disable-next-line no-console
+
     console.debug(thisPitch + " not found");
     return 0;
 };
@@ -5633,7 +5625,7 @@ const getInterval = (interval, keySignature, pitch) => {
                     ii = scale.indexOf(pitch);
                 } else {
                     // Should never happen.
-                    // eslint-disable-next-line no-console
+
                     console.debug(pitch + " not found");
                     return 0;
                 }
@@ -6174,7 +6166,6 @@ const calcOctaveInterval = arg => {
             value = -2;
             break;
         default:
-            // eslint-disable-next-line no-console
             console.debug("Interval octave must be between -2 and 2.");
             value = 0;
             break;
@@ -6389,7 +6380,7 @@ const getPitchInfo = function (activity, type, currentNote, tur) {
                 } else if (NOTESFLAT.includes(pitch)) {
                     return NOTESFLAT.indexOf(pitch) * 8.33;
                 }
-                // eslint-disable-next-line no-console
+
                 console.debug("Pitch not found: " + pitch);
                 return 0;
             case "pitch to shade":
@@ -6398,7 +6389,6 @@ const getPitchInfo = function (activity, type, currentNote, tur) {
                 return "__INVALID_INPUT__";
         }
     } catch {
-        // eslint-disable-next-line no-console
         console.debug("Waiting for note to play");
     }
 };
@@ -6435,7 +6425,6 @@ if (typeof module !== "undefined" && module.exports) {
         TEMPERAMENT,
         setOctaveRatio,
         getOctaveRatio,
-        TEMPERAMENT,
         TEMPERAMENTS,
         INITIALTEMPERAMENTS,
         PreDefinedTemperaments,
@@ -6445,7 +6434,6 @@ if (typeof module !== "undefined" && module.exports) {
         addTemperamentToList,
         deleteTemperamentFromList,
         addTemperamentToDictionary,
-        updateTemperaments,
         DEFAULTINVERT,
         DEFAULTMODE,
         customMode,
