@@ -676,10 +676,8 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                         false
                     );
                 } catch (e) {
-                    console.error("Error triggering pitch preview:", e);
+                    console.error("Synth trigger error:", e);
                 }
-
-                // Always release the lock When success or failure
                 setTimeout(() => {
                     that._triggerLock = false;
                 }, 125);
