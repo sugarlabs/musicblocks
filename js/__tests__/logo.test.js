@@ -34,6 +34,7 @@ global.Synth = jest.fn().mockImplementation(() => ({
     start: jest.fn(),
     stop: jest.fn(),
     stopSound: jest.fn(),
+    resetTemperamentState: jest.fn(),
     changeInTemperament: false,
     recorder: null
 }));

@@ -1135,10 +1135,7 @@ class Logo {
 
         this.deps.Singer.masterBPM = TARGETBPM;
         this.deps.Singer.defaultBPMFactor = TONEBPM / TARGETBPM;
-        this.synth.inTemperament = "equal";
-        this.synth.startingPitch = "C4";
-        this.synth.noteFrequencies = {};
-        this.synth.changeInTemperament = false;
+        this.synth.resetTemperamentState();
 
         this._checkingCompletionState = false;
 
