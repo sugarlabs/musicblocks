@@ -14,16 +14,12 @@
 /*
    global
 
-   _, Notation, Synth, instruments, instrumentsFilters,
+   Notation, Synth, instruments, instrumentsFilters,
    instrumentsEffects, Singer, Tone, CAMERAVALUE, doUseCamera,
    VIDEOVALUE, last, getIntervalDirection, getIntervalNumber,
-   getStatsFromNotation, delayExecution, DEFAULTVOICE, performanceTracker, ManagedTimer, window
- */
-
-/*
-   exported
-
-   Queue, Logo, LogoDependencies, DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY,
+   getStatsFromNotation, delayExecution, DEFAULTVOICE, performanceTracker, ManagedTimer,
+   doStopVideoCam, mixedNumber, rationalToFraction, StatusMatrix, define,
+   DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY,
    OSCVOLUMEADJUSTMENT, TONEBPM, TARGETBPM, TURTLESTEP, NOTEDIV,
    MIN_HIGHLIGHT_DURATION_MS,
    NOMICERRORMSG, NANERRORMSG, NOSTRINGERRORMSG, NOBOXERRORMSG,
@@ -32,6 +28,12 @@
    NOTATIONNOTE, NOTATIONDURATION, NOTATIONDOTCOUNT,
    NOTATIONTUPLETVALUE, NOTATIONROUNDDOWN, NOTATIONINSIDECHORD,
    NOTATIONSTACCATO
+ */
+
+/*
+   exported
+
+   Queue, LogoDependencies
  */
 
 // Constants moved to js/logoconstants.js to resolve circular dependency
@@ -56,6 +58,7 @@ class Queue {
     }
 }
 
+// eslint-disable-next-line no-redeclare
 class Logo {
     /**
      * @constructor
@@ -845,7 +848,6 @@ class Logo {
                         // Debug logging removed to avoid console noise in production
                         eval(logo.evalArgDict[logo.blockList[blk].name]);
                     } else {
-                        // eslint-disable-next-line no-console
                         console.error("I do not know how to " + logo.blockList[blk].name);
                     }
                     break;
@@ -1085,7 +1087,6 @@ class Logo {
         // by _timerManager, so clearAll() cancels them in one sweep.
         const cancelledTimers = this._timerManager.clearAll();
         if (cancelledTimers > 0) {
-            // eslint-disable-next-line no-console
             console.debug(
                 "ManagedTimer: cancelled " + cancelledTimers + " pending timer(s) on stop"
             );
@@ -2800,7 +2801,6 @@ if (typeof module !== "undefined" && module.exports) {
     if (typeof DEFAULTVOLUME === "undefined") {
         try {
             const constants = require("./logoconstants");
-            Object.assign(global, constants);
             Object.assign(exportsObj, constants);
         } catch (e) {
             // Ignore

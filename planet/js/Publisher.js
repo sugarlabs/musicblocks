@@ -12,7 +12,7 @@
 /*
    global
 
-   _, jQuery, Materialize
+   Materialize
 */
 /*
    exported
@@ -81,7 +81,6 @@ class Publisher {
 
             return tags;
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.error("dataToTags: failed to process project data:", e.message);
             return [];
         }
@@ -315,7 +314,6 @@ class Publisher {
         try {
             tb = JSON.parse(tb);
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.log(e);
             return "";
         }
