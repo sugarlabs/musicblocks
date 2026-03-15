@@ -34,7 +34,9 @@ export default [
                 Blocks: "readonly",
                 Turtles: "readonly",
                 Activity: "readonly",
-                _: "readonly"
+                _: "readonly",
+                docById: "readonly",
+                define: "readonly"
             }
         },
 
@@ -43,6 +45,7 @@ export default [
             "no-unused-vars": "off",
             "no-use-before-define": "off",
             "prefer-const": "off",
+            "no-redeclare": "off",
 
             "semi": ["error", "always"],
             "no-duplicate-case": "error",
