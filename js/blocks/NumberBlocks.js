@@ -367,7 +367,7 @@ function setupNumberBlocks(activity) {
                 "note1"
             ]);
 
-            this.extraSearchTerms = ['divide', 'division'];
+            this.extraSearchTerms = ["divide", "division"];
 
             this.fontsize = 9;
             this.formBlock({
@@ -445,7 +445,7 @@ function setupNumberBlocks(activity) {
 
             this.setHelpString([_("The Multiply block is used to multiply."), "documentation", ""]);
 
-            this.extraSearchTerms = ['multiply', 'product', 'times'];
+            this.extraSearchTerms = ["multiply", "product", "times"];
 
             this.fontsize = 14;
             this.formBlock({
