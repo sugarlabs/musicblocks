@@ -2298,7 +2298,7 @@ function SampleWidget() {
 
         this.widgetWindow.getWidgetBody().appendChild(container);
 
-        startButton.addEventListener("click", startPitchDetection);
+      startButton.addEventListener("click", () => startPitchDetection(pitchSpan, noteSpan));
     };
 
     /**
