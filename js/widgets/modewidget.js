@@ -51,6 +51,7 @@
  * notes on a circular wheel interface. It supports playing, saving,
  * rotating, and inverting modes.
  */
+const RESET_NOTES_DELAY = 500;
 class ModeWidget {
     static ICONSIZE = 32;
     static BUTTONSIZE = 53;
@@ -708,7 +709,7 @@ class ModeWidget {
                     this.__playNextNote(i + 1);
                 } else {
                     this._locked = false;
-                    setTimeout(() => this._resetNotes(), 500);
+                    setTimeout(() => this._resetNotes(), RESET_NOTES_DELAY);
                     return;
                 }
             }, 1000 * time);
@@ -755,7 +756,7 @@ class ModeWidget {
                     this.__playNextNote(i + 1);
                 } else {
                     this._locked = false;
-                    setTimeout(() => this._resetNotes(), 500);
+                    setTimeout(() => this._resetNotes(), RESET_NOTES_DELAY);
                     return;
                 }
             }, 1000 * time);
