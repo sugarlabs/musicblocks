@@ -559,7 +559,6 @@ describe("MathUtility", () => {
         test("doMod throws an error when divisor is zero", () => {
             expect(() => MathUtility.doMod(5, 0)).toThrow();
         });
-
         test("doSqrt handles Infinity", () => {
             expect(MathUtility.doSqrt(Infinity)).toBe(Infinity);
         });
