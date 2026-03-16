@@ -67,9 +67,9 @@ global.SVG = class {
     constructor() {
         this.docks = [];
     }
-    setScale() { }
-    setExpand() { }
-    setOutie() { }
+    setScale() {}
+    setExpand() {}
+    setOutie() {}
     basicBox() {
         return "fill_color stroke_color block_label arg_label_0";
     }
@@ -271,7 +271,7 @@ describe("Palettes Class", () => {
         test("creates selector buttons for each multipalette", () => {
             const spyMakeSelectorButton = jest
                 .spyOn(palettes, "_makeSelectorButton")
-                .mockImplementation(() => { });
+                .mockImplementation(() => {});
 
             palettes.init_selectors();
 
@@ -2059,8 +2059,8 @@ describe("Palettes Class", () => {
             global.document.createElement = jest.fn(() => ({}));
 
             mockActivity.beginnerMode = true;
-            jest.spyOn(palettes, "makeSearchButton").mockImplementation(() => { });
-            const makeButtonSpy = jest.spyOn(palettes, "makeButton").mockImplementation(() => { });
+            jest.spyOn(palettes, "makeSearchButton").mockImplementation(() => {});
+            const makeButtonSpy = jest.spyOn(palettes, "makeButton").mockImplementation(() => {});
             jest.spyOn(palettes, "countProtoBlocks").mockReturnValue(0);
 
             palettes.makePalettes(0);
@@ -2097,8 +2097,8 @@ describe("Palettes Class", () => {
             global.docById = jest.fn(() => palette);
             global.document.createElement = jest.fn(() => ({}));
 
-            jest.spyOn(palettes, "makeSearchButton").mockImplementation(() => { });
-            const makeButtonSpy = jest.spyOn(palettes, "makeButton").mockImplementation(() => { });
+            jest.spyOn(palettes, "makeSearchButton").mockImplementation(() => {});
+            const makeButtonSpy = jest.spyOn(palettes, "makeButton").mockImplementation(() => {});
             jest.spyOn(palettes, "countProtoBlocks").mockReturnValue(2);
 
             palettes.makePalettes(0);
@@ -2131,7 +2131,7 @@ describe("Palettes Class", () => {
         test("palette button schedules showPalette on hover", () => {
             jest.useFakeTimers();
             const row = {};
-            const showSpy = jest.spyOn(palettes, "showPalette").mockImplementation(() => { });
+            const showSpy = jest.spyOn(palettes, "showPalette").mockImplementation(() => {});
 
             palettes._loadPaletteButtonHandler("rhythm", row);
             row.onmouseover();
@@ -2146,7 +2146,7 @@ describe("Palettes Class", () => {
         test("palette button cancels timeout on mouseout", () => {
             jest.useFakeTimers();
             const row = {};
-            const showSpy = jest.spyOn(palettes, "showPalette").mockImplementation(() => { });
+            const showSpy = jest.spyOn(palettes, "showPalette").mockImplementation(() => {});
 
             palettes._loadPaletteButtonHandler("rhythm", row);
             row.onmouseover();
@@ -2312,7 +2312,7 @@ describe("Palettes Class", () => {
         });
 
         test("removes other action prototype variants", () => {
-            const updateSpy = jest.spyOn(palettes, "updatePalettes").mockImplementation(() => { });
+            const updateSpy = jest.spyOn(palettes, "updatePalettes").mockImplementation(() => {});
 
             palettes.dict = {
                 action: {
