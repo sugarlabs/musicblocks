@@ -770,7 +770,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             ["setkey", "setkey2"].includes(that.blocks.blockList[that.connections[0]].name)
         ) {
             // We may need to update the mode widget.
-            that.activity.logo.modeBlock = that.blocks.blockList.indexOf(that);
+            that.activity.logo.modeBlock = that.blockIndex;
         }
     };
 
@@ -3682,7 +3682,7 @@ const piemenuBlockContext = block => {
     let pasteDy = 0;
 
     const that = block;
-    const blockBlock = block.blocks.blockList.indexOf(block);
+    const blockBlock = block.blockIndex;
 
     // Position the widget centered over the active block.
     docById("contextWheelDiv").style.position = "absolute";
@@ -3805,7 +3805,7 @@ const piemenuBlockContext = block => {
         that.blocks.sendStackToTrash(that.blocks.blockList[blockBlock]);
         docById("contextWheelDiv").style.display = "none";
         // prompting a notification on deleting any block
-        activity.textMsg(
+        that.activity.textMsg(
             _("You can restore deleted blocks from the trash with the Restore From Trash button."),
             3000
         );
@@ -3815,20 +3815,22 @@ const piemenuBlockContext = block => {
         docById("contextWheelDiv").style.display = "none";
     };
 
-    // Named function for proper cleanup
-    const hideContextWheelOnClick = event => {
+    // Use a named handler stored globally so we can remove the previous one
+    // before adding a new one, preventing accumulation of click listeners.
+    if (window._contextWheelClickHandler) {
+        document.body.removeEventListener("click", window._contextWheelClickHandler);
+    }
+
+    window._contextWheelClickHandler = event => {
         const wheelElement = document.getElementById("contextWheelDiv");
         const displayStyle = window.getComputedStyle(wheelElement).display;
         if (displayStyle === "block") {
             wheelElement.style.display = "none";
-            // Remove listener after hiding to prevent memory leak
-            document.body.removeEventListener("click", hideContextWheelOnClick);
+            document.body.removeEventListener("click", window._contextWheelClickHandler);
         }
     };
 
-    // Remove any existing listener before adding a new one
-    document.body.removeEventListener("click", hideContextWheelOnClick);
-    document.body.addEventListener("click", hideContextWheelOnClick);
+    document.body.addEventListener("click", window._contextWheelClickHandler);
 
     if (
         ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].includes(
