@@ -1985,25 +1985,35 @@ function SampleWidget() {
                         const dataArray = this.pitchAnalysers[1].getValue();
                         if (dataArray && dataArray.length > 0) {
                             const pitch = detectPitch(dataArray);
-                            if (pitch > 0) {
-                                const { note, cents } = frequencyToNote(pitch);
-                                this.tunerDisplay.update(note, cents, this.centsValue);
+                        if (pitchElement && noteElement) {
+    if (pitch > 0) {
+        const { note, cents } = frequencyToNote(pitch);
 
-                                // Update segments
-                                const tunerSegments = document.querySelectorAll(
-                                    "#tunerContainer svg path"
-                                );
-                                tunerSegments.forEach((segment, i) => {
-                                    const segmentCents = (i - 5) * 10;
-                                    if (Math.abs(cents - segmentCents) <= 5) {
-                                        segment.setAttribute("fill", "#00ff00"); // In tune (green)
-                                    } else if (cents < segmentCents) {
-                                        segment.setAttribute("fill", "#ff0000"); // Flat (red)
-                                    } else {
-                                        segment.setAttribute("fill", "#0000ff"); // Sharp (blue)
-                                    }
-                                });
-                            }
+        // Update the tuner display
+        this.tunerDisplay.update(note, cents, this.centsValue);
+
+        // Update segments
+        const tunerSegments = document.querySelectorAll("#tunerContainer svg path");
+        tunerSegments.forEach((segment, i) => {
+            const segmentCents = (i - 5) * 10;
+            if (Math.abs(cents - segmentCents) <= 5) {
+                segment.setAttribute("fill", "#00ff00"); // In tune (green)
+            } else if (cents < segmentCents) {
+                segment.setAttribute("fill", "#ff0000"); // Flat (red)
+            } else {
+                segment.setAttribute("fill", "#0000ff"); // Sharp (blue)
+            }
+        });
+
+        // Update text elements
+        pitchElement.textContent = pitch.toFixed(2);
+        noteElement.textContent =
+            cents === 0 ? ` ${note} (Perfect)` : ` ${note}, off by ${cents} cents`;
+    } else {
+        pitchElement.textContent = "---";
+        noteElement.textContent = "---";
+    }
+}
                         }
                     }
                 }
