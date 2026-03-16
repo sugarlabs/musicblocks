@@ -16,7 +16,7 @@
    PALETTEFILLCOLORS, PALETTESTROKECOLORS,
    PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
    MULTIPALETTEICONS, PALETTEICONS, makePaletteIcons,
-   globalActivity
+   globalActivity, createjs
 */
 
 /* exported ThemeBox, themeConfigs */
@@ -451,6 +451,42 @@ class ThemeBox {
         // Refresh the activity canvas if available
         if (this.activity.refreshCanvas) {
             this.activity.refreshCanvas();
+        }
+
+        // Update grid colors for new theme
+        if (this.activity.turtles) {
+            const grids = [
+                this.activity.cartesianBitmap,
+                this.activity.polarBitmap,
+                this.activity.trebleBitmap,
+                this.activity.grandBitmap,
+                this.activity.sopranoBitmap,
+                this.activity.altoBitmap,
+                this.activity.tenorBitmap,
+                this.activity.bassBitmap
+            ];
+
+            const isDarkMode = this._theme === "dark";
+            const isHighContrastMode = this._theme === "highcontrast";
+
+            grids.forEach(grid => {
+                if (grid) {
+                    if (isDarkMode || isHighContrastMode) {
+                        // Apply invert filter for dark/high contrast mode (white grids)
+                        const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
+                        grid.filters = [invertFilter];
+                    } else {
+                        // Remove filter for light mode (black grids)
+                        grid.filters = [];
+                    }
+                    // Re-cache the bitmap to apply the new filter
+                    if (grid.visible) {
+                        grid.uncache();
+                        grid.cache(0, 0, 1200, 900);
+                        grid.updateCache();
+                    }
+                }
+            });
         }
 
         // Update planet iframe theme if it exists
