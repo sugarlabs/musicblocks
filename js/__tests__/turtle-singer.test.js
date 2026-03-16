@@ -38,6 +38,12 @@ global.numberToPitch = mockGlobals.numberToPitch;
 global.pitchToNumber = mockGlobals.pitchToNumber;
 global.last = jest.fn(array => array[array.length - 1]);
 
+global.SEMITONES = 12;
+global.pitchToFrequency = jest.fn().mockReturnValue(440);
+global.rationalSum = jest.fn((a, b) => {
+    return [a[0] + b[0], a[1] + b[1]];
+});
+
 const createTurtleMock = () => ({
     turtles: [],
     singer: null,
@@ -54,6 +60,13 @@ const createActivityMock = turtleMock => ({
         ithTurtle: jest.fn().mockReturnValue(turtleMock),
         turtleList: [turtleMock]
     },
+    blocks: {
+        blockList: {
+            mockBlk: {
+                connections: [0, 0]
+            }
+        }
+    },
     logo: {
         synth: {
             setMasterVolume: jest.fn(),
@@ -66,12 +79,7 @@ const createActivityMock = turtleMock => ({
         stopTurtle: false,
         inPitchDrumMatrix: false,
         inMatrix: false,
-        clearNoteParams: jest.fn(),
-        blockList: {
-            mockBlk: {
-                connections: [0, 0]
-            }
-        }
+        clearNoteParams: jest.fn()
     }
 });
 
@@ -682,5 +690,279 @@ describe("Musical state mutability", () => {
     test("should allow updating duplicateFactor", () => {
         singer.duplicateFactor = 3;
         expect(singer.duplicateFactor).toBe(3);
+    });
+});
+
+describe("killAllVoices lifecycle safety", () => {
+    let singer;
+
+    beforeEach(() => {
+        const turtleMock = createTurtleMock();
+        singer = new Singer(turtleMock);
+    });
+
+    test("should stop, release, or disconnect all active voices and clear set", () => {
+        const stopMock = jest.fn();
+        const releaseMock = jest.fn();
+        const disconnectMock = jest.fn();
+
+        const voice1 = { stop: stopMock };
+        const voice2 = { releaseAll: releaseMock };
+        const voice3 = { disconnect: disconnectMock };
+
+        singer.activeVoices.add(voice1);
+        singer.activeVoices.add(voice2);
+        singer.activeVoices.add(voice3);
+
+        singer.killAllVoices();
+
+        expect(stopMock).toHaveBeenCalled();
+        expect(releaseMock).toHaveBeenCalled();
+        expect(disconnectMock).toHaveBeenCalled();
+        expect(singer.activeVoices.size).toBe(0);
+    });
+
+    test("should ignore errors from already stopped nodes", () => {
+        const voice = {
+            stop: jest.fn(() => {
+                throw new Error("already stopped");
+            })
+        };
+
+        singer.activeVoices.add(voice);
+
+        expect(() => singer.killAllVoices()).not.toThrow();
+        expect(singer.activeVoices.size).toBe(0);
+    });
+});
+
+describe("numberOfNotes — state restoration and tally logic", () => {
+    let turtleMock;
+    let activityMock;
+    let logoMock;
+
+    beforeEach(() => {
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+
+        // Extend minimal state
+        turtleMock.x = 10;
+        turtleMock.y = 20;
+        turtleMock.orientation = 90;
+        turtleMock.endOfClampSignals = {};
+        turtleMock.butNotThese = {};
+        turtleMock.running = false;
+        turtleMock.painter = {
+            color: "red",
+            value: 1,
+            chroma: 2,
+            stroke: 3,
+            canvasAlpha: 1,
+            penState: true,
+            doPenUp: jest.fn(),
+            doSetXY: jest.fn(),
+            doSetHeading: jest.fn()
+        };
+
+        activityMock = {
+            turtles: {
+                ithTurtle: jest.fn().mockReturnValue(turtleMock),
+                getTurtle: jest.fn().mockReturnValue({ queue: [] }),
+                turtleList: [turtleMock]
+            },
+            logo: {
+                runFromBlockNow: jest.fn((logo, turtle) => {
+                    const tur = turtleMock;
+                    tur.singer.tallyNotes += 5;
+                }),
+                boxes: {},
+                turtleHeaps: { 0: {} },
+                turtleDicts: { 0: {} }
+            }
+        };
+
+        logoMock = {
+            activity: activityMock,
+            boxes: {},
+            turtleHeaps: { 0: {} },
+            turtleDicts: { 0: {} }
+        };
+    });
+
+    test("should return tally difference and restore state", () => {
+        turtleMock.singer.tallyNotes = 2;
+
+        const result = Singer.numberOfNotes(logoMock, 0, 123);
+
+        expect(result).toBe(5);
+        expect(turtleMock.singer.tallyNotes).toBe(2);
+        expect(turtleMock.painter.doPenUp).toHaveBeenCalled();
+    });
+});
+
+describe("processPitch — note block execution path", () => {
+    let turtleMock;
+    let activityMock;
+
+    beforeEach(() => {
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+
+        turtleMock.singer.inNoteBlock = [0];
+        turtleMock.singer.notePitches = { 0: [] };
+        turtleMock.singer.noteOctaves = { 0: [] };
+        turtleMock.singer.noteCents = { 0: [] };
+        turtleMock.singer.noteHertz = { 0: [] };
+        turtleMock.singer.noteBeatValues = { 0: [] };
+
+        turtleMock.singer.beatFactor = 1;
+        turtleMock.singer.transposition = 0;
+        turtleMock.singer.register = 0;
+        turtleMock.singer.invertList = [];
+        turtleMock.singer.intervals = [];
+        turtleMock.singer.semitoneIntervals = [];
+        turtleMock.singer.chordIntervals = [];
+        turtleMock.singer.ratioIntervals = [];
+
+        activityMock = {
+            turtles: {
+                ithTurtle: jest.fn().mockReturnValue(turtleMock)
+            },
+            logo: {
+                synth: { inTemperament: false },
+                clearNoteParams: jest.fn()
+            }
+        };
+    });
+
+    test("should push pitch data and mark note as pushed", () => {
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(turtleMock.singer.notePitches[0].length).toBe(1);
+        expect(turtleMock.singer.noteOctaves[0].length).toBe(1);
+        expect(turtleMock.singer.noteBeatValues[0].length).toBe(1);
+        expect(turtleMock.singer.pushedNote).toBe(true);
+    });
+});
+
+describe("noteCounter regression behavior", () => {
+    let turtleMock;
+    let activityMock;
+    let logoMock;
+    let singer;
+
+    beforeEach(() => {
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+
+        turtleMock.painter = {
+            color: 0,
+            value: 0,
+            chroma: 0,
+            stroke: 1,
+            canvasAlpha: 1,
+            penState: true,
+            doPenUp: jest.fn(),
+            doSetXY: jest.fn(),
+            doSetHeading: jest.fn()
+        };
+
+        turtleMock.x = 0;
+        turtleMock.y = 0;
+        turtleMock.orientation = 0;
+        turtleMock.endOfClampSignals = {};
+        turtleMock.butNotThese = {};
+        activityMock = createActivityMock(turtleMock);
+        logoMock = createLogoMock(activityMock);
+        activityMock.turtles.getTurtle = jest.fn().mockReturnValue({
+            queue: []
+        });
+        logoMock.boxes = {};
+        logoMock.turtleHeaps = { 0: {} };
+        logoMock.turtleDicts = { 0: {} };
+        activityMock.logo.runFromBlockNow = jest.fn();
+        singer = turtleMock.singer;
+    });
+
+    test("should restore execution state after counting notes", () => {
+        const originalSuppress = singer.suppressOutput;
+        const originalTime = singer.turtleTime;
+        const originalPrevTime = singer.previousTurtleTime;
+        Singer.noteCounter(logoMock, 0, 1);
+        expect(singer.suppressOutput).toBe(originalSuppress);
+        expect(singer.turtleTime).toBe(originalTime);
+        expect(singer.previousTurtleTime).toBe(originalPrevTime);
+    });
+
+    test("should push and pop justCounting correctly", () => {
+        const originalLength = singer.justCounting.length;
+        Singer.noteCounter(logoMock, 0, 1);
+        expect(singer.justCounting.length).toBe(originalLength);
+    });
+});
+
+describe("processNote regression behavior", () => {
+    let turtleMock;
+    let activityMock;
+    let singer;
+
+    beforeEach(() => {
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        activityMock = createActivityMock(turtleMock);
+        activityMock.logo.specialArgs = [];
+        activityMock.stage = {
+            update: jest.fn()
+        };
+        singer = turtleMock.singer;
+    });
+
+    test("should not modify bpm stack during execution", () => {
+        singer.bpm.push(120);
+        const originalLength = singer.bpm.length;
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+        expect(singer.bpm.length).toBe(originalLength);
+    });
+
+    test("should execute without mutating bpm stack", () => {
+        singer.bpm = [120];
+        const before = [...singer.bpm];
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+        expect(singer.bpm).toEqual(before);
+    });
+
+    test("should trigger stage update after processing note", () => {
+        const callback = jest.fn();
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, callback);
+        expect(activityMock.stage.update).toHaveBeenCalledTimes(1);
+    });
+
+    test("should use default BPM when bpm stack is empty", () => {
+        singer.bpm = [];
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+        expect(activityMock.stage.update).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe("scalarDistance edge cases", () => {
+    let turtleMock;
+    let activityMock;
+    let logoMock;
+
+    beforeEach(() => {
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        activityMock = createActivityMock(turtleMock);
+        logoMock = createLogoMock(activityMock);
+    });
+
+    test("should return 0 when notes are equal", () => {
+        const result = Singer.scalarDistance(logoMock, turtleMock, 60, 60);
+        expect(result).toBe(0);
+    });
+
+    test("should return negative distance when lastNote < firstNote", () => {
+        const result = Singer.scalarDistance(logoMock, turtleMock, 65, 60);
+        expect(result).toBeLessThanOrEqual(0);
     });
 });
