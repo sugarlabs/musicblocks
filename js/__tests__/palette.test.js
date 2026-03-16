@@ -1539,7 +1539,12 @@ describe("Palettes Class", () => {
 
         test("_showMenuItems renders a basic block", () => {
             const paletteList = {
-                appendChild: jest.fn()
+                insertRow: jest.fn(() => ({
+                    insertCell: jest.fn(() => ({
+                        style: {},
+                        appendChild: jest.fn()
+                    }))
+                }))
             };
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
@@ -1563,12 +1568,25 @@ describe("Palettes Class", () => {
 
             palette._showMenuItems();
 
-            expect(paletteList.appendChild).toHaveBeenCalled();
+            expect(paletteList.insertRow).toHaveBeenCalled();
         });
 
         test("_showMenuItems handles image blocks and drag events", () => {
             const paletteList = {
-                appendChild: jest.fn()
+                insertRow: jest.fn(() => ({
+                    insertCell: jest.fn(() => {
+                        let capturedImg;
+                        return {
+                            style: {},
+                            appendChild: jest.fn(img => {
+                                capturedImg = img;
+                            }),
+                            get _capturedImg() {
+                                return capturedImg;
+                            }
+                        };
+                    })
+                }))
             };
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
@@ -1607,9 +1625,9 @@ describe("Palettes Class", () => {
 
             palette._showMenuItems();
 
-            const itemRow = paletteList.appendChild.mock.calls[0][0];
-            const itemCell = itemRow.appendChild.mock.calls[0][0];
-            const img = itemCell.appendChild.mock.calls[0][0];
+            const itemCell =
+                paletteList.insertRow.mock.results[0].value.insertCell.mock.results[0].value;
+            const img = itemCell._capturedImg;
             img.offsetWidth = 10;
             img.offsetHeight = 10;
             document.body.appendChild = jest.fn();
@@ -1640,7 +1658,20 @@ describe("Palettes Class", () => {
 
         test("_showMenuItems handles touch drag", () => {
             const paletteList = {
-                appendChild: jest.fn()
+                insertRow: jest.fn(() => ({
+                    insertCell: jest.fn(() => {
+                        let capturedImg;
+                        return {
+                            style: {},
+                            appendChild: jest.fn(img => {
+                                capturedImg = img;
+                            }),
+                            get _capturedImg() {
+                                return capturedImg;
+                            }
+                        };
+                    })
+                }))
             };
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
@@ -1668,9 +1699,9 @@ describe("Palettes Class", () => {
 
             palette._showMenuItems();
 
-            const itemRow = paletteList.appendChild.mock.calls[0][0];
-            const itemCell = itemRow.appendChild.mock.calls[0][0];
-            const img = itemCell.appendChild.mock.calls[0][0];
+            const itemCell =
+                paletteList.insertRow.mock.results[0].value.insertCell.mock.results[0].value;
+            const img = itemCell._capturedImg;
             img.offsetWidth = 10;
             img.offsetHeight = 10;
             document.body.appendChild = jest.fn();
@@ -1693,7 +1724,12 @@ describe("Palettes Class", () => {
 
         test("_showMenuItems hides palette when mobile", () => {
             const paletteList = {
-                appendChild: jest.fn()
+                insertRow: jest.fn(() => ({
+                    insertCell: jest.fn(() => ({
+                        style: {},
+                        appendChild: jest.fn()
+                    }))
+                }))
             };
             const palDiv = { childNodes: [{ style: {} }], removeChild: jest.fn() };
             global.docById = jest.fn(id => {
