@@ -138,4 +138,17 @@ describe("MusicBlocks Application", () => {
                 .and("not.be.empty");
         });
     });
+    describe("Palette Functionality", () => {
+        it("should display palette row 1", () => {
+            cy.get('[width="126"] > tbody > :nth-child(1)').should("be.visible");
+        });
+
+        it("should display palette row 2", () => {
+            cy.get('[width="126"] > tbody > :nth-child(2)').should("be.visible");
+        });
+
+        it("should display palette row 3", () => {
+            cy.get('[width="126"] > tbody > :nth-child(3)').should("be.visible");
+        });
+    });
 });
