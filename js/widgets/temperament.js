@@ -891,7 +891,7 @@ function TemperamentWidget() {
                 that.performEqualEdit(event);
             } catch (error) {
                 activity.errorMsg(
-                    _("Invalid number of divisions. Please enter a reasonable value."),
+                    error.message,
                     3000
                 );
             }
@@ -905,7 +905,7 @@ function TemperamentWidget() {
             // Validate input to prevent UI performance issues
             // Limit to 200 divisions to prevent excessive DOM elements and slow rendering
             if (isNaN(divisions) || divisions < 1 || divisions > 200) {
-                throw new Error("Invalid divisions: must be between 1 and 200");
+                throw new Error("Invalid number of divisions: must be between 1 and 200");
             }
 
             this.tempRatios = this.ratios.slice();
