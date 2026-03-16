@@ -3240,6 +3240,7 @@ class Activity {
         /*
          * Uses JQuery to add autocompleted search suggestions
          */
+        const searchCache = {};
         this.doSearch = () => {
             // Guard: ensure searchWidget exists before proceeding
             if (!this.searchWidget) {
@@ -3257,7 +3258,25 @@ class Activity {
 
             if (!$search.data("autocomplete-init")) {
                 $search.autocomplete({
-                    source: that.searchSuggestions,
+                    source: function(request, response) {
+
+    const term = request.term.toLowerCase();
+
+    if (searchCache[term]) {
+        response(searchCache[term]);
+        return;
+    }
+
+    const matcher = new RegExp($j.ui.autocomplete.escapeRegex(term), "i");
+
+    const results = $j.grep(that.searchSuggestions, function(item) {
+        return matcher.test(item.label);
+    });
+
+    searchCache[term] = results;
+
+    response(results);
+},
                     appendTo: "body",
                     select: (event, ui) => {
                         event.preventDefault();
@@ -6740,7 +6759,24 @@ class Activity {
 
             if (!$helpfulSearch.data("autocomplete-init")) {
                 $helpfulSearch.autocomplete({
-                    source: that.searchSuggestions,
+                    source: function(request, response) {
+
+    const term = request.term.toLowerCase();
+
+    if (searchCache[term]) {
+        response(searchCache[term]);
+        return;
+    }
+
+    const matcher = new RegExp($j.ui.autocomplete.escapeRegex(term), "i");
+    const results = $j.grep(that.searchSuggestions, function(item) {
+        return matcher.test(item.label);
+    });
+
+    searchCache[term] = results;
+
+    response(results);
+},
                     appendTo: "body",
                     select: (event, ui) => {
                         event.preventDefault();
