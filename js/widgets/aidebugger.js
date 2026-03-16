@@ -9,6 +9,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/* global _THIS_IS_MUSIC_BLOCKS_ */
+
 /* This widget provides an AI-powered debugging interface for Music Blocks projects,
 offering intelligent assistance, cool suggestions, and helping take your musical creations to new heights! */
 
@@ -93,6 +95,12 @@ function AIDebuggerWidget() {
      * @type {HTMLElement}
      */
     this.sendButton = null;
+
+    /**
+     * Flag to prevent concurrent message sends
+     * @type {boolean}
+     */
+    this._isProcessing = false;
 
     /**
      * Generates a unique conversation ID
@@ -279,6 +287,8 @@ function AIDebuggerWidget() {
 
         const messageText = this.messageInput.value.trim();
         if (messageText === "") return;
+        if (this._isProcessing) return;
+        this._isProcessing = true;
 
         const userMessage = {
             type: "user",
@@ -390,6 +400,7 @@ function AIDebuggerWidget() {
             .then(data => {
                 this.isProcessing = false;
                 this._hideTypingIndicator();
+                this._isProcessing = false;
 
                 if (data && data.response) {
                     const botResponse = {
@@ -409,6 +420,7 @@ function AIDebuggerWidget() {
             .catch(error => {
                 this.isProcessing = false;
                 this._hideTypingIndicator();
+                this._isProcessing = false;
                 console.error("Backend connection error:", error.message);
 
                 this.activity.textMsg(_("Server error: Unable to connect to AI backend."));
@@ -465,12 +477,12 @@ function AIDebuggerWidget() {
      */
     this._hideTypingIndicator = function () {
         const typingIndicators = this.chatLog.querySelectorAll(".typing-indicator");
-        typingIndicators.forEach(typingIndicator => {
-            const animationId = typingIndicator.getAttribute("data-animation-id");
+        typingIndicators.forEach(indicator => {
+            const animationId = indicator.getAttribute("data-animation-id");
             if (animationId) {
                 clearInterval(parseInt(animationId));
             }
-            typingIndicator.remove();
+            indicator.remove();
         });
     };
 

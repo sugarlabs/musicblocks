@@ -13,7 +13,7 @@
 /*
    global
 
-   _, ACCIDENTALLABELS, ACCIDENTALNAMES, addTemperamentToDictionary,
+    ACCIDENTALLABELS, ACCIDENTALNAMES, addTemperamentToDictionary,
    blockBlocks, COLLAPSEBUTTON, COLLAPSETEXTX, COLLAPSETEXTY,
    createjs, DEFAULTACCIDENTAL, DEFAULTDRUM, DEFAULTEFFECT,
    DEFAULTFILTERTYPE, DEFAULTINTERVAL, DEFAULTINVERT, DEFAULTMODE,
@@ -21,9 +21,9 @@
    DEFAULTVOICE, DEGREES, delayExecution, deleteTemperamentFromList,
    DISABLEDFILLCOLOR, DISABLEDSTROKECOLOR, docById, DOUBLEFLAT,
    DOUBLESHARP, DRUMNAMES, EASTINDIANSOLFNOTES, EFFECTSNAMES,
-   EXPANDBUTTON, FILTERTYPES, FLAT, getDrumName, getDrumSynthName,
+    EXPANDBUTTON, FILTERTYPES, FLAT, getDrumName, getDrumSynthName,
    getModeNumbers, getNoiseName, getTemperament, getTemperamentKeys,
-   getTemperamentsList, getTextWidth, hideDOMLabel, HIGHLIGHTSTROKECOLORS,
+    getTemperamentsList, getTextWidth, hideDOMLabel, HIGHLIGHTSTROKECOLORS,
    i18nSolfege, INVERTMODES, isCustomTemperament, last, MEDIASAFEAREA,
    NATURAL, NOISENAMES, NSYMBOLS, NUMBERBLOCKDEFAULT, OSCTYPES,
    PALETTEFILLCOLORS, PALETTEHIGHLIGHTCOLORS, PALETTESTROKECOLORS,
@@ -31,9 +31,9 @@
    piemenuBoolean, piemenuColor, piemenuCustomNotes, piemenuIntervals,
    piemenuModes, piemenuNoteValue, piemenuNumber, piemenuPitches,
    piemenuVoices, piemenuChords, platformColor, ProtoBlock, RSYMBOLS,
-   safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
+    safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
    splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
-   topBlock, updateTemperaments, VALUETEXTX, DEFAULTCHORD,
+    topBlock, updateTemperaments, VALUETEXTX, DEFAULTCHORD, base64Encode,
    VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_
  */
 
@@ -71,7 +71,7 @@
         platformColor
  */
 
-/* exported Block, $ */
+/* exported Block */
 
 // Length of a long touch
 
@@ -274,6 +274,11 @@ class Block {
         this.name = protoblock.name;
         this.activity = this.blocks.activity;
 
+        // Cached index in blocks.blockList — set when block is added
+        // to blockList. Avoids O(N) blockList.indexOf() lookups that
+        // are scattered across the codebase (33+ call sites).
+        this.blockIndex = -1;
+
         this.collapsed = false; // Is this collapsible block collapsed?
         this.inCollapsed = false; // Is this block in a collapsed stack?
         this.trash = false; // Is this block in the trash?
@@ -399,6 +404,13 @@ class Block {
     updateCache() {
         const that = this;
         return new Promise((resolve, reject) => {
+            // If the container has no active bitmap cache (e.g., trashed
+            // blocks whose cache was freed), skip the update silently.
+            if (that.container && !that.container.bitmapCache) {
+                resolve();
+                return;
+            }
+
             let loopCount = 0;
             const MAX_RETRIES = 15;
             const INITIAL_DELAY = 100;
@@ -415,7 +427,8 @@ class Block {
 
                     if (that.bounds === null) {
                         const delayTime = INITIAL_DELAY * Math.pow(2, loopCount);
-                        await that.pause(delayTime);
+                        await delayExecution(delayTime);
+                        await new Promise(resolve => setTimeout(resolve, delayTime));
                         updateBounds(loopCount + 1);
                     } else {
                         that.container.updateCache();
@@ -1039,7 +1052,7 @@ class Block {
     generateArtwork(firstTime) {
         // Get the block labels from the protoblock.
         const that = this;
-        const thisBlock = this.blocks.blockList.indexOf(this);
+        const thisBlock = this.blockIndex;
         let block_label = "";
 
         /**
@@ -1071,7 +1084,7 @@ class Block {
 
             const __callback = (that, firstTime) => {
                 that.activity.refreshCanvas();
-                const thisBlock = that.blocks.blockList.indexOf(that);
+                const thisBlock = that.blockIndex;
 
                 if (firstTime) {
                     that._loadEventHandlers();
@@ -1289,7 +1302,7 @@ class Block {
             artwork = artwork.replace("arg_label_" + i, this.protoblock.staticLabels[i]);
         }
 
-        that.blocks.blockArt[that.blocks.blockList.indexOf(that)] = artwork;
+        that.blocks.blockArt[that.blockIndex] = artwork;
 
         _blockMakeBitmap(artwork, __processBitmap, this);
     }
@@ -1300,7 +1313,7 @@ class Block {
      * @returns {void}
      */
     _finishImageLoad() {
-        // const thisBlock = this.blocks.blockList.indexOf(this);
+        // const thisBlock = this.blockIndex;
         let proto, obj, label, attr;
         // Value blocks get a modifiable text label.
         if (SPECIALINPUTS.includes(this.name)) {
@@ -1490,7 +1503,7 @@ class Block {
      * @returns {void}
      */
     _generateCollapseArtwork(postProcess) {
-        const thisBlock = this.blocks.blockList.indexOf(this);
+        const thisBlock = this.blockIndex;
 
         /**
          * Run the postprocess function after the artwork is loaded.
@@ -1746,7 +1759,7 @@ class Block {
             that._ensureDecorationOnTop();
 
             // Save the collapsed block artwork for export.
-            that.blocks.blockCollapseArt[that.blocks.blockList.indexOf(that)] = that.collapseArtwork
+            that.blocks.blockCollapseArt[that.blockIndex] = that.collapseArtwork
                 .replace(/fill_color/g, PALETTEFILLCOLORS[that.protoblock.palette.name])
                 .replace(/stroke_color/g, PALETTESTROKECOLORS[that.protoblock.palette.name])
                 .replace("block_label", safeSVG(that.collapseText.text));
@@ -2033,12 +2046,50 @@ class Block {
     }
 
     /**
+     * Determines what type of layout update this block requires when a child is connected
+     * at the specified connection index.
+     *
+     * This is a behavioral abstraction that encapsulates the logic of which blocks
+     * need pre-layout updates based on their child connections, rather than having
+     * the engine infer this from block type categories.
+     *
+     * @param {number} connectionIndex - The index of the connection where a child was attached
+     * @returns {string|null} - "ARG" for argument layout updates, "FLOW" for flow layout updates, null otherwise
+     */
+    getLayoutUpdateType(connectionIndex) {
+        // Guard against invalid indices (can occur during drag/undo/intermediate states)
+        if (connectionIndex < 0) {
+            return null;
+        }
+
+        // Two-argument blocks and expandable argument blocks need ARG layout updates
+        // when a child connects to their first argument slot (connection index 1)
+        if (connectionIndex === 1) {
+            if (this.isTwoArgBlock() || (this.isArgBlock() && this.isExpandableBlock())) {
+                return "ARG";
+            }
+        }
+
+        const n = this.connections.length;
+        if (
+            connectionIndex === n - 2 &&
+            !this.isArgClamp() &&
+            this.docks[n - 1] &&
+            this.docks[n - 1][2] === "in"
+        ) {
+            return "FLOW";
+        }
+
+        return null;
+    }
+
+    /**
      * Gets the unique identifier for the block.
      * @returns {string} - The unique identifier for the block.
      */
     getBlockId() {
         // Generate a UID based on the block index into the blockList.
-        const number = blockBlocks.blockList.indexOf(this);
+        const number = this.blockIndex;
         return "_" + number.toString();
     }
 
@@ -2061,7 +2112,7 @@ class Block {
      */
     loadThumbnail(imagePath) {
         // Load an image thumbnail onto block.
-        const thisBlock = this.blocks.blockList.indexOf(this);
+        const thisBlock = this.blockIndex;
         const that = this;
 
         if (this.blocks.blockList[thisBlock].value === null && imagePath === null) {
@@ -2198,7 +2249,7 @@ class Block {
     collapseToggle() {
         // Find the blocks to collapse/expand inside of a collapable
         // block.
-        const thisBlock = this.blocks.blockList.indexOf(this);
+        const thisBlock = this.blockIndex;
         this.blocks.findDragGroup(thisBlock);
 
         if (this.collapseBlockBitmap === null) {
@@ -2317,7 +2368,7 @@ class Block {
         const intervals = [];
         let i = 0;
 
-        let c = this.blocks.blockList.indexOf(this),
+        let c = this.blockIndex,
             lastIntervalBlock;
         while (c !== null) {
             lastIntervalBlock = c;
@@ -2830,7 +2881,7 @@ class Block {
      */
     _loadEventHandlers() {
         const that = this;
-        const thisBlock = this.blocks.blockList.indexOf(this);
+        const thisBlock = this.blockIndex;
 
         this._calculateBlockHitArea();
 
@@ -2851,6 +2902,11 @@ class Block {
         let moved = false;
         let locked = false;
         let getInput = window.hasMouse;
+
+        // Cached drag state: computed once at mousedown, reused during pressmove.
+        // This avoids redundant O(N) findDragGroup and O(D) rest2 chain walks
+        // on every mouse move event (which fires 60+ times per second).
+        let _dragHasRest2 = false;
 
         /**
          * Handles the click event on the block container.
@@ -2974,7 +3030,7 @@ class Block {
             that.blocks.mouseDownTime = new Date().getTime();
 
             that.blocks.longPressTimeout = setTimeout(() => {
-                that.blocks.activeBlock = that.blocks.blockList.indexOf(that);
+                that.blocks.activeBlock = that.blockIndex;
                 that._triggerLongPress = true;
                 that.blocks.triggerLongPress();
             }, LONGPRESSTIME);
@@ -3018,10 +3074,33 @@ class Block {
                 x: Math.round(that.container.x - that.original.x),
                 y: Math.round(that.container.y - that.original.y)
             };
+
+            // Cache the drag group once on mousedown instead of
+            // recomputing the tree traversal on every pressmove.
+            that.blocks.cacheDragGroup(thisBlock);
+            // Invalidate the top-block cache since a drag may
+            // disconnect blocks, changing the topology.
+            that.blocks.invalidateTopBlockCache();
+
+            // Pre-compute whether the chain below contains a rest2 block.
+            // This avoids walking the entire connection chain on every
+            // mouse move event.
+            _dragHasRest2 = false;
+            let checkBlock = that.blocks.blockList[that.connections[1]];
+            while (checkBlock != null) {
+                if (checkBlock?.name === "rest2") {
+                    _dragHasRest2 = true;
+                    break;
+                }
+                checkBlock = checkBlock?.blocks.blockList[checkBlock.connections[1]];
+            }
         });
 
         /**
          * Handles the pressmove event on the block container.
+         * Performance-optimized: uses cached drag group, batched block
+         * moves, throttled edge scroll, and a single deferred
+         * checkBounds + refreshCanvas per frame.
          * @param {Event} event - The pressmove event.
          */
         this.container.on("pressmove", event => {
@@ -3041,14 +3120,11 @@ class Block {
                 return;
             }
 
-            // Do not allow a stack of blocks to be dragged if the stack contains a silence block.
-            let block = that.blocks.blockList[that.connections[1]];
-            while (block != null) {
-                if (block?.name === "rest2") {
-                    this.activity.errorMsg(_("Silence block cannot be removed."), block);
-                    return;
-                }
-                block = block?.blocks.blockList[block.connections[1]];
+            // Use the cached rest2 check from mousedown instead of
+            // walking the chain on every mouse move event.
+            if (_dragHasRest2) {
+                this.activity.errorMsg(_("Silence block cannot be removed."), that);
+                return;
             }
 
             if (window.hasMouse) {
@@ -3081,14 +3157,27 @@ class Block {
                 dy += 45 - finalPos;
             }
 
-            // scroll when reached edges.
-            if (event.stageX < 10 && that.activity.scrollBlockContainer)
-                that.blocks.moveAllBlocksExcept(that, 10, 0);
-            else if (event.stageX > window.innerWidth - 10 && that.activity.scrollBlockContainer)
-                that.blocks.moveAllBlocksExcept(that, -10, 0);
-            else if (event.stageY > window.innerHeight - 10)
-                that.blocks.moveAllBlocksExcept(that, 0, -10);
-            else if (event.stageY < 60) that.blocks.moveAllBlocksExcept(that, 0, 10);
+            // Edge-scroll: throttled to ~60fps (16ms) to avoid
+            // running moveAllBlocksExcept on every mouse event.
+            const now = Date.now();
+            if (now - that.blocks._lastEdgeScrollTime >= 16) {
+                if (event.stageX < 10 && that.activity.scrollBlockContainer) {
+                    that.blocks.moveAllBlocksExcept(that, 10, 0);
+                    that.blocks._lastEdgeScrollTime = now;
+                } else if (
+                    event.stageX > window.innerWidth - 10 &&
+                    that.activity.scrollBlockContainer
+                ) {
+                    that.blocks.moveAllBlocksExcept(that, -10, 0);
+                    that.blocks._lastEdgeScrollTime = now;
+                } else if (event.stageY > window.innerHeight - 10) {
+                    that.blocks.moveAllBlocksExcept(that, 0, -10);
+                    that.blocks._lastEdgeScrollTime = now;
+                } else if (event.stageY < 60) {
+                    that.blocks.moveAllBlocksExcept(that, 0, 10);
+                    that.blocks._lastEdgeScrollTime = now;
+                }
+            }
 
             if (that.blocks.longPressTimeout != null) {
                 clearTimeout(that.blocks.longPressTimeout);
@@ -3100,7 +3189,8 @@ class Block {
                 that.label.style.display = "none";
             }
 
-            that.blocks.moveBlockRelative(thisBlock, dx, dy);
+            // Move the dragged block itself (batched — no checkBounds).
+            that.blocks.moveBlockRelativeBatched(thisBlock, dx, dy);
 
             // If we are over the trash, warn the user.
             if (
@@ -3119,17 +3209,31 @@ class Block {
                 that.container.setChildIndex(that.text, that.container.children.length - 1);
             }
 
-            // ...and move any connected blocks.
-            that.blocks.findDragGroup(thisBlock);
-            if (that.blocks.dragGroup.length > 0) {
-                for (let b = 0; b < that.blocks.dragGroup.length; b++) {
-                    const blk = that.blocks.dragGroup[b];
-                    if (b !== 0) {
-                        that.blocks.moveBlockRelative(blk, dx, dy);
+            // Move connected blocks using the cached drag group
+            // (computed once on mousedown, not every pressmove).
+            const cachedGroup = that.blocks._cachedDragGroup;
+            if (cachedGroup != null && cachedGroup.length > 0) {
+                for (let b = 0; b < cachedGroup.length; b++) {
+                    const blk = cachedGroup[b];
+                    if (blk !== thisBlock) {
+                        that.blocks.moveBlockRelativeBatched(blk, dx, dy);
+                    }
+                }
+            } else {
+                // Fallback: recompute if cache is missing
+                that.blocks.findDragGroup(thisBlock);
+                if (that.blocks.dragGroup.length > 0) {
+                    for (let b = 0; b < that.blocks.dragGroup.length; b++) {
+                        const blk = that.blocks.dragGroup[b];
+                        if (b !== 0) {
+                            that.blocks.moveBlockRelativeBatched(blk, dx, dy);
+                        }
                     }
                 }
             }
 
+            // Single deferred checkBounds + single canvas refresh per frame
+            that.blocks.scheduleCheckBounds();
             that.activity.refreshCanvas();
         });
 
@@ -3152,7 +3256,12 @@ class Block {
                 that.blocks.unhighlight(thisBlock, true);
             }
             that.blocks.activeBlock = null;
+            // Release cached drag group and top-block map
+            that.blocks.clearCachedDragGroup();
+            that.blocks.invalidateTopBlockCache();
 
+            // Clear cached drag state.
+            _dragHasRest2 = false;
             moved = false;
         });
 
@@ -3174,7 +3283,12 @@ class Block {
 
             that.blocks.unhighlight(thisBlock, true);
             that.blocks.activeBlock = null;
+            // Release cached drag group and top-block map
+            that.blocks.clearCachedDragGroup();
+            that.blocks.invalidateTopBlockCache();
 
+            // Clear cached drag state.
+            _dragHasRest2 = false;
             moved = false;
         });
     }
@@ -3190,7 +3304,7 @@ class Block {
      * @returns {void}
      */
     _mouseoutCallback(event, moved, haveClick, hideDOM) {
-        const thisBlock = this.blocks.blockList.indexOf(this);
+        const thisBlock = this.blockIndex;
         if (!this.activity.logo.runningLilypond) {
             document.body.style.cursor = "default";
         }
@@ -3232,7 +3346,7 @@ class Block {
                 // Just in case the blocks are not properly docked after
                 // the move (workaround for issue #38 -- Blocks fly
                 // apart). Still need to get to the root cause.
-                this.blocks.adjustDocks(this.blocks.blockList.indexOf(this), true);
+                this.blocks.adjustDocks(this.blockIndex, true);
             }
         } else if (SPECIALINPUTS.includes(this.name) || ["media", "loadFile"].includes(this.name)) {
             if (!haveClick) {
@@ -3290,7 +3404,7 @@ class Block {
         }
 
         // Numeric pie menus
-        const blk = this.blocks.blockList.indexOf(this);
+        const blk = this.blockIndex;
 
         if (this.blocks.octaveNumber(blk)) {
             return true;
@@ -3347,7 +3461,7 @@ class Block {
             return false;
         }
 
-        return this.blocks.blockList[cblk].connections[1] === this.blocks.blockList.indexOf(this);
+        return this.blocks.blockList[cblk].connections[1] === this.blockIndex;
     }
 
     /**
@@ -3369,7 +3483,7 @@ class Block {
             return false;
         }
 
-        return this.blocks.blockList[cblk].connections[2] === this.blocks.blockList.indexOf(this);
+        return this.blocks.blockList[cblk].connections[2] === this.blockIndex;
     }
 
     /**
@@ -3391,7 +3505,7 @@ class Block {
             return false;
         }
 
-        return this.blocks.blockList[cblk].connections[3] === this.blocks.blockList.indexOf(this);
+        return this.blocks.blockList[cblk].connections[3] === this.blockIndex;
     }
 
     /**
@@ -3938,7 +4052,7 @@ class Block {
         } else {
             // If the number block is connected to a pitch block, then
             // use the pie menu for octaves. Other special cases as well.
-            const blk = this.blocks.blockList.indexOf(this);
+            const blk = this.blockIndex;
             if (this.blocks.octaveNumber(blk)) {
                 piemenuNumber(this, [8, 7, 6, 5, 4, 3, 2, 1], this.value);
             } else if (this.blocks.noteValueNumber(blk, 2)) {
@@ -4086,7 +4200,7 @@ class Block {
             }
         }
 
-        // const blk = this.blocks.blockList.indexOf(this);
+        // const blk = this.blockIndex;
         if (!this._usePiemenu()) {
             let focused = false;
 
@@ -4219,7 +4333,7 @@ class Block {
     _checkWidgets(closeInput) {
         // Detect if label is changed, then reinit widget windows
         // if they are open.
-        const thisBlock = this.blocks.blockList.indexOf(this);
+        const thisBlock = this.blockIndex;
         const topBlock = this.blocks.findTopBlock(thisBlock);
         const widgetTitle = document.getElementsByClassName("wftTitle");
         let lockInit = false;
@@ -4398,7 +4512,7 @@ class Block {
             }
 
             if (isNaN(this.value)) {
-                const thisBlock = this.blocks.blockList.indexOf(this);
+                const thisBlock = this.blockIndex;
                 this.activity.errorMsg(newValue + ": " + _("Not a number"), thisBlock);
                 this.activity.refreshCanvas();
                 this.value = oldValue;
@@ -4409,7 +4523,7 @@ class Block {
                 this.blocks.blockList[cblk1].name === "pitch" &&
                 (this.value > 8 || this.value < 1)
             ) {
-                const thisBlock = this.blocks.blockList.indexOf(this);
+                const thisBlock = this.blockIndex;
                 this.activity.errorMsg(_("Octave value must be between 1 and 8."), thisBlock);
                 this.activity.refreshCanvas();
                 this.label.value = oldValue;
@@ -4417,7 +4531,7 @@ class Block {
             }
 
             if (String(this.value).length > 10) {
-                const thisBlock = this.blocks.blockList.indexOf(this);
+                const thisBlock = this.blockIndex;
                 this.activity.errorMsg(_("Numbers can have at most 10 digits."), thisBlock);
                 this.activity.refreshCanvas();
                 this.label.value = oldValue;
@@ -4489,20 +4603,14 @@ class Block {
                     // Rename both do <- name and nameddo blocks.
                     this.blocks.renameDos(oldValue, newValue);
 
+                    // eslint-disable-next-line no-case-declarations
+                    const metadata = this.blocks.actionMetadata(c);
                     if (oldValue === _("action")) {
-                        this.blocks.newNameddoBlock(
-                            newValue,
-                            this.blocks.actionHasReturn(c),
-                            this.blocks.actionHasArgs(c)
-                        );
+                        this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
                         this.blocks.setActionProtoVisibility(false);
                     }
 
-                    this.blocks.newNameddoBlock(
-                        newValue,
-                        this.blocks.actionHasReturn(c),
-                        this.blocks.actionHasArgs(c)
-                    );
+                    this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
                     // eslint-disable-next-line no-case-declarations
                     const blockPalette = this.blocks.palettes.dict["action"];
                     for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
@@ -4519,11 +4627,7 @@ class Block {
                     }
 
                     if (oldValue === _("action")) {
-                        this.blocks.newNameddoBlock(
-                            newValue,
-                            this.blocks.actionHasReturn(c),
-                            this.blocks.actionHasArgs(c)
-                        );
+                        this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
                         this.blocks.setActionProtoVisibility(false);
                     }
                     this.blocks.renameNameddos(oldValue, newValue);
@@ -4535,10 +4639,7 @@ class Block {
                     // Check to see which connection we are using in
                     // cblock.  We only do something if blk is attached to
                     // the name connection (1).
-                    if (
-                        cblock.connections[1] === this.blocks.blockList.indexOf(this) &&
-                        closeInput
-                    ) {
+                    if (cblock.connections[1] === this.blockIndex && closeInput) {
                         // If the label was the name of a storein, update the
                         // associated box this.blocks and the palette buttons.
                         if (this.value !== "box") {
@@ -4585,30 +4686,6 @@ class Block {
         }
     }
 }
-
-/**
- * Set elements to an array; if element is string, then set element's id to element.
- * @public
- * @returns {Array|HTMLElement} - An array of elements or a single element.
- */
-const $ = () => {
-    const elements = new Array();
-
-    for (let i = 0; i < elements.length; i++) {
-        let element = elements[i];
-        if (typeof element === "string") {
-            element = docById(element);
-        }
-
-        if (elements.length === 1) {
-            return element;
-        }
-
-        elements.push(element);
-    }
-
-    return elements;
-};
 
 // Track mouse presence
 window.hasMouse = false;

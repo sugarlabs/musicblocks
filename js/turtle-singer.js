@@ -18,7 +18,7 @@
 /*
    global
 
-   DEFAULTVOLUME, TARGETBPM, TONEBPM, frequencyToPitch, last,
+   DEFAULTVOLUME, TARGETBPM, TONEBPM, MIN_HIGHLIGHT_DURATION_MS, frequencyToPitch, last,
    pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp,
    getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
@@ -210,6 +210,38 @@ class Singer {
         this.dispatchFactor = 1; // scale factor for turtle graphics embedded in notes
 
         this.inverted = false; // tracks if the notes being played are inverted
+
+        // Voice Manager: Track active audio sources for proper cleanup
+        this.activeVoices = new Set();
+    }
+
+    /**
+     * Kills all active audio voices for this turtle.
+     * Called during stop/halt to prevent "zombie audio" that continues playing.
+     * Uses try/catch to handle nodes that may have already stopped.
+     *
+     * @returns {void}
+     */
+    killAllVoices() {
+        this.activeVoices.forEach(audioNode => {
+            try {
+                // Stop Tone.Player instances (drums/samples)
+                if (audioNode.stop && typeof audioNode.stop === "function") {
+                    audioNode.stop();
+                }
+                // Release all voices for PolySynth/Sampler instances
+                else if (audioNode.releaseAll && typeof audioNode.releaseAll === "function") {
+                    audioNode.releaseAll();
+                }
+                // Disconnect as fallback
+                else if (audioNode.disconnect && typeof audioNode.disconnect === "function") {
+                    audioNode.disconnect();
+                }
+            } catch (e) {
+                // Ignore errors from already-stopped nodes
+            }
+        });
+        this.activeVoices.clear();
     }
 
     // ========= Class variables ==============================================
@@ -660,18 +692,6 @@ class Singer {
         tur.painter.doPenUp();
         tur.painter.doSetXY(saveState.x, saveState.y);
         tur.painter.doSetHeading(saveState.orientation);
-        tur.painter.doSetXY(saveX, saveY);
-        tur.painter.color = saveColor;
-        tur.painter.value = saveValue;
-        tur.painter.chroma = saveChroma;
-        tur.painter.stroke = saveStroke;
-        tur.painter.canvasAlpha = saveCanvasAlpha;
-        tur.painter.doSetHeading(saveOrientation);
-        tur.painter.penState = savePenState;
-        tur.singer.suppressOutput = saveSuppressStatus;
-        tur.singer.previousTurtleTime = savePrevTurtleTime;
-        tur.singer.turtleTime = saveTurtleTime;
-        tur.singer.whichNoteToCount = saveWhichNoteToCount;
         tur.singer.justCounting.pop();
         tur.butNotThese = {};
 
@@ -691,8 +711,8 @@ class Singer {
         const activity = logo.activity;
         volume = Math.min(Math.max(volume, 0), 100);
         if (blk) {
-            const firstConnection = activity.logo.blockList[blk].connections[0];
-            const lastConnection = last(activity.logo.blockList[blk].connections);
+            const firstConnection = activity.blocks.blockList[blk].connections[0];
+            const lastConnection = last(activity.blocks.blockList[blk].connections);
             logo.synth.setMasterVolume(volume, firstConnection, lastConnection);
         } else {
             logo.synth.setMasterVolume(volume);
@@ -859,7 +879,9 @@ class Singer {
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
                 );
-                nnote[0] = noteIsSolfege(note) ? getSolfege(nnote[0]) : nnote[0];
+                nnote[0] = noteIsSolfege(note)
+                    ? getSolfege(nnote[0], tur.singer.keySignature, tur.singer.movable)
+                    : nnote[0];
 
                 if (tur.singer.drumStyle.length > 0) {
                     activity.logo.pitchDrumMatrix.drums.push(last(tur.singer.drumStyle));
@@ -905,7 +927,11 @@ class Singer {
                     tur.singer.keySignature[1].toLowerCase() === "major" &&
                     noteIsSolfege(note)
                 ) {
-                    noteObj[0] = getSolfege(noteObj[0]);
+                    noteObj[0] = getSolfege(
+                        noteObj[0],
+                        tur.singer.keySignature,
+                        tur.singer.movable
+                    );
                 }
 
                 // If we are in a setdrum clamp, override the pitch.
@@ -968,7 +994,11 @@ class Singer {
                     tur.singer.keySignature[1].toLowerCase() === "major" &&
                     noteIsSolfege(note)
                 ) {
-                    noteObj[0] = getSolfege(noteObj[0]);
+                    noteObj[0] = getSolfege(
+                        noteObj[0],
+                        tur.singer.keySignature,
+                        tur.singer.movable
+                    );
                 }
 
                 // If we are in a setdrum clamp, override the pitch.
@@ -1055,6 +1085,10 @@ class Singer {
                 if (noteObj[2] !== 0 && cents === 0) {
                     cents = noteObj[2];
                     // eslint-disable-next-line no-console
+                }
+
+                if (Math.abs(cents) < 1e-9) {
+                    cents = 0;
                 }
 
                 if (tur.singer.drumStyle.length > 0) {
@@ -1212,7 +1246,9 @@ class Singer {
                 null,
                 activity.errorMsg
             );
-            nnote[0] = noteIsSolfege(note) ? getSolfege(nnote[0]) : nnote[0];
+            nnote[0] = noteIsSolfege(note)
+                ? getSolfege(nnote[0], tur.singer.keySignature, tur.singer.movable)
+                : nnote[0];
 
             if (tur.singer.drumStyle.length === 0) {
                 activity.logo.musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
@@ -1574,6 +1610,9 @@ class Singer {
             // We start the music clock as the first note is being played
             if (activity.logo.firstNoteTime === null) {
                 activity.logo.firstNoteTime = new Date().getTime();
+                if (typeof Tone !== "undefined") {
+                    activity.logo.firstNoteAudioTime = Tone.now();
+                }
             }
 
             // Calculate a lag: In case this turtle has fallen behind,
@@ -1827,6 +1866,15 @@ class Singer {
             if (duration > 0) {
                 tur.singer.previousTurtleTime = tur.singer.turtleTime;
                 if (tur.singer.inNoteBlock.length === 1) {
+                    if (
+                        !tur.singer.suppressOutput &&
+                        activity.logo.firstNoteAudioTime !== null &&
+                        typeof Tone !== "undefined"
+                    ) {
+                        const audioElapsed = Tone.now() - activity.logo.firstNoteAudioTime;
+                        future = Math.max(tur.singer.previousTurtleTime - audioElapsed, 0);
+                    }
+
                     tur.singer.turtleTime += bpmFactor / duration;
                     if (!tur.singer.suppressOutput) {
                         tur.doWait(Math.max(bpmFactor / duration - turtleLag, 0));
@@ -2104,8 +2152,10 @@ class Singer {
                                 pitchNumber *
                                 (Math.log10(ratio[k]) / Math.log10(getOctaveRatio()))
                             ).toFixed(0);
-                            numerator[k] = rationalToFraction(ratio[k])[0];
-                            denominator[k] = rationalToFraction(ratio[k])[1];
+                            // Cache rationalToFraction result to avoid duplicate calls
+                            const fraction = rationalToFraction(ratio[k]);
+                            numerator[k] = fraction[0];
+                            denominator[k] = fraction[1];
                         }
                     }
 
@@ -2441,12 +2491,26 @@ class Singer {
                 // After the note plays, clear the embedded graphics and notes queue.
                 tur.singer.embeddedGraphics[blk] = [];
 
-                // Ensure note value block unhighlights after note plays.
-                setTimeout(() => {
+                // Ensure note value block unhighlights after note plays (minimum duration so highlight is visible).
+                // Cancel any previously pending unhighlight timer for this block to
+                // prevent unbounded timer accumulation in tight infinite loops, which
+                // would otherwise saturate the JS timer queue and stall the main thread.
+                if (!tur.singer._unhighlightTimers) {
+                    tur.singer._unhighlightTimers = {};
+                }
+                if (tur.singer._unhighlightTimers[blk]) {
+                    clearTimeout(tur.singer._unhighlightTimers[blk]);
+                }
+                const highlightDurationMs = Math.max(beatValue * 1000, MIN_HIGHLIGHT_DURATION_MS);
+                tur.singer._unhighlightTimers[blk] = setTimeout(() => {
                     if (activity.blocks.visible && blk in activity.blocks.blockList) {
                         activity.blocks.unhighlight(blk);
+                        if (activity.stage) {
+                            activity.stage.update();
+                        }
                     }
-                }, beatValue * 1000);
+                    delete tur.singer._unhighlightTimers[blk];
+                }, highlightDurationMs);
             };
 
             if (last(tur.singer.inNoteBlock) !== null || noteInNote) {
@@ -2499,15 +2563,23 @@ class Singer {
             callback();
         }
 
-        activity.stage.update();
+        activity.stageDirty = true;
     }
 }
 
+// Maintain CommonJS compatibility for tests
 if (typeof module !== "undefined" && module.exports) {
     module.exports = Singer;
 }
 
-// Export to global scope for browser (RequireJS shim)
+// Implement additive AMD define
+if (typeof define === "function" && define.amd) {
+    define(["activity/logoconstants"], function () {
+        return Singer;
+    });
+}
+
+// Preserve existing global exposure exactly as before
 if (typeof window !== "undefined") {
     window.Singer = Singer;
 }

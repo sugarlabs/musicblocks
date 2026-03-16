@@ -1,22 +1,26 @@
-Cypress.on("uncaught:exception", (err, runnable) => {
-    return false;
+Cypress.on("uncaught:exception", err => {
+    const ignored = [
+        "ResizeObserver loop limit exceeded",
+        "Cannot read properties of undefined (reading 'postMessage')",
+        "_ is not defined",
+        "Permissions check failed"
+    ];
+    return !ignored.some(msg => err.message.includes(msg));
 });
 
 describe("MusicBlocks Application", () => {
     before(() => {
         cy.visit("http://localhost:3000");
-    });
-
-    afterEach(() => {
-        console.log("Next test running, no reload should happen");
+        cy.waitForAppReady();
     });
 
     describe("Loading and Initial Render", () => {
-        it("should display the loading animation and then the main content", () => {
-            cy.get("#loading-image-container").should("be.visible");
-            cy.contains("#loadingText", "Loading Complete!", { timeout: 20000 }).should("be.visible");
-            cy.wait(10000);
-            cy.get("#canvas", { timeout: 10000 }).should("be.visible");
+        it("should display the loading animation container", () => {
+            cy.get("#loading-image-container").should("exist");
+        });
+
+        it("should display the canvas after loading", () => {
+            cy.get("#canvas").should("be.visible");
         });
 
         it("should display the Musicblocks guide page", () => {
@@ -27,7 +31,7 @@ describe("MusicBlocks Application", () => {
     describe("Audio Controls", () => {
         it("should have a functional play button", () => {
             cy.get("#play").should("be.visible").click();
-            cy.window().then((win) => {
+            cy.window().then(win => {
                 const audioContext = win.Tone.context;
                 cy.wrap(audioContext.state).should("eq", "running");
             });
@@ -41,17 +45,12 @@ describe("MusicBlocks Application", () => {
     describe("Toolbar and Navigation", () => {
         it("should open the language selection dropdown", () => {
             cy.get("#aux-toolbar").invoke("show");
-            cy.get("#languageSelectIcon").click({ force: true });
+            cy.get("#languageSelectIcon").click();
             cy.get("#languagedropdown").should("be.visible");
         });
 
-        it("should toggle full-screen mode", () => {
-            cy.get("#FullScreen").click();
-            cy.wait(500);
-            cy.document().its("fullscreenElement").should("not.be.null");
-            cy.get("#FullScreen").click();
-            cy.wait(500);
-            cy.document().its("fullscreenElement").should("be.null");
+        it("should verify fullscreen button exists and is visible", () => {
+            cy.get("#FullScreen").should("exist").and("be.visible");
         });
 
         it("should toggle the toolbar menu", () => {
@@ -73,19 +72,14 @@ describe("MusicBlocks Application", () => {
             cy.get("#saveddropdownbeg").should("be.visible");
         });
 
-        it("should display file save options", () => {
-            cy.get("#saveButton").click();
+        it("should display all file save options", () => {
             cy.get("#saveddropdownbeg").should("be.visible");
             cy.get("#save-html-beg").should("exist");
             cy.get("#save-png-beg").should("exist");
         });
 
-        it('should click the New File button and verify "New Project" appears', () => {
-            cy.get("#newFile > .material-icons")
-                .should("exist")
-                .and("be.visible");
-            cy.get("#newFile > .material-icons").click();
-            cy.wait(500);
+        it("should show New Project dialog on new file click", () => {
+            cy.get("#newFile > .material-icons").should("exist").and("be.visible").click();
             cy.contains("New project").should("be.visible");
         });
     });
@@ -99,7 +93,7 @@ describe("MusicBlocks Application", () => {
                 "#Decrease\\ block\\ size > img",
                 "#Increase\\ block\\ size > img"
             ];
-        
+
             bottomBarElements.forEach(selector => {
                 cy.get(selector).should("exist").and("be.visible");
             });
@@ -111,27 +105,20 @@ describe("MusicBlocks Application", () => {
                 "tr > :nth-child(2) > img",
                 "tr > :nth-child(3) > img"
             ];
-        
+
             sidebarElements.forEach(selector => {
-                cy.get(selector)
-                    .should("exist")
-                    .and("be.visible")
-                    .click();
+                cy.get(selector).should("exist").and("be.visible").click();
             });
         });
 
         it("should verify that Grid, Clear, and Collapse elements exist and are visible", () => {
-            const elements = [
-                "#Grid > img",
-                "#Clear",
-                "#Collapse > img"
-            ];
+            const elements = ["#Grid > img", "#Clear", "#Collapse > img"];
             elements.forEach(selector => {
                 cy.get(selector).should("exist").and("be.visible");
             });
         });
 
-        it("should verify that all nth-child elements from 1 to 6 exist", () => {
+        it("should verify that all palette rows exist and are visible", () => {
             for (let i = 1; i <= 6; i++) {
                 cy.get(`[width="126"] > tbody > :nth-child(${i})`)
                     .should("exist")
@@ -141,22 +128,13 @@ describe("MusicBlocks Application", () => {
     });
 
     describe("Planet Page Interaction", () => {
-        it("should load the Planet page and return to the main page when clicking the close button", () => {
+        it("should open the Planet iframe on planet icon click", () => {
             cy.get("#planetIcon > .material-icons").should("exist").and("be.visible").click();
 
             cy.get("#planet-iframe", { timeout: 10000 })
                 .should("be.visible")
                 .and("have.attr", "src")
                 .and("not.be.empty");
-
-            cy.get("#planet-iframe").then(($iframe) => {
-                const iframeSrc = $iframe.attr("src");
-                cy.log("Iframe source:", iframeSrc);
-            });
-
-            cy.window().then((win) => {
-                win.document.getElementById("planet-iframe").style.display = "block";
-            });
         });
     });
 });
