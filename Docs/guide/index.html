@@ -9,29 +9,101 @@
       crossorigin="anonymous"
     />
     <style type="text/css">
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+        background-color: #f9f9f9;
+      }
+      .jumbotron {
+        background-color: #5bc0de;
+        color: white;
+        text-align: center;
+        border-radius: 8px;
+        margin-top: 20px;
+        padding: 40px 20px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      }
+      .jumbotron h1 {
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+      .content-wrapper {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-bottom: 40px;
+      }
+      .top-nav {
+        margin-bottom: 20px;
+        text-align: right;
+      }
+      .top-nav a {
+        color: #777;
+        margin-left: 10px;
+        text-decoration: none;
+      }
+      .top-nav a:hover {
+        color: #333;
+      }
       ol {
         counter-reset: item;
       }
       li {
         display: block;
+        margin-bottom: 8px;
       }
       li:before {
         content: counters(item, ".") " ";
         counter-increment: item;
+        font-weight: bold;
+        color: #5bc0de;
+      }
+      h2, h3, h4 {
+        color: #2c3e50;
+        margin-top: 30px;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+        margin: 15px 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .download-btn {
+        margin-top: 20px;
+        font-size: 1.1em;
+        padding: 10px 20px;
+        border-radius: 30px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        transition: all 0.3s;
+      }
+      .download-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0,0,0,0.3);
       }
     </style>
   </head>
   <body>
-    <div class="container">
+    <div class="container content-wrapper">
+      <div class="top-nav">
+        <a href="../guide/index.html">English</a> |
+        <a href="../guide-es/index.html">Español</a> |
+        <a href="../guide-ja/index.html">日本語</a> |
+        <a href="../guide-zhCN/index.html">中文</a> |
+        <a href="../guide-pt/index.html">Português</a>
+      </div>
       <div id="content">
-        <p>
-          <a href="../guide/index.html">English</a> |
-          <a href="../guide-es/index.html">Español</a> |
-          <a href="../guide-ja/index.html">日本語</a> |
-          <a href="../guide-zhCN/index.html">中文</a> |
-          <a href="../guide-pt/index.html">Português</a>
-        </p>
-        <h1 id="guide-to-programming-with-music-blocks">Guide to Programming with Music Blocks</h1>
+        <div class="jumbotron">
+          <h1 id="guide-to-programming-with-music-blocks">Music Blocks Programming Guide</h1>
+          <p class="lead">A complete guide to learning and programming with Music Blocks</p>
+          <a href="MusicBlocks_Guide.pdf" class="btn btn-warning btn-lg download-btn" download>
+             <span class="glyphicon glyphicon-download-alt"></span> Download PDF Guide
+          </a>
+        </div>
+        
         <p>
           Music Blocks is a programming environment for children interested in music and graphics.
           It expands upon Turtle Blocks by adding a collection of features relating to pitch and
