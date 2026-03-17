@@ -1429,7 +1429,7 @@ class PhraseMaker {
             if (PhraseMakerUtils.MATRIXGRAPHICS2.includes(this.rowLabels[blockIndex])) {
                 blockLabel =
                     this.activity.blocks.protoBlockDict[this.rowLabels[blockIndex]][
-                        "staticLabels"
+                    "staticLabels"
                     ][0];
                 cell.innerHTML = `${blockLabel}<br>${this.rowArgs[blockIndex][0]} ${this.rowArgs[blockIndex][1]}`;
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + "px";
@@ -1718,7 +1718,7 @@ class PhraseMaker {
             } else if (PhraseMakerUtils.MATRIXGRAPHICS.includes(this.rowLabels[blockIndex])) {
                 blockLabel =
                     this.activity.blocks.protoBlockDict[this.rowLabels[blockIndex]][
-                        "staticLabels"
+                    "staticLabels"
                     ][0];
                 cell.innerHTML = `${blockLabel}<br>${this.rowArgs[blockIndex]}`;
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + "px";
@@ -3111,7 +3111,7 @@ class PhraseMaker {
         if (this._deps.last(this.activity.blocks.blockList[blockToDelete].connections) !== null) {
             this.activity.blocks.sendStackToTrash(
                 this.activity.blocks.blockList[
-                    this._deps.last(this.activity.blocks.blockList[blockToDelete].connections)
+                this._deps.last(this.activity.blocks.blockList[blockToDelete].connections)
                 ]
             );
         }
@@ -3923,7 +3923,12 @@ class PhraseMaker {
             }
         }
 
-        let isMouseDown;
+        let isMouseDown = false;
+        const matrixMouseUp = () => {
+            isMouseDown = false;
+        };
+        document.addEventListener("mouseup", matrixMouseUp);
+
         for (let i = 0; i < rowCount; i++) {
             // The buttons get added to the embedded table.
             row = this._rows[i];
@@ -3932,8 +3937,6 @@ class PhraseMaker {
                 // Give each clickable cell a unique id
                 cell.setAttribute("data-i", i);
                 cell.setAttribute("data-j", j);
-
-                isMouseDown = false;
 
                 cell.onmousedown = evt => {
                     isMouseDown = true;
@@ -3964,9 +3967,7 @@ class PhraseMaker {
                     }
                 };
 
-                cell.onmouseup = () => {
-                    isMouseDown = false;
-                };
+
             }
         }
 

@@ -934,13 +934,13 @@ describe("processNote regression behavior", () => {
     test("should trigger stage update after processing note", () => {
         const callback = jest.fn();
         Singer.processNote(activityMock, 4, false, "mockBlk", 0, callback);
-        expect(activityMock.stage.update).toHaveBeenCalledTimes(1);
+        expect(activityMock.stageDirty).toBe(true);
     });
 
     test("should use default BPM when bpm stack is empty", () => {
         singer.bpm = [];
         Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
-        expect(activityMock.stage.update).toHaveBeenCalledTimes(1);
+        expect(activityMock.stageDirty).toBe(true);
     });
 });
 

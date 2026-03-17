@@ -765,7 +765,7 @@ class Palettes {
         this.activePalette = name; // used to delete plugins
     }
 
-    _showMenus() {}
+    _showMenus() { }
 
     _hideMenus() {
         // Hide the menu buttons and the palettes themselves.
@@ -844,8 +844,7 @@ class Palettes {
             element.classList.add("flex-palette");
             element.setAttribute(
                 "style",
-                `position: fixed; z-index: 1000; left: 0px; top: ${
-                    60 + this.top
+                `position: fixed; z-index: 1000; left: 0px; top: ${60 + this.top
                 }px; overflow-y: auto;`
             );
             element.innerHTML = `<div style="height:fit-content">
@@ -922,7 +921,7 @@ class Palettes {
             const actionBlock = this.dict["action"].protoList[blk];
             if (
                 ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(actionBlock.name) !==
-                    -1 &&
+                -1 &&
                 actionBlock.defaults[0] === actionName
             ) {
                 // Remove the palette protoList entry for this block.
@@ -1469,8 +1468,8 @@ class Palette {
                     document.body.style.cursor = "default";
                     document.removeEventListener("mousemove", onMouseMove);
                     document.removeEventListener("touchmove", onMouseMove);
-                    img.onmouseup = null;
-                    img.ontouchend = null;
+                    document.removeEventListener("mouseup", up);
+                    document.removeEventListener("touchend", up);
 
                     const x = parseInt(img.style.left);
                     const y = parseInt(img.style.top);
@@ -1488,14 +1487,14 @@ class Palette {
                         b.modname,
                         event,
                         (x || that.activity.blocksContainer.x + 100) -
-                            that.activity.blocksContainer.x,
+                        that.activity.blocksContainer.x,
                         (y || that.activity.blocksContainer.y + 100) -
-                            that.activity.blocksContainer.y
+                        that.activity.blocksContainer.y
                     );
                 };
 
-                img.ontouchend = up;
-                img.onmouseup = up;
+                document.addEventListener("touchend", up);
+                document.addEventListener("mouseup", up);
             };
 
             img.ontouchstart = down;
@@ -1516,7 +1515,8 @@ class Palette {
         let posY, top;
 
         const mouseUpGrab = () => {
-            // paletteList.onmousemove = null;
+            document.removeEventListener("mousemove", mouseMoveGrab);
+            document.removeEventListener("mouseup", mouseUpGrab);
             document.body.style.cursor = "default";
         };
 
@@ -1530,9 +1530,8 @@ class Palette {
             posY = event.clientY;
             top = paletteList.scrollTop;
 
-            paletteList.onmousemove = mouseMoveGrab;
-            paletteList.onmouseup = mouseUpGrab;
-            paletteList.onmouseleave = mouseUpGrab;
+            document.addEventListener("mousemove", mouseMoveGrab);
+            document.addEventListener("mouseup", mouseUpGrab);
         };
 
         paletteList.onmousedown = mouseDownGrab;
