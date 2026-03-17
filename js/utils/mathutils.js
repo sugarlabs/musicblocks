@@ -118,19 +118,10 @@ class MathUtility {
         return Math.random() < 0.5 ? a : b;
     }
 
-    /**
-     * Returns a modulo b.
-     *
-     * @static
-     * @param {number} a
-     * @param {number} b
-     * @returns {number} - Result of a modulo b.
-     * @throws {string} NAN error if the arguments are not valid.
-     */
     static doMod(a, b) {
         if (typeof a === "number" && typeof b === "number") {
             if (Number(b) === 0) {
-                return NaN;
+                throw "DivByZeroError";
             }
             return Number(a) % Number(b);
         } else {
