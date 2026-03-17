@@ -16,8 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-
-const { TextEncoder } = require("util");
 global.TextEncoder = TextEncoder;
 global._ = jest.fn(str => str);
 global.window = {
@@ -104,7 +102,11 @@ const {
     NOTESSHARP,
     MUSICALMODES,
     getStepSizeUp,
-    getStepSizeDown
+    getStepSizeDown,
+    TEMPERAMENTS,
+    INITIALTEMPERAMENTS,
+    A0,
+    NATURAL
 } = require("../musicutils");
 
 describe("musicutils", () => {
@@ -743,10 +745,8 @@ describe("noteToObj", () => {
 
 describe("frequencyToPitch", () => {
     beforeEach(() => {
-        global.A0 = 27.5;
         global.C8 = 4186.01;
         global.C10 = 16744.04;
-        global.TWELVEHUNDRETHROOT2 = Math.pow(2, 1 / 1200);
         global.PITCHES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
     });
 
@@ -1654,41 +1654,35 @@ describe("noteToPitchOctave", () => {
 });
 
 describe("pitchToFrequency", () => {
-    global.TWELTHROOT2 = 1.0594630943592953;
-    global.TWELVEHUNDRETHROOT2 = 1.0005777895065549;
-    global.A0 = 27.5;
 
     it("calculates frequency with 0 cents", () => {
         const result = pitchToFrequency("A", 4, 0, "C");
-        expect(result).toBe(A0 * Math.pow(TWELTHROOT2, 48));
+        expect(result).toBe(A0 * Math.pow(1.0594630943592953, 48));
     });
 
     it("calculates frequency with non-zero cents", () => {
         const result = pitchToFrequency("A", 4, 50, "C");
-        expect(result).toBe(A0 * Math.pow(TWELVEHUNDRETHROOT2, 48 * 100 + 50));
+        expect(result).toBe(A0 * Math.pow(1.000577789506555, 48 * 100 + 50));
     });
 
     it("handles edge case with extreme pitch number", () => {
         const result = pitchToFrequency("C", 8, 0, "C");
-        expect(result).toBe(A0 * Math.pow(TWELTHROOT2, 87));
+        expect(result).toBe(A0 * Math.pow(1.0594630943592953, 87));
     });
 
     it("throws error if pitchToNumber fails", () => {
-        expect(pitchToFrequency("Z", 4, 0, "C")).toBe(A0 * Math.pow(TWELTHROOT2, 39));
+        expect(pitchToFrequency("Z", 4, 0, "C")).toBe(A0 * Math.pow(1.0594630943592953, 39));
     });
 });
 
 describe("noteToFrequency", () => {
-    global.TWELTHROOT2 = 1.0594630943592953;
-    global.TWELVEHUNDRETHROOT2 = 1.0005777895065549;
-    global.A0 = 27.5;
     it("converts note to frequency correctly", () => {
         const result = noteToFrequency("A4", "C");
-        expect(result).toBe(A0 * Math.pow(TWELTHROOT2, 48));
+        expect(result).toBe(A0 * Math.pow(1.0594630943592953, 48));
     });
 
     it("handles invalid note input gracefully", () => {
-        expect(noteToFrequency("X9", "C")).toBe(A0 * Math.pow(TWELTHROOT2, 99));
+        expect(noteToFrequency("X9", "C")).toBe(A0 * Math.pow(1.0594630943592953, 99));
     });
 });
 
