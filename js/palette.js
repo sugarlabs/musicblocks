@@ -117,144 +117,138 @@ class Palettes {
         if (!palette) return;
 
         // Make palette focusable
-        if (palette && palette.setAttribute) {
-            palette.setAttribute("tabindex", "0");
-        }
+        palette.setAttribute("tabindex", "0");
 
-        if (palette && palette.addEventListener) {
-            palette.addEventListener("keydown", event => {
-                const key = event.key;
-                if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Enter"].includes(key)) {
-                    return;
-                }
+        palette.addEventListener("keydown", event => {
+            const key = event.key;
+            if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Enter"].includes(key)) {
+                return;
+            }
 
-                // Don't handle keyboard events if search widget is focused
-                const searchWidget = document.getElementById("search");
-                if (searchWidget && document.activeElement === searchWidget) {
-                    return;
-                }
+            // Don't handle keyboard events if search widget is focused
+            const searchWidget = document.getElementById("search");
+            if (searchWidget && document.activeElement === searchWidget) {
+                return;
+            }
 
-                event.preventDefault();
-                event.stopPropagation();
-                this._keyboardNavActive = true;
+            event.preventDefault();
+            event.stopPropagation();
+            this._keyboardNavActive = true;
 
-                const tr = palette.children[0]?.children[0]?.children[0]?.children[0];
-                const typeCount = tr ? tr.children.length : MULTIPALETTES.length;
-                const listBody = docById("palette")?.children[0]?.children[1]?.children[1];
-                const blockRows = listBody ? Array.from(listBody.children) : [];
+            const tr = palette.children[0]?.children[0]?.children[0]?.children[0];
+            const typeCount = tr ? tr.children.length : MULTIPALETTES.length;
+            const listBody = docById("palette")?.children[0]?.children[1]?.children[1];
+            const blockRows = listBody ? Array.from(listBody.children) : [];
 
-                if (key === "ArrowLeft" || key === "ArrowRight") {
-                    // Navigate within type section or between blocks list and palette
-                    if (this._navSection === "type") {
-                        if (key === "ArrowLeft") {
-                            this._navTypeIndex = (this._navTypeIndex - 1 + typeCount) % typeCount;
-                        } else {
-                            this._navTypeIndex = (this._navTypeIndex + 1) % typeCount;
-                        }
-                        this._updateKeyboardFocus(tr, blockRows);
-                        // Trigger the palette change
-                        this.showSelection(this._navTypeIndex, tr);
-                        this.makePalettes(this._navTypeIndex);
-                    } else if (this._navSection === "blocks" && key === "ArrowRight") {
-                        // Move from block categories to palette blocks panel
-                        const paletteBlocks = this._getPaletteBlocks();
-                        if (paletteBlocks.length > 0) {
-                            this._navSection = "palette";
-                            this._navPaletteBlockIndex = 0;
-                            this._updateKeyboardFocus(tr, blockRows);
-                        }
-                    } else if (this._navSection === "palette" && key === "ArrowLeft") {
-                        // Move from palette blocks back to block categories
-                        this._navSection = "blocks";
+            if (key === "ArrowLeft" || key === "ArrowRight") {
+                // Navigate within type section or between blocks list and palette
+                if (this._navSection === "type") {
+                    if (key === "ArrowLeft") {
+                        this._navTypeIndex = (this._navTypeIndex - 1 + typeCount) % typeCount;
+                    } else {
+                        this._navTypeIndex = (this._navTypeIndex + 1) % typeCount;
+                    }
+                    this._updateKeyboardFocus(tr, blockRows);
+                    // Trigger the palette change
+                    this.showSelection(this._navTypeIndex, tr);
+                    this.makePalettes(this._navTypeIndex);
+                } else if (this._navSection === "blocks" && key === "ArrowRight") {
+                    // Move from block categories to palette blocks panel
+                    const paletteBlocks = this._getPaletteBlocks();
+                    if (paletteBlocks.length > 0) {
+                        this._navSection = "palette";
+                        this._navPaletteBlockIndex = 0;
                         this._updateKeyboardFocus(tr, blockRows);
                     }
-                } else if (key === "ArrowDown") {
-                    if (this._navSection === "type") {
+                } else if (this._navSection === "palette" && key === "ArrowLeft") {
+                    // Move from palette blocks back to block categories
+                    this._navSection = "blocks";
+                    this._updateKeyboardFocus(tr, blockRows);
+                }
+            } else if (key === "ArrowDown") {
+                if (this._navSection === "type") {
+                    this._navSection = "search";
+                    this._navBlockIndex = 0;
+                    // Close any open block menus when moving to search
+                    this._hideMenus();
+                } else if (this._navSection === "search") {
+                    // Move to first block category (skip search at index 0)
+                    if (blockRows.length > 1) {
+                        this._navSection = "blocks";
+                        this._navBlockIndex = 1;
+                        this._navPaletteBlockIndex = 0; // Reset palette block index
+                        // Auto-open the palette for this category
+                        const row = blockRows[this._navBlockIndex];
+                        if (row) {
+                            const paletteName = this._getPaletteNameFromRow(row);
+                            if (paletteName) {
+                                this.showPalette(paletteName);
+                            }
+                        }
+                    }
+                } else if (this._navSection === "blocks") {
+                    if (this._navBlockIndex < blockRows.length - 1) {
+                        this._navBlockIndex++;
+                        this._navPaletteBlockIndex = 0; // Reset palette block index
+                        // Auto-open the palette for this category
+                        const row = blockRows[this._navBlockIndex];
+                        if (row) {
+                            const paletteName = this._getPaletteNameFromRow(row);
+                            if (paletteName) {
+                                this.showPalette(paletteName);
+                            }
+                        }
+                    }
+                } else if (this._navSection === "palette") {
+                    // Navigate within palette blocks
+                    const paletteBlocks = this._getPaletteBlocks();
+                    if (this._navPaletteBlockIndex < paletteBlocks.length - 1) {
+                        this._navPaletteBlockIndex++;
+                    }
+                }
+                this._updateKeyboardFocus(tr, blockRows);
+            } else if (key === "ArrowUp") {
+                if (this._navSection === "blocks") {
+                    if (this._navBlockIndex > 1) {
+                        this._navBlockIndex--;
+                        this._navPaletteBlockIndex = 0; // Reset palette block index
+                        // Auto-open the palette for this category
+                        const row = blockRows[this._navBlockIndex];
+                        if (row) {
+                            const paletteName = this._getPaletteNameFromRow(row);
+                            if (paletteName) {
+                                this.showPalette(paletteName);
+                            }
+                        }
+                    } else {
                         this._navSection = "search";
                         this._navBlockIndex = 0;
                         // Close any open block menus when moving to search
                         this._hideMenus();
-                    } else if (this._navSection === "search") {
-                        // Move to first block category (skip search at index 0)
-                        if (blockRows.length > 1) {
-                            this._navSection = "blocks";
-                            this._navBlockIndex = 1;
-                            this._navPaletteBlockIndex = 0; // Reset palette block index
-                            // Auto-open the palette for this category
-                            const row = blockRows[this._navBlockIndex];
-                            if (row) {
-                                const paletteName = this._getPaletteNameFromRow(row);
-                                if (paletteName) {
-                                    this.showPalette(paletteName);
-                                }
-                            }
-                        }
-                    } else if (this._navSection === "blocks") {
-                        if (this._navBlockIndex < blockRows.length - 1) {
-                            this._navBlockIndex++;
-                            this._navPaletteBlockIndex = 0; // Reset palette block index
-                            // Auto-open the palette for this category
-                            const row = blockRows[this._navBlockIndex];
-                            if (row) {
-                                const paletteName = this._getPaletteNameFromRow(row);
-                                if (paletteName) {
-                                    this.showPalette(paletteName);
-                                }
-                            }
-                        }
-                    } else if (this._navSection === "palette") {
-                        // Navigate within palette blocks
-                        const paletteBlocks = this._getPaletteBlocks();
-                        if (this._navPaletteBlockIndex < paletteBlocks.length - 1) {
-                            this._navPaletteBlockIndex++;
-                        }
                     }
-                    this._updateKeyboardFocus(tr, blockRows);
-                } else if (key === "ArrowUp") {
-                    if (this._navSection === "blocks") {
-                        if (this._navBlockIndex > 1) {
-                            this._navBlockIndex--;
-                            this._navPaletteBlockIndex = 0; // Reset palette block index
-                            // Auto-open the palette for this category
-                            const row = blockRows[this._navBlockIndex];
-                            if (row) {
-                                const paletteName = this._getPaletteNameFromRow(row);
-                                if (paletteName) {
-                                    this.showPalette(paletteName);
-                                }
-                            }
-                        } else {
-                            this._navSection = "search";
-                            this._navBlockIndex = 0;
-                            // Close any open block menus when moving to search
-                            this._hideMenus();
-                        }
-                    } else if (this._navSection === "search") {
-                        this._navSection = "type";
-                        // Close any open block menus when moving to type section
-                        this._hideMenus();
-                    } else if (this._navSection === "palette") {
-                        // Navigate within palette blocks
-                        if (this._navPaletteBlockIndex > 0) {
-                            this._navPaletteBlockIndex--;
-                        }
+                } else if (this._navSection === "search") {
+                    this._navSection = "type";
+                    // Close any open block menus when moving to type section
+                    this._hideMenus();
+                } else if (this._navSection === "palette") {
+                    // Navigate within palette blocks
+                    if (this._navPaletteBlockIndex > 0) {
+                        this._navPaletteBlockIndex--;
                     }
-                    this._updateKeyboardFocus(tr, blockRows);
-                } else if (key === "Enter") {
-                    this._activateCurrentNavItem(blockRows);
                 }
-            });
-        }
+                this._updateKeyboardFocus(tr, blockRows);
+            } else if (key === "Enter") {
+                this._activateCurrentNavItem(blockRows);
+            }
+        });
 
         // Clear keyboard nav highlight on mouse movement and restore mouse hover
-        if (palette && palette.addEventListener) {
-            palette.addEventListener("mousemove", () => {
-                if (this._keyboardNavActive) {
-                    this._keyboardNavActive = false;
-                    this._clearKeyboardFocus();
-                }
-            });
-        }
+        palette.addEventListener("mousemove", () => {
+            if (this._keyboardNavActive) {
+                this._keyboardNavActive = false;
+                this._clearKeyboardFocus();
+            }
+        });
     }
 
     /**
@@ -772,12 +766,12 @@ class Palettes {
 
         // Mouse hover - only work if not in keyboard navigation mode
         row.addEventListener("mouseover", () => {
-            if (!this._keyboardNavActive && !(row.dataset && row.dataset.keyboardFocus)) {
+            if (!this._keyboardNavActive && !row.dataset.keyboardFocus) {
                 row.style.backgroundColor = platformColor.hoverColor;
             }
         });
         row.addEventListener("mouseout", () => {
-            if (!(row.dataset && row.dataset.keyboardFocus)) {
+            if (!row.dataset.keyboardFocus) {
                 row.style.backgroundColor = platformColor.paletteBackground;
             }
         });
@@ -812,12 +806,12 @@ class Palettes {
 
         // Mouse hover - only work if not in keyboard navigation mode
         row.addEventListener("mouseover", () => {
-            if (!this._keyboardNavActive && !(row.dataset && row.dataset.keyboardFocus)) {
+            if (!this._keyboardNavActive && !row.dataset.keyboardFocus) {
                 row.style.backgroundColor = platformColor.hoverColor;
             }
         });
         row.addEventListener("mouseout", () => {
-            if (!(row.dataset && row.dataset.keyboardFocus)) {
+            if (!row.dataset.keyboardFocus) {
                 row.style.backgroundColor = platformColor.paletteBackground;
             }
         });
