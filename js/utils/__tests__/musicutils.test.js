@@ -1654,7 +1654,6 @@ describe("noteToPitchOctave", () => {
 });
 
 describe("pitchToFrequency", () => {
-
     it("calculates frequency with 0 cents", () => {
         const result = pitchToFrequency("A", 4, 0, "C");
         expect(result).toBe(A0 * Math.pow(1.0594630943592953, 48));
