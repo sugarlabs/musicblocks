@@ -13,7 +13,7 @@
 /*
    global
 
-   _, last, Tone, require, getTemperament, pitchToNumber,
+   last, Tone, getTemperament, pitchToNumber,
    getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
    getOctaveRatio, isCustomTemperament, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
@@ -499,7 +499,6 @@ function Synth() {
     this.tone = null;
 
     Tone.Buffer.onload = () => {
-        // eslint-disable-next-line no-console
         console.debug("sample loaded");
     };
     /**
@@ -693,7 +692,7 @@ function Synth() {
             if (key.substring(1, key.length) === FLAT || key.substring(1, key.length) === "b") {
                 note = key.substring(0, 1) + "" + "b";
                 this.noteFrequencies[note] = this.noteFrequencies[key];
-                // eslint-disable-next-line no-delete-var
+
                 delete this.noteFrequencies[key];
             } else if (
                 key.substring(1, key.length) === SHARP ||
@@ -701,7 +700,7 @@ function Synth() {
             ) {
                 note = key.substring(0, 1) + "" + "#";
                 this.noteFrequencies[note] = this.noteFrequencies[key];
-                // eslint-disable-next-line no-delete-var
+
                 delete this.noteFrequencies[key];
             }
         }
@@ -869,13 +868,11 @@ function Synth() {
         this.tone.context.resume();
     };
 
-    /*eslint-disable no-undef*/
     /**
      * Function to load samples.
      * @function
      */
     this.loadSamples = () => {
-        /*eslint-disable no-prototype-builtins*/
         if (this.samples === null) {
             this.samples = { voice: {}, drum: {} };
             // Pre-populate with null to indicate they exist as valid instruments but are not loaded
@@ -931,7 +928,6 @@ function Synth() {
             // Load the sample module using require
             require([sampleInfo.path], () => {
                 try {
-                    // eslint-disable-next-line no-undef
                     const sampleData = window[sampleInfo.global];
                     if (sampleData) {
                         this.samples[sampleType][sampleName] = sampleData();
@@ -1102,7 +1098,7 @@ function Synth() {
             if (fileName) {
                 download(url, fileName + (platform.FF ? ".wav" : ".ogg"));
             } else {
-                alert("Download cancelled.");
+                alert(_("Download cancelled."));
             }
         };
         // this.recorder.start();
@@ -1308,7 +1304,6 @@ function Synth() {
      * @param {string} turtle - The turtle identifier.
      */
     this.createDefaultSynth = turtle => {
-        // eslint-disable-next-line no-console
         console.debug("create default poly/default/custom synth for turtle " + turtle);
         const default_synth = new Tone.PolySynth(Tone.AMSynth, POLYCOUNT).toDestination();
         instruments[turtle]["electronic synth"] = default_synth;
@@ -1408,7 +1403,6 @@ function Synth() {
         } else if (fragment in letterDict) {
             chromaticNumber = letterDict[fragment];
         } else {
-            // eslint-disable-next-line no-console
             console.debug("Cannot parse " + fragment);
         }
         const pitchNumber = octave * 12 + chromaticNumber + attr;
@@ -1949,27 +1943,30 @@ function Synth() {
                 // A 500 ms safety buffer is added beyond the note duration to prevent
                 // premature disposal caused by audio-clock drift or scheduler jitter,
                 // which would otherwise produce crackling artefacts in long sessions.
-                setTimeout(() => {
-                    try {
-                        // Dispose of effects
-                        effectsToDispose.forEach(effect => {
-                            if (effect && typeof effect.dispose === "function") {
-                                effect.dispose();
-                            }
-                        });
-
-                        // Dispose of filters
-                        if (temp_filters.length > 0) {
-                            temp_filters.forEach(filter => {
-                                if (filter && typeof filter.dispose === "function") {
-                                    filter.dispose();
+                setTimeout(
+                    () => {
+                        try {
+                            // Dispose of effects
+                            effectsToDispose.forEach(effect => {
+                                if (effect && typeof effect.dispose === "function") {
+                                    effect.dispose();
                                 }
                             });
+
+                            // Dispose of filters
+                            if (temp_filters.length > 0) {
+                                temp_filters.forEach(filter => {
+                                    if (filter && typeof filter.dispose === "function") {
+                                        filter.dispose();
+                                    }
+                                });
+                            }
+                        } catch (e) {
+                            console.debug("Error disposing effects:", e);
                         }
-                    } catch (e) {
-                        console.debug("Error disposing effects:", e);
-                    }
-                }, beatValue * 1000 + 500);
+                    },
+                    beatValue * 1000 + 500
+                );
             }
         } catch (e) {
             console.error("Error in _performNotes:", e);
@@ -2041,17 +2038,6 @@ function Synth() {
             Tone.start().catch(function (e) {
                 console.warn("Audio start failed:", e);
             });
-
-            // Set a "Watchdog Timer" (Wait 2 seconds to avoid false positives)
-            setTimeout(function () {
-                // If it is STILL suspended after 2 seconds, it is definitely blocked
-                if (Tone.context.state !== "running" && !window.hasShownAudioWarning) {
-                    window.hasShownAudioWarning = true;
-                    alert(
-                        "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
-                    );
-                }
-            }, 2000);
         }
         try {
             // Ensure audio context is started
@@ -2277,7 +2263,6 @@ function Synth() {
             synth = instruments[turtle][instrumentName];
         }
 
-        // eslint-disable-next-line no-console
         console.debug(
             "Crescendo(decibels)",
             instrumentName,
@@ -2288,7 +2273,7 @@ function Synth() {
             "t:",
             rampTime
         );
-        // eslint-disable-next-line no-console
+
         console.debug("Crescendo", instrumentName, ":", oldVol, "to", volume, "t:", rampTime);
 
         synth.volume.linearRampToValueAtTime(db, Tone.now() + rampTime);
@@ -2393,7 +2378,6 @@ function Synth() {
                 this.recorder.start();
             })
             .catch(error => {
-                // eslint-disable-next-line no-console
                 console.error(error);
             });
     };
@@ -2471,7 +2455,6 @@ function Synth() {
             // In practice this runs in the browser; keep a safe fallback for tests.
             try {
                 if (typeof module !== "undefined" && module.exports) {
-                    // eslint-disable-next-line global-require
                     const ctx = require("../activity-context");
                     if (ctx && typeof ctx.getActivity === "function") {
                         return ctx.getActivity();
