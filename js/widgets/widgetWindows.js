@@ -163,16 +163,6 @@ class WidgetWindow {
         }
         const closeButton = this._create("div", "wftButton close", this._drag);
         closeButton.title = _("Close");
-        // Accessibility: ARIA + keyboard support
-        closeButton.setAttribute("role", "button");
-        closeButton.setAttribute("aria-label", _("Close"));
-        closeButton.setAttribute("tabindex", "0");
-        closeButton.addEventListener("keydown", e => {
-            if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                closeButton.click();
-            }
-        });
         closeButton.onclick = e => {
             this.onclose();
             e.preventDefault();
@@ -218,16 +208,6 @@ class WidgetWindow {
         this._rollButton = this._create("div", "wftButton rollup", this._nonclosebuttons);
         const rollButton = this._rollButton;
         rollButton.title = _("Minimize");
-        // Accessibility: ARIA + keyboard support
-        rollButton.setAttribute("role", "button");
-        rollButton.setAttribute("aria-label", _("Minimize"));
-        rollButton.setAttribute("tabindex", "0");
-        rollButton.addEventListener("keydown", e => {
-            if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                rollButton.click();
-            }
-        });
         rollButton.onclick = e => {
             if (this._rolled) {
                 this.unroll();
