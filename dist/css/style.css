@@ -130,4 +130,40 @@ body.dark .toolbar-btn-focused,
   box-shadow: 0 0 8px rgba(0, 150, 136, 0.5) !important;
 }
 
+/* ===== Toggle Button Visual States ===== */
+/* Turtle Wrap button - ON state with custom blue color */
+#wrapTurtle.toggle-button-active {
+    background-color: #1b7ace !important;
+}
+
+/* Turtle Wrap button - OFF state (transparent) */
+#wrapTurtle.toggle-button-inactive {
+    background-color: transparent !important;
+}
+
+/* Hover effect for OFF state - 10% black overlay (matches toolbar buttons) */
+#wrapTurtle.toggle-button-inactive:hover {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Hover effect for ON state - darken the blue with 10% black overlay effect */
+#wrapTurtle.toggle-button-active:hover {
+    background-color: rgba(18, 95, 162, 1) !important;
+}
+
+/* Dark mode - ON state */
+.dark #wrapTurtle.toggle-button-active {
+    background-color: #011235 !important;
+}
+
+/* Dark mode - ON state hover (apply 10% black overlay effect) */
+.dark #wrapTurtle.toggle-button-active:hover {
+    background-color: rgba(0, 8, 24, 1) !important;
+}
+
+/* Dark mode - OFF state hover */
+.dark #wrapTurtle.toggle-button-inactive:hover {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
 html, body { overscroll-behavior-x: none; }

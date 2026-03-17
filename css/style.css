@@ -105,30 +105,89 @@ input[type="range"]:focus::-ms-fill-upper {
 }
 
 /* ===== Toggle Button Visual States ===== */
-/* Visual indicator for active toggle buttons (ON state) */
-.toggle-button-active {
-    opacity: 1 !important;
-    background-color: rgba(0, 150, 136, 0.2) !important;
-    border: 2px solid rgba(0, 150, 136, 0.6) !important;
-    border-radius: 4px;
-    box-shadow: 0 0 8px rgba(0, 150, 136, 0.3) inset;
-    transition: all 0.3s ease;
+/* Turtle Wrap button - ON state with custom blue color */
+#wrapTurtle.toggle-button-active {
+    background-color: #1b7ace !important;
 }
 
-/* Visual indicator for inactive toggle buttons (OFF state) */
-.toggle-button-inactive {
-    opacity: 0.6;
+/* Turtle Wrap button - OFF state (transparent) */
+#wrapTurtle.toggle-button-inactive {
     background-color: transparent !important;
-    border: 2px solid transparent !important;
+}
+
+/* Hover effect for OFF state - 10% black overlay (matches toolbar buttons) */
+#wrapTurtle.toggle-button-inactive:hover {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Hover effect for ON state - darken the blue with 10% black overlay effect */
+#wrapTurtle.toggle-button-active:hover {
+    background-color: rgba(18, 95, 162, 1) !important;
+}
+
+/* Dark mode - ON state */
+.dark #wrapTurtle.toggle-button-active {
+    background-color: #011235 !important;
+}
+
+/* Dark mode - ON state hover (apply 10% black overlay effect) */
+.dark #wrapTurtle.toggle-button-active:hover {
+    background-color: rgba(0, 8, 24, 1) !important;
+}
+
+/* Dark mode - OFF state hover */
+.dark #wrapTurtle.toggle-button-inactive:hover {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ===== Toggle Button Visual States ===== */
+/* Turtle Wrap button container styling */
+#wrapTurtle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 4px;
+    box-sizing: border-box;
     border-radius: 4px;
-    transition: all 0.3s ease;
+    transition: background-color 0.3s ease;
+}
+
+/* Visual indicator for active toggle buttons (ON state) - Custom blue color */
+#wrapTurtle.toggle-button-active {
+    background-color: #1b7ace !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Visual indicator for inactive toggle buttons (OFF state) - No styling */
+#wrapTurtle.toggle-button-inactive {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 /* Hover effect for better UX */
-.toggle-button-active:hover,
-.toggle-button-inactive:hover {
-    opacity: 1;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+#wrapTurtle:hover {
+    background-color: rgba(27, 122, 206, 0.15) !important;
+}
+
+#wrapTurtle.toggle-button-active:hover {
+    background-color: #1657a1 !important;
+}
+
+/* Dark mode support */
+.dark #wrapTurtle.toggle-button-active {
+    background-color: #011235 !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.dark #wrapTurtle:hover {
+    background-color: rgba(1, 18, 53, 0.2) !important;
+}
+
+.dark #wrapTurtle.toggle-button-active:hover {
+    background-color: #0a1c47 !important;
 }
 
 .lego-brick {
