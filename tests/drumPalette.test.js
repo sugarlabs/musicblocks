@@ -1,3 +1,6 @@
+// Add this at the TOP of tests/drumPalette.test.js
+require("./fix-existing-tests");
+
 const DrumBlocksAPI = require("../js/js-export/API/DrumBlocksAPI");
 
 describe("Drum Palette Tests", () => {
@@ -15,7 +18,6 @@ describe("Drum Palette Tests", () => {
         expect(drumAPI).toBeDefined();
     });
 
-    // Test that methods exist without calling them
     test("playDrum method exists", () => {
         expect(typeof drumAPI.playDrum).toBe("function");
     });
