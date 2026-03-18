@@ -177,8 +177,8 @@ class HelpWidget {
 
         if (!useActiveBlock) {
             // display help menu
-            docById("helpBodyDiv").style.height = "325px";
-            docById("helpBodyDiv").style.width = "345px";
+            docById("helpBodyDiv").style.height = "auto";
+            docById("helpBodyDiv").style.width = "100%";
             this._showPage(page);
         } else {
             // display help for this block
@@ -354,9 +354,9 @@ class HelpWidget {
             ].includes(HELPCONTENT[page][0])
         ) {
             // body = body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"></p>';
-            body = `<figure>&nbsp;<img src=" ${HELPCONTENT[page][2]}"></figure>`;
+            body = `<figure style="margin: 0; max-width: 100%; text-align: center;">&nbsp;<img src=" ${HELPCONTENT[page][2]}" style="max-width: 100%; height: auto;"></figure>`;
         } else {
-            body = `<figure>&nbsp;<img src=" ${HELPCONTENT[page][2]}" width="64px" height="64px"></figure>`;
+            body = `<figure style="margin: 0; max-width: 100%; text-align: center;">&nbsp;<img src=" ${HELPCONTENT[page][2]}" width="64px" height="64px"></figure>`;
         }
 
         const helpContentHTML = `<h1 class="heading">${HELPCONTENT[page][0]}</h1> 

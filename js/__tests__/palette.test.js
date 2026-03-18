@@ -67,9 +67,9 @@ global.SVG = class {
     constructor() {
         this.docks = [];
     }
-    setScale() {}
-    setExpand() {}
-    setOutie() {}
+    setScale() { }
+    setExpand() { }
+    setOutie() { }
     basicBox() {
         return "fill_color stroke_color block_label arg_label_0";
     }
@@ -138,12 +138,14 @@ describe("Palettes Class", () => {
         };
 
         global.document = {
-            createElement: jest.fn(() => ({
+            createElement: jest.fn(type => ({
+                tagName: type.toUpperCase(),
                 id: "",
                 setAttribute: jest.fn(),
                 classList: { add: jest.fn() },
                 appendChild: jest.fn(),
                 style: {},
+                dataset: {},
                 innerHTML: "",
                 childNodes: [{ style: {} }]
             })),
@@ -271,7 +273,7 @@ describe("Palettes Class", () => {
         test("creates selector buttons for each multipalette", () => {
             const spyMakeSelectorButton = jest
                 .spyOn(palettes, "_makeSelectorButton")
-                .mockImplementation(() => {});
+                .mockImplementation(() => { });
 
             palettes.init_selectors();
 
@@ -1539,12 +1541,7 @@ describe("Palettes Class", () => {
 
         test("_showMenuItems renders a basic block", () => {
             const paletteList = {
-                insertRow: jest.fn(() => ({
-                    insertCell: jest.fn(() => ({
-                        style: {},
-                        appendChild: jest.fn()
-                    }))
-                }))
+                appendChild: jest.fn()
             };
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
@@ -1568,25 +1565,12 @@ describe("Palettes Class", () => {
 
             palette._showMenuItems();
 
-            expect(paletteList.insertRow).toHaveBeenCalled();
+            expect(paletteList.appendChild).toHaveBeenCalled();
         });
 
         test("_showMenuItems handles image blocks and drag events", () => {
             const paletteList = {
-                insertRow: jest.fn(() => ({
-                    insertCell: jest.fn(() => {
-                        let capturedImg;
-                        return {
-                            style: {},
-                            appendChild: jest.fn(img => {
-                                capturedImg = img;
-                            }),
-                            get _capturedImg() {
-                                return capturedImg;
-                            }
-                        };
-                    })
-                }))
+                appendChild: jest.fn()
             };
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
@@ -1625,11 +1609,11 @@ describe("Palettes Class", () => {
 
             palette._showMenuItems();
 
-            const itemCell =
-                paletteList.insertRow.mock.results[0].value.insertCell.mock.results[0].value;
-            const img = itemCell._capturedImg;
-            img.offsetWidth = 10;
-            img.offsetHeight = 10;
+            const itemRow = paletteList.appendChild.mock.calls[0][0];
+            const itemCell = itemRow.appendChild.mock.calls[0][0];
+            const img = itemCell.appendChild.mock.calls[0][0];
+            img.width = 10;
+            img.height = 10;
             document.body.appendChild = jest.fn();
             document.body.removeChild = jest.fn();
 
@@ -1658,20 +1642,7 @@ describe("Palettes Class", () => {
 
         test("_showMenuItems handles touch drag", () => {
             const paletteList = {
-                insertRow: jest.fn(() => ({
-                    insertCell: jest.fn(() => {
-                        let capturedImg;
-                        return {
-                            style: {},
-                            appendChild: jest.fn(img => {
-                                capturedImg = img;
-                            }),
-                            get _capturedImg() {
-                                return capturedImg;
-                            }
-                        };
-                    })
-                }))
+                appendChild: jest.fn()
             };
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
@@ -1699,11 +1670,11 @@ describe("Palettes Class", () => {
 
             palette._showMenuItems();
 
-            const itemCell =
-                paletteList.insertRow.mock.results[0].value.insertCell.mock.results[0].value;
-            const img = itemCell._capturedImg;
-            img.offsetWidth = 10;
-            img.offsetHeight = 10;
+            const itemRow = paletteList.appendChild.mock.calls[0][0];
+            const itemCell = itemRow.appendChild.mock.calls[0][0];
+            const img = itemCell.appendChild.mock.calls[0][0];
+            img.width = 10;
+            img.height = 10;
             document.body.appendChild = jest.fn();
             document.body.removeChild = jest.fn();
 
@@ -1724,12 +1695,7 @@ describe("Palettes Class", () => {
 
         test("_showMenuItems hides palette when mobile", () => {
             const paletteList = {
-                insertRow: jest.fn(() => ({
-                    insertCell: jest.fn(() => ({
-                        style: {},
-                        appendChild: jest.fn()
-                    }))
-                }))
+                appendChild: jest.fn()
             };
             const palDiv = { childNodes: [{ style: {} }], removeChild: jest.fn() };
             global.docById = jest.fn(id => {
@@ -2038,8 +2004,8 @@ describe("Palettes Class", () => {
             global.document.createElement = jest.fn(() => ({}));
 
             mockActivity.beginnerMode = true;
-            jest.spyOn(palettes, "makeSearchButton").mockImplementation(() => {});
-            const makeButtonSpy = jest.spyOn(palettes, "makeButton").mockImplementation(() => {});
+            jest.spyOn(palettes, "makeSearchButton").mockImplementation(() => { });
+            const makeButtonSpy = jest.spyOn(palettes, "makeButton").mockImplementation(() => { });
             jest.spyOn(palettes, "countProtoBlocks").mockReturnValue(0);
 
             palettes.makePalettes(0);
@@ -2076,8 +2042,8 @@ describe("Palettes Class", () => {
             global.docById = jest.fn(() => palette);
             global.document.createElement = jest.fn(() => ({}));
 
-            jest.spyOn(palettes, "makeSearchButton").mockImplementation(() => {});
-            const makeButtonSpy = jest.spyOn(palettes, "makeButton").mockImplementation(() => {});
+            jest.spyOn(palettes, "makeSearchButton").mockImplementation(() => { });
+            const makeButtonSpy = jest.spyOn(palettes, "makeButton").mockImplementation(() => { });
             jest.spyOn(palettes, "countProtoBlocks").mockReturnValue(2);
 
             palettes.makePalettes(0);
@@ -2110,7 +2076,7 @@ describe("Palettes Class", () => {
         test("palette button schedules showPalette on hover", () => {
             jest.useFakeTimers();
             const row = {};
-            const showSpy = jest.spyOn(palettes, "showPalette").mockImplementation(() => {});
+            const showSpy = jest.spyOn(palettes, "showPalette").mockImplementation(() => { });
 
             palettes._loadPaletteButtonHandler("rhythm", row);
             row.onmouseover();
@@ -2125,7 +2091,7 @@ describe("Palettes Class", () => {
         test("palette button cancels timeout on mouseout", () => {
             jest.useFakeTimers();
             const row = {};
-            const showSpy = jest.spyOn(palettes, "showPalette").mockImplementation(() => {});
+            const showSpy = jest.spyOn(palettes, "showPalette").mockImplementation(() => { });
 
             palettes._loadPaletteButtonHandler("rhythm", row);
             row.onmouseover();
@@ -2291,7 +2257,7 @@ describe("Palettes Class", () => {
         });
 
         test("removes other action prototype variants", () => {
-            const updateSpy = jest.spyOn(palettes, "updatePalettes").mockImplementation(() => {});
+            const updateSpy = jest.spyOn(palettes, "updatePalettes").mockImplementation(() => { });
 
             palettes.dict = {
                 action: {

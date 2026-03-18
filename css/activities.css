@@ -145,14 +145,14 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 }
 
 .cancel-button {
-  border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  background-color: #e0e0e0;
-  color: black;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    background-color: #e0e0e0;
+    color: black;
 }
 
 .cancel-button:hover {
@@ -459,7 +459,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     display: block;
 }
 
-#popdown-palette.show ~ .canvasHolder {
+#popdown-palette.show~.canvasHolder {
     filter: blur(10px);
     -webkit-filter: blur(10px);
 }
@@ -1127,6 +1127,7 @@ table {
 }
 
 @media (max-width: 600px) {
+
     #right-arrow,
     #left-arrow {
         height: 30px;
@@ -1136,6 +1137,7 @@ table {
 }
 
 @media (max-width: 450px) {
+
     #right-arrow,
     #left-arrow {
         height: 25px;
@@ -1145,6 +1147,7 @@ table {
 }
 
 @media (max-width: 320px) {
+
     #right-arrow,
     #left-arrow {
         height: 20px;
@@ -1283,13 +1286,13 @@ table {
 
 @media (max-width: 450px) {
     #helpBodyDiv {
-        width: 240px;
+        width: 240px !important;
     }
 }
 
 @media (max-width: 320px) {
     #helpBodyDiv {
-        width: 200px;
+        width: 200px !important;
     }
 }
 
@@ -1862,7 +1865,7 @@ input.timbreName {
     z-index: 10000;
 }
 
-.wheelNav > svg {
+.wheelNav>svg {
     width: 100%;
     height: 100%;
 }
@@ -1877,7 +1880,7 @@ input.timbreName {
     position: fixed;
 }
 
-#chooseKeyDiv > svg {
+#chooseKeyDiv>svg {
     width: 100%;
     height: 100%;
     transition: width 2s linear 1s;
@@ -2015,6 +2018,7 @@ table {
 }
 
 @media (max-width: 390px) {
+
     #right-arrow,
     #left-arrow {
         position: relative;
@@ -2183,25 +2187,25 @@ table {
    FIX: Center the Welcome Modal on Mobile
    ====================================================== */
 @media screen and (max-width: 600px) {
-  #helpDiv {
-    /* 1. Fit the screen width */
-    width: 90% !important;
+    #helpDiv {
+        /* 1. Fit the screen width */
+        width: 90% !important;
 
-    /* 2. Center Horizontally */
-    left: 50% !important;
-    transform: translateX(-50%);
-    /* Moves it back by half its width to center it */
+        /* 2. Center Horizontally */
+        left: 50% !important;
+        transform: translateX(-50%);
+        /* Moves it back by half its width to center it */
 
-    /* 3. Reset Top position if needed */
-    top: 15% !important;
-  }
+        /* 3. Reset Top position if needed */
+        top: 15% !important;
+    }
 
-  /* Fix the inner text box width so it doesn't overflow */
-  #helpBodyDiv {
-    width: calc(100% - 110px) !important;
-    margin: 0 auto !important;
-    left: 0 !important;
-    padding: 0 10px;
-    box-sizing: border-box;
-  }
+    /* Fix the inner text box width so it doesn't overflow */
+    #helpBodyDiv {
+        width: calc(100% - 110px) !important;
+        margin: 0 auto !important;
+        left: 0 !important;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
 }
