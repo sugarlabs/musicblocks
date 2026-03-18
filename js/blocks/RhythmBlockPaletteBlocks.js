@@ -552,7 +552,6 @@ function setupRhythmBlockPaletteBlocks(activity) {
             const listenerName = "_tuplet_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 if (logo.inMatrix) {
                     logo.tuplet = false;
@@ -701,7 +700,6 @@ function setupRhythmBlockPaletteBlocks(activity) {
             const listenerName = "_tuplet_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 const tur = activity.turtles.ithTurtle(turtle);
 
