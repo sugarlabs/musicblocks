@@ -20,6 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* global NOACTIONERRORMSG, NOINPUTERRORMSG */
 const { setupActionBlocks } = jest.requireActual("../ActionBlocks");
 
 global._ = s => s;
