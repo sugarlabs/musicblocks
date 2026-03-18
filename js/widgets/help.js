@@ -12,7 +12,7 @@
 
 /* global
 
-   _, docById, getMacroExpansion, HELPCONTENT,
+   docById, getMacroExpansion, HELPCONTENT,
 */
 /*
      Globals locations
