@@ -414,7 +414,7 @@ Music Blocks has handy widgets for various musical concepts to create musical co
 | Morse-code-rhythms.html | Generate Morse code rhythms by typing in letters that generate rhythmic patterns |
 | typing-game.html | Catch the falling alphabets/letters before they reach ground by inputting them correctly |
 | abacus-prototype.html | Working abacus example... remix to enrich this example. |
-
+| HyperScore-Tonal.html | Create music by painting patterns on the canvas |
 
 # Utilities
 

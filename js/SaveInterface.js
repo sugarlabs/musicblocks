@@ -156,6 +156,7 @@ class SaveInterface {
 
     /**
      * Download a file to the user's computer.
+     * Uses MBDialog prompt when available to collect a filename with a modal UI.
      * @param {string} extension - The file extension (including the dot).
      * @param {string} dataurl - The base64 data url of the file.
      * @param {string} defaultfilename - The default filename to be used.
@@ -163,6 +164,19 @@ class SaveInterface {
      */
     download(extension, dataurl, defaultfilename) {
         let filename = null;
+        const finishDownload = name => {
+            if (name === null) {
+                // eslint-disable-next-line no-console
+                console.debug("save cancelled");
+                return;
+            }
+
+            if (fileExt(name) !== extension) {
+                name += "." + extension;
+            }
+
+            this.downloadURL(name, dataurl);
+        };
         if (defaultfilename === undefined || defaultfilename === null) {
             if (this.activity.PlanetInterface === undefined) {
                 defaultfilename = STR_MY_PROJECT;
@@ -176,8 +190,17 @@ class SaveInterface {
 
             if (window.isElectron === true) {
                 filename = defaultfilename;
+            } else if (window.MBDialog && typeof window.MBDialog.prompt === "function") {
+                window.MBDialog.prompt({
+                    title: _("Save file"),
+                    message: _("Filename:"),
+                    defaultValue: defaultfilename,
+                    okText: _("Save"),
+                    cancelText: _("Cancel")
+                }).then(result => finishDownload(result));
+                return;
             } else {
-                filename = prompt("Filename:", defaultfilename);
+                filename = prompt(_("Filename:"), defaultfilename);
             }
         } else {
             if (fileExt(defaultfilename) !== extension) {
@@ -188,17 +211,7 @@ class SaveInterface {
 
         // eslint-disable-next-line no-console
         console.debug("saving to " + filename);
-        if (filename === null) {
-            // eslint-disable-next-line no-console
-            console.debug("save cancelled");
-            return;
-        }
-
-        if (fileExt(filename) !== extension) {
-            filename += "." + extension;
-        }
-
-        this.downloadURL(filename, dataurl);
+        finishDownload(filename);
     }
 
     /**
