@@ -40,12 +40,11 @@ export default [
                 ...globals.node,
                 ...globals.jest,
                 ...globals.jquery,
-                // Add specific Music Blocks globals if needed
                 Logo: "readonly",
                 Blocks: "readonly",
                 Turtles: "readonly",
                 Activity: "readonly",
-                _: "readonly" // i18n
+                _: "readonly"
             }
         },
         rules: {
@@ -66,6 +65,12 @@ export default [
             "no-dupe-keys": "off",
             "no-useless-catch": "off",
             "no-loss-of-precision": "off"
+        }
+    },
+    {
+        files: ["**/*.mjs"],
+        languageOptions: {
+            sourceType: "module"
         }
     }
 ];
