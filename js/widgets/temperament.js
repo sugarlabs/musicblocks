@@ -889,8 +889,11 @@ function TemperamentWidget() {
         divAppend.addEventListener("click", function (event) {
             try {
                 that.performEqualEdit(event);
-            } catch {
-                activity.errorMsg(_("The Number of divisions is too large."), 3000);
+            } catch (error) {
+                activity.errorMsg(
+                    error.message,
+                    3000
+                );
             }
         });
 
@@ -898,8 +901,18 @@ function TemperamentWidget() {
             pitchNumber1 = Number(docById("octaveIn").value);
             pitchNumber2 = Number(docById("octaveOut").value);
             divisions = Number(docById("divisions").value);
+
+            // Validate input to prevent UI performance issues
+            // Limit to 200 divisions to prevent excessive DOM elements and slow rendering
+            if (isNaN(divisions) || divisions < 1 || divisions > 200) {
+                throw new Error("Invalid number of divisions: must be between 1 and 200");
+            }
+
             this.tempRatios = this.ratios.slice();
             if (pitchNumber1 === pitchNumber2) {
+                // Generate equal temperament dynamically
+                const customTemperament = generateEqualTemperament(divisions);
+
                 for (let i = 0; i < divisions; i++) {
                     ratio[i] = Math.pow(this.powerBase, i / divisions);
                     ratio1[i] = ratio[i].toFixed(2);
@@ -1590,6 +1603,7 @@ function TemperamentWidget() {
         const intervals = [];
         let selectedTemperament;
 
+        // First check if this matches a predefined temperament
         const keys = getTemperamentKeys();
         for (let i = 0; i < keys.length; i++) {
             const temperament = keys[i];
@@ -1616,6 +1630,39 @@ function TemperamentWidget() {
             }
         }
 
+        // Check if this matches a custom equal temperament
+        if (selectedTemperament === undefined && this.typeOfEdit === "equal") {
+            const divisions = this.divisions;
+            if (divisions && divisions > 0) {
+                try {
+                    const customTemperament = generateEqualTemperament(divisions);
+                    const customRatios = [];
+                    for (let j = 0; j < divisions; j++) {
+                        if (customTemperament.interval[j]) {
+                            intervals[j] = customTemperament.interval[j];
+                            customRatios[j] = customTemperament[customTemperament.interval[j]];
+                            customRatios[j] = customRatios[j].toFixed(2);
+                        }
+                    }
+
+                    const ratiosEqual =
+                        ratios.length == customRatios.length &&
+                        ratios.every(function (element, index) {
+                            return element === customRatios[index];
+                        });
+
+                    if (ratiosEqual) {
+                        selectedTemperament = `equal-${divisions}`;
+                        this.inTemperament = `equal-${divisions}`;
+                        temperamentCell.innerHTML = this.inTemperament;
+                    }
+                } catch (error) {
+                    // Ignore errors in temperament generation
+                }
+            }
+        }
+
+        // If still no match, mark as custom
         if (selectedTemperament === undefined) {
             this.inTemperament = "custom";
             temperamentCell.innerHTML = this.inTemperament;
