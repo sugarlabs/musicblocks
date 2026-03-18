@@ -19,8 +19,15 @@
    VIDEOVALUE, last, getIntervalDirection, getIntervalNumber,
    mixedNumber, rationalToFraction, doStopVideoCam, StatusMatrix,
    getStatsFromNotation, delayExecution, DEFAULTVOICE, define,
-   DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY, OSCVOLUMEADJUSTMENT,
-   TONEBPM, TARGETBPM, TURTLESTEP, NOTEDIV, MIN_HIGHLIGHT_DURATION_MS,
+   performanceTracker, window
+ */
+
+/*
+   exported
+
+   Queue, Logo, LogoDependencies, DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY,
+   OSCVOLUMEADJUSTMENT, TONEBPM, TARGETBPM, TURTLESTEP, NOTEDIV,
+   MIN_HIGHLIGHT_DURATION_MS,
    NOMICERRORMSG, NANERRORMSG, NOSTRINGERRORMSG, NOBOXERRORMSG,
    NOACTIONERRORMSG, NOINPUTERRORMSG, NOSQRTERRORMSG,
    ZERODIVIDEERRORMSG, EMPTYHEAPERRORMSG, INVALIDPITCH, POSNUMBER,
@@ -1117,6 +1124,18 @@ class Logo {
      * @returns {void}
      */
     runLogoCommands(startHere, env) {
+        // Performance instrumentation: enable/disable based on URL flag
+        if (typeof performanceTracker !== "undefined") {
+            if (
+                typeof window !== "undefined" &&
+                window.location.search.includes("performance=true")
+            ) {
+                performanceTracker.enable();
+            } else {
+                performanceTracker.disable();
+            }
+        }
+
         this._prematureRestart = this._alreadyRunning;
         if (this._alreadyRunning && this._runningBlock !== null) {
             this._ignoringBlock = this._runningBlock;
@@ -1311,6 +1330,11 @@ class Logo {
             this.activity.turtles.getTurtle(turtle).running = false;
         }
 
+        // Performance instrumentation: begin tracking
+        if (typeof performanceTracker !== "undefined") {
+            performanceTracker.startRun();
+        }
+
         /*
         ===========================================================================
         (2) Execute the stack. (A bit complicated due to lots of corner cases.)
@@ -1451,6 +1475,10 @@ class Logo {
      * @returns {void}
      */
     runFromBlockNow(logo, turtle, blk, isflow, receivedArg, queueStart) {
+        if (typeof performanceTracker !== "undefined") {
+            performanceTracker.enterBlock();
+        }
+
         this._alreadyRunning = true;
 
         this.receivedArg = receivedArg;
@@ -1604,7 +1632,6 @@ class Logo {
             let res = null;
             // Is it a plugin?
             if (logo.blockList[blk].name in logo.evalFlowDict) {
-                console.log("running eval on " + logo.blockList[blk].name);
                 logo.pluginReturnValue = null;
                 eval(logo.evalFlowDict[logo.blockList[blk].name]);
                 // Clamp blocks will return the child flow.
@@ -1625,7 +1652,12 @@ class Logo {
                 const [cf, cfc, ret] = res;
                 if (cf !== undefined) childFlow = cf;
                 if (cfc !== undefined) childFlowCount = cfc;
-                if (ret) return ret;
+                if (ret) {
+                    if (typeof performanceTracker !== "undefined") {
+                        performanceTracker.exitBlock();
+                    }
+                    return ret;
+                }
             }
         } else {
             if (
@@ -1892,6 +1924,12 @@ class Logo {
                     queueStart === 0 &&
                     tur.singer.justCounting.length === 0
                 ) {
+                    // Performance instrumentation: end tracking and log stats
+                    if (typeof performanceTracker !== "undefined") {
+                        performanceTracker.endRun();
+                        performanceTracker.logStats();
+                    }
+
                     if (logo.runningLilypond) {
                         if (logo.collectingStats) {
                             // console.debug("stats collection completed");
@@ -1965,6 +2003,10 @@ class Logo {
             };
 
             setTimeout(__checkCompletionState, 100);
+        }
+
+        if (typeof performanceTracker !== "undefined") {
+            performanceTracker.exitBlock();
         }
     }
 
