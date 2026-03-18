@@ -18,6 +18,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* global MULTIPALETTES, platformColor, docById, TEXTWIDTH */
+
 const { Palettes, initPalettes } = require("../palette");
 
 global.LEADING = 10;
@@ -100,7 +102,10 @@ describe("Palettes Class", () => {
             style: { visibility: "visible", top: "100px" },
             setAttribute: jest.fn(),
             addEventListener: jest.fn(),
+<<<<<<< HEAD
             focus: jest.fn(),
+=======
+>>>>>>> 0bd7931f4 (Fix _showMenuItems tests: use appendChild mock instead of insertRow)
             children: [
                 {
                     children: [
@@ -360,6 +365,7 @@ describe("Palettes Class", () => {
                     insertCell: jest.fn(),
                     dataset: {},
                     style: {},
+                    dataset: {},
                     addEventListener: jest.fn((event, handler) => {
                         handlers[event] = handler;
                     })
