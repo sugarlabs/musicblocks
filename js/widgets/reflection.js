@@ -271,13 +271,16 @@ class ReflectionMatrix {
 
         this.triggerFirst = true;
         setTimeout(() => {
-            this.showTypingIndicator("Reading code");
+            if (this.isOpen) {
+                this.showTypingIndicator("Reading code");
+            }
         }, 1000);
 
         const code = await this.activity.prepareExport();
         const data = await this.generateAlgorithm(code);
 
         this.hideTypingIndicator();
+        if (!this.isOpen) return;
 
         if (data && !data.error) {
             this.inputContainer.style.display = "flex";
@@ -294,6 +297,7 @@ class ReflectionMatrix {
      * @returns {Promise<void>}
      */
     async updateProjectCode() {
+        if (this.typingDiv) return;
         const code = await this.activity.prepareExport();
         if (code === this.code) {
             return; // No changes in code
@@ -302,6 +306,7 @@ class ReflectionMatrix {
         this.showTypingIndicator("Reading code");
         const data = await this.generateNewAlgorithm(code);
         this.hideTypingIndicator();
+        if (!this.isOpen) return;
 
         if (data && !data.error) {
             if (data.algorithm !== "unchanged") {
@@ -398,9 +403,11 @@ class ReflectionMatrix {
      */
     async getAnalysis() {
         if (this.chatHistory.length < 10) return;
+        if (this.typingDiv) return;
         this.showTypingIndicator("Analyzing");
         const data = await this.generateAnalysis();
         this.hideTypingIndicator();
+        if (!this.isOpen) return;
         if (data) {
             this.botReplyDiv(data, false, true);
         }
@@ -454,6 +461,8 @@ class ReflectionMatrix {
             this.activity.errorMsg(_("Failed to send message"), 3000);
             return;
         }
+
+        if (!this.isOpen) return;
 
         this.chatHistory.push({
             role: this.AImentor,

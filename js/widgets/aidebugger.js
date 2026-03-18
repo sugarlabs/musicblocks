@@ -107,6 +107,8 @@ function AIDebuggerWidget() {
 
     this.conversationId = this._generateConversationId();
 
+    this.isOpen = false;
+
     /**
      * Initializes the Debugger Widget.
      * @param {object} activity
@@ -115,6 +117,7 @@ function AIDebuggerWidget() {
     this.init = function (activity) {
         this.activity = activity;
         this.activity.isInputON = true;
+        this.isOpen = true;
 
         if (!this.conversationId) {
             this.conversationId = this._generateConversationId();
@@ -129,6 +132,7 @@ function AIDebuggerWidget() {
         widgetWindow.getWidgetBody().style.height = CHATHEIGHT + "px";
 
         widgetWindow.onclose = () => {
+            this.isOpen = false;
             widgetWindow.destroy();
             this.activity.isInputON = false;
         };
@@ -391,6 +395,7 @@ function AIDebuggerWidget() {
             .then(data => {
                 this._hideTypingIndicator();
                 this._isProcessing = false;
+                if (!this.isOpen) return;
 
                 if (data && data.response) {
                     const botResponse = {
@@ -410,6 +415,8 @@ function AIDebuggerWidget() {
             .catch(error => {
                 this._hideTypingIndicator();
                 this._isProcessing = false;
+                if (!this.isOpen) return;
+
                 console.error("Backend connection error:", error.message);
 
                 this.activity.textMsg(_("Server error: Unable to connect to AI backend."));
@@ -566,6 +573,7 @@ function AIDebuggerWidget() {
             })
             .then(data => {
                 this._hideTypingIndicator();
+                if (!this.isOpen) return;
 
                 if (data.response) {
                     // Add the backend's initial response
@@ -586,6 +594,8 @@ function AIDebuggerWidget() {
             })
             .catch(error => {
                 this._hideTypingIndicator();
+                if (!this.isOpen) return;
+
                 console.error("Backend initialization error:", error.message);
                 this.activity.textMsg(_("Server error: Failed to initialize AI debugger."));
 

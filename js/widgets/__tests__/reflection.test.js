@@ -1,3 +1,4 @@
+/* global ReflectionMatrix */
 /**
  * MusicBlocks
  *
@@ -293,6 +294,7 @@ describe("ReflectionMatrix", () => {
         beforeEach(() => {
             reflection = new ReflectionMatrix();
             reflection.activity = mockActivity;
+            reflection.isOpen = true;
             reflection.inputContainer = document.createElement("div");
             reflection.chatLog = document.createElement("div");
             reflection.input = document.createElement("input");
