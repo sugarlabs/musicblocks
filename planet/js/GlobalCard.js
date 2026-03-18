@@ -17,7 +17,7 @@
 /*
    exported
 
-   GlobalCard, copyURLToClipboard
+   GlobalCard
 */
 
 class GlobalCard {
@@ -26,6 +26,7 @@ class GlobalCard {
         this.ProjectData = null;
         this.id = null;
         this.likeTimeout = null;
+        this.clipboard = null;
         this.PlaceholderMBImage = "images/mbgraphic.png";
         this.PlaceholderTBImage = "images/tbgraphic.png";
 
@@ -67,7 +68,7 @@ class GlobalCard {
                                     <div class="card-content shareurltext"> 
                                             <div class="shareurltitle">${_("Share")}</div> 
                                             <input type="text" name="shareurl" class="shareurlinput" data-originalurl="https://musicblocks.sugarlabs.org/index.html?id={ID}"> 
-                                            <a class="copyshareurl tooltipped" onclick="copyURLToClipboard()" data-clipboard-text="https://musicblocks.sugarlabs.org/index.html?id={ID}&run=True" data-delay="50" data-tooltip="${_(
+                                            <a class="copyshareurl tooltipped" data-clipboard-text="https://musicblocks.sugarlabs.org/index.html?id={ID}&run=True" data-delay="50" data-tooltip="${_(
                                                 "Copy link to clipboard"
                                             )}"><i class="material-icons"alt="Copy!">file_copy</i></a>
                                             <div class="shareurl-advanced" id="global-advanced-{ID}"> 
@@ -207,6 +208,48 @@ class GlobalCard {
 
         document.getElementById("global-projects").appendChild(frag);
         updateCheckboxes(`global-sharebox-${this.id}`);
+
+        // Prevent accidental re-render leaks
+        if (this.clipboard) {
+            this.clipboard.destroy();
+        }
+
+        // Initialize ClipboardJS for this card
+        this.clipboard = new ClipboardJS(`.copyshareurl[data-clipboard-text*="${this.id}"]`);
+
+        this.clipboard.on("success", e => {
+            // eslint-disable-next-line no-console
+            console.info("Copied:", e.text);
+            e.clearSelection();
+        });
+
+        this.clipboard.on("error", e => {
+            alert("Failed to copy!");
+            // eslint-disable-next-line no-console
+            console.error("Failed to copy:", e.action);
+        });
+    }
+
+    /**
+     * Ensures all per-card resources (ClipboardJS, timeouts, etc.) are released
+     * when the card is removed. Prevents memory leaks during pagination and search.
+     */
+    cleanup() {
+        // Clear any pending like timeouts safely
+        if (this.likeTimeout) {
+            clearTimeout(this.likeTimeout);
+            this.likeTimeout = null;
+        }
+
+        // Destroy ClipboardJS instance safely to prevent memory leaks
+        if (this.clipboard) {
+            this.clipboard.destroy();
+            this.clipboard = null;
+        }
+
+        // Break references for GC
+        this.ProjectData = null;
+        this.Planet = null;
     }
 
     like() {
@@ -246,20 +289,4 @@ class GlobalCard {
         this.id = id;
         this.ProjectData = this.Planet.GlobalPlanet.cache[id];
     }
-}
-
-function copyURLToClipboard() {
-    const clipboard = new ClipboardJS(".copyshareurl");
-
-    clipboard.on("success", e => {
-        // eslint-disable-next-line no-console
-        console.info("Copied:", e.text);
-        e.clearSelection();
-    });
-
-    clipboard.on("error", e => {
-        alert("Failed to copy!");
-        // eslint-disable-next-line no-console
-        console.error("Failed to copy:", e.action);
-    });
 }
