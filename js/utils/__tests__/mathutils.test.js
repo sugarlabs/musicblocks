@@ -198,6 +198,76 @@ describe("MathUtility", () => {
         });
     });
 
+    describe("doSin", () => {
+        test("calculates sine of 0 degrees", () => {
+            expect(MathUtility.doSin(0)).toBeCloseTo(0, 10);
+        });
+
+        test("calculates sine of 90 degrees", () => {
+            expect(MathUtility.doSin(90)).toBeCloseTo(1, 10);
+        });
+
+        test("calculates sine of 180 degrees", () => {
+            expect(MathUtility.doSin(180)).toBeCloseTo(0, 10);
+        });
+
+        test("calculates sine of 30 degrees", () => {
+            expect(MathUtility.doSin(30)).toBeCloseTo(0.5, 10);
+        });
+
+        test("throws NanError for string input", () => {
+            expect(() => MathUtility.doSin("90")).toThrow("NanError");
+        });
+    });
+
+    describe("doCos", () => {
+        test("calculates cosine of 0 degrees", () => {
+            expect(MathUtility.doCos(0)).toBeCloseTo(1, 10);
+        });
+
+        test("calculates cosine of 90 degrees", () => {
+            expect(MathUtility.doCos(90)).toBeCloseTo(0, 10);
+        });
+
+        test("calculates cosine of 180 degrees", () => {
+            expect(MathUtility.doCos(180)).toBeCloseTo(-1, 10);
+        });
+
+        test("calculates cosine of 60 degrees", () => {
+            expect(MathUtility.doCos(60)).toBeCloseTo(0.5, 10);
+        });
+
+        test("throws NanError for string input", () => {
+            expect(() => MathUtility.doCos("0")).toThrow("NanError");
+        });
+    });
+
+    describe("doLog", () => {
+        test("calculates natural log of e", () => {
+            expect(MathUtility.doLog(Math.E)).toBeCloseTo(1, 10);
+        });
+
+        test("calculates natural log of 1", () => {
+            expect(MathUtility.doLog(1)).toBeCloseTo(0, 10);
+        });
+
+        test("calculates natural log of 10", () => {
+            expect(MathUtility.doLog(10)).toBeCloseTo(2.302585, 5);
+        });
+
+        test("throws NanError for zero", () => {
+            expect(() => MathUtility.doLog(0)).toThrow("NanError");
+        });
+
+        test("throws NanError for negative input", () => {
+            expect(() => MathUtility.doLog(-1)).toThrow("NanError");
+        });
+
+        test("throws NanError for string input", () => {
+            expect(() => MathUtility.doLog("10")).toThrow("NanError");
+        });
+    });
+
     describe("doPlus", () => {
         test("adds two numbers", () => {
             expect(MathUtility.doPlus(2, 3)).toBe(5);
