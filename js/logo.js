@@ -14,11 +14,12 @@
 /*
    global
 
-   _, Notation, Synth, instruments, instrumentsFilters,
+   Notation, Synth, instruments, instrumentsFilters,
    instrumentsEffects, Singer, Tone, CAMERAVALUE, doUseCamera,
    VIDEOVALUE, last, getIntervalDirection, getIntervalNumber,
    mixedNumber, rationalToFraction, doStopVideoCam, StatusMatrix,
-   getStatsFromNotation, delayExecution, DEFAULTVOICE, performanceTracker, window
+   getStatsFromNotation, delayExecution, DEFAULTVOICE, define,
+   performanceTracker, window
  */
 
 /*
@@ -33,6 +34,12 @@
    NOTATIONNOTE, NOTATIONDURATION, NOTATIONDOTCOUNT,
    NOTATIONTUPLETVALUE, NOTATIONROUNDDOWN, NOTATIONINSIDECHORD,
    NOTATIONSTACCATO
+ */
+
+/*
+   exported
+
+   Queue, Logo, LogoDependencies
  */
 
 // Constants moved to js/logoconstants.js to resolve circular dependency
@@ -57,6 +64,7 @@ class Queue {
     }
 }
 
+// eslint-disable-next-line no-redeclare
 class Logo {
     /**
      * @constructor
@@ -789,7 +797,6 @@ class Logo {
                         // Debug logging removed to avoid console noise in production
                         eval(logo.evalArgDict[logo.blockList[blk].name]);
                     } else {
-                        // eslint-disable-next-line no-console
                         console.error("I do not know how to " + logo.blockList[blk].name);
                     }
                     break;
@@ -1827,12 +1834,18 @@ class Logo {
 
             // We don't update parameter blocks when running full speed.
             if (logo.turtleDelay !== 0) {
+                let updatedParameterBlocks = false;
                 for (const pblk in tur.parameterQueue) {
                     logo.activity.blocks.updateParameterBlock(
                         logo,
                         turtle,
                         tur.parameterQueue[pblk]
                     );
+                    updatedParameterBlocks = true;
+                }
+
+                if (updatedParameterBlocks) {
+                    logo.activity.refreshCanvas();
                 }
             }
 
