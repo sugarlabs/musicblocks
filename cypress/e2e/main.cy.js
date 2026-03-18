@@ -1,3 +1,4 @@
+/* global cy, Cypress, before */
 Cypress.on("uncaught:exception", err => {
     const ignored = [
         "ResizeObserver loop limit exceeded",
