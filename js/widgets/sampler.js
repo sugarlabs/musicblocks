@@ -2325,7 +2325,6 @@ function SampleWidget() {
                 instruments[0][instrumentName].playbackRate.value = playbackRate;
             } else {
                 // If the instrument doesn't exist yet, we'll apply the adjustment when playing
-                console.log("Instrument not found, will apply cent adjustment during playback");
             }
         }
 
