@@ -6,6 +6,7 @@ import prettierConfig from "eslint-config-prettier";
 export default [
     js.configs.recommended,
     prettierConfig,
+
     {
         ignores: [
             "**/node_modules/**",
@@ -23,6 +24,7 @@ export default [
             reportUnusedDisableDirectives: "off"
         }
     },
+
     {
         files: ["**/*.js", "**/*.mjs"],
         languageOptions: {
@@ -47,6 +49,7 @@ export default [
                 _: "readonly"
             }
         },
+
         rules: {
             "no-console": "off",
             "no-unused-vars": "off",
