@@ -962,8 +962,9 @@ class PaletteModel {
 
     update() {
         this.blocks = [];
-        for (const blk in this.palette.protoList) {
-            const block = this.palette.protoList[blk];
+        for (let i = 0; i < this.palette.protoList.length; i++) {
+            const block = this.palette.protoList[i];
+            const blk = String(i);
             // Don't show hidden blocks on the menus
             // But we still make them.
             // if (block.hidden) {
@@ -1403,8 +1404,9 @@ class Palette {
         blocks.reverse();
         const protoListScope = [...this.protoList];
         if (last(blocks).blkname != last(protoListScope).name) protoListScope.reverse();
-        for (const blk in blocks) {
-            const b = blocks[blk];
+        for (let i = 0; i < blocks.length; i++) {
+            const b = blocks[i];
+            const blk = String(i);
 
             if (b.hidden) {
                 continue;

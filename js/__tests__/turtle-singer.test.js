@@ -20,6 +20,8 @@
 global.DEFAULTVOLUME = 100;
 global.TARGETBPM = 120;
 global.TONEBPM = 60;
+global.DEFAULTVOICE = "sine";
+global.MIN_HIGHLIGHT_DURATION_MS = 200;
 
 const Singer = require("../turtle-singer");
 
@@ -28,7 +30,10 @@ const mockGlobals = {
     isCustomTemperament: jest.fn(),
     getStepSizeUp: jest.fn().mockReturnValue(1),
     numberToPitch: jest.fn().mockReturnValue(["C", 4]),
-    pitchToNumber: jest.fn().mockReturnValue(60)
+    pitchToNumber: jest.fn().mockReturnValue(60),
+    getTemperament: jest.fn().mockReturnValue({ pitchNumber: 12 }),
+    getOctaveRatio: jest.fn().mockReturnValue(2),
+    rationalToFraction: jest.fn().mockReturnValue([1, 1])
 };
 
 global.getNote = mockGlobals.getNote;
@@ -36,6 +41,9 @@ global.isCustomTemperament = mockGlobals.isCustomTemperament;
 global.getStepSizeUp = mockGlobals.getStepSizeUp;
 global.numberToPitch = mockGlobals.numberToPitch;
 global.pitchToNumber = mockGlobals.pitchToNumber;
+global.getTemperament = mockGlobals.getTemperament;
+global.getOctaveRatio = mockGlobals.getOctaveRatio;
+global.rationalToFraction = mockGlobals.rationalToFraction;
 global.last = jest.fn(array => array[array.length - 1]);
 
 global.SEMITONES = 12;
@@ -52,7 +60,9 @@ const createTurtleMock = () => ({
     notePitches: { 0: [] },
     noteOctaves: { 0: [] },
     noteCents: { 0: [] },
-    noteHertz: { 0: [] }
+    noteHertz: { 0: [] },
+    doWait: jest.fn(),
+    blink: jest.fn()
 });
 
 const createActivityMock = turtleMock => ({
@@ -71,7 +81,13 @@ const createActivityMock = turtleMock => ({
         synth: {
             setMasterVolume: jest.fn(),
             setVolume: jest.fn(),
-            rampTo: jest.fn()
+            rampTo: jest.fn(),
+            getFrequency: jest.fn().mockReturnValue([440]),
+            getCustomFrequency: jest.fn().mockReturnValue([440]),
+            startingPitch: "A4",
+            inTemperament: false,
+            trigger: jest.fn(),
+            start: jest.fn()
         },
         pitchDrumMatrix: { addRowBlock: jest.fn() },
         notation: { notationInsertTie: jest.fn(), notationRemoveTie: jest.fn() },
@@ -79,7 +95,8 @@ const createActivityMock = turtleMock => ({
         stopTurtle: false,
         inPitchDrumMatrix: false,
         inMatrix: false,
-        clearNoteParams: jest.fn()
+        clearNoteParams: jest.fn(),
+        dispatchTurtleSignals: jest.fn()
     }
 });
 
@@ -914,7 +931,17 @@ describe("processNote regression behavior", () => {
         activityMock.stage = {
             update: jest.fn()
         };
+        activityMock.blocks = {
+            visible: true,
+            blockList: { "mockBlk": {} },
+            unhighlight: jest.fn()
+        };
         singer = turtleMock.singer;
+        jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
     });
 
     test("should not modify bpm stack during execution", () => {
@@ -932,14 +959,36 @@ describe("processNote regression behavior", () => {
     });
 
     test("should trigger stage update after processing note", () => {
+        singer.inNoteBlock = ["mockBlk"];
+        singer.notePitches = { "mockBlk": ["C"] };
+        singer.noteOctaves = { "mockBlk": [4] };
+        singer.noteCents = { "mockBlk": [0] };
+        singer.noteHertz = { "mockBlk": [0] };
+        singer.noteBeatValues = { "mockBlk": [1] };
+        singer.noteDrums = { "mockBlk": [] };
+        singer.embeddedGraphics = { "mockBlk": [] };
+        singer.oscList = { "mockBlk": [] };
+
         const callback = jest.fn();
         Singer.processNote(activityMock, 4, false, "mockBlk", 0, callback);
+        jest.runAllTimers();
         expect(activityMock.stage.update).toHaveBeenCalledTimes(1);
     });
 
     test("should use default BPM when bpm stack is empty", () => {
+        singer.inNoteBlock = ["mockBlk"];
+        singer.notePitches = { "mockBlk": ["C"] };
+        singer.noteOctaves = { "mockBlk": [4] };
+        singer.noteCents = { "mockBlk": [0] };
+        singer.noteHertz = { "mockBlk": [0] };
+        singer.noteBeatValues = { "mockBlk": [1] };
+        singer.noteDrums = { "mockBlk": [] };
+        singer.embeddedGraphics = { "mockBlk": [] };
+        singer.oscList = { "mockBlk": [] };
+
         singer.bpm = [];
         Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+        jest.runAllTimers();
         expect(activityMock.stage.update).toHaveBeenCalledTimes(1);
     });
 });
