@@ -976,7 +976,7 @@ describe("setupNumberBlocks", () => {
         });
 
         it("SqrtBlock should push to statusFields when inStatusMatrix", () => {
-            activity.blocks.blockList[410] = { connections: [411, "c1"] };
+            activity.blocks.blockList[410] = { connections: [411, "c1"], name: "sqrt" };
             activity.blocks.blockList[411] = { name: "print" };
             logo.inStatusMatrix = true;
             logo.statusFields = [];
@@ -985,7 +985,7 @@ describe("setupNumberBlocks", () => {
         });
 
         it("AbsBlock should push to statusFields when inStatusMatrix", () => {
-            activity.blocks.blockList[420] = { connections: [421, "c1"] };
+            activity.blocks.blockList[420] = { connections: [421, "c1"], name: "abs" };
             activity.blocks.blockList[421] = { name: "print" };
             logo.inStatusMatrix = true;
             logo.statusFields = [];

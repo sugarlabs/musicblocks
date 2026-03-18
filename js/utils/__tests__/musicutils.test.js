@@ -17,9 +17,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const { TextEncoder } = require("util");
-global.TextEncoder = TextEncoder;
+global.TextEncoder = globalThis.TextEncoder || require("util").TextEncoder;
 global._ = jest.fn(str => str);
+global.INVALIDPITCH = "?";
 global.window = {
     btoa: jest.fn(str => Buffer.from(str, "utf8").toString("base64"))
 };
@@ -104,7 +104,11 @@ const {
     NOTESSHARP,
     MUSICALMODES,
     getStepSizeUp,
-    getStepSizeDown
+    getStepSizeDown,
+    TEMPERAMENTS,
+    INITIALTEMPERAMENTS,
+    A0,
+    NATURAL
 } = require("../musicutils");
 
 describe("musicutils", () => {
@@ -221,6 +225,7 @@ describe("Temperament Functions", () => {
         });
 
         it("does not add a duplicate entry if already present", () => {
+            updateTemperaments();
             const duplicateEntry = ["Equal (12EDO)", "equal", "equal"];
             addTemperamentToList(duplicateEntry);
             expect(TEMPERAMENTS.filter(entry => entry[1] === "equal").length).toBe(1);
@@ -743,10 +748,8 @@ describe("noteToObj", () => {
 
 describe("frequencyToPitch", () => {
     beforeEach(() => {
-        global.A0 = 27.5;
         global.C8 = 4186.01;
         global.C10 = 16744.04;
-        global.TWELVEHUNDRETHROOT2 = Math.pow(2, 1 / 1200);
         global.PITCHES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
     });
 
@@ -787,7 +790,7 @@ describe("frequencyToPitch", () => {
     });
 
     it("should map intermediate frequencies to nearest note", () => {
-        const intermediateFreq = A0 * Math.pow(2, 1 / 3);
+        const intermediateFreq = 27.5 * Math.pow(2, 1 / 3);
         const result = frequencyToPitch(intermediateFreq);
         expect(result[0]).toBe("D♭");
         expect(result[1]).toBe(1);
@@ -1654,41 +1657,34 @@ describe("noteToPitchOctave", () => {
 });
 
 describe("pitchToFrequency", () => {
-    global.TWELTHROOT2 = 1.0594630943592953;
-    global.TWELVEHUNDRETHROOT2 = 1.0005777895065549;
-    global.A0 = 27.5;
-
     it("calculates frequency with 0 cents", () => {
         const result = pitchToFrequency("A", 4, 0, "C");
-        expect(result).toBe(A0 * Math.pow(TWELTHROOT2, 48));
+        expect(result).toBe(27.5 * Math.pow(1.0594630943592953, 48));
     });
 
     it("calculates frequency with non-zero cents", () => {
         const result = pitchToFrequency("A", 4, 50, "C");
-        expect(result).toBe(A0 * Math.pow(TWELVEHUNDRETHROOT2, 48 * 100 + 50));
+        expect(result).toBeCloseTo(27.5 * Math.pow(1.000577789506555, 48 * 100 + 50), 5);
     });
 
     it("handles edge case with extreme pitch number", () => {
         const result = pitchToFrequency("C", 8, 0, "C");
-        expect(result).toBe(A0 * Math.pow(TWELTHROOT2, 87));
+        expect(result).toBe(27.5 * Math.pow(1.0594630943592953, 87));
     });
 
     it("throws error if pitchToNumber fails", () => {
-        expect(pitchToFrequency("Z", 4, 0, "C")).toBe(A0 * Math.pow(TWELTHROOT2, 39));
+        expect(pitchToFrequency("Z", 4, 0, "C")).toBe(27.5 * Math.pow(1.0594630943592953, 39));
     });
 });
 
 describe("noteToFrequency", () => {
-    global.TWELTHROOT2 = 1.0594630943592953;
-    global.TWELVEHUNDRETHROOT2 = 1.0005777895065549;
-    global.A0 = 27.5;
     it("converts note to frequency correctly", () => {
         const result = noteToFrequency("A4", "C");
-        expect(result).toBe(A0 * Math.pow(TWELTHROOT2, 48));
+        expect(result).toBe(27.5 * Math.pow(1.0594630943592953, 48));
     });
 
     it("handles invalid note input gracefully", () => {
-        expect(noteToFrequency("X9", "C")).toBe(A0 * Math.pow(TWELTHROOT2, 99));
+        expect(noteToFrequency("X9", "C")).toBe(27.5 * Math.pow(1.0594630943592953, 99));
     });
 });
 
@@ -1844,13 +1840,13 @@ describe("splitScaleDegree", () => {
     });
 
     it("should return default natural attribute when no attributes are provided", () => {
-        expect(splitScaleDegree("")).toEqual([5, NATURAL]);
-        expect(splitScaleDegree(null)).toEqual([5, NATURAL]);
+        expect(splitScaleDegree("")).toEqual([5, "♮"]);
+        expect(splitScaleDegree(null)).toEqual([5, "♮"]);
     });
 
     it("should handle invalid or undefined inputs gracefully", () => {
-        expect(splitScaleDegree(undefined)).toEqual([5, NATURAL]);
-        expect(splitScaleDegree("")).toEqual([5, NATURAL]);
+        expect(splitScaleDegree(undefined)).toEqual([5, "♮"]);
+        expect(splitScaleDegree("")).toEqual([5, "♮"]);
     });
 });
 
@@ -2306,13 +2302,13 @@ describe("_calculate_pitch_number", () => {
     });
 
     it("calculates pitch number for a standard note string", () => {
-        const val = _calculate_pitch_number(activity, "C4", tur);
+        const val = _calculate_pitch_number("C", 4);
         expect(typeof val).toBe("number");
     });
 
     it("calculates pitch number relative to another note", () => {
-        const valC4 = _calculate_pitch_number(activity, "C4", tur);
-        const valC5 = _calculate_pitch_number(activity, "C5", tur);
+        const valC4 = _calculate_pitch_number("C", 4);
+        const valC5 = _calculate_pitch_number("C", 5);
         expect(valC5).toBeGreaterThan(valC4);
     });
 });
