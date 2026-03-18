@@ -5106,7 +5106,7 @@ class Activity {
             const pitch = pitches;
             pitchDuration = toFraction(pitchDuration);
             const adjustedNote = _adjustPitch(pitch.name, keySignature).toUpperCase();
-            if (triplet !== undefined && triplet !== null) {
+            if (triplet != null) {
                 pitchDuration[1] = meterDen * triplet;
             }
 
