@@ -34,6 +34,7 @@ global.Synth = jest.fn().mockImplementation(() => ({
     start: jest.fn(),
     stop: jest.fn(),
     stopSound: jest.fn(),
+    disposeAllInstruments: jest.fn(),
     changeInTemperament: false,
     recorder: null
 }));
@@ -424,6 +425,7 @@ describe("Logo Class", () => {
             logo.synth = {
                 stop: jest.fn(),
                 stopSound: jest.fn(),
+                disposeAllInstruments: jest.fn(),
                 recorder: null
             };
 
@@ -437,6 +439,7 @@ describe("Logo Class", () => {
             logo.synth = {
                 stop: jest.fn(),
                 stopSound: jest.fn(),
+                disposeAllInstruments: jest.fn(),
                 recorder: null
             };
 
@@ -451,6 +454,7 @@ describe("Logo Class", () => {
             logo.synth = {
                 stop: jest.fn(),
                 stopSound: jest.fn(),
+                disposeAllInstruments: jest.fn(),
                 recorder: null
             };
 
@@ -465,6 +469,7 @@ describe("Logo Class", () => {
             logo.synth = {
                 stop: jest.fn(),
                 stopSound: jest.fn(),
+                disposeAllInstruments: jest.fn(),
                 recorder: null
             };
             logo.stepQueue = { 0: [1, 2, 3] };
@@ -1069,6 +1074,7 @@ describe("Logo comprehensive method coverage", () => {
         logo.synth = {
             stop: jest.fn(),
             stopSound: jest.fn(),
+            disposeAllInstruments: jest.fn(),
             recorder: { state: "recording", stop: jest.fn() }
         };
         logo._restoreConnections = jest.fn();
