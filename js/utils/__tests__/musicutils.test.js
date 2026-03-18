@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-const { TextEncoder } = require("util");
-global.TextEncoder = TextEncoder;
+
+global.TextEncoder = globalThis.TextEncoder || require("util").TextEncoder;
 global._ = jest.fn(str => str);
 global.INVALIDPITCH = "?";
 global.window = {
