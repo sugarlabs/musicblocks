@@ -421,8 +421,8 @@ describe("ActionBlocks", () => {
     describe("ReturnToURLBlock - getURL", () => {
         test("getURL returns window location href", () => {
             const block = activity.registeredBlocks["returnToUrl"];
-            global.window = { location: { href: "http://test.com" } };
-            expect(block.getURL()).toBe("http://test.com");
+
+            expect(block.getURL()).toBe(window.location.href);
         });
 
         test("handles readyState 4 and status 200", () => {
@@ -457,24 +457,19 @@ describe("ActionBlocks", () => {
 
     describe("CalcBlock - arg", () => {
         test("returns result when action exists", () => {
-            const block = activity.registeredBlocks["calc"];
+            const block = activity.registeredBlocks["namedcalc"];
             activity.blocks.blockList[50] = { privateData: "myCalc" };
             logo.actions["myCalc"] = [];
-            logo.returns[0] = [42];
-            activity.turtles.ithTurtle = jest.fn(() => ({
-                queue: [],
-                running: false
-            }));
-            activity.turtles.getTurtle = jest.fn(() => ({
-                running: false,
-                queue: []
-            }));
+            logo.runFromBlockNow = jest.fn();
+            logo.returns = { 0: [42] };
+            const mockTurtle = { running: false, queue: [] };
+            activity.turtles.getTurtle = jest.fn(() => mockTurtle);
             const result = block.arg(logo, 0, 50, null);
             expect(result).toBe(42);
         });
 
         test("calls errorMsg when action not found", () => {
-            const block = activity.registeredBlocks["calc"];
+            const block = activity.registeredBlocks["namedcalc"];
             activity.blocks.blockList[50] = { privateData: "missingCalc" };
             const result = block.arg(logo, 0, 50, null);
             expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, 50, "missingCalc");
@@ -595,6 +590,8 @@ describe("ActionBlocks", () => {
                 connections: [null]
             };
             logo.actions["myCalc"] = [];
+            logo.runFromBlockNow = jest.fn();
+            logo.returns = { 0: [42] };
             logo.returns[0] = [55];
             activity.turtles.getTurtle = jest.fn(() => ({
                 running: false,
@@ -619,7 +616,7 @@ describe("ActionBlocks", () => {
 
     describe("DoArgBlock - arg (line 740-774)", () => {
         test("returns result when action exists and cblk is valid", () => {
-            const block = activity.registeredBlocks["doArg"];
+            const block = activity.registeredBlocks["calcArg"];
             activity.blocks.blockList[80] = {
                 argClampSlots: [],
                 connections: ["c0", "c1"]
@@ -636,7 +633,7 @@ describe("ActionBlocks", () => {
         });
 
         test("calls errorMsg when action not found", () => {
-            const block = activity.registeredBlocks["doArg"];
+            const block = activity.registeredBlocks["calcArg"];
             activity.blocks.blockList[80] = {
                 argClampSlots: [],
                 connections: ["c0", "c1"]
@@ -648,7 +645,7 @@ describe("ActionBlocks", () => {
         });
 
         test("calls errorMsg when cblk is null", () => {
-            const block = activity.registeredBlocks["doArg"];
+            const block = activity.registeredBlocks["calcArg"];
             activity.blocks.blockList[80] = {
                 argClampSlots: [],
                 connections: ["c0", null]
@@ -799,6 +796,8 @@ describe("ActionBlocks", () => {
             const block = activity.registeredBlocks["namedcalc"];
             activity.blocks.blockList[55] = { privateData: "myCalc" };
             logo.actions["myCalc"] = [];
+            logo.runFromBlockNow = jest.fn();
+            logo.returns = { 0: [42] };
             logo.returns[0] = [88];
             activity.turtles.getTurtle = jest.fn(() => ({
                 running: false,
