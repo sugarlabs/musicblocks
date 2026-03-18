@@ -86,9 +86,9 @@ Use Chrome DevTools Memory panel + Performance monitor.
 2. Repeat 10 cycles: open widget -> use briefly -> close widget.
 3. Repeat 5 cycles: run project -> stop.
 4. Take heap snapshots at:
-   - initial idle
-   - after widget cycles
-   - after run/stop cycles
+    - initial idle
+    - after widget cycles
+    - after run/stop cycles
 
 Record:
 
@@ -104,12 +104,14 @@ Copy this section into issue/PR comments.
 ### Performance Baseline
 
 Environment:
+
 - OS:
 - Browser:
 - Commit SHA:
 - Date:
 
 Load (Lighthouse):
+
 - Performance:
 - FCP:
 - LCP:
@@ -119,18 +121,21 @@ Load (Lighthouse):
 - Report URL:
 
 Assets:
+
 - JS files (js/):
 - JS files (lib/):
 - Total size:
 - Estimated minified size:
 
 Runtime Lag:
+
 - Long tasks count:
 - Max long task:
 - Avg FPS:
 - Scenario notes:
 
 Memory:
+
 - Heap initial:
 - Heap after widget cycles:
 - Heap after run/stop cycles:

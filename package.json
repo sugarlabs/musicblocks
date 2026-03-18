@@ -1,27 +1,27 @@
 {
-     "name": "musicblocks",
-     "version": "3.4.1",
-     "main": "electron-main.js",
-     "description": "A musical microworld",
-     "repository": {
-         "url": "https://github.com/sugarlabs/musicblocks.git"
-     },
+    "name": "musicblocks",
+    "version": "3.4.1",
+    "main": "electron-main.js",
+    "description": "A musical microworld",
+    "repository": {
+        "url": "https://github.com/sugarlabs/musicblocks.git"
+    },
     "license": "AGPL-3.0 License",
     "bugs": {
         "url": "https://github.com/sugarlabs/musicblocks/issues"
     },
     "amd": {},
-     "scripts": {
-         "lint": "eslint js/ planet/js/",
-         "lint:staged": "lint-staged",
-         "prepare": "husky",
-         "serve": "http-server -a 127.0.0.1 -p 3000 --gzip --brotli",
-         "serve:dev": "http-server -a 127.0.0.1 -p 3000 -c-1",
-         "perf:assets": "node scripts/analyze-production-assets.js",
-         "perf:lhci": "npx @lhci/cli autorun --config=./lighthouserc.js",
-         "start": "node index.js",
-         "dev": "cross-env NODE_ENV=development nodemon index.js",
-         "prod": "cross-env NODE_ENV=production node index.js",
+    "scripts": {
+        "lint": "eslint js/ planet/js/",
+        "lint:staged": "lint-staged",
+        "prepare": "husky",
+        "serve": "http-server -a 127.0.0.1 -p 3000 --gzip --brotli",
+        "serve:dev": "http-server -a 127.0.0.1 -p 3000 -c-1",
+        "perf:assets": "node scripts/analyze-production-assets.js",
+        "perf:lhci": "npx @lhci/cli autorun --config=./lighthouserc.js",
+        "start": "node index.js",
+        "dev": "cross-env NODE_ENV=development nodemon index.js",
+        "prod": "cross-env NODE_ENV=production node index.js",
         "test": "jest",
         "cypress:run": "cypress run",
         "electron": "electron .",
@@ -93,10 +93,10 @@
             "postcss": "^8.4.31"
         }
     },
-     "lint-staged": {
-         "*.{js,mjs}": [
-             "eslint --max-warnings=0 --fix",
-             "prettier --write"
-         ]
-     }
+    "lint-staged": {
+        "*.{js,mjs}": [
+            "eslint --max-warnings=0 --fix",
+            "prettier --write"
+        ]
+    }
 }
