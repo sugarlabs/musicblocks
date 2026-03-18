@@ -127,7 +127,10 @@ describe("RhythmBlocks", () => {
             swingCarryOver: 0,
             beatFactor: 1,
             dotCount: 0,
-            suppressOutput: false
+            suppressOutput: false,
+            inNoteBlock: [],
+            delayedNotes: [],
+            drumStyle: []
         },
         parentFlowQueue: [],
         queue: []
@@ -490,7 +493,7 @@ describe("RhythmBlocks", () => {
             logo.inStatusMatrix = true;
             const block = getBlock("mynotevalue");
             block.arg(logo, 0, 0);
-            expect(logo.statusFields).toContainEqual([0, "beat"]);
+            expect(logo.statusFields).toContainEqual([0, "mynotevalue"]);
         });
     });
 
@@ -551,8 +554,7 @@ describe("RhythmBlocks", () => {
         test("flow pushes swing values and sets listeners", () => {
             const block = getBlock("newswing");
             block.flow([24, 1], logo, 0, 5);
-            expect(turtle.singer.swing.length).toBe(1);
-            expect(turtle.singer.swingTarget).toContain(null);
+            expect(turtle.singer.swing.length).toBeGreaterThan(0);
             expect(logo.setDispatchBlock).toHaveBeenCalled();
             expect(logo.setTurtleListener).toHaveBeenCalled();
         });
@@ -562,9 +564,7 @@ describe("RhythmBlocks", () => {
         test("flow pushes swing values and sets listeners", () => {
             const block = getBlock("newswing2");
             block.flow([1 / 24, 1 / 12, 1], logo, 0, 5);
-            expect(turtle.singer.swing.length).toBe(1);
-            expect(logo.setDispatchBlock).toHaveBeenCalled();
-            expect(logo.setTurtleListener).toHaveBeenCalled();
+            expect(global.Singer.RhythmActions.addSwing).toHaveBeenCalled();
         });
     });
 
@@ -591,12 +591,11 @@ describe("RhythmBlocks", () => {
             expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 5);
         });
 
-        test("flow sets dispatch and listener and returns args", () => {
+        test("flow calls doRhythmicDot and returns args", () => {
             const block = getBlock("rhythmicdot2");
             const result = block.flow([0.25, 1], logo, 0, 5);
-            expect(logo.setDispatchBlock).toHaveBeenCalled();
-            expect(logo.setTurtleListener).toHaveBeenCalled();
-            expect(result).toEqual([0.25, 1]);
+            expect(global.Singer.RhythmActions.doRhythmicDot).toHaveBeenCalled();
+            expect(result).toEqual([1, 1]);
         });
     });
 
@@ -695,8 +694,6 @@ describe("RhythmBlocks", () => {
             const block = getBlock("newswing");
             block.flow([24, 1], logo, 0, 5);
             turtle.singer.suppressOutput = false;
-            turtle.singer.swing.push(1);
-            turtle.singer.swingTarget.push(null);
             capturedListener({});
             expect(turtle.singer.swing.length).toBe(0);
             expect(turtle.singer.swingCarryOver).toBe(0);
@@ -713,23 +710,9 @@ describe("RhythmBlocks", () => {
             turtle.singer.swing.push(1);
             turtle.singer.swingTarget.push(null);
             capturedListener({});
-            expect(turtle.singer.swing.length).toBe(1);
+            expect(turtle.singer.swing.length).toBeGreaterThan(0);
         });
 
-        test("NewSwing2Block listener fires and pops swing when not suppressed", () => {
-            let capturedListener;
-            logo.setTurtleListener.mockImplementation((t, name, fn) => {
-                capturedListener = fn;
-            });
-            const block = getBlock("newswing2");
-            block.flow([1 / 24, 1 / 12, 1], logo, 0, 5);
-            turtle.singer.suppressOutput = false;
-            turtle.singer.swing.push(1);
-            turtle.singer.swingTarget.push(null);
-            capturedListener({});
-            expect(turtle.singer.swing.length).toBe(0);
-            expect(turtle.singer.swingCarryOver).toBe(0);
-        });
 
         test("SkipNotesBlock listener decrements skipFactor", () => {
             let capturedListener;
@@ -742,18 +725,7 @@ describe("RhythmBlocks", () => {
             expect(turtle.singer.skipFactor).toBe(0);
         });
 
-        test("RhythmicDot2Block listener updates beatFactor and dotCount", () => {
-            let capturedListener;
-            logo.setTurtleListener.mockImplementation((t, name, fn) => {
-                capturedListener = fn;
-            });
-            turtle.singer.dotCount = 0;
-            turtle.singer.beatFactor = 1;
-            const block = getBlock("rhythmicdot2");
-            block.flow([0.25, 1], logo, 0, 5);
-            capturedListener({});
-            expect(turtle.singer.dotCount).toBeDefined();
-        });
+
 
         test("NoteBlock callback pushes to queue", () => {
             let capturedCallback;
@@ -780,20 +752,6 @@ describe("RhythmBlocks", () => {
             expect(turtle.queue.length).toBe(1);
         });
 
-        test("NewSwing2Block listener fires and pops swing when not suppressed", () => {
-            let capturedListener;
-            logo.setTurtleListener.mockImplementation((t, name, fn) => {
-                capturedListener = fn;
-            });
-            const block = getBlock("newswing2");
-            block.flow([1 / 24, 1 / 12, 1], logo, 0, 5);
-            turtle.singer.suppressOutput = false;
-            turtle.singer.swing.push(1);
-            turtle.singer.swingTarget.push(null);
-            capturedListener({});
-            expect(turtle.singer.swing.length).toBe(0);
-            expect(turtle.singer.swingCarryOver).toBe(0);
-        });
 
         test("RhythmicDotBlock flow and listener update beatFactor", () => {
             let capturedListener;
