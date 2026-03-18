@@ -12,14 +12,14 @@
 /*
    global
 
-   _, docById, LEADING, DEFAULTPALETTE, MULTIPALETTES, platformColor,
+   docById, LEADING, DEFAULTPALETTE, MULTIPALETTES, platformColor,
    PALETTEICONS, MULTIPALETTEICONS, SKIPPALETTES, toTitleCase,
    i18nSolfege, NUMBERBLOCKDEFAULT, TEXTWIDTH, STRINGLEN,
    DEFAULTBLOCKSCALE, SVG, DISABLEDFILLCOLOR, DISABLEDSTROKECOLOR,
    PALETTEFILLCOLORS, PALETTESTROKECOLORS, last, getTextWidth,
     STANDARDBLOCKHEIGHT, CLOSEICON, BUILTINPALETTES,
     safeSVG, blockIsMacro, getMacroExpansion,
-    cameraPALETTE, mediaPALETTE, videoPALETTE
+    cameraPALETTE, mediaPALETTE, videoPALETTE, base64Encode, StatusMatrix
 */
 
 /* exported Palettes, initPalettes */
@@ -778,7 +778,7 @@ class Palettes {
 
     getInfo() {
         for (const key in this.dict) {
-            // eslint-disable-next-line no-console
+             
             console.debug(this.dict[key].getInfo());
         }
     }
@@ -817,7 +817,7 @@ class Palettes {
         try {
             // First hide all palettes
             for (const name in this.dict) {
-                if (this.dict.hasOwnProperty(name)) {
+                if (Object.prototype.hasOwnProperty.call(this.dict, name)) {
                     const palette = this.dict[name];
                     if (palette && typeof palette.hideMenu === "function") {
                         palette.hideMenu();
@@ -877,7 +877,7 @@ class Palettes {
     }
 
     add(name) {
-        // eslint-disable-next-line no-use-before-define
+         
         this.dict[name] = new Palette(this, name);
         return this;
     }
@@ -1288,9 +1288,8 @@ class Palette {
     }
 
     hideMenu() {
-        docById(
-            "palette"
-        ).childNodes[0].style.borderRight = `1px solid ${platformColor.selectorSelected}`;
+        docById("palette").childNodes[0].style.borderRight =
+            `1px solid ${platformColor.selectorSelected}`;
         if (this._outsideClickListener) {
             document.removeEventListener("click", this._outsideClickListener);
             this._outsideClickListener = null;
@@ -1853,7 +1852,7 @@ class Palette {
                 // Add variables first
                 for (let i = 0; i < foundVariables.length; i++) {
                     const [blockId, blockType] = foundVariables[i];
-                    const block = activity.blocks.blockList[blockId];
+                    const block = this.activity.blocks.blockList[blockId];
                     const isLastVar = i === foundVariables.length - 1;
                     const hasBoxes = boxBlocks.length > 0;
 
@@ -1884,7 +1883,7 @@ class Palette {
                 // Then add box blocks
                 for (let i = 0; i < boxBlocks.length; i++) {
                     const boxBlockId = boxBlocks[i];
-                    const boxBlock = activity.blocks.blockList[boxBlockId];
+                    const boxBlock = this.activity.blocks.blockList[boxBlockId];
 
                     statusBlocks.push([
                         lastBlockIndex + 1,

@@ -933,7 +933,7 @@ describe("processNote regression behavior", () => {
         };
         activityMock.blocks = {
             visible: true,
-            blockList: { "mockBlk": {} },
+            blockList: { mockBlk: {} },
             unhighlight: jest.fn()
         };
         singer = turtleMock.singer;
@@ -960,14 +960,14 @@ describe("processNote regression behavior", () => {
 
     test("should trigger stage update after processing note", () => {
         singer.inNoteBlock = ["mockBlk"];
-        singer.notePitches = { "mockBlk": ["C"] };
-        singer.noteOctaves = { "mockBlk": [4] };
-        singer.noteCents = { "mockBlk": [0] };
-        singer.noteHertz = { "mockBlk": [0] };
-        singer.noteBeatValues = { "mockBlk": [1] };
-        singer.noteDrums = { "mockBlk": [] };
-        singer.embeddedGraphics = { "mockBlk": [] };
-        singer.oscList = { "mockBlk": [] };
+        singer.notePitches = { mockBlk: ["C"] };
+        singer.noteOctaves = { mockBlk: [4] };
+        singer.noteCents = { mockBlk: [0] };
+        singer.noteHertz = { mockBlk: [0] };
+        singer.noteBeatValues = { mockBlk: [1] };
+        singer.noteDrums = { mockBlk: [] };
+        singer.embeddedGraphics = { mockBlk: [] };
+        singer.oscList = { mockBlk: [] };
 
         const callback = jest.fn();
         Singer.processNote(activityMock, 4, false, "mockBlk", 0, callback);
@@ -977,14 +977,14 @@ describe("processNote regression behavior", () => {
 
     test("should use default BPM when bpm stack is empty", () => {
         singer.inNoteBlock = ["mockBlk"];
-        singer.notePitches = { "mockBlk": ["C"] };
-        singer.noteOctaves = { "mockBlk": [4] };
-        singer.noteCents = { "mockBlk": [0] };
-        singer.noteHertz = { "mockBlk": [0] };
-        singer.noteBeatValues = { "mockBlk": [1] };
-        singer.noteDrums = { "mockBlk": [] };
-        singer.embeddedGraphics = { "mockBlk": [] };
-        singer.oscList = { "mockBlk": [] };
+        singer.notePitches = { mockBlk: ["C"] };
+        singer.noteOctaves = { mockBlk: [4] };
+        singer.noteCents = { mockBlk: [0] };
+        singer.noteHertz = { mockBlk: [0] };
+        singer.noteBeatValues = { mockBlk: [1] };
+        singer.noteDrums = { mockBlk: [] };
+        singer.embeddedGraphics = { mockBlk: [] };
+        singer.oscList = { mockBlk: [] };
 
         singer.bpm = [];
         Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
