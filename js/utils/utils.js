@@ -676,11 +676,44 @@ const processPluginData = (activity, pluginData, pluginSource) => {
             return;
         }
 
-        // NOTE: This eval is required for the Plugin system to load dynamic block definitions.
+        // NOTE: This loads dynamic block definitions for the Plugin system with CSP compliance.
         // The content comes from plugin JSON files which satisfy the isTrustedPluginSource check.
+        // Using blob URL + script injection to execute in global scope (required for plugin
+        // code to access global objects like palettes, blocks, logo) while being CSP-compliant.
+        // Wrapping in IIFE prevents const/let/class declaration conflicts between plugin blocks.
         try {
-            // eslint-disable-next-line no-eval
-            eval(code);
+            // Wrap code in IIFE to scope local variables while maintaining global object access
+            const wrappedCode = `(function() { ${code} })();`;
+
+            // Create a Blob containing the wrapped plugin code
+            const blob = new Blob([wrappedCode], { type: "application/javascript" });
+            const blobURL = URL.createObjectURL(blob);
+
+            // Create a script element with the blob URL
+            const script = document.createElement("script");
+            script.src = blobURL;
+
+            // Add error handling
+            script.onerror = e => {
+                // eslint-disable-next-line no-console
+                console.error("Plugin execution failed:", label, e);
+                URL.revokeObjectURL(blobURL);
+                if (script.parentNode) {
+                    document.head.removeChild(script);
+                }
+            };
+
+            // Append to document head - this executes the code in global scope
+            document.head.appendChild(script);
+
+            // Clean up blob URL and script element after execution
+            // Using setTimeout to ensure script has finished executing
+            setTimeout(() => {
+                URL.revokeObjectURL(blobURL);
+                if (script.parentNode) {
+                    document.head.removeChild(script);
+                }
+            }, 100);
         } catch (e) {
             // eslint-disable-next-line no-console
             console.error("Plugin execution failed:", label, e);
@@ -823,10 +856,9 @@ const processPluginData = (activity, pluginData, pluginSource) => {
     }
 
     // Create the plugin protoblocks.
-    // FIXME: On Chrome, plugins are broken (They still work on Firefox):
-    // EvalError: Refused to evaluate a string as JavaScript because 'unsafe-eval' is not an allowed source of script in the following Content Security Policy directive: "script-src 'self' blob: filesystem: chrome-extension-resource:".
-    // Maybe:
-    // let g = (function() { return this ? this : typeof self !== 'undefined' ? self : undefined})() || Function("return this")();
+    // Plugin code is executed using blob URL script injection to maintain global scope access
+    // while being CSP-compliant. This allows plugins to access global objects like palettes,
+    // blocks, and logo.
 
     if ("BLOCKPLUGINS" in obj) {
         for (const block in obj["BLOCKPLUGINS"]) {
