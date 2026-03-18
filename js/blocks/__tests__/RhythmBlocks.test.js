@@ -713,7 +713,6 @@ describe("RhythmBlocks", () => {
             expect(turtle.singer.swing.length).toBeGreaterThan(0);
         });
 
-
         test("SkipNotesBlock listener decrements skipFactor", () => {
             let capturedListener;
             logo.setTurtleListener.mockImplementation((t, name, fn) => {
@@ -724,8 +723,6 @@ describe("RhythmBlocks", () => {
             capturedListener({});
             expect(turtle.singer.skipFactor).toBe(0);
         });
-
-
 
         test("NoteBlock callback pushes to queue", () => {
             let capturedCallback;
@@ -751,7 +748,6 @@ describe("RhythmBlocks", () => {
             expect(turtle.parentFlowQueue).toContain(5);
             expect(turtle.queue.length).toBe(1);
         });
-
 
         test("RhythmicDotBlock flow and listener update beatFactor", () => {
             let capturedListener;
