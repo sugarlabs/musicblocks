@@ -1102,7 +1102,13 @@ function Synth() {
             if (fileName) {
                 download(url, fileName + (platform.FF ? ".wav" : ".ogg"));
             } else {
-                alert("Download cancelled.");
+                // activity is a global available after app initialization
+                if (typeof activity !== "undefined") {
+                    activity.textMsg(_("Download cancelled."));
+                } else {
+                    // eslint-disable-next-line no-console
+                    console.log(_("Download cancelled."));
+                }
             }
         };
         // this.recorder.start();
@@ -1949,27 +1955,30 @@ function Synth() {
                 // A 500 ms safety buffer is added beyond the note duration to prevent
                 // premature disposal caused by audio-clock drift or scheduler jitter,
                 // which would otherwise produce crackling artefacts in long sessions.
-                setTimeout(() => {
-                    try {
-                        // Dispose of effects
-                        effectsToDispose.forEach(effect => {
-                            if (effect && typeof effect.dispose === "function") {
-                                effect.dispose();
-                            }
-                        });
-
-                        // Dispose of filters
-                        if (temp_filters.length > 0) {
-                            temp_filters.forEach(filter => {
-                                if (filter && typeof filter.dispose === "function") {
-                                    filter.dispose();
+                setTimeout(
+                    () => {
+                        try {
+                            // Dispose of effects
+                            effectsToDispose.forEach(effect => {
+                                if (effect && typeof effect.dispose === "function") {
+                                    effect.dispose();
                                 }
                             });
+
+                            // Dispose of filters
+                            if (temp_filters.length > 0) {
+                                temp_filters.forEach(filter => {
+                                    if (filter && typeof filter.dispose === "function") {
+                                        filter.dispose();
+                                    }
+                                });
+                            }
+                        } catch (e) {
+                            console.debug("Error disposing effects:", e);
                         }
-                    } catch (e) {
-                        console.debug("Error disposing effects:", e);
-                    }
-                }, beatValue * 1000 + 500);
+                    },
+                    beatValue * 1000 + 500
+                );
             }
         } catch (e) {
             console.error("Error in _performNotes:", e);

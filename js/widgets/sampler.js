@@ -2236,7 +2236,7 @@ function SampleWidget() {
             this.pitchDetectionAnimationId = requestAnimationFrame(updatePitch);
         } catch (err) {
             console.error(`${err.name}: ${err.message}`);
-            alert("Microphone access failed: " + err.message);
+            this.activity.errorMsg(_("Microphone access failed: ") + err.message);
             // Clean up any partially initialized resources
             this.stopPitchDetection();
         }
