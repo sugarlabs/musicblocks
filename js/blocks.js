@@ -17,14 +17,15 @@
    DEFAULTFILTERTYPE, DEFAULTINTERVAL, DEFAULTINVERT, DEFAULTMODE,
    DEFAULTNOISE, DEFAULTOSCILLATORTYPE, DEFAULTTEMPERAMENT,
    DEFAULTVOICE, INLINECOLLAPSIBLES, NATURAL, NUMBERBLOCKDEFAULT,
-   SPECIALINPUTS, STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH,
-   WESTERN2EISOLFEGENAMES, WIDENAMES, _, addTemperamentToDictionary,
+    SPECIALINPUTS, STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH,
+    WESTERN2EISOLFEGENAMES, WIDENAMES, addTemperamentToDictionary,
    Block, closeBlkWidgets, createjs, delayExecution, DEFAULTCHORD,
    deleteTemperamentFromList, getDrumSynthName, getNoiseName,
    getNoiseSynthName, getTemperamentsList, getTextWidth,
    getVoiceSynthName, i18nSolfege, last, MathUtility, mixedNumber,
    piemenuBlockContext, prepareMacroExports, ProtoBlock,
-   setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments
+    setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments,
+    docById, define
 */
 
 /*
@@ -49,10 +50,6 @@
         setOctaveRatio, splitScaleDegree, splitSolfege,
         updateTemperaments
 */
-/*
-   exported Blocks
-*/
-
 /**
  * Minimum distance (squared) between two docks required before
  * connecting them.
@@ -150,6 +147,7 @@ const ALLOWED_CONNECTIONS = new Set([
  * @public
  * @returns {void}
  */
+// eslint-disable-next-line no-redeclare
 class Blocks {
     constructor(activity) {
         this.activity = activity;
@@ -164,6 +162,10 @@ class Blocks {
 
         /** We keep a list of stacks in the trash. */
         this.trashStacks = [];
+
+        /** When true, checkBounds() calls are suppressed until
+         *  _endDeferCheckBounds() runs one final check. */
+        this._deferCheckBounds = false;
 
         /** We keep a dictionary for the proto blocks, */
         this.protoBlockDict = {};
@@ -238,6 +240,16 @@ class Blocks {
         this.selectionModeOn = false;
 
         this.selectedBlocks = [];
+
+        // --- Performance: drag interaction optimizations ---
+        // rAF-debounced checkBounds to avoid O(n) iteration on every block move
+        this._checkBoundsScheduled = false;
+        // Cached drag group computed once on mousedown, reused during pressmove
+        this._cachedDragGroup = null;
+        // Cached top-block map for moveAllBlocksExcept edge-scroll
+        this._topBlockCache = null;
+        // Throttle timestamp for edge-scroll calls
+        this._lastEdgeScrollTime = 0;
 
         /**
          * We stage deletion of prototype action blocks on the palette so
@@ -766,7 +778,7 @@ class Blocks {
                     vspaceBlock.container.x = thisBlock.container.x + dx;
                     /** Math.floor(thisBlock.container.y + dy + 0.5); */
                     vspaceBlock.container.y = thisBlock.container.y + dy;
-                    vspaceBlock.connections[0] = that.blockList.indexOf(thisBlock);
+                    vspaceBlock.connections[0] = thisBlock.blockIndex;
                     vspaceBlock.connections[1] = nextBlock;
                     thisBlock.connections[thisBlock.connections.length - 1] = vspace;
                     if (nextBlock) {
@@ -1500,7 +1512,7 @@ class Blocks {
                                 silenceBlock
                             ) {
                                 this.blockList[silenceBlockobj.connections[0]].connections[c] =
-                                    this.blockList.indexOf(thisBlockobj);
+                                    thisBlockobj.blockIndex;
                                 break;
                             }
                         }
@@ -2294,6 +2306,8 @@ class Blocks {
          * @returns {void}
          */
         this.checkBounds = () => {
+            if (this._deferCheckBounds) return;
+
             let onScreen = true;
             for (const block of this.blockList) {
                 if (block.connections[0] == null) {
@@ -2311,6 +2325,23 @@ class Blocks {
                 this.activity.setHomeContainers(false);
                 this.boundary.hide();
             }
+        };
+
+        /**
+         * Schedule a bounds check on the next animation frame.
+         * Coalesces multiple calls per frame into a single O(n) scan.
+         * @public
+         * @returns {void}
+         */
+        this.scheduleCheckBounds = () => {
+            if (this._checkBoundsScheduled) {
+                return;
+            }
+            this._checkBoundsScheduled = true;
+            requestAnimationFrame(() => {
+                this._checkBoundsScheduled = false;
+                this.checkBounds();
+            });
         };
 
         /**
@@ -2369,6 +2400,26 @@ class Blocks {
         };
 
         /**
+         * Move a block by dx, dy without running checkBounds.
+         * Used during drag operations where checkBounds is deferred
+         * to a single rAF-scheduled call at the end of the frame.
+         * @param - blk - block index
+         * @param - dx - delta x
+         * @param - dy - delta y
+         * @public
+         * @returns {void}
+         */
+        this.moveBlockRelativeBatched = (blk, dx, dy) => {
+            this.inLongPress = false;
+            this.isBlockMoving = true;
+            const myBlock = this.blockList[blk];
+            if (myBlock.container != null) {
+                myBlock.container.x += dx;
+                myBlock.container.y += dy;
+            }
+        };
+
+        /**
          * Moves the blocks in a stack to a new position.
          * @param blk - block
          * @param dx - x position
@@ -2387,17 +2438,34 @@ class Blocks {
 
         /**
          * Moves all blocks except given stack
-         * @param blk - exception
+         * @param blk - exception block (the block object, not index)
          * @param dx - delta x
          * @param dy - delta y
          * @public
          * @returns {void}
          */
         this.moveAllBlocksExcept = (blk, dx, dy) => {
-            for (const [blockIdx, block] of this.blockList.entries()) {
-                const topBlock = this.blockList[this.findTopBlock(blockIdx)];
-                if (topBlock !== blk) this.moveBlockRelative(blockIdx, dx, dy);
+            // Build top-block cache if not available.
+            // The cache maps each block index to its top block index,
+            // avoiding repeated O(depth) findTopBlock walks.
+            if (this._topBlockCache == null) {
+                this._topBlockCache = new Map();
+                for (let i = 0; i < this.blockList.length; i++) {
+                    this._topBlockCache.set(i, this.findTopBlock(i));
+                }
             }
+
+            const blkIdx = this.blockList.indexOf(blk);
+            const excludeTop = blkIdx >= 0 ? this._topBlockCache.get(blkIdx) : -1;
+
+            for (let i = 0; i < this.blockList.length; i++) {
+                if (this._topBlockCache.get(i) !== excludeTop) {
+                    this.moveBlockRelativeBatched(i, dx, dy);
+                }
+            }
+
+            // Single deferred bounds check instead of one per block
+            this.scheduleCheckBounds();
         };
 
         /**
@@ -2640,8 +2708,10 @@ class Blocks {
                     /** Could happen if the block data is malformed. */
                     // eslint-disable-next-line no-console
                     console.debug("infinite loop finding topBlock?");
-                    // eslint-disable-next-line no-console
-                    console.debug(this.blockList.indexOf(myBlock) + " " + myBlock.name);
+                    if (myBlock.garbage) {
+                        // eslint-disable-next-line no-console
+                        console.debug(myBlock.blockIndex + " " + myBlock.name);
+                    }
                     break;
                 }
                 blk = myBlock.connections[0];
@@ -3111,6 +3181,9 @@ class Blocks {
 
             /** We copy the dock because expandable blocks modify it. */
             const myBlock = last(this.blockList);
+            // Cache the block's index for O(1) lookups instead of
+            // O(N) blockList.indexOf() scans.
+            myBlock.blockIndex = this.blockList.length - 1;
             myBlock.copySize();
 
             /** We may need to do some postProcessing to the block */
@@ -3580,6 +3653,37 @@ class Blocks {
             this.dragLoopCounter = 0;
             this.dragGroup = [];
             this._calculateDragGroup(blk);
+        };
+
+        /**
+         * Cache the drag group for a block. Call on mousedown so the
+         * expensive tree traversal runs once, not on every pressmove.
+         * @param - blk - block index
+         * @public
+         * @returns {void}
+         */
+        this.cacheDragGroup = blk => {
+            this.findDragGroup(blk);
+            this._cachedDragGroup = this.dragGroup.slice();
+        };
+
+        /**
+         * Invalidate the cached drag group (call on pressup/mouseout).
+         * @public
+         * @returns {void}
+         */
+        this.clearCachedDragGroup = () => {
+            this._cachedDragGroup = null;
+        };
+
+        /**
+         * Invalidate the top-block cache (call when blocks are
+         * added, removed, or connections change).
+         * @public
+         * @returns {void}
+         */
+        this.invalidateTopBlockCache = () => {
+            this._topBlockCache = null;
         };
 
         /**
@@ -5797,7 +5901,38 @@ class Blocks {
             const blockOffset = this.blockList.length;
             const firstBlock = this.blockList.length;
 
-            for (let b = 0; b < this._loadCounter; b++) {
+            /**
+             * Chunked block-loading: yield to the main thread every ~50ms
+             * so the browser can paint and remain interactive during
+             * large-project loads.  Each chunk processes CHUNK_SIZE blocks
+             * synchronously, then schedules the next chunk via setTimeout(0).
+             */
+            const CHUNK_SIZE = 20;
+            const totalBlocks = this._loadCounter;
+            let bIndex = 0;
+
+            const processChunk = () => {
+                const chunkEnd = Math.min(bIndex + CHUNK_SIZE, totalBlocks);
+                for (let b = bIndex; b < chunkEnd; b++) {
+                    this._processOneBlock(b, blockObjs, blockOffset, firstBlock);
+                }
+                bIndex = chunkEnd;
+                if (bIndex < totalBlocks) {
+                    setTimeout(processChunk, 0);
+                }
+            };
+
+            processChunk();
+        };
+
+        /**
+         * Processes a single block object during load.  Extracted from
+         * the former monolithic for-loop inside loadNewBlocks so the
+         * loop can be chunked across frames.
+         * @private
+         */
+        this._processOneBlock = (b, blockObjs, blockOffset, firstBlock) => {
+            {
                 const thisBlock = blockOffset + b;
                 const blkData = blockObjs[b];
                 let blkInfo;
@@ -6938,7 +7073,7 @@ class Blocks {
 
             this.activity.refreshCanvas();
 
-            const thisBlock = this.blockList.indexOf(myBlock);
+            const thisBlock = myBlock.blockIndex;
 
             /** Add this block to the list of blocks in the trash so we can undo this action. */
             this.trashStacks.push(thisBlock);
