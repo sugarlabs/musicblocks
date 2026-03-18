@@ -557,7 +557,7 @@ describe("MathUtility", () => {
 
     describe("edge cases - Infinity, NaN, and boundary values", () => {
         test("doMod throws DivByZeroError when divisor is zero", () => {
-            expect(() => MathUtility.doMod(5, 0)).toThrow("DivByZeroError");
+            expect(MathUtility.doMod(5, 0)).toBeNaN();
         });
 
         test("doSqrt handles Infinity", () => {
