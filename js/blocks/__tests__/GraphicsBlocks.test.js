@@ -80,7 +80,11 @@ describe("GraphicsBlocks", () => {
         };
 
         activity = {
-            blocks: { blockList: {} },
+            blocks: {
+                blockList: {
+                    0: { connections: [null] }
+                }
+            },
             errorMsg: jest.fn(),
             turtles: {
                 companionTurtle: jest.fn(() => 0),
