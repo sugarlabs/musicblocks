@@ -1539,7 +1539,13 @@ describe("Palettes Class", () => {
 
         test("_showMenuItems renders a basic block", () => {
             const paletteList = {
-                appendChild: jest.fn()
+                appendChild: jest.fn(),
+                insertRow: jest.fn(() => ({
+                    insertCell: jest.fn(() => ({
+                        style: {},
+                        appendChild: jest.fn()
+                    }))
+                }))
             };
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
@@ -1563,12 +1569,18 @@ describe("Palettes Class", () => {
 
             palette._showMenuItems();
 
-            expect(paletteList.appendChild).toHaveBeenCalled();
+            expect(paletteList.insertRow).toHaveBeenCalled();
         });
 
         test("_showMenuItems handles image blocks and drag events", () => {
             const paletteList = {
-                appendChild: jest.fn()
+                appendChild: jest.fn(),
+                insertRow: jest.fn(() => ({
+                    insertCell: jest.fn(() => ({
+                        style: {},
+                        appendChild: jest.fn()
+                    }))
+                }))
             };
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
@@ -1608,18 +1620,14 @@ describe("Palettes Class", () => {
             palette._showMenuItems();
 
             let capturedImg;
-            const origCE2 = document.createElement.bind(document);
-            document.createElement = jest.fn(tag => {
-                const el = origCE2(tag);
-                if (tag === "td") {
-                    const origAppend = el.appendChild.bind(el);
-                    el.appendChild = jest.fn(child => {
-                        capturedImg = child;
-                        origAppend(child);
-                    });
-                }
-                return el;
-            });
+            const mockCell = {
+                style: {},
+                appendChild: jest.fn(child => {
+                    capturedImg = child;
+                })
+            };
+            const mockRow = { insertCell: jest.fn(() => mockCell) };
+            paletteList.insertRow = jest.fn(() => mockRow);
             palette._showMenuItems();
             const img = capturedImg;
             img.offsetWidth = 10;
@@ -1653,7 +1661,13 @@ describe("Palettes Class", () => {
 
         test("_showMenuItems handles touch drag", () => {
             const paletteList = {
-                appendChild: jest.fn()
+                appendChild: jest.fn(),
+                insertRow: jest.fn(() => ({
+                    insertCell: jest.fn(() => ({
+                        style: {},
+                        appendChild: jest.fn()
+                    }))
+                }))
             };
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
@@ -1680,20 +1694,15 @@ describe("Palettes Class", () => {
             });
 
             palette._showMenuItems();
-
             let capturedImg2;
-            const origCE3 = document.createElement.bind(document);
-            document.createElement = jest.fn(tag => {
-                const el = origCE3(tag);
-                if (tag === "td") {
-                    const origAppend = el.appendChild.bind(el);
-                    el.appendChild = jest.fn(child => {
-                        capturedImg2 = child;
-                        origAppend(child);
-                    });
-                }
-                return el;
-            });
+            const mockCell2 = {
+                style: {},
+                appendChild: jest.fn(child => {
+                    capturedImg2 = child;
+                })
+            };
+            const mockRow2 = { insertCell: jest.fn(() => mockCell2) };
+            paletteList.insertRow = jest.fn(() => mockRow2);
             palette._showMenuItems();
             const img = capturedImg2;
             img.offsetWidth = 10;
@@ -1719,7 +1728,13 @@ describe("Palettes Class", () => {
 
         test("_showMenuItems hides palette when mobile", () => {
             const paletteList = {
-                appendChild: jest.fn()
+                appendChild: jest.fn(),
+                insertRow: jest.fn(() => ({
+                    insertCell: jest.fn(() => ({
+                        style: {},
+                        appendChild: jest.fn()
+                    }))
+                }))
             };
             const palDiv = { childNodes: [{ style: {} }], removeChild: jest.fn() };
             global.docById = jest.fn(id => {
