@@ -2375,3 +2375,7 @@ class PitchSmoother {
         this.pitchHistory = [];
     }
 }
+
+if (typeof module !== "undefined") {
+    module.exports = { SampleWidget, PitchSmoother };
+}
