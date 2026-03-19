@@ -49,6 +49,7 @@ function makeMockElement(tag) {
         id: '',
         innerHTML: '',
         textContent: '',
+        innerText: '',
         value: '',
         cloneNode: jest.fn(() => makeMockElement(tag)),
         querySelector: jest.fn(() => makeMockElement('div')),
@@ -193,6 +194,7 @@ function enhancedMakeMockElement(tag) {
     const el = makeMockElement(tag);
     el.setAttribute = jest.fn();
     el.getAttribute = jest.fn();
+    el.removeAttribute = jest.fn();
     el.appendChild = jest.fn().mockImplementation(function(child) {
         if (child && typeof child === 'object') {
             if (!this.children) this.children = [];
