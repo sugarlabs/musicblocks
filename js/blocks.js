@@ -2115,7 +2115,22 @@ class Blocks {
                 }
 
                 this.adjustDocks(newBlock, true);
-                /** TODO: some graphical feedback re new connection? */
+
+                // Graphical feedback for new connection
+                if (this.blockList[thisBlock]) {
+                    this.blockList[thisBlock].highlight();
+                }
+                if (this.blockList[newBlock]) {
+                    this.blockList[newBlock].highlight();
+                }
+                setTimeout(() => {
+                    if (this.blockList[thisBlock]) {
+                        this.blockList[thisBlock].unhighlight();
+                    }
+                    if (this.blockList[newBlock]) {
+                        this.blockList[newBlock].unhighlight();
+                    }
+                }, 200);
 
                 /** Check if top block is one of the widget blocks. */
                 let lockInit = false;
