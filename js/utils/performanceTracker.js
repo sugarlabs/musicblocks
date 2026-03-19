@@ -115,7 +115,7 @@ function _getHeapSize() {
  *
  * @returns {boolean} True if performance mode is active.
  */
-// eslint-disable-next-line no-unused-vars
+
 function isPerformanceModeEnabled() {
     // Check global flag first (fastest path)
     if (typeof window !== "undefined" && window.DEBUG_PERFORMANCE === true) {
@@ -144,7 +144,7 @@ function isPerformanceModeEnabled() {
  * Captures start time and initial memory snapshot.
  * Resets depth counters for a clean measurement.
  */
-// eslint-disable-next-line no-unused-vars
+
 function startPerformanceTracking() {
     // Reset all state for a fresh run
     _startTime = _now();
@@ -161,7 +161,7 @@ function startPerformanceTracking() {
  * Ends the current performance measurement session.
  * Captures end time, computes execution duration, and memory delta.
  */
-// eslint-disable-next-line no-unused-vars
+
 function endPerformanceTracking() {
     _endTime = _now();
     _executionTime = _endTime - _startTime;
@@ -182,7 +182,7 @@ function endPerformanceTracking() {
  *
  * @returns {Object} Stats object with executionTime, memoryDelta, and maxDepth.
  */
-// eslint-disable-next-line no-unused-vars
+
 function getPerformanceStats() {
     return {
         executionTime: _executionTime,
@@ -195,7 +195,7 @@ function getPerformanceStats() {
  * Resets all internal tracking state to initial values.
  * Call this before starting a new measurement if needed.
  */
-// eslint-disable-next-line no-unused-vars
+
 function resetPerformanceStats() {
     _startTime = null;
     _endTime = null;
@@ -218,7 +218,7 @@ function resetPerformanceStats() {
  * This is a lightweight counter — it does NOT modify the interpreter's
  * recursion model or call stack.
  */
-// eslint-disable-next-line no-unused-vars
+
 function enterExecutionScope() {
     _currentDepth++;
     if (_currentDepth > _maxDepth) {
@@ -230,7 +230,7 @@ function enterExecutionScope() {
  * Called when exiting an execution scope.
  * Decrements current depth safely (never goes below zero).
  */
-// eslint-disable-next-line no-unused-vars
+
 function exitExecutionScope() {
     if (_currentDepth > 0) {
         _currentDepth--;
@@ -251,29 +251,28 @@ function _logPerformanceStats() {
 
     // Use groupCollapsed for a tidy console; fall back to group or plain log
     if (typeof console.groupCollapsed === "function") {
-        console.groupCollapsed(groupLabel); // eslint-disable-line no-console
+        console.groupCollapsed(groupLabel);
     } else if (typeof console.group === "function") {
-        console.group(groupLabel); // eslint-disable-line no-console
+        console.group(groupLabel);
     } else {
-        console.log(groupLabel); // eslint-disable-line no-console
+        console.log(groupLabel);
     }
 
     // Execution time
     console.log(
-        // eslint-disable-line no-console
         "⏱  Execution Time: " +
             (_executionTime !== null ? _executionTime.toFixed(2) + " ms" : "N/A")
     );
 
     // Memory delta
     var memoryDisplay = _memoryDelta !== null ? _memoryDelta + " bytes" : "unsupported";
-    console.log("💾  Memory Delta: " + memoryDisplay); // eslint-disable-line no-console
+    console.log("💾  Memory Delta: " + memoryDisplay);
 
     // Max execution depth
-    console.log("📊  Max Execution Depth: " + _maxDepth); // eslint-disable-line no-console
+    console.log("📊  Max Execution Depth: " + _maxDepth);
 
     if (typeof console.groupEnd === "function") {
-        console.groupEnd(); // eslint-disable-line no-console
+        console.groupEnd();
     }
 }
 
@@ -281,7 +280,6 @@ function _logPerformanceStats() {
 // Global performanceTracker object — the public API consumed by logo.js
 // ============================================================================
 
-// eslint-disable-next-line no-unused-vars
 var performanceTracker = {
     /** Enable instrumentation. */
     enable: function () {
