@@ -1733,7 +1733,7 @@ describe("noteToPitchOctave", () => {
 
 describe("pitchToFrequency", () => {
     global.TWELTHROOT2 = 1.0594630943592953;
-    global.TWELVEHUNDRETHROOT2 = 1.0005777895065549;
+    global.TWELVEHUNDRETHROOT2 = Number("1.0005777895065549");
     global.A0 = 27.5;
 
     it("calculates frequency with 0 cents", () => {
@@ -1758,7 +1758,7 @@ describe("pitchToFrequency", () => {
 
 describe("noteToFrequency", () => {
     global.TWELTHROOT2 = 1.0594630943592953;
-    global.TWELVEHUNDRETHROOT2 = 1.0005777895065549;
+    global.TWELVEHUNDRETHROOT2 = Number("1.0005777895065549");
     global.A0 = 27.5;
     it("converts note to frequency correctly", () => {
         const result = noteToFrequency("A4", "C");

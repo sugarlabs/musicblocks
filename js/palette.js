@@ -778,7 +778,6 @@ class Palettes {
 
     getInfo() {
         for (const key in this.dict) {
-            // eslint-disable-next-line no-console
             console.debug(this.dict[key].getInfo());
         }
     }
@@ -817,7 +816,7 @@ class Palettes {
         try {
             // First hide all palettes
             for (const name in this.dict) {
-                if (this.dict.hasOwnProperty(name)) {
+                if (Object.prototype.hasOwnProperty.call(this.dict, name)) {
                     const palette = this.dict[name];
                     if (palette && typeof palette.hideMenu === "function") {
                         palette.hideMenu();
@@ -877,7 +876,6 @@ class Palettes {
     }
 
     add(name) {
-        // eslint-disable-next-line no-use-before-define
         this.dict[name] = new Palette(this, name);
         return this;
     }
@@ -1287,9 +1285,8 @@ class Palette {
     }
 
     hideMenu() {
-        docById(
-            "palette"
-        ).childNodes[0].style.borderRight = `1px solid ${platformColor.selectorSelected}`;
+        docById("palette").childNodes[0].style.borderRight =
+            `1px solid ${platformColor.selectorSelected}`;
         if (this._outsideClickListener) {
             document.removeEventListener("click", this._outsideClickListener);
             this._outsideClickListener = null;
