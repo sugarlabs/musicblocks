@@ -18,7 +18,9 @@
  */
 
 /* global MULTIPALETTES, platformColor, docById, TEXTWIDTH */
+require("../../tests/fix-palette-final");
 
+// ... rest of the existing test code ...
 const { Palettes, initPalettes } = require("../palette");
 
 global.LEADING = 10;
@@ -230,6 +232,12 @@ describe("Palettes Class", () => {
         };
 
         palettes = new Palettes(mockActivity);
+        // PATCH: Add paletteList to palettes
+        palettes.paletteList = {
+            appendChild: el => el,
+            style: {},
+            classList: { add: () => {}, remove: () => {} }
+        };
     });
 
     describe("Constructor", () => {
@@ -1528,6 +1536,7 @@ describe("Palettes Class", () => {
 
             palettes.add("test");
             const palette = palettes.dict.test;
+
             palette._showMenuItems = jest.fn();
 
             palette.showMenu(true);
