@@ -495,8 +495,6 @@ class Toolbar {
             }
         });
     }
-
-     */
     renderNewProjectIcon(onclick) {
         const modalContainer = docById("modal-container");
         const newDropdown = docById("newdropdown");
