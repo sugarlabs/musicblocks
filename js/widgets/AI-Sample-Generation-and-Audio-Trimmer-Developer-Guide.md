@@ -11,7 +11,6 @@ To run this feature, you need to set up the backend: [AI-Sample-Generation-Backe
 ### Endpoints
 
 The backend provides three endpoints:
-
 - `/generate` - Generate audio from text
 - `/preview` - Preview generated audio
 - `/save` - Save generated audio
@@ -33,7 +32,7 @@ this._promptBtn = widgetWindow.addButton("prompt.svg", ICONSIZE, _("Prompt"), ""
 ```
 
 - Prompt Button (`this._promptBtn`)
-    - Upon clicking it, the AI Sample Generation screen is rendered.
+  - Upon clicking it, the AI Sample Generation screen is rendered.
 
 ---
 
@@ -49,13 +48,13 @@ this._promptBtn = widgetWindow.addButton("prompt.svg", ICONSIZE, _("Prompt"), ""
         - Textarea uses a random placeholder from a predefined prompt list.
     - **Adds Buttons**
         - **Submit**
-            - Sends a request to `/generate` with the user’s prompt.
-            - Shows status messages while generating.
-            - On success, enables **Preview** and **Save**.
+          - Sends a request to `/generate` with the user’s prompt.
+          - Shows status messages while generating.
+          - On success, enables **Preview** and **Save**.
         - **Preview**
-            - Plays the generated audio from `/preview`.
+          - Plays the generated audio from `/preview`.
         - **Save**
-            - Downloads the generated audio from `/save`.
+          - Downloads the generated audio from `/save`.
 
 ---
 

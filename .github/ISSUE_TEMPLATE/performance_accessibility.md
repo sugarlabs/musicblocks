@@ -28,17 +28,17 @@ assignees: ""
 
 ### Environment
 
-- Device type: [e.g., desktop, mobile]
-- Operating System: [e.g., Windows, macOS, Linux, Android, iOS]
-- Browser (if applicable): [e.g., Chrome, Firefox, Safari]
-- Version of Software/Project: [e.g., v1.0.0]
+-   Device type: [e.g., desktop, mobile]
+-   Operating System: [e.g., Windows, macOS, Linux, Android, iOS]
+-   Browser (if applicable): [e.g., Chrome, Firefox, Safari]
+-   Version of Software/Project: [e.g., v1.0.0]
 
 ### Checklist
 
-- [ ] I have read and followed the project's code of conduct.
-- [ ] I have searched for similar issues before creating this one.
-- [ ] I have provided enough information to understand and assess the issue.
-- [ ] I am willing to contribute to the resolution of this issue.
+-   [ ] I have read and followed the project's code of conduct.
+-   [ ] I have searched for similar issues before creating this one.
+-   [ ] I have provided enough information to understand and assess the issue.
+-   [ ] I am willing to contribute to the resolution of this issue.
 
 ---
 

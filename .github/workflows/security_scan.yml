@@ -1,27 +1,27 @@
 name: Security Scans
 
 on:
-    push:
-        branches:
-            - main
-    pull_request:
-    workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
 
 jobs:
-    security-scans:
-        runs-on: ubuntu-latest
+  security-scans:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout Code
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "22"
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
 
-            - name: Install Dependencies
-              run: npm ci
+      - name: Install Dependencies
+        run: npm ci
 
-            - name: Run npm Audit
-              run: npm audit --omit=dev --audit-level=high
+      - name: Run npm Audit
+        run: npm audit --omit=dev --audit-level=high

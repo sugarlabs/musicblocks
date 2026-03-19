@@ -26,10 +26,10 @@ assignees: ""
 
 ### Checklist
 
-- [ ] I have read and followed the project's code of conduct.
-- [ ] I have searched for similar issues before creating this one.
-- [ ] I have provided all the necessary information to understand and reproduce the issue.
-- [ ] I am willing to contribute to the resolution of this issue.
+-   [ ] I have read and followed the project's code of conduct.
+-   [ ] I have searched for similar issues before creating this one.
+-   [ ] I have provided all the necessary information to understand and reproduce the issue.
+-   [ ] I am willing to contribute to the resolution of this issue.
 
 ---
 

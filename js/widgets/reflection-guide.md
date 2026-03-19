@@ -8,70 +8,73 @@ Backend Code for the widget : [musicblocks_reflection_fastapi](https://github.co
 
 ## Key Features
 
-- **Multi-mentor Chat:** Switch between AI mentors (Meta/Rohan, Music/Beethoven, Code/Alan).
-- **Chat History:** Stores and renders conversation history.
-- **Typing Indicator:** Shows animated "Thinking..." while awaiting responses.
-- **Markdown Rendering:** Converts Markdown responses to HTML for display.
-- **Analysis & Summary:** Fetches project analysis after sufficient chat history.
-- **Local Storage:** Saves and retrieves analysis reports.
-- **Export:** Download chat transcript as a text file.
+-   **Multi-mentor Chat:** Switch between AI mentors (Meta/Rohan, Music/Beethoven, Code/Alan).
+-   **Chat History:** Stores and renders conversation history.
+-   **Typing Indicator:** Shows animated "Thinking..." while awaiting responses.
+-   **Markdown Rendering:** Converts Markdown responses to HTML for display.
+-   **Analysis & Summary:** Fetches project analysis after sufficient chat history.
+-   **Local Storage:** Saves and retrieves analysis reports.
+-   **Export:** Download chat transcript as a text file.
 
 ## Components
 
-- **Widget Interface**: `js/widgets/reflection.js`
-- **Block Definition**: `js/blocks/WidgetBlocks.js`
-- **Registration**: `js/activity.js` (line 176) and `js/logo.js` (line 113)
-- **CSS styling**: `css/activities.css` (line 2023 - 2072)
+-   **Widget Interface**: `js/widgets/reflection.js`
+-   **Block Definition**: `js/blocks/WidgetBlocks.js`
+-   **Registration**: `js/activity.js` (line 176) and `js/logo.js` (line 113)
+-   **CSS styling**: `css/activities.css` (line 2023 - 2072)
 
 ## Methods
 
-- **Widget Window Initialisation**
+-   **Widget Window Initialisation**
 
     `init(activity)` : Triggers when the reflection block is clicked. It renders the widget and initializes the required data structures.
 
 ---
 
-- **Mentor Switching**
+-   **Mentor Switching**
 
     `changeMentor("code")` : Changes the active mentor and updates button highlights.
 
 ---
 
-- Sending Messages
+-   Sending Messages
 
     `sendMessage()` : Pushes user message to history, displays it, and requests bot reply.
 
 ---
 
-- Bot Reply Handling
+-   Bot Reply Handling
 
     `botReplyDiv(message, user_query, md)` :
-    - If `user_query` is true, sends message to backend and displays reply.
-    - If `md` is true, renders reply as Markdown.
+
+    -   If `user_query` is true, sends message to backend and displays reply.
+    -   If `md` is true, renders reply as Markdown.
 
 ---
 
-- Analysis & Summary
+-   Analysis & Summary
 
     `getAnalysis()` :
-    - Requests project analysis from backend if chat history is sufficient.
-    - Saves analysis to localStorage.
+
+    -   Requests project analysis from backend if chat history is sufficient.
+    -   Saves analysis to localStorage.
 
 ---
 
-- Local Storage
-    - **Save:** `saveReport(data)` stores analysis.
-    - **Read:** `readReport()` retrieves analysis.
+-   Local Storage
+
+    -   **Save:** `saveReport(data)` stores analysis.
+    -   **Read:** `readReport()` retrieves analysis.
 
 ---
 
-- Export Conversation
+-   Export Conversation
 
     `downloadAsTxt(conversationData)` : Downloads chat history as a `.txt` file.
 
 ---
 
-- Markdown Rendering
+-   Markdown Rendering
 
     `mdToHTML(md)` : Converts Markdown to HTML for display in chat.
 
@@ -81,15 +84,15 @@ Backend Code for the widget : [musicblocks_reflection_fastapi](https://github.co
 
 ### 1. `/projectcode`
 
-- **Method:** `POST`
-- **Purpose:** Sends the exported project code to the backend to receive an algorithmic summary.
-- **Payload:**
+-   **Method:** `POST`
+-   **Purpose:** Sends the exported project code to the backend to receive an algorithmic summary.
+-   **Payload:**
     ```json
     {
         "code": "<project code string>"
     }
     ```
-- **Response:**
+-   **Response:**
     ```json
     {
         "algorithm": "<algorithm string>",
@@ -107,9 +110,9 @@ Backend Code for the widget : [musicblocks_reflection_fastapi](https://github.co
 
 ### 2. `/chat`
 
-- **Method:** `POST`
-- **Purpose:** Sends a user query, chat history, mentor selection, and project algorithm to the backend to get an AI mentor's reply.
-- **Payload:**
+-   **Method:** `POST`
+-   **Purpose:** Sends a user query, chat history, mentor selection, and project algorithm to the backend to get an AI mentor's reply.
+-   **Payload:**
     ```json
     {
       "query": "<user message>",
@@ -118,12 +121,12 @@ Backend Code for the widget : [musicblocks_reflection_fastapi](https://github.co
       "algorithm": "<algorithm string>"
     }
     ```
-- **Response:**  
-  `{ response: "<bot reply>" }`  
-  or  
-  `{ error: "<error message>" }`
+-   **Response:**  
+    `{ response: "<bot reply>" }`  
+    or  
+    `{ error: "<error message>" }`
 
-- **Example `messages` structure**
+-   **Example `messages` structure**
     ```json
     [
         {
@@ -145,34 +148,34 @@ Backend Code for the widget : [musicblocks_reflection_fastapi](https://github.co
 
 ### 3. `/analysis`
 
-- **Method:** `POST`
-- **Purpose:** Sends the chat history and summary to the backend to receive a project analysis report.
-- **Payload:**
+-   **Method:** `POST`
+-   **Purpose:** Sends the chat history and summary to the backend to receive a project analysis report.
+-   **Payload:**
     ```json
     {
       "messages": [ { "role": "...", "content": "..." }, ... ],
       "summary": "<summary string>"
     }
     ```
-- **Response:**  
-  `{ response: "<analysis report>" }`  
-  or  
-  `{ error: "<error message>" }`
+-   **Response:**  
+    `{ response: "<analysis report>" }`  
+    or  
+    `{ error: "<error message>" }`
 
 ---
 
 ### 4. `/updatecode`
 
-- **Method:** `POST`
-- **Purpose:** Sends updated project code to the backend to refresh the algorithmic summary.
-- **Payload:**
+-   **Method:** `POST`
+-   **Purpose:** Sends updated project code to the backend to refresh the algorithmic summary.
+-   **Payload:**
     ```json
     {
         "oldcode": "<existing project code string>",
         "newcode": "<new project code string>"
     }
     ```
-- **Response:**
+-   **Response:**
     ```json
     {
         "algorithm": "<new algorithm string>",
