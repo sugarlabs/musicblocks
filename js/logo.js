@@ -789,7 +789,6 @@ class Logo {
                         // Debug logging removed to avoid console noise in production
                         eval(logo.evalArgDict[logo.blockList[blk].name]);
                     } else {
-                        // eslint-disable-next-line no-console
                         console.error("I do not know how to " + logo.blockList[blk].name);
                     }
                     break;
