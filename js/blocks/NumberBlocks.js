@@ -814,9 +814,9 @@ function setupNumberBlocks(activity) {
                             return MathUtility.doPlus(a, b);
                         } catch (e) {
                             activity.errorMsg(NOINPUTERRORMSG, blk);
-                            // eslint-disable-next-line no-console
+
                             console.debug(a + " " + b);
-                            // eslint-disable-next-line no-console
+
                             console.debug(e);
                             if (!isNaN(a)) {
                                 return a;
@@ -981,7 +981,6 @@ function setupNumberBlocks(activity) {
             try {
                 return Number(activity.blocks.blockList[blk].value);
             } catch (e) {
-                // eslint-disable-next-line no-console
                 console.debug(e);
                 return 0;
             }

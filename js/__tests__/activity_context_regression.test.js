@@ -172,7 +172,7 @@ describe("window.activity — deprecation guard contract", () => {
 
     test("reading window.activity triggers console.warn", () => {
         const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
-        // eslint-disable-next-line no-unused-vars
+
         const _ = window.activity; // trigger getter
         expect(warnSpy).toHaveBeenCalledTimes(1);
         expect(warnSpy.mock.calls[0][0]).toMatch(/\[Deprecated\]/);
