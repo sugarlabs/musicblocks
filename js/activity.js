@@ -7534,6 +7534,7 @@ class Activity {
             this.toolbar.renderLogoIcon(showAboutPage);
             this.toolbar.renderPlayIcon(doFastButton);
             this.toolbar.renderStopIcon(doHardStopButton);
+            this.toolbar.renderHighContrastToggle();
             this.toolbar.renderNewProjectIcon(_afterDelete);
             this.toolbar.renderLoadIcon(doLoad);
             this.toolbar.renderSaveIcons(
@@ -7552,7 +7553,6 @@ class Activity {
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
             this.toolbar.renderMenuIcon(showHideAuxMenu);
             this.toolbar.renderHelpIcon(showHelp);
-            this.toolbar.renderHighContrastToggle();
             this.toolbar.renderModeSelectIcon(
                 doSwitchMode,
                 () => doRecordButton(this),

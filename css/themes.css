@@ -394,16 +394,13 @@ body.high-contrast {
     border-bottom: 2px solid #ffffff !important;
 }
 
-
 .high-contrast .material-icons {
     color: #ffffff !important;
 }
 
-
 .high-contrast #canvas {
     background-color: #000000 !important;
 }
-
 
 .high-contrast #palette-list li {
     background-color: #000000 !important;
@@ -413,7 +410,6 @@ body.high-contrast {
 .high-contrast #palette-list li:hover {
     background-color: #333333 !important;
 }
-
 
 .high-contrast #floatingWindows > .windowFrame {
     border: 2px solid #ffffff !important;
@@ -427,7 +423,6 @@ body.high-contrast {
     background-color: #000000 !important;
 }
 
-
 .high-contrast .dropdown-content {
     background-color: #000000 !important;
 }
@@ -439,19 +434,16 @@ body.high-contrast {
     background-color: #333333 !important;
 }
 
-
 .high-contrast *:focus {
     outline: 3px solid #ffff00 !important;
     outline-offset: 2px !important;
 }
-
 
 .high-contrast .material-tooltip {
     background-color: #000000 !important;
     color: #ffff00 !important;
     border: 1px solid #ffffff !important;
 }
-
 
 .high-contrast .modal-content {
     background-color: #000000 !important;
