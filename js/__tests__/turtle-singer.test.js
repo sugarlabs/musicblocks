@@ -917,6 +917,10 @@ describe("processNote regression behavior", () => {
         singer = turtleMock.singer;
     });
 
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
     test("should not modify bpm stack during execution", () => {
         singer.bpm.push(120);
         const originalLength = singer.bpm.length;
