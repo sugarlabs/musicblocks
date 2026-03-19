@@ -65,6 +65,30 @@ class ReflectionMatrix {
          * @type {string}
          */
         this.code = "";
+
+        /**
+         * Tracks whether the widget is mounted and can still update UI safely.
+         * @type {boolean}
+         */
+        this._isMounted = false;
+
+        /**
+         * Tracks in-flight fetch controllers so they can be aborted on close.
+         * @type {Set<AbortController>}
+         */
+        this._pendingRequests = new Set();
+
+        /**
+         * Delayed typing-indicator timeout for initial project loading.
+         * @type {number|null}
+         */
+        this._typingTimeout = null;
+
+        /**
+         * Reference to the send button so it can be disabled during async work.
+         * @type {HTMLButtonElement|null}
+         */
+        this.sendButton = null;
     }
 
     /**
@@ -74,6 +98,7 @@ class ReflectionMatrix {
     init(activity) {
         this.activity = activity;
         this.isOpen = true;
+        this._isMounted = true;
         this.isMaximized = false;
         this.activity.isInputON = true;
         this.PORT = "http://3.105.177.138:8000"; // http://127.0.0.1:8000
@@ -87,10 +112,15 @@ class ReflectionMatrix {
 
         widgetWindow.onclose = () => {
             this.isOpen = false;
+            this._isMounted = false;
             this.activity.isInputON = false;
-            if (this.dotsInterval) {
-                clearInterval(this.dotsInterval);
+            this._setControlsDisabled(true);
+            this.hideTypingIndicator();
+            if (this._typingTimeout) {
+                clearTimeout(this._typingTimeout);
+                this._typingTimeout = null;
             }
+            this._abortPendingRequests();
             widgetWindow.destroy();
         };
 
@@ -176,12 +206,12 @@ class ReflectionMatrix {
             }
         };
 
-        const sendBtn = document.createElement("button");
-        sendBtn.className = "confirm-button";
-        sendBtn.style.marginRight = "10px";
-        sendBtn.innerText = "Send";
-        sendBtn.onclick = () => this.sendMessage();
-        this.inputContainer.appendChild(sendBtn);
+        this.sendButton = document.createElement("button");
+        this.sendButton.className = "confirm-button";
+        this.sendButton.style.marginRight = "10px";
+        this.sendButton.innerText = "Send";
+        this.sendButton.onclick = () => this.sendMessage();
+        this.inputContainer.appendChild(this.sendButton);
 
         // first message
         this.chatInterface.appendChild(this.inputContainer);
@@ -200,7 +230,7 @@ class ReflectionMatrix {
      * @returns {void}
      */
     showTypingIndicator(action) {
-        if (this.typingDiv) return;
+        if (!this._isWidgetActive() || this.typingDiv) return;
 
         this.typingDiv = document.createElement("div");
         this.typingDiv.className = "typing-indicator";
@@ -233,6 +263,86 @@ class ReflectionMatrix {
             clearInterval(this.dotsInterval);
             this.typingDiv.remove();
             this.typingDiv = null;
+            this.dotsContainer = null;
+        }
+    }
+
+    /**
+     * Returns true if the widget is still mounted and safe to update.
+     * @returns {boolean}
+     */
+    _isWidgetActive() {
+        return this._isMounted && this.isOpen && this.chatLog;
+    }
+
+    /**
+     * Disables controls while async work is in progress.
+     * @param {boolean} disabled - Whether controls should be disabled.
+     * @returns {void}
+     */
+    _setControlsDisabled(disabled) {
+        [
+            this.summaryButton,
+            this.reloadButton,
+            this.metaButton,
+            this.codeButton,
+            this.musicButton,
+            this.sendButton,
+            this.input
+        ].forEach(control => {
+            if (control) {
+                control.disabled = disabled;
+            }
+        });
+    }
+
+    /**
+     * Aborts all in-flight widget requests.
+     * @returns {void}
+     */
+    _abortPendingRequests() {
+        this._pendingRequests.forEach(controller => controller.abort());
+        this._pendingRequests.clear();
+    }
+
+    /**
+     * Sends JSON to the backend while tracking widget lifecycle.
+     * @param {string} path - Backend path suffix.
+     * @param {Object} payload - Request payload.
+     * @returns {Promise<Object|null>}
+     */
+    async _postJSON(path, payload) {
+        const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+
+        if (controller) {
+            this._pendingRequests.add(controller);
+        }
+
+        try {
+            const request = {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            };
+
+            if (controller) {
+                request.signal = controller.signal;
+            }
+
+            const response = await fetch(`${this.PORT}${path}`, request);
+            const data = await response.json();
+            return this._isWidgetActive() ? data : null;
+        } catch (error) {
+            if (error && error.name === "AbortError") {
+                return null;
+            }
+
+            console.error("Error :", error);
+            return { error: "Failed to send message" };
+        } finally {
+            if (controller) {
+                this._pendingRequests.delete(controller);
+            }
         }
     }
 
@@ -267,25 +377,46 @@ class ReflectionMatrix {
      *  @returns {Promise<void>}
      */
     async startChatSession() {
-        if (this.triggerFirst == true) return;
+        if (this.triggerFirst === true || !this._isWidgetActive()) return;
 
         this.triggerFirst = true;
-        setTimeout(() => {
+        this._setControlsDisabled(true);
+        this._typingTimeout = setTimeout(() => {
             this.showTypingIndicator("Reading code");
         }, 1000);
 
-        const code = await this.activity.prepareExport();
-        const data = await this.generateAlgorithm(code);
+        try {
+            const code = await this.activity.prepareExport();
+            const data = await this.generateAlgorithm(code);
 
-        this.hideTypingIndicator();
+            if (this._typingTimeout) {
+                clearTimeout(this._typingTimeout);
+                this._typingTimeout = null;
+            }
 
-        if (data && !data.error) {
-            this.inputContainer.style.display = "flex";
-            this.botReplyDiv(data, false, false);
-            this.projectAlgorithm = data.algorithm;
-            this.code = code;
-        } else {
-            this.activity.errorMsg(_(data.error), 3000);
+            this.hideTypingIndicator();
+
+            if (!this._isWidgetActive() || !data) {
+                return;
+            }
+
+            if (!data.error) {
+                this.inputContainer.style.display = "flex";
+                this.botReplyDiv(data, false, false);
+                this.projectAlgorithm = data.algorithm;
+                this.code = code;
+            } else {
+                this.activity.errorMsg(_(data.error), 3000);
+            }
+        } finally {
+            if (this._typingTimeout) {
+                clearTimeout(this._typingTimeout);
+                this._typingTimeout = null;
+            }
+
+            if (this._isWidgetActive()) {
+                this._setControlsDisabled(false);
+            }
         }
     }
 
@@ -294,26 +425,42 @@ class ReflectionMatrix {
      * @returns {Promise<void>}
      */
     async updateProjectCode() {
+        if (this.typingDiv || !this._isWidgetActive()) {
+            return;
+        }
+
         const code = await this.activity.prepareExport();
         if (code === this.code) {
             return; // No changes in code
         }
 
+        this._setControlsDisabled(true);
         this.showTypingIndicator("Reading code");
-        const data = await this.generateNewAlgorithm(code);
-        this.hideTypingIndicator();
 
-        if (data && !data.error) {
-            if (data.algorithm !== "unchanged") {
-                this.projectAlgorithm = data.algorithm; // update algorithm
-                this.code = code;
+        try {
+            const data = await this.generateNewAlgorithm(code);
+            this.hideTypingIndicator();
+
+            if (!this._isWidgetActive() || !data) {
+                return;
             }
-            this.botReplyDiv(data, false, false);
-        } else {
-            this.activity.errorMsg(_(data.error), 3000);
-        }
 
-        this.projectAlgorithm = data.algorithm;
+            if (!data.error) {
+                if (data.algorithm !== "unchanged") {
+                    this.projectAlgorithm = data.algorithm; // update algorithm
+                    this.code = code;
+                }
+                this.botReplyDiv(data, false, false);
+                this.projectAlgorithm = data.algorithm;
+            } else {
+                this.activity.errorMsg(_(data.error), 3000);
+            }
+        } finally {
+            if (this._isWidgetActive()) {
+                this.hideTypingIndicator();
+                this._setControlsDisabled(false);
+            }
+        }
     }
 
     /**
@@ -322,20 +469,9 @@ class ReflectionMatrix {
      * @returns {Promise<Object>} - The server response containing the algorithm.
      */
     async generateAlgorithm(code) {
-        try {
-            const response = await fetch(`${this.PORT}/projectcode`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    code: code
-                })
-            });
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Failed to send message" };
-        }
+        return this._postJSON("/projectcode", {
+            code: code
+        });
     }
 
     /**
@@ -345,21 +481,10 @@ class ReflectionMatrix {
      * @returns {Promise<Object>} - The server response containing the updated algorithm.
      */
     async generateNewAlgorithm(code) {
-        try {
-            const response = await fetch(`${this.PORT}/updatecode`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    oldcode: this.code,
-                    newcode: code
-                })
-            });
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Failed to send message" };
-        }
+        return this._postJSON("/updatecode", {
+            oldcode: this.code,
+            newcode: code
+        });
     }
 
     /**
@@ -371,25 +496,15 @@ class ReflectionMatrix {
      *  @returns {Promise<Object>} - The server response containing the bot's reply.
      */
     async generateBotReply(message, chatHistory, mentor, algorithm) {
-        try {
-            this.showTypingIndicator();
-            const response = await fetch(`${this.PORT}/chat`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    query: message,
-                    messages: chatHistory,
-                    mentor: mentor,
-                    algorithm: algorithm
-                })
-            });
-            this.hideTypingIndicator();
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Failed to send message" };
-        }
+        this.showTypingIndicator();
+        const data = await this._postJSON("/chat", {
+            query: message,
+            messages: chatHistory,
+            mentor: mentor,
+            algorithm: algorithm
+        });
+        this.hideTypingIndicator();
+        return data;
     }
 
     /**
@@ -397,14 +512,27 @@ class ReflectionMatrix {
      * @returns {Promise<void>}
      */
     async getAnalysis() {
-        if (this.chatHistory.length < 10) return;
+        if (this.chatHistory.length < 10 || this.typingDiv || !this._isWidgetActive()) return;
+
+        this._setControlsDisabled(true);
         this.showTypingIndicator("Analyzing");
-        const data = await this.generateAnalysis();
-        this.hideTypingIndicator();
-        if (data) {
+
+        try {
+            const data = await this.generateAnalysis();
+            this.hideTypingIndicator();
+
+            if (!this._isWidgetActive() || !data) {
+                return;
+            }
+
             this.botReplyDiv(data, false, true);
+            await this.saveReport(data);
+        } finally {
+            if (this._isWidgetActive()) {
+                this.hideTypingIndicator();
+                this._setControlsDisabled(false);
+            }
         }
-        await this.saveReport(data);
     }
 
     /**
@@ -412,21 +540,10 @@ class ReflectionMatrix {
      *  @returns {Promise<Object>} - The server response containing the analysis.
      */
     async generateAnalysis() {
-        try {
-            const response = await fetch(`${this.PORT}/analysis`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    messages: this.chatHistory,
-                    summary: this.summary
-                })
-            });
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error("Error :", error);
-            return { error: "Failed to send message" };
-        }
+        return this._postJSON("/analysis", {
+            messages: this.chatHistory,
+            summary: this.summary
+        });
     }
 
     /**
@@ -437,17 +554,22 @@ class ReflectionMatrix {
      */
     async botReplyDiv(message, user_query = true, md = false) {
         let reply;
+        let replyMentor = this.AImentor;
         // check if message is from user or bot
         if (user_query === true) {
-            if (this.typingDiv) return;
+            if (this.typingDiv || !this._isWidgetActive()) return;
             reply = await this.generateBotReply(
                 message,
                 this.chatHistory,
-                this.AImentor,
+                replyMentor,
                 this.projectAlgorithm
             );
         } else {
             reply = message;
+        }
+
+        if (!this._isWidgetActive() || !reply) {
+            return;
         }
 
         if (reply.error) {
@@ -457,7 +579,7 @@ class ReflectionMatrix {
         }
 
         this.chatHistory.push({
-            role: this.AImentor,
+            role: replyMentor,
             content: reply.response
         });
 
@@ -474,7 +596,7 @@ class ReflectionMatrix {
         senderName.style.marginBottom = "4px";
         senderName.style.color = "#383838ff";
         senderName.style.alignSelf = "flex-start";
-        senderName.innerText = this.mentorsMap[this.AImentor];
+        senderName.innerText = this.mentorsMap[replyMentor];
 
         const botReply = document.createElement("div");
 
@@ -497,7 +619,7 @@ class ReflectionMatrix {
      */
     sendMessage() {
         const text = this.input.value.trim();
-        if (text === "") return;
+        if (text === "" || this.typingDiv || !this._isWidgetActive()) return;
         this.chatHistory.push({
             role: "user",
             content: text
@@ -523,7 +645,12 @@ class ReflectionMatrix {
 
         this.chatLog.appendChild(messageContainer);
         this.input.value = "";
-        this.botReplyDiv(text);
+        this._setControlsDisabled(true);
+        this.botReplyDiv(text).finally(() => {
+            if (this._isWidgetActive()) {
+                this._setControlsDisabled(false);
+            }
+        });
         this.chatLog.scrollTop = this.chatLog.scrollHeight;
     }
 

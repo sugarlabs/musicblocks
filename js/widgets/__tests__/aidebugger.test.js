@@ -33,6 +33,20 @@ new Function(
 global._ = str => str;
 global._THIS_IS_MUSIC_BLOCKS_ = true;
 
+function createMockWidgetWindow() {
+    const widgetBody = document.createElement("div");
+    return {
+        clear: jest.fn(),
+        show: jest.fn(),
+        onclose: null,
+        onmaximize: null,
+        addButton: jest.fn(() => document.createElement("button")),
+        getWidgetBody: jest.fn(() => widgetBody),
+        sendToCenter: jest.fn(),
+        destroy: jest.fn()
+    };
+}
+
 describe("AIDebuggerWidget", () => {
     describe("Constructor", () => {
         test("initializes basic properties", () => {
@@ -48,6 +62,10 @@ describe("AIDebuggerWidget", () => {
             expect(debuggerWidget.chatLog).toBeNull();
             expect(debuggerWidget.messageInput).toBeNull();
             expect(debuggerWidget.sendButton).toBeNull();
+            expect(debuggerWidget._isProcessing).toBe(false);
+            expect(debuggerWidget._isInitializing).toBe(false);
+            expect(debuggerWidget._isMounted).toBe(false);
+            expect(debuggerWidget._pendingRequests.size).toBe(0);
         });
 
         test("_generateConversationId returns unique IDs", () => {
@@ -57,6 +75,150 @@ describe("AIDebuggerWidget", () => {
 
             expect(id1).not.toBe(id2);
             expect(id1.startsWith("conv_")).toBe(true);
+        });
+    });
+
+    describe("Async lifecycle handling", () => {
+        let debuggerWidget;
+        let mockWidgetWindow;
+        let mockActivity;
+
+        beforeEach(() => {
+            document.body.innerHTML = "";
+            jest.clearAllMocks();
+
+            mockWidgetWindow = createMockWidgetWindow();
+            window.widgetWindows = {
+                windowFor: jest.fn(() => mockWidgetWindow)
+            };
+
+            mockActivity = {
+                isInputON: false,
+                textMsg: jest.fn(),
+                prepareExport: jest.fn(() => "[]")
+            };
+
+            global.fetch = jest.fn();
+            debuggerWidget = new AIDebuggerWidget();
+        });
+
+        test("init aborts pending requests on close", () => {
+            jest.spyOn(debuggerWidget, "_loadProjectAndInitialize").mockImplementation(() => {});
+
+            debuggerWidget.init(mockActivity);
+
+            const abortSpy = jest.fn();
+            debuggerWidget._pendingRequests.add({ abort: abortSpy });
+            mockWidgetWindow.onclose();
+
+            expect(debuggerWidget._isMounted).toBe(false);
+            expect(abortSpy).toHaveBeenCalled();
+            expect(mockWidgetWindow.destroy).toHaveBeenCalled();
+            expect(mockActivity.isInputON).toBe(false);
+        });
+
+        test("_sendMessage skips while initialization is in progress", () => {
+            debuggerWidget.activity = mockActivity;
+            debuggerWidget.widgetWindow = mockWidgetWindow;
+            debuggerWidget.chatLog = document.createElement("div");
+            debuggerWidget.messageInput = document.createElement("input");
+            debuggerWidget.sendButton = document.createElement("button");
+            debuggerWidget.messageInput.value = "Help me debug";
+            debuggerWidget._isMounted = true;
+            debuggerWidget._isInitializing = true;
+
+            const sendSpy = jest.spyOn(debuggerWidget, "_sendToBackend");
+
+            debuggerWidget._sendMessage();
+
+            expect(debuggerWidget.chatHistory).toEqual([]);
+            expect(sendSpy).not.toHaveBeenCalled();
+        });
+
+        test("_sendToBackend ignores late responses after widget unmount", async () => {
+            debuggerWidget.activity = mockActivity;
+            debuggerWidget.widgetWindow = mockWidgetWindow;
+            debuggerWidget.chatLog = document.createElement("div");
+            debuggerWidget.messageInput = document.createElement("input");
+            debuggerWidget.sendButton = document.createElement("button");
+            debuggerWidget._isMounted = true;
+
+            let resolveFetch;
+            global.fetch.mockImplementation(
+                () =>
+                    new Promise(resolve => {
+                        resolveFetch = resolve;
+                    })
+            );
+
+            debuggerWidget._sendToBackend("Why is this broken?");
+            debuggerWidget._isMounted = false;
+
+            resolveFetch({
+                ok: true,
+                json: jest.fn().mockResolvedValue({ response: "Late response" })
+            });
+
+            await Promise.resolve();
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(debuggerWidget.chatHistory).toEqual([]);
+        });
+
+        test("_initializeBackendWithProject ignores late responses after widget unmount", async () => {
+            debuggerWidget.activity = mockActivity;
+            debuggerWidget.widgetWindow = mockWidgetWindow;
+            debuggerWidget.chatLog = document.createElement("div");
+            debuggerWidget.messageInput = document.createElement("input");
+            debuggerWidget.sendButton = document.createElement("button");
+            debuggerWidget._isMounted = true;
+
+            let resolveFetch;
+            global.fetch.mockImplementation(
+                () =>
+                    new Promise(resolve => {
+                        resolveFetch = resolve;
+                    })
+            );
+
+            debuggerWidget._initializeBackendWithProject("[]");
+            debuggerWidget._isMounted = false;
+
+            resolveFetch({
+                ok: true,
+                json: jest.fn().mockResolvedValue({ response: "Initial analysis" })
+            });
+
+            await Promise.resolve();
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(debuggerWidget.chatHistory).toEqual([]);
+        });
+
+        test("_resetConversation aborts pending work before reinitializing", () => {
+            debuggerWidget.activity = mockActivity;
+            debuggerWidget.widgetWindow = mockWidgetWindow;
+            debuggerWidget.chatLog = document.createElement("div");
+            debuggerWidget.messageInput = document.createElement("input");
+            debuggerWidget.sendButton = document.createElement("button");
+            debuggerWidget._isMounted = true;
+            debuggerWidget.chatHistory = [{ type: "user", content: "hello" }];
+            debuggerWidget.promptCount = 3;
+
+            const abortSpy = jest.fn();
+            debuggerWidget._pendingRequests.add({ abort: abortSpy });
+            const loadSpy = jest
+                .spyOn(debuggerWidget, "_loadProjectAndInitialize")
+                .mockImplementation(() => {});
+
+            debuggerWidget._resetConversation();
+
+            expect(abortSpy).toHaveBeenCalled();
+            expect(debuggerWidget.chatHistory).toEqual([]);
+            expect(debuggerWidget.promptCount).toBe(0);
+            expect(loadSpy).toHaveBeenCalled();
         });
     });
 
