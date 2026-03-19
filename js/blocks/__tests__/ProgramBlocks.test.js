@@ -825,7 +825,10 @@ describe("ProgramBlocks", () => {
     describe("MakeBlockBlock branch coverage", () => {
         const setupArg = (name, argValues = []) => {
             activity.blocks.blockList = [
-                { connections: [null, 10, ...argValues.map((_, i) => i + 10)], argClampSlots: argValues.map((_, i) => i) }
+                {
+                    connections: [null, 10, ...argValues.map((_, i) => i + 10)],
+                    argClampSlots: argValues.map((_, i) => i)
+                }
             ];
             const allMocks = [...argValues, name];
             logo.parseArg = jest.fn();
@@ -902,7 +905,11 @@ describe("ProgramBlocks", () => {
 
         test("handles number arg with dock type mismatch", () => {
             setupArg("customblock", [42]);
-            activity.blocks.palettes.getProtoNameAndPalette.mockReturnValue(["proto1", "program", "customblock"]);
+            activity.blocks.palettes.getProtoNameAndPalette.mockReturnValue([
+                "proto1",
+                "program",
+                "customblock"
+            ]);
             activity.blocks.protoBlockDict["proto1"] = { dockTypes: [null, "textin"] };
             getBlock("makeblock").arg(logo, 0, 0, null);
             expect(activity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Warning"));
@@ -910,7 +917,11 @@ describe("ProgramBlocks", () => {
 
         test("handles string arg with dock type mismatch", () => {
             setupArg("customblock", ["hello"]);
-            activity.blocks.palettes.getProtoNameAndPalette.mockReturnValue(["proto1", "program", "customblock"]);
+            activity.blocks.palettes.getProtoNameAndPalette.mockReturnValue([
+                "proto1",
+                "program",
+                "customblock"
+            ]);
             activity.blocks.protoBlockDict["proto1"] = { dockTypes: [null, "numberin"] };
             getBlock("makeblock").arg(logo, 0, 0, null);
             expect(activity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Warning"));
@@ -918,7 +929,11 @@ describe("ProgramBlocks", () => {
 
         test("handles boolean arg with dock type mismatch", () => {
             setupArg("customblock", [true]);
-            activity.blocks.palettes.getProtoNameAndPalette.mockReturnValue(["proto1", "program", "customblock"]);
+            activity.blocks.palettes.getProtoNameAndPalette.mockReturnValue([
+                "proto1",
+                "program",
+                "customblock"
+            ]);
             activity.blocks.protoBlockDict["proto1"] = { dockTypes: [null, "textin"] };
             getBlock("makeblock").arg(logo, 0, 0, null);
             expect(activity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Warning"));
@@ -926,7 +941,11 @@ describe("ProgramBlocks", () => {
 
         test("handles unhandled arg type (object)", () => {
             setupArg("customblock", [{ obj: true }]);
-            activity.blocks.palettes.getProtoNameAndPalette.mockReturnValue(["proto1", "program", "customblock"]);
+            activity.blocks.palettes.getProtoNameAndPalette.mockReturnValue([
+                "proto1",
+                "program",
+                "customblock"
+            ]);
             activity.blocks.protoBlockDict["proto1"] = { dockTypes: [null, "textin"] };
             getBlock("makeblock").arg(logo, 0, 0, null);
             expect(activity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Warning"));
