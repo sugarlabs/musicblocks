@@ -130,7 +130,7 @@ describe("MathUtility", () => {
         });
 
         test("throws error for invalid inputs", () => {
-            expect(() => MathUtility.doMod("a", 3)).toThrow("NanError");
+            expect(() => MathUtility.doMod("a", 3)).toThrow("Invalid number input");
         });
 
         // Edge case tests
@@ -159,7 +159,7 @@ describe("MathUtility", () => {
         });
 
         test("throws error when second arg is string", () => {
-            expect(() => MathUtility.doMod(10, "a")).toThrow("NanError");
+            expect(() => MathUtility.doMod(10, "a")).toThrow("Invalid number input");
         });
     });
 
@@ -556,8 +556,8 @@ describe("MathUtility", () => {
     });
 
     describe("edge cases - Infinity, NaN, and boundary values", () => {
-        test("doMod throws DivByZeroError when divisor is zero", () => {
-            expect(MathUtility.doMod(5, 0)).toBeNaN();
+        test("doMod throws an error when divisor is zero", () => {
+            expect(() => MathUtility.doMod(5, 0)).toThrow();
         });
 
         test("doSqrt handles Infinity", () => {
