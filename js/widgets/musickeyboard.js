@@ -15,7 +15,7 @@
    global
 
    docById, platformColor, FIXEDSOLFEGE, FIXEDSOLFEGE1, SHARP, FLAT,
-   last, Singer, _, noteToFrequency, EIGHTHNOTEWIDTH,
+   last, Singer, noteToFrequency, EIGHTHNOTEWIDTH,
    MATRIXSOLFEHEIGHT, i18nSolfege, MATRIXSOLFEWIDTH, toFraction,
    wheelnav, slicePath, getNote, PREVIEWVOLUME, DEFAULTVOICE,
    PITCHES3, SOLFEGENAMES, SOLFEGECONVERSIONTABLE, NOTESSHARP,
@@ -647,12 +647,17 @@ function MusicKeyboard(activity) {
                 myNode.innerHTML = "";
             }
 
-            this.tick = false;
-            this.firstNote = false;
-            this.metronomeON = false;
+            // Ensure countdown interval/loop resources are cleaned up on close.
+            if (typeof this.stopMetronome === "function") {
+                this.stopMetronome();
+            } else {
+                this.tick = false;
+                this.firstNote = false;
+                this.metronomeON = false;
+                if (this.loopTick) this.loopTick.stop();
+            }
 
             selectedNotes = [];
-            if (this.loopTick) this.loopTick.stop();
             docById("wheelDivptm").style.display = "none";
             docById("wheelDivptm").style.display = "none";
             if (this._menuWheel) this._menuWheel.removeWheel();
@@ -2139,7 +2144,6 @@ function MusicKeyboard(activity) {
                     ]);
                     break;
                 default:
-                    // eslint-disable-next-line no-console
                     console.log("Nothing to do for " + label);
             }
 
@@ -2188,7 +2192,6 @@ function MusicKeyboard(activity) {
                         key.objId; //convet solfege to alphabetic.
                 }, 500);
             } else {
-                // eslint-disable-next-line no-console
                 console.log("Could not find anywhere to insert new block.");
             }
         };

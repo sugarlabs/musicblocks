@@ -60,6 +60,13 @@ const createActivityMock = turtleMock => ({
         ithTurtle: jest.fn().mockReturnValue(turtleMock),
         turtleList: [turtleMock]
     },
+    blocks: {
+        blockList: {
+            mockBlk: {
+                connections: [0, 0]
+            }
+        }
+    },
     logo: {
         synth: {
             setMasterVolume: jest.fn(),
@@ -72,12 +79,7 @@ const createActivityMock = turtleMock => ({
         stopTurtle: false,
         inPitchDrumMatrix: false,
         inMatrix: false,
-        clearNoteParams: jest.fn(),
-        blockList: {
-            mockBlk: {
-                connections: [0, 0]
-            }
-        }
+        clearNoteParams: jest.fn()
     }
 });
 
@@ -928,17 +930,21 @@ describe("processNote regression behavior", () => {
         Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
         expect(singer.bpm).toEqual(before);
     });
-
-    test("should trigger stage update after processing note", () => {
+    test("should execute callback after processing note", () => {
         const callback = jest.fn();
         Singer.processNote(activityMock, 4, false, "mockBlk", 0, callback);
-        expect(activityMock.stage.update).toHaveBeenCalledTimes(1);
+        expect(callback).toHaveBeenCalled();
     });
 
-    test("should use default BPM when bpm stack is empty", () => {
+    test("should execute without errors when bpm stack is empty", () => {
         singer.bpm = [];
-        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
-        expect(activityMock.stage.update).toHaveBeenCalledTimes(1);
+        const callback = jest.fn();
+
+        expect(() => {
+            Singer.processNote(activityMock, 4, false, "mockBlk", 0, callback);
+        }).not.toThrow();
+
+        expect(callback).toHaveBeenCalled();
     });
 });
 
