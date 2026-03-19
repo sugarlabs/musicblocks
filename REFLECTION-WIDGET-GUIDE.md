@@ -4,20 +4,22 @@ The Reflection Widget lets you chat with AI mentors to reflect on and analyze yo
 
 ## Getting Started
 
-1. **Open the Reflection Widget**  
-  - You will find the reflection block in the widget palette (available in both beginner and advanced modes).
-  - Drag it to your workspace and click it to open the widget.
+1. **Open the Reflection Widget**
 
-2. **Meet Your AI Mentors**  
+- You will find the reflection block in the widget palette (available in both beginner and advanced modes).
+- Drag it to your workspace and click it to open the widget.
 
-  There are three AI mentors in the widget:
-  - **Rohan** (Meta) for general project reflection. He is an expert at helping you think about your project as a whole. He will discuss your goals, challenges, and learning.
+2. **Meet Your AI Mentors**
 
-  - **Beethoven** (Music) for music-specific advice. The famous composer Ludwig van Beethoven is here to help you improve your music compositions and knowledge.
+There are three AI mentors in the widget:
 
-  - **Alan** (Code) for coding help. Alan Kay, a pioneer in computer science, will assist you with coding concepts. He may ask critical questions to help you think about your code structure and logic.
+- **Rohan** (Meta) for general project reflection. He is an expert at helping you think about your project as a whole. He will discuss your goals, challenges, and learning.
 
-  Click the mentor’s icon to change who you’re chatting with. You can switch mentors at any time.
+- **Beethoven** (Music) for music-specific advice. The famous composer Ludwig van Beethoven is here to help you improve your music compositions and knowledge.
+
+- **Alan** (Code) for coding help. Alan Kay, a pioneer in computer science, will assist you with coding concepts. He may ask critical questions to help you think about your code structure and logic.
+
+Click the mentor’s icon to change who you’re chatting with. You can switch mentors at any time.
 
 ## Sending Messages
 

@@ -1,15 +1,12 @@
-Artwork(GIF) --> Video
-======
+# Artwork(GIF) --> Video
 
-Use video formats for animated content
-----------------------
+## Use video formats for animated content
 
 **Why you should replace animated GIFs with video ?**
 
 Large GIFs are inefficient for delivering animated content. By converting large GIFs to videos, you can save big on users' bandwidth. Consider using MPEG4/WebM videos for animations and PNG/WebP for static images instead of GIF to save network bytes.
 
 <img width="708" alt="image" src="https://user-images.githubusercontent.com/75945709/174280188-2155dcb7-11f3-43e1-a96b-05f0aa211c91.png">
-
 
 **Create MPEG videos**
 
@@ -20,7 +17,6 @@ ffmpeg -i my-animation.gif my-animation.mp4
 ```
 
 This tells FFmpeg to take my-animation.gif as the input, signified by the -i flag, and to convert it to a video called my-animation.mp4.
-
 
 **Create WEBM Videos**
 
@@ -42,15 +38,11 @@ Animated GIFs have three key traits that a video needs to replicate:
 
 Luckily, you can recreate these behaviors using the <video> element.
 
-  
 ```
 <video autoplay loop muted playsinline>
   <source src="my-animation.webm" type="video/webm">
   <source src="my-animation.mp4" type="video/mp4">
 </video>
-  ```
-
+```
 
 [Learn More](https://web.dev/efficient-animated-content/?utm_source=lighthouse&utm_medium=lr#why-you-should-replace-animated-gifs-with-video)
-
-

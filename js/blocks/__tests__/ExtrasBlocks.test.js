@@ -175,45 +175,47 @@ describe("ExtrasBlocks", () => {
         blockNames.forEach(name => {
             const blockInstance = new mockBlockClass();
 
-            blockInstance.flow = jest
-                .fn()
-                .mockImplementation(function (args = [], logo = {}, turtle) {
-                    if (args.includes("test.abc")) {
-                        this.activity.save.afterSaveAbc("test.abc");
+            blockInstance.flow = jest.fn().mockImplementation(function (
+                args = [],
+                logo = {},
+                turtle
+            ) {
+                if (args.includes("test.abc")) {
+                    this.activity.save.afterSaveAbc("test.abc");
+                }
+                if (args.includes("test.ly")) {
+                    this.activity.save.afterSaveLilypond("test.ly");
+                }
+                if (args.includes("test.svg")) {
+                    this.activity.save.saveSVG("test.svg");
+                }
+                if (this instanceof this.activity.blocks.NoBackgroundBlock) {
+                    logo.svgBackground = false;
+                }
+                if (this instanceof this.activity.blocks.WaitBlock) {
+                    this.activity.turtles.ithTurtle(turtle);
+                }
+                if (this instanceof this.activity.blocks.ShowBlocksBlock) {
+                    this.activity.blocks.showBlocks();
+                }
+                if (this instanceof this.activity.blocks.HideBlocksBlock) {
+                    this.activity.blocks.hideBlocks();
+                }
+                if (this instanceof this.activity.blocks.CommentBlock) {
+                    this.activity.textMsg(args[0]);
+                }
+                if (this instanceof this.activity.blocks.PrintBlock) {
+                    this.activity.textMsg(args[0]);
+                }
+                if (this instanceof this.activity.blocks.DisplayGridBlock) {
+                    if (args[0] === "Cartesian") {
+                        this.activity.blocks.activity._showCartesian();
+                    } else if (args[0] === "polar") {
+                        this.activity.blocks.activity._showPolar();
                     }
-                    if (args.includes("test.ly")) {
-                        this.activity.save.afterSaveLilypond("test.ly");
-                    }
-                    if (args.includes("test.svg")) {
-                        this.activity.save.saveSVG("test.svg");
-                    }
-                    if (this instanceof this.activity.blocks.NoBackgroundBlock) {
-                        logo.svgBackground = false;
-                    }
-                    if (this instanceof this.activity.blocks.WaitBlock) {
-                        this.activity.turtles.ithTurtle(turtle);
-                    }
-                    if (this instanceof this.activity.blocks.ShowBlocksBlock) {
-                        this.activity.blocks.showBlocks();
-                    }
-                    if (this instanceof this.activity.blocks.HideBlocksBlock) {
-                        this.activity.blocks.hideBlocks();
-                    }
-                    if (this instanceof this.activity.blocks.CommentBlock) {
-                        this.activity.textMsg(args[0]);
-                    }
-                    if (this instanceof this.activity.blocks.PrintBlock) {
-                        this.activity.textMsg(args[0]);
-                    }
-                    if (this instanceof this.activity.blocks.DisplayGridBlock) {
-                        if (args[0] === "Cartesian") {
-                            this.activity.blocks.activity._showCartesian();
-                        } else if (args[0] === "polar") {
-                            this.activity.blocks.activity._showPolar();
-                        }
-                    }
-                    return args;
-                });
+                }
+                return args;
+            });
 
             blockInstance.arg = jest.fn().mockReturnValue("parsedArg");
 

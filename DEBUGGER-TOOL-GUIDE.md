@@ -8,25 +8,25 @@ Debugging is a crucial skill for any programmer. The MusicBlocks JSeditor debugg
 
 ## Key Features of the Debugger
 
-1. **Breakpoint System:**  
-   - Set breakpoints directly in the JSeditor by clicking next to the line numbers.
-   - Breakpoints are visually indicated and can be toggled on/off.
+1. **Breakpoint System:**
+    - Set breakpoints directly in the JSeditor by clicking next to the line numbers.
+    - Breakpoints are visually indicated and can be toggled on/off.
 
-2. **Step-by-Step Execution:**  
-   - Use the “Run Slowly” or “Step” buttons to execute your program one step at a time.
-   - Execution pauses at each breakpoint or debugger block.
+2. **Step-by-Step Execution:**
+    - Use the “Run Slowly” or “Step” buttons to execute your program one step at a time.
+    - Execution pauses at each breakpoint or debugger block.
 
-3. **Variable Inspection:**  
-   - When execution pauses, you can create a status block, showing all user-defined and MusicBlocks variables.
-   - The status block is automatically populated with relevant variables for easy inspection.
+3. **Variable Inspection:**
+    - When execution pauses, you can create a status block, showing all user-defined and MusicBlocks variables.
+    - The status block is automatically populated with relevant variables for easy inspection.
 
-4. **Visual Block Integration:**  
-   - Breakpoints in code are converted to debugger blocks in the visual interface.
-   - The currently executing block is highlighted for clear tracking.
+4. **Visual Block Integration:**
+    - Breakpoints in code are converted to debugger blocks in the visual interface.
+    - The currently executing block is highlighted for clear tracking.
 
-5. **Flexible Debugging Controls:**  
-   - Resume, step, or stop execution at any paused point.
-   - Debugger blocks only affect execution in debug modes (not during normal “Play”).
+5. **Flexible Debugging Controls:**
+    - Resume, step, or stop execution at any paused point.
+    - Debugger blocks only affect execution in debug modes (not during normal “Play”).
 
 ---
 

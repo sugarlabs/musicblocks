@@ -1,8 +1,6 @@
-Server
-======
+# Server
 
-Running a local server
-----------------------
+## Running a local server
 
 [Clone the server](https://github.com/tchx84/turtleblocksjs-server) and
 [change the api key]
@@ -12,6 +10,7 @@ to your TurtleJS key.
 Install apache and turtleblocksjs.
 
 Setup a link to /var/www/html
+
 ```
 sudo apt-get install apache2
 cd /var/www
@@ -19,21 +18,22 @@ sudo ln -s /home/path/to/app/ html
 ```
 
 Then, enable the 'proxy' modules in apache.
+
 ```
-cd /etc/apache2/mods-enabled 
-sudo ln -s ../mods-available/proxy* . 
+cd /etc/apache2/mods-enabled
+sudo ln -s ../mods-available/proxy* .
 sudo ln -s ../mods-available/xml2enc.load .
 sudo ln -s ../mods-available/slotmem_* .
 ```
 
 Remove the alias module.
+
 ```
 sudo unlink alias.conf
 sudo unlink alias.load
 ```
 
-Apache TurtleJS Config
-----------------------
+## Apache TurtleJS Config
 
 Copy this into `/etc/apache2/sites-enabled/turtlejs.conf`
 
@@ -52,14 +52,17 @@ Copy this into `/etc/apache2/sites-enabled/turtlejs.conf`
 
 </Virtualhost>
 ```
+
 Then, restart apache.
-```sudo service apache2 restart```
+`sudo service apache2 restart`
 
 Now, you need to run the TurtleJS server.
 
 ```
-cd /home/path/to/server/ 
+cd /home/path/to/server/
 ./server.py
 ```
+
 If everything is ok in your browser you should able to access to
+
 <pre>localhost</pre> and see TurtleJS instance.

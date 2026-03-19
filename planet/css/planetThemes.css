@@ -109,7 +109,9 @@ s .dark #local-projects .card:hover {
 .dark .modal-footer .btn-flat {
     color: #ffffff !important;
     background-color: transparent !important;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease;
     font-weight: bold;
 }
 
@@ -300,7 +302,9 @@ s .highcontrast #local-projects .card:hover {
 .highcontrast .modal-footer .btn-flat {
     color: #ffff00 !important;
     background-color: transparent !important;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease;
     font-weight: bold;
     border: 2px solid #ffff00;
 }
