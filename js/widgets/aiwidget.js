@@ -208,7 +208,7 @@ function AIWidget() {
         const pitch = pitches;
         pitchDuration = toFraction(pitchDuration);
         const adjustedNote = adjustPitch(pitch.name, keySignature).toUpperCase();
-        if (triplet !== undefined && triplet !== null) {
+        if (triplet != null) {
             pitchDuration[1] = meterDen * triplet;
         }
 
@@ -405,7 +405,7 @@ function AIWidget() {
                                 tripletFinder,
                                 entry.meterDen
                             );
-                            if (element?.endTriplet !== null && element?.endTriplet !== undefined) {
+                            if (element?.endTriplet != null) {
                                 tripletFinder = null;
                             }
                             blockId = blockId + 9;
