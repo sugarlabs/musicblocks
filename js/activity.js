@@ -15,11 +15,11 @@
 // scratch. -- Walter Bender, October 2014.
 
 /*
-   globals
+   global
 
-   _, ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON,
+   ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON,
    ActivityContext,
-   Blocks, Boundary, CARTESIAN, changeImage, closeWidgets,
+   Boundary, CARTESIAN, changeImage, closeWidgets,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
    DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
@@ -27,19 +27,21 @@
    getMacroExpansion, getOctaveRatio, getTemperament, transcribeMidi,
    GOHOMEBUTTON, GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
    hideDOMLabel, initBasicProtoBlocks, initPalettes,
-   INLINECOLLAPSIBLES, jQuery, JSEditor, LanguageBox, ThemeBox, Logo, MSGBLOCK,
+   INLINECOLLAPSIBLES, JSEditor, LanguageBox, ThemeBox, MSGBLOCK,
    NANERRORMSG, NOACTIONERRORMSG, NOBOXERRORMSG, NOINPUTERRORMSG,
    NOMICERRORMSG, NOSQRTERRORMSG, NOSTRINGERRORMSG, PALETTEFILLCOLORS,
    PALETTESTROKECOLORS, PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
    Palettes, PasteBox, PlanetInterface, platform, platformColor,
    piemenuKey, POLAR, preparePluginExports, processMacroData,
-   processPluginData, processRawPluginData, require, SaveInterface,
+   processPluginData, processRawPluginData, SaveInterface,
    SHOWBLOCKSBUTTON, SMALLERBUTTON, SMALLERDISABLEBUTTON, SOPRANO,
    SPECIALINPUTS, STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
-   TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, Turtles, TURTLESVG,
+   TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, TURTLESVG,
    updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_F,
    SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
-   MUSICALMODES, waitForReadiness
+   MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
+   base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
+   SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS
  */
 
 /*
@@ -66,11 +68,16 @@ let MYDEFINES = [
     "tweenjs.min",
     "preloadjs.min",
     "howler",
-    "p5.min",
-    "p5-sound-adapter",
-    "p5.dom.min",
-    // 'mespeak',
-    "Chart",
+    // p5.min, p5-sound-adapter, and p5.dom.min are NOT loaded eagerly.
+    // They are only needed by the JS-export feature and will be loaded
+    // on demand via require() when that feature is used, saving ~10-15 MB
+    // of heap memory on every page load.
+    // "p5.min",
+    // "p5-sound-adapter",
+    // "p5.dom.min",
+    // Chart.js is only used by the statistics widget and will be loaded
+    // on demand when the widget is opened, saving ~3-5 MB of heap memory.
+    // "Chart",
     "utils/utils",
     "activity/artwork",
     "widgets/status",
@@ -102,6 +109,7 @@ let MYDEFINES = [
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
+    "utils/performanceTracker",
     "activity/pastebox",
     "prefixfree.min",
     "Tone",
@@ -211,6 +219,7 @@ const doAnalyzeProject = function () {
 /**
  * Represents an activity in the application.
  */
+
 class Activity {
     /**
      * Creates an Activity instance.
@@ -325,7 +334,6 @@ class Activity {
         if (typeof GIFAnimator !== "undefined") {
             this.gifAnimator = new GIFAnimator();
         } else {
-            // eslint-disable-next-line no-console
             console.debug("GIFAnimator not yet available in constructor");
             this.gifAnimator = null;
         }
@@ -333,8 +341,10 @@ class Activity {
         // Dirty flag for canvas rendering optimization
         // When true, the stage needs to be redrawn on the next animation frame
         this.stageDirty = false;
+        this._renderLoopRafId = null;
+        this._renderLoopRunning = false;
 
-        this.themes = ["light", "dark"];
+        this.themes = ["light", "dark", "highcontrast"];
         try {
             // Detect system theme preference (using same logic as ThemeBox)
             const getSystemTheme = () => {
@@ -352,9 +362,9 @@ class Activity {
 
             for (let i = 0; i < this.themes.length; i++) {
                 if (this.themes[i] === activeTheme) {
-                    body.classList.add(this.themes[i]);
+                    document.body.classList.add(this.themes[i]);
                 } else {
-                    body.classList.remove(this.themes[i]);
+                    document.body.classList.remove(this.themes[i]);
                 }
             }
         } catch (e) {
@@ -374,7 +384,6 @@ class Activity {
                 }
             }
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.error(e);
         }
 
@@ -402,7 +411,6 @@ class Activity {
                 this.KeySignatureEnv[2] = this.KeySignatureEnv[2] === "true";
             }
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.error(e);
         }
 
@@ -411,6 +419,7 @@ class Activity {
          * Sets up the initial state and dependencies of the activity.
          */
         this.setupDependencies = () => {
+            this._stopRenderLoop();
             this.cleanupEventListeners();
             createDefaultStack();
             createHelpContent(this);
@@ -465,7 +474,15 @@ class Activity {
             this.hideBlocksContainer = null;
             this.collapseBlocksContainer = null;
 
+            // --- DOM reads (batched to avoid forced synchronous layout) ---
             this.searchWidget = document.getElementById("search");
+            this.progressBar = document.getElementById("myProgress");
+            const pasteEl = document.getElementById("paste");
+            new createjs.DOMElement(pasteEl);
+            this.paste = pasteEl;
+            this.toolbarHeight = document.getElementById("toolbars").offsetHeight;
+
+            // --- DOM writes (after all reads complete) ---
             this.searchWidget.style.visibility = "hidden";
             this.searchWidget.placeholder = _("Search for blocks");
 
@@ -474,14 +491,8 @@ class Activity {
             this.helpfulSearchWidget.style.visibility = "hidden";
             this.helpfulSearchWidget.placeholder = _("Search for blocks");
             this.helpfulSearchWidget.classList.add("ui-autocomplete");
-            this.progressBar = document.getElementById("myProgress");
             this.progressBar.style.visibility = "hidden";
-
-            new createjs.DOMElement(document.getElementById("paste"));
-            this.paste = document.getElementById("paste");
             this.paste.style.visibility = "hidden";
-
-            this.toolbarHeight = document.getElementById("toolbars").offsetHeight;
 
             this.helpfulWheelItems = [];
 
@@ -501,19 +512,35 @@ class Activity {
          * 3. GIF animations are playing
          * This eliminates unnecessary 60fps updates when idle.
          */
-        const renderLoop = () => {
-            if (this.stage) {
-                const hasActiveTweens = createjs.Tween.hasActiveTweens();
-                const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
+        this._startRenderLoop = () => {
+            if (this._renderLoopRunning) return;
+            this._renderLoopRunning = true;
 
-                if (this.stageDirty || hasActiveTweens || hasActiveGifs) {
-                    this.stage.update();
-                    this.stageDirty = false;
+            const renderLoop = () => {
+                if (!this._renderLoopRunning) return;
+
+                if (this.stage) {
+                    const hasActiveTweens = createjs.Tween.hasActiveTweens();
+                    const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
+
+                    if (this.stageDirty || hasActiveTweens || hasActiveGifs) {
+                        this.stage.update();
+                        this.stageDirty = false;
+                    }
                 }
-            }
-            requestAnimationFrame(renderLoop);
+                this._renderLoopRafId = requestAnimationFrame(renderLoop);
+            };
+
+            this._renderLoopRafId = requestAnimationFrame(renderLoop);
         };
-        requestAnimationFrame(renderLoop);
+
+        this._stopRenderLoop = () => {
+            this._renderLoopRunning = false;
+            if (this._renderLoopRafId !== null) {
+                cancelAnimationFrame(this._renderLoopRafId);
+                this._renderLoopRafId = null;
+            }
+        };
 
         /*
          * creates helpfulSearchDiv for search
@@ -1248,7 +1275,6 @@ class Activity {
                     }
 
                     setTimeout(() => {
-                        // eslint-disable-next-line no-console
                         console.log("Saving help artwork: " + name + "_block.svg");
                         const svg = "data:image/svg+xml;utf8," + that.printBlockSVG();
                         that.save.download("svg", svg, name + "_block.svg");
@@ -1965,7 +1991,6 @@ class Activity {
                 let recordedChunks = [];
                 mediaRecorder = new MediaRecorder(stream);
                 stream.oninactive = function () {
-                    // eslint-disable-next-line no-console
                     console.log("Recording is ready to save");
                     stopRec();
                     flag = 0;
@@ -1986,7 +2011,6 @@ class Activity {
 
                 mediaRecorder.start(200);
                 setTimeout(() => {
-                    // eslint-disable-next-line no-console
                     console.log("Resizing for Record", that.canvas.height);
                     that._onResize();
                 }, 500);
@@ -2326,7 +2350,7 @@ class Activity {
             }
 
             await this.setSmallerLargerStatus();
-            await this.stage.update();
+            this.stageDirty = true;
         };
 
         /**
@@ -2366,7 +2390,7 @@ class Activity {
             }
 
             await this.setSmallerLargerStatus();
-            await this.stage.update();
+            this.stageDirty = true;
         };
 
         /*
@@ -2439,17 +2463,14 @@ class Activity {
                     const name =
                         this.palettes.dict[this.palettes.activePalette].protoList[i]["name"];
                     if (name in obj["FLOWPLUGINS"]) {
-                        // eslint-disable-next-line no-console
                         console.log("deleting " + name);
                         delete obj["FLOWPLUGINS"][name];
                     }
                     if (name in obj["BLOCKPLUGINS"]) {
-                        // eslint-disable-next-line no-console
                         console.log("deleting " + name);
                         delete obj["BLOCKPLUGINS"][name];
                     }
                     if (name in obj["ARGPLUGINS"]) {
-                        // eslint-disable-next-line no-console
                         console.log("deleting " + name);
                         delete obj["ARGPLUGINS"][name];
                     }
@@ -2651,47 +2672,55 @@ class Activity {
              * Handles touch start event on the canvas.
              * @param {TouchEvent} event - The touch event object.
              */
-            myCanvas.addEventListener("touchstart", event => {
-                if (event.touches.length === 2) {
-                    for (let i = 0; i < 2; i++) {
-                        initialTouches[i][0] = event.touches[i].clientY;
-                        initialTouches[i][1] = event.touches[i].clientX;
+            myCanvas.addEventListener(
+                "touchstart",
+                event => {
+                    if (event.touches.length === 2) {
+                        for (let i = 0; i < 2; i++) {
+                            initialTouches[i][0] = event.touches[i].clientY;
+                            initialTouches[i][1] = event.touches[i].clientX;
+                        }
                     }
-                }
-            });
+                },
+                { passive: true }
+            );
 
             /**
              * Handles touch move event on the canvas.
              * @param {TouchEvent} event - The touch event object.
              */
-            myCanvas.addEventListener("touchmove", event => {
-                if (event.touches.length === 2) {
-                    for (let i = 0; i < 2; i++) {
-                        const touchY = event.touches[i].clientY;
-                        const touchX = event.touches[i].clientX;
+            myCanvas.addEventListener(
+                "touchmove",
+                event => {
+                    if (event.touches.length === 2) {
+                        for (let i = 0; i < 2; i++) {
+                            const touchY = event.touches[i].clientY;
+                            const touchX = event.touches[i].clientX;
 
-                        if (initialTouches[i][0] !== null && initialTouches[i][1] !== null) {
-                            const deltaY = touchY - initialTouches[i][0];
-                            const deltaX = touchX - initialTouches[i][1];
+                            if (initialTouches[i][0] !== null && initialTouches[i][1] !== null) {
+                                const deltaY = touchY - initialTouches[i][0];
+                                const deltaX = touchX - initialTouches[i][1];
 
-                            if (deltaY !== 0) {
-                                closeAnyOpenMenusAndLabels();
-                                that.blocksContainer.y -= deltaY;
+                                if (deltaY !== 0) {
+                                    closeAnyOpenMenusAndLabels();
+                                    that.blocksContainer.y -= deltaY;
+                                }
+
+                                if (that.scrollBlockContainer && deltaX !== 0) {
+                                    closeAnyOpenMenusAndLabels();
+                                    that.blocksContainer.x -= deltaX;
+                                }
+
+                                initialTouches[i][0] = touchY;
+                                initialTouches[i][1] = touchX;
                             }
-
-                            if (that.scrollBlockContainer && deltaX !== 0) {
-                                closeAnyOpenMenusAndLabels();
-                                that.blocksContainer.x -= deltaX;
-                            }
-
-                            initialTouches[i][0] = touchY;
-                            initialTouches[i][1] = touchX;
                         }
-                    }
 
-                    that.refreshCanvas();
-                }
-            });
+                        that.refreshCanvas();
+                    }
+                },
+                { passive: true }
+            );
 
             /**
              * Handles touch end event on the canvas.
@@ -2709,8 +2738,10 @@ class Activity {
              */
             const __wheelHandler = event => {
                 const data = normalizeWheel(event);
-                const delY = data.pixelY;
-                const delX = data.pixelX;
+                // Apply scroll speed multiplier for smoother scrolling
+                const SCROLL_SPEED_MULTIPLIER = 2;
+                const delY = data.pixelY * SCROLL_SPEED_MULTIPLIER;
+                const delX = data.pixelX * SCROLL_SPEED_MULTIPLIER;
 
                 if (event.ctrlKey) {
                     event.preventDefault();
@@ -2731,6 +2762,19 @@ class Activity {
 
                 that.refreshCanvas();
             };
+
+            // Remove previous wheel event listener if it exists
+            if (this._wheelHandler) {
+                this.removeEventListener(
+                    document.getElementById("myCanvas"),
+                    "wheel",
+                    this._wheelHandler,
+                    false
+                );
+            }
+
+            // Store the handler reference for future cleanup
+            this._wheelHandler = __wheelHandler;
 
             this.addEventListener(
                 document.getElementById("myCanvas"),
@@ -2794,7 +2838,6 @@ class Activity {
                     // Deselect active block if moving the block container
                     that.blocks.activeBlock = null;
 
-                    // eslint-disable-next-line max-len
                     const delta =
                         Math.abs(event.stageX - lastCoords.x) +
                         Math.abs(event.stageY - lastCoords.y);
@@ -2953,8 +2996,14 @@ class Activity {
          * Initialize an idle watcher that throttles the application's framerate
          * when the application is inactive and no music is playing.
          * This significantly reduces CPU usage and improves battery life.
+         *
+         * Listeners and intervals are properly cleaned up via stopIdleWatcher()
+         * to prevent accumulation on re-initialization.
          */
         this._initIdleWatcher = () => {
+            // Ensure any prior idle watcher is cleaned up before reinitializing
+            this._stopIdleWatcher();
+
             const IDLE_THRESHOLD = 5000; // 5 seconds
             const ACTIVE_FPS = 60;
             const IDLE_FPS = 1;
@@ -2963,25 +3012,26 @@ class Activity {
             this.isAppIdle = false;
 
             // Wake up function - restores full framerate
-            const resetIdleTimer = () => {
+            // Stored as instance property for cleanup
+            this._resetIdleTimer = () => {
                 lastActivity = Date.now();
                 if (this.isAppIdle) {
                     this.isAppIdle = false;
                     createjs.Ticker.framerate = ACTIVE_FPS;
                     // Force immediate redraw for responsiveness
-                    if (this.stage) this.stage.update();
+                    this.stageDirty = true;
                 }
             };
 
-            // Track user activity
-            window.addEventListener("mousemove", resetIdleTimer);
-            window.addEventListener("mousedown", resetIdleTimer);
-            window.addEventListener("keydown", resetIdleTimer);
-            window.addEventListener("touchstart", resetIdleTimer);
-            window.addEventListener("wheel", resetIdleTimer);
+            // Track user activity using managed addEventListener for proper cleanup
+            this.addEventListener(window, "mousemove", this._resetIdleTimer);
+            this.addEventListener(window, "mousedown", this._resetIdleTimer);
+            this.addEventListener(window, "keydown", this._resetIdleTimer);
+            this.addEventListener(window, "touchstart", this._resetIdleTimer);
+            this.addEventListener(window, "wheel", this._resetIdleTimer);
 
-            // Periodic check for idle state
-            setInterval(() => {
+            // Periodic check for idle state - store interval ID for cleanup
+            this._idleWatcherInterval = setInterval(() => {
                 // Check if music/code is playing
                 const isMusicPlaying = this.logo?._alreadyRunning || false;
 
@@ -2993,9 +3043,37 @@ class Activity {
                     }
                 } else if (this.isAppIdle && isMusicPlaying) {
                     // Music started playing - wake up immediately
-                    resetIdleTimer();
+                    this._resetIdleTimer();
                 }
             }, 1000);
+
+            // Expose activity instance for external checks
+            if (typeof window !== "undefined") {
+                window.activity = this;
+            }
+        };
+
+        /**
+         * Stop the idle watcher and clean up its listeners and interval.
+         * Called during Activity lifecycle teardown to prevent listener/interval accumulation.
+         * It is safe to call this method even if the idle watcher was never started.
+         */
+        this._stopIdleWatcher = () => {
+            // Clear the periodic interval
+            if (typeof this._idleWatcherInterval !== "undefined") {
+                clearInterval(this._idleWatcherInterval);
+                this._idleWatcherInterval = undefined;
+            }
+
+            // Remove event listeners if they were registered
+            if (typeof this._resetIdleTimer === "function") {
+                this.removeEventListener(window, "mousemove", this._resetIdleTimer);
+                this.removeEventListener(window, "mousedown", this._resetIdleTimer);
+                this.removeEventListener(window, "keydown", this._resetIdleTimer);
+                this.removeEventListener(window, "touchstart", this._resetIdleTimer);
+                this.removeEventListener(window, "wheel", this._resetIdleTimer);
+                this._resetIdleTimer = undefined;
+            }
         };
 
         /**
@@ -3402,8 +3480,7 @@ class Activity {
             const paletteName = protoblk.palette.name;
             const protoName = protoblk.name;
 
-            // eslint-disable-next-line no-prototype-builtins
-            if (this.blocks.protoBlockDict.hasOwnProperty(protoName)) {
+            if (Object.prototype.hasOwnProperty.call(this.blocks.protoBlockDict, protoName)) {
                 this.palettes.dict[paletteName].makeBlockFromSearch(
                     protoblk,
                     protoName,
@@ -3586,7 +3663,7 @@ class Activity {
                         break;
                     }
                     case 13: {
-                        // 'R or ENTER'
+                        // Alt+ENTER
                         if (this.isInputON) return;
 
                         if (this.searchWidget.style.visibility === "visible") {
@@ -3597,12 +3674,20 @@ class Activity {
                             document.getElementById("paste").style.visibility = "hidden";
                             return;
                         }
-                        this.textMsg("Enter " + _("Play"));
-                        const stopbt = document.getElementById("stop");
-                        if (stopbt) {
-                            stopbt.style.color = platformColor.stopIconcolor;
+
+                        // Check if any widget window is open
+                        const hasOpenWidget = Object.values(window.widgetWindows.openWindows).some(
+                            w => w
+                        );
+                        if (this.turtles.running()) {
+                            this._doHardStopButton();
+                        } else if (!hasOpenWidget) {
+                            const stopbtn = document.getElementById("stop");
+                            if (stopbtn) {
+                                stopbtn.style.color = platformColor.stopIconcolor;
+                            }
+                            this._doFastButton();
                         }
-                        this._doFastButton();
                         break;
                     }
                     case 83: // 'S'
@@ -3624,7 +3709,7 @@ class Activity {
                             disableHorizScrollIcon.style.display == "block"
                         ) {
                             this.blocksContainer.x += this.canvas.width / 10;
-                            this.stage.update();
+                            this.stageDirty = true;
                         }
                     // fall through
                     case 220:
@@ -3634,7 +3719,7 @@ class Activity {
                             disableHorizScrollIcon.style.display == "block"
                         ) {
                             this.blocksContainer.x -= this.canvas.width / 10;
-                            this.stage.update();
+                            this.stageDirty = true;
                         }
                 }
             } else if (event.ctrlKey) {
@@ -3693,17 +3778,17 @@ class Activity {
                             this.textMsg("END " + _("Jumping to the bottom of the page."));
                             this.blocksContainer.y =
                                 -this.blocks.bottomMostBlock() + this.canvas.height / 2;
-                            this.stage.update();
+                            this.stageDirty = true;
                             break;
                         case PAGE_UP:
                             this.textMsg("PAGE_UP " + _("Scrolling up."));
                             this.blocksContainer.y += this.canvas.height / 2;
-                            this.stage.update();
+                            this.stageDirty = true;
                             break;
                         case PAGE_DOWN:
                             this.textMsg("PAGE_DOWN " + _("Scrolling down."));
                             this.blocksContainer.y -= this.canvas.height / 2;
-                            this.stage.update();
+                            this.stageDirty = true;
                             break;
                         case DEL:
                             this.textMsg("DEL " + _("Extracting block"));
@@ -3727,7 +3812,7 @@ class Activity {
                                 } else {
                                     this.blocksContainer.y += 20;
                                 }
-                                this.stage.update();
+                                this.stageDirty = true;
                             }
                             break;
                         case KEYCODE_DOWN:
@@ -3751,7 +3836,7 @@ class Activity {
                                 } else {
                                     this.blocksContainer.y -= 20;
                                 }
-                                this.stage.update();
+                                this.stageDirty = true;
                             }
                             break;
                         case KEYCODE_LEFT:
@@ -3768,7 +3853,7 @@ class Activity {
                                 } else if (this.scrollBlockContainer) {
                                     this.blocksContainer.x += 20;
                                 }
-                                this.stage.update();
+                                this.stageDirty = true;
                             }
                             break;
                         case KEYCODE_RIGHT:
@@ -3785,7 +3870,7 @@ class Activity {
                                 } else if (this.scrollBlockContainer) {
                                     this.blocksContainer.x -= 20;
                                 }
-                                this.stage.update();
+                                this.stageDirty = true;
                             }
                             break;
                         case HOME:
@@ -3803,7 +3888,7 @@ class Activity {
                                 // Bring all the blocks "home".
                                 this._findBlocks();
                             }
-                            this.stage.update();
+                            this.stageDirty = true;
                             break;
                         case TAB:
                             break;
@@ -3813,23 +3898,24 @@ class Activity {
                                 this.searchWidget.style.visibility = "hidden";
                             }
                             break;
-                        case RETURN:
-                            this.textMsg("Return " + _("Play"));
-                            if (this.inTempoWidget) {
-                                if (this.logo.tempo.isMoving) {
-                                    this.logo.tempo.pause();
+                        case RETURN: {
+                            // Check if any widget window is open
+                            const hasOpenWidget = Object.values(
+                                window.widgetWindows.openWindows
+                            ).some(w => w);
+                            if (this.turtles.running()) {
+                                event.preventDefault();
+                                this._doHardStopButton();
+                            } else if (!disableKeys && !hasOpenWidget) {
+                                event.preventDefault();
+                                const stopbtn = document.getElementById("stop");
+                                if (stopbtn) {
+                                    stopbtn.style.color = platformColor.stopIconcolor;
                                 }
-                                this.logo.tempo.resume();
-                            }
-                            if (
-                                this.blocks.activeBlock === null ||
-                                !SPECIALINPUTS.includes(
-                                    this.blocks.blockList[this.blocks.activeBlock].name
-                                )
-                            ) {
-                                this.logo.runLogoCommands();
+                                this._doFastButton();
                             }
                             break;
+                        }
                         default:
                             break;
                     }
@@ -4147,7 +4233,6 @@ class Activity {
                 that._onResize(false);
                 document.getElementById("hideContents").click();
             } catch (error) {
-                // eslint-disable-next-line no-console
                 console.error("An error occurred in resizeCanvas_:", error);
             }
         };
@@ -4403,10 +4488,12 @@ class Activity {
                     this._restoreTrashById(blockId);
                     trashView.classList.add("hidden");
                 });
-                handleClickOutsideTrashView(trashView);
 
                 trashView.appendChild(listItem);
             });
+
+            // Attach outside-click listener once, after all items are rendered
+            handleClickOutsideTrashView(trashView);
 
             const existingView = document.getElementById("trashView");
             if (existingView) {
@@ -4827,20 +4914,19 @@ class Activity {
                     if (_THIS_IS_MUSIC_BLOCKS_) {
                         const imgUrl =
                             "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+IDxzdmcgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIiB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgaWQ9InN2ZzExMjEiIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDM0LjEzMTI0OSAxNC41NTIwODkiIGhlaWdodD0iNTUuMDAwMDE5IiB3aWR0aD0iMTI5Ij4gPGRlZnMgaWQ9ImRlZnMxMTE1Ij4gPGNsaXBQYXRoIGlkPSJjbGlwUGF0aDQzMzciIGNsaXBQYXRoVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4gPHJlY3QgeT0iNTUyIiB4PSI1ODgiIGhlaWdodD0iMTQzNiIgd2lkdGg9IjE5MDAiIGlkPSJyZWN0NDMzOSIgc3R5bGU9ImZpbGw6I2EzYjVjNDtmaWxsLW9wYWNpdHk6MTtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MTU7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDwvY2xpcFBhdGg+IDwvZGVmcz4gPG1ldGFkYXRhIGlkPSJtZXRhZGF0YTExMTgiPiA8cmRmOlJERj4gPGNjOldvcmsgcmRmOmFib3V0PSIiPiA8ZGM6Zm9ybWF0PmltYWdlL3N2Zyt4bWw8L2RjOmZvcm1hdD4gPGRjOnR5cGUgcmRmOnJlc291cmNlPSJodHRwOi8vcHVybC5vcmcvZGMvZGNtaXR5cGUvU3RpbGxJbWFnZSIgLz4gPGRjOnRpdGxlPjwvZGM6dGl0bGU+IDwvY2M6V29yaz4gPC9yZGY6UkRGPiA8L21ldGFkYXRhPiA8ZyB0cmFuc2Zvcm09Im1hdHJpeCgxLjA4Njc4MiwwLDAsMS4wODY3ODIsLTEuNTQ3MzI0NSwtMS4zMDU3OTkpIiBpZD0iZzE4MTIiPiA8ZWxsaXBzZSB0cmFuc2Zvcm09Im1hdHJpeCgwLjAxMDQ2MDk5LDAsMCwwLjAxMDQ2MDk5LDEuMDE2NzM4OSwtNi4yMDQ4NTI5KSIgY2xpcC1wYXRoPSJ1cmwoI2NsaXBQYXRoNDMzNykiIHJ5PSI3NjgiIHJ4PSI3NDgiIGN5PSIxNDc2IiBjeD0iMTU0MCIgaWQ9InBhdGg0MzMzIiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDojYTNiNWM0O2ZpbGwtb3BhY2l0eToxO3N0cm9rZTpub25lO3N0cm9rZS13aWR0aDoxNTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPGVsbGlwc2Ugcnk9IjEuNzgyNjg1OSIgcng9IjEuNjkzOTIxNiIgY3k9IjguODM0MzUzNCIgY3g9IjE2LjQ0NjczOSIgaWQ9InBhdGg0MjU2IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDojYzlkYWQ4O2ZpbGwtb3BhY2l0eToxO3N0cm9rZTojYzlkYWQ4O3N0cm9rZS13aWR0aDowLjEwNDYwOTk7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDMyOCIgZD0ibSAxNy42MzAyNjYsMTMuNDg3MDkgMC4zMjU0NywwLjM5MjA0NCAwLjM0NzY2LDAuMjczNjkgMC4zMTA2NzYsMC4xMTA5NTUgMC4yMzY3MDUsLTAuMDUxNzggMC4xNDA1NDQsLTAuMTg0OTI2IDAuMTk5NzIsMC4wODEzNyAwLjE1NTMzOCwwLjA0NDM4IDAuNjEzOTU0LC0wLjQyMTYzMiAwLjQyMTYzMSwtMC4yNTE0OTkgYyAwLDAgMC44ODc2NDUsLTAuMDA3NCAxLjYwNTE1NywtMC41NTQ3NzcgMC43MTc1MTMsLTAuNTQ3MzgxIDAuNDk1NjAyLC0wLjY1MDkzOSAwLjQ5NTYwMiwtMC42NTA5MzkgbCAtMC4wMzY5OSwtMC40MjkwMjkgLTAuNTM5OTg0LC0wLjcxNzUxMyAtMC41NTQ3NzcsLTAuNTY5NTcxIC0wLjIyOTMwOSwtMC4xNDc5NDEgYyAwLDAgLTAuMDIyMTksLTAuMDQ0MzggLTAuMDczOTcsLTAuMDQ0MzggLTAuMDUxNzgsMCAtMC4yNDQxMDMsLTAuMDczOTcgLTAuNTE3NzkzLDAuMDQ0MzggLTAuMjczNjkxLDAuMTE4MzUzIC0wLjQ2NjAxNCwwLjE3MDEzMiAtMC44NDMyNjMsMC4zODQ2NDYgLTAuMzc3MjQ4LDAuMjE0NTE0IC0wLjcxMDExNSwwLjQyMTYzMSAtMC44MzU4NjUsMC40OTU2MDIgLTAuMTI1NzUsMC4wNzM5NyAtMC43NDcxLDAuNDI5MDI4IC0wLjc0NzEsMC40MjkwMjggbCAtMC4wOTYxNiwwLjY1ODMzNiB6IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDojZjhmOGY4O2ZpbGwtb3BhY2l0eToxO2ZpbGwtcnVsZTpldmVub2RkO3N0cm9rZTpub25lO3N0cm9rZS13aWR0aDowLjAxMDQ2MDk5cHg7c3Ryb2tlLWxpbmVjYXA6YnV0dDtzdHJva2UtbGluZWpvaW46bWl0ZXI7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggaWQ9InBhdGg0MzMwIiBkPSJtIDE4LjA4MTQ4NSwxMy4xMTcyMzkgYyAwLDAgMS4wMTcyMDIsMC4yMTk4MDggMS40OTA2MTMsLTAuMTM1MjUgMC42ODI1NSwtMC42NzQwOTcgMS42NTU4OTMsLTEuMTU0NzMxIDEuODcwMzU1LC0xLjc0NTMwOCAwLjEwODI1NywtMC4yOTgxMTYgMC4wOTI2NSwtMC4zNzIzNzcgLTAuMDgwMTgsLTAuNjM3MTkxIC0wLjc4NDA4NSwtMS4xMTY5NTIzIC0yLjE4NjAyMywwLjQ4MzU2MyAtMi4xODYwMjMsMC40ODM1NjMgbCAtMS4yMjA1MTEsMS4wNDI5ODMgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2M5ZGFkODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI4MSIgZD0ibSAxOC45MjM2MzgsMTEuOTExMTY2IGMgMCwwIC0yLjI2MjA3MywwLjM2MDA3MyAtMS4yNDU4MDcsMS42MzE0MjYgMS4wMTYyNjgsMS4yNzEzNTQgMS4zMzE1OSwwLjQ2ODQxNSAxLjMzMTU5LDAuNDY4NDE1IDAsMCAwLjIzNzM2NCwwLjI4NDAyMSAwLjU1MDIyMSwtMC4wMTI4OSAwLjMxMjg1NywtMC4yOTY5MSAwLjgwMTY1NywtMC40ODY1NjMgMC44MDE2NTcsLTAuNDg2NTYzIDAsMCAwLjgzMzQxOSwtMC4wODE1OCAxLjcyODg1MSwtMC42NDAzNDUgMC44OTU0MzIsLTAuNTU4NzY5IDAuMDI1NDUsLTEuNDk0NjQ0IDAuMDI1NDUsLTEuNDk0NjQ0IDAsMCAtMC43MDQwMDIsLTAuOTE0MzA1IC0xLjE5MTE1OCwtMS4wNjIwMDQgLTAuNDg3MTU1LC0wLjE0NzY5OSAtMS4yNjAyMDYsLTAuMjA1OTYzIC0xLjI2MDIwNiwtMC4yMDU5NjMgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6bm9uZTtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNTkyNiIgZD0ibSAxNi44ODkxNjUsMy45OTA3MDY3IGMgLTAuMjA1OTI1LDAuMDA5MDIgLTAuNDkwNTg0LDAuMDE2NDUyIC0wLjY4MjQzNCwwLjA5NDMwNiAtMC4zNjM1MSwwLjExMzE2MjUgLTAuNzg0MDE5LDAuMzA2NTkxNiAtMS4xMDIwMzksMC40MTQ1MTk3IEMgMTQuODA1NzA3LDQuNjAwOTk5MyAxNC41MjgzODMsNC44Njc1ODQxIDE0LjQ0MjUxNSw0Ljc3MDc2NzYgMTQuMzE0ODUsNC42MjY4MjQ0IDE0LjIyNDM1Myw0LjU5NTM2MyAxNC4wNDU2ODksNC40OTc1NTkgMTMuODAxNzgxLDQuMzk5NTA1IDEzLjg3Mzc3Myw0LjQ0NDgyNzIgMTMuNjYwODY2LDQuMzg2MzI4MyAxMy41MTM2ODEsNC4zNDU4ODcxIDEzLjQ0ODI5LDQuMjg4Mjk1OCAxMy4wNDc5NTQsNC4zMDIzNTY3IGMgLTAuMjE2MDg3LDAuMDA3NTkgLTAuNDczNTEsMC4wMDgwNCAtMC42NjAwODEsMC4wODk3MjUgLTAuMzc0NjE1LDAuMTY0MDE3OCAtMC4yOTksMC4yNDg0NzU3IC0wLjUzODU3MiwwLjQ5MDAyNTIgLTAuMTY1MTA4LDAuMTY2NDcwOSAtMC4yMjMwMjksMC41NzQ5ODMxIC0wLjI4MjA0MSwwLjgxODg1OCAtMC4wNjkzOSwwLjI4Njc3NzYgLTAuMDU0NywwLjYwMTAzOTMgLTAuMDIwMzEsMC45Njc0MDMxIDAuMDI3NjEsMC4yOTQxOTY1IDAuMDkxNzMsMC40OTczOTM5IDAuMjQ5Mzg4LDAuNzU5MDYzIDAuMTM1MDg0LDAuMjI0MTk4OSAwLjMyNDU2MSwwLjI4MzU4MjggMC41NDY1OSwwLjQ5NzI4OTMgMC4wNzc3NCwwLjA3NDgzIDAuMzY4Mzk4LC0wLjAzODk2NSAwLjQ4NDg4LC0wLjAxNTEwNCAwLjEwODcwOSwwLjAyMjI3IC0wLjA0ODE3LDAuMjE2NzA4OCAtMC4wNTMyLDAuMjQ1MzgzNCAtMC4wNTM4LDAuMjM5NTE2OSAtMC4xMTA1MDMsMC4wODc3NzEgLTAuMDgwNiwwLjYyNzQyNjEgMC4zNDgxMjMsMi4wMjY2ODkyIDEuMDA1MDg5LC0xLjA2NzI2NDcgMC4zMjY2NDksMC42Njg2MTk0IC0wLjA1Mjk4LDAuMTM1NTY0IC0wLjQzNzU5NCwwLjM4ODgwNjggLTAuNTAzMzY4LDAuNTg2ODUzOCAtMC4wMTI2NywwLjE2NTEwOSAwLjE5NzgzNSwwLjE5NDA4IDAuMzE4OTk3LDAuMTc4MDQ5IDAuMDYyNjYsMC40ODAzOTUgMC4xMjQ5ODIsMS4wNDIwNDggMC41MjIyNDIsMS4zNzI0MzkgMC4xMjAxNzcsMC4xMDY0MDIgMC4yODY2NTIsMC4wOTQ0NyAwLjQyOTMxNywwLjEyNjQ0MyAwLjIyMTY0MSwwLjI2ODEyOCAwLjQ0ODY2OCwwLjU1NzA2NiAwLjc4NDA4NywwLjY4OTc3NCAwLjI4Mzg0NSwwLjE0ODQzNSAwLjYyNDkxMywwLjA1MSAwLjg5NjEzOCwwLjIzMzA2NSAwLjcxMjkyNSwwLjM2MDkwMSAxLjU5NDM3LDAuMjI3NDI0IDIuMjQwMzA3LC0wLjIxNDM2NyAwLjIzOTczNiwtMC4wMjU4NCAwLjUwMTI0MywwLjA1MTE5IDAuNzUxMzkxLDAuMDIyMjIgMC41NzU4OTgsLTAuMDIwMDYgMS4xNjcyMDcsLTAuMjQwMDA1IDEuNTIzOTYyLC0wLjcxMTUwMiAwLjA3MjksLTAuMDY2IDAuMTAyMDgxLC0wLjE3ODE0IDAuMTY4ODAzLC0wLjI0MDYzNSAwLjA2NjE2LDAuMDgzMyAwLjIwMTA3OSwwLjE2NTI4OSAwLjI4NTY1MywwLjA1NTAyIDAuMTkzMDcyLC0wLjI1MzQzNiAwLjIyMzQxMywtMC41OTUxMDQgMC4zMjcxNDUsLTAuODgyNTU5IDAuMDg2NTgsMC4wMzY0MSAwLjA4NDIsMC4yNjU3MzQgMC4xOTA4MiwwLjE3NTk2OCAwLjA4ODU4LC0wLjI3NzUxIDAuMjMxMDU1LC0wLjU4OTU1NCAwLjE1NzQ4NywtMC44NzUxMDMgQyAyMS4wOTQ5NjgsOS44NjQxNTE0IDIwLjk5NDc5OSw5LjcxMDk4NzkgMjAuOTU5NzUxLDkuNjcwOTkxNCAyMS4wNjk3Myw5LjY2NDkyMTQgMjEuMzkyMTQ2LDkuNjA3NDEyNCAyMS4zNjQyMjYsOS40MzQyNzkgMjEuMjg0OTAyLDkuMjY0MDY1MSAyMC45MzAzMjQsOS4wNTgwODkzIDIwLjc4MTQ3LDguOTYzNjg5MyAyMC42Mjc0ODksNy4wODIzNjI5IDIwLjgzMTk0MSw3Ljk3MzAwNDMgMjAuMzc0NDc1LDYuNTcyMTY2OCAyMC4yODY2OTMsNi4yOTYzNjYgMjAuMTc5NTgyLDYuMDI1MzkwOCAyMC4wMzkxNDksNS43NjczNzc4IDE5LjgxNDE1NSw1LjM1NDAwNzYgMTkuNTAzNjMsNC45NzM5MDc1IDE5LjA1MDAzMSw0LjY2MDUzMjggMTguNjk0MTU3LDQuNDg2NjE1NyAxOC43NzkxNjcsNC40MTI0NTc4IDE4LjQxNjMxOSw0LjI4NDIxMTggMTguMDQwOTE2LDQuMTE0ODkzIDE3LjkyMzEyNiw0LjExNDQyOTQgMTcuNzA2MjE3LDQuMDQ5NTUxNCAxNy40MjE5OTMsNC4wMDQyMzgyIDE3LjE3NjIyNiwzLjk5MzQ2MTEgMTYuODg5MTY1LDMuOTkwNzA2NyBaIG0gLTAuNDE2Nzc3LDMuNzcwMjM0NSBjIDAuMjU4MDA1LDAuMDA5NzYgMC40MjkyNTksMC4yNTQ4MTQgMC41Mjc1MDEsMC40Njg0NDEgLTAuMDQ2NTEsMC4xMjA5MTIzIC0wLjIxNzYxMywwLjE4MDMzMTggLTAuMzE0MzE2LDAuMjcwODAwNSAtMC4wNTIyNywwLjAzMDg5OCAtMC4xOTUwNTcsMC4xNDE5ODI5IC0wLjA3Mzk3LDAuMTc2MjU4MyAwLjE2NzU3NCwtMC4wMDgwMSAwLjM0MTEyNSwtMC4xMDE3NzYgMC41MDIzNjMsLTAuMDgxMjUzIDAuMDM4OCwwLjMxMzY5MjcgMC4wMTAzOCwwLjcyNTUwMzEgLTAuMjk1OTM5LDAuOTAyMTQ5NSAtMC4zMTY4ODQsMC4wODI4MjcgLTAuNTYyMDUzLC0wLjIxMjE0MTYgLTAuNjc2ODI5LC0wLjQ3MTYxOCAtMC4xNDcwOTYsLTAuMzY2NjkwMiAtMC4xODU5MzQsLTAuODQyODQzMSAwLjA3NjUxLC0xLjE2Njk5ODggMC4wNjUzMSwtMC4wNjgyNjggMC4xNjAwMTEsLTAuMTA2MzQ3NSAwLjI1NDY3OCwtMC4wOTc3OCB6IG0gMi44NTkyNDQsMi41NzU3ODc4IGMgLTAuMDc2NzMsMC4xODQ3NTggLTAuMjMwNjU5LDAuMzMwMTU2IC0wLjQwNzAxMSwwLjQxMzI1MiAtMC4wNTUzOSwwLjE1MDcwNSAwLjA0MDA0LDAuMzU0MzggMC4wMjk3LDAuNDgzMjM0IC0wLjA0OTA3LC0wLjE2MDM1NyAtMC4wMDE2LC0wLjM2MTQyNiAtMC4xMDg4NzUsLTAuNDk2NzU3IC0wLjA3MDE4LC0wLjAyMjcxIC0wLjE0Nzc0NywtMC4wMjgxIC0wLjIxMTc0MSwtMC4wNzIwNiAwLjIxMjc5NCwwLjExNzcxNyAwLjQ5NTYxLDAuMDM5MjQgMC42MDQ3NjYsLTAuMTgyMDk0IDAuMDI5MzQsLTAuMDM3NjIgMC4wODE1OSwtMC4xNDU1NzUgMC4wOTMxNiwtMC4xNDU1NzEgeiBtIC0wLjk2NTM3MiwwLjE0MTk4OCBjIDAuMDQ1NjYsMC4wMzQwOSAwLjIwNDg5NywwLjE2Mjg1NyAwLjA3NzQ0LDAuMDY3ODUgLTAuMDE2NDEsLTAuMDExMzggLTAuMDkwMTksLTAuMDcwODYgLTAuMDc3NDQsLTAuMDY3ODUgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2M5ZGFkODtmaWxsLW9wYWNpdHk6MTtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wNTIzMDQ5NTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggaWQ9InBhdGg0MjU3IiBkPSJtIDE4LjU2MjI5Miw0LjM0MDY1NDMgYyAwLDAgLTAuMDE4MjMsLTAuMTI2MDkyNSAwLjA1NTAzLC0wLjI2MzA5MTEgMC4xMDcwNjUsLTAuMjAwMjExOCAwLjM2NDA0MywtMC40MDk5NDg1IDAuNjYxOTUxLC0wLjU5NjUyOTEgMC4zOTA1NzksLTAuMjQ0NjIwMiAwLjg3ODEwNSwtMC40MDE1NzcyIDEuNDU3NjUzLDAuMDM1OTg1IDAuMTUwMzMxLDAuMTEzNTAwOCAwLjI3NTEyLDAuMzU2MTg0OSAwLjQzNjUyLDAuNTQ2MjQ1OCAwLDAgMC40NDM4MjIsMC41MzI1ODcxIDAuMDU5MTgsMS43OTAwODI5IEMgMjAuODQ3OTc4LDcuMTEwODQ1IDIwLjI0MTQyLDYuNTMzODc1NCAyMC4yNDE0Miw2LjUzMzg3NTQgWiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2M5ZGFkODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI1OSIgZD0ibSAxNS41NDQ5NjIsNC4zMTU2Mjk4IGMgMC42NzQwMTYsMC44NjIwMTcgMi4yMjQ5NDUsMy4zNjQ2NDY3IDIuNTUyNDgxLDIuMTM1NzQ3MSAwLjIwOTIyLC0wLjkxMDEwNjEgMC4wMTUzMiwtMi4zMDI1OTczIDAuMDE1MzIsLTIuMzAyNTk3MyAwLDAgLTEuMjUyMDM4LC0wLjQ2NTg4NTcgLTIuNTY3ODAyLDAuMTY2ODUwMiB6IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDojODk5YmIwO2ZpbGwtb3BhY2l0eToxO2ZpbGwtcnVsZTpldmVub2RkO3N0cm9rZTojODk5YmIwO3N0cm9rZS13aWR0aDowLjEwNDYwOTk7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI3NiIgZD0ibSAxNC41NTMyNiw5LjMxOTI1NjMgYyAwLDAgLTAuMTY3Mzc2LDAuMDUyMzA1IDEuMDk4NDA0LDAuMzM0NzUxNyAxLjI2NTc4LDAuMjgyNDQ2NyAxLjYyMTQ1MywtMC42Njk1MDM0IDEuNjIxNDUzLC0wLjY2OTUwMzQgMCwwIDEuMDM1NjM4LC0xLjUxNjg0MzYgMi4xNDQ1MDMsLTAuMzAzMzY4NyAwLDAgMC4yODI0NDcsMC4zMDMzNjg3IDAuNzg0NTc1LDAuMjkyOTA3NyAwLDAgMC4zMTM4MjksLTAuMTc3ODM2OCAwLjU3NTM1NCwtMC4wMTA0NjEgMC4yNjE1MjUsMC4xNjczNzU5IDAuNDkxNjY3LDAuMzI0MjkwNyAwLjQ5MTY2NywwLjMyNDI5MDcgMCwwIDAuMzg3MDU2LDAuMzY2MTM0NyAtMC4yOTI5MDgsMC4zNTU2NzM3IDAsMCAwLjQyODksMC4xMDQ2MDk5IC0wLjA4MzY5LDEuMzM5MDA3IGwgLTAuMTQ2NDU0LC0wLjMzNDc1MiBjIDAsMCAtMC4yMDkyMiwxLjQwMTc3MyAtMC41NzUzNTQsMC44NjgyNjIgMCwwIC0wLjE2ODU2NywwLjI4NDA0MiAtMC41NDkzMzUsMC41MzgxMTEgLTAuNDYxNzA0LDAuMzA4MDczIC0xLjIwMDYyLDAuNTc5MDM0IC0xLjg4Mjg0NiwwLjMzNTM4MiAwLDAgLTAuOTI5NDM2LDEuMDIzNTYzIC0yLjUxMjQwMiwwLjEyMTEyNSAwLDAgLTAuODcxNzI4LDAuMTY2NTUyIC0xLjQ1NzU0MywtMC44MTY3ODEgMCwwIC0wLjgwNTQ5NiwwLjE5ODc1OSAtMC45NTE5NSwtMS40OTU5MjIgMCwwIC0wLjY3OTk2NSwwLjA0MTg0IC0wLjA0MTg0LC0wLjU0Mzk3MSAwLjYzODEyLC0wLjU4NTgxNTUgMS4yMDMwMTQsLTAuNDYwMjgzNiAxLjIwMzAxNCwtMC40NjAyODM2IHoiIHN0eWxlPSJkaXNwbGF5OmlubGluZTtmaWxsOiNmOGY4Zjg7ZmlsbC1vcGFjaXR5OjE7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOm5vbmU7c3Ryb2tlLXdpZHRoOjAuMDEwNDYwOTlweDtzdHJva2UtbGluZWNhcDpidXR0O3N0cm9rZS1saW5lam9pbjptaXRlcjtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQzNjUiIGQ9Im0gMTMuNTM4NTQ0LDUuMzE3OTI3NiBjIC0wLjAxNjk4LDAuMDAzMzMgLTAuMjk1NDI5LDAuMDA0MTEgLTAuNTQyNjE0LC0wLjEyODc4OTQgLTAuMTI2Mjk4LC0wLjA2NzkwNiAtMC4yNDcwMjYsLTAuMTI3MDA2OSAtMC4yOTEyNywtMC4xODU5ODA3IC0wLjAzNTY0LC0wLjA0NzUwOCAwLjAwNDEsLTAuMTExNDU4NyAtMC4wNjY4NSwtMC4wNTMwMjIgLTAuOTQ5ODUyLDAuNzgyODExNiAtMC40ODU4NjcsMi4wNDg5MTU3IDAuMzkxNTE4LDIuMzgxNzQ5OSAwLDAgMC4xNjgwMywtMC45MzA1MDIgMS4wODQ1NzEsLTEuOTg3ODA1NyIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2Y4ZjhmODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggaWQ9InBhdGg0MzY3IiBkPSJtIDE4Ljk2OTEyOSw0LjU1MTQ2OTcgYyAwLDAgMC45NjE2MTUsMC42ODA1MjcxIDEuMTk4MzIsMS42MTI1NTQzIDAsMCAxLjE1MzkzOSwtMS43MzA5MDY4IC0wLjA3Mzk3LC0yLjQyNjIyODIgMCwwIC0wLjIwNzExOCwwLjc5ODg4IC0xLjEyNDM1MSwwLjgxMzY3MzkgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2Y4ZjhmODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDIxNSIgZD0ibSAxMi44Mzg2ODUsMTAuMjA5MDE4IGMgMC4xNDQzOTksMS43NjE2ODIgMC45Mzg2MDEsMS40NzI4ODIgMC45Mzg2MDEsMS40NzI4ODIgMC42MzUzNiwxLjAxMDggMS40Mjk1NjEsMC44MjMwOCAxLjQyOTU2MSwwLjgyMzA4IDEuMzcxODAyLDAuODM3NTIyIDIuNTI3MDAzLC0wLjEwMTA3OSAyLjUyNzAwMywtMC4xMDEwNzkgMS45MzQ5NjMsMC4zMTc2OCAyLjQxMTQ4MywtMC45MjQxNjIgMi40MTE0ODMsLTAuOTI0MTYyIDAuMzc1NDQxLDAuNTc3NjAxIDAuNjA2NDgxLC0wLjgwODY0MSAwLjYwNjQ4MSwtMC44MDg2NDEgMC4wNTc3NiwtMC4xMTU1MiAwLjE0NDQwMSwwLjM0NjU2IDAuMTQ0NDAxLDAuMzQ2NTYgMC40NjIwNzksLTEuMjEyOTYwNSAwLjA4MzI0LC0xLjM3NzgzMyAwLjA4MzI0LC0xLjM3NzgzMyAxLjAxMDgwMSwwLjAyODg4IC0wLjIwMzYyNiwtMC43MDI4NzQgLTAuMjAzNjI2LC0wLjcwMjg3NCAtMC4wMjU1MywtMS4wNTkwNjU0IC0wLjAyNTA4LC0xLjMyOTIxMzEgLTAuMzkwMDU0LC0yLjMzMzQzNzggMC44MDk3OTcsMC4yMTYzODc3IDAuODExMDU3LC0wLjk2MDY1ODkgMC45NDkxNywtMS4yMjk3ODc3IDAuMTk5OTE5LC0wLjUzOTAyNDUgLTAuMDM1NiwtMS41MDQ0OTA0IC0wLjY3OTY0MSwtMS45MTk1MzIzIC0wLjI2NTQxMSwtMC4xNzEwMzg3IC0wLjYwMDIsLTAuMjQ4NjAwOSAtMS4wMDI0ODYsLTAuMTY0MzE5OCAtMC4zMDI3NTUsMC4xMzkwMTI4IC0wLjY5MjU0LDAuMzk0OTg5NSAtMC45MDc2MjgsMC42MDg2NjE5IC0wLjE5MzYxMywwLjE5MjMzOTUgLTAuMjE5NjQ5LDAuMzAzMjExNCAtMC4xOTU0NDIsMC40MTU1NTciIHN0eWxlPSJmaWxsOm5vbmU7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOiM1MDUwNTA7c3Ryb2tlLXdpZHRoOjAuMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggaWQ9InBhdGg0MjI3IiBkPSJtIDEyLjgzODY4NSwxMC4yMTE0OTUgYyAwLDAgLTAuOTA5NzIxLDAuMDk4NiAwLjI1OTkyLC0wLjgxMTExNzkgMCwwIDAuNDkwOTYsLTAuNDE4NzYwOCAxLjQ3Mjg4MSwtMC4wNTc3NiIgc3R5bGU9ImZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQyMjkiIGQ9Ik0gMTIuOTA0OTA0LDkuNTY1NTUzIEMgMTIuNTA1NjUzLDguNzczODU0OCAxMi42NzA3OTcsOC4xNjU2MDM3IDEyLjg1MDI0NCw3Ljk1ODI5NCIgc3R5bGU9ImZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQyMDEiIGQ9Im0gMTQuNTgxMzAzLDQuODIyNzY5MiBjIDAsMCAxLjc5NTc0OSwtMS40NTE3MDY2IDMuOTY3MjA3LC0wLjUxNTAzMDkiIHN0eWxlPSJkaXNwbGF5OmlubGluZTtmaWxsOm5vbmU7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOiM1MDUwNTA7c3Ryb2tlLXdpZHRoOjAuMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiBkPSJNIDEyLjkxMzUyNyw3Ljg5OTY1ODEgQyAxMC44OTQzNTYsOC4zNTIwMTQzIDExLjE2ODQwMiw0LjI1NDUyNDcgMTIuNzY0OTUyLDQuMzAyNTA3MyAxMy4zODM1NjksNC4yODU3MzczIDE0LjA5NzQyNCw0LjI2Nzg1NSAxNC42NTY4MSw1LjAwMTUxMyIgaWQ9InBhdGg0MjA3IiAvPiA8cGF0aCBpZD0icGF0aDQyMzMiIGQ9Im0gMTguMzQwMzMxLDEwLjQ1NDQ5OSBjIDAsMCAwLjY2NDI0LDAuNzIyIDEuMDEwODAxLC0wLjE3MzI4IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDpub25lO2ZpbGwtcnVsZTpldmVub2RkO3N0cm9rZTojNTA1MDUwO3N0cm9rZS13aWR0aDowLjEwNDYwOTk7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDIzNSIgZD0ibSAxOC44ODkwNTIsMTAuNzI4ODU5IDAuMDcyMiwwLjU2MzE2IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDpub25lO2ZpbGwtcnVsZTpldmVub2RkO3N0cm9rZTojNTA1MDUwO3N0cm9rZS13aWR0aDowLjEwNDYwOTk7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI1MSIgZD0ibSAxNC4xMzQ4Miw1LjM0NDA4MDEgYyAtMC4xNzgzOTEsMCAtMC42MzI5NDYsMC4wMDY5OCAtMC45OTQxOTIsLTAuMDg2ODE2IEMgMTIuOTA4NzMsNS4xOTcwNTE5IDEyLjcxNTI4NCw1LjA5NTMxMjUgMTIuNjU4MDI2LDQuOTIzNTM3OCIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQzMDEiIGQ9Im0gMTIuNjcyOTA2LDExLjI0OTk1OSBjIDAsMCAtMS4yMTMxMTMsMC44ODAyNDcgLTAuNzI0OTA5LDEuNTQ1OTgxIGwgMC41OTkxNiwwLjUzMjU4NiAwLjgyMTA3MiwwLjQ0MzgyMyAxLjIyNzkwNywwLjA2NjU3IDAuODA2Mjc3LC0wLjE0Nzk0MSAwLjQxNDIzNCwtMC4xODQ5MjYgMC40NDM4MjIsMC4zNzcyNSAwLjM5OTQ0MSwwLjAxNDc5IDAuMjI5MzA4LC0wLjExMDk1NiAwLjY4NzkyNCwtMC4yNzM2OTEgMC4zNjI0NTYsLTAuMjg0Nzg2IDAuMjA3MTE3LC0wLjMxNDM3MyAtMC4wMjk1OSwtMC4zNDAyNjQgYyAwLDAgLTAuMzg0NjQ2LC0xLjE2MTMzNSAtMC43OTg4OCwtMS4zNDYyNjEgMCwwIC0wLjUzMjU4NywtMC41NzY5NjkgLTEuMjcyMjkxLC0wLjA4MTM3IDAsMCAtMS4xMTY5NTIsMC4zNjk4NTIgLTIuMDg1OTY0LDAuMDQ0MzggLTAuOTY5MDEyLC0wLjMyNTQ3IC0xLjI4NzA4NSwwLjA1OTE4IC0xLjI4NzA4NSwwLjA1OTE4IHoiIHN0eWxlPSJkaXNwbGF5OmlubGluZTtmaWxsOiNmOGY4Zjg7ZmlsbC1vcGFjaXR5OjE7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOm5vbmU7c3Ryb2tlLXdpZHRoOjAuMDEwNDYwOTlweDtzdHJva2UtbGluZWNhcDpidXR0O3N0cm9rZS1saW5lam9pbjptaXRlcjtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQzMjUiIGQ9Im0gMTEuODUzMTgsMTIuNDgxMDk0IGMgMCwwIDEuMjIwNTExLC0wLjcwMjcxOSAzLjA2OTc3LC0wLjE4NDkyNyAwLDAgMC45MTcyMzQsMC4xNjI3MzYgMS41MDg5OTYsLTAuMDY2NTcgMC41OTE3NjQsLTAuMjI5MzA5IDAuNzkxNDgzLDAuMjczNjkgMC43OTE0ODMsMC4yNzM2OSAwLDAgMC40NjYwMTQsMC44NDMyNjIgMC4zOTk0NCwwLjkwMjQzOCBsIDAuMTc3NTI5LC0wLjA1MTc4IDAuMjY2MjkzLC0wLjM0MDI2NCAwLjA3Mzk3LC0wLjI1ODg5NyAtMC4xNDA1NDMsLTAuNDI5MDI4IC0wLjI3MzY5MSwtMC41NzY5NjggLTAuMzEwNjc2LC0wLjQ0MzgyMiAtMC4yNTE0OTksLTAuMTg0OTI3IC0wLjQyMTYzMSwtMC4xODQ5MjUgLTAuNDA2ODM4LDAuMDI5NTkgLTAuNjA2NTU2LDAuMjUxNDk5IGMgMCwwIC0xLjAyODE4OSwwLjI4ODQ4NSAtMi4yNDg3LC0wLjE4NDkyNSAwLDAgLTAuOTAyNDM4LC0wLjE2MjczNiAtMS41MTYzOTIsMC45ODM4MDYgbCAtMC4xMTgzNTMsMC4zOTk0MzkgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2M5ZGFkODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI3OSIgZD0ibSAxNi44MzM2NzIsMTMuNzg1MjE3IGMgMC4xNTM0MjMsLTAuMTAyOTY3IDEuNDU0MTIyLC0wLjQwNTE0NCAxLjI3MTUzLC0xLjEwNzA1MiAtMC4xODI1OSwtMC43MDE5MDYgLTAuODEwNDg4LC0yLjE4MzA4IC0xLjk2Mjc0OSwtMS42MjExNTEgLTEuMTUyMjY0LDAuNTYxOTMyIC0yLjQyODI3MSwwLjA0NDIyIC0yLjQyODI3MSwwLjA0NDIyIDAsMCAtMC41MDI1NzUsLTAuMTkxMTk4IC0wLjkxNzEzNywwLjA0NDc1IC0wLjQxNDU2MiwwLjIzNTk1MSAtMC44MzU2OTEsMC42MjQyODUgLTAuOTY5NjcsMS4yNjM4MzYgLTAuMTMzOTgyLDAuNjM5NTU3IDEuNTU5NzQ1LDEuMzQxOTkxIDEuNTU5NzQ1LDEuMzQxOTkxIDAsMCAxLjYyODU2NywwLjIzODgxMyAyLjM5NTY5MywtMC4yNzYwMzUgMCwwIDAuNjI5NzI5LDAuNjk3NzcxIDEuMDUwODU5LDAuMzA5NDM3IHoiIHN0eWxlPSJkaXNwbGF5OmlubGluZTtmaWxsOm5vbmU7ZmlsbC1vcGFjaXR5OjE7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOiM1MDUwNTA7c3Ryb2tlLXdpZHRoOjAuMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggZD0ibSAxNy4xMTQwMTYsOC41MDk4MjQxIGEgMC45NDk4OTcwOCwwLjU4NjQwNTg3IDc4LjA3ODA2MiAwIDEgLTAuMzQwNjEzLDEuMDQwNjk1NSAwLjk0OTg5NzA4LDAuNTg2NDA1ODcgNzguMDc4MDYyIDAgMSAtMC43NzY1NjIsLTAuNjc4NzU2IDAuOTQ5ODk3MDgsMC41ODY0MDU4NyA3OC4wNzgwNjIgMCAxIDAuMjM5NTYsLTEuMTI5MDIxNiAwLjk0OTg5NzA4LDAuNTg2NDA1ODcgNzguMDc4MDYyIDAgMSAwLjgwNzczNiwwLjUzMTgzNzIgbCAtMC41MDM4NzgsMC4zNTYzODM5IHoiIGlkPSJwYXRoNDI2NSIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6IzUwNTA1MDtmaWxsLW9wYWNpdHk6MTtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5NDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZSIgLz4gPHBhdGggZD0iTSAyMC40MTM5NzcsOC4wMzE1OTA2IEEgMC44NTY3NjMyNSwwLjUyODkxMDk1IDc4LjA3ODA2MiAwIDEgMjAuMTA2NzYsOC45NzAyNDk4IDAuODU2NzYzMjUsMC41Mjg5MTA5NSA3OC4wNzgwNjIgMCAxIDE5LjQwNjMzNiw4LjM1ODA0MzEgMC44NTY3NjMyNSwwLjUyODkxMDk1IDc4LjA3ODA2MiAwIDEgMTkuNjIyNDA3LDcuMzM5NzE3NiAwLjg1Njc2MzI1LDAuNTI4OTEwOTUgNzguMDc4MDYyIDAgMSAyMC4zNTA5NDgsNy44MTk0MTA4IGwgLTAuNDU0NDc0LDAuMzIxNDQxNiB6IiBpZD0icGF0aDQyNjUtMiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6IzUwNTA1MDtmaWxsLW9wYWNpdHk6MTtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5NDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZSIgLz4gPHBhdGggaWQ9InBhdGg1NzIwIiBkPSJtIDIxLjEzNDgzMiw3LjY5NjM2MzQgYyAtMC4xMTIzMTgsLTAuMDI3NzU3IC0wLjI2MjQ5NywtMC4wODEwNTQgLTAuMzMzNzMxLC0wLjExODQzODMgLTAuMTQ0MDA1LC0wLjA3NTU3MyAtMC4yOTkzMjksLTAuMjY5ODY1MyAtMC4yOTkzMjksLTAuMzc0NDI2IDAsLTAuMDk2NjA3IC0wLjE5MzI5OCwtMC44NDY4MTQgLTAuMjk0MTMzLC0xLjE0MTU1OTcgQyAxOS45MTc4NSw1LjIxNDg4MjcgMTkuNDI2NzM2LDQuNjc1ODIwNSAxOC44MDY4MDgsNC41MjQzNDIzIDE4LjU3NDU0Myw0LjQ2NzU4OTMgMTguMzc3OTYsNC4zNzc3MTcyIDE4LjM3Nzk2LDQuMzI4Mjg1MSBjIDAsLTAuMTE2NTg3NCAwLjUxODc4NywtMC4zNzIwNTkgMC43NTU1ODcsLTAuMzcyMDgxOCAwLjIyNTEyOSwtMi4wOWUtNSAwLjU1MTc3MywwLjE5NTUxMDUgMC43NTQwMDcsMC40NTEzNTU2IDAuMDg5NTgsMC4xMTMzMjYgMC4zMzY4NDMsMC41NTg3ODc0IDAuNTQ5NDc2LDAuOTg5OTE0MSAwLjYzMDg5MSwxLjI3OTE3MTkgMS4xMjc0NjQsMS45Njg0NzM4IDEuNTY3NTYzLDIuMTc1OTYzMyAwLjIxNzMwOCwwLjEwMjQ1MTggMC4yMjYxMTYsMC4xMTE5NDIgMC4xMzA4ODEsMC4xNDEwMjE1IC0wLjE1OTgzNSwwLjA0ODgwNCAtMC43NzQ5NSwwLjAzNzY4MSAtMS4wMDA2NDIsLTAuMDE4MDk0IHoiIHN0eWxlPSJmaWxsOiMwMDAwMDA7ZmlsbC1vcGFjaXR5OjA7c3Ryb2tlLXdpZHRoOjAuMDUyMzA0OTU7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lIiAvPiA8cGF0aCBpZD0icGF0aDQyNDUiIGQ9Im0gMTUuNTQ0Mzg3LDQuMzE0MzcwOSBjIDAsMCAxLjU1NTIyNiwyLjEwODgwNTMgMi4wNzgyNzYsMi4yNzYxODExIDAuNTIzMDQ5LDAuMTY3Mzc1OSAwLjU1MDA5OSwtMS4yNjczOTM5IDAuNTUwMDk5LC0xLjI2NzM5MzkgMCwwIDAuMDEwNDYsLTAuODA1NDk2MiAtMC4wMzEzOCwtMS4xNjExNyIgc3R5bGU9ImZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQyNDkiIGQ9Im0gMTguOTQ0Mzc3LDQuNTQ1NjI2MiBjIDAuMjUwMTgyLDAuMDI5NjUgMC44NTMyMzUsLTAuMDU1OTAzIDEuMTM0NjY1LC0wLjc3MjM2OTQiIHN0eWxlPSJmaWxsOm5vbmU7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOiM1MDUwNTA7c3Ryb2tlLXdpZHRoOjAuMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHRleHQgaWQ9InRleHQ0MjQ1IiB5PSIyLjA1MTI3MTQiIHg9IjExLjU1NzI5OSIgc3R5bGU9ImZvbnQtc3R5bGU6bm9ybWFsO2ZvbnQtd2VpZ2h0Om5vcm1hbDtmb250LXNpemU6MC4xMjU1MzE4OHB4O2xpbmUtaGVpZ2h0OjAlO2ZvbnQtZmFtaWx5OnNhbnMtc2VyaWY7bGV0dGVyLXNwYWNpbmc6MHB4O3dvcmQtc3BhY2luZzowcHg7ZmlsbDojMDAwMDAwO2ZpbGwtb3BhY2l0eToxO3N0cm9rZTpub25lO3N0cm9rZS13aWR0aDowLjAxMDQ2MDk5cHg7c3Ryb2tlLWxpbmVjYXA6YnV0dDtzdHJva2UtbGluZWpvaW46bWl0ZXI7c3Ryb2tlLW9wYWNpdHk6MSIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHRzcGFuIHN0eWxlPSJmb250LXNpemU6MC40MTg0Mzk2cHg7bGluZS1oZWlnaHQ6MS4yNTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4IiB5PSIyLjA1MTI3MTQiIHg9IjExLjU1NzI5OSIgaWQ9InRzcGFuNDI0NyI+wqA8L3RzcGFuPjwvdGV4dD4gPC9nPiA8L3N2Zz4=";
-                        // eslint-disable-next-line no-console
+
                         console.log(
                             "%cMusic Blocks",
                             "font-size: 24px; font-weight: bold; font-family: sans-serif; padding:20px 0 0 110px; background: url(" +
                                 imgUrl +
                                 ") no-repeat;"
                         );
-                        // eslint-disable-next-line no-console
+
                         console.log(
                             "%cMusic Blocks is a collection of tools for exploring fundamental musical concepts in a fun way.",
                             "font-size: 16px; font-family: sans-serif; font-weight: bold;"
                         );
                     } else {
-                        // eslint-disable-next-line no-console
                         console.log(
                             "%cTurtle Blocks is a collection of tools for exploring  concepts from Logo in a fun way.",
                             "font-size: 16px; font-family: sans-serif; font-weight: bold;"
@@ -4884,7 +4970,6 @@ class Activity {
                         that.blocks.loadNewBlocks(JSON.parse(that.sessionData));
                     }
                 } catch (e) {
-                    // eslint-disable-next-line no-console
                     console.error(e);
                 }
             } else {
@@ -4922,7 +5007,6 @@ class Activity {
                         that.loadStartWrapper(loadStart);
                     });
                 } catch (e) {
-                    // eslint-disable-next-line no-console
                     console.error(e);
                     that.loadStartWrapper(loadStart);
                 }
@@ -5077,7 +5161,7 @@ class Activity {
 
             tune.lines?.forEach(line => {
                 line.staff?.forEach((staff, staffIndex) => {
-                    if (!organizeBlock.hasOwnProperty(staffIndex)) {
+                    if (!Object.prototype.hasOwnProperty.call(organizeBlock, staffIndex)) {
                         organizeBlock[staffIndex] = {
                             arrangedBlocks: []
                         };
@@ -5088,7 +5172,7 @@ class Activity {
             });
             for (const lineId in organizeBlock) {
                 organizeBlock[lineId].arrangedBlocks?.forEach(staff => {
-                    if (!staffBlocksMap.hasOwnProperty(lineId)) {
+                    if (!Object.prototype.hasOwnProperty.call(staffBlocksMap, lineId)) {
                         staffBlocksMap[lineId] = {
                             meterNum: staff?.meter?.value[0]?.num || 4,
                             meterDen: staff?.meter?.value[0]?.den || 4,
@@ -5655,7 +5739,7 @@ class Activity {
             }
 
             this.printText.classList.add("show");
-            this.printTextContent.innerHTML = msg;
+            this.printTextContent.textContent = msg;
 
             const that = this;
             this.msgTimeoutID = setTimeout(() => {
@@ -5792,7 +5876,7 @@ class Activity {
                 default:
                     // Show and populate errorText div
                     this.errorText.classList.add("show");
-                    this.errorTextContent.innerHTML = msg;
+                    this.errorTextContent.textContent = msg;
                     break;
             }
 
@@ -5923,10 +6007,10 @@ class Activity {
             this.trebleBitmap.cache(0, 0, 1200, 900);
             this.trebleBitmap.updateCache();
             this._hideAccidentals();
-            // eslint-disable-next-line no-console
+
             console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
-            // eslint-disable-next-line no-console
+
             console.log(scale);
             const _sharps = [
                 "F" + SHARP,
@@ -5981,10 +6065,10 @@ class Activity {
             this.grandBitmap.cache(0, 0, 1200, 900);
             this.grandBitmap.updateCache();
             this._hideAccidentals();
-            // eslint-disable-next-line no-console
+
             console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
-            // eslint-disable-next-line no-console
+
             console.log(scale);
             const _sharps = [
                 "F" + SHARP,
@@ -6037,10 +6121,10 @@ class Activity {
             this.sopranoBitmap.cache(0, 0, 1200, 900);
             this.sopranoBitmap.updateCache();
             this._hideAccidentals();
-            // eslint-disable-next-line no-console
+
             console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
-            // eslint-disable-next-line no-console
+
             console.log(scale);
             const _sharps = [
                 "F" + SHARP,
@@ -6099,10 +6183,10 @@ class Activity {
             this.altoBitmap.cache(0, 0, 1200, 900);
             this.altoBitmap.updateCache();
             this._hideAccidentals();
-            // eslint-disable-next-line no-console
+
             console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
-            // eslint-disable-next-line no-console
+
             console.log(scale);
             const _sharps = [
                 "F" + SHARP,
@@ -6156,10 +6240,10 @@ class Activity {
             this.tenorBitmap.cache(0, 0, 1200, 900);
             this.tenorBitmap.updateCache();
             this._hideAccidentals();
-            // eslint-disable-next-line no-console
+
             console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
-            // eslint-disable-next-line no-console
+
             console.log(scale);
             const _sharps = [
                 "F" + SHARP,
@@ -6214,10 +6298,10 @@ class Activity {
             this.bassBitmap.cache(0, 0, 1200, 900);
             this.bassBitmap.updateCache();
             this._hideAccidentals();
-            // eslint-disable-next-line no-console
+
             console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
-            // eslint-disable-next-line no-console
+
             console.log(scale);
             const _sharps = [
                 "F" + SHARP,
@@ -6260,6 +6344,7 @@ class Activity {
          */
         this.prepareExport = () => {
             const blockMap = [];
+            const blockIndexById = new Map();
             this.hasMatrixDataBlock = false;
             for (let blk = 0; blk < this.blocks.blockList.length; blk++) {
                 const myBlock = this.blocks.blockList[blk];
@@ -6268,6 +6353,7 @@ class Activity {
                     continue;
                 }
 
+                blockIndexById.set(blk, blockMap.length);
                 blockMap.push(blk);
             }
 
@@ -6341,11 +6427,10 @@ class Activity {
                                 // temperament.
                                 let customName = "custom";
                                 if (myBlock.connections[1] !== null) {
-                                    // eslint-disable-next-line max-len
                                     customName =
                                         this.blocks.blockList[myBlock.connections[1]].value;
                                 }
-                                // eslint-disable-next-line no-console
+
                                 console.log(customName);
                                 args = {
                                     customName: customName,
@@ -6411,17 +6496,19 @@ class Activity {
 
                 const connections = [];
                 for (let c = 0; c < myBlock.connections.length; c++) {
-                    const mapConnection = blockMap.indexOf(myBlock.connections[c]);
-                    if (myBlock.connections[c] === null || mapConnection === -1) {
+                    const connection = myBlock.connections[c];
+                    const mapConnection = blockIndexById.get(connection);
+                    if (connection === null || mapConnection === undefined) {
                         connections.push(null);
                     } else {
                         connections.push(mapConnection);
                     }
                 }
 
+                const blockIndex = blockIndexById.get(blk);
                 if (args === null) {
                     data.push([
-                        blockMap.indexOf(blk),
+                        blockIndex,
                         myBlock.name,
                         myBlock.container.x,
                         myBlock.container.y,
@@ -6429,7 +6516,7 @@ class Activity {
                     ]);
                 } else {
                     data.push([
-                        blockMap.indexOf(blk),
+                        blockIndex,
                         [myBlock.name, args],
                         myBlock.container.x,
                         myBlock.container.y,
@@ -6786,8 +6873,7 @@ class Activity {
             const paletteName = protoblk.palette.name;
             const protoName = protoblk.name;
 
-            // eslint-disable-next-line no-prototype-builtins
-            if (this.blocks.protoBlockDict.hasOwnProperty(protoName)) {
+            if (Object.prototype.hasOwnProperty.call(that.blocks.protoBlockDict, protoName)) {
                 this.palettes.dict[paletteName].makeBlockFromSearch(
                     protoblk,
                     protoName,
@@ -6885,15 +6971,16 @@ class Activity {
 
             const img = new Image();
             img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(name));
+            // Accessibility: derive alt text from the button label
+            const altText = label ? label.replace(/\s*\[.*\]$/, "") : "Toolbar button";
+            img.setAttribute("alt", altText);
 
+            // Batch DOM reads before writes to avoid forced synchronous layout
+            const rightPos = document.body.clientWidth - x;
             container.appendChild(img);
             container.setAttribute(
                 "style",
-                "position: absolute; right:" +
-                    (document.body.clientWidth - x) +
-                    "px;  top: " +
-                    y +
-                    "px;"
+                "position: absolute; right:" + rightPos + "px;  top: " + y + "px;"
             );
             document.getElementById("buttoncontainerBOTTOM").appendChild(container);
             return container;
@@ -6988,7 +7075,7 @@ class Activity {
                     this.storage.allProjects = JSON.stringify(["My Project"]);
                 } catch (e) {
                     // Edge case, eg. Firefox localSorage DB corrupted
-                    // eslint-disable-next-line no-console
+
                     console.error(e);
                 }
             }
@@ -6998,7 +7085,6 @@ class Activity {
                 p = this.storage.currentProject;
                 this.storage["SESSION" + p] = data;
             } catch (e) {
-                // eslint-disable-next-line no-console
                 console.error(e);
             }
 
@@ -7019,7 +7105,6 @@ class Activity {
                 try {
                     that.storage["SESSIONIMAGE" + p] = bitmap.bitmapCache.getCacheDataURL();
                 } catch (e) {
-                    // eslint-disable-next-line no-console
                     console.error(e);
                 }
             };
@@ -7095,7 +7180,7 @@ class Activity {
                     pasteDy = 0;
                 const map = new Map();
                 for (let i = 0; i < blocksArray.length; i++) {
-                    const idx = this.blocks.blockList.indexOf(blocksArray[i]);
+                    const idx = blocksArray[i].blockIndex;
                     map.set(
                         idx,
                         blocksArray[i].connections.filter(blk => blk !== null)
@@ -7146,6 +7231,8 @@ class Activity {
             this.currentX = 0;
             this.currentY = 0;
             this.hasMouseMoved = false;
+            // rAF guard for throttling drag-select mousemove
+            this._dragSelectRafPending = false;
             if (this.selectionArea && this.selectionArea.parentNode) {
                 this.selectionArea.parentNode.removeChild(this.selectionArea);
             }
@@ -7156,17 +7243,24 @@ class Activity {
 
             this.addEventListener(document, "mousemove", event => {
                 this.hasMouseMoved = true;
-                // event.preventDefault();
-                // this.selectedBlocks = [];
                 if (this.isDragging && this.isSelecting) {
                     this.currentX = event.clientX;
                     this.currentY = event.clientY;
-                    if (!this.blocks.isBlockMoving && !this.turtles.running()) {
-                        this.setSelectionMode(true);
-                        this.drawSelectionArea();
-                        this.selectedBlocks = this.selectBlocksInDragArea();
-                        this.unhighlightSelectedBlocks(true, true);
-                        this.blocks.setSelectedBlocks(this.selectedBlocks);
+                    // Throttle drag-select to one update per animation frame
+                    if (
+                        !this._dragSelectRafPending &&
+                        !this.blocks.isBlockMoving &&
+                        !this.turtles.running()
+                    ) {
+                        this._dragSelectRafPending = true;
+                        requestAnimationFrame(() => {
+                            this._dragSelectRafPending = false;
+                            this.setSelectionMode(true);
+                            this.drawSelectionArea();
+                            this.selectedBlocks = this.selectBlocksInDragArea();
+                            this.unhighlightSelectedBlocks(true, true);
+                            this.blocks.setSelectedBlocks(this.selectedBlocks);
+                        });
                     }
                 }
             });
@@ -7202,15 +7296,23 @@ class Activity {
             const width = Math.abs(this.currentX - this.startX);
             const height = Math.abs(this.currentY - this.startY);
 
-            this.selectionArea.style.display = "flex";
-            this.selectionArea.style.position = "absolute";
-            this.selectionArea.style.left = x + "px";
-            this.selectionArea.style.top = y + "px";
-            this.selectionArea.style.height = height + "px";
-            this.selectionArea.style.width = width + "px";
-            this.selectionArea.style.zIndex = "9989";
-            this.selectionArea.style.backgroundColor = "rgba(137, 207, 240, 0.5)";
-            this.selectionArea.style.pointerEvents = "none";
+            // Batch all CSS writes into a single cssText assignment
+            // to avoid multiple forced style recalculations.
+            this.selectionArea.style.cssText =
+                "display:flex;position:absolute;" +
+                "left:" +
+                x +
+                "px;top:" +
+                y +
+                "px;" +
+                "width:" +
+                width +
+                "px;height:" +
+                height +
+                "px;" +
+                "z-index:9989;" +
+                "background-color:rgba(137,207,240,0.5);" +
+                "pointer-events:none;";
 
             this.dragArea = { x, y, width, height };
         };
@@ -7252,43 +7354,33 @@ class Activity {
         // Unhighlight the selected blocks
 
         this.unhighlightSelectedBlocks = (unhighlight, selectionModeOn) => {
+            // Build a Set of selected block indices for O(1) lookup
+            // instead of O(n*m) deep-equality comparisons.
+            const selectedSet = new Set();
             for (let i = 0; i < this.selectedBlocks.length; i++) {
-                for (const blk in this.blocks.blockList) {
-                    if (this.isEqual(this.blocks.blockList[blk], this.selectedBlocks[i])) {
-                        if (unhighlight) {
-                            this.blocks.unhighlightSelectedBlocks(blk, true);
-                        } else {
-                            this.blocks.highlight(blk, true);
-                            this.refreshCanvas();
-                        }
-                    }
+                const idx = this.blocks.blockList.indexOf(this.selectedBlocks[i]);
+                if (idx >= 0) {
+                    selectedSet.add(idx);
                 }
+            }
+
+            for (const blk of selectedSet) {
+                if (unhighlight) {
+                    this.blocks.unhighlightSelectedBlocks(blk, true);
+                } else {
+                    this.blocks.highlight(blk, true);
+                }
+            }
+
+            if (!unhighlight && selectedSet.size > 0) {
+                this.refreshCanvas();
             }
         };
 
-        // Check if two blocks are same or not.
+        // Check if two blocks are the same by identity (reference equality).
 
         this.isEqual = (obj1, obj2) => {
-            const keys1 = Object.keys(obj1);
-            const keys2 = Object.keys(obj2);
-
-            if (keys1.length !== keys2.length) {
-                return false;
-            }
-
-            for (const key of keys1) {
-                if (!obj2.hasOwnProperty(key)) {
-                    return false;
-                }
-            }
-
-            for (const key of keys1) {
-                if (obj1[key] !== obj2[key]) {
-                    return false;
-                }
-            }
-
-            return true;
+            return obj1 === obj2;
         };
 
         this.setSelectionMode = selection => {
@@ -7311,14 +7403,21 @@ class Activity {
          * Inits everything. The main function.
          */
         this.init = async () => {
+            // Guard against double initialization
+            if (this._initialized) return;
+            this._initialized = true;
+
+            // Batch DOM reads before any writes to avoid forced synchronous layout
             this._clientWidth = document.body.clientWidth;
             this._clientHeight = document.body.clientHeight;
             this._innerWidth = window.innerWidth;
             this._innerHeight = window.innerHeight;
             this._outerWidth = window.outerWidth;
             this._outerHeight = window.outerHeight;
+            const loaderEl = document.getElementById("loader");
 
-            document.getElementById("loader").className = "loader";
+            // DOM write: apply class after all geometry reads
+            loaderEl.className = "loader";
 
             /*
              * Run browser check before implementing onblur -->
@@ -7339,6 +7438,7 @@ class Activity {
 
             this.stage = new createjs.Stage(this.canvas);
             createjs.Touch.enable(this.stage);
+            this._startRenderLoop();
 
             // Initialize Ticker with optimal framerate
             createjs.Ticker.framerate = 60;
@@ -7369,6 +7469,7 @@ class Activity {
             // Use managed addEventListener for automatic cleanup
             this.addEventListener(document, "mousemove", this.handleMouseMove);
             this.addEventListener(document, "click", this.handleDocumentClick);
+            this.addEventListener(window, "beforeunload", this._stopRenderLoop);
 
             this._createMsgContainer(
                 "#ffffff",
@@ -7605,7 +7706,7 @@ class Activity {
                                             "Cannot load project from the file. Please check the file type."
                                         )
                                     );
-                                    // eslint-disable-next-line no-console
+
                                     console.error(e);
                                     document.body.style.cursor = "default";
                                     that.loading = false;
@@ -7616,7 +7717,7 @@ class Activity {
 
                     midiReader.onload = e => {
                         const midi = new Midi(e.target.result);
-                        // eslint-disable-next-line no-console
+
                         console.debug(midi);
                         midiImportBlocks(midi);
                     };
@@ -7699,7 +7800,6 @@ class Activity {
                                 that.loading = false;
                                 that.refreshCanvas();
                             } catch (e) {
-                                // eslint-disable-next-line no-console
                                 console.error(e);
                                 that.errorMsg(
                                     _(
@@ -7714,7 +7814,7 @@ class Activity {
                 };
                 midiReader.onload = e => {
                     const midi = new Midi(e.target.result);
-                    // eslint-disable-next-line no-console
+
                     console.debug(midi);
                     midiImportBlocks(midi);
                 };
@@ -7726,7 +7826,7 @@ class Activity {
                     abcData = abcData.replace(/\\/g, "");
 
                     const tunebook = new ABCJS.parseOnly(abcData);
-                    // eslint-disable-next-line no-console
+
                     console.log(tunebook);
                     tunebook.forEach(tune => {
                         //call parseABC to parse abcdata to MB json
@@ -8092,7 +8192,6 @@ class Activity {
             localStorage.setItem("beginnerMode", this.beginnerMode.toString());
             localStorage.setItem("themePreference", this.themePreference.toString());
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.error("Error saving to localStorage:", e);
         }
     }
@@ -8124,20 +8223,17 @@ class Activity {
 
             // Safely hide and clear existing palettes
             if (!this.palettes) {
-                // eslint-disable-next-line no-console
                 console.warn("Palettes object not initialized");
                 return;
             }
 
             if (typeof this.palettes.hide !== "function") {
-                // eslint-disable-next-line no-console
                 console.warn("Palettes hide method not available");
             } else {
                 this.palettes.hide();
             }
 
             if (typeof this.palettes.clear !== "function") {
-                // eslint-disable-next-line no-console
                 console.warn("Palettes clear method not available");
                 // Fallback clear implementation
                 this.palettes.dict = {};
@@ -8185,7 +8281,6 @@ class Activity {
 
             this.refreshCanvas();
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.error("Error regenerating palettes:", e);
             this.errorMsg(_("Error regenerating palettes. Please refresh the page."));
         }
@@ -8208,7 +8303,6 @@ class Activity {
             configurable: true, // allow removal in the next major version
             enumerable: false,
             get() {
-                // eslint-disable-next-line no-console
                 console.warn(
                     "[Deprecated] window.activity is removed. " +
                         "Use ActivityContext.getActivity() instead."
@@ -8216,7 +8310,6 @@ class Activity {
                 return undefined;
             },
             set() {
-                // eslint-disable-next-line no-console
                 console.error(
                     "[Deprecated] window.activity is removed and cannot be set. " +
                         "Use ActivityContext.setActivity() via activity-context.js."
@@ -8225,7 +8318,7 @@ class Activity {
         });
     } catch (e) {
         // Fail silently — defining the property must never break the app.
-        // eslint-disable-next-line no-console
+
         console.warn("[ActivityDeprecationGuard] Could not install guard:", e);
     }
 })();

@@ -55,7 +55,6 @@ class LocalPlanet {
         }
 
         this.projects.sort((a, b) => {
-            // eslint-disable-next-line max-len
             return (
                 this.ProjectTable[b[0]].DateLastModified - this.ProjectTable[a[0]].DateLastModified
             );
@@ -81,7 +80,7 @@ class LocalPlanet {
 
         if (index != -1) {
             const id = `local-project-image-${this.projects[index][0]}`;
-            // eslint-disable-next-line no-console
+
             const cardimg = document.getElementById(id);
             cardimg.src = this.currentProjectImage;
         }
@@ -94,7 +93,7 @@ class LocalPlanet {
 
         document.getElementById("deleter-button").addEventListener(
             "click",
-            // eslint-disable-next-line no-unused-vars
+
             function (evt) {
                 if (t.DeleteModalID !== null) {
                     t.Planet.ProjectStorage.deleteProject(t.DeleteModalID);
