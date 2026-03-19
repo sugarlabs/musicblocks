@@ -332,10 +332,22 @@ global.docById = jest.fn((id) => {
     if (id === 'submitLilypond') {
         el.onclick = jest.fn(); // SaveInterface will set this
     }
-    // Add more lilypond modal elements that the code expects
     if (id === 'fileNameText' || id === 'titleText' || id === 'authorText' || 
         id === 'MIDIText' || id === 'guitarText') {
         el.textContent = ''; // SaveInterface will set these via _
+    }
+    if (id === 'editorConsole') {
+        el.textContent = '<b>hello</b>second';
+        el.innerHTML = '<b>hello</b><br>second';
+        el.querySelector = jest.fn((selector) => {
+            if (selector === 'b') return null;
+            if (selector === 'br') return enhancedMakeMockElement('br');
+            return null;
+        });
+        el.querySelectorAll = jest.fn((selector) => {
+            if (selector === 'br') return [enhancedMakeMockElement('br')];
+            return [];
+        });
     }
 
     return el;
@@ -546,6 +558,8 @@ global.MULTIPALETTEICONS = ["music", "logic", "artwork"];
 global.SKIPPALETTES = ["heap", "dictionary"];
 global.toTitleCase = jest.fn((str) => str.charAt(0).toUpperCase() + str.slice(1));
 global._ = jest.fn((str) => str);
+
+// Add platform-specific mocks
 global.platformColor = {
     selectorSelected: "#000",
     paletteBackground: "#fff",
@@ -555,9 +569,104 @@ global.platformColor = {
     paletteLabelSelected: "#aaa",
     hoverColor: "#ddd",
     paletteText: "#000",
-    textColor: "#111"
+    textColor: "#111",
+    header: "#4DA6FF",
+    header: "#1E88E5"
 };
-global.base64Encode = str => str;
+
+// Mock window.platform
+global.window.platform = {
+    FFOS: false,
+    navigator: {
+        userAgent: "jest"
+    }
+};
+
+// Mock canvas elements for oscilloscope tests
+if (typeof document !== 'undefined') {
+    const originalCreateElement = document.createElement;
+    document.createElement = jest.fn((tagName) => {
+        const el = originalCreateElement.call(document, tagName);
+        if (tagName === 'canvas') {
+            el.getContext = jest.fn((type) => {
+                if (type === '2d') {
+                    return {
+                        fillStyle: '',
+                        strokeStyle: '',
+                        lineWidth: 1,
+                        fillRect: jest.fn(),
+                        strokeRect: jest.fn(),
+                        clearRect: jest.fn(),
+                        beginPath: jest.fn(),
+                        closePath: jest.fn(),
+                        moveTo: jest.fn(),
+                        lineTo: jest.fn(),
+                        arc: jest.fn(),
+                        fill: jest.fn(),
+                        stroke: jest.fn(),
+                        save: jest.fn(),
+                        restore: jest.fn(),
+                        translate: jest.fn(),
+                        rotate: jest.fn(),
+                        scale: jest.fn(),
+                        createLinearGradient: jest.fn(() => ({
+                            addColorStop: jest.fn()
+                        })),
+                        createRadialGradient: jest.fn(() => ({
+                            addColorStop: jest.fn()
+                        }))
+                    };
+                }
+                return null;
+            });
+            el.width = 0;
+            el.height = 0;
+            el.className = '';
+        }
+        return el;
+    });
+}
+
+// Mock SuperGif for gif-animator tests
+global.window.SuperGif = jest.fn(() => {
+    const mockSuperGifInstance = {
+        load: jest.fn(),
+        pause: jest.fn(),
+        play: jest.fn(),
+        move_to: jest.fn(),
+        get_canvas: jest.fn(() => ({
+            getContext: jest.fn(() => ({
+                save: jest.fn(),
+                restore: jest.fn(),
+                clearRect: jest.fn(),
+                translate: jest.fn(),
+                rotate: jest.fn(),
+                drawImage: jest.fn()
+            }))
+        })),
+        get_length: jest.fn(() => 10),
+        get_current_frame: jest.fn(() => 0)
+    };
+    return mockSuperGifInstance;
+});
+
+// Mock performance.now for gif-animator tests
+global.performance = {
+    now: jest.fn(() => Date.now())
+};
+
+// Mock document.querySelector for theme-color meta tag
+if (typeof document !== 'undefined') {
+    document.querySelector = jest.fn((selector) => {
+        const el = enhancedMakeMockElement('meta');
+        if (selector === 'meta[name=theme-color]') {
+            // Return the current theme color based on platformColor.header
+            el.content = global.platformColor ? global.platformColor.header : "#4DA6FF";
+        }
+        return el;
+    });
+}
+
 global.i18nSolfege = jest.fn(() => "sol");
 global.NUMBERBLOCKDEFAULT = 1;
 global.TEXTWIDTH = 100;
