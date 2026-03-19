@@ -18,8 +18,6 @@
  */
 /* global MULTIPALETTES, platformColor, docById, TEXTWIDTH */
 
-/* global MULTIPALETTES, platformColor, docById, TEXTWIDTH */
-
 const { Palettes, initPalettes } = require("../palette");
 
 global.LEADING = 10;
