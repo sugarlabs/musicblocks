@@ -990,10 +990,7 @@ class Toolbar {
                     return;
                 }
 
-                if (
-                    !RecordDropdownArrow.contains(e.target) &&
-                    !dropdown.contains(e.target)
-                ) {
+                if (!RecordDropdownArrow.contains(e.target) && !dropdown.contains(e.target)) {
                     arrowIcon.textContent = "arrow_drop_down";
                 }
             };
