@@ -602,6 +602,7 @@ if (typeof document !== 'undefined') {
                         moveTo: jest.fn(),
                         lineTo: jest.fn(),
                         arc: jest.fn(),
+                        ellipse: jest.fn(),
                         fill: jest.fn(),
                         stroke: jest.fn(),
                         save: jest.fn(),
