@@ -42,7 +42,7 @@ class JSEditor {
         );
         this.widgetWindow.clear();
         this.widgetWindow.show();
-        this.widgetWindow.setPosition(160, 132);
+        this.widgetWindow.sendToCenter();
 
         /** topmost DOM container for the widget contents */
         this._editor = document.createElement("div");
