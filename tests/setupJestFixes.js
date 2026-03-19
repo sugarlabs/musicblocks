@@ -8,20 +8,21 @@ function makeMockElement(tag) {
         tagName: tag?.toUpperCase() || 'DIV',
         nodeType: 1,
         style: {
-            display: '',
-            cursor: '',
-            border: '',
-            color: '',
-            backgroundColor: '',
-            width: '',
-            height: '',
-            position: '',
-            left: '',
-            top: '',
-            zIndex: '',
-            fontWeight: '',
-            padding: '',
-            margin: ''
+            display: "",
+            backgroundColor: "",
+            border: "",
+            color: "",
+            cursor: "",
+            fontWeight: "",
+            height: "",
+            left: "",
+            margin: "",
+            padding: "",
+            position: "",
+            top: "",
+            width: "",
+            zIndex: "",
+            removeProperty: jest.fn()
         },
         children: [],
         childNodes: [],
@@ -226,6 +227,7 @@ function enhancedMakeMockElement(tag) {
     el.contains = jest.fn((child) => false);
     el.parentElement = null;
     el.parentNode = null;
+    el.remove = jest.fn();
     return el;
 }
 
