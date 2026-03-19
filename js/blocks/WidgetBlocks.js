@@ -368,12 +368,10 @@ function setupWidgetBlocks(activity) {
                 logo.sample = new SampleWidget();
             }
             logo.inSample = true;
-            logo.sample = new SampleWidget();
 
             const listenerName = "_sampler_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 logo.sample.init(activity);
             };
@@ -593,7 +591,6 @@ function setupWidgetBlocks(activity) {
                 let blocks = [[0, "oscilloscope", x, y, [null, 1, null]]];
                 for (const turtle of activity.turtles.turtleList) {
                     if (!turtle.inTrash)
-                        // eslint-disable-next-line max-len
                         blocks = addPrintTurtle(
                             blocks,
                             turtle,
@@ -1677,12 +1674,10 @@ function setupWidgetBlocks(activity) {
                 logo.sample = new AIWidget();
             }
             logo.inSample = true;
-            logo.sample = new AIWidget();
 
             const listenerName = "_sampler_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 logo.sample.init(activity);
             };
@@ -1867,7 +1862,6 @@ function setupWidgetBlocks(activity) {
                 logo.sample = new AIDebuggerWidget();
             }
             logo.inSample = true;
-            logo.sample = new AIDebuggerWidget();
 
             const listenerName = "_sampler_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);

@@ -337,20 +337,21 @@ const PhraseMakerAudio = {
         let noteValue = pm._notesToPlay[noteCounter][1];
         time = 1 / noteValue;
 
-        setTimeout(() => {
-            let row, cell, tupletCell;
-            // Did we just play the last note?
-            if (noteCounter === pm._notesToPlay.length - 1) {
-                PhraseMakerUI.resetMatrix(pm);
+        setTimeout(
+            () => {
+                let row, cell, tupletCell;
+                // Did we just play the last note?
+                if (noteCounter === pm._notesToPlay.length - 1) {
+                    PhraseMakerUI.resetMatrix(pm);
 
-                pm.widgetWindow.modifyButton(
-                    0,
-                    "play-button.svg",
-                    pm.constructor.ICONSIZE,
-                    pm._("Play")
-                );
-                pm.playingNow = false;
-                pm._playButton.innerHTML = `&nbsp;&nbsp;<img 
+                    pm.widgetWindow.modifyButton(
+                        0,
+                        "play-button.svg",
+                        pm.constructor.ICONSIZE,
+                        pm._("Play")
+                    );
+                    pm.playingNow = false;
+                    pm._playButton.innerHTML = `&nbsp;&nbsp;<img 
                     src="header-icons/play-button.svg" 
                     title="${pm._("Play")}" 
                     alt="${pm._("Play")}" 
@@ -358,118 +359,124 @@ const PhraseMakerAudio = {
                     width="${pm.constructor.ICONSIZE}" 
                     vertical-align="middle"
                 >&nbsp;&nbsp;`;
-            } else {
-                row = pm._noteValueRow;
-                cell = row.cells[pm._colIndex];
+                } else {
+                    row = pm._noteValueRow;
+                    cell = row.cells[pm._colIndex];
 
-                if (cell != undefined) {
-                    cell.style.backgroundColor = pm.platformColor.selectorBackground;
-                    if (cell.colSpan > 1) {
-                        row = pm._tupletNoteValueRow;
-                        tupletCell = row.cells[pm._notesCounter];
-                        tupletCell.style.backgroundColor = pm.platformColor.selectorBackground;
-                    }
-                }
-
-                if (pm._notesCounter >= pm._notesToPlay.length) {
-                    pm._notesCounter = 1;
-                    pm.activity.logo.synth.stop();
-                }
-
-                const note = pm._notesToPlay[pm._notesCounter][0];
-                noteValue = pm._notesToPlay[pm._notesCounter][1];
-                pm._notesCounter += 1;
-
-                const pitchNotes = [];
-                const synthNotes = [];
-                const drumNotes = [];
-                let drumName, obj;
-                // Note can be a chord, hence it is an array.
-                if (!pm._stopOrCloseClicked) {
-                    for (let i = 0; i < note.length; i++) {
-                        if (typeof note[i] === "number") {
-                            drumName = null;
-                        } else {
-                            drumName = pm._deps.getDrumName(note[i]);
+                    if (cell != undefined) {
+                        cell.style.backgroundColor = pm.platformColor.selectorBackground;
+                        if (cell.colSpan > 1) {
+                            row = pm._tupletNoteValueRow;
+                            tupletCell = row.cells[pm._notesCounter];
+                            tupletCell.style.backgroundColor = pm.platformColor.selectorBackground;
                         }
+                    }
 
-                        if (typeof note[i] === "number") {
-                            synthNotes.push(note[i]);
-                        } else if (drumName != null) {
-                            drumNotes.push(drumName);
-                        } else if (note[i].slice(0, 4) === "http") {
-                            drumNotes.push(note[i]);
-                        } else {
-                            obj = note[i].split(": ");
-                            // Deprecated
-                            if (PhraseMakerUtils.MATRIXSYNTHS.includes(obj[0])) {
-                                synthNotes.push(note[i]);
-                                continue;
-                            } else if (PhraseMakerUtils.MATRIXGRAPHICS.includes(obj[0])) {
-                                this._processGraphics(pm, obj);
-                            } else if (PhraseMakerUtils.MATRIXGRAPHICS2.includes(obj[0])) {
-                                this._processGraphics(pm, obj);
+                    if (pm._notesCounter >= pm._notesToPlay.length) {
+                        pm._notesCounter = 1;
+                        pm.activity.logo.synth.stop();
+                    }
+
+                    const note = pm._notesToPlay[pm._notesCounter][0];
+                    noteValue = pm._notesToPlay[pm._notesCounter][1];
+                    pm._notesCounter += 1;
+
+                    const pitchNotes = [];
+                    const synthNotes = [];
+                    const drumNotes = [];
+                    let drumName, obj;
+                    // Note can be a chord, hence it is an array.
+                    if (!pm._stopOrCloseClicked) {
+                        for (let i = 0; i < note.length; i++) {
+                            if (typeof note[i] === "number") {
+                                drumName = null;
                             } else {
-                                pitchNotes.push(note[i].replace(/♭/g, "b").replace(/♯/g, "#"));
+                                drumName = pm._deps.getDrumName(note[i]);
+                            }
+
+                            if (typeof note[i] === "number") {
+                                synthNotes.push(note[i]);
+                            } else if (drumName != null) {
+                                drumNotes.push(drumName);
+                            } else if (note[i].slice(0, 4) === "http") {
+                                drumNotes.push(note[i]);
+                            } else {
+                                obj = note[i].split(": ");
+                                // Deprecated
+                                if (PhraseMakerUtils.MATRIXSYNTHS.includes(obj[0])) {
+                                    synthNotes.push(note[i]);
+                                    continue;
+                                } else if (PhraseMakerUtils.MATRIXGRAPHICS.includes(obj[0])) {
+                                    this._processGraphics(pm, obj);
+                                } else if (PhraseMakerUtils.MATRIXGRAPHICS2.includes(obj[0])) {
+                                    this._processGraphics(pm, obj);
+                                } else {
+                                    pitchNotes.push(note[i].replace(/♭/g, "b").replace(/♯/g, "#"));
+                                }
                             }
                         }
                     }
-                }
 
-                if (note[0] !== "R" && pitchNotes.length > 0) {
-                    this._playChord(pm, pitchNotes, pm._deps.Singer.defaultBPMFactor / noteValue);
-                }
-
-                for (let i = 0; i < synthNotes.length; i++) {
-                    pm.activity.logo.synth.trigger(
-                        0,
-                        [Number(synthNotes[i])],
-                        pm._deps.Singer.defaultBPMFactor / noteValue,
-                        pm._instrumentName,
-                        null,
-                        null
-                    );
-                }
-
-                for (let i = 0; i < drumNotes.length; i++) {
-                    pm.activity.logo.synth.trigger(
-                        0,
-                        ["C2"],
-                        pm._deps.Singer.defaultBPMFactor / noteValue,
-                        drumNotes[i],
-                        null,
-                        null
-                    );
-                }
-            }
-
-            row = pm._noteValueRow;
-            cell = row.cells[pm._colIndex];
-            if (cell != undefined) {
-                if (cell.colSpan > 1) {
-                    pm._spanCounter += 1;
-                    if (pm._spanCounter === cell.colSpan) {
-                        pm._colIndex += 1;
-                        pm._spanCounter = 0;
+                    if (note[0] !== "R" && pitchNotes.length > 0) {
+                        this._playChord(
+                            pm,
+                            pitchNotes,
+                            pm._deps.Singer.defaultBPMFactor / noteValue
+                        );
                     }
-                } else {
-                    pm._colIndex += 1;
+
+                    for (let i = 0; i < synthNotes.length; i++) {
+                        pm.activity.logo.synth.trigger(
+                            0,
+                            [Number(synthNotes[i])],
+                            pm._deps.Singer.defaultBPMFactor / noteValue,
+                            pm._instrumentName,
+                            null,
+                            null
+                        );
+                    }
+
+                    for (let i = 0; i < drumNotes.length; i++) {
+                        pm.activity.logo.synth.trigger(
+                            0,
+                            ["C2"],
+                            pm._deps.Singer.defaultBPMFactor / noteValue,
+                            drumNotes[i],
+                            null,
+                            null
+                        );
+                    }
                 }
 
-                if (pm._colIndex >= row.cells.length) {
-                    PhraseMakerUI.resetMatrix(pm);
-                    pm._colIndex = 0;
-                }
-            }
+                row = pm._noteValueRow;
+                cell = row.cells[pm._colIndex];
+                if (cell != undefined) {
+                    if (cell.colSpan > 1) {
+                        pm._spanCounter += 1;
+                        if (pm._spanCounter === cell.colSpan) {
+                            pm._colIndex += 1;
+                            pm._spanCounter = 0;
+                        }
+                    } else {
+                        pm._colIndex += 1;
+                    }
 
-            if (noteCounter < pm._notesToPlay.length - 1) {
-                if (!pm._stopOrCloseClicked) {
-                    this.__playNote(pm, time, noteCounter + 1);
-                } else {
-                    PhraseMakerUI.resetMatrix(pm);
+                    if (pm._colIndex >= row.cells.length) {
+                        PhraseMakerUI.resetMatrix(pm);
+                        pm._colIndex = 0;
+                    }
                 }
-            }
-        }, pm._deps.Singer.defaultBPMFactor * 1000 * time + pm.activity.logo.turtleDelay);
+
+                if (noteCounter < pm._notesToPlay.length - 1) {
+                    if (!pm._stopOrCloseClicked) {
+                        this.__playNote(pm, time, noteCounter + 1);
+                    } else {
+                        PhraseMakerUI.resetMatrix(pm);
+                    }
+                }
+            },
+            pm._deps.Singer.defaultBPMFactor * 1000 * time + pm.activity.logo.turtleDelay
+        );
     },
 
     /**
@@ -571,7 +578,6 @@ const PhraseMakerAudio = {
                 firstTurtle.painter.doSetXY(obj[1], obj[2]);
                 break;
             default:
-                //eslint-disable-next-line no-console
                 console.debug("unknown graphics command " + obj[0]);
                 break;
         }
