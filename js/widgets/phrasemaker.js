@@ -378,7 +378,6 @@ class PhraseMaker {
         widgetWindow.clear();
         widgetWindow.show();
 
-        //eslint-disable-next-line no-console
         console.debug("notes " + this.rowLabels + " octave " + this.rowArgs);
 
         this._notesToPlay = [];
@@ -1085,7 +1084,6 @@ class PhraseMaker {
                     rArg = 0;
                     break;
                 default:
-                    //eslint-disable-next-line no-console
                     console.debug(label + " not found");
                     break;
             }
@@ -1339,14 +1337,14 @@ class PhraseMaker {
                 this._blockLabelsWheel2.navItems[
                     this._blockLabelsWheel2.selectedNavItemIndex
                 ].title;
-            // eslint-disable-next-line no-use-before-define
+
             __selectionChanged(true);
         };
 
         const __enterArgValue2 = () => {
             this.yblockValue[0] =
                 this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
-            // eslint-disable-next-line no-use-before-define
+
             __selectionChanged(true);
         };
 
@@ -1429,7 +1427,7 @@ class PhraseMaker {
             if (PhraseMakerUtils.MATRIXGRAPHICS2.includes(this.rowLabels[blockIndex])) {
                 blockLabel =
                     this.activity.blocks.protoBlockDict[this.rowLabels[blockIndex]][
-                    "staticLabels"
+                        "staticLabels"
                     ][0];
                 cell.innerHTML = `${blockLabel}<br>${this.rowArgs[blockIndex][0]} ${this.rowArgs[blockIndex][1]}`;
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + "px";
@@ -1619,7 +1617,7 @@ class PhraseMaker {
                 this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
             this.docById("wheelnav-_exitWheel-title-1").children[0].textContent = this.blockValue;
             lastIndex = this._pitchWheel.selectedNavItemIndex; // Update lastIndex
-            // eslint-disable-next-line no-use-before-define
+
             __selectionChanged(true);
         };
 
@@ -1718,7 +1716,7 @@ class PhraseMaker {
             } else if (PhraseMakerUtils.MATRIXGRAPHICS.includes(this.rowLabels[blockIndex])) {
                 blockLabel =
                     this.activity.blocks.protoBlockDict[this.rowLabels[blockIndex]][
-                    "staticLabels"
+                        "staticLabels"
                     ][0];
                 cell.innerHTML = `${blockLabel}<br>${this.rowArgs[blockIndex]}`;
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + "px";
@@ -2461,7 +2459,6 @@ class PhraseMaker {
             if (i === 0) {
                 this._sortedRowMap.push(0);
             } else if (i > 0 && obj[1] !== "hertz" && obj[1] === this._deps.last(this.rowLabels)) {
-                //eslint-disable-next-line no-console
                 console.debug("skipping " + obj[1] + " " + this._deps.last(this.rowLabels));
                 this._sortedRowMap.push(this._deps.last(this._sortedRowMap));
                 if (oldColumnBlockMap[sortedList[lastObj][3]] != undefined) {
@@ -2482,7 +2479,6 @@ class PhraseMaker {
                 this._rowMap[i] = this._rowMap[i - 1];
                 continue;
             } else {
-                //eslint-disable-next-line no-console
                 console.debug("pushing " + obj[1] + " " + this._deps.last(this.rowLabels));
                 this._sortedRowMap.push(this._deps.last(this._sortedRowMap) + 1);
                 lastObj = i;
@@ -2533,7 +2529,6 @@ class PhraseMaker {
         const exportWindow = window.open("");
         const exportDocument = exportWindow.document;
         if (exportDocument === undefined) {
-            //eslint-disable-next-line no-console
             console.debug("Could not create export window");
             return;
         }
@@ -3111,7 +3106,7 @@ class PhraseMaker {
         if (this._deps.last(this.activity.blocks.blockList[blockToDelete].connections) !== null) {
             this.activity.blocks.sendStackToTrash(
                 this.activity.blocks.blockList[
-                this._deps.last(this.activity.blocks.blockList[blockToDelete].connections)
+                    this._deps.last(this.activity.blocks.blockList[blockToDelete].connections)
                 ]
             );
         }
@@ -3966,8 +3961,6 @@ class PhraseMaker {
                         }
                     }
                 };
-
-
             }
         }
 
@@ -4214,7 +4207,6 @@ class PhraseMaker {
                         );
                     }
                 } else {
-                    //eslint-disable-next-line no-console
                     console.debug("Cannot parse note object: " + obj);
                 }
             }

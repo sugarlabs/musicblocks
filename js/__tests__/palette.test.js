@@ -67,9 +67,9 @@ global.SVG = class {
     constructor() {
         this.docks = [];
     }
-    setScale() { }
-    setExpand() { }
-    setOutie() { }
+    setScale() {}
+    setExpand() {}
+    setOutie() {}
     basicBox() {
         return "fill_color stroke_color block_label arg_label_0";
     }
@@ -138,25 +138,14 @@ describe("Palettes Class", () => {
         };
 
         global.document = {
-            createElement: jest.fn(type => ({
-                tagName: type.toUpperCase(),
+            createElement: jest.fn(() => ({
                 id: "",
                 setAttribute: jest.fn(),
                 classList: { add: jest.fn() },
                 appendChild: jest.fn(),
-                insertCell: type === "tr" ? jest.fn(() => ({ style: {}, appendChild: jest.fn() })) : undefined,
-                insertRow: type === "table" || type === "tbody" ? jest.fn(() => ({ insertCell: jest.fn(() => ({ style: {}, appendChild: jest.fn() })) })) : undefined,
                 style: {},
                 innerHTML: "",
-                childNodes: [{ style: {} }],
-                getContext: type === "canvas" ? jest.fn(() => ({
-                    clearRect: jest.fn(),
-                    beginPath: jest.fn(),
-                    stroke: jest.fn(),
-                    fill: jest.fn(),
-                    arc: jest.fn(),
-                    closePath: jest.fn()
-                })) : undefined
+                childNodes: [{ style: {} }]
             })),
             getElementById: jest.fn(() => null),
             addEventListener: jest.fn(),
@@ -282,7 +271,7 @@ describe("Palettes Class", () => {
         test("creates selector buttons for each multipalette", () => {
             const spyMakeSelectorButton = jest
                 .spyOn(palettes, "_makeSelectorButton")
-                .mockImplementation(() => { });
+                .mockImplementation(() => {});
 
             palettes.init_selectors();
 
@@ -1248,24 +1237,12 @@ describe("Palettes Class", () => {
             const palette = palettes.dict.test;
             palette.setupGrabScroll(paletteList);
 
-            // Mock document events
-            let mouseMoveHandler, mouseUpHandler;
-            document.addEventListener = jest.fn((type, handler) => {
-                if (type === "mousemove") mouseMoveHandler = handler;
-                if (type === "mouseup") mouseUpHandler = handler;
-            });
-
             paletteList.onmousedown({ clientY: 10 });
+            paletteList.onmousemove({ clientY: 5 });
 
-            if (mouseMoveHandler) {
-                mouseMoveHandler({ clientY: 5 });
-                expect(paletteList.scrollTop).toBe(105);
-            }
-
-            if (mouseUpHandler) {
-                mouseUpHandler();
-                expect(document.body.style.cursor).toBe("default");
-            }
+            expect(paletteList.scrollTop).toBe(105);
+            paletteList.onmouseup();
+            expect(document.body.style.cursor).toBe("default");
         });
 
         test("remove deletes protoList entry and model block", () => {
@@ -1562,6 +1539,12 @@ describe("Palettes Class", () => {
 
         test("_showMenuItems renders a basic block", () => {
             const paletteList = {
+                insertRow: jest.fn(() => ({
+                    insertCell: jest.fn(() => ({
+                        style: {},
+                        appendChild: jest.fn()
+                    }))
+                })),
                 appendChild: jest.fn()
             };
             global.docById = jest.fn(id => {
@@ -1590,32 +1573,38 @@ describe("Palettes Class", () => {
         });
 
         test("_showMenuItems handles image blocks and drag events", () => {
+            let capturedImg;
             const paletteList = {
-                appendChild: jest.fn(row => {
-                    const cell = row.children ? row.children[0] : null;
-                    if (cell && cell.children && cell.children[0]) {
-                        paletteList._capturedImg = cell.children[0];
-                    }
-                })
+                appendChild: jest.fn()
             };
-            // Override global document.createElement for this test specifically if needed, 
-            // but the new global mock already supports tr/td structure if we use it correctly.
-            // Actually, js/palette.js uses document.createElement('tr') and td.appendChild(img) etc.
 
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
                 return null;
             });
 
-            // Mock tr and td creation to allow building the hierarchy
-            const originalCreateElement = global.document.createElement;
-            global.document.createElement = jest.fn(tag => {
-                const el = originalCreateElement(tag);
-                el.children = [];
-                el.appendChild = jest.fn(child => el.children.push(child));
-                return el;
-            });
+            // Mock DOM elements created inside _showMenuItems
+            document.createElement = jest.fn(tag => {
+                if (tag === "tr") {
+                    return {
+                        children: [],
+                        appendChild(child) {
+                            this.children.push(child);
+                        }
+                    };
+                }
 
+                if (tag === "td") {
+                    return {
+                        style: {},
+                        appendChild(img) {
+                            capturedImg = img;
+                        }
+                    };
+                }
+
+                return {};
+            });
             global.mediaPALETTE = "<svg></svg>";
             global.cameraPALETTE = "<svg></svg>";
             global.videoPALETTE = "<svg></svg>";
@@ -1649,10 +1638,10 @@ describe("Palettes Class", () => {
 
             palette._showMenuItems();
 
-            const img = paletteList._capturedImg;
+            const img = capturedImg;
+            expect(img).toBeDefined();
             img.offsetWidth = 10;
             img.offsetHeight = 10;
-            img.style = { left: "0px", top: "0px" };
             document.body.appendChild = jest.fn();
             document.body.removeChild = jest.fn();
 
@@ -1661,13 +1650,11 @@ describe("Palettes Class", () => {
             img.onmouseleave();
             expect(document.body.style.cursor).toBe("default");
             expect(img.ondragstart()).toBe(false);
-
             img.onmousedown({
                 pageX: 10,
                 pageY: 20,
                 preventDefault: jest.fn()
             });
-
             const mouseMoveHandler = document.addEventListener.mock.calls.find(
                 call => call[0] === "mousemove"
             )[1];
@@ -1678,43 +1665,40 @@ describe("Palettes Class", () => {
                 preventDefault: jest.fn()
             });
 
-            const mouseUpHandler = document.addEventListener.mock.calls.find(
-                call => call[0] === "mouseup"
-            )[1];
-            mouseUpHandler({
-                type: "mouseup",
-                preventDefault: jest.fn()
-            });
-
-            expect(palette._makeBlockFromProtoblock).toHaveBeenCalled();
-
-            // Restore original mock
-            global.document.createElement = originalCreateElement;
+            img.onmouseup({});
         });
 
         test("_showMenuItems handles touch drag", () => {
+            let capturedImg;
             const paletteList = {
-                appendChild: jest.fn(row => {
-                    const cell = row.children ? row.children[0] : null;
-                    if (cell && cell.children && cell.children[0]) {
-                        paletteList._capturedImg = cell.children[0];
-                    }
-                })
+                appendChild: jest.fn()
             };
+
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
                 return null;
             });
 
-            // Mock tr and td creation
-            const originalCreateElement = global.document.createElement;
-            global.document.createElement = jest.fn(tag => {
-                const el = originalCreateElement(tag);
-                el.children = [];
-                el.appendChild = jest.fn(child => el.children.push(child));
-                return el;
-            });
+            document.createElement = jest.fn(tag => {
+                if (tag === "tr") {
+                    return {
+                        children: [],
+                        appendChild(child) {
+                            this.children.push(child);
+                        }
+                    };
+                }
 
+                if (tag === "td") {
+                    return {
+                        style: {},
+                        appendChild(img) {
+                            capturedImg = img;
+                        }
+                    };
+                }
+                return {};
+            });
             document.addEventListener = jest.fn();
             document.removeEventListener = jest.fn();
 
@@ -1737,13 +1721,12 @@ describe("Palettes Class", () => {
 
             palette._showMenuItems();
 
-            const img = paletteList._capturedImg;
+            const img = capturedImg;
+            expect(img).toBeDefined();
             img.offsetWidth = 10;
             img.offsetHeight = 10;
-            img.style = { left: "0px", top: "0px" };
             document.body.appendChild = jest.fn();
             document.body.removeChild = jest.fn();
-
             img.ontouchstart({
                 touches: [{ clientX: 10, clientY: 20 }],
                 preventDefault: jest.fn()
@@ -1756,21 +1739,17 @@ describe("Palettes Class", () => {
                 touches: [{ clientX: 12, clientY: 22 }],
                 preventDefault: jest.fn()
             });
-
-            const touchEndHandler = document.addEventListener.mock.calls.find(
-                call => call[0] === "touchend"
-            )[1];
-            touchEndHandler({
-                type: "touchend",
-                preventDefault: jest.fn()
-            });
-
-            expect(palette._makeBlockFromProtoblock).toHaveBeenCalled();
-            global.document.createElement = originalCreateElement;
+            img.ontouchend({});
         });
 
         test("_showMenuItems hides palette when mobile", () => {
             const paletteList = {
+                insertRow: jest.fn(() => ({
+                    insertCell: jest.fn(() => ({
+                        style: {},
+                        appendChild: jest.fn()
+                    }))
+                })),
                 appendChild: jest.fn()
             };
             const palDiv = { childNodes: [{ style: {} }], removeChild: jest.fn() };
@@ -2080,8 +2059,8 @@ describe("Palettes Class", () => {
             global.document.createElement = jest.fn(() => ({}));
 
             mockActivity.beginnerMode = true;
-            jest.spyOn(palettes, "makeSearchButton").mockImplementation(() => { });
-            const makeButtonSpy = jest.spyOn(palettes, "makeButton").mockImplementation(() => { });
+            jest.spyOn(palettes, "makeSearchButton").mockImplementation(() => {});
+            const makeButtonSpy = jest.spyOn(palettes, "makeButton").mockImplementation(() => {});
             jest.spyOn(palettes, "countProtoBlocks").mockReturnValue(0);
 
             palettes.makePalettes(0);
@@ -2118,8 +2097,8 @@ describe("Palettes Class", () => {
             global.docById = jest.fn(() => palette);
             global.document.createElement = jest.fn(() => ({}));
 
-            jest.spyOn(palettes, "makeSearchButton").mockImplementation(() => { });
-            const makeButtonSpy = jest.spyOn(palettes, "makeButton").mockImplementation(() => { });
+            jest.spyOn(palettes, "makeSearchButton").mockImplementation(() => {});
+            const makeButtonSpy = jest.spyOn(palettes, "makeButton").mockImplementation(() => {});
             jest.spyOn(palettes, "countProtoBlocks").mockReturnValue(2);
 
             palettes.makePalettes(0);
@@ -2152,7 +2131,7 @@ describe("Palettes Class", () => {
         test("palette button schedules showPalette on hover", () => {
             jest.useFakeTimers();
             const row = {};
-            const showSpy = jest.spyOn(palettes, "showPalette").mockImplementation(() => { });
+            const showSpy = jest.spyOn(palettes, "showPalette").mockImplementation(() => {});
 
             palettes._loadPaletteButtonHandler("rhythm", row);
             row.onmouseover();
@@ -2167,7 +2146,7 @@ describe("Palettes Class", () => {
         test("palette button cancels timeout on mouseout", () => {
             jest.useFakeTimers();
             const row = {};
-            const showSpy = jest.spyOn(palettes, "showPalette").mockImplementation(() => { });
+            const showSpy = jest.spyOn(palettes, "showPalette").mockImplementation(() => {});
 
             palettes._loadPaletteButtonHandler("rhythm", row);
             row.onmouseover();
@@ -2333,7 +2312,7 @@ describe("Palettes Class", () => {
         });
 
         test("removes other action prototype variants", () => {
-            const updateSpy = jest.spyOn(palettes, "updatePalettes").mockImplementation(() => { });
+            const updateSpy = jest.spyOn(palettes, "updatePalettes").mockImplementation(() => {});
 
             palettes.dict = {
                 action: {

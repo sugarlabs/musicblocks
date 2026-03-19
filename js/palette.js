@@ -765,7 +765,7 @@ class Palettes {
         this.activePalette = name; // used to delete plugins
     }
 
-    _showMenus() { }
+    _showMenus() {}
 
     _hideMenus() {
         // Hide the menu buttons and the palettes themselves.
@@ -778,7 +778,6 @@ class Palettes {
 
     getInfo() {
         for (const key in this.dict) {
-            // eslint-disable-next-line no-console
             console.debug(this.dict[key].getInfo());
         }
     }
@@ -817,7 +816,7 @@ class Palettes {
         try {
             // First hide all palettes
             for (const name in this.dict) {
-                if (this.dict.hasOwnProperty(name)) {
+                if (Object.prototype.hasOwnProperty.call(this.dict, name)) {
                     const palette = this.dict[name];
                     if (palette && typeof palette.hideMenu === "function") {
                         palette.hideMenu();
@@ -844,7 +843,8 @@ class Palettes {
             element.classList.add("flex-palette");
             element.setAttribute(
                 "style",
-                `position: fixed; z-index: 1000; left: 0px; top: ${60 + this.top
+                `position: fixed; z-index: 1000; left: 0px; top: ${
+                    60 + this.top
                 }px; overflow-y: auto;`
             );
             element.innerHTML = `<div style="height:fit-content">
@@ -876,7 +876,6 @@ class Palettes {
     }
 
     add(name) {
-        // eslint-disable-next-line no-use-before-define
         this.dict[name] = new Palette(this, name);
         return this;
     }
@@ -921,7 +920,7 @@ class Palettes {
             const actionBlock = this.dict["action"].protoList[blk];
             if (
                 ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(actionBlock.name) !==
-                -1 &&
+                    -1 &&
                 actionBlock.defaults[0] === actionName
             ) {
                 // Remove the palette protoList entry for this block.
@@ -1286,9 +1285,8 @@ class Palette {
     }
 
     hideMenu() {
-        docById(
-            "palette"
-        ).childNodes[0].style.borderRight = `1px solid ${platformColor.selectorSelected}`;
+        docById("palette").childNodes[0].style.borderRight =
+            `1px solid ${platformColor.selectorSelected}`;
         if (this._outsideClickListener) {
             document.removeEventListener("click", this._outsideClickListener);
             this._outsideClickListener = null;
@@ -1487,9 +1485,9 @@ class Palette {
                         b.modname,
                         event,
                         (x || that.activity.blocksContainer.x + 100) -
-                        that.activity.blocksContainer.x,
+                            that.activity.blocksContainer.x,
                         (y || that.activity.blocksContainer.y + 100) -
-                        that.activity.blocksContainer.y
+                            that.activity.blocksContainer.y
                     );
                 };
 
