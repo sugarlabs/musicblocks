@@ -21,13 +21,13 @@
    ServerInterface
 */
 
-// eslint-disable-next-line no-unused-vars
 class ServerInterface {
     constructor(Planet) {
         this.Planet = Planet;
         this.ServerURL = "https://musicblocks.sugarlabs.org/planet-server/index.php";
         this.ConnectionFailureData = { success: false, error: "ERROR_CONNECTION_FAILURE" };
         this.APIKey = "3f2d3a4c-c7a4-4c3c-892e-ac43784f7381";
+        this.disablePlanetCache = this.shouldDisablePlanetCache();
 
         // Initialize RequestManager for rate limiting and retry logic
         this.requestManager = new RequestManager({
@@ -49,6 +49,20 @@ class ServerInterface {
     }
 
     /**
+     * Determines whether Planet caching should be disabled.
+     * @returns {boolean}
+     */
+    shouldDisablePlanetCache() {
+        const runtimeEnv = window.MB_ENV;
+
+        if (runtimeEnv === "production") {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Initializes the cache manager
      * @returns {Promise<boolean>}
      */
@@ -67,7 +81,6 @@ class ServerInterface {
     request(data, callback) {
         data["api-key"] = this.APIKey;
 
-        // eslint-disable-next-line no-unused-vars
         const req = jQuery
             .ajax({
                 type: "POST",
@@ -108,7 +121,6 @@ class ServerInterface {
 
             callback(result);
         } catch (error) {
-            // eslint-disable-next-line no-console
             console.error("[ServerInterface] Request failed after retries:", error);
             callback(this.ConnectionFailureData);
         }
@@ -149,23 +161,23 @@ class ServerInterface {
      * Gets project details with caching support
      */
     async getProjectDetails(ProjectID, callback) {
-        // Try cache first
-        await this.initCache();
-        const cached = await this.cacheManager.getMetadata(ProjectID);
+        if (!this.disablePlanetCache) {
+            // Try cache first
+            await this.initCache();
+            const cached = await this.cacheManager.getMetadata(ProjectID);
 
-        if (cached) {
-            // eslint-disable-next-line no-console
-            console.debug("[ServerInterface] Returning cached metadata for:", ProjectID);
-            callback({ success: true, data: cached });
-            return;
+            if (cached) {
+                console.debug("[ServerInterface] Returning cached metadata for:", ProjectID);
+                callback({ success: true, data: cached });
+                return;
+            }
         }
-
         // Fetch from server
         const obj = { action: "getProjectDetails", ProjectID: ProjectID };
 
         this.throttledRequest(obj, async result => {
             // Cache successful responses
-            if (result && result.success && result.data) {
+            if (!this.disablePlanetCache && result && result.success && result.data) {
                 await this.cacheManager.cacheMetadata(ProjectID, result.data);
             }
             callback(result);
@@ -190,23 +202,23 @@ class ServerInterface {
      * Downloads full project data with caching support
      */
     async downloadProject(ProjectID, callback) {
-        // Try cache first
-        await this.initCache();
-        const cached = await this.cacheManager.getProject(ProjectID);
+        if (!this.disablePlanetCache) {
+            // Try cache first
+            await this.initCache();
+            const cached = await this.cacheManager.getProject(ProjectID);
 
-        if (cached) {
-            // eslint-disable-next-line no-console
-            console.debug("[ServerInterface] Returning cached project:", ProjectID);
-            callback({ success: true, data: cached });
-            return;
+            if (cached) {
+                console.debug("[ServerInterface] Returning cached project:", ProjectID);
+                callback({ success: true, data: cached });
+                return;
+            }
         }
-
         // Fetch from server
         const obj = { action: "downloadProject", ProjectID: ProjectID };
 
         this.throttledRequest(obj, async result => {
             // Cache successful responses
-            if (result && result.success && result.data) {
+            if (!this.disablePlanetCache && result && result.success && result.data) {
                 await this.cacheManager.cacheProject(ProjectID, result.data);
             }
             callback(result);
@@ -271,8 +283,14 @@ class ServerInterface {
      * Initializes the server interface
      */
     async init() {
-        await this.initCache();
-        // eslint-disable-next-line no-console
-        console.debug("[ServerInterface] Initialized with rate limiting and caching");
+        if (!this.disablePlanetCache) {
+            await this.initCache();
+        }
+
+        console.debug(
+            `[ServerInterface] Initialized with rate limiting and ${
+                this.disablePlanetCache ? "cache disabled (dev mode)" : "caching"
+            }`
+        );
     }
 }

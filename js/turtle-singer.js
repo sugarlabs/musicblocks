@@ -18,7 +18,7 @@
 /*
    global
 
-   DEFAULTVOLUME, TARGETBPM, TONEBPM, frequencyToPitch, last,
+   DEFAULTVOLUME, TARGETBPM, TONEBPM, MIN_HIGHLIGHT_DURATION_MS, frequencyToPitch, last,
    pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp,
    getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
@@ -711,8 +711,8 @@ class Singer {
         const activity = logo.activity;
         volume = Math.min(Math.max(volume, 0), 100);
         if (blk) {
-            const firstConnection = activity.logo.blockList[blk].connections[0];
-            const lastConnection = last(activity.logo.blockList[blk].connections);
+            const firstConnection = activity.blocks.blockList[blk].connections[0];
+            const lastConnection = last(activity.blocks.blockList[blk].connections);
             logo.synth.setMasterVolume(volume, firstConnection, lastConnection);
         } else {
             logo.synth.setMasterVolume(volume);
@@ -879,7 +879,9 @@ class Singer {
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
                 );
-                nnote[0] = noteIsSolfege(note) ? getSolfege(nnote[0]) : nnote[0];
+                nnote[0] = noteIsSolfege(note)
+                    ? getSolfege(nnote[0], tur.singer.keySignature, tur.singer.movable)
+                    : nnote[0];
 
                 if (tur.singer.drumStyle.length > 0) {
                     activity.logo.pitchDrumMatrix.drums.push(last(tur.singer.drumStyle));
@@ -925,7 +927,11 @@ class Singer {
                     tur.singer.keySignature[1].toLowerCase() === "major" &&
                     noteIsSolfege(note)
                 ) {
-                    noteObj[0] = getSolfege(noteObj[0]);
+                    noteObj[0] = getSolfege(
+                        noteObj[0],
+                        tur.singer.keySignature,
+                        tur.singer.movable
+                    );
                 }
 
                 // If we are in a setdrum clamp, override the pitch.
@@ -988,7 +994,11 @@ class Singer {
                     tur.singer.keySignature[1].toLowerCase() === "major" &&
                     noteIsSolfege(note)
                 ) {
-                    noteObj[0] = getSolfege(noteObj[0]);
+                    noteObj[0] = getSolfege(
+                        noteObj[0],
+                        tur.singer.keySignature,
+                        tur.singer.movable
+                    );
                 }
 
                 // If we are in a setdrum clamp, override the pitch.
@@ -1074,7 +1084,6 @@ class Singer {
                 // Cents may have been added through a transposition.
                 if (noteObj[2] !== 0 && cents === 0) {
                     cents = noteObj[2];
-                    // eslint-disable-next-line no-console
                 }
 
                 if (Math.abs(cents) < 1e-9) {
@@ -1236,7 +1245,9 @@ class Singer {
                 null,
                 activity.errorMsg
             );
-            nnote[0] = noteIsSolfege(note) ? getSolfege(nnote[0]) : nnote[0];
+            nnote[0] = noteIsSolfege(note)
+                ? getSolfege(nnote[0], tur.singer.keySignature, tur.singer.movable)
+                : nnote[0];
 
             if (tur.singer.drumStyle.length === 0) {
                 activity.logo.musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
@@ -1881,7 +1892,6 @@ class Singer {
                             break;
                         }
                     }
-                    // eslint-disable-next-line no-console
                 }
             }
             let forceSilence = false;
@@ -2479,12 +2489,26 @@ class Singer {
                 // After the note plays, clear the embedded graphics and notes queue.
                 tur.singer.embeddedGraphics[blk] = [];
 
-                // Ensure note value block unhighlights after note plays.
-                setTimeout(() => {
+                // Ensure note value block unhighlights after note plays (minimum duration so highlight is visible).
+                // Cancel any previously pending unhighlight timer for this block to
+                // prevent unbounded timer accumulation in tight infinite loops, which
+                // would otherwise saturate the JS timer queue and stall the main thread.
+                if (!tur.singer._unhighlightTimers) {
+                    tur.singer._unhighlightTimers = {};
+                }
+                if (tur.singer._unhighlightTimers[blk]) {
+                    clearTimeout(tur.singer._unhighlightTimers[blk]);
+                }
+                const highlightDurationMs = Math.max(beatValue * 1000, MIN_HIGHLIGHT_DURATION_MS);
+                tur.singer._unhighlightTimers[blk] = setTimeout(() => {
                     if (activity.blocks.visible && blk in activity.blocks.blockList) {
                         activity.blocks.unhighlight(blk);
+                        if (activity.stage) {
+                            activity.stage.update();
+                        }
                     }
-                }, beatValue * 1000);
+                    delete tur.singer._unhighlightTimers[blk];
+                }, highlightDurationMs);
             };
 
             if (last(tur.singer.inNoteBlock) !== null || noteInNote) {
@@ -2537,15 +2561,23 @@ class Singer {
             callback();
         }
 
-        activity.stage.update();
+        activity.stageDirty = true;
     }
 }
 
+// Maintain CommonJS compatibility for tests
 if (typeof module !== "undefined" && module.exports) {
     module.exports = Singer;
 }
 
-// Export to global scope for browser (RequireJS shim)
+// Implement additive AMD define
+if (typeof define === "function" && define.amd) {
+    define(["activity/logoconstants"], function () {
+        return Singer;
+    });
+}
+
+// Preserve existing global exposure exactly as before
 if (typeof window !== "undefined") {
     window.Singer = Singer;
 }

@@ -268,8 +268,6 @@ function LegoWidget() {
         widgetWindow.clear();
         widgetWindow.show();
 
-        var that = this;
-
         widgetWindow.onclose = () => {
             this._stopWebcam();
             this._deactivateEyeDropper(); // Clean up eye dropper mode
