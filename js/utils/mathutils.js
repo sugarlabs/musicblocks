@@ -129,9 +129,12 @@ class MathUtility {
      */
     static doMod(a, b) {
         if (typeof a === "number" && typeof b === "number") {
+            if (Number(b) === 0) {
+                throw new Error("Division by zero");
+            }
             return Number(a) % Number(b);
         } else {
-            throw "NanError";
+            throw new Error("Invalid number input");
         }
     }
 

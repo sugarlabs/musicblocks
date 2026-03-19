@@ -624,7 +624,6 @@ const analyzeProject = activity => {
                 cats.push(TACAT[blockList[b]]);
             }
         } else {
-            // eslint-disable-next-line no-console
             console.debug(blockList[b] + " not in catalog");
         }
     }
