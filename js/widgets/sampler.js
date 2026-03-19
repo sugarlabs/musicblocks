@@ -527,7 +527,6 @@ function SampleWidget() {
                 stopTuner();
                 const fileChooser = docById("myOpenAll");
 
-                // eslint-disable-next-line no-unused-vars
                 const __readerAction = function (event) {
                     window.scroll(0, 0);
                     const sampleFile = fileChooser.files[0];
