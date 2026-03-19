@@ -130,7 +130,7 @@ describe("MathUtility", () => {
         });
 
         test("throws error for invalid inputs", () => {
-            expect(() => MathUtility.doMod("a", 3)).toThrow("NanError");
+            expect(() => MathUtility.doMod("a", 3)).toThrow("Invalid number input");
         });
 
         // Edge case tests
@@ -159,7 +159,7 @@ describe("MathUtility", () => {
         });
 
         test("throws error when second arg is string", () => {
-            expect(() => MathUtility.doMod(10, "a")).toThrow("NanError");
+            expect(() => MathUtility.doMod(10, "a")).toThrow("Invalid number input");
         });
     });
 
