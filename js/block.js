@@ -4225,7 +4225,7 @@ class Block {
                 labelElem.classList.remove("hasKeyboard");
 
                 window.scroll(0, 0);
-                // eslint-disable-next-line no-use-before-define
+
                 that.label.removeEventListener("keypress", __keypress);
 
                 if (movedStage) {
