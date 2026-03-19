@@ -104,17 +104,14 @@ class Planet {
         this.ServerInterface = new ServerInterface(this);
         this.ServerInterface.init();
 
-        // eslint-disable-next-line no-unused-vars
         document.getElementById("close-planet").addEventListener("click", evt => {
             this.closeButton();
         });
 
-        // eslint-disable-next-line no-unused-vars
         document.getElementById("planet-open-file").addEventListener("click", evt => {
             this.loadProjectFromFile();
         });
 
-        // eslint-disable-next-line no-unused-vars
         document.getElementById("planet-new-project").addEventListener("click", evt => {
             this.loadNewProject();
         });

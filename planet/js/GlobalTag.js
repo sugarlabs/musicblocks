@@ -72,7 +72,6 @@ class GlobalTag {
 
         tag.textContent = toTitleCase(_(this.name));
 
-        // eslint-disable-next-line no-unused-vars
         tag.addEventListener("click", evt => {
             this.onTagClick();
         });
