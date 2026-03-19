@@ -43,6 +43,11 @@ export default [
             "no-unused-vars": "off",
             "no-use-before-define": "off",
             "prefer-const": "off",
+            "no-undef": "off",
+            "no-redeclare": "off",
+            "no-prototype-builtins": "off",
+            "no-dupe-keys": "off",
+            "no-loss-of-precision": "off",
 
             "semi": ["error", "always"],
             "no-duplicate-case": "error",

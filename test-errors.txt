@@ -1,0 +1,94 @@
+  ● processNote regression behavior › should trigger stage update after processing note
+
+    expect(jest.fn()).toHaveBeenCalledTimes(expected)
+
+    Expected number of calls: 1
+    Received number of calls: 0
+
+    [0m [90m 935 |[39m         [36mconst[39m callback [33m=[39m jest[33m.[39mfn()[33m;[39m
+     [90m 936 |[39m         [33mSinger[39m[33m.[39mprocessNote(activityMock[33m,[39m [35m4[39m[33m,[39m [36mfalse[39m[33m,[39m [32m"mockBlk"[39m[33m,[39m [35m0[39m[33m,[39m callback)[33m;[39m
+    [31m[1m>[22m[39m[90m 937 |[39m         expect(activityMock[33m.[39mstage[33m.[39mupdate)[33m.[39mtoHaveBeenCalledTimes([35m1[39m)[33m;[39m
+     [90m     |[39m                                           [31m[1m^[22m[39m
+     [90m 938 |[39m     })[33m;[39m
+     [90m 939 |[39m
+     [90m 940 |[39m     test([32m"should use default BPM when bpm stack is empty"[39m[33m,[39m () [33m=>[39m {[0m
+
+      at Object.toHaveBeenCalledTimes (js/__tests__/turtle-singer.test.js:937:43)
+
+  ● processNote regression behavior › should use default BPM when bpm stack is empty
+
+    expect(jest.fn()).toHaveBeenCalledTimes(expected)
+
+    Expected number of calls: 1
+    Received number of calls: 0
+
+    [0m [90m 941 |[39m         singer[33m.[39mbpm [33m=[39m [][33m;[39m
+     [90m 942 |[39m         [33mSinger[39m[33m.[39mprocessNote(activityMock[33m,[39m [35m4[39m[33m,[39m [36mfalse[39m[33m,[39m [32m"mockBlk"[39m[33m,[39m [35m0[39m[33m,[39m jest[33m.[39mfn())[33m;[39m
+    [31m[1m>[22m[39m[90m 943 |[39m         expect(activityMock[33m.[39mstage[33m.[39mupdate)[33m.[39mtoHaveBeenCalledTimes([35m1[39m)[33m;[39m
+     [90m     |[39m                                           [31m[1m^[22m[39m
+     [90m 944 |[39m     })[33m;[39m
+     [90m 945 |[39m })[33m;[39m
+     [90m 946 |[39m[0m
+
+      at Object.toHaveBeenCalledTimes (js/__tests__/turtle-singer.test.js:943:43)
+
+---
+  ● Palettes Class › Palette methods › _showMenuItems renders a basic block
+
+    TypeError: paletteList.appendChild is not a function
+
+    [0m [90m 1505 |[39m             itemCell[33m.[39mstyle[33m.[39mpaddingRight [33m=[39m [32m`${this.palettes.cellSize}px`[39m[33m;[39m
+     [90m 1506 |[39m             itemCell[33m.[39mappendChild(img)[33m;[39m
+    [31m[1m>[22m[39m[90m 1507 |[39m             paletteList[33m.[39mappendChild(itemRow)[33m;[39m
+     [90m      |[39m                         [31m[1m^[22m[39m
+     [90m 1508 |[39m         }
+     [90m 1509 |[39m
+     [90m 1510 |[39m         [36mif[39m ([36mthis[39m[33m.[39mpalettes[33m.[39mmobile) {[0m
+
+      at Palette.appendChild [as _showMenuItems] (js/palette.js:1507:25)
+      at Object._showMenuItems (js/__tests__/palette.test.js:1569:21)
+
+  ● Palettes Class › Palette methods › _showMenuItems handles image blocks and drag events
+
+    TypeError: paletteList.appendChild is not a function
+
+    [0m [90m 1505 |[39m             itemCell[33m.[39mstyle[33m.[39mpaddingRight [33m=[39m [32m`${this.palettes.cellSize}px`[39m[33m;[39m
+     [90m 1506 |[39m             itemCell[33m.[39mappendChild(img)[33m;[39m
+    [31m[1m>[22m[39m[90m 1507 |[39m             paletteList[33m.[39mappendChild(itemRow)[33m;[39m
+     [90m      |[39m                         [31m[1m^[22m[39m
+     [90m 1508 |[39m         }
+     [90m 1509 |[39m
+     [90m 1510 |[39m         [36mif[39m ([36mthis[39m[33m.[39mpalettes[33m.[39mmobile) {[0m
+
+      at Palette.appendChild [as _showMenuItems] (js/palette.js:1507:25)
+      at Object._showMenuItems (js/__tests__/palette.test.js:1626:21)
+
+  ● Palettes Class › Palette methods › _showMenuItems handles touch drag
+
+    TypeError: paletteList.appendChild is not a function
+
+    [0m [90m 1505 |[39m             itemCell[33m.[39mstyle[33m.[39mpaddingRight [33m=[39m [32m`${this.palettes.cellSize}px`[39m[33m;[39m
+     [90m 1506 |[39m             itemCell[33m.[39mappendChild(img)[33m;[39m
+    [31m[1m>[22m[39m[90m 1507 |[39m             paletteList[33m.[39mappendChild(itemRow)[33m;[39m
+     [90m      |[39m                         [31m[1m^[22m[39m
+     [90m 1508 |[39m         }
+     [90m 1509 |[39m
+     [90m 1510 |[39m         [36mif[39m ([36mthis[39m[33m.[39mpalettes[33m.[39mmobile) {[0m
+
+      at Palette.appendChild [as _showMenuItems] (js/palette.js:1507:25)
+      at Object._showMenuItems (js/__tests__/palette.test.js:1700:21)
+
+  ● Palettes Class › Palette methods › _showMenuItems hides palette when mobile
+
+    TypeError: paletteList.appendChild is not a function
+
+    [0m [90m 1505 |[39m             itemCell[33m.[39mstyle[33m.[39mpaddingRight [33m=[39m [32m`${this.palettes.cellSize}px`[39m[33m;[39m
+     [90m 1506 |[39m             itemCell[33m.[39mappendChild(img)[33m;[39m
+    [31m[1m>[22m[39m[90m 1507 |[39m             paletteList[33m.[39mappendChild(itemRow)[33m;[39m
+     [90m      |[39m                         [31m[1m^[22m[39m
+     [90m 1508 |[39m         }
+     [90m 1509 |[39m
+     [90m 1510 |[39m         [36mif[39m ([36mthis[39m[33m.[39mpalettes[33m.[39mmobile) {[0m
+
+      at Palette.appendChild [as _showMenuItems] (js/palette.js:1507:25)
+      at Object._showMenuItems (js/__tests__/palette.test.js:1758:21)
