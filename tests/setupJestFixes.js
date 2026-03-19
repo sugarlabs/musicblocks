@@ -731,6 +731,7 @@ global.makePaletteIcons = jest.fn(() => enhancedMakeMockElement('div'));
 global.makePaletteIcon = jest.fn(() => enhancedMakeMockElement('div'));
 global.makeBasicBox = jest.fn(() => "mock-box");
 global.makeBasicBlock = jest.fn(() => "mock-block");
+global.base64Encode = jest.fn((str) => btoa(str));
 
 // Add constants that SaveInterface expects
 global.STR_MY_PROJECT = "My Project";
