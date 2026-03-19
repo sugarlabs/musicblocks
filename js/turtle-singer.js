@@ -1084,7 +1084,6 @@ class Singer {
                 // Cents may have been added through a transposition.
                 if (noteObj[2] !== 0 && cents === 0) {
                     cents = noteObj[2];
-                    // eslint-disable-next-line no-console
                 }
 
                 if (Math.abs(cents) < 1e-9) {
@@ -1893,7 +1892,6 @@ class Singer {
                             break;
                         }
                     }
-                    // eslint-disable-next-line no-console
                 }
             }
             let forceSilence = false;

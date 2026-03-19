@@ -268,7 +268,7 @@ function AIWidget() {
 
         tune.lines?.forEach(line => {
             line.staff?.forEach((staff, staffIndex) => {
-                if (!organizeBlock.hasOwnProperty(staffIndex)) {
+                if (!Object.prototype.hasOwnProperty.call(organizeBlock, staffIndex)) {
                     organizeBlock[staffIndex] = {
                         arrangedBlocks: []
                     };
