@@ -32,6 +32,40 @@ class Toolbar {
             this.language = navigator.language;
         }
         this.tooltipsDisabled = false;
+        this._recordDropdownArrowElement = null;
+        this._recordDropdownArrowClickHandler = null;
+        this._recordDropdownOutsideClickHandler = null;
+    }
+
+    /**
+     * Removes record dropdown listeners attached by updateRecordButton.
+     *
+     * @returns {void}
+     */
+    _cleanupRecordDropdownListeners() {
+        if (this._recordDropdownArrowElement && this._recordDropdownArrowClickHandler) {
+            this._recordDropdownArrowElement.removeEventListener(
+                "click",
+                this._recordDropdownArrowClickHandler
+            );
+        }
+
+        if (this._recordDropdownOutsideClickHandler) {
+            document.removeEventListener("click", this._recordDropdownOutsideClickHandler);
+        }
+
+        this._recordDropdownArrowElement = null;
+        this._recordDropdownArrowClickHandler = null;
+        this._recordDropdownOutsideClickHandler = null;
+    }
+
+    /**
+     * Disposes transient toolbar listeners.
+     *
+     * @returns {void}
+     */
+    dispose() {
+        this._cleanupRecordDropdownListeners();
     }
 
     /**
@@ -890,6 +924,8 @@ class Toolbar {
         const browser = fnBrowserDetect();
         const hideIn = ["firefox", "safari"];
 
+        this._cleanupRecordDropdownListeners();
+
         if (hideIn.includes(browser)) {
             Record.classList.add("hide");
             if (RecordDropdownArrow) RecordDropdownArrow.classList.add("hide");
@@ -925,7 +961,7 @@ class Toolbar {
             RecordDropdownArrow.innerHTML = `<i class="material-icons main" style="font-size: 28px;">arrow_drop_down</i>`;
 
             // Create handler function for arrow click
-            const arrowClickHandler = function () {
+            const arrowClickHandler = () => {
                 setTimeout(() => {
                     const dropdown = docById("recorddropdown");
                     const arrowIcon = RecordDropdownArrow.querySelector("i");
@@ -941,30 +977,29 @@ class Toolbar {
                 }, 50);
             };
 
-            // Remove old listener to prevent accumulation
-            if (RecordDropdownArrow._arrowClickHandler) {
-                RecordDropdownArrow.removeEventListener(
-                    "click",
-                    RecordDropdownArrow._arrowClickHandler
-                );
-            }
-
-            // Store reference and attach fresh listener
-            RecordDropdownArrow._arrowClickHandler = arrowClickHandler;
+            this._recordDropdownArrowElement = RecordDropdownArrow;
+            this._recordDropdownArrowClickHandler = arrowClickHandler;
             RecordDropdownArrow.addEventListener("click", arrowClickHandler);
 
             // Reset arrow when clicking outside (close dropdown)
-            document.addEventListener("click", function (e) {
+            const outsideClickHandler = e => {
                 const dropdown = docById("recorddropdown");
                 const arrowIcon = RecordDropdownArrow.querySelector("i");
+
+                if (!arrowIcon || !dropdown) {
+                    return;
+                }
+
                 if (
-                    arrowIcon &&
                     !RecordDropdownArrow.contains(e.target) &&
                     !dropdown.contains(e.target)
                 ) {
                     arrowIcon.textContent = "arrow_drop_down";
                 }
-            });
+            };
+
+            this._recordDropdownOutsideClickHandler = outsideClickHandler;
+            document.addEventListener("click", outsideClickHandler);
         }
 
         // Set up click handlers for dropdown options
