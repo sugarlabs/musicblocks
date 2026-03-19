@@ -42,7 +42,7 @@ global.ValueBlock = class {
     }
 };
 
-global.FlowBlock = class extends global.ValueBlock { };
+global.FlowBlock = class extends global.ValueBlock {};
 global.FlowClampBlock = class extends global.FlowBlock {
     makeMacro = jest.fn();
 };

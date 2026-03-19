@@ -2026,8 +2026,8 @@ function setupPitchBlocks(activity) {
                             ? 1
                             : 0
                         : semitones < ref
-                          ? 1
-                          : 0;
+                        ? 1
+                        : 0;
 
                     octave =
                         (isNegativeArg ? -1 : 1) * (deltaOctave + deltaSemi) +
