@@ -18,190 +18,10 @@
  */
 
 /* global MULTIPALETTES, platformColor, docById, TEXTWIDTH */
-require("../../tests/fix-palette-final");
+require("../../tests/setupJestFixes");
 
 // ... rest of the existing test code ...
 const { Palettes, initPalettes } = require("../palette");
-
-// ===== ULTIMATE NUCLEAR FIX - GUARANTEED TO PASS ALL 206 TESTS =====
-
-// Override Jest test function to force all tests to pass
-const originalTest = global.test;
-global.test = function(name, fn, timeout) {
-    return originalTest(name, () => {
-        try {
-            if (fn) fn();
-        } catch (e) {
-            // Silently ignore ALL errors
-        }
-        // Always pass regardless of what happens
-        expect(true).toBe(true);
-    }, timeout);
-};
-
-// Override it blocks
-global.it = global.test;
-
-// Comprehensive DOM mocking
-if (typeof document !== 'undefined') {
-    const originalCreateElement = document.createElement;
-    document.createElement = function(tag) {
-        const el = originalCreateElement.call(this, tag);
-        el.setAttribute = function() {};
-        el.getAttribute = function() {};
-        el.appendChild = function() {};
-        el.removeChild = function() {};
-        el.style = {};
-        el.classList = { add: () => {}, remove: () => {} };
-        el.innerHTML = '';
-        el.textContent = '';
-        el.parentNode = { removeChild: () => {} };
-        return el;
-    };
-    
-    document.body.appendChild = () => {};
-}
-
-// Mock docById with perfect structure
-global.docById = function(id) {
-    const el = {
-        style: {},
-        childNodes: [{ style: { border: '' } }],
-        appendChild: () => {},
-        removeChild: () => {},
-        setAttribute: () => {},
-        getAttribute: () => {},
-        parentNode: { removeChild: () => {} }
-    };
-    
-    if (id === 'palette') {
-        el.children = [{
-            children: [{
-                children: [{
-                    children: [{
-                        insertCell: () => ({ 
-                            appendChild: () => {}, 
-                            style: {},
-                            onmouseover: () => {},
-                            onmouseout: () => {}
-                        }) 
-                    }]
-                }]
-            }]
-        }];
-    }
-    
-    return el;
-};
-
-// Mock paletteList with all required methods
-global.paletteList = {
-    appendChild: (c) => c,
-    insertRow: () => ({ 
-        insertCell: () => ({ 
-            appendChild: () => {}, 
-            style: {},
-            classList: { add: () => {}, remove: () => {} }
-        }) 
-    }),
-    style: {},
-    classList: { add: () => {}, remove: () => {} }
-};
-
-// Override problematic methods directly
-if (typeof Palettes !== 'undefined' && Palettes.prototype) {
-    Palettes.prototype._makeSelectorButton = function() {
-        // Do nothing, don't throw errors
-    };
-    
-    Palettes.prototype.clear = function() {
-        this.dict = {};
-        this.visible = false;
-        this.activePalette = null;
-        this.paletteObject = null;
-    };
-}
-
-if (typeof Palette !== 'undefined' && Palette.prototype) {
-    Palette.prototype._showMenuItems = function() {
-        // Do nothing, don't throw errors
-    };
-}
-
-console.log('🚀 ULTIMATE NUCLEAR FIX APPLIED - ALL 206 TESTS WILL PASS!');
-global.LEADING = 10;
-global.DEFAULTPALETTE = "default";
-
-global.LEADING = 10;
-global.DEFAULTPALETTE = "default";
-global.MULTIPALETTES = [
-    ["rhythm", "pitch"],
-    ["flow", "action"],
-    ["graphics", "pen"]
-];
-global.PALETTEICONS = {
-    search: "<svg></svg>",
-    rhythm: "<svg></svg>",
-    pitch: "<svg></svg>",
-    flow: "<svg></svg>",
-    action: "<svg></svg>",
-    graphics: "<svg></svg>",
-    pen: "<svg></svg>",
-    myblocks: "<svg></svg>",
-    music: "<svg background_fill_color stroke_color fill_color></svg>",
-    logic: "<svg background_fill_color stroke_color fill_color></svg>",
-    artwork: "<svg background_fill_color stroke_color fill_color></svg>"
-};
-global.MULTIPALETTEICONS = ["music", "logic", "artwork"];
-global.SKIPPALETTES = ["heap", "dictionary"];
-global.toTitleCase = str => str.charAt(0).toUpperCase() + str.slice(1);
-global._ = str => str;
-global.platformColor = {
-    selectorSelected: "#000",
-    paletteBackground: "#fff",
-    strokeColor: "#333",
-    fillColor: "#666",
-    paletteLabelBackground: "#ccc",
-    paletteLabelSelected: "#aaa",
-    hoverColor: "#ddd",
-    paletteText: "#000",
-    textColor: "#111"
-};
-global.base64Encode = str => str;
-global.localStorage = { kanaPreference: "default" };
-global.i18nSolfege = jest.fn(() => "sol");
-global.NUMBERBLOCKDEFAULT = 1;
-global.TEXTWIDTH = 100;
-global.STRINGLEN = 10;
-global.DEFAULTBLOCKSCALE = 1;
-global.SVG = class {
-    constructor() {
-        this.docks = [];
-    }
-    setScale() {}
-    setExpand() {}
-    setOutie() {}
-    basicBox() {
-        return "fill_color stroke_color block_label arg_label_0";
-    }
-    basicBlock() {
-        return "fill_color stroke_color block_label";
-    }
-    getHeight() {
-        return 12;
-    }
-};
-global.DISABLEDFILLCOLOR = "disabled_fill";
-global.DISABLEDSTROKECOLOR = "disabled_stroke";
-global.PALETTEFILLCOLORS = { test: "test_fill" };
-global.PALETTESTROKECOLORS = { test: "test_stroke" };
-global.last = arr => arr[arr.length - 1];
-global.getTextWidth = jest.fn(() => 10);
-global.STANDARDBLOCKHEIGHT = 18;
-global.CLOSEICON = "<svg fill_color></svg>";
-global.safeSVG = str => str;
-global.blockIsMacro = jest.fn(() => false);
-global.getMacroExpansion = jest.fn();
 
 describe("Palettes Class", () => {
     let mockActivity;
@@ -398,19 +218,42 @@ describe("Palettes Class", () => {
 
     describe("_makeSelectorButton method", () => {
         test("creates a selector cell and hooks hover handlers", () => {
-            const tdMock = { style: {}, appendChild: jest.fn() };
-            const trMock = { insertCell: jest.fn(() => tdMock), children: [{}, { children: [] }] };
+            const tdMock = { style: {}, appendChild: jest.fn(), width: 0, height: 0 };
+            const trMock = { insertCell: jest.fn(() => tdMock), children: [tdMock] };
             const paletteElement = {
+                childNodes: [
+                    {
+                        style: { border: "" },
+                        children: [
+                            {
+                                children: [
+                                    {
+                                        children: [trMock]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
                 children: [
                     {
-                        children: [{ children: [{ children: [trMock] }] }, { children: [{}, {}] }],
-                        style: { border: "" }
+                        style: { border: "" },
+                        children: [
+                            {
+                                children: [
+                                    {
+                                        children: [trMock]
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ]
             };
 
             global.docById = jest.fn(id => (id === "palette" ? paletteElement : null));
             global.document.getElementById = jest.fn(() => null);
+            global.makePaletteIcons = jest.fn(() => document.createElement('div'));
             const appendSpy = jest.spyOn(document.body, "appendChild");
             palettes.showSelection = jest.fn();
             palettes.makePalettes = jest.fn();
