@@ -7,7 +7,22 @@ function makeMockElement(tag) {
     const el = {
         tagName: tag?.toUpperCase() || 'DIV',
         nodeType: 1,
-        style: {},
+        style: {
+            display: '',
+            cursor: '',
+            border: '',
+            color: '',
+            backgroundColor: '',
+            width: '',
+            height: '',
+            position: '',
+            left: '',
+            top: '',
+            zIndex: '',
+            fontWeight: '',
+            padding: '',
+            margin: ''
+        },
         children: [],
         childNodes: [],
         classList: {
@@ -60,13 +75,43 @@ function makeMockElement(tag) {
         title: '',
         type: 'text',
         name: '',
-        placeholder: ''
+        placeholder: '',
+        className: '',
+        onclick: null
     };
 
     // Add proper textContent getter/setter
     Object.defineProperty(el, 'textContent', {
         get: function() { return this._textContent || ''; },
         set: function(value) { this._textContent = value; },
+        configurable: true
+    });
+
+    // Add proper value getter/setter
+    Object.defineProperty(el, 'value', {
+        get: function() { return this._value || ''; },
+        set: function(value) { this._value = value; },
+        configurable: true
+    });
+
+    // Add proper className getter/setter
+    Object.defineProperty(el, 'className', {
+        get: function() { return this._className || ''; },
+        set: function(value) { this._className = value; },
+        configurable: true
+    });
+
+    // Add proper onclick getter/setter
+    Object.defineProperty(el, 'onclick', {
+        get: function() { return this._onclick; },
+        set: function(value) { this._onclick = value; },
+        configurable: true
+    });
+
+    // Add proper style.display getter/setter
+    Object.defineProperty(el.style, 'display', {
+        get: function() { return this._display || ''; },
+        set: function(value) { this._display = value; },
         configurable: true
     });
 
@@ -279,43 +324,40 @@ global.docById = jest.fn((id) => {
 
     // Add common elements that tests expect
     if (id === 'lilypondModal') {
-        el.style = { display: 'block' };
-        // Add a method to change display
-        Object.defineProperty(el.style, 'display', {
-            get: function() { return this._display || 'block'; },
-            set: function(value) { this._display = value; },
-            configurable: true
-        });
+        el.style.display = 'none'; // Start with none, SaveInterface will set it to block
     }
-    if (id === 'fileName') {
-        el.value = 'Test Project.ly';
-        Object.defineProperty(el, 'value', {
-            get: function() { return this._value || 'Test Project.ly'; },
-            set: function(value) { this._value = value; },
-            configurable: true
-        });
-    }
-    if (id === 'title') {
-        el.value = 'Test Project';
-        Object.defineProperty(el, 'value', {
-            get: function() { return this._value || 'Test Project'; },
-            set: function(value) { this._value = value; },
-            configurable: true
-        });
-    }
-    if (id === 'author') {
-        el.value = 'Custom Author';
-        Object.defineProperty(el, 'value', {
-            get: function() { return this._value || 'Custom Author'; },
-            set: function(value) { this._value = value; },
-            configurable: true
-        });
+    if (id === 'fileName' || id === 'title' || id === 'author') {
+        el.value = ''; // SaveInterface will set these
     }
     if (id === 'submitLilypond') {
-        el.click = jest.fn();
+        el.onclick = jest.fn(); // SaveInterface will set this
+    }
+    // Add more lilypond modal elements that the code expects
+    if (id === 'fileNameText' || id === 'titleText' || id === 'authorText' || 
+        id === 'MIDIText' || id === 'guitarText') {
+        el.textContent = ''; // SaveInterface will set these via _
     }
 
     return el;
+});
+
+// Mock docByClass function for SaveInterface
+global.docByClass = jest.fn((className) => {
+    const el = enhancedMakeMockElement('div');
+    el.className = className;
+    el.onclick = null;
+    Object.defineProperty(el, 'onclick', {
+        get: function() { return this._onclick; },
+        set: function(value) { 
+            this._onclick = value;
+            // Automatically call the onclick function when set (simulating click)
+            if (typeof value === 'function') {
+                value();
+            }
+        },
+        configurable: true
+    });
+    return [el]; // Return array as expected by docByClass
 });
 
 // Mock paletteList
@@ -555,6 +597,9 @@ global.makePaletteIcons = jest.fn(() => enhancedMakeMockElement('div'));
 global.makePaletteIcon = jest.fn(() => enhancedMakeMockElement('div'));
 global.makeBasicBox = jest.fn(() => "mock-box");
 global.makeBasicBlock = jest.fn(() => "mock-block");
+
+// Add constants that SaveInterface expects
+global.STR_MY_PROJECT = "My Project";
 
 // Mock console methods to avoid noise
 global.console = {
