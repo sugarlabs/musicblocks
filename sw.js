@@ -143,11 +143,16 @@ self.addEventListener("fetch", function (event) {
                 // This is where we call the server to get the newest
                 // version of the file to use the next time we show view
                 event.waitUntil(
-                    fetch(event.request).then(function (response) {
-                        if (response.ok) {
-                            return updateCache(event.request, response);
-                        }
-                    })
+                    fetch(event.request)
+                        .then(function (response) {
+                            if (response.ok) {
+                                return updateCache(event.request, response);
+                            }
+                        })
+                        .catch(function () {
+                            // Ignore network fetch failures when offline.
+                            // The cached response has already been returned.
+                        })
                 );
                 return response;
             },
