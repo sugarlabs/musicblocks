@@ -28,7 +28,8 @@ function makeMockElement(tag) {
         classList: {
             add: jest.fn(),
             remove: jest.fn(),
-            contains: jest.fn()
+            contains: jest.fn(),
+            toggle: jest.fn()
         },
         appendChild: jest.fn(function(child) {
             if (child && typeof child === 'object') {
@@ -202,6 +203,20 @@ function enhancedMakeMockElement(tag) {
         }
         return child;
     });
+    el.append = jest.fn().mockImplementation(function(...children) {
+        children.forEach(child => {
+            if (child && typeof child === 'object') {
+                if (!this.children) this.children = [];
+                this.children.push(child);
+                if (!this.childNodes) this.childNodes = [];
+                this.childNodes.push(child);
+                child.parentNode = this;
+            }
+        });
+    });
+    el.insertAdjacentHTML = jest.fn();
+    el.insertAdjacentElement = jest.fn();
+    el.insertAdjacentText = jest.fn();
     return el;
 }
 
