@@ -404,7 +404,6 @@ class Toolbar {
             if (!isPlayIconRunning) {
                 playIcon.onclick = null;
             } else {
-                // eslint-disable-next-line no-use-before-define
                 playIcon.onclick = tempClick;
                 isPlayIconRunning = false;
             }
