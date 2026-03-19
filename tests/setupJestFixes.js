@@ -217,6 +217,13 @@ function enhancedMakeMockElement(tag) {
     el.insertAdjacentHTML = jest.fn();
     el.insertAdjacentElement = jest.fn();
     el.insertAdjacentText = jest.fn();
+    el.getBoundingClientRect = jest.fn(() => ({
+        top: 0, left: 0, bottom: 0, right: 0, width: 0, height: 0
+    }));
+    el.closest = jest.fn((selector) => null);
+    el.contains = jest.fn((child) => false);
+    el.parentElement = null;
+    el.parentNode = null;
     return el;
 }
 
