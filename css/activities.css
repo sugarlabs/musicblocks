@@ -1268,29 +1268,160 @@ table {
     height: 100%;
 }
 
-@media (max-width: 600px) {
-    #helpBodyDiv .icon-container {
-        margin-top: 0;
-        padding-top: 0;
-    }
+/* ======================================================
+   ENHANCED: Responsive Tour for All Mobile Devices
+   Improved touch targets, text sizing, and layout
+   ====================================================== */
 
-    .icon-container #findIcon,
-    .icon-container #loadButton,
-    .icon-container #advIconText {
-        transform: scale(1.1);
-    }
+/* Small Mobile Devices (320px - 480px) */
+@media screen and (max-width: 480px) {
+  #helpDiv {
+    width: 95% !important;
+    height: auto !important;
+    max-height: 85vh !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    top: 10% !important;
+    border-radius: 8px !important;
+  }
+
+  #helpBodyDiv {
+    width: calc(100% - 80px) !important;
+    height: auto !important;
+    max-height: 60vh !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    padding: 10px !important;
+    overflow-y: auto !important;
+  }
+
+  #helpBodyDiv h1 {
+    font-size: 18px !important;
+    margin-bottom: 15px !important;
+    text-align: center !important;
+  }
+
+  #helpBodyDiv p {
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+    margin-bottom: 10px !important;
+  }
+
+  #helpBodyDiv .icon-container {
+    width: 60px !important;
+    height: 60px !important;
+    margin: 10px auto !important;
+  }
+
+  #helpBodyDiv .blockImage {
+    max-width: 100% !important;
+    height: auto !important;
+    padding: 10px 0 !important;
+  }
 }
 
-@media (max-width: 450px) {
-    #helpBodyDiv {
-        width: 240px;
-    }
+/* Medium Mobile Devices (481px - 768px) */
+@media screen and (min-width: 481px) and (max-width: 768px) {
+  #helpDiv {
+    width: 90% !important;
+    height: auto !important;
+    max-height: 80vh !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    top: 10% !important;
+  }
+
+  #helpBodyDiv {
+    width: calc(100% - 100px) !important;
+    height: auto !important;
+    max-height: 65vh !important;
+    font-size: 15px !important;
+    padding: 15px !important;
+  }
+
+  #helpBodyDiv h1 {
+    font-size: 20px !important;
+  }
+
+  #helpBodyDiv p {
+    font-size: 14px !important;
+  }
+
+  #helpBodyDiv .icon-container {
+    width: 80px !important;
+    height: 80px !important;
+    margin: 15px auto !important;
+  }
 }
 
-@media (max-width: 320px) {
-    #helpBodyDiv {
-        width: 200px;
-    }
+/* Large Tablets (769px - 1024px) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  #helpDiv {
+    width: 85% !important;
+    max-width: 700px !important;
+    height: auto !important;
+    max-height: 75vh !important;
+  }
+
+  #helpBodyDiv {
+    width: calc(100% - 120px) !important;
+    font-size: 16px !important;
+  }
+}
+
+/* Touch-friendly improvements for all mobile devices */
+@media screen and (max-width: 1024px) {
+  #left-arrow, #right-arrow {
+    width: 50px !important;
+    height: 50px !important;
+    min-width: 50px !important;
+    min-height: 50px !important;
+    border-radius: 25px !important;
+    touch-action: manipulation !important;
+  }
+
+  #left-arrow:hover, #right-arrow:hover,
+  #left-arrow:focus, #right-arrow:focus {
+    transform: translateY(-50%) scale(1.1) !important;
+    transition: transform 0.2s ease !important;
+  }
+
+  #helpScrollWrapper {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  #helpButtonsDiv {
+    padding: 10px !important;
+    text-align: center !important;
+  }
+
+  #helpButtonsDiv button {
+    min-height: 44px !important;
+    min-width: 44px !important;
+    font-size: 14px !important;
+    padding: 8px 16px !important;
+    margin: 5px !important;
+  }
+}
+
+/* Landscape orientation improvements */
+@media screen and (max-width: 1024px) and (orientation: landscape) {
+  #helpDiv {
+    width: 95% !important;
+    max-height: 90vh !important;
+    top: 5% !important;
+  }
+
+  #helpBodyDiv {
+    max-height: 70vh !important;
+  }
+
+  #helpBodyDiv .icon-container {
+    width: 50px !important;
+    height: 50px !important;
+    margin: 5px auto !important;
+  }
 }
 
 #pscDiv {
