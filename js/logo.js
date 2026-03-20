@@ -1116,7 +1116,6 @@ class Logo {
      * @returns {void}
      */
     runLogoCommands(startHere, env) {
-
         // Performance instrumentation: enable/disable based on URL flag
         if (typeof performanceTracker !== "undefined") {
             if (
@@ -1916,13 +1915,11 @@ class Logo {
                     queueStart === 0 &&
                     tur.singer.justCounting.length === 0
                 ) {
-
                     // Performance instrumentation: end tracking and log stats
                     if (typeof performanceTracker !== "undefined") {
                         performanceTracker.endRun();
                         performanceTracker.logStats();
                     }
-
 
                     if (logo.runningLilypond) {
                         if (logo.collectingStats) {
