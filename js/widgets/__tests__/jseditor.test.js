@@ -211,10 +211,10 @@ describe("JSEditor", () => {
             expect(mockWidgetWindow.show).toHaveBeenCalled();
         });
 
-        test("calls widgetWindow.setPosition", () => {
+        test("calls widgetWindow.sendToCenter", () => {
             createEditor();
 
-            expect(mockWidgetWindow.setPosition).toHaveBeenCalledWith(160, 132);
+            expect(mockWidgetWindow.sendToCenter).toHaveBeenCalled();
         });
 
         test("creates _editor div element", () => {
