@@ -2113,24 +2113,31 @@ class Blocks {
                         }
                     }
                 }
-
-                this.adjustDocks(newBlock, true);
-
-                // Graphical feedback for new connection
-                if (this.blockList[thisBlock]) {
-                    this.blockList[thisBlock].highlight();
-                }
+ 
+                 this.adjustDocks(newBlock, true);
+ 
+                 // Graphical feedback for new connection
+                this.findDragGroup(thisBlock);
+                const blocksToHighlight = [...this.dragGroup];
                 if (this.blockList[newBlock]) {
-                    this.blockList[newBlock].highlight();
+                    blocksToHighlight.push(newBlock);
                 }
+
+                blocksToHighlight.forEach(b => {
+                    if (this.blockList[b]) {
+                        this.blockList[b].highlight();
+                    }
+                });
+                this.activity.refreshCanvas();
+
                 setTimeout(() => {
-                    if (this.blockList[thisBlock]) {
-                        this.blockList[thisBlock].unhighlight();
-                    }
-                    if (this.blockList[newBlock]) {
-                        this.blockList[newBlock].unhighlight();
-                    }
-                }, 200);
+                    blocksToHighlight.forEach(b => {
+                        if (this.blockList[b]) {
+                            this.blockList[b].unhighlight();
+                        }
+                    });
+                    this.activity.refreshCanvas();
+                }, 500);
 
                 /** Check if top block is one of the widget blocks. */
                 let lockInit = false;
