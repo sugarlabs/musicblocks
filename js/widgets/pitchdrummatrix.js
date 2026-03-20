@@ -563,7 +563,7 @@ class PitchDrumMatrix {
                 cell = cellRow.cells[j];
 
                 drumRow = drumTable.rows[0];
-                // eslint-disable-next-line no-unused-vars
+
                 drumCell = drumRow.cells[j];
 
                 cell.onclick = e => {
