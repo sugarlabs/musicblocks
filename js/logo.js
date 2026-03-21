@@ -37,6 +37,17 @@
  */
 
 // Constants moved to js/logoconstants.js to resolve circular dependency
+// In the Node.js / Jest environment (where window is absent), the constants
+// are not set on global scope by logoconstants.js. Pull them in explicitly
+// so that all references inside this module resolve correctly.
+if (typeof module !== "undefined" && typeof NOTEDIV === "undefined") {
+    try {
+        const _lc = require("./logoconstants");
+        Object.assign(global, _lc);
+    } catch (_) {
+        // Ignore — constants will be available as browser globals in production
+    }
+}
 
 /**
  * @class

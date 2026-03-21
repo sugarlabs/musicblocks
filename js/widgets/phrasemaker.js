@@ -13,7 +13,7 @@
 /*
    global
 
-   _, PhraseMakerUtils, PhraseMakerGrid, PhraseMakerUI, PhraseMakerAudio, platformColor, docById, MATRIXSOLFEHEIGHT, toFraction, Singer,
+   PhraseMakerUtils, PhraseMakerGrid, PhraseMakerUI, PhraseMakerAudio, platformColor, docById, MATRIXSOLFEHEIGHT, toFraction, Singer,
    SOLFEGECONVERSIONTABLE, slicePath, wheelnav, delayExecution,
    DEFAULTVOICE, getDrumName, MATRIXSOLFEWIDTH, getDrumIcon,
    noteIsSolfege, isCustomTemperament, i18nSolfege, getNote, DEFAULTDRUM, last,
@@ -378,7 +378,6 @@ class PhraseMaker {
         widgetWindow.clear();
         widgetWindow.show();
 
-        //eslint-disable-next-line no-console
         console.debug("notes " + this.rowLabels + " octave " + this.rowArgs);
 
         this._notesToPlay = [];
@@ -1085,7 +1084,6 @@ class PhraseMaker {
                     rArg = 0;
                     break;
                 default:
-                    //eslint-disable-next-line no-console
                     console.debug(label + " not found");
                     break;
             }
@@ -1138,12 +1136,12 @@ class PhraseMaker {
             }
 
             if (aboveBlock === this.blockNo) {
-                setTimeout(this._addNotesBlockBetween(aboveBlock, newBlock, true), 500);
+                setTimeout(() => this._addNotesBlockBetween(aboveBlock, newBlock, true), 500);
                 this.rowLabels.splice(0, 0, rLabel);
                 this.rowArgs.splice(0, 0, rArg);
                 this._rowBlocks.splice(0, 0, newBlock);
             } else {
-                setTimeout(this._addNotesBlockBetween(aboveBlock, newBlock, false), 500);
+                setTimeout(() => this._addNotesBlockBetween(aboveBlock, newBlock, false), 500);
                 let i;
                 for (i = 0; i < this.columnBlocksMap.length; i++) {
                     if (this.columnBlocksMap[i][0] === aboveBlock) {
@@ -1211,7 +1209,7 @@ class PhraseMaker {
             }
         }
 
-        setTimeout(this._createColumnPieSubmenu(i, "pitchblocks", true), 500);
+        setTimeout(() => this._createColumnPieSubmenu(i, "pitchblocks", true), 500);
     }
 
     /**
@@ -1339,14 +1337,14 @@ class PhraseMaker {
                 this._blockLabelsWheel2.navItems[
                     this._blockLabelsWheel2.selectedNavItemIndex
                 ].title;
-            // eslint-disable-next-line no-use-before-define
+
             __selectionChanged(true);
         };
 
         const __enterArgValue2 = () => {
             this.yblockValue[0] =
                 this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
-            // eslint-disable-next-line no-use-before-define
+
             __selectionChanged(true);
         };
 
@@ -1619,7 +1617,7 @@ class PhraseMaker {
                 this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
             this.docById("wheelnav-_exitWheel-title-1").children[0].textContent = this.blockValue;
             lastIndex = this._pitchWheel.selectedNavItemIndex; // Update lastIndex
-            // eslint-disable-next-line no-use-before-define
+
             __selectionChanged(true);
         };
 
@@ -2461,7 +2459,6 @@ class PhraseMaker {
             if (i === 0) {
                 this._sortedRowMap.push(0);
             } else if (i > 0 && obj[1] !== "hertz" && obj[1] === this._deps.last(this.rowLabels)) {
-                //eslint-disable-next-line no-console
                 console.debug("skipping " + obj[1] + " " + this._deps.last(this.rowLabels));
                 this._sortedRowMap.push(this._deps.last(this._sortedRowMap));
                 if (oldColumnBlockMap[sortedList[lastObj][3]] != undefined) {
@@ -2482,7 +2479,6 @@ class PhraseMaker {
                 this._rowMap[i] = this._rowMap[i - 1];
                 continue;
             } else {
-                //eslint-disable-next-line no-console
                 console.debug("pushing " + obj[1] + " " + this._deps.last(this.rowLabels));
                 this._sortedRowMap.push(this._deps.last(this._sortedRowMap) + 1);
                 lastObj = i;
@@ -2533,7 +2529,6 @@ class PhraseMaker {
         const exportWindow = window.open("");
         const exportDocument = exportWindow.document;
         if (exportDocument === undefined) {
-            //eslint-disable-next-line no-console
             console.debug("Could not create export window");
             return;
         }
@@ -3156,9 +3151,9 @@ class PhraseMaker {
         }
         this.activity.blocks.loadNewBlocks(RHYTHMOBJ);
         if (this.activity.blocks.blockList[bottomOfClamp].name === "vspace") {
-            setTimeout(this.blockConnection(6, bottomOfClamp), 500);
+            setTimeout(() => this.blockConnection(6, bottomOfClamp), 500);
         } else {
-            setTimeout(this.blockConnection(7, bottomOfClamp), 500);
+            setTimeout(() => this.blockConnection(7, bottomOfClamp), 500);
         }
         this.activity.refreshCanvas();
     }
@@ -4213,7 +4208,6 @@ class PhraseMaker {
                         );
                     }
                 } else {
-                    //eslint-disable-next-line no-console
                     console.debug("Cannot parse note object: " + obj);
                 }
             }
@@ -4744,7 +4738,7 @@ class PhraseMaker {
 
         // Create a new stack for the chunk.
         this.activity.blocks.loadNewBlocks(newStack);
-        activity.textMsg(this._("New action block generated."), 3000);
+        this.activity.textMsg(this._("New action block generated."), 3000);
     }
 }
 if (typeof module !== "undefined") {

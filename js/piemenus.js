@@ -21,7 +21,7 @@
    DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
    FIXEDSOLFEGE, NOTENAMES, FIXEDSOLFEGE, NOTENAMES, numberToPitch,
    nthDegreeToPitch, SOLFEGENAMES, buildScale, _THIS_IS_TURTLE_BLOCKS_,
-    CHORDNAMES, Synth, Tone, activity
+    CHORDNAMES, Tone, Synth
 */
 
 /*
@@ -770,7 +770,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             ["setkey", "setkey2"].includes(that.blocks.blockList[that.connections[0]].name)
         ) {
             // We may need to update the mode widget.
-            that.activity.logo.modeBlock = that.blocks.blockList.indexOf(that);
+            that.activity.logo.modeBlock = that.blockIndex;
         }
     };
 
@@ -3682,7 +3682,7 @@ const piemenuBlockContext = block => {
     let pasteDy = 0;
 
     const that = block;
-    const blockBlock = block.blocks.blockList.indexOf(block);
+    const blockBlock = block.blockIndex;
 
     // Position the widget centered over the active block.
     docById("contextWheelDiv").style.position = "absolute";
@@ -3805,7 +3805,7 @@ const piemenuBlockContext = block => {
         that.blocks.sendStackToTrash(that.blocks.blockList[blockBlock]);
         docById("contextWheelDiv").style.display = "none";
         // prompting a notification on deleting any block
-        activity.textMsg(
+        that.activity.textMsg(
             _("You can restore deleted blocks from the trash with the Restore From Trash button."),
             3000
         );

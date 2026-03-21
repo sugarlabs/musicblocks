@@ -166,7 +166,6 @@ class SaveInterface {
         let filename = null;
         const finishDownload = name => {
             if (name === null) {
-                // eslint-disable-next-line no-console
                 console.debug("save cancelled");
                 return;
             }
@@ -209,7 +208,6 @@ class SaveInterface {
             filename = defaultfilename;
         }
 
-        // eslint-disable-next-line no-console
         console.debug("saving to " + filename);
         finishDownload(filename);
     }
@@ -832,7 +830,6 @@ class SaveInterface {
                     if (copied) {
                         showCopiedMessage();
                     } else {
-                        // eslint-disable-next-line no-console
                         console.debug("Clipboard copy failed:", err);
                     }
                 });
@@ -841,7 +838,6 @@ class SaveInterface {
             if (copied) {
                 showCopiedMessage();
             } else {
-                // eslint-disable-next-line no-console
                 console.debug("Clipboard copy failed");
             }
         }
@@ -865,7 +861,6 @@ class SaveInterface {
         window.Converter.ly2pdf(lydata, (success, dataurl) => {
             document.body.style.cursor = "default";
             if (!success) {
-                // eslint-disable-next-line no-console
                 console.debug("Error: " + dataurl);
                 this.activity.errorMsg(
                     _("Failed to convert Lilypond to PDF. Please try saving as .ly file instead."),
@@ -890,7 +885,7 @@ class SaveInterface {
      * @instance
      *
      */
-    // eslint-disable-next-line no-unused-vars
+
     saveMxml(filename) {
         this.activity.logo.runningMxml = true;
         for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
