@@ -683,12 +683,12 @@ class Toolbar {
         };
     }
 
-    renderUndoRedoButtons(){
+    renderUndoRedoButtons() {
         const undoButton = docById("undoButton");
         const redoButton = docById("redoButton");
         if (!undoButton || !redoButton) return;
         const that = this;
-        undoButton.onclick = (e) => {
+        undoButton.onclick = e => {
             e.preventDefault();
             e.stopPropagation();
             // Use canUndo() for robust check
@@ -696,7 +696,7 @@ class Toolbar {
                 window.UndoRedo.undo();
             }
         };
-        redoButton.onclick = (e) => {
+        redoButton.onclick = e => {
             e.preventDefault();
             e.stopPropagation();
             // Use canRedo() for robust check
@@ -707,7 +707,7 @@ class Toolbar {
         // Initialize button states
         this.updateUndoRedoButton();
     }
-    updateUndoRedoButton(){
+    updateUndoRedoButton() {
         const undoBtn = docById("undoButton");
         const redoBtn = docById("redoButton");
         if (undoBtn && redoBtn && window.UndoRedo) {
