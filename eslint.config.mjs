@@ -45,7 +45,7 @@ export default [
                 Blocks: "readonly",
                 Turtles: "readonly",
                 Activity: "readonly",
-                _: "readonly" // i18n
+                "_": "readonly" // i18n
             }
         },
         rules: {
