@@ -1547,7 +1547,8 @@ describe("Palettes Class", () => {
                         style: {},
                         appendChild: jest.fn()
                     }))
-                }))
+                })),
+                appendChild: jest.fn()
             };
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
@@ -1571,29 +1572,41 @@ describe("Palettes Class", () => {
 
             palette._showMenuItems();
 
-            expect(paletteList.insertRow).toHaveBeenCalled();
+            expect(paletteList.appendChild).toHaveBeenCalled();
         });
 
         test("_showMenuItems handles image blocks and drag events", () => {
+            let capturedImg;
             const paletteList = {
-                insertRow: jest.fn(() => ({
-                    insertCell: jest.fn(() => {
-                        let capturedImg;
-                        return {
-                            style: {},
-                            appendChild: jest.fn(img => {
-                                capturedImg = img;
-                            }),
-                            get _capturedImg() {
-                                return capturedImg;
-                            }
-                        };
-                    })
-                }))
+                appendChild: jest.fn()
             };
+
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
                 return null;
+            });
+
+            // Mock DOM elements created inside _showMenuItems
+            document.createElement = jest.fn(tag => {
+                if (tag === "tr") {
+                    return {
+                        children: [],
+                        appendChild(child) {
+                            this.children.push(child);
+                        }
+                    };
+                }
+
+                if (tag === "td") {
+                    return {
+                        style: {},
+                        appendChild(img) {
+                            capturedImg = img;
+                        }
+                    };
+                }
+
+                return {};
             });
             global.mediaPALETTE = "<svg></svg>";
             global.cameraPALETTE = "<svg></svg>";
@@ -1628,9 +1641,8 @@ describe("Palettes Class", () => {
 
             palette._showMenuItems();
 
-            const itemCell =
-                paletteList.insertRow.mock.results[0].value.insertCell.mock.results[0].value;
-            const img = itemCell._capturedImg;
+            const img = capturedImg;
+            expect(img).toBeDefined();
             img.offsetWidth = 10;
             img.offsetHeight = 10;
             document.body.appendChild = jest.fn();
@@ -1641,7 +1653,6 @@ describe("Palettes Class", () => {
             img.onmouseleave();
             expect(document.body.style.cursor).toBe("default");
             expect(img.ondragstart()).toBe(false);
-
             img.onmousedown({
                 pageX: 10,
                 pageY: 20,
@@ -1656,29 +1667,40 @@ describe("Palettes Class", () => {
                 pageY: 25,
                 preventDefault: jest.fn()
             });
+
             img.onmouseup({});
         });
 
         test("_showMenuItems handles touch drag", () => {
+            let capturedImg;
             const paletteList = {
-                insertRow: jest.fn(() => ({
-                    insertCell: jest.fn(() => {
-                        let capturedImg;
-                        return {
-                            style: {},
-                            appendChild: jest.fn(img => {
-                                capturedImg = img;
-                            }),
-                            get _capturedImg() {
-                                return capturedImg;
-                            }
-                        };
-                    })
-                }))
+                appendChild: jest.fn()
             };
+
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
                 return null;
+            });
+
+            document.createElement = jest.fn(tag => {
+                if (tag === "tr") {
+                    return {
+                        children: [],
+                        appendChild(child) {
+                            this.children.push(child);
+                        }
+                    };
+                }
+
+                if (tag === "td") {
+                    return {
+                        style: {},
+                        appendChild(img) {
+                            capturedImg = img;
+                        }
+                    };
+                }
+                return {};
             });
             document.addEventListener = jest.fn();
             document.removeEventListener = jest.fn();
@@ -1702,14 +1724,12 @@ describe("Palettes Class", () => {
 
             palette._showMenuItems();
 
-            const itemCell =
-                paletteList.insertRow.mock.results[0].value.insertCell.mock.results[0].value;
-            const img = itemCell._capturedImg;
+            const img = capturedImg;
+            expect(img).toBeDefined();
             img.offsetWidth = 10;
             img.offsetHeight = 10;
             document.body.appendChild = jest.fn();
             document.body.removeChild = jest.fn();
-
             img.ontouchstart({
                 touches: [{ clientX: 10, clientY: 20 }],
                 preventDefault: jest.fn()
@@ -1732,7 +1752,8 @@ describe("Palettes Class", () => {
                         style: {},
                         appendChild: jest.fn()
                     }))
-                }))
+                })),
+                appendChild: jest.fn()
             };
             const palDiv = { childNodes: [{ style: {} }], removeChild: jest.fn() };
             global.docById = jest.fn(id => {

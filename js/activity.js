@@ -39,10 +39,9 @@
    TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, TURTLESVG,
    updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_F,
    SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
-   MUSICALMODES, waitForReadiness, body, i18next, wheelnav, slicePath,
-   base64Encode, disableHorizScrollIcon,
-   toFraction, CARTESIANBUTTON, piemenuGrid,
-   SELECTBUTTON, CLEARBUTTON, Midi, ABCJS
+   MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
+   base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
+   SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS
  */
 
 /*
@@ -221,7 +220,7 @@ const doAnalyzeProject = function () {
 /**
  * Represents an activity in the application.
  */
-/* eslint-disable-next-line no-redeclare */
+
 class Activity {
     /**
      * Creates an Activity instance.
@@ -343,6 +342,8 @@ class Activity {
         // Dirty flag for canvas rendering optimization
         // When true, the stage needs to be redrawn on the next animation frame
         this.stageDirty = false;
+        this._renderLoopRafId = null;
+        this._renderLoopRunning = false;
 
         this.themes = ["light", "dark", "highcontrast"];
         try {
@@ -362,9 +363,9 @@ class Activity {
 
             for (let i = 0; i < this.themes.length; i++) {
                 if (this.themes[i] === activeTheme) {
-                    body.classList.add(this.themes[i]);
+                    document.body.classList.add(this.themes[i]);
                 } else {
-                    body.classList.remove(this.themes[i]);
+                    document.body.classList.remove(this.themes[i]);
                 }
             }
         } catch (e) {
@@ -419,6 +420,7 @@ class Activity {
          * Sets up the initial state and dependencies of the activity.
          */
         this.setupDependencies = () => {
+            this._stopRenderLoop();
             this.cleanupEventListeners();
             createDefaultStack();
             createHelpContent(this);
@@ -511,19 +513,35 @@ class Activity {
          * 3. GIF animations are playing
          * This eliminates unnecessary 60fps updates when idle.
          */
-        const renderLoop = () => {
-            if (this.stage) {
-                const hasActiveTweens = createjs.Tween.hasActiveTweens();
-                const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
+        this._startRenderLoop = () => {
+            if (this._renderLoopRunning) return;
+            this._renderLoopRunning = true;
 
-                if (this.stageDirty || hasActiveTweens || hasActiveGifs) {
-                    this.stage.update();
-                    this.stageDirty = false;
+            const renderLoop = () => {
+                if (!this._renderLoopRunning) return;
+
+                if (this.stage) {
+                    const hasActiveTweens = createjs.Tween.hasActiveTweens();
+                    const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
+
+                    if (this.stageDirty || hasActiveTweens || hasActiveGifs) {
+                        this.stage.update();
+                        this.stageDirty = false;
+                    }
                 }
-            }
-            requestAnimationFrame(renderLoop);
+                this._renderLoopRafId = requestAnimationFrame(renderLoop);
+            };
+
+            this._renderLoopRafId = requestAnimationFrame(renderLoop);
         };
-        requestAnimationFrame(renderLoop);
+
+        this._stopRenderLoop = () => {
+            this._renderLoopRunning = false;
+            if (this._renderLoopRafId !== null) {
+                cancelAnimationFrame(this._renderLoopRafId);
+                this._renderLoopRafId = null;
+            }
+        };
 
         /*
          * creates helpfulSearchDiv for search
@@ -2328,7 +2346,7 @@ class Activity {
             }
 
             await this.setSmallerLargerStatus();
-            await this.stage.update();
+            this.stageDirty = true;
         };
 
         /**
@@ -2368,7 +2386,7 @@ class Activity {
             }
 
             await this.setSmallerLargerStatus();
-            await this.stage.update();
+            this.stageDirty = true;
         };
 
         /*
@@ -2997,7 +3015,7 @@ class Activity {
                     this.isAppIdle = false;
                     createjs.Ticker.framerate = ACTIVE_FPS;
                     // Force immediate redraw for responsiveness
-                    if (this.stage) this.stage.update();
+                    this.stageDirty = true;
                 }
             };
 
@@ -3687,7 +3705,7 @@ class Activity {
                             disableHorizScrollIcon.style.display == "block"
                         ) {
                             this.blocksContainer.x += this.canvas.width / 10;
-                            this.stage.update();
+                            this.stageDirty = true;
                         }
                     // fall through
                     case 220:
@@ -3697,7 +3715,7 @@ class Activity {
                             disableHorizScrollIcon.style.display == "block"
                         ) {
                             this.blocksContainer.x -= this.canvas.width / 10;
-                            this.stage.update();
+                            this.stageDirty = true;
                         }
                 }
             } else if (event.ctrlKey) {
@@ -3756,17 +3774,17 @@ class Activity {
                             this.textMsg("END " + _("Jumping to the bottom of the page."));
                             this.blocksContainer.y =
                                 -this.blocks.bottomMostBlock() + this.canvas.height / 2;
-                            this.stage.update();
+                            this.stageDirty = true;
                             break;
                         case PAGE_UP:
                             this.textMsg("PAGE_UP " + _("Scrolling up."));
                             this.blocksContainer.y += this.canvas.height / 2;
-                            this.stage.update();
+                            this.stageDirty = true;
                             break;
                         case PAGE_DOWN:
                             this.textMsg("PAGE_DOWN " + _("Scrolling down."));
                             this.blocksContainer.y -= this.canvas.height / 2;
-                            this.stage.update();
+                            this.stageDirty = true;
                             break;
                         case DEL:
                             this.textMsg("DEL " + _("Extracting block"));
@@ -3790,7 +3808,7 @@ class Activity {
                                 } else {
                                     this.blocksContainer.y += 20;
                                 }
-                                this.stage.update();
+                                this.stageDirty = true;
                             }
                             break;
                         case KEYCODE_DOWN:
@@ -3814,7 +3832,7 @@ class Activity {
                                 } else {
                                     this.blocksContainer.y -= 20;
                                 }
-                                this.stage.update();
+                                this.stageDirty = true;
                             }
                             break;
                         case KEYCODE_LEFT:
@@ -3831,7 +3849,7 @@ class Activity {
                                 } else if (this.scrollBlockContainer) {
                                     this.blocksContainer.x += 20;
                                 }
-                                this.stage.update();
+                                this.stageDirty = true;
                             }
                             break;
                         case KEYCODE_RIGHT:
@@ -3848,7 +3866,7 @@ class Activity {
                                 } else if (this.scrollBlockContainer) {
                                     this.blocksContainer.x -= 20;
                                 }
-                                this.stage.update();
+                                this.stageDirty = true;
                             }
                             break;
                         case HOME:
@@ -3866,7 +3884,7 @@ class Activity {
                                 // Bring all the blocks "home".
                                 this._findBlocks();
                             }
-                            this.stage.update();
+                            this.stageDirty = true;
                             break;
                         case TAB:
                             break;
@@ -7158,7 +7176,7 @@ class Activity {
                     pasteDy = 0;
                 const map = new Map();
                 for (let i = 0; i < blocksArray.length; i++) {
-                    const idx = this.blocks.blockList.indexOf(blocksArray[i]);
+                    const idx = blocksArray[i].blockIndex;
                     map.set(
                         idx,
                         blocksArray[i].connections.filter(blk => blk !== null)
@@ -7416,6 +7434,7 @@ class Activity {
 
             this.stage = new createjs.Stage(this.canvas);
             createjs.Touch.enable(this.stage);
+            this._startRenderLoop();
 
             // Initialize Ticker with optimal framerate
             createjs.Ticker.framerate = 60;
@@ -7446,6 +7465,7 @@ class Activity {
             // Use managed addEventListener for automatic cleanup
             this.addEventListener(document, "mousemove", this.handleMouseMove);
             this.addEventListener(document, "click", this.handleDocumentClick);
+            this.addEventListener(window, "beforeunload", this._stopRenderLoop);
 
             this._createMsgContainer(
                 "#ffffff",

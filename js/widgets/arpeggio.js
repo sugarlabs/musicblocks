@@ -417,7 +417,7 @@ class Arpeggio {
                 cell = cellRow.cells[j];
 
                 arpeggioRow = arpeggioNoteTable.rows[0];
-                // eslint-disable-next-line no-unused-vars
+
                 arpeggioCell = arpeggioRow.cells[j];
 
                 cell.onclick = e => {

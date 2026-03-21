@@ -169,6 +169,7 @@ class Turtle {
     /**
      * Causes turtle to blink (toggle turtle's visibility) every 100 ms.
      */
+
     async blink(duration, volume) {
         // Suppress blinking when using cursorout and cursorover
         // sensors to prevent multiple triggers.

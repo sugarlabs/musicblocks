@@ -1,9 +1,4 @@
 /*
-   global
-   define
-*/
-
-/*
    exported
    DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY,
    OSCVOLUMEADJUSTMENT, TONEBPM, TARGETBPM, TURTLESTEP, NOTEDIV,
@@ -87,12 +82,18 @@ const logoconstants = {
 // Maintain CommonJS compatibility for tests
 if (typeof module !== "undefined" && module.exports) {
     module.exports = logoconstants;
-} else if (typeof define === "function" && define.amd) {
-    // Implement additive AMD define
+}
+
+// Implement additive AMD define
+/* global define */
+if (typeof define === "function" && define.amd) {
     define(function () {
         return logoconstants;
     });
-} else if (typeof window !== "undefined") {
-    // Preserve existing global exposure exactly as before
+}
+
+// Preserve existing global exposure when loaded as a plain browser script.
+// Skipped when running as a CommonJS module (e.g. Jest) to avoid polluting the global scope.
+if (typeof window !== "undefined" && typeof module === "undefined") {
     Object.assign(window, logoconstants);
 }
