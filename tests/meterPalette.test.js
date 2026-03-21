@@ -253,7 +253,7 @@ describe("Meter Palette Tests", () => {
             // Test with no next block
             const result1 = block.flow([], logo, 0, "drift");
             expect(global.Singer.MeterActions.setNoClock).not.toHaveBeenCalled();
-            expect(result1).toEqual([]);
+            expect(result1).toBeUndefined();
             
             // Test with next block
             const result2 = block.flow(["next"], logo, 0, "drift");
