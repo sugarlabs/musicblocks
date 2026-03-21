@@ -6926,56 +6926,107 @@ class Activity {
         };
 
         this._showKeyboardShortcuts = () => {
+            const platformKeys = (windowsKeys, macKeys = windowsKeys) =>
+                `${_("Windows/Linux")}: ${windowsKeys}\n${_("Mac")}: ${macKeys}`;
+
             const shortcutSections = [
                 {
                     title: _("Workspace"),
                     items: [
-                        { keys: "Alt + R", action: _("Play project") },
-                        { keys: "Alt + S", action: _("Stop project") },
                         {
-                            keys: "Alt + Enter",
+                            keys: platformKeys("Alt + R", "Option + R"),
+                            action: _("Play project")
+                        },
+                        {
+                            keys: platformKeys("Alt + S", "Option + S"),
+                            action: _("Stop project")
+                        },
+                        {
+                            keys: platformKeys("Alt + Enter", "Option + Enter"),
                             action: _("Play or stop depending on the current state")
                         },
                         {
-                            keys: "Space",
+                            keys: platformKeys("Space", "Space"),
                             action: _("Play or stop when no text input or widget is active")
                         },
-                        { keys: "Shift + Space", action: _("Toggle stage scale") },
-                        { keys: "Home", action: _("Jump to home position") },
-                        { keys: "End", action: _("Jump to the bottom of the workspace") },
-                        { keys: "Page Up", action: _("Scroll workspace up") },
-                        { keys: "Page Down", action: _("Scroll workspace down") },
-                        { keys: "Esc", action: _("Hide block search when it is open") }
+                        {
+                            keys: platformKeys("Shift + Space", "Shift + Space"),
+                            action: _("Toggle stage scale")
+                        },
+                        {
+                            keys: platformKeys("Home", "Home"),
+                            action: _("Jump to home position")
+                        },
+                        {
+                            keys: platformKeys("End", "End"),
+                            action: _("Jump to the bottom of the workspace")
+                        },
+                        {
+                            keys: platformKeys("Page Up", "Page Up"),
+                            action: _("Scroll workspace up")
+                        },
+                        {
+                            keys: platformKeys("Page Down", "Page Down"),
+                            action: _("Scroll workspace down")
+                        },
+                        {
+                            keys: platformKeys("Esc", "Esc"),
+                            action: _("Hide block search when it is open")
+                        }
                     ]
                 },
                 {
                     title: _("Editing"),
                     items: [
-                        { keys: "Alt + C", action: _("Copy selected stack") },
-                        { keys: "Alt + V", action: _("Paste previous stack") },
-                        { keys: "Ctrl + V", action: _("Open the JSON paste box") },
-                        { keys: "Enter", action: _("Paste JSON when the paste box is focused") },
-                        { keys: "Delete", action: _("Extract the active block") },
-                        { keys: "Alt + E", action: _("Clear workspace") },
-                        { keys: "Alt + B", action: _("Save block artwork") },
-                        { keys: "Alt + H", action: _("Save block help") }
+                        {
+                            keys: platformKeys("Alt + C", "Option + C"),
+                            action: _("Copy selected stack")
+                        },
+                        {
+                            keys: platformKeys("Alt + V", "Option + V"),
+                            action: _("Paste previous stack")
+                        },
+                        {
+                            keys: platformKeys("Ctrl + V", "Control + V"),
+                            action: _("Open the JSON paste box")
+                        },
+                        {
+                            keys: platformKeys("Enter", "Enter"),
+                            action: _("Paste JSON when the paste box is focused")
+                        },
+                        {
+                            keys: platformKeys("Delete", "Delete"),
+                            action: _("Extract the active block")
+                        },
+                        {
+                            keys: platformKeys("Alt + E", "Option + E"),
+                            action: _("Clear workspace")
+                        },
+                        {
+                            keys: platformKeys("Alt + B", "Option + B"),
+                            action: _("Save block artwork")
+                        },
+                        {
+                            keys: platformKeys("Alt + H", "Option + H"),
+                            action: _("Save block help")
+                        }
                     ]
                 },
                 {
                     title: _("Navigation"),
                     items: [
                         {
-                            keys: _("Arrow keys"),
+                            keys: platformKeys(_("Arrow keys"), _("Arrow keys")),
                             action: _(
                                 "Move the active block, scroll palettes, adjust the tempo widget, or pan the workspace depending on context"
                             )
                         },
                         {
-                            keys: "/",
+                            keys: platformKeys("/", "/"),
                             action: _("Pan workspace right when horizontal scrolling is enabled")
                         },
                         {
-                            keys: "\\",
+                            keys: platformKeys("\\", "\\"),
                             action: _("Pan workspace left when horizontal scrolling is enabled")
                         }
                     ]
@@ -6984,23 +7035,38 @@ class Activity {
                     title: _("Toolbar"),
                     items: [
                         {
-                            keys: _("Arrow Left / Arrow Right"),
+                            keys: platformKeys(
+                                _("Arrow Left / Arrow Right"),
+                                _("Arrow Left / Arrow Right")
+                            ),
                             action: _("Move focus within the current toolbar")
                         },
                         {
-                            keys: _("Arrow Up / Arrow Down"),
+                            keys: platformKeys(
+                                _("Arrow Up / Arrow Down"),
+                                _("Arrow Up / Arrow Down")
+                            ),
                             action: _("Move focus between main and auxiliary toolbars")
                         },
-                        { keys: "Enter", action: _("Activate the focused toolbar button") },
-                        { keys: "Esc", action: _("Exit toolbar keyboard navigation") }
+                        {
+                            keys: platformKeys("Enter", "Enter"),
+                            action: _("Activate the focused toolbar button")
+                        },
+                        {
+                            keys: platformKeys("Esc", "Esc"),
+                            action: _("Exit toolbar keyboard navigation")
+                        }
                     ]
                 },
                 {
                     title: _("Widget Windows"),
                     items: [
-                        { keys: "Esc", action: _("Close the focused widget window") },
                         {
-                            keys: _("Ctrl/Cmd + Shift + M"),
+                            keys: platformKeys("Esc", "Esc"),
+                            action: _("Close the focused widget window")
+                        },
+                        {
+                            keys: platformKeys("Ctrl + Shift + M", "Command + Shift + M"),
                             action: _("Maximize or restore the focused widget window")
                         }
                     ]
@@ -7009,11 +7075,14 @@ class Activity {
                     title: _("Help and Pitch Slider"),
                     items: [
                         {
-                            keys: _("Arrow Left / Arrow Right"),
+                            keys: platformKeys(
+                                _("Arrow Left / Arrow Right"),
+                                _("Arrow Left / Arrow Right")
+                            ),
                             action: _("Move between help pages when Help is open")
                         },
                         {
-                            keys: _("Arrow keys"),
+                            keys: platformKeys(_("Arrow keys"), _("Arrow keys")),
                             action: _("Adjust pitch by semitone when Pitch Slider is open")
                         }
                     ]
@@ -7056,7 +7125,7 @@ class Activity {
             intro.innerHTML =
                 `<div style="font-size:18px;font-weight:700;">${_("Keyboard shortcuts")}</div>` +
                 `<div style="font-size:13px;opacity:0.92;margin-top:4px;">${_(
-                    "Shortcuts are context-sensitive. Some only work when a related panel, widget, or mode is active."
+                    "Shortcuts are context-sensitive. Some only work when a related panel, widget, or mode is active. Windows/Linux and Mac equivalents are shown together."
                 )}</div>`;
             wrapper.appendChild(intro);
 
@@ -7091,9 +7160,10 @@ class Activity {
                     key.style.fontFamily = '"Fira Mono", monospace';
                     key.style.fontSize = "12px";
                     key.style.fontWeight = "700";
+                    key.style.whiteSpace = "pre-line";
                     key.style.background = "#eef6ff";
                     key.style.border = "1px solid #cde3fb";
-                    key.style.borderRadius = "999px";
+                    key.style.borderRadius = "14px";
                     key.style.padding = "6px 10px";
                     key.style.color = "#114a80";
                     key.style.display = "inline-block";
