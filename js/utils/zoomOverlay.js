@@ -6,31 +6,31 @@
  * @param {number} scale - Current block scale value (e.g., 1, 1.5, 2).
  */
 function showZoomOverlay(scale) {
-
     let overlay = document.getElementById("zoomOverlay");
 
-    // If it doesn't exist, create it and append it to the document body
     if (!overlay) {
         overlay = document.createElement("div");
         overlay.id = "zoomOverlay";
-
-        overlay.classList.add("zoom-overlay");
-
+        overlay.className = "zoom-overlay";
         overlay.setAttribute("aria-live", "polite");
 
-        // Add overlay to the page
-        document.body.appendChild(overlay);
+        document.documentElement.appendChild(overlay);
     }
 
-    // Convert scale value to percentage and display it
     overlay.textContent = Math.round(scale * 100) + "%";
 
-    overlay.classList.add("visible");
+    overlay.style.position = "fixed";
+    overlay.style.top = "50%";
+    overlay.style.left = "50%";
+    overlay.style.transform = "translate(-50%, -50%)";
+    overlay.style.background = "black"; 
+    overlay.style.color = "white";
+    overlay.style.zIndex = "2147483647";
+    overlay.style.opacity = "1";
+    overlay.style.fontSize = "56px";
 
     clearTimeout(overlay.hideTimeout);
-
-    // Hide the overlay after 1.5 seconds
     overlay.hideTimeout = setTimeout(() => {
-        overlay.classList.remove("visible");
+        overlay.style.opacity = "0";
     }, 1500);
 }
