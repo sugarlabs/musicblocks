@@ -1123,6 +1123,76 @@ describe("Utility Functions (logic-only)", () => {
             await expect(preloadProjectSamples([])).resolves.toBeUndefined();
         });
     });
+
+    describe("recording cleanup", () => {
+        let originalURL;
+
+        beforeEach(() => {
+            originalURL = global.URL;
+            global.URL = {
+                createObjectURL: jest.fn(() => "blob:recording-url"),
+                revokeObjectURL: jest.fn()
+            };
+        });
+
+        afterEach(() => {
+            global.URL = originalURL;
+        });
+
+        it("revokes the previous recording URL before replacing it", async () => {
+            Synth.audioURL = "blob:old-recording";
+            Synth.player = {
+                stop: jest.fn(),
+                dispose: jest.fn()
+            };
+            Synth.recorder = {
+                stop: jest.fn().mockResolvedValue("recording-blob")
+            };
+            Synth.mic = {
+                close: jest.fn()
+            };
+
+            const result = await Synth.stopRecording();
+
+            expect(global.URL.revokeObjectURL).toHaveBeenCalledWith("blob:old-recording");
+            expect(Synth.player).toBeNull();
+            expect(Synth.mic.close).toHaveBeenCalled();
+            expect(global.URL.createObjectURL).toHaveBeenCalledWith("recording-blob");
+            expect(result).toBe("blob:recording-url");
+        });
+
+        it("disposes the existing player before starting playback again", async () => {
+            const oldPlayer = {
+                stop: jest.fn(),
+                dispose: jest.fn()
+            };
+
+            Synth.audioURL = "blob:recording-url";
+            Synth.player = oldPlayer;
+
+            await Synth.playRecording();
+
+            expect(oldPlayer.stop).toHaveBeenCalled();
+            expect(oldPlayer.dispose).toHaveBeenCalled();
+            expect(Synth.player).toBeInstanceOf(Tone.Player);
+            expect(Synth.player.load).toHaveBeenCalledWith("blob:recording-url");
+            expect(Synth.player.start).toHaveBeenCalled();
+        });
+
+        it("releases recording resources during synth teardown", () => {
+            Synth.audioURL = "blob:recording-url";
+            Synth.player = {
+                stop: jest.fn(),
+                dispose: jest.fn()
+            };
+
+            Synth.disposeAllInstruments();
+
+            expect(global.URL.revokeObjectURL).toHaveBeenCalledWith("blob:recording-url");
+            expect(Synth.player).toBeNull();
+            expect(Synth.audioURL).toBeNull();
+        });
+    });
 });
 
 describe("Tuner Utilities (Audio Test Functions)", () => {
