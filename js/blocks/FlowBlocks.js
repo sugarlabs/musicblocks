@@ -1178,9 +1178,8 @@ function setupFlowBlocks(activity) {
             ) {
                 logo.statusFields.push([blk, "duplicate"]);
             } else {
-                activity.blocks.blockList[blk].value = activity.turtles.ithTurtle(
-                    turtle
-                ).singer.duplicateFactor;
+                activity.blocks.blockList[blk].value =
+                    activity.turtles.ithTurtle(turtle).singer.duplicateFactor;
             }
         }
     }
