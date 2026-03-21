@@ -1169,11 +1169,8 @@ class Singer {
                 const noteObj2 = getNote(
                     noteObj1[0],
                     noteObj1[1],
-                    getInterval(
-                        chordInterval[0],
-                        tur.singer.keySignature,
-                        noteObj1[0]
-                    ) + chordInterval[1],
+                    getInterval(chordInterval[0], tur.singer.keySignature, noteObj1[0]) +
+                        chordInterval[1],
                     tur.singer.keySignature,
                     tur.singer.movable,
                     null,
