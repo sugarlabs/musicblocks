@@ -10,9 +10,9 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /*
-  global _, jQuery, _THIS_IS_MUSIC_BLOCKS_, docById, doSVG, fnBrowserDetect,
-  RECORDBUTTON
- */
+  global _THIS_IS_MUSIC_BLOCKS_, docById, doSVG, fnBrowserDetect,
+  RECORDBUTTON, saveButton, saveButtonAdvanced
+*/
 
 /* exported Toolbar */
 
@@ -70,6 +70,7 @@ class Toolbar {
                 ["themeSelectIcon", _("Change theme")],
                 ["light", _("Light Mode")],
                 ["dark", _("Dark Mode")],
+                ["highcontrast", _("High Contrast Mode")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["chooseKeyIcon", _("Set Pitch Preview")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
@@ -139,6 +140,7 @@ class Toolbar {
                 _("Change theme"),
                 _("Light Mode"),
                 _("Dark Mode"),
+                _("High Contrast Mode"),
                 _("Merge with current project"),
                 _("Set Pitch Preview"),
                 _("JavaScript Editor"),
@@ -212,6 +214,7 @@ class Toolbar {
                 ["themeSelectIcon", _("Change theme")],
                 ["light", _("Light Mode")],
                 ["dark", _("Dark Mode")],
+                ["highcontrast", _("High Contrast Mode")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
                 ["restoreIcon", _("Restore")],
@@ -275,6 +278,7 @@ class Toolbar {
                 _("Change theme"),
                 _("Light Mode"),
                 _("Dark Mode"),
+                _("High Contrast Mode"),
                 _("Merge with current project"),
                 _("JavaScript Editor"),
                 _("Restore"),
@@ -400,7 +404,6 @@ class Toolbar {
             if (!isPlayIconRunning) {
                 playIcon.onclick = null;
             } else {
-                // eslint-disable-next-line no-use-before-define
                 playIcon.onclick = tempClick;
                 isPlayIconRunning = false;
             }
@@ -954,8 +957,8 @@ class Toolbar {
             }
             RecordDropdownArrow.innerHTML = `<i class="material-icons main" style="font-size: 28px;">arrow_drop_down</i>`;
 
-            // Toggle arrow on click
-            RecordDropdownArrow.addEventListener("click", function () {
+            // Create handler function for arrow click
+            const arrowClickHandler = function () {
                 setTimeout(() => {
                     const dropdown = docById("recorddropdown");
                     const arrowIcon = RecordDropdownArrow.querySelector("i");
@@ -969,7 +972,19 @@ class Toolbar {
                         arrowIcon.textContent = "arrow_drop_down";
                     }
                 }, 50);
-            });
+            };
+
+            // Remove old listener to prevent accumulation
+            if (RecordDropdownArrow._arrowClickHandler) {
+                RecordDropdownArrow.removeEventListener(
+                    "click",
+                    RecordDropdownArrow._arrowClickHandler
+                );
+            }
+
+            // Store reference and attach fresh listener
+            RecordDropdownArrow._arrowClickHandler = arrowClickHandler;
+            RecordDropdownArrow.addEventListener("click", arrowClickHandler);
 
             // Reset arrow when clicking outside (close dropdown)
             document.addEventListener("click", function (e) {

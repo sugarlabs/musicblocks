@@ -156,6 +156,7 @@ class SaveInterface {
 
     /**
      * Download a file to the user's computer.
+     * Uses MBDialog prompt when available to collect a filename with a modal UI.
      * @param {string} extension - The file extension (including the dot).
      * @param {string} dataurl - The base64 data url of the file.
      * @param {string} defaultfilename - The default filename to be used.
@@ -163,6 +164,18 @@ class SaveInterface {
      */
     download(extension, dataurl, defaultfilename) {
         let filename = null;
+        const finishDownload = name => {
+            if (name === null) {
+                console.debug("save cancelled");
+                return;
+            }
+
+            if (fileExt(name) !== extension) {
+                name += "." + extension;
+            }
+
+            this.downloadURL(name, dataurl);
+        };
         if (defaultfilename === undefined || defaultfilename === null) {
             if (this.activity.PlanetInterface === undefined) {
                 defaultfilename = STR_MY_PROJECT;
@@ -176,8 +189,17 @@ class SaveInterface {
 
             if (window.isElectron === true) {
                 filename = defaultfilename;
+            } else if (window.MBDialog && typeof window.MBDialog.prompt === "function") {
+                window.MBDialog.prompt({
+                    title: _("Save file"),
+                    message: _("Filename:"),
+                    defaultValue: defaultfilename,
+                    okText: _("Save"),
+                    cancelText: _("Cancel")
+                }).then(result => finishDownload(result));
+                return;
             } else {
-                filename = prompt("Filename:", defaultfilename);
+                filename = prompt(_("Filename:"), defaultfilename);
             }
         } else {
             if (fileExt(defaultfilename) !== extension) {
@@ -186,19 +208,8 @@ class SaveInterface {
             filename = defaultfilename;
         }
 
-        // eslint-disable-next-line no-console
         console.debug("saving to " + filename);
-        if (filename === null) {
-            // eslint-disable-next-line no-console
-            console.debug("save cancelled");
-            return;
-        }
-
-        if (fileExt(filename) !== extension) {
-            filename += "." + extension;
-        }
-
-        this.downloadURL(filename, dataurl);
+        finishDownload(filename);
     }
 
     /**
@@ -819,7 +830,6 @@ class SaveInterface {
                     if (copied) {
                         showCopiedMessage();
                     } else {
-                        // eslint-disable-next-line no-console
                         console.debug("Clipboard copy failed:", err);
                     }
                 });
@@ -828,7 +838,6 @@ class SaveInterface {
             if (copied) {
                 showCopiedMessage();
             } else {
-                // eslint-disable-next-line no-console
                 console.debug("Clipboard copy failed");
             }
         }
@@ -852,7 +861,6 @@ class SaveInterface {
         window.Converter.ly2pdf(lydata, (success, dataurl) => {
             document.body.style.cursor = "default";
             if (!success) {
-                // eslint-disable-next-line no-console
                 console.debug("Error: " + dataurl);
                 this.activity.errorMsg(
                     _("Failed to convert Lilypond to PDF. Please try saving as .ly file instead."),
@@ -877,7 +885,7 @@ class SaveInterface {
      * @instance
      *
      */
-    // eslint-disable-next-line no-unused-vars
+
     saveMxml(filename) {
         this.activity.logo.runningMxml = true;
         for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
