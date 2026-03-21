@@ -4626,6 +4626,21 @@ class Activity {
                 this.blocks.blockList[blk].trash = true;
                 this.blocks.moveBlockRelative(blk, dx, dy);
                 this.blocks.blockList[blk].hide();
+
+                // Free the backing canvas memory for trashed blocks.
+                // Each cached block holds a bitmap canvas (~0.5-2 MB).
+                // This matches the cleanup pattern in sendStackToTrash().
+                if (this.blocks.blockList[blk].container) {
+                    this.blocks.blockList[blk].container.uncache();
+                }
+
+                // Clean up SVG art strings to free memory.
+                if (this.blocks.blockArt[blk]) {
+                    delete this.blocks.blockArt[blk];
+                }
+                if (this.blocks.blockCollapseArt[blk]) {
+                    delete this.blocks.blockCollapseArt[blk];
+                }
             }
 
             if (addStartBlock) {
