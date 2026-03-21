@@ -378,10 +378,11 @@ class Block {
                         that.regenerateArtwork(true, []);
                         checkBounds(loopCount + 1);
                     } else {
-                        if (that.container.cacheCanvas){
-                            try{
+                        if (that.container.cacheCanvas) {
+                            try {
                                 that.container.uncache();
-                            }catch (e) {
+                            } catch (e) {
+                                // Ignore uncache failures and retry caching below.
                             }
                         }
                         that.container.cache(
@@ -438,10 +439,10 @@ class Block {
                         await new Promise(resolve => setTimeout(resolve, delayTime));
                         updateBounds(loopCount + 1);
                     } else {
-                        try{
+                        try {
                             that.container.updateCache();
-                        }catch(e) {
-
+                        } catch (e) {
+                            // Ignore transient cache failures; caller retries on next refresh.
                         }
                         that.activity.refreshCanvas();
                         resolve();
@@ -1072,7 +1073,7 @@ class Block {
          * @param {object} that - Reference to the current object.
          */
         const __processHighlightBitmap = (bitmap, that) => {
-            if (that.blocks._isUndoingMove){
+            if (that.blocks._isUndoingMove) {
                 return;
             }
             if (that.highlightBitmap != null) {

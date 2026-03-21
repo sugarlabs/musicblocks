@@ -1320,8 +1320,9 @@ class Palette {
     }
 
     hideMenu() {
-        docById("palette").childNodes[0].style.borderRight =
-            `1px solid ${platformColor.selectorSelected}`;
+        docById(
+            "palette"
+        ).childNodes[0].style.borderRight = `1px solid ${platformColor.selectorSelected}`;
         if (this._outsideClickListener) {
             document.removeEventListener("click", this._outsideClickListener);
             this._outsideClickListener = null;
@@ -1969,7 +1970,7 @@ class Palette {
             }
 
             if (macroExpansion !== null) {
-                this.activity.blocks.loadNewBlocks(macroExpansion);
+                this.activity.blocks.loadNewBlocks(macroExpansion, true);
                 const thisBlock = this.activity.blocks.blockList.length - 1;
                 const topBlk = this.activity.blocks.findTopBlock(thisBlock);
                 // Ensure that the newly created block is not under
@@ -2029,7 +2030,7 @@ class Palette {
                 // before loading.
                 obj[0][2] = saveX;
                 obj[0][3] = saveY;
-                this.activity.blocks.loadNewBlocks(obj);
+                this.activity.blocks.loadNewBlocks(obj, true);
 
                 const thisBlock = this.activity.blocks.blockList.length - 1;
                 const topBlk = this.activity.blocks.findTopBlock(thisBlock);

@@ -383,6 +383,7 @@ class MoveBlockCommand {
                                         (typeof parentBlk.isExpandableBlock === "function" &&
                                             parentBlk.isExpandableBlock())
                                     ) {
+                                        // Parent clamp state is recomputed later.
                                     }
                                     connectionRestored = true;
                                     break;
@@ -403,6 +404,7 @@ class MoveBlockCommand {
                                         (typeof parentBlk.isExpandableBlock === "function" &&
                                             parentBlk.isExpandableBlock())
                                     ) {
+                                        // Parent clamp state is recomputed later.
                                     }
                                     connectionRestored = true;
                                     break;
@@ -420,6 +422,7 @@ class MoveBlockCommand {
                                             (parentBlk.isExpandableBlock &&
                                                 parentBlk.isExpandableBlock())
                                         ) {
+                                            // Parent clamp state is recomputed later.
                                         }
                                         break;
                                     }
@@ -811,6 +814,12 @@ class Activity {
 
         this._listeners = [];
 
+        // Allow lightweight VM/unit-test construction without requiring the
+        // full browser app environment.
+        if (typeof i18next === "undefined") {
+            return;
+        }
+
         this.cellSize = 55;
         this.searchSuggestions = [];
         this.homeButtonContainer;
@@ -885,7 +894,9 @@ class Activity {
         this.keyboardEnableFlag;
         this.inTempoWidget = false;
         this.projectID = null;
-        this.storage = localStorage;
+        this.storage =
+            (typeof window !== "undefined" && window.localStorage) ||
+            (typeof localStorage !== "undefined" ? localStorage : null);
 
         // Flag to indicate whether the user is performing a 2D drag operation.
         this.isDragging = false;
@@ -969,7 +980,10 @@ class Activity {
                 if (lang.startsWith("ja")) lang = "ja"; // normalize Japanese
                 i18next.changeLanguage(lang);
             } else {
-                lang = navigator.language;
+                const browserNavigator =
+                    (typeof window !== "undefined" && window.navigator) ||
+                    (typeof navigator !== "undefined" ? navigator : null);
+                lang = browserNavigator?.language || lang;
                 if (lang.includes("-")) {
                     lang = lang.slice(0, lang.indexOf("-"));
                 }
@@ -1842,11 +1856,11 @@ class Activity {
                     } else if (typeof message[3] === "string") {
                         // If it is a string, load the macro associated with this block.
                         const blocksToLoad = getMacroExpansion(that, message[3], 0, 0);
-                        that.blocks.loadNewBlocks(blocksToLoad);
+                        that.blocks.loadNewBlocks(blocksToLoad, true);
                     } else {
                         // Load the block.
                         const blocksToLoad = message[3];
-                        that.blocks.loadNewBlocks(blocksToLoad);
+                        that.blocks.loadNewBlocks(blocksToLoad, true);
                     }
 
                     setTimeout(() => {
@@ -4115,7 +4129,7 @@ class Activity {
                 [7, "hidden", 0, 0, [1, null]],
                 [8, "hiddennoflow", 0, 0, [0, null]]
             ];
-            this.blocks.loadNewBlocks(samplerStack);
+            this.blocks.loadNewBlocks(samplerStack, true);
         };
 
         /*
@@ -4979,9 +4993,12 @@ class Activity {
         };
 
         // Add event listener for trash icon click
-        document.getElementById("restoreIcon").addEventListener("click", () => {
-            this._renderTrashView();
-        });
+        const restoreIcon = document.getElementById("restoreIcon");
+        if (restoreIcon) {
+            restoreIcon.addEventListener("click", () => {
+                this._renderTrashView();
+            });
+        }
 
         // Store the click handler reference for proper cleanup
         let trashViewClickHandler = null;
@@ -5224,7 +5241,7 @@ class Activity {
             }
 
             if (addStartBlock) {
-                this.blocks.loadNewBlocks(DATAOBJS);
+                this.blocks.loadNewBlocks(DATAOBJS, false);
                 this._allClear(false);
                 if (window.UndoRedo) {
                     window.UndoRedo.clear();
@@ -5560,7 +5577,7 @@ class Activity {
                         that.justLoadStart();
                     } else {
                         window.loadedSession = that.sessionData;
-                        that.blocks.loadNewBlocks(JSON.parse(that.sessionData));
+                        that.blocks.loadNewBlocks(JSON.parse(that.sessionData), false);
                         if (window.UndoRedo) {
                             window.UndoRedo.clear();
                         }
@@ -6201,7 +6218,7 @@ class Activity {
                 finalBlock.push(...flattenedLineBlock);
                 finalBlock.push(...staffBlocksMap[staffIndex].repeatBlock);
             }
-            this.blocks.loadNewBlocks(finalBlock);
+            this.blocks.loadNewBlocks(finalBlock, true);
             return null;
         };
 
@@ -6252,7 +6269,7 @@ class Activity {
         };
 
         this.justLoadStart = () => {
-            this.blocks.loadNewBlocks(DATAOBJS);
+            this.blocks.loadNewBlocks(DATAOBJS, false);
             if (window.UndoRedo) {
                 window.UndoRedo.clear();
             }
@@ -6284,7 +6301,7 @@ class Activity {
                     // avoid clearing the screen of any graphics. Do it here
                     // instead.
                     that.sendAllToTrash(false, false);
-                    that.blocks.loadNewBlocks(DATAOBJS);
+                    that.blocks.loadNewBlocks(DATAOBJS, false);
                 }, 1000);
             }
         };
@@ -7624,7 +7641,7 @@ class Activity {
 
             this.refreshCanvas();
 
-            this.blocks.loadNewBlocks(obj);
+            this.blocks.loadNewBlocks(obj, true);
             this.pasteBox.hide();
         };
 
@@ -8270,7 +8287,7 @@ class Activity {
                                     if (!that.merging) {
                                         // Wait for the old blocks to be removed.
                                         const __listener = () => {
-                                            that.blocks.loadNewBlocks(obj);
+                                            that.blocks.loadNewBlocks(obj, false);
                                             if (window.UndoRedo) {
                                                 window.UndoRedo.clear();
                                             }
@@ -8298,7 +8315,7 @@ class Activity {
                                         }
                                     } else {
                                         that.merging = false;
-                                        that.blocks.loadNewBlocks(obj);
+                                        that.blocks.loadNewBlocks(obj, true);
                                     }
 
                                     that.loading = false;
@@ -8382,7 +8399,7 @@ class Activity {
 
                                 // Wait for the old blocks to be removed.
                                 const __listener = () => {
-                                    that.blocks.loadNewBlocks(obj);
+                                    that.blocks.loadNewBlocks(obj, false);
                                     that.stage.removeAllEventListeners("trashsignal");
 
                                     if (document.addEventListener) {

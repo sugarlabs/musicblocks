@@ -24,6 +24,7 @@
    getNoiseSynthName, getTemperamentsList, getTextWidth,
    getVoiceSynthName, i18nSolfege, last, MathUtility, mixedNumber,
    piemenuBlockContext, prepareMacroExports, ProtoBlock,
+   Action, MoveBlockCommand, UndoRedo,
     setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments,
     docById, define
 */
@@ -1557,7 +1558,6 @@ class Blocks {
                 /** Find any containing expandable blocks. */
                 this.clampBlocksToCheck = [];
                 if (thisBlock == null) {
-                    // eslint-disable-next-line no-console
                     console.debug("blockMoved called with null block.");
                     return;
                 }
@@ -1575,7 +1575,6 @@ class Blocks {
                 while (blk != null) {
                     expandableLoopCounter += 1;
                     if (expandableLoopCounter > 2 * this.blockList.length) {
-                        // eslint-disable-next-line no-console
                         console.debug("Infinite loop encountered checking for expandables?");
                         break;
                     }
@@ -1593,7 +1592,6 @@ class Blocks {
                 const checkArgBlocks = [];
                 const myBlock = this.blockList[thisBlock];
                 if (myBlock == null) {
-                    // eslint-disable-next-line no-console
                     console.debug("null block found in blockMoved method: " + thisBlock);
                     return;
                 }
@@ -2101,7 +2099,6 @@ class Blocks {
                                 this.blockList[bottom].connections.length - 1
                             ] = connection;
                         } else {
-                            // eslint-disable-next-line no-console
                             console.debug("HOW DID WE GET HERE?");
                         }
                     }
@@ -2255,9 +2252,7 @@ class Blocks {
                     /** Extra check for malformed data. */
                     expandableLoopCounter += 1;
                     if (expandableLoopCounter > 2 * this.blockList.length) {
-                        // eslint-disable-next-line no-console
                         console.debug("Infinite loop checking for expandables?");
-                        // eslint-disable-next-line no-console
                         console.debug(this.blockList);
                         break;
                     }
@@ -2330,8 +2325,9 @@ class Blocks {
                                 newClampCounts
                             );
 
-                            // Execute the command through the command manager
-                            UndoRedo.executeCommand(moveCommand);
+                            // The drag has already applied the move on canvas.
+                            // Record the command for undo/redo without re-executing it.
+                            UndoRedo.addAction(moveCommand);
                         }
 
                         // Clear stored drag positions after command is created
@@ -5256,7 +5252,7 @@ class Blocks {
                     this.pasteDx += 21;
                     this.pasteDy += 21;
                 }
-                this.loadNewBlocks(this.selectedBlocksObj);
+                this.loadNewBlocks(this.selectedBlocksObj, true);
                 this.activity.__tick();
             }
         };
@@ -5446,7 +5442,7 @@ class Blocks {
          * @public
          * return {void}
          */
-        this.loadNewBlocks = blockObjs => {
+        this.loadNewBlocks = (blockObjs, addToUndo = false) => {
             /**
              * Playback Queue has been deprecated, but some old projects
              * may still have playback blocks appended, which we will
@@ -5984,6 +5980,38 @@ class Blocks {
                 bIndex = chunkEnd;
                 if (bIndex < totalBlocks) {
                     setTimeout(processChunk, 0);
+                } else {
+                    const afterCount = this.blockList.length;
+                    if (addToUndo && afterCount > beforeCount) {
+                        const createdIndices = [];
+                        for (let i = beforeCount; i < afterCount; i++) {
+                            const blk = this.blockList[i];
+                            if (blk) createdIndices.push(i);
+                        }
+                        UndoRedo.addAction(
+                            new Action(
+                                () => {
+                                    createdIndices.forEach(index => {
+                                        const blk = this.blockList[index];
+                                        if (!blk) return;
+                                        blk.trash = false;
+                                        blk.show();
+                                    });
+                                    this.activity.refreshCanvas();
+                                },
+                                () => {
+                                    for (let i = createdIndices.length - 1; i >= 0; i--) {
+                                        const blk = this.blockList[createdIndices[i]];
+                                        if (!blk) continue;
+                                        blk.trash = true;
+                                        blk.hide();
+                                    }
+                                    this.activity.refreshCanvas();
+                                },
+                                "Add blocks"
+                            )
+                        );
+                    }
                 }
             };
 
@@ -6827,37 +6855,6 @@ class Blocks {
                         }
                     }
                 }
-            }
-            const afterCount = this.blockList.length;
-            if (afterCount > beforeCount) {
-                const createdIndices = [];
-                for (let i = beforeCount; i < afterCount; i++) {
-                    const blk = this.blockList[i];
-                    if (blk) createdIndices.push(i);
-                }
-                UndoRedo.addAction(
-                    new Action(
-                        () => {
-                            createdIndices.forEach(index => {
-                                const blk = this.blockList[index];
-                                if (!blk) return;
-                                blk.trash = false;
-                                blk.show();
-                            });
-                            this.activity.refreshCanvas();
-                        },
-                        () => {
-                            for (let i = createdIndices.length - 1; i >= 0; i--) {
-                                const blk = this.blockList[createdIndices[i]];
-                                if (!blk) continue;
-                                blk.trash = true;
-                                blk.hide();
-                            }
-                            this.activity.refreshCanvas();
-                        },
-                        "Add blocks"
-                    )
-                );
             }
         };
 
