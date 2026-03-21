@@ -764,6 +764,12 @@ class UndoRedoManager {
         return Array.isArray(this.redoStack) && this.redoStack.length > 0;
     }
 
+    clear() {
+        this.undoStack = [];
+        this.redoStack = [];
+        this.updateButtons();
+    }
+
     updateButtons() {
         // Update button states
         if (globalActivity && globalActivity.toolbar) {
@@ -5133,6 +5139,9 @@ class Activity {
             if (addStartBlock) {
                 this.blocks.loadNewBlocks(DATAOBJS);
                 this._allClear(false);
+                if (window.UndoRedo) {
+                    window.UndoRedo.clear();
+                }
             } else if (!doNotSave) {
                 // Overwrite session data too.
                 this.saveLocally();
@@ -5466,6 +5475,9 @@ class Activity {
                     } else {
                         window.loadedSession = that.sessionData;
                         that.blocks.loadNewBlocks(JSON.parse(that.sessionData));
+                        if (window.UndoRedo) {
+                            window.UndoRedo.clear();
+                        }
                     }
                 } catch (e) {
                     // eslint-disable-next-line no-console
@@ -6157,6 +6169,9 @@ class Activity {
 
         this.justLoadStart = () => {
             this.blocks.loadNewBlocks(DATAOBJS);
+            if (window.UndoRedo) {
+                window.UndoRedo.clear();
+            }
         };
 
         /*
@@ -8155,6 +8170,9 @@ class Activity {
                                         // Wait for the old blocks to be removed.
                                         const __listener = () => {
                                             that.blocks.loadNewBlocks(obj);
+                                            if (window.UndoRedo) {
+                                                window.UndoRedo.clear();
+                                            }
                                             that.stage.removeAllEventListeners("trashsignal");
                                             if (that.planet) {
                                                 that.planet.saveLocally();
