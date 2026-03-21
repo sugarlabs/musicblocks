@@ -304,8 +304,12 @@ export class Logo {
         this.customTemperamentDefined = false;
         this.specialArgs = [];
 
-        // Load the default synthesizer
-        this.synth = new this.deps.classes.Synth();
+        // Use the synthesizer from SoundManager if available, otherwise fallback
+        if (this.activity && this.activity.soundManager) {
+            this.synth = this.activity.soundManager.synth;
+        } else {
+            this.synth = new this.deps.classes.Synth();
+        }
         this.synth.activity = this.activity; // Reference for voice tracking
         this.synth.changeInTemperament = false;
 
