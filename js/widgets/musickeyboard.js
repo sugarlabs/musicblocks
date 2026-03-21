@@ -15,7 +15,7 @@
    global
 
    docById, platformColor, FIXEDSOLFEGE, FIXEDSOLFEGE1, SHARP, FLAT,
-   last, Singer, _, noteToFrequency, EIGHTHNOTEWIDTH,
+   last, Singer, noteToFrequency, EIGHTHNOTEWIDTH,
    MATRIXSOLFEHEIGHT, i18nSolfege, MATRIXSOLFEWIDTH, toFraction,
    wheelnav, slicePath, getNote, PREVIEWVOLUME, DEFAULTVOICE,
    PITCHES3, SOLFEGENAMES, SOLFEGECONVERSIONTABLE, NOTESSHARP,
@@ -647,12 +647,17 @@ function MusicKeyboard(activity) {
                 myNode.innerHTML = "";
             }
 
-            this.tick = false;
-            this.firstNote = false;
-            this.metronomeON = false;
+            // Ensure countdown interval/loop resources are cleaned up on close.
+            if (typeof this.stopMetronome === "function") {
+                this.stopMetronome();
+            } else {
+                this.tick = false;
+                this.firstNote = false;
+                this.metronomeON = false;
+                if (this.loopTick) this.loopTick.stop();
+            }
 
             selectedNotes = [];
-            if (this.loopTick) this.loopTick.stop();
             docById("wheelDivptm").style.display = "none";
             docById("wheelDivptm").style.display = "none";
             if (this._menuWheel) this._menuWheel.removeWheel();
@@ -1885,9 +1890,9 @@ function MusicKeyboard(activity) {
             let oldcurValue, newcurValue;
             if (parseInt(curValue.startTime) === start) {
                 prevValue = prevValue.concat([curValue]);
-                oldcurValue = JSON.parse(JSON.stringify(curValue));
+                oldcurValue = Object.assign({}, curValue);
                 for (let i = 0; i < divideNoteBy; i++) {
-                    newcurValue = JSON.parse(JSON.stringify(oldcurValue));
+                    newcurValue = Object.assign({}, oldcurValue);
                     newcurValue.startTime = oldcurValue.startTime + oldcurValue.duration * 1000;
                     prevValue = prevValue.concat([newcurValue]);
                     oldcurValue = newcurValue;
@@ -1940,12 +1945,12 @@ function MusicKeyboard(activity) {
                     }
                 }
 
-                newcurValue = JSON.parse(JSON.stringify(curValue));
+                newcurValue = Object.assign({}, curValue);
                 newcurValue.duration = curValue.duration / divideNoteBy;
                 prevValue = prevValue.concat([newcurValue]);
                 oldcurValue = newcurValue;
                 for (let i = 0; i < divideNoteBy - 1; i++) {
-                    newcurValue2 = JSON.parse(JSON.stringify(oldcurValue));
+                    newcurValue2 = Object.assign({}, oldcurValue);
                     newcurValue2.startTime = parseInt(
                         newcurValue2.startTime + newcurValue2.duration * 1000
                     );
@@ -2139,7 +2144,6 @@ function MusicKeyboard(activity) {
                     ]);
                     break;
                 default:
-                    // eslint-disable-next-line no-console
                     console.log("Nothing to do for " + label);
             }
 
@@ -2188,7 +2192,6 @@ function MusicKeyboard(activity) {
                         key.objId; //convet solfege to alphabetic.
                 }, 500);
             } else {
-                // eslint-disable-next-line no-console
                 console.log("Could not find anywhere to insert new block.");
             }
         };
@@ -3072,7 +3075,7 @@ function MusicKeyboard(activity) {
             return ans;
         };
         const actionGroupInterval = 50;
-        var actionGroups = parseInt(selectedNotes.length / actionGroupInterval) + 1;
+        const actionGroups = parseInt(selectedNotes.length / actionGroupInterval) + 1;
 
         for (let actionGroup = 0; actionGroup < actionGroups; actionGroup++) {
             const currentSelectedNotes = selectedNotes.slice(
