@@ -1,5 +1,4 @@
 // tests/ornamentPalette.test.js
-require("./fix-ornament");
 
 const OrnamentBlocksAPI = require("../js/js-export/API/OrnamentBlocksAPI");
 
