@@ -18,7 +18,7 @@
    DEFAULTBLOCKSCALE, SVG, DISABLEDFILLCOLOR, DISABLEDSTROKECOLOR,
    PALETTEFILLCOLORS, PALETTESTROKECOLORS, last, getTextWidth,
    STANDARDBLOCKHEIGHT, CLOSEICON, BUILTINPALETTES,
-   safeSVG, blockIsMacro, getMacroExpansion
+   safeSVG, blockIsMacro, getMacroExpansion, UndoRedo, Action
 */
 
 /* exported Palettes, initPalettes */
@@ -29,7 +29,42 @@ const PALETTE_SCALE_FACTOR = 0.5;
 const PALETTE_WIDTH_FACTOR = 3;
 
 const paletteBlockButtonPush = (blocks, name, arg) => {
+    const beforeCount = blocks.blockList.length;
     const blk = blocks.makeBlock(name, arg);
+    if (UndoRedo && typeof UndoRedo.addAction === "function") {
+        const createdIndices = [];
+        for (let i = beforeCount; i < blocks.blockList.length; i++) {
+            if (blocks.blockList[i]) {
+                createdIndices.push(i);
+            }
+        }
+
+        if (createdIndices.length > 0) {
+            UndoRedo.addAction(
+                new Action(
+                    () => {
+                        createdIndices.forEach(index => {
+                            const block = blocks.blockList[index];
+                            if (!block) return;
+                            block.trash = false;
+                            block.show();
+                        });
+                        blocks.activity.refreshCanvas();
+                    },
+                    () => {
+                        for (let i = createdIndices.length - 1; i >= 0; i--) {
+                            const block = blocks.blockList[createdIndices[i]];
+                            if (!block) continue;
+                            block.trash = true;
+                            block.hide();
+                        }
+                        blocks.activity.refreshCanvas();
+                    },
+                    "Add block"
+                )
+            );
+        }
+    }
     return blk;
 };
 

@@ -89,12 +89,35 @@ global.CLOSEICON = "<svg fill_color></svg>";
 global.safeSVG = str => str;
 global.blockIsMacro = jest.fn(() => false);
 global.getMacroExpansion = jest.fn();
+global.Action = class {
+    constructor(doFunc, undoFunc, description = "") {
+        this.doFunc = doFunc;
+        this.undoFunc = undoFunc;
+        this.description = description;
+    }
+
+    do() {
+        if (typeof this.doFunc === "function") {
+            this.doFunc();
+        }
+    }
+
+    undo() {
+        if (typeof this.undoFunc === "function") {
+            this.undoFunc();
+        }
+    }
+};
+global.UndoRedo = {
+    addAction: jest.fn()
+};
 
 describe("Palettes Class", () => {
     let mockActivity;
     let palettes;
 
     beforeEach(() => {
+        global.UndoRedo.addAction.mockClear();
         const paletteMock = {
             style: { visibility: "visible", top: "100px" },
             children: [
@@ -1434,6 +1457,38 @@ describe("Palettes Class", () => {
 
             palette._makeBlockFromPalette({ name: "custom" }, "customblk", callback);
             expect(mockActivity.blocks.makeBlock).toHaveBeenCalledWith("customblk", "__NOARG__");
+        });
+
+        test("_makeBlockFromPalette registers undo for direct block insertion", () => {
+            palettes.add("test");
+            const palette = palettes.dict.test;
+            const callback = jest.fn();
+            const createdBlock = {
+                trash: false,
+                show: jest.fn(),
+                hide: jest.fn()
+            };
+
+            mockActivity.blocks.blockList = [];
+            mockActivity.blocks.makeBlock = jest.fn(() => {
+                mockActivity.blocks.blockList.push(createdBlock);
+                return 0;
+            });
+            mockActivity.blocks.activity = { refreshCanvas: jest.fn() };
+
+            palette._makeBlockFromPalette({ name: "pitch" }, "pitch", callback);
+
+            expect(global.UndoRedo.addAction).toHaveBeenCalledTimes(1);
+
+            const action = global.UndoRedo.addAction.mock.calls[0][0];
+            action.undo();
+            expect(createdBlock.trash).toBe(true);
+            expect(createdBlock.hide).toHaveBeenCalled();
+
+            action.do();
+            expect(createdBlock.trash).toBe(false);
+            expect(createdBlock.show).toHaveBeenCalled();
+            expect(mockActivity.blocks.activity.refreshCanvas).toHaveBeenCalled();
         });
 
         test("_makeBlockFromProtoblock runs drag-group callback", () => {
