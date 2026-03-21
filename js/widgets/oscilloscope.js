@@ -216,7 +216,7 @@ class Oscilloscope {
         canvas.className = "oscilloscopeCanvas";
         this.widgetWindow.getWidgetBody().appendChild(canvas);
 
-        const canvasCtx = canvas.getContext("2d");
+        const canvasCtx = canvas.getContext("2d", { willReadFrequently: true });
         canvasCtx.clearRect(0, 0, width, height);
 
         this._canvasState[turtleIdx] = {

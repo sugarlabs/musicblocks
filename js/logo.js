@@ -57,7 +57,7 @@ class Queue {
     }
 }
 
-class Logo {
+export class Logo {
     /**
      * @constructor
      * @param {Object|LogoDependencies} activityOrDeps - Either an Activity object (old pattern)

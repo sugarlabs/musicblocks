@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014-21 Walter Bender
+// Copyright (c) 2014-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -254,7 +254,7 @@ const _getStatic = id => {
  * Represents a block instance with associated methods.
  * @class
  */
-class Block {
+export class Block {
     /**
      * Creates an instance of Block.
      * @param {object} protoblock - The protoblock object.

@@ -462,7 +462,7 @@ const instrumentsFilters = { 0: {} };
  * Synth constructor function.
  * @constructor
  */
-function Synth() {
+export function Synth() {
     // Isolate synth functions here.
     /**
      * Built-in synth types.

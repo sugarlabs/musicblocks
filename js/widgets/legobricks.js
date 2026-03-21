@@ -1364,7 +1364,7 @@ function LegoWidget() {
 
         // Create a temporary canvas to sample pixel data
         const tempCanvas = document.createElement("canvas");
-        const ctx = tempCanvas.getContext("2d");
+        const ctx = tempCanvas.getContext("2d", { willReadFrequently: true });
 
         // Set canvas size to match the media element's natural size
         tempCanvas.width =
@@ -2807,7 +2807,7 @@ function LegoWidget() {
         const canvas = document.createElement("canvas");
         canvas.width = canvasWidth;
         canvas.height = canvasHeight;
-        const ctx = canvas.getContext("2d");
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
         // Fill background
         ctx.fillStyle = "#f0f0f0";

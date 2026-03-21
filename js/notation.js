@@ -39,7 +39,7 @@
  * store relevant information about the notations for exporting to lilypond, abc, etc. Also
  * contains the methods to modify them.
  */
-class Notation {
+export class Notation {
     /**
      * @constructor
      * @param {Object} logo - object of Logo

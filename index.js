@@ -2,6 +2,14 @@ const express = require("express");
 const compression = require("compression");
 const path = require("path");
 
+process.on("unhandledRejection", (reason, promise) => {
+    console.error("Unhandled Rejection at:", promise, "reason:", reason);
+});
+
+process.on("uncaughtException", (err, origin) => {
+    console.error(`Caught exception: ${err}\nException origin: ${origin}`);
+});
+
 const app = express();
 
 // Detect environment (default to development for safety)
@@ -51,8 +59,26 @@ app.use(
     })
 );
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, "127.0.0.1", () => {
-    console.log(`Music Blocks running at http://127.0.0.1:${PORT}/`);
-    console.log("Compression enabled");
-});
+// Use port 3001 to avoid common conflicts (e.g., with EonVPN on 3000)
+const startPort = parseInt(process.env.PORT, 10) || 3000;
+
+function startServer(port) {
+    const server = app.listen(port, "0.0.0.0", () => {
+        console.log(`Music Blocks is running at http://localhost:${port}`);
+        console.log("Compression enabled");
+    });
+
+    server.on("error", err => {
+        if (err.code === "EADDRINUSE") {
+            console.log(`Port ${port} is in use, trying ${port + 1}...`);
+            startServer(port + 1);
+        } else {
+            console.error("Server error:", err);
+        }
+    });
+}
+
+startServer(startPort);
+
+// Force the process to stay alive
+process.stdin.resume();

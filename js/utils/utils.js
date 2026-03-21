@@ -182,7 +182,9 @@ function fnBrowserDetect() {
  */
 function canvasPixelRatio() {
     const devicePixelRatio = window.devicePixelRatio || 1;
-    const context = document.querySelector("#myCanvas").getContext("2d");
+    const context = document
+        .querySelector("#myCanvas")
+        .getContext("2d", { willReadFrequently: true });
     const backingStoreRatio =
         context.webkitBackingStorePixelRatio ||
         context.mozBackingStorePixelRatio ||
@@ -527,7 +529,7 @@ let last = myList => {
 let getTextWidth = (text, font) => {
     // re-use canvas object for better performance
     const canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
-    const context = canvas.getContext("2d");
+    const context = canvas.getContext("2d", { willReadFrequently: true });
     context.font = font;
     const metrics = context.measureText(text);
     return metrics.width;
@@ -1088,7 +1090,7 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
     function draw() {
         canvas.width = w;
         canvas.height = h;
-        canvas.getContext("2d").drawImage(video, 0, 0, w, h);
+        canvas.getContext("2d", { willReadFrequently: true }).drawImage(video, 0, 0, w, h);
         const data = canvas.toDataURL("image/png");
         turtles.getTurtle(turtle).doShowImage(args[0], data);
     }

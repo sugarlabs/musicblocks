@@ -61,7 +61,7 @@
  * Unused methods' names begin with double underscore '__'.
  * Internal functions' names are in PascalCase.
  */
-class Singer {
+export class Singer {
     /**
      * @constructor
      * @param {Object} turtle - Turtle object

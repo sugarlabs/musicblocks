@@ -220,7 +220,7 @@ const doAnalyzeProject = function () {
  * Represents an activity in the application.
  */
 
-class Activity {
+export class Activity {
     /**
      * Creates an Activity instance.
      */
@@ -1481,7 +1481,7 @@ class Activity {
 
             const svgContent = this.printBlockSVG();
             const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
+            const ctx = canvas.getContext("2d", { willReadFrequently: true });
             const parser = new DOMParser();
             const svgDoc = parser.parseFromString(decodeURIComponent(svgContent), "image/svg+xml");
             const svgElement = svgDoc.documentElement;
@@ -1630,7 +1630,7 @@ class Activity {
                     this.gifAnimator.stopAll();
                     const overlayCanvas = document.getElementById("overlayCanvas");
                     if (overlayCanvas) {
-                        const ctx = overlayCanvas.getContext("2d");
+                        const ctx = overlayCanvas.getContext("2d", { willReadFrequently: true });
                         ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
                     }
                 }
@@ -1814,7 +1814,7 @@ class Activity {
                 const recordCanvas = document.createElement("canvas");
                 recordCanvas.width = canvasWidth;
                 recordCanvas.height = canvasHeight;
-                const recordCtx = recordCanvas.getContext("2d");
+                const recordCtx = recordCanvas.getContext("2d", { willReadFrequently: true });
 
                 // Set background to match the canvas (white/light gray)
                 recordCtx.fillStyle = "#f5f5f5"; // Adjust this color to match your canvas background

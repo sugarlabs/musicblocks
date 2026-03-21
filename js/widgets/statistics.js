@@ -95,7 +95,7 @@ class StatsWindow {
         this.activity.blocks.activeBlock = null;
         const myChart = docById("myChart");
 
-        const ctx = myChart.getContext("2d");
+        const ctx = myChart.getContext("2d", { willReadFrequently: true });
         this.activity.loading = true;
         document.body.style.cursor = "wait";
 

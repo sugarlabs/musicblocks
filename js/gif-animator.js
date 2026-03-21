@@ -87,7 +87,7 @@ class GIFAnimator {
                 gifPlayer,
                 frames: totalFrames,
                 frameCanvas,
-                frameCtx: frameCanvas.getContext("2d"),
+                frameCtx: frameCanvas.getContext("2d", { willReadFrequently: true }),
                 currentFrame: 0,
                 lastFrameTime: 0,
                 canvas,
@@ -118,7 +118,7 @@ class GIFAnimator {
      * Renders a single GIF frame to the target canvas.
      */
     renderFrame(animation) {
-        const ctx = animation.canvas.getContext("2d");
+        const ctx = animation.canvas.getContext("2d", { willReadFrequently: true });
 
         // Clear only the region occupied by the GIF
         ctx.save();

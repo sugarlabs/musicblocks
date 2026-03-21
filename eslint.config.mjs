@@ -23,7 +23,7 @@ export default [
         files: ["**/*.js", "**/*.mjs"],
         languageOptions: {
             ecmaVersion: "latest",
-            sourceType: "script",
+            sourceType: "module",
             globals: {
                 ...globals.browser,
                 ...globals.node,

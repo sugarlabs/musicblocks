@@ -63,7 +63,7 @@ const DEFAULTFONT = "sans-serif"; // also used in PenBlocks.js
 
 /*exported Painter*/
 
-class Painter {
+export class Painter {
     /**
      * @constructor
      * @param {Object} turtle - Turtle object
