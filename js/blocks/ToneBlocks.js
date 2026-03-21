@@ -353,7 +353,6 @@ function setupToneBlocks(activity) {
             const listenerName = "_harmonic_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 tur.singer.inHarmonic.pop();
                 tur.singer.partials.pop();
@@ -786,7 +785,6 @@ function setupToneBlocks(activity) {
                 const listenerName = "_setvoice_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
-                // eslint-disable-next-line no-unused-vars
                 const __listener = event => tur.singer.voices.pop();
 
                 logo.setTurtleListener(turtle, listenerName, __listener);

@@ -63,10 +63,13 @@ function setupRhythmBlocks(activity) {
          * @returns {number} The note value.
          */
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId != null &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "mynotevalue"]);
             } else {
@@ -111,10 +114,13 @@ function setupRhythmBlocks(activity) {
          * @returns {number} The skip factor value.
          */
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId != null &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "skip"]);
             } else {
@@ -243,7 +249,6 @@ function setupRhythmBlocks(activity) {
             const listenerName = "_swing_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 if (!tur.singer.suppressOutput) {
                     tur.singer.swingTarget.pop();
@@ -309,7 +314,6 @@ function setupRhythmBlocks(activity) {
             const listenerName = "_swing_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 if (!tur.singer.suppressOutput) {
                     tur.singer.swingTarget.pop();
@@ -452,7 +456,6 @@ function setupRhythmBlocks(activity) {
             const listenerName = "_skip_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 tur.singer.skipFactor -= arg;
             };
@@ -628,7 +631,6 @@ function setupRhythmBlocks(activity) {
             const listenerName = "_dot_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
                 tur.singer.beatFactor *= currentDotFactor;

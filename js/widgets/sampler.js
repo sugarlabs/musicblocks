@@ -527,7 +527,6 @@ function SampleWidget() {
                 stopTuner();
                 const fileChooser = docById("myOpenAll");
 
-                // eslint-disable-next-line no-unused-vars
                 const __readerAction = function (event) {
                     window.scroll(0, 0);
                     const sampleFile = fileChooser.files[0];
@@ -2176,9 +2175,11 @@ function SampleWidget() {
 
     /**
      * Start pitch detection
+     * @param {HTMLElement} pitchElement - Widget-local span for displaying detected pitch
+     * @param {HTMLElement} noteElement - Widget-local span for displaying detected note
      * @returns {Promise<void>}
      */
-    const startPitchDetection = async () => {
+    const startPitchDetection = async (pitchElement, noteElement) => {
         // Stop any existing pitch detection first to avoid multiple instances
         this.stopPitchDetection();
 
@@ -2211,10 +2212,7 @@ function SampleWidget() {
                 analyser.getFloatTimeDomainData(buffer);
                 const pitch = detectPitch(buffer);
 
-                // Safely update DOM elements (check if they exist first)
-                const pitchElement = document.getElementById("pitch");
-                const noteElement = document.getElementById("note");
-
+                // Update widget-local DOM elements (passed in from makeTuner — no global query)
                 if (pitchElement && noteElement) {
                     if (pitch > 0) {
                         const { note, cents } = frequencyToNote(pitch);
@@ -2297,7 +2295,7 @@ function SampleWidget() {
 
         this.widgetWindow.getWidgetBody().appendChild(container);
 
-        document.getElementById("start").addEventListener("click", startPitchDetection);
+        startButton.addEventListener("click", () => startPitchDetection(pitchSpan, noteSpan));
     };
 
     /**
