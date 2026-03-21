@@ -32,103 +32,16 @@
     <link rel="prefetch" as="video" href="loading-animation.webm" type="video/webm" />
     <link rel="prefetch" as="video" href="loading-animation.mp4" type="video/mp4" />
 
-    <!-- <script src="js/utils/detectIE.js"></script> -->
-
-    <!-- <script src="sounds/samples/manifest.js"></script> -->
-
-    <!-- <script src="lib/mespeak.js"></script> -->
-
-    <script src="lib/reqwest.js" defer></script>
-
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <!-- Scripts will be loaded via RequireJS -->
     <script src="lib/jquery-3.7.1.min.js"></script>
-    <script src="lib/jquery-ui.js"></script>
-    <script src="lib/materialize.min.js"></script>
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
-    <script>
-        jQuery(document).ready(function () {
-            if (jQuery.ui && jQuery.ui.autocomplete) {
-                jQuery.fn.materializeAutocomplete = jQuery.fn.autocomplete;
-                jQuery.widget.bridge("autocomplete", jQuery.ui.autocomplete);
-            }
-        });
-    </script>
-    <script>
-        jQuery(document).ready(function () {
-            const fixAutocompletePosition = function () {
-                const $search = jQuery("#search");
-                if ($search.length && $search.data("ui-autocomplete")) {
-                    const instance = $search.autocomplete("instance");
-                    if (instance) {
-                        const originalRenderMenu = instance._renderMenu;
-                        instance._renderMenu = function (ul, items) {
-                            originalRenderMenu.call(this, ul, items);
-                            setTimeout(() => {
-                                const searchInput = document.querySelector("#search");
-                                const dropdown = ul[0];
-                                if (searchInput && dropdown) {
-                                    const rect = searchInput.getBoundingClientRect();
-                                    dropdown.style.position = "fixed";
-                                    dropdown.style.left = rect.left + "px";
-                                    dropdown.style.top = rect.bottom + 2 + "px";
-                                    dropdown.style.width = rect.width + "px";
-                                }
-                            }, 0);
-                        };
-                    }
-                } else {
-                    setTimeout(fixAutocompletePosition, 500);
-                }
-            };
-            setTimeout(fixAutocompletePosition, 1000);
-        });
-    </script>
-    <script src="lib/Tone.js" defer></script>
-    <script src="lib/midi.js" defer></script>
-    <script src="lib/jquery.ruler.js" defer></script>
-    <script src="lib/modernizr-2.6.2.min.js" defer></script>
-    <script src="lib/raphael.min.js" defer></script>
-    <script src="lib/wheelnav.js" defer></script>
-    <script src="lib/abc.min.js" defer></script>
-    <script src="lib/codejar/codejar.min.js" defer></script>
-    <script src="lib/codejar/highlight.pack.js" defer></script>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css" />
-
-    <!-- libgif.js (SuperGif) provides low-level GIF frame extraction.
-     Browsers expose only the first frame of a GIF; SuperGif lets us
-     step through frames so animated GIFs can be drawn onto our canvas. -->
-    <script src="https://cdn.jsdelivr.net/gh/buzzfeed/libgif-js/libgif.js" defer></script>
-
-    <!-- gif-animator.js integrates SuperGif with Music Blocks. It manages
-     decoding and drawing GIF frames onto the turtle's overlay canvas.
-     Canvas refreshing is handled separately by CreateJS Ticker. -->
-    <script src="js/gif-animator.js" defer></script>
-    <script defer>
-        document.addEventListener("DOMContentLoaded", function () {
-            if (window.hljs) hljs.highlightAll();
-        });
-    </script>
-    <script src="lib/astring.min.js" defer></script>
-    <script src="js/utils/mb-dialog.js" defer></script>
-    <script src="lib/acorn.min.js" defer></script>
-    <script src="env.js"></script>
     <script src="js/ViralLoops.js" defer></script>
-
-
-    <script data-main="js/loader" src="lib/require.js" defer></script>
+    <script data-main="js/loader" src="lib/require.js"></script>
     <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
     <link rel="preload" href="/fonts/material-icons.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="stylesheet" href="lib/materialize-iso.css">
     <link rel="stylesheet" href="css/themes.css?v=fixed">
-    <script src="lib/easeljs.min.js" defer></script>
-    <script src="lib/tweenjs.min.js" defer></script>
-    <script>
-        let ast2blocklist_config;
-        document.addEventListener("DOMContentLoaded", function () {
-            fetch("js/js-export/ast2blocks.min.json")
-                .then(response => response.json())
-                .then(data => { ast2blocklist_config = data });
-        });
-    </script>
 </head>
 
 <body id="body" data-title="index" style="background: #f9f9f9;">
@@ -573,25 +486,6 @@
         </div>
     </main>
 
-    <!-- Initialize Scripts -->
-    <script>
-        let canvas, stage;
-        function init() {
-            // Defensive check: ensure createjs is loaded before using it
-            if (typeof createjs === "undefined") {
-                // Retry after a short delay if createjs isn't ready yet
-                setTimeout(init, 50);
-                return;
-            }
-
-            canvas = document.getElementById("canvas");
-            stage = new createjs.Stage(canvas);
-
-            createjs.Ticker.framerate = 60;
-            // createjs.Ticker.addEventListener("tick", stage); // Managed by Activity class
-        }
-        document.addEventListener("DOMContentLoaded", init);
-    </script>
 
     <script>
         // Register service worker only in production (not on localhost)
@@ -733,6 +627,10 @@
                 });
             }
         });
+<<<<<<< HEAD
+=======
+
+>>>>>>> ed76dec7 (Refactor module loading to standardize on RequireJS)
     </script>
 
     <script>
@@ -954,11 +852,19 @@
         (function () {
             function setAppHeight() {
                 const vh = window.innerHeight * 0.01;
+<<<<<<< HEAD
                 document.documentElement.style.setProperty("--vh", `${vh}px`);
             }
 
             window.addEventListener("resize", setAppHeight);
             document.addEventListener("fullscreenchange", setAppHeight);
+=======
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            }
+
+            window.addEventListener('resize', setAppHeight);
+            document.addEventListener('fullscreenchange', setAppHeight);
+>>>>>>> ed76dec7 (Refactor module loading to standardize on RequireJS)
             setAppHeight();
         })();
 
@@ -975,12 +881,23 @@
                     c.style.height = "100%";
                 });
             }
+<<<<<<< HEAD
+=======
 
             window.addEventListener("resize", resizeCanvasesToScreen);
             document.addEventListener("fullscreenchange", resizeCanvasesToScreen);
 
             setTimeout(resizeCanvasesToScreen, 150);
         })();
+
+    </script>
+    >>>>>>> ed76dec7 (Refactor module loading to standardize on RequireJS)
+
+    window.addEventListener("resize", resizeCanvasesToScreen);
+    document.addEventListener("fullscreenchange", resizeCanvasesToScreen);
+
+    setTimeout(resizeCanvasesToScreen, 150);
+    })();
     </script>
 </body>
 
