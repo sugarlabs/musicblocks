@@ -18,8 +18,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global MULTIPALETTES, platformColor, docById, TEXTWIDTH */
-
 const { Palettes, initPalettes } = require("../palette");
 
 global.LEADING = 10;
@@ -135,9 +133,7 @@ describe("Palettes Class", () => {
                     ],
                     style: { border: "" }
                 }
-            ],
-            setAttribute: jest.fn(),
-            addEventListener: jest.fn()
+            ]
         };
 
         global.document = {

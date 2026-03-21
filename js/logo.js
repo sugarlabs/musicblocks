@@ -69,7 +69,6 @@ class Queue {
     }
 }
 
-// eslint-disable-next-line no-redeclare
 class Logo {
     /**
      * @constructor
