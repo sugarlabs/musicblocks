@@ -42,7 +42,15 @@ describe("PenBlocksAPI", () => {
         penBlocksAPI.ENDFLOW = "end";
         penBlocksAPI.runCommand = jest.fn();
     });
+    test("beginFill calls runCommand with doStartFill", () => {
+        penBlocksAPI.beginFill();
+        expect(penBlocksAPI.runCommand).toHaveBeenCalledWith("doStartFill");
+    });
 
+    test("endFill calls runCommand with doEndFill", () => {
+        penBlocksAPI.endFill();
+        expect(penBlocksAPI.runCommand).toHaveBeenCalledWith("doEndFill");
+    });
     test("setColor calls runCommand with validated arguments", () => {
         JSInterface.validateArgs.mockReturnValue([50]);
         penBlocksAPI.setColor(50);
