@@ -84,6 +84,20 @@ global.Singer = {
         setPanning: jest.fn(),
         setMasterVolume: jest.fn(),
         masterVolume: 1.0
+    },
+    ToneActions: {
+        toneMethod: jest.fn()
+    },
+    OrnamentActions: {
+        ornamentMethod: jest.fn()
+    },
+    DrumActions: {
+        drumMethod: jest.fn()
+    }
+};
+global.Turtle = {
+    DictActions: {
+        dictMethod: jest.fn()
     }
 };
 
@@ -148,7 +162,12 @@ describe("MusicBlocks Class", () => {
         expect(musicBlocks.mouse).toBe(mouse);
         expect(musicBlocks.turtle).toBe(mouse.turtle);
     });
-
+    test("should get BLK and increment _blockNo", () => {
+        const before = MusicBlocks._blockNo;
+        const blk = MusicBlocks.BLK;
+        expect(blk).toBe("B" + before);
+        expect(MusicBlocks._blockNo).toBe(before + 1);
+    });
     test("should run all mice", () => {
         Mouse.MouseList.push(mouse);
         MusicBlocks.run();
@@ -437,6 +456,30 @@ describe("MusicBlocks Class", () => {
 
             expect(mockMouse.turtle.listeners).toEqual({});
         });
+        test("should only remove own properties from listeners and ignore inherited ones", () => {
+            const baseListeners = { inheritedSignal: jest.fn() };
+            const turtleListeners = Object.create(baseListeners);
+            turtleListeners.ownSignal = jest.fn();
+
+            const mockMouse = {
+                run: jest.fn(),
+                turtle: { listeners: turtleListeners }
+            };
+            Mouse.MouseList = [mockMouse];
+
+            MusicBlocks.run();
+
+            expect(globalActivity.logo.stage.removeEventListener).toHaveBeenCalledWith(
+                "ownSignal",
+                turtleListeners.ownSignal,
+                false
+            );
+            expect(globalActivity.logo.stage.removeEventListener).not.toHaveBeenCalledWith(
+                "inheritedSignal",
+                expect.any(Function),
+                expect.any(Boolean)
+            );
+        });
     });
 
     describe("runCommand", () => {
@@ -490,6 +533,49 @@ describe("MusicBlocks Class", () => {
             const result = await musicBlocks.runCommand("draw", []);
             expect(mockPainterMethod).toHaveBeenCalled();
             expect(result).toBe("painted");
+        });
+    });
+    describe("MusicBlocks.init", () => {
+        beforeAll(() => {
+            global.Singer.RhythmActions = { rhythmMethod: jest.fn() };
+            global.Singer.MeterActions = { meterMethod: jest.fn() };
+            global.Singer.PitchActions = { pitchMethod: jest.fn() };
+            global.Singer.IntervalsActions = { intervalsMethod: jest.fn() };
+            global.Singer.ToneActions = { toneMethod: jest.fn() };
+            global.Singer.OrnamentActions = { ornamentMethod: jest.fn() };
+            global.Singer.VolumeActions = { volumeMethod: jest.fn() };
+            global.Singer.DrumActions = { drumMethod: jest.fn() };
+            global.Turtle = { DictActions: { dictMethod: jest.fn() } };
+        });
+        afterAll(() => {
+            delete global.Turtle;
+        });
+
+        test("should initialize the API method list and set isRun to true when start is true", () => {
+            MusicBlocks.init(true);
+
+            expect(MusicBlocks.isRun).toBe(true);
+            expect(MusicBlocks._methodList["Painter"]).toContain("method1");
+            expect(MusicBlocks._methodList["Painter"]).not.toContain("constructor");
+            expect(MusicBlocks._methodList["Turtle.DictActions"]).toContain("dictMethod");
+            expect(MusicBlocks._methodList["Singer.ToneActions"]).toContain("toneMethod");
+        });
+
+        test("should clean up added turtles, clear state, and set isRun to false when start is false", () => {
+            const mockTurtle = { container: { visible: true }, inTrash: false };
+            Mouse.AddedTurtles = [mockTurtle];
+            globalActivity.turtles.getIndexOfTurtle.mockReturnValue(5);
+
+            MusicBlocks.init(false);
+
+            expect(MusicBlocks.isRun).toBe(false);
+            expect(MusicBlocks._methodList).toEqual({});
+            expect(mockTurtle.container.visible).toBe(false);
+            expect(mockTurtle.inTrash).toBe(true);
+            expect(globalActivity.turtles.removeTurtle).toHaveBeenCalledWith(5);
+            expect(MusicBlocks._blockNo).toBe(-1);
+            expect(Mouse.MouseList).toEqual([]);
+            expect(Mouse.TurtleMouseMap).toEqual({});
         });
     });
 });
