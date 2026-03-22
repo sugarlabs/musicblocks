@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * @license
  * MusicBlocks v3.4.1

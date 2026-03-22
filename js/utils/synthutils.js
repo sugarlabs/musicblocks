@@ -13,7 +13,7 @@
 /*
    global
 
-   _, last, Tone, require, getTemperament, pitchToNumber,
+   last, Tone, getTemperament, pitchToNumber,
    getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
    getOctaveRatio, isCustomTemperament, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
