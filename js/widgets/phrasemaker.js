@@ -13,7 +13,7 @@
 /*
    global
 
-   _, PhraseMakerUtils, PhraseMakerGrid, PhraseMakerUI, PhraseMakerAudio, platformColor, docById, MATRIXSOLFEHEIGHT, toFraction, Singer,
+   PhraseMakerUtils, PhraseMakerGrid, PhraseMakerUI, PhraseMakerAudio, platformColor, docById, MATRIXSOLFEHEIGHT, toFraction, Singer,
    SOLFEGECONVERSIONTABLE, slicePath, wheelnav, delayExecution,
    DEFAULTVOICE, getDrumName, MATRIXSOLFEWIDTH, getDrumIcon,
    noteIsSolfege, isCustomTemperament, i18nSolfege, getNote, DEFAULTDRUM, last,
@@ -378,7 +378,6 @@ class PhraseMaker {
         widgetWindow.clear();
         widgetWindow.show();
 
-        //eslint-disable-next-line no-console
         console.debug("notes " + this.rowLabels + " octave " + this.rowArgs);
 
         this._notesToPlay = [];
@@ -936,6 +935,14 @@ class PhraseMaker {
         }
     }
 
+    _setupWheelDiv(size, left, top) {
+        this.docById("wheelDivptm").style.position = "absolute";
+        this.docById("wheelDivptm").style.height = size + "px";
+        this.docById("wheelDivptm").style.width = size + "px";
+        this.docById("wheelDivptm").style.left = left + "px";
+        this.docById("wheelDivptm").style.top = top + "px";
+    }
+
     /**
      * Creates a pie submenu for adding new rows to the matrix.
      * This method initializes a wheel menu with options for adding different types of rows (e.g., pitch, drum, graphics).
@@ -1010,19 +1017,17 @@ class PhraseMaker {
         const x = this.docById("addnotes").getBoundingClientRect().x;
         const y = this.docById("addnotes").getBoundingClientRect().y;
 
-        this.docById("wheelDivptm").style.position = "absolute";
-        this.docById("wheelDivptm").style.height = "300px";
-        this.docById("wheelDivptm").style.width = "300px";
-        this.docById("wheelDivptm").style.left =
+        this._setupWheelDiv(
+            300,
             Math.min(
                 this.activity.canvas.width - 200,
                 Math.max(0, x * this.activity.getStageScale())
-            ) + "px";
-        this.docById("wheelDivptm").style.top =
+            ),
             Math.min(
                 this.activity.canvas.height - 250,
                 Math.max(0, y * this.activity.getStageScale())
-            ) + "px";
+            )
+        );
 
         this._exitWheel.navItems[0].navigateFunction = () => {
             this.docById("wheelDivptm").style.display = "none";
@@ -1079,7 +1084,6 @@ class PhraseMaker {
                     rArg = 0;
                     break;
                 default:
-                    //eslint-disable-next-line no-console
                     console.debug(label + " not found");
                     break;
             }
@@ -1132,12 +1136,12 @@ class PhraseMaker {
             }
 
             if (aboveBlock === this.blockNo) {
-                setTimeout(this._addNotesBlockBetween(aboveBlock, newBlock, true), 500);
+                setTimeout(() => this._addNotesBlockBetween(aboveBlock, newBlock, true), 500);
                 this.rowLabels.splice(0, 0, rLabel);
                 this.rowArgs.splice(0, 0, rArg);
                 this._rowBlocks.splice(0, 0, newBlock);
             } else {
-                setTimeout(this._addNotesBlockBetween(aboveBlock, newBlock, false), 500);
+                setTimeout(() => this._addNotesBlockBetween(aboveBlock, newBlock, false), 500);
                 let i;
                 for (i = 0; i < this.columnBlocksMap.length; i++) {
                     if (this.columnBlocksMap[i][0] === aboveBlock) {
@@ -1205,7 +1209,7 @@ class PhraseMaker {
             }
         }
 
-        setTimeout(this._createColumnPieSubmenu(i, "pitchblocks", true), 500);
+        setTimeout(() => this._createColumnPieSubmenu(i, "pitchblocks", true), 500);
     }
 
     /**
@@ -1281,19 +1285,17 @@ class PhraseMaker {
         const x = this._labelcols[blockIndex].getBoundingClientRect().x;
         const y = this._labelcols[blockIndex].getBoundingClientRect().y;
 
-        this.docById("wheelDivptm").style.position = "absolute";
-        this.docById("wheelDivptm").style.height = "300px";
-        this.docById("wheelDivptm").style.width = "300px";
-        this.docById("wheelDivptm").style.left =
+        this._setupWheelDiv(
+            300,
             Math.min(
                 this.activity.canvas.width - 200,
                 Math.max(0, x * this.activity.getStageScale())
-            ) + "px";
-        this.docById("wheelDivptm").style.top =
+            ),
             Math.min(
                 this.activity.canvas.height - 250,
                 Math.max(0, y * this.activity.getStageScale())
-            ) + "px";
+            )
+        );
 
         let thisBlock = this.columnBlocksMap[blockIndex][0];
         if (blk !== null) {
@@ -1335,14 +1337,14 @@ class PhraseMaker {
                 this._blockLabelsWheel2.navItems[
                     this._blockLabelsWheel2.selectedNavItemIndex
                 ].title;
-            // eslint-disable-next-line no-use-before-define
+
             __selectionChanged(true);
         };
 
         const __enterArgValue2 = () => {
             this.yblockValue[0] =
                 this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
-            // eslint-disable-next-line no-use-before-define
+
             __selectionChanged(true);
         };
 
@@ -1555,19 +1557,17 @@ class PhraseMaker {
         const x = this._labelcols[blockIndex].getBoundingClientRect().x;
         const y = this._labelcols[blockIndex].getBoundingClientRect().y;
 
-        this.docById("wheelDivptm").style.position = "absolute";
-        this.docById("wheelDivptm").style.height = "300px";
-        this.docById("wheelDivptm").style.width = "300px";
-        this.docById("wheelDivptm").style.left =
+        this._setupWheelDiv(
+            300,
             Math.min(
                 this.activity.canvas.width - 200,
                 Math.max(0, x * this.activity.getStageScale())
-            ) + "px";
-        this.docById("wheelDivptm").style.top =
+            ),
             Math.min(
                 this.activity.canvas.height - 250,
                 Math.max(0, y * this.activity.getStageScale())
-            ) + "px";
+            )
+        );
 
         let thisBlock = this.columnBlocksMap[blockIndex][0];
         if (blk !== null) {
@@ -1617,7 +1617,7 @@ class PhraseMaker {
                 this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
             this.docById("wheelnav-_exitWheel-title-1").children[0].textContent = this.blockValue;
             lastIndex = this._pitchWheel.selectedNavItemIndex; // Update lastIndex
-            // eslint-disable-next-line no-use-before-define
+
             __selectionChanged(true);
         };
 
@@ -1905,19 +1905,17 @@ class PhraseMaker {
         const x = this._labelcols[index].getBoundingClientRect().x;
         const y = this._labelcols[index].getBoundingClientRect().y;
 
-        this.docById("wheelDivptm").style.position = "absolute";
-        this.docById("wheelDivptm").style.height = "300px";
-        this.docById("wheelDivptm").style.width = "300px";
-        this.docById("wheelDivptm").style.left =
+        this._setupWheelDiv(
+            300,
             Math.min(
                 this.activity.canvas.width - 200,
                 Math.max(0, x * this.activity.getStageScale())
-            ) + "px";
-        this.docById("wheelDivptm").style.top =
+            ),
             Math.min(
                 this.activity.canvas.height - 250,
                 Math.max(0, y * this.activity.getStageScale())
-            ) + "px";
+            )
+        );
 
         if (!this._noteBlocks) {
             block = this.columnBlocksMap[index][0];
@@ -2461,7 +2459,6 @@ class PhraseMaker {
             if (i === 0) {
                 this._sortedRowMap.push(0);
             } else if (i > 0 && obj[1] !== "hertz" && obj[1] === this._deps.last(this.rowLabels)) {
-                //eslint-disable-next-line no-console
                 console.debug("skipping " + obj[1] + " " + this._deps.last(this.rowLabels));
                 this._sortedRowMap.push(this._deps.last(this._sortedRowMap));
                 if (oldColumnBlockMap[sortedList[lastObj][3]] != undefined) {
@@ -2482,7 +2479,6 @@ class PhraseMaker {
                 this._rowMap[i] = this._rowMap[i - 1];
                 continue;
             } else {
-                //eslint-disable-next-line no-console
                 console.debug("pushing " + obj[1] + " " + this._deps.last(this.rowLabels));
                 this._sortedRowMap.push(this._deps.last(this._sortedRowMap) + 1);
                 lastObj = i;
@@ -2533,7 +2529,6 @@ class PhraseMaker {
         const exportWindow = window.open("");
         const exportDocument = exportWindow.document;
         if (exportDocument === undefined) {
-            //eslint-disable-next-line no-console
             console.debug("Could not create export window");
             return;
         }
@@ -3156,9 +3151,9 @@ class PhraseMaker {
         }
         this.activity.blocks.loadNewBlocks(RHYTHMOBJ);
         if (this.activity.blocks.blockList[bottomOfClamp].name === "vspace") {
-            setTimeout(this.blockConnection(6, bottomOfClamp), 500);
+            setTimeout(() => this.blockConnection(6, bottomOfClamp), 500);
         } else {
-            setTimeout(this.blockConnection(7, bottomOfClamp), 500);
+            setTimeout(() => this.blockConnection(7, bottomOfClamp), 500);
         }
         this.activity.refreshCanvas();
     }
@@ -3685,10 +3680,6 @@ class PhraseMaker {
         this._menuWheel.createWheel(mainTabsLabels);
         this._exitWheel.createWheel(exitTabLabel);
 
-        this.docById("wheelDivptm").style.position = "absolute";
-        this.docById("wheelDivptm").style.height = "250px";
-        this.docById("wheelDivptm").style.width = "250px";
-
         let x = 0,
             y = 0;
         if (noteToDivide !== null) {
@@ -3697,16 +3688,17 @@ class PhraseMaker {
             y = ntd.getBoundingClientRect().y;
         }
 
-        this.docById("wheelDivptm").style.left =
+        this._setupWheelDiv(
+            250,
             Math.min(
                 this.activity.canvas.width - 200,
                 Math.max(0, x * this.activity.getStageScale())
-            ) + "px";
-        this.docById("wheelDivptm").style.top =
+            ),
             Math.min(
                 this.activity.canvas.height - 250,
                 Math.max(0, y * this.activity.getStageScale())
-            ) + "px";
+            )
+        );
 
         this._exitWheel.navItems[0].navigateFunction = () => {
             this.docById("wheelDivptm").style.display = "none";
@@ -4216,7 +4208,6 @@ class PhraseMaker {
                         );
                     }
                 } else {
-                    //eslint-disable-next-line no-console
                     console.debug("Cannot parse note object: " + obj);
                 }
             }
@@ -4747,7 +4738,7 @@ class PhraseMaker {
 
         // Create a new stack for the chunk.
         this.activity.blocks.loadNewBlocks(newStack);
-        activity.textMsg(this._("New action block generated."), 3000);
+        this.activity.textMsg(this._("New action block generated."), 3000);
     }
 }
 if (typeof module !== "undefined") {
