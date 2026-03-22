@@ -1,5 +1,5 @@
 ---
-name: 🎨 UI/UX 
+name: 🎨 UI/UX
 about: Report UI or UX bugs, inconsistencies, or improvement suggestions
 title: "[UI/UX]"
 labels: "Issue-User-Experience"
