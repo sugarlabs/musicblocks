@@ -1380,6 +1380,10 @@ const LCD = (a, b) => {
  * @returns {Array} The sum of the two rational numbers in the form [numerator, denominator].
  */
 let rationalSum = (a, b) => {
+    // TODO: handle undefined/null array inputs safely (see Issue #XXX)
+    // In block-based environments, empty blocks may pass undefined instead of [num, den].
+    // Accessing a[0] or b[0] below will currently throw a fatal TypeError.
+    //But if upstream guarantees: a = [num, den] then the issue may never occur
     if (a === 0 || b === 0) {
         // console.debug("divide by zero?");
         return [0, 1];
