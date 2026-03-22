@@ -1504,7 +1504,7 @@ describe("Palettes Class", () => {
                 appendChild: jest.fn(),
                 removeChild: jest.fn()
             };
-            
+
             // Mock all elements created by showMenu
             const elementFactory = tag => {
                 if (tag === "div") {
@@ -1572,7 +1572,7 @@ describe("Palettes Class", () => {
                     classList: { add: jest.fn() }
                 };
             };
-            
+
             global.document.createElement = jest.fn(elementFactory);
             global.docById = jest.fn(id => {
                 if (id === "palette") return palDiv;
@@ -2559,7 +2559,16 @@ describe("Palette Integration Tests - Critical Paths", () => {
             children: [
                 {
                     children: [
-                        { children: [{ insertCell: jest.fn(() => ({ appendChild: jest.fn(), style: {} })) }] },
+                        {
+                            children: [
+                                {
+                                    insertCell: jest.fn(() => ({
+                                        appendChild: jest.fn(),
+                                        style: {}
+                                    }))
+                                }
+                            ]
+                        },
                         { children: [{}, { appendChild: jest.fn(), removeChild: jest.fn() }] }
                     ],
                     style: { border: "" }
@@ -2590,7 +2599,12 @@ describe("Palette Integration Tests - Critical Paths", () => {
 
         global.docById = jest.fn(id => {
             if (id === "palette") return paletteMock;
-            return { style: {}, appendChild: jest.fn(), removeChild: jest.fn(), childNodes: [{style: {}}] };
+            return {
+                style: {},
+                appendChild: jest.fn(),
+                removeChild: jest.fn(),
+                childNodes: [{ style: {} }]
+            };
         });
 
         mockActivity = {
@@ -2608,7 +2622,7 @@ describe("Palette Integration Tests - Critical Paths", () => {
 
     test("adds palette and initializes it as an object", () => {
         palettes.add("rhythm");
-        
+
         expect(palettes.dict.rhythm).toBeDefined();
         expect(palettes.dict.rhythm.name).toBe("rhythm");
         expect(palettes.dict.rhythm.visible).toBe(false);
@@ -2619,7 +2633,7 @@ describe("Palette Integration Tests - Critical Paths", () => {
         palettes.add("rhythm");
         palettes.add("pitch");
         palettes.add("flow");
-        
+
         expect(Object.keys(palettes.dict).length).toBe(3);
         expect(palettes.dict.rhythm).toBeDefined();
         expect(palettes.dict.pitch).toBeDefined();
@@ -2630,40 +2644,40 @@ describe("Palette Integration Tests - Critical Paths", () => {
         palettes.add("rhythm");
         const p1 = palettes.dict.rhythm;
         const p2 = palettes.dict.rhythm;
-        
+
         expect(p1).toBe(p2);
     });
 
     test("countProtoBlocks counts blocks in palette", () => {
         mockActivity.blocks.protoBlockDict = {
-            "forward": { palette: { name: "flow" }, name: "forward", hidden: false },
-            "back": { palette: { name: "flow" }, name: "back", hidden: false },
-            "wait": { palette: { name: "flow" }, name: "wait", hidden: false }
+            forward: { palette: { name: "flow" }, name: "forward", hidden: false },
+            back: { palette: { name: "flow" }, name: "back", hidden: false },
+            wait: { palette: { name: "flow" }, name: "wait", hidden: false }
         };
 
         palettes.add("flow");
         const count = palettes.countProtoBlocks("flow");
-        
+
         expect(count).toBe(3);
     });
 
     test("countProtoBlocks returns 0 for empty palette", () => {
         palettes.add("empty");
         const count = palettes.countProtoBlocks("empty");
-        
+
         expect(count).toBe(0);
     });
 
     test("countProtoBlocks returns 0 for non-existent palette", () => {
         const count = palettes.countProtoBlocks("nonexistent");
-        
+
         expect(count).toBe(0);
     });
 
     test("Palette model is correctly initialized", () => {
         palettes.add("test");
         const palette = palettes.dict.test;
-        
+
         expect(palette.model).toBeDefined();
         expect(palette.model.blocks).toBeDefined();
         expect(Array.isArray(palette.model.blocks)).toBe(true);
@@ -2672,7 +2686,7 @@ describe("Palette Integration Tests - Critical Paths", () => {
     test("Palette initializes with default properties", () => {
         palettes.add("test");
         const palette = palettes.dict.test;
-        
+
         expect(palette.protoList).toEqual([]);
         expect(palette.size).toBe(0);
         expect(palette.columns).toBe(0);
@@ -2682,27 +2696,27 @@ describe("Palette Integration Tests - Critical Paths", () => {
     test("cellSize is updated when Palettes.setSize is called", () => {
         const oldSize = palettes.cellSize;
         palettes.setSize(80);
-        
+
         expect(palettes.cellSize).not.toBe(oldSize);
     });
 
     test("palette remove function removes proto blocks", () => {
         palettes.add("test");
         const palette = palettes.dict.test;
-        
+
         const protoBlock = { name: "nameddo" };
         palette.protoList = [protoBlock];
         palette.model.blocks = [{ blkname: "nameddo", modname: "myAction" }];
-        
+
         palette.remove(protoBlock, "myAction");
-        
+
         expect(palette.protoList).toEqual([]);
         expect(palette.model.blocks).toEqual([]);
     });
 
     test("palette buttons stored in Palettes object", () => {
         palettes.add("test");
-        
+
         // Buttons should be added to palettes.buttons
         expect(palettes.buttons).toBeDefined();
         expect(typeof palettes.buttons).toBe("object");

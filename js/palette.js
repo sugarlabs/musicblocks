@@ -1285,8 +1285,9 @@ class Palette {
     }
 
     hideMenu() {
-        docById("palette").childNodes[0].style.borderRight =
-            `1px solid ${platformColor.selectorSelected}`;
+        docById(
+            "palette"
+        ).childNodes[0].style.borderRight = `1px solid ${platformColor.selectorSelected}`;
         if (this._outsideClickListener) {
             document.removeEventListener("click", this._outsideClickListener);
             this._outsideClickListener = null;
@@ -1298,38 +1299,56 @@ class Palette {
         const palDiv = docById("palette");
         palDiv.childNodes[0].style.borderRight = "0";
         if (docById("PaletteBody")) palDiv.removeChild(docById("PaletteBody"));
-        const palBody = document.createElement("table");
-        palBody.id = "PaletteBody";
+
         const palBodyHeight = window.innerHeight - this.palettes.top - this.palettes.cellSize - 26;
 
-        // palBody.innerHTML = `<thead></thead><tbody style = "display: block; height: ${palBodyHeight}px; overflow: auto; overflow-x: hidden;" id="PaletteBody_items" class="PalScrol"></tbody>`;
+        // Create wrapper div for proper scroll container
+        const palBodyWrapper = document.createElement("div");
+        palBodyWrapper.id = "PaletteBody";
+        palBodyWrapper.style.minWidth = "180px";
+        palBodyWrapper.style.background = platformColor.paletteBackground;
+        palBodyWrapper.style.float = "left";
+        palBodyWrapper.style.border = `1px solid ${platformColor.selectorSelected}`;
+        palBodyWrapper.style.boxSizing = "border-box";
+        palBodyWrapper.style.padding = "8px";
+        palBodyWrapper.style.height = `${palBodyHeight}px`;
+        palBodyWrapper.style.width = "100%";
+        palBodyWrapper.style.overflow = "auto";
+        palBodyWrapper.style.overflowX = "hidden";
 
-        palBody.insertAdjacentHTML(
-            "afterbegin",
-            `<thead></thead><tbody style = "display: block;   width: 100% ; height:auto ; max-height: ${palBodyHeight}px;  overflow: auto; overflow-x: hidden;" id="PaletteBody_items" class="PalScrol"></tbody>`
-        );
+        // Create inner table for header and rows
+        const palBody = document.createElement("table");
+        palBody.id = "PaletteBody_table";
+        palBody.style.width = "100%";
+        palBody.style.borderCollapse = "collapse";
+        palBody.style.tableLayout = "fixed"; // Prevent table from expanding
 
-        palBody.style.minWidth = "180px";
-        palBody.style.background = platformColor.paletteBackground;
-        palBody.style.float = "left";
+        // Create thead
+        const thead = document.createElement("thead");
+        const tbody = document.createElement("tbody");
+        tbody.id = "PaletteBody_items";
+        tbody.style.display = "block"; // Make tbody behave like a block element
+        tbody.style.width = "100%";
 
-        palBody.style.border = `1px solid ${platformColor.selectorSelected}`;
-        [palBody.childNodes[0], palBody.childNodes[1]].forEach(item => {
-            item.style.boxSizing = "border-box";
-            item.style.padding = "8px";
-        });
-        palDiv.appendChild(palBody);
+        palBody.appendChild(thead);
+        palBody.appendChild(tbody);
+        palBodyWrapper.appendChild(palBody);
+        palDiv.appendChild(palBodyWrapper);
 
-        this.menuContainer = palBody;
+        this.menuContainer = palBodyWrapper;
 
         if (createHeader) {
-            let header = this.menuContainer.children[0];
-            header = header.insertRow();
+            let header = thead.insertRow();
             header.style.backgroundColor = platformColor.paletteLabelBackground;
-            header.innerHTML =
-                '<td style ="width: 100%; height: 42px; box-sizing: border-box; display: flex; flex-direction: row; align-items: center; justify-content: space-between;"></td>';
-            header = header.children[0];
-            header.style.padding = "8px";
+            let headerCell = header.insertCell();
+            headerCell.style.width = "100%";
+            headerCell.style.height = "42px";
+            headerCell.style.boxSizing = "border-box";
+            headerCell.style.display = "flex";
+            headerCell.style.flexDirection = "row";
+            headerCell.style.alignItems = "center";
+            headerCell.style.justifyContent = "space-between";
+            headerCell.style.padding = "8px";
 
             const labelImg = makePaletteIcons(
                 PALETTEICONS[this.name],
@@ -1339,13 +1358,13 @@ class Palette {
             labelImg.style.borderRadius = "4px";
             labelImg.style.padding = "2px";
             labelImg.style.backgroundColor = platformColor.paletteBackground;
-            header.appendChild(labelImg);
+            headerCell.appendChild(labelImg);
 
             const label = document.createElement("span");
             label.textContent = toTitleCase(_(this.name));
             label.style.fontWeight = "bold";
             label.style.color = platformColor.textColor;
-            header.appendChild(label);
+            headerCell.appendChild(label);
 
             const closeDownImg = document.createElement("span");
             closeDownImg.style.height = `${this.palettes.cellSize}px`;
@@ -1358,7 +1377,7 @@ class Palette {
             closeImg.onmouseover = () => (document.body.style.cursor = "pointer");
             closeImg.onmouseleave = () => (document.body.style.cursor = "default");
             closeDownImg.appendChild(closeImg);
-            header.appendChild(closeDownImg);
+            headerCell.appendChild(closeDownImg);
         }
 
         this._showMenuItems();
@@ -1507,6 +1526,12 @@ class Palette {
         if (this.palettes.mobile) {
             this.hide();
         }
+
+        // Setup grab scroll on the wrapper container (PaletteBody)
+        const paletteListContainer = docById("PaletteBody");
+        if (paletteListContainer) {
+            this.setupGrabScroll(paletteListContainer);
+        }
     }
 
     setupGrabScroll(paletteList) {
@@ -1522,15 +1547,21 @@ class Palette {
 
         const mouseMoveGrab = event => {
             const now = Date.now();
-            
+
             // Throttle: only update scroll position every THROTTLE_MS milliseconds
             // This prevents excessive DOM updates during rapid mouse movements
             if (now - lastMoveTime >= THROTTLE_MS) {
                 const dy = event.clientY - posY;
-                paletteList.scrollTop = top - dy;
+                let newScrollTop = top - dy;
+
+                // Bound scrolling: prevent infinite scrolling beyond content limits
+                const maxScroll = paletteList.scrollHeight - paletteList.clientHeight;
+                newScrollTop = Math.max(0, Math.min(newScrollTop, maxScroll));
+
+                paletteList.scrollTop = newScrollTop;
                 lastMoveTime = now;
             }
-            
+
             document.body.style.cursor = "grabbing";
         };
 
@@ -1544,6 +1575,22 @@ class Palette {
         };
 
         paletteList.onmousedown = mouseDownGrab;
+
+        // CRITICAL: Prevent scroll wheel/scrollbar scrolling beyond boundaries
+        paletteList.addEventListener(
+            "scroll",
+            event => {
+                const maxScroll = paletteList.scrollHeight - paletteList.clientHeight;
+
+                // If scroll is beyond limits, clamp it back
+                if (paletteList.scrollTop < 0) {
+                    paletteList.scrollTop = 0;
+                } else if (paletteList.scrollTop > maxScroll) {
+                    paletteList.scrollTop = maxScroll;
+                }
+            },
+            { passive: false }
+        );
     }
 
     getInfo() {
