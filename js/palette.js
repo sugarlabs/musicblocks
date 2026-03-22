@@ -9,16 +9,15 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/*
-   global
-
-   _, docById, LEADING, DEFAULTPALETTE, MULTIPALETTES, platformColor,
+/* global
+   docById, LEADING, DEFAULTPALETTE, MULTIPALETTES, platformColor,
    PALETTEICONS, MULTIPALETTEICONS, SKIPPALETTES, toTitleCase,
    i18nSolfege, NUMBERBLOCKDEFAULT, TEXTWIDTH, STRINGLEN,
    DEFAULTBLOCKSCALE, SVG, DISABLEDFILLCOLOR, DISABLEDSTROKECOLOR,
    PALETTEFILLCOLORS, PALETTESTROKECOLORS, last, getTextWidth,
    STANDARDBLOCKHEIGHT, CLOSEICON, BUILTINPALETTES,
-   safeSVG, blockIsMacro, getMacroExpansion
+   safeSVG, blockIsMacro, getMacroExpansion,
+   base64Encode, StatusMatrix, activity
 */
 
 /* exported Palettes, initPalettes */
@@ -600,7 +599,7 @@ class Palettes {
         cover.style.background = platformColor.paletteLabelBackground;
 
         td.appendChild(cover);
-      
+
         // Mouse hover for type selectors - only if not in keyboard nav mode
         td.onmouseover = () => {
             if (!this._keyboardNavActive) {
@@ -852,7 +851,6 @@ class Palettes {
 
     getInfo() {
         for (const key in this.dict) {
-            // eslint-disable-next-line no-console
             console.debug(this.dict[key].getInfo());
         }
     }
@@ -891,7 +889,7 @@ class Palettes {
         try {
             // First hide all palettes
             for (const name in this.dict) {
-                if (this.dict.hasOwnProperty(name)) {
+                if (Object.prototype.hasOwnProperty.call(this.dict, name)) {
                     const palette = this.dict[name];
                     if (palette && typeof palette.hideMenu === "function") {
                         palette.hideMenu();
@@ -976,7 +974,6 @@ class Palettes {
     }
 
     add(name) {
-        // eslint-disable-next-line no-use-before-define
         this.dict[name] = new Palette(this, name);
         return this;
     }
