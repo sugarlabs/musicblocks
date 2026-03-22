@@ -55,7 +55,7 @@
   DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
   INTERVALVALUES, getIntervalRatio, frequencyToPitch, NOTESTEP,
   GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
-  SEMITONES, CHROMATIC_SOLFEGE
+  SEMITONES
 */
 
 /**
@@ -72,7 +72,7 @@ const SYNTHSVG =
  * @type {string}
  */
 // Helper function to convert string to binary string for Base64 encoding
-const _stringToBinary = (str) => {
+const _stringToBinary = str => {
     const encoder = new TextEncoder();
     const uint8Array = encoder.encode(str);
     return String.fromCharCode(...uint8Array);
@@ -106,69 +106,69 @@ const SIXTYFOURTHNOTE =
  * @constant {string}
  * @default
  */
-const SHARP = "♯";
+const SHARP = '♯';
 
 /**
  * Symbol for a flat note.
  * @constant {string}
  * @default
  */
-const FLAT = "♭";
+const FLAT = '♭';
 
 /**
  * Symbol for a natural note.
  * @constant {string}
  * @default
  */
-const NATURAL = "♮";
+const NATURAL = '♮';
 
 /**
  * Symbol for a double sharp note.
  * @constant {string}
  * @default
  */
-const DOUBLESHARP = "𝄪";
+const DOUBLESHARP = '𝄪';
 
 /**
  * Symbol for a double flat note.
  * @constant {string}
  * @default
  */
-const DOUBLEFLAT = "𝄫";
+const DOUBLEFLAT = '𝄫';
 
 /**
  * Symbols representing different note durations.
  * @constant {Object.<number, string>}
  * @default
  */
-const NSYMBOLS = { 1: "𝅝", 2: "𝅗𝅥", 4: "♩", 8: "♪", 16: "𝅘𝅥𝅯" };
+const NSYMBOLS = { 1: '𝅝', 2: '𝅗𝅥', 4: '♩', 8: '♪', 16: '𝅘𝅥𝅯' };
 
 /**
  * Symbols representing different rest durations.
  * @constant {Object.<number, string>}
  * @default
  */
-const RSYMBOLS = { 1: "𝄻", 2: "𝄼", 4: "𝄽", 8: "𝄾", 16: "𝄿" };
+const RSYMBOLS = { 1: '𝄻', 2: '𝄼', 4: '𝄽', 8: '𝄾', 16: '𝄿' };
 
 /**
  * Maps from notes with flats to their corresponding notes with '♭' (flat) symbol.
  * @constant {Object.<string, string>}
  */
 const BTOFLAT = {
-    Eb: "E" + FLAT,
-    Gb: "G" + FLAT,
-    Ab: "A" + FLAT,
-    Bb: "B" + FLAT,
-    Db: "D" + FLAT,
-    Cb: "C" + FLAT,
-    Fb: "F" + FLAT,
-    eb: "E" + FLAT,
-    gb: "G" + FLAT,
-    ab: "A" + FLAT,
-    bb: "B" + FLAT,
-    db: "D" + FLAT,
-    cb: "C" + FLAT,
-    fb: "F" + FLAT
+    Eb: 'E' + FLAT,
+    Gb: 'G' + FLAT,
+    Ab: 'A' + FLAT,
+    Bb: 'B' + FLAT,
+    Db: 'D' + FLAT,
+    Cb: 'C' + FLAT,
+    Fb: 'F' + FLAT,
+    eb: 'E' + FLAT,
+    gb: 'G' + FLAT,
+    ab: 'A' + FLAT,
+    bb: 'B' + FLAT,
+    db: 'D' + FLAT,
+    cb: 'C' + FLAT,
+    fb: 'F' + FLAT,
 };
 
 /**
@@ -176,58 +176,39 @@ const BTOFLAT = {
  * @constant {Object.<string, string>}
  */
 const STOSHARP = {
-    "E#": "E" + SHARP,
-    "G#": "G" + SHARP,
-    "A#": "A" + SHARP,
-    "B#": "B" + SHARP,
-    "D#": "D" + SHARP,
-    "C#": "C" + SHARP,
-    "F#": "F" + SHARP,
-    "e#": "E" + SHARP,
-    "g#": "G" + SHARP,
-    "a#": "A" + SHARP,
-    "b#": "B" + SHARP,
-    "d#": "D" + SHARP,
-    "c#": "C" + SHARP,
-    "f#": "F" + SHARP
+    'E#': 'E' + SHARP,
+    'G#': 'G' + SHARP,
+    'A#': 'A' + SHARP,
+    'B#': 'B' + SHARP,
+    'D#': 'D' + SHARP,
+    'C#': 'C' + SHARP,
+    'F#': 'F' + SHARP,
+    'e#': 'E' + SHARP,
+    'g#': 'G' + SHARP,
+    'a#': 'A' + SHARP,
+    'b#': 'B' + SHARP,
+    'd#': 'D' + SHARP,
+    'c#': 'C' + SHARP,
+    'f#': 'F' + SHARP,
 };
-
-/**
- * Array containing the solfege names for the chromatic scale.
- * @constant {string[]}
- */
-const CHROMATIC_SOLFEGE = [
-    "Do", // 0
-    "Di", // 1
-    "Re", // 2
-    "Ri", // 3
-    "Mi", // 4
-    "Fa", // 5
-    "Fi", // 6
-    "Sol", // 7
-    "Si", // 8
-    "La", // 9
-    "Li", // 10
-    "Ti" // 11
-];
 
 /**
  * Array of notes with sharps.
  * @constant {string[]}
  */
 const NOTESSHARP = [
-    "C",
-    "C" + SHARP,
-    "D",
-    "D" + SHARP,
-    "E",
-    "F",
-    "F" + SHARP,
-    "G",
-    "G" + SHARP,
-    "A",
-    "A" + SHARP,
-    "B"
+    'C',
+    'C' + SHARP,
+    'D',
+    'D' + SHARP,
+    'E',
+    'F',
+    'F' + SHARP,
+    'G',
+    'G' + SHARP,
+    'A',
+    'A' + SHARP,
+    'B',
 ];
 
 /**
@@ -235,18 +216,18 @@ const NOTESSHARP = [
  * @constant {string[]}
  */
 const NOTESFLAT = [
-    "C",
-    "D" + FLAT,
-    "D",
-    "E" + FLAT,
-    "E",
-    "F",
-    "G" + FLAT,
-    "G",
-    "A" + FLAT,
-    "A",
-    "B" + FLAT,
-    "B"
+    'C',
+    'D' + FLAT,
+    'D',
+    'E' + FLAT,
+    'E',
+    'F',
+    'G' + FLAT,
+    'G',
+    'A' + FLAT,
+    'A',
+    'B' + FLAT,
+    'B',
 ];
 
 /**
@@ -254,18 +235,18 @@ const NOTESFLAT = [
  * @constant {string[]}
  */
 const NOTESFLAT2 = [
-    "c",
-    "d" + FLAT,
-    "d",
-    "e" + FLAT,
-    "e",
-    "f",
-    "g" + FLAT,
-    "g",
-    "a" + FLAT,
-    "a",
-    "b" + FLAT,
-    "b"
+    'c',
+    'd' + FLAT,
+    'd',
+    'e' + FLAT,
+    'e',
+    'f',
+    'g' + FLAT,
+    'g',
+    'a' + FLAT,
+    'a',
+    'b' + FLAT,
+    'b',
 ];
 
 /**
@@ -274,11 +255,11 @@ const NOTESFLAT2 = [
  * @type {Object.<string, string>}
  */
 const EQUIVALENTFLATS = {
-    "C♯": "D" + FLAT,
-    "D♯": "E" + FLAT,
-    "F♯": "G" + FLAT,
-    "G♯": "A" + FLAT,
-    "A♯": "B" + FLAT
+    'C♯': 'D' + FLAT,
+    'D♯': 'E' + FLAT,
+    'F♯': 'G' + FLAT,
+    'G♯': 'A' + FLAT,
+    'A♯': 'B' + FLAT,
 };
 
 /**
@@ -287,24 +268,24 @@ const EQUIVALENTFLATS = {
  * @type {Object.<string, string>}
  */
 const EQUIVALENTSHARPS = {
-    "D♭": "C" + SHARP,
-    "E♭": "D" + SHARP,
-    "G♭": "F" + SHARP,
-    "A♭": "G" + SHARP,
-    "B♭": "A" + SHARP
+    'D♭': 'C' + SHARP,
+    'E♭': 'D' + SHARP,
+    'G♭': 'F' + SHARP,
+    'A♭': 'G' + SHARP,
+    'B♭': 'A' + SHARP,
 };
 
 /**
  * Maps from notes with specific accidentals to their equivalent natural notes.
  * @constant {Object.<string, string>}
  */
-const EQUIVALENTNATURALS = { "E♯": "F", "B♯": "C", "C♭": "B", "F♭": "E" };
+const EQUIVALENTNATURALS = { 'E♯': 'F', 'B♯': 'C', 'C♭': 'B', 'F♭': 'E' };
 
 /**
  * Maps from natural notes to their equivalent notes with specific accidentals.
  * @constant {Object.<string, string>}
  */
-const EQUIVALENTACCIDENTALS = { F: "E♯", C: "B♯", B: "C♭", E: "F♭", G: "F𝄪", D: "C𝄪", A: "G𝄪" };
+const EQUIVALENTACCIDENTALS = { F: 'E♯', C: 'B♯', B: 'C♭', E: 'F♭', G: 'F𝄪', D: 'C𝄪', A: 'G𝄪' };
 
 /**
  * Converts a note down to a flat note.
@@ -312,15 +293,15 @@ const EQUIVALENTACCIDENTALS = { F: "E♯", C: "B♯", B: "C♭", E: "F♭", G: "
  * @type {Object.<string, string>}
  */
 const CONVERT_DOWN = {
-    "C": "B" + SHARP,
-    "C♭": "B",
-    "D♭": "C" + SHARP,
-    "E♭": "D" + SHARP,
-    "F": "E" + SHARP,
-    "F♭": "E",
-    "G♭": "F" + SHARP,
-    "A♭": "G" + SHARP,
-    "B♭": "A" + SHARP
+    'C': 'B' + SHARP,
+    'C♭': 'B',
+    'D♭': 'C' + SHARP,
+    'E♭': 'D' + SHARP,
+    'F': 'E' + SHARP,
+    'F♭': 'E',
+    'G♭': 'F' + SHARP,
+    'A♭': 'G' + SHARP,
+    'B♭': 'A' + SHARP,
 };
 
 /**
@@ -328,13 +309,13 @@ const CONVERT_DOWN = {
  * @constant {Object.<string, string>}
  */
 const CONVERT_DOUBLE_DOWN = {
-    "C♯": "B" + DOUBLESHARP,
-    "D": "C" + DOUBLESHARP,
-    "E": "D" + DOUBLESHARP,
-    "F♯": "E" + DOUBLESHARP,
-    "G": "F" + DOUBLESHARP,
-    "A": "G" + DOUBLESHARP,
-    "B": "A" + DOUBLESHARP
+    'C♯': 'B' + DOUBLESHARP,
+    'D': 'C' + DOUBLESHARP,
+    'E': 'D' + DOUBLESHARP,
+    'F♯': 'E' + DOUBLESHARP,
+    'G': 'F' + DOUBLESHARP,
+    'A': 'G' + DOUBLESHARP,
+    'B': 'A' + DOUBLESHARP,
 };
 
 /**
@@ -342,15 +323,15 @@ const CONVERT_DOUBLE_DOWN = {
  * @constant {Object.<string, string>}
  */
 const CONVERT_UP = {
-    "C♯": "D" + FLAT,
-    "D♯": "E" + FLAT,
-    "E♯": "F",
-    "E": "F" + FLAT,
-    "F♯": "G" + FLAT,
-    "G♯": "A" + FLAT,
-    "A♯": "B" + FLAT,
-    "B♯": "C",
-    "B": "C" + FLAT
+    'C♯': 'D' + FLAT,
+    'D♯': 'E' + FLAT,
+    'E♯': 'F',
+    'E': 'F' + FLAT,
+    'F♯': 'G' + FLAT,
+    'G♯': 'A' + FLAT,
+    'A♯': 'B' + FLAT,
+    'B♯': 'C',
+    'B': 'C' + FLAT,
 };
 
 /**
@@ -358,13 +339,13 @@ const CONVERT_UP = {
  * @constant {Object.<string, string>}
  */
 const CONVERT_DOUBLE_UP = {
-    "C": "D" + DOUBLEFLAT,
-    "D": "E" + DOUBLEFLAT,
-    "E♭": "F" + DOUBLEFLAT,
-    "F": "G" + DOUBLEFLAT,
-    "G": "A" + DOUBLEFLAT,
-    "A": "B" + DOUBLEFLAT,
-    "B♭": "C" + DOUBLEFLAT
+    'C': 'D' + DOUBLEFLAT,
+    'D': 'E' + DOUBLEFLAT,
+    'E♭': 'F' + DOUBLEFLAT,
+    'F': 'G' + DOUBLEFLAT,
+    'G': 'A' + DOUBLEFLAT,
+    'A': 'B' + DOUBLEFLAT,
+    'B♭': 'C' + DOUBLEFLAT,
 };
 
 /**
@@ -372,102 +353,102 @@ const CONVERT_DOUBLE_UP = {
  * @constant {Object.<string, [string, number]>}
  */
 const EXTRATRANSPOSITIONS = {
-    "E♯": ["F", 0],
-    "B♯": ["C", 1],
-    "C♭": ["B", -1],
-    "F♭": ["E", 0],
-    "e♯": ["F", 0],
-    "b♯": ["C", 1],
-    "c♭": ["B", -1],
-    "f♭": ["E", 0]
+    'E♯': ['F', 0],
+    'B♯': ['C', 1],
+    'C♭': ['B', -1],
+    'F♭': ['E', 0],
+    'e♯': ['F', 0],
+    'b♯': ['C', 1],
+    'c♭': ['B', -1],
+    'f♭': ['E', 0],
 };
 
 /**
  * Array containing the solfege names for the diatonic scale.
  * @constant {string[]}
  */
-const SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti"];
+const SOLFEGENAMES = ['do', 're', 'mi', 'fa', 'sol', 'la', 'ti'];
 
 /**
  * Array containing the solfege names for the chromatic scale.
  * @constant {string[]}
  */
 const SOLFEGENAMES1 = [
-    "do",
-    "do" + SHARP,
-    "do" + DOUBLESHARP,
-    "re" + DOUBLEFLAT,
-    "re" + FLAT,
-    "re",
-    "re" + SHARP,
-    "re" + DOUBLESHARP,
-    "mi" + DOUBLEFLAT,
-    "mi" + FLAT,
-    "mi",
-    "fa",
-    "fa" + SHARP,
-    "fa" + DOUBLESHARP,
-    "sol" + DOUBLEFLAT,
-    "sol" + FLAT,
-    "sol",
-    "sol" + SHARP,
-    "sol" + DOUBLESHARP,
-    "la",
-    "la" + DOUBLEFLAT,
-    "la" + FLAT,
-    "la" + SHARP,
-    "la" + DOUBLESHARP,
-    "ti" + DOUBLEFLAT,
-    "ti" + FLAT,
-    "ti"
+    'do',
+    'do' + SHARP,
+    'do' + DOUBLESHARP,
+    're' + DOUBLEFLAT,
+    're' + FLAT,
+    're',
+    're' + SHARP,
+    're' + DOUBLESHARP,
+    'mi' + DOUBLEFLAT,
+    'mi' + FLAT,
+    'mi',
+    'fa',
+    'fa' + SHARP,
+    'fa' + DOUBLESHARP,
+    'sol' + DOUBLEFLAT,
+    'sol' + FLAT,
+    'sol',
+    'sol' + SHARP,
+    'sol' + DOUBLESHARP,
+    'la',
+    'la' + DOUBLEFLAT,
+    'la' + FLAT,
+    'la' + SHARP,
+    'la' + DOUBLESHARP,
+    'ti' + DOUBLEFLAT,
+    'ti' + FLAT,
+    'ti',
 ];
 
 /**
  * Array containing the basic note names (without accidentals).
  * @constant {string[]}
  */
-const NOTENAMES = ["C", "D", "E", "F", "G", "A", "B"];
+const NOTENAMES = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 
 /**
  * Array containing all possible note names, including double sharps/flats and triple sharps/flats.
  * @constant {string[]}
  */
 const ALLNOTENAMES = [
-    "C",
-    "C#",
-    "Cx",
-    "Dbb",
-    "Db",
-    "D",
-    "D#",
-    "Dx",
-    "Ebb",
-    "Eb",
-    "E",
-    "E#",
-    "Ex",
-    "Fbb",
-    "Fb",
-    "F",
-    "F#",
-    "Fx",
-    "Gbb",
-    "Gb",
-    "G",
-    "G#",
-    "Gx",
-    "Abb",
-    "Ab",
-    "A",
-    "A#",
-    "Ax",
-    "Bbb",
-    "Bb",
-    "B",
-    "B#",
-    "Bx",
-    "Cbb",
-    "Cb"
+    'C',
+    'C#',
+    'Cx',
+    'Dbb',
+    'Db',
+    'D',
+    'D#',
+    'Dx',
+    'Ebb',
+    'Eb',
+    'E',
+    'E#',
+    'Ex',
+    'Fbb',
+    'Fb',
+    'F',
+    'F#',
+    'Fx',
+    'Gbb',
+    'Gb',
+    'G',
+    'G#',
+    'Gx',
+    'Abb',
+    'Ab',
+    'A',
+    'A#',
+    'Ax',
+    'Bbb',
+    'Bb',
+    'B',
+    'B#',
+    'Bx',
+    'Cbb',
+    'Cb',
 ];
 
 /**
@@ -475,33 +456,33 @@ const ALLNOTENAMES = [
  * @constant {string[]}
  */
 const NOTENAMES1 = [
-    "C",
-    "C" + SHARP,
-    "C" + DOUBLESHARP,
-    "D" + DOUBLEFLAT,
-    "D" + FLAT,
-    "D",
-    "D" + SHARP,
-    "D" + DOUBLESHARP,
-    "E" + DOUBLEFLAT,
-    "E" + FLAT,
-    "E",
-    "F",
-    "F" + SHARP,
-    "F" + DOUBLESHARP,
-    "G" + DOUBLEFLAT,
-    "G" + FLAT,
-    "G",
-    "G" + SHARP,
-    "G" + DOUBLESHARP,
-    "A",
-    "A" + DOUBLEFLAT,
-    "A" + FLAT,
-    "A" + SHARP,
-    "A" + DOUBLESHARP,
-    "B" + DOUBLEFLAT,
-    "B" + FLAT,
-    "B"
+    'C',
+    'C' + SHARP,
+    'C' + DOUBLESHARP,
+    'D' + DOUBLEFLAT,
+    'D' + FLAT,
+    'D',
+    'D' + SHARP,
+    'D' + DOUBLESHARP,
+    'E' + DOUBLEFLAT,
+    'E' + FLAT,
+    'E',
+    'F',
+    'F' + SHARP,
+    'F' + DOUBLESHARP,
+    'G' + DOUBLEFLAT,
+    'G' + FLAT,
+    'G',
+    'G' + SHARP,
+    'G' + DOUBLESHARP,
+    'A',
+    'A' + DOUBLEFLAT,
+    'A' + FLAT,
+    'A' + SHARP,
+    'A' + DOUBLESHARP,
+    'B' + DOUBLEFLAT,
+    'B' + FLAT,
+    'B',
 ];
 
 /**
@@ -509,26 +490,26 @@ const NOTENAMES1 = [
  * @constant {Object.<string, string>}
  */
 const SOLFEGECONVERSIONTABLE = {
-    "C♭": "do" + FLAT,
-    "C": "do",
-    "C♯": "do" + SHARP,
-    "D♭": "re" + FLAT,
-    "D": "re",
-    "D♯": "re" + SHARP,
-    "E♭": "mi" + FLAT,
-    "E": "mi",
-    "F": "fa",
-    "F♯": "fa" + SHARP,
-    "G♭": "sol" + FLAT,
-    "G": "sol",
-    "G♯": "sol" + SHARP,
-    "A♭": "la" + FLAT,
-    "A": "la",
-    "A♯": "la" + SHARP,
-    "B♭": "ti" + FLAT,
-    "B": "ti",
-    "B♯": "ti" + SHARP,
-    "R": _("rest")
+    'C♭': 'do' + FLAT,
+    'C': 'do',
+    'C♯': 'do' + SHARP,
+    'D♭': 're' + FLAT,
+    'D': 're',
+    'D♯': 're' + SHARP,
+    'E♭': 'mi' + FLAT,
+    'E': 'mi',
+    'F': 'fa',
+    'F♯': 'fa' + SHARP,
+    'G♭': 'sol' + FLAT,
+    'G': 'sol',
+    'G♯': 'sol' + SHARP,
+    'A♭': 'la' + FLAT,
+    'A': 'la',
+    'A♯': 'la' + SHARP,
+    'B♭': 'ti' + FLAT,
+    'B': 'ti',
+    'B♯': 'ti' + SHARP,
+    'R': _('rest'),
 };
 
 /**
@@ -536,13 +517,13 @@ const SOLFEGECONVERSIONTABLE = {
  * @constant {Object.<string, string>}
  */
 const WESTERN2EISOLFEGENAMES = {
-    do: "sa",
-    re: "re",
-    mi: "ga",
-    fa: "ma",
-    sol: "pa",
-    la: "dha",
-    ti: "ni"
+    do: 'sa',
+    re: 're',
+    mi: 'ga',
+    fa: 'ma',
+    sol: 'pa',
+    la: 'dha',
+    ti: 'ni',
 };
 
 /**
@@ -550,68 +531,68 @@ const WESTERN2EISOLFEGENAMES = {
  * @constant {string[]}
  */
 const PITCHES = [
-    "C",
-    "D" + FLAT,
-    "D",
-    "E" + FLAT,
-    "E",
-    "F",
-    "G" + FLAT,
-    "G",
-    "A" + FLAT,
-    "A",
-    "B" + FLAT,
-    "B"
+    'C',
+    'D' + FLAT,
+    'D',
+    'E' + FLAT,
+    'E',
+    'F',
+    'G' + FLAT,
+    'G',
+    'A' + FLAT,
+    'A',
+    'B' + FLAT,
+    'B',
 ];
 
 /**
  * Array containing pitches with flats and sharps.
  * @constant {string[]}
  */
-const PITCHES1 = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+const PITCHES1 = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 
 /**
  * Array containing pitches with sharps.
  * @constant {string[]}
  */
 const PITCHES2 = [
-    "C",
-    "C" + SHARP,
-    "D",
-    "D" + SHARP,
-    "E",
-    "F",
-    "F" + SHARP,
-    "G",
-    "G" + SHARP,
-    "A",
-    "A" + SHARP,
-    "B"
+    'C',
+    'C' + SHARP,
+    'D',
+    'D' + SHARP,
+    'E',
+    'F',
+    'F' + SHARP,
+    'G',
+    'G' + SHARP,
+    'A',
+    'A' + SHARP,
+    'B',
 ];
 
 /**
  * Array containing pitches with sharps.
  * @constant {string[]}
  */
-const PITCHES3 = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+const PITCHES3 = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
 /**
  * Maps from numerical values to solfege names.
  * @constant {Object.<number, string>}
  */
 const NOTESTABLE = {
-    1: "do",
-    2: "do" + SHARP,
-    3: "re",
-    4: "re" + SHARP,
-    5: "mi",
-    6: "fa",
-    7: "fa" + SHARP,
-    8: "sol",
-    9: "sol" + SHARP,
-    10: "la",
-    11: "la" + SHARP,
-    0: "ti"
+    1: 'do',
+    2: 'do' + SHARP,
+    3: 're',
+    4: 're' + SHARP,
+    5: 'mi',
+    6: 'fa',
+    7: 'fa' + SHARP,
+    8: 'sol',
+    9: 'sol' + SHARP,
+    10: 'la',
+    11: 'la' + SHARP,
+    0: 'ti',
 };
 
 /**
@@ -619,13 +600,13 @@ const NOTESTABLE = {
  * @constant {Object.<string, string>}
  */
 const FIXEDSOLFEGE = {
-    do: "C",
-    re: "D",
-    mi: "E",
-    fa: "F",
-    sol: "G",
-    la: "A",
-    ti: "B"
+    do: 'C',
+    re: 'D',
+    mi: 'E',
+    fa: 'F',
+    sol: 'G',
+    la: 'A',
+    ti: 'B',
 };
 
 /**
@@ -633,42 +614,42 @@ const FIXEDSOLFEGE = {
  * @constant {Object.<string, string>}
  */
 const FIXEDSOLFEGE1 = {
-    "do𝄫": "B",
-    "do♭": "C" + FLAT,
-    "do": "C",
-    "do♯": "C" + SHARP,
-    "do𝄪": "D",
-    "re𝄫": "C",
-    "re♭": "D" + FLAT,
-    "re": "D",
-    "re♯": "D" + SHARP,
-    "re𝄪": "E",
-    "mi𝄫": "D",
-    "mi♭": "E" + FLAT,
-    "mi": "E",
-    "mi♯": "E" + SHARP,
-    "mi𝄪": "G",
-    "fa𝄫": "E" + FLAT,
-    "fa♭": "F" + FLAT,
-    "fa": "F",
-    "fa♯": "F" + SHARP,
-    "fa𝄪": "G" + SHARP,
-    "sol𝄫": "E",
-    "sol♭": "G" + FLAT,
-    "sol": "G",
-    "sol♯": "G" + SHARP,
-    "sol𝄪": "A",
-    "la𝄫": "G",
-    "la♭": "A" + FLAT,
-    "la": "A",
-    "la♯": "A" + SHARP,
-    "la𝄪": "B",
-    "ti𝄫": "A",
-    "ti♭": "B" + FLAT,
-    "ti": "B",
-    "ti♯": "B" + SHARP,
-    "ti𝄪": "C",
-    "R": _("rest")
+    'do𝄫': 'B',
+    'do♭': 'C' + FLAT,
+    'do': 'C',
+    'do♯': 'C' + SHARP,
+    'do𝄪': 'D',
+    're𝄫': 'C',
+    're♭': 'D' + FLAT,
+    're': 'D',
+    're♯': 'D' + SHARP,
+    're𝄪': 'E',
+    'mi𝄫': 'D',
+    'mi♭': 'E' + FLAT,
+    'mi': 'E',
+    'mi♯': 'E' + SHARP,
+    'mi𝄪': 'G',
+    'fa𝄫': 'E' + FLAT,
+    'fa♭': 'F' + FLAT,
+    'fa': 'F',
+    'fa♯': 'F' + SHARP,
+    'fa𝄪': 'G' + SHARP,
+    'sol𝄫': 'E',
+    'sol♭': 'G' + FLAT,
+    'sol': 'G',
+    'sol♯': 'G' + SHARP,
+    'sol𝄪': 'A',
+    'la𝄫': 'G',
+    'la♭': 'A' + FLAT,
+    'la': 'A',
+    'la♯': 'A' + SHARP,
+    'la𝄪': 'B',
+    'ti𝄫': 'A',
+    'ti♭': 'B' + FLAT,
+    'ti': 'B',
+    'ti♯': 'B' + SHARP,
+    'ti𝄪': 'C',
+    'R': _('rest'),
 };
 
 /**
@@ -682,27 +663,27 @@ const NOTESTEP = { C: 1, D: 3, E: 5, F: 6, G: 8, A: 10, B: 12 };
  * @constant {Object.<number, string>}
  */
 const ALLNOTESTEP = {
-    "Cb": 0,
-    "C": 1,
-    "C#": 2,
-    "Db": 2,
-    "D": 3,
-    "D#": 4,
-    "Eb": 4,
-    "E": 5,
-    "E#": 6,
-    "Fb": 5,
-    "F": 6,
-    "F#": 7,
-    "Gb": 7,
-    "G": 8,
-    "G#": 9,
-    "Ab": 9,
-    "A": 10,
-    "A#": 11,
-    "Bb": 11,
-    "B": 12,
-    "B#": 0
+    'Cb': 0,
+    'C': 1,
+    'C#': 2,
+    'Db': 2,
+    'D': 3,
+    'D#': 4,
+    'Eb': 4,
+    'E': 5,
+    'E#': 6,
+    'Fb': 5,
+    'F': 6,
+    'F#': 7,
+    'Gb': 7,
+    'G': 8,
+    'G#': 9,
+    'Ab': 9,
+    'A': 10,
+    'A#': 11,
+    'Bb': 11,
+    'B': 12,
+    'B#': 0,
 };
 
 /**
@@ -711,28 +692,28 @@ const ALLNOTESTEP = {
  */
 
 const SEMITONETOINTERVALMAP = {
-    0: { 0: _("Perfect unison"), 1: _("Diminished second") },
-    1: { 1: _("Minor second"), 0: _("Augmented unison") },
-    2: { 1: _("Major second"), 2: _("Diminished third") },
-    3: { 2: _("Minor third"), 1: _("Augmented second") },
-    4: { 2: _("Major third"), 3: _("Diminished fourth") },
-    5: { 3: _("Perfect fourth"), 2: _("Augmented third") },
-    6: { 4: _("Diminished fifth"), 3: _("Augmented fourth") },
-    7: { 4: _("Perfect fifth"), 5: _("Diminished sixth") },
-    8: { 5: _("Minor sixth"), 4: _("Augmented fifth") },
-    9: { 5: _("Major sixth"), 6: _("Diminished seventh") },
-    10: { 6: _("Minor seventh"), 5: _("Augmented sixth") },
-    11: { 6: _("Major seventh"), 0: _("Diminished octave") },
-    12: { 0: _("Perfect octave"), 6: _("Augmented seventh") },
-    13: { 1: _("Minor ninth"), 0: _("Augmented octave") },
-    14: { 1: _("Major ninth"), 2: _("Diminished tenth") },
-    15: { 2: _("Minor tenth"), 1: _("Augmented ninth") },
-    16: { 2: _("Major tenth"), 3: _("Diminished eleventh") },
-    17: { 3: _("Perfect eleventh"), 2: _("Augmented tenth") },
-    18: { 4: _("Diminished twelfth"), 3: _("Augmented eleventh") },
-    19: { 4: _("Perfect twelfth"), 5: _("Diminished thirteenth") },
-    20: { 5: _("Minor thirteenth"), 4: _("Augmented fifth, plus an octave") },
-    21: { 5: _("Major thirteenth"), 6: _("Diminished seventh, plus an octave") }
+    0: { 0: _('Perfect unison'), 1: _('Diminished second') },
+    1: { 1: _('Minor second'), 0: _('Augmented unison') },
+    2: { 1: _('Major second'), 2: _('Diminished third') },
+    3: { 2: _('Minor third'), 1: _('Augmented second') },
+    4: { 2: _('Major third'), 3: _('Diminished fourth') },
+    5: { 3: _('Perfect fourth'), 2: _('Augmented third') },
+    6: { 4: _('Diminished fifth'), 3: _('Augmented fourth') },
+    7: { 4: _('Perfect fifth'), 5: _('Diminished sixth') },
+    8: { 5: _('Minor sixth'), 4: _('Augmented fifth') },
+    9: { 5: _('Major sixth'), 6: _('Diminished seventh') },
+    10: { 6: _('Minor seventh'), 5: _('Augmented sixth') },
+    11: { 6: _('Major seventh'), 0: _('Diminished octave') },
+    12: { 0: _('Perfect octave'), 6: _('Augmented seventh') },
+    13: { 1: _('Minor ninth'), 0: _('Augmented octave') },
+    14: { 1: _('Major ninth'), 2: _('Diminished tenth') },
+    15: { 2: _('Minor tenth'), 1: _('Augmented ninth') },
+    16: { 2: _('Major tenth'), 3: _('Diminished eleventh') },
+    17: { 3: _('Perfect eleventh'), 2: _('Augmented tenth') },
+    18: { 4: _('Diminished twelfth'), 3: _('Augmented eleventh') },
+    19: { 4: _('Perfect twelfth'), 5: _('Diminished thirteenth') },
+    20: { 5: _('Minor thirteenth'), 4: _('Augmented fifth, plus an octave') },
+    21: { 5: _('Major thirteenth'), 6: _('Diminished seventh, plus an octave') },
 };
 
 /**
@@ -740,19 +721,19 @@ const SEMITONETOINTERVALMAP = {
  * @constant {string[]}
  */
 const SHARPPREFERENCE = [
-    "g major",
-    "d major",
-    "a major",
-    "e major",
-    "b major",
-    "f# major",
-    "c# major",
-    "e minor",
-    "b minor",
-    "f# minor",
-    "c# minor",
-    "g# minor",
-    "d# minor"
+    'g major',
+    'd major',
+    'a major',
+    'e major',
+    'b major',
+    'f# major',
+    'c# major',
+    'e minor',
+    'b minor',
+    'f# minor',
+    'c# minor',
+    'g# minor',
+    'd# minor',
 ];
 
 /**
@@ -760,69 +741,69 @@ const SHARPPREFERENCE = [
  * @constant {string[]}
  */
 const FLATPREFERENCE = [
-    "f major",
-    "bb major",
-    "eb major",
-    "ab major",
-    "db major",
-    "gb major",
-    "cb major",
-    "d minor",
-    "g minor",
-    "c minor",
-    "f minor",
-    "bb minor",
-    "eb minor",
-    "d harmonic minor",
-    "g harmonic minor",
-    "c harmonic minor",
-    "f harmonic minor",
-    "bb harmonic minor",
-    "eb harmonic minor"
+    'f major',
+    'bb major',
+    'eb major',
+    'ab major',
+    'db major',
+    'gb major',
+    'cb major',
+    'd minor',
+    'g minor',
+    'c minor',
+    'f minor',
+    'bb minor',
+    'eb minor',
+    'd harmonic minor',
+    'g harmonic minor',
+    'c harmonic minor',
+    'f harmonic minor',
+    'bb harmonic minor',
+    'eb harmonic minor',
 ];
 
 /**
  * Internal representation of solfege notes used in selectors.
  * @constant {string[]}
  */
-const SOLFNOTES = ["ti", "la", "sol", "fa", "mi", "re", "do"];
+const SOLFNOTES = ['ti', 'la', 'sol', 'fa', 'mi', 're', 'do'];
 
 /**
  * Scale notes used in selectors.
  * @constant {string[]}
  */
-const SCALENOTES = ["7", "6", "5", "4", "3", "2", "1"];
+const SCALENOTES = ['7', '6', '5', '4', '3', '2', '1'];
 
 /**
  * Carnatic solfege notes.
  * @constant {string[]}
  */
-const EASTINDIANSOLFNOTES = ["ni", "dha", "pa", "ma", "ga", "re", "sa"];
+const EASTINDIANSOLFNOTES = ['ni', 'dha', 'pa', 'ma', 'ga', 're', 'sa'];
 
 /**
  * Drum names used in selectors.
  * @constant {string[]}
  */
 const DRUMS = [
-    "snare drum",
-    "kick drum",
-    "tom tom",
-    "floor tom",
-    "bass drum",
-    "cup drum",
-    "darbuka drum",
-    "japanese drum",
-    "hi hat",
-    "ride bell",
-    "cow bell",
-    "triangle bell",
-    "finger cymbals",
-    "chime",
-    "gong",
-    "clang",
-    "crash",
-    "clap",
-    "slap"
+    'snare drum',
+    'kick drum',
+    'tom tom',
+    'floor tom',
+    'bass drum',
+    'cup drum',
+    'darbuka drum',
+    'japanese drum',
+    'hi hat',
+    'ride bell',
+    'cow bell',
+    'triangle bell',
+    'finger cymbals',
+    'chime',
+    'gong',
+    'clang',
+    'crash',
+    'clap',
+    'slap',
 ];
 
 /**
@@ -830,17 +811,17 @@ const DRUMS = [
  * @constant {string[]}
  */
 const GRAPHICS = [
-    "forward",
-    "back",
-    "right",
-    "left",
-    "set heading",
-    "set color",
-    "set shade",
-    "set hue",
-    "set grey",
-    "set translucency",
-    "set pen size"
+    'forward',
+    'back',
+    'right',
+    'left',
+    'set heading',
+    'set color',
+    'set shade',
+    'set hue',
+    'set grey',
+    'set translucency',
+    'set pen size',
 ];
 
 //The "original solfege" https://en.wikipedia.org/wiki/Solf%C3%A8ge#Origin
@@ -860,7 +841,7 @@ const SOLFATTRS = [DOUBLESHARP, SHARP, NATURAL, FLAT, DOUBLEFLAT];
  * Ordinal numbers for degrees.
  * @constant {string}
  */
-const DEGREES = _("1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th");
+const DEGREES = _('1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th');
 
 /**
  * Number of semitones in an octave.
@@ -887,6 +868,7 @@ const CENTS_PER_OCTAVE = SEMITONES * CENTS_PER_SEMITONE;
  */
 const POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
 
+// eslint-disable-next-line no-loss-of-precision
 const TWELTHROOT2 = 1.0594630943592953;
 // eslint-disable-next-line no-loss-of-precision
 const TWELVEHUNDRETHROOT2 = 1.0005777895065549;
@@ -949,43 +931,43 @@ const SLIDERWIDTH = 50;
  * Color of matrix buttons.
  * @constant {string}
  */
-const MATRIXBUTTONCOLOR = "#c374e9";
+const MATRIXBUTTONCOLOR = '#c374e9';
 
 /**
  * Color of matrix labels.
  * @constant {string}
  */
-const MATRIXLABELCOLOR = "#90c100";
+const MATRIXLABELCOLOR = '#90c100';
 
 /**
  * Color of matrix note cells.
  * @constant {string}
  */
-const MATRIXNOTECELLCOLOR = "#b1db00";
+const MATRIXNOTECELLCOLOR = '#b1db00';
 
 /**
  * Color of matrix tuplet cells.
  * @constant {string}
  */
-const MATRIXTUPLETCELLCOLOR = "#57e751";
+const MATRIXTUPLETCELLCOLOR = '#57e751';
 
 /**
  * Color of matrix rhythm cells.
  * @constant {string}
  */
-const MATRIXRHYTHMCELLCOLOR = "#c8c8c8";
+const MATRIXRHYTHMCELLCOLOR = '#c8c8c8';
 
 /**
  * Hover color of matrix buttons.
  * @constant {string}
  */
-const MATRIXBUTTONCOLORHOVER = "#c894e0";
+const MATRIXBUTTONCOLORHOVER = '#c894e0';
 
 /**
  * Hover color of matrix note cells.
  * @constant {string}
  */
-const MATRIXNOTECELLCOLORHOVER = "#c2e820";
+const MATRIXNOTECELLCOLORHOVER = '#c2e820';
 
 /**
  * Width of matrix solfege.
@@ -1021,15 +1003,15 @@ const MATRIXSOLFEHEIGHT = 30;
  * Image URL for a whole note.
  * @constant {string}
  */
-const wholeNoteImg = "data:image/svg+xml;base64," + window.btoa(_stringToBinary(WHOLENOTE));
-const halfNoteImg = "data:image/svg+xml;base64," + window.btoa(_stringToBinary(HALFNOTE));
-const quarterNoteImg = "data:image/svg+xml;base64," + window.btoa(_stringToBinary(QUARTERNOTE));
-const eighthNoteImg = "data:image/svg+xml;base64," + window.btoa(_stringToBinary(EIGHTHNOTE));
-const sixteenthNoteImg = "data:image/svg+xml;base64," + window.btoa(_stringToBinary(SIXTEENTHNOTE));
+const wholeNoteImg = 'data:image/svg+xml;base64,' + window.btoa(_stringToBinary(WHOLENOTE));
+const halfNoteImg = 'data:image/svg+xml;base64,' + window.btoa(_stringToBinary(HALFNOTE));
+const quarterNoteImg = 'data:image/svg+xml;base64,' + window.btoa(_stringToBinary(QUARTERNOTE));
+const eighthNoteImg = 'data:image/svg+xml;base64,' + window.btoa(_stringToBinary(EIGHTHNOTE));
+const sixteenthNoteImg = 'data:image/svg+xml;base64,' + window.btoa(_stringToBinary(SIXTEENTHNOTE));
 const thirtysecondNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(_stringToBinary(THIRTYSECONDNOTE));
+    'data:image/svg+xml;base64,' + window.btoa(_stringToBinary(THIRTYSECONDNOTE));
 const sixtyfourthNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(_stringToBinary(SIXTYFOURTHNOTE));
+    'data:image/svg+xml;base64,' + window.btoa(_stringToBinary(SIXTYFOURTHNOTE));
 
 /**
  * Map from note duration to corresponding note symbols.
@@ -1043,7 +1025,7 @@ const NOTESYMBOLS = {
     8: eighthNoteImg,
     16: sixteenthNoteImg,
     32: thirtysecondNoteImg,
-    64: sixtyfourthNoteImg
+    64: sixtyfourthNoteImg,
 };
 
 /**
@@ -1052,203 +1034,203 @@ const NOTESYMBOLS = {
  */
 const SELECTORSTRINGS = [
     //.TRANS: unison is a music term related to intervals
-    _("unison"),
+    _('unison'),
     //.TRANS: augmented is a music term related to intervals
-    _("augmented"),
+    _('augmented'),
     //.TRANS: diminished is a music term related to intervals and mode
-    _("diminished"),
+    _('diminished'),
     //.TRANS: minor is a music term related to intervals and mode
-    _("minor"),
+    _('minor'),
     //.TRANS: major is a music term related to intervals and mode
-    _("major"),
+    _('major'),
     //.TRANS: perfect is a music term related to intervals
-    _("perfect"),
+    _('perfect'),
     //.TRANS: twelve semi-tone scale for music
-    _("chromatic"),
-    _("algerian"),
-    _("spanish"),
+    _('chromatic'),
+    _('algerian'),
+    _('spanish'),
     //.TRANS: modal scale in music
-    _("octatonic"),
+    _('octatonic'),
     //.TRANS: harmonic major scale in music
-    _("harmonic major"),
+    _('harmonic major'),
     //.TRANS: natural minor scales in music
-    _("natural minor"),
+    _('natural minor'),
     //.TRANS: harmonic minor scale in music
-    _("harmonic minor"),
+    _('harmonic minor'),
     //.TRANS: melodic minor scale in music
-    _("melodic minor"),
+    _('melodic minor'),
     //.TRANS: modal scale for music
-    _("ionian"),
+    _('ionian'),
     //.TRANS: modal scale for music
-    _("dorian"),
+    _('dorian'),
     //.TRANS: modal scale for music
-    _("phrygian"),
+    _('phrygian'),
     //.TRANS: modal scale for music
-    _("lydian"),
+    _('lydian'),
     //.TRANS: modal scale for music
-    _("mixolydian"),
+    _('mixolydian'),
     //.TRANS: modal scale for music
-    _("aeolian"),
+    _('aeolian'),
     //.TRANS: modal scale for music
-    _("locrian"),
+    _('locrian'),
     //.TRANS: minor jazz scale for music
-    _("jazz minor"),
+    _('jazz minor'),
     //.TRANS: bebop scale for music
-    _("bebop"),
-    _("arabic"),
-    _("byzantine"),
+    _('bebop'),
+    _('arabic'),
+    _('byzantine'),
     //.TRANS: musical scale for music by Verdi
-    _("enigmatic"),
-    _("ethiopian"),
+    _('enigmatic'),
+    _('ethiopian'),
     //.TRANS: Ethiopic scale for music
-    _("geez"),
-    _("hindu"),
-    _("hungarian"),
+    _('geez'),
+    _('hindu'),
+    _('hungarian'),
     //.TRANS: minor Romanian scale for music
-    _("romanian minor"),
-    _("spanish gypsy"),
+    _('romanian minor'),
+    _('spanish gypsy'),
     //.TRANS: musical scale for Mid-Eastern music
-    _("maqam"),
+    _('maqam'),
     //.TRANS: minor blues scale for music
-    _("minor blues"),
+    _('minor blues'),
     //.TRANS: major blues scale for music
-    _("major blues"),
-    _("whole tone"),
+    _('major blues'),
+    _('whole tone'),
     //.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "minor pentatonic"
-    _("minor pentatonic"),
+    _('minor pentatonic'),
     //.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "major pentatonic"
-    _("major pentatonic"),
-    _("chinese"),
-    _("egyptian"),
+    _('major pentatonic'),
+    _('chinese'),
+    _('egyptian'),
     //.TRANS: https://en.wikipedia.org/wiki/Hirajoshi_scale NOTE: There are three different versions of this scale
-    _("hirajoshi"),
-    _("Japan"),
+    _('hirajoshi'),
+    _('Japan'),
     //.TRANS: https://en.wikipedia.org/wiki/In_scale and https://en.wikipedia.org/wiki/Sakura_Sakura
-    _("in"),
+    _('in'),
     //.TRANS: https://en.wikipedia.org/wiki/Miny%C5%8D_scale
-    _("minyo"),
+    _('minyo'),
     //.TRANS: Italian mathematician
-    _("fibonacci"),
-    _("custom"),
+    _('fibonacci'),
+    _('custom'),
     //.TRANS: highpass filter
-    _("highpass"),
+    _('highpass'),
     //.TRANS: lowpass filter
-    _("lowpass"),
+    _('lowpass'),
     //.TRANS: bandpass filter
-    _("bandpass"),
+    _('bandpass'),
     //.TRANS: high-shelf filter
-    _("highshelf"),
+    _('highshelf'),
     //.TRANS: low-shelf filter
-    _("lowshelf"),
+    _('lowshelf'),
     //.TRANS: notch-shelf filter
-    _("notch"),
+    _('notch'),
     //.TRANS: all-pass filter
-    _("allpass"),
+    _('allpass'),
     //.TRANS: peaking filter
-    _("peaking"),
-    _("sine"),
-    _("square"),
-    _("triangle"),
-    _("sawtooth"),
+    _('peaking'),
+    _('sine'),
+    _('square'),
+    _('triangle'),
+    _('sawtooth'),
     //.TRANS: even numbers
-    _("even"),
+    _('even'),
     //.TRANS: odd numbers
-    _("odd"),
-    _("scalar"),
-    _("piano"),
-    _("violin"),
-    _("viola"),
-    _("xylophone"),
-    _("vibraphone"),
-    _("cello"),
-    _("bass"),
-    _("double bass"),
-    _("guitar"),
-    _("sitar"),
-    _("harmoiunm"),
-    _("mandolin"),
-    _("acoustic guitar"),
-    _("flute"),
-    _("clarinet"),
-    _("saxophone"),
-    _("tuba"),
-    _("trumpet"),
-    _("oboe"),
-    _("trombone"),
-    _("electronic synth"),
-    _("simple 1"),
-    _("simple 2"),
-    _("simple 3"),
-    _("simple 4"),
-    _("white noise"),
-    _("brown noise"),
-    _("pink noise"),
-    _("custom"),
-    _("snare drum"),
-    _("kick drum"),
-    _("tom tom"),
-    _("floor tom"),
-    _("bass drum"),
-    _("cup drum"),
-    _("darbuka drum"),
-    _("hi hat"),
-    _("ride bell"),
-    _("cow bell"),
-    _("japanese drum"),
+    _('odd'),
+    _('scalar'),
+    _('piano'),
+    _('violin'),
+    _('viola'),
+    _('xylophone'),
+    _('vibraphone'),
+    _('cello'),
+    _('bass'),
+    _('double bass'),
+    _('guitar'),
+    _('sitar'),
+    _('harmoiunm'),
+    _('mandolin'),
+    _('acoustic guitar'),
+    _('flute'),
+    _('clarinet'),
+    _('saxophone'),
+    _('tuba'),
+    _('trumpet'),
+    _('oboe'),
+    _('trombone'),
+    _('electronic synth'),
+    _('simple 1'),
+    _('simple 2'),
+    _('simple 3'),
+    _('simple 4'),
+    _('white noise'),
+    _('brown noise'),
+    _('pink noise'),
+    _('custom'),
+    _('snare drum'),
+    _('kick drum'),
+    _('tom tom'),
+    _('floor tom'),
+    _('bass drum'),
+    _('cup drum'),
+    _('darbuka drum'),
+    _('hi hat'),
+    _('ride bell'),
+    _('cow bell'),
+    _('japanese drum'),
     // _('japanese bell'),
-    _("triangle bell"),
-    _("finger cymbals"),
-    _("chime"),
-    _("gong"),
-    _("clang"),
-    _("crash"),
-    _("bottle"),
-    _("clap"),
-    _("slap"),
-    _("splash"),
-    _("bubbles"),
-    _("raindrop"),
-    _("cat"),
-    _("cricket"),
-    _("dog"),
-    _("duck"),
-    _("banjo"),
-    _("koto"),
-    _("dulcimer"),
-    _("electric guitar"),
-    _("bassoon"),
-    _("celeste"),
+    _('triangle bell'),
+    _('finger cymbals'),
+    _('chime'),
+    _('gong'),
+    _('clang'),
+    _('crash'),
+    _('bottle'),
+    _('clap'),
+    _('slap'),
+    _('splash'),
+    _('bubbles'),
+    _('raindrop'),
+    _('cat'),
+    _('cricket'),
+    _('dog'),
+    _('duck'),
+    _('banjo'),
+    _('koto'),
+    _('dulcimer'),
+    _('electric guitar'),
+    _('bassoon'),
+    _('celeste'),
     //.TRANS: musical temperament
-    _("equal"),
+    _('equal'),
     //.TRANS: musical temperament
-    _("Pythagorean"),
+    _('Pythagorean'),
     //.TRANS: musical temperament
-    _("just intonation"),
+    _('just intonation'),
     //.TRANS: musical temperament
-    _("Meantone").toLowerCase(),
-    _("custom"),
+    _('Meantone').toLowerCase(),
+    _('custom'),
     //.TRANS: double flat is a music term related to pitch
-    _("double flat"),
+    _('double flat'),
     //.TRANS: flat is a music term related to pitch
-    _("flat"),
+    _('flat'),
     //.TRANS: natural is a music term related to pitch
-    _("natural"),
+    _('natural'),
     //.TRANS: sharp is a music term related to pitch
-    _("sharp"),
+    _('sharp'),
     //.TRANS: double sharp is a music term related to pitch
-    _("double sharp"),
+    _('double sharp'),
     // Chord names
-    _("major"),
-    _("minor"),
-    _("augmented"),
-    _("diminished"),
-    _("major 7th"),
-    _("minor 7th"),
-    _("dominant 7th"),
-    _("minor-major 7th"),
-    _("fully-diminished 7th"),
-    _("half-diminished 7th"),
-    _("custom")
+    _('major'),
+    _('minor'),
+    _('augmented'),
+    _('diminished'),
+    _('major 7th'),
+    _('minor 7th'),
+    _('dominant 7th'),
+    _('minor-major 7th'),
+    _('fully-diminished 7th'),
+    _('half-diminished 7th'),
+    _('custom'),
 ];
 
 /**
@@ -1256,11 +1238,11 @@ const SELECTORSTRINGS = [
  * @constant {Array<string>}
  */
 const ACCIDENTALLABELS = [
-    _("double sharp") + " " + DOUBLESHARP,
-    _("sharp") + " " + SHARP,
-    _("natural") + " " + NATURAL,
-    _("flat") + " " + FLAT,
-    _("double flat") + " " + DOUBLEFLAT
+    _('double sharp') + ' ' + DOUBLESHARP,
+    _('sharp') + ' ' + SHARP,
+    _('natural') + ' ' + NATURAL,
+    _('flat') + ' ' + FLAT,
+    _('double flat') + ' ' + DOUBLEFLAT,
 ];
 
 /**
@@ -1268,11 +1250,11 @@ const ACCIDENTALLABELS = [
  * @constant {Array<string>}
  */
 const ACCIDENTALNAMES = [
-    "double sharp" + " " + DOUBLESHARP,
-    "sharp" + " " + SHARP,
-    "natural" + " " + NATURAL,
-    "flat" + " " + FLAT,
-    "double flat" + " " + DOUBLEFLAT
+    'double sharp' + ' ' + DOUBLESHARP,
+    'sharp' + ' ' + SHARP,
+    'natural' + ' ' + NATURAL,
+    'flat' + ' ' + FLAT,
+    'double flat' + ' ' + DOUBLEFLAT,
 ];
 
 /**
@@ -1287,28 +1269,28 @@ const ACCIDENTALVALUES = [2, 1, 0, -1, -2];
  */
 const CHORDNAMES = [
     // scalar
-    "triad (root position)",
-    "triad (1st inversion)",
-    "triad (2nd inversion)",
-    "seventh (root position)",
-    "seventh (1st inversion)",
-    "seventh (2nd inversion)",
-    "seventh (3rd inversion)",
-    "ninth (root position)",
-    "thirteenth (root position)",
+    'triad (root position)',
+    'triad (1st inversion)',
+    'triad (2nd inversion)',
+    'seventh (root position)',
+    'seventh (1st inversion)',
+    'seventh (2nd inversion)',
+    'seventh (3rd inversion)',
+    'ninth (root position)',
+    'thirteenth (root position)',
     // semitone
-    "major",
-    "minor",
-    "augmented",
-    "diminished",
-    "major 7th",
-    "minor 7th",
-    "dominant 7th",
-    "minor-major 7th",
-    "fully-diminished 7th",
-    "half-diminished 7th",
+    'major',
+    'minor',
+    'augmented',
+    'diminished',
+    'major 7th',
+    'minor 7th',
+    'dominant 7th',
+    'minor-major 7th',
+    'fully-diminished 7th',
+    'half-diminished 7th',
     // custom must always be at the end of the list.
-    "custom"
+    'custom',
 ];
 
 /**
@@ -1326,119 +1308,119 @@ const CHORDVALUES = [
     [
         [0, 0],
         [2, 0],
-        [4, 0]
+        [4, 0],
     ],
     [
         [2, 0],
         [4, 0],
-        [7, 0]
+        [7, 0],
     ],
     [
         [-3, 0],
         [0, 0],
-        [2, 0]
+        [2, 0],
     ],
     [
         [0, 0],
         [2, 0],
         [4, 0],
-        [6, 0]
+        [6, 0],
     ],
     [
         [2, 0],
         [4, 0],
         [6, 0],
-        [7, 0]
+        [7, 0],
     ],
     [
         [-3, 0],
         [-1, 0],
         [0, 0],
-        [2, 0]
+        [2, 0],
     ],
     [
         [-1, 0],
         [0, 0],
         [2, 0],
-        [4, 0]
+        [4, 0],
     ],
     [
         [0, 0],
         [2, 0],
         [4, 0],
         [6, 0],
-        [8, 0]
+        [8, 0],
     ],
     [
         [0, 0],
         [2, 0],
         [4, 0],
         [6, 0],
-        [12, 0]
+        [12, 0],
     ],
     //semitone
     [
         [0, 0],
         [0, 4],
-        [0, 7]
+        [0, 7],
     ],
     [
         [0, 0],
         [0, 3],
-        [0, 7]
+        [0, 7],
     ],
     [
         [0, 0],
         [0, 4],
-        [0, 8]
-    ],
-    [
-        [0, 0],
-        [0, 3],
-        [0, 6]
-    ],
-    [
-        [0, 0],
-        [0, 4],
-        [0, 7],
-        [0, 11]
-    ],
-    [
-        [0, 0],
-        [0, 3],
-        [0, 7],
-        [0, 10]
-    ],
-    [
-        [0, 0],
-        [0, 4],
-        [0, 7],
-        [0, 10]
-    ],
-    [
-        [0, 0],
-        [0, 3],
-        [0, 7],
-        [0, 11]
+        [0, 8],
     ],
     [
         [0, 0],
         [0, 3],
         [0, 6],
-        [0, 9]
+    ],
+    [
+        [0, 0],
+        [0, 4],
+        [0, 7],
+        [0, 11],
+    ],
+    [
+        [0, 0],
+        [0, 3],
+        [0, 7],
+        [0, 10],
+    ],
+    [
+        [0, 0],
+        [0, 4],
+        [0, 7],
+        [0, 10],
+    ],
+    [
+        [0, 0],
+        [0, 3],
+        [0, 7],
+        [0, 11],
     ],
     [
         [0, 0],
         [0, 3],
         [0, 6],
-        [0, 10]
+        [0, 9],
+    ],
+    [
+        [0, 0],
+        [0, 3],
+        [0, 6],
+        [0, 10],
     ],
     // custom is always at the end of the list
     [
         [0, 0],
         [0, 4],
-        [0, 7]
-    ]
+        [0, 7],
+    ],
 ];
 
 /**
@@ -1455,9 +1437,9 @@ const setCustomChord = chord => {
  * @constant {Array<Array<string>>}
  */
 const INVERTMODES = [
-    [_("even"), "even"],
-    [_("odd"), "odd"],
-    [_("scalar"), "scalar"]
+    [_('even'), 'even'],
+    [_('odd'), 'odd'],
+    [_('scalar'), 'scalar'],
 ];
 
 /**
@@ -1465,11 +1447,11 @@ const INVERTMODES = [
  * @constant {Array<Array<string>>}
  */
 const INTERVALS = [
-    [_("perfect"), "perfect", [1, 4, 5, 8]],
-    [_("minor"), "minor", [2, 3, 6, 7]],
-    [_("diminished"), "diminished", [2, 3, 4, 5, 6, 7, 8]],
-    [_("augmented"), "augmented", [1, 2, 3, 4, 5, 6, 7, 8]],
-    [_("major"), "major", [2, 3, 6, 7]]
+    [_('perfect'), 'perfect', [1, 4, 5, 8]],
+    [_('minor'), 'minor', [2, 3, 6, 7]],
+    [_('diminished'), 'diminished', [2, 3, 4, 5, 6, 7, 8]],
+    [_('augmented'), 'augmented', [1, 2, 3, 4, 5, 6, 7, 8]],
+    [_('major'), 'major', [2, 3, 6, 7]],
 ];
 
 /**
@@ -1477,37 +1459,37 @@ const INTERVALS = [
  * @constant {Object}
  */
 const INTERVALVALUES = {
-    "perfect 1": [0, 0, 1 / 1],
-    "diminished 2": [0, -1, 128 / 125],
-    "augmented 1": [1, 1, 25 / 24],
-    "chromatic semitone": [1, 1, 25 / 24],
-    "minor 2": [1, -1, 16 / 15],
-    "major 2": [2, 1, 9 / 8],
-    "whole tone": [2, 1, 9 / 8],
-    "diminished 3": [2, -1, 144 / 125],
-    "augmented 2": [3, 1, 75 / 64],
-    "minor 3": [3, -1, 6 / 5],
-    "major 3": [4, 1, 5 / 4],
-    "diminished 4": [4, -1, 32 / 25],
-    "augmented 3": [5, 1, 125 / 96],
-    "perfect 4": [5, 0, 4 / 3],
-    "augmented 4": [6, 1, 25 / 18],
-    "diminished 5": [6, -1, 36 / 25],
-    "perfect 5": [7, 0, 3 / 2],
-    "diminished 6": [7, -1, 192 / 125],
-    "augmented 5": [8, 1, 25 / 16],
-    "minor 6": [8, -1, 8 / 5],
-    "major 6": [9, 1, 5 / 3],
-    "diminished 7": [9, -1, 9 / 5],
-    "augmented 6": [10, 1, 125 / 72],
-    "minor 7": [10, -1, 9 / 5],
-    "major 7": [11, 1, 15 / 8],
-    "diminished 8": [11, -1, 48 / 25],
-    "diminished octave": [11, -1, 48 / 25],
-    "augmented 7": [12, 1, 125 / 64],
-    "perfect 8": [12, 0, 2 / 1],
-    "octave": [12, 0, 2 / 1],
-    "augmented 8": [13, 1, 25 / 12]
+    'perfect 1': [0, 0, 1 / 1],
+    'diminished 2': [0, -1, 128 / 125],
+    'augmented 1': [1, 1, 25 / 24],
+    'chromatic semitone': [1, 1, 25 / 24],
+    'minor 2': [1, -1, 16 / 15],
+    'major 2': [2, 1, 9 / 8],
+    'whole tone': [2, 1, 9 / 8],
+    'diminished 3': [2, -1, 144 / 125],
+    'augmented 2': [3, 1, 75 / 64],
+    'minor 3': [3, -1, 6 / 5],
+    'major 3': [4, 1, 5 / 4],
+    'diminished 4': [4, -1, 32 / 25],
+    'augmented 3': [5, 1, 125 / 96],
+    'perfect 4': [5, 0, 4 / 3],
+    'augmented 4': [6, 1, 25 / 18],
+    'diminished 5': [6, -1, 36 / 25],
+    'perfect 5': [7, 0, 3 / 2],
+    'diminished 6': [7, -1, 192 / 125],
+    'augmented 5': [8, 1, 25 / 16],
+    'minor 6': [8, -1, 8 / 5],
+    'major 6': [9, 1, 5 / 3],
+    'diminished 7': [9, -1, 9 / 5],
+    'augmented 6': [10, 1, 125 / 72],
+    'minor 7': [10, -1, 9 / 5],
+    'major 7': [11, 1, 15 / 8],
+    'diminished 8': [11, -1, 48 / 25],
+    'diminished octave': [11, -1, 48 / 25],
+    'augmented 7': [12, 1, 125 / 64],
+    'perfect 8': [12, 0, 2 / 1],
+    'octave': [12, 0, 2 / 1],
+    'augmented 8': [13, 1, 25 / 12],
 };
 
 /**
@@ -1515,78 +1497,78 @@ const INTERVALVALUES = {
  * @constant {Object}
  */
 const MODE_PIE_MENUS = {
-    "5": [
-        "minor pentatonic",
-        "major pentatonic",
-        " ",
-        "chinese",
-        "egyptian",
-        " ",
-        "hirajoshi",
-        "in",
-        "minyo",
-        " ",
-        "fibonacci",
-        " "
+    '5': [
+        'minor pentatonic',
+        'major pentatonic',
+        ' ',
+        'chinese',
+        'egyptian',
+        ' ',
+        'hirajoshi',
+        'in',
+        'minyo',
+        ' ',
+        'fibonacci',
+        ' ',
     ],
-    "6": ["minor blues", " ", " ", " ", "major blues", " ", " ", " ", "whole tone", " ", " ", " "],
-    "7": [
-        "ionian",
-        " ",
-        "dorian",
-        " ",
-        "phrygian",
-        "lydian",
-        " ",
-        "mixolydian",
-        " ",
-        "aeolian",
-        " ",
-        "locrian"
+    '6': ['minor blues', ' ', ' ', ' ', 'major blues', ' ', ' ', ' ', 'whole tone', ' ', ' ', ' '],
+    '7': [
+        'ionian',
+        ' ',
+        'dorian',
+        ' ',
+        'phrygian',
+        'lydian',
+        ' ',
+        'mixolydian',
+        ' ',
+        'aeolian',
+        ' ',
+        'locrian',
     ],
-    "7a": [
-        "major",
-        " ",
-        "harmonic major",
-        " ",
-        "natural minor",
-        " ",
-        "harmonic minor",
-        " ",
-        "melodic minor",
-        " ",
-        " ",
-        " "
+    '7a': [
+        'major',
+        ' ',
+        'harmonic major',
+        ' ',
+        'natural minor',
+        ' ',
+        'harmonic minor',
+        ' ',
+        'melodic minor',
+        ' ',
+        ' ',
+        ' ',
     ],
-    "7b": [
-        "jazz minor",
-        " ",
-        "arabic",
-        "byzantine",
-        "enigmatic",
-        "ethiopian",
-        "geez",
-        "hindu",
-        "hungarian",
-        "maqam",
-        "romanian minor",
-        "spanish gypsy"
+    '7b': [
+        'jazz minor',
+        ' ',
+        'arabic',
+        'byzantine',
+        'enigmatic',
+        'ethiopian',
+        'geez',
+        'hindu',
+        'hungarian',
+        'maqam',
+        'romanian minor',
+        'spanish gypsy',
     ],
-    "8": [
-        "octatonic",
-        " ",
-        "spanish",
-        " ",
-        "bebop",
-        " ",
-        "diminished",
-        " ",
-        " ",
-        "algerian",
-        " ",
-        " "
+    '8': [
+        'octatonic',
+        ' ',
+        'spanish',
+        ' ',
+        'bebop',
+        ' ',
+        'diminished',
+        ' ',
+        ' ',
+        'algerian',
+        ' ',
+        ' ',
     ],
-    "12": ["chromatic", " ", " ", " ", " ", " ", "custom", " ", " ", " ", " ", " "]
+    '12': ['chromatic', ' ', ' ', ' ', ' ', ' ', 'custom', ' ', ' ', ' ', ' ', ' '],
 };
 
 // The table contains the intervals that define the modes.
@@ -1595,62 +1577,62 @@ const MODE_PIE_MENUS = {
 // TODO: better system of organizing and naming collections of pitches
 const MUSICALMODES = {
     // 12 notes in an octave
-    "chromatic": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    'chromatic': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 
     // 8 notes in an octave
-    "algerian": [2, 1, 2, 1, 1, 1, 3, 1],
-    "diminished": [2, 1, 2, 1, 2, 1, 2, 1],
-    "spanish": [1, 2, 1, 1, 1, 2, 2, 2],
-    "octatonic": [1, 2, 1, 2, 1, 2, 1, 2],
-    "bebop": [1, 1, 1, 2, 2, 1, 2, 2],
+    'algerian': [2, 1, 2, 1, 1, 1, 3, 1],
+    'diminished': [2, 1, 2, 1, 2, 1, 2, 1],
+    'spanish': [1, 2, 1, 1, 1, 2, 2, 2],
+    'octatonic': [1, 2, 1, 2, 1, 2, 1, 2],
+    'bebop': [1, 1, 1, 2, 2, 1, 2, 2],
 
     // 7 notes in an octave
-    "major": [2, 2, 1, 2, 2, 2, 1],
-    "harmonic major": [2, 2, 1, 2, 1, 3, 1],
-    "natural minor": [2, 1, 2, 2, 1, 2, 2],
-    "harmonic minor": [2, 1, 2, 2, 1, 3, 1],
-    "melodic minor": [2, 1, 2, 2, 2, 2, 1],
+    'major': [2, 2, 1, 2, 2, 2, 1],
+    'harmonic major': [2, 2, 1, 2, 1, 3, 1],
+    'natural minor': [2, 1, 2, 2, 1, 2, 2],
+    'harmonic minor': [2, 1, 2, 2, 1, 3, 1],
+    'melodic minor': [2, 1, 2, 2, 2, 2, 1],
 
-    "ionian": [2, 2, 1, 2, 2, 2, 1],
-    "dorian": [2, 1, 2, 2, 2, 1, 2],
-    "phrygian": [1, 2, 2, 2, 1, 2, 2],
-    "lydian": [2, 2, 2, 1, 2, 2, 1],
-    "mixolydian": [2, 2, 1, 2, 2, 1, 2],
-    "minor": [2, 1, 2, 2, 1, 2, 2],
-    "aeolian": [2, 1, 2, 2, 1, 2, 2],
-    "locrian": [1, 2, 2, 1, 2, 2, 2],
+    'ionian': [2, 2, 1, 2, 2, 2, 1],
+    'dorian': [2, 1, 2, 2, 2, 1, 2],
+    'phrygian': [1, 2, 2, 2, 1, 2, 2],
+    'lydian': [2, 2, 2, 1, 2, 2, 1],
+    'mixolydian': [2, 2, 1, 2, 2, 1, 2],
+    'minor': [2, 1, 2, 2, 1, 2, 2],
+    'aeolian': [2, 1, 2, 2, 1, 2, 2],
+    'locrian': [1, 2, 2, 1, 2, 2, 2],
 
-    "jazz minor": [2, 1, 2, 2, 2, 2, 1],
+    'jazz minor': [2, 1, 2, 2, 2, 2, 1],
 
-    "arabic": [2, 2, 1, 1, 2, 2, 2],
-    "byzantine": [1, 3, 1, 2, 1, 3, 1],
-    "enigmatic": [1, 3, 2, 2, 2, 1, 1],
-    "ethiopian": [2, 1, 2, 2, 1, 2, 2],
-    "geez": [2, 1, 2, 2, 1, 2, 2],
-    "hindu": [2, 2, 1, 2, 1, 2, 2],
-    "hungarian": [2, 1, 3, 1, 1, 3, 1],
-    "maqam": [1, 3, 1, 2, 1, 3, 1],
-    "romanian minor": [2, 1, 3, 1, 2, 1, 2],
-    "spanish gypsy": [1, 3, 1, 2, 1, 2, 2],
+    'arabic': [2, 2, 1, 1, 2, 2, 2],
+    'byzantine': [1, 3, 1, 2, 1, 3, 1],
+    'enigmatic': [1, 3, 2, 2, 2, 1, 1],
+    'ethiopian': [2, 1, 2, 2, 1, 2, 2],
+    'geez': [2, 1, 2, 2, 1, 2, 2],
+    'hindu': [2, 2, 1, 2, 1, 2, 2],
+    'hungarian': [2, 1, 3, 1, 1, 3, 1],
+    'maqam': [1, 3, 1, 2, 1, 3, 1],
+    'romanian minor': [2, 1, 3, 1, 2, 1, 2],
+    'spanish gypsy': [1, 3, 1, 2, 1, 2, 2],
 
     // 6 notes in an octave
-    "minor blues": [3, 2, 1, 1, 3, 2],
-    "major blues": [2, 1, 1, 3, 2, 2],
-    "whole tone": [2, 2, 2, 2, 2, 2],
+    'minor blues': [3, 2, 1, 1, 3, 2],
+    'major blues': [2, 1, 1, 3, 2, 2],
+    'whole tone': [2, 2, 2, 2, 2, 2],
 
     // 5 notes in an octave
-    "major pentatonic": [2, 2, 3, 2, 3],
-    "minor pentatonic": [3, 2, 2, 3, 2],
-    "chinese": [4, 2, 1, 4, 1],
-    "egyptian": [2, 3, 2, 3, 2],
-    "hirajoshi": [1, 4, 1, 4, 2],
-    "in": [1, 4, 2, 1, 4],
-    "minyo": [3, 2, 2, 3, 2],
-    "fibonacci": [1, 1, 2, 3, 5],
-    "alt pentatonic": [2, 3, 2, 2, 3],
+    'major pentatonic': [2, 2, 3, 2, 3],
+    'minor pentatonic': [3, 2, 2, 3, 2],
+    'chinese': [4, 2, 1, 4, 1],
+    'egyptian': [2, 3, 2, 3, 2],
+    'hirajoshi': [1, 4, 1, 4, 2],
+    'in': [1, 4, 2, 1, 4],
+    'minyo': [3, 2, 2, 3, 2],
+    'fibonacci': [1, 1, 2, 3, 5],
+    'alt pentatonic': [2, 3, 2, 2, 3],
 
     // User definition overrides this constant
-    "custom": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    'custom': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 };
 
 /**
@@ -1658,15 +1640,15 @@ const MUSICALMODES = {
  * @constant {Object}
  */
 const MAQAMTABLE = {
-    "hijaz kar": "C maqam",
-    "hijaz kar maqam": "C maqam",
-    "shahnaz": "D maqam",
-    "maqam mustar": "Eb maqam",
-    "maqam jiharkah": "F maqam",
-    "shadd araban": "G maqam",
-    "suzidil": "A maqam",
-    "ajam": "Bb maqam",
-    "ajam maqam": "Bb maqam"
+    'hijaz kar': 'C maqam',
+    'hijaz kar maqam': 'C maqam',
+    'shahnaz': 'D maqam',
+    'maqam mustar': 'Eb maqam',
+    'maqam jiharkah': 'F maqam',
+    'shadd araban': 'G maqam',
+    'suzidil': 'A maqam',
+    'ajam': 'Bb maqam',
+    'ajam maqam': 'Bb maqam',
 };
 
 /**
@@ -1674,14 +1656,14 @@ const MAQAMTABLE = {
  * @constant {Array<Array<string>>}
  */
 const FILTERTYPES = [
-    [_("highpass"), "highpass"],
-    [_("lowpass"), "lowpass"],
-    [_("bandpass"), "bandpass"],
-    [_("highshelf"), "highshelf"],
-    [_("lowshelf"), "lowshelf"],
-    [_("notch"), "notch"],
-    [_("allpass"), "allpass"],
-    [_("peaking"), "peaking"]
+    [_('highpass'), 'highpass'],
+    [_('lowpass'), 'lowpass'],
+    [_('bandpass'), 'bandpass'],
+    [_('highshelf'), 'highshelf'],
+    [_('lowshelf'), 'lowshelf'],
+    [_('notch'), 'notch'],
+    [_('allpass'), 'allpass'],
+    [_('peaking'), 'peaking'],
 ];
 
 /**
@@ -1689,10 +1671,10 @@ const FILTERTYPES = [
  * @constant {Array<Array<string>>}
  */
 const OSCTYPES = [
-    [_("sine"), "sine"],
-    [_("square"), "square"],
-    [_("triangle"), "triangle"],
-    [_("sawtooth"), "sawtooth"]
+    [_('sine'), 'sine'],
+    [_('square'), 'square'],
+    [_('triangle'), 'triangle'],
+    [_('sawtooth'), 'sawtooth'],
 ];
 
 /**
@@ -1700,15 +1682,15 @@ const OSCTYPES = [
  * @constant {Array<Array<string>>}
  */
 const INITIALTEMPERAMENTS = [
-    [_("Equal (12EDO)"), "equal", "equal"],
-    [_("Equal (5EDO)"), "equal5", "equal5"],
-    [_("Equal (7EDO)"), "equal7", "equal7"],
-    [_("Equal (19EDO)"), "equal19", "equal19"],
-    [_("Equal (31EDO)"), "equal31", "equal31"],
-    [_("5-limit Just Intonation"), "just intonation", "just intonation"],
-    [_("Pythagorean (3-limit JI)"), "Pythagorean", "Pythagorean"],
-    [_("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
-    [_("Meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"]
+    [_('Equal (12EDO)'), 'equal', 'equal'],
+    [_('Equal (5EDO)'), 'equal5', 'equal5'],
+    [_('Equal (7EDO)'), 'equal7', 'equal7'],
+    [_('Equal (19EDO)'), 'equal19', 'equal19'],
+    [_('Equal (31EDO)'), 'equal31', 'equal31'],
+    [_('5-limit Just Intonation'), 'just intonation', 'just intonation'],
+    [_('Pythagorean (3-limit JI)'), 'Pythagorean', 'Pythagorean'],
+    [_('Meantone') + ' (1/3)', '1/3 comma meantone', 'meantone (1/3)'],
+    [_('Meantone') + ' (1/4)', '1/4 comma meantone', 'meantone (1/4)'],
 ];
 
 /**
@@ -1716,16 +1698,16 @@ const INITIALTEMPERAMENTS = [
  * @type {Array<Array<string>>}
  */
 let TEMPERAMENTS = [
-    [_("Equal (12EDO)"), "equal", "equal"],
-    [_("Equal (5EDO)"), "equal5", "equal5"],
-    [_("Equal (7EDO)"), "equal7", "equal7"],
-    [_("Equal (19EDO)"), "equal19", "equal19"],
-    [_("Equal (31EDO)"), "equal31", "equal31"],
-    [_("5-limit Just Intonation"), "just intonation", "just intonation"],
-    [_("Pythagorean (3-limit JI)"), "Pythagorean", "Pythagorean"],
-    [_("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
-    [_("Meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"],
-    [_("custom"), "custom", "custom"]
+    [_('Equal (12EDO)'), 'equal', 'equal'],
+    [_('Equal (5EDO)'), 'equal5', 'equal5'],
+    [_('Equal (7EDO)'), 'equal7', 'equal7'],
+    [_('Equal (19EDO)'), 'equal19', 'equal19'],
+    [_('Equal (31EDO)'), 'equal31', 'equal31'],
+    [_('5-limit Just Intonation'), 'just intonation', 'just intonation'],
+    [_('Pythagorean (3-limit JI)'), 'Pythagorean', 'Pythagorean'],
+    [_('Meantone') + ' (1/3)', '1/3 comma meantone', 'meantone (1/3)'],
+    [_('Meantone') + ' (1/4)', '1/4 comma meantone', 'meantone (1/4)'],
+    [_('custom'), 'custom', 'custom'],
 ];
 
 /**
@@ -1733,15 +1715,15 @@ let TEMPERAMENTS = [
  * @constant {Object}
  */
 const PreDefinedTemperaments = {
-    "equal": true,
-    "equal5": true,
-    "equal7": true,
-    "equal19": true,
-    "equal31": true,
-    "just intonation": true,
-    "Pythagorean": true,
-    "1/3 comma meantone": true,
-    "1/4 comma meantone": true
+    'equal': true,
+    'equal5': true,
+    'equal7': true,
+    'equal19': true,
+    'equal31': true,
+    'just intonation': true,
+    'Pythagorean': true,
+    '1/3 comma meantone': true,
+    '1/4 comma meantone': true,
 };
 
 /**
@@ -1749,407 +1731,407 @@ const PreDefinedTemperaments = {
  * @constant {Object}
  */
 const TEMPERAMENT = {
-    "equal": {
-        "perfect 1": Math.pow(2, 0 / 12),
-        "minor 2": Math.pow(2, 1 / 12),
-        "augmented 1": Math.pow(2, 1 / 12),
-        "major 2": Math.pow(2, 2 / 12),
-        "augmented 2": Math.pow(2, 3 / 12),
-        "minor 3": Math.pow(2, 3 / 12),
-        "major 3": Math.pow(2, 4 / 12),
-        "augmented 3": Math.pow(2, 5 / 12),
-        "diminished 4": Math.pow(2, 4 / 12),
-        "perfect 4": Math.pow(2, 5 / 12),
-        "augmented 4": Math.pow(2, 6 / 12),
-        "diminished 5": Math.pow(2, 6 / 12),
-        "perfect 5": Math.pow(2, 7 / 12),
-        "augmented 5": Math.pow(2, 8 / 12),
-        "minor 6": Math.pow(2, 8 / 12),
-        "major 6": Math.pow(2, 9 / 12),
-        "augmented 6": Math.pow(2, 10 / 12),
-        "minor 7": Math.pow(2, 10 / 12),
-        "major 7": Math.pow(2, 11 / 12),
-        "augmented 7": Math.pow(2, 12 / 12),
-        "diminished 8": Math.pow(2, 11 / 12),
-        "perfect 8": Math.pow(2, 12 / 12),
-        "pitchNumber": 12,
-        "interval": [
-            "perfect 1",
-            "minor 2",
-            "major 2",
-            "minor 3",
-            "major 3",
-            "perfect 4",
-            "diminished 5",
-            "perfect 5",
-            "minor 6",
-            "major 6",
-            "minor 7",
-            "major 7",
-            "perfect 8"
-        ]
+    'equal': {
+        'perfect 1': Math.pow(2, 0 / 12),
+        'minor 2': Math.pow(2, 1 / 12),
+        'augmented 1': Math.pow(2, 1 / 12),
+        'major 2': Math.pow(2, 2 / 12),
+        'augmented 2': Math.pow(2, 3 / 12),
+        'minor 3': Math.pow(2, 3 / 12),
+        'major 3': Math.pow(2, 4 / 12),
+        'augmented 3': Math.pow(2, 5 / 12),
+        'diminished 4': Math.pow(2, 4 / 12),
+        'perfect 4': Math.pow(2, 5 / 12),
+        'augmented 4': Math.pow(2, 6 / 12),
+        'diminished 5': Math.pow(2, 6 / 12),
+        'perfect 5': Math.pow(2, 7 / 12),
+        'augmented 5': Math.pow(2, 8 / 12),
+        'minor 6': Math.pow(2, 8 / 12),
+        'major 6': Math.pow(2, 9 / 12),
+        'augmented 6': Math.pow(2, 10 / 12),
+        'minor 7': Math.pow(2, 10 / 12),
+        'major 7': Math.pow(2, 11 / 12),
+        'augmented 7': Math.pow(2, 12 / 12),
+        'diminished 8': Math.pow(2, 11 / 12),
+        'perfect 8': Math.pow(2, 12 / 12),
+        'pitchNumber': 12,
+        'interval': [
+            'perfect 1',
+            'minor 2',
+            'major 2',
+            'minor 3',
+            'major 3',
+            'perfect 4',
+            'diminished 5',
+            'perfect 5',
+            'minor 6',
+            'major 6',
+            'minor 7',
+            'major 7',
+            'perfect 8',
+        ],
     },
-    "equal5": {
+    'equal5': {
         // Equal 5EDO temperament: 5 Equal Divisions of the Octave
-        "perfect 1": Math.pow(2, 0 / 5), //Unison
-        "minor 2": Math.pow(2, 1 / 5),
-        "augmented 1": Math.pow(2, 1 / 5),
-        "major 2": Math.pow(2, 2 / 5),
-        "augmented 2": Math.pow(2, 2 / 5),
-        "minor 3": Math.pow(2, 2 / 5),
-        "major 3": Math.pow(2, 3 / 5),
-        "augmented 3": Math.pow(2, 3 / 5),
-        "diminished 4": Math.pow(2, 3 / 5),
-        "perfect 4": Math.pow(2, 3 / 5),
-        "augmented 4": Math.pow(2, 4 / 5),
-        "diminished 5": Math.pow(2, 4 / 5),
-        "perfect 5": Math.pow(2, 5 / 5),
-        "augmented 5": Math.pow(2, 5 / 5),
-        "minor 6": Math.pow(2, 5 / 5),
-        "major 6": Math.pow(2, 5 / 5),
-        "augmented 6": Math.pow(2, 5 / 5),
-        "minor 7": Math.pow(2, 5 / 5),
-        "major 7": Math.pow(2, 5 / 5),
-        "augmented 7": Math.pow(2, 5 / 5),
-        "diminished 8": Math.pow(2, 5 / 5),
-        "perfect 8": Math.pow(2, 5 / 5),
-        "pitchNumber": 5,
-        "interval": ["perfect 1", "minor 2", "major 2", "major 3", "augmented 4", "perfect 5"]
+        'perfect 1': Math.pow(2, 0 / 5), //Unison
+        'minor 2': Math.pow(2, 1 / 5),
+        'augmented 1': Math.pow(2, 1 / 5),
+        'major 2': Math.pow(2, 2 / 5),
+        'augmented 2': Math.pow(2, 2 / 5),
+        'minor 3': Math.pow(2, 2 / 5),
+        'major 3': Math.pow(2, 3 / 5),
+        'augmented 3': Math.pow(2, 3 / 5),
+        'diminished 4': Math.pow(2, 3 / 5),
+        'perfect 4': Math.pow(2, 3 / 5),
+        'augmented 4': Math.pow(2, 4 / 5),
+        'diminished 5': Math.pow(2, 4 / 5),
+        'perfect 5': Math.pow(2, 5 / 5),
+        'augmented 5': Math.pow(2, 5 / 5),
+        'minor 6': Math.pow(2, 5 / 5),
+        'major 6': Math.pow(2, 5 / 5),
+        'augmented 6': Math.pow(2, 5 / 5),
+        'minor 7': Math.pow(2, 5 / 5),
+        'major 7': Math.pow(2, 5 / 5),
+        'augmented 7': Math.pow(2, 5 / 5),
+        'diminished 8': Math.pow(2, 5 / 5),
+        'perfect 8': Math.pow(2, 5 / 5),
+        'pitchNumber': 5,
+        'interval': ['perfect 1', 'minor 2', 'major 2', 'major 3', 'augmented 4', 'perfect 5'],
     },
-    "equal7": {
+    'equal7': {
         // Equal 7EDO Temperament: 7 Equal Divisions of the Octave
-        "perfect 1": Math.pow(2, 0 / 7), //Unison
-        "minor 2": Math.pow(2, 1 / 7),
-        "augmented 1": Math.pow(2, 1 / 7),
-        "major 2": Math.pow(2, 2 / 7),
-        "augmented 2": Math.pow(2, 2 / 7),
-        "minor 3": Math.pow(2, 3 / 7),
-        "major 3": Math.pow(2, 3 / 7),
-        "augmented 3": Math.pow(2, 4 / 7),
-        "diminished 4": Math.pow(2, 4 / 7),
-        "perfect 4": Math.pow(2, 4 / 7),
-        "augmented 4": Math.pow(2, 5 / 7),
-        "diminished 5": Math.pow(2, 4 / 7),
-        "perfect 5": Math.pow(2, 5 / 7),
-        "augmented 5": Math.pow(2, 6 / 7),
-        "minor 6": Math.pow(2, 5 / 7),
-        "major 6": Math.pow(2, 6 / 7),
-        "augmented 6": Math.pow(2, 7 / 7),
-        "minor 7": Math.pow(2, 6 / 7),
-        "major 7": Math.pow(2, 6 / 7),
-        "augmented 7": Math.pow(2, 7 / 7), // wraps around
-        "diminished 8": Math.pow(2, 7 / 7),
-        "perfect 8": Math.pow(2, 7 / 7),
-        "pitchNumber": 7,
-        "interval": [
-            "perfect 1",
-            "minor 2",
-            "major 2",
-            "major 3",
-            "perfect 4",
-            "perfect 5",
-            "major 6",
-            "perfect 8"
-        ]
+        'perfect 1': Math.pow(2, 0 / 7), //Unison
+        'minor 2': Math.pow(2, 1 / 7),
+        'augmented 1': Math.pow(2, 1 / 7),
+        'major 2': Math.pow(2, 2 / 7),
+        'augmented 2': Math.pow(2, 2 / 7),
+        'minor 3': Math.pow(2, 3 / 7),
+        'major 3': Math.pow(2, 3 / 7),
+        'augmented 3': Math.pow(2, 4 / 7),
+        'diminished 4': Math.pow(2, 4 / 7),
+        'perfect 4': Math.pow(2, 4 / 7),
+        'augmented 4': Math.pow(2, 5 / 7),
+        'diminished 5': Math.pow(2, 4 / 7),
+        'perfect 5': Math.pow(2, 5 / 7),
+        'augmented 5': Math.pow(2, 6 / 7),
+        'minor 6': Math.pow(2, 5 / 7),
+        'major 6': Math.pow(2, 6 / 7),
+        'augmented 6': Math.pow(2, 7 / 7),
+        'minor 7': Math.pow(2, 6 / 7),
+        'major 7': Math.pow(2, 6 / 7),
+        'augmented 7': Math.pow(2, 7 / 7), // wraps around
+        'diminished 8': Math.pow(2, 7 / 7),
+        'perfect 8': Math.pow(2, 7 / 7),
+        'pitchNumber': 7,
+        'interval': [
+            'perfect 1',
+            'minor 2',
+            'major 2',
+            'major 3',
+            'perfect 4',
+            'perfect 5',
+            'major 6',
+            'perfect 8',
+        ],
     },
-    "equal19": {
+    'equal19': {
         // Equal 19EDO Temperament: 19 Equal Divisions of the Octave
-        "perfect 1": Math.pow(2, 0 / 19),
-        "minor 2": Math.pow(2, 2 / 19),
-        "augmented 1": Math.pow(2, 1 / 19),
-        "major 2": Math.pow(2, 3 / 19),
-        "augmented 2": Math.pow(2, 4 / 19),
-        "minor 3": Math.pow(2, 5 / 19),
-        "major 3": Math.pow(2, 6 / 19),
-        "augmented 3": Math.pow(2, 7 / 19),
-        "diminished 4": Math.pow(2, 7 / 19),
-        "perfect 4": Math.pow(2, 8 / 19),
-        "augmented 4": Math.pow(2, 9 / 19),
-        "diminished 5": Math.pow(2, 9 / 19),
-        "perfect 5": Math.pow(2, 10 / 19),
-        "augmented 5": Math.pow(2, 11 / 19),
-        "minor 6": Math.pow(2, 12 / 19),
-        "major 6": Math.pow(2, 13 / 19),
-        "augmented 6": Math.pow(2, 14 / 19),
-        "minor 7": Math.pow(2, 15 / 19),
-        "major 7": Math.pow(2, 16 / 19),
-        "augmented 7": Math.pow(2, 17 / 19),
-        "diminished 8": Math.pow(2, 18 / 19),
-        "perfect 8": Math.pow(2, 19 / 19),
-        "pitchNumber": 19,
-        "interval": [
-            "perfect 1",
-            "augmented 1",
-            "minor 2",
-            "major 2",
-            "augmented 2",
-            "minor 3",
-            "major 3",
-            "augmented 3",
-            "perfect 4",
-            "augmented 4",
-            "perfect 5",
-            "augmented 5",
-            "minor 6",
-            "major 6",
-            "augmented 6",
-            "minor 7",
-            "major 7",
-            "augmented 7",
-            "diminished 8",
-            "perfect 8"
-        ]
+        'perfect 1': Math.pow(2, 0 / 19),
+        'minor 2': Math.pow(2, 2 / 19),
+        'augmented 1': Math.pow(2, 1 / 19),
+        'major 2': Math.pow(2, 3 / 19),
+        'augmented 2': Math.pow(2, 4 / 19),
+        'minor 3': Math.pow(2, 5 / 19),
+        'major 3': Math.pow(2, 6 / 19),
+        'augmented 3': Math.pow(2, 7 / 19),
+        'diminished 4': Math.pow(2, 7 / 19),
+        'perfect 4': Math.pow(2, 8 / 19),
+        'augmented 4': Math.pow(2, 9 / 19),
+        'diminished 5': Math.pow(2, 9 / 19),
+        'perfect 5': Math.pow(2, 10 / 19),
+        'augmented 5': Math.pow(2, 11 / 19),
+        'minor 6': Math.pow(2, 12 / 19),
+        'major 6': Math.pow(2, 13 / 19),
+        'augmented 6': Math.pow(2, 14 / 19),
+        'minor 7': Math.pow(2, 15 / 19),
+        'major 7': Math.pow(2, 16 / 19),
+        'augmented 7': Math.pow(2, 17 / 19),
+        'diminished 8': Math.pow(2, 18 / 19),
+        'perfect 8': Math.pow(2, 19 / 19),
+        'pitchNumber': 19,
+        'interval': [
+            'perfect 1',
+            'augmented 1',
+            'minor 2',
+            'major 2',
+            'augmented 2',
+            'minor 3',
+            'major 3',
+            'augmented 3',
+            'perfect 4',
+            'augmented 4',
+            'perfect 5',
+            'augmented 5',
+            'minor 6',
+            'major 6',
+            'augmented 6',
+            'minor 7',
+            'major 7',
+            'augmented 7',
+            'diminished 8',
+            'perfect 8',
+        ],
     },
-    "equal31": {
+    'equal31': {
         // Equal 31EDO Temperament: 31 Equal Divisions of the Octave
-        "perfect 1": Math.pow(2, 0 / 31),
-        "diminished 2": Math.pow(2, 1 / 31),
-        "augmented 1": Math.pow(2, 2 / 31),
-        "minor 2": Math.pow(2, 3 / 31),
-        "mid 2": Math.pow(2, 4 / 31),
-        "major 2": Math.pow(2, 5 / 31),
-        "up-major 2": Math.pow(2, 6 / 31),
-        "down-minor 3": Math.pow(2, 7 / 31),
-        "minor 3": Math.pow(2, 8 / 31),
-        "mid 3": Math.pow(2, 9 / 31),
-        "major 3": Math.pow(2, 10 / 31),
-        "up-major 3": Math.pow(2, 11 / 31),
-        "down 4": Math.pow(2, 12 / 31),
-        "perfect 4": Math.pow(2, 13 / 31),
-        "up 4": Math.pow(2, 14 / 31),
-        "down-diminished 5": Math.pow(2, 15 / 31),
-        "up-augmented 4": Math.pow(2, 16 / 31),
-        "down 5": Math.pow(2, 17 / 31),
-        "perfect 5": Math.pow(2, 18 / 31),
-        "up 5": Math.pow(2, 19 / 31),
-        "down-minor 6": Math.pow(2, 20 / 31),
-        "minor 6": Math.pow(2, 21 / 31),
-        "mid 6": Math.pow(2, 22 / 31),
-        "major 6": Math.pow(2, 23 / 31),
-        "up-major 6": Math.pow(2, 24 / 31),
-        "down-minor 7": Math.pow(2, 25 / 31),
-        "minor 7": Math.pow(2, 26 / 31),
-        "mid 7": Math.pow(2, 27 / 31),
-        "major 7": Math.pow(2, 28 / 31),
-        "up-major 7": Math.pow(2, 29 / 31),
-        "down 8": Math.pow(2, 30 / 31),
-        "perfect 8": Math.pow(2, 31 / 31),
-        "octave": Math.pow(2, 31 / 31),
-        "pitchNumber": 31,
-        "interval": [
-            "perfect 1",
-            "diminished 2",
-            "augmented 1",
-            "minor 2",
-            "mid 2",
-            "major 2",
-            "up-major 2",
-            "down-minor 3",
-            "minor 3",
-            "mid 3",
-            "major 3",
-            "up-major 3",
-            "down 4",
-            "perfect 4",
-            "up 4",
-            "down-diminished 5",
-            "up-augmented 4",
-            "down 5",
-            "perfect 5",
-            "up 5",
-            "down-minor 6",
-            "minor 6",
-            "mid 6",
-            "major 6",
-            "up-major 6",
-            "down-minor 7",
-            "minor 7",
-            "mid 7",
-            "major 7",
-            "up-major 7",
-            "down 8",
-            "perfect 8"
-        ]
+        'perfect 1': Math.pow(2, 0 / 31),
+        'diminished 2': Math.pow(2, 1 / 31),
+        'augmented 1': Math.pow(2, 2 / 31),
+        'minor 2': Math.pow(2, 3 / 31),
+        'mid 2': Math.pow(2, 4 / 31),
+        'major 2': Math.pow(2, 5 / 31),
+        'up-major 2': Math.pow(2, 6 / 31),
+        'down-minor 3': Math.pow(2, 7 / 31),
+        'minor 3': Math.pow(2, 8 / 31),
+        'mid 3': Math.pow(2, 9 / 31),
+        'major 3': Math.pow(2, 10 / 31),
+        'up-major 3': Math.pow(2, 11 / 31),
+        'down 4': Math.pow(2, 12 / 31),
+        'perfect 4': Math.pow(2, 13 / 31),
+        'up 4': Math.pow(2, 14 / 31),
+        'down-diminished 5': Math.pow(2, 15 / 31),
+        'up-augmented 4': Math.pow(2, 16 / 31),
+        'down 5': Math.pow(2, 17 / 31),
+        'perfect 5': Math.pow(2, 18 / 31),
+        'up 5': Math.pow(2, 19 / 31),
+        'down-minor 6': Math.pow(2, 20 / 31),
+        'minor 6': Math.pow(2, 21 / 31),
+        'mid 6': Math.pow(2, 22 / 31),
+        'major 6': Math.pow(2, 23 / 31),
+        'up-major 6': Math.pow(2, 24 / 31),
+        'down-minor 7': Math.pow(2, 25 / 31),
+        'minor 7': Math.pow(2, 26 / 31),
+        'mid 7': Math.pow(2, 27 / 31),
+        'major 7': Math.pow(2, 28 / 31),
+        'up-major 7': Math.pow(2, 29 / 31),
+        'down 8': Math.pow(2, 30 / 31),
+        'perfect 8': Math.pow(2, 31 / 31),
+        'octave': Math.pow(2, 31 / 31),
+        'pitchNumber': 31,
+        'interval': [
+            'perfect 1',
+            'diminished 2',
+            'augmented 1',
+            'minor 2',
+            'mid 2',
+            'major 2',
+            'up-major 2',
+            'down-minor 3',
+            'minor 3',
+            'mid 3',
+            'major 3',
+            'up-major 3',
+            'down 4',
+            'perfect 4',
+            'up 4',
+            'down-diminished 5',
+            'up-augmented 4',
+            'down 5',
+            'perfect 5',
+            'up 5',
+            'down-minor 6',
+            'minor 6',
+            'mid 6',
+            'major 6',
+            'up-major 6',
+            'down-minor 7',
+            'minor 7',
+            'mid 7',
+            'major 7',
+            'up-major 7',
+            'down 8',
+            'perfect 8',
+        ],
     },
-    "just intonation": {
-        "perfect 1": 1 / 1,
-        "minor 2": 16 / 15,
-        "augmented 1": 16 / 15,
-        "major 2": 9 / 8,
-        "augmented 2": 6 / 5,
-        "minor 3": 6 / 5,
-        "major 3": 5 / 4,
-        "augmented 3": 4 / 3,
-        "diminished 4": 5 / 4,
-        "perfect 4": 4 / 3,
-        "augmented 4": 7 / 5,
-        "diminished 5": 7 / 5,
-        "perfect 5": 3 / 2,
-        "augmented 5": 8 / 5,
-        "minor 6": 8 / 5,
-        "major 6": 5 / 3,
-        "augmented 6": 16 / 9,
-        "minor 7": 16 / 9,
-        "major 7": 15 / 8,
-        "augmented 7": 2 / 1,
-        "diminished 8": 15 / 8,
-        "perfect 8": 2 / 1,
-        "pitchNumber": 12,
-        "interval": [
-            "perfect 1",
-            "minor 2",
-            "major 2",
-            "minor 3",
-            "major 3",
-            "perfect 4",
-            "diminished 5",
-            "perfect 5",
-            "minor 6",
-            "major 6",
-            "minor 7",
-            "major 7",
-            "perfect 8"
-        ]
+    'just intonation': {
+        'perfect 1': 1 / 1,
+        'minor 2': 16 / 15,
+        'augmented 1': 16 / 15,
+        'major 2': 9 / 8,
+        'augmented 2': 6 / 5,
+        'minor 3': 6 / 5,
+        'major 3': 5 / 4,
+        'augmented 3': 4 / 3,
+        'diminished 4': 5 / 4,
+        'perfect 4': 4 / 3,
+        'augmented 4': 7 / 5,
+        'diminished 5': 7 / 5,
+        'perfect 5': 3 / 2,
+        'augmented 5': 8 / 5,
+        'minor 6': 8 / 5,
+        'major 6': 5 / 3,
+        'augmented 6': 16 / 9,
+        'minor 7': 16 / 9,
+        'major 7': 15 / 8,
+        'augmented 7': 2 / 1,
+        'diminished 8': 15 / 8,
+        'perfect 8': 2 / 1,
+        'pitchNumber': 12,
+        'interval': [
+            'perfect 1',
+            'minor 2',
+            'major 2',
+            'minor 3',
+            'major 3',
+            'perfect 4',
+            'diminished 5',
+            'perfect 5',
+            'minor 6',
+            'major 6',
+            'minor 7',
+            'major 7',
+            'perfect 8',
+        ],
     },
-    "Pythagorean": {
-        "perfect 1": 1 / 1,
-        "minor 2": 256 / 243,
-        "augmented 1": 256 / 243,
-        "major 2": 9 / 8,
-        "augmented 2": 32 / 27,
-        "minor 3": 32 / 27,
-        "major 3": 81 / 64,
-        "augmented 3": 4 / 3,
-        "diminished 4": 81 / 64,
-        "perfect 4": 4 / 3,
-        "augmented 4": 729 / 512,
-        "diminished 5": 729 / 512,
-        "perfect 5": 3 / 2,
-        "augmented 5": 128 / 81,
-        "minor 6": 128 / 81,
-        "major 6": 27 / 16,
-        "augmented 6": 16 / 9,
-        "minor 7": 16 / 9,
-        "major 7": 243 / 128,
-        "augmented 7": 2 / 1,
-        "diminished 8": 243 / 128,
-        "perfect 8": 2 / 1,
-        "pitchNumber": 12,
-        "interval": [
-            "perfect 1",
-            "minor 2",
-            "major 2",
-            "minor 3",
-            "major 3",
-            "perfect 4",
-            "diminished 5",
-            "perfect 5",
-            "minor 6",
-            "major 6",
-            "minor 7",
-            "major 7",
-            "perfect 8"
-        ]
+    'Pythagorean': {
+        'perfect 1': 1 / 1,
+        'minor 2': 256 / 243,
+        'augmented 1': 256 / 243,
+        'major 2': 9 / 8,
+        'augmented 2': 32 / 27,
+        'minor 3': 32 / 27,
+        'major 3': 81 / 64,
+        'augmented 3': 4 / 3,
+        'diminished 4': 81 / 64,
+        'perfect 4': 4 / 3,
+        'augmented 4': 729 / 512,
+        'diminished 5': 729 / 512,
+        'perfect 5': 3 / 2,
+        'augmented 5': 128 / 81,
+        'minor 6': 128 / 81,
+        'major 6': 27 / 16,
+        'augmented 6': 16 / 9,
+        'minor 7': 16 / 9,
+        'major 7': 243 / 128,
+        'augmented 7': 2 / 1,
+        'diminished 8': 243 / 128,
+        'perfect 8': 2 / 1,
+        'pitchNumber': 12,
+        'interval': [
+            'perfect 1',
+            'minor 2',
+            'major 2',
+            'minor 3',
+            'major 3',
+            'perfect 4',
+            'diminished 5',
+            'perfect 5',
+            'minor 6',
+            'major 6',
+            'minor 7',
+            'major 7',
+            'perfect 8',
+        ],
     },
-    "1/3 comma meantone": {
+    '1/3 comma meantone': {
         // 19-EDO
-        "perfect 1": 1 / 1,
-        "minor 2": 1.075693,
-        "augmented 1": 1.037156,
-        "major 2": 1.115656,
-        "augmented 2": 1.157109,
-        "minor 3": 1.200103,
-        "major 3": 1.244694,
-        "augmented 3": 1.290943,
-        "diminished 4": 1.290943,
-        "perfect 4": 1.338902,
-        "augmented 4": 1.38865,
-        "diminished 5": 1.440247,
-        "perfect 5": 1.493762,
-        "augmented 5": 1.549255,
-        "minor 6": 1.60682,
-        "major 6": 1.666524,
-        "augmented 6": 1.728445,
-        "minor 7": 1.792668,
-        "major 7": 1.859266,
-        "augmented 7": 1.92835,
-        "diminished 8": 1.92835,
-        "perfect 8": 2 / 1,
-        "pitchNumber": 19,
-        "interval": [
-            "perfect 1",
-            "augmented 1",
-            "minor 2",
-            "major 2",
-            "augmented 2",
-            "minor 3",
-            "major 3",
-            "diminished 4",
-            "perfect 4",
-            "augmented 4",
-            "diminished 5",
-            "perfect 5",
-            "augmented 5",
-            "minor 6",
-            "major 6",
-            "augmented 6",
-            "minor 7",
-            "major 7",
-            "diminished 8",
-            "perfect 8"
-        ]
+        'perfect 1': 1 / 1,
+        'minor 2': 1.075693,
+        'augmented 1': 1.037156,
+        'major 2': 1.115656,
+        'augmented 2': 1.157109,
+        'minor 3': 1.200103,
+        'major 3': 1.244694,
+        'augmented 3': 1.290943,
+        'diminished 4': 1.290943,
+        'perfect 4': 1.338902,
+        'augmented 4': 1.38865,
+        'diminished 5': 1.440247,
+        'perfect 5': 1.493762,
+        'augmented 5': 1.549255,
+        'minor 6': 1.60682,
+        'major 6': 1.666524,
+        'augmented 6': 1.728445,
+        'minor 7': 1.792668,
+        'major 7': 1.859266,
+        'augmented 7': 1.92835,
+        'diminished 8': 1.92835,
+        'perfect 8': 2 / 1,
+        'pitchNumber': 19,
+        'interval': [
+            'perfect 1',
+            'augmented 1',
+            'minor 2',
+            'major 2',
+            'augmented 2',
+            'minor 3',
+            'major 3',
+            'diminished 4',
+            'perfect 4',
+            'augmented 4',
+            'diminished 5',
+            'perfect 5',
+            'augmented 5',
+            'minor 6',
+            'major 6',
+            'augmented 6',
+            'minor 7',
+            'major 7',
+            'diminished 8',
+            'perfect 8',
+        ],
     },
-    "1/4 comma meantone": {
+    '1/4 comma meantone': {
         // 21 notes per octave
-        "perfect 1": 1 / 1,
-        "minor 2": 16 / 15,
-        "augmented 1": 25 / 24,
-        "major 2": 9 / 8,
-        "augmented 2": 75 / 64,
-        "minor 3": 6 / 5,
-        "major 3": 5 / 4,
-        "diminished 4": 32 / 25,
-        "augmented 3": 125 / 96,
-        "perfect 4": 4 / 3,
-        "augmented 4": 25 / 18,
-        "diminished 5": 36 / 25,
-        "perfect 5": 3 / 2,
-        "augmented 5": 25 / 16,
-        "minor 6": 8 / 5,
-        "major 6": 5 / 3,
-        "augmented 6": 125 / 72,
-        "minor 7": 9 / 5,
-        "major 7": 15 / 8,
-        "diminished 8": 48 / 25,
-        "augmented 7": 125 / 64,
-        "perfect 8": 2 / 1,
-        "pitchNumber": 21,
-        "interval": [
-            "perfect 1",
-            "augmented 1",
-            "minor 2",
-            "major 2",
-            "augmented 2",
-            "minor 3",
-            "major 3",
-            "diminished 4",
-            "augmented 3",
-            "perfect 4",
-            "augmented 4",
-            "diminished 5",
-            "perfect 5",
-            "augmented 5",
-            "minor 6",
-            "major 6",
-            "augmented 6",
-            "minor 7",
-            "major 7",
-            "diminished 8",
-            "augmented 7",
-            "perfect 8"
-        ]
+        'perfect 1': 1 / 1,
+        'minor 2': 16 / 15,
+        'augmented 1': 25 / 24,
+        'major 2': 9 / 8,
+        'augmented 2': 75 / 64,
+        'minor 3': 6 / 5,
+        'major 3': 5 / 4,
+        'diminished 4': 32 / 25,
+        'augmented 3': 125 / 96,
+        'perfect 4': 4 / 3,
+        'augmented 4': 25 / 18,
+        'diminished 5': 36 / 25,
+        'perfect 5': 3 / 2,
+        'augmented 5': 25 / 16,
+        'minor 6': 8 / 5,
+        'major 6': 5 / 3,
+        'augmented 6': 125 / 72,
+        'minor 7': 9 / 5,
+        'major 7': 15 / 8,
+        'diminished 8': 48 / 25,
+        'augmented 7': 125 / 64,
+        'perfect 8': 2 / 1,
+        'pitchNumber': 21,
+        'interval': [
+            'perfect 1',
+            'augmented 1',
+            'minor 2',
+            'major 2',
+            'augmented 2',
+            'minor 3',
+            'major 3',
+            'diminished 4',
+            'augmented 3',
+            'perfect 4',
+            'augmented 4',
+            'diminished 5',
+            'perfect 5',
+            'augmented 5',
+            'minor 6',
+            'major 6',
+            'augmented 6',
+            'minor 7',
+            'major 7',
+            'diminished 8',
+            'augmented 7',
+            'perfect 8',
+        ],
     },
-    "custom": {
+    'custom': {
         0: Math.pow(2, 0 / 12),
         1: Math.pow(2, 1 / 12),
         2: Math.pow(2, 2 / 12),
@@ -2164,97 +2146,97 @@ const TEMPERAMENT = {
         11: Math.pow(2, 11 / 12),
         pitchNumber: 12,
         interval: [
-            "perfect 1",
-            "minor 2",
-            "major 2",
-            "minor 3",
-            "major 3",
-            "perfect 4",
-            "diminished 5",
-            "perfect 5",
-            "minor 6",
-            "major 6",
-            "minor 7",
-            "major 7",
-            "perfect 8"
-        ]
-    }
+            'perfect 1',
+            'minor 2',
+            'major 2',
+            'minor 3',
+            'major 3',
+            'perfect 4',
+            'diminished 5',
+            'perfect 5',
+            'minor 6',
+            'major 6',
+            'minor 7',
+            'major 7',
+            'perfect 8',
+        ],
+    },
 };
 
 const MIDI_INSTRUMENTS = {
-    "default": 0, // Acoustic Grand Piano
-    "piano": 0,
-    "violin": 40,
-    "viola": 41,
-    "cello": 42,
-    "double bass": 43,
-    "bass": 32,
-    "sitar": 104,
-    "guitar": 24,
-    "acoustic guitar": 25,
-    "electric guitar": 27,
-    "flute": 73,
-    "clarinet": 71,
-    "saxophone": 65,
-    "tuba": 58,
-    "trumpet": 56,
-    "oboe": 68,
-    "trombone": 57,
-    "banjo": 105,
-    "koto": 107,
-    "dulcimer": 15,
-    "bassoon": 70,
-    "celeste": 8,
-    "xylophone": 13,
-    "electronic synth": 81,
-    "sine": 81, // Approximate with Lead 2 (Sawtooth)
-    "square": 80,
-    "sawtooth": 81,
-    "triangle": 81, // Approximate with Lead 2 (Sawtooth)
-    "vibraphone": 11
+    'default': 0, // Acoustic Grand Piano
+    'piano': 0,
+    'violin': 40,
+    'viola': 41,
+    'cello': 42,
+    'double bass': 43,
+    'bass': 32,
+    'sitar': 104,
+    'guitar': 24,
+    'acoustic guitar': 25,
+    'electric guitar': 27,
+    'flute': 73,
+    'clarinet': 71,
+    'saxophone': 65,
+    'tuba': 58,
+    'trumpet': 56,
+    'oboe': 68,
+    'trombone': 57,
+    'banjo': 105,
+    'koto': 107,
+    'dulcimer': 15,
+    'bassoon': 70,
+    'celeste': 8,
+    'xylophone': 13,
+    'electronic synth': 81,
+    'sine': 81, // Approximate with Lead 2 (Sawtooth)
+    'square': 80,
+    'sawtooth': 81,
+    'triangle': 81, // Approximate with Lead 2 (Sawtooth)
+    'vibraphone': 11,
 };
 
 const DRUM_MIDI_MAP = {
-    "snare drum": 38,
-    "kick drum": 36,
-    "tom tom": 41,
-    "floor tom tom": 43,
-    "cup drum": 47, // Closest: Low-Mid Tom
-    "darbuka drum": 50, // Closest: High Tom
-    "japanese drum": 56, // Closest: Cowbell or Tambourine
-    "hi hat": 42,
-    "ride bell": 53,
-    "cow bell": 56,
-    "triangle bell": 81,
-    "finger cymbals": 69, // Closest: Open Hi-Hat
-    "chime": 82, // Closest: Shaker
-    "gong": 52, // Closest: Chinese Cymbal
-    "clang": 55, // Closest: Splash Cymbal
-    "crash": 49,
-    "clap": 39,
-    "slap": 40,
-    "raindrop": 88 // Custom mapping (not in GM), can use melodic notes
+    'snare drum': 38,
+    'kick drum': 36,
+    'tom tom': 41,
+    'floor tom tom': 43,
+    'cup drum': 47, // Closest: Low-Mid Tom
+    'darbuka drum': 50, // Closest: High Tom
+    'japanese drum': 56, // Closest: Cowbell or Tambourine
+    'hi hat': 42,
+    'ride bell': 53,
+    'cow bell': 56,
+    'triangle bell': 81,
+    'finger cymbals': 69, // Closest: Open Hi-Hat
+    'chime': 82, // Closest: Shaker
+    'gong': 52, // Closest: Chinese Cymbal
+    'clang': 55, // Closest: Splash Cymbal
+    'crash': 49,
+    'clap': 39,
+    'slap': 40,
+    'raindrop': 88, // Custom mapping (not in GM), can use melodic notes
 };
 
 const REVERSE_DRUM_MIDI_MAP = {
-    38: ["snare drum"],
-    36: ["kick drum"],
-    41: ["tom tom"],
-    43: ["floor tom tom"],
-    47: ["cup drum"],
-    50: ["darbuka drum"],
-    56: ["japanese drum", "cow bell"],
-    42: ["hi hat"],
-    53: ["ride bell"],
-    81: ["triangle bell"],
-    69: ["finger cymbals"],
-    82: ["chime"],
-    52: ["gong"],
-    55: ["clang"],
-    49: ["crash"],
-    39: ["clap"],
-    40: ["slap"],
-    88: ["raindrop"]
+    38: ['snare drum'],
+    36: ['kick drum'],
+    41: ['tom tom'],
+    43: ['floor tom tom'],
+    47: ['cup drum'],
+    50: ['darbuka drum'],
+    56: ['japanese drum', 'cow bell'],
+    42: ['hi hat'],
+    53: ['ride bell'],
+    81: ['triangle bell'],
+    69: ['finger cymbals'],
+    82: ['chime'],
+    52: ['gong'],
+    55: ['clang'],
+    49: ['crash'],
+    39: ['clap'],
+    40: ['slap'],
+    88: ['raindrop'],
 };
 
 /**
@@ -2390,63 +2372,63 @@ const updateTemperaments = () => {
  * Default invert mode.
  * @constant {string}
  */
-const DEFAULTINVERT = "even";
+const DEFAULTINVERT = 'even';
 /**
  * Default interval for the mode.
  * @constant {string}
  */
-const DEFAULTINTERVAL = "perfect" + " 5";
+const DEFAULTINTERVAL = 'perfect' + ' 5';
 /**
  * Default voice for audio synthesis.
  * @constant {string}
  */
-const DEFAULTVOICE = "electronic synth";
+const DEFAULTVOICE = 'electronic synth';
 /**
  * Default noise type for audio synthesis.
  * @constant {string}
  */
-const DEFAULTNOISE = "noise1";
+const DEFAULTNOISE = 'noise1';
 /**
  * Default drum type for audio synthesis.
  * @constant {string}
  */
-const DEFAULTDRUM = "kick drum";
+const DEFAULTDRUM = 'kick drum';
 /**
  * Default effect for audio synthesis.
  * @constant {string}
  */
-const DEFAULTEFFECT = "duck";
+const DEFAULTEFFECT = 'duck';
 /**
  * Default musical mode.
  * @constant {string}
  */
-const DEFAULTMODE = "major";
+const DEFAULTMODE = 'major';
 /**
  * Default temperament.
  * @constant {string}
  */
-const DEFAULTTEMPERAMENT = "equal";
+const DEFAULTTEMPERAMENT = 'equal';
 /**
  * Default filter type for audio processing.
  * @constant {string}
  */
-const DEFAULTFILTERTYPE = "highpass";
+const DEFAULTFILTERTYPE = 'highpass';
 /**
  * Default oscillator type for audio synthesis.
  * @constant {string}
  */
-const DEFAULTOSCILLATORTYPE = "sine";
+const DEFAULTOSCILLATORTYPE = 'sine';
 /**
  * Default accidental for musical notation.
  * @constant {string}
  */
-const DEFAULTACCIDENTAL = "natural" + " " + NATURAL;
+const DEFAULTACCIDENTAL = 'natural' + ' ' + NATURAL;
 
 /**
  * Custom mode from the musical modes dictionary.
  * @constant {Object}
  */
-const customMode = MUSICALMODES["custom"];
+const customMode = MUSICALMODES['custom'];
 
 /**
  * Get the invert mode name based on its identifier.
@@ -2460,7 +2442,7 @@ const getInvertMode = name => {
             INVERTMODES[interval][0] === name ||
             INVERTMODES[interval][1].toLowerCase() === name.toLowerCase()
         ) {
-            if (INVERTMODES[interval][0] != "") {
+            if (INVERTMODES[interval][0] != '') {
                 return INVERTMODES[interval][0];
             } else {
                 return INVERTMODES[interval][1];
@@ -2511,11 +2493,11 @@ const getIntervalRatio = name => {
 const getModeNumbers = name => {
     const __convert = obj => {
         let n = 0;
-        let m = "";
+        let m = '';
         for (let i = 0; i < obj.length; i++) {
             m += n.toString();
             if (i < obj.length - 1) {
-                m += " ";
+                m += ' ';
             }
 
             n += obj[i];
@@ -2531,7 +2513,7 @@ const getModeNumbers = name => {
     }
 
     // console.debug(name + " not found in MUSICALMODES");
-    return "";
+    return '';
 };
 
 /**
@@ -2541,10 +2523,10 @@ const getModeNumbers = name => {
  * @returns {number} The index of the drum, or -1 if not found.
  */
 const getDrumIndex = name => {
-    if (name === "") {
+    if (name === '') {
         // console.debug("getDrumName passed blank name. Returning " + DEFAULTDRUM);
         name = DEFAULTDRUM;
-    } else if (name.slice(0, 4) === "http") {
+    } else if (name.slice(0, 4) === 'http') {
         name = DEFAULTDRUM;
     }
 
@@ -2566,9 +2548,9 @@ const getDrumIndex = name => {
  * @returns {string|null} The name of the drum, or null if not found.
  */
 const getDrumName = name => {
-    if (name === "") {
+    if (name === '') {
         name = DEFAULTDRUM;
-    } else if (name.slice(0, 4) === "http") {
+    } else if (name.slice(0, 4) === 'http') {
         return null;
     }
 
@@ -2590,20 +2572,20 @@ const getDrumName = name => {
  * @returns {string} The symbol of the drum, or "hh" if not found.
  */
 const getDrumSymbol = name => {
-    if (name === "") {
-        return "hh";
+    if (name === '') {
+        return 'hh';
     }
 
     for (let drum = 0; drum < DRUMNAMES.length; drum++) {
         if (DRUMNAMES[drum][0].toLowerCase() === name.toLowerCase()) {
             return DRUMNAMES[drum][3];
         } else if (DRUMNAMES[drum][1].toLowerCase() === name.toLowerCase()) {
-            return "hh";
+            return 'hh';
         }
     }
 
     // console.debug(name + " not found in DRUMNAMES");
-    return "hh";
+    return 'hh';
 };
 
 /**
@@ -2613,7 +2595,7 @@ const getDrumSymbol = name => {
  * @returns {string} The filter type, or the default filter type if not found.
  */
 const getFilterTypes = name => {
-    if (name === "") {
+    if (name === '') {
         name = DEFAULTFILTERTYPE;
     }
 
@@ -2636,7 +2618,7 @@ const getFilterTypes = name => {
  * @returns {string|null} The oscillator type, or null if not found.
  */
 const getOscillatorTypes = name => {
-    if (name === "") {
+    if (name === '') {
         name = null; // DEFAULTOSCILLATORTYPE;
     }
 
@@ -2659,10 +2641,10 @@ const getOscillatorTypes = name => {
  * @returns {string} The file path of the drum icon, or the default drum icon path if not found.
  */
 const getDrumIcon = name => {
-    if (name === "") {
+    if (name === '') {
         name = DEFAULTDRUM;
-    } else if (name.slice(0, 4) === "http") {
-        return "images/drum.svg";
+    } else if (name.slice(0, 4) === 'http') {
+        return 'images/drum.svg';
     }
 
     for (let i = 0; i < DRUMNAMES.length; i++) {
@@ -2672,7 +2654,7 @@ const getDrumIcon = name => {
     }
 
     // console.debug(name + " not found in DRUMNAMES");
-    return "images/drum.svg";
+    return 'images/drum.svg';
 };
 
 /**
@@ -2685,9 +2667,9 @@ const getDrumSynthName = name => {
     if (name === null || name === undefined) {
         // console.debug("getDrumSynthName passed null name. Returning null");
         return null;
-    } else if (name === "") {
+    } else if (name === '') {
         name = DEFAULTDRUM;
-    } else if (name.slice(0, 4) === "http") {
+    } else if (name.slice(0, 4) === 'http') {
         return name;
     }
 
@@ -2708,13 +2690,13 @@ const getDrumSynthName = name => {
  * @returns {string} The name of the noise, or the default noise if not found.
  */
 const getNoiseName = name => {
-    if (name === "") {
+    if (name === '') {
         name = DEFAULTNOISE;
     }
 
     for (let i = 0; i < NOISENAMES.length; i++) {
         if (NOISENAMES[i][1] === name) {
-            if (NOISENAMES[i][0] != "") {
+            if (NOISENAMES[i][0] != '') {
                 return NOISENAMES[i][0];
             } else {
                 return NOISENAMES[i][1];
@@ -2732,10 +2714,10 @@ const getNoiseName = name => {
  * @returns {string} The file path of the noise icon, or the default noise icon path if not found.
  */
 const getNoiseIcon = name => {
-    if (name === "") {
+    if (name === '') {
         name = DEFAULTNOISE;
-    } else if (name.slice(0, 4) === "http") {
-        return "images/noises.svg";
+    } else if (name.slice(0, 4) === 'http') {
+        return 'images/noises.svg';
     }
 
     for (let i = 0; i < NOISENAMES.length; i++) {
@@ -2745,7 +2727,7 @@ const getNoiseIcon = name => {
     }
 
     // console.debug(name + " not found in NOISENAMES");
-    return "images/synth.svg";
+    return 'images/synth.svg';
 };
 
 /**
@@ -2757,7 +2739,7 @@ const getNoiseIcon = name => {
 const getNoiseSynthName = name => {
     if (name === null || name === undefined) {
         return null;
-    } else if (name === "") {
+    } else if (name === '') {
         name = DEFAULTNOISE;
     }
 
@@ -2778,15 +2760,15 @@ const getNoiseSynthName = name => {
  * @returns {string|null} The name of the voice, or null if not found.
  */
 const getVoiceName = name => {
-    if (name === "") {
+    if (name === '') {
         name = DEFAULTVOICE;
-    } else if (name.slice(0, 4) === "http") {
+    } else if (name.slice(0, 4) === 'http') {
         return null;
     }
 
     for (let i = 0; i < VOICENAMES.length; i++) {
         if (VOICENAMES[i][0] === name) {
-            if (VOICENAMES[i][0] != "") {
+            if (VOICENAMES[i][0] != '') {
                 return VOICENAMES[i][0];
             } else if (VOICENAMES[i][1] === name) {
                 return VOICENAMES[i][1];
@@ -2804,10 +2786,10 @@ const getVoiceName = name => {
  * @returns {string} The file path of the voice icon, or the default voice icon path if not found.
  */
 const getVoiceIcon = name => {
-    if (name === "") {
+    if (name === '') {
         name = DEFAULTVOICE;
-    } else if (name.slice(0, 4) === "http") {
-        return "images/voices.svg";
+    } else if (name.slice(0, 4) === 'http') {
+        return 'images/voices.svg';
     }
 
     for (let i = 0; i < VOICENAMES.length; i++) {
@@ -2823,7 +2805,7 @@ const getVoiceIcon = name => {
     }
 
     // console.debug(name + " not found in VOICENAMES");
-    return "images/voices.svg";
+    return 'images/voices.svg';
 };
 
 /**
@@ -2835,9 +2817,9 @@ const getVoiceIcon = name => {
 const getVoiceSynthName = name => {
     if (name === null || name === undefined) {
         return null;
-    } else if (name === "") {
+    } else if (name === '') {
         name = DEFAULTVOICE;
-    } else if (name.slice(0, 4) === "http") {
+    } else if (name.slice(0, 4) === 'http') {
         return name;
     }
 
@@ -2868,7 +2850,7 @@ const isCustomTemperament = temperament => {
  * @returns {string} The name of the temperament, or the default temperament name if not found.
  */
 const getTemperamentName = name => {
-    if (name === "") {
+    if (name === '') {
         name = DEFAULTTEMPERAMENT;
     }
 
@@ -2911,9 +2893,9 @@ const frequencyToPitch = hz => {
     // the nearest cent.
 
     if (hz < A0) {
-        return ["A", 0, 0];
+        return ['A', 0, 0];
     } else if (hz > C10) {
-        return ["C", 10, 0];
+        return ['C', 10, 0];
     }
 
     // Calculate cents to keep track of drift
@@ -2930,15 +2912,15 @@ const frequencyToPitch = hz => {
                 j += 1;
             }
             return [
-                PITCHES[(j + PITCHES.indexOf("A")) % SEMITONES],
-                Math.floor((j + PITCHES.indexOf("A")) / SEMITONES),
-                cents
+                PITCHES[(j + PITCHES.indexOf('A')) % SEMITONES],
+                Math.floor((j + PITCHES.indexOf('A')) / SEMITONES),
+                cents,
             ];
         }
     }
 
     // console.debug("Could not find note/octave/cents for " + hz);
-    return ["?", -1, 0];
+    return ['?', -1, 0];
 };
 
 /**
@@ -2949,24 +2931,24 @@ const frequencyToPitch = hz => {
  */
 const getArticulation = note => {
     return note
-        .replace("do", "")
-        .replace("re", "")
-        .replace("mi", "")
-        .replace("fa", "")
-        .replace("sol", "")
-        .replace("la", "")
-        .replace("ti", "")
-        .replace("A", "")
-        .replace("B", "")
-        .replace("C", "")
-        .replace("D", "")
-        .replace("E", "")
-        .replace("F", "")
-        .replace("G", "")
-        .replace("^^", "") // up/down from custom notes
-        .replace("vv", "")
-        .replace("^", "")
-        .replace("v", "");
+        .replace('do', '')
+        .replace('re', '')
+        .replace('mi', '')
+        .replace('fa', '')
+        .replace('sol', '')
+        .replace('la', '')
+        .replace('ti', '')
+        .replace('A', '')
+        .replace('B', '')
+        .replace('C', '')
+        .replace('D', '')
+        .replace('E', '')
+        .replace('F', '')
+        .replace('G', '')
+        .replace('^^', '') // up/down from custom notes
+        .replace('vv', '')
+        .replace('^', '')
+        .replace('v', '');
 };
 
 /**
@@ -2977,8 +2959,8 @@ const getArticulation = note => {
  */
 const keySignatureToMode = keySignature => {
     // Convert from "A Minor" to "A" and "MINOR"
-    if (keySignature === "" || keySignature == null) {
-        return ["C", "major"];
+    if (keySignature === '' || keySignature == null) {
+        return ['C', 'major'];
     }
 
     // Maqams have special names for certain keys.
@@ -2986,11 +2968,11 @@ const keySignatureToMode = keySignature => {
         keySignature = MAQAMTABLE[keySignature.toLowerCase()];
     }
 
-    let parts = keySignature.split(" ");
+    let parts = keySignature.split(' ');
 
     // A special case to test: m used for minor.
     let minorMode = false;
-    if (parts.length === 1 && parts[0][parts[0].length - 1] === "m") {
+    if (parts.length === 1 && parts[0][parts[0].length - 1] === 'm') {
         minorMode = true;
         parts[0] = parts[0].slice(0, parts[0].length - 1);
     }
@@ -3004,45 +2986,46 @@ const keySignatureToMode = keySignature => {
         key = parts[0];
     }
 
-    if (key === "C" + FLAT) {
-        parts = keySignature.split(" ");
-        key = "C" + FLAT;
-    } else if (key == "B" + SHARP) {
-        parts = keySignature.split(" ");
-        key = "B" + SHARP;
-    } else if (key == "F" + FLAT) {
-        parts = keySignature.split(" ");
-        key = "F" + FLAT;
+    if (key === 'C' + FLAT) {
+        parts = keySignature.split(' ');
+        key = 'C' + FLAT;
+    } else if (key == 'B' + SHARP) {
+        parts = keySignature.split(' ');
+        key = 'B' + SHARP;
+    } else if (key == 'F' + FLAT) {
+        parts = keySignature.split(' ');
+        key = 'F' + FLAT;
     } else if (SOLFEGENAMES1.includes(key)) {
         // This conversion will be a bit iffy depending upon the current mode.
-
-        key = getNote(key, 4, 0, "C Major", false)[0];
+        // eslint-disable-next-line no-use-before-define
+        key = getNote(key, 4, 0, 'C Major', false)[0];
     } else if (!NOTESSHARP.includes(key) && !NOTESFLAT.includes(key)) {
-        console.debug("Invalid key or missing name; reverting to C.");
+        // eslint-disable-next-line no-console
+        console.debug('Invalid key or missing name; reverting to C.');
         // Is is possible that the key was left out?
-        keySignature = "C " + keySignature;
-        parts = keySignature.split(" ");
-        key = "C";
+        keySignature = 'C ' + keySignature;
+        parts = keySignature.split(' ');
+        key = 'C';
     }
 
     if (minorMode) {
-        return [key, "natural minor"];
+        return [key, 'natural minor'];
     }
 
     // Reassemble remaining parts to get mode name
-    let mode = "";
+    let mode = '';
     for (let i = 1; i < parts.length; i++) {
-        if (parts[i] !== "") {
-            if (mode === "") {
+        if (parts[i] !== '') {
+            if (mode === '') {
                 mode = parts[i];
             } else {
-                mode += " " + parts[i];
+                mode += ' ' + parts[i];
             }
         }
     }
 
-    if (mode === "") {
-        mode = "major";
+    if (mode === '') {
+        mode = 'major';
     } else {
         mode = mode.toLowerCase();
     }
@@ -3050,8 +3033,9 @@ const keySignatureToMode = keySignature => {
     if (mode in MUSICALMODES) {
         return [key, mode];
     } else {
-        console.debug("Invalid mode name: " + mode + " reverting to major.");
-        return [key, "major"];
+        // eslint-disable-next-line no-console
+        console.debug('Invalid mode name: ' + mode + ' reverting to major.');
+        return [key, 'major'];
     }
 };
 
@@ -3061,7 +3045,7 @@ const keySignatureToMode = keySignature => {
  * @constant
  * @type {Array}
  */
-const SOLFMAPPER = ["do", "do", "re", "re", "mi", "fa", "fa", "sol", "sol", "la", "la", "ti"];
+const SOLFMAPPER = ['do', 'do', 're', 're', 'mi', 'fa', 'fa', 'sol', 'sol', 'la', 'la', 'ti'];
 
 /**
  * Get the scale and solfege with half-steps for a given key signature.
@@ -3074,7 +3058,7 @@ const getScaleAndHalfSteps = keySignature => {
     const obj = keySignatureToMode(keySignature);
     let myKeySignature = obj[0];
     let halfSteps;
-    if (obj[1] === "CUSTOM") {
+    if (obj[1] === 'CUSTOM') {
         halfSteps = customMode;
     } else {
         halfSteps = MUSICALMODES[obj[1]];
@@ -3086,7 +3070,7 @@ const getScaleAndHalfSteps = keySignature => {
         for (let i = 0; i < halfSteps.length; i++) {
             solfege.push(SOLFEGENAMES[i]);
             for (let j = 1; j < halfSteps[i]; j++) {
-                solfege.push("");
+                solfege.push('');
             }
         }
     } else if (halfSteps.length > 7) {
@@ -3099,7 +3083,7 @@ const getScaleAndHalfSteps = keySignature => {
             }
 
             for (let j = 1; j < halfSteps[i]; j++) {
-                solfege.push("");
+                solfege.push('');
             }
         }
     } else {
@@ -3118,7 +3102,7 @@ const getScaleAndHalfSteps = keySignature => {
             solfege.push(solf);
 
             for (let j = 1; j < halfSteps[i]; j++) {
-                solfege.push("");
+                solfege.push('');
             }
         }
     }
@@ -3148,325 +3132,325 @@ const modeMapper = (key, mode) => {
     mode = mode.toLowerCase();
 
     switch (mode) {
-        case "ionian":
-            mode = "major";
+        case 'ionian':
+            mode = 'major';
             break;
-        case "dorian":
-            mode = "major";
+        case 'dorian':
+            mode = 'major';
             switch (key) {
-                case "c":
-                    key = "a" + SHARP;
+                case 'c':
+                    key = 'a' + SHARP;
                     break;
-                case "d":
-                    key = "c";
+                case 'd':
+                    key = 'c';
                     break;
-                case "e":
-                    key = "d";
+                case 'e':
+                    key = 'd';
                     break;
-                case "f":
-                    key = "c";
-                    mode = "minor";
+                case 'f':
+                    key = 'c';
+                    mode = 'minor';
                     break;
-                case "g":
-                    key = "f";
+                case 'g':
+                    key = 'f';
                     break;
-                case "a":
-                    key = "g";
+                case 'a':
+                    key = 'g';
                     break;
-                case "b":
-                    key = "a";
+                case 'b':
+                    key = 'a';
                     break;
-                case "c" + SHARP:
-                    key = "b";
+                case 'c' + SHARP:
+                    key = 'b';
                     break;
-                case "d" + SHARP:
-                    key = "b";
+                case 'd' + SHARP:
+                    key = 'b';
                     break;
-                case "f" + SHARP:
-                    key = "f";
+                case 'f' + SHARP:
+                    key = 'f';
                     break;
-                case "g" + SHARP:
-                    key = "b";
+                case 'g' + SHARP:
+                    key = 'b';
                     break;
-                case "a" + SHARP:
-                    key = "g" + SHARP;
+                case 'a' + SHARP:
+                    key = 'g' + SHARP;
                     break;
-                case "d" + FLAT:
-                    key = "e" + FLAT;
-                    mode = "minor";
+                case 'd' + FLAT:
+                    key = 'e' + FLAT;
+                    mode = 'minor';
                     break;
-                case "e" + FLAT:
-                    key = "e" + FLAT;
-                    mode = "minor";
+                case 'e' + FLAT:
+                    key = 'e' + FLAT;
+                    mode = 'minor';
                     break;
-                case "g" + FLAT:
-                    key = "d";
-                    mode = "minor";
+                case 'g' + FLAT:
+                    key = 'd';
+                    mode = 'minor';
                     break;
-                case "a" + FLAT:
-                    key = "e" + FLAT;
-                    mode = "minor";
+                case 'a' + FLAT:
+                    key = 'e' + FLAT;
+                    mode = 'minor';
                     break;
-                case "b" + FLAT:
-                    key = "f";
-                    mode = "minor";
+                case 'b' + FLAT:
+                    key = 'f';
+                    mode = 'minor';
                     break;
             }
             break;
-        case "phrygian":
-            mode = "major";
+        case 'phrygian':
+            mode = 'major';
             switch (key) {
-                case "c":
-                    key = "g" + SHARP;
+                case 'c':
+                    key = 'g' + SHARP;
                     break;
-                case "d":
-                    key = "a" + SHARP;
+                case 'd':
+                    key = 'a' + SHARP;
                     break;
-                case "e":
-                    key = "c";
+                case 'e':
+                    key = 'c';
                     break;
-                case "f":
-                    key = "b";
+                case 'f':
+                    key = 'b';
                     break;
-                case "g":
-                    key = "c";
-                    mode = "minor";
+                case 'g':
+                    key = 'c';
+                    mode = 'minor';
                     break;
-                case "a":
-                    key = "f";
+                case 'a':
+                    key = 'f';
                     break;
-                case "b":
-                    key = "g";
+                case 'b':
+                    key = 'g';
                     break;
-                case "c" + SHARP:
-                    key = "a";
+                case 'c' + SHARP:
+                    key = 'a';
                     break;
-                case "d" + SHARP:
-                    key = "b";
+                case 'd' + SHARP:
+                    key = 'b';
                     break;
-                case "f" + SHARP:
-                    key = "d";
+                case 'f' + SHARP:
+                    key = 'd';
                     break;
-                case "g" + SHARP:
-                    key = "e";
+                case 'g' + SHARP:
+                    key = 'e';
                     break;
-                case "a" + SHARP:
-                    key = "b";
+                case 'a' + SHARP:
+                    key = 'b';
                     break;
-                case "d" + FLAT:
-                    key = "g" + FLAT;
-                    mode = "minor";
+                case 'd' + FLAT:
+                    key = 'g' + FLAT;
+                    mode = 'minor';
                     break;
-                case "e" + FLAT:
-                    key = "e" + FLAT;
-                    mode = "minor";
+                case 'e' + FLAT:
+                    key = 'e' + FLAT;
+                    mode = 'minor';
                     break;
-                case "g" + FLAT:
-                    key = "d";
+                case 'g' + FLAT:
+                    key = 'd';
                     break;
-                case "a" + FLAT:
-                    key = "d" + FLAT;
-                    mode = "minor";
+                case 'a' + FLAT:
+                    key = 'd' + FLAT;
+                    mode = 'minor';
                     break;
-                case "b" + FLAT:
-                    key = "e" + FLAT;
-                    mode = "minor";
+                case 'b' + FLAT:
+                    key = 'e' + FLAT;
+                    mode = 'minor';
                     break;
             }
             break;
-        case "lydian":
-            mode = "major";
+        case 'lydian':
+            mode = 'major';
             switch (key) {
-                case "c":
-                    key = "g";
+                case 'c':
+                    key = 'g';
                     break;
-                case "d":
-                    key = "a";
+                case 'd':
+                    key = 'a';
                     break;
-                case "e":
-                    key = "b";
+                case 'e':
+                    key = 'b';
                     break;
-                case "f":
-                    key = "c";
+                case 'f':
+                    key = 'c';
                     break;
-                case "g":
-                    key = "d";
+                case 'g':
+                    key = 'd';
                     break;
-                case "a":
-                    key = "e";
+                case 'a':
+                    key = 'e';
                     break;
-                case "b":
-                    key = "b";
+                case 'b':
+                    key = 'b';
                     break;
-                case "c" + SHARP:
-                    key = "g" + SHARP;
+                case 'c' + SHARP:
+                    key = 'g' + SHARP;
                     break;
-                case "d" + SHARP:
-                    key = "a" + SHARP;
+                case 'd' + SHARP:
+                    key = 'a' + SHARP;
                     break;
-                case "f" + SHARP:
-                    key = "b";
+                case 'f' + SHARP:
+                    key = 'b';
                     break;
-                case "g" + SHARP:
-                    key = "c";
-                    mode = "minor";
+                case 'g' + SHARP:
+                    key = 'c';
+                    mode = 'minor';
                     break;
-                case "a" + SHARP:
-                    key = "f";
+                case 'a' + SHARP:
+                    key = 'f';
                     break;
-                case "d" + FLAT:
-                    key = "f";
-                    mode = "minor";
+                case 'd' + FLAT:
+                    key = 'f';
+                    mode = 'minor';
                     break;
-                case "e" + FLAT:
-                    key = "g";
-                    mode = "minor";
+                case 'e' + FLAT:
+                    key = 'g';
+                    mode = 'minor';
                     break;
-                case "g" + FLAT:
-                    key = "d" + FLAT;
-                    mode = "minor";
+                case 'g' + FLAT:
+                    key = 'd' + FLAT;
+                    mode = 'minor';
                     break;
-                case "a" + FLAT:
-                    key = "c";
-                    mode = "minor";
+                case 'a' + FLAT:
+                    key = 'c';
+                    mode = 'minor';
                     break;
-                case "b" + FLAT:
-                    key = "d";
-                    mode = "minor";
+                case 'b' + FLAT:
+                    key = 'd';
+                    mode = 'minor';
                     break;
             }
             break;
-        case "mixolydian":
-            mode = "major";
+        case 'mixolydian':
+            mode = 'major';
             switch (key) {
-                case "c":
-                    key = "f";
+                case 'c':
+                    key = 'f';
                     break;
-                case "d":
-                    key = "g";
+                case 'd':
+                    key = 'g';
                     break;
-                case "e":
-                    key = "a";
+                case 'e':
+                    key = 'a';
                     break;
-                case "f":
-                    key = "a" + SHARP;
+                case 'f':
+                    key = 'a' + SHARP;
                     break;
-                case "g":
-                    key = "c";
+                case 'g':
+                    key = 'c';
                     break;
-                case "a":
-                    key = "d";
+                case 'a':
+                    key = 'd';
                     break;
-                case "b":
-                    key = "e";
+                case 'b':
+                    key = 'e';
                     break;
-                case "c" + SHARP:
-                    key = "b";
+                case 'c' + SHARP:
+                    key = 'b';
                     break;
-                case "d" + SHARP:
-                    key = "g" + SHARP;
+                case 'd' + SHARP:
+                    key = 'g' + SHARP;
                     break;
-                case "f" + SHARP:
-                    key = "b";
+                case 'f' + SHARP:
+                    key = 'b';
                     break;
-                case "g" + SHARP:
-                    key = "b";
+                case 'g' + SHARP:
+                    key = 'b';
                     break;
-                case "a" + SHARP:
-                    key = "c";
-                    mode = "minor";
+                case 'a' + SHARP:
+                    key = 'c';
+                    mode = 'minor';
                     break;
-                case "d" + FLAT:
-                    key = "e" + FLAT;
-                    mode = "minor";
+                case 'd' + FLAT:
+                    key = 'e' + FLAT;
+                    mode = 'minor';
                     break;
-                case "e" + FLAT:
-                    key = "f";
-                    mode = "minor";
+                case 'e' + FLAT:
+                    key = 'f';
+                    mode = 'minor';
                     break;
-                case "g" + FLAT:
-                    key = "e" + FLAT;
-                    mode = "minor";
+                case 'g' + FLAT:
+                    key = 'e' + FLAT;
+                    mode = 'minor';
                     break;
-                case "a" + FLAT:
-                    key = "e" + FLAT;
-                    mode = "minor";
+                case 'a' + FLAT:
+                    key = 'e' + FLAT;
+                    mode = 'minor';
                     break;
-                case "b" + FLAT:
-                    key = "c";
-                    mode = "minor";
+                case 'b' + FLAT:
+                    key = 'c';
+                    mode = 'minor';
                     break;
             }
             break;
-        case "locrian":
-            mode = "major";
+        case 'locrian':
+            mode = 'major';
             switch (key) {
-                case "c":
-                    key = "b";
+                case 'c':
+                    key = 'b';
                     break;
-                case "d":
-                    key = "c";
-                    mode = "minor";
+                case 'd':
+                    key = 'c';
+                    mode = 'minor';
                     break;
-                case "e":
-                    key = "f";
+                case 'e':
+                    key = 'f';
                     break;
-                case "f":
-                    key = "b";
+                case 'f':
+                    key = 'b';
                     break;
-                case "g":
-                    key = "g" + SHARP;
+                case 'g':
+                    key = 'g' + SHARP;
                     break;
-                case "a":
-                    key = "a" + SHARP;
+                case 'a':
+                    key = 'a' + SHARP;
                     break;
-                case "b":
-                    key = "c";
+                case 'b':
+                    key = 'c';
                     break;
-                case "c" + SHARP:
-                    key = "d";
+                case 'c' + SHARP:
+                    key = 'd';
                     break;
-                case "d" + SHARP:
-                    key = "e";
+                case 'd' + SHARP:
+                    key = 'e';
                     break;
-                case "f" + SHARP:
-                    key = "g";
+                case 'f' + SHARP:
+                    key = 'g';
                     break;
-                case "g" + SHARP:
-                    key = "a ";
+                case 'g' + SHARP:
+                    key = 'a ';
                     break;
-                case "a" + SHARP:
-                    key = "b";
+                case 'a' + SHARP:
+                    key = 'b';
                     break;
-                case "d" + FLAT:
-                    key = "d";
+                case 'd' + FLAT:
+                    key = 'd';
                     break;
-                case "e" + FLAT:
-                    key = "d" + FLAT;
-                    mode = "minor";
+                case 'e' + FLAT:
+                    key = 'd' + FLAT;
+                    mode = 'minor';
                     break;
-                case "g" + FLAT:
-                    key = "f";
-                    mode = "minor";
+                case 'g' + FLAT:
+                    key = 'f';
+                    mode = 'minor';
                     break;
-                case "a" + FLAT:
-                    key = "g" + FLAT;
-                    mode = "minor";
+                case 'a' + FLAT:
+                    key = 'g' + FLAT;
+                    mode = 'minor';
                     break;
-                case "b" + FLAT:
-                    key = "d" + FLAT;
-                    mode = "minor";
+                case 'b' + FLAT:
+                    key = 'd' + FLAT;
+                    mode = 'minor';
                     break;
             }
             break;
-        case "aeolian":
-            mode = "minor";
+        case 'aeolian':
+            mode = 'minor';
             break;
-        case "natural minor":
-            mode = "minor";
+        case 'natural minor':
+            mode = 'minor';
             break;
-        case "major":
-        case "minor":
+        case 'major':
+        case 'minor':
         default:
             break;
     }
@@ -3484,14 +3468,14 @@ const modeMapper = (key, mode) => {
 const getSharpFlatPreference = keySignature => {
     const obj = keySignatureToMode(keySignature);
     const obj2 = modeMapper(obj[0], obj[1]);
-    const ks = obj2[0] + " " + obj2[1];
+    const ks = obj2[0] + ' ' + obj2[1];
 
     if (SHARPPREFERENCE.includes(ks)) {
-        return "sharp";
+        return 'sharp';
     } else if (FLATPREFERENCE.includes(ks)) {
-        return "flat";
+        return 'flat';
     } else {
-        return "natural";
+        return 'natural';
     }
 };
 
@@ -3507,33 +3491,33 @@ const getCustomNote = note => {
         note = note[0];
     }
 
-    let centsInfo = "";
-    if (note.includes("(")) {
-        centsInfo = note.substring(note.indexOf("("), note.length);
+    let centsInfo = '';
+    if (note.includes('(')) {
+        centsInfo = note.substring(note.indexOf('('), note.length);
     }
 
-    note = note.replace(centsInfo, "");
+    note = note.replace(centsInfo, '');
     const articulation = getArticulation(note);
-    note = note.replace(articulation, "");
+    note = note.replace(articulation, '');
 
     switch (articulation) {
-        case "bb":
+        case 'bb':
         case DOUBLEFLAT:
-            note = note + "𝄫" + centsInfo;
+            note = note + '𝄫' + centsInfo;
             break;
-        case "b":
+        case 'b':
         case FLAT:
-            note = note + "♭" + centsInfo;
+            note = note + '♭' + centsInfo;
             break;
-        case "##":
-        case "*":
-        case "x":
+        case '##':
+        case '*':
+        case 'x':
         case DOUBLESHARP:
-            note = note + "𝄪" + centsInfo;
+            note = note + '𝄪' + centsInfo;
             break;
-        case "#":
+        case '#':
         case SHARP:
-            note = note + "♯" + centsInfo;
+            note = note + '♯' + centsInfo;
             break;
         default:
             note = note + articulation + centsInfo;
@@ -3552,7 +3536,7 @@ const getCustomNote = note => {
  */
 const pitchToNumber = (pitch, octave, keySignature) => {
     // Calculate the pitch index based on pitch and octave.
-    if (pitch.toUpperCase() === "R") {
+    if (pitch.toUpperCase() === 'R') {
         return 0;
     }
     // Check for flat, sharp, double flat, or double sharp.
@@ -3564,19 +3548,19 @@ const pitchToNumber = (pitch, octave, keySignature) => {
             lastTwo = pitch.slice(len - 2);
             //Unsure why slice is not working for double flats and double sharps.
             lastOne = pitch.substring(1, len);
-            if (lastTwo === "bb") {
+            if (lastTwo === 'bb') {
                 pitch = pitch.substring(0, 1);
                 transposition -= 2;
             } else if (lastOne === DOUBLEFLAT) {
                 pitch = pitch.substring(0, 1);
                 transposition -= 2;
-            } else if (lastTwo === "*" || lastTwo === DOUBLESHARP) {
+            } else if (lastTwo === '*' || lastTwo === DOUBLESHARP) {
                 pitch = pitch.substring(0, 1);
                 transposition += 2;
             } else if (
-                lastTwo === "#b" ||
+                lastTwo === '#b' ||
                 lastTwo === SHARP + FLAT ||
-                lastTwo === "b#" ||
+                lastTwo === 'b#' ||
                 lastTwo === FLAT + SHARP
             ) {
                 // Not sure this could occur... but just in case.
@@ -3586,10 +3570,10 @@ const pitchToNumber = (pitch, octave, keySignature) => {
 
         if (pitch.length > 1) {
             lastOne = pitch.slice(len - 1);
-            if (lastOne === "b" || lastOne === FLAT) {
+            if (lastOne === 'b' || lastOne === FLAT) {
                 pitch = pitch.slice(0, len - 1);
                 transposition -= 1;
-            } else if (lastOne === "#" || lastOne === SHARP) {
+            } else if (lastOne === '#' || lastOne === SHARP) {
                 pitch = pitch.slice(0, len - 1);
                 transposition += 1;
             }
@@ -3605,7 +3589,8 @@ const pitchToNumber = (pitch, octave, keySignature) => {
         if (obj[1].includes(pitch.toLowerCase())) {
             pitchNumber = obj[1].indexOf(pitch.toLowerCase());
         } else {
-            console.debug("pitch " + pitch + " not found in mode.");
+            // eslint-disable-next-line no-console
+            console.debug('pitch ' + pitch + ' not found in mode.');
             // Try an equivalent pitch.
             if (pitch.toLowerCase() in FIXEDSOLFEGE1) {
                 const thisPitch = FIXEDSOLFEGE1[pitch.toLowerCase()];
@@ -3616,7 +3601,7 @@ const pitchToNumber = (pitch, octave, keySignature) => {
         }
     }
     // We start at A0.
-    return octave * 12 + pitchNumber - PITCHES.indexOf("A") + transposition;
+    return octave * 12 + pitchNumber - PITCHES.indexOf('A') + transposition;
 };
 
 /**
@@ -3636,13 +3621,13 @@ const numberToPitchSharp = i => {
         }
 
         return [
-            PITCHES2[(i + PITCHES2.indexOf("A")) % 12],
-            Math.floor((i + PITCHES2.indexOf("A")) / 12) - n
+            PITCHES2[(i + PITCHES2.indexOf('A')) % 12],
+            Math.floor((i + PITCHES2.indexOf('A')) / 12) - n,
         ];
     } else {
         return [
-            PITCHES2[(i + PITCHES2.indexOf("A")) % 12],
-            Math.floor((i + PITCHES2.indexOf("A")) / 12)
+            PITCHES2[(i + PITCHES2.indexOf('A')) % 12],
+            Math.floor((i + PITCHES2.indexOf('A')) / 12),
         ];
     }
 };
@@ -3670,13 +3655,13 @@ const getNumber = (notename, octave) => {
         num += NOTESTEP[notename.substring(0, 1)];
         if (notename.length >= 1) {
             const delta = notename.substring(1);
-            if (delta === "bb" || delta === DOUBLEFLAT) {
+            if (delta === 'bb' || delta === DOUBLEFLAT) {
                 num -= 2;
-            } else if (delta === "##" || delta === "*" || delta === DOUBLESHARP) {
+            } else if (delta === '##' || delta === '*' || delta === DOUBLESHARP) {
                 num += 2;
-            } else if (delta === "b" || delta === FLAT) {
+            } else if (delta === 'b' || delta === FLAT) {
                 num -= 1;
-            } else if (delta === "#" || delta === SHARP) {
+            } else if (delta === '#' || delta === SHARP) {
                 num += 1;
             }
         }
@@ -3697,9 +3682,9 @@ const getNoteFromInterval = (pitch, interval) => {
     const pitch1 = pitch.substring(0, 1);
     const note1 = pitch.substring(0, len - 1);
     const octave1 = Number(pitch.slice(-1));
-    const number = pitchToNumber(note1, octave1, "C major");
-    const pitches = ["C", "D", "E", "F", "G", "A", "B"];
-    const priorAttrs = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP];
+    const number = pitchToNumber(note1, octave1, 'C major');
+    const pitches = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+    const priorAttrs = [DOUBLEFLAT, FLAT, '', SHARP, DOUBLESHARP];
 
     /**
      * Find the note that corresponds to a major interval.
@@ -3719,9 +3704,9 @@ const getNoteFromInterval = (pitch, interval) => {
         //Same technique is used to code the findMajorInterval.
         const halfSteps = INTERVALVALUES[interval][0];
         // const direction = INTERVALVALUES[interval][1];
-
+        // eslint-disable-next-line no-use-before-define
         let note = numberToPitch(number + halfSteps);
-        const num = interval.split(" ");
+        const num = interval.split(' ');
         const pitchIndex = pitches.indexOf(pitch1);
         let index = pitchIndex + Number(num[num.length - 1]) - 1;
         let octave = octave1;
@@ -3738,9 +3723,9 @@ const getNoteFromInterval = (pitch, interval) => {
                 return [note[0], octave];
             } else {
                 const steps = getNumber(id, octave) - getNumber(note1, octave1);
-                const naturalIndex = priorAttrs.indexOf("");
+                const naturalIndex = priorAttrs.indexOf('');
                 const attr = priorAttrs[naturalIndex + halfSteps - steps];
-                note = id + attr + "";
+                note = id + attr + '';
                 return [note, octave];
             }
         }
@@ -3753,19 +3738,19 @@ const getNoteFromInterval = (pitch, interval) => {
      * @returns {Array} An array containing the note and octave.
      */
     const findOtherIntervals = interval => {
-        const num = interval.split(" ");
+        const num = interval.split(' ');
         let majorNote;
         let accidental;
         let index1;
 
         if (
-            interval === "minor 2" ||
-            interval === "minor 3" ||
-            interval === "minor 6" ||
-            interval === "minor 7"
+            interval === 'minor 2' ||
+            interval === 'minor 3' ||
+            interval === 'minor 6' ||
+            interval === 'minor 7'
         ) {
             //Major intervals lowered by a half step become minor.
-            majorNote = findMajorInterval("major " + num[num.length - 1]);
+            majorNote = findMajorInterval('major ' + num[num.length - 1]);
             accidental = majorNote[0].substring(1, majorNote[0].length);
             index1 = priorAttrs.indexOf(accidental);
             if (index1 === 0) {
@@ -3776,14 +3761,14 @@ const getNoteFromInterval = (pitch, interval) => {
         }
 
         // Diminished intervals for perfect intervals (lowered by half step)
-        else if (interval === "down 4" || interval === "down 5" || interval === "down 8") {
+        else if (interval === 'down 4' || interval === 'down 5' || interval === 'down 8') {
             // Mapping to the corresponding perfect interval
-            if (interval === "down 4") {
-                majorNote = findMajorInterval("perfect 4");
-            } else if (interval === "down 5") {
-                majorNote = findMajorInterval("perfect 5");
-            } else if (interval === "down 8") {
-                majorNote = findMajorInterval("perfect 8");
+            if (interval === 'down 4') {
+                majorNote = findMajorInterval('perfect 4');
+            } else if (interval === 'down 5') {
+                majorNote = findMajorInterval('perfect 5');
+            } else if (interval === 'down 8') {
+                majorNote = findMajorInterval('perfect 8');
             }
 
             // Lowering by one half step
@@ -3797,8 +3782,8 @@ const getNoteFromInterval = (pitch, interval) => {
         }
 
         // Special case: doubly diminished 5th (very diminished)
-        else if (interval === "down-diminished 5") {
-            majorNote = findMajorInterval("perfect 5");
+        else if (interval === 'down-diminished 5') {
+            majorNote = findMajorInterval('perfect 5');
             accidental = majorNote[0].substring(1, majorNote[0].length);
             index1 = priorAttrs.indexOf(accidental);
 
@@ -3813,8 +3798,8 @@ const getNoteFromInterval = (pitch, interval) => {
         }
 
         // Special case: diminished 2nd (from unison)
-        else if (interval === "diminished 2") {
-            majorNote = findMajorInterval("perfect 1");
+        else if (interval === 'diminished 2') {
+            majorNote = findMajorInterval('perfect 1');
             accidental = majorNote[0].substring(1, majorNote[0].length);
             index1 = priorAttrs.indexOf(accidental);
             if (index1 === 0) {
@@ -3825,15 +3810,15 @@ const getNoteFromInterval = (pitch, interval) => {
         }
 
         // Handle standard diminished intervals not covered by microtonal cases
-        else if (interval.startsWith("diminished ")) {
-            const intervalNum = interval.split(" ")[1];
+        else if (interval.startsWith('diminished ')) {
+            const intervalNum = interval.split(' ')[1];
             let baseInterval;
-            if (["4", "5", "8"].includes(intervalNum)) {
+            if (['4', '5', '8'].includes(intervalNum)) {
                 // Perfect-based
-                baseInterval = "perfect " + intervalNum;
+                baseInterval = 'perfect ' + intervalNum;
             } else {
                 // Major-based
-                baseInterval = "major " + intervalNum;
+                baseInterval = 'major ' + intervalNum;
             }
 
             majorNote = findMajorInterval(baseInterval);
@@ -3849,12 +3834,12 @@ const getNoteFromInterval = (pitch, interval) => {
         }
 
         // Augmented intervals for perfect intervals (raised by half step)
-        else if (interval === "up 4" || interval === "up 5" || interval === "up-augmented 4") {
+        else if (interval === 'up 4' || interval === 'up 5' || interval === 'up-augmented 4') {
             // Mapping to the corresponding perfect interval
-            if (interval === "up 4" || interval === "up-augmented 4") {
-                majorNote = findMajorInterval("perfect 4");
-            } else if (interval === "up 5") {
-                majorNote = findMajorInterval("perfect 5");
+            if (interval === 'up 4' || interval === 'up-augmented 4') {
+                majorNote = findMajorInterval('perfect 4');
+            } else if (interval === 'up 5') {
+                majorNote = findMajorInterval('perfect 5');
             }
 
             // Raise by one half step
@@ -3868,8 +3853,8 @@ const getNoteFromInterval = (pitch, interval) => {
         }
 
         // Special case: augmented unison
-        else if (interval === "augmented 1") {
-            majorNote = findMajorInterval("perfect 1");
+        else if (interval === 'augmented 1') {
+            majorNote = findMajorInterval('perfect 1');
             accidental = majorNote[0].substring(1, majorNote[0].length);
             index1 = priorAttrs.indexOf(accidental);
             if (index1 === 4) {
@@ -3881,21 +3866,21 @@ const getNoteFromInterval = (pitch, interval) => {
 
         // Standard augmented intervals
         else if (
-            interval === "augmented 2" ||
-            interval === "augmented 3" ||
-            interval === "augmented 4" ||
-            interval === "augmented 5" ||
-            interval === "augmented 6" ||
-            interval === "augmented 7" ||
-            interval === "augmented 8"
+            interval === 'augmented 2' ||
+            interval === 'augmented 3' ||
+            interval === 'augmented 4' ||
+            interval === 'augmented 5' ||
+            interval === 'augmented 6' ||
+            interval === 'augmented 7' ||
+            interval === 'augmented 8'
         ) {
-            const intervalNum = interval.split(" ")[1];
-            if (["1", "4", "5", "8"].includes(intervalNum)) {
+            const intervalNum = interval.split(' ')[1];
+            if (['1', '4', '5', '8'].includes(intervalNum)) {
                 // Perfect-based augmented intervals
-                majorNote = findMajorInterval("perfect " + intervalNum);
+                majorNote = findMajorInterval('perfect ' + intervalNum);
             } else {
                 // Major-based augmented intervals
-                majorNote = findMajorInterval("major " + intervalNum);
+                majorNote = findMajorInterval('major ' + intervalNum);
             }
             accidental = majorNote[0].substring(1, majorNote[0].length);
             index1 = priorAttrs.indexOf(accidental);
@@ -3908,14 +3893,14 @@ const getNoteFromInterval = (pitch, interval) => {
 
         // Handle "up-major" intervals (raised major)
         else if (
-            interval === "up-major 2" ||
-            interval === "up-major 3" ||
-            interval === "up-major 6" ||
-            interval === "up-major 7"
+            interval === 'up-major 2' ||
+            interval === 'up-major 3' ||
+            interval === 'up-major 6' ||
+            interval === 'up-major 7'
         ) {
             let intervalNum;
-            intervalNum = interval.split(" ")[1];
-            majorNote = findMajorInterval("major " + intervalNum);
+            intervalNum = interval.split(' ')[1];
+            majorNote = findMajorInterval('major ' + intervalNum);
             accidental = majorNote[0].substring(1, majorNote[0].length);
             index1 = priorAttrs.indexOf(accidental);
             if (index1 === 4) {
@@ -3927,12 +3912,12 @@ const getNoteFromInterval = (pitch, interval) => {
 
         // Handle "down-minor" intervals (lowered minor - like diminished)
         else if (
-            interval === "down-minor 3" ||
-            interval === "down-minor 6" ||
-            interval === "down-minor 7"
+            interval === 'down-minor 3' ||
+            interval === 'down-minor 6' ||
+            interval === 'down-minor 7'
         ) {
-            const intervalNum = interval.split(" ")[1];
-            majorNote = findMajorInterval("major " + intervalNum);
+            const intervalNum = interval.split(' ')[1];
+            majorNote = findMajorInterval('major ' + intervalNum);
             accidental = majorNote[0].substring(1, majorNote[0].length);
             index1 = priorAttrs.indexOf(accidental);
 
@@ -3946,13 +3931,13 @@ const getNoteFromInterval = (pitch, interval) => {
 
         // Handle neutral/mid intervals (between major and minor)
         else if (
-            interval === "mid 2" ||
-            interval === "mid 3" ||
-            interval === "mid 6" ||
-            interval === "mid 7"
+            interval === 'mid 2' ||
+            interval === 'mid 3' ||
+            interval === 'mid 6' ||
+            interval === 'mid 7'
         ) {
-            const intervalNum = interval.split(" ")[1];
-            majorNote = findMajorInterval("major " + intervalNum);
+            const intervalNum = interval.split(' ')[1];
+            majorNote = findMajorInterval('major ' + intervalNum);
             accidental = majorNote[0].substring(1, majorNote[0].length);
             index1 = priorAttrs.indexOf(accidental);
             if (index1 === 0) {
@@ -3962,18 +3947,18 @@ const getNoteFromInterval = (pitch, interval) => {
             }
         }
 
-        return [majorNote[0].substring(0, 1) + accidental + "", majorNote[1]];
+        return [majorNote[0].substring(0, 1) + accidental + '', majorNote[1]];
     };
 
     if (
-        interval === "major 2" ||
-        interval === "major 3" ||
-        interval === "major 6" ||
-        interval === "major 7" ||
-        interval === "perfect 4" ||
-        interval === "perfect 5" ||
-        interval === "perfect 8" ||
-        interval === "perfect 1"
+        interval === 'major 2' ||
+        interval === 'major 3' ||
+        interval === 'major 6' ||
+        interval === 'major 7' ||
+        interval === 'perfect 4' ||
+        interval === 'perfect 5' ||
+        interval === 'perfect 8' ||
+        interval === 'perfect 1'
     ) {
         return findMajorInterval(interval);
     } else {
@@ -3994,7 +3979,7 @@ const numberToPitch = (i, temperament, startPitch, offset) => {
     // Calculate the pitch and octave based on index.
     // We start at A0.
     if (temperament === undefined) {
-        temperament = "equal";
+        temperament = 'equal';
     }
 
     let n = 0;
@@ -4005,19 +3990,19 @@ const numberToPitch = (i, temperament, startPitch, offset) => {
             n += 1; // Count octave bump ups.
         }
 
-        if (temperament === "equal") {
+        if (temperament === 'equal') {
             return [
-                PITCHES[(i + PITCHES.indexOf("A")) % 12],
-                Math.floor((i + PITCHES.indexOf("A")) / 12) - n
+                PITCHES[(i + PITCHES.indexOf('A')) % 12],
+                Math.floor((i + PITCHES.indexOf('A')) / 12) - n,
             ];
         } else {
             pitchNumber = Math.floor(i - offset);
         }
     } else {
-        if (temperament === "equal") {
+        if (temperament === 'equal') {
             return [
-                PITCHES[(i + PITCHES.indexOf("A")) % 12],
-                Math.floor((i + PITCHES.indexOf("A")) / 12)
+                PITCHES[(i + PITCHES.indexOf('A')) % 12],
+                Math.floor((i + PITCHES.indexOf('A')) / 12),
             ];
         } else {
             pitchNumber = Math.floor(i - offset);
@@ -4027,27 +4012,27 @@ const numberToPitch = (i, temperament, startPitch, offset) => {
     let interval;
     if (isCustomTemperament(temperament)) {
         // The index may be outside of the octave.
-        const octaveLength = TEMPERAMENT[temperament]["pitchNumber"];
+        const octaveLength = TEMPERAMENT[temperament]['pitchNumber'];
         const pitchIdx = pitchNumber % octaveLength;
         const octaveFactor = Math.floor(pitchNumber / octaveLength);
 
-        pitchNumber = pitchIdx + "";
+        pitchNumber = pitchIdx + '';
         if (TEMPERAMENT[temperament][pitchNumber] === undefined) {
             // If custom temperament is not defined, then it will
             // store equal temperament notes.
             for (let j = 0; j < 12; j++) {
-                const number = "" + j;
-                interval = TEMPERAMENT["equal"]["interval"][i];
+                const number = '' + j;
+                interval = TEMPERAMENT['equal']['interval'][i];
                 TEMPERAMENT[temperament][number] = [
                     Math.pow(2, j / 12),
                     getNoteFromInterval(startPitch, interval)[0],
-                    getNoteFromInterval(startPitch, interval)[1]
+                    getNoteFromInterval(startPitch, interval)[1],
                 ];
             }
 
             return [
                 TEMPERAMENT[temperament][pitchNumber][1],
-                TEMPERAMENT[temperament][pitchNumber][2]
+                TEMPERAMENT[temperament][pitchNumber][2],
             ];
         } else {
             // Add in octave factor from above.
@@ -4055,7 +4040,7 @@ const numberToPitch = (i, temperament, startPitch, offset) => {
             return [TEMPERAMENT[temperament][pitchNumber][1], o];
         }
     } else {
-        interval = TEMPERAMENT[temperament]["interval"][pitchNumber];
+        interval = TEMPERAMENT[temperament]['interval'][pitchNumber];
         return getNoteFromInterval(startPitch, interval);
     }
 };
@@ -4071,17 +4056,17 @@ const GetNotesForInterval = tur => {
     const notePitches = tur.singer.notePitches;
     const intervals = tur.singer.intervals;
     const noteOctave = tur.singer.noteOctaves;
-    let firstNote = "C",
-        secondNote = "C",
+    let firstNote = 'C',
+        secondNote = 'C',
         octave = 0;
     if (noteStatus && noteStatus[0]) {
-        firstNote = noteStatus[0][0].replace(/\d/g, ""); //removing all numbers like '1'
+        firstNote = noteStatus[0][0].replace(/\d/g, ''); //removing all numbers like '1'
         if (!noteStatus[0][1]) {
             return { firstNote, secondNote: firstNote, octave };
         }
-        secondNote = noteStatus[0][1].replace(/\d/g, "");
-        const octavea = parseInt(noteStatus[0][0].replace(/[^0-9]/g, ""));
-        const octaveb = parseInt(noteStatus[0][1].replace(/[^0-9]/g, ""));
+        secondNote = noteStatus[0][1].replace(/\d/g, '');
+        const octavea = parseInt(noteStatus[0][0].replace(/[^0-9]/g, ''));
+        const octaveb = parseInt(noteStatus[0][1].replace(/[^0-9]/g, ''));
         octave = octaveb - octavea;
     } else if (notePitches) {
         const pitchBlk = notePitches[last(tur.singer.inNoteBlock)];
@@ -4096,10 +4081,10 @@ const GetNotesForInterval = tur => {
         octave = octaveblk[octaveblk.length - 1] - octaveblk[0];
     }
 
-    firstNote = firstNote.replace("♭", "b");
-    secondNote = secondNote.replace("♭", "b");
-    firstNote = firstNote.replace("♯", "#");
-    secondNote = secondNote.replace("♯", "#");
+    firstNote = firstNote.replace('♭', 'b');
+    secondNote = secondNote.replace('♭', 'b');
+    firstNote = firstNote.replace('♯', '#');
+    secondNote = secondNote.replace('♯', '#');
 
     return { firstNote, secondNote, octave };
 };
@@ -4125,10 +4110,10 @@ function getNote(
     movable,
     direction,
     errorMsg,
-    temperament
+    temperament,
 ) {
     if (temperament === undefined) {
-        temperament = "equal";
+        temperament = 'equal';
     }
 
     let sharpFlat = false;
@@ -4154,28 +4139,28 @@ function getNote(
         transpositionCents = (transposition - transpositionFloor) * 100;
     }
 
-    if (typeof noteArg !== "number") {
+    if (typeof noteArg !== 'number') {
         // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
-        if (noteArg.substr(-1) === ">") {
+        if (noteArg.substr(-1) === '>') {
             // Read octave and solfege from HTML
-            octave = parseInt(noteArg.slice(noteArg.indexOf(">") + 1, noteArg.indexOf("/") - 1));
-            noteArg = noteArg.substr(0, noteArg.indexOf("<"));
+            octave = parseInt(noteArg.slice(noteArg.indexOf('>') + 1, noteArg.indexOf('/') - 1));
+            noteArg = noteArg.substr(0, noteArg.indexOf('<'));
         }
         if (
-            noteArg.toLowerCase().substr(0, 4) === "rest" ||
-            noteArg.toLowerCase().substr(0, 4) === "r"
+            noteArg.toLowerCase().substr(0, 4) === 'rest' ||
+            noteArg.toLowerCase().substr(0, 4) === 'r'
         ) {
-            return ["R", "", 0];
+            return ['R', '', 0];
         }
         // Could be a number as a string (with or without an accidental.
         let noteAsNumber = noteArg;
-        if (["#", SHARP, FLAT, "b"].includes(noteArg.substr(-1))) {
+        if (['#', SHARP, FLAT, 'b'].includes(noteArg.substr(-1))) {
             noteAsNumber = noteArg.slice(0, noteArg.length - 1);
         }
         if (!isNaN(noteAsNumber)) {
-            if (["#", SHARP].includes(noteArg.substr(-1))) {
+            if (['#', SHARP].includes(noteArg.substr(-1))) {
                 transpositionFloor += 1;
-            } else if (["b", FLAT].includes(noteArg.substr(-1))) {
+            } else if (['b', FLAT].includes(noteArg.substr(-1))) {
                 transpositionFloor -= 1;
             }
             noteArg = Number(noteAsNumber);
@@ -4184,27 +4169,27 @@ function getNote(
 
     octave = Math.round(octave);
 
-    if (typeof noteArg === "number") {
+    if (typeof noteArg === 'number') {
         // Assume it is a pitch number.
         if (!keySignature) {
-            keySignature = "C major";
+            keySignature = 'C major';
         }
         let kOffset = 0;
         if (movable) {
-            kOffset = PITCHES.indexOf(keySignature.split(" ")[0]);
+            kOffset = PITCHES.indexOf(keySignature.split(' ')[0]);
             if (kOffset === -1) {
-                kOffset = PITCHES.indexOf(keySignature.split(" ")[0]);
+                kOffset = PITCHES.indexOf(keySignature.split(' ')[0]);
             }
             if (kOffset === -1) {
-                kOffset = PITCHES2.indexOf(keySignature.split(" ")[0]);
+                kOffset = PITCHES2.indexOf(keySignature.split(' ')[0]);
             }
             if (kOffset === -1) {
                 kOffset = 0;
-
-                console.log("Cannot find " + keySignature.split(" ")[0] + ". Reverting to C");
+                // eslint-disable-next-line no-console
+                console.log('Cannot find ' + keySignature.split(' ')[0] + '. Reverting to C');
             }
         }
-        if (getSharpFlatPreference(keySignature) === "sharp") {
+        if (getSharpFlatPreference(keySignature) === 'sharp') {
             noteArg = PITCHES2[(noteArg + kOffset) % 12];
         } else {
             noteArg = PITCHES[(noteArg + kOffset) % 12];
@@ -4218,35 +4203,35 @@ function getNote(
         // Check for double flat or double sharp. Since bb and x behave
         // funny with string operations, we jump through some hoops.
         articulation = getArticulation(noteArg);
-        noteArg = noteArg.replace(articulation, "");
+        noteArg = noteArg.replace(articulation, '');
 
         switch (articulation) {
-            case "bb":
+            case 'bb':
             case DOUBLEFLAT:
-                noteArg += "b";
+                noteArg += 'b';
                 rememberFlat = true;
                 transpositionFloor -= 1;
                 break;
-            case "b":
+            case 'b':
             case FLAT:
-                noteArg += "b";
+                noteArg += 'b';
                 rememberFlat = true;
                 break;
-            case "##":
-            case "*":
-            case "x":
+            case '##':
+            case '*':
+            case 'x':
             case DOUBLESHARP:
-                noteArg += "#";
+                noteArg += '#';
                 rememberSharp = true;
                 transpositionFloor += 1;
                 break;
-            case "#":
+            case '#':
             case SHARP:
-                noteArg += "#";
+                noteArg += '#';
                 rememberSharp = true;
                 break;
-            case "b#":
-            case "#b":
+            case 'b#':
+            case '#b':
             case FLAT + SHARP:
             case SHARP + FLAT:
             default:
@@ -4275,12 +4260,12 @@ function getNote(
             // Convert to uppercase, e.g., d♭ -> D♭.
             note = NOTESFLAT[NOTESFLAT2.indexOf(noteArg)];
         } else {
-            if (["#", SHARP, FLAT, "b"].includes(noteArg.substr(-1))) {
+            if (['#', SHARP, FLAT, 'b'].includes(noteArg.substr(-1))) {
                 sharpFlat = true;
             }
 
             if (!keySignature) {
-                keySignature = "C major";
+                keySignature = 'C major';
             }
 
             let obj;
@@ -4288,7 +4273,7 @@ function getNote(
             if (movable) {
                 obj = getScaleAndHalfSteps(keySignature);
             } else {
-                obj = getScaleAndHalfSteps("C major");
+                obj = getScaleAndHalfSteps('C major');
             }
 
             let thisScale = obj[0];
@@ -4300,12 +4285,13 @@ function getNote(
                 // Ensure it is a valid key signature.
                 offset = thisScale.indexOf(myKeySignature);
                 if (offset === -1) {
+                    // eslint-disable-next-line no-console
                     console.debug(
-                        "WARNING: Key " +
+                        'WARNING: Key ' +
                             myKeySignature +
-                            " not found in " +
+                            ' not found in ' +
                             thisScale +
-                            ". Using default of C"
+                            '. Using default of C',
                     );
                     offset = 0;
                     thisScale = NOTESSHARP;
@@ -4324,13 +4310,13 @@ function getNote(
             }
 
             if (sharpFlat) {
-                if (noteArg.substr(-1) === "#") {
+                if (noteArg.substr(-1) === '#') {
                     offset += 1;
                 } else if (noteArg.substr(-1) === SHARP) {
                     offset += 1;
                 } else if (noteArg.substr(-1) === FLAT) {
                     offset -= 1;
-                } else if (noteArg.substr(-1) === "b") {
+                } else if (noteArg.substr(-1) === 'b') {
                     offset -= 1;
                 }
             }
@@ -4347,7 +4333,7 @@ function getNote(
                 // Reverse any i18n
                 // solfnotes_ is used in the interface for i18n
                 //.TRANS: the note names must be separated by single spaces
-                const solfnotes_ = _("ti la sol fa mi re do").split(" ");
+                const solfnotes_ = _('ti la sol fa mi re do').split(' ');
                 if (solfnotes_.includes(noteArg.substr(0, 1).toLowerCase())) {
                     solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase())];
                 } else if (solfnotes_.includes(noteArg.substr(0, 2).toLowerCase())) {
@@ -4362,7 +4348,7 @@ function getNote(
             if (movable) {
                 let i;
                 switch (mode) {
-                    case "dorian":
+                    case 'dorian':
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 0) {
                             transpositionFloor += 12;
@@ -4376,7 +4362,7 @@ function getNote(
 
                         solfegePart = SOLFEGENAMES[i];
                         break;
-                    case "phrygian":
+                    case 'phrygian':
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 1) {
                             transpositionFloor += 12;
@@ -4389,7 +4375,7 @@ function getNote(
 
                         solfegePart = SOLFEGENAMES[i];
                         break;
-                    case "lydian":
+                    case 'lydian':
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 2) {
                             transpositionFloor += 12;
@@ -4402,7 +4388,7 @@ function getNote(
 
                         solfegePart = SOLFEGENAMES[i];
                         break;
-                    case "mixolydian":
+                    case 'mixolydian':
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 3) {
                             transpositionFloor += 12;
@@ -4415,8 +4401,8 @@ function getNote(
 
                         solfegePart = SOLFEGENAMES[i];
                         break;
-                    case "minor":
-                    case "aeolian":
+                    case 'minor':
+                    case 'aeolian':
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 4) {
                             transpositionFloor += 12;
@@ -4429,7 +4415,7 @@ function getNote(
 
                         solfegePart = SOLFEGENAMES[i];
                         break;
-                    case "locrian":
+                    case 'locrian':
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 5) {
                             transpositionFloor += 12;
@@ -4442,8 +4428,8 @@ function getNote(
 
                         solfegePart = SOLFEGENAMES[i];
                         break;
-                    case "major":
-                    case "ionian":
+                    case 'major':
+                    case 'ionian':
                     default:
                         break;
                 }
@@ -4462,14 +4448,19 @@ function getNote(
 
                 note = thisScale[index];
             } else {
+                // eslint-disable-next-line no-console
                 console.debug(
-                    "WARNING: Note [" + noteArg + "] not found in " + halfSteps + ". Returning REST"
+                    'WARNING: Note [' +
+                        noteArg +
+                        '] not found in ' +
+                        halfSteps +
+                        '. Returning REST',
                 );
                 if (errorMsg != undefined) {
                     errorMsg(INVALIDPITCH, null);
                 }
 
-                return ["R", "", 0];
+                return ['R', '', 0];
             }
 
             if (note in EXTRATRANSPOSITIONS) {
@@ -4516,7 +4507,8 @@ function getNote(
 
                     note = NOTESFLAT[i];
                 } else {
-                    console.debug("note not found? " + note);
+                    // eslint-disable-next-line no-console
+                    console.debug('note not found? ' + note);
                 }
             } else if (deltaNote < 0) {
                 if (NOTESFLAT.includes(note)) {
@@ -4544,24 +4536,25 @@ function getNote(
 
                     note = NOTESSHARP[i];
                 } else {
-                    console.debug("note not found? " + note);
+                    // eslint-disable-next-line no-console
+                    console.debug('note not found? ' + note);
                 }
             }
         }
 
         // Try to find a note in the current keySignature
         switch (getSharpFlatPreference(keySignature)) {
-            case "flat":
+            case 'flat':
                 if (note in EQUIVALENTFLATS) {
                     note = EQUIVALENTFLATS[note];
                 }
                 break;
-            case "sharp":
+            case 'sharp':
                 if (note in EQUIVALENTSHARPS) {
                     note = EQUIVALENTSHARPS[note];
                 }
                 break;
-            case "natural":
+            case 'natural':
                 if (note in EQUIVALENTNATURALS) {
                     note = EQUIVALENTNATURALS[note];
                 }
@@ -4601,16 +4594,16 @@ function getNote(
         note = getCustomNote(noteArg);
         let pitchNumber = null;
         for (const number in TEMPERAMENT[temperament]) {
-            if (number !== "pitchNumber" && number != "interval") {
+            if (number !== 'pitchNumber' && number != 'interval') {
                 if (note === TEMPERAMENT[temperament][number][3]) {
-                    if (typeof number === "string") {
+                    if (typeof number === 'string') {
                         pitchNumber = Number(number);
                     } else {
                         pitchNumber = number;
                     }
                     break;
                 } else if (note === TEMPERAMENT[temperament][number][1]) {
-                    if (typeof number === "string") {
+                    if (typeof number === 'string') {
                         pitchNumber = Number(number);
                     } else {
                         pitchNumber = number;
@@ -4620,7 +4613,7 @@ function getNote(
             }
         }
 
-        if (pitchNumber === null || pitchNumber === "null") {
+        if (pitchNumber === null || pitchNumber === 'null') {
             return getNote(
                 noteArg,
                 octave,
@@ -4628,14 +4621,14 @@ function getNote(
                 keySignature,
                 movable,
                 direction,
-                errorMsg
+                errorMsg,
                 // No temperament arg is passed so the note will not
                 // be processed as a custom temperament.
             );
         }
 
         let inOctave = octave;
-        const octaveLength = TEMPERAMENT[temperamentFloor]["pitchNumber"];
+        const octaveLength = TEMPERAMENT[temperamentFloor]['pitchNumber'];
         let deltaOctave, deltaNote;
         if (transpositionFloor !== 0) {
             if (transpositionFloor < 0) {
@@ -4657,7 +4650,7 @@ function getNote(
             pitchNumber = pitchNumber - octaveLength;
             inOctave = inOctave + 1;
         }
-        pitchNumber = pitchNumber + "";
+        pitchNumber = pitchNumber + '';
         if (TEMPERAMENT[temperament][pitchNumber].length > 3) {
             note = TEMPERAMENT[temperament][pitchNumber][3];
         } else {
@@ -4667,33 +4660,33 @@ function getNote(
     } else {
         // Return E# as E#, Fb as Fb etc. for different temperament systems.
         articulation = getArticulation(noteArg);
-        noteArg = noteArg.replace(articulation, "");
+        noteArg = noteArg.replace(articulation, '');
 
         if (SOLFEGENAMES.includes(noteArg)) {
             noteArg = FIXEDSOLFEGE[noteArg];
         }
 
         switch (articulation) {
-            case "bb":
+            case 'bb':
             case DOUBLEFLAT:
-                noteArg += "𝄫";
+                noteArg += '𝄫';
                 break;
-            case "b":
+            case 'b':
             case FLAT:
-                noteArg += "b";
+                noteArg += 'b';
                 break;
-            case "##":
-            case "*":
-            case "x":
+            case '##':
+            case '*':
+            case 'x':
             case DOUBLESHARP:
-                noteArg += "𝄪";
+                noteArg += '𝄪';
                 break;
-            case "#":
+            case '#':
             case SHARP:
-                noteArg += "#";
+                noteArg += '#';
                 break;
-            case "b#":
-            case "#b":
+            case 'b#':
+            case '#b':
             case FLAT + SHARP:
             case SHARP + FLAT:
             default:
@@ -4716,7 +4709,7 @@ function getNote(
 
             let pitch, note1, octave1;
             if (deltaNote > 0) {
-                pitch = note + "" + octave;
+                pitch = note + '' + octave;
                 for (const interval in INTERVALVALUES) {
                     if (deltaNote === INTERVALVALUES[interval][0]) {
                         note1 = getNoteFromInterval(pitch, interval);
@@ -4725,7 +4718,7 @@ function getNote(
                 }
             } else if (deltaNote < 0) {
                 octave1 = octave - 1;
-                pitch = note + "" + octave1;
+                pitch = note + '' + octave1;
                 for (const interval in INTERVALVALUES) {
                     if (12 + deltaNote === INTERVALVALUES[interval][0]) {
                         note1 = getNoteFromInterval(pitch, interval);
@@ -4733,8 +4726,8 @@ function getNote(
                     }
                 }
             } else if (deltaNote === 0) {
-                pitch = note + "" + octave;
-                note1 = getNoteFromInterval(pitch, "perfect 1");
+                pitch = note + '' + octave;
+                note1 = getNoteFromInterval(pitch, 'perfect 1');
             }
             note = note1[0];
             octave = note1[1];
@@ -4751,115 +4744,50 @@ function getNote(
 }
 
 /**
- * Maps accidental characters to their semitone offsets.
- * Named distinctly to avoid collision with the ACCIDENTAL_MAP in abc.js
- * (which maps accidentals to ABC notation strings, not semitone offsets).
- * @constant {Object.<string, number>}
+ * Calculate the pitch number based on the activity, pitch value, and tur parameters.
+ * @function
+ * @param {Object} activity - The activity object.
+ * @param {string|number} np - The pitch value (note name or frequency in Hertz).
+ * @param {Object} tur - The tur parameters containing singer information.
+ * @returns {number} The calculated pitch number.
  */
-const ACCIDENTAL_SEMITONE_MAP = {
-    "#": 1,
-    "♯": 1,
-    "b": -1,
-    "♭": -1,
-    "x": 2, // double-sharp (textual)
-    "𝄪": 2, // double-sharp (Unicode)
-    "𝄫": -2 // double-flat (Unicode)
-};
-
-/**
- * Parses a pitch string into its note name and octave components.
- * Handles single and double accidentals (#, b, ♯, ♭, x, 𝄪, 𝄫).
- * @param {string} str - The pitch string (e.g. "C4", "A#10", "F𝄪5").
- * @returns {Array} An array containing [normalizedNoteName, octave].
- */
-function _parse_pitch_string(str) {
-    const match = str.match(/^([A-Ga-g])([#b♭♯𝄪𝄫x]*)(-?\d+)$/u);
-    if (match) {
-        const baseLetter = match[1].toUpperCase();
-        const accidentalStr = match[2];
-        const octave = parseInt(match[3], 10);
-
-        if (!accidentalStr) {
-            // No accidentals; return as-is
-            return [baseLetter, octave];
-        }
-
-        // Sum up semitone offsets for all accidental characters.
-        // 𝄪 and 𝄫 are multi-byte but treated as single code points by spread.
-        const accidentalChars = [...accidentalStr];
-        const semitoneOffset = accidentalChars.reduce(
-            (sum, char) => sum + (ACCIDENTAL_SEMITONE_MAP[char] || 0),
-            0
-        );
-
-        // Build a normalized name using canonical SHARP/FLAT symbols.
-        let normalizedName;
-        if (semitoneOffset === 0) {
-            normalizedName = baseLetter;
-        } else if (semitoneOffset === 1) {
-            normalizedName = baseLetter + SHARP;
-        } else if (semitoneOffset === -1) {
-            normalizedName = baseLetter + FLAT;
-        } else if (semitoneOffset === 2) {
-            normalizedName = baseLetter + DOUBLESHARP;
-        } else if (semitoneOffset === -2) {
-            normalizedName = baseLetter + DOUBLEFLAT;
+const _calculate_pitch_number = (activity, np, tur) => {
+    let obj;
+    if (tur.singer.lastNotePlayed !== null) {
+        if (typeof np === 'string') {
+            obj = noteToObj(np);
         } else {
-            // For unusual combinations, keep semitone representation as extra sharps/flats
-            const sym = semitoneOffset > 0 ? SHARP : FLAT;
-            normalizedName = baseLetter + sym.repeat(Math.abs(semitoneOffset));
+            // Hertz
+            obj = frequencyToPitch(np);
         }
-
-        return [normalizedName, octave];
+    } else if (
+        tur.singer.inNoteBlock in tur.singer.notePitches &&
+        tur.singer.notePitches[last(tur.singer.inNoteBlock)].length > 0
+    ) {
+        obj = getNote(
+            tur.singer.notePitches[last(tur.singer.inNoteBlock)][0],
+            tur.singer.noteOctaves[last(tur.singer.inNoteBlock)][0],
+            0,
+            tur.singer.keySignature,
+            tur.singer.movable,
+            null,
+            activity.errorMsg,
+        );
+    } else {
+        try {
+            if (typeof np === 'string') {
+                obj = noteToObj(np);
+            } else {
+                // Hertz
+                obj = frequencyToPitch(np);
+            }
+        } catch (e) {
+            activity.errorMsg(INVALIDPITCH);
+            obj = ['G', 4];
+        }
     }
-    // Fallback: no octave digit found – normalize accidentals and default octave to 4
-    return [str.replaceAll("#", SHARP).replaceAll("b", FLAT), 4];
-}
-
-/**
- * Calculates a pitch number from a note name and octave.
- * @param {string} noteName - The name of the note (e.g. "C", "C#").
- * @param {number} octave - The octave number.
- * @returns {number|string} The calculated pitch number or INVALIDPITCH if calculation fails.
- */
-function _calculate_pitch_number(noteName, octave, applyOffset = 0) {
-    if (typeof noteName !== "string") {
-        return INVALIDPITCH;
-    }
-
-    let name = noteName.replaceAll("#", SHARP).replaceAll("b", FLAT);
-
-    // Handle double accidentals (𝄪 / 𝄫) by computing offset directly from
-    // the base note letter, since they won't appear in NOTESSHARP/NOTESFLAT.
-    if (name.includes(DOUBLESHARP) || name.includes(DOUBLEFLAT)) {
-        const offset = name.includes(DOUBLESHARP) ? 2 : -2;
-        const baseLetter = name.replace(DOUBLESHARP, "").replace(DOUBLEFLAT, "");
-        let baseIndex = NOTESSHARP.indexOf(baseLetter);
-        if (baseIndex === -1) baseIndex = NOTESFLAT.indexOf(baseLetter);
-        if (baseIndex === -1) return INVALIDPITCH;
-        const rawPitch = (parseInt(octave, 10) + 1) * 12 + baseIndex + offset;
-        return rawPitch - applyOffset;
-    }
-
-    if (EQUIVALENTSHARPS[name]) {
-        name = EQUIVALENTSHARPS[name];
-    } else if (EQUIVALENTFLATS[name]) {
-        name = EQUIVALENTFLATS[name];
-    } else if (EQUIVALENTNATURALS[name]) {
-        name = EQUIVALENTNATURALS[name];
-    }
-
-    let pitchIndex = NOTESSHARP.indexOf(name);
-    if (pitchIndex === -1) {
-        pitchIndex = NOTESFLAT.indexOf(name);
-    }
-
-    if (pitchIndex === -1) {
-        return INVALIDPITCH;
-    }
-
-    return (parseInt(octave, 10) + 1) * 12 + pitchIndex - applyOffset;
-}
+    return pitchToNumber(obj[0], obj[1], tur.singer.keySignature) - tur.singer.pitchNumberOffset;
+};
 
 /**
  * Build the scale based on the given key signature.
@@ -4869,41 +4797,41 @@ function _calculate_pitch_number(noteName, octave, applyOffset = 0) {
  */
 const buildScale = keySignature => {
     // FIX ME: temporary hard-coded fix to avoid errors in pitch preview
-    if (keySignature == "C♭ major") {
+    if (keySignature == 'C♭ major') {
         const scale = [
-            "C" + FLAT,
-            "D" + FLAT,
-            "E" + FLAT,
-            "F" + FLAT,
-            "G" + FLAT,
-            "A" + FLAT,
-            "B" + FLAT,
-            "C" + FLAT
+            'C' + FLAT,
+            'D' + FLAT,
+            'E' + FLAT,
+            'F' + FLAT,
+            'G' + FLAT,
+            'A' + FLAT,
+            'B' + FLAT,
+            'C' + FLAT,
         ];
         return [scale, [2, 2, 1, 2, 2, 2, 1]];
-    } else if (keySignature == "F♭ major") {
+    } else if (keySignature == 'F♭ major') {
         const scale = [
-            "F" + FLAT,
-            "G" + FLAT,
-            "A" + FLAT,
-            "B" + DOUBLEFLAT,
-            "C" + FLAT,
-            "D" + FLAT,
-            "E" + FLAT,
-            "F" + FLAT
+            'F' + FLAT,
+            'G' + FLAT,
+            'A' + FLAT,
+            'B' + DOUBLEFLAT,
+            'C' + FLAT,
+            'D' + FLAT,
+            'E' + FLAT,
+            'F' + FLAT,
         ];
         return [scale, [2, 2, 1, 2, 2, 2, 1]];
     }
 
     let obj = keySignatureToMode(keySignature);
     let myKeySignature = obj[0];
-    if (myKeySignature == "C" + FLAT) {
-        obj = keySignatureToMode("B " + obj[1]);
+    if (myKeySignature == 'C' + FLAT) {
+        obj = keySignatureToMode('B ' + obj[1]);
         myKeySignature = obj[0];
     }
 
     let halfSteps;
-    if (obj[1] === "CUSTOM") {
+    if (obj[1] === 'CUSTOM') {
         halfSteps = customMode;
     } else {
         halfSteps = MUSICALMODES[obj[1]];
@@ -4911,13 +4839,13 @@ const buildScale = keySignature => {
 
     let thisScale;
     if (NOTESFLAT.includes(myKeySignature)) {
-        if (SHARPPREFERENCE.includes(obj[0].toLowerCase() + " " + obj[1])) {
+        if (SHARPPREFERENCE.includes(obj[0].toLowerCase() + ' ' + obj[1])) {
             thisScale = NOTESSHARP;
         } else {
             thisScale = NOTESFLAT;
         }
     } else {
-        if (FLATPREFERENCE.includes(obj[0].toLowerCase() + " " + obj[1])) {
+        if (FLATPREFERENCE.includes(obj[0].toLowerCase() + ' ' + obj[1])) {
             thisScale = NOTESFLAT;
         } else {
             thisScale = NOTESSHARP;
@@ -5003,7 +4931,7 @@ const buildScale = keySignature => {
 const _getStepSize = (keySignature, pitch, direction, transposition, temperament) => {
     // Returns how many half-steps to the next note in this key.
     if (temperament === undefined) {
-        temperament = "equal";
+        temperament = 'equal';
     }
     if (isCustomTemperament(temperament)) {
         //Scalar = Semitone for custom Temperament.
@@ -5031,25 +4959,25 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
     const logicalEquals = (s1, s2) => {
         if (s1 == s2) {
             return true;
-        } else if (s1 == "E" + SHARP && s2 == "F") {
+        } else if (s1 == 'E' + SHARP && s2 == 'F') {
             return true;
-        } else if (s1 == "E" && s2 == "F" + FLAT) {
+        } else if (s1 == 'E' && s2 == 'F' + FLAT) {
             return true;
-        } else if (s1 == "F" && s2 == "E♯") {
+        } else if (s1 == 'F' && s2 == 'E♯') {
             return true;
-        } else if (s1 == "F" + FLAT && s2 == "E") {
+        } else if (s1 == 'F' + FLAT && s2 == 'E') {
             return true;
-        } else if (s1 == "B" + SHARP && s2 == "C") {
+        } else if (s1 == 'B' + SHARP && s2 == 'C') {
             return true;
-        } else if (s1 == "B" && s2 == "C" + FLAT) {
+        } else if (s1 == 'B' && s2 == 'C' + FLAT) {
             return true;
-        } else if (s1 == "C" && s2 == "B♯") {
+        } else if (s1 == 'C' && s2 == 'B♯') {
             return true;
-        } else if (s1 == "C" + FLAT && s2 == "B") {
+        } else if (s1 == 'C' + FLAT && s2 == 'B') {
             return true;
-        } else if (s1 == "B" + DOUBLEFLAT && s2 == "A") {
+        } else if (s1 == 'B' + DOUBLEFLAT && s2 == 'A') {
             return true;
-        } else if (s1 == "F" + DOUBLESHARP && s2 == "G") {
+        } else if (s1 == 'F' + DOUBLESHARP && s2 == 'G') {
             return true;
         }
         return false;
@@ -5057,7 +4985,7 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
 
     let ii = scale.findIndex(scale => logicalEquals(scale, pitch));
     if (ii !== -1) {
-        if (direction === "up") {
+        if (direction === 'up') {
             return halfSteps[ii];
         } else {
             if (ii > 0) {
@@ -5087,7 +5015,7 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
     }
 
     if (ii !== -1) {
-        if (direction === "up") {
+        if (direction === 'up') {
             return halfSteps[ii];
         } else {
             if (ii > 0) {
@@ -5109,7 +5037,7 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
                 i = PITCHES2.indexOf(thisPitch);
             }
 
-            if (direction === "up") {
+            if (direction === 'up') {
                 i += 1;
                 thisPitch = PITCHES[i % 12];
                 offset += 1;
@@ -5135,7 +5063,7 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
                 i = PITCHES.indexOf(thisPitch);
             }
 
-            if (direction === "up") {
+            if (direction === 'up') {
                 i += 1;
                 thisPitch = PITCHES2[i % 12];
                 offset += 1;
@@ -5154,8 +5082,8 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
     }
 
     // Should never get here, but just in case.
-
-    console.debug(thisPitch + " not found");
+    // eslint-disable-next-line no-console
+    console.debug(thisPitch + ' not found');
     return 0;
 };
 
@@ -5169,7 +5097,7 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
  * @returns {number} The step size in half-steps.
  */
 const getStepSizeUp = (keySignature, pitch, transposition, temperament) => {
-    return _getStepSize(keySignature, pitch, "up", transposition, temperament);
+    return _getStepSize(keySignature, pitch, 'up', transposition, temperament);
 };
 
 /**
@@ -5182,7 +5110,7 @@ const getStepSizeUp = (keySignature, pitch, transposition, temperament) => {
  * @returns {number} The step size in half-steps.
  */
 const getStepSizeDown = (keySignature, pitch, transposition, temperament) => {
-    return _getStepSize(keySignature, pitch, "down", transposition, temperament);
+    return _getStepSize(keySignature, pitch, 'down', transposition, temperament);
 };
 
 /**
@@ -5229,7 +5157,7 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch) =>
 
     // if movable do is present just return the major/perfect tones
     if (movable) {
-        finalScale = buildScale(chosenMode[0] + " major")[0];
+        finalScale = buildScale(chosenMode[0] + ' major')[0];
 
         if (pitch === null) {
             return finalScale[scaleDegree];
@@ -5284,7 +5212,7 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch) =>
             }
         } else if (chosenModePattern.length < 7) {
             // Major scale of the choosen key is used as fallback
-            const majorScale = buildScale(chosenMode[0] + " major")[0];
+            const majorScale = buildScale(chosenMode[0] + ' major')[0];
 
             // according to the choosenModePattern, calculate defined scale degrees
             for (let i = 0; i < chosenModePattern.length; i++) {
@@ -5608,8 +5536,8 @@ const getInterval = (interval, keySignature, pitch) => {
                     ii = scale.indexOf(pitch);
                 } else {
                     // Should never happen.
-
-                    console.debug(pitch + " not found");
+                    // eslint-disable-next-line no-console
+                    console.debug(pitch + ' not found');
                     return 0;
                 }
             }
@@ -5654,9 +5582,9 @@ const reducedFraction = (a, b) => {
     const gcm = greatestCommonMultiple(a, b);
 
     if ([1, 2, 4, 8, 16].includes(b / gcm)) {
-        return a / gcm + "<br>&mdash;<br>" + b / gcm + "<br>" + NSYMBOLS[b / gcm];
+        return a / gcm + '<br>&mdash;<br>' + b / gcm + '<br>' + NSYMBOLS[b / gcm];
     } else {
-        return a / gcm + "<br>&mdash;<br>" + b / gcm + "<br><br>";
+        return a / gcm + '<br>&mdash;<br>' + b / gcm + '<br><br>';
     }
 };
 
@@ -5710,7 +5638,7 @@ const calcNoteValueToDisplay = (a, b) => {
 
     if (noteValue in NSYMBOLS) {
         noteValueToDisplay =
-            "1<br>&mdash;<br>" + noteValue.toString() + "<br>" + NSYMBOLS[noteValue];
+            '1<br>&mdash;<br>' + noteValue.toString() + '<br>' + NSYMBOLS[noteValue];
     } else {
         noteValueToDisplay = reducedFraction(b, a);
     }
@@ -5728,12 +5656,12 @@ const calcNoteValueToDisplay = (a, b) => {
             noteValueToDisplay =
                 // value.toFixed(2) +
                 obj[0].toFixed(d0) +
-                "<br>&mdash;<br>" +
+                '<br>&mdash;<br>' +
                 // noteValueToDisplay.toString() +
                 obj[1].toFixed(d1) +
-                "<br>" +
+                '<br>' +
                 NSYMBOLS[noteValueToDisplay] +
-                ".";
+                '.';
         } else {
             noteValueToDisplay = parseInt(noteValue * 1.75);
             if (noteValueToDisplay in NSYMBOLS) {
@@ -5744,12 +5672,12 @@ const calcNoteValueToDisplay = (a, b) => {
                 noteValueToDisplay =
                     // value.toFixed(2) +
                     obj[0].toFixed(d0) +
-                    "<br>&mdash;<br>" +
+                    '<br>&mdash;<br>' +
                     // noteValueToDisplay.toString() +
                     obj[1].toFixed(d1) +
-                    "<br>" +
+                    '<br>' +
                     NSYMBOLS[noteValueToDisplay] +
-                    "..";
+                    '..';
             } else {
                 noteValueToDisplay = reducedFraction(b, a);
             }
@@ -5858,15 +5786,11 @@ const noteToFrequency = (note, keySignature) => {
  * @returns {boolean} True if the note is in solfege, false otherwise.
  */
 const noteIsSolfege = note => {
-    if (SOLFEGECONVERSIONTABLE[note] !== undefined) {
+    if (SOLFEGECONVERSIONTABLE[note] === undefined) {
+        return true;
+    } else {
         return false;
     }
-    // Check normalized version (ASCII to Unicode)
-    const altNote = note.replace("#", SHARP).replace("b", FLAT);
-    if (SOLFEGECONVERSIONTABLE[altNote] !== undefined) {
-        return false;
-    }
-    return true;
 };
 
 /**
@@ -5875,61 +5799,13 @@ const noteIsSolfege = note => {
  * @param {string} note - The note string.
  * @returns {string} The solfege representation.
  */
-const getSolfege = (note, keySignature, movable) => {
+const getSolfege = note => {
+    // TODO: Use mode-specific conversion.
     if (noteIsSolfege(note)) {
         return note;
+    } else {
+        return SOLFEGECONVERSIONTABLE[note];
     }
-
-    if (movable && keySignature) {
-        const scaleResult = buildScale(keySignature);
-        if (!scaleResult) return SOLFEGECONVERSIONTABLE[note];
-
-        const scale = scaleResult[0];
-
-        // 1) exact match
-        let index = scale.indexOf(note);
-
-        // 2) normalized accidental match
-        if (index === -1) {
-            const altNote = note.replace("#", SHARP).replace("b", FLAT);
-            index = scale.indexOf(altNote);
-        }
-
-        const isMinor = Array.isArray(keySignature)
-            ? keySignature[1].toLowerCase() === "minor"
-            : keySignature.toLowerCase().includes("minor");
-
-        // diatonic note
-        if (index !== -1 && index < SOLFEGENAMES.length) {
-            let solfegeIndex = index;
-
-            // minor movable-do → la-based
-            if (isMinor) {
-                solfegeIndex = (index + 5) % 7;
-            }
-
-            return SOLFEGENAMES[solfegeIndex].toLowerCase();
-        }
-
-        // 3) chromatic fallback (interval based)
-        const tonic = scale[0];
-        const tonicPitch = pitchToNumber(tonic, 4, keySignature);
-        const notePitch = pitchToNumber(note, 4, keySignature);
-
-        // semitones from tonic
-        let semitones = (notePitch - tonicPitch + 12) % 12;
-
-        if (isMinor) {
-            // For minor, relative major is 3 semitones up.
-            // We want solfege relative to the relative major.
-            // e.g. Minor tonic (La) -> +9 -> La
-            semitones = (semitones + 9) % 12;
-        }
-
-        return CHROMATIC_SOLFEGE[semitones].toLowerCase();
-    }
-
-    return SOLFEGECONVERSIONTABLE[note];
 };
 
 /**
@@ -5940,13 +5816,13 @@ const getSolfege = (note, keySignature, movable) => {
  */
 const splitSolfege = value => {
     // Separate the pitch from any attributes, e.g., # or b
-    if (value != null && typeof value === "string") {
+    if (value != null && typeof value === 'string') {
         let note, attr;
         if (SOLFNOTES.includes(value)) {
             note = value;
-            attr = "";
-        } else if (value.slice(0, 3) === "sol") {
-            note = "sol";
+            attr = '';
+        } else if (value.slice(0, 3) === 'sol') {
+            note = 'sol';
             if (value.length === 4) {
                 attr = value[3];
             } else {
@@ -5964,7 +5840,7 @@ const splitSolfege = value => {
         return [note, attr];
     }
 
-    return ["sol", ""];
+    return ['sol', ''];
 };
 
 /**
@@ -5975,7 +5851,7 @@ const splitSolfege = value => {
  */
 const i18nSolfege = note => {
     // solfnotes_ is used in the interface for i18n
-    const solfnotes_ = _("ti la sol fa mi re do").split(" ");
+    const solfnotes_ = _('ti la sol fa mi re do').split(' ');
     const obj = splitSolfege(note);
 
     const i = SOLFNOTES.indexOf(obj[0]);
@@ -6023,7 +5899,7 @@ const getNumNote = (value, delta) => {
 
     const note = NOTESTABLE[num];
 
-    if (note[num] === "ti") {
+    if (note[num] === 'ti') {
         octave -= 1;
     }
 
@@ -6044,7 +5920,7 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
     // which can be a number, a 'number' as a string, 'current',
     // 'previous', or 'next'.
 
-    if (typeof arg === "number") {
+    if (typeof arg === 'number') {
         return Math.max(1, Math.min(Math.floor(arg), 9));
     }
 
@@ -6068,7 +5944,7 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
         // strip off octave from end of note
         lastNotePlayed = lastNotePlayed.substring(0, lastNotePlayed.length - 1);
     } else {
-        lastNotePlayed = "G";
+        lastNotePlayed = 'G';
     }
 
     const stepLastNotePlayed = getNumber(lastNotePlayed, currentOctave);
@@ -6094,14 +5970,14 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
     }
 
     switch (arg) {
-        case _("current"):
-        case "current":
+        case _('current'):
+        case 'current':
             return changedCurrent;
-        case _("next"):
-        case "next":
+        case _('next'):
+        case 'next':
             return Math.min(changedCurrent + 1, 10);
-        case _("previous"):
-        case "previous":
+        case _('previous'):
+        case 'previous':
             return Math.max(changedCurrent - 1, 1);
         default:
             try {
@@ -6128,17 +6004,17 @@ const calcOctaveInterval = arg => {
     let value = 0;
     switch (arg) {
         case 1:
-        case _("next"):
-        case "next":
+        case _('next'):
+        case 'next':
             value = 1;
             break;
         case -1:
-        case _("previous"):
-        case "previous":
+        case _('previous'):
+        case 'previous':
             value = -1;
             break;
-        case _("current"):
-        case "current":
+        case _('current'):
+        case 'current':
         case 0:
             value = 0;
             break;
@@ -6149,7 +6025,8 @@ const calcOctaveInterval = arg => {
             value = -2;
             break;
         default:
-            console.debug("Interval octave must be between -2 and 2.");
+            // eslint-disable-next-line no-console
+            console.debug('Interval octave must be between -2 and 2.');
             value = 0;
             break;
     }
@@ -6193,84 +6070,60 @@ const convertFromSolfege = note => {
 const convertFactor = factor => {
     switch (factor) {
         case 0.0625: // 1/16
-            return "16";
+            return '16';
         case 0.125: // 1/8
-            return "8";
+            return '8';
         case 0.09375: // 3/32
-            return "16.";
+            return '16.';
         case 0.1875: // 3/16
-            return "8.";
+            return '8.';
         case 0.21875: // 7/32
-            return "8..";
+            return '8..';
         case 0.25: // 1/4
-            return "4";
+            return '4';
         case 0.3125: // 5/16
-            return "4 16";
+            return '4 16';
         case 0.375: // 3/8
-            return "4.";
+            return '4.';
         case 0.4375: // 7/16
-            return "4..";
+            return '4..';
         case 0.5: // 1/2
-            return "2";
+            return '2';
         case 0.5625: // 9/16
-            return "2 16";
+            return '2 16';
         case 0.675: // 5/8
-            return "2 8";
+            return '2 8';
         case 0.6875: // 11/16
-            return "2 8 16";
+            return '2 8 16';
         case 0.75: // 3/4
-            return "2.";
+            return '2.';
         case 0.8125: // 13/16
-            return "2 4 16";
+            return '2 4 16';
         case 0.875: // 7/8
-            return "2..";
+            return '2..';
         case 0.9375: // 15/16
-            return "2 4 8 16";
+            return '2 4 8 16';
         case 1: // 1/1
-            return "1";
+            return '1';
         default:
             return null;
     }
 };
 
 /**
- * Get pitch information based on the note or pitch provided.
+ * Get pitch information based on the activity, type, current note, and tur.
  * @function
- * @param {string|number} noteOrPitch - The note name (e.g. "C4") or a numeric pitch index.
- * @returns {Object|string} If called with one argument, returns { name, octave, pitchNumber }. Otherwise returns legacy values.
+ * @param {string} activity - The activity information.
+ * @param {string} type - The type of pitch information to retrieve.
+ * @param {string|number} currentNote - The current note or frequency.
+ * @param {*} tur - The tur object.
+ * @returns {*} The pitch information based on the specified type.
  */
-const getPitchInfo = function (activity, type, currentNote, tur) {
-    if (arguments.length === 1) {
-        const noteOrPitch = activity;
-        let name, octave, pitchNumber;
-
-        if (typeof noteOrPitch === "number") {
-            pitchNumber = noteOrPitch;
-            octave = Math.floor(pitchNumber / 12) - 1;
-            name = NOTESSHARP[pitchNumber % 12];
-        } else if (typeof noteOrPitch === "string") {
-            [name, octave] = _parse_pitch_string(noteOrPitch);
-            pitchNumber = _calculate_pitch_number(name, octave);
-        } else {
-            return INVALIDPITCH;
-        }
-
-        if (pitchNumber === INVALIDPITCH) {
-            return { name: null, octave: null, pitchNumber: INVALIDPITCH };
-        }
-
-        return {
-            name: name.replaceAll(SHARP, "#").replaceAll(FLAT, "b"),
-            octave: parseInt(octave, 10),
-            pitchNumber: pitchNumber
-        };
-    }
-
-    // Legacy behavior for 4 arguments
+const getPitchInfo = (activity, type, currentNote, tur) => {
+    // A variety of conversions.
     let pitch;
     let octave;
     let obj;
-    let cents;
     if (Number(currentNote)) {
         // If it is a frequency, convert it to a pitch/octave.
         obj = frequencyToPitch(currentNote);
@@ -6279,26 +6132,27 @@ const getPitchInfo = function (activity, type, currentNote, tur) {
         cents = obj[2];
     } else {
         // Turn the note into pitch and octave.
-        [pitch, octave] = _parse_pitch_string(currentNote);
+        pitch = currentNote.substr(0, currentNote.length - 1);
+        octave = currentNote[currentNote.length - 1];
     }
     // Remap double sharps/double flats.
     if (pitch.includes(DOUBLESHARP)) {
-        pitch = pitch.replace(DOUBLESHARP, "");
-        if (pitch === "B") {
-            pitch = "C" + SHARP;
+        pitch = pitch.replace(DOUBLESHARP, '');
+        if (pitch === 'B') {
+            pitch = 'C' + SHARP;
         } else {
             pitch = NOTESSHARP[NOTESSHARP.indexOf(pitch) + 2];
         }
     } else if (pitch.includes(DOUBLEFLAT)) {
-        pitch = pitch.replace(DOUBLEFLAT, "");
-        if (pitch === "C") {
-            pitch = "B" + FLAT;
+        pitch = pitch.replace(DOUBLEFLAT, '');
+        if (pitch === 'C') {
+            pitch = 'B' + FLAT;
         } else {
             pitch = NOTESFLAT[NOTESFLAT.indexOf(pitch) - 2];
         }
     }
     // Map the pitch to the current scale.
-    pitch = pitch.replaceAll("#", SHARP).replaceAll("b", FLAT);
+    pitch = pitch.replace('#', SHARP).replace('b', FLAT);
     if (!buildScale(tur.singer.keySignature)[0].includes(pitch)) {
         if (pitch in EQUIVALENTFLATS) {
             pitch = EQUIVALENTFLATS[pitch];
@@ -6309,73 +6163,74 @@ const getPitchInfo = function (activity, type, currentNote, tur) {
 
     try {
         switch (type) {
-            case "alphabet":
+            case 'alphabet':
                 return pitch;
-            case "alphabet class":
-            case "letter class":
+            case 'alphabet class':
+            case 'letter class':
                 return pitch[0];
-            case "solfege syllable":
-            case "solfege class":
-                if (type === "solfege class") {
+            case 'solfege syllable':
+            case 'solfege class':
+                if (type === 'solfege class') {
                     // Remove sharps and flats.
-                    pitch = pitch.replace(SHARP, "").replace(FLAT, "");
+                    pitch = pitch.replace(SHARP).replace(FLAT);
                 }
                 if (tur.singer.movable === false) {
                     return SOLFEGECONVERSIONTABLE[pitch];
                 }
                 return SOLFEGENAMES[buildScale(tur.singer.keySignature)[0].indexOf(pitch)];
-            case "pitch class":
+            case 'pitch class':
                 return (pitchToNumber(pitch, octave, tur.singer.keySignature) - 3) % 12;
-            case "scalar class":
+            case 'scalar class':
                 return scaleDegreeToPitchMapping(
                     tur.singer.keySignature,
                     null,
                     tur.singer.movable,
-                    pitch
+                    pitch,
                 )[0];
-            case "scale degree":
+            case 'scale degree':
                 obj = scaleDegreeToPitchMapping(
                     tur.singer.keySignature,
                     null,
                     tur.singer.movable,
-                    pitch
+                    pitch,
                 );
                 return obj[0] + obj[1];
-            case "nth degree":
+            case 'nth degree':
                 return buildScale(tur.singer.keySignature)[0].indexOf(pitch);
-            case "staff y":
+            case 'staff y':
                 // These numbers are in relation to the staff artwork.
                 return (
-                    ["C", "D", "E", "F", "G", "A", "B"].indexOf(pitch[0]) * YSTAFFNOTEHEIGHT +
+                    ['C', 'D', 'E', 'F', 'G', 'A', 'B'].indexOf(pitch[0]) * YSTAFFNOTEHEIGHT +
                     (octave - 4) * YSTAFFOCTAVEHEIGHT
                 );
-            case "pitch number":
-                return _calculate_pitch_number(pitch, octave, tur?.singer?.pitchNumberOffset || 0);
-            case "pitch in hertz":
+            case 'pitch number':
+                return _calculate_pitch_number(activity, pitch, tur);
+            case 'pitch in hertz':
                 // This function ignores cents.
                 return activity.logo.synth._getFrequency(
                     pitch + octave,
-                    activity.logo.synth.changeInTemperament
+                    activity.logo.synth.changeInTemperament,
                 );
-            case "pitch to color":
+            case 'pitch to color':
                 if (NOTESSHARP.includes(pitch)) {
                     return NOTESSHARP.indexOf(pitch) * 8.33;
                 } else if (NOTESFLAT.includes(pitch)) {
                     return NOTESFLAT.indexOf(pitch) * 8.33;
                 }
-
-                console.debug("Pitch not found: " + pitch);
+                // eslint-disable-next-line no-console
+                console.debug('Pitch not found: ' + pitch);
                 return 0;
-            case "pitch to shade":
+            case 'pitch to shade':
                 return octave * 12.5;
             default:
-                return "__INVALID_INPUT__";
+                return '__INVALID_INPUT__';
         }
     } catch {
-        console.debug("Waiting for note to play");
+        // eslint-disable-next-line no-console
+        console.debug('Waiting for note to play');
     }
 };
-if (typeof module !== "undefined" && module.exports) {
+if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         updateTemperaments,
         scaleDegreeToPitchMapping,
@@ -6408,6 +6263,7 @@ if (typeof module !== "undefined" && module.exports) {
         TEMPERAMENT,
         setOctaveRatio,
         getOctaveRatio,
+        TEMPERAMENT,
         TEMPERAMENTS,
         INITIALTEMPERAMENTS,
         PreDefinedTemperaments,
@@ -6417,6 +6273,7 @@ if (typeof module !== "undefined" && module.exports) {
         addTemperamentToList,
         deleteTemperamentFromList,
         addTemperamentToDictionary,
+        updateTemperaments,
         DEFAULTINVERT,
         DEFAULTMODE,
         customMode,
@@ -6464,6 +6321,6 @@ if (typeof module !== "undefined" && module.exports) {
         NOTESTEP,
         MUSICALMODES,
         SHARP,
-        FLAT
+        FLAT,
     };
 }
