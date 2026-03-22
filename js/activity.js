@@ -4615,6 +4615,9 @@ export class Activity {
                     }
                     // Set flag to 1 to enable keyboard after MB finishes loading
                     that.keyboardEnableFlag = 1;
+
+                    // Auto-center blocks on load
+                    that._findBlocks();
                 }
 
                 document.removeEventListener("finishedLoading", __afterLoad);
