@@ -114,6 +114,21 @@ global.base64Encode = jest.fn(str => {
 });
 
 describe("musicutils", () => {
+    // Shared setup to avoid duplicate global assignments
+    beforeEach(() => {
+        global.NOTESSHARP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        global.NOTESFLAT = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+        global.MUSICALMODES = {
+            major: [2, 2, 1, 2, 2, 2, 1],
+            minor: [2, 1, 2, 2, 1, 2, 2]
+        };
+        global.MAQAMTABLE = {};
+        global.BTOFLAT = {};
+        global.STOSHARP = {};
+        global.SOLFEGENAMES = [];
+        global.SOLFEGENAMES1 = [];
+    });
+
     it("should set and get Octave Ratio", () => {
         setOctaveRatio(4);
         const octaveR = getOctaveRatio();
@@ -827,12 +842,6 @@ describe("keySignatureToMode", () => {
         global.FLAT = "b";
         global.SHARP = "#";
         global.SOLFEGENAMES1 = [];
-        global.NOTESSHARP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-        global.NOTESFLAT = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
-        global.MUSICALMODES = {
-            major: [2, 2, 1, 2, 2, 2, 1],
-            minor: [2, 1, 2, 2, 1, 2, 2]
-        };
     });
 
     it("should handle empty and null inputs", () => {
@@ -866,16 +875,7 @@ describe("getScaleAndHalfSteps", () => {
             "ti"
         ];
         global.SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti"];
-        global.NOTESSHARP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-        global.NOTESFLAT = ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"];
-        global.MUSICALMODES = {
-            major: [2, 2, 1, 2, 2, 2, 1],
-            minor: [2, 1, 2, 2, 1, 2, 2]
-        };
         global.EXTRATRANSPOSITIONS = {};
-        global.MAQAMTABLE = {};
-        global.BTOFLAT = {};
-        global.STOSHARP = {};
         global.FLAT = "♭";
         global.SHARP = "#";
         global.SOLFEGENAMES1 = [];
