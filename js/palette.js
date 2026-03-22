@@ -18,6 +18,9 @@
    STANDARDBLOCKHEIGHT, CLOSEICON, BUILTINPALETTES,
    safeSVG, blockIsMacro, getMacroExpansion,
    base64Encode, StatusMatrix, activity
+    STANDARDBLOCKHEIGHT, CLOSEICON, BUILTINPALETTES,
+    safeSVG, blockIsMacro, getMacroExpansion,
+    cameraPALETTE, mediaPALETTE, videoPALETTE
 */
 
 /* exported Palettes, initPalettes */
@@ -50,6 +53,14 @@ const makePaletteIcons = (data, width, height) => {
     if (width) img.width = width;
     if (height) img.height = height;
     return img;
+};
+
+const buildPaletteImageMap = () => {
+    const map = {};
+    if (typeof mediaPALETTE !== "undefined") map.media = mediaPALETTE;
+    if (typeof cameraPALETTE !== "undefined") map.camera = cameraPALETTE;
+    if (typeof videoPALETTE !== "undefined") map.video = videoPALETTE;
+    return map;
 };
 
 class Palettes {
@@ -1364,6 +1375,14 @@ class Palette {
         this.fadedDownButton = null;
         this.count = 0;
         this._outsideClickListener = null;
+        this._paletteImageMap = null;
+    }
+
+    _getPaletteImageForBlockName(blkname) {
+        if (!this._paletteImageMap) {
+            this._paletteImageMap = buildPaletteImageMap();
+        }
+        return this._paletteImageMap[blkname] || null;
     }
 
     hide() {
@@ -1375,9 +1394,8 @@ class Palette {
     }
 
     hideMenu() {
-        docById(
-            "palette"
-        ).childNodes[0].style.borderRight = `1px solid ${platformColor.selectorSelected}`;
+        docById("palette").childNodes[0].style.borderRight =
+            `1px solid ${platformColor.selectorSelected}`;
         if (this._outsideClickListener) {
             document.removeEventListener("click", this._outsideClickListener);
             this._outsideClickListener = null;
@@ -1497,15 +1515,15 @@ class Palette {
             if (b.hidden) {
                 continue;
             }
-            const itemRow = paletteList.insertRow();
-            const itemCell = itemRow.insertCell();
+            const itemRow = document.createElement("tr");
+            const itemCell = document.createElement("td");
+            itemRow.appendChild(itemCell);
             let img = makePaletteIcons(b.artwork);
 
             if (b.image) {
-                if (["media", "camera", "video"].includes(b.blkname)) {
-                    // Use artwork.js strings as images for:
-                    // cameraPALETTE, videoPALETTE, mediaPALETTE
-                    img = makePaletteIcons(eval(b.blkname + "PALETTE"));
+                const paletteImage = this._getPaletteImageForBlockName(b.blkname);
+                if (paletteImage) {
+                    img = makePaletteIcons(paletteImage);
                 } else {
                     // or use the plugin image...
                     img = makePaletteIcons(this.activity.pluginsImages[b.blkname]);
@@ -1592,6 +1610,7 @@ class Palette {
             itemCell.style.width = `${img.width}px`;
             itemCell.style.paddingRight = `${this.palettes.cellSize}px`;
             itemCell.appendChild(img);
+            paletteList.appendChild(itemRow);
         }
 
         if (this.palettes.mobile) {

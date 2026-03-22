@@ -461,7 +461,6 @@ function setupVolumeBlocks(activity) {
             const listenerName = "_synthvolume_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 tur.singer.synthVolume[synth].pop();
                 // Restore previous volume
@@ -751,7 +750,6 @@ function setupVolumeBlocks(activity) {
             const listenerName = "_volume_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 Singer.masterVolume.pop();
                 // Restore previous volume
