@@ -29,14 +29,6 @@ export default [
                 ...globals.node,
                 ...globals.jest,
                 ...globals.jquery,
-                cy: "readonly",
-                Cypress: "readonly",
-                describe: "readonly",
-                it: "readonly",
-                before: "readonly",
-                beforeEach: "readonly",
-                after: "readonly",
-                afterEach: "readonly",
 
                 Logo: "readonly",
                 Blocks: "readonly",
@@ -182,6 +174,22 @@ export default [
         files: ["**/*.mjs"],
         languageOptions: {
             sourceType: "module"
+        }
+    },
+
+    {
+        files: ["cypress/**/*.js"],
+        languageOptions: {
+            globals: {
+                cy: "readonly",
+                Cypress: "readonly",
+                describe: "readonly",
+                it: "readonly",
+                before: "readonly",
+                beforeEach: "readonly",
+                after: "readonly",
+                afterEach: "readonly"
+            }
         }
     }
 ];
