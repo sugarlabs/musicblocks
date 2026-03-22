@@ -4905,5 +4905,5 @@
         );
     }).prototype = p = new cjs.MovieClip();
     p.nominalBounds = new cjs.Rectangle(1935.9, 923.5, 3669.2, 1692);
-})((lib = lib || {}), (images = images || {}), (createjs = createjs || {}));
-var lib, images, createjs;
+})((lib = lib || {}), (images = images || {}), createjs);
+var lib, images;
