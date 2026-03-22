@@ -99,13 +99,19 @@ const {
     getNoteFromInterval,
     numberToPitch,
     GetNotesForInterval,
-    base64Encode,
     NOTESFLAT,
     NOTESSHARP,
     MUSICALMODES,
     getStepSizeUp,
     getStepSizeDown
 } = require("../musicutils");
+
+// Define base64Encode globally (it's in base64Utils.js, not musicutils)
+// This converts UTF-8 string to Latin-1 string (byte representation)
+global.base64Encode = jest.fn(str => {
+    const bytes = new TextEncoder().encode(str);
+    return String.fromCharCode(...bytes);
+});
 
 describe("musicutils", () => {
     it("should set and get Octave Ratio", () => {
@@ -2402,5 +2408,77 @@ describe("getStepSizeUp", () => {
     it("should return 0 for an invalid temperament", () => {
         const result = getStepSizeUp("C major", "C", 0, "invalid");
         expect(result).toBe(0);
+    });
+});
+
+describe("Music Conversion - Critical Paths for Pitch & Frequency", () => {
+    describe("noteToFrequency conversions", () => {
+        it("should convert A4 to 440Hz (concert pitch standard)", () => {
+            const freq = noteToFrequency("A4");
+            expect(freq).toBeCloseTo(440, 0);
+        });
+
+        it("should convert C4 to approximately 261.63Hz", () => {
+            const freq = noteToFrequency("C4");
+            expect(freq).toBeCloseTo(261.63, 0);
+        });
+
+        it("should handle octave variations correctly", () => {
+            const freqOctave3 = noteToFrequency("A3");
+            const freqOctave4 = noteToFrequency("A4");
+            const freqOctave5 = noteToFrequency("A5");
+            
+            // Each octave should be a factor of 2 in frequency
+            expect(freqOctave4 / freqOctave3).toBeCloseTo(2, 0);
+            expect(freqOctave5 / freqOctave4).toBeCloseTo(2, 0);
+        });
+    });
+
+    describe("Scale and Mode Consistency", () => {
+        it("should maintain consistent scale structure across different modes", () => {
+            const majorScale = buildScale("C", "major");
+            const minorScale = buildScale("C", "minor");
+            
+            expect(Array.isArray(majorScale)).toBe(true);
+            expect(Array.isArray(minorScale)).toBe(true);
+            expect(majorScale.length).toBeGreaterThan(0);
+            expect(minorScale.length).toBeGreaterThan(0);
+        });
+
+        it("should handle custom user-defined scales", () => {
+            // Custom modes should be creatable and retrievable
+            expect(MUSICALMODES["custom"]).toBeDefined();
+        });
+
+        it("should build pentatonic scales with 5 notes", () => {
+            expect(MUSICALMODES["major pentatonic"].length).toBe(5);
+            expect(MUSICALMODES["minor pentatonic"].length).toBe(5);
+        });
+
+        it("should have all mode intervals sum to 12 semitones", () => {
+            const sum = arr => arr.reduce((a, b) => a + b, 0);
+            expect(sum(MUSICALMODES["major"])).toBe(12);
+            expect(sum(MUSICALMODES["minor"])).toBe(12);
+            expect(sum(MUSICALMODES["dorian"])).toBe(12);
+        });
+    });
+
+    describe("Interval calculations for music theory", () => {
+        it("should return correct step size down for scale degrees", () => {
+            const result = getStepSizeDown("C major", "D", 0, "equal");
+            expect(result).toBe(-2);
+        });
+
+        it("should return correct step size up for scale degrees", () => {
+            const result = getStepSizeUp("C major", "C", 0, "equal");
+            expect(result).toBe(2);
+        });
+
+        it("should return 0 for invalid temperaments in calculations", () => {
+            const downResult = getStepSizeDown("C major", "D", 0, "invalid");
+            const upResult = getStepSizeUp("C major", "C", 0, "invalid");
+            expect(downResult).toBe(0);
+            expect(upResult).toBe(0);
+        });
     });
 });
