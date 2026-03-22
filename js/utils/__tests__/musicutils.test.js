@@ -1628,7 +1628,9 @@ describe("noteToPitchOctave", () => {
 });
 
 describe("pitchToFrequency", () => {
+    // eslint-disable-next-line no-loss-of-precision
     global.TWELTHROOT2 = 1.0594630943592953;
+    // eslint-disable-next-line no-loss-of-precision
     global.TWELVEHUNDRETHROOT2 = 1.0005777895065549;
     global.A0 = 27.5;
 
@@ -1653,7 +1655,9 @@ describe("pitchToFrequency", () => {
 });
 
 describe("noteToFrequency", () => {
+    // eslint-disable-next-line no-loss-of-precision
     global.TWELTHROOT2 = 1.0594630943592953;
+    // eslint-disable-next-line no-loss-of-precision
     global.TWELVEHUNDRETHROOT2 = 1.0005777895065549;
     global.A0 = 27.5;
     it("converts note to frequency correctly", () => {
