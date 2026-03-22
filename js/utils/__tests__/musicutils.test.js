@@ -1628,10 +1628,8 @@ describe("noteToPitchOctave", () => {
 });
 
 describe("pitchToFrequency", () => {
-    // eslint-disable-next-line no-loss-of-precision
-    global.TWELTHROOT2 = 1.0594630943592953;
-    // eslint-disable-next-line no-loss-of-precision
-    global.TWELVEHUNDRETHROOT2 = 1.0005777895065549;
+    global.TWELTHROOT2 = 1.0594630943592953; // eslint-disable-line no-loss-of-precision
+    global.TWELVEHUNDRETHROOT2 = 1.0005777895065549; // eslint-disable-line no-loss-of-precision
     global.A0 = 27.5;
 
     it("calculates frequency with 0 cents", () => {
@@ -1655,10 +1653,8 @@ describe("pitchToFrequency", () => {
 });
 
 describe("noteToFrequency", () => {
-    // eslint-disable-next-line no-loss-of-precision
-    global.TWELTHROOT2 = 1.0594630943592953;
-    // eslint-disable-next-line no-loss-of-precision
-    global.TWELVEHUNDRETHROOT2 = 1.0005777895065549;
+    global.TWELTHROOT2 = 1.0594630943592953; // eslint-disable-line no-loss-of-precision
+    global.TWELVEHUNDRETHROOT2 = 1.0005777895065549; // eslint-disable-line no-loss-of-precision
     global.A0 = 27.5;
     it("converts note to frequency correctly", () => {
         const result = noteToFrequency("A4", "C");
