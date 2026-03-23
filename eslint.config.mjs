@@ -42,16 +42,14 @@ export default [
                 ...globals.node,
                 ...globals.jest,
                 ...globals.jquery,
-                // Add specific Music Blocks globals if needed
 
                 Logo: "readonly",
                 Blocks: "readonly",
                 Turtles: "readonly",
                 Activity: "readonly",
                 _: "readonly",
-                _: "readonly",
 
-                // Project-wide globals used throughout the codebase
+                // Project-wide globals
                 TONEBPM: "readonly",
                 TARGETBPM: "readonly",
                 TURTLESTEP: "readonly",
@@ -164,15 +162,13 @@ export default [
         },
 
         rules: {
-            // allow redeclaring builtin globals via /* global */ comments
             "no-redeclare": ["error", { builtinGlobals: false }],
 
             "no-console": "off",
             "no-unused-vars": "off",
             "no-use-before-define": "off",
             "prefer-const": "off",
-            "no-undef": "off",
-            "no-redeclare": "off",
+
             "semi": ["error", "always"],
             "no-duplicate-case": "error",
             "no-irregular-whitespace": "warn",
@@ -180,14 +176,9 @@ export default [
             "no-useless-escape": "off",
             "no-inner-declarations": "off",
             "no-constant-assign": "off",
-            "no-const-assign": "off",
             "no-dupe-keys": "off",
             "no-useless-catch": "off",
-            "no-loss-of-precision": "off",
-
-            "semi": ["error", "always"],
-            "no-duplicate-case": "error",
-            "no-irregular-whitespace": "warn"
+            "no-loss-of-precision": "off"
         }
     },
 
