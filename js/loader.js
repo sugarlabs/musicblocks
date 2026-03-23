@@ -95,6 +95,10 @@ requirejs.config({
             ],
             exports: "Logo"
         },
+        "activity/logoconstants": {
+            deps: ["utils/utils"], // ensures _ is loaded first
+            exports: "LogoConstants"
+        },
         "activity/activity": {
             deps: [
                 "utils/utils",
