@@ -18,9 +18,7 @@
    STANDARDBLOCKHEIGHT, CLOSEICON, BUILTINPALETTES,
    safeSVG, blockIsMacro, getMacroExpansion,
    base64Encode, StatusMatrix, activity
-    STANDARDBLOCKHEIGHT, CLOSEICON, BUILTINPALETTES,
-    safeSVG, blockIsMacro, getMacroExpansion,
-    cameraPALETTE, mediaPALETTE, videoPALETTE
+   cameraPALETTE, mediaPALETTE, videoPALETTE
 */
 
 /* exported Palettes, initPalettes */
