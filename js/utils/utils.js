@@ -11,8 +11,8 @@
 
 /*
    globals
-
-   jQuery, PALETTEICONS, PALETTEFILLCOLORS, PALETTESTROKECOLORS,
+   , base64Encode, i18next, createjs,
+   PALETTEICONS, PALETTEFILLCOLORS, PALETTESTROKECOLORS,
    PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS, MULTIPALETTES,
    platformColor
 */
@@ -64,6 +64,7 @@ const changeImage = (imgElement, from, to) => {
  * @param {string} text - The input text to be translated.
  * @returns {string} The translated text.
  */
+// eslint-disable-next-line no-redeclare
 function _(text, options = {}) {
     if (!text) return "";
 
@@ -1379,9 +1380,26 @@ const LCD = (a, b) => {
  * @param {Array} b - The second rational number.
  * @returns {Array} The sum of the two rational numbers in the form [numerator, denominator].
  */
+
 let rationalSum = (a, b) => {
+    // validate inputs
+    if (!Array.isArray(a) || !Array.isArray(b)) {
+        return [0, 1];
+    }
+
+    if (a.length !== 2 || b.length !== 2) {
+        return [0, 1];
+    }
+
+    if (typeof a[0] !== "number" || typeof a[1] !== "number") {
+        return [0, 1];
+    }
+
+    if (typeof b[0] !== "number" || typeof b[1] !== "number") {
+        return [0, 1];
+    }
+
     if (a === 0 || b === 0) {
-        // console.debug("divide by zero?");
         return [0, 1];
     }
 
