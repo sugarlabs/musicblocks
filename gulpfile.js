@@ -45,7 +45,13 @@ const cssTask = () => {
 
 // JS task: concatenates and uglifies JS files to app.min.js
 const jsTask = () => {
-    return src(["js/**/*.js", "!js/**/*.test.js", "!js/**/*.mock.js", "!js/__tests__/**/*.js", "!js/**/__tests__/**/*.js"])
+    return src([
+        "js/**/*.js",
+        "!js/**/*.test.js",
+        "!js/**/*.mock.js",
+        "!js/__tests__/**/*.js",
+        "!js/**/__tests__/**/*.js"
+    ])
         .pipe(concat("app.min.js"))
         .pipe(
             babel({
@@ -68,7 +74,13 @@ const cacheBustTask = () => {
 
 const prettify = () => {
     return gulp
-        .src(["js/**/*.js", "!js/**/*.test.js", "!js/**/*.mock.js", "!js/__tests__/**/*.js", "!js/**/__tests__/**/*.js"])
+        .src([
+            "js/**/*.js",
+            "!js/**/*.test.js",
+            "!js/**/*.mock.js",
+            "!js/__tests__/**/*.js",
+            "!js/**/__tests__/**/*.js"
+        ])
         .pipe(
             prettier({
                 singleQuote: true,
@@ -81,14 +93,30 @@ const prettify = () => {
 //to check whether or not files adhere to Prettier's formatting
 
 const validate = () => {
-    return gulp.src(["js/**/*.js", "!js/**/*.test.js", "!js/**/*.mock.js", "!js/__tests__/**/*.js", "!js/**/__tests__/**/*.js"]).pipe(prettier.check({ singleQuote: true, trailingComma: "all" }));
+    return gulp
+        .src([
+            "js/**/*.js",
+            "!js/**/*.test.js",
+            "!js/**/*.mock.js",
+            "!js/__tests__/**/*.js",
+            "!js/**/__tests__/**/*.js"
+        ])
+        .pipe(prettier.check({ singleQuote: true, trailingComma: "all" }));
 };
 
 // Watch task: watch SASS , CSS and JS files for changes
 // If any change, run sass, css and js tasks simultaneously
 const watchTask = () => {
     return watch(
-        ["js/**/*.js", "!js/**/*.test.js", "!js/**/*.mock.js", "!js/__tests__/**/*.js", "!js/**/__tests__/**/*.js", files.cssPath, files.sassPath],
+        [
+            "js/**/*.js",
+            "!js/**/*.test.js",
+            "!js/**/*.mock.js",
+            "!js/__tests__/**/*.js",
+            "!js/**/__tests__/**/*.js",
+            files.cssPath,
+            files.sassPath
+        ],
         parallel(jsTask, cssTask, sassTask)
     );
 };

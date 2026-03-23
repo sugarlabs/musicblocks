@@ -72,7 +72,7 @@ const SYNTHSVG =
  * @type {string}
  */
 // Helper function to convert string to binary string for Base64 encoding
-const _stringToBinary = (str) => {
+const _stringToBinary = str => {
     const encoder = new TextEncoder();
     const uint8Array = encoder.encode(str);
     return String.fromCharCode(...uint8Array);
