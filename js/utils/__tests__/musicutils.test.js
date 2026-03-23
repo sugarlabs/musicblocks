@@ -99,7 +99,6 @@ const {
     getNoteFromInterval,
     numberToPitch,
     GetNotesForInterval,
-    base64Encode,
     NOTESFLAT,
     NOTESSHARP,
     MUSICALMODES,
@@ -1198,23 +1197,6 @@ describe("GetNotesForInterval", () => {
     });
 });
 
-describe("base64Encode", () => {
-    it("should handle empty string", () => {
-        const input = "";
-        const result = base64Encode(input);
-        expect(result.length).toBe(0);
-    });
-    it("should handle special characters and Unicode", () => {
-        const input = "¡Hola! 你好";
-        const result = base64Encode(input);
-        const bytes = new TextEncoder().encode(input);
-        expect(result.length).toBe(bytes.length);
-        for (let i = 0; i < bytes.length; i++) {
-            expect(result.charCodeAt(i)).toBe(bytes[i]);
-        }
-    });
-});
-
 describe("getNote", () => {
     it("should return rest note", () => {
         expect(getNote("rest")).toEqual(["R", "", 0]);
@@ -2245,6 +2227,17 @@ describe("_calculate_pitch_number", () => {
     let activity, tur;
 
     beforeEach(() => {
+        global.INVALIDPITCH = "Not a valid pitch name";
+        global.NOTESSHARP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        global.NOTESFLAT = ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"];
+        global.SHARP = "♯";
+        global.FLAT = "♭";
+        global.DOUBLESHARP = "𝄪";
+        global.DOUBLEFLAT = "𝄫";
+        global.EQUIVALENTSHARPS = {};
+        global.EQUIVALENTFLATS = {};
+        global.EQUIVALENTNATURALS = {};
+
         activity = {
             errorMsg: jest.fn()
         };
@@ -2263,13 +2256,13 @@ describe("_calculate_pitch_number", () => {
     });
 
     it("calculates pitch number for a standard note string", () => {
-        const val = _calculate_pitch_number(activity, "C4", tur);
+        const val = _calculate_pitch_number("C", 4);
         expect(typeof val).toBe("number");
     });
 
     it("calculates pitch number relative to another note", () => {
-        const valC4 = _calculate_pitch_number(activity, "C4", tur);
-        const valC5 = _calculate_pitch_number(activity, "C5", tur);
+        const valC4 = _calculate_pitch_number("C", 4);
+        const valC5 = _calculate_pitch_number("C", 5);
         expect(valC5).toBeGreaterThan(valC4);
     });
 });
