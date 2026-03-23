@@ -536,21 +536,6 @@ describe("MusicBlocks Class", () => {
         });
     });
     describe("MusicBlocks.init", () => {
-        beforeAll(() => {
-            global.Singer.RhythmActions = { rhythmMethod: jest.fn() };
-            global.Singer.MeterActions = { meterMethod: jest.fn() };
-            global.Singer.PitchActions = { pitchMethod: jest.fn() };
-            global.Singer.IntervalsActions = { intervalsMethod: jest.fn() };
-            global.Singer.ToneActions = { toneMethod: jest.fn() };
-            global.Singer.OrnamentActions = { ornamentMethod: jest.fn() };
-            global.Singer.VolumeActions = { volumeMethod: jest.fn() };
-            global.Singer.DrumActions = { drumMethod: jest.fn() };
-            global.Turtle = { DictActions: { dictMethod: jest.fn() } };
-        });
-        afterAll(() => {
-            delete global.Turtle;
-        });
-
         test("should initialize the API method list and set isRun to true when start is true", () => {
             MusicBlocks.init(true);
 
