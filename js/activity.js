@@ -3041,11 +3041,6 @@ class Activity {
                     this._resetIdleTimer();
                 }
             }, 1000);
-
-            // Expose activity instance for external checks
-            if (typeof window !== "undefined") {
-                window.activity = this;
-            }
         };
 
         /**
