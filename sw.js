@@ -13,15 +13,13 @@ const precacheFiles = [
 ];
 
 self.addEventListener("install", function (event) {
-    // eslint-disable-next-line no-console
     console.log("[PWA Builder] Install Event processing");
-    // eslint-disable-next-line no-console
+
     console.log("[PWA Builder] Skip waiting on install");
     self.skipWaiting();
 
     event.waitUntil(
         caches.open(CACHE).then(function (cache) {
-            // eslint-disable-next-line no-console
             console.log("[PWA Builder] Caching pages during install");
             return cache.addAll(precacheFiles);
         })
@@ -30,7 +28,6 @@ self.addEventListener("install", function (event) {
 
 // Allow sw to control of current page
 self.addEventListener("activate", function (event) {
-    // eslint-disable-next-line no-console
     console.log("[PWA Builder] Claiming clients for current page");
     event.waitUntil(self.clients.claim());
 });
@@ -143,11 +140,16 @@ self.addEventListener("fetch", function (event) {
                 // This is where we call the server to get the newest
                 // version of the file to use the next time we show view
                 event.waitUntil(
-                    fetch(event.request).then(function (response) {
-                        if (response.ok) {
-                            return updateCache(event.request, response);
-                        }
-                    })
+                    fetch(event.request)
+                        .then(function (response) {
+                            if (response.ok) {
+                                return updateCache(event.request, response);
+                            }
+                        })
+                        .catch(function () {
+                            // Ignore network fetch failures when offline.
+                            // The cached response has already been returned.
+                        })
                 );
                 return response;
             },
@@ -161,7 +163,6 @@ self.addEventListener("fetch", function (event) {
                     }
                     return response;
                 } catch (error) {
-                    // eslint-disable-next-line no-console
                     console.log("[PWA Builder] Network request failed and no cache." + error);
 
                     if (typeof offlineFallbackPage !== "undefined") {
@@ -183,7 +184,6 @@ self.addEventListener("fetch", function (event) {
 // update the offline page
 self.addEventListener("refreshOffline", function () {
     if (typeof offlineFallbackPage !== "string" || offlineFallbackPage.trim().length === 0) {
-        // eslint-disable-next-line no-console
         console.log("[PWA Builder] refreshOffline ignored: offlineFallbackPage is not set");
         return Promise.resolve();
     }
@@ -192,7 +192,6 @@ self.addEventListener("refreshOffline", function () {
 
     return fetch(offlineFallbackPage).then(function (response) {
         return caches.open(CACHE).then(function (cache) {
-            // eslint-disable-next-line no-console
             console.log(
                 "[PWA Builder] Offline page updated from refreshOffline event: " + response.url
             );

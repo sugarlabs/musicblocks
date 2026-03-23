@@ -88,8 +88,10 @@ function setupToneActions(activity) {
                 activity.logo.phraseMaker._instrumentName = synth;
             }
 
+            let pushed = false;
             if (!tur.singer.instrumentNames.includes(synth)) {
                 tur.singer.instrumentNames.push(synth);
+                pushed = true;
                 activity.logo.synth.loadSynth(turtle, synth);
 
                 if (tur.singer.synthVolume[synth] === undefined) {
@@ -113,7 +115,9 @@ function setupToneActions(activity) {
 
             const __listener = () => {
                 tur.inSetTimbre = false;
-                tur.singer.instrumentNames.pop();
+                if (pushed) {
+                    tur.singer.instrumentNames.pop();
+                }
             };
 
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
@@ -159,9 +163,8 @@ function setupToneActions(activity) {
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
 
             if (activity.logo.inTimbre) {
-                instrumentsEffects[turtle][activity.logo.timbre.instrumentName][
-                    "vibratoActive"
-                ] = true;
+                instrumentsEffects[turtle][activity.logo.timbre.instrumentName]["vibratoActive"] =
+                    true;
                 activity.logo.timbre.vibratoEffect.push(blk);
                 activity.logo.timbre.vibratoParams.push(last(tur.singer.vibratoIntensity) * 100);
                 instrumentsEffects[turtle][activity.logo.timbre.instrumentName][
