@@ -1030,6 +1030,7 @@
         <!-- Loading Dialog Script -->
         <script>
             document.addEventListener("DOMContentLoaded", function () {
+                window._ = window._ || (x => x);
                 let loadL10nSplashScreen = function () {
                     console.debug("The browser is set to " + navigator.language);
                     let lang = navigator.language;
