@@ -19,7 +19,7 @@
     "name": "Walter Bender",
     "url": "https://sugarlabs.org"
   },
-  "default_locale": "en"
+  "default_locale": "en",
   "screenshots": [{
       "src": "screenshots/Screenshot-1.png",
       "sizes": "1440x715",
