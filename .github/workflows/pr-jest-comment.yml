@@ -41,7 +41,7 @@ jobs:
             # that marks the end of the value. It must appear alone on its own line.
             echo "COMMENT_BODY<<EOF_COMMENT_BODY" >> $GITHUB_OUTPUT
             echo "<!-- jest-results -->" >> $GITHUB_OUTPUT
-            echo "⚠️ Jest results not found. Tests may have failed to run." >> $GITHUB_OUTPUT
+            echo " Jest results not found. Tests may have failed to run." >> $GITHUB_OUTPUT
             echo "EOF_COMMENT_BODY" >> $GITHUB_OUTPUT
             exit 0
           fi
@@ -55,9 +55,9 @@ jobs:
           if [ "$SUCCESS" = "true" ]; then
             echo "COMMENT_BODY<<EOF_COMMENT_BODY" >> $GITHUB_OUTPUT
             echo "<!-- jest-results -->" >> $GITHUB_OUTPUT
-            echo "## ✅ Jest Tests Passed" >> $GITHUB_OUTPUT
+            echo "## Jest Tests Passed" >> $GITHUB_OUTPUT
             echo "" >> $GITHUB_OUTPUT
-            echo "All $TOTAL tests passed 🎉" >> $GITHUB_OUTPUT
+            echo "All $TOTAL tests passed " >> $GITHUB_OUTPUT
             echo "EOF_COMMENT_BODY" >> $GITHUB_OUTPUT
           else
             # Assumption: no Jest test name will contain the exact string
@@ -71,7 +71,7 @@ jobs:
             # Markdown closing fence below would be ambiguous to renderers.
             echo "COMMENT_BODY<<EOF_COMMENT_BODY" >> $GITHUB_OUTPUT
             echo "<!-- jest-results -->" >> $GITHUB_OUTPUT
-            echo "## ❌ Jest Tests Failed" >> $GITHUB_OUTPUT
+            echo "##  Jest Tests Failed" >> $GITHUB_OUTPUT
             echo "" >> $GITHUB_OUTPUT
             echo "**Results:** $PASSED/$TOTAL passed, $FAILED failed" >> $GITHUB_OUTPUT
             echo "" >> $GITHUB_OUTPUT
