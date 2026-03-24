@@ -68,11 +68,11 @@ jobs:
           FAILED_TESTS: ${{ steps.results.outputs.FAILED_TESTS }}
         run: |
           if [ "$JEST_OUTCOME" = "success" ]; then
-            echo "### ✅ Jest Tests Passed" >> $GITHUB_STEP_SUMMARY
+            echo "### Jest Tests Passed" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "All $TOTAL tests passed!" >> $GITHUB_STEP_SUMMARY
           else
-            echo "### ❌ Jest Tests Failed" >> $GITHUB_STEP_SUMMARY
+            echo "### Jest Tests Failed" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "**Results:** $PASSED/$TOTAL passed" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
@@ -108,6 +108,6 @@ jobs:
           JEST_OUTCOME: ${{ steps.jest.outcome }}
         run: |
           if [ "$JEST_OUTCOME" = "failure" ]; then
-            echo "❌ Tests failed."
+            echo " Tests failed."
             exit 1
           fi
