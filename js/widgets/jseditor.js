@@ -892,10 +892,20 @@ class JSEditor {
      *
      * @returns {Void}
      */
-    _codeToBlocks() {
+    async _codeToBlocks() {
         JSEditor.clearConsole();
 
         try {
+            if (!ast2blocklist_config && window.ast2blocklist_config_ready) {
+                await window.ast2blocklist_config_ready;
+            }
+
+            if (!ast2blocklist_config) {
+                throw new Error(
+                    _("JavaScript block conversion is still loading. Please try again.")
+                );
+            }
+
             let ast = acorn.parse(this._code, { ecmaVersion: 2020 });
             let blockList = AST2BlockList.toBlockList(ast, ast2blocklist_config);
             const activity = this.activity;
