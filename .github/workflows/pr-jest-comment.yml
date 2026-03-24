@@ -1,0 +1,131 @@
+name: Comment Jest Results on PR
+
+on:
+  workflow_run:
+    workflows: ["Run Jest Tests on PR"]
+    types:
+      - completed
+
+jobs:
+  comment:
+    name: Post PR Comment
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: artifacts
+
+      - name: Get PR Number and Generate Comment
+        id: pr_info
+        run: |
+          # Find and read PR number
+          PR_FILE=$(find artifacts -name 'pr-number.txt' -type f | head -1)
+          if [ -z "$PR_FILE" ]; then
+            echo "::warning::No PR number artifact found"
+            exit 0
+          fi
+          PR_NUMBER=$(cat "$PR_FILE")
+          echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_OUTPUT
+
+          # Find jest results
+          # Note: jq is pre-installed on ubuntu-latest runners
+          RESULTS_FILE=$(find artifacts -name 'jest-results.json' -type f | head -1)
+          if [ -z "$RESULTS_FILE" ]; then
+            # GitHub Actions multiline output syntax: the string after << is the delimiter
+            # that marks the end of the value. It must appear alone on its own line.
+            echo "COMMENT_BODY<<EOF_COMMENT_BODY" >> $GITHUB_OUTPUT
+            echo "<!-- jest-results -->" >> $GITHUB_OUTPUT
+            echo "⚠️ Jest results not found. Tests may have failed to run." >> $GITHUB_OUTPUT
+            echo "EOF_COMMENT_BODY" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Parse test results
+          SUCCESS=$(jq '.success // false' "$RESULTS_FILE")
+          TOTAL=$(jq '.numTotalTests // 0' "$RESULTS_FILE")
+          PASSED=$(jq '.numPassedTests // 0' "$RESULTS_FILE")
+          FAILED=$(jq '.numFailedTests // 0' "$RESULTS_FILE")
+
+          if [ "$SUCCESS" = "true" ]; then
+            echo "COMMENT_BODY<<EOF_COMMENT_BODY" >> $GITHUB_OUTPUT
+            echo "<!-- jest-results -->" >> $GITHUB_OUTPUT
+            echo "## ✅ Jest Tests Passed" >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_OUTPUT
+            echo "All $TOTAL tests passed 🎉" >> $GITHUB_OUTPUT
+            echo "EOF_COMMENT_BODY" >> $GITHUB_OUTPUT
+          else
+            # Assumption: no Jest test name will contain the exact string
+            # "EOF_COMMENT_BODY" on a line by itself. If it did, the $GITHUB_OUTPUT
+            # multiline block would terminate early and the rest of the body would
+            # be silently dropped. Jest test names are code identifiers so this is
+            # safe in practice, but worth noting for future delimiter changes.
+            FAILED_TESTS=$(jq -r '[.testResults[] | select(.status == "failed") | .assertionResults[]? | select(.status == "failed") | "- " + .fullName] | join("\n")' "$RESULTS_FILE")
+            FAILED_TESTS="${FAILED_TESTS:-Failed tests found but details unavailable}"
+            # Assumption: no test name is the bare string "\`\`\`". If it were, the
+            # Markdown closing fence below would be ambiguous to renderers.
+            echo "COMMENT_BODY<<EOF_COMMENT_BODY" >> $GITHUB_OUTPUT
+            echo "<!-- jest-results -->" >> $GITHUB_OUTPUT
+            echo "## ❌ Jest Tests Failed" >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_OUTPUT
+            echo "**Results:** $PASSED/$TOTAL passed, $FAILED failed" >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_OUTPUT
+            echo "**Failed Tests:**" >> $GITHUB_OUTPUT
+            echo '```' >> $GITHUB_OUTPUT
+            echo "$FAILED_TESTS" >> $GITHUB_OUTPUT
+            echo '```' >> $GITHUB_OUTPUT
+            echo "EOF_COMMENT_BODY" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Post or Update PR Comment
+        if: steps.pr_info.outputs.PR_NUMBER != ''
+        uses: actions/github-script@v7
+        env:
+          COMMENT_BODY: ${{ steps.pr_info.outputs.COMMENT_BODY }}
+          PR_NUMBER: ${{ steps.pr_info.outputs.PR_NUMBER }}
+        with:
+          script: |
+            const marker = "<!-- jest-results -->";
+            const body = process.env.COMMENT_BODY;
+            const prNumber = parseInt(process.env.PR_NUMBER);
+
+            if (!prNumber) {
+              console.log("Skipping comment: no PR number available");
+              return;
+            }
+
+            try {
+              const { data: comments } = await github.rest.issues.listComments({
+                issue_number: prNumber,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+              });
+
+              const existing = comments.find(c => c.body.includes(marker));
+
+              if (existing) {
+                await github.rest.issues.updateComment({
+                  comment_id: existing.id,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body
+                });
+                console.log("Updated existing Jest comment");
+              } else {
+                await github.rest.issues.createComment({
+                  issue_number: prNumber,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body
+                });
+                console.log("Created new Jest comment");
+              }
+            } catch (error) {
+              console.error("Failed to post comment:", error.message);
+              throw error;
+            }
