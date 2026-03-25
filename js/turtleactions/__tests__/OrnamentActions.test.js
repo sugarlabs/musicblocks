@@ -109,12 +109,13 @@ describe("OrnamentActions", () => {
                     global.MusicBlocks.isRun = isRun;
                     if (nullMouse) global.Mouse.getMouseFromTurtle = () => null;
                     Singer.OrnamentActions.setStaccato(2, 0, blk);
+                    const expectedName = "_staccato_0_" + blk;
                     expect(turtle.singer.staccato).toEqual([0.5]);
                     expect(dispatchCalls.length).toBe(expectDispatch ? 1 : 0);
                     expect(listenerCalls.length).toBe(1);
-                    if (expectMouseListener) expect(mouseMB.listeners).toContain("_staccato_0");
-                    else expect(mouseMB.listeners).not.toContain("_staccato_0");
-                    listenerFunctions["_staccato_0"]();
+                    if (expectMouseListener) expect(mouseMB.listeners).toContain(expectedName);
+                    else expect(mouseMB.listeners).not.toContain(expectedName);
+                    listenerFunctions[expectedName]();
                     expect(turtle.singer.staccato).toEqual([]);
                 });
             }
@@ -195,9 +196,10 @@ describe("OrnamentActions", () => {
                     expect(beginSlurCalls.length).toBe(expectBeginSlur ? 1 : 0);
                     expect(dispatchCalls.length).toBe(expectDispatch ? 1 : 0);
                     expect(listenerCalls.length).toBe(1);
-                    if (expectMouseListener) expect(mouseMB.listeners).toContain("_staccato_0");
-                    else expect(mouseMB.listeners).not.toContain("_staccato_0");
-                    listenerFunctions["_staccato_0"]();
+                    const expectedName = "_staccato_0_" + blk;
+                    if (expectMouseListener) expect(mouseMB.listeners).toContain(expectedName);
+                    else expect(mouseMB.listeners).not.toContain(expectedName);
+                    listenerFunctions[expectedName]();
                     expect(turtle.singer.staccato).toEqual([]);
                     expect(endSlurCalls.length).toBe(expectBeginSlur ? 1 : 0);
                 });

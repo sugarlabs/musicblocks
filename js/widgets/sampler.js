@@ -189,8 +189,8 @@ function SampleWidget() {
                         this.activity.blocks.blockList[mainSampleBlock].text.text
                     ) {
                         // Append cent adjustment to the block text if possible
-                        const currentText = this.activity.blocks.blockList[mainSampleBlock].text
-                            .text;
+                        const currentText =
+                            this.activity.blocks.blockList[mainSampleBlock].text.text;
                         if (!currentText.includes("¢")) {
                             this.activity.blocks.blockList[mainSampleBlock].text.text +=
                                 " " + centText;
@@ -305,14 +305,14 @@ function SampleWidget() {
      * @returns {void}
      */
     this.__save = function () {
-        var that = this;
+        const that = this;
         setTimeout(function () {
             that._addSample();
 
             // Include the cent adjustment value in the sample block
             const centAdjustment = that.centAdjustmentValue || 0;
 
-            var newStack = [
+            const newStack = [
                 [0, "settimbre", 100, 100, [null, 1, null, 5]],
                 [
                     1,
@@ -493,10 +493,16 @@ function SampleWidget() {
             }
 
             docById("wheelDivptm").style.display = "none";
-            if (!this.pitchWheel === undefined) {
+            if (this._pitchWheel !== undefined) {
                 this._pitchWheel.removeWheel();
+            }
+            if (this._exitWheel !== undefined) {
                 this._exitWheel.removeWheel();
+            }
+            if (this._accidentalsWheel !== undefined) {
                 this._accidentalsWheel.removeWheel();
+            }
+            if (this._octavesWheel !== undefined) {
                 this._octavesWheel.removeWheel();
             }
             this.pitchAnalysers = {};
@@ -516,28 +522,23 @@ function SampleWidget() {
             }
         };
 
-        widgetWindow.addButton(
-            "load-media.svg",
-            ICONSIZE,
-            _("Upload sample"),
-            ""
-        ).onclick = function () {
-            stopTuner();
-            const fileChooser = docById("myOpenAll");
+        widgetWindow.addButton("load-media.svg", ICONSIZE, _("Upload sample"), "").onclick =
+            function () {
+                stopTuner();
+                const fileChooser = docById("myOpenAll");
 
-            // eslint-disable-next-line no-unused-vars
-            const __readerAction = function (event) {
+                const __readerAction = function (event) {
+                    window.scroll(0, 0);
+                    const sampleFile = fileChooser.files[0];
+                    that.handleFiles(sampleFile);
+                    fileChooser.removeEventListener("change", __readerAction);
+                };
+
+                fileChooser.addEventListener("change", __readerAction, false);
+                fileChooser.focus();
+                fileChooser.click();
                 window.scroll(0, 0);
-                const sampleFile = fileChooser.files[0];
-                that.handleFiles(sampleFile);
-                fileChooser.removeEventListener("change", __readerAction);
             };
-
-            fileChooser.addEventListener("change", __readerAction, false);
-            fileChooser.focus();
-            fileChooser.click();
-            window.scroll(0, 0);
-        };
 
         // Create a container for the pitch button and frequency display
         this.pitchBtnContainer = document.createElement("div");
@@ -570,22 +571,18 @@ function SampleWidget() {
         };
 
         this._save_lock = false;
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            ICONSIZE,
-            _("Save sample"),
-            ""
-        ).onclick = function () {
-            stopTuner();
-            // Debounce button
-            if (!that._get_save_lock()) {
-                that._save_lock = true;
-                that._saveSample();
-                setTimeout(function () {
-                    that._save_lock = false;
-                }, 1000);
-            }
-        };
+        widgetWindow.addButton("export-chunk.svg", ICONSIZE, _("Save sample"), "").onclick =
+            function () {
+                stopTuner();
+                // Debounce button
+                if (!that._get_save_lock()) {
+                    that._save_lock = true;
+                    that._saveSample();
+                    setTimeout(function () {
+                        that._save_lock = false;
+                    }, 1000);
+                }
+            };
 
         this._recordBtn = widgetWindow.addButton("mic.svg", ICONSIZE, _("Toggle Mic"), "");
 
@@ -1777,9 +1774,8 @@ function SampleWidget() {
 
         const __selectionChanged = () => {
             const label = this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
-            const attr = this._accidentalsWheel.navItems[
-                this._accidentalsWheel.selectedNavItemIndex
-            ].title;
+            const attr =
+                this._accidentalsWheel.navItems[this._accidentalsWheel.selectedNavItemIndex].title;
             const octave = Number(
                 this._octavesWheel.navItems[this._octavesWheel.selectedNavItemIndex].title
             );
@@ -2041,9 +2037,8 @@ function SampleWidget() {
             const playbackRate = TunerUtils.calculatePlaybackRate(0, this.centsValue);
             // Apply the playback rate to the sample
             if (instruments[0]["customsample_" + this.originalSampleName]) {
-                instruments[0][
-                    "customsample_" + this.originalSampleName
-                ].playbackRate.value = playbackRate;
+                instruments[0]["customsample_" + this.originalSampleName].playbackRate.value =
+                    playbackRate;
             }
         }
     };
@@ -2180,9 +2175,11 @@ function SampleWidget() {
 
     /**
      * Start pitch detection
+     * @param {HTMLElement} pitchElement - Widget-local span for displaying detected pitch
+     * @param {HTMLElement} noteElement - Widget-local span for displaying detected note
      * @returns {Promise<void>}
      */
-    const startPitchDetection = async () => {
+    const startPitchDetection = async (pitchElement, noteElement) => {
         // Stop any existing pitch detection first to avoid multiple instances
         this.stopPitchDetection();
 
@@ -2215,10 +2212,7 @@ function SampleWidget() {
                 analyser.getFloatTimeDomainData(buffer);
                 const pitch = detectPitch(buffer);
 
-                // Safely update DOM elements (check if they exist first)
-                const pitchElement = document.getElementById("pitch");
-                const noteElement = document.getElementById("note");
-
+                // Update widget-local DOM elements (passed in from makeTuner — no global query)
                 if (pitchElement && noteElement) {
                     if (pitch > 0) {
                         const { note, cents } = frequencyToNote(pitch);
@@ -2301,7 +2295,7 @@ function SampleWidget() {
 
         this.widgetWindow.getWidgetBody().appendChild(container);
 
-        document.getElementById("start").addEventListener("click", startPitchDetection);
+        startButton.addEventListener("click", () => startPitchDetection(pitchSpan, noteSpan));
     };
 
     /**

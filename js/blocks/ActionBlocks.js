@@ -150,6 +150,17 @@ function setupActionBlocks(activity) {
         }
 
         /**
+         * Gets the current window location URL.
+         *
+         * @memberof ReturnToURLBlock
+         * @method
+         * @returns {string} The current window location URL.
+         */
+        getURL() {
+            return window.location.href;
+        }
+
+        /**
          * Handles the flow of the Return to URL block.
          *
          * @memberof ReturnToURLBlock
@@ -157,7 +168,7 @@ function setupActionBlocks(activity) {
          * @param {Array} args - The arguments for the flow.
          */
         flow(args) {
-            const URL = window.location.href;
+            const URL = this.getURL();
             let urlParts;
             let outurl;
 
@@ -461,7 +472,6 @@ function setupActionBlocks(activity) {
                         }
                     }
 
-                    // eslint-disable-next-line no-unused-vars
                     const __listener = event => tur.singer.backward.pop();
 
                     logo.setTurtleListener(turtle, listenerName, __listener);
@@ -982,7 +992,6 @@ function setupActionBlocks(activity) {
                 return [logo.actions[args[0]], 1];
             }
 
-            // eslint-disable-next-line no-console
             console.debug("action " + args[0] + " not found");
             activity.errorMsg(NOACTIONERRORMSG, blk, args[0]);
         }
@@ -1066,7 +1075,6 @@ function setupActionBlocks(activity) {
             } else {
                 const tur = activity.turtles.ithTurtle(turtle);
 
-                // eslint-disable-next-line no-unused-vars
                 const __listener = event => {
                     if (tur.running) {
                         const queueBlock = new Queue(logo.actions[args[1]], 1, blk);
@@ -1358,7 +1366,6 @@ function setupActionBlocks(activity) {
                 return [logo.actions[args[0]], 1];
             }
 
-            // eslint-disable-next-line no-console
             console.debug("action " + args[0] + " not found");
             activity.errorMsg(NOACTIONERRORMSG, blk, args[0]);
         }
@@ -1452,7 +1459,6 @@ function setupActionBlocks(activity) {
                     }
                 }
 
-                // eslint-disable-next-line no-unused-vars
                 const __listener = event => tur.singer.backward.pop();
 
                 logo.setTurtleListener(turtle, listenerName, __listener);

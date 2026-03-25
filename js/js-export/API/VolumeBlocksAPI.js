@@ -61,3 +61,6 @@ class VolumeBlocksAPI {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = VolumeBlocksAPI;
 }
+if (typeof window !== "undefined") {
+    window.VolumeBlocksAPI = VolumeBlocksAPI;
+}

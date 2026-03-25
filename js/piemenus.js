@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 // Copyright (c) 2014-23 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
@@ -14,7 +13,7 @@
 /*
    global
 
-   _, platformColor, docById, Singer, slicePath, wheelnav,
+    platformColor, docById, Singer, slicePath, wheelnav,
    DEFAULTVOICE, getDrumName, getNote, MUSICALMODES last, SHARP, FLAT,
    PREVIEWVOLUME, DEFAULTVOLUME, MODE_PIE_MENUS, HelpWidget,
    INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName,
@@ -22,7 +21,7 @@
    DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
    FIXEDSOLFEGE, NOTENAMES, FIXEDSOLFEGE, NOTENAMES, numberToPitch,
    nthDegreeToPitch, SOLFEGENAMES, buildScale, _THIS_IS_TURTLE_BLOCKS_,
-   CHORDNAMES
+    CHORDNAMES, Tone, Synth
 */
 
 /*
@@ -57,12 +56,21 @@
    piemenuModes, piemenuPitches, piemenuCustomNotes, piemenuGrid,
    piemenuBlockContext, piemenuIntervals, piemenuVoices, piemenuBoolean,
    piemenuBasic, piemenuColor, piemenuNumber, piemenuNthModalPitch,
-   piemenuNoteValue, piemenuAccidentals, piemenuKey, piemenuChords
+   piemenuNoteValue, piemenuAccidentals, piemenuKey, piemenuChords,
+   piemenuDissectNumber
 */
 
-const setWheelSize = i => {
+/**
+ * Sets the pie menu container size based on the viewport width.
+ * Uses the base diameter and scales down for smaller screens.
+ * @param diameter Base diameter of the wheel in pixels
+ * @returns void
+ */
+const setWheelSize = (i = 400) => {
     const wheelDiv = document.getElementById("wheelDiv");
     const screenWidth = window.innerWidth;
+
+    if (!wheelDiv) return;
 
     wheelDiv.style.position = "absolute";
     wheelDiv.style.zIndex = "20000"; // Set z-index higher than floating windows (10000)
@@ -81,10 +89,142 @@ const setWheelSize = i => {
     wheelDiv.style.height = wheelDiv.style.width;
 };
 
+/**
+ * Computes an appropriate pie menu size based on the turtle canvas bounds.
+ *
+ * @param block Block instance owning the pie menu
+ * @returns Minimum of the canvas width and height
+ */
+const getPieMenuSize = block => {
+    const canvas = block.blocks.turtles._canvas;
+    return Math.min(canvas.width, canvas.height);
+};
+
+// Debounce resize handler for performance
+let wheelResizeTimeout;
+const debouncedSetWheelSize = () => {
+    clearTimeout(wheelResizeTimeout);
+    wheelResizeTimeout = setTimeout(setWheelSize, 150);
+};
+
 // Call the function initially and whenever the window is resized
 setWheelSize();
-window.addEventListener("resize", setWheelSize);
+window.addEventListener("resize", debouncedSetWheelSize);
 
+/**
+ * Enables mouse-wheel scrolling to rotate a wheelnav instance
+ * without triggering sound previews.
+ *
+ * @param wheel Wheelnav instance to rotate
+ * @param itemCount Total number of selectable items in the wheel
+ * @returns void
+ */
+const enableWheelScroll = (wheel, itemCount) => {
+    const wheelDiv = document.getElementById("wheelDiv");
+    if (!wheelDiv || !wheel) return;
+
+    // Remove existing scroll handler if any
+    if (wheelDiv._scrollHandler) {
+        wheelDiv.removeEventListener("wheel", wheelDiv._scrollHandler);
+    }
+
+    let isScrolling = false;
+    let scrollTimeout = null;
+
+    const scrollHandler = event => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        // Throttle the scroll events (only process every 150ms)
+        if (isScrolling) return;
+        isScrolling = true;
+
+        // Calculate the direction and amount to rotate
+        const delta = event.deltaY > 0 ? 1 : -1;
+
+        // Get current selected index
+        const currentIndex = wheel.selectedNavItemIndex;
+
+        // Calculate next index (with wrapping)
+        let nextIndex = currentIndex + delta;
+        if (nextIndex < 0) {
+            nextIndex = itemCount - 1;
+        } else if (nextIndex >= itemCount) {
+            nextIndex = 0;
+        }
+
+        // Temporarily disable all navigate functions to prevent sound previews
+        const originalFunctions = [];
+        for (let i = 0; i < wheel.navItems.length; i++) {
+            originalFunctions[i] = wheel.navItems[i].navigateFunction;
+            wheel.navItems[i].navigateFunction = null;
+        }
+
+        // Navigate to the next item
+        wheel.navigateWheel(nextIndex);
+
+        // Restore navigate functions after a short delay
+        setTimeout(() => {
+            for (let i = 0; i < wheel.navItems.length; i++) {
+                wheel.navItems[i].navigateFunction = originalFunctions[i];
+            }
+        }, 50);
+
+        // Reset throttle after 150ms
+        setTimeout(() => {
+            isScrolling = false;
+        }, 150);
+    };
+
+    // Store the handler so we can remove it later
+    wheelDiv._scrollHandler = scrollHandler;
+    wheelDiv.addEventListener("wheel", scrollHandler, { passive: false });
+};
+
+// Ensure exit wheels behave like stateless buttons (no sticky selection)
+const configureExitWheel = exitWheel => {
+    if (!exitWheel || !exitWheel.navItems) {
+        return;
+    }
+
+    const clearSelection = () => {
+        exitWheel.selectedNavItemIndex = null;
+        for (let i = 0; i < exitWheel.navItems.length; i++) {
+            exitWheel.navItems[i].selected = false;
+            exitWheel.navItems[i].hovered = false;
+        }
+        if (exitWheel.raphael && exitWheel.raphael.canvas) {
+            exitWheel.refreshWheel(true);
+        }
+    };
+
+    clearSelection();
+
+    exitWheel.navigateWheel = clicked => {
+        const item = exitWheel.navItems[clicked];
+        if (!item || item.enabled === false) {
+            return;
+        }
+        clearSelection();
+        if (typeof item.navigateFunction === "function") {
+            item.navigateFunction();
+        }
+    };
+};
+
+/**
+ * Builds the pitch selection pie menu with optional accidentals
+ * and an optional octave wheel.
+ *
+ * @param {Object} block Block instance invoking the menu
+ * @param {string[]} noteLabels Labels shown in the pitch wheel
+ * @param {string[]} noteValues Values mapped to labels
+ * @param {Array} accidentals Accidental labels/values for the inner wheel
+ * @param {string} note Currently selected note value
+ * @param {string} accidental Currently selected accidental
+ * @param {boolean} [custom=false] Whether to use the custom-note layout
+ * @returns {void}
+ */
 const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accidental, custom) => {
     let prevPitch = null;
     // wheelNav pie menu for pitch selection
@@ -119,7 +259,8 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     wheelDiv.style.opacity = "0";
 
     // The pitch selector
-    block._pitchWheel = new wheelnav("wheelDiv", null, 600, 600);
+    const wheelSize = getPieMenuSize(block);
+    block._pitchWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
 
     if (!custom) {
         // The accidental selector
@@ -168,6 +309,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     if (!custom) {
         block._accidentalsWheel.colors = platformColor.accidentalsWheelcolors;
@@ -235,27 +377,29 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
-    setWheelSize(300);
+    const displaySize = 400;
+    setWheelSize(displaySize);
+    const halfWheelSize = displaySize / 2;
     docById("wheelDiv").style.left =
         Math.min(
-            block.blocks.turtles._canvas.width - 300,
+            block.blocks.turtles._canvas.width - displaySize,
             Math.max(
                 0,
                 Math.round(
                     (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
                         canvasLeft
-                ) - 200
+                ) - halfWheelSize
             )
         ) + "px";
     docById("wheelDiv").style.top =
         Math.min(
-            block.blocks.turtles._canvas.height - 350,
+            block.blocks.turtles._canvas.height - displaySize,
             Math.max(
                 0,
                 Math.round(
                     (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
                         canvasTop
-                ) - 200
+                ) - halfWheelSize
             )
         ) + "px";
 
@@ -388,7 +532,6 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
 
             // Ensure synth is initialized before proceeding
             if (!that.activity.logo.synth) {
-                console.debug("Creating synth in logo");
                 that.activity.logo.synth = new Synth();
             }
 
@@ -501,7 +644,6 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                     that.activity.logo.synth.createDefaultSynth(0);
                     await that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
                 } catch (e) {
-                    console.debug("Error initializing synth:", e);
                     return;
                 }
             }
@@ -516,7 +658,6 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                 that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
                 that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
             } catch (e) {
-                console.debug("Error setting volume:", e);
                 return;
             }
 
@@ -534,13 +675,11 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                         false
                     );
                 } catch (e) {
-                    console.debug("Error triggering note:", e);
-                } finally {
-                    // Ensure trigger lock is released after a delay
-                    setTimeout(() => {
-                        that._triggerLock = false;
-                    }, 125); // 1/8 second in milliseconds
+                    console.error("Synth trigger error:", e);
                 }
+                setTimeout(() => {
+                    that._triggerLock = false;
+                }, 125);
             }
         } catch (e) {
             console.error("Error in pitch preview:", e);
@@ -631,7 +770,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             ["setkey", "setkey2"].includes(that.blocks.blockList[that.connections[0]].name)
         ) {
             // We may need to update the mode widget.
-            that.activity.logo.modeBlock = that.blocks.blockList.indexOf(that);
+            that.activity.logo.modeBlock = that.blockIndex;
         }
     };
 
@@ -646,16 +785,19 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     };
 
     const __selectionChangedAccidental = () => {
-        selection["note"] = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+        const i = that._pitchWheel.selectedNavItemIndex;
+        selection["note"] = noteLabels[i];
+        const selectedNoteValue = noteValues[i];
+
         selection["attr"] =
             that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
 
         if (selection["attr"] === "♮") {
             that.text.text = selection["note"];
-            that.value = selection["note"];
+            that.value = selectedNoteValue;
         } else {
-            that.value = selection["note"] + selection["attr"];
-            that.text.text = that.value;
+            that.value = selectedNoteValue + selection["attr"];
+            that.text.text = selection["note"] + selection["attr"];
         }
 
         that.container.setChildIndex(that.text, that.container.children.length - 1);
@@ -673,9 +815,10 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     const setupAudioContext = async () => {
         try {
             await Tone.start();
-            console.debug("Audio context started");
         } catch (e) {
-            console.debug("Error starting audio context:", e);
+            // Tone.start() may fail if the user has not interacted with the page yet
+            // or if the audio context is already running. We can safely ignore this.
+            console.debug("Tone.start() skipped or failed", e);
         }
     };
 
@@ -701,20 +844,31 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     };
 
     for (let i = 0; i < noteValues.length; i++) {
-        block._pitchWheel.navItems[i].navigateFunction = __previewWrapper;
+        block._pitchWheel.navItems[i].navigateFunction = async () => {
+            __selectionChangedSolfege();
+            await __previewWrapper();
+        };
     }
 
     if (!custom) {
         for (let i = 0; i < accidentals.length; i++) {
-            block._accidentalsWheel.navItems[i].navigateFunction = __previewWrapper;
+            block._accidentalsWheel.navItems[i].navigateFunction = async () => {
+                __selectionChangedAccidental();
+                await __previewWrapper();
+            };
         }
     }
 
     if (hasOctaveWheel) {
         for (let i = 0; i < 8; i++) {
-            block._octavesWheel.navItems[i].navigateFunction = __previewWrapper;
+            block._octavesWheel.navItems[i].navigateFunction = async () => {
+                __selectionChangedOctave();
+                await __previewWrapper();
+            };
         }
     }
+
+    enableWheelScroll(block._pitchWheel, noteLabels.length);
 
     // Hide the widget when the exit button is clicked.
     block._exitWheel.navItems[0].navigateFunction = () => {
@@ -726,14 +880,17 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                 : "";
 
         // Update the block's displayed text with the note and accidental
+        const i = that._pitchWheel.selectedNavItemIndex;
+        const selectedNoteValue = noteValues[i];
+
         if (selectedAccidental === "♮" || selectedAccidental === "") {
             // Natural or no accidental: display only the note
             that.text.text = selectedNote;
-            that.value = selectedNote;
+            that.value = selectedNoteValue;
         } else {
             // Combine note and accidental for display
             that.text.text = selectedNote + selectedAccidental;
-            that.value = selectedNote + selectedAccidental;
+            that.value = selectedNoteValue + selectedAccidental;
         }
 
         // Ensure proper layering of the text element
@@ -753,6 +910,16 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     };
 };
 
+/**
+ * Builds the custom temperament pie menu with an optional octave wheel.
+ *
+ * @param {Object} block Block instance invoking the menu
+ * @param {Object} noteLabels Custom note label map keyed by temperament
+ * @param {string[]} customLabels Identifiers for available custom sets
+ * @param {string} selectedCustom Currently selected custom set key
+ * @param {number|string} selectedNote Currently selected note within the set
+ * @returns {void}
+ */
 const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, selectedNote) => {
     // pie menu for customNote selection
     if (block.blocks.stageClick) {
@@ -906,6 +1073,9 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
+
+    // Avoid auto-selecting the close button on open.
 
     const that = block;
 
@@ -1080,6 +1250,14 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     block._exitWheel.navItems[0].navigateFunction = __exitMenu;
 };
 
+/**
+ * Builds the scale-degree (nth modal pitch) pie menu.
+ *
+ * @param {Object} block Block instance invoking the menu
+ * @param {number[]} noteValues Scale degree values to display
+ * @param {number} note Currently selected degree (rounded if fractional)
+ * @returns {void}
+ */
 const piemenuNthModalPitch = (block, noteValues, note) => {
     // wheelNav pie menu for scale degree pitch selection
 
@@ -1102,7 +1280,8 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
 
     docById("wheelDiv").style.display = "";
 
-    block._pitchWheel = new wheelnav("wheelDiv", null, 600, 600);
+    const wheelSize = getPieMenuSize(block);
+    block._pitchWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
     block._octavesWheel = new wheelnav("_octavesWheel", block._pitchWheel.raphael);
     block._exitWheel = new wheelnav("_exitWheel", block._pitchWheel.raphael);
 
@@ -1136,6 +1315,7 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     block._octavesWheel.colors = platformColor.octavesWheelcolors;
     block._octavesWheel.slicePathFunction = slicePath().DonutSlice;
@@ -1180,6 +1360,7 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
 
     docById("wheelDiv").style.position = "absolute";
     setWheelSize(300);
+    const halfWheelSize = wheelSize / 2;
 
     const selectorWidth = 150;
     const left = Math.round(
@@ -1261,14 +1442,18 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
         /* We're using a default of C major ==> -7 to -1 should be one octave lower
            than the reference, 0-6 in the same octave and 7 should be once octave higher
         */
-        let deltaOctave = 0;
-        if (noteLabels[i] == 7) {
-            deltaOctave = 1;
-        } else if (noteLabels[i] < 0) {
-            deltaOctave = -1;
+        let deltaOctave;
+        let note;
+
+        // Use C major as of now; fix block to use current keySignature once that feature is in place
+        const keySignature =
+            block.activity.KeySignatureEnv[0] + " " + block.activity.KeySignatureEnv[1];
+        if (noteValues[i] >= 0) {
+            [note, deltaOctave] = nthDegreeToPitch(keySignature, noteValues[i]);
+        } else {
+            [note, deltaOctave] = nthDegreeToPitch(keySignature, 7 + noteValues[i]);
         }
 
-        // prevPitch = i;
         let octave = Number(
             that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
         );
@@ -1277,17 +1462,6 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
             octave = 1;
         } else if (octave > 8) {
             octave = 8;
-        }
-
-        let note;
-
-        // Use C major as of now; fix block to use current keySignature once that feature is in place
-        const keySignature =
-            block.activity.KeySignatureEnv[0] + " " + block.activity.KeySignatureEnv[1];
-        if (noteValues[i] >= 0) {
-            note = nthDegreeToPitch(keySignature, noteValues[i]);
-        } else {
-            note = nthDegreeToPitch(keySignature, 7 + noteValues[i]);
         }
 
         const tur = that.activity.turtles.ithTurtle(0);
@@ -1338,6 +1512,15 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
     };
 };
 
+/**
+ * Builds the accidental selection pie menu.
+ *
+ * @param {Object} block Block instance invoking the menu
+ * @param {string[]} accidentalLabels Display labels for accidentals
+ * @param {Array} accidentalValues Values mapped to labels
+ * @param {*} accidental Currently selected accidental
+ * @returns {void}
+ */
 const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidental) => {
     // wheelNav pie menu for accidental selection
 
@@ -1348,7 +1531,8 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
     docById("wheelDiv").style.display = "";
 
     // the accidental selector
-    block._accidentalWheel = new wheelnav("wheelDiv", null, 600, 600);
+    const wheelSize = getPieMenuSize(block);
+    block._accidentalWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
     // exit button
     block._exitWheel = new wheelnav("_exitWheel", block._accidentalWheel.raphael);
 
@@ -1390,6 +1574,7 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -1471,6 +1656,13 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
     };
 };
 
+/**
+ * Builds the note duration pie menu and its sub-wheel options.
+ *
+ * @param {Object} block Block instance invoking the menu
+ * @param {number} noteValue Currently selected duration value
+ * @returns {void}
+ */
 const piemenuNoteValue = (block, noteValue) => {
     // input form and  wheelNav pie menu for note value selection
 
@@ -1507,7 +1699,8 @@ const piemenuNoteValue = (block, noteValue) => {
     }
 
     // the noteValue selector
-    block._noteValueWheel = new wheelnav("wheelDiv", null, 600, 600);
+    const wheelSize = getPieMenuSize(block);
+    block._noteValueWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
     // exit button
     block._exitWheel = new wheelnav("_exitWheel", block._noteValueWheel.raphael);
     // submenu wheel
@@ -1548,6 +1741,7 @@ const piemenuNoteValue = (block, noteValue) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const tabsLabels = [];
     for (let i = 0; i < WHEELVALUES.length; i++) {
@@ -1621,7 +1815,7 @@ const piemenuNoteValue = (block, noteValue) => {
 
     docById("wheelDiv").style.position = "absolute";
     setWheelSize(300);
-
+    const halfWheelSize = wheelSize / 2;
     const selectorWidth = 150;
     const left = Math.round(
         (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
@@ -1634,13 +1828,13 @@ const piemenuNoteValue = (block, noteValue) => {
 
     docById("wheelDiv").style.left =
         Math.min(
-            Math.max(left - (300 - selectorWidth) / 2, 0),
-            block.blocks.turtles._canvas.width - 300
+            Math.max(left - (halfWheelSize - selectorWidth / 2), 0),
+            block.blocks.turtles._canvas.width - wheelSize
         ) + "px";
-    if (top - 300 < 0) {
+    if (top - wheelSize < 0) {
         docById("wheelDiv").style.top = top + 40 + "px";
     } else {
-        docById("wheelDiv").style.top = top - 300 + "px";
+        docById("wheelDiv").style.top = top - wheelSize + "px";
     }
 
     block.label.style.width =
@@ -1711,6 +1905,14 @@ const piemenuNoteValue = (block, noteValue) => {
     };
 };
 
+/**
+ * Builds the numeric value pie menu and synchronizes the selected value.
+ *
+ * @param {Object} block Block instance invoking the menu
+ * @param {number[]} wheelValues Values to show on the wheel
+ * @param {number} selectedValue Currently selected value
+ * @returns {void}
+ */
 const piemenuNumber = (block, wheelValues, selectedValue) => {
     // input form and  wheelNav pie menu for number selection
     if (block.blocks.stageClick) {
@@ -1718,7 +1920,8 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     }
     docById("wheelDiv").style.display = "";
     // the number selector
-    block._numberWheel = new wheelnav("wheelDiv", null, 600, 600);
+    const wheelSize = getPieMenuSize(block);
+    block._numberWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
     // exit button
     block._exitWheel = new wheelnav("_exitWheel", block._numberWheel.raphael);
     const wheelLabels = [];
@@ -1807,6 +2010,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     block._exitWheel.navItems[2].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[2].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -1906,26 +2110,44 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         __exitMenu();
     };
     block._exitWheel.navItems[1].navigateFunction = () => {
-        const cblk1 = that.connections[0];
-        const cblk2 = that.blocks.blockList[cblk1]?.connections[0];
-        // Decrease the value but ensure it does not go below 1
-        if (that.value > 1) {
-            that.value -= 1;
+        const index = wheelValues.indexOf(that.value);
+        if (index === -1) return;
+
+        const isAscending = wheelValues[0] < wheelValues[wheelValues.length - 1];
+
+        if (isAscending) {
+            if (index > 0) {
+                that.value = wheelValues[index - 1];
+            }
+        } else {
+            if (index < wheelValues.length - 1) {
+                that.value = wheelValues[index + 1];
+            }
         }
+
         that.text.text = that.value.toString();
-        // Make sure text is on top.
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
         that.label.value = that.value;
     };
+
     block._exitWheel.navItems[2].navigateFunction = () => {
-        const cblk = that.connections[0];
-        // Increase the value but ensure it does not exceed 8
-        if (that.value < 8) {
-            that.value += 1;
+        const index = wheelValues.indexOf(that.value);
+        if (index === -1) return;
+
+        const isAscending = wheelValues[0] < wheelValues[wheelValues.length - 1];
+
+        if (isAscending) {
+            if (index < wheelValues.length - 1) {
+                that.value = wheelValues[index + 1];
+            }
+        } else {
+            if (index > 0) {
+                that.value = wheelValues[index - 1];
+            }
         }
+
         that.text.text = that.value.toString();
-        // Make sure text is on top.
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
         that.label.value = that.value;
@@ -2008,6 +2230,15 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     }
 };
 
+/**
+ * Builds the color-selection pie menu for turtle and paint blocks.
+ *
+ * @param {Object} block Block instance invoking the menu
+ * @param {number[]} wheelValues Numeric values mapped to colors
+ * @param {number} selectedValue Currently selected value
+ * @param {string} mode Color mode (e.g. setcolor, setturtlecolor, sethue)
+ * @returns {void}
+ */
 const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     // input form and  wheelNav pie menu for setcolor selection
 
@@ -2018,7 +2249,8 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     docById("wheelDiv").style.display = "";
 
     // the number selector
-    block._numberWheel = new wheelnav("wheelDiv", null, 600, 600);
+    const wheelSize = getPieMenuSize(block);
+    block._numberWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
     // exit button
     block._exitWheel = new wheelnav("_exitWheel", block._numberWheel.raphael);
 
@@ -2086,6 +2318,7 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -2179,6 +2412,16 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     };
 };
 
+/**
+ * Builds a generic pie menu with arbitrary labels and values.
+ *
+ * @param {Object} block Block instance invoking the menu
+ * @param {Array} menuLabels Labels rendered on the wheel
+ * @param {Array} menuValues Values corresponding to each label
+ * @param {*} selectedValue Currently selected value
+ * @param {Array} [colors] Optional override colors for the wheel
+ * @returns {void}
+ */
 const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     // basic wheelNav pie menu
 
@@ -2243,6 +2486,7 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -2321,6 +2565,15 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     };
 };
 
+/**
+ * Builds the boolean selection pie menu.
+ *
+ * @param {Object} block Block instance invoking the menu
+ * @param {string[]} booleanLabels Display labels for each option
+ * @param {boolean[]} booleanValues Values mapped to each label
+ * @param {boolean} boolean Currently selected value
+ * @returns {void}
+ */
 const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
     // wheelNav pie menu for boolean selection
 
@@ -2331,7 +2584,8 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
     docById("wheelDiv").style.display = "";
 
     // the boolean selector
-    block._booleanWheel = new wheelnav("wheelDiv", null, 600, 600);
+    const wheelSize = getPieMenuSize(block);
+    block._booleanWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
 
     const labels = [];
     for (let i = 0; i < booleanLabels.length; i++) {
@@ -2424,6 +2678,13 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
     };
 };
 
+/**
+ * Builds the chord selection pie menu.
+ *
+ * @param {Object} block Block instance invoking the menu
+ * @param {string} selectedChord Currently selected chord label
+ * @returns {void}
+ */
 const piemenuChords = (block, selectedChord) => {
     // wheelNav pie menu for chord selection
 
@@ -2481,6 +2742,7 @@ const piemenuChords = (block, selectedChord) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -2539,6 +2801,9 @@ const piemenuChords = (block, selectedChord) => {
 
     block._chordWheel.navigateWheel(i);
 
+    // Enable scroll-to-rotate
+    enableWheelScroll(block._chordWheel, chordLabels.length);
+
     // Hide the widget when the selection is made.
     for (let i = 0; i < chordLabels.length; i++) {
         block._chordWheel.navItems[i].navigateFunction = () => {
@@ -2552,6 +2817,17 @@ const piemenuChords = (block, selectedChord) => {
     };
 };
 
+/**
+ * Builds the voice/instrument selection pie menu.
+ *
+ * @param {Object} block Block instance invoking the menu
+ * @param {string[]} voiceLabels Labels shown in the wheel
+ * @param {Array} voiceValues Values mapped to labels
+ * @param {number[]} categories Category indices for color grouping
+ * @param {*} voice Currently selected voice value
+ * @param {number} [rotate] Optional title rotation angle
+ * @returns {void}
+ */
 const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotate) => {
     // wheelNav pie menu for voice selection
 
@@ -2622,6 +2898,7 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -2715,6 +2992,9 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
 
     block._voiceWheel.navigateWheel(i);
 
+    // Enable scroll-to-rotate
+    enableWheelScroll(block._voiceWheel, voiceLabels.length);
+
     // Set up handlers for voice preview.
     for (let i = 0; i < voiceValues.length; i++) {
         block._voiceWheel.navItems[i].navigateFunction = __voicePreview;
@@ -2727,6 +3007,12 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
     };
 };
 
+/**
+ * Builds the interval selection pie menu.
+ * @param {Object} block Block instance invoking the menu
+ * @param {string} selectedInterval Currently selected interval value
+ * @returns {void}
+ */
 const piemenuIntervals = (block, selectedInterval) => {
     // pie menu for interval selection
 
@@ -2808,6 +3094,7 @@ const piemenuIntervals = (block, selectedInterval) => {
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -2844,7 +3131,7 @@ const piemenuIntervals = (block, selectedInterval) => {
         ) + "px";
 
     // Add function to each main menu for show/hide sub menus
-    // FIXME: Add all tabs to each interval
+    // TODO: Add all tabs to each interval
     const __setupAction = (i, activeTabs) => {
         that._intervalNameWheel.navItems[i].navigateFunction = () => {
             for (let l = 0; l < labels.length; l++) {
@@ -2881,6 +3168,9 @@ const piemenuIntervals = (block, selectedInterval) => {
     }
 
     block._intervalNameWheel.navigateWheel(i);
+
+    // Enable scroll-to-rotate
+    enableWheelScroll(block._intervalNameWheel, labels.length);
 
     const j = Number(obj[1]);
     if (INTERVALS[i][2].includes(j)) {
@@ -2949,6 +3239,13 @@ const piemenuIntervals = (block, selectedInterval) => {
     block._exitWheel.navItems[0].navigateFunction = __exitMenu;
 };
 
+/**
+ * Builds the musical mode selection pie menu.
+ *
+ * @param {Object} block Block instance invoking the menu
+ * @param {string} selectedMode Currently selected mode value
+ * @returns {void}
+ */
 const piemenuModes = (block, selectedMode) => {
     // pie menu for mode selection
 
@@ -3038,6 +3335,7 @@ const piemenuModes = (block, selectedMode) => {
     block._exitWheel.navItems[1].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[1].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+    configureExitWheel(block._exitWheel);
 
     const that = block;
 
@@ -3278,15 +3576,18 @@ const piemenuModes = (block, selectedMode) => {
         docById("wheelnav-_exitWheel-title-1").style.fill = "#ffffff";
         docById("wheelnav-_exitWheel-title-1").style.pointerEvents = "none";
         docById("wheelnav-_exitWheel-slice-1").style.pointerEvents = "none";
-        setTimeout(() => {
-            const playButtonTitle = docById("wheelnav-_exitWheel-title-1");
-            const playButtonSlice = docById("wheelnav-_exitWheel-slice-1");
-            if (playButtonTitle && playButtonSlice) {
-                playButtonTitle.style.fill = "#000000";
-                playButtonTitle.style.pointerEvents = "auto";
-                playButtonSlice.style.pointerEvents = "auto";
-            }
-        }, (20 * 1000) / 10);
+        setTimeout(
+            () => {
+                const playButtonTitle = docById("wheelnav-_exitWheel-title-1");
+                const playButtonSlice = docById("wheelnav-_exitWheel-slice-1");
+                if (playButtonTitle && playButtonSlice) {
+                    playButtonTitle.style.fill = "#000000";
+                    playButtonTitle.style.pointerEvents = "auto";
+                    playButtonSlice.style.pointerEvents = "auto";
+                }
+            },
+            (20 * 1000) / 10
+        );
 
         __playScale(activeTabs, 0);
     };
@@ -3381,7 +3682,7 @@ const piemenuBlockContext = block => {
     let pasteDy = 0;
 
     const that = block;
-    const blockBlock = block.blocks.blockList.indexOf(block);
+    const blockBlock = block.blockIndex;
 
     // Position the widget centered over the active block.
     docById("contextWheelDiv").style.position = "absolute";
@@ -3504,7 +3805,7 @@ const piemenuBlockContext = block => {
         that.blocks.sendStackToTrash(that.blocks.blockList[blockBlock]);
         docById("contextWheelDiv").style.display = "none";
         // prompting a notification on deleting any block
-        activity.textMsg(
+        that.activity.textMsg(
             _("You can restore deleted blocks from the trash with the Restore From Trash button."),
             3000
         );
@@ -3514,13 +3815,22 @@ const piemenuBlockContext = block => {
         docById("contextWheelDiv").style.display = "none";
     };
 
-    document.body.addEventListener("click", event => {
+    // Use a named handler stored globally so we can remove the previous one
+    // before adding a new one, preventing accumulation of click listeners.
+    if (window._contextWheelClickHandler) {
+        document.body.removeEventListener("click", window._contextWheelClickHandler);
+    }
+
+    window._contextWheelClickHandler = event => {
         const wheelElement = document.getElementById("contextWheelDiv");
         const displayStyle = window.getComputedStyle(wheelElement).display;
         if (displayStyle === "block") {
             wheelElement.style.display = "none";
+            document.body.removeEventListener("click", window._contextWheelClickHandler);
         }
-    });
+    };
+
+    document.body.addEventListener("click", window._contextWheelClickHandler);
 
     if (
         ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].includes(
@@ -3649,6 +3959,7 @@ const piemenuGrid = activity => {
     activity.turtles._exitWheel.sliceInitPathCustom = activity.turtles._exitWheel.slicePathCustom;
     activity.turtles._exitWheel.clickModeRotate = false;
     activity.turtles._exitWheel.createWheel(["×", " "]);
+    configureExitWheel(activity.turtles._exitWheel);
 
     activity.turtles._exitWheel.navItems[0].navigateFunction = () => {
         hidePiemenu(activity);
@@ -3759,6 +4070,7 @@ const piemenuKey = activity => {
     exitWheel.colors = platformColor.exitWheelcolors;
     exitWheel.animatetime = 0;
     exitWheel.createWheel(["×", " "]);
+    configureExitWheel(exitWheel);
 
     const x = event.clientX;
     const y = event.clientY;
@@ -4016,4 +4328,144 @@ const piemenuKey = activity => {
     if (j !== -1) {
         modenameWheel.navigateWheel(j);
     }
+};
+
+/**
+ * Shows a pie menu for selecting the rhythm dissect number.
+ * Displays different options based on beginner mode.
+ * @param {Object} widget - The widget instance (RhythmRuler).
+ * @returns {void}
+ */
+const piemenuDissectNumber = widget => {
+    // Use activity.beginnerMode as the global beginnerMode variable references the DOM element
+    const isBeginnerMode = widget.activity.beginnerMode;
+
+    // Determine wheel values based on beginner mode
+    const wheelValues = isBeginnerMode ? [2, 3, 4] : [2, 3, 4, 5, 7];
+
+    const currentValue = parseInt(widget._dissectNumber.value) || 2;
+
+    // Show the wheel div
+    docById("wheelDiv").style.display = "";
+
+    // Create the number wheel
+    const wheelSize = getPieMenuSize({ blocks: widget.activity.logo.blocks });
+    const numberWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
+    const exitWheel = new wheelnav("_exitWheel", numberWheel.raphael);
+
+    // Prepare labels with spacer
+    const wheelLabels = wheelValues.map(v => v.toString());
+    wheelLabels.push(null); // spacer
+
+    wheelnav.cssMode = true;
+    numberWheel.keynavigateEnabled = false;
+    numberWheel.colors = platformColor.numberWheelcolors;
+    numberWheel.slicePathFunction = slicePath().DonutSlice;
+    numberWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+    numberWheel.slicePathCustom.minRadiusPercent = 0.2;
+    numberWheel.slicePathCustom.maxRadiusPercent = 0.6;
+    numberWheel.sliceSelectedPathCustom = numberWheel.slicePathCustom;
+    numberWheel.sliceInitPathCustom = numberWheel.slicePathCustom;
+    numberWheel.animatetime = 0;
+    numberWheel.createWheel(wheelLabels);
+
+    // Create exit wheel with close, minus, and plus buttons
+    exitWheel.colors = platformColor.exitWheelcolors2;
+    exitWheel.slicePathFunction = slicePath().DonutSlice;
+    exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+    exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+    exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+    exitWheel.sliceSelectedPathCustom = exitWheel.slicePathCustom;
+    exitWheel.sliceInitPathCustom = exitWheel.slicePathCustom;
+    exitWheel.clickModeRotate = false;
+    exitWheel.initWheel(["×", "-", "+"]); // Close, minus, plus
+    exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
+    exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
+    exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
+    exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
+    exitWheel.navItems[1].sliceSelectedAttr.cursor = "pointer";
+    exitWheel.navItems[1].sliceHoverAttr.cursor = "pointer";
+    exitWheel.navItems[1].titleSelectedAttr.cursor = "pointer";
+    exitWheel.navItems[1].titleHoverAttr.cursor = "pointer";
+    exitWheel.navItems[2].sliceSelectedAttr.cursor = "pointer";
+    exitWheel.navItems[2].sliceHoverAttr.cursor = "pointer";
+    exitWheel.navItems[2].titleSelectedAttr.cursor = "pointer";
+    exitWheel.navItems[2].titleHoverAttr.cursor = "pointer";
+    exitWheel.createWheel();
+    configureExitWheel(exitWheel);
+
+    // Handle selection
+    const __selectionChanged = () => {
+        const selectedIndex = numberWheel.selectedNavItemIndex;
+        const newValue = wheelValues[selectedIndex];
+        widget._dissectNumber.value = newValue;
+    };
+
+    // Handle exit
+    const __exitMenu = () => {
+        docById("wheelDiv").style.display = "none";
+        numberWheel.removeWheel();
+        exitWheel.removeWheel();
+    };
+
+    // Get button position for positioning the pie menu
+    const buttonRect = widget._dissectNumber.getBoundingClientRect();
+    const canvasLeft = widget.activity.canvas.offsetLeft + 28;
+    const canvasTop = widget.activity.canvas.offsetTop + 6;
+
+    // Position the wheel
+    docById("wheelDiv").style.position = "absolute";
+    setWheelSize(300);
+
+    const left = Math.round(buttonRect.left - canvasLeft);
+    const top = Math.round(buttonRect.top - canvasTop);
+
+    // Position to the left of the button as shown in user image
+    // left - 300 (wheel size) - 10px padding
+    // top + half button height - 150 (half wheel size) for vertical centering
+    docById("wheelDiv").style.left = Math.max(0, left - 300 - 10) + "px";
+    docById("wheelDiv").style.top = Math.max(0, top + buttonRect.height / 2 - 150) + "px";
+
+    // Navigate to current value
+    const currentIndex = wheelValues.indexOf(currentValue);
+    if (currentIndex !== -1) {
+        numberWheel.navigateWheel(currentIndex);
+    }
+
+    // Set up click handlers for number selections
+    for (let i = 0; i < wheelValues.length; i++) {
+        numberWheel.navItems[i].navigateFunction = () => {
+            __selectionChanged();
+            __exitMenu();
+        };
+    }
+
+    // Set up exit button (×)
+    exitWheel.navItems[0].navigateFunction = () => {
+        __exitMenu();
+    };
+
+    // Set up decrement button (-)
+    exitWheel.navItems[1].navigateFunction = () => {
+        const currentVal = parseInt(widget._dissectNumber.value);
+        const currentIdx = wheelValues.indexOf(currentVal);
+
+        // Move to previous value in the array, or stay at first
+        if (currentIdx > 0) {
+            const newValue = wheelValues[currentIdx - 1];
+            widget._dissectNumber.value = newValue;
+        }
+    };
+
+    // Set up increment button (+)
+    exitWheel.navItems[2].navigateFunction = () => {
+        const currentVal = parseInt(widget._dissectNumber.value);
+        const currentIdx = wheelValues.indexOf(currentVal);
+
+        // Move to next value in the array, or stay at last
+        if (currentIdx < wheelValues.length - 1) {
+            const newValue = wheelValues[currentIdx + 1];
+            widget._dissectNumber.value = newValue;
+        }
+    };
 };

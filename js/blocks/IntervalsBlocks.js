@@ -292,10 +292,13 @@ function setupIntervalsBlocks(activity) {
          * @returns {*} - The argument for the IntervalNumber block.
          */
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId != null &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "intervalnumber"]);
             } else {
@@ -347,10 +350,13 @@ function setupIntervalsBlocks(activity) {
          * @returns {*} - The argument for the CurrentInterval block.
          */
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId != null &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "currentinterval"]);
             } else {
@@ -420,6 +426,8 @@ function setupIntervalsBlocks(activity) {
             const saveCanvasAlpha = tur.painter.canvasAlpha;
             const saveOrientation = tur.orientation;
             const savePenState = tur.painter.penState;
+            const previousButNotThese = tur.butNotThese;
+            tur.butNotThese = JSON.parse(JSON.stringify(tur.butNotThese));
 
             tur.singer.suppressOutput = true;
             tur.singer.justCounting.push(true);
@@ -473,8 +481,7 @@ function setupIntervalsBlocks(activity) {
             tur.singer.justMeasuring.pop();
             tur.singer.suppressOutput = saveSuppressStatus;
 
-            // Handle cascading
-            tur.butNotThese = {};
+            tur.butNotThese = previousButNotThese;
 
             return distance;
         }
@@ -537,6 +544,8 @@ function setupIntervalsBlocks(activity) {
             const saveCanvasAlpha = tur.painter.canvasAlpha;
             const saveOrientation = tur.orientation;
             const savePenState = tur.painter.penState;
+            const previousButNotThese = tur.butNotThese;
+            tur.butNotThese = JSON.parse(JSON.stringify(tur.butNotThese));
 
             tur.singer.suppressOutput = true;
 
@@ -591,8 +600,7 @@ function setupIntervalsBlocks(activity) {
             tur.singer.justMeasuring.pop();
             tur.singer.suppressOutput = saveSuppressStatus;
 
-            // FIXME: we need to handle cascading.
-            tur.butNotThese = {};
+            tur.butNotThese = previousButNotThese;
             return distance;
         }
     }
@@ -667,31 +675,8 @@ function setupIntervalsBlocks(activity) {
             this.setPalette("intervals", activity);
             // Values for the piemenu (circle menu) representing semi-tone intervals.
             this.piemenuValuesC1 = [
-                -12,
-                -11,
-                -10,
-                -9,
-                -8,
-                -7,
-                -6,
-                -5,
-                -4,
-                -3,
-                -2,
-                -1,
-                0,
-                1,
-                2,
-                3,
-                4,
-                5,
-                6,
-                7,
-                8,
-                9,
-                10,
-                11,
-                12
+                -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                11, 12
             ];
             this.setHelpString([
                 _(
@@ -798,7 +783,7 @@ function setupIntervalsBlocks(activity) {
             }
 
             // Queue each block in the clamp.
-            const listenerName = "_duplicate_" + turtle;
+            const listenerName = "_duplicate_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __lookForOtherTurtles = function (blk, turtle) {
@@ -817,45 +802,76 @@ function setupIntervalsBlocks(activity) {
 
             tur.singer.inDuplicate = true;
 
-            // eslint-disable-next-line no-unused-vars
-            const __listener = event => {
+            /**
+             * Acquires the connectionStoreLock with proper waiting.
+             * Uses a polling mechanism to wait for the lock to be released.
+             * @param {number} maxRetries - Maximum number of retry attempts
+             * @param {number} retryInterval - Milliseconds between retries
+             * @returns {Promise<boolean>} - Resolves to true when lock is acquired
+             */
+            const __acquireLock = (maxRetries = 100, retryInterval = 10) => {
+                return new Promise(resolve => {
+                    let retries = 0;
+                    const tryAcquire = () => {
+                        if (!logo.connectionStoreLock) {
+                            logo.connectionStoreLock = true;
+                            resolve(true);
+                        } else if (retries < maxRetries) {
+                            retries++;
+                            setTimeout(tryAcquire, retryInterval);
+                        } else {
+                            // Force acquire after max retries to prevent deadlock
+                            console.warn(
+                                "connectionStoreLock: Max retries reached, forcing lock acquisition"
+                            );
+                            logo.connectionStoreLock = true;
+                            resolve(true);
+                        }
+                    };
+                    tryAcquire();
+                });
+            };
+
+            const __listener = async event => {
                 tur.singer.inDuplicate = false;
                 tur.singer.duplicateFactor /= factor;
                 tur.singer.arpeggio = [];
-                // Check for a race condition.
-                // FIXME: Do something about the race condition.
-                if (logo.connectionStoreLock) {
-                    // eslint-disable-next-line no-console
-                    console.debug("LOCKED");
-                }
 
-                logo.connectionStoreLock = true;
+                // Acquire lock with proper waiting
+                await __acquireLock();
 
-                // The last turtle should restore the broken connections.
-                if (__lookForOtherTurtles(blk, turtle) === null) {
-                    const n = logo.connectionStore[turtle][blk].length;
-                    for (let i = 0; i < n; i++) {
-                        const obj = logo.connectionStore[turtle][blk].pop();
-                        activity.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
-                        if (obj[2] != null) {
-                            activity.blocks.blockList[obj[2]].connections[0] = obj[0];
+                try {
+                    // The last turtle should restore the broken connections.
+                    if (__lookForOtherTurtles(blk, turtle) === null) {
+                        const n = logo.connectionStore[turtle][blk].length;
+                        for (let i = 0; i < n; i++) {
+                            const obj = logo.connectionStore[turtle][blk].pop();
+                            activity.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
+                            if (obj[2] != null) {
+                                activity.blocks.blockList[obj[2]].connections[0] = obj[0];
+                            }
                         }
+                    } else {
+                        delete logo.connectionStore[turtle][blk];
                     }
-                } else {
-                    delete logo.connectionStore[turtle][blk];
+                } finally {
+                    logo.connectionStoreLock = false;
                 }
-                logo.connectionStoreLock = false;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
 
-            // Test for race condition.
-            // FIXME: Do something about the race condition.
-            if (logo.connectionStoreLock) {
-                // eslint-disable-next-line no-console
-                console.debug("LOCKED");
+            // Acquire lock synchronously for the main flow
+            // Note: This section runs synchronously, so we use a simple spin-wait
+            // with a maximum iteration count to prevent infinite loops
+            let lockAttempts = 0;
+            const maxLockAttempts = 1000;
+            while (logo.connectionStoreLock && lockAttempts < maxLockAttempts) {
+                lockAttempts++;
             }
-
+            if (lockAttempts >= maxLockAttempts) {
+                console.warn("connectionStoreLock: Max attempts reached in ArpeggioBlock flow");
+            }
             logo.connectionStoreLock = true;
 
             // Check to see if another turtle has already disconnected these blocks
@@ -1034,7 +1050,6 @@ function setupIntervalsBlocks(activity) {
                 if (intervalName in INTERVALVALUES) {
                     r = INTERVALVALUES[intervalName][2];
                 } else {
-                    // eslint-disable-next-line no-console
                     console.log("could not find " + intervalName + " in INTERVALVALUES");
                     r = 1;
                 }
@@ -1042,7 +1057,7 @@ function setupIntervalsBlocks(activity) {
 
             if (isNaN(r) || r < 0) {
                 r = 1;
-                // eslint-disable-next-line no-console
+
                 console.debug("ratio " + r + " must be a number > 0");
             }
             Singer.IntervalsActions.setRatioInterval(r, turtle, blk);
@@ -1264,10 +1279,13 @@ function setupIntervalsBlocks(activity) {
          * @returns {any} - The argument value.
          */
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId != null &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "modelength"]);
             } else {
@@ -1317,10 +1335,13 @@ function setupIntervalsBlocks(activity) {
          * @returns {any} - The argument value.
          */
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId != null &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "currentmode"]);
             } else {
@@ -1370,10 +1391,13 @@ function setupIntervalsBlocks(activity) {
          * @returns {any} - The argument value.
          */
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId != null &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "key"]);
             } else {
@@ -1531,4 +1555,7 @@ function setupIntervalsBlocks(activity) {
     new KeyBlock().setup(activity);
     new SetKeyBlock().setup(activity);
     new SetKey2Block().setup(activity);
+}
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = setupIntervalsBlocks;
 }

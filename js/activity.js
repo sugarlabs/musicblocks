@@ -15,10 +15,11 @@
 // scratch. -- Walter Bender, October 2014.
 
 /*
-   globals
+   global
 
-   _, ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON,
-   Blocks, Boundary, CARTESIAN, changeImage, closeWidgets,
+   ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON,
+   ActivityContext,
+   Boundary, CARTESIAN, changeImage, closeWidgets,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
    DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
@@ -26,18 +27,21 @@
    getMacroExpansion, getOctaveRatio, getTemperament, transcribeMidi,
    GOHOMEBUTTON, GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
    hideDOMLabel, initBasicProtoBlocks, initPalettes,
-   INLINECOLLAPSIBLES, jQuery, JSEditor, LanguageBox, ThemeBox, Logo, MSGBLOCK,
+   INLINECOLLAPSIBLES, JSEditor, LanguageBox, ThemeBox, MSGBLOCK,
    NANERRORMSG, NOACTIONERRORMSG, NOBOXERRORMSG, NOINPUTERRORMSG,
    NOMICERRORMSG, NOSQRTERRORMSG, NOSTRINGERRORMSG, PALETTEFILLCOLORS,
    PALETTESTROKECOLORS, PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
    Palettes, PasteBox, PlanetInterface, platform, platformColor,
    piemenuKey, POLAR, preparePluginExports, processMacroData,
-   processPluginData, processRawPluginData, require, SaveInterface,
+   processPluginData, processRawPluginData, SaveInterface,
    SHOWBLOCKSBUTTON, SMALLERBUTTON, SMALLERDISABLEBUTTON, SOPRANO,
    SPECIALINPUTS, STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
-   TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, Turtles, TURTLESVG,
+   TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, TURTLESVG,
    updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_F,
-   SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator
+   SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
+   MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
+   base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
+   SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS
  */
 
 /*
@@ -54,23 +58,31 @@ const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 const _ERRORMSGTIMEOUT_ = 15000;
 const _MSGTIMEOUT_ = 60000;
 
+// Responsive breakpoint constants
+const RESPONSIVE_BREAKPOINT_TABLET = 768;
+const RESPONSIVE_BREAKPOINT_MOBILE = 600;
+
 let MYDEFINES = [
     "utils/platformstyle",
     "easeljs.min",
     "tweenjs.min",
     "preloadjs.min",
     "howler",
-    "p5.min",
-    "p5.sound.min",
-    "p5.dom.min",
-    // 'mespeak',
-    "Chart",
+    // p5.min, p5-sound-adapter, and p5.dom.min are NOT loaded eagerly.
+    // They are only needed by the JS-export feature and will be loaded
+    // on demand via require() when that feature is used, saving ~10-15 MB
+    // of heap memory on every page load.
+    // "p5.min",
+    // "p5-sound-adapter",
+    // "p5.dom.min",
+    // Chart.js is only used by the statistics widget and will be loaded
+    // on demand when the widget is opened, saving ~3-5 MB of heap memory.
+    // "Chart",
     "utils/utils",
     "activity/artwork",
     "widgets/status",
     "widgets/help",
     "utils/munsell",
-    "activity/gif-animator",
     "activity/toolbar",
     "activity/trash",
     "activity/boundary",
@@ -97,6 +109,7 @@ let MYDEFINES = [
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
+    "utils/performanceTracker",
     "activity/pastebox",
     "prefixfree.min",
     "Tone",
@@ -160,6 +173,10 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
     const MUSICBLOCKS_EXTRAS = [
         "widgets/modewidget",
         "widgets/meterwidget",
+        "widgets/PhraseMakerUtils",
+        "widgets/PhraseMakerGrid",
+        "widgets/PhraseMakerUI",
+        "widgets/PhraseMakerAudio",
         "widgets/phrasemaker",
         "widgets/arpeggio",
         "widgets/aiwidget",
@@ -184,8 +201,11 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
     MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
 }
 
-// Create a global variable from the Activity obj to provide access to
-// blocks, logo, palettes, and turtles for plugins and js-export.
+// Module-scoped singleton reference to the active Activity instance.
+// • Used by plugins (weather.rtp, etc.) that are eval()'d inside this module's
+//   closure scope and therefore can close over `globalActivity` directly.
+// • External modules (synthutils, etc.) should use ActivityContext.getActivity()
+//   instead of reaching through window.* globals.
 let globalActivity;
 
 /**
@@ -199,12 +219,22 @@ const doAnalyzeProject = function () {
 /**
  * Represents an activity in the application.
  */
+
 class Activity {
     /**
      * Creates an Activity instance.
      */
     constructor() {
         globalActivity = this;
+
+        // Register with ActivityContext – the single authority for the Activity singleton.
+        // activity-context.js is declared as a RequireJS dep of this module (loader.js shim),
+        // so window.ActivityContext is guaranteed to exist before this constructor runs.
+        if (window.ActivityContext && typeof window.ActivityContext.setActivity === "function") {
+            window.ActivityContext.setActivity(this);
+        }
+
+        this._listeners = [];
 
         this.cellSize = 55;
         this.searchSuggestions = [];
@@ -301,15 +331,40 @@ class Activity {
         this.loadAnimationIntervalId = null;
 
         // Initialize GIF animator
-        this.gifAnimator = new GIFAnimator();
+        if (typeof GIFAnimator !== "undefined") {
+            this.gifAnimator = new GIFAnimator();
+        } else {
+            console.debug("GIFAnimator not yet available in constructor");
+            this.gifAnimator = null;
+        }
 
-        this.themes = ["light", "dark"];
+        // Dirty flag for canvas rendering optimization
+        // When true, the stage needs to be redrawn on the next animation frame
+        this.stageDirty = false;
+        this._renderLoopRafId = null;
+        this._renderLoopRunning = false;
+
+        this.themes = ["light", "dark", "highcontrast"];
         try {
+            // Detect system theme preference (using same logic as ThemeBox)
+            const getSystemTheme = () => {
+                if (
+                    window.matchMedia &&
+                    window.matchMedia("(prefers-color-scheme: dark)").matches
+                ) {
+                    return "dark";
+                }
+                return "light";
+            };
+
+            // Use stored preference, fallback to system preference
+            const activeTheme = this.storage.themePreference || getSystemTheme();
+
             for (let i = 0; i < this.themes.length; i++) {
-                if (this.themes[i] === this.storage.themePreference) {
-                    body.classList.add(this.themes[i]);
+                if (this.themes[i] === activeTheme) {
+                    document.body.classList.add(this.themes[i]);
                 } else {
-                    body.classList.remove(this.themes[i]);
+                    document.body.classList.remove(this.themes[i]);
                 }
             }
         } catch (e) {
@@ -329,7 +384,6 @@ class Activity {
                 }
             }
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.error(e);
         }
 
@@ -353,13 +407,10 @@ class Activity {
         this.KeySignatureEnv = ["C", "major", false];
         try {
             if (this.storage.KeySignatureEnv !== undefined) {
-                // eslint-disable-next-line no-console
-                console.log(this.storage.KeySignatureEnv);
                 this.KeySignatureEnv = this.storage.KeySignatureEnv.split(",");
                 this.KeySignatureEnv[2] = this.KeySignatureEnv[2] === "true";
             }
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.error(e);
         }
 
@@ -368,25 +419,11 @@ class Activity {
          * Sets up the initial state and dependencies of the activity.
          */
         this.setupDependencies = () => {
+            this._stopRenderLoop();
+            this.cleanupEventListeners();
             createDefaultStack();
             createHelpContent(this);
             window.scroll(0, 0);
-
-            /*
-            try {
-                meSpeak.loadConfig('lib/mespeak_config.json');
-                lang = document.webL10n.getLanguage();
-
-                if (['es', 'ca', 'de', 'el', 'eo', 'fi', 'fr', 'hu', 'it', 'kn', 'la', 'lv', 'nl', 'pl', 'pt', 'ro', 'sk', 'sv', 'tr', 'zh'].indexOf(lang) !== -1) {
-                    meSpeak.loadVoice('lib/voices/' + lang + '.json');
-                } else {
-                    meSpeak.loadVoice('lib/voices/en/en.json');
-                }
-            } catch (e) {
-                // eslint-disable-next-line no-console
-                console.debug(e);
-            }
-            */
 
             document.title = TITLESTRING;
             this.canvas = document.getElementById("myCanvas");
@@ -402,7 +439,7 @@ class Activity {
             this.errorText = document.getElementById("errorText");
             this.errorTextContent = document.getElementById("errorTextContent");
             // Hide Arrow on hiding error message
-            this.errorText.addEventListener("click", this._hideArrows);
+            this.addEventListener(this.errorText, "click", this._hideArrows);
             // Show and populate the printText div.
             this.printText = document.getElementById("printText");
             this.printTextContent = document.getElementById("printTextContent");
@@ -437,7 +474,15 @@ class Activity {
             this.hideBlocksContainer = null;
             this.collapseBlocksContainer = null;
 
+            // --- DOM reads (batched to avoid forced synchronous layout) ---
             this.searchWidget = document.getElementById("search");
+            this.progressBar = document.getElementById("myProgress");
+            const pasteEl = document.getElementById("paste");
+            new createjs.DOMElement(pasteEl);
+            this.paste = pasteEl;
+            this.toolbarHeight = document.getElementById("toolbars").offsetHeight;
+
+            // --- DOM writes (after all reads complete) ---
             this.searchWidget.style.visibility = "hidden";
             this.searchWidget.placeholder = _("Search for blocks");
 
@@ -446,31 +491,56 @@ class Activity {
             this.helpfulSearchWidget.style.visibility = "hidden";
             this.helpfulSearchWidget.placeholder = _("Search for blocks");
             this.helpfulSearchWidget.classList.add("ui-autocomplete");
-            this.progressBar = document.getElementById("myProgress");
             this.progressBar.style.visibility = "hidden";
-
-            new createjs.DOMElement(document.getElementById("paste"));
-            this.paste = document.getElementById("paste");
             this.paste.style.visibility = "hidden";
-
-            this.toolbarHeight = document.getElementById("toolbars").offsetHeight;
 
             this.helpfulWheelItems = [];
 
             this.setHelpfulSearchDiv();
+
+            // Late initialization of GIF animator if it was missed in constructor
+            if (!this.gifAnimator && typeof GIFAnimator !== "undefined") {
+                this.gifAnimator = new GIFAnimator();
+            }
         };
 
         /*
-         * Ensure continuous canvas updates for animated content.
-         * The ticker runs at a fixed framerate to allow smooth GIF animation
-         * even when the turtle or UI is otherwise idle.
+         * Optimized canvas rendering using dirty flag pattern.
+         * The stage only updates when:
+         * 1. stageDirty flag is set (something changed)
+         * 2. Active tweens are running
+         * 3. GIF animations are playing
+         * This eliminates unnecessary 60fps updates when idle.
          */
-        createjs.Ticker.framerate = 60;
-        createjs.Ticker.on("tick", () => {
-            if (this.stage) {
-                this.stage.update();
+        this._startRenderLoop = () => {
+            if (this._renderLoopRunning) return;
+            this._renderLoopRunning = true;
+
+            const renderLoop = () => {
+                if (!this._renderLoopRunning) return;
+
+                if (this.stage) {
+                    const hasActiveTweens = createjs.Tween.hasActiveTweens();
+                    const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
+
+                    if (this.stageDirty || hasActiveTweens || hasActiveGifs) {
+                        this.stage.update();
+                        this.stageDirty = false;
+                    }
+                }
+                this._renderLoopRafId = requestAnimationFrame(renderLoop);
+            };
+
+            this._renderLoopRafId = requestAnimationFrame(renderLoop);
+        };
+
+        this._stopRenderLoop = () => {
+            this._renderLoopRunning = false;
+            if (this._renderLoopRafId !== null) {
+                cancelAnimationFrame(this._renderLoopRafId);
+                this._renderLoopRafId = null;
             }
-        });
+        };
 
         /*
          * creates helpfulSearchDiv for search
@@ -503,8 +573,8 @@ class Activity {
 
             // Add event listener to remove the search div from the DOM
             const modeButton = document.getElementById("begIconText");
-            closeButton.addEventListener("click", this._hideHelpfulSearchWidget);
-            modeButton.addEventListener("click", this._hideHelpfulSearchWidget);
+            this.addEventListener(closeButton, "click", this._hideHelpfulSearchWidget);
+            this.addEventListener(modeButton, "click", this._hideHelpfulSearchWidget);
 
             this.helpfulSearchDiv.appendChild(this.helpfulSearchWidget);
         };
@@ -516,14 +586,12 @@ class Activity {
             if (!document.getElementById("helpfulSearchDiv")) {
                 this.setHelpfulSearchDiv(); // Re-create and append the div if it's not found
             }
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
             this.helpfulSearchDiv.style.left =
-                document.getElementById("helpfulWheelDiv").offsetLeft +
-                80 * this.getStageScale() +
-                "px";
+                helpfulWheelDiv.offsetLeft + 80 * this.getStageScale() + "px";
             this.helpfulSearchDiv.style.top =
-                document.getElementById("helpfulWheelDiv").offsetTop +
-                110 * this.getStageScale() +
-                "px";
+                helpfulWheelDiv.offsetTop + 110 * this.getStageScale() + "px";
 
             const windowWidth = window.innerWidth;
             const windowHeight = window.innerHeight;
@@ -545,8 +613,10 @@ class Activity {
         // hides helpfulSearchDiv on canvas
 
         this._hideHelpfulSearchWidget = e => {
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
             }
             if (this.helpfulSearchDiv && this.helpfulSearchDiv.parentNode) {
                 this.helpfulSearchDiv.parentNode.removeChild(this.helpfulSearchDiv);
@@ -559,7 +629,8 @@ class Activity {
          * (if block is right clicked)
          */
         this.doContextMenus = () => {
-            document.addEventListener(
+            this.addEventListener(
+                document,
                 "contextmenu",
                 event => {
                     event.preventDefault();
@@ -583,7 +654,9 @@ class Activity {
          * displays helpfulWheel on canvas on right click
          */
         this._displayHelpfulWheel = event => {
-            document.getElementById("helpfulWheelDiv").style.position = "absolute";
+            // Cache DOM element reference for performance (7 lookups reduced to 1)
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            helpfulWheelDiv.style.position = "absolute";
 
             const x = event.clientX;
             const y = event.clientY;
@@ -600,21 +673,21 @@ class Activity {
                 canvasTop
             );
 
-            document.getElementById("helpfulWheelDiv").style.left = helpfulWheelLeft + "px";
+            helpfulWheelDiv.style.left = helpfulWheelLeft + "px";
 
-            document.getElementById("helpfulWheelDiv").style.top = helpfulWheelTop + "px";
+            helpfulWheelDiv.style.top = helpfulWheelTop + "px";
 
             const windowWidth = window.innerWidth - 20;
             const windowHeight = window.innerHeight - 20;
 
             if (helpfulWheelLeft + 350 > windowWidth) {
-                document.getElementById("helpfulWheelDiv").style.left = windowWidth - 350 + "px";
+                helpfulWheelDiv.style.left = windowWidth - 350 + "px";
             }
             if (helpfulWheelTop + 350 > windowHeight) {
-                document.getElementById("helpfulWheelDiv").style.top = windowHeight - 350 + "px";
+                helpfulWheelDiv.style.top = windowHeight - 350 + "px";
             }
 
-            document.getElementById("helpfulWheelDiv").style.display = "";
+            helpfulWheelDiv.style.display = "";
 
             const wheel = new wheelnav("helpfulWheelDiv", null, 300, 300);
             wheel.colors = platformColor.wheelcolors;
@@ -639,11 +712,11 @@ class Activity {
                 const isClickInside = helpfulWheelDiv.contains(e.target);
                 if (!isClickInside) {
                     helpfulWheelDiv.style.display = "none";
-                    document.removeEventListener("click", closeHelpfulWheel);
+                    this.removeEventListener(document, "click", closeHelpfulWheel);
                 }
             };
 
-            document.addEventListener("click", closeHelpfulWheel);
+            this.addEventListener(document, "click", closeHelpfulWheel);
         };
 
         /**
@@ -720,8 +793,10 @@ class Activity {
          */
         const findBlocks = activity => {
             activity._findBlocks();
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -762,14 +837,20 @@ class Activity {
                     };
                 }
 
-                if (canvasWidth < 768 && !referenceBlock.beforeMobilePosition) {
+                if (
+                    canvasWidth < RESPONSIVE_BREAKPOINT_TABLET &&
+                    !referenceBlock.beforeMobilePosition
+                ) {
                     referenceBlock.beforeMobilePosition = {
                         x: referenceBlock.container.x,
                         y: referenceBlock.container.y
                     };
                 }
 
-                if (canvasWidth >= 768 && referenceBlock.beforeMobilePosition) {
+                if (
+                    canvasWidth >= RESPONSIVE_BREAKPOINT_TABLET &&
+                    referenceBlock.beforeMobilePosition
+                ) {
                     const dx = referenceBlock.beforeMobilePosition.x - referenceBlock.container.x;
                     const dy = referenceBlock.beforeMobilePosition.y - referenceBlock.container.y;
                     group.forEach(blockId => {
@@ -781,14 +862,20 @@ class Activity {
                     //this prevents old groups from affecting new calculations.
                 }
 
-                if (canvasWidth < 600 && !referenceBlock.before600pxPosition) {
+                if (
+                    canvasWidth < RESPONSIVE_BREAKPOINT_MOBILE &&
+                    !referenceBlock.before600pxPosition
+                ) {
                     referenceBlock.before600pxPosition = {
                         x: referenceBlock.container.x,
                         y: referenceBlock.container.y
                     };
                 }
 
-                if (canvasWidth >= 600 && referenceBlock.before600pxPosition) {
+                if (
+                    canvasWidth >= RESPONSIVE_BREAKPOINT_MOBILE &&
+                    referenceBlock.before600pxPosition
+                ) {
                     const dx = referenceBlock.before600pxPosition.x - referenceBlock.container.x;
                     const dy = referenceBlock.before600pxPosition.y - referenceBlock.container.y;
 
@@ -834,7 +921,8 @@ class Activity {
         }
 
         //if any window resize event occurs:
-        window.addEventListener("resize", () => repositionBlocks(this));
+        this._handleRepositionBlocksOnResize = () => repositionBlocks(this);
+        this.addEventListener(window, "resize", this._handleRepositionBlocksOnResize);
 
         /**
          * Finds and organizes blocks within the workspace.
@@ -852,7 +940,7 @@ class Activity {
             this.blocksContainer.y = 0;
 
             const screenWidth = window.innerWidth;
-            const isNarrowScreen = screenWidth < 600;
+            const isNarrowScreen = screenWidth < RESPONSIVE_BREAKPOINT_MOBILE;
             const minColumnWidth = 400;
             const numColumns = isNarrowScreen ? 1 : Math.floor(screenWidth / minColumnWidth);
 
@@ -1130,7 +1218,7 @@ class Activity {
          * @constructor
          */
         this.setHomeContainers = homeState => {
-            if (this.homeButtonContainer === null) {
+            if (this.homeButtonContainer === null || this.homeButtonContainer === undefined) {
                 return;
             }
 
@@ -1187,7 +1275,6 @@ class Activity {
                     }
 
                     setTimeout(() => {
-                        // eslint-disable-next-line no-console
                         console.log("Saving help artwork: " + name + "_block.svg");
                         const svg = "data:image/svg+xml;utf8," + that.printBlockSVG();
                         that.save.download("svg", svg, name + "_block.svg");
@@ -1217,6 +1304,20 @@ class Activity {
             this.sendAllToTrash(true, true);
         };
 
+        const extractSVGInner = svgString => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(svgString, "image/svg+xml");
+            const svgEl = doc.querySelector("svg");
+            if (!svgEl) return "";
+
+            // Remove drop shadow filters safely
+            svgEl.querySelectorAll("[filter]").forEach(el => {
+                el.removeAttribute("filter");
+            });
+
+            return svgEl.innerHTML;
+        };
+
         /**
          * @returns {SVG} returns SVG of blocks
          */
@@ -1240,11 +1341,9 @@ class Activity {
                     yMax = this.blocks.blockList[i].container.y + this.blocks.blockList[i].height;
                 }
 
-                if (this.blocks.blockList[i].collapsed) {
-                    parts = this.blocks.blockCollapseArt[i].split("><");
-                } else {
-                    parts = this.blocks.blockArt[i].split("><");
-                }
+                const rawSVG = this.blocks.blockList[i].collapsed
+                    ? this.blocks.blockCollapseArt[i]
+                    : this.blocks.blockArt[i];
 
                 if (this.blocks.blockList[i].isCollapsible()) {
                     svg += "<g>";
@@ -1256,47 +1355,51 @@ class Activity {
                     ", " +
                     this.blocks.blockList[i].container.y +
                     ')">';
-                if (SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
-                    for (let p = 1; p < parts.length; p++) {
-                        // FIXME: This is fragile.
-                        if (p === 1) {
-                            svg += "<" + parts[p] + "><";
-                        } else if (p === 2) {
-                            // skip filter
-                        } else if (p === 3) {
-                            svg += parts[p].replace("filter:url(#dropshadow);", "") + "><";
-                        } else if (p === 5) {
-                            // Add block value to SVG between tspans
-                            if (typeof this.blocks.blockList[i].value === "string") {
-                                svg += parts[p] + ">" + _(this.blocks.blockList[i].value) + "<";
-                            } else {
-                                svg += parts[p] + ">" + this.blocks.blockList[i].value + "<";
-                            }
-                        } else if (p === parts.length - 2) {
-                            svg += parts[p] + ">";
-                        } else if (p === parts.length - 1) {
-                            // skip final </svg>
-                        } else {
-                            svg += parts[p] + "><";
-                        }
-                    }
+
+                if (!SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
+                    svg += extractSVGInner(rawSVG);
                 } else {
-                    for (let p = 1; p < parts.length; p++) {
-                        // FIXME: This is fragile.
-                        if (p === 1) {
-                            svg += "<" + parts[p] + "><";
-                        } else if (p === 2) {
-                            // skip filter
-                        } else if (p === 3) {
-                            svg += parts[p].replace("filter:url(#dropshadow);", "") + "><";
-                        } else if (p === parts.length - 2) {
-                            svg += parts[p] + ">";
-                        } else if (p === parts.length - 1) {
-                            // skip final </svg>
-                        } else {
-                            svg += parts[p] + "><";
-                        }
+                    // Safer SVG manipulation using DOM instead of string splitting
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(rawSVG, "image/svg+xml");
+
+                    // remove dropshadow filter if present
+                    const filtered = doc.querySelector('[style*="filter:url(#dropshadow)"]');
+                    if (filtered) {
+                        filtered.style.filter = "";
                     }
+
+                    // Find correct tspan to inject value (matches previous behaviour)
+                    let target = null;
+
+                    // 1) Prefer empty tspan (most block SVGs reserve this for value)
+                    target = Array.from(doc.querySelectorAll("text tspan")).find(
+                        t => !t.textContent || t.textContent.trim() === ""
+                    );
+
+                    // 2) Otherwise fallback to last tspan
+                    if (!target) {
+                        const tspans = doc.querySelectorAll("text tspan");
+                        if (tspans.length) target = tspans[tspans.length - 1];
+                    }
+
+                    // 3) Final fallback to text node
+                    if (!target) {
+                        target = doc.querySelector("text");
+                    }
+
+                    if (target) {
+                        const val = this.blocks.blockList[i].value;
+                        target.textContent = typeof val === "string" ? _(val) : val;
+                    }
+
+                    // serialize without outer <svg> wrapper (matches previous behavior)
+                    let serialized = new XMLSerializer().serializeToString(doc.documentElement);
+
+                    // remove outer svg tags because original code skipped them
+                    serialized = serialized.replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "");
+
+                    svg += serialized;
                 }
 
                 svg += "</g>";
@@ -1440,7 +1543,7 @@ class Activity {
 
             const importConfirm = document.createElement("button");
             importConfirm.classList.add("confirm-button");
-            importConfirm.textContent = "Confirm";
+            importConfirm.textContent = _("Confirm");
             importConfirm.addEventListener("click", () => {
                 const maxNoteBlocks = select.value;
                 transcribeMidi(midi, maxNoteBlocks);
@@ -1450,7 +1553,7 @@ class Activity {
 
             const cancelBtn = document.createElement("button");
             cancelBtn.classList.add("cancel-button");
-            cancelBtn.textContent = "Cancel";
+            cancelBtn.textContent = _("Cancel");
             cancelBtn.addEventListener("click", () => {
                 document.body.removeChild(modal);
             });
@@ -1483,7 +1586,7 @@ class Activity {
 
             const confirmBtn = document.createElement("button");
             confirmBtn.classList.add("confirm-button");
-            confirmBtn.textContent = "Confirm";
+            confirmBtn.textContent = _("Confirm");
             confirmBtn.style.backgroundColor = platformColor.blueButton;
             confirmBtn.style.color = "white";
             confirmBtn.style.border = "none";
@@ -1492,14 +1595,14 @@ class Activity {
             confirmBtn.style.fontWeight = "bold";
             confirmBtn.style.cursor = "pointer";
             confirmBtn.style.marginRight = "16px";
-            confirmBtn.addEventListener("click", () => {
+            this.addEventListener(confirmBtn, "click", () => {
                 document.body.removeChild(modal);
                 clearCanvasAction();
             });
 
             const cancelBtn = document.createElement("button");
             cancelBtn.classList.add("cancel-button");
-            cancelBtn.textContent = "Cancel";
+            cancelBtn.textContent = _("Cancel");
             cancelBtn.style.backgroundColor = "#f1f1f1";
             cancelBtn.style.color = "black";
             cancelBtn.style.border = "none";
@@ -1507,7 +1610,7 @@ class Activity {
             cancelBtn.style.padding = "8px 16px";
             cancelBtn.style.fontWeight = "bold";
             cancelBtn.style.cursor = "pointer";
-            cancelBtn.addEventListener("click", () => {
+            this.addEventListener(cancelBtn, "click", () => {
                 document.body.removeChild(modal);
             });
 
@@ -1560,25 +1663,15 @@ class Activity {
                 this.blocksContainer.x = 0;
                 this.blocksContainer.y = 0;
 
-                Element.prototype.remove = () => {
-                    this.parentElement.removeChild(this);
-                };
-
-                NodeList.prototype.remove = HTMLCollection.prototype.remove = () => {
-                    for (let i = 0, len = this.length; i < len; i++) {
-                        if (this[i] && this[i].parentElement) {
-                            this[i].parentElement.removeChild(this[i]);
-                        }
-                    }
-                };
-
                 const table = document.getElementById("myTable");
                 if (table !== null) {
                     table.remove();
                 }
 
-                if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                    document.getElementById("helpfulWheelDiv").style.display = "none";
+                // Cache DOM element reference for performance
+                const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+                if (helpfulWheelDiv.style.display !== "none") {
+                    helpfulWheelDiv.style.display = "none";
                     this.__tick();
                 }
             };
@@ -1657,6 +1750,12 @@ class Activity {
                 return; // Exit the function if execution is already in progress
             }
 
+            if (!activity || typeof activity._doRecordButton !== "function") {
+                console.warn("doRecordButton called without valid activity context");
+                isExecuting = false;
+                return;
+            }
+
             isExecuting = true; // Set the flag to indicate execution has started
             activity._doRecordButton();
         };
@@ -1666,34 +1765,136 @@ class Activity {
          * @private
          */
         this._doRecordButton = () => {
+            const that = this;
             const start = document.getElementById("record"),
                 recInside = document.getElementById("rec_inside");
             let mediaRecorder;
-            var clickEvent = new Event("click");
+            const clickEvent = new Event("click");
             let flag = 0;
+            let currentStream = null;
+            let audioDestination = null;
 
             /**
              * Records the screen using the browser's media devices API.
              * @returns {Promise<MediaStream>} A promise resolving to the recorded media stream.
              */
+
             async function recordScreen() {
-                flag = 1;
-                return await navigator.mediaDevices.getDisplayMedia({
-                    preferCurrentTab: "True",
-                    systemAudio: "include",
-                    audio: "True",
-                    video: { mediaSource: "tab" },
-                    bandwidthProfile: {
-                        video: {
-                            clientTrackSwitchOffControl: "auto",
-                            contentPreferencesMode: "auto"
-                        }
-                    },
-                    preferredVideoCodecs: "auto"
-                });
+                const mode = localStorage.getItem("musicBlocksRecordMode");
+
+                if (mode === "canvas") {
+                    return await recordCanvasOnly();
+                } else {
+                    return await recordScreenWithTools();
+                }
             }
 
-            const that = this;
+            async function recordCanvasOnly() {
+                flag = 1;
+                const canvas = document.getElementById("myCanvas");
+                if (!canvas) {
+                    throw new Error("Canvas element not found");
+                }
+
+                // Get the toolbar height to exclude from recording
+                const toolbar = document.getElementById("toolbars");
+                const toolbarHeight = toolbar ? toolbar.offsetHeight : 0;
+
+                // Get canvas dimensions
+                const canvasRect = canvas.getBoundingClientRect();
+
+                // Get the actual canvas dimensions
+                const canvasWidth = canvas.width;
+                const canvasHeight = canvas.height;
+
+                // Calculate the visible area (excluding toolbar)
+                const visibleHeight = canvasHeight - toolbarHeight;
+
+                // Create a clean recording canvas
+                const recordCanvas = document.createElement("canvas");
+                recordCanvas.width = canvasWidth;
+                recordCanvas.height = canvasHeight;
+                const recordCtx = recordCanvas.getContext("2d");
+
+                // Set background to match the canvas (white/light gray)
+                recordCtx.fillStyle = "#f5f5f5"; // Adjust this color to match your canvas background
+                let animationFrameId;
+
+                // Function to continuously copy canvas content
+                const copyFrame = () => {
+                    // Fill background
+                    recordCtx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+                    // Draw only the visible portion of the canvas (skip the toolbar area)
+                    recordCtx.drawImage(
+                        canvas,
+                        0,
+                        toolbarHeight, // Source x, y (skip toolbar)
+                        canvasWidth,
+                        visibleHeight, // Source width, height
+                        0,
+                        0, // Destination x, y
+                        canvasWidth,
+                        visibleHeight // Destination width, height
+                    );
+
+                    // Continue if still recording
+                    if (flag === 1) {
+                        animationFrameId = requestAnimationFrame(copyFrame);
+                    }
+                };
+
+                // Start copying frames
+                copyFrame();
+
+                // Capture the canvas stream directly at 30fps
+                const canvasStream = recordCanvas.captureStream(30);
+
+                // Add audio track if available
+                const Tone = that.logo.synth.tone;
+                if (Tone && Tone.context) {
+                    const dest = Tone.context.createMediaStreamDestination();
+                    Tone.Destination.connect(dest);
+                    audioDestination = dest;
+                    const audioTrack = dest.stream.getAudioTracks()[0];
+                    if (audioTrack) {
+                        canvasStream.addTrack(audioTrack);
+                    }
+                }
+                currentStream = canvasStream;
+
+                // Clean up animation frame when recording stops
+                canvasStream.getTracks()[0].addEventListener("ended", () => {
+                    if (animationFrameId) {
+                        cancelAnimationFrame(animationFrameId);
+                    }
+                });
+
+                return canvasStream;
+            }
+            async function recordScreenWithTools() {
+                flag = 1;
+
+                try {
+                    return await navigator.mediaDevices.getDisplayMedia({
+                        preferCurrentTab: "True",
+                        systemAudio: "include",
+                        audio: "True",
+                        video: { mediaSource: "tab" },
+                        bandwidthProfile: {
+                            video: {
+                                clientTrackSwitchOffControl: "auto",
+                                contentPreferencesMode: "auto"
+                            }
+                        },
+                        preferredVideoCodecs: "auto"
+                    });
+                } catch (error) {
+                    console.error("Screen capture failed:", error);
+                    flag = 0;
+                    throw error;
+                }
+            }
 
             /**
              * Saves the recorded chunks as a video file.
@@ -1702,10 +1903,35 @@ class Activity {
             function saveFile(recordedChunks) {
                 flag = 1;
                 recInside.classList.remove("blink");
+                // Prevent zero-byte files
+                if (!recordedChunks || recordedChunks.length === 0) {
+                    alert(_("Recorded file is empty. File not saved."));
+                    flag = 0;
+                    recording();
+                    doRecordButton();
+                    return;
+                }
                 const blob = new Blob(recordedChunks, {
                     type: "video/webm"
                 });
-
+                if (blob.size === 0) {
+                    alert(_("Recorded file is empty. File not saved."));
+                    flag = 0;
+                    recording();
+                    doRecordButton();
+                    return;
+                }
+                // Clean up stream after recording
+                if (currentStream) {
+                    currentStream.getTracks().forEach(track => track.stop());
+                    currentStream = null;
+                }
+                if (audioDestination && audioDestination.stream) {
+                    audioDestination.stream.getTracks().forEach(track => track.stop());
+                    audioDestination = null;
+                }
+                mediaRecorder = null;
+                // Prompt to save file
                 const filename = window.prompt(_("Enter file name"));
                 if (filename === null || filename.trim() === "") {
                     alert(_("File save canceled"));
@@ -1714,27 +1940,33 @@ class Activity {
                     doRecordButton();
                     return; // Exit without saving the file
                 }
-
                 const downloadLink = document.createElement("a");
                 downloadLink.href = URL.createObjectURL(blob);
                 downloadLink.download = `${filename}.webm`;
-
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
                 URL.revokeObjectURL(blob);
                 document.body.removeChild(downloadLink);
                 flag = 0;
-                // eslint-disable-next-line no-use-before-define
+                // Allow multiple recordings
                 recording();
                 doRecordButton();
-                that.textMsg(_("Click on stop saving"));
+                that.textMsg(_("Recording stopped. File saved."));
             }
             /**
              * Stops the recording process.
              */
             function stopRec() {
                 flag = 0;
-                mediaRecorder.stop();
+
+                if (mediaRecorder && typeof mediaRecorder.stop === "function") {
+                    mediaRecorder.stop();
+                }
+
+                // Clean up the recording canvas stream
+                if (currentStream) {
+                    currentStream.getTracks().forEach(track => track.stop());
+                }
                 const node = document.createElement("p");
                 node.textContent = "Stopped recording";
                 document.body.appendChild(node);
@@ -1749,11 +1981,11 @@ class Activity {
             function createRecorder(stream, mimeType) {
                 flag = 1;
                 recInside.classList.add("blink");
+                that.textMsg(_("Recording started. Click stop to finish."));
                 start.removeEventListener("click", createRecorder, true);
                 let recordedChunks = [];
-                const mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder = new MediaRecorder(stream);
                 stream.oninactive = function () {
-                    // eslint-disable-next-line no-console
                     console.log("Recording is ready to save");
                     stopRec();
                     flag = 0;
@@ -1774,7 +2006,6 @@ class Activity {
 
                 mediaRecorder.start(200);
                 setTimeout(() => {
-                    // eslint-disable-next-line no-console
                     console.log("Resizing for Record", that.canvas.height);
                     that._onResize();
                 }, 500);
@@ -1785,31 +2016,57 @@ class Activity {
              * Handles the recording process.
              */
             function recording() {
-                start.addEventListener("click", async function handler() {
-                    const stream = await recordScreen();
-                    const mimeType = "video/webm";
-                    mediaRecorder = createRecorder(stream, mimeType);
-                    if (flag == 1) {
-                        this.removeEventListener("click", handler);
+                // Remove any previous handler to avoid multiple triggers
+                if (start._recordHandler) {
+                    start.removeEventListener("click", start._recordHandler);
+                }
+                const handler = async function handler() {
+                    try {
+                        const stream = await recordScreen();
+                        const mimeType = "video/webm";
+                        mediaRecorder = createRecorder(stream, mimeType);
+                        if (flag == 1) {
+                            start.removeEventListener("click", handler);
+                            // Add stop handler
+                            const stopHandler = function stopHandler() {
+                                if (mediaRecorder && mediaRecorder.state === "recording") {
+                                    mediaRecorder.stop();
+                                    mediaRecorder = new MediaRecorder(stream);
+                                    recInside.classList.remove("blink");
+                                    flag = 0;
+                                    // Clean up stream
+                                    if (currentStream) {
+                                        currentStream.getTracks().forEach(track => track.stop());
+                                    }
+                                    if (audioDestination && audioDestination.stream) {
+                                        audioDestination.stream
+                                            .getTracks()
+                                            .forEach(track => track.stop());
+                                    }
+                                }
+                                start.removeEventListener("click", stopHandler);
+                                // Re-enable recording for next time
+                                recording();
+                            };
+                            start.addEventListener("click", stopHandler);
+                        }
+                        recInside.setAttribute("fill", "red");
+                    } catch (error) {
+                        console.error("Recording failed:", error);
+                        that.textMsg(_("Recording failed: ") + error.message);
+                        flag = 0;
+                        // Re-enable recording button
+                        recording();
                     }
-                    const node = document.createElement("p");
-                    node.textContent = "Started recording";
-                    document.body.appendChild(node);
-                    recInside.setAttribute("fill", "red");
-                });
+                };
+                start.addEventListener("click", handler);
+                start._recordHandler = handler;
             }
 
             // Start recording process if not already executing
             if (flag == 0 && isExecuting) {
                 recording();
                 start.dispatchEvent(clickEvent);
-                flag = 1;
-            }
-
-            // Stop recording if already executing
-            if (flag == 1 && isExecuting) {
-                start.addEventListener("click", stopRec);
-                flag = 0;
             }
         };
 
@@ -1867,9 +2124,8 @@ class Activity {
                 // Queue and take first step.
                 if (!this.turtles.running()) {
                     this.logo.runLogoCommands();
-                    document.getElementById(
-                        "stop"
-                    ).style.color = this.toolbar.stopIconColorWhenPlaying;
+                    document.getElementById("stop").style.color =
+                        this.toolbar.stopIconColorWhenPlaying;
                 }
                 this.logo.step();
             } else {
@@ -1937,7 +2193,6 @@ class Activity {
                 activity.save.savePNG.bind(activity.save),
                 activity.save.saveWAV.bind(activity.save),
                 activity.save.saveLilypond.bind(activity.save),
-                activity.save.saveLilypond.bind(afterSaveLilypond),
                 activity.save.afterSaveLilypondLY.bind(activity.save),
                 activity.save.saveAbc.bind(activity.save),
                 activity.save.saveMxml.bind(activity.save),
@@ -1950,6 +2205,11 @@ class Activity {
                 activity.regeneratePalettes();
             }
 
+            // Update record button and dropdown visibility
+            if (activity.toolbar && typeof activity.toolbar.updateRecordButton === "function") {
+                activity.toolbar.updateRecordButton(() => doRecordButton(activity));
+            }
+
             // Force immediate canvas refresh
             activity.refreshCanvas();
         };
@@ -1960,8 +2220,10 @@ class Activity {
         const setScroller = activity => {
             activity._setScroller();
             activity._setupBlocksContainerEvents();
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
             }
         };
 
@@ -2055,8 +2317,10 @@ class Activity {
          */
         const doLargerBlocks = async activity => {
             await activity._doLargerBlocks();
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -2081,7 +2345,7 @@ class Activity {
             }
 
             await this.setSmallerLargerStatus();
-            await this.stage.update();
+            this.stageDirty = true;
         };
 
         /**
@@ -2090,8 +2354,10 @@ class Activity {
          */
         const doSmallerBlocks = async activity => {
             await activity._doSmallerBlocks();
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -2119,7 +2385,7 @@ class Activity {
             }
 
             await this.setSmallerLargerStatus();
-            await this.stage.update();
+            this.stageDirty = true;
         };
 
         /*
@@ -2189,21 +2455,17 @@ class Activity {
                     i < this.palettes.dict[this.palettes.activePalette].protoList.length;
                     i++
                 ) {
-                    const name = this.palettes.dict[this.palettes.activePalette].protoList[i][
-                        "name"
-                    ];
+                    const name =
+                        this.palettes.dict[this.palettes.activePalette].protoList[i]["name"];
                     if (name in obj["FLOWPLUGINS"]) {
-                        // eslint-disable-next-line no-console
                         console.log("deleting " + name);
                         delete obj["FLOWPLUGINS"][name];
                     }
                     if (name in obj["BLOCKPLUGINS"]) {
-                        // eslint-disable-next-line no-console
                         console.log("deleting " + name);
                         delete obj["BLOCKPLUGINS"][name];
                     }
                     if (name in obj["ARGPLUGINS"]) {
-                        // eslint-disable-next-line no-console
                         console.log("deleting " + name);
                         delete obj["ARGPLUGINS"][name];
                     }
@@ -2405,47 +2667,55 @@ class Activity {
              * Handles touch start event on the canvas.
              * @param {TouchEvent} event - The touch event object.
              */
-            myCanvas.addEventListener("touchstart", event => {
-                if (event.touches.length === 2) {
-                    for (let i = 0; i < 2; i++) {
-                        initialTouches[i][0] = event.touches[i].clientY;
-                        initialTouches[i][1] = event.touches[i].clientX;
+            myCanvas.addEventListener(
+                "touchstart",
+                event => {
+                    if (event.touches.length === 2) {
+                        for (let i = 0; i < 2; i++) {
+                            initialTouches[i][0] = event.touches[i].clientY;
+                            initialTouches[i][1] = event.touches[i].clientX;
+                        }
                     }
-                }
-            });
+                },
+                { passive: true }
+            );
 
             /**
              * Handles touch move event on the canvas.
              * @param {TouchEvent} event - The touch event object.
              */
-            myCanvas.addEventListener("touchmove", event => {
-                if (event.touches.length === 2) {
-                    for (let i = 0; i < 2; i++) {
-                        const touchY = event.touches[i].clientY;
-                        const touchX = event.touches[i].clientX;
+            myCanvas.addEventListener(
+                "touchmove",
+                event => {
+                    if (event.touches.length === 2) {
+                        for (let i = 0; i < 2; i++) {
+                            const touchY = event.touches[i].clientY;
+                            const touchX = event.touches[i].clientX;
 
-                        if (initialTouches[i][0] !== null && initialTouches[i][1] !== null) {
-                            const deltaY = touchY - initialTouches[i][0];
-                            const deltaX = touchX - initialTouches[i][1];
+                            if (initialTouches[i][0] !== null && initialTouches[i][1] !== null) {
+                                const deltaY = touchY - initialTouches[i][0];
+                                const deltaX = touchX - initialTouches[i][1];
 
-                            if (deltaY !== 0) {
-                                closeAnyOpenMenusAndLabels();
-                                that.blocksContainer.y -= deltaY;
+                                if (deltaY !== 0) {
+                                    closeAnyOpenMenusAndLabels();
+                                    that.blocksContainer.y -= deltaY;
+                                }
+
+                                if (that.scrollBlockContainer && deltaX !== 0) {
+                                    closeAnyOpenMenusAndLabels();
+                                    that.blocksContainer.x -= deltaX;
+                                }
+
+                                initialTouches[i][0] = touchY;
+                                initialTouches[i][1] = touchX;
                             }
-
-                            if (deltaX !== 0) {
-                                closeAnyOpenMenusAndLabels();
-                                that.blocksContainer.x -= deltaX;
-                            }
-
-                            initialTouches[i][0] = touchY;
-                            initialTouches[i][1] = touchX;
                         }
-                    }
 
-                    that.refreshCanvas();
-                }
-            });
+                        that.refreshCanvas();
+                    }
+                },
+                { passive: true }
+            );
 
             /**
              * Handles touch end event on the canvas.
@@ -2463,30 +2733,50 @@ class Activity {
              */
             const __wheelHandler = event => {
                 const data = normalizeWheel(event);
-                const delY = data.pixelY;
-                const delX = data.pixelX;
+                // Apply scroll speed multiplier for smoother scrolling
+                const SCROLL_SPEED_MULTIPLIER = 2;
+                const delY = data.pixelY * SCROLL_SPEED_MULTIPLIER;
+                const delX = data.pixelX * SCROLL_SPEED_MULTIPLIER;
 
                 if (event.ctrlKey) {
                     event.preventDefault();
                     delY < 0 ? doLargerBlocks(that) : doSmallerBlocks(that);
-                } else if (delY !== 0 && event.axis === event.VERTICAL_AXIS) {
-                    closeAnyOpenMenusAndLabels();
-                    that.blocksContainer.y -= delY;
-                } else if (
-                    that.scrollBlockContainer &&
-                    delX !== 0 &&
-                    event.axis === event.HORIZONTAL_AXIS
-                ) {
-                    closeAnyOpenMenusAndLabels();
-                    that.blocksContainer.x -= delX;
                 } else {
-                    event.preventDefault();
+                    closeAnyOpenMenusAndLabels();
+                    if (that.scrollBlockContainer) {
+                        // Horizontal scrolling enabled (Advanced)
+                        if (delY !== 0) that.blocksContainer.y -= delY;
+                        if (delX !== 0) that.blocksContainer.x -= delX;
+                    } else {
+                        // Vertical scrolling only (Beginner / Default)
+                        if (event.axis === event.VERTICAL_AXIS && delY !== 0) {
+                            that.blocksContainer.y -= delY;
+                        }
+                    }
                 }
 
                 that.refreshCanvas();
             };
 
-            document.getElementById("myCanvas").addEventListener("wheel", __wheelHandler, false);
+            // Remove previous wheel event listener if it exists
+            if (this._wheelHandler) {
+                this.removeEventListener(
+                    document.getElementById("myCanvas"),
+                    "wheel",
+                    this._wheelHandler,
+                    false
+                );
+            }
+
+            // Store the handler reference for future cleanup
+            this._wheelHandler = __wheelHandler;
+
+            this.addEventListener(
+                document.getElementById("myCanvas"),
+                "wheel",
+                __wheelHandler,
+                false
+            );
 
             /**
              * Handles stage mouse up event.
@@ -2543,7 +2833,6 @@ class Activity {
                     // Deselect active block if moving the block container
                     that.blocks.activeBlock = null;
 
-                    // eslint-disable-next-line max-len
                     const delta =
                         Math.abs(event.stageX - lastCoords.x) +
                         Math.abs(event.stageY - lastCoords.y);
@@ -2615,13 +2904,15 @@ class Activity {
 
             const bitmap = new createjs.Bitmap(img);
             container.addChild(bitmap);
-            bitmap.cache(0, 0, 1200, 900);
+            // Do NOT cache the bitmap here. Each cached grid allocates a
+            // 1200x900x4 = ~4.3 MB backing canvas, and with 8 grids that
+            // totals ~35 MB even though at most 1 grid is visible at a time.
+            // Instead, we cache lazily in _show*() and uncache in _hide*().
 
             bitmap.x = (this.canvas.width - 1200) / 2;
             bitmap.y = (this.canvas.height - 900) / 2;
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 1;
             bitmap.visible = false;
-            bitmap.updateCache();
 
             return bitmap;
         };
@@ -2667,8 +2958,7 @@ class Activity {
                 hitArea.y = 0;
                 container.hitArea = hitArea;
 
-                // eslint-disable-next-line no-unused-vars
-                container.on("click", event => {
+                container.on("click", () => {
                     container.visible = false;
                     // On the possibility that there was an error
                     // arrow associated with this container
@@ -2694,6 +2984,90 @@ class Activity {
             for (let i = 0; i < ERRORARTWORK.length; i++) {
                 const name = ERRORARTWORK[i];
                 this._makeErrorArtwork(name);
+            }
+        };
+
+        /**
+         * Initialize an idle watcher that throttles the application's framerate
+         * when the application is inactive and no music is playing.
+         * This significantly reduces CPU usage and improves battery life.
+         *
+         * Listeners and intervals are properly cleaned up via stopIdleWatcher()
+         * to prevent accumulation on re-initialization.
+         */
+        this._initIdleWatcher = () => {
+            // Ensure any prior idle watcher is cleaned up before reinitializing
+            this._stopIdleWatcher();
+
+            const IDLE_THRESHOLD = 5000; // 5 seconds
+            const ACTIVE_FPS = 60;
+            const IDLE_FPS = 1;
+
+            let lastActivity = Date.now();
+            this.isAppIdle = false;
+
+            // Wake up function - restores full framerate
+            // Stored as instance property for cleanup
+            this._resetIdleTimer = () => {
+                lastActivity = Date.now();
+                if (this.isAppIdle) {
+                    this.isAppIdle = false;
+                    createjs.Ticker.framerate = ACTIVE_FPS;
+                    // Force immediate redraw for responsiveness
+                    this.stageDirty = true;
+                }
+            };
+
+            // Track user activity using managed addEventListener for proper cleanup
+            this.addEventListener(window, "mousemove", this._resetIdleTimer);
+            this.addEventListener(window, "mousedown", this._resetIdleTimer);
+            this.addEventListener(window, "keydown", this._resetIdleTimer);
+            this.addEventListener(window, "touchstart", this._resetIdleTimer);
+            this.addEventListener(window, "wheel", this._resetIdleTimer);
+
+            // Periodic check for idle state - store interval ID for cleanup
+            this._idleWatcherInterval = setInterval(() => {
+                // Check if music/code is playing
+                const isMusicPlaying = this.logo?._alreadyRunning || false;
+
+                if (!isMusicPlaying && Date.now() - lastActivity > IDLE_THRESHOLD) {
+                    if (!this.isAppIdle) {
+                        this.isAppIdle = true;
+                        createjs.Ticker.framerate = IDLE_FPS;
+                        console.log("⚡ Idle mode: Throttling to 1 FPS to save battery");
+                    }
+                } else if (this.isAppIdle && isMusicPlaying) {
+                    // Music started playing - wake up immediately
+                    this._resetIdleTimer();
+                }
+            }, 1000);
+
+            // Expose activity instance for external checks
+            if (typeof window !== "undefined") {
+                window.activity = this;
+            }
+        };
+
+        /**
+         * Stop the idle watcher and clean up its listeners and interval.
+         * Called during Activity lifecycle teardown to prevent listener/interval accumulation.
+         * It is safe to call this method even if the idle watcher was never started.
+         */
+        this._stopIdleWatcher = () => {
+            // Clear the periodic interval
+            if (typeof this._idleWatcherInterval !== "undefined") {
+                clearInterval(this._idleWatcherInterval);
+                this._idleWatcherInterval = undefined;
+            }
+
+            // Remove event listeners if they were registered
+            if (typeof this._resetIdleTimer === "function") {
+                this.removeEventListener(window, "mousemove", this._resetIdleTimer);
+                this.removeEventListener(window, "mousedown", this._resetIdleTimer);
+                this.removeEventListener(window, "keydown", this._resetIdleTimer);
+                this.removeEventListener(window, "touchstart", this._resetIdleTimer);
+                this.removeEventListener(window, "wheel", this._resetIdleTimer);
+                this._resetIdleTimer = undefined;
             }
         };
 
@@ -2729,8 +3103,7 @@ class Activity {
                 container.hitArea = hitArea;
 
                 const that = this;
-                // eslint-disable-next-line no-unused-vars
-                container.on("click", event => {
+                container.on("click", () => {
                     container.visible = false;
                     // On the possibility that there was an error
                     // arrow associated with this container
@@ -2753,6 +3126,12 @@ class Activity {
 
             this.searchSuggestions = [];
             this.deprecatedBlockNames = [];
+
+            // Guard: blocks may not be initialized yet during early loading
+            if (!this.blocks || !this.blocks.protoBlockDict) {
+                console.debug("prepSearchWidget: blocks not yet initialized, skipping");
+                return;
+            }
 
             for (const i in this.blocks.protoBlockDict) {
                 const block = this.blocks.protoBlockDict[i];
@@ -2940,52 +3319,163 @@ class Activity {
          * Uses JQuery to add autocompleted search suggestions
          */
         this.doSearch = () => {
-            const $j = jQuery.noConflict();
+            // Guard: ensure searchWidget exists before proceeding
+            if (!this.searchWidget) {
+                console.debug("doSearch: searchWidget not yet initialized, skipping");
+                return;
+            }
+
+            const $j = window.jQuery;
+            if (this.searchSuggestions.length === 0) {
+                this.prepSearchWidget();
+            }
 
             const that = this;
-            $j("#search").autocomplete({
-                source: that.searchSuggestions,
-                select: (event, ui) => {
-                    event.preventDefault();
-                    that.searchWidget.value = ui.item.label;
-                    that.searchWidget.idInput_custom = ui.item.value;
-                    that.searchWidget.protoblk = ui.item.specialDict;
-                    that.doSearch();
-                    if (event.keyCode === 13) this.searchWidget.style.visibility = "visible";
-                },
-                focus: event => {
-                    event.preventDefault();
-                }
-            });
+            const $search = $j("#search");
 
-            $j("#search").autocomplete("instance")._renderItem = (ul, item) => {
-                return $j("<li></li>")
-                    .data("item.autocomplete", item)
-                    .append(
-                        '<img src="' +
-                            item.artwork +
-                            '" height="20px">' +
-                            "<a> " +
-                            item.label +
-                            "</a>"
-                    )
-                    .appendTo(
-                        ul.css({
-                            "z-index": 9999,
-                            "max-height": "200px",
-                            "overflow-y": "auto"
-                        })
-                    );
-            };
+            if (!$search.data("autocomplete-init")) {
+                $search.autocomplete({
+                    source: that.searchSuggestions,
+                    appendTo: "body",
+                    select: (event, ui) => {
+                        event.preventDefault();
+                        that.searchWidget.value = ui.item.label;
+                        that.searchWidget.idInput_custom = ui.item.value;
+                        that.searchWidget.protoblk = ui.item.specialDict;
+                        that.doSearch();
+                        if (event.keyCode === 13) this.searchWidget.style.visibility = "visible";
+                    },
+                    focus: event => {
+                        event.preventDefault();
+                    }
+                });
+
+                const instance = $search.autocomplete("instance");
+                if (instance) {
+                    instance._renderItem = (ul, item) => {
+                        const li = $j("<li></li>");
+
+                        const img = document.createElement("img");
+                        img.src = item.artwork || "";
+                        img.height = 20;
+                        img.style.cursor = "grab";
+
+                        // Drag-and-drop: mirrors the palette drag pattern in
+                        // palette.js _showMenuItems(). Keep both in sync.
+                        img.ondragstart = () => false;
+
+                        const down = event => {
+                            // Stop jQuery UI autocomplete from handling this
+                            event.stopPropagation();
+                            event.stopImmediatePropagation();
+                            event.preventDefault();
+
+                            const posit = img.style.position;
+                            const zInd = img.style.zIndex;
+                            img.style.position = "absolute";
+                            img.style.zIndex = 10000;
+
+                            // Close the autocomplete dropdown
+                            $j("#search").autocomplete("close");
+
+                            document.body.appendChild(img);
+
+                            const moveAt = (pageX, pageY) => {
+                                img.style.left = pageX - img.offsetWidth / 2 + "px";
+                                img.style.top = pageY - img.offsetHeight / 2 + "px";
+                            };
+
+                            const onMouseMove = e => {
+                                e.preventDefault();
+                                let x, y;
+                                if (e.type === "touchmove") {
+                                    x = e.touches[0].clientX;
+                                    y = e.touches[0].clientY;
+                                } else {
+                                    x = e.pageX;
+                                    y = e.pageY;
+                                }
+                                moveAt(x, y);
+                            };
+                            onMouseMove(event);
+
+                            document.addEventListener("touchmove", onMouseMove, { passive: false });
+                            document.addEventListener("mousemove", onMouseMove);
+
+                            const up = () => {
+                                document.body.style.cursor = "default";
+                                document.removeEventListener("mousemove", onMouseMove);
+                                document.removeEventListener("touchmove", onMouseMove);
+
+                                const x = parseInt(img.style.left);
+                                const y = parseInt(img.style.top);
+
+                                img.style.position = posit;
+                                img.style.zIndex = zInd;
+                                if (img.parentNode === document.body) {
+                                    document.body.removeChild(img);
+                                }
+
+                                if (isNaN(x) && isNaN(y)) return;
+
+                                const protoblk = item.specialDict;
+                                const paletteName = protoblk.palette.name;
+                                const protoName = item.value;
+
+                                that.palettes.dict[paletteName].makeBlockFromSearch(
+                                    protoblk,
+                                    protoName,
+                                    newBlock => {
+                                        that.blocks.moveBlock(
+                                            newBlock,
+                                            (x || that.blocksContainer.x + 100) -
+                                                that.blocksContainer.x,
+                                            (y || that.blocksContainer.y + 100) -
+                                                that.blocksContainer.y
+                                        );
+                                    }
+                                );
+                            };
+
+                            document.addEventListener("mouseup", up, { once: true });
+                            document.addEventListener("touchend", up, { once: true });
+                        };
+
+                        // Capture phase fires BEFORE jQuery UI's event delegation
+                        li[0].addEventListener("mousedown", down, true);
+                        li[0].addEventListener("touchstart", down, {
+                            capture: true,
+                            passive: false
+                        });
+
+                        li.append(img);
+                        li.append("<a> " + item.label + "</a>");
+
+                        return li.appendTo(
+                            ul.css({
+                                "z-index": 35000,
+                                "max-height": "200px",
+                                "overflow-y": "auto"
+                            })
+                        );
+                    };
+                }
+                $search.data("autocomplete-init", true);
+            }
+
             const searchInput = this.searchWidget.idInput_custom;
-            if (!searchInput || searchInput.length <= 0) return;
+            if (!searchInput || searchInput.length <= 0) {
+                if (this.searchWidget.value && this.searchWidget.value.length > 0) {
+                    $search.autocomplete("search", this.searchWidget.value);
+                }
+                return;
+            }
 
             const protoblk = this.searchWidget.protoblk;
             const paletteName = protoblk.palette.name;
             const protoName = protoblk.name;
 
-            // eslint-disable-next-line no-prototype-builtins
-            if (this.blocks.protoBlockDict.hasOwnProperty(protoName)) {
+            if (Object.prototype.hasOwnProperty.call(this.blocks.protoBlockDict, protoName)) {
                 this.palettes.dict[paletteName].makeBlockFromSearch(
                     protoblk,
                     protoName,
@@ -3009,103 +3499,6 @@ class Activity {
 
             this.searchWidget.value = "";
             this.update = true;
-        };
-
-        /*
-         * Makes initial "start up" note for a brand new MB project
-         */
-        this.__makeNewNote = (octave, solf) => {
-            const newNote = [
-                [
-                    0,
-                    "newnote",
-                    300 - this.blocksContainer.x,
-                    300 - this.blocksContainer.y,
-                    [null, 1, 4, 8]
-                ],
-                [1, "divide", 0, 0, [0, 2, 3]],
-                [
-                    2,
-                    [
-                        "number",
-                        {
-                            value: 1
-                        }
-                    ],
-                    0,
-                    0,
-                    [1]
-                ],
-                [
-                    3,
-                    [
-                        "number",
-                        {
-                            value: 4
-                        }
-                    ],
-                    0,
-                    0,
-                    [1]
-                ],
-                [4, "vspace", 0, 0, [0, 5]],
-                [5, "pitch", 0, 0, [4, 6, 7, null]],
-                [
-                    6,
-                    [
-                        "solfege",
-                        {
-                            value: solf
-                        }
-                    ],
-                    0,
-                    0,
-                    [5]
-                ],
-                [
-                    7,
-                    [
-                        "number",
-                        {
-                            value: octave
-                        }
-                    ],
-                    0,
-                    0,
-                    [5]
-                ],
-                [8, "hidden", 0, 0, [0, null]]
-            ];
-
-            this.blocks.loadNewBlocks(newNote);
-            if (this.blocks.activeBlock !== null) {
-                // Connect the newly created block to the active block (if
-                // it is a hidden block at the end of a new note block).
-                const bottom = this.blocks.findBottomBlock(this.blocks.activeBlock);
-                if (
-                    this.blocks.blockList[bottom].name === "hidden" &&
-                    this.blocks.blockList[this.blocks.blockList[bottom].connections[0]].name ===
-                        "newnote"
-                ) {
-                    // The note block macro creates nine blocks.
-                    const newlyCreatedBlock = this.blocks.blockList.length - 9;
-
-                    // Set last connection of active block to the
-                    // newly created block.
-                    const lastConnection = this.blocks.blockList[bottom].connections.length - 1;
-                    this.blocks.blockList[bottom].connections[lastConnection] = newlyCreatedBlock;
-
-                    // Set first connection of the newly created block to
-                    // the active block.
-                    this.blocks.blockList[newlyCreatedBlock].connections[0] = bottom;
-                    // Adjust the dock positions to realign the stack.
-                    this.blocks.adjustDocks(bottom, true);
-                }
-            }
-
-            // Set new hidden block at the end of the newly created
-            // note block to the active block.
-            this.blocks.activeBlock = this.blocks.blockList.length - 1;
         };
 
         //To create a sampler widget
@@ -3156,6 +3549,10 @@ class Activity {
                 return;
             }
             if (document.getElementById("labelDiv").classList.contains("hasKeyboard")) {
+                return;
+            }
+            // Skip hotkeys when value bar is visible (prevents accidental block creation)
+            if (this.printText && this.printText.classList.contains("show")) {
                 return;
             }
 
@@ -3214,14 +3611,6 @@ class Activity {
             const KEYCODE_DOWN = 40;
             const DEL = 46;
             const V = 86;
-            // Shortcuts for creating new notes
-            const KEYCODE_D = 68; // do
-            const KEYCODE_R = 82; // re
-            const KEYCODE_M = 77; // mi
-            const KEYCODE_F = 70; // fa
-            const KEYCODE_S = 83; // so
-            const KEYCODE_L = 76; // la
-            const KEYCODE_T = 84; // ti
             const disableKeys =
                 document.getElementById("lilypondModal").style.display === "block" ||
                 this.searchWidget.style.visibility === "visible" ||
@@ -3269,7 +3658,7 @@ class Activity {
                         break;
                     }
                     case 13: {
-                        // 'R or ENTER'
+                        // Alt+ENTER
                         if (this.isInputON) return;
 
                         if (this.searchWidget.style.visibility === "visible") {
@@ -3280,12 +3669,20 @@ class Activity {
                             document.getElementById("paste").style.visibility = "hidden";
                             return;
                         }
-                        this.textMsg("Enter " + _("Play"));
-                        const stopbt = document.getElementById("stop");
-                        if (stopbt) {
-                            stopbt.style.color = platformColor.stopIconcolor;
+
+                        // Check if any widget window is open
+                        const hasOpenWidget = Object.values(window.widgetWindows.openWindows).some(
+                            w => w
+                        );
+                        if (this.turtles.running()) {
+                            this._doHardStopButton();
+                        } else if (!hasOpenWidget) {
+                            const stopbtn = document.getElementById("stop");
+                            if (stopbtn) {
+                                stopbtn.style.color = platformColor.stopIconcolor;
+                            }
+                            this._doFastButton();
                         }
-                        this._doFastButton();
                         break;
                     }
                     case 83: // 'S'
@@ -3307,7 +3704,7 @@ class Activity {
                             disableHorizScrollIcon.style.display == "block"
                         ) {
                             this.blocksContainer.x += this.canvas.width / 10;
-                            this.stage.update();
+                            this.stageDirty = true;
                         }
                     // fall through
                     case 220:
@@ -3317,7 +3714,7 @@ class Activity {
                             disableHorizScrollIcon.style.display == "block"
                         ) {
                             this.blocksContainer.x -= this.canvas.width / 10;
-                            this.stage.update();
+                            this.stageDirty = true;
                         }
                 }
             } else if (event.ctrlKey) {
@@ -3336,50 +3733,7 @@ class Activity {
                         break;
                 }
             } else if (event.shiftKey && !disableKeys) {
-                const solfnotes_ = _("ti la sol fa mi re do").split(" ");
                 switch (event.keyCode) {
-                    case KEYCODE_D:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("D " + solfnotes_[6]);
-                            this.__makeNewNote(5, "do");
-                        }
-                        break;
-                    case KEYCODE_R:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("R " + solfnotes_[5]);
-                            this.__makeNewNote(5, "re");
-                        }
-                        break;
-                    case KEYCODE_M:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("M " + solfnotes_[4]);
-                            this.__makeNewNote(5, "mi");
-                        }
-                        break;
-                    case KEYCODE_F:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("F " + solfnotes_[3]);
-                            this.__makeNewNote(5, "fa");
-                        }
-                        break;
-                    case KEYCODE_S:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("S " + solfnotes_[2]);
-                            this.__makeNewNote(5, "sol");
-                        }
-                        break;
-                    case KEYCODE_L:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("L " + solfnotes_[1]);
-                            this.__makeNewNote(5, "la");
-                        }
-                        break;
-                    case KEYCODE_T:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("T " + solfnotes_[0]);
-                            this.__makeNewNote(5, "ti");
-                        }
-                        break;
                     case SPACE:
                         event.preventDefault();
                         if (this.turtleContainer.scaleX === 1) {
@@ -3407,26 +3761,29 @@ class Activity {
                         this._doHardStopButton();
                     } else if (!disableKeys && !hasOpenWidget) {
                         event.preventDefault();
+                        const stopbtn = document.getElementById("stop");
+                        if (stopbtn) {
+                            stopbtn.style.color = platformColor.stopIconcolor;
+                        }
                         this._doFastButton();
                     }
                 } else if (!disableKeys) {
-                    const solfnotes_ = _("ti la sol fa mi re do").split(" ");
                     switch (event.keyCode) {
                         case END:
                             this.textMsg("END " + _("Jumping to the bottom of the page."));
                             this.blocksContainer.y =
                                 -this.blocks.bottomMostBlock() + this.canvas.height / 2;
-                            this.stage.update();
+                            this.stageDirty = true;
                             break;
                         case PAGE_UP:
                             this.textMsg("PAGE_UP " + _("Scrolling up."));
                             this.blocksContainer.y += this.canvas.height / 2;
-                            this.stage.update();
+                            this.stageDirty = true;
                             break;
                         case PAGE_DOWN:
                             this.textMsg("PAGE_DOWN " + _("Scrolling down."));
                             this.blocksContainer.y -= this.canvas.height / 2;
-                            this.stage.update();
+                            this.stageDirty = true;
                             break;
                         case DEL:
                             this.textMsg("DEL " + _("Extracting block"));
@@ -3450,7 +3807,7 @@ class Activity {
                                 } else {
                                     this.blocksContainer.y += 20;
                                 }
-                                this.stage.update();
+                                this.stageDirty = true;
                             }
                             break;
                         case KEYCODE_DOWN:
@@ -3474,7 +3831,7 @@ class Activity {
                                 } else {
                                     this.blocksContainer.y -= 20;
                                 }
-                                this.stage.update();
+                                this.stageDirty = true;
                             }
                             break;
                         case KEYCODE_LEFT:
@@ -3491,7 +3848,7 @@ class Activity {
                                 } else if (this.scrollBlockContainer) {
                                     this.blocksContainer.x += 20;
                                 }
-                                this.stage.update();
+                                this.stageDirty = true;
                             }
                             break;
                         case KEYCODE_RIGHT:
@@ -3508,7 +3865,7 @@ class Activity {
                                 } else if (this.scrollBlockContainer) {
                                     this.blocksContainer.x -= 20;
                                 }
-                                this.stage.update();
+                                this.stageDirty = true;
                             }
                             break;
                         case HOME:
@@ -3526,7 +3883,7 @@ class Activity {
                                 // Bring all the blocks "home".
                                 this._findBlocks();
                             }
-                            this.stage.update();
+                            this.stageDirty = true;
                             break;
                         case TAB:
                             break;
@@ -3536,65 +3893,24 @@ class Activity {
                                 this.searchWidget.style.visibility = "hidden";
                             }
                             break;
-                        case RETURN:
-                            this.textMsg("Return " + _("Play"));
-                            if (this.inTempoWidget) {
-                                if (this.logo.tempo.isMoving) {
-                                    this.logo.tempo.pause();
+                        case RETURN: {
+                            // Check if any widget window is open
+                            const hasOpenWidget = Object.values(
+                                window.widgetWindows.openWindows
+                            ).some(w => w);
+                            if (this.turtles.running()) {
+                                event.preventDefault();
+                                this._doHardStopButton();
+                            } else if (!disableKeys && !hasOpenWidget) {
+                                event.preventDefault();
+                                const stopbtn = document.getElementById("stop");
+                                if (stopbtn) {
+                                    stopbtn.style.color = platformColor.stopIconcolor;
                                 }
-                                this.logo.tempo.resume();
-                            }
-                            if (
-                                this.blocks.activeBlock === null ||
-                                !SPECIALINPUTS.includes(
-                                    this.blocks.blockList[this.blocks.activeBlock].name
-                                )
-                            ) {
-                                this.logo.runLogoCommands();
+                                this._doFastButton();
                             }
                             break;
-                        case KEYCODE_D:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("d " + solfnotes_[6]);
-                                this.__makeNewNote(4, "do");
-                            }
-                            break;
-                        case KEYCODE_R:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("r " + solfnotes_[5]);
-                                this.__makeNewNote(4, "re");
-                            }
-                            break;
-                        case KEYCODE_M:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("m " + solfnotes_[4]);
-                                this.__makeNewNote(4, "mi");
-                            }
-                            break;
-                        case KEYCODE_F:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("f " + solfnotes_[3]);
-                                this.__makeNewNote(4, "fa");
-                            }
-                            break;
-                        case KEYCODE_S:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("s " + solfnotes_[2]);
-                                this.__makeNewNote(4, "sol");
-                            }
-                            break;
-                        case KEYCODE_L:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("l " + solfnotes_[1]);
-                                this.__makeNewNote(4, "la");
-                            }
-                            break;
-                        case KEYCODE_T:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("t " + solfnotes_[0]);
-                                this.__makeNewNote(4, "ti");
-                            }
-                            break;
+                        }
                         default:
                             break;
                     }
@@ -3636,7 +3952,13 @@ class Activity {
                 return;
             }
 
-            const $j = jQuery.noConflict();
+            // Skip resize when the tab is hidden — canvas reports 0×0
+            // and any layout work would corrupt positions.
+            if (document.hidden) {
+                return;
+            }
+
+            const $j = window.jQuery;
             let w = 0,
                 h = 0;
             if (typeof platform !== "undefined" && !platform.androidWebkit) {
@@ -3653,6 +3975,12 @@ class Activity {
             this._innerHeight = window.innerHeight;
             this._outerWidth = window.outerWidth;
             this._outerHeight = window.outerHeight;
+
+            // Guard against zero or invalid dimensions to prevent
+            // division-by-zero and ResizeObserver loop errors
+            if (w <= 0 || h <= 0) {
+                return;
+            }
 
             if (document.getElementById("labelDiv").classList.contains("hasKeyboard")) {
                 return;
@@ -3827,6 +4155,11 @@ class Activity {
         const defaultHeight = 900;
 
         function handleResize() {
+            // Skip resize when the tab is hidden to prevent 0×0 canvas
+            if (document.hidden) {
+                return;
+            }
+
             const isMaximized =
                 window.innerWidth === window.screen.width &&
                 window.innerHeight === window.screen.height;
@@ -3842,6 +4175,12 @@ class Activity {
             } else {
                 const windowWidth = window.innerWidth;
                 const windowHeight = window.innerHeight;
+
+                // Guard against zero or invalid dimensions
+                if (windowWidth <= 0 || windowHeight <= 0) {
+                    return;
+                }
+
                 container.style.width = windowWidth + "px";
                 container.style.height = windowHeight + "px";
                 canvas.width = windowWidth;
@@ -3856,27 +4195,50 @@ class Activity {
         }
 
         let resizeTimeout;
-        window.addEventListener("resize", () => {
+        this._handleWindowResize = () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
                 handleResize();
                 this._setupPaletteMenu();
-            }, 100);
-        });
-        window.addEventListener("orientationchange", handleResize);
+            }, 200);
+        };
+        this.addEventListener(window, "resize", this._handleWindowResize);
+        this._handleOrientationChangeResize = handleResize;
+        this.addEventListener(window, "orientationchange", this._handleOrientationChangeResize);
+
+        // When the user returns to the Music Blocks tab after it was
+        // hidden, re-apply the correct dimensions.  While the tab was
+        // hidden the resize guards above intentionally skipped any
+        // layout work, so we need to catch up now.
+        this._handleVisibilityChange = () => {
+            if (!document.hidden && this.stage) {
+                // Use a short delay to let the browser finish
+                // exposing the tab and reporting real dimensions.
+                setTimeout(() => {
+                    handleResize();
+                    this._onResize(false);
+                }, 250);
+            }
+        };
+        this.addEventListener(document, "visibilitychange", this._handleVisibilityChange);
+
         const that = this;
         const resizeCanvas_ = () => {
             try {
                 that._onResize(false);
                 document.getElementById("hideContents").click();
             } catch (error) {
-                // eslint-disable-next-line no-console
                 console.error("An error occurred in resizeCanvas_:", error);
             }
         };
 
         resizeCanvas_();
-        window.addEventListener("orientationchange", resizeCanvas_);
+        this._handleOrientationChangeResizeCanvas = resizeCanvas_;
+        this.addEventListener(
+            window,
+            "orientationchange",
+            this._handleOrientationChangeResizeCanvas
+        );
 
         /*
          * Restore last stack pushed to trashStack back onto canvas.
@@ -3893,8 +4255,10 @@ class Activity {
                 return;
             }
 
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -3911,8 +4275,10 @@ class Activity {
             this._restoreTrashById(this.blocks.trashStacks[this.blocks.trashStacks.length - 1]);
             activity.textMsg(_("Item restored from the trash."), 3000);
 
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -3938,6 +4304,19 @@ class Activity {
                 const blk = this.blocks.dragGroup[b];
                 this.blocks.blockList[blk].trash = false;
                 this.blocks.moveBlockRelative(blk, dx, dy);
+
+                // Re-cache the container if it was uncached to save
+                // memory in sendStackToTrash().
+                const block = this.blocks.blockList[blk];
+                if (block.container && !block.container.bitmapCache) {
+                    block.container.cache(
+                        0,
+                        0,
+                        Math.max(block.width, 1),
+                        Math.max(block.height, 1)
+                    );
+                }
+
                 this.blocks.blockList[blk].show();
             }
 
@@ -3988,6 +4367,15 @@ class Activity {
                             }
                         }
                     }
+
+                    // Re-add the action to the palette
+                    const actionName = actionArg.value;
+                    this.blocks.newNameddoBlock(
+                        actionName,
+                        this.blocks.actionHasReturn(blockId),
+                        this.blocks.actionHasArgs(blockId)
+                    );
+                    this.palettes.updatePalettes("action");
                 }
             }
             activity.textMsg(_("Item restored from the trash."), 3000);
@@ -4000,18 +4388,30 @@ class Activity {
             this._renderTrashView();
         });
 
+        // Store the click handler reference for proper cleanup
+        let trashViewClickHandler = null;
+
         // function to hide trashView from canvas
         function handleClickOutsideTrashView(trashView) {
+            // Remove existing listener to prevent duplicates
+            if (trashViewClickHandler) {
+                document.removeEventListener("click", trashViewClickHandler);
+            }
+
             let firstClick = true;
-            document.addEventListener("click", event => {
+            trashViewClickHandler = event => {
                 if (firstClick) {
                     firstClick = false;
                     return;
                 }
                 if (!trashView.contains(event.target) && event.target !== trashView) {
                     trashView.style.display = "none";
+                    // Clean up listener when trashView is hidden
+                    document.removeEventListener("click", trashViewClickHandler);
+                    trashViewClickHandler = null;
                 }
-            });
+            };
+            document.addEventListener("click", trashViewClickHandler);
         }
 
         this._renderTrashView = () => {
@@ -4083,10 +4483,12 @@ class Activity {
                     this._restoreTrashById(blockId);
                     trashView.classList.add("hidden");
                 });
-                handleClickOutsideTrashView(trashView);
 
                 trashView.appendChild(listItem);
             });
+
+            // Attach outside-click listener once, after all items are rendered
+            handleClickOutsideTrashView(trashView);
 
             const existingView = document.getElementById("trashView");
             if (existingView) {
@@ -4119,7 +4521,8 @@ class Activity {
             // function to increase or decrease the "top" property of the top-right corner buttons
 
             const topRightButtons = document.querySelectorAll("#buttoncontainerTOP .tooltipped");
-            const btnY = document.getElementById("Grid").getBoundingClientRect().top;
+            const gridElement = document.getElementById("Grid");
+            const btnY = gridElement ? gridElement.getBoundingClientRect().top : 70 + LEADING + 6;
 
             this.changeTopButtonsPosition = value => {
                 topRightButtons.forEach(child => {
@@ -4253,8 +4656,10 @@ class Activity {
          */
         const changeBlockVisibility = activity => {
             activity._changeBlockVisibility();
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -4287,8 +4692,10 @@ class Activity {
          */
         const toggleCollapsibleStacks = activity => {
             activity._toggleCollapsibleStacks();
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -4320,6 +4727,11 @@ class Activity {
          */
         this.clearCache = () => {
             this.blocks.blockList.forEach(block => {
+                // Skip trashed blocks — they are hidden and their backing
+                // canvases are freed in sendStackToTrash(). Re-caching them
+                // here would waste ~0.5–2 MB per trashed block.
+                if (block.trash) return;
+
                 if (block.container) {
                     block.container.uncache();
                     block.container.cache();
@@ -4332,7 +4744,8 @@ class Activity {
         };
 
         /*
-         * Updates all canvas elements
+         * Updates all canvas elements by marking stage as dirty.
+         * The actual render will happen on the next animation frame.
          */
         this.refreshCanvas = () => {
             if (this.blockRefreshCanvas) {
@@ -4340,27 +4753,34 @@ class Activity {
             }
 
             this.blockRefreshCanvas = true;
-            // Force stage clear and update
-            this.stage.clear();
-            this.stage.update();
+            // Mark stage as needing update
+            this.stageDirty = true;
             this.update = true;
 
             const that = this;
             setTimeout(() => {
                 that.blockRefreshCanvas = false;
-                that.stage.update();
+                that.stageDirty = true;
             }, 5);
         };
 
         /*
-         * This set makes it so the stage only re-renders when an
-         * event handler indicates a change has happened.
+         * This sets the dirty flag so the stage re-renders on the next
+         * animation frame when an event handler indicates a change has happened.
          */
         this.__tick = event => {
             if (this.update || createjs.Tween.hasActiveTweens()) {
-                this.update = false; // Only update once
-                this.stage.update(event);
+                this.update = false;
+                this.stageDirty = true;
             }
+        };
+
+        /*
+         * Marks the stage as needing a redraw on the next animation frame.
+         * Call this whenever visual changes occur that need to be rendered.
+         */
+        this.markStageDirty = () => {
+            this.stageDirty = true;
         };
 
         /*
@@ -4393,8 +4813,10 @@ class Activity {
          */
         const chooseKeyMenu = that => {
             piemenuKey(that);
-            if (document.getElementById("helpfulWheelDiv").style.display !== "none") {
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
             }
         };
 
@@ -4466,7 +4888,7 @@ class Activity {
         /**
          * Loads MB project from Planet.
          * @param  projectID {Planet project ID}
-         * @param  flags     {parameteres}
+         * @param  flags     {parameters}
          * @param  env       {specifies environment}
          */
         const loadProject = (activity, projectID, flags, env) => {
@@ -4487,20 +4909,19 @@ class Activity {
                     if (_THIS_IS_MUSIC_BLOCKS_) {
                         const imgUrl =
                             "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+IDxzdmcgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIiB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgaWQ9InN2ZzExMjEiIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDM0LjEzMTI0OSAxNC41NTIwODkiIGhlaWdodD0iNTUuMDAwMDE5IiB3aWR0aD0iMTI5Ij4gPGRlZnMgaWQ9ImRlZnMxMTE1Ij4gPGNsaXBQYXRoIGlkPSJjbGlwUGF0aDQzMzciIGNsaXBQYXRoVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4gPHJlY3QgeT0iNTUyIiB4PSI1ODgiIGhlaWdodD0iMTQzNiIgd2lkdGg9IjE5MDAiIGlkPSJyZWN0NDMzOSIgc3R5bGU9ImZpbGw6I2EzYjVjNDtmaWxsLW9wYWNpdHk6MTtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MTU7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDwvY2xpcFBhdGg+IDwvZGVmcz4gPG1ldGFkYXRhIGlkPSJtZXRhZGF0YTExMTgiPiA8cmRmOlJERj4gPGNjOldvcmsgcmRmOmFib3V0PSIiPiA8ZGM6Zm9ybWF0PmltYWdlL3N2Zyt4bWw8L2RjOmZvcm1hdD4gPGRjOnR5cGUgcmRmOnJlc291cmNlPSJodHRwOi8vcHVybC5vcmcvZGMvZGNtaXR5cGUvU3RpbGxJbWFnZSIgLz4gPGRjOnRpdGxlPjwvZGM6dGl0bGU+IDwvY2M6V29yaz4gPC9yZGY6UkRGPiA8L21ldGFkYXRhPiA8ZyB0cmFuc2Zvcm09Im1hdHJpeCgxLjA4Njc4MiwwLDAsMS4wODY3ODIsLTEuNTQ3MzI0NSwtMS4zMDU3OTkpIiBpZD0iZzE4MTIiPiA8ZWxsaXBzZSB0cmFuc2Zvcm09Im1hdHJpeCgwLjAxMDQ2MDk5LDAsMCwwLjAxMDQ2MDk5LDEuMDE2NzM4OSwtNi4yMDQ4NTI5KSIgY2xpcC1wYXRoPSJ1cmwoI2NsaXBQYXRoNDMzNykiIHJ5PSI3NjgiIHJ4PSI3NDgiIGN5PSIxNDc2IiBjeD0iMTU0MCIgaWQ9InBhdGg0MzMzIiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDojYTNiNWM0O2ZpbGwtb3BhY2l0eToxO3N0cm9rZTpub25lO3N0cm9rZS13aWR0aDoxNTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPGVsbGlwc2Ugcnk9IjEuNzgyNjg1OSIgcng9IjEuNjkzOTIxNiIgY3k9IjguODM0MzUzNCIgY3g9IjE2LjQ0NjczOSIgaWQ9InBhdGg0MjU2IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDojYzlkYWQ4O2ZpbGwtb3BhY2l0eToxO3N0cm9rZTojYzlkYWQ4O3N0cm9rZS13aWR0aDowLjEwNDYwOTk7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDMyOCIgZD0ibSAxNy42MzAyNjYsMTMuNDg3MDkgMC4zMjU0NywwLjM5MjA0NCAwLjM0NzY2LDAuMjczNjkgMC4zMTA2NzYsMC4xMTA5NTUgMC4yMzY3MDUsLTAuMDUxNzggMC4xNDA1NDQsLTAuMTg0OTI2IDAuMTk5NzIsMC4wODEzNyAwLjE1NTMzOCwwLjA0NDM4IDAuNjEzOTU0LC0wLjQyMTYzMiAwLjQyMTYzMSwtMC4yNTE0OTkgYyAwLDAgMC44ODc2NDUsLTAuMDA3NCAxLjYwNTE1NywtMC41NTQ3NzcgMC43MTc1MTMsLTAuNTQ3MzgxIDAuNDk1NjAyLC0wLjY1MDkzOSAwLjQ5NTYwMiwtMC42NTA5MzkgbCAtMC4wMzY5OSwtMC40MjkwMjkgLTAuNTM5OTg0LC0wLjcxNzUxMyAtMC41NTQ3NzcsLTAuNTY5NTcxIC0wLjIyOTMwOSwtMC4xNDc5NDEgYyAwLDAgLTAuMDIyMTksLTAuMDQ0MzggLTAuMDczOTcsLTAuMDQ0MzggLTAuMDUxNzgsMCAtMC4yNDQxMDMsLTAuMDczOTcgLTAuNTE3NzkzLDAuMDQ0MzggLTAuMjczNjkxLDAuMTE4MzUzIC0wLjQ2NjAxNCwwLjE3MDEzMiAtMC44NDMyNjMsMC4zODQ2NDYgLTAuMzc3MjQ4LDAuMjE0NTE0IC0wLjcxMDExNSwwLjQyMTYzMSAtMC44MzU4NjUsMC40OTU2MDIgLTAuMTI1NzUsMC4wNzM5NyAtMC43NDcxLDAuNDI5MDI4IC0wLjc0NzEsMC40MjkwMjggbCAtMC4wOTYxNiwwLjY1ODMzNiB6IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDojZjhmOGY4O2ZpbGwtb3BhY2l0eToxO2ZpbGwtcnVsZTpldmVub2RkO3N0cm9rZTpub25lO3N0cm9rZS13aWR0aDowLjAxMDQ2MDk5cHg7c3Ryb2tlLWxpbmVjYXA6YnV0dDtzdHJva2UtbGluZWpvaW46bWl0ZXI7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggaWQ9InBhdGg0MzMwIiBkPSJtIDE4LjA4MTQ4NSwxMy4xMTcyMzkgYyAwLDAgMS4wMTcyMDIsMC4yMTk4MDggMS40OTA2MTMsLTAuMTM1MjUgMC42ODI1NSwtMC42NzQwOTcgMS42NTU4OTMsLTEuMTU0NzMxIDEuODcwMzU1LC0xLjc0NTMwOCAwLjEwODI1NywtMC4yOTgxMTYgMC4wOTI2NSwtMC4zNzIzNzcgLTAuMDgwMTgsLTAuNjM3MTkxIC0wLjc4NDA4NSwtMS4xMTY5NTIzIC0yLjE4NjAyMywwLjQ4MzU2MyAtMi4xODYwMjMsMC40ODM1NjMgbCAtMS4yMjA1MTEsMS4wNDI5ODMgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2M5ZGFkODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI4MSIgZD0ibSAxOC45MjM2MzgsMTEuOTExMTY2IGMgMCwwIC0yLjI2MjA3MywwLjM2MDA3MyAtMS4yNDU4MDcsMS42MzE0MjYgMS4wMTYyNjgsMS4yNzEzNTQgMS4zMzE1OSwwLjQ2ODQxNSAxLjMzMTU5LDAuNDY4NDE1IDAsMCAwLjIzNzM2NCwwLjI4NDAyMSAwLjU1MDIyMSwtMC4wMTI4OSAwLjMxMjg1NywtMC4yOTY5MSAwLjgwMTY1NywtMC40ODY1NjMgMC44MDE2NTcsLTAuNDg2NTYzIDAsMCAwLjgzMzQxOSwtMC4wODE1OCAxLjcyODg1MSwtMC42NDAzNDUgMC44OTU0MzIsLTAuNTU4NzY5IDAuMDI1NDUsLTEuNDk0NjQ0IDAuMDI1NDUsLTEuNDk0NjQ0IDAsMCAtMC43MDQwMDIsLTAuOTE0MzA1IC0xLjE5MTE1OCwtMS4wNjIwMDQgLTAuNDg3MTU1LC0wLjE0NzY5OSAtMS4yNjAyMDYsLTAuMjA1OTYzIC0xLjI2MDIwNiwtMC4yMDU5NjMgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6bm9uZTtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNTkyNiIgZD0ibSAxNi44ODkxNjUsMy45OTA3MDY3IGMgLTAuMjA1OTI1LDAuMDA5MDIgLTAuNDkwNTg0LDAuMDE2NDUyIC0wLjY4MjQzNCwwLjA5NDMwNiAtMC4zNjM1MSwwLjExMzE2MjUgLTAuNzg0MDE5LDAuMzA2NTkxNiAtMS4xMDIwMzksMC40MTQ1MTk3IEMgMTQuODA1NzA3LDQuNjAwOTk5MyAxNC41MjgzODMsNC44Njc1ODQxIDE0LjQ0MjUxNSw0Ljc3MDc2NzYgMTQuMzE0ODUsNC42MjY4MjQ0IDE0LjIyNDM1Myw0LjU5NTM2MyAxNC4wNDU2ODksNC40OTc1NTkgMTMuODAxNzgxLDQuMzk5NTA1IDEzLjg3Mzc3Myw0LjQ0NDgyNzIgMTMuNjYwODY2LDQuMzg2MzI4MyAxMy41MTM2ODEsNC4zNDU4ODcxIDEzLjQ0ODI5LDQuMjg4Mjk1OCAxMy4wNDc5NTQsNC4zMDIzNTY3IGMgLTAuMjE2MDg3LDAuMDA3NTkgLTAuNDczNTEsMC4wMDgwNCAtMC42NjAwODEsMC4wODk3MjUgLTAuMzc0NjE1LDAuMTY0MDE3OCAtMC4yOTksMC4yNDg0NzU3IC0wLjUzODU3MiwwLjQ5MDAyNTIgLTAuMTY1MTA4LDAuMTY2NDcwOSAtMC4yMjMwMjksMC41NzQ5ODMxIC0wLjI4MjA0MSwwLjgxODg1OCAtMC4wNjkzOSwwLjI4Njc3NzYgLTAuMDU0NywwLjYwMTAzOTMgLTAuMDIwMzEsMC45Njc0MDMxIDAuMDI3NjEsMC4yOTQxOTY1IDAuMDkxNzMsMC40OTczOTM5IDAuMjQ5Mzg4LDAuNzU5MDYzIDAuMTM1MDg0LDAuMjI0MTk4OSAwLjMyNDU2MSwwLjI4MzU4MjggMC41NDY1OSwwLjQ5NzI4OTMgMC4wNzc3NCwwLjA3NDgzIDAuMzY4Mzk4LC0wLjAzODk2NSAwLjQ4NDg4LC0wLjAxNTEwNCAwLjEwODcwOSwwLjAyMjI3IC0wLjA0ODE3LDAuMjE2NzA4OCAtMC4wNTMyLDAuMjQ1MzgzNCAtMC4wNTM4LDAuMjM5NTE2OSAtMC4xMTA1MDMsMC4wODc3NzEgLTAuMDgwNiwwLjYyNzQyNjEgMC4zNDgxMjMsMi4wMjY2ODkyIDEuMDA1MDg5LC0xLjA2NzI2NDcgMC4zMjY2NDksMC42Njg2MTk0IC0wLjA1Mjk4LDAuMTM1NTY0IC0wLjQzNzU5NCwwLjM4ODgwNjggLTAuNTAzMzY4LDAuNTg2ODUzOCAtMC4wMTI2NywwLjE2NTEwOSAwLjE5NzgzNSwwLjE5NDA4IDAuMzE4OTk3LDAuMTc4MDQ5IDAuMDYyNjYsMC40ODAzOTUgMC4xMjQ5ODIsMS4wNDIwNDggMC41MjIyNDIsMS4zNzI0MzkgMC4xMjAxNzcsMC4xMDY0MDIgMC4yODY2NTIsMC4wOTQ0NyAwLjQyOTMxNywwLjEyNjQ0MyAwLjIyMTY0MSwwLjI2ODEyOCAwLjQ0ODY2OCwwLjU1NzA2NiAwLjc4NDA4NywwLjY4OTc3NCAwLjI4Mzg0NSwwLjE0ODQzNSAwLjYyNDkxMywwLjA1MSAwLjg5NjEzOCwwLjIzMzA2NSAwLjcxMjkyNSwwLjM2MDkwMSAxLjU5NDM3LDAuMjI3NDI0IDIuMjQwMzA3LC0wLjIxNDM2NyAwLjIzOTczNiwtMC4wMjU4NCAwLjUwMTI0MywwLjA1MTE5IDAuNzUxMzkxLDAuMDIyMjIgMC41NzU4OTgsLTAuMDIwMDYgMS4xNjcyMDcsLTAuMjQwMDA1IDEuNTIzOTYyLC0wLjcxMTUwMiAwLjA3MjksLTAuMDY2IDAuMTAyMDgxLC0wLjE3ODE0IDAuMTY4ODAzLC0wLjI0MDYzNSAwLjA2NjE2LDAuMDgzMyAwLjIwMTA3OSwwLjE2NTI4OSAwLjI4NTY1MywwLjA1NTAyIDAuMTkzMDcyLC0wLjI1MzQzNiAwLjIyMzQxMywtMC41OTUxMDQgMC4zMjcxNDUsLTAuODgyNTU5IDAuMDg2NTgsMC4wMzY0MSAwLjA4NDIsMC4yNjU3MzQgMC4xOTA4MiwwLjE3NTk2OCAwLjA4ODU4LC0wLjI3NzUxIDAuMjMxMDU1LC0wLjU4OTU1NCAwLjE1NzQ4NywtMC44NzUxMDMgQyAyMS4wOTQ5NjgsOS44NjQxNTE0IDIwLjk5NDc5OSw5LjcxMDk4NzkgMjAuOTU5NzUxLDkuNjcwOTkxNCAyMS4wNjk3Myw5LjY2NDkyMTQgMjEuMzkyMTQ2LDkuNjA3NDEyNCAyMS4zNjQyMjYsOS40MzQyNzkgMjEuMjg0OTAyLDkuMjY0MDY1MSAyMC45MzAzMjQsOS4wNTgwODkzIDIwLjc4MTQ3LDguOTYzNjg5MyAyMC42Mjc0ODksNy4wODIzNjI5IDIwLjgzMTk0MSw3Ljk3MzAwNDMgMjAuMzc0NDc1LDYuNTcyMTY2OCAyMC4yODY2OTMsNi4yOTYzNjYgMjAuMTc5NTgyLDYuMDI1MzkwOCAyMC4wMzkxNDksNS43NjczNzc4IDE5LjgxNDE1NSw1LjM1NDAwNzYgMTkuNTAzNjMsNC45NzM5MDc1IDE5LjA1MDAzMSw0LjY2MDUzMjggMTguNjk0MTU3LDQuNDg2NjE1NyAxOC43NzkxNjcsNC40MTI0NTc4IDE4LjQxNjMxOSw0LjI4NDIxMTggMTguMDQwOTE2LDQuMTE0ODkzIDE3LjkyMzEyNiw0LjExNDQyOTQgMTcuNzA2MjE3LDQuMDQ5NTUxNCAxNy40MjE5OTMsNC4wMDQyMzgyIDE3LjE3NjIyNiwzLjk5MzQ2MTEgMTYuODg5MTY1LDMuOTkwNzA2NyBaIG0gLTAuNDE2Nzc3LDMuNzcwMjM0NSBjIDAuMjU4MDA1LDAuMDA5NzYgMC40MjkyNTksMC4yNTQ4MTQgMC41Mjc1MDEsMC40Njg0NDEgLTAuMDQ2NTEsMC4xMjA5MTIzIC0wLjIxNzYxMywwLjE4MDMzMTggLTAuMzE0MzE2LDAuMjcwODAwNSAtMC4wNTIyNywwLjAzMDg5OCAtMC4xOTUwNTcsMC4xNDE5ODI5IC0wLjA3Mzk3LDAuMTc2MjU4MyAwLjE2NzU3NCwtMC4wMDgwMSAwLjM0MTEyNSwtMC4xMDE3NzYgMC41MDIzNjMsLTAuMDgxMjUzIDAuMDM4OCwwLjMxMzY5MjcgMC4wMTAzOCwwLjcyNTUwMzEgLTAuMjk1OTM5LDAuOTAyMTQ5NSAtMC4zMTY4ODQsMC4wODI4MjcgLTAuNTYyMDUzLC0wLjIxMjE0MTYgLTAuNjc2ODI5LC0wLjQ3MTYxOCAtMC4xNDcwOTYsLTAuMzY2NjkwMiAtMC4xODU5MzQsLTAuODQyODQzMSAwLjA3NjUxLC0xLjE2Njk5ODggMC4wNjUzMSwtMC4wNjgyNjggMC4xNjAwMTEsLTAuMTA2MzQ3NSAwLjI1NDY3OCwtMC4wOTc3OCB6IG0gMi44NTkyNDQsMi41NzU3ODc4IGMgLTAuMDc2NzMsMC4xODQ3NTggLTAuMjMwNjU5LDAuMzMwMTU2IC0wLjQwNzAxMSwwLjQxMzI1MiAtMC4wNTUzOSwwLjE1MDcwNSAwLjA0MDA0LDAuMzU0MzggMC4wMjk3LDAuNDgzMjM0IC0wLjA0OTA3LC0wLjE2MDM1NyAtMC4wMDE2LC0wLjM2MTQyNiAtMC4xMDg4NzUsLTAuNDk2NzU3IC0wLjA3MDE4LC0wLjAyMjcxIC0wLjE0Nzc0NywtMC4wMjgxIC0wLjIxMTc0MSwtMC4wNzIwNiAwLjIxMjc5NCwwLjExNzcxNyAwLjQ5NTYxLDAuMDM5MjQgMC42MDQ3NjYsLTAuMTgyMDk0IDAuMDI5MzQsLTAuMDM3NjIgMC4wODE1OSwtMC4xNDU1NzUgMC4wOTMxNiwtMC4xNDU1NzEgeiBtIC0wLjk2NTM3MiwwLjE0MTk4OCBjIDAuMDQ1NjYsMC4wMzQwOSAwLjIwNDg5NywwLjE2Mjg1NyAwLjA3NzQ0LDAuMDY3ODUgLTAuMDE2NDEsLTAuMDExMzggLTAuMDkwMTksLTAuMDcwODYgLTAuMDc3NDQsLTAuMDY3ODUgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2M5ZGFkODtmaWxsLW9wYWNpdHk6MTtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wNTIzMDQ5NTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggaWQ9InBhdGg0MjU3IiBkPSJtIDE4LjU2MjI5Miw0LjM0MDY1NDMgYyAwLDAgLTAuMDE4MjMsLTAuMTI2MDkyNSAwLjA1NTAzLC0wLjI2MzA5MTEgMC4xMDcwNjUsLTAuMjAwMjExOCAwLjM2NDA0MywtMC40MDk5NDg1IDAuNjYxOTUxLC0wLjU5NjUyOTEgMC4zOTA1NzksLTAuMjQ0NjIwMiAwLjg3ODEwNSwtMC40MDE1NzcyIDEuNDU3NjUzLDAuMDM1OTg1IDAuMTUwMzMxLDAuMTEzNTAwOCAwLjI3NTEyLDAuMzU2MTg0OSAwLjQzNjUyLDAuNTQ2MjQ1OCAwLDAgMC40NDM4MjIsMC41MzI1ODcxIDAuMDU5MTgsMS43OTAwODI5IEMgMjAuODQ3OTc4LDcuMTEwODQ1IDIwLjI0MTQyLDYuNTMzODc1NCAyMC4yNDE0Miw2LjUzMzg3NTQgWiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2M5ZGFkODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI1OSIgZD0ibSAxNS41NDQ5NjIsNC4zMTU2Mjk4IGMgMC42NzQwMTYsMC44NjIwMTcgMi4yMjQ5NDUsMy4zNjQ2NDY3IDIuNTUyNDgxLDIuMTM1NzQ3MSAwLjIwOTIyLC0wLjkxMDEwNjEgMC4wMTUzMiwtMi4zMDI1OTczIDAuMDE1MzIsLTIuMzAyNTk3MyAwLDAgLTEuMjUyMDM4LC0wLjQ2NTg4NTcgLTIuNTY3ODAyLDAuMTY2ODUwMiB6IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDojODk5YmIwO2ZpbGwtb3BhY2l0eToxO2ZpbGwtcnVsZTpldmVub2RkO3N0cm9rZTojODk5YmIwO3N0cm9rZS13aWR0aDowLjEwNDYwOTk7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI3NiIgZD0ibSAxNC41NTMyNiw5LjMxOTI1NjMgYyAwLDAgLTAuMTY3Mzc2LDAuMDUyMzA1IDEuMDk4NDA0LDAuMzM0NzUxNyAxLjI2NTc4LDAuMjgyNDQ2NyAxLjYyMTQ1MywtMC42Njk1MDM0IDEuNjIxNDUzLC0wLjY2OTUwMzQgMCwwIDEuMDM1NjM4LC0xLjUxNjg0MzYgMi4xNDQ1MDMsLTAuMzAzMzY4NyAwLDAgMC4yODI0NDcsMC4zMDMzNjg3IDAuNzg0NTc1LDAuMjkyOTA3NyAwLDAgMC4zMTM4MjksLTAuMTc3ODM2OCAwLjU3NTM1NCwtMC4wMTA0NjEgMC4yNjE1MjUsMC4xNjczNzU5IDAuNDkxNjY3LDAuMzI0MjkwNyAwLjQ5MTY2NywwLjMyNDI5MDcgMCwwIDAuMzg3MDU2LDAuMzY2MTM0NyAtMC4yOTI5MDgsMC4zNTU2NzM3IDAsMCAwLjQyODksMC4xMDQ2MDk5IC0wLjA4MzY5LDEuMzM5MDA3IGwgLTAuMTQ2NDU0LC0wLjMzNDc1MiBjIDAsMCAtMC4yMDkyMiwxLjQwMTc3MyAtMC41NzUzNTQsMC44NjgyNjIgMCwwIC0wLjE2ODU2NywwLjI4NDA0MiAtMC41NDkzMzUsMC41MzgxMTEgLTAuNDYxNzA0LDAuMzA4MDczIC0xLjIwMDYyLDAuNTc5MDM0IC0xLjg4Mjg0NiwwLjMzNTM4MiAwLDAgLTAuOTI5NDM2LDEuMDIzNTYzIC0yLjUxMjQwMiwwLjEyMTEyNSAwLDAgLTAuODcxNzI4LDAuMTY2NTUyIC0xLjQ1NzU0MywtMC44MTY3ODEgMCwwIC0wLjgwNTQ5NiwwLjE5ODc1OSAtMC45NTE5NSwtMS40OTU5MjIgMCwwIC0wLjY3OTk2NSwwLjA0MTg0IC0wLjA0MTg0LC0wLjU0Mzk3MSAwLjYzODEyLC0wLjU4NTgxNTUgMS4yMDMwMTQsLTAuNDYwMjgzNiAxLjIwMzAxNCwtMC40NjAyODM2IHoiIHN0eWxlPSJkaXNwbGF5OmlubGluZTtmaWxsOiNmOGY4Zjg7ZmlsbC1vcGFjaXR5OjE7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOm5vbmU7c3Ryb2tlLXdpZHRoOjAuMDEwNDYwOTlweDtzdHJva2UtbGluZWNhcDpidXR0O3N0cm9rZS1saW5lam9pbjptaXRlcjtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQzNjUiIGQ9Im0gMTMuNTM4NTQ0LDUuMzE3OTI3NiBjIC0wLjAxNjk4LDAuMDAzMzMgLTAuMjk1NDI5LDAuMDA0MTEgLTAuNTQyNjE0LC0wLjEyODc4OTQgLTAuMTI2Mjk4LC0wLjA2NzkwNiAtMC4yNDcwMjYsLTAuMTI3MDA2OSAtMC4yOTEyNywtMC4xODU5ODA3IC0wLjAzNTY0LC0wLjA0NzUwOCAwLjAwNDEsLTAuMTExNDU4NyAtMC4wNjY4NSwtMC4wNTMwMjIgLTAuOTQ5ODUyLDAuNzgyODExNiAtMC40ODU4NjcsMi4wNDg5MTU3IDAuMzkxNTE4LDIuMzgxNzQ5OSAwLDAgMC4xNjgwMywtMC45MzA1MDIgMS4wODQ1NzEsLTEuOTg3ODA1NyIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2Y4ZjhmODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggaWQ9InBhdGg0MzY3IiBkPSJtIDE4Ljk2OTEyOSw0LjU1MTQ2OTcgYyAwLDAgMC45NjE2MTUsMC42ODA1MjcxIDEuMTk4MzIsMS42MTI1NTQzIDAsMCAxLjE1MzkzOSwtMS43MzA5MDY4IC0wLjA3Mzk3LC0yLjQyNjIyODIgMCwwIC0wLjIwNzExOCwwLjc5ODg4IC0xLjEyNDM1MSwwLjgxMzY3MzkgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2Y4ZjhmODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDIxNSIgZD0ibSAxMi44Mzg2ODUsMTAuMjA5MDE4IGMgMC4xNDQzOTksMS43NjE2ODIgMC45Mzg2MDEsMS40NzI4ODIgMC45Mzg2MDEsMS40NzI4ODIgMC42MzUzNiwxLjAxMDggMS40Mjk1NjEsMC44MjMwOCAxLjQyOTU2MSwwLjgyMzA4IDEuMzcxODAyLDAuODM3NTIyIDIuNTI3MDAzLC0wLjEwMTA3OSAyLjUyNzAwMywtMC4xMDEwNzkgMS45MzQ5NjMsMC4zMTc2OCAyLjQxMTQ4MywtMC45MjQxNjIgMi40MTE0ODMsLTAuOTI0MTYyIDAuMzc1NDQxLDAuNTc3NjAxIDAuNjA2NDgxLC0wLjgwODY0MSAwLjYwNjQ4MSwtMC44MDg2NDEgMC4wNTc3NiwtMC4xMTU1MiAwLjE0NDQwMSwwLjM0NjU2IDAuMTQ0NDAxLDAuMzQ2NTYgMC40NjIwNzksLTEuMjEyOTYwNSAwLjA4MzI0LC0xLjM3NzgzMyAwLjA4MzI0LC0xLjM3NzgzMyAxLjAxMDgwMSwwLjAyODg4IC0wLjIwMzYyNiwtMC43MDI4NzQgLTAuMjAzNjI2LC0wLjcwMjg3NCAtMC4wMjU1MywtMS4wNTkwNjU0IC0wLjAyNTA4LC0xLjMyOTIxMzEgLTAuMzkwMDU0LC0yLjMzMzQzNzggMC44MDk3OTcsMC4yMTYzODc3IDAuODExMDU3LC0wLjk2MDY1ODkgMC45NDkxNywtMS4yMjk3ODc3IDAuMTk5OTE5LC0wLjUzOTAyNDUgLTAuMDM1NiwtMS41MDQ0OTA0IC0wLjY3OTY0MSwtMS45MTk1MzIzIC0wLjI2NTQxMSwtMC4xNzEwMzg3IC0wLjYwMDIsLTAuMjQ4NjAwOSAtMS4wMDI0ODYsLTAuMTY0MzE5OCAtMC4zMDI3NTUsMC4xMzkwMTI4IC0wLjY5MjU0LDAuMzk0OTg5NSAtMC45MDc2MjgsMC42MDg2NjE5IC0wLjE5MzYxMywwLjE5MjMzOTUgLTAuMjE5NjQ5LDAuMzAzMjExNCAtMC4xOTU0NDIsMC40MTU1NTciIHN0eWxlPSJmaWxsOm5vbmU7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOiM1MDUwNTA7c3Ryb2tlLXdpZHRoOjAuMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggaWQ9InBhdGg0MjI3IiBkPSJtIDEyLjgzODY4NSwxMC4yMTE0OTUgYyAwLDAgLTAuOTA5NzIxLDAuMDk4NiAwLjI1OTkyLC0wLjgxMTExNzkgMCwwIDAuNDkwOTYsLTAuNDE4NzYwOCAxLjQ3Mjg4MSwtMC4wNTc3NiIgc3R5bGU9ImZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQyMjkiIGQ9Ik0gMTIuOTA0OTA0LDkuNTY1NTUzIEMgMTIuNTA1NjUzLDguNzczODU0OCAxMi42NzA3OTcsOC4xNjU2MDM3IDEyLjg1MDI0NCw3Ljk1ODI5NCIgc3R5bGU9ImZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQyMDEiIGQ9Im0gMTQuNTgxMzAzLDQuODIyNzY5MiBjIDAsMCAxLjc5NTc0OSwtMS40NTE3MDY2IDMuOTY3MjA3LC0wLjUxNTAzMDkiIHN0eWxlPSJkaXNwbGF5OmlubGluZTtmaWxsOm5vbmU7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOiM1MDUwNTA7c3Ryb2tlLXdpZHRoOjAuMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiBkPSJNIDEyLjkxMzUyNyw3Ljg5OTY1ODEgQyAxMC44OTQzNTYsOC4zNTIwMTQzIDExLjE2ODQwMiw0LjI1NDUyNDcgMTIuNzY0OTUyLDQuMzAyNTA3MyAxMy4zODM1NjksNC4yODU3MzczIDE0LjA5NzQyNCw0LjI2Nzg1NSAxNC42NTY4MSw1LjAwMTUxMyIgaWQ9InBhdGg0MjA3IiAvPiA8cGF0aCBpZD0icGF0aDQyMzMiIGQ9Im0gMTguMzQwMzMxLDEwLjQ1NDQ5OSBjIDAsMCAwLjY2NDI0LDAuNzIyIDEuMDEwODAxLC0wLjE3MzI4IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDpub25lO2ZpbGwtcnVsZTpldmVub2RkO3N0cm9rZTojNTA1MDUwO3N0cm9rZS13aWR0aDowLjEwNDYwOTk7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDIzNSIgZD0ibSAxOC44ODkwNTIsMTAuNzI4ODU5IDAuMDcyMiwwLjU2MzE2IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDpub25lO2ZpbGwtcnVsZTpldmVub2RkO3N0cm9rZTojNTA1MDUwO3N0cm9rZS13aWR0aDowLjEwNDYwOTk7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI1MSIgZD0ibSAxNC4xMzQ4Miw1LjM0NDA4MDEgYyAtMC4xNzgzOTEsMCAtMC42MzI5NDYsMC4wMDY5OCAtMC45OTQxOTIsLTAuMDg2ODE2IEMgMTIuOTA4NzMsNS4xOTcwNTE5IDEyLjcxNTI4NCw1LjA5NTMxMjUgMTIuNjU4MDI2LDQuOTIzNTM3OCIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQzMDEiIGQ9Im0gMTIuNjcyOTA2LDExLjI0OTk1OSBjIDAsMCAtMS4yMTMxMTMsMC44ODAyNDcgLTAuNzI0OTA5LDEuNTQ1OTgxIGwgMC41OTkxNiwwLjUzMjU4NiAwLjgyMTA3MiwwLjQ0MzgyMyAxLjIyNzkwNywwLjA2NjU3IDAuODA2Mjc3LC0wLjE0Nzk0MSAwLjQxNDIzNCwtMC4xODQ5MjYgMC40NDM4MjIsMC4zNzcyNSAwLjM5OTQ0MSwwLjAxNDc5IDAuMjI5MzA4LC0wLjExMDk1NiAwLjY4NzkyNCwtMC4yNzM2OTEgMC4zNjI0NTYsLTAuMjg0Nzg2IDAuMjA3MTE3LC0wLjMxNDM3MyAtMC4wMjk1OSwtMC4zNDAyNjQgYyAwLDAgLTAuMzg0NjQ2LC0xLjE2MTMzNSAtMC43OTg4OCwtMS4zNDYyNjEgMCwwIC0wLjUzMjU4NywtMC41NzY5NjkgLTEuMjcyMjkxLC0wLjA4MTM3IDAsMCAtMS4xMTY5NTIsMC4zNjk4NTIgLTIuMDg1OTY0LDAuMDQ0MzggLTAuOTY5MDEyLC0wLjMyNTQ3IC0xLjI4NzA4NSwwLjA1OTE4IC0xLjI4NzA4NSwwLjA1OTE4IHoiIHN0eWxlPSJkaXNwbGF5OmlubGluZTtmaWxsOiNmOGY4Zjg7ZmlsbC1vcGFjaXR5OjE7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOm5vbmU7c3Ryb2tlLXdpZHRoOjAuMDEwNDYwOTlweDtzdHJva2UtbGluZWNhcDpidXR0O3N0cm9rZS1saW5lam9pbjptaXRlcjtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQzMjUiIGQ9Im0gMTEuODUzMTgsMTIuNDgxMDk0IGMgMCwwIDEuMjIwNTExLC0wLjcwMjcxOSAzLjA2OTc3LC0wLjE4NDkyNyAwLDAgMC45MTcyMzQsMC4xNjI3MzYgMS41MDg5OTYsLTAuMDY2NTcgMC41OTE3NjQsLTAuMjI5MzA5IDAuNzkxNDgzLDAuMjczNjkgMC43OTE0ODMsMC4yNzM2OSAwLDAgMC40NjYwMTQsMC44NDMyNjIgMC4zOTk0NCwwLjkwMjQzOCBsIDAuMTc3NTI5LC0wLjA1MTc4IDAuMjY2MjkzLC0wLjM0MDI2NCAwLjA3Mzk3LC0wLjI1ODg5NyAtMC4xNDA1NDMsLTAuNDI5MDI4IC0wLjI3MzY5MSwtMC41NzY5NjggLTAuMzEwNjc2LC0wLjQ0MzgyMiAtMC4yNTE0OTksLTAuMTg0OTI3IC0wLjQyMTYzMSwtMC4xODQ5MjUgLTAuNDA2ODM4LDAuMDI5NTkgLTAuNjA2NTU2LDAuMjUxNDk5IGMgMCwwIC0xLjAyODE4OSwwLjI4ODQ4NSAtMi4yNDg3LC0wLjE4NDkyNSAwLDAgLTAuOTAyNDM4LC0wLjE2MjczNiAtMS41MTYzOTIsMC45ODM4MDYgbCAtMC4xMTgzNTMsMC4zOTk0MzkgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2M5ZGFkODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI3OSIgZD0ibSAxNi44MzM2NzIsMTMuNzg1MjE3IGMgMC4xNTM0MjMsLTAuMTAyOTY3IDEuNDU0MTIyLC0wLjQwNTE0NCAxLjI3MTUzLC0xLjEwNzA1MiAtMC4xODI1OSwtMC43MDE5MDYgLTAuODEwNDg4LC0yLjE4MzA4IC0xLjk2Mjc0OSwtMS42MjExNTEgLTEuMTUyMjY0LDAuNTYxOTMyIC0yLjQyODI3MSwwLjA0NDIyIC0yLjQyODI3MSwwLjA0NDIyIDAsMCAtMC41MDI1NzUsLTAuMTkxMTk4IC0wLjkxNzEzNywwLjA0NDc1IC0wLjQxNDU2MiwwLjIzNTk1MSAtMC44MzU2OTEsMC42MjQyODUgLTAuOTY5NjcsMS4yNjM4MzYgLTAuMTMzOTgyLDAuNjM5NTU3IDEuNTU5NzQ1LDEuMzQxOTkxIDEuNTU5NzQ1LDEuMzQxOTkxIDAsMCAxLjYyODU2NywwLjIzODgxMyAyLjM5NTY5MywtMC4yNzYwMzUgMCwwIDAuNjI5NzI5LDAuNjk3NzcxIDEuMDUwODU5LDAuMzA5NDM3IHoiIHN0eWxlPSJkaXNwbGF5OmlubGluZTtmaWxsOm5vbmU7ZmlsbC1vcGFjaXR5OjE7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOiM1MDUwNTA7c3Ryb2tlLXdpZHRoOjAuMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggZD0ibSAxNy4xMTQwMTYsOC41MDk4MjQxIGEgMC45NDk4OTcwOCwwLjU4NjQwNTg3IDc4LjA3ODA2MiAwIDEgLTAuMzQwNjEzLDEuMDQwNjk1NSAwLjk0OTg5NzA4LDAuNTg2NDA1ODcgNzguMDc4MDYyIDAgMSAtMC43NzY1NjIsLTAuNjc4NzU2IDAuOTQ5ODk3MDgsMC41ODY0MDU4NyA3OC4wNzgwNjIgMCAxIDAuMjM5NTYsLTEuMTI5MDIxNiAwLjk0OTg5NzA4LDAuNTg2NDA1ODcgNzguMDc4MDYyIDAgMSAwLjgwNzczNiwwLjUzMTgzNzIgbCAtMC41MDM4NzgsMC4zNTYzODM5IHoiIGlkPSJwYXRoNDI2NSIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6IzUwNTA1MDtmaWxsLW9wYWNpdHk6MTtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5NDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZSIgLz4gPHBhdGggZD0iTSAyMC40MTM5NzcsOC4wMzE1OTA2IEEgMC44NTY3NjMyNSwwLjUyODkxMDk1IDc4LjA3ODA2MiAwIDEgMjAuMTA2NzYsOC45NzAyNDk4IDAuODU2NzYzMjUsMC41Mjg5MTA5NSA3OC4wNzgwNjIgMCAxIDE5LjQwNjMzNiw4LjM1ODA0MzEgMC44NTY3NjMyNSwwLjUyODkxMDk1IDc4LjA3ODA2MiAwIDEgMTkuNjIyNDA3LDcuMzM5NzE3NiAwLjg1Njc2MzI1LDAuNTI4OTEwOTUgNzguMDc4MDYyIDAgMSAyMC4zNTA5NDgsNy44MTk0MTA4IGwgLTAuNDU0NDc0LDAuMzIxNDQxNiB6IiBpZD0icGF0aDQyNjUtMiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6IzUwNTA1MDtmaWxsLW9wYWNpdHk6MTtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5NDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZSIgLz4gPHBhdGggaWQ9InBhdGg1NzIwIiBkPSJtIDIxLjEzNDgzMiw3LjY5NjM2MzQgYyAtMC4xMTIzMTgsLTAuMDI3NzU3IC0wLjI2MjQ5NywtMC4wODEwNTQgLTAuMzMzNzMxLC0wLjExODQzODMgLTAuMTQ0MDA1LC0wLjA3NTU3MyAtMC4yOTkzMjksLTAuMjY5ODY1MyAtMC4yOTkzMjksLTAuMzc0NDI2IDAsLTAuMDk2NjA3IC0wLjE5MzI5OCwtMC44NDY4MTQgLTAuMjk0MTMzLC0xLjE0MTU1OTcgQyAxOS45MTc4NSw1LjIxNDg4MjcgMTkuNDI2NzM2LDQuNjc1ODIwNSAxOC44MDY4MDgsNC41MjQzNDIzIDE4LjU3NDU0Myw0LjQ2NzU4OTMgMTguMzc3OTYsNC4zNzc3MTcyIDE4LjM3Nzk2LDQuMzI4Mjg1MSBjIDAsLTAuMTE2NTg3NCAwLjUxODc4NywtMC4zNzIwNTkgMC43NTU1ODcsLTAuMzcyMDgxOCAwLjIyNTEyOSwtMi4wOWUtNSAwLjU1MTc3MywwLjE5NTUxMDUgMC43NTQwMDcsMC40NTEzNTU2IDAuMDg5NTgsMC4xMTMzMjYgMC4zMzY4NDMsMC41NTg3ODc0IDAuNTQ5NDc2LDAuOTg5OTE0MSAwLjYzMDg5MSwxLjI3OTE3MTkgMS4xMjc0NjQsMS45Njg0NzM4IDEuNTY3NTYzLDIuMTc1OTYzMyAwLjIxNzMwOCwwLjEwMjQ1MTggMC4yMjYxMTYsMC4xMTE5NDIgMC4xMzA4ODEsMC4xNDEwMjE1IC0wLjE1OTgzNSwwLjA0ODgwNCAtMC43NzQ5NSwwLjAzNzY4MSAtMS4wMDA2NDIsLTAuMDE4MDk0IHoiIHN0eWxlPSJmaWxsOiMwMDAwMDA7ZmlsbC1vcGFjaXR5OjA7c3Ryb2tlLXdpZHRoOjAuMDUyMzA0OTU7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lIiAvPiA8cGF0aCBpZD0icGF0aDQyNDUiIGQ9Im0gMTUuNTQ0Mzg3LDQuMzE0MzcwOSBjIDAsMCAxLjU1NTIyNiwyLjEwODgwNTMgMi4wNzgyNzYsMi4yNzYxODExIDAuNTIzMDQ5LDAuMTY3Mzc1OSAwLjU1MDA5OSwtMS4yNjczOTM5IDAuNTUwMDk5LC0xLjI2NzM5MzkgMCwwIDAuMDEwNDYsLTAuODA1NDk2MiAtMC4wMzEzOCwtMS4xNjExNyIgc3R5bGU9ImZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQyNDkiIGQ9Im0gMTguOTQ0Mzc3LDQuNTQ1NjI2MiBjIDAuMjUwMTgyLDAuMDI5NjUgMC44NTMyMzUsLTAuMDU1OTAzIDEuMTM0NjY1LC0wLjc3MjM2OTQiIHN0eWxlPSJmaWxsOm5vbmU7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOiM1MDUwNTA7c3Ryb2tlLXdpZHRoOjAuMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHRleHQgaWQ9InRleHQ0MjQ1IiB5PSIyLjA1MTI3MTQiIHg9IjExLjU1NzI5OSIgc3R5bGU9ImZvbnQtc3R5bGU6bm9ybWFsO2ZvbnQtd2VpZ2h0Om5vcm1hbDtmb250LXNpemU6MC4xMjU1MzE4OHB4O2xpbmUtaGVpZ2h0OjAlO2ZvbnQtZmFtaWx5OnNhbnMtc2VyaWY7bGV0dGVyLXNwYWNpbmc6MHB4O3dvcmQtc3BhY2luZzowcHg7ZmlsbDojMDAwMDAwO2ZpbGwtb3BhY2l0eToxO3N0cm9rZTpub25lO3N0cm9rZS13aWR0aDowLjAxMDQ2MDk5cHg7c3Ryb2tlLWxpbmVjYXA6YnV0dDtzdHJva2UtbGluZWpvaW46bWl0ZXI7c3Ryb2tlLW9wYWNpdHk6MSIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHRzcGFuIHN0eWxlPSJmb250LXNpemU6MC40MTg0Mzk2cHg7bGluZS1oZWlnaHQ6MS4yNTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4IiB5PSIyLjA1MTI3MTQiIHg9IjExLjU1NzI5OSIgaWQ9InRzcGFuNDI0NyI+wqA8L3RzcGFuPjwvdGV4dD4gPC9nPiA8L3N2Zz4=";
-                        // eslint-disable-next-line no-console
+
                         console.log(
                             "%cMusic Blocks",
                             "font-size: 24px; font-weight: bold; font-family: sans-serif; padding:20px 0 0 110px; background: url(" +
                                 imgUrl +
                                 ") no-repeat;"
                         );
-                        // eslint-disable-next-line no-console
+
                         console.log(
                             "%cMusic Blocks is a collection of tools for exploring fundamental musical concepts in a fun way.",
                             "font-size: 16px; font-family: sans-serif; font-weight: bold;"
                         );
                     } else {
-                        // eslint-disable-next-line no-console
                         console.log(
                             "%cTurtle Blocks is a collection of tools for exploring  concepts from Logo in a fun way.",
                             "font-size: 16px; font-family: sans-serif; font-weight: bold;"
@@ -4544,7 +4965,6 @@ class Activity {
                         that.blocks.loadNewBlocks(JSON.parse(that.sessionData));
                     }
                 } catch (e) {
-                    // eslint-disable-next-line no-console
                     console.error(e);
                 }
             } else {
@@ -4554,8 +4974,7 @@ class Activity {
             that.update = true;
         };
 
-        // eslint-disable-next-line no-unused-vars
-        this._loadProject = (projectID, flags, env) => {
+        this._loadProject = (projectID, flags) => {
             if (this.planet === undefined) {
                 return;
             }
@@ -4583,7 +5002,6 @@ class Activity {
                         that.loadStartWrapper(loadStart);
                     });
                 } catch (e) {
-                    // eslint-disable-next-line no-console
                     console.error(e);
                     that.loadStartWrapper(loadStart);
                 }
@@ -4738,7 +5156,7 @@ class Activity {
 
             tune.lines?.forEach(line => {
                 line.staff?.forEach((staff, staffIndex) => {
-                    if (!organizeBlock.hasOwnProperty(staffIndex)) {
+                    if (!Object.prototype.hasOwnProperty.call(organizeBlock, staffIndex)) {
                         organizeBlock[staffIndex] = {
                             arrangedBlocks: []
                         };
@@ -4749,7 +5167,7 @@ class Activity {
             });
             for (const lineId in organizeBlock) {
                 organizeBlock[lineId].arrangedBlocks?.forEach(staff => {
-                    if (!staffBlocksMap.hasOwnProperty(lineId)) {
+                    if (!Object.prototype.hasOwnProperty.call(staffBlocksMap, lineId)) {
                         staffBlocksMap[lineId] = {
                             meterNum: staff?.meter?.value[0]?.num || 4,
                             meterDen: staff?.meter?.value[0]?.den || 4,
@@ -5074,9 +5492,8 @@ class Activity {
                             }
                         }
                         staffBlocksMap[staffIndex].baseBlocks[0][0][firstnammedo][4][0] = blockId;
-                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
-                            endnammedo
-                        ][4][1] = null;
+                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][endnammedo][4][1] =
+                            null;
 
                         blockId += 2;
                     } else {
@@ -5144,9 +5561,8 @@ class Activity {
                                 prevnameddo
                             ][4][1] = blockId;
                         } else {
-                            staffBlocksMap[staffIndex].repeatBlock[
-                                prevrepeatnameddo
-                            ][4][3] = blockId;
+                            staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3] =
+                                blockId;
                         }
                         if (afternamedo !== -1) {
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
@@ -5189,18 +5605,11 @@ class Activity {
         };
 
         /**
-         * Calculate time such that no matter how long it takes to load the program, the loading
-         * animation will cycle at least once.
          * @param loadProject all params are from load project function
          */
         this.loadStartWrapper = async (func, arg1, arg2, arg3) => {
-            const time1 = new Date();
             await func(this, arg1, arg2, arg3);
-
-            const time2 = new Date();
-            const elapsedTime = time2.getTime() - time1.getTime();
-            const timeLeft = Math.max(6000 - elapsedTime);
-            setTimeout(this.showContents, timeLeft);
+            this.showContents();
         };
 
         /*
@@ -5208,13 +5617,37 @@ class Activity {
          * Shows contents of MB after loading screen.
          */
         this.showContents = () => {
-            document.getElementById("loading-image-container").style.display = "none";
-            document.getElementById("bottom-right-logo").style.display = "none";
-            document.getElementById("palette").style.display = "block";
-            // document.getElementById('canvas').style.display = 'none';
-            document.getElementById("hideContents").style.display = "block";
-            document.getElementById("buttoncontainerBOTTOM").style.display = "block";
-            document.getElementById("buttoncontainerTOP").style.display = "block";
+            clearInterval(window.intervalId);
+            document.getElementById("loadingText").textContent = _("Loading Complete!");
+
+            setTimeout(() => {
+                const loadingText = document.getElementById("loadingText");
+                if (loadingText) loadingText.textContent = null;
+
+                const loadingImageContainer = document.getElementById("loading-image-container");
+                if (loadingImageContainer) loadingImageContainer.style.display = "none";
+
+                // Try hiding load-container instead if it exists
+                const loadContainer = document.getElementById("load-container");
+                if (loadContainer) loadContainer.style.display = "none";
+
+                const bottomRightLogo = document.getElementById("bottom-right-logo");
+                if (bottomRightLogo) bottomRightLogo.style.display = "none";
+
+                const palette = document.getElementById("palette");
+                if (palette) palette.style.display = "block";
+
+                // document.getElementById('canvas').style.display = 'none';
+
+                const hideContents = document.getElementById("hideContents");
+                if (hideContents) hideContents.style.display = "block";
+
+                const btnBottom = document.getElementById("buttoncontainerBOTTOM");
+                if (btnBottom) btnBottom.style.display = "block";
+
+                const btnTop = document.getElementById("buttoncontainerTOP");
+                if (btnTop) btnTop.style.display = "block";
+            }, 500);
         };
 
         this.justLoadStart = () => {
@@ -5256,8 +5689,13 @@ class Activity {
          * Hides all message containers
          */
         this.hideMsgs = () => {
-            // FIXME: When running before everything is set up.
-            if (this.errorMsgText === null) {
+            // The containers may not be ready yet, so check before accessing.
+            if (
+                this.errorMsgText === null ||
+                this.msgText === null ||
+                this.errorText === undefined ||
+                this.printText === undefined
+            ) {
                 return;
             }
             this.errorMsgText.parent.visible = false;
@@ -5273,8 +5711,6 @@ class Activity {
             this.refreshCanvas();
         };
 
-        // Accessed from index.html
-        // eslint-disable-next-line no-unused-vars
         const hideArrows = () => {
             globalActivity._hideArrows();
         };
@@ -5298,7 +5734,7 @@ class Activity {
             }
 
             this.printText.classList.add("show");
-            this.printTextContent.innerHTML = msg;
+            this.printTextContent.textContent = msg;
 
             const that = this;
             this.msgTimeoutID = setTimeout(() => {
@@ -5435,7 +5871,7 @@ class Activity {
                 default:
                     // Show and populate errorText div
                     this.errorText.classList.add("show");
-                    this.errorTextContent.innerHTML = msg;
+                    this.errorTextContent.textContent = msg;
                     break;
             }
 
@@ -5476,7 +5912,7 @@ class Activity {
          */
         this._hideCartesian = () => {
             this.cartesianBitmap.visible = false;
-            this.cartesianBitmap.updateCache();
+            this.cartesianBitmap.uncache();
             this.update = true;
         };
 
@@ -5485,6 +5921,7 @@ class Activity {
          */
         this._showCartesian = () => {
             this.cartesianBitmap.visible = true;
+            this.cartesianBitmap.cache(0, 0, 1200, 900);
             this.cartesianBitmap.updateCache();
             this.update = true;
         };
@@ -5494,7 +5931,7 @@ class Activity {
          */
         this._hidePolar = () => {
             this.polarBitmap.visible = false;
-            this.polarBitmap.updateCache();
+            this.polarBitmap.uncache();
             this.update = true;
         };
 
@@ -5503,6 +5940,7 @@ class Activity {
          */
         this._showPolar = () => {
             this.polarBitmap.visible = true;
+            this.polarBitmap.cache(0, 0, 1200, 900);
             this.polarBitmap.updateCache();
             this.update = true;
         };
@@ -5515,45 +5953,33 @@ class Activity {
             for (let i = 0; i < 7; i++) {
                 this.grandSharpBitmap[i].visible = false;
                 this.grandSharpBitmap[i].x = newX;
-                this.grandSharpBitmap[i].updateCache();
                 this.grandFlatBitmap[i].visible = false;
                 this.grandFlatBitmap[i].x = newX;
-                this.grandFlatBitmap[i].updateCache();
 
                 this.trebleSharpBitmap[i].visible = false;
                 this.trebleSharpBitmap[i].x = newX;
-                this.trebleSharpBitmap[i].updateCache();
                 this.trebleFlatBitmap[i].visible = false;
                 this.trebleFlatBitmap[i].x = newX;
-                this.trebleFlatBitmap[i].updateCache();
 
                 this.sopranoSharpBitmap[i].visible = false;
                 this.sopranoSharpBitmap[i].x = newX;
-                this.sopranoSharpBitmap[i].updateCache();
                 this.sopranoFlatBitmap[i].visible = false;
                 this.sopranoFlatBitmap[i].x = newX;
-                this.sopranoFlatBitmap[i].updateCache();
 
                 this.altoSharpBitmap[i].visible = false;
                 this.altoSharpBitmap[i].x = newX;
-                this.altoSharpBitmap[i].updateCache();
                 this.altoFlatBitmap[i].visible = false;
                 this.altoFlatBitmap[i].x = newX;
-                this.altoFlatBitmap[i].updateCache();
 
                 this.tenorSharpBitmap[i].visible = false;
                 this.tenorSharpBitmap[i].x = newX;
-                this.tenorSharpBitmap[i].updateCache();
                 this.tenorFlatBitmap[i].visible = false;
                 this.tenorFlatBitmap[i].x = newX;
-                this.tenorFlatBitmap[i].updateCache();
 
                 this.bassSharpBitmap[i].visible = false;
                 this.bassSharpBitmap[i].x = newX;
-                this.bassSharpBitmap[i].updateCache();
                 this.bassFlatBitmap[i].visible = false;
                 this.bassFlatBitmap[i].x = newX;
-                this.bassFlatBitmap[i].updateCache();
             }
             this.update = true;
         };
@@ -5563,7 +5989,7 @@ class Activity {
          */
         this._hideTreble = () => {
             this.trebleBitmap.visible = false;
-            this.trebleBitmap.updateCache();
+            this.trebleBitmap.uncache();
             this._hideAccidentals();
             this.update = true;
         };
@@ -5573,12 +5999,13 @@ class Activity {
          */
         this._showTreble = () => {
             this.trebleBitmap.visible = true;
+            this.trebleBitmap.cache(0, 0, 1200, 900);
             this.trebleBitmap.updateCache();
             this._hideAccidentals();
-            // eslint-disable-next-line no-console
+
             console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
-            // eslint-disable-next-line no-console
+
             console.log(scale);
             const _sharps = [
                 "F" + SHARP,
@@ -5603,13 +6030,11 @@ class Activity {
                 if (scale.includes(_sharps[i])) {
                     this.trebleSharpBitmap[i].x += dx;
                     this.trebleSharpBitmap[i].visible = true;
-                    this.trebleSharpBitmap[i].updateCache();
                     dx += 15;
                 }
                 if (scale.includes(_flats[i])) {
                     this.trebleFlatBitmap[i].x += dx;
                     this.trebleFlatBitmap[i].visible = true;
-                    this.trebleFlatBitmap[i].updateCache();
                     dx += 15;
                 }
             }
@@ -5622,7 +6047,7 @@ class Activity {
          */
         this._hideGrand = () => {
             this.grandBitmap.visible = false;
-            this.grandBitmap.updateCache();
+            this.grandBitmap.uncache();
             this._hideAccidentals();
             this.update = true;
         };
@@ -5632,12 +6057,13 @@ class Activity {
          */
         this._showGrand = () => {
             this.grandBitmap.visible = true;
+            this.grandBitmap.cache(0, 0, 1200, 900);
             this.grandBitmap.updateCache();
             this._hideAccidentals();
-            // eslint-disable-next-line no-console
+
             console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
-            // eslint-disable-next-line no-console
+
             console.log(scale);
             const _sharps = [
                 "F" + SHARP,
@@ -5662,13 +6088,11 @@ class Activity {
                 if (scale.includes(_sharps[i])) {
                     this.grandSharpBitmap[i].x += dx;
                     this.grandSharpBitmap[i].visible = true;
-                    this.grandSharpBitmap[i].updateCache();
                     dx += 15;
                 }
                 if (scale.includes(_flats[i])) {
                     this.grandFlatBitmap[i].x += dx;
                     this.grandFlatBitmap[i].visible = true;
-                    this.grandFlatBitmap[i].updateCache();
                     dx += 15;
                 }
             }
@@ -5680,7 +6104,7 @@ class Activity {
          */
         this._hideSoprano = () => {
             this.sopranoBitmap.visible = false;
-            this.sopranoBitmap.updateCache();
+            this.sopranoBitmap.uncache();
             this.update = true;
         };
 
@@ -5689,12 +6113,13 @@ class Activity {
          */
         this._showSoprano = () => {
             this.sopranoBitmap.visible = true;
+            this.sopranoBitmap.cache(0, 0, 1200, 900);
             this.sopranoBitmap.updateCache();
             this._hideAccidentals();
-            // eslint-disable-next-line no-console
+
             console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
-            // eslint-disable-next-line no-console
+
             console.log(scale);
             const _sharps = [
                 "F" + SHARP,
@@ -5719,13 +6144,11 @@ class Activity {
                 if (scale.includes(_sharps[i])) {
                     this.sopranoSharpBitmap[i].x += dx;
                     this.sopranoSharpBitmap[i].visible = true;
-                    this.sopranoSharpBitmap[i].updateCache();
                     dx += 15;
                 }
                 if (scale.includes(_flats[i])) {
                     this.sopranoFlatBitmap[i].x += dx;
                     this.sopranoFlatBitmap[i].visible = true;
-                    this.sopranoFlatBitmap[i].updateCache();
                     dx += 15;
                 }
             }
@@ -5738,24 +6161,27 @@ class Activity {
          */
         this._hideAlto = () => {
             this.altoBitmap.visible = false;
-            this.altoBitmap.updateCache();
+            this.altoBitmap.uncache();
             this._hideAccidentals();
             this.update = true;
         };
 
-        this.__showAltoAccidentals = () => {};
+        this.__showAltoAccidentals = () => {
+            // No-op for Alto clef
+        };
 
         /*
          * Shows musical alto staff
          */
         this._showAlto = () => {
             this.altoBitmap.visible = true;
+            this.altoBitmap.cache(0, 0, 1200, 900);
             this.altoBitmap.updateCache();
             this._hideAccidentals();
-            // eslint-disable-next-line no-console
+
             console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
-            // eslint-disable-next-line no-console
+
             console.log(scale);
             const _sharps = [
                 "F" + SHARP,
@@ -5780,13 +6206,11 @@ class Activity {
                 if (scale.includes(_sharps[i])) {
                     this.altoSharpBitmap[i].x += dx;
                     this.altoSharpBitmap[i].visible = true;
-                    this.altoSharpBitmap[i].updateCache();
                     dx += 15;
                 }
                 if (scale.includes(_flats[i])) {
                     this.altoFlatBitmap[i].x += dx;
                     this.altoFlatBitmap[i].visible = true;
-                    this.altoFlatBitmap[i].updateCache();
                     dx += 15;
                 }
             }
@@ -5799,7 +6223,7 @@ class Activity {
          */
         this._hideTenor = () => {
             this.tenorBitmap.visible = false;
-            this.tenorBitmap.updateCache();
+            this.tenorBitmap.uncache();
             this.update = true;
         };
 
@@ -5808,12 +6232,13 @@ class Activity {
          */
         this._showTenor = () => {
             this.tenorBitmap.visible = true;
+            this.tenorBitmap.cache(0, 0, 1200, 900);
             this.tenorBitmap.updateCache();
             this._hideAccidentals();
-            // eslint-disable-next-line no-console
+
             console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
-            // eslint-disable-next-line no-console
+
             console.log(scale);
             const _sharps = [
                 "F" + SHARP,
@@ -5838,13 +6263,11 @@ class Activity {
                 if (scale.includes(_sharps[i])) {
                     this.tenorSharpBitmap[i].x += dx;
                     this.tenorSharpBitmap[i].visible = true;
-                    this.tenorSharpBitmap[i].updateCache();
                     dx += 15;
                 }
                 if (scale.includes(_flats[i])) {
                     this.tenorFlatBitmap[i].x += dx;
                     this.tenorFlatBitmap[i].visible = true;
-                    this.tenorFlatBitmap[i].updateCache();
                     dx += 15;
                 }
             }
@@ -5857,7 +6280,7 @@ class Activity {
          */
         this._hideBass = () => {
             this.bassBitmap.visible = false;
-            this.bassBitmap.updateCache();
+            this.bassBitmap.uncache();
             this._hideAccidentals();
             this.update = true;
         };
@@ -5867,12 +6290,13 @@ class Activity {
          */
         this._showBass = () => {
             this.bassBitmap.visible = true;
+            this.bassBitmap.cache(0, 0, 1200, 900);
             this.bassBitmap.updateCache();
             this._hideAccidentals();
-            // eslint-disable-next-line no-console
+
             console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
-            // eslint-disable-next-line no-console
+
             console.log(scale);
             const _sharps = [
                 "F" + SHARP,
@@ -5897,13 +6321,11 @@ class Activity {
                 if (scale.includes(_sharps[i])) {
                     this.bassSharpBitmap[i].x += dx;
                     this.bassSharpBitmap[i].visible = true;
-                    this.bassSharpBitmap[i].updateCache();
                     dx += 15;
                 }
                 if (scale.includes(_flats[i])) {
                     this.bassFlatBitmap[i].x += dx;
                     this.bassFlatBitmap[i].visible = true;
-                    this.bassFlatBitmap[i].updateCache();
                     dx += 15;
                 }
             }
@@ -5917,6 +6339,7 @@ class Activity {
          */
         this.prepareExport = () => {
             const blockMap = [];
+            const blockIndexById = new Map();
             this.hasMatrixDataBlock = false;
             for (let blk = 0; blk < this.blocks.blockList.length; blk++) {
                 const myBlock = this.blocks.blockList[blk];
@@ -5925,6 +6348,7 @@ class Activity {
                     continue;
                 }
 
+                blockIndexById.set(blk, blockMap.length);
                 blockMap.push(blk);
             }
 
@@ -5998,11 +6422,10 @@ class Activity {
                                 // temperament.
                                 let customName = "custom";
                                 if (myBlock.connections[1] !== null) {
-                                    // eslint-disable-next-line max-len
-                                    customName = this.blocks.blockList[myBlock.connections[1]]
-                                        .value;
+                                    customName =
+                                        this.blocks.blockList[myBlock.connections[1]].value;
                                 }
-                                // eslint-disable-next-line no-console
+
                                 console.log(customName);
                                 args = {
                                     customName: customName,
@@ -6068,17 +6491,19 @@ class Activity {
 
                 const connections = [];
                 for (let c = 0; c < myBlock.connections.length; c++) {
-                    const mapConnection = blockMap.indexOf(myBlock.connections[c]);
-                    if (myBlock.connections[c] === null || mapConnection === -1) {
+                    const connection = myBlock.connections[c];
+                    const mapConnection = blockIndexById.get(connection);
+                    if (connection === null || mapConnection === undefined) {
                         connections.push(null);
                     } else {
                         connections.push(mapConnection);
                     }
                 }
 
+                const blockIndex = blockIndexById.get(blk);
                 if (args === null) {
                     data.push([
-                        blockMap.indexOf(blk),
+                        blockIndex,
                         myBlock.name,
                         myBlock.container.x,
                         myBlock.container.y,
@@ -6086,7 +6511,7 @@ class Activity {
                     ]);
                 } else {
                     data.push([
-                        blockMap.indexOf(blk),
+                        blockIndex,
                         [myBlock.name, args],
                         myBlock.container.x,
                         myBlock.container.y,
@@ -6357,7 +6782,7 @@ class Activity {
          */
         this.showHelpfulSearchWidget = () => {
             // Bring widget to top.
-            const $j = jQuery.noConflict();
+            const $j = window.jQuery;
             if ($j("#helpfulSearch")) {
                 try {
                     $j("#helpfulSearch").autocomplete("destroy");
@@ -6388,46 +6813,62 @@ class Activity {
          * Uses JQuery to add autocompleted search suggestions
          */
         this.doHelpfulSearch = () => {
-            const $j = jQuery.noConflict();
+            const $j = window.jQuery;
+            if (this.searchSuggestions.length === 0) {
+                this.prepSearchWidget();
+            }
 
             const that = this;
-            $j("#helpfulSearch").autocomplete({
-                source: that.searchSuggestions,
-                select: (event, ui) => {
-                    event.preventDefault();
-                    that.helpfulSearchWidget.value = ui.item.label;
-                    that.helpfulSearchWidget.idInput_custom = ui.item.value;
-                    that.helpfulSearchWidget.protoblk = ui.item.specialDict;
-                    that.doHelpfulSearch();
-                },
-                focus: event => {
-                    event.preventDefault();
-                }
-            });
+            const $helpfulSearch = $j("#helpfulSearch");
 
-            $j("#helpfulSearch").autocomplete("instance")._renderItem = (ul, item) => {
-                return $j("<li></li>")
-                    .data("item.autocomplete", item)
-                    .append(
-                        '<img src="' +
-                            item.artwork +
-                            '" height = "20px">' +
-                            "<a>" +
-                            " " +
-                            item.label +
-                            "</a>"
-                    )
-                    .appendTo(ul.css("z-index", 9999));
-            };
+            if (!$helpfulSearch.data("autocomplete-init")) {
+                $helpfulSearch.autocomplete({
+                    source: that.searchSuggestions,
+                    appendTo: "body",
+                    select: (event, ui) => {
+                        event.preventDefault();
+                        that.helpfulSearchWidget.value = ui.item.label;
+                        that.helpfulSearchWidget.idInput_custom = ui.item.value;
+                        that.helpfulSearchWidget.protoblk = ui.item.specialDict;
+                        that.doHelpfulSearch();
+                    },
+                    focus: event => {
+                        event.preventDefault();
+                    }
+                });
+
+                const instance = $helpfulSearch.autocomplete("instance");
+                if (instance) {
+                    instance._renderItem = (ul, item) => {
+                        return $j("<li></li>")
+                            .append(
+                                '<img src="' +
+                                    (item.artwork || "") +
+                                    '" height = "20px">' +
+                                    "<a>" +
+                                    " " +
+                                    item.label +
+                                    "</a>"
+                            )
+                            .appendTo(ul.css("z-index", 35000));
+                    };
+                }
+                $helpfulSearch.data("autocomplete-init", true);
+            }
+
             const searchInput = this.helpfulSearchWidget.idInput_custom;
-            if (!searchInput || searchInput.length <= 0) return;
+            if (!searchInput || searchInput.length <= 0) {
+                if (this.helpfulSearchWidget.value && this.helpfulSearchWidget.value.length > 0) {
+                    $helpfulSearch.autocomplete("search", this.helpfulSearchWidget.value);
+                }
+                return;
+            }
 
             const protoblk = this.helpfulSearchWidget.protoblk;
             const paletteName = protoblk.palette.name;
             const protoName = protoblk.name;
 
-            // eslint-disable-next-line no-prototype-builtins
-            if (this.blocks.protoBlockDict.hasOwnProperty(protoName)) {
+            if (Object.prototype.hasOwnProperty.call(that.blocks.protoBlockDict, protoName)) {
                 this.palettes.dict[paletteName].makeBlockFromSearch(
                     protoblk,
                     protoName,
@@ -6501,14 +6942,13 @@ class Activity {
             container.setAttribute("class", "tooltipped");
             container.setAttribute("data-tooltip", label);
             container.setAttribute("data-position", "top");
-            jQuery.noConflict()(".tooltipped").tooltip({
+            window.jQuery(".tooltipped").tooltip({
                 html: true,
                 delay: 100
             });
 
             const that = this;
-            // eslint-disable-next-line no-unused-vars
-            container.onmouseover = event => {
+            container.onmouseover = () => {
                 if (!that.loading) {
                     document.body.style.cursor = "pointer";
                     container.style.transition = "0.12s ease-out";
@@ -6516,8 +6956,7 @@ class Activity {
                 }
             };
 
-            // eslint-disable-next-line no-unused-vars
-            container.onmouseout = event => {
+            container.onmouseout = () => {
                 if (!that.loading) {
                     document.body.style.cursor = "default";
                     container.style.transition = "0.15s ease-out";
@@ -6527,15 +6966,16 @@ class Activity {
 
             const img = new Image();
             img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(name));
+            // Accessibility: derive alt text from the button label
+            const altText = label ? label.replace(/\s*\[.*\]$/, "") : "Toolbar button";
+            img.setAttribute("alt", altText);
 
+            // Batch DOM reads before writes to avoid forced synchronous layout
+            const rightPos = document.body.clientWidth - x;
             container.appendChild(img);
             container.setAttribute(
                 "style",
-                "position: absolute; right:" +
-                    (document.body.clientWidth - x) +
-                    "px;  top: " +
-                    y +
-                    "px;"
+                "position: absolute; right:" + rightPos + "px;  top: " + y + "px;"
             );
             document.getElementById("buttoncontainerBOTTOM").appendChild(container);
             return container;
@@ -6548,8 +6988,7 @@ class Activity {
          */
         this._loadButtonDragHandler = (container, actionClick, arg) => {
             const that = this;
-            // eslint-disable-next-line no-unused-vars
-            container.onmousedown = event => {
+            container.onmousedown = () => {
                 if (!that.loading) {
                     document.body.style.cursor = "default";
                 }
@@ -6612,8 +7051,7 @@ class Activity {
          * Ran once dom is ready and editable
          * Sets up dependencies and vars
          */
-        // eslint-disable-next-line no-unused-vars
-        this.domReady = async doc => {
+        this.domReady = async () => {
             this.saveLocally = undefined;
 
             // Do we need to update the stage?
@@ -6632,7 +7070,7 @@ class Activity {
                     this.storage.allProjects = JSON.stringify(["My Project"]);
                 } catch (e) {
                     // Edge case, eg. Firefox localSorage DB corrupted
-                    // eslint-disable-next-line no-console
+
                     console.error(e);
                 }
             }
@@ -6642,7 +7080,6 @@ class Activity {
                 p = this.storage.currentProject;
                 this.storage["SESSION" + p] = data;
             } catch (e) {
-                // eslint-disable-next-line no-console
                 console.error(e);
             }
 
@@ -6663,7 +7100,6 @@ class Activity {
                 try {
                     that.storage["SESSIONIMAGE" + p] = bitmap.bitmapCache.getCacheDataURL();
                 } catch (e) {
-                    // eslint-disable-next-line no-console
                     console.error(e);
                 }
             };
@@ -6674,7 +7110,8 @@ class Activity {
         // Setup mouse events to start the drag
 
         this.setupMouseEvents = () => {
-            document.addEventListener(
+            this.addEventListener(
+                document,
                 "mousedown",
                 event => {
                     if (!this.isSelecting) return;
@@ -6697,7 +7134,7 @@ class Activity {
         };
 
         // end the drag on navbar
-        document.getElementById("toolbars").addEventListener("mouseover", () => {
+        this.addEventListener(document.getElementById("toolbars"), "mouseover", () => {
             this.isDragging = false;
         });
 
@@ -6726,6 +7163,7 @@ class Activity {
                 // set selection mode to false
                 this.blocks.setSelectionToActivity(false);
                 this.refreshCanvas();
+                // Cache DOM element reference for performance
                 document.getElementById("helpfulWheelDiv").style.display = "none";
             }
         };
@@ -6737,7 +7175,7 @@ class Activity {
                     pasteDy = 0;
                 const map = new Map();
                 for (let i = 0; i < blocksArray.length; i++) {
-                    const idx = this.blocks.blockList.indexOf(blocksArray[i]);
+                    const idx = blocksArray[i].blockIndex;
                     map.set(
                         idx,
                         blocksArray[i].connections.filter(blk => blk !== null)
@@ -6766,6 +7204,7 @@ class Activity {
                 this.unhighlightSelectedBlocks(false, false);
                 this.blocks.setSelectedBlocks(this.selectedBlocks);
                 this.refreshCanvas();
+                // Cache DOM element reference for performance
                 document.getElementById("helpfulWheelDiv").style.display = "none";
             }
         };
@@ -6787,29 +7226,41 @@ class Activity {
             this.currentX = 0;
             this.currentY = 0;
             this.hasMouseMoved = false;
+            // rAF guard for throttling drag-select mousemove
+            this._dragSelectRafPending = false;
+            if (this.selectionArea && this.selectionArea.parentNode) {
+                this.selectionArea.parentNode.removeChild(this.selectionArea);
+            }
             this.selectionArea = document.createElement("div");
             document.body.appendChild(this.selectionArea);
 
             this.setupMouseEvents();
 
-            document.addEventListener("mousemove", event => {
+            this.addEventListener(document, "mousemove", event => {
                 this.hasMouseMoved = true;
-                // event.preventDefault();
-                // this.selectedBlocks = [];
                 if (this.isDragging && this.isSelecting) {
                     this.currentX = event.clientX;
                     this.currentY = event.clientY;
-                    if (!this.blocks.isBlockMoving && !this.turtles.running()) {
-                        this.setSelectionMode(true);
-                        this.drawSelectionArea();
-                        this.selectedBlocks = this.selectBlocksInDragArea();
-                        this.unhighlightSelectedBlocks(true, true);
-                        this.blocks.setSelectedBlocks(this.selectedBlocks);
+                    // Throttle drag-select to one update per animation frame
+                    if (
+                        !this._dragSelectRafPending &&
+                        !this.blocks.isBlockMoving &&
+                        !this.turtles.running()
+                    ) {
+                        this._dragSelectRafPending = true;
+                        requestAnimationFrame(() => {
+                            this._dragSelectRafPending = false;
+                            this.setSelectionMode(true);
+                            this.drawSelectionArea();
+                            this.selectedBlocks = this.selectBlocksInDragArea();
+                            this.unhighlightSelectedBlocks(true, true);
+                            this.blocks.setSelectedBlocks(this.selectedBlocks);
+                        });
                     }
                 }
             });
 
-            document.addEventListener("mouseup", event => {
+            this.addEventListener(document, "mouseup", event => {
                 // event.preventDefault();
                 if (!this.isSelecting) return;
                 this.isDragging = false;
@@ -6840,15 +7291,23 @@ class Activity {
             const width = Math.abs(this.currentX - this.startX);
             const height = Math.abs(this.currentY - this.startY);
 
-            this.selectionArea.style.display = "flex";
-            this.selectionArea.style.position = "absolute";
-            this.selectionArea.style.left = x + "px";
-            this.selectionArea.style.top = y + "px";
-            this.selectionArea.style.height = height + "px";
-            this.selectionArea.style.width = width + "px";
-            this.selectionArea.style.zIndex = "9989";
-            this.selectionArea.style.backgroundColor = "rgba(137, 207, 240, 0.5)";
-            this.selectionArea.style.pointerEvents = "none";
+            // Batch all CSS writes into a single cssText assignment
+            // to avoid multiple forced style recalculations.
+            this.selectionArea.style.cssText =
+                "display:flex;position:absolute;" +
+                "left:" +
+                x +
+                "px;top:" +
+                y +
+                "px;" +
+                "width:" +
+                width +
+                "px;height:" +
+                height +
+                "px;" +
+                "z-index:9989;" +
+                "background-color:rgba(137,207,240,0.5);" +
+                "pointer-events:none;";
 
             this.dragArea = { x, y, width, height };
         };
@@ -6890,43 +7349,33 @@ class Activity {
         // Unhighlight the selected blocks
 
         this.unhighlightSelectedBlocks = (unhighlight, selectionModeOn) => {
+            // Build a Set of selected block indices for O(1) lookup
+            // instead of O(n*m) deep-equality comparisons.
+            const selectedSet = new Set();
             for (let i = 0; i < this.selectedBlocks.length; i++) {
-                for (const blk in this.blocks.blockList) {
-                    if (this.isEqual(this.blocks.blockList[blk], this.selectedBlocks[i])) {
-                        if (unhighlight) {
-                            this.blocks.unhighlightSelectedBlocks(blk, true);
-                        } else {
-                            this.blocks.highlight(blk, true);
-                            this.refreshCanvas();
-                        }
-                    }
+                const idx = this.blocks.blockList.indexOf(this.selectedBlocks[i]);
+                if (idx >= 0) {
+                    selectedSet.add(idx);
                 }
+            }
+
+            for (const blk of selectedSet) {
+                if (unhighlight) {
+                    this.blocks.unhighlightSelectedBlocks(blk, true);
+                } else {
+                    this.blocks.highlight(blk, true);
+                }
+            }
+
+            if (!unhighlight && selectedSet.size > 0) {
+                this.refreshCanvas();
             }
         };
 
-        // Check if two blocks are same or not.
+        // Check if two blocks are the same by identity (reference equality).
 
         this.isEqual = (obj1, obj2) => {
-            const keys1 = Object.keys(obj1);
-            const keys2 = Object.keys(obj2);
-
-            if (keys1.length !== keys2.length) {
-                return false;
-            }
-
-            for (const key of keys1) {
-                if (!obj2.hasOwnProperty(key)) {
-                    return false;
-                }
-            }
-
-            for (const key of keys1) {
-                if (obj1[key] !== obj2[key]) {
-                    return false;
-                }
-            }
-
-            return true;
+            return obj1 === obj2;
         };
 
         this.setSelectionMode = selection => {
@@ -6949,14 +7398,21 @@ class Activity {
          * Inits everything. The main function.
          */
         this.init = async () => {
+            // Guard against double initialization
+            if (this._initialized) return;
+            this._initialized = true;
+
+            // Batch DOM reads before any writes to avoid forced synchronous layout
             this._clientWidth = document.body.clientWidth;
             this._clientHeight = document.body.clientHeight;
             this._innerWidth = window.innerWidth;
             this._innerHeight = window.innerHeight;
             this._outerWidth = window.outerWidth;
             this._outerHeight = window.outerHeight;
+            const loaderEl = document.getElementById("loader");
 
-            document.getElementById("loader").className = "loader";
+            // DOM write: apply class after all geometry reads
+            loaderEl.className = "loader";
 
             /*
              * Run browser check before implementing onblur -->
@@ -6977,21 +7433,25 @@ class Activity {
 
             this.stage = new createjs.Stage(this.canvas);
             createjs.Touch.enable(this.stage);
+            this._startRenderLoop();
 
-            // createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
-            // createjs.Ticker.framerate = 15;
-            // createjs.Ticker.addEventListener('tick', this.stage);
-            // createjs.Ticker.addEventListener('tick', that.__tick);
+            // Initialize Ticker with optimal framerate
+            createjs.Ticker.framerate = 60;
 
+            // ===== Idle Ticker Optimization =====
+            // Throttle rendering when user is inactive and no music is playing
+            this._initIdleWatcher();
+
+            // Named event handlers for proper cleanup
             let mouseEvents = 0;
-            document.addEventListener("mousemove", () => {
+            this.handleMouseMove = () => {
                 mouseEvents++;
                 if (mouseEvents % 4 === 0) {
                     that.__tick();
                 }
-            });
+            };
 
-            document.addEventListener("click", e => {
+            this.handleDocumentClick = e => {
                 if (!this.hasMouseMoved) {
                     if (this.selectionModeOn) {
                         this.deselectSelectedBlocks();
@@ -6999,7 +7459,12 @@ class Activity {
                         this._hideHelpfulSearchWidget(e);
                     }
                 }
-            });
+            };
+
+            // Use managed addEventListener for automatic cleanup
+            this.addEventListener(document, "mousemove", this.handleMouseMove);
+            this.addEventListener(document, "click", this.handleDocumentClick);
+            this.addEventListener(window, "beforeunload", this._stopRenderLoop);
 
             this._createMsgContainer(
                 "#ffffff",
@@ -7089,7 +7554,7 @@ class Activity {
             this.toolbar.renderHelpIcon(showHelp);
             this.toolbar.renderModeSelectIcon(
                 doSwitchMode,
-                doRecordButton,
+                () => doRecordButton(this),
                 doAnalytics,
                 doOpenPlugin,
                 deletePlugin,
@@ -7138,26 +7603,27 @@ class Activity {
             // Load custom mode saved in local storage.
             const custommodeData = this.storage.custommode;
             if (custommodeData !== undefined) {
-                // FIX ME
-                // eslint-disable-next-line no-unused-vars
-                const customMode = JSON.parse(custommodeData);
+                // Parse and update the custom musical mode with saved data.
+                try {
+                    const customModeDataObj = JSON.parse(custommodeData);
+                    Object.assign(MUSICALMODES["custom"], customModeDataObj);
+                } catch (e) {
+                    console.error("Error parsing custommode data:", e);
+                }
             }
 
-            // eslint-disable-next-line no-unused-vars
-            this.fileChooser.addEventListener("click", event => {
+            this.fileChooser.addEventListener("click", () => {
                 that.value = null;
             });
 
             this.fileChooser.addEventListener(
                 "change",
-                // eslint-disable-next-line no-unused-vars
-                event => {
+                () => {
                     // Read file here.
                     const reader = new FileReader();
                     const midiReader = new FileReader();
 
-                    // eslint-disable-next-line no-unused-vars
-                    reader.onload = theFile => {
+                    reader.onload = () => {
                         that.loading = true;
                         document.body.style.cursor = "wait";
                         that.doLoadAnimation();
@@ -7198,8 +7664,7 @@ class Activity {
 
                                     if (!that.merging) {
                                         // Wait for the old blocks to be removed.
-                                        // eslint-disable-next-line no-unused-vars
-                                        const __listener = event => {
+                                        const __listener = () => {
                                             that.blocks.loadNewBlocks(obj);
                                             that.stage.removeAllEventListeners("trashsignal");
                                             if (that.planet) {
@@ -7236,7 +7701,7 @@ class Activity {
                                             "Cannot load project from the file. Please check the file type."
                                         )
                                     );
-                                    // eslint-disable-next-line no-console
+
                                     console.error(e);
                                     document.body.style.cursor = "default";
                                     that.loading = false;
@@ -7247,7 +7712,7 @@ class Activity {
 
                     midiReader.onload = e => {
                         const midi = new Midi(e.target.result);
-                        // eslint-disable-next-line no-console
+
                         console.debug(midi);
                         midiImportBlocks(midi);
                     };
@@ -7275,8 +7740,7 @@ class Activity {
                 const midiReader = new FileReader();
 
                 const abcReader = new FileReader();
-                // eslint-disable-next-line no-unused-vars
-                reader.onload = theFile => {
+                reader.onload = () => {
                     that.loading = true;
                     document.body.style.cursor = "wait";
                     // doLoadAnimation();
@@ -7309,8 +7773,7 @@ class Activity {
                                 };
 
                                 // Wait for the old blocks to be removed.
-                                // eslint-disable-next-line no-unused-vars
-                                const __listener = event => {
+                                const __listener = () => {
                                     that.blocks.loadNewBlocks(obj);
                                     that.stage.removeAllEventListeners("trashsignal");
 
@@ -7332,7 +7795,6 @@ class Activity {
                                 that.loading = false;
                                 that.refreshCanvas();
                             } catch (e) {
-                                // eslint-disable-next-line no-console
                                 console.error(e);
                                 that.errorMsg(
                                     _(
@@ -7347,7 +7809,7 @@ class Activity {
                 };
                 midiReader.onload = e => {
                     const midi = new Midi(e.target.result);
-                    // eslint-disable-next-line no-console
+
                     console.debug(midi);
                     midiImportBlocks(midi);
                 };
@@ -7359,22 +7821,7 @@ class Activity {
                     abcData = abcData.replace(/\\/g, "");
 
                     const tunebook = new ABCJS.parseOnly(abcData);
-                    // eslint-disable-next-line no-console
-                    console.log(tunebook);
-                    tunebook.forEach(tune => {
-                        //call parseABC to parse abcdata to MB json
-                        this.parseABC(tune);
-                    });
-                };
 
-                // Music Block Parser from abc to MB
-                abcReader.onload = event => {
-                    //get the abc data and replace the / so that the block does not break
-                    let abcData = event.target.result;
-                    abcData = abcData.replace(/\\/g, "");
-
-                    const tunebook = new ABCJS.parseOnly(abcData);
-                    // eslint-disable-next-line no-console
                     console.log(tunebook);
                     tunebook.forEach(tune => {
                         //call parseABC to parse abcdata to MB json
@@ -7399,7 +7846,6 @@ class Activity {
                         return;
                     }
                     reader.readAsText(files[0]);
-                    reader.readAsText(files[0]);
                     window.scroll(0, 0);
                 }
             };
@@ -7414,29 +7860,25 @@ class Activity {
             dropZone.addEventListener("dragover", __handleDragOver, false);
             dropZone.addEventListener("drop", __handleFileSelect, false);
 
-            // eslint-disable-next-line no-unused-vars
-            this.allFilesChooser.addEventListener("click", event => {
+            this.allFilesChooser.addEventListener("click", () => {
                 this.value = null;
             });
 
-            // eslint-disable-next-line no-unused-vars
-            this.pluginChooser.addEventListener("click", event => {
+            this.pluginChooser.addEventListener("click", () => {
                 window.scroll(0, 0);
                 this.value = null;
             });
 
             this.pluginChooser.addEventListener(
                 "change",
-                // eslint-disable-next-line no-unused-vars
-                event => {
+                () => {
                     window.scroll(0, 0);
 
                     // Read file here.
                     const reader = new FileReader();
                     const pluginFile = that.pluginChooser.files[0];
 
-                    // eslint-disable-next-line no-unused-vars
-                    reader.onload = theFile => {
+                    reader.onload = () => {
                         that.loading = true;
                         document.body.style.cursor = "wait";
                         //doLoadAnimation();
@@ -7509,7 +7951,7 @@ class Activity {
             // We use G (one sharp) and F (one flat) as prototypes for all
             // of the accidentals. When applied, these graphics are offset
             // vertically to rendering different sharps and flats and
-            // horizonally so as not to overlap.
+            // horizontally so as not to overlap.
             for (let i = 0; i < 7; i++) {
                 this.grandSharpBitmap[i] = this._createGrid(
                     "data:image/svg+xml;base64," + window.btoa(base64Encode(GRAND_G))
@@ -7610,8 +8052,7 @@ class Activity {
                                             const n = data.arg;
                                             env.push(parseInt(n));
                                         },
-                                        // eslint-disable-next-line no-unused-vars
-                                        status => {
+                                        () => {
                                             alert(
                                                 "Something went wrong reading JSON-encoded project data."
                                             );
@@ -7651,8 +8092,10 @@ class Activity {
 
             this.prepSearchWidget();
 
-            // create functionality of 2D drag to select blocks in bulk
+            // initialize doSearch
+            this.doSearch();
 
+            // create functionality of 2D drag to select blocks in bulk
             this._create2Ddrag();
 
             /*
@@ -7660,15 +8103,79 @@ class Activity {
             document.addEventListener("DOMMouseScroll", scrollEvent, false);
             */
 
+            // Named event handler for proper cleanup
             const activity = this;
-            document.onkeydown = () => {
+            this.handleKeyDown = event => {
                 activity.__keyPressed(event);
             };
+
+            // Use managed addEventListener instead of onkeydown assignment
+            this.addEventListener(document, "keydown", this.handleKeyDown);
 
             if (this.planet !== undefined) {
                 this.planet.planet.setAnalyzeProject(doAnalyzeProject);
             }
         };
+    }
+
+    /**
+     * Managed addEventListener that tracks listeners for cleanup.
+     * @param {EventTarget} target - The DOM element or object to attach the listener to.
+     * @param {string} type - The event type.
+     * @param {Function} listener - The callback function.
+     * @param {Object|boolean} [options] - listener options.
+     */
+    addEventListener(target, type, listener, options) {
+        if (!target || typeof target.addEventListener !== "function") return;
+        target.addEventListener(type, listener, options);
+        this._listeners.push({ target, type, listener, options });
+    }
+
+    /**
+     * Managed removeEventListener that also updates the tracker.
+     * @param {EventTarget} target - The DOM element or object to remove the listener from.
+     * @param {string} type - The event type.
+     * @param {Function} listener - The callback function.
+     * @param {Object|boolean} [options] - listener options.
+     */
+    removeEventListener(target, type, listener, options) {
+        if (!target || typeof target.removeEventListener !== "function") return;
+        target.removeEventListener(type, listener, options);
+        this._listeners = this._listeners.filter(
+            l =>
+                l.target !== target ||
+                l.type !== type ||
+                l.listener !== listener ||
+                !this._areOptionsEqual(l.options, options)
+        );
+    }
+
+    /**
+     * Checks if two event listener option sets are equivalent for the purpose of removal.
+     * @param {Object|boolean} opt1 - First option set.
+     * @param {Object|boolean} opt2 - Second option set.
+     * @returns {boolean} True if they are effectively equal.
+     */
+    _areOptionsEqual(opt1, opt2) {
+        // Normalize options to booleans for capture flag, as that's the primary discriminator for removal
+        const getCapture = opt => {
+            if (typeof opt === "boolean") return opt;
+            if (typeof opt === "object" && opt !== null) return !!opt.capture;
+            return false;
+        };
+        return getCapture(opt1) === getCapture(opt2);
+    }
+
+    /**
+     * Removes all tracked event listeners.
+     */
+    cleanupEventListeners() {
+        while (this._listeners.length > 0) {
+            const { target, type, listener, options } = this._listeners.pop();
+            if (target && typeof target.removeEventListener === "function") {
+                target.removeEventListener(type, listener, options);
+            }
+        }
     }
 
     /**
@@ -7680,7 +8187,6 @@ class Activity {
             localStorage.setItem("beginnerMode", this.beginnerMode.toString());
             localStorage.setItem("themePreference", this.themePreference.toString());
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.error("Error saving to localStorage:", e);
         }
     }
@@ -7712,20 +8218,17 @@ class Activity {
 
             // Safely hide and clear existing palettes
             if (!this.palettes) {
-                // eslint-disable-next-line no-console
                 console.warn("Palettes object not initialized");
                 return;
             }
 
             if (typeof this.palettes.hide !== "function") {
-                // eslint-disable-next-line no-console
                 console.warn("Palettes hide method not available");
             } else {
                 this.palettes.hide();
             }
 
             if (typeof this.palettes.clear !== "function") {
-                // eslint-disable-next-line no-console
                 console.warn("Palettes clear method not available");
                 // Fallback clear implementation
                 this.palettes.dict = {};
@@ -7773,25 +8276,89 @@ class Activity {
 
             this.refreshCanvas();
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.error("Error regenerating palettes:", e);
             this.errorMsg(_("Error regenerating palettes. Please refresh the page."));
         }
     }
 }
 
+// ---------------------------------------------------------------------------
+// Hard Deprecation Guard — window.activity
+//
+// The Activity singleton is no longer exposed on window.activity.
+// All code must use ActivityContext.getActivity() instead.
+// This guard ensures:
+//   • Silent-regression safety (warns loudly in console, not silently undefined)
+//   • A migration window — replace with a hard removal in the next major version
+// ---------------------------------------------------------------------------
+(function installActivityDeprecationGuard() {
+    if (typeof window === "undefined") return; // safety for SSR / Node test runners
+    try {
+        Object.defineProperty(window, "activity", {
+            configurable: true, // allow removal in the next major version
+            enumerable: false,
+            get() {
+                console.warn(
+                    "[Deprecated] window.activity is removed. " +
+                        "Use ActivityContext.getActivity() instead."
+                );
+                return undefined;
+            },
+            set() {
+                console.error(
+                    "[Deprecated] window.activity is removed and cannot be set. " +
+                        "Use ActivityContext.setActivity() via activity-context.js."
+                );
+            }
+        });
+    } catch (e) {
+        // Fail silently — defining the property must never break the app.
+
+        console.warn("[ActivityDeprecationGuard] Could not install guard:", e);
+    }
+})();
+
 const activity = new Activity();
 
-require(["domReady!"], doc => {
-    setTimeout(() => {
-        activity.setupDependencies();
-        activity.domReady(doc);
-    }, 5000);
-});
+// Execute initialization once all RequireJS modules are loaded AND DOM is ready
+define(["domReady!"].concat(MYDEFINES), doc => {
+    const initialize = () => {
+        // Defensive check for multiple critical globals that may be delayed
+        // due to 'defer' execution timing variances.
+        const globalsReady =
+            typeof createDefaultStack !== "undefined" &&
+            typeof createjs !== "undefined" &&
+            typeof Tone !== "undefined" &&
+            typeof GIFAnimator !== "undefined" &&
+            typeof SuperGif !== "undefined";
 
-// eslint-disable-next-line no-unused-vars
-define(MYDEFINES, compatibility => {
-    activity.setupDependencies();
-    activity.doContextMenus();
-    activity.doPluginsAndPaletteCols();
+        if (globalsReady) {
+            activity.setupDependencies();
+            activity.domReady(doc);
+            activity.doContextMenus();
+            activity.doPluginsAndPaletteCols();
+        } else {
+            // Race condition in Firefox: non-AMD scripts might not have
+            // finished global assignment yet.
+            // Use readiness-based initialization for Firefox for better performance
+            if (typeof jQuery !== "undefined" && jQuery.browser && jQuery.browser.mozilla) {
+                waitForReadiness(
+                    () => {
+                        activity.setupDependencies();
+                        activity.domReady(doc);
+                        activity.doContextMenus();
+                        activity.doPluginsAndPaletteCols();
+                    },
+                    {
+                        maxWait: 10000,
+                        minWait: 500,
+                        checkInterval: 100
+                    }
+                );
+            } else {
+                setTimeout(initialize, 50); // Increased delay slightly
+            }
+        }
+    };
+    initialize();
 });

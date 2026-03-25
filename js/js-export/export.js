@@ -50,7 +50,7 @@ class Mouse {
         this.turtle.initTurtle(false);
 
         this.flow = flow;
-        // eslint-disable-next-line no-use-before-define
+
         this.MB = new MusicBlocks(this); // associate a MusicBlocks object with each Mouse
 
         Mouse.MouseList.push(this);
@@ -207,7 +207,10 @@ class MusicBlocks {
         // Remove any listeners that might be still active
         for (const mouse of Mouse.MouseList) {
             for (const listener in mouse.turtle.listeners) {
-                if (globalActivity.logo.stage && mouse.turtle.listeners.hasOwnProperty(listener)) {
+                if (
+                    globalActivity.logo.stage &&
+                    Object.prototype.hasOwnProperty.call(mouse.turtle.listeners, listener)
+                ) {
                     globalActivity.logo.stage.removeEventListener(
                         listener,
                         mouse.turtle.listeners[listener],
@@ -443,4 +446,9 @@ class MusicBlocks {
 }
 if (typeof module !== "undefined" && module.exports) {
     module.exports = { Mouse, MusicBlocks };
+}
+
+if (typeof window !== "undefined") {
+    window.Mouse = Mouse;
+    window.MusicBlocks = MusicBlocks;
 }

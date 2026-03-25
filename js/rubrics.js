@@ -538,8 +538,8 @@ const PALLABELS = [
     _("number"),
     _("flow"),
     _("action"),
-    _("Sensors").toLowerCase(),
-    _("Media").toLowerCase(),
+    _("sensors"),
+    _("media"),
     _("mice")
 ];
 
@@ -624,7 +624,6 @@ const analyzeProject = activity => {
                 cats.push(TACAT[blockList[b]]);
             }
         } else {
-            // eslint-disable-next-line no-console
             console.debug(blockList[b] + " not in catalog");
         }
     }
