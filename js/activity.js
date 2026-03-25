@@ -2064,7 +2064,9 @@ class Activity {
             hideDOMLabel();
 
             this.logo.turtleDelay = DEFAULTDELAY;
-            this.logo.synth.resume();
+            if (this.logo?.synth?.resume) {
+                this.logo.synth.resume();
+            }
 
             if (!this.turtles.running()) {
                 this.logo.runLogoCommands();
@@ -2091,7 +2093,9 @@ class Activity {
             hideDOMLabel();
 
             const turtleCount = Object.keys(this.logo.stepQueue).length;
-            this.logo.synth.resume();
+            if (this.logo?.synth?.resume) {
+                this.logo.synth.resume();
+            }
 
             if (turtleCount === 0 || this.logo.turtleDelay !== this.TURTLESTEP) {
                 // Either we haven't set up a queue or we are

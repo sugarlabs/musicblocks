@@ -2190,13 +2190,19 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         const actualPitch = frequencyToPitch(wheelValues[i]);
         const tur = that.activity.turtles.ithTurtle(0);
         if (!tur.singer.instrumentNames.includes(DEFAULTVOICE)) {
-            that.activity.logo.synth.createDefaultSynth(0);
-            that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
+            if (that.activity?.logo?.synth?.createDefaultSynth) {
+                that.activity.logo.synth.createDefaultSynth(0);
+            }
+            if (that.activity?.logo?.synth?.loadSynth) {
+                that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
+            }
         }
-        that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
-        that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+        if (that.activity?.logo?.synth) {
+            that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
+            that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+        }
         actualPitch[0] = actualPitch[0].replace(SHARP, "#").replace(FLAT, "b");
-        if (!that._triggerLock) {
+        if (!that._triggerLock && that.activity?.logo?.synth?.trigger) {
             that._triggerLock = true;
             that.activity.logo.synth.trigger(
                 0,
@@ -3577,15 +3583,18 @@ const piemenuModes = (block, selectedMode) => {
         docById("wheelnav-_exitWheel-title-1").style.fill = "#ffffff";
         docById("wheelnav-_exitWheel-title-1").style.pointerEvents = "none";
         docById("wheelnav-_exitWheel-slice-1").style.pointerEvents = "none";
-        setTimeout(() => {
-            const playButtonTitle = docById("wheelnav-_exitWheel-title-1");
-            const playButtonSlice = docById("wheelnav-_exitWheel-slice-1");
-            if (playButtonTitle && playButtonSlice) {
-                playButtonTitle.style.fill = "#000000";
-                playButtonTitle.style.pointerEvents = "auto";
-                playButtonSlice.style.pointerEvents = "auto";
-            }
-        }, (20 * 1000) / 10);
+        setTimeout(
+            () => {
+                const playButtonTitle = docById("wheelnav-_exitWheel-title-1");
+                const playButtonSlice = docById("wheelnav-_exitWheel-slice-1");
+                if (playButtonTitle && playButtonSlice) {
+                    playButtonTitle.style.fill = "#000000";
+                    playButtonTitle.style.pointerEvents = "auto";
+                    playButtonSlice.style.pointerEvents = "auto";
+                }
+            },
+            (20 * 1000) / 10
+        );
 
         __playScale(activeTabs, 0);
     };
