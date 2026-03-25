@@ -97,10 +97,13 @@ function setupGraphicsBlocks(activity) {
          * @returns {number} - The heading value.
          */
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId != null &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "heading"]);
             } else {
@@ -179,10 +182,13 @@ function setupGraphicsBlocks(activity) {
          * @returns {number} - The Y-coordinate value.
          */
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId != null &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "y"]);
             } else {
@@ -262,10 +268,13 @@ function setupGraphicsBlocks(activity) {
          * @returns {number} - The X-coordinate value.
          */
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId != null &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "x"]);
             } else {
@@ -569,30 +578,8 @@ function setupGraphicsBlocks(activity) {
 
             // Set piemenu values for C1 and C2
             this.piemenuValuesC1 = [
-                15,
-                30,
-                45,
-                60,
-                75,
-                90,
-                105,
-                120,
-                135,
-                150,
-                165,
-                180,
-                195,
-                210,
-                225,
-                240,
-                255,
-                270,
-                285,
-                300,
-                315,
-                330,
-                345,
-                360
+                15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180, 195, 210, 225, 240, 255, 270,
+                285, 300, 315, 330, 345, 360
             ];
             this.piemenuValuesC2 = [25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300];
 
@@ -680,22 +667,7 @@ function setupGraphicsBlocks(activity) {
 
             // Set piemenu values for C1
             this.piemenuValuesC1 = [
-                0,
-                30,
-                45,
-                60,
-                90,
-                120,
-                135,
-                150,
-                180,
-                210,
-                225,
-                240,
-                270,
-                300,
-                315,
-                330
+                0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330
             ];
 
             // Set the help string for the Set Heading block

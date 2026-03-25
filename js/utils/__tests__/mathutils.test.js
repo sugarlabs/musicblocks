@@ -130,7 +130,7 @@ describe("MathUtility", () => {
         });
 
         test("throws error for invalid inputs", () => {
-            expect(() => MathUtility.doMod("a", 3)).toThrow("NanError");
+            expect(() => MathUtility.doMod("a", 3)).toThrow("Invalid number input");
         });
 
         // Edge case tests
@@ -159,7 +159,7 @@ describe("MathUtility", () => {
         });
 
         test("throws error when second arg is string", () => {
-            expect(() => MathUtility.doMod(10, "a")).toThrow("NanError");
+            expect(() => MathUtility.doMod(10, "a")).toThrow("Invalid number input");
         });
     });
 
@@ -552,6 +552,37 @@ describe("MathUtility", () => {
         test("returns NaN for non-numeric string", () => {
             // The function uses Math.floor(Number("abc") + 0.5) which gives NaN
             expect(MathUtility.doInt("abc")).toBeNaN();
+        });
+    });
+
+    describe("edge cases - Infinity, NaN, and boundary values", () => {
+        test("doMod throws an error when divisor is zero", () => {
+            expect(() => MathUtility.doMod(5, 0)).toThrow();
+        });
+
+        test("doSqrt handles Infinity", () => {
+            expect(MathUtility.doSqrt(Infinity)).toBe(Infinity);
+        });
+
+        test("doAbs handles negative Infinity", () => {
+            expect(MathUtility.doAbs(-Infinity)).toBe(Infinity);
+        });
+
+        test("doDivide returns Infinity for Infinity dividend", () => {
+            expect(MathUtility.doDivide(Infinity, 1)).toBe(Infinity);
+        });
+
+        test("doPower returns Infinity for very large exponent", () => {
+            expect(MathUtility.doPower(10, 309)).toBe(Infinity);
+        });
+
+        test("doNegate handles floating-point numbers", () => {
+            expect(MathUtility.doNegate(-3.14)).toBeCloseTo(3.14);
+        });
+
+        test("doPlus coerces booleans via numeric branch", () => {
+            // booleans are not strings, so Number(true) + Number(true) = 2
+            expect(MathUtility.doPlus(true, true)).toBe(2);
         });
     });
 });

@@ -287,19 +287,6 @@ const processABCNotes = function (logo, turtle) {
                     k++; // Increment notes in tuplet.
                 }
 
-                // FIXME: Debug for ABC
-                if (i + j - 1 < logo.notation.notationStaging[turtle].length - 1) {
-                    const nextObj = logo.notation.notationStaging[turtle][i + j];
-                    if (typeof nextObj === "string" && nextObj === ")") {
-                        // logo.notationNotes[turtle] += '';
-                        i += 1;
-                    } else {
-                        logo.notationNotes[turtle] += " ";
-                    }
-                } else {
-                    logo.notationNotes[turtle] += " ";
-                }
-
                 return j;
             };
 
@@ -419,7 +406,7 @@ const saveAbcOutput = function (activity) {
     // for (const t in activity.logo.notation.notationStaging) {
     //     turtleCount += 1;
     // }
-    // eslint-disable-next-line no-console
+
     // console.debug("saving as abc: " + turtleCount);
 
     for (const t in activity.logo.notation.notationStaging) {

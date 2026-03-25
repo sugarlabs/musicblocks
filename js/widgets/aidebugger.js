@@ -9,6 +9,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/* global _THIS_IS_MUSIC_BLOCKS_ */
+
 /* This widget provides an AI-powered debugging interface for Music Blocks projects,
 offering intelligent assistance, cool suggestions, and helping take your musical creations to new heights! */
 
@@ -39,8 +41,6 @@ function AIDebuggerWidget() {
         },
         TIMEOUT: 30000
     };
-
-    console.log("AI Debugger Backend URL:", BACKEND_CONFIG.BASE_URL);
 
     /**
      * Chat history array to store conversation
@@ -91,12 +91,18 @@ function AIDebuggerWidget() {
     this.sendButton = null;
 
     /**
+     * Flag to prevent concurrent message sends
+     * @type {boolean}
+     */
+    this._isProcessing = false;
+
+    /**
      * Generates a unique conversation ID
      * @returns {string} Unique conversation identifier
      * @private
      */
     this._generateConversationId = function () {
-        return "conv_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+        return "conv_" + Date.now() + "_" + Math.random().toString(36).substring(2, 11);
     };
 
     this.conversationId = this._generateConversationId();
@@ -273,6 +279,8 @@ function AIDebuggerWidget() {
     this._sendMessage = function () {
         const messageText = this.messageInput.value.trim();
         if (messageText === "") return;
+        if (this._isProcessing) return;
+        this._isProcessing = true;
 
         const userMessage = {
             type: "user",
@@ -382,6 +390,7 @@ function AIDebuggerWidget() {
             })
             .then(data => {
                 this._hideTypingIndicator();
+                this._isProcessing = false;
 
                 if (data && data.response) {
                     const botResponse = {
@@ -400,6 +409,7 @@ function AIDebuggerWidget() {
             })
             .catch(error => {
                 this._hideTypingIndicator();
+                this._isProcessing = false;
                 console.error("Backend connection error:", error.message);
 
                 this.activity.textMsg(_("Server error: Unable to connect to AI backend."));
@@ -455,14 +465,14 @@ function AIDebuggerWidget() {
      * @private
      */
     this._hideTypingIndicator = function () {
-        const typingIndicator = this.chatLog.querySelector(".typing-indicator");
-        if (typingIndicator) {
-            const animationId = typingIndicator.getAttribute("data-animation-id");
+        const typingIndicators = this.chatLog.querySelectorAll(".typing-indicator");
+        typingIndicators.forEach(indicator => {
+            const animationId = indicator.getAttribute("data-animation-id");
             if (animationId) {
                 clearInterval(parseInt(animationId));
             }
-            typingIndicator.remove();
-        }
+            indicator.remove();
+        });
     };
 
     /**

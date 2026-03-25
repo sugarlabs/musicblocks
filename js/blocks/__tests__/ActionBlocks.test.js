@@ -250,8 +250,11 @@ describe("ActionBlocks", () => {
                     href: "http://localhost?outurl=http://callback&dummy=1"
                 }
             };
-
             const block = getBlock("returnToUrl");
+            jest.spyOn(block, "getURL").mockReturnValue(
+                "http://localhost?outurl=http://callback&dummy=1"
+            );
+
             block.flow([100]);
 
             expect(mockHttp.open).toHaveBeenCalledWith("POST", "http://callback", true);
@@ -271,6 +274,8 @@ describe("ActionBlocks", () => {
 
             // No need to mock for default case - JSDOM's default URL is fine
             const block = getBlock("returnToUrl");
+            jest.spyOn(block, "getURL").mockReturnValue("http://localhost");
+
             block.flow([42]);
 
             expect(mockHttp.open).toHaveBeenCalledWith("POST", undefined, true);

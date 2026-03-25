@@ -101,7 +101,6 @@ class GlobalCard {
 
     render() {
         const Planet = this.Planet;
-        //TODO: Have a TB placeholder image specific to TB projects
         const html = this.renderData.replace(new RegExp("{ID}", "g"), this.id);
         const frag = document.createRange().createContextualFragment(html);
 
@@ -132,17 +131,15 @@ class GlobalCard {
         }
 
         // set title text
-        frag.getElementById(
-            `global-project-title-${this.id}`
-        ).textContent = this.ProjectData.ProjectName;
+        frag.getElementById(`global-project-title-${this.id}`).textContent =
+            this.ProjectData.ProjectName;
 
         // set number of likes
-        frag.getElementById(
-            `global-project-likes-${this.id}`
-        ).textContent = this.ProjectData.ProjectLikes.toString();
+        frag.getElementById(`global-project-likes-${this.id}`).textContent =
+            this.ProjectData.ProjectLikes.toString();
 
         // set view button listener
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`global-project-more-details-${this.id}`).addEventListener(
             "click",
             evt => {
@@ -151,25 +148,25 @@ class GlobalCard {
         );
 
         // set open button listener
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`global-project-open-${this.id}`).addEventListener("click", evt => {
             Planet.GlobalPlanet.openGlobalProject(this.id);
         });
 
         // set image listener
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`global-project-image-${this.id}`).addEventListener("click", evt => {
             Planet.GlobalPlanet.ProjectViewer.open(this.id);
         });
 
         // set merge modify listener
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`global-project-merge-${this.id}`).addEventListener("click", evt => {
             Planet.GlobalPlanet.mergeGlobalProject(this.id);
         });
 
         // set share button listener
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`global-project-share-${this.id}`).addEventListener("click", evt => {
             const s = document.getElementById(`global-sharebox-${this.id}`);
 
@@ -183,15 +180,15 @@ class GlobalCard {
         });
 
         // set share checkbox listener
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`global-checkboxrun-${this.id}`).addEventListener("click", evt => {
             updateCheckboxes(`global-sharebox-${this.id}`);
         });
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`global-checkboxshow-${this.id}`).addEventListener("click", evt => {
             updateCheckboxes(`global-sharebox-${this.id}`);
         });
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`global-checkboxcollapse-${this.id}`).addEventListener("click", evt => {
             updateCheckboxes(`global-sharebox-${this.id}`);
         });
@@ -203,7 +200,6 @@ class GlobalCard {
             ? "favorite"
             : "favorite_border";
 
-        // eslint-disable-next-line no-unused-vars
         frag.getElementById(`global-like-icon-${this.id}`).addEventListener("click", evt => {
             this.like();
         });
@@ -255,14 +251,13 @@ function copyURLToClipboard() {
     const clipboard = new ClipboardJS(".copyshareurl");
 
     clipboard.on("success", e => {
-        // eslint-disable-next-line no-console
         console.info("Copied:", e.text);
         e.clearSelection();
     });
 
     clipboard.on("error", e => {
         alert("Failed to copy!");
-        // eslint-disable-next-line no-console
+
         console.error("Failed to copy:", e.action);
     });
 }
