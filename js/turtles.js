@@ -467,6 +467,15 @@ Turtles.TurtlesModel = class {
      */
     removeTurtle(index) {
         if (index >= 0 && index < this._turtleList.length) {
+            const turtle = this._turtleList[index];
+
+            // Clear any active intervals to prevent memory leaks
+            if (turtle.interval !== undefined) {
+                const intervalId = turtle.interval;
+                clearInterval(intervalId);
+                turtle.interval = undefined;
+            }
+
             this._turtleList.splice(index, 1);
         }
     }

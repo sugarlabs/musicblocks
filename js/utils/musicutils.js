@@ -54,7 +54,8 @@
   addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
   DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
   INTERVALVALUES, getIntervalRatio, frequencyToPitch, NOTESTEP,
-  GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP
+  GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
+  SEMITONES
 */
 
 /**
@@ -5786,7 +5787,7 @@ const noteIsSolfege = note => {
  * @returns {string} The solfege representation.
  */
 const getSolfege = note => {
-    // FIXME: Use mode-specific conversion.
+    // TODO: Use mode-specific conversion.
     if (noteIsSolfege(note)) {
         return note;
     } else {

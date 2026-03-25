@@ -1,7 +1,7 @@
 ---
 name: 💡 Feature request
 about: Suggest an enhancement
-title: ""
+title: "[Feature]"
 labels: "Issue-Enhancement"
 assignees: ""
 ---

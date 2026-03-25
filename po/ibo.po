@@ -1177,7 +1177,7 @@ msgstr "igba"
 #: js/turtledefs.js:240
 #: planet/js/GlobalTag.js:48
 #. TRANS: On the Planet, we use labels to tag projects.
-msgid "Sensors"
+msgid "sensors"
 msgstr ""
 
 #: js/rubrics.js:532
@@ -1186,7 +1186,7 @@ msgstr ""
 #: js/blocks/MediaBlocks.js:930
 #: planet/js/GlobalTag.js:46
 #. TRANS: On the Planet, we use labels to tag projects.
-msgid "Media"
+msgid "media"
 msgstr ""
 
 #: js/rubrics.js:533
@@ -2065,8 +2065,8 @@ msgid "Expand/collapse option toolbar"
 msgstr "Ịmụbawanye / daa nhọrọ toolbar"
 
 #: js/turtledefs.js:587
-msgid "Click this button to expand or collapse the auxillary toolbar."
-msgstr "Pịa a button mụbaa ma ọ bụ daa na auxillary toolbar"
+msgid "Click this button to expand or collapse the auxiliary toolbar."
+msgstr "Pịa a button mụbaa ma ọ bụ daa na auxiliary toolbar"
 
 #: js/turtledefs.js:593
 msgid "Displays help messages for the main and auxiliary toolbar, right-click contextual menu for blocks and canvas, and palettes."

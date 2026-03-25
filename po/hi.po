@@ -436,7 +436,7 @@ msgstr "बहाव"
 #: js/turtledefs.js:240
 #: planet/js/GlobalTag.js:48
 #.TRANS: On the Planet, we use labels to tag projects.
-msgid "Sensors"
+msgid "sensors"
 msgstr "सेंसर्स"
 
 #: js/rubrics.js:532
@@ -445,7 +445,7 @@ msgstr "सेंसर्स"
 #: js/blocks/MediaBlocks.js:914
 #: planet/js/GlobalTag.js:46
 #.TRANS: On the Planet, we use labels to tag projects.
-msgid "Media"
+msgid "media"
 msgstr "मीडिया"
 
 #: js/rubrics.js:533
@@ -1017,7 +1017,7 @@ msgid "Expand/collapse option toolbar"
 msgstr "विकल्प टूलबार को विस्तृत/संकुचित करें"
 
 #: js/turtledefs.js:588
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxiliary toolbar."
 msgstr "सहायक उपकरण पट्टी को विस्तृत या संक्षिप्त करने के लिए यह बटन क्लिक करें."
 
 #: js/turtledefs.js:593

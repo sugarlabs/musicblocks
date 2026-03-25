@@ -175,9 +175,10 @@ function setupRhythmActions(activity) {
                     tur.singer.multipleVoices = false;
                 }
 
-                /** @todo FIXME: broken when nesting */
-                activity.logo.pitchBlocks = [];
-                activity.logo.drumBlocks = [];
+                if (tur.singer.inNoteBlock.length === 0) {
+                    activity.logo.pitchBlocks = [];
+                    activity.logo.drumBlocks = [];
+                }
             };
 
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
