@@ -103,19 +103,15 @@ class Tempo {
         };
 
         this._save_lock = false;
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            Tempo.ICONSIZE,
-            _("Save tempo"),
-            ""
-        ).onclick = () => {
-            // Debounce button
-            if (!this._get_save_lock()) {
-                this._save_lock = true;
-                this._saveTempo();
-                setTimeout(() => (this._save_lock = false), 1000);
-            }
-        };
+        widgetWindow.addButton("export-chunk.svg", Tempo.ICONSIZE, _("Save tempo"), "").onclick =
+            () => {
+                // Debounce button
+                if (!this._get_save_lock()) {
+                    this._save_lock = true;
+                    this._saveTempo();
+                    setTimeout(() => (this._save_lock = false), 1000);
+                }
+            };
 
         this.bodyTable = document.createElement("table");
         this.widgetWindow.getWidgetBody().appendChild(this.bodyTable);
@@ -139,13 +135,19 @@ class Tempo {
                 Tempo.ICONSIZE,
                 _("speed up"),
                 r1.insertCell()
-            ).onclick = (i => () => this.speedUp(i))(i);
+            ).onclick = (
+                i => () =>
+                    this.speedUp(i)
+            )(i);
             widgetWindow.addButton(
                 "down.svg",
                 Tempo.ICONSIZE,
                 _("slow down"),
                 r2.insertCell()
-            ).onclick = (i => () => this.slowDown(i))(i);
+            ).onclick = (
+                i => () =>
+                    this.slowDown(i)
+            )(i);
 
             this.BPMInputs[i] = widgetWindow.addInputButton(this.BPMs[i], r3.insertCell());
             this.tempoCanvases[i] = document.createElement("canvas");

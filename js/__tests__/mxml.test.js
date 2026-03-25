@@ -24,8 +24,8 @@ describe("saveMxmlOutput", () => {
         const logo = {
             notation: {
                 notationStaging: {
-                    "0": [[["C"], 4, 0]],
-                    "1": []
+                    0: [[["C"], 4, 0]],
+                    1: []
                 }
             }
         };
@@ -43,11 +43,11 @@ describe("saveMxmlOutput", () => {
         const logo = {
             notation: {
                 notationStaging: {
-                    "0": [
+                    0: [
                         [["C"], 4, 0],
                         [["D"], 4, 0]
                     ],
-                    "1": [
+                    1: [
                         [["E"], 4, 0],
                         [["F"], 4, 0]
                     ]
@@ -69,7 +69,7 @@ describe("saveMxmlOutput", () => {
         const logo = {
             notation: {
                 notationStaging: {
-                    "0": ["voice one", [["C"], 4, 0], "voice two"]
+                    0: ["voice one", [["C"], 4, 0], "voice two"]
                 }
             }
         };
@@ -85,7 +85,7 @@ describe("saveMxmlOutput", () => {
         const logo = {
             notation: {
                 notationStaging: {
-                    "0": ["tempo", 120, 4, [["C"], 4, 0]]
+                    0: ["tempo", 120, 4, [["C"], 4, 0]]
                 }
             }
         };
@@ -100,7 +100,7 @@ describe("saveMxmlOutput", () => {
         const logo = {
             notation: {
                 notationStaging: {
-                    "0": ["meter", 3, 4, [["C"], 4, 0]]
+                    0: ["meter", 3, 4, [["C"], 4, 0]]
                 }
             }
         };
@@ -116,7 +116,7 @@ describe("saveMxmlOutput", () => {
         const logo = {
             notation: {
                 notationStaging: {
-                    "0": [
+                    0: [
                         "begin crescendo",
                         [["C"], 4, 0],
                         "end crescendo",
@@ -141,7 +141,7 @@ describe("saveMxmlOutput", () => {
         const logo = {
             notation: {
                 notationStaging: {
-                    "0": [[["C"], 4, 0], "tie", [["C"], 4, 0]]
+                    0: [[["C"], 4, 0], "tie", [["C"], 4, 0]]
                 }
             }
         };
