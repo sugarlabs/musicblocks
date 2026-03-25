@@ -119,10 +119,14 @@ function setupVolumeBlocks(activity) {
          * @param {number} turtle - Turtle index.
          */
         setter(logo, value, turtle) {
-            const len = Singer.masterVolume.length;
-            Singer.masterVolume[len - 1] = value;
-            if (!activity.turtles.ithTurtle(turtle).singer.suppressOutput) {
-                Singer.VolumeActions.setMasterVolume(logo, value);
+            if (typeof Singer !== "undefined" && Singer && Singer.masterVolume) {
+                const len = Singer.masterVolume.length;
+                Singer.masterVolume[len - 1] = value;
+                if (!activity.turtles.ithTurtle(turtle).singer.suppressOutput) {
+                    Singer.VolumeActions.setMasterVolume(logo, value);
+                }
+            } else {
+                console.warn("Singer not initialized - skipping master volume setting");
             }
         }
 
@@ -742,19 +746,26 @@ function setupVolumeBlocks(activity) {
 
             const tur = activity.turtles.ithTurtle(turtle);
 
-            Singer.masterVolume.push(arg);
-            if (!tur.singer.suppressOutput) {
-                Singer.setMasterVolume(logo, arg);
+            if (typeof Singer !== "undefined" && Singer && Singer.masterVolume) {
+                Singer.masterVolume.push(arg);
+                if (!tur.singer.suppressOutput) {
+                    Singer.setMasterVolume(logo, arg);
+                }
+            } else {
+                console.warn("Singer not initialized - skipping volume push");
+                return;
             }
 
             const listenerName = "_volume_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = event => {
-                Singer.masterVolume.pop();
-                // Restore previous volume
-                if (tur.singer.justCounting.length === 0 && Singer.masterVolume.length > 0) {
-                    Singer.setMasterVolume(logo, last(Singer.masterVolume));
+                if (typeof Singer !== "undefined" && Singer && Singer.masterVolume) {
+                    Singer.masterVolume.pop();
+                    // Restore previous volume
+                    if (tur.singer.justCounting.length === 0 && Singer.masterVolume.length > 0) {
+                        Singer.setMasterVolume(logo, last(Singer.masterVolume));
+                    }
                 }
             };
 

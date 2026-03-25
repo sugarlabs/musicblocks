@@ -1330,11 +1330,15 @@ class Block {
                         this.value = "5";
                         break;
                     case "customNote":
-                        this.value =
-                            this.activity.logo.synth.startingPitch.substring(
-                                0,
-                                this.activity.logo.synth.startingPitch.length - 1
-                            ) + "(+0)";
+                        if (this.activity?.logo?.synth?.startingPitch) {
+                            this.value =
+                                this.activity.logo.synth.startingPitch.substring(
+                                    0,
+                                    this.activity.logo.synth.startingPitch.length - 1
+                                ) + "(+0)";
+                        } else {
+                            this.value = "G4";
+                        }
                         break;
                     case "notename":
                         this.value = "G";
@@ -2986,7 +2990,9 @@ class Block {
                         topBlk = that.blocks.findTopBlock(thisBlock);
 
                         that.activity.runMode = "normal";
-                        that.activity.logo.synth.resume();
+                        if (that.activity?.logo?.synth) {
+                            that.activity.logo.synth.resume();
+                        }
 
                         if (that.activity.turtles.running()) {
                             that.activity.logo.doStopTurtles();
@@ -3004,7 +3010,9 @@ class Block {
                     topBlk = that.blocks.findTopBlock(thisBlock);
 
                     that.activity.runMode = "normal";
-                    that.activity.logo.synth.resume();
+                    if (that.activity?.logo?.synth) {
+                        that.activity.logo.synth.resume();
+                    }
 
                     if (that.activity.turtles.running()) {
                         that.activity.logo.doStopTurtles();
@@ -3298,7 +3306,7 @@ class Block {
      * Removes all CreateJS event listeners to prevent memory leaks when blocks are deleted.
      * This addresses the listener accumulation vulnerability where event handlers persist
      * even after blocks are moved to trash or deleted.
-     * 
+     *
      * @private
      * @returns {void}
      */
@@ -4694,7 +4702,9 @@ class Block {
                 case "setdrum":
                 case "playdrum":
                     if (newValue.slice(0, 4) === "http") {
-                        this.activity.logo.synth.loadSynth(0, newValue);
+                        if (this.activity?.logo?.synth) {
+                            this.activity.logo.synth.loadSynth(0, newValue);
+                        }
                     }
                     break;
                 case "temperament1":
@@ -4714,7 +4724,9 @@ class Block {
 
         // Load the synth for the selected drum.
         if (["drumname", "effectsname", "voicename", "noisename"].includes(this.name)) {
-            this.activity.logo.synth.loadSynth(0, getDrumSynthName(this.value));
+            if (this.activity?.logo?.synth) {
+                this.activity.logo.synth.loadSynth(0, getDrumSynthName(this.value));
+            }
         }
     }
 }

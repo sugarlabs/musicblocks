@@ -2908,10 +2908,12 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
         that.value = voiceValues[i];
         that.text.text = label;
 
-        if (getDrumName(that.value) === null) {
-            that.activity.logo.synth.loadSynth(0, getVoiceSynthName(that.value));
-        } else {
-            that.activity.logo.synth.loadSynth(0, getDrumSynthName(that.value));
+        if (that.activity?.logo?.synth) {
+            if (getDrumName(that.value) === null) {
+                that.activity.logo.synth.loadSynth(0, getVoiceSynthName(that.value));
+            } else {
+                that.activity.logo.synth.loadSynth(0, getDrumSynthName(that.value));
+            }
         }
 
         // Make sure text is on top.
@@ -2934,26 +2936,30 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
 
         if (!tur.singer.instrumentNames.includes(voice)) {
             tur.singer.instrumentNames.push(voice);
-            if (voice === DEFAULTVOICE) {
-                that.activity.logo.synth.createDefaultSynth(0);
-            }
+            if (that.activity?.logo?.synth) {
+                if (voice === DEFAULTVOICE) {
+                    that.activity.logo.synth.createDefaultSynth(0);
+                }
 
-            that.activity.logo.synth.loadSynth(0, voice);
-            // give the synth time to load
-            timeout = 500;
+                that.activity.logo.synth.loadSynth(0, voice);
+                // give the synth time to load
+                timeout = 500;
+            }
         }
 
         setTimeout(() => {
-            if (that.activity.logo.deps?.Singer) {
-                that.activity.logo.deps.Singer.setSynthVolume(
-                    that.activity.logo,
-                    0,
-                    voice,
-                    DEFAULTVOLUME
-                );
+            if (that.activity?.logo?.synth) {
+                if (that.activity.logo.deps?.Singer) {
+                    that.activity.logo.deps.Singer.setSynthVolume(
+                        that.activity.logo,
+                        0,
+                        voice,
+                        DEFAULTVOLUME
+                    );
+                }
+                that.activity.logo.synth.trigger(0, "G4", 1 / 4, voice, null, null, false);
+                that.activity.logo.synth.start();
             }
-            that.activity.logo.synth.trigger(0, "G4", 1 / 4, voice, null, null, false);
-            that.activity.logo.synth.start();
         }, timeout);
 
         __selectionChanged();
