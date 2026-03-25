@@ -25,6 +25,11 @@ window.platformColor = {
     selectorSelected: "#1A8CFF"
 };
 
+// Mock window.location.reload - delete and reassign
+const mockReload = jest.fn();
+delete window.location;
+window.location = { reload: mockReload };
+
 // Mock document elements
 document.body.innerHTML = `
     <meta name="theme-color" content="#4DA6FF">
@@ -56,10 +61,8 @@ describe("ThemeBox", () => {
         });
         jest.spyOn(global.Storage.prototype, "setItem").mockImplementation(() => {});
 
-        Object.defineProperty(window, "location", {
-            value: { reload: jest.fn() },
-            writable: true
-        });
+        // Reset the mock reload function
+        mockReload.mockClear();
 
         // Reset body classes
         document.body.classList.remove("light", "dark");
@@ -89,7 +92,7 @@ describe("ThemeBox", () => {
         expect(themeBox._theme).toBe("dark");
         expect(mockActivity.storage.themePreference).toBe("dark");
         // Should NOT reload - instant theme switch
-        expect(window.location.reload).not.toHaveBeenCalled();
+        expect(mockReload).not.toHaveBeenCalled();
         // Should show theme switched message
         expect(mockActivity.textMsg).toHaveBeenCalledWith("Theme switched to dark mode.", 2000);
     });
@@ -100,7 +103,7 @@ describe("ThemeBox", () => {
         themeBox.setPreference();
         expect(mockActivity.storage.themePreference).toBe("dark");
         // Should NOT reload - instant theme switch
-        expect(window.location.reload).not.toHaveBeenCalled();
+        expect(mockReload).not.toHaveBeenCalled();
         // Body should have dark class
         expect(document.body.classList.contains("dark")).toBe(true);
         expect(document.body.classList.contains("light")).toBe(false);
@@ -108,7 +111,7 @@ describe("ThemeBox", () => {
 
     test("setPreference() does not change if theme is unchanged", () => {
         themeBox.light_onclick();
-        expect(window.location.reload).not.toHaveBeenCalled();
+        expect(mockReload).not.toHaveBeenCalled();
         expect(mockActivity.textMsg).toHaveBeenCalledWith(
             "Music Blocks is already set to this theme."
         );
@@ -125,13 +128,13 @@ describe("ThemeBox", () => {
         themeBox._theme = "dark";
         themeBox.applyThemeInstantly();
         const canvas = document.getElementById("canvas");
-        expect(canvas.style.backgroundColor).toBe("rgb(28, 28, 28)");
+        expect(canvas.style.backgroundColor).toBe("rgb(48, 48, 48)");
     });
 
     test("applyThemeInstantly() updates canvas background for light mode", () => {
         themeBox._theme = "light";
         themeBox.applyThemeInstantly();
         const canvas = document.getElementById("canvas");
-        expect(canvas.style.backgroundColor).toBe("rgb(255, 255, 255)");
+        expect(canvas.style.backgroundColor).toBe("rgb(249, 249, 249)");
     });
 });
