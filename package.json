@@ -13,6 +13,8 @@
     "amd": {},
     "scripts": {
         "lint": "eslint js/ planet/js/",
+        "lint:staged": "lint-staged",
+        "prepare": "husky",
         "serve": "http-server -a 127.0.0.1 -p 3000 --gzip --brotli",
         "serve:dev": "http-server -a 127.0.0.1 -p 3000 -c-1",
         "start": "node index.js",
@@ -39,9 +41,12 @@
         "gulp-clean-css": "^4.3.0",
         "gulp-prettier": "^3.0.0",
         "gulp-uglify": "^3.0.2",
+        "husky": "^9.1.7",
         "jest": "^29.7.0",
         "jest-environment-jsdom": "^30.2.0",
-        "nodemon": "^3.1.9"
+        "lint-staged": "^15.5.2",
+        "nodemon": "^3.1.9",
+        "prettier": "^3.6.2"
     },
     "dependencies": {
         "@tonejs/midi": "^2.0.28",
@@ -57,7 +62,6 @@
         "http-server": "^14.1.1",
         "i18next": "^25.3.2",
         "i18next-http-backend": "^3.0.2",
-        "node": "^24.2.0",
         "postcss": "^8.5.6",
         "sass": "^1.97.2",
         "tone": "^15.1.22"
@@ -85,5 +89,11 @@
         "@gulp-sourcemaps/identity-map": {
             "postcss": "^8.4.31"
         }
+    },
+    "lint-staged": {
+        "*.{js,mjs}": [
+            "eslint --max-warnings=0 --fix",
+            "prettier --write"
+        ]
     }
 }
