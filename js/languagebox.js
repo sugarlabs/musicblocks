@@ -63,6 +63,10 @@ class LanguageBox {
         this.hide();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     kana_onclick() {
         this._language = "ja-kana";
         this.activity.storage.kanaPreference = "kana";
@@ -274,8 +278,14 @@ class LanguageBox {
         }
 
         const languageLinks = document.querySelectorAll(".language-link");
+
         languageLinks.forEach(link => {
-            link.addEventListener("click", () => this.OnClick());
+            if (link && (!link.dataset || !link.dataset.listenerAttached)) {
+                link.addEventListener("click", () => this.OnClick());
+                if (link.dataset) {
+                    link.dataset.listenerAttached = "true";
+                }
+            }
         });
     }
 }

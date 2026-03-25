@@ -681,11 +681,14 @@ function setupPitchBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[0] === null || args[1] === null) activity.errorMsg(NOINPUTERRORMSG, blk);
+            // Check for missing inputs
+            if (args[0] === null || args[1] === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return;
+            }
 
-            const arg0 = args[0] === null ? "C" : args[0];
-            const arg1 = args[1] === null ? 4 : args[1];
-            Singer.PitchActions.setPitchNumberOffset(arg0, arg1, turtle, activity);
+            // Inputs are valid, proceed directly
+            Singer.PitchActions.setPitchNumberOffset(args[0], args[1], turtle, activity);
         }
     }
 
@@ -718,7 +721,6 @@ function setupPitchBlocks(activity) {
                     activity.errorMsg(NOINPUTERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else {
-                    // eslint-disable-next-line no-console
                     console.error(e);
                 }
             }
@@ -1007,7 +1009,6 @@ function setupPitchBlocks(activity) {
             const listenerName = "_invert_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => tur.singer.invertList.pop();
             logo.setTurtleListener(turtle, listenerName, __listener);
 
@@ -1093,31 +1094,8 @@ function setupPitchBlocks(activity) {
             super("settransposition");
             this.setPalette("pitch", activity);
             this.piemenuValuesC1 = [
-                -12,
-                -11,
-                -10,
-                -9,
-                -8,
-                -7,
-                -6,
-                -5,
-                -4,
-                -3,
-                -2,
-                -1,
-                0,
-                1,
-                2,
-                3,
-                4,
-                5,
-                6,
-                7,
-                8,
-                9,
-                10,
-                11,
-                12
+                -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                11, 12
             ];
             this.setHelpString([
                 _(
@@ -1196,7 +1174,6 @@ function setupPitchBlocks(activity) {
                 if (intervalName in INTERVALVALUES) {
                     r = INTERVALVALUES[intervalName][2];
                 } else {
-                    // eslint-disable-next-line no-console
                     console.log("could not find " + intervalName + " in INTERVALVALUES");
                     r = 1;
                 }
@@ -1204,7 +1181,7 @@ function setupPitchBlocks(activity) {
 
             if (isNaN(r) || r < 0) {
                 r = 1;
-                // eslint-disable-next-line no-console
+
                 console.debug("ratio " + r + " must be a number > 0");
             }
             Singer.PitchActions.setRatioTranspose(r, turtle, blk);
@@ -1547,7 +1524,6 @@ function setupPitchBlocks(activity) {
             const listenerName = "_flat_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event =>
                 (tur.singer.transposition += tur.singer.invertList.length > 0 ? -1 : 1);
 
@@ -2013,8 +1989,8 @@ function setupPitchBlocks(activity) {
                             ? 1
                             : 0
                         : semitones < ref
-                        ? 1
-                        : 0;
+                          ? 1
+                          : 0;
 
                     octave =
                         (isNegativeArg ? -1 : 1) * (deltaOctave + deltaSemi) +
@@ -2046,10 +2022,20 @@ function setupPitchBlocks(activity) {
                         arg0 = 7; // set default value to 7th semitone
                     }
 
-                    note = nthDegreeToPitch(tur.singer.keySignature, Math.round(arg0));
-                    octave = Math.floor(
-                        calcOctave(tur.singer.currentOctave, arg1, tur.singer.lastNotePlayed, note)
+                    const [noteName, offset] = nthDegreeToPitch(
+                        tur.singer.keySignature,
+                        Math.round(arg0)
                     );
+                    note = noteName;
+                    octave =
+                        Math.floor(
+                            calcOctave(
+                                tur.singer.currentOctave,
+                                arg1,
+                                tur.singer.lastNotePlayed,
+                                note
+                            )
+                        ) + offset;
                     cents = 0;
                 } else {
                     if (arg0 < A0 || arg0 > C8) {

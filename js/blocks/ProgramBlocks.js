@@ -65,6 +65,7 @@ function setupProgramBlocks(activity) {
 
         /**
          * Executes the flow of the LoadHeapFromAppBlock.
+         * Uses async fetch to avoid blocking the UI during network requests.
          * @param {string[]} args - The arguments passed to the block.
          * @param {Object} logo - The logo object.
          * @param {Object} turtle - The turtle object.
@@ -76,45 +77,35 @@ function setupProgramBlocks(activity) {
                 return;
             }
 
-            let data = [];
             const url = args[1];
             const name = args[0];
-            const xmlHttp = new XMLHttpRequest();
-            let oldHeap = [];
-            xmlHttp.open("GET", url, false);
-            xmlHttp.send();
+            const oldHeap = name in logo.turtleHeaps ? logo.turtleHeaps[name] : [];
 
-            if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
-                // eslint-disable-next-line no-console
-                console.debug(xmlHttp.responseText);
-                try {
-                    data = JSON.parse(xmlHttp.responseText);
-                } catch (e) {
-                    // eslint-disable-next-line no-console
-                    console.debug(e);
-                    activity.errorMsg(_("Error parsing JSON data:") + e);
-                }
-            } else if (xmlHttp.readyState === 4 && xmlHttp.status !== 200) {
-                // eslint-disable-next-line no-console
-                console.debug("fetched the wrong page or network error...");
-                activity.errorMsg(_("404: Page not found"));
-                return;
-            } else {
-                activity.errorMsg("xmlHttp.readyState: " + xmlHttp.readyState);
-                return;
-            }
-
-            if (name in logo.turtleHeaps) {
-                oldHeap = logo.turtleHeaps[turtle];
-            }
-
-            try {
-                logo.turtleHeaps[name] = data;
-            } catch (e) {
-                logo.turtleHeaps[name] = oldHeap;
-                // eslint-disable-next-line no-console
-                console.debug(e);
-            }
+            // Use async fetch to avoid blocking the UI
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        console.debug("fetched the wrong page or network error...");
+                        activity.errorMsg(_("404: Page not found"));
+                        throw new Error("Network response was not ok");
+                    }
+                    return response.text();
+                })
+                .then(responseText => {
+                    console.debug(responseText);
+                    try {
+                        const data = JSON.parse(responseText);
+                        logo.turtleHeaps[name] = data;
+                    } catch (e) {
+                        console.debug(e);
+                        activity.errorMsg(_("Error parsing JSON data:") + e);
+                        logo.turtleHeaps[name] = oldHeap;
+                    }
+                })
+                .catch(error => {
+                    console.debug("Fetch error:", error);
+                    logo.turtleHeaps[name] = oldHeap;
+                });
         }
     }
 
@@ -993,7 +984,7 @@ function setupProgramBlocks(activity) {
             if (activity.blocks.blockList[args[0]].name === "start") {
                 const thisTurtle = activity.blocks.blockList[args[0]].value;
                 const tur = activity.turtles.ithTurtle(thisTurtle);
-                // eslint-disable-next-line no-console
+
                 console.debug("run start " + thisTurtle);
 
                 logo.initTurtle(thisTurtle);
@@ -1057,28 +1048,24 @@ function setupProgramBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             if (args.length < 3) {
-                // eslint-disable-next-line no-console
                 console.debug(args.length + " < 3");
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
             if (args[0] < 0 || args[0] > activity.blocks.blockList.length - 1) {
-                // eslint-disable-next-line no-console
                 console.debug(args[0] + " > " + activity.blocks.blockList.length - 1);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
             if (args[0] === args[2]) {
-                // eslint-disable-next-line no-console
                 console.debug(args[0] + " == " + args[2]);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
             if (args[2] < 0 || args[2] > activity.blocks.blockList.length - 1) {
-                // eslint-disable-next-line no-console
                 console.debug(args[2] + " > " + activity.blocks.blockList.length - 1);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
@@ -1091,7 +1078,6 @@ function setupProgramBlocks(activity) {
                 args[1] < 1 ||
                 args[1] > activity.blocks.blockList[args[0]].connections.length - 1
             ) {
-                // eslint-disable-next-line no-console
                 console.debug(args[1] + " out of bounds");
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
@@ -1260,21 +1246,72 @@ function setupProgramBlocks(activity) {
                     [8, "hidden", 0, 0, [0, null]]
                 ];
                 activity.blocks.loadNewBlocks(newNote);
-                // eslint-disable-next-line no-console
-                console.debug("BLOCKNUMBER " + blockNumber);
                 return blockNumber;
             } else if (name === _("start")) {
                 const newBlock = [[0, "start", x, y, [null, null, null]]];
                 activity.blocks.loadNewBlocks(newBlock);
-                // eslint-disable-next-line no-console
-                console.debug("BLOCKNUMBER " + blockNumber);
                 return blockNumber;
             } else if (name === _("silence")) {
-                // FIXME: others too
                 const newBlock = [[0, "rest2", x, y, [null, null]]];
                 activity.blocks.loadNewBlocks(newBlock);
-                // eslint-disable-next-line no-console
-                console.debug("BLOCKNUMBER " + blockNumber);
+                return blockNumber;
+            } else if (name === _("tempo")) {
+                let bpm, beat;
+                switch (blockArgs.length) {
+                    case 1:
+                        bpm = 90;
+                        beat = 4;
+                        break;
+                    case 2:
+                        bpm = blockArgs[1];
+                        beat = 4;
+                        break;
+                    default:
+                        bpm = blockArgs[1];
+                        beat = blockArgs[2];
+                        break;
+                }
+                const newTempo = [
+                    [0, "setbpm3", x, y, [null, 1, 2, 5]],
+                    [1, ["number", { value: bpm }], 0, 0, [0]],
+                    [2, "divide", 0, 0, [0, 3, 4]],
+                    [3, ["number", { value: 1 }], 0, 0, [2]],
+                    [4, ["number", { value: beat }], 0, 0, [2]],
+                    [5, "vspace", 0, 0, [0, null]]
+                ];
+                activity.blocks.loadNewBlocks(newTempo);
+                return blockNumber;
+            } else if (name === _("volume")) {
+                let synth, vol;
+                switch (blockArgs.length) {
+                    case 1:
+                        synth = "piano";
+                        vol = 50;
+                        break;
+                    case 2:
+                        synth = blockArgs[1];
+                        vol = 50;
+                        break;
+                    default:
+                        synth = blockArgs[1];
+                        vol = blockArgs[2];
+                        break;
+                }
+                const newVolume = [
+                    [0, "setsynthvolume", x, y, [null, 1, 2, null]],
+                    [1, ["voicename", { value: synth }], 0, 0, [0]],
+                    [2, ["number", { value: vol }], 0, 0, [0]]
+                ];
+                activity.blocks.loadNewBlocks(newVolume);
+                return blockNumber;
+            } else if (name === _("instrument")) {
+                let instr = blockArgs.length > 1 ? blockArgs[1] : "piano";
+                const newInstrument = [
+                    [0, "settimbre", x, y, [null, 1, null, 2]],
+                    [1, ["voicename", { value: instr }], 0, 0, [0]],
+                    [2, "hidden", 0, 0, [0, null]]
+                ];
+                activity.blocks.loadNewBlocks(newInstrument);
                 return blockNumber;
             } else {
                 const obj = activity.blocks.palettes.getProtoNameAndPalette(name);
@@ -1282,7 +1319,7 @@ function setupProgramBlocks(activity) {
                 const protoName = obj[2];
                 if (protoblk === null) {
                     activity.errorMsg(_("Cannot find block") + " " + name);
-                    // eslint-disable-next-line no-console
+
                     console.debug("Cannot find block " + name);
                     return 0;
                 } else {
@@ -1319,7 +1356,7 @@ function setupProgramBlocks(activity) {
                                 activity.errorMsg(
                                     _("Warning: block argument type unhandled: ") + typeof arg
                                 );
-                                // eslint-disable-next-line no-console
+
                                 console.warn("Unhandled argument type", arg);
                                 newBlock[0][4].push(null);
                             }
@@ -1329,7 +1366,7 @@ function setupProgramBlocks(activity) {
                     }
 
                     activity.blocks.loadNewBlocks(newBlock);
-                    // eslint-disable-next-line no-console
+
                     console.debug("BLOCKNUMBER " + blockNumber);
                     return blockNumber;
                 }
