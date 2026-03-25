@@ -389,12 +389,10 @@ class SaveInterface {
                             instrumentTrack.name = `Track ${
                                 parseInt(blockIndex) + 1
                             } - ${instrument}`;
-                            instrumentTrack.instrument.number = Object.prototype.hasOwnProperty.call(
-                                instrumentMIDI,
-                                instrument
-                            )
-                                ? instrumentMIDI[instrument]
-                                : instrumentMIDI["default"];
+                            instrumentTrack.instrument.number =
+                                Object.prototype.hasOwnProperty.call(instrumentMIDI, instrument)
+                                    ? instrumentMIDI[instrument]
+                                    : instrumentMIDI["default"];
                             trackMap.set(instrument, instrumentTrack);
                         }
 
