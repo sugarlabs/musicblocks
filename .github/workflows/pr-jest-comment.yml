@@ -1,0 +1,72 @@
+name: Post Jest Test Results Comment
+
+on:
+  workflow_run:
+    workflows: ["Run Jest Tests on PR"]
+    types:
+      - completed
+
+concurrency:
+  group: pr-comment-${{ github.event.workflow_run.pull_requests[0].number }}
+  cancel-in-progress: true
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.event == 'pull_request'
+    
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Download Test Results
+        id: download
+        uses: actions/download-artifact@v4
+        with:
+          name: jest-results-${{ github.event.workflow_run.id }}
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Parse Test Results
+        if: steps.download.outcome == 'success'
+        id: results
+        run: |
+          if [ ! -f jest-results.json ]; then
+            echo "comment_body=Unable to find test results artifact." >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          TESTS_FAILED=$(jq -r '.numFailedTests // 0' jest-results.json)
+          
+          if [ "$TESTS_FAILED" -gt 0 ]; then
+            COMMENT_BODY="❌ Some Jest tests failed. Please review the test logs."
+          else
+            COMMENT_BODY="✅ All Jest tests passed! This PR is ready to merge."
+          fi
+          
+          echo "comment_body=$COMMENT_BODY" >> $GITHUB_OUTPUT
+
+      - name: Find Test Comment
+        id: find-comment
+        uses: peter-evans/find-comment@v3
+        with:
+          issue-number: ${{ github.event.workflow_run.pull_requests[0].number }}
+          comment-author: "github-actions[bot]"
+          body-includes: "Jest tests"
+
+      - name: Create or Update Comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.workflow_run.pull_requests[0].number }}
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          edit-mode: replace
+          body: ${{ steps.results.outputs.comment_body }}
+
+      - name: Handle Download Failure
+        if: steps.download.outcome == 'failure'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.workflow_run.pull_requests[0].number }}
+          body: |
+            ⚠️ Could not retrieve test results. Please check the test workflow logs for details.

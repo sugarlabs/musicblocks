@@ -3294,6 +3294,38 @@ class Block {
     }
 
     /**
+     * Cleanup event handlers attached to the block container.
+     * Removes all CreateJS event listeners to prevent memory leaks when blocks are deleted.
+     * This addresses the listener accumulation vulnerability where event handlers persist
+     * even after blocks are moved to trash or deleted.
+     * 
+     * @private
+     * @returns {void}
+     */
+    _cleanupEventHandlers() {
+        if (!this.container) {
+            return;
+        }
+
+        // Remove all CreateJS container event listeners
+        // These are added in _loadEventHandlers() and must be removed to prevent accumulation
+        this.container.off("mouseover");
+        this.container.off("click");
+        this.container.off("mousedown");
+        this.container.off("pressmove");
+        this.container.off("mouseout");
+        this.container.off("pressup");
+
+        // Remove DOM event listeners from label input field if present
+        if (this.label && this.label.removeEventListener) {
+            this.label.removeEventListener("blur", this._labelBlurHandler);
+            this.label.removeEventListener("input", this._labelInputHandler);
+            this.label.removeEventListener("keypress", this._labelKeypressHandler);
+            this.label.removeEventListener("change", this._labelChangeHandler);
+        }
+    }
+
+    /**
      * Handles mouseout events and processes related actions.
      * @private
      * @param {Event} event - The mouse event.

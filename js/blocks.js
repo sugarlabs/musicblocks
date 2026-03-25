@@ -7064,6 +7064,9 @@ class Blocks {
             this.findDragGroup(thisBlock);
             for (let b = 0; b < this.dragGroup.length; b++) {
                 const blk = this.dragGroup[b];
+                // Clean up event listeners before marking block as trash
+                // This prevents listener accumulation vulnerabilities (issue #6354)
+                this.blockList[blk]._cleanupEventHandlers();
                 this.blockList[blk].trash = true;
                 this.blockList[blk].hide();
 
