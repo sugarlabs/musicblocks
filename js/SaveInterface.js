@@ -170,17 +170,15 @@ class SaveInterface {
     }
 
     showToast(message) {
-        console.log("Toast function running ✅");
         const toast = document.createElement("div");
         toast.className = "toast";
         toast.innerText = message;
 
         const canvas = document.querySelector("#canvas");
-        const container = canvas.parentElement;
+        const container = canvas ? canvas.parentElement : document.body;
 
         container.appendChild(toast);
 
-        // 🔥 Ensure styling is visible
         toast.style.position = "absolute";
         toast.style.bottom = "20px";
         toast.style.right = "20px";
@@ -217,9 +215,7 @@ class SaveInterface {
             }
 
             this.downloadURL(name, dataurl);
-            console.log("Download called");
-
-            this.showToast("Project saved successfully"); // ✅ FIXED
+            this.showToast("Project saved successfully");
         };
         if (defaultfilename === undefined || defaultfilename === null) {
             if (this.activity.PlanetInterface === undefined) {
