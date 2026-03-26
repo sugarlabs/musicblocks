@@ -225,6 +225,17 @@ describe("Pie Menus Module", () => {
             expect(piemenusContent).toContain("__pitchPreview");
         });
 
+        it("should compute pitch wrapping using noteLabels length", () => {
+            expect(piemenusContent).toContain("const noteCount = noteLabels.length");
+            expect(piemenusContent).toContain("const halfSpan = noteCount / 2");
+        });
+
+        it("should adjust octave direction correctly on pitch wrapping", () => {
+            expect(piemenusContent).toContain("deltaOctave = 1");
+            expect(piemenusContent).toContain("deltaOctave = -1");
+            expect(piemenusContent).toContain("if (prevPitch + delta > noteCount - 1)");
+        });
+
         it("should have voice preview function", () => {
             expect(piemenusContent).toContain("__voicePreview");
         });
