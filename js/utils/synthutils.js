@@ -1093,13 +1093,20 @@ function Synth() {
             }
             chunks = [];
             const url = URL.createObjectURL(blob);
-            // Prompt the user for the file name
-            const fileName = window.prompt("Enter file name", "recording");
-            if (fileName) {
-                download(url, fileName + (platform.FF ? ".wav" : ".ogg"));
-            } else {
-                alert("Download cancelled.");
-            }
+            // Prompt the user for the file name using non-blocking dialog
+            window.MBDialog.prompt({
+                title: _("Save Recording"),
+                message: _("Enter file name"),
+                defaultValue: _("recording"),
+                okText: _("Save"),
+                cancelText: _("Cancel")
+            }).then(fileName => {
+                if (fileName) {
+                    download(url, fileName + (platform.FF ? ".wav" : ".ogg"));
+                } else {
+                    window.MBDialog.alert(_("Download cancelled."));
+                }
+            });
         };
         // this.recorder.start();
         // setTimeout(()=>{this.recorder.stop();},5000);

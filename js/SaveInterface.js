@@ -189,7 +189,7 @@ class SaveInterface {
 
             if (window.isElectron === true) {
                 filename = defaultfilename;
-            } else if (window.MBDialog && typeof window.MBDialog.prompt === "function") {
+            } else {
                 window.MBDialog.prompt({
                     title: _("Save file"),
                     message: _("Filename:"),
@@ -198,8 +198,6 @@ class SaveInterface {
                     cancelText: _("Cancel")
                 }).then(result => finishDownload(result));
                 return;
-            } else {
-                filename = prompt(_("Filename:"), defaultfilename);
             }
         } else {
             if (fileExt(defaultfilename) !== extension) {
