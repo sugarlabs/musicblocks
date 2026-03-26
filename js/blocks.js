@@ -401,6 +401,12 @@ class Blocks {
 
                 this.moveStackRelative(blk, 4 * STANDARDBLOCKHEIGHT, 0);
                 this.blockMoved(blk);
+
+                // Keep parent dock coordinates in sync after removing special-input
+                // arg blocks (e.g., accidentalname), so reconnect can snap correctly.
+                if (adjustDock && firstConnection != null) {
+                    this.adjustDocks(firstConnection, true);
+                }
             }
         };
 
