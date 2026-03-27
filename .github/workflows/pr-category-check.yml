@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check categories and apply labels
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const prBody = context.payload.pull_request.body || '';
@@ -177,7 +177,7 @@ jobs:
 
       - name: Apply PR size label
         if: success()
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const prNumber  = context.payload.pull_request.number;
@@ -262,7 +262,7 @@ jobs:
       - name: Apply PR area labels
 
         if: success()
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const prNumber = context.payload.pull_request.number;
@@ -362,7 +362,7 @@ jobs:
 
 #      - name: Check release notes
 #        if: success()
-#        uses: actions/github-script@v7
+#        uses: actions/github-script@v8
 #        with:
 #          script: |
 #            const prNumber = context.payload.pull_request.number;
