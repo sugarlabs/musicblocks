@@ -897,12 +897,18 @@ class JSEditor {
 
         try {
             if (!ast2blocklist_config && window.ast2blocklist_config_ready) {
-                await window.ast2blocklist_config_ready;
+                await window.ast2blocklist_config_ready.catch(error => {
+                    window.ast2blocklist_config_error = error;
+                });
             }
 
             if (!ast2blocklist_config) {
                 throw new Error(
-                    _("JavaScript block conversion is still loading. Please try again.")
+                    window.ast2blocklist_config_error
+                        ? _(
+                              "JavaScript block conversion is unavailable because its config failed to load."
+                          )
+                        : _("JavaScript block conversion is still loading. Please try again.")
                 );
             }
 
