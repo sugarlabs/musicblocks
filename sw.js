@@ -34,7 +34,6 @@ self.addEventListener("activate", function (event) {
     console.log("[PWA Builder] Claiming clients for current page");
     event.waitUntil(self.clients.claim());
 });
-/*
 function isPrecachedRequest(request) {
     try {
         const url = new URL(request.url);
@@ -103,10 +102,8 @@ function shouldCacheResponse(request, response) {
     // Only cache responses for allowlisted requests (static assets + explicit precache URLs).
     return isStaticAssetRequest(request) || isPrecachedRequest(request);
 }
-*/
 function updateCache(request, response) {
-    if (response.status === 206) {
-        console.log("Partial response is unsupported for caching.");
+    if (!shouldCacheResponse(request, response)) {
         return Promise.resolve();
     }
     return caches.open(CACHE).then(function (cache) {
