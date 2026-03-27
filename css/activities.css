@@ -2336,3 +2336,105 @@ table {
     box-sizing: border-box;
   }
 }
+
+/* ======================================================
+   FIX: Make "Take a Tour" responsive on mobile
+   ====================================================== */
+@media screen and (max-width: 768px) {
+  #floatingWindows > .windowFrame {
+    width: 95% !important;
+    max-width: 95% !important;
+    left: 2.5% !important;
+    padding: 12px !important;
+    min-width: 300px !important;
+  }
+  
+  #floatingWindows > .windowFrame .wfTopBar {
+    padding: 8px 12px !important;
+    min-height: 44px !important;
+  }
+  
+  #floatingWindows > .windowFrame .wftTitle {
+    font-size: 16px !important;
+    line-height: 1.2 !important;
+  }
+  
+  #floatingWindows > .windowFrame .wftButton {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 8px !important;
+    font-size: 14px !important;
+  }
+  
+  #floatingWindows > .windowFrame .wfWinBody {
+    padding: 12px !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+  }
+  
+  #floatingWindows > .windowFrame .wfWinBody p,
+  #floatingWindows > .windowFrame .wfWinBody li {
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    margin-bottom: 8px !important;
+  }
+  
+  #floatingWindows > .windowFrame .wfWinBody button,
+  #floatingWindows > .windowFrame .wfWinBody .btn {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 10px 16px !important;
+    font-size: 14px !important;
+    margin: 4px !important;
+  }
+  
+  #left-arrow, #right-arrow {
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 14px !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  #floatingWindows > .windowFrame {
+    width: 98% !important;
+    left: 1% !important;
+    padding: 8px !important;
+    min-width: 280px !important;
+  }
+  
+  #floatingWindows > .windowFrame .wfTopBar {
+    padding: 6px 8px !important;
+    min-height: 40px !important;
+  }
+  
+  #floatingWindows > .windowFrame .wftTitle {
+    font-size: 14px !important;
+  }
+  
+  #floatingWindows > .windowFrame .wfWinBody {
+    padding: 8px !important;
+    font-size: 12px !important;
+    line-height: 1.3 !important;
+  }
+  
+  #floatingWindows > .windowFrame .wfWinBody p,
+  #floatingWindows > .windowFrame .wfWinBody li {
+    font-size: 12px !important;
+    line-height: 1.3 !important;
+    margin-bottom: 6px !important;
+  }
+  
+  #floatingWindows > .windowFrame .wfWinBody button,
+  #floatingWindows > .windowFrame .wfWinBody .btn {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+    margin: 2px !important;
+  }
+  
+  #left-arrow, #right-arrow {
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 12px !important;
+  }
+}
