@@ -135,7 +135,7 @@ beforeEach(() => {
     global.AST2BlockList.toBlockList.mockReturnValue(["blocks"]);
     global.ast2blocklist_config = { ready: true };
     window.ast2blocklist_config_ready = null;
-    window.ast2blocklist_config_error = null;
+    window.ast2blocklist_config_failed = false;
     global.CodeJar = jest.fn().mockImplementation(() => ({
         updateCode: jest.fn(),
         updateOptions: jest.fn(),
@@ -505,6 +505,8 @@ describe("JSEditor", () => {
     });
 
     describe("export/run functionality", () => {
+        const ast = { type: "Program", body: [] };
+
         test("_codeToBlocks waits for pending AST config", async () => {
             const editor = createEditor();
             let resolveConfig;
@@ -516,7 +518,7 @@ describe("JSEditor", () => {
                 global.ast2blocklist_config = data;
                 return data;
             });
-            acorn.parse.mockReturnValue({ type: "Program", body: [] });
+            acorn.parse.mockReturnValue(ast);
 
             const conversionPromise = editor._codeToBlocks();
             expect(AST2BlockList.toBlockList).not.toHaveBeenCalled();
@@ -524,10 +526,7 @@ describe("JSEditor", () => {
             resolveConfig({ loaded: true });
             await conversionPromise;
 
-            expect(AST2BlockList.toBlockList).toHaveBeenCalledWith(
-                { type: "Program", body: [] },
-                { loaded: true }
-            );
+            expect(AST2BlockList.toBlockList).toHaveBeenCalledWith(ast, { loaded: true });
         });
 
         test("_codeToBlocks logs a clear error when AST config fails", async () => {

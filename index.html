@@ -164,7 +164,7 @@
     <script src="lib/tweenjs.min.js" defer></script>
     <script>
         let ast2blocklist_config;
-        window.ast2blocklist_config_error = null;
+        window.ast2blocklist_config_failed = false;
         window.ast2blocklist_config_ready = fetch("js/js-export/ast2blocks.min.json")
             .then(response => {
                 if (!response.ok) {
@@ -176,9 +176,8 @@
                 ast2blocklist_config = data;
                 return data;
             })
-            .catch(error => {
-                window.ast2blocklist_config_error = error;
-                console.error("Failed to load AST block config.", error);
+            .catch(() => {
+                window.ast2blocklist_config_failed = true;
                 return null;
             });
     </script>
