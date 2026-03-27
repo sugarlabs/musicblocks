@@ -1324,7 +1324,7 @@ class Activity {
         this.printBlockSVG = () => {
             this.blocks.activeBlock = null;
             let startCounter = 0;
-            let svg = "";
+            const svgParts = [];
             let xMax = 0;
             let yMax = 0;
             let parts;
@@ -1346,18 +1346,19 @@ class Activity {
                     : this.blocks.blockArt[i];
 
                 if (this.blocks.blockList[i].isCollapsible()) {
-                    svg += "<g>";
+                    svgParts.push("<g>");
                 }
 
-                svg +=
+                svgParts.push(
                     '<g transform="translate(' +
-                    this.blocks.blockList[i].container.x +
-                    ", " +
-                    this.blocks.blockList[i].container.y +
-                    ')">';
+                        this.blocks.blockList[i].container.x +
+                        ", " +
+                        this.blocks.blockList[i].container.y +
+                        ')">'
+                );
 
                 if (!SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
-                    svg += extractSVGInner(rawSVG);
+                    svgParts.push(extractSVGInner(rawSVG));
                 } else {
                     // Safer SVG manipulation using DOM instead of string splitting
                     const parser = new DOMParser();
@@ -1399,10 +1400,10 @@ class Activity {
                     // remove outer svg tags because original code skipped them
                     serialized = serialized.replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "");
 
-                    svg += serialized;
+                    svgParts.push(serialized);
                 }
 
-                svg += "</g>";
+                svgParts.push("</g>");
 
                 if (this.blocks.blockList[i].isCollapsible()) {
                     let y;
@@ -1412,12 +1413,13 @@ class Activity {
                         y = this.blocks.blockList[i].container.y + 12;
                     }
 
-                    svg +=
+                    svgParts.push(
                         '<g transform="translate(' +
-                        this.blocks.blockList[i].container.x +
-                        ", " +
-                        y +
-                        ') scale(0.5 0.5)">';
+                            this.blocks.blockList[i].container.x +
+                            ", " +
+                            y +
+                            ') scale(0.5 0.5)">'
+                    );
                     if (this.blocks.blockList[i].collapsed) {
                         parts = EXPANDBUTTON.split("><");
                     } else {
@@ -1425,16 +1427,16 @@ class Activity {
                     }
 
                     for (let p = 2; p < parts.length - 1; p++) {
-                        svg += "<" + parts[p] + ">";
+                        svgParts.push("<" + parts[p] + ">");
                     }
 
-                    svg += "</g>";
+                    svgParts.push("</g>");
                 }
 
                 if (this.blocks.blockList[i].name === "start") {
                     const x = this.blocks.blockList[i].container.x + 110;
                     const y = this.blocks.blockList[i].container.y + 12;
-                    svg += '<g transform="translate(' + x + ", " + y + ') scale(0.4 0.4)">';
+                    svgParts.push('<g transform="translate(' + x + ", " + y + ') scale(0.4 0.4)">');
 
                     parts = TURTLESVG.replace(/fill_color/g, FILLCOLORS[startCounter])
                         .replace(/stroke_color/g, STROKECOLORS[startCounter])
@@ -1446,18 +1448,18 @@ class Activity {
                     }
 
                     for (let p = 2; p < parts.length - 1; p++) {
-                        svg += "<" + parts[p] + ">";
+                        svgParts.push("<" + parts[p] + ">");
                     }
 
-                    svg += "</g>";
+                    svgParts.push("</g>");
                 }
 
                 if (this.blocks.blockList[i].isCollapsible()) {
-                    svg += "</g>";
+                    svgParts.push("</g>");
                 }
             }
 
-            svg += "</svg>";
+            svgParts.push("</svg>");
 
             return (
                 '<svg xmlns="http://www.w3.org/2000/svg" width="' +
@@ -1465,7 +1467,7 @@ class Activity {
                 '" height="' +
                 yMax +
                 '">' +
-                encodeURIComponent(svg)
+                encodeURIComponent(svgParts.join(""))
             );
         };
 
