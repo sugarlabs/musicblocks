@@ -432,9 +432,8 @@ function TemperamentWidget() {
                     docById("noteInfo").remove();
                 }
 
-                docById(
-                    "information"
-                ).innerHTML += `<div class="popup" id="noteInfo" style="left: ${x}px; top: ${y}px;">
+                docById("information").innerHTML +=
+                    `<div class="popup" id="noteInfo" style="left: ${x}px; top: ${y}px;">
                         <span class="popuptext" id="myPopup"></span>
                     </div>`;
                 if (i !== 0) {
@@ -520,19 +519,17 @@ function TemperamentWidget() {
         docById("noteInfo").style.height = "130px";
         docById("note").innerHTML = "";
         docById("frequency").innerHTML = "";
-        docById(
-            "noteInfo"
-        ).innerHTML += `<center><input type="range" class="sliders" id="frequencySlider1" style="width:170px; background:white; border:0;" min="${
-            this.frequencies[i - 1]
-        }" max="${this.frequencies[i + 1]}"></center>`;
+        docById("noteInfo").innerHTML +=
+            `<center><input type="range" class="sliders" id="frequencySlider1" style="width:170px; background:white; border:0;" min="${
+                this.frequencies[i - 1]
+            }" max="${this.frequencies[i + 1]}"></center>`;
         docById("noteInfo").innerHTML += `<br>&nbsp;&nbsp;${_(
             "frequency"
         )}<span class="rangeslidervalue" id="frequencydiv1">${this.frequencies[i]}</span>`;
-        docById(
-            "noteInfo"
-        ).innerHTML += `<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>${_(
-            "done"
-        )}</center><div>`;
+        docById("noteInfo").innerHTML +=
+            `<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>${_(
+                "done"
+            )}</center><div>`;
 
         docById("frequencySlider1").oninput = function () {
             docById("frequencydiv1").innerHTML = docById("frequencySlider1").value;
@@ -1443,19 +1440,17 @@ function TemperamentWidget() {
                     '" alt="' +
                     _("Close") +
                     '" height=20px width=20px align="right">';
-                docById(
-                    "noteInfo1"
-                ).innerHTML += `<br><center><input type="range" class="sliders" id = "frequencySlider" style="width:170px; background:white; border:0;" min="${
-                    frequencies[i]
-                }" max="${frequencies[i + 1]}" value="30"></center>`;
+                docById("noteInfo1").innerHTML +=
+                    `<br><center><input type="range" class="sliders" id = "frequencySlider" style="width:170px; background:white; border:0;" min="${
+                        frequencies[i]
+                    }" max="${frequencies[i + 1]}" value="30"></center>`;
                 docById("noteInfo1").innerHTML += `&nbsp;&nbsp;${_(
                     "frequency"
                 )} : <span class="rangeslidervalue" id="frequencydiv">${frequencies[i]}</span>`;
-                docById(
-                    "noteInfo1"
-                ).innerHTML += `<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>${_(
-                    "done"
-                )}</center><div>`;
+                docById("noteInfo1").innerHTML +=
+                    `<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>${_(
+                        "done"
+                    )}</center><div>`;
 
                 docById("noteInfo1").style.top = "100px";
                 docById("noteInfo1").style.left = "90px";
@@ -1905,19 +1900,61 @@ function TemperamentWidget() {
      * @returns {void}
      */
     this.playNote = function (pitchNumber) {
+        if (
+            !this._logo ||
+            !this._logo.synth ||
+            typeof this._logo.resetSynth !== "function" ||
+            typeof this._logo.synth.trigger !== "function"
+        ) {
+            return;
+        }
+
         this._logo.resetSynth(0);
         const duration = 1 / 2;
         let notes;
 
+        // Dataset ids are strings; normalize and guard invalid indexes.
+        const pitchIndex = Number.parseInt(pitchNumber, 10);
+        if (Number.isNaN(pitchIndex) || pitchIndex < 0) {
+            return;
+        }
+
+        // Ensure per-note playback uses the currently selected temperament mapping.
+        this._logo.synth.inTemperament = this.inTemperament;
+        this._logo.synth.changeInTemperament = true;
+
         if (docById("wheelDiv4") === null) {
-            notes = this.frequencies[pitchNumber];
             if (this.editMode == "equal" && this.eqTempHzs && this.eqTempHzs.length) {
-                notes = this.eqTempHzs[pitchNumber];
+                notes = this.eqTempHzs[pitchIndex];
             } else if (this.editMode == "ratio" && this.NEqTempHzs && this.NEqTempHzs.length) {
-                notes = this.NEqTempHzs[pitchNumber];
+                notes = this.NEqTempHzs[pitchIndex];
+            } else if (isCustomTemperament(this.inTemperament)) {
+                notes = this.frequencies[pitchIndex];
+            } else if (this.inTemperament === "equal") {
+                // Preserve existing 12EDO/equal behavior by using direct frequency.
+                notes = this.frequencies[pitchIndex];
+            } else if (this.notes[pitchIndex] && Array.isArray(this.notes[pitchIndex])) {
+                const noteName = this.notes[pitchIndex][0];
+                const octave = this.notes[pitchIndex][1];
+                notes =
+                    noteName
+                        .replace(/♭/g, "b")
+                        .replace(/♯/g, "#")
+                        .replace(/𝄫/g, "bb")
+                        .replace(/𝄪/g, "x") + octave;
+            } else {
+                notes = this.frequencies[pitchIndex];
             }
         } else {
-            notes = this.tempRatios1[pitchNumber] * this.frequencies[0];
+            const ratio = this.tempRatios1 && this.tempRatios1[pitchIndex];
+            if (typeof ratio === "number" && this.frequencies && this.frequencies.length) {
+                notes = ratio * this.frequencies[0];
+            }
+        }
+
+        // Guard against undefined notes/frequencies to avoid invalid trigger calls.
+        if (notes === undefined || notes === null) {
+            return;
         }
 
         this._logo.synth.trigger(
@@ -2098,9 +2135,12 @@ function TemperamentWidget() {
             }
 
             if (i <= pitchNumber && i >= 0 && that._playing && p < 2) {
-                setTimeout(function () {
-                    __playLoop(i);
-                }, Singer.defaultBPMFactor * 1000 * duration);
+                setTimeout(
+                    function () {
+                        __playLoop(i);
+                    },
+                    Singer.defaultBPMFactor * 1000 * duration
+                );
             } else {
                 that.inbetween = true;
             }
@@ -2117,13 +2157,16 @@ function TemperamentWidget() {
                 that._playing = false;
                 that.playbackForward = true;
                 this.inbetween = false;
-                setTimeout(function () {
-                    that.notesCircle.navItems[0].fillAttr = "#c8C8C8";
-                    that.notesCircle.navItems[0].sliceHoverAttr.fill = "#c8C8C8";
-                    that.notesCircle.navItems[0].slicePathAttr.fill = "#c8C8C8";
-                    that.notesCircle.navItems[0].sliceSelectedAttr.fill = "#c8C8C8";
-                    that.notesCircle.refreshWheel();
-                }, Singer.defaultBPMFactor * 1000 * duration);
+                setTimeout(
+                    function () {
+                        that.notesCircle.navItems[0].fillAttr = "#c8C8C8";
+                        that.notesCircle.navItems[0].sliceHoverAttr.fill = "#c8C8C8";
+                        that.notesCircle.navItems[0].slicePathAttr.fill = "#c8C8C8";
+                        that.notesCircle.navItems[0].sliceSelectedAttr.fill = "#c8C8C8";
+                        that.notesCircle.refreshWheel();
+                    },
+                    Singer.defaultBPMFactor * 1000 * duration
+                );
             }
         };
         if (
