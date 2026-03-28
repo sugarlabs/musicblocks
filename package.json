@@ -88,7 +88,10 @@
         "svgo": "^4.0.1",
         "@gulp-sourcemaps/identity-map": {
             "postcss": "^8.4.31"
-        }
+        },
+        "path-to-regexp": "^8.4.2",
+        "picomatch": "^4.0.4",
+        "yaml": "^2.8.3"
     },
     "lint-staged": {
         "*.{js,mjs}": [
