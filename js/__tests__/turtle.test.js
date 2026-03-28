@@ -250,3 +250,11 @@ describe("Turtle", () => {
         });
     });
 });
+
+test("doWait handles negative input gracefully", () => {
+    const turtle = new Turtle({}, 0, "t1", {}, null);
+
+    turtle.doWait(-1);
+
+    expect(turtle._waitTime).toBeLessThanOrEqual(0);
+});
