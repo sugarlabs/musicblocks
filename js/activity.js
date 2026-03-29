@@ -2394,6 +2394,9 @@ class Activity {
          * Sets the status of the smaller and larger block icons based on the current block size.
          */
         this.setSmallerLargerStatus = async () => {
+            // Guard: skip if containers are not yet initialized
+            if (!this.smallerContainer || !this.largerContainer) return;
+
             if (BLOCKSCALES[this.blockscale] < DEFAULTBLOCKSCALE) {
                 await changeImage(
                     this.smallerContainer.children[0],
@@ -2407,7 +2410,6 @@ class Activity {
                     SMALLERBUTTON
                 );
             }
-
             if (BLOCKSCALES[this.blockscale] === 4) {
                 await changeImage(
                     this.largerContainer.children[0],
