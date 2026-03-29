@@ -1223,12 +1223,9 @@ class Logo {
             );
             return;
         }
-
         if (typeof performanceTracker !== "undefined") {
             if (performanceModeEnabled) {
                 performanceTracker.enable();
-            } else {
-                performanceTracker.disable();
             }
         }
 
@@ -1430,10 +1427,9 @@ class Logo {
         }
 
         // Performance instrumentation: begin tracking
-        if (typeof performanceTracker !== "undefined") {
-            performanceTracker.startRun();
+        if (window.performanceTrackerInstance) {
+            window.performanceTrackerInstance.startRun();
         }
-
         /*
         ===========================================================================
         (2) Execute the stack. (A bit complicated due to lots of corner cases.)
@@ -1585,8 +1581,8 @@ class Logo {
      * @returns {void}
      */
     runFromBlockNow(logo, turtle, blk, isflow, receivedArg, queueStart) {
-        if (typeof performanceTracker !== "undefined") {
-            performanceTracker.enterBlock();
+        if (window.performanceTrackerInstance) {
+            window.performanceTrackerInstance.enterBlock();
         }
 
         this._alreadyRunning = true;
