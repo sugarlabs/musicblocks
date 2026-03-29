@@ -29,12 +29,15 @@
    MIN_HIGHLIGHT_DURATION_MS,
    NOMICERRORMSG, NANERRORMSG, NOSTRINGERRORMSG, NOBOXERRORMSG,
    NOACTIONERRORMSG, NOINPUTERRORMSG, NOSQRTERRORMSG,
-   ZERODIVIDEERRORMSG, EMPTYHEAPERRORMSG, INVALIDPITCH, POSNUMBER,
+   ZERODIVIDEERRORMSG, EMPTYHEAPERRORMSG, INVALIDPITCH, POSNUMBER,run
    NOTATIONNOTE, NOTATIONDURATION, NOTATIONDOTCOUNT,
    NOTATIONTUPLETVALUE, NOTATIONROUNDDOWN, NOTATIONINSIDECHORD,
    NOTATIONSTACCATO
  */
-
+// Clean up after all tests are done
+afterAll(() => {
+    delete global.performanceTrackerInstance;
+});
 // Constants moved to js/logoconstants.js to resolve circular dependency
 
 /**
@@ -1116,31 +1119,26 @@ class Logo {
      * @returns {void}
      */
     runLogoCommands(startHere, env) {
-        // Performance instrumentation: enable/disable based on URL flag
-        if (typeof window !== "undefined" && window.location.search.includes("performance=true")) {
-            require(["utils/performanceTracker"], function (performanceTracker) {
-                // Store in a global variable to use later in other blocks
-                window.performanceTrackerInstance = performanceTracker;
-                performanceTracker.enable();
-            });
-        } else {
-            // We still load it in the else branch if you want to call disable()
-            require(["utils/performanceTracker"], function (performanceTracker) {
-                window.performanceTrackerInstance = performanceTracker;
+        // Performance instrumentation: resolve tracker from whichever environment set it
+        const _pt =
+            typeof window !== "undefined"
+                ? window.performanceTrackerInstance
+                : typeof global !== "undefined"
+                  ? global.performanceTrackerInstance
+                  : null;
 
-                if (
-                    typeof window !== "undefined" &&
-                    window.location.search.includes("performance=true")
-                ) {
-                    performanceTracker.enable();
-                } else {
-                    performanceTracker.disable();
-                }
-                // Start the run immediately
-                performanceTracker.startRun();
-            });
+        if (_pt) {
+            if (
+                typeof window !== "undefined" &&
+                window.location.search &&
+                window.location.search.includes("performance=true")
+            ) {
+                _pt.enable();
+            } else {
+                _pt.disable();
+            }
+            _pt.startRun();
         }
-
         this._prematureRestart = this._alreadyRunning;
         if (this._alreadyRunning && this._runningBlock !== null) {
             this._ignoringBlock = this._runningBlock;
@@ -1336,8 +1334,15 @@ class Logo {
         }
 
         // Performance instrumentation: begin tracking
-        if (window.performanceTrackerInstance) {
-            window.performanceTrackerInstance.startRun();
+        const tracker =
+            typeof window !== "undefined"
+                ? window.performanceTrackerInstance
+                : typeof global !== "undefined"
+                  ? global.performanceTrackerInstance
+                  : null;
+
+        if (tracker) {
+            tracker.enterBlock();
         }
         /*
         ===========================================================================
@@ -1657,9 +1662,13 @@ class Logo {
                 if (cf !== undefined) childFlow = cf;
                 if (cfc !== undefined) childFlowCount = cfc;
                 if (ret) {
-                    if (typeof performanceTracker !== "undefined") {
-                        performanceTracker.exitBlock();
-                    }
+                    const _pt3 =
+                        typeof window !== "undefined"
+                            ? window.performanceTrackerInstance
+                            : typeof global !== "undefined"
+                              ? global.performanceTrackerInstance
+                              : null;
+                    if (_pt3) _pt3.exitBlock();
                     return ret;
                 }
             }
@@ -1923,9 +1932,15 @@ class Logo {
                     tur.singer.justCounting.length === 0
                 ) {
                     // Performance instrumentation: end tracking and log stats
-                    if (typeof performanceTracker !== "undefined") {
-                        performanceTracker.endRun();
-                        performanceTracker.logStats();
+                    const _pt4 =
+                        typeof window !== "undefined"
+                            ? window.performanceTrackerInstance
+                            : typeof global !== "undefined"
+                              ? global.performanceTrackerInstance
+                              : null;
+                    if (_pt4) {
+                        _pt4.endRun();
+                        _pt4.logStats();
                     }
 
                     if (logo.runningLilypond) {
@@ -2003,9 +2018,13 @@ class Logo {
             setTimeout(__checkCompletionState, 100);
         }
 
-        if (typeof performanceTracker !== "undefined") {
-            performanceTracker.exitBlock();
-        }
+        const _pt5 =
+            typeof window !== "undefined"
+                ? window.performanceTrackerInstance
+                : typeof global !== "undefined"
+                  ? global.performanceTrackerInstance
+                  : null;
+        if (_pt5) _pt5.exitBlock();
     }
 
     /**
