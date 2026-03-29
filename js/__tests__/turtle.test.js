@@ -250,3 +250,32 @@ describe("Turtle", () => {
         });
     });
 });
+
+test("initTurtle resets state correctly on multiple calls", () => {
+    const turtle = new Turtle({}, 0, "t1", {}, null);
+
+    turtle.doWait(5);
+    turtle.initTurtle(false);
+
+    turtle.doWait(3);
+    turtle.initTurtle(false);
+
+    expect(turtle._waitTime).toBe(0);
+});
+
+test("initTurtle handles undefined input safely", () => {
+    const turtle = new Turtle({}, 0, "t1", {}, null);
+
+    turtle.initTurtle(undefined);
+
+    expect(turtle.singer.suppressOutput).toBeUndefined();
+});
+
+test("initTurtle does not break turtle object structure", () => {
+    const turtle = new Turtle({}, 0, "t1", {}, null);
+
+    turtle.initTurtle(false);
+
+    expect(turtle).toHaveProperty("singer");
+    expect(turtle).toHaveProperty("_waitTime");
+});
