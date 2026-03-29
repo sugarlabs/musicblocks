@@ -6,9 +6,15 @@ labels: "Issue-Documentation"
 assignees: ""
 ---
 
+#### Getting started
+1. Open music blocks.
+2. Drag blocks from the palette.
+3. Connect blocks together.
+4. Click run button to play music.
+
 #### Current State
 
-<!-- A brief description of what the current circumstance is. -->
+<!-- A brief description of the current situation -->
 
 #### Desired State
 
