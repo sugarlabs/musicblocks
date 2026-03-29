@@ -1,15 +1,15 @@
 /* Light Mode Defaults */
 body {
-    --bg: #e8e8e8;
-    --fg: #666666;
+    --bg: #39a2c8;
+    --fg: #d1f18f;
     --overlay-bg: rgba(255, 255, 255, 0.75);
 }
 
 /* Dark Mode Overrides */
 body.dark {
-    --bg: #1d1d20;
+    --bg: #88ec88;
     --fg: #e8e8e8;
-    --overlay-bg: rgba(15, 15, 16, 0.75);
+    --overlay-bg: rgba(67, 196, 181, 0.75);
 
     background: var(--bg);
     color: var(--fg);

@@ -253,6 +253,19 @@ class ThemeBox {
     }
 
     /**
+     * @public
+     * @returns {void}
+     */
+    toggle_onclick() {
+        if (this._theme === "dark") {
+            this._theme = "light";
+        } else {
+            this._theme = "dark";
+        }
+        this.setPreference();
+    }
+
+    /**
      * Apply theme instantly without page reload
      * @private
      * @returns {void}
@@ -355,10 +368,17 @@ class ThemeBox {
      */
     updateThemeIcon() {
         const themeSelectIcon = document.getElementById("themeSelectIcon");
+        const themeToggleButton = document.getElementById("themeToggleButton");
         if (themeSelectIcon) {
             const currentThemeElement = document.getElementById(this._theme);
             if (currentThemeElement) {
                 themeSelectIcon.innerHTML = currentThemeElement.innerHTML;
+            }
+        }
+        if (themeToggleButton) {
+            const icon = themeToggleButton.querySelector("i");
+            if (icon) {
+                icon.textContent = this._theme === "dark" ? "brightness_2" : "brightness_7";
             }
         }
     }

@@ -7563,6 +7563,7 @@ class Activity {
             this.toolbar.renderRunSlowlyIcon(doSlowButton);
             this.toolbar.renderRunStepIcon(doStepButton);
             this.toolbar.renderThemeSelectIcon(this.themeBox, this.themes);
+            this.toolbar.renderThemeToggleButton(this.themeBox);
             this.toolbar.renderMergeIcon(_doMergeLoad);
             this.toolbar.renderRestoreIcon(restoreTrash);
             if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -8361,4 +8362,10 @@ define(["domReady!"].concat(MYDEFINES), doc => {
         }
     };
     initialize();
+});
+document.addEventListener("click", async () => {
+    if (window.Tone && Tone.context.state !== "running") {
+        await Tone.start();
+        console.log("Audio started");
+    }
 });

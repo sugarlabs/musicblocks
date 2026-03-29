@@ -14,15 +14,20 @@
 
 @import url("play-only-mode.css");
 
+
 *:focus:not(:focus-visible) {
     outline: none;
 }
 
 *:focus-visible {
-    outline: 2px solid #0066ff !important;
+    outline: 2px solid var(--accent) !important;
     outline-offset: 2px;
 }
 
+body {
+    background: radial-gradient(circle at top, var(--bg), var(--panel-bg));
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+}
 body:not(.dark):not(.highcontrast) #helpfulSearch,
 body:not(.dark):not(.highcontrast) .ui-autocomplete {
     background-color: #fff !important;
@@ -55,13 +60,14 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 
 #newdropdown {
     font-size: 16px;
-    background-color: #fff;
-    border: 1px solid #cccccc;
-    color: #000000;
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border);
+    color: var(--fg);
     padding: 24px;
     width: 400px;
-    border-radius: 8px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-medium);
+    transition: all var(--transition-fast);
 }
 
 #newdropdown li {
@@ -103,12 +109,13 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 400px;
-    padding: 24px;
-    background-color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
+    padding: 32px;
+    background-color: var(--panel-bg);
+    box-shadow: var(--shadow-medium);
+    border-radius: var(--border-radius-lg);
     z-index: 10000;
     text-align: left;
+    border: 1px solid var(--border);
 }
 
 .modal-title {
@@ -130,33 +137,37 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 
 .confirm-button {
     border: none;
-    border-radius: 4px;
-    padding: 8px 16px;
-    font-weight: bold;
+    border-radius: var(--border-radius-md);
+    padding: 10px 24px;
+    font-weight: 600;
     cursor: pointer;
-    background-color: #0066ff;
+    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
     color: white;
     margin-right: 16px;
-    transition: background-color 0.2s ease;
+    transition: all var(--transition-fast);
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
 }
 
 .confirm-button:hover {
-    background-color: #023a76;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    filter: brightness(1.1);
 }
 
 .cancel-button {
-  border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  background-color: #e0e0e0;
-  color: black;
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius-md);
+    padding: 10px 24px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    background-color: transparent;
+    color: var(--fg);
 }
 
 .cancel-button:hover {
-    background-color: #afafaf;
+    background-color: var(--border);
+    transform: translateY(-1px);
 }
 
 .modal {
@@ -176,13 +187,14 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 400px;
-    padding: 24px;
-    background-color: #fefefe;
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px;
-    border-radius: 8px;
+    width: 440px;
+    padding: 32px;
+    background-color: var(--panel-bg);
+    box-shadow: var(--shadow-medium);
+    border-radius: var(--border-radius-lg);
     z-index: 10000;
     text-align: left;
+    border: 1px solid var(--border);
 }
 
 .block-count-dropdown {
@@ -225,18 +237,20 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     width: 300px;
     box-sizing: border-box;
     position: absolute;
-    background-color: white;
-    background-repeat: no-repeat;
-    padding: 4.5px 10px 4.5px 20px;
-    -webkit-transition: width 0.4s ease-in-out;
-    transition: width 0.4s ease-in-out;
-    font-size: 24px;
-    color: black;
+    background-color: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: var(--border-radius-md);
+    padding: 8px 16px;
+    transition: all var(--transition-fast);
+    font-size: 20px;
+    color: var(--fg);
     max-width: 100%;
 }
 
 #search:focus {
-    border: 2px solid #87cefa;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.1);
+    outline: none;
 }
 
 #search.open {
@@ -541,14 +555,16 @@ nav {
     top: 0px;
     left: 0px;
     z-index: 100;
-    background-color: #8bc34a;
+    background-color: var(--panel-bg);
+    border-bottom: 1px solid var(--border);
     height: 64px;
     width: 100%;
-    box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.16), 0px 2px 10px 0px rgba(0, 0, 0, 0.12);
-    font: 32px sans;
+    box-shadow: var(--shadow-soft);
+    font: 18px "Inter", system-ui, sans-serif;
     vertical-align: middle;
     line-height: 64px;
-    color: white;
+    color: var(--fg);
+    transition: all var(--transition-fast);
 }
 
 nav .nav-container {
@@ -676,12 +692,13 @@ img.icon:hover {
 }
 
 body {
-    background-color: #92b5c8 !important;
-    /*  2.5B 7/4 */
+    background-color: var(--bg) !important;
     padding: 0;
     margin: 0;
-    font-family: sans-serif;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    color: var(--fg);
     overflow: hidden;
+    line-height: 1.5;
 }
 
 body.noScroll {
@@ -778,6 +795,7 @@ table {
 
 #canvas {
     overflow-y: visible;
+    border-radius: 20%;
 }
 
 #statusDiv {
@@ -2204,4 +2222,50 @@ table {
     padding: 0 10px;
     box-sizing: border-box;
   }
+}
+
+/* Close button for persistent notification */
+#persistentNotification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--accent);
+    color: white;
+    padding: 12px 40px 12px 16px;
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-medium);
+    z-index: 10001;
+    font-size: 14px;
+    max-width: 90vw;
+}
+
+.notification-close {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 20px;
+    padding: 4px;
+    line-height: 1;
+}
+
+/* Close button for New Project modal */
+.modal-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--fg);
+    opacity: 0.6;
+    transition: opacity var(--transition-fast);
+    z-index: 10;
+}
+
+.modal-close-btn:hover {
+    opacity: 1;
 }

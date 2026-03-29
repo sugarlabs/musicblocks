@@ -186,9 +186,9 @@
     border-radius: 0;
     border: none;
     width: 100vw;
-    height: 100vh;
+    height: calc(100vh - 64px);
     left: 0 !important;
-    top: 0 !important;
+    top: 64px !important;
     display: flex;
     flex-direction: column;
   }

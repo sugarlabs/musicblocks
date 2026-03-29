@@ -191,19 +191,29 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 body {
-    --border: #cccccc;
+    --border: #e0e0e0;
     --bg: #ffffff;
-    --fg: #666666;
-    --panel-bg: #f5f5f5;
-    --accent: #2196f3;
+    --fg: #333333;
+    --panel-bg: #f8f9fa;
+    --accent: #007bff;
+    --accent-hover: #0056b3;
+    --border-radius-lg: 16px;
+    --border-radius-md: 10px;
+    --border-radius-sm: 6px;
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+    --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body.dark {
-    --border: #000000;
-    --bg: #1d1d20;
-    --fg: #e8e8e8;
-    --panel-bg: #1c1c1c;
-    --accent: #3fe0d1;
+    --border: #30363d;
+    --bg: #0d1117;
+    --fg: #c9d1d9;
+    --panel-bg: #161b22;
+    --accent: #58a6ff;
+    --accent-hover: #79c0ff;
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
+    --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.4);
 }
 
 body.highcontrast {

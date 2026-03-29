@@ -177,6 +177,7 @@
     <noscript>
         JavaScript is required to view this page.
     </noscript>
+    
     <header>
         <div id="loading-image-container"
             style="position: fixed; top: 0; left: 0; width: 100%; height: calc(var(--vh) * 100); display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #FFFFFF; z-index: 9999; contain: paint;">
@@ -491,6 +492,7 @@
                                         tabindex="0"
                                     ></a>
                                 </li>
+                                
                             </ul>
 
                             <ul class="main right">
@@ -590,6 +592,18 @@
                                         <i id="menu" class="animated-icon material-icons md-48"
                                             >menu</i
                                         >
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        id="themeToggleButton"
+                                        class="tooltipped"
+                                        data-position="bottom"
+                                        role="button"
+                                        tabindex="0"
+                                        data-tooltip="Toggle Dark/Light Mode"
+                                    >
+                                        <i class="material-icons md-48">brightness_4</i>
                                     </a>
                                 </li>
                                 <li>
@@ -1243,6 +1257,13 @@
                         persistentNotification.id = "persistentNotification";
                         persistentNotification.innerHTML =
                             "Play only mode enabled. For full Music Blocks experience, use a larger display.";
+
+                        const closeBtn = document.createElement("span");
+                        closeBtn.innerHTML = "&times;";
+                        closeBtn.className = "notification-close";
+                        closeBtn.onclick = removePersistentNotification;
+                        persistentNotification.appendChild(closeBtn);
+
                         document.body.appendChild(persistentNotification);
                     }
                 }

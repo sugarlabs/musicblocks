@@ -479,6 +479,14 @@ class Toolbar {
         title.textContent = _("New project");
         newDropdown.appendChild(title);
 
+        const closeBtn = document.createElement("button");
+        closeBtn.innerHTML = "&times;";
+        closeBtn.className = "modal-close-btn";
+        closeBtn.onclick = () => {
+            modalContainer.style.display = "none";
+        };
+        newDropdown.appendChild(closeBtn);
+
         const confirmationMessage = document.createElement("div");
         confirmationMessage.id = "confirmation-message";
         confirmationMessage.textContent = _("Are you sure you want to create a new project?");
@@ -633,6 +641,17 @@ class Toolbar {
                 docById(theme).onclick = () => themeBox[`${theme}_onclick`](this.activity);
             });
         };
+    }
+
+    renderThemeToggleButton(themeBox) {
+        const themeToggleButton = docById("themeToggleButton");
+        if (themeToggleButton) {
+            themeToggleButton.onclick = () => {
+                themeBox.toggle_onclick(this.activity);
+            };
+            // Initial icon update
+            themeBox.updateThemeIcon();
+        }
     }
 
     /**

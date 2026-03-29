@@ -13,7 +13,7 @@
 
 requirejs.config({
     baseUrl: "./",
-    urlArgs: window.location.protocol === "file:" ? "" : "v=999999_fix7",
+    // urlArgs: window.location.protocol === "file:" ? "" : "v=999999_fix7",
     waitSeconds: 60,
     shim: {
         "easeljs.min": {
