@@ -298,7 +298,7 @@ class Turtle {
         this.singer.justMeasuring = [];
         this.singer.firstPitch = [];
         this.singer.lastPitch = [];
-        this.singer.suppressOutput = suppressOutput;
+        this.singer.suppressOutput = Boolean(suppressOutput);
 
         this.singer.dispatchFactor = 1;
 
