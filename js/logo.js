@@ -1202,34 +1202,29 @@ class Logo {
      * @returns {void}
      */
     runLogoCommands(startHere, env) {
-        const performanceModeEnabled =
-            typeof window !== "undefined" &&
-            (window.DEBUG_PERFORMANCE === true ||
-                (window.location && window.location.search.includes("performance=true")));
-
-        if (
-            performanceModeEnabled &&
-            typeof performanceTracker === "undefined" &&
-            typeof requirejs === "function" &&
-            !this._performanceTrackerLoadFailed
-        ) {
-            requirejs(
-                ["utils/performanceTracker"],
-                () => this.runLogoCommands(startHere, env),
-                () => {
-                    this._performanceTrackerLoadFailed = true;
-                    this.runLogoCommands(startHere, env);
-                }
-            );
-            return;
-        }
-
-        if (typeof performanceTracker !== "undefined") {
-            if (performanceModeEnabled) {
+        // Performance instrumentation: enable/disable based on URL flag
+        if (typeof window !== "undefined" && window.location.search.includes("performance=true")) {
+            require(["utils/performanceTracker"], function (performanceTracker) {
+                // Store in a global variable to use later in other blocks
+                window.performanceTrackerInstance = performanceTracker;
                 performanceTracker.enable();
-            } else {
-                performanceTracker.disable();
-            }
+            });
+        } else {
+            // We still load it in the else branch if you want to call disable()
+            require(["utils/performanceTracker"], function (performanceTracker) {
+                window.performanceTrackerInstance = performanceTracker;
+
+                if (
+                    typeof window !== "undefined" &&
+                    window.location.search.includes("performance=true")
+                ) {
+                    performanceTracker.enable();
+                } else {
+                    performanceTracker.disable();
+                }
+                // Start the run immediately
+                performanceTracker.startRun();
+            });
         }
 
         this._prematureRestart = this._alreadyRunning;
@@ -1430,10 +1425,9 @@ class Logo {
         }
 
         // Performance instrumentation: begin tracking
-        if (typeof performanceTracker !== "undefined") {
-            performanceTracker.startRun();
+        if (window.performanceTrackerInstance) {
+            window.performanceTrackerInstance.startRun();
         }
-
         /*
         ===========================================================================
         (2) Execute the stack. (A bit complicated due to lots of corner cases.)
@@ -1585,8 +1579,8 @@ class Logo {
      * @returns {void}
      */
     runFromBlockNow(logo, turtle, blk, isflow, receivedArg, queueStart) {
-        if (typeof performanceTracker !== "undefined") {
-            performanceTracker.enterBlock();
+        if (window.performanceTrackerInstance) {
+            window.performanceTrackerInstance.enterBlock();
         }
 
         this._alreadyRunning = true;

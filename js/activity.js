@@ -121,6 +121,7 @@ let MYDEFINES = [
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
+    //"utils/performanceTracker",
     "activity/pastebox",
     "prefixfree.min",
     "Tone",
