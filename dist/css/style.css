@@ -131,3 +131,34 @@ body.dark .toolbar-btn-focused,
 }
 
 html, body { overscroll-behavior-x: none; }
+
+/* Hover state */
+#palette tr:hover {
+  background-color: #333333 !important;
+  cursor: pointer;
+}
+
+/* 🔥 Enhance ACTIVE indicator (the small div) */
+#palette tr div[style*="background"] {
+  width: 6px !important;
+  background-color: #42a5f5 !important;
+}
+
+/* 🔥 Make active row more visible using parent effect */
+#palette tr div[style*="background"] {
+  box-shadow: 0 0 10px rgba(66, 165, 245, 0.8);
+}
+
+/* Text contrast */
+#palette tr td {
+  color: #e0e0e0;
+}
+
+#palette tr:hover td {
+  color: #ffffff;
+}
+
+/* Accessibility */
+#palette tr:focus {
+  outline: 2px solid #42a5f5;
+}
