@@ -65,8 +65,10 @@ class Oscilloscope {
         widgetWindow.show();
 
         widgetWindow.onclose = () => {
-            this.close();
-        };
+        // Cleanup document event listener
+        document.removeEventListener("visibilitychange", this._handleVisibilityChange);
+        this.close();
+    };
         widgetWindow.onmaximize = this._scale.bind(this);
 
         // UI state
