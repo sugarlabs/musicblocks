@@ -6,6 +6,12 @@ on:
     types:
       - completed
 
+# Prevent duplicate comments if the triggering workflow is re-run or retried
+# while a previous comment job is still in progress for the same run.
+concurrency:
+  group: jest-comment-${{ github.event.workflow_run.id }}
+  cancel-in-progress: true
+
 jobs:
   comment:
     name: Post PR Comment
