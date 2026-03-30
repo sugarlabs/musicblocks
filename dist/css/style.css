@@ -109,7 +109,7 @@ input[type="range"]:focus::-ms-fill-upper {
 .toolbar-btn-focused {
   background-color: rgba(0, 0, 0, 0.25) !important;
   border-radius: 4px;
-  transition: background-color 0.15s ease;
+  transition: background-color 0.15s ease;  
 }
 
 /* Dark mode focus - brighten the background */
@@ -132,4 +132,23 @@ body.dark .toolbar-btn-focused,
 
 html, body { overscroll-behavior-x: none; }
 
-  
+  /* Global focus visibility improvement */
+:focus-visible {
+  outline: 3px solid #42a5f5;
+  outline-offset: 2px;
+}
+
+/* Remove default ugly focus (optional) */
+:focus {
+  outline: none;
+}
+
+.dropdown-content li a:focus-visible {
+  background-color: rgba(66, 165, 245, 0.3) !important;
+  color: #ffffff !important;
+}
+
+#palette tr:focus-visible {
+  background-color: #1565c0 !important;
+  color: #ffffff !important;
+}
