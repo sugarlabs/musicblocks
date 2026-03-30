@@ -5,11 +5,13 @@ on:
     types:
       - opened
       - synchronize
+      - reopened
 
 jobs:
   test:
     name: Run Jest Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
 
@@ -30,7 +32,7 @@ jobs:
       - name: Run Jest Tests
         id: jest
         continue-on-error: true
-        run: npm test -- --json --outputFile=jest-results.json --forceExit
+        run: npm test -- --json --outputFile=jest-results.json --detectOpenHandles --forceExit
 
       - name: Process Jest Results
         id: results
@@ -71,15 +73,21 @@ jobs:
             echo "### Jest Tests Passed" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "All $TOTAL tests passed!" >> $GITHUB_STEP_SUMMARY
+          elif [ "$JEST_OUTCOME" = "cancelled" ]; then
+            echo "### Jest Tests Cancelled" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Tests were cancelled before completion." >> $GITHUB_STEP_SUMMARY
           else
             echo "### Jest Tests Failed" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "**Results:** $PASSED/$TOTAL passed" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**Failed Tests:**" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "$FAILED_TESTS" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
+            if [ -n "$FAILED_TESTS" ]; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "**Failed Tests:**" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              echo "$FAILED_TESTS" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+            fi
           fi
 
       - name: Upload Jest Results
@@ -107,7 +115,7 @@ jobs:
         env:
           JEST_OUTCOME: ${{ steps.jest.outcome }}
         run: |
-          if [ "$JEST_OUTCOME" = "failure" ]; then
-            echo " Tests failed."
+          if [ "$JEST_OUTCOME" = "failure" ] || [ "$JEST_OUTCOME" = "cancelled" ]; then
+            echo "Tests did not pass (outcome: $JEST_OUTCOME)."
             exit 1
           fi

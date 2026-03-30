@@ -16,11 +16,14 @@ jobs:
   comment:
     name: Post PR Comment
     runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion != 'cancelled'
     permissions:
       pull-requests: write
 
     steps:
       - name: Download Artifacts
+        id: download
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           run-id: ${{ github.event.workflow_run.id }}
@@ -29,12 +32,13 @@ jobs:
 
       - name: Get PR Number and Generate Comment
         id: pr_info
+        if: steps.download.outcome == 'success'
         run: |
           # Find and read PR number
           PR_FILE=$(find artifacts -name 'pr-number.txt' -type f | head -1)
           if [ -z "$PR_FILE" ]; then
-            echo "::warning::No PR number artifact found"
-            exit 0
+            echo "::error::No PR number artifact found"
+            exit 1
           fi
           PR_NUMBER=$(cat "$PR_FILE")
           echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_OUTPUT
@@ -89,7 +93,7 @@ jobs:
           fi
 
       - name: Post or Update PR Comment
-        if: steps.pr_info.outputs.PR_NUMBER != ''
+        if: steps.download.outcome == 'success' && steps.pr_info.outputs.PR_NUMBER != ''
         uses: actions/github-script@v7
         env:
           COMMENT_BODY: ${{ steps.pr_info.outputs.COMMENT_BODY }}
