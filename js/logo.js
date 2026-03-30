@@ -41,7 +41,7 @@
    NOTATIONNOTE, NOTATIONDURATION, NOTATIONDOTCOUNT,
    NOTATIONTUPLETVALUE, NOTATIONROUNDDOWN, NOTATIONINSIDECHORD,
    NOTATIONSTACCATO
-*/
+    */
 // Constants moved to js/logoconstants.js to resolve circular dependency
 
 /**
