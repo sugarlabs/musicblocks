@@ -806,12 +806,17 @@ class Activity {
          * Ensures that music blocks are responsive to horizontal resizing.
          * Ensures that overall integrity of blocks isn't hampered with.
          */
-        function repositionBlocks(activity) {
-            const canvasWidth = window.innerWidth;
-            const processedBlocks = new Set();
+            function repositionBlocks(activity) {
+            //  FIX: guard against blocks not being initialized yet
+            if (!activity || !activity.blocks || !activity.blocks.blockList) {
+                return;
+                 }
+
+    const canvasWidth = window.innerWidth;
+    const processedBlocks = new Set();
 
             //Array for storing individual dragGroups (the chunks of code linked together which are not connected)
-            const dragGroups = [];
+            
 
             // Identifying individual dragGroups
             Object.values(activity.blocks.blockList).forEach(block => {
@@ -6571,12 +6576,15 @@ class Activity {
             ButtonHolder.style.display = "block";
             document.body.appendChild(ButtonHolder);
 
-            this.homeButtonContainer = createButton(
+           this.homeButtonContainer = createButton(
                 GOHOMEFADEDBUTTON,
-                _("Home") + " [" + _("Home").toUpperCase() + "]",
+             _("Home") + " [" + _("Home").toUpperCase() + "]",
                 findBlocks
             );
-            this.boundary.hide();
+                // ✅ FIX: guard against boundary not being initialized
+                    if (this.boundary) {
+                    this.boundary.hide();
+                    }
 
             if (!this.helpfulWheelItems.find(ele => ele.label === "Home [HOME]"))
                 this.helpfulWheelItems.push({
