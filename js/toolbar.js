@@ -15,6 +15,7 @@
 */
 
 /* exported Toolbar */
+console.log("Tamil added");
 
 let WRAP = true;
 const $j = window.jQuery;
@@ -104,6 +105,7 @@ class Toolbar {
                 ["ayc", _("aymara"), "innerHTML"],
                 ["quz", _("quechua"), "innerHTML"],
                 ["gug", _("guarani"), "innerHTML"],
+                ["ta", _("தமிழ்"), "innerHTML"],
                 ["hi", _("हिंदी"), "innerHTML"],
                 ["ibo", _("igbo"), "innerHTML"],
                 ["ar", _("عربى"), "innerHTML"],
@@ -180,6 +182,7 @@ class Toolbar {
                 _("aymara"),
                 _("quechua"),
                 _("guarani"),
+                _("தமிழ்"),
                 _("हिंदी"),
                 _("తెలుగు"),
                 _("igbo"),
@@ -242,6 +245,7 @@ class Toolbar {
                 ["ayc", _("aymara"), "innerHTML"],
                 ["quz", _("quechua"), "innerHTML"],
                 ["gug", _("guarani"), "innerHTML"],
+                ["ta", _("தமிழ்"), "innerHTML"],
                 ["hi", _("हिंदी"), "innerHTML"],
                 ["ibo", _("igbo"), "innerHTML"],
                 ["ar", _("عربى"), "innerHTML"],
@@ -306,6 +310,7 @@ class Toolbar {
                 _("aymara"),
                 _("quechua"),
                 _("guarani"),
+                _("தமிழ்"),
                 _("हिंदी"),
                 _("తెలుగు"),
                 _("igbo"),
@@ -1423,6 +1428,7 @@ class Toolbar {
             "ayc",
             "quz",
             "gug",
+            "ta",
             "hi",
             "ibo",
             "ar",
