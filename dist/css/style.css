@@ -132,33 +132,59 @@ body.dark .toolbar-btn-focused,
 
 html, body { overscroll-behavior-x: none; }
 
-/* Hover state */
-#palette tr:hover {
-  background-color: #333333 !important;
-  cursor: pointer;
+/* ===== LIGHT THEME ===== */
+#palette td {
+  color: #333333 !important;
 }
 
-/* 🔥 Enhance ACTIVE indicator (the small div) */
-#palette tr div[style*="background"] {
-  width: 6px !important;
-  background-color: #42a5f5 !important;
+#palette tr:hover,
+#palette tr.selected {
+  background-color: #d0d0d0 !important;
 }
 
-/* 🔥 Make active row more visible using parent effect */
-#palette tr div[style*="background"] {
-  box-shadow: 0 0 10px rgba(66, 165, 245, 0.8);
+#palette tr:hover td,
+#palette tr.selected td {
+  color: #000000 !important;
 }
 
-/* Text contrast */
-#palette tr td {
-  color: #e0e0e0;
+
+/* ===== DARK THEME ===== */
+body.dark #palette td,
+.dark-theme #palette td {
+  color: #ffffff !important;
 }
 
-#palette tr:hover td {
-  color: #ffffff;
+body.dark #palette tr:hover,
+.dark-theme #palette tr:hover,
+body.dark #palette tr.selected,
+.dark-theme #palette tr.selected {
+  background-color: #2c2c2c !important;
 }
 
-/* Accessibility */
-#palette tr:focus {
-  outline: 2px solid #42a5f5;
+body.dark #palette tr:hover td,
+.dark-theme #palette tr:hover td,
+body.dark #palette tr.selected td,
+.dark-theme #palette tr.selected td {
+  color: #ffffff !important;
+}
+
+
+/* ===== HIGH CONTRAST MODE ===== */
+body.highcontrast #palette td,
+.highcontrast #palette td {
+  color: #ffffff !important;
+}
+
+body.highcontrast #palette tr:hover,
+.highcontrast #palette tr:hover,
+body.highcontrast #palette tr.selected,
+.highcontrast #palette tr.selected {
+  background-color: #000000 !important;
+}
+
+body.highcontrast #palette tr:hover td,
+.highcontrast #palette tr:hover td,
+body.highcontrast #palette tr.selected td,
+.highcontrast #palette tr.selected td {
+  color: #ffffff !important;
 }
