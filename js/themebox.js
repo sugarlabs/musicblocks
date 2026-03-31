@@ -253,6 +253,22 @@ class ThemeBox {
     }
 
     /**
+     * Toggle between dark and light modes
+     * @public
+     * @returns {void}
+     */
+    toggleDarkLightMode() {
+        // If currently in high contrast, switch to light mode first
+        if (this._theme === "highcontrast") {
+            this._theme = "light";
+        } else {
+            // Toggle between light and dark
+            this._theme = this._theme === "light" ? "dark" : "light";
+        }
+        this.setPreference();
+    }
+
+    /**
      * Apply theme instantly without page reload
      * @private
      * @returns {void}
@@ -355,11 +371,24 @@ class ThemeBox {
      */
     updateThemeIcon() {
         const themeSelectIcon = document.getElementById("themeSelectIcon");
+        const themeToggleIcon = document.getElementById("themeToggleIcon");
+
         if (themeSelectIcon) {
             const currentThemeElement = document.getElementById(this._theme);
             if (currentThemeElement) {
                 themeSelectIcon.innerHTML = currentThemeElement.innerHTML;
             }
+        }
+
+        if (themeToggleIcon) {
+            // Update toggle button icon based on current theme
+            let toggleIcon = "brightness_7"; // Default to light mode icon
+            if (this._theme === "dark") {
+                toggleIcon = "brightness_4";
+            } else if (this._theme === "highcontrast") {
+                toggleIcon = "brightness_6";
+            }
+            themeToggleIcon.innerHTML = `<i class="material-icons md-48">${toggleIcon}</i>`;
         }
     }
 

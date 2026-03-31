@@ -67,6 +67,7 @@ class Toolbar {
                 ["delPluginIcon", _("Delete plugin")],
                 ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
                 ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
+                ["themeToggleIcon", _("Toggle Dark/Light Mode")],
                 ["themeSelectIcon", _("Change theme")],
                 ["light", _("Light Mode")],
                 ["dark", _("Dark Mode")],
@@ -211,6 +212,7 @@ class Toolbar {
                 ["delPluginIcon", _("Delete plugin")],
                 ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
                 ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
+                ["themeToggleIcon", _("Toggle Dark/Light Mode")],
                 ["themeSelectIcon", _("Change theme")],
                 ["light", _("Light Mode")],
                 ["dark", _("Dark Mode")],
@@ -633,6 +635,31 @@ class Toolbar {
                 docById(theme).onclick = () => themeBox[`${theme}_onclick`](this.activity);
             });
         };
+    }
+
+    /**
+     * Renders the theme toggle icon for quick dark/light mode switching
+     * @public
+     * @param {ThemeBox} themeBox - The theme box instance
+     * @returns {void}
+     */
+    renderThemeToggleIcon(themeBox) {
+        const themeToggleIcon = docById("themeToggleIcon");
+        if (themeToggleIcon) {
+            // Set initial icon state
+            themeBox.updateThemeIcon();
+
+            // Add click handler for toggle functionality
+            themeToggleIcon.onclick = () => {
+                themeBox.toggleDarkLightMode();
+            };
+
+            // Initialize tooltip
+            $j(".tooltipped").tooltip({
+                html: true,
+                delay: 100
+            });
+        }
     }
 
     /**
@@ -1559,7 +1586,7 @@ class Toolbar {
             const auxSelectors =
                 "#runSlowlyIcon, #runStepByStepIcon, #displayStatsIcon, " +
                 "#loadPluginIcon, #delPluginIcon, #enableHorizScrollIcon, " +
-                "#disableHorizScrollIcon, #themeSelectIcon, #mergeWithCurrentIcon, " +
+                "#disableHorizScrollIcon, #themeToggleIcon, #themeSelectIcon, #mergeWithCurrentIcon, " +
                 "#wrapTurtle, #chooseKeyIcon, #toggleJavaScriptIcon, #restoreIcon, " +
                 "#beginnerMode, #advancedMode, #languageSelectIcon";
 
