@@ -1847,6 +1847,12 @@ function SampleWidget() {
             height = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 70;
         }
         document.getElementsByTagName("canvas")[0].innerHTML = "";
+        // Cancel any existing RAF loop for this canvas before creating a new one
+        // to prevent multiple concurrent draw loops accumulating on resize/maximize.
+        if (this.drawVisualIDs[0]) {
+            cancelAnimationFrame(this.drawVisualIDs[0]);
+            this.drawVisualIDs[0] = null;
+        }
         this.makeCanvas(width, height, 0, true);
         this.reconnectSynthsToAnalyser();
     };
@@ -1922,11 +1928,15 @@ function SampleWidget() {
         }
 
         const draw = () => {
-            this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
+            // Only continue the RAF loop when there is active work to render.
+            // Scheduling inside the condition stops the loop naturally when idle
+            // (not recording and no active analyser) instead of spinning at ~60fps
+            // unconditionally — matching the lifecycle pattern of the Oscilloscope widget.
             if (
                 this.is_recording ||
                 (this.pitchAnalysers[turtleIdx] && (this.running || resized))
             ) {
+                this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
                 canvasCtx.fillStyle = "#FFFFFF";
                 canvasCtx.font = "10px Verdana";
                 this.verticalOffset = -canvas.height / 4;
@@ -2006,6 +2016,9 @@ function SampleWidget() {
                         }
                     }
                 }
+            } else {
+                // No active work — clear the stored RAF id so the loop is fully stopped.
+                this.drawVisualIDs[turtleIdx] = null;
             }
         };
         draw();
