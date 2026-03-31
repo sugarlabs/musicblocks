@@ -99,7 +99,9 @@ CLI_), on your local machine.
 Music Blocks, using `cd path/to/musicblocks/`.
 
 3. After you are in `path/to/musicblocks/` directory, install the
-dependencies using the following command
+dependencies using the following command:
+
+(Ensure you have Node.js and npm installed before running this step)
 
     ```bash
     npm install
@@ -111,6 +113,7 @@ server using npm
     ```bash
     npm run dev
     ```
+5. You should see a message `Serving HTTP on 127.0.0.1 port 3000 (http://127.0.0.1:3000/) ...` since the HTTP Server is set to start listening on port 3000.
 
 6. You should see a message `Serving HTTP on 127.0.0.1 port 3000
 (http://127.0.0.1:3000/) ...` since the HTTP Server is set to start
