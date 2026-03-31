@@ -9,11 +9,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global requirejs */
+/* global define, requirejs */
+
+const ASSET_VERSION = window.location.protocol === "file:" ? "" : "v=999999_fix7";
 
 requirejs.config({
     baseUrl: "./",
-    urlArgs: window.location.protocol === "file:" ? "" : "v=999999_fix7",
+    urlArgs: ASSET_VERSION,
     waitSeconds: 60,
     shim: {
         "easeljs.min": {
@@ -217,7 +219,9 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                         escapeValue: false
                     },
                     backend: {
-                        loadPath: "locales/{{lng}}.json?v=" + Date.now()
+                        loadPath: ASSET_VERSION
+                            ? `locales/{{lng}}.json?${ASSET_VERSION}`
+                            : "locales/{{lng}}.json"
                     }
                 },
                 function (err) {
