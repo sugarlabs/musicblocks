@@ -702,7 +702,6 @@ function setupMediaBlocks(activity) {
             this.parameter = false;
         }
 
-        // eslint-disable-next-line no-unused-vars
         /**
          * Returns the argument value for the block.
          * @param {Logo} logo - The logo object.

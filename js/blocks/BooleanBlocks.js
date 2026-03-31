@@ -101,7 +101,6 @@ function setupBooleanBlocks(activity) {
             try {
                 return !a;
             } catch (e) {
-                // eslint-disable-next-line no-console
                 console.debug(e);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
@@ -459,7 +458,6 @@ function setupBooleanBlocks(activity) {
             try {
                 return Number(a) > Number(b);
             } catch (e) {
-                // eslint-disable-next-line no-console
                 console.debug(e);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
@@ -565,7 +563,6 @@ function setupBooleanBlocks(activity) {
             try {
                 return Number(a) < Number(b);
             } catch (e) {
-                // eslint-disable-next-line no-console
                 console.debug(e);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
@@ -666,7 +663,6 @@ function setupBooleanBlocks(activity) {
             try {
                 return Number(a) <= Number(b);
             } catch (e) {
-                // eslint-disable-next-line no-console
                 console.debug(e);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
@@ -767,7 +763,6 @@ function setupBooleanBlocks(activity) {
             try {
                 return Number(a) >= Number(b);
             } catch (e) {
-                // eslint-disable-next-line no-console
                 console.debug(e);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
@@ -872,7 +867,6 @@ function setupBooleanBlocks(activity) {
             try {
                 return a === b;
             } catch (e) {
-                // eslint-disable-next-line no-console
                 console.debug(e);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
@@ -974,7 +968,6 @@ function setupBooleanBlocks(activity) {
             try {
                 return a !== b;
             } catch (e) {
-                // eslint-disable-next-line no-console
                 console.debug(e);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
