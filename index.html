@@ -79,48 +79,11 @@
 
         <script src="lib/reqwest.js" defer></script>
 
-        <script src="lib/jquery-3.7.1.min.js"></script>
-        <script src="lib/jquery-ui.js"></script>
-        <script src="lib/materialize.min.js"></script>
+        <script src="lib/jquery-3.7.1.min.js" defer></script>
+        <script src="lib/jquery-ui.js" defer></script>
+        <script src="lib/materialize.min.js" defer></script>
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
-        <script>
-            jQuery(document).ready(function () {
-                if (jQuery.ui && jQuery.ui.autocomplete) {
-                    jQuery.fn.materializeAutocomplete = jQuery.fn.autocomplete;
-                    jQuery.widget.bridge("autocomplete", jQuery.ui.autocomplete);
-                }
-            });
-        </script>
-        <script>
-            jQuery(document).ready(function () {
-                const fixAutocompletePosition = function () {
-                    const $search = jQuery("#search");
-                    if ($search.length && $search.data("ui-autocomplete")) {
-                        const instance = $search.autocomplete("instance");
-                        if (instance) {
-                            const originalRenderMenu = instance._renderMenu;
-                            instance._renderMenu = function (ul, items) {
-                                originalRenderMenu.call(this, ul, items);
-                                setTimeout(() => {
-                                    const searchInput = document.querySelector("#search");
-                                    const dropdown = ul[0];
-                                    if (searchInput && dropdown) {
-                                        const rect = searchInput.getBoundingClientRect();
-                                        dropdown.style.position = "fixed";
-                                        dropdown.style.left = rect.left + "px";
-                                        dropdown.style.top = rect.bottom + 2 + "px";
-                                        dropdown.style.width = rect.width + "px";
-                                    }
-                                }, 0);
-                            };
-                        }
-                    } else {
-                        setTimeout(fixAutocompletePosition, 500);
-                    }
-                };
-                setTimeout(fixAutocompletePosition, 1000);
-            });
-        </script>
+        <script src="js/utils/jquery-setup.js" defer></script>
         <script src="lib/Tone.js" defer></script>
         <script src="lib/midi.js" defer></script>
         <script src="lib/jquery.ruler.js" defer></script>
@@ -152,7 +115,7 @@
     <script src="lib/astring.min.js" defer></script>
     <script src="js/utils/mb-dialog.js" defer></script>
     <script src="lib/acorn.min.js" defer></script>
-    <script src="env.js"></script>
+    <script src="env.js" defer></script>
 
 
     <script data-main="js/loader" src="lib/require.js" defer></script>
