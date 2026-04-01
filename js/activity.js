@@ -81,7 +81,6 @@ let MYDEFINES = [
     "utils/utils",
     "activity/artwork",
     "widgets/status",
-    "widgets/help",
     "utils/munsell",
     "activity/toolbar",
     "activity/trash",
@@ -113,24 +112,6 @@ let MYDEFINES = [
     "activity/pastebox",
     "prefixfree.min",
     "Tone",
-    "activity/js-export/samples/sample",
-    "activity/js-export/export",
-    "activity/js-export/interface",
-    "activity/js-export/constraints",
-    "activity/js-export/ASTutils",
-    "activity/js-export/generate",
-    "activity/js-export/ast2blocklist",
-    "activity/js-export/API/GraphicsBlocksAPI",
-    "activity/js-export/API/PenBlocksAPI",
-    "activity/js-export/API/RhythmBlocksAPI",
-    "activity/js-export/API/MeterBlocksAPI",
-    "activity/js-export/API/PitchBlocksAPI",
-    "activity/js-export/API/IntervalsBlocksAPI",
-    "activity/js-export/API/ToneBlocksAPI",
-    "activity/js-export/API/OrnamentBlocksAPI",
-    "activity/js-export/API/VolumeBlocksAPI",
-    "activity/js-export/API/DrumBlocksAPI",
-    "activity/js-export/API/DictBlocksAPI",
     "activity/turtleactions/RhythmActions",
     "activity/turtleactions/MeterActions",
     "activity/turtleactions/PitchActions",
@@ -164,41 +145,29 @@ let MYDEFINES = [
     "activity/blocks/MediaBlocks",
     "activity/blocks/SensorsBlocks",
     "activity/blocks/EnsembleBlocks",
-    "widgets/widgetWindows",
-    "widgets/statistics",
-    "widgets/jseditor"
+    "widgets/widgetWindows"
 ];
 
-if (_THIS_IS_MUSIC_BLOCKS_) {
-    const MUSICBLOCKS_EXTRAS = [
-        "widgets/modewidget",
-        "widgets/meterwidget",
-        "widgets/PhraseMakerUtils",
-        "widgets/PhraseMakerGrid",
-        "widgets/PhraseMakerUI",
-        "widgets/PhraseMakerAudio",
-        "widgets/phrasemaker",
-        "widgets/arpeggio",
-        "widgets/aiwidget",
-        "widgets/aidebugger",
-        "widgets/pitchdrummatrix",
-        "widgets/rhythmruler",
-        "widgets/pitchstaircase",
-        "widgets/temperament",
-        "widgets/tempo",
-        "widgets/pitchslider",
-        "widgets/musickeyboard",
-        "widgets/timbre",
-        "widgets/oscilloscope",
-        "widgets/sampler",
-        "widgets/reflection",
-        "widgets/legobricks",
-        "activity/lilypond",
-        "activity/abc",
-        "activity/midi",
-        "activity/mxml"
-    ];
-    MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
+/**
+ * Dynamically load one or more RequireJS modules on demand.
+ * Returns a Promise that resolves once all modules are loaded.
+ * RequireJS caches modules, so subsequent calls are instant.
+ *
+ * @param {string|string[]} modulePaths - Module path(s) to load.
+ * @returns {Promise<void>}
+ */
+function lazyLoad(modulePaths) {
+    // In Node/Jest (CommonJS), modules are already available as globals — resolve immediately.
+    if (typeof define !== "function" || !define.amd) {
+        return Promise.resolve();
+    }
+
+    // In browser with RequireJS (AMD), load modules dynamically.
+    return new Promise(resolve => {
+        require(Array.isArray(modulePaths) ? modulePaths : [modulePaths], function () {
+            resolve();
+        });
+    });
 }
 
 // Module-scoped singleton reference to the active Activity instance.
@@ -6899,11 +6868,33 @@ class Activity {
         /**
          * Toggles display of javaScript editor widget.
          */
-        const toggleJSWindow = activity => {
+        const toggleJSWindow = async activity => {
+            await lazyLoad([
+                "activity/js-export/samples/sample",
+                "activity/js-export/export",
+                "activity/js-export/interface",
+                "activity/js-export/constraints",
+                "activity/js-export/ASTutils",
+                "activity/js-export/generate",
+                "activity/js-export/ast2blocklist",
+                "activity/js-export/API/GraphicsBlocksAPI",
+                "activity/js-export/API/PenBlocksAPI",
+                "activity/js-export/API/RhythmBlocksAPI",
+                "activity/js-export/API/MeterBlocksAPI",
+                "activity/js-export/API/PitchBlocksAPI",
+                "activity/js-export/API/IntervalsBlocksAPI",
+                "activity/js-export/API/ToneBlocksAPI",
+                "activity/js-export/API/OrnamentBlocksAPI",
+                "activity/js-export/API/VolumeBlocksAPI",
+                "activity/js-export/API/DrumBlocksAPI",
+                "activity/js-export/API/DictBlocksAPI",
+                "widgets/jseditor"
+            ]);
             new JSEditor(activity);
         };
 
-        const doAnalytics = activity => {
+        const doAnalytics = async activity => {
+            await lazyLoad("widgets/statistics");
             if (!activity.statsWindow || !activity.statsWindow.isOpen) {
                 activity.statsWindow = new StatsWindow(activity);
             }
@@ -6916,7 +6907,8 @@ class Activity {
             activity._showHelp();
         };
 
-        this._showHelp = () => {
+        this._showHelp = async () => {
+            await lazyLoad("widgets/help");
             // Will show welcome page by default.
             new HelpWidget(this, false);
         };
@@ -6928,7 +6920,8 @@ class Activity {
             activity._showAboutPage();
         };
 
-        this._showAboutPage = () => {
+        this._showAboutPage = async () => {
+            await lazyLoad("widgets/help");
             // Will show welcome page by default.
             new HelpWidget(this, false);
         };
