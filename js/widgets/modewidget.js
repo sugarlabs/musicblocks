@@ -309,8 +309,19 @@ class ModeWidget {
         modePianoDiv.style.border = "0px";
         modePianoDiv.style.top = "0px";
         modePianoDiv.style.left = "0px";
-        modePianoDiv.innerHTML =
+        let pianoHTML =
             '<img src="images/piano_keys.png"  id="modeKeyboard" style="top:0px; left:0px; position:relative;">';
+        for (let i = 0; i < 12; i++) {
+            pianoHTML += '<img id="pkey_' + i + '" style="top:0px; left:0px; position:absolute;">';
+        }
+        modePianoDiv.innerHTML = pianoHTML;
+
+        // Cache piano key elements to avoid repeated getElementById calls
+        this._pianoKeys = [];
+        for (let i = 0; i < 12; i++) {
+            this._pianoKeys[i] = document.getElementById("pkey_" + i);
+        }
+
         const highlightImgs = [
             "images/highlights/sel_c.png",
             "images/highlights/sel_c_sharp.png",
@@ -358,25 +369,9 @@ class ModeWidget {
             startingPosition = 0;
         }
 
-        modePianoDiv.innerHTML += '<img id="pkey_0" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_1" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_2" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_3" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_4" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_5" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_6" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_7" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_8" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_9" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML +=
-            '<img id="pkey_10" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML +=
-            '<img id="pkey_11" style="top:0px; left:0px; position:absolute;">';
-
         for (let i = 0; i < 12; ++i) {
             if (this._selectedNotes[i])
-                document.getElementById("pkey_" + i).src =
-                    highlightImgs[(i + startingPosition) % 12];
+                this._pianoKeys[i].src = highlightImgs[(i + startingPosition) % 12];
         }
     }
     /**
@@ -653,7 +648,7 @@ class ModeWidget {
                 setTimeout(() => {
                     // Did we just play the last note?
                     this._playing = false;
-                    const note_key = document.getElementById("pkey_" + 0);
+                    const note_key = this._pianoKeys ? this._pianoKeys[0] : null;
                     if (note_key !== null) {
                         note_key.src = highlightImgs[0];
                     }
@@ -675,7 +670,9 @@ class ModeWidget {
             setTimeout(() => {
                 if (this._lastNotePlayed !== null) {
                     this._playWheel.navItems[this._lastNotePlayed % 12].navItem.hide();
-                    const note_key = document.getElementById("pkey_" + (this._lastNotePlayed % 12));
+                    const note_key = this._pianoKeys
+                        ? this._pianoKeys[this._lastNotePlayed % 12]
+                        : null;
                     if (note_key !== null) {
                         note_key.src =
                             highlightImgs[(this._lastNotePlayed + startingposition) % 12];
@@ -686,7 +683,7 @@ class ModeWidget {
                 this._playWheel.navItems[note % 12].navItem.show();
 
                 if (note !== 12) {
-                    const note_key = document.getElementById("pkey_" + (note % 12));
+                    const note_key = this._pianoKeys ? this._pianoKeys[note % 12] : null;
                     if (note_key !== null) {
                         note_key.src = animationImgs[(note + startingposition) % 12];
                     }
