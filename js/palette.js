@@ -597,7 +597,7 @@ class Palettes {
 
     getPluginMacroExpansion(blkname, x, y) {
         const obj = this.pluginMacros[blkname];
-        if (obj != null) {
+        if (obj !== null && obj !== undefined) {
             obj[0][2] = x;
             obj[0][3] = y;
         }
@@ -783,7 +783,7 @@ class Palettes {
     }
 
     updatePalettes(showPalette) {
-        if (showPalette != null) {
+        if (showPalette !== null) {
             // Show the action palette after adding/deleting new
             // nameddo blocks.
             if (showPalette in this.dict) {
@@ -897,7 +897,7 @@ class Palettes {
         row.onmouseout = () => clearTimeout(timeout);
 
         row.onclick = () => {
-            if (name == "search") {
+            if (name === "search") {
                 this._hideMenus();
                 this.activity.showSearchWidget();
             } else {
@@ -1119,7 +1119,7 @@ class PaletteModel {
                 label = _("pitch converter");
                 break;
             default:
-                if (blkname != modname) {
+                if (blkname !== modname) {
                     // Override label for do, storein, box, and namedarg
                     if (blkname === "storein" && block.defaults[0] === _("box")) {
                         label = _("store in");
@@ -1156,8 +1156,8 @@ class PaletteModel {
                 "calcArg",
                 "nameddoArg",
                 "namedcalcArg"
-            ].indexOf(protoBlock.name) != -1 &&
-            label != null
+            ].indexOf(protoBlock.name) !== -1 &&
+            label !== null
         ) {
             if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
                 label = label.substr(0, STRINGLEN) + "...";
@@ -1285,8 +1285,9 @@ class Palette {
     }
 
     hideMenu() {
-        docById("palette").childNodes[0].style.borderRight =
-            `1px solid ${platformColor.selectorSelected}`;
+        docById(
+            "palette"
+        ).childNodes[0].style.borderRight = `1px solid ${platformColor.selectorSelected}`;
         if (this._outsideClickListener) {
             document.removeEventListener("click", this._outsideClickListener);
             this._outsideClickListener = null;
@@ -1399,7 +1400,7 @@ class Palette {
         const blocks = this.model.blocks;
         blocks.reverse();
         const protoListScope = [...this.protoList];
-        if (last(blocks).blkname != last(protoListScope).name) protoListScope.reverse();
+        if (last(blocks).blkname !== last(protoListScope).name) protoListScope.reverse();
         for (const blk in blocks) {
             const b = blocks[blk];
 

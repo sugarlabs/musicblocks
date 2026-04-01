@@ -157,6 +157,8 @@ export default [
             "no-use-before-define": "off",
             "prefer-const": "off",
 
+            "eqeqeq": "warn",
+            "no-dupe-keys": "error",
             "semi": ["error", "always"],
             "no-duplicate-case": "error",
             "no-irregular-whitespace": "warn"
