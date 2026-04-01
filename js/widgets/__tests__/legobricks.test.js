@@ -20,13 +20,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const fs = require("fs");
-const path = require("path");
-
-const source = fs.readFileSync(path.resolve(__dirname, "../legobricks.js"), "utf-8");
-new Function(source + "\nif (typeof global !== 'undefined') { global.LegoWidget = LegoWidget; }")();
-
 global._ = str => str;
+const LegoWidget = require("../legobricks");
 
 describe("LegoWidget core logic", () => {
     let widget;

@@ -3065,3 +3065,7 @@ function LegoWidget() {
         });
     };
 }
+
+if (typeof module !== "undefined") {
+    module.exports = LegoWidget;
+}
