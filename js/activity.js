@@ -7349,25 +7349,27 @@ class Activity {
         // Unhighlight the selected blocks
 
         this.unhighlightSelectedBlocks = (unhighlight, selectionModeOn) => {
-            // Build a Set of selected block indices for O(1) lookup
-            // instead of O(n*m) deep-equality comparisons.
-            const selectedSet = new Set();
+            const blockIndexMap = new Map();
+            for (const [index, block] of this.blocks.blockList.entries()) {
+                if (block) {
+                    blockIndexMap.set(block, index);
+                }
+            }
+
             for (let i = 0; i < this.selectedBlocks.length; i++) {
-                const idx = this.blocks.blockList.indexOf(this.selectedBlocks[i]);
-                if (idx >= 0) {
-                    selectedSet.add(idx);
+                const blockIndex = blockIndexMap.get(this.selectedBlocks[i]);
+                if (blockIndex === undefined) {
+                    continue;
                 }
-            }
 
-            for (const blk of selectedSet) {
                 if (unhighlight) {
-                    this.blocks.unhighlightSelectedBlocks(blk, true);
+                    this.blocks.unhighlightSelectedBlocks(blockIndex, true);
                 } else {
-                    this.blocks.highlight(blk, true);
+                    this.blocks.highlight(blockIndex, true);
                 }
             }
 
-            if (!unhighlight && selectedSet.size > 0) {
+            if (!unhighlight && this.selectedBlocks.length > 0) {
                 this.refreshCanvas();
             }
         };
