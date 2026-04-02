@@ -192,11 +192,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         "widgets/oscilloscope",
         "widgets/sampler",
         "widgets/reflection",
-        "widgets/legobricks",
-        "activity/lilypond",
-        "activity/abc",
-        "activity/midi",
-        "activity/mxml"
+        "widgets/legobricks"
     ];
     MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
 }
@@ -1546,7 +1542,9 @@ class Activity {
             importConfirm.textContent = _("Confirm");
             importConfirm.addEventListener("click", () => {
                 const maxNoteBlocks = select.value;
-                transcribeMidi(midi, maxNoteBlocks);
+                require(["activity/midi"], function () {
+                    transcribeMidi(midi, maxNoteBlocks);
+                });
                 document.body.removeChild(modal);
             });
             modal.appendChild(importConfirm);

@@ -519,39 +519,42 @@ class SaveInterface {
     saveAbc(activity) {
         document.body.style.cursor = "wait";
 
-        // Check if we have buffered notation data (Issue #2330)
-        if (activity.logo.recordingBuffer.hasData) {
-            // Use buffered data - restore it temporarily
-            activity.logo.notationOutput = activity.logo.recordingBuffer.notationOutput;
-            activity.logo.notationNotes = activity.logo.recordingBuffer.notationNotes;
-            for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
-                if (activity.logo.recordingBuffer.notationStaging[t]) {
-                    activity.logo.notation.notationStaging[t] =
-                        activity.logo.recordingBuffer.notationStaging[t];
+        // Lazy-load abc module before using ABCHEADER
+        require(["activity/abc"], function () {
+            // Check if we have buffered notation data (Issue #2330)
+            if (activity.logo.recordingBuffer.hasData) {
+                // Use buffered data - restore it temporarily
+                activity.logo.notationOutput = activity.logo.recordingBuffer.notationOutput;
+                activity.logo.notationNotes = activity.logo.recordingBuffer.notationNotes;
+                for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
+                    if (activity.logo.recordingBuffer.notationStaging[t]) {
+                        activity.logo.notation.notationStaging[t] =
+                            activity.logo.recordingBuffer.notationStaging[t];
+                    }
+                    if (activity.logo.recordingBuffer.notationDrumStaging[t]) {
+                        activity.logo.notation.notationDrumStaging[t] =
+                            activity.logo.recordingBuffer.notationDrumStaging[t];
+                    }
                 }
-                if (activity.logo.recordingBuffer.notationDrumStaging[t]) {
-                    activity.logo.notation.notationDrumStaging[t] =
-                        activity.logo.recordingBuffer.notationDrumStaging[t];
-                }
-            }
 
-            // Save immediately
-            setTimeout(() => {
-                activity.save.afterSaveAbc();
-            }, 100);
-        } else {
-            // No buffered data - run the program to generate notation (original behavior)
-            //Suppress music and turtle output when generating Abc output.
-            activity.logo.runningAbc = true;
-            activity.logo.notationOutput = ABCHEADER;
-            activity.logo.notationNotes = {};
-            for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
-                activity.logo.notation.notationStaging[t] = [];
-                activity.logo.notation.notationDrumStaging[t] = [];
-                activity.turtles.getTurtle(t).painter.doClear(true, true, true);
+                // Save immediately
+                setTimeout(() => {
+                    activity.save.afterSaveAbc();
+                }, 100);
+            } else {
+                // No buffered data - run the program to generate notation (original behavior)
+                //Suppress music and turtle output when generating Abc output.
+                activity.logo.runningAbc = true;
+                activity.logo.notationOutput = ABCHEADER;
+                activity.logo.notationNotes = {};
+                for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
+                    activity.logo.notation.notationStaging[t] = [];
+                    activity.logo.notation.notationDrumStaging[t] = [];
+                    activity.turtles.getTurtle(t).painter.doClear(true, true, true);
+                }
+                activity.logo.runLogoCommands();
             }
-            activity.logo.runLogoCommands();
-        }
+        });
     }
 
     /**
@@ -565,8 +568,11 @@ class SaveInterface {
      * @instance
      */
     afterSaveAbc() {
-        const abc = encodeURIComponent(saveAbcOutput(this.activity));
-        this.activity.save.download("abc", "data:text;utf8," + abc, null);
+        // Lazy-load abc module before using saveAbcOutput
+        require(["activity/abc"], () => {
+            const abc = encodeURIComponent(saveAbcOutput(this.activity));
+            this.activity.save.download("abc", "data:text;utf8," + abc, null);
+        });
     }
 
     /**
@@ -690,73 +696,76 @@ class SaveInterface {
             "Mr. Mouse": projectAuthor
         };
 
-        const lyheader = LILYPONDHEADER.replace(
-            /My Music Blocks Creation|Mr. Mouse/gi,
-            matched => mapLilypondObj[matched]
-        );
-
-        if (MIDICheck) {
-            this.activity.logo.MIDIOutput =
-                "% MIDI SECTION\n% MIDI Output included! \n\n\\midi {\n   \\tempo 4=90\n}\n\n\n}\n\n";
-        } else {
-            this.activity.logo.MIDIOutput =
-                "% MIDI SECTION\n% Delete the %{ and %} below to include MIDI output.\n%{\n\\midi {\n   \\tempo 4=90\n}\n%}\n\n}\n\n";
-        }
-
-        if (guitarCheck) {
-            this.activity.logo.guitarOutputHead =
-                '\n\n% GUITAR TAB SECTION\n% Guitar tablature output included!\n\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
-            this.activity.logo.guitarOutputEnd = "      >>\n\n";
-        } else {
-            this.activity.logo.guitarOutputHead =
-                '\n\n% GUITAR TAB SECTION\n% Delete the %{ and %} below to include guitar tablature output.\n%{\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
-            this.activity.logo.guitarOutputEnd = "      >>\n%}\n";
-        }
-
-        // Check if we're using buffered data (Issue #2330)
-        if (this.activity.logo.recordingBuffer.hasData) {
-            // We already have the notation data in the buffer, just save it
-            if (isPDF) {
-                this.notationConvert = "pdf";
-            } else {
-                this.notationConvert = "";
-            }
-            // Update the header with user's title and author
-            this.activity.logo.notationOutput = this.activity.logo.notationOutput.replace(
+        // Lazy-load lilypond module before using LILYPONDHEADER
+        require(["activity/lilypond"], () => {
+            const lyheader = LILYPONDHEADER.replace(
                 /My Music Blocks Creation|Mr. Mouse/gi,
                 matched => mapLilypondObj[matched]
             );
 
-            // Close dialog and save immediately
-            docById("lilypondModal").style.display = "none";
-            document.body.style.cursor = "wait";
-
-            // Trigger save after a short delay to let UI update
-            setTimeout(() => {
-                this.afterSaveLilypond();
-            }, 100);
-        } else {
-            // No buffered data - run the program to generate notation (original behavior)
-            // Suppress music and turtle output when generating Lilypond output.
-            this.activity.logo.runningLilypond = true;
-            if (isPDF) {
-                this.notationConvert = "pdf";
+            if (MIDICheck) {
+                this.activity.logo.MIDIOutput =
+                    "% MIDI SECTION\n% MIDI Output included! \n\n\\midi {\n   \\tempo 4=90\n}\n\n\n}\n\n";
             } else {
-                this.notationConvert = "";
+                this.activity.logo.MIDIOutput =
+                    "% MIDI SECTION\n% Delete the %{ and %} below to include MIDI output.\n%{\n\\midi {\n   \\tempo 4=90\n}\n%}\n\n}\n\n";
             }
-            this.activity.logo.notationOutput = lyheader;
-            this.activity.logo.notationNotes = {};
-            for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
-                this.activity.logo.notation.notationStaging[t] = [];
-                this.activity.logo.notation.notationDrumStaging[t] = [];
-                this.activity.turtles.getTurtle(t).painter.doClear(true, true, true);
-            }
-            document.body.style.cursor = "wait";
-            this.activity.logo.runLogoCommands();
 
-            // Close the dialog box after hitting button.
-            docById("lilypondModal").style.display = "none";
-        }
+            if (guitarCheck) {
+                this.activity.logo.guitarOutputHead =
+                    '\n\n% GUITAR TAB SECTION\n% Guitar tablature output included!\n\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
+                this.activity.logo.guitarOutputEnd = "      >>\n\n";
+            } else {
+                this.activity.logo.guitarOutputHead =
+                    '\n\n% GUITAR TAB SECTION\n% Delete the %{ and %} below to include guitar tablature output.\n%{\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
+                this.activity.logo.guitarOutputEnd = "      >>\n%}\n";
+            }
+
+            // Check if we're using buffered data (Issue #2330)
+            if (this.activity.logo.recordingBuffer.hasData) {
+                // We already have the notation data in the buffer, just save it
+                if (isPDF) {
+                    this.notationConvert = "pdf";
+                } else {
+                    this.notationConvert = "";
+                }
+                // Update the header with user's title and author
+                this.activity.logo.notationOutput = this.activity.logo.notationOutput.replace(
+                    /My Music Blocks Creation|Mr. Mouse/gi,
+                    matched => mapLilypondObj[matched]
+                );
+
+                // Close dialog and save immediately
+                docById("lilypondModal").style.display = "none";
+                document.body.style.cursor = "wait";
+
+                // Trigger save after a short delay to let UI update
+                setTimeout(() => {
+                    this.afterSaveLilypond();
+                }, 100);
+            } else {
+                // No buffered data - run the program to generate notation (original behavior)
+                // Suppress music and turtle output when generating Lilypond output.
+                this.activity.logo.runningLilypond = true;
+                if (isPDF) {
+                    this.notationConvert = "pdf";
+                } else {
+                    this.notationConvert = "";
+                }
+                this.activity.logo.notationOutput = lyheader;
+                this.activity.logo.notationNotes = {};
+                for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
+                    this.activity.logo.notation.notationStaging[t] = [];
+                    this.activity.logo.notation.notationDrumStaging[t] = [];
+                    this.activity.turtles.getTurtle(t).painter.doClear(true, true, true);
+                }
+                document.body.style.cursor = "wait";
+                this.activity.logo.runLogoCommands();
+
+                // Close the dialog box after hitting button.
+                docById("lilypondModal").style.display = "none";
+            }
+        });
     }
 
     /**
@@ -771,17 +780,20 @@ class SaveInterface {
      * @instance
      */
     afterSaveLilypond(filename) {
-        filename = docById("fileName").value;
-        const ly = saveLilypondOutput(this.activity);
-        switch (this.notationConvert) {
-            case "pdf":
-                this.afterSaveLilypondPDF(ly, filename);
-                break;
-            default:
-                this.afterSaveLilypondLY(ly, filename);
-                break;
-        }
-        this.notationConvert = "";
+        // Lazy-load lilypond module before using saveLilypondOutput
+        require(["activity/lilypond"], () => {
+            filename = docById("fileName").value;
+            const ly = saveLilypondOutput(this.activity);
+            switch (this.notationConvert) {
+                case "pdf":
+                    this.afterSaveLilypondPDF(ly, filename);
+                    break;
+                default:
+                    this.afterSaveLilypondLY(ly, filename);
+                    break;
+            }
+            this.notationConvert = "";
+        });
     }
 
     /**
@@ -910,9 +922,12 @@ class SaveInterface {
      *
      */
     afterSaveMxml(filename) {
-        const data = saveMxmlOutput(this.activity.logo);
-        this.download("xml", "data:text;utf8," + encodeURIComponent(data), filename);
-        this.activity.logo.runningMxml = false;
+        // Lazy-load mxml module before using saveMxmlOutput
+        require(["activity/mxml"], () => {
+            const data = saveMxmlOutput(this.activity.logo);
+            this.download("xml", "data:text;utf8," + encodeURIComponent(data), filename);
+            this.activity.logo.runningMxml = false;
+        });
     }
 }
 
