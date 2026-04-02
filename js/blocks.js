@@ -17,15 +17,14 @@
    DEFAULTFILTERTYPE, DEFAULTINTERVAL, DEFAULTINVERT, DEFAULTMODE,
    DEFAULTNOISE, DEFAULTOSCILLATORTYPE, DEFAULTTEMPERAMENT,
    DEFAULTVOICE, INLINECOLLAPSIBLES, NATURAL, NUMBERBLOCKDEFAULT,
-    SPECIALINPUTS, STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH,
-    WESTERN2EISOLFEGENAMES, WIDENAMES, addTemperamentToDictionary,
+   SPECIALINPUTS, STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH,
+   WESTERN2EISOLFEGENAMES, WIDENAMES, addTemperamentToDictionary,
    Block, closeBlkWidgets, createjs, delayExecution, DEFAULTCHORD,
-   deleteTemperamentFromList, getDrumSynthName, getNoiseName,
+   define, deleteTemperamentFromList, docById, getDrumSynthName, getNoiseName,
    getNoiseSynthName, getTemperamentsList, getTextWidth,
    getVoiceSynthName, i18nSolfege, last, MathUtility, mixedNumber,
    piemenuBlockContext, prepareMacroExports, ProtoBlock,
-    setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments,
-    docById, define
+   setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments
 */
 
 /*
@@ -147,7 +146,7 @@ const ALLOWED_CONNECTIONS = new Set([
  * @public
  * @returns {void}
  */
-
+// eslint-disable-next-line no-redeclare
 class Blocks {
     constructor(activity) {
         this.activity = activity;
@@ -999,14 +998,14 @@ class Blocks {
                 if (!foundMatch) {
                     console.debug(
                         "Did not find match for " +
-                            myBlock.name +
-                            " (" +
-                            blk +
-                            ") and " +
-                            this.blockList[cblk].name +
-                            " (" +
-                            cblk +
-                            ")"
+                        myBlock.name +
+                        " (" +
+                        blk +
+                        ") and " +
+                        this.blockList[cblk].name +
+                        " (" +
+                        cblk +
+                        ")"
                     );
 
                     console.debug(myBlock.connections);
@@ -2011,7 +2010,7 @@ class Blocks {
                                     if (
                                         protoblock.name === "nameddo" &&
                                         protoblock.staticLabels[0] ===
-                                            this.blockList[connection].value
+                                        this.blockList[connection].value
                                     ) {
                                         await delayExecution(50);
                                         blockPalette.remove(
@@ -2664,14 +2663,14 @@ class Blocks {
             ) {
                 console.debug(
                     "WARNING: CORRUPTED BLOCK DATA. Block " +
-                        myBlock.name +
-                        " (" +
-                        blk +
-                        ") is connected to the same block " +
-                        this.blockList[myBlock.connections[0]].name +
-                        " (" +
-                        myBlock.connections[0] +
-                        ") twice."
+                    myBlock.name +
+                    " (" +
+                    blk +
+                    ") is connected to the same block " +
+                    this.blockList[myBlock.connections[0]].name +
+                    " (" +
+                    myBlock.connections[0] +
+                    ") twice."
                 );
                 return blk;
             }
@@ -3405,7 +3404,7 @@ class Blocks {
 
                 postProcessArg = [thisBlock, arg];
             } else if (name === "newnote") {
-                postProcess = () => {};
+                postProcess = () => { };
                 postProcessArg = [thisBlock, null];
             } else {
                 postProcess = null;
@@ -4141,7 +4140,7 @@ class Blocks {
                 const block = actionsPalette.protoList[blockId];
                 if (
                     ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(block.name) !==
-                        -1 /** && block.defaults[0] !== _('action') */ &&
+                    -1 /** && block.defaults[0] !== _('action') */ &&
                     block.defaults[0] === oldName
                 ) {
                     block.defaults[0] = newName;
@@ -5668,10 +5667,10 @@ class Blocks {
                             if (nextName !== "hidden") {
                                 console.debug(
                                     "last connection of " +
-                                        name +
-                                        " is " +
-                                        nextName +
-                                        ": adding hidden block"
+                                    name +
+                                    " is " +
+                                    nextName +
+                                    ": adding hidden block"
                                 );
                                 /** If the next block is not a hidden block, add one. */
                                 blockObjs[b][4][len - 1] = blockObjsLength + extraBlocksLength;
@@ -5805,10 +5804,10 @@ class Blocks {
                             if (nextName !== "hidden") {
                                 console.debug(
                                     "last connection of " +
-                                        name +
-                                        " is " +
-                                        nextName +
-                                        ": adding hidden block"
+                                    name +
+                                    " is " +
+                                    nextName +
+                                    ": adding hidden block"
                                 );
                                 /** If the next block is not a hidden block, add one. */
                                 blockObjs[b][4][2] = blockObjsLength + extraBlocksLength;
@@ -6598,7 +6597,7 @@ class Blocks {
                                     if (this.protoBlockDict[blockObjs[c][1][0]] !== undefined) {
                                         if (
                                             this.protoBlockDict[blockObjs[c][1][0]].dockTypes[
-                                                cc
+                                            cc
                                             ] !== "in"
                                         ) {
                                             flowBlock = false;
@@ -6614,7 +6613,7 @@ class Blocks {
                                         if (this.protoBlockDict[blockObjs[c][1]] !== undefined) {
                                             if (
                                                 this.protoBlockDict[blockObjs[c][1]].dockTypes[
-                                                    cc
+                                                cc
                                                 ] !== "out"
                                             ) {
                                                 flowBlock = false;
@@ -7192,7 +7191,6 @@ class Blocks {
                 }
 
                 this.blockList[blk].container.updateCache();
-                this.activity.refreshCanvas();
             }
         };
 
