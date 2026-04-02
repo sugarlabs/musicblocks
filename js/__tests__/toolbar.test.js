@@ -964,3 +964,94 @@ describe("Toolbar Class", () => {
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, false);
     });
 });
+
+describe("FocusCycleManager", () => {
+    test("leaving the palette uses the shared palette reset helper", () => {
+        const resetKeyboardNavigation = jest.fn();
+        const paletteElement = {
+            classList: { remove: jest.fn() }
+        };
+
+        global.ActivityContext = {
+            getActivity: jest.fn(() => ({ palettes: { resetKeyboardNavigation } }))
+        };
+        global.window.ActivityContext = global.ActivityContext;
+        global.document = {
+            getElementById: jest.fn(id => (id === "palette" ? paletteElement : null))
+        };
+
+        const manager = new Toolbar.FocusCycleManager();
+        manager._leaveZone("palette");
+
+        expect(resetKeyboardNavigation).toHaveBeenCalledWith({
+            closeMenus: true,
+            blur: true
+        });
+    });
+
+    test("workspace click clears toolbar focus and shifts focus to workspace", () => {
+        const resetKeyboardNavigation = jest.fn();
+        const workspaceTarget = { id: "canvas" };
+        const blocks = { activeBlock: 123 };
+        const toolbarButton = {
+            blur: jest.fn(),
+            classList: { remove: jest.fn() }
+        };
+        const toolbars = {
+            contains: jest.fn(node => node === toolbarButton),
+            classList: { remove: jest.fn() }
+        };
+        const palette = {
+            contains: jest.fn(() => false),
+            classList: { remove: jest.fn() }
+        };
+        const canvasHolder = {
+            contains: jest.fn(node => node === workspaceTarget),
+            hasAttribute: jest.fn(() => false),
+            setAttribute: jest.fn(),
+            focus: jest.fn(),
+            classList: { remove: jest.fn() }
+        };
+        const canvasContainer = {
+            contains: jest.fn(() => false)
+        };
+        const overlayCanvas = {
+            contains: jest.fn(() => false)
+        };
+        const canvas = {
+            contains: jest.fn(() => false),
+            dispatchEvent: jest.fn()
+        };
+
+        global.PointerEvent = function PointerEvent(type, init) {
+            return { type, ...init };
+        };
+        global.ActivityContext = {
+            getActivity: jest.fn(() => ({ palettes: { resetKeyboardNavigation }, blocks }))
+        };
+        global.window.ActivityContext = global.ActivityContext;
+        global.document = {
+            activeElement: toolbarButton,
+            querySelectorAll: jest.fn(() => [toolbarButton]),
+            getElementById: jest.fn(id => {
+                if (id === "toolbars") return toolbars;
+                if (id === "palette") return palette;
+                if (id === "canvasHolder") return canvasHolder;
+                if (id === "canvasContainer") return canvasContainer;
+                if (id === "canvas") return canvas;
+                if (id === "myCanvas") return overlayCanvas;
+                return null;
+            })
+        };
+
+        const manager = new Toolbar.FocusCycleManager();
+        manager._onMouseDown({ target: workspaceTarget });
+
+        expect(resetKeyboardNavigation).toHaveBeenCalledWith({
+            closeMenus: true,
+            blur: true
+        });
+        expect(blocks.activeBlock).toBeNull();
+        expect(manager._currentZone).toBe("workspace");
+    });
+});
