@@ -707,3 +707,6 @@ class ReflectionMatrix {
         return this.sanitizeHTML(html);
     }
 }
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = ReflectionMatrix;
+}
