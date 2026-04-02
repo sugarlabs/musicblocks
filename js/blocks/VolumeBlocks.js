@@ -445,7 +445,9 @@ function setupVolumeBlocks(activity) {
 
             if (!tur.singer.instrumentNames.includes(synth)) {
                 tur.singer.instrumentNames.push(synth);
-                logo.synth.loadSynth(turtle, synth);
+                if (logo?.synth?.loadSynth) {
+                    logo.synth.loadSynth(turtle, synth);
+                }
 
                 if (tur.singer.synthVolume[synth] === undefined) {
                     tur.singer.synthVolume[synth] = [DEFAULTVOLUME];

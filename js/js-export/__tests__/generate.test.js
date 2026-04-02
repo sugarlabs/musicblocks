@@ -261,7 +261,7 @@ describe("JSGenerate Class", () => {
             "background: greenyellow; color: midnightblue; font-weight: bold"
         );
     });
-  
+
     test("should generate stack trees with various block types and arguments", () => {
         globalActivity.blocks.stackList = [1, 20];
         const booleanGrandParent = { constructor: { name: "BooleanBlock" } };
