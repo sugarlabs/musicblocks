@@ -403,7 +403,12 @@ describe("Toolbar Class", () => {
 
         const wrapIcon = {
             setAttribute: jest.fn(),
-            onclick: null
+            onclick: null,
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                contains: jest.fn()
+            }
         };
         global.docById.mockReturnValue(wrapIcon);
         global.$j = jest.fn(() => ({
@@ -434,7 +439,12 @@ describe("Toolbar Class", () => {
         };
 
         const wrapIcon = {
-            setAttribute: jest.fn()
+            setAttribute: jest.fn(),
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                contains: jest.fn()
+            }
         };
         const helpfulWheelDiv = {
             style: { display: "block" }
