@@ -114,3 +114,50 @@ input[type="range"]:focus::-ms-fill-upper {
 .lego-size-1 { width: 20px; height: 10px; }
 .lego-size-2 { width: 40px; height: 10px; }
 /* ... more sizes ... */
+
+*:focus {
+    outline: 3px solid #005fcc !important;
+    outline-offset: 2px !important;
+}
+
+*:focus:not(:focus-visible) {
+    outline: none !important;
+}
+
+*:focus-visible {
+    outline: 3px solid #005fcc !important;
+    outline-offset: 2px !important;
+    border-radius: 2px;
+}
+
+#play:focus-visible,
+#stop:focus-visible,
+#record:focus-visible,
+#FullScreen:focus-visible,
+#newFile:focus-visible,
+#load:focus-visible,
+#saveButton:focus-visible,
+#planetIcon:focus-visible,
+#toggleAuxBtn:focus-visible,
+#helpIcon:focus-visible,
+#highContrastToggle:focus-visible {
+    outline: 3px solid #ffffff !important;
+    outline-offset: 3px !important;
+    border-radius: 4px;
+}
+
+[role="button"]:focus-visible {
+    outline: 3px solid #005fcc !important;
+    outline-offset: 2px !important;
+    border-radius: 3px;
+}
+
+body.high-contrast *:focus-visible {
+    outline: 3px solid #ffff00 !important;
+    outline-offset: 2px !important;
+}
+
+input[type="range"]:focus-visible {
+    outline: 3px solid #005fcc !important;
+    outline-offset: 2px !important;
+}
