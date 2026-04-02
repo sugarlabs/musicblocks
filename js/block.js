@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014-21 Walter Bender
+// Copyright (c) 2014-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -13,8 +13,8 @@
 /*
    global
 
-    ACCIDENTALLABELS, ACCIDENTALNAMES, addTemperamentToDictionary,
-   blockBlocks, COLLAPSEBUTTON, COLLAPSETEXTX, COLLAPSETEXTY,
+   addTemperamentToDictionary, base64Encode,
+   ACCIDENTALLABELS, ACCIDENTALNAMES, blockBlocks, COLLAPSEBUTTON, COLLAPSETEXTX, COLLAPSETEXTY,
    createjs, DEFAULTACCIDENTAL, DEFAULTDRUM, DEFAULTEFFECT,
    DEFAULTFILTERTYPE, DEFAULTINTERVAL, DEFAULTINVERT, DEFAULTMODE,
    DEFAULTNOISE, DEFAULTOSCILLATORTYPE, DEFAULTTEMPERAMENT,
@@ -31,7 +31,7 @@
    piemenuBoolean, piemenuColor, piemenuCustomNotes, piemenuIntervals,
    piemenuModes, piemenuNoteValue, piemenuNumber, piemenuPitches,
    piemenuVoices, piemenuChords, platformColor, ProtoBlock, RSYMBOLS,
-    safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
+   retryWithBackoff, safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
    splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
     topBlock, updateTemperaments, VALUETEXTX, DEFAULTCHORD, base64Encode,
    VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_
@@ -356,42 +356,24 @@ class Block {
      */
     _createCache(callback, args) {
         const that = this;
-        return new Promise((resolve, reject) => {
-            let loopCount = 0;
-            const MAX_RETRIES = 20;
-            const INITIAL_DELAY = 50;
+        const MAX_RETRIES = 20;
+        const INITIAL_DELAY = 50;
 
-            const checkBounds = async counter => {
-                try {
-                    if (counter !== undefined) {
-                        loopCount = counter;
-                    }
-                    if (loopCount > MAX_RETRIES) {
-                        throw new Error("COULD NOT CREATE CACHE");
-                    }
-
-                    that.bounds = that.container.getBounds();
-
-                    if (that.bounds === null) {
-                        const delayTime = INITIAL_DELAY * Math.pow(2, loopCount);
-                        await delayExecution(delayTime);
-                        that.regenerateArtwork(true, []);
-                        checkBounds(loopCount + 1);
-                    } else {
-                        that.container.cache(
-                            that.bounds.x,
-                            that.bounds.y,
-                            that.bounds.width,
-                            that.bounds.height
-                        );
-                        callback(that, args);
-                        resolve();
-                    }
-                } catch (e) {
-                    reject(e);
-                }
-            };
-            checkBounds();
+        return retryWithBackoff({
+            check: () => {
+                that.bounds = that.container.getBounds();
+                return that.bounds;
+            },
+            onSuccess: bounds => {
+                that.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+                callback(that, args);
+            },
+            onRetry: () => {
+                that.regenerateArtwork(true, []);
+            },
+            maxRetries: MAX_RETRIES,
+            initialDelay: INITIAL_DELAY,
+            errorMessage: "COULD NOT CREATE CACHE"
         });
     }
 
@@ -403,43 +385,25 @@ class Block {
      */
     updateCache() {
         const that = this;
-        return new Promise((resolve, reject) => {
-            // If the container has no active bitmap cache (e.g., trashed
-            // blocks whose cache was freed), skip the update silently.
-            if (that.container && !that.container.bitmapCache) {
-                resolve();
-                return;
-            }
 
-            let loopCount = 0;
-            const MAX_RETRIES = 15;
-            const INITIAL_DELAY = 100;
+        // If the container has no active bitmap cache (e.g., trashed
+        // blocks whose cache was freed), skip the update silently.
+        if (that.container && !that.container.bitmapCache) {
+            return Promise.resolve();
+        }
 
-            const updateBounds = async counter => {
-                try {
-                    if (counter !== undefined) {
-                        loopCount = counter;
-                    }
+        const MAX_RETRIES = 15;
+        const INITIAL_DELAY = 100;
 
-                    if (loopCount > MAX_RETRIES) {
-                        throw new Error("COULD NOT UPDATE CACHE");
-                    }
-
-                    if (that.bounds === null) {
-                        const delayTime = INITIAL_DELAY * Math.pow(2, loopCount);
-                        await delayExecution(delayTime);
-                        await new Promise(resolve => setTimeout(resolve, delayTime));
-                        updateBounds(loopCount + 1);
-                    } else {
-                        that.container.updateCache();
-                        that.activity.refreshCanvas();
-                        resolve();
-                    }
-                } catch (e) {
-                    reject(e);
-                }
-            };
-            updateBounds();
+        return retryWithBackoff({
+            check: () => that.bounds !== null && that.container && that.container.bitmapCache,
+            onSuccess: () => {
+                that.container.updateCache();
+                that.activity.refreshCanvas();
+            },
+            maxRetries: MAX_RETRIES,
+            initialDelay: INITIAL_DELAY,
+            errorMessage: "COULD NOT UPDATE CACHE"
         });
     }
 

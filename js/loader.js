@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global requirejs */
+/* global requirejs, define */
 
 requirejs.config({
     baseUrl: "./",
@@ -53,12 +53,16 @@ requirejs.config({
             deps: ["utils/platformstyle"],
             exports: "_"
         },
+        "utils/retryWithBackoff": {
+            deps: ["utils/utils"],
+            exports: "retryWithBackoff"
+        },
         "activity/turtledefs": {
             deps: ["utils/utils"],
             exports: "createDefaultStack"
         },
         "activity/block": {
-            deps: ["activity/turtledefs"],
+            deps: ["activity/turtledefs", "utils/retryWithBackoff"],
             exports: "Block"
         },
         "activity/blocks": {
@@ -72,7 +76,12 @@ requirejs.config({
             exports: "Painter"
         },
         "activity/turtle": {
-            deps: ["activity/turtledefs", "activity/turtle-singer", "activity/turtle-painter"],
+            deps: [
+                "activity/turtledefs",
+                "activity/turtle-singer",
+                "activity/turtle-painter",
+                "utils/retryWithBackoff"
+            ],
             exports: "Turtle"
         },
         "activity/turtles": {
