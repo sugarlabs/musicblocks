@@ -47,6 +47,7 @@ global.FlowClampBlock = class extends global.FlowBlock {
     makeMacro = jest.fn();
 };
 
+const { count } = require("node:console");
 const { setupGraphicsBlocks } = require("../GraphicsBlocks");
 
 describe("GraphicsBlocks", () => {
@@ -78,7 +79,6 @@ describe("GraphicsBlocks", () => {
             orientation: 45,
             container: { x: 10, y: 20 }
         };
-
         activity = {
             blocks: {
                 blockList: {
