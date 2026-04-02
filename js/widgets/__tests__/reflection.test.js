@@ -124,7 +124,7 @@ describe("ReflectionMatrix", () => {
             expect(reflection.isOpen).toBe(true);
             expect(reflection.isMaximized).toBe(false);
             expect(mockActivity.isInputON).toBe(true);
-            expect(reflection.PORT).toBe("http://3.105.177.138:8000");
+            expect(reflection.PORT).toBe("http://localhost:8000");
 
             expect(window.widgetWindows.windowFor).toHaveBeenCalledWith(
                 reflection,
