@@ -1,3 +1,4 @@
+/* global MULTIPALETTES, platformColor, docById, TEXTWIDTH */
 /**
  * @license
  * MusicBlocks v3.7.0
@@ -16,8 +17,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-
-/* global MULTIPALETTES, platformColor, docById, TEXTWIDTH */
 
 const { Palettes, initPalettes } = require("../palette");
 
@@ -319,6 +318,7 @@ describe("Palettes Class", () => {
                 const row = {
                     insertCell: jest.fn(),
                     style: {},
+                    dataset: {},
                     addEventListener: jest.fn((event, handler) => {
                         handlers[event] = handler;
                     })

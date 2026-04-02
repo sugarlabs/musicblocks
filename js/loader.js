@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global requirejs */
+/* global requirejs, define */
 
 requirejs.config({
     baseUrl: "./",
@@ -86,12 +86,16 @@ requirejs.config({
             deps: ["utils/utils", "activity/activity-context"],
             exports: "Synth"
         },
+        "utils/ManagedTimer": {
+            exports: "ManagedTimer"
+        },
         "activity/logo": {
             deps: [
                 "activity/turtles",
                 "activity/notation",
                 "utils/synthutils",
-                "activity/logoconstants"
+                "activity/logoconstants",
+                "utils/ManagedTimer"
             ],
             exports: "Logo"
         },
