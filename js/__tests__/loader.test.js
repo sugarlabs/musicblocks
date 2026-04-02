@@ -1,94 +1,62 @@
+// Copyright (c) 2015-2024 Yash Khandelwal
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+
+/* global jest, describe, beforeEach, afterEach, test, expect, require */
+
 describe("loader.js coverage", () => {
     let mockRequireJS;
     let mockRequireJSConfig;
     let mockI18next;
-    let mockI18nextHttpBackend;
     let consoleErrorSpy;
+    let consoleLogSpy;
 
     beforeEach(() => {
         jest.resetModules();
 
-        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {
-            // Mock empty implementation
-        });
+        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+        consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => { });
 
         document.body.innerHTML = `
-            <div data-i18n="title">Original Title</div>
-            <span data-i18n="label">Original Label</span>
+            <div id="loadingText">Loading...</div>
         `;
 
         mockI18next = {
             use: jest.fn().mockReturnThis(),
-            init: jest.fn(),
-            changeLanguage: jest.fn(),
-            t: jest.fn(key => `TRANSLATED_${key}`),
-            on: jest.fn(),
-            isInitialized: false
+            init: jest.fn((config, cb) => {
+                if (cb) cb(null);
+            })
         };
-
-        mockI18nextHttpBackend = {};
 
         mockRequireJSConfig = jest.fn();
-        mockRequireJS = jest.fn();
+        mockRequireJS = jest.fn((deps, callback) => {
+            if (callback) {
+                // Return mocks for known dependencies
+                if (deps.includes("activity/activity")) {
+                    callback(
+                        jest.fn(fn => fn()), // mock $ function that runs ready callback
+                        {} // mock Activity
+                    );
+                } else {
+                    callback();
+                }
+            }
+        });
         mockRequireJS.config = mockRequireJSConfig;
-        mockRequireJS.defined = jest.fn(() => false);
 
         global.requirejs = mockRequireJS;
-        global.define = jest.fn();
         global.window = document.defaultView;
-        global.window.createjs = {
-            Stage: jest.fn(),
-            Ticker: { framerate: 60, addEventListener: jest.fn() }
-        };
     });
 
     afterEach(() => {
-        delete global.define;
         jest.restoreAllMocks();
     });
 
-    const loadScript = async ({ initError = false, langError = false } = {}) => {
-        mockRequireJS.mockImplementation((deps, callback) => {
-            if (deps.includes("highlight")) {
-                if (callback) callback(null);
-            } else if (deps.includes("i18next")) {
-                mockI18next.init.mockImplementation((config, cb) => {
-                    if (initError) {
-                        cb("Init Failed");
-                    } else {
-                        mockI18next.isInitialized = true;
-                        cb(null);
-                    }
-                });
-                mockI18next.changeLanguage.mockImplementation((lang, cb) => {
-                    if (langError) cb("Lang Change Failed");
-                    else cb(null);
-                });
-                if (callback) {
-                    callback(mockI18next, mockI18nextHttpBackend);
-                }
-            } else if (deps.includes("easeljs.min")) {
-                // Phase 1 bootstrap
-                // Mock globals expected by verification
-                window.createDefaultStack = jest.fn();
-                window.Logo = jest.fn();
-                window.Blocks = jest.fn();
-                window.Turtles = jest.fn();
-                if (callback) callback();
-            } else if (deps.includes("activity/activity")) {
-                // Phase 2 bootstrap
-                if (callback) callback();
-            }
-            return null;
-        });
-
+    test("Configures requirejs correctly", () => {
         require("../loader.js");
-
-        await new Promise(resolve => setTimeout(resolve, 200)); // More time
-    }; // Allow async main() to proceed
-
-    test("Configures requirejs correctly", async () => {
-        await loadScript();
         expect(mockRequireJSConfig).toHaveBeenCalledWith(
             expect.objectContaining({
                 baseUrl: "./",
@@ -98,88 +66,29 @@ describe("loader.js coverage", () => {
         );
     });
 
-    test("Full success path: initializes i18n, updates DOM, and loads app", async () => {
-        Object.defineProperty(document, "readyState", {
-            value: "complete",
-            configurable: true
-        });
+    test("Bootstraps the application", () => {
+        require("../loader.js");
 
-        await loadScript();
-
-        expect(mockI18next.use).toHaveBeenCalledWith(mockI18nextHttpBackend);
-        expect(mockI18next.init).toHaveBeenCalledWith(
-            expect.objectContaining({ lng: "en" }),
-            expect.any(Function)
-        );
-        expect(window.i18next).toBe(mockI18next);
-
-        expect(mockI18next.changeLanguage).toHaveBeenCalledWith("en", expect.any(Function));
-
-        const title = document.querySelector('[data-i18n="title"]');
-        const label = document.querySelector('[data-i18n="label"]');
-
-        expect(mockI18next.t).toHaveBeenCalledWith("title");
-        expect(mockI18next.t).toHaveBeenCalledWith("label");
-        expect(title.textContent).toBe("TRANSLATED_title");
-        expect(label.textContent).toBe("TRANSLATED_label");
-
-        expect(mockI18next.on).toHaveBeenCalledWith("languageChanged", expect.any(Function));
-
-        // Verify Phase 2 was reached
+        // Check initial requirejs call
         expect(mockRequireJS).toHaveBeenCalledWith(
-            ["activity/activity"],
+            ["jquery", "activity/activity"],
             expect.any(Function),
             expect.any(Function)
         );
+
+        // The new loader.js doesn't set globals anymore
+        // These are now handled by individual modules or requirejs shims
+        // Verify initialization log message
+        expect(consoleLogSpy).toHaveBeenCalledWith("Music Blocks application initialized.");
+
+
     });
 
-    test("Handles i18next initialization error", async () => {
-        await loadScript({ initError: true });
-
-        expect(consoleErrorSpy).toHaveBeenCalledWith("i18next init failed:", "Init Failed");
-        expect(window.i18next).toBe(mockI18next);
-    });
-
-    test("Handles changeLanguage error", async () => {
-        await loadScript({ langError: true });
-
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-            "Error changing language:",
-            "Lang Change Failed"
-        );
-    });
-
-    test("Handles DOMContentLoaded when document is loading", async () => {
-        Object.defineProperty(document, "readyState", {
-            value: "loading",
-            configurable: true
-        });
-
-        const addEventListenerSpy = jest.spyOn(document, "addEventListener");
-
-        await loadScript();
-
-        expect(addEventListenerSpy).toHaveBeenCalledWith("DOMContentLoaded", expect.any(Function));
-
-        const eventHandler = addEventListenerSpy.mock.calls.find(
-            call => call[0] === "DOMContentLoaded"
-        )[1];
-
-        mockI18next.t.mockClear();
-        eventHandler();
-        expect(mockI18next.t).toHaveBeenCalled();
-    });
-
-    test("Triggering languageChanged event updates content", async () => {
-        await loadScript();
-
-        const onCall = mockI18next.on.mock.calls.find(call => call[0] === "languageChanged");
-        const onHandler = onCall[1];
-
-        mockI18next.t.mockClear();
-
-        onHandler();
-
-        expect(mockI18next.t).toHaveBeenCalled();
+    test("Handles initialization errors", () => {
+        require("../loader.js");
+        const errorCallback = mockRequireJS.mock.calls[0][2];
+        const testError = new Error("Load failed");
+        errorCallback(testError);
+        expect(consoleErrorSpy).toHaveBeenCalledWith("Failed to start Music Blocks:", testError);
     });
 });

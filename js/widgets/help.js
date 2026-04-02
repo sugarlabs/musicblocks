@@ -61,7 +61,7 @@ class HelpWidget {
         setTimeout(() => this._setup(useActiveBlock, 0), 0);
 
         // Position center
-        setTimeout(this.widgetWindow.sendToCenter, 50);
+        setTimeout(() => this.widgetWindow.sendToCenter(), 50);
     }
 
     /**
