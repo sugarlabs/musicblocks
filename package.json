@@ -95,5 +95,12 @@
             "eslint --max-warnings=0 --fix",
             "prettier --write"
         ]
+    },
+    "nodemonConfig": {
+        "watch": [
+            "index.js",
+            "package.json"
+        ],
+        "ext": "js,mjs,cjs,json"
     }
 }
