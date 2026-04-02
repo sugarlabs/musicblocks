@@ -12,9 +12,9 @@
 /*
    globals
 
-   jQuery, PALETTEICONS, PALETTEFILLCOLORS, PALETTESTROKECOLORS,
+   PALETTEICONS, PALETTEFILLCOLORS, PALETTESTROKECOLORS,
    PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS, MULTIPALETTES,
-   platformColor
+   platformColor, base64Encode, i18next, createjs
 */
 
 /*
@@ -64,6 +64,7 @@ const changeImage = (imgElement, from, to) => {
  * @param {string} text - The input text to be translated.
  * @returns {string} The translated text.
  */
+// eslint-disable-next-line no-redeclare
 function _(text, options = {}) {
     if (!text) return "";
 
@@ -1084,11 +1085,17 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
     let streaming = false;
     const video = document.querySelector("#camVideo");
     const canvas = document.querySelector("#camCanvas");
+    const context = canvas.getContext("2d");
+
+    if (canvas.width !== w) {
+        canvas.width = w;
+    }
+    if (canvas.height !== h) {
+        canvas.height = h;
+    }
 
     function draw() {
-        canvas.width = w;
-        canvas.height = h;
-        canvas.getContext("2d").drawImage(video, 0, 0, w, h);
+        context.drawImage(video, 0, 0, w, h);
         const data = canvas.toDataURL("image/png");
         turtles.getTurtle(turtle).doShowImage(args[0], data);
     }
