@@ -1380,6 +1380,10 @@ const LCD = (a, b) => {
  * @returns {Array} The sum of the two rational numbers in the form [numerator, denominator].
  */
 let rationalSum = (a, b) => {
+    if (!Array.isArray(a) || !Array.isArray(b)) {
+        console.warn('utils.rationalSum received invalid inputs', a, b);
+        return [0, 1];
+    }
     if (a === 0 || b === 0) {
         // console.debug("divide by zero?");
         return [0, 1];
