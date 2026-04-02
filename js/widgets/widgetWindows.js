@@ -148,6 +148,12 @@ class WidgetWindow {
         const windows = docById("floatingWindows");
         this._frame = this._create("div", "windowFrame", windows);
         this._overlayframe = this._create("div", "windowFrame", windows);
+
+        // Add mouse leave handler to reset cursor
+        this._frame.onmouseleave = () => {
+            document.body.style.cursor = "default";
+        };
+
         this._drag = this._create("div", "wfTopBar", this._frame);
         this._drag.style.display = "flex";
         this._drag.style.justifyContent = "space-between";
@@ -330,6 +336,9 @@ class WidgetWindow {
      */
     _dragTopHandler(e) {
         this._dragging = false;
+        // Reset cursor when drag ends
+        document.body.style.cursor = "default";
+
         if (this._fullscreenEnabled && this._frame.style.top === "64px" && !this._maximized) {
             this._maximize();
             this.takeFocus();
@@ -446,6 +455,8 @@ class WidgetWindow {
         document.removeEventListener("mouseup", this._dragTopHandler, true);
         document.removeEventListener("mousemove", this._docMouseMoveHandler, true);
         document.removeEventListener("mousedown", this._docMouseDownHandler, true);
+        // Reset cursor when widget is closed
+        document.body.style.cursor = "default";
         this.onclose();
     }
 
@@ -607,6 +618,9 @@ class WidgetWindow {
         if (this._docMouseDownHandler) {
             document.removeEventListener("mousedown", this._docMouseDownHandler, true);
         }
+        // Reset cursor when widget is destroyed
+        document.body.style.cursor = "default";
+
         if (this._frame && this._frame.parentElement) {
             this._frame.parentElement.removeChild(this._frame);
         }
