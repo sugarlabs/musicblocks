@@ -2113,9 +2113,31 @@ class Blocks {
                         }
                     }
                 }
+ 
+                 this.adjustDocks(newBlock, true);
+ 
+                 // Graphical feedback for new connection
+                this.findDragGroup(thisBlock);
+                const blocksToHighlight = [...this.dragGroup];
+                if (this.blockList[newBlock]) {
+                    blocksToHighlight.push(newBlock);
+                }
 
-                this.adjustDocks(newBlock, true);
-                /** TODO: some graphical feedback re new connection? */
+                blocksToHighlight.forEach(b => {
+                    if (this.blockList[b]) {
+                        this.blockList[b].highlight();
+                    }
+                });
+                this.activity.refreshCanvas();
+
+                setTimeout(() => {
+                    blocksToHighlight.forEach(b => {
+                        if (this.blockList[b]) {
+                            this.blockList[b].unhighlight();
+                        }
+                    });
+                    this.activity.refreshCanvas();
+                }, 500);
 
                 /** Check if top block is one of the widget blocks. */
                 let lockInit = false;
