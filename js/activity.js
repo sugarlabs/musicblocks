@@ -2914,6 +2914,15 @@ class Activity {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 1;
             bitmap.visible = false;
 
+            // Apply color filter based on theme
+            const isDarkMode = document.body.classList.contains("dark");
+            const isHighContrastMode = document.body.classList.contains("highcontrast");
+            if (isDarkMode || isHighContrastMode) {
+                // Create an invert filter to turn black elements white
+                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
+                bitmap.filters = [invertFilter];
+            }
+
             return bitmap;
         };
 
@@ -5921,6 +5930,15 @@ class Activity {
          */
         this._showCartesian = () => {
             this.cartesianBitmap.visible = true;
+            // Apply color filter based on theme
+            const isDarkMode = document.body.classList.contains("dark");
+            const isHighContrastMode = document.body.classList.contains("highcontrast");
+            if (isDarkMode || isHighContrastMode) {
+                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
+                this.cartesianBitmap.filters = [invertFilter];
+            } else {
+                this.cartesianBitmap.filters = [];
+            }
             this.cartesianBitmap.cache(0, 0, 1200, 900);
             this.cartesianBitmap.updateCache();
             this.update = true;
@@ -5940,6 +5958,15 @@ class Activity {
          */
         this._showPolar = () => {
             this.polarBitmap.visible = true;
+            // Apply color filter based on theme
+            const isDarkMode = document.body.classList.contains("dark");
+            const isHighContrastMode = document.body.classList.contains("highcontrast");
+            if (isDarkMode || isHighContrastMode) {
+                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
+                this.polarBitmap.filters = [invertFilter];
+            } else {
+                this.polarBitmap.filters = [];
+            }
             this.polarBitmap.cache(0, 0, 1200, 900);
             this.polarBitmap.updateCache();
             this.update = true;
@@ -5999,6 +6026,15 @@ class Activity {
          */
         this._showTreble = () => {
             this.trebleBitmap.visible = true;
+            // Apply color filter based on theme
+            const isDarkMode = document.body.classList.contains("dark");
+            const isHighContrastMode = document.body.classList.contains("highcontrast");
+            if (isDarkMode || isHighContrastMode) {
+                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
+                this.trebleBitmap.filters = [invertFilter];
+            } else {
+                this.trebleBitmap.filters = [];
+            }
             this.trebleBitmap.cache(0, 0, 1200, 900);
             this.trebleBitmap.updateCache();
             this._hideAccidentals();
@@ -6057,6 +6093,15 @@ class Activity {
          */
         this._showGrand = () => {
             this.grandBitmap.visible = true;
+            // Apply color filter based on theme
+            const isDarkMode = document.body.classList.contains("dark");
+            const isHighContrastMode = document.body.classList.contains("highcontrast");
+            if (isDarkMode || isHighContrastMode) {
+                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
+                this.grandBitmap.filters = [invertFilter];
+            } else {
+                this.grandBitmap.filters = [];
+            }
             this.grandBitmap.cache(0, 0, 1200, 900);
             this.grandBitmap.updateCache();
             this._hideAccidentals();
@@ -6113,6 +6158,15 @@ class Activity {
          */
         this._showSoprano = () => {
             this.sopranoBitmap.visible = true;
+            // Apply color filter based on theme
+            const isDarkMode = document.body.classList.contains("dark");
+            const isHighContrastMode = document.body.classList.contains("highcontrast");
+            if (isDarkMode || isHighContrastMode) {
+                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
+                this.sopranoBitmap.filters = [invertFilter];
+            } else {
+                this.sopranoBitmap.filters = [];
+            }
             this.sopranoBitmap.cache(0, 0, 1200, 900);
             this.sopranoBitmap.updateCache();
             this._hideAccidentals();
@@ -6175,6 +6229,15 @@ class Activity {
          */
         this._showAlto = () => {
             this.altoBitmap.visible = true;
+            // Apply color filter based on theme
+            const isDarkMode = document.body.classList.contains("dark");
+            const isHighContrastMode = document.body.classList.contains("highcontrast");
+            if (isDarkMode || isHighContrastMode) {
+                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
+                this.altoBitmap.filters = [invertFilter];
+            } else {
+                this.altoBitmap.filters = [];
+            }
             this.altoBitmap.cache(0, 0, 1200, 900);
             this.altoBitmap.updateCache();
             this._hideAccidentals();
@@ -6232,6 +6295,15 @@ class Activity {
          */
         this._showTenor = () => {
             this.tenorBitmap.visible = true;
+            // Apply color filter based on theme
+            const isDarkMode = document.body.classList.contains("dark");
+            const isHighContrastMode = document.body.classList.contains("highcontrast");
+            if (isDarkMode || isHighContrastMode) {
+                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
+                this.tenorBitmap.filters = [invertFilter];
+            } else {
+                this.tenorBitmap.filters = [];
+            }
             this.tenorBitmap.cache(0, 0, 1200, 900);
             this.tenorBitmap.updateCache();
             this._hideAccidentals();
@@ -6290,6 +6362,15 @@ class Activity {
          */
         this._showBass = () => {
             this.bassBitmap.visible = true;
+            // Apply color filter based on theme
+            const isDarkMode = document.body.classList.contains("dark");
+            const isHighContrastMode = document.body.classList.contains("highcontrast");
+            if (isDarkMode || isHighContrastMode) {
+                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
+                this.bassBitmap.filters = [invertFilter];
+            } else {
+                this.bassBitmap.filters = [];
+            }
             this.bassBitmap.cache(0, 0, 1200, 900);
             this.bassBitmap.updateCache();
             this._hideAccidentals();

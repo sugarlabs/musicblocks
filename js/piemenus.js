@@ -13,15 +13,15 @@
 /*
    global
 
-    platformColor, docById, Singer, slicePath, wheelnav,
+   platformColor, docById, Singer, slicePath, wheelnav,
    DEFAULTVOICE, getDrumName, getNote, MUSICALMODES last, SHARP, FLAT,
    PREVIEWVOLUME, DEFAULTVOLUME, MODE_PIE_MENUS, HelpWidget,
    INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName,
    getMunsellColor, COLORS40, frequencyToPitch, instruments,
    DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
-   FIXEDSOLFEGE, NOTENAMES, FIXEDSOLFEGE, NOTENAMES, numberToPitch,
+   FIXEDSOLFEGE, NOTENAMES, numberToPitch,
    nthDegreeToPitch, SOLFEGENAMES, buildScale, _THIS_IS_TURTLE_BLOCKS_,
-    CHORDNAMES, Tone, Synth
+   CHORDNAMES, Synth, Tone, activity
 */
 
 /*
@@ -3864,6 +3864,7 @@ const piemenuBlockContext = block => {
  */
 const piemenuGrid = activity => {
     docById("wheelDivptm").style.display = "none";
+    docById("wheelDivptm").classList.add("grid-wheel");
     const x = activity.turtles.gridButton.getBoundingClientRect().x;
     const y = activity.turtles.gridButton.getBoundingClientRect().y;
     docById("wheelDivptm").style.position = "absolute";
@@ -3971,6 +3972,7 @@ const piemenuGrid = activity => {
 
     const hidePiemenu = activity => {
         docById("wheelDivptm").style.display = "none";
+        docById("wheelDivptm").classList.remove("grid-wheel");
         activity.turtles.gridWheel.removeWheel();
         activity.turtles._exitWheel.removeWheel();
     };
