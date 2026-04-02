@@ -152,7 +152,14 @@ class LanguageBox {
         this._language = "te";
         this.hide();
     }
-
+    /**
+     * @public
+     * @returns {void}
+     */
+    ta_onclick() {
+    this._language = "ta";
+    this.hide();
+    }
     /**
      * @public
      * @returns {void}
@@ -240,6 +247,7 @@ class LanguageBox {
             pt: "Atualize seu navegador para alterar sua preferência de idioma.",
             zh_CN: "刷新浏览器以更改您的语言偏好",
             th: "รีเฟรชเบราเซอร์เพื่อเปลี่ยนการตั้งค่าภาษาของคุณ",
+            ta: "உங்கள் மொழி விருப்பத்தை மாற்ற உலாவியை புதுப்பிக்கவும்.",
             hi: "अपनी भाषा की वरीयता बदलने के लिए अपना ब्राउज़र ताज़ा करें",
             te: "మీ భాష ప్రాధాన్యతను మార్చడానికి మీ బ్రౌజర్‌ని రిఫ్రెష్ చేయండి.",
             tr: "dil tercihinizi değiştirmek için tarayıcınızı yenileyin",
