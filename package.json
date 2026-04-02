@@ -17,6 +17,8 @@
         "prepare": "husky",
         "serve": "http-server -a 127.0.0.1 -p 3000 --gzip --brotli",
         "serve:dev": "http-server -a 127.0.0.1 -p 3000 -c-1",
+        "perf:assets": "node scripts/analyze-production-assets.js",
+        "perf:lhci": "npx @lhci/cli autorun --config=./lighthouserc.js",
         "start": "node index.js",
         "dev": "cross-env NODE_ENV=development nodemon index.js",
         "prod": "cross-env NODE_ENV=production node index.js",
