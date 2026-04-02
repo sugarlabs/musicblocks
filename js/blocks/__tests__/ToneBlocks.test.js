@@ -218,6 +218,16 @@ describe("setupToneBlocks", () => {
             );
             expect(logo.timbre.osc).toContain("existingOsc");
         });
+        it("should match oscillator type by value", () => {
+            const osc = getBlock("oscillator");
+            logo.inTimbre = true;
+            logo.timbre.osc = [];
+            logo.timbre.oscParams = [];
+            const oscType = Object.values(OSCTYPES)[0][1];
+            osc.flow([oscType, 4], logo, 0, "oscBlk");
+            expect(logo.timbre.oscParams).toContain(oscType);
+            logo.inTimbre = false;
+        });
     });
 
     describe("FillerTypeBlock and OscillatorTypeBlock", () => {
@@ -308,6 +318,20 @@ describe("setupToneBlocks", () => {
                 expect.stringContaining("_harmonic_")
             );
             expect(ret).toEqual([42, 1]);
+        });
+        it("should pop harmonic and partials when listener fires", () => {
+            const harmonic = getBlock("harmonic");
+            const tur = activity.turtles.ithTurtle(0);
+            tur.singer.inHarmonic = [];
+            tur.singer.partials = [];
+            let capturedListener = null;
+            logo.setTurtleListener = jest.fn((turtle, name, fn) => {
+                capturedListener = fn;
+            });
+            harmonic.flow([42], logo, 0, "harmonicBlk");
+            capturedListener({});
+            expect(tur.singer.inHarmonic).toEqual([]);
+            expect(tur.singer.partials).toEqual([]);
         });
     });
 
@@ -458,6 +482,14 @@ describe("setupToneBlocks", () => {
             setVoice.flow(args, logo, 0, "setVoiceBlk2");
             expect(activity.errorMsg).toHaveBeenCalledWith("No input error", "setVoiceBlk2");
         });
+        it("should match voice by internal name", () => {
+            const setVoice = getBlock("setvoice");
+            const tur = activity.turtles.ithTurtle(0);
+            tur.singer.voices = [];
+            const voiceVal = Object.values(VOICENAMES)[0][1];
+            setVoice.flow([voiceVal, 44], logo, 0, "setVoiceBlk3");
+            expect(tur.singer.voices).toContain(voiceVal);
+        });
     });
 
     describe("SynthNameBlock", () => {
@@ -491,6 +523,13 @@ describe("setupToneBlocks", () => {
             const tur = activity.turtles.ithTurtle(turtle);
             tur.singer.instrumentNames = [];
             setDefVoice.flow(["piano"], logo, turtle, "setDefVoiceBlk2");
+            expect(tur.singer.instrumentNames[0]).toEqual("piano");
+        });
+        it("should update existing instrument name when list is non-empty", () => {
+            const setDefVoice = getBlock("setdefaultinstrument");
+            const tur = activity.turtles.ithTurtle(0);
+            tur.singer.instrumentNames = ["flute"];
+            setDefVoice.flow(["piano"], logo, 0, "setDefVoiceBlk3");
             expect(tur.singer.instrumentNames[0]).toEqual("piano");
         });
     });
@@ -529,6 +568,33 @@ describe("setupToneBlocks", () => {
             expect(logo.sample.samplePitch).toEqual("la");
             expect(logo.sample.sampleOctave).toEqual(5);
         });
+        it("should set inRhythmRuler block when inRhythmRuler is true", () => {
+            logo.inRhythmRuler = true;
+            logo.rhythmRuler = { Drums: [], Rulers: [] };
+            const setTimbre = getBlock("settimbre");
+            setTimbre.flow(["drumkit", 77], logo, 0, "setTimbreBlk4");
+            expect(logo.rhythmRuler.Drums).toContain("setTimbreBlk4");
+            logo.inRhythmRuler = false;
+        });
+        it("should set default sample properties when inSample and args is not object", () => {
+            logo.inSample = true;
+            logo.sample = {};
+            const setTimbre = getBlock("settimbre");
+            setTimbre.flow(["stringValue", 88], logo, 0, "setTimbreBlk5");
+            expect(logo.sample.sampleName).toEqual("");
+            expect(logo.sample.samplePitch).toEqual("la");
+            logo.inSample = false;
+        });
+
+        it("should set sample properties when inSample and args length is 2", () => {
+            logo.inSample = true;
+            logo.sample = {};
+            const setTimbre = getBlock("settimbre");
+            setTimbre.flow([["sampleName", "sampleData"], 88], logo, 0, "setTimbreBlk6");
+            expect(logo.sample.samplePitch).toEqual("la");
+            expect(logo.sample.sampleOctave).toEqual(4);
+            logo.inSample = false;
+        });
     });
 
     describe("CustomSampleBlock", () => {
@@ -549,6 +615,18 @@ describe("setupToneBlocks", () => {
             const customSample = getBlock("customsample");
             const ret = customSample.arg(logo, 0, "csBlk2");
             expect(ret).toEqual(["newName", "newData", "re", 7]);
+        });
+        it("should push to statusFields when inStatusMatrix and connected to print", () => {
+            const customSample = getBlock("customsample");
+            activity.blocks.blockList.csBlk3 = {
+                connections: ["printBlk"],
+                value: ["", "", "do", 4]
+            };
+            activity.blocks.blockList.printBlk = { name: "print" };
+            logo.inStatusMatrix = true;
+            customSample.arg(logo, 0, "csBlk3");
+            expect(logo.statusFields).toContainEqual(["csBlk3", "customsample"]);
+            logo.inStatusMatrix = false;
         });
     });
 
