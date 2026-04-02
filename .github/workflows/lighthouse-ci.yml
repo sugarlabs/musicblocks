@@ -28,6 +28,9 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
+      - name: Validate package-lock sync
+        run: bash .github/scripts/validate-lockfile-sync.sh
+
       - name: Install dependencies
         run: npm ci
 
