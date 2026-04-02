@@ -63,6 +63,10 @@ describe("LanguageBox Class", () => {
 
     // ===== ONCLICK TEST =====
     describe("OnClick method", () => {
+        it("should expose OnClick as a function", () => {
+            expect(typeof languageBox.OnClick).toBe("function");
+        });
+
         it("should call reload method when OnClick is called", () => {
             const reloadSpy = jest.spyOn(languageBox, "reload").mockImplementation(() => {});
             languageBox.OnClick();

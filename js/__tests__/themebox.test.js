@@ -31,6 +31,11 @@ window.platformColor = {
     selectorSelected: "#1A8CFF"
 };
 
+// Mock window.location.reload - delete and reassign
+const mockReload = jest.fn();
+delete window.location;
+window.location = { reload: mockReload };
+
 // Mock document elements
 document.body.innerHTML = `
     <meta name="theme-color" content="#4DA6FF">
@@ -62,6 +67,8 @@ describe("ThemeBox", () => {
         });
         jest.spyOn(global.Storage.prototype, "setItem").mockImplementation(() => {});
 
+        // Reset the mock reload function
+        mockReload.mockClear();
         // Reset body classes
         document.body.classList.remove("light", "dark");
 
