@@ -178,7 +178,7 @@ class PlanetInterface {
         this.newProject = () => {
             this.closePlanet();
             this.initialiseNewProject();
-            this.activity._loadStart();
+            this.activity.justLoadStart();
             this.saveLocally();
         };
 
