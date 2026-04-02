@@ -63,6 +63,12 @@
  */
 class Singer {
     /**
+     * Number of semitones in one octave.
+     * @constant {number}
+     */
+    static SEMITONES_PER_OCTAVE = 12;
+
+    /**
      * @constructor
      * @param {Object} turtle - Turtle object
      */
@@ -1055,7 +1061,7 @@ class Singer {
                 noteObj = getNote(
                     anote,
                     octave,
-                    atrans + tur.singer.register * SEMITONES,
+                    atrans + tur.singer.register * Singer.SEMITONES_PER_OCTAVE,
                     tur.singer.keySignature,
                     tur.singer.movable,
                     direction,
@@ -1273,7 +1279,7 @@ class Singer {
                 const noteObj = getNote(
                     note,
                     octave,
-                    transposition + tur.singer.register * SEMITONES,
+                    transposition + tur.singer.register * Singer.SEMITONES_PER_OCTAVE,
                     tur.singer.keySignature,
                     tur.singer.movable,
                     direction,
