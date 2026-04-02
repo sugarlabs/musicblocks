@@ -58,6 +58,10 @@ global.MusicBlocks = {
 global.JS_API =
     "// Music Blocks JavaScript API\n// Available functions:\n// playNote()\n// setTempo()";
 
+global.AST2BlockList = {
+    toBlockList: jest.fn()
+};
+
 /**
  * Creates a mock widgetWindow object with all required methods.
  * The widget body is appended to document.body so getElementById works.
@@ -127,6 +131,11 @@ beforeEach(() => {
     jest.clearAllMocks();
     global.JSGenerate.code = 'console.log("hello");';
     global.acorn.parse = jest.fn();
+    global.AST2BlockList.toBlockList.mockReset();
+    global.AST2BlockList.toBlockList.mockReturnValue(["blocks"]);
+    global.ast2blocklist_config = { ready: true };
+    window.ast2blocklist_config_ready = null;
+    window.ast2blocklist_config_failed = false;
     global.CodeJar = jest.fn().mockImplementation(() => ({
         updateCode: jest.fn(),
         updateOptions: jest.fn(),
@@ -496,6 +505,46 @@ describe("JSEditor", () => {
     });
 
     describe("export/run functionality", () => {
+        const ast = { type: "Program", body: [] };
+
+        test("_codeToBlocks waits for pending AST config", async () => {
+            const editor = createEditor();
+            let resolveConfig;
+
+            global.ast2blocklist_config = undefined;
+            window.ast2blocklist_config_ready = new Promise(resolve => {
+                resolveConfig = resolve;
+            }).then(data => {
+                global.ast2blocklist_config = data;
+                return data;
+            });
+            acorn.parse.mockReturnValue(ast);
+
+            const conversionPromise = editor._codeToBlocks();
+            expect(AST2BlockList.toBlockList).not.toHaveBeenCalled();
+
+            resolveConfig({ loaded: true });
+            await conversionPromise;
+
+            expect(AST2BlockList.toBlockList).toHaveBeenCalledWith(ast, { loaded: true });
+        });
+
+        test("_codeToBlocks logs a clear error when AST config fails", async () => {
+            const editor = createEditor();
+            const consoleEl = document.getElementById("editorConsole");
+
+            global.ast2blocklist_config = undefined;
+            window.ast2blocklist_config_ready = Promise.reject(new Error("network failed"));
+
+            await editor._codeToBlocks();
+
+            expect(consoleEl.textContent).toContain(
+                "JavaScript block conversion is unavailable because its config failed to load."
+            );
+            expect(AST2BlockList.toBlockList).not.toHaveBeenCalled();
+            expect(editor.activity.sendAllToTrash).not.toHaveBeenCalled();
+        });
+
         test("_runCode does nothing when _showingHelp is true", () => {
             const editor = createEditor();
             editor._showingHelp = true;
