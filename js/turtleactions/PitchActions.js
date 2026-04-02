@@ -234,7 +234,7 @@ function setupPitchActions(activity) {
                 scaleDegree = (number % modeLength) + 1;
             }
 
-            const [note, offset] = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
+            const [note, _offset] = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
             let semitones = ref;
             semitones += NOTESFLAT.includes(note)
                 ? NOTESFLAT.indexOf(note) - ref
@@ -591,7 +591,7 @@ function setupPitchActions(activity) {
         static deltaPitch(outType, turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (tur.singer.previousNotePlayed == null) {
+            if (tur.singer.previousNotePlayed === null) {
                 return 0;
             } else {
                 let len = tur.singer.previousNotePlayed[0].length;
