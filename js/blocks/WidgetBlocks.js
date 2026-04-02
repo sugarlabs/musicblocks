@@ -1900,7 +1900,44 @@ function setupWidgetBlocks(activity) {
         new RhythmRuler2Block().setup(activity);
         new MatrixGMajorBlock().setup(activity);
         new MatrixCMajorBlock().setup(activity);
-        new MatrixBlock().setup(activity);
+        const matrixBlock = new MatrixBlock();
+        if (!matrixBlock.protoblock) {
+            matrixBlock.protoblock = matrixBlock;
+        }
+
+        matrixBlock.protoblock._onLoad = function (activity) {
+            if (!this || !this.connections) return;
+            try {
+                const setKey = activity.blocks.blockList[this.connections[1]];
+                if (!setKey || setKey.name !== "setkey2") return;
+                const noteName = activity.blocks.blockList[setKey.connections[1]];
+                if (!noteName || noteName.name !== "notename") return;
+                this.privateData = this.privateData || {};
+                this.privateData.scale = noteName.value;
+            } catch (e) {
+                console.warn("Matrix hydration failed", e);
+            }
+        };
+
+        matrixBlock.protoblock.postCreate = function (activity) {
+            try {
+                if (activity?.loading) return;
+                if (!this.connections || this.connections.length === 0) return;
+                const hasScaleChild = this.connections.some(id => {
+                    const child = activity.blocks.blockList[id];
+                    return child?.name === "setkey2" || child?.name === "notename";
+                });
+                if (!hasScaleChild) return;
+                const fn = this._onLoad || this.protoblock?._onLoad;
+                if (typeof fn === "function") {
+                    fn.call(this, activity);
+                }
+            } catch (e) {
+                console.warn("Matrix hydration skipped:", e);
+            }
+        };
+
+        matrixBlock.setup(activity);
     }
     // Set up AIDebugger for both Music Blocks and Turtle Blocks
     new AIDebugger().setup(activity);

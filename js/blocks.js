@@ -6719,11 +6719,32 @@ class Blocks {
                 return;
             }
 
+            // Pre-cleanup hydration pass for blocks with _onLoad callbacks.
+            Object.values(this.blockList).forEach(block => {
+                const onLoad = block._onLoad || block.protoblock?._onLoad;
+                if (typeof onLoad === "function") {
+                    try {
+                        onLoad.call(block, this.activity);
+                    } catch (e) {
+                        console.warn("_onLoad failed", e);
+                    }
+                }
+            });
+
             this._findDrumURLs();
 
             this.updateBlockPositions();
 
             this._cleanupStacks();
+
+            // Guard: Recover Matrix blocks that were prematurely trashed during cleanup.
+            Object.values(this.blockList).forEach(block => {
+                if (block.name === "matrix" && block.privateData?.scale) {
+                    if (block.trash) {
+                        block.trash = false;
+                    }
+                }
+            });
 
             for (let i = 0; i < this.blocksToCollapse.length; i++) {
                 this.blockList[this.blocksToCollapse[i]].collapseToggle();
