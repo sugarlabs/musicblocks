@@ -112,8 +112,9 @@ describe("Trashcan Class", () => {
     });
 
     it("should resize and debounce the event listener", () => {
+        const addEventListenerSpy = jest.spyOn(window, "addEventListener");
         trashcan.resizeEvent(1);
-        const resizeFn = window.addEventListener.mock.calls[0][1];
+        const resizeFn = addEventListenerSpy.mock.calls[0][1];
         resizeFn(); // simulate resize
         jest.advanceTimersByTime(300);
     });
