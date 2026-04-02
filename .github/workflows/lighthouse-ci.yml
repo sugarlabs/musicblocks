@@ -1,7 +1,7 @@
 name: Lighthouse CI
 
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, synchronize, reopened]
   push:
     branches: [master]
@@ -10,23 +10,23 @@ jobs:
   lighthouse:
     name: Lighthouse Performance Audit
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       pull-requests: write
       contents: read
-      issues: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -34,11 +34,13 @@ jobs:
       - name: Install Lighthouse CI
         run: npm install -g @lhci/cli@0.14.x
 
+      - name: Validate Lighthouse config
+        run: test -f ./lighthouserc.js || (echo "::error::lighthouserc.js not found" && exit 1)
+
       - name: Run Lighthouse CI
         id: lighthouse
-        run: |
-          lhci autorun --config=./lighthouserc.js 2>&1 | tee lighthouse-output.txt
-          echo "LIGHTHOUSE_EXIT_CODE=$?" >> $GITHUB_ENV
+        continue-on-error: true
+        run: lhci autorun --config=./lighthouserc.js 2>&1 | tee lighthouse-output.txt
 
       - name: Parse Lighthouse Results
         id: parse
@@ -59,8 +61,8 @@ jobs:
               BP_SCORE=$(jq '[.[].summary["best-practices"]] | add / length * 100 | floor' "$MANIFEST" 2>/dev/null || echo "N/A")
               SEO_SCORE=$(jq '[.[].summary.seo] | add / length * 100 | floor' "$MANIFEST" 2>/dev/null || echo "N/A")
               
-              # Get report URL from temporary-public-storage
-              REPORT_URL=$(jq -r '.[0].url // "N/A"' "$MANIFEST" 2>/dev/null)
+              # Get hosted report URL (links key) or fall back to audited page URL
+              REPORT_URL=$(jq -r '.[0].links["lighthouse-viewer"] // .[0].url // "N/A"' "$MANIFEST" 2>/dev/null)
               
               echo "PERF_SCORE=$PERF_SCORE" >> $GITHUB_OUTPUT
               echo "A11Y_SCORE=$A11Y_SCORE" >> $GITHUB_OUTPUT
@@ -74,8 +76,8 @@ jobs:
         id: emoji
         run: |
           get_emoji() {
-            score=$1
-            if [ "$score" = "N/A" ]; then
+            score="${1:-0}"
+            if ! [[ "$score" =~ ^[0-9]+$ ]]; then
               echo "⚪"
             elif [ "$score" -ge 90 ]; then
               echo "🟢"
@@ -92,7 +94,10 @@ jobs:
           echo "SEO_EMOJI=$(get_emoji '${{ steps.parse.outputs.SEO_SCORE }}')" >> $GITHUB_OUTPUT
 
       - name: Comment on PR
-        if: github.event_name == 'pull_request'
+        if: >-
+          github.event_name == 'pull_request'
+          && github.event.pull_request.number != ''
+          && github.event.pull_request.head.repo.full_name == github.repository
         uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
