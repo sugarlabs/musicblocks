@@ -822,4 +822,11 @@ describe("ProgramBlocks", () => {
             expect(block.formDefn.outType).toBe("numberout");
         });
     });
+    describe("setupProgramBlocks export", () => {
+    test("exports setupProgramBlocks function", () => {
+      const exported = require("../ProgramBlocks");
+      expect(typeof exported.setupProgramBlocks).toBe("function");
+    });
+  });
+
 });
