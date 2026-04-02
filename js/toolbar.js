@@ -1089,8 +1089,6 @@ class Toolbar {
     }
 
     /**
-     * Renders the help icon with the provided onclick handler.
-     *
      * @public
      * @param {Function} onclick - The onclick handler for the help icon.
      * @returns {void}
