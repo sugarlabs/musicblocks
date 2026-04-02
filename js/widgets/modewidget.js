@@ -56,6 +56,7 @@ class ModeWidget {
     static BUTTONSIZE = 53;
     static ROTATESPEED = 125;
     static BUTTONDIVWIDTH = 535;
+    static RESET_NOTES_DELAY = 500;
 
     /**
      * Constructs a new ModeWidget instance.
@@ -708,7 +709,7 @@ class ModeWidget {
                     this.__playNextNote(i + 1);
                 } else {
                     this._locked = false;
-                    setTimeout(() => this._resetNotes(), 500);
+                    setTimeout(() => this._resetNotes(), ModeWidget.RESET_NOTES_DELAY);
                     return;
                 }
             }, 1000 * time);
@@ -755,7 +756,7 @@ class ModeWidget {
                     this.__playNextNote(i + 1);
                 } else {
                     this._locked = false;
-                    setTimeout(() => this._resetNotes(), 500);
+                    setTimeout(() => this._resetNotes(), ModeWidget.RESET_NOTES_DELAY);
                     return;
                 }
             }, 1000 * time);
