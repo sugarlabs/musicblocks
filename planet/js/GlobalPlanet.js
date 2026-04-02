@@ -12,7 +12,7 @@
 /*
    global
 
-   _, GlobalTag, GlobalCard, jQuery, currentUserScrollPos:true,
+   GlobalTag, GlobalCard, currentUserScrollPos:true,
    maxScrollPos:true, ProjectViewer, debounce
 */
 /*
@@ -245,25 +245,35 @@ class GlobalPlanet {
         } else if (l === this.page + 1) {
             this.downloadProjectsToCache(
                 toDownload,
+                function (id) {
+                    this.renderSingleProject(id);
+                }.bind(this),
                 function () {
-                    this.render(data);
+                    this.hideLoading();
                     this.showLoadMore();
+                    this.index += this.page;
                 }.bind(this)
             );
         } else {
             this.downloadProjectsToCache(
                 toDownload,
+                function (id) {
+                    this.renderSingleProject(id);
+                }.bind(this),
                 function () {
-                    this.render(data);
+                    this.hideLoading();
                     this.hideLoadMore();
+                    this.index += this.page;
                 }.bind(this)
             );
         }
     }
 
-    downloadProjectsToCache(data, callback) {
+    downloadProjectsToCache(data, onEachComplete, onAllComplete) {
         const Planet = this.Planet;
         this.loadCount = data.length;
+        this.loadedCount = 0;
+        const totalCount = data.length;
 
         for (let i = 0; i < data.length; i++) {
             (function () {
@@ -272,20 +282,35 @@ class GlobalPlanet {
                     id,
                     function (d) {
                         const tempid = id;
-                        this.addProjectToCache(tempid, d, callback);
+                        this.addProjectToCache(
+                            tempid,
+                            d,
+                            onEachComplete,
+                            onAllComplete,
+                            totalCount
+                        );
                     }.bind(this)
                 );
             }).bind(this)();
         }
     }
 
-    addProjectToCache(id, data, callback) {
+    addProjectToCache(id, data, onEachComplete, onAllComplete, totalCount) {
         if (data.success) {
             this.cache[id] = data.data;
             this.cache[id].ProjectData = null;
             this.loadCount -= 1;
+            this.loadedCount += 1;
 
-            if (this.loadCount <= 0) callback();
+            if (onEachComplete) {
+                onEachComplete(id);
+            }
+
+            this.updateLoadingProgress(this.loadedCount, totalCount);
+
+            if (this.loadCount <= 0 && onAllComplete) {
+                onAllComplete();
+            }
         } else this.throwOfflineError();
     }
 
@@ -293,7 +318,7 @@ class GlobalPlanet {
         this.Planet.ServerInterface.getProjectDetails(
             id,
             function (d) {
-                this.addProjectToCache(id, d, callback);
+                this.addProjectToCache(id, d, null, callback, 1);
             }.bind(this)
         );
     }
@@ -375,6 +400,16 @@ class GlobalPlanet {
         this.afterAddProjects();
     }
 
+    renderSingleProject(id) {
+        if (Object.prototype.hasOwnProperty.call(this.cache, id)) {
+            const g = new GlobalCard(this.Planet);
+            g.init(id);
+            g.render();
+            this.cards.push(g);
+            jQuery(".tooltipped").tooltip({ delay: 50 });
+        }
+    }
+
     afterAddProjects() {
         this.index += this.page;
         this.hideLoading();
@@ -406,6 +441,11 @@ class GlobalPlanet {
 
     showLoading() {
         document.getElementById("global-load").style.display = "block";
+    }
+
+    updateLoadingProgress(loaded, total) {
+        // Progress is shown by cards appearing incrementally
+        // The loading spinner remains visible until all projects are loaded
     }
 
     hideLoadMore() {
