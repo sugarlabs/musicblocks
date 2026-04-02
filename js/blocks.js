@@ -288,6 +288,7 @@ class Blocks {
             let palette;
             /** Regenerate all of the artwork at the new scale. */
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 block.resize(scale);
             }
 
@@ -412,6 +413,7 @@ class Blocks {
         this.bottomMostBlock = () => {
             let maxy = -1000;
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 if (block.container.y > maxy) {
                     maxy = block.container.y;
                 }
@@ -2086,6 +2088,10 @@ class Blocks {
                             continue;
                         }
 
+                        if (this.blockList[b].trash) {
+                            continue;
+                        }
+
                         if (this.blockList[b].name === "action") {
                             if (this.blockList[b].connections[1] != null) {
                                 if (
@@ -2254,6 +2260,7 @@ class Blocks {
          */
         this.updateBlockPositions = () => {
             for (const [blk, block] of this.blockList.entries()) {
+                if (block.trash) continue;
                 this._moveBlock(blk, block.container.x, block.container.y);
             }
         };
@@ -2267,6 +2274,7 @@ class Blocks {
             this._adjustTheseStacks = [];
 
             for (const [blk, myBlock] of this.blockList.entries()) {
+                if (myBlock.trash) continue;
                 if (myBlock.connections[0] == null) {
                     this._adjustTheseStacks.push(blk);
                 }
@@ -2289,6 +2297,7 @@ class Blocks {
 
             let onScreen = true;
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 if (block.connections[0] == null) {
                     if (block.offScreen(this.boundary)) {
                         this.activity.setHomeContainers(true);
@@ -2428,6 +2437,7 @@ class Blocks {
             if (this._topBlockCache == null) {
                 this._topBlockCache = new Map();
                 for (let i = 0; i < this.blockList.length; i++) {
+                    if (this.blockList[i].trash) continue;
                     this._topBlockCache.set(i, this.findTopBlock(i));
                 }
             }
@@ -2436,6 +2446,7 @@ class Blocks {
             const excludeTop = blkIdx >= 0 ? this._topBlockCache.get(blkIdx) : -1;
 
             for (let i = 0; i < this.blockList.length; i++) {
+                if (this.blockList[i].trash) continue;
                 if (this._topBlockCache.get(i) !== excludeTop) {
                     this.moveBlockRelativeBatched(i, dx, dy);
                 }
@@ -2837,6 +2848,7 @@ class Blocks {
         this.findStacks = () => {
             this.stackList = [];
             for (let i = 0; i < this.blockList.length; i++) {
+                if (this.blockList[i].trash) continue;
                 if (this.blockList[i].connections[0] == null) {
                     this.stackList.push(i);
                 }
@@ -2867,6 +2879,7 @@ class Blocks {
         this._findTwoArgs = () => {
             this._expandablesList = [];
             for (let i = 0; i < this.blockList.length; i++) {
+                if (this.blockList[i].trash) continue;
                 if (this.blockList[i].isArgBlock() && this.blockList[i].isExpandableBlock()) {
                     this._expandablesList.push(i);
                 } else if (this.blockList[i].isTwoArgBlock()) {
@@ -2882,6 +2895,7 @@ class Blocks {
          */
         this._searchForArgFlow = () => {
             for (const [blk, block] of this.blockList.entries()) {
+                if (block.trash) continue;
                 if (block.isArgFlowClampBlock()) {
                     this._searchCounter = 0;
                     this._searchForExpandables(blk);
@@ -2979,6 +2993,7 @@ class Blocks {
          */
         this.changeDisabledStatus = (name, flag) => {
             for (const myBlock of this.blockList) {
+                if (myBlock.trash) continue;
                 if (myBlock.name === name) {
                     myBlock.protoblock.disabled = flag;
                     myBlock.regenerateArtwork(false);
@@ -2992,7 +3007,8 @@ class Blocks {
          * @returns {void}
          */
         this.unhighlightAll = () => {
-            for (const [blk] of this.blockList.entries()) {
+            for (const [blk, block] of this.blockList.entries()) {
+                if (block.trash) continue;
                 this.unhighlight(blk);
             }
         };
@@ -3061,6 +3077,7 @@ class Blocks {
          */
         this.show = () => {
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 block.show();
             }
             this.visible = true;
@@ -3840,6 +3857,7 @@ class Blocks {
          */
         this._findDrumURLs = () => {
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 if (block.name === "text" || block.name === "string") {
                     const c = block.connections[0];
                     if (
@@ -3871,6 +3889,7 @@ class Blocks {
             // Collect blocks to update for batched cache update
             const blocksToUpdate = [];
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 if (block.name === "text") {
                     const c = block.connections[0];
                     if (c != null && this.blockList[c].name === "box") {
@@ -3912,6 +3931,7 @@ class Blocks {
             // Collect blocks to update for batched cache update
             const blocksToUpdate = [];
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 if (block.name === "text") {
                     const c = block.connections[0];
                     if (c != null && this.blockList[c].name === "storein") {
@@ -3966,6 +3986,7 @@ class Blocks {
             // Collect blocks to update for batched cache update
             const blocksToUpdate = [];
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 if (block.name === "storein2") {
                     if (block.privateData === oldName) {
                         block.privateData = newName;
@@ -4011,6 +4032,7 @@ class Blocks {
             // Collect blocks to update for batched cache update
             const blocksToUpdate = [];
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 if (block.name === "namedbox") {
                     if (block.privateData === oldName) {
                         block.privateData = newName;
@@ -4062,6 +4084,9 @@ class Blocks {
                 }
 
                 const myBlock = this.blockList[blk];
+                if (myBlock.trash) {
+                    continue;
+                }
                 const blkParent = this.blockList[myBlock.connections[0]];
                 if (blkParent == null) {
                     continue;
@@ -4116,6 +4141,10 @@ class Blocks {
 
             /** Update the blocks, do->oldName should be do->newName */
             for (const blk in this.blockList) {
+                if (this.blockList[blk].trash) {
+                    continue;
+                }
+
                 if (
                     ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].includes(
                         this.blockList[blk].name
@@ -5021,6 +5050,7 @@ class Blocks {
 
             const c2v = this.blockList[c2].value;
             for (let i = 0; i < this.blockList.length; i++) {
+                if (this.blockList[i].trash) continue;
                 if (["setbpm3", "setmasterbpm2"].includes(this.blockList[i].name)) {
                     const bn = this.blockList[i].connections[1];
                     if (bn === null || this.blockList[bn].name !== "number") {
@@ -6912,6 +6942,7 @@ class Blocks {
                 /** Look for any "orphan" action blocks. */
                 for (const blk in this.blockList) {
                     const thisBlock = this.blockList[blk];
+                    if (thisBlock.trash) continue;
 
                     /** We are only interested in do and nameddo blocks. */
                     if (
