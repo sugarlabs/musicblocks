@@ -3006,6 +3006,15 @@ class Activity {
             let lastActivity = Date.now();
             this.isAppIdle = false;
 
+            this._visibilityHandler = () => {
+                if (document.hidden) {
+                    createjs.Ticker.paused = true;
+                } else {
+                    createjs.Ticker.paused = false;
+                    resetIdleTimer();
+                }
+            };
+
             // Wake up function - restores full framerate
             // Stored as instance property for cleanup
             this._resetIdleTimer = () => {
@@ -3024,6 +3033,8 @@ class Activity {
             this.addEventListener(window, "keydown", this._resetIdleTimer);
             this.addEventListener(window, "touchstart", this._resetIdleTimer);
             this.addEventListener(window, "wheel", this._resetIdleTimer);
+
+            this.addEventListener(document, "visibilitychange", this._visibilityHandler);
 
             // Periodic check for idle state - store interval ID for cleanup
             this._idleWatcherInterval = setInterval(() => {
@@ -3048,11 +3059,6 @@ class Activity {
             }
         };
 
-        /**
-         * Stop the idle watcher and clean up its listeners and interval.
-         * Called during Activity lifecycle teardown to prevent listener/interval accumulation.
-         * It is safe to call this method even if the idle watcher was never started.
-         */
         this._stopIdleWatcher = () => {
             // Clear the periodic interval
             if (typeof this._idleWatcherInterval !== "undefined") {
@@ -3068,6 +3074,18 @@ class Activity {
                 this.removeEventListener(window, "touchstart", this._resetIdleTimer);
                 this.removeEventListener(window, "wheel", this._resetIdleTimer);
                 this._resetIdleTimer = undefined;
+            }
+            
+            if (typeof this._visibilityHandler === "function"){
+                this.removeEventListener(document, "visibilitychange", this._visibilityHandler);
+                this._visibilityHandler = undefined;
+            }
+        };
+
+        this._createErrorContainers = () => {
+            for (let i = 0; i < ERRORARTWORK.length; i++) {
+                const name = ERRORARTWORK[i];
+                this._makeErrorArtwork(name);
             }
         };
 
@@ -7437,6 +7455,7 @@ class Activity {
 
             // Initialize Ticker with optimal framerate
             createjs.Ticker.framerate = 60;
+            createjs.Ticker.timingMode = createjs.Ticker.RAF;
 
             // ===== Idle Ticker Optimization =====
             // Throttle rendering when user is inactive and no music is playing
