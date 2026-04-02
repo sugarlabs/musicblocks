@@ -9,7 +9,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global requirejs */
+/* global requirejs, define */
+
+// Localization helper for early bootstrap
+const t_ = s => (typeof _ !== "undefined" ? _(s) : s);
 
 requirejs.config({
     baseUrl: "./",
@@ -321,7 +324,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                             console.error(
                                 "FATAL: createjs (EaselJS/TweenJS) not found. Cannot proceed."
                             );
-                            alert("Failed to load EaselJS. Please refresh the page.");
+                            alert(t_("Failed to load EaselJS. Please refresh the page."));
                             return;
                         }
 
@@ -333,7 +336,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                             },
                             function (err) {
                                 console.error("Failed to load activity/activity:", err);
-                                alert("Failed to load Music Blocks. Please refresh the page.");
+                                alert(t_("Failed to load Music Blocks. Please refresh the page."));
                             }
                         );
                     }, 100); // Small delay to allow globals to be set
@@ -341,8 +344,10 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 function (err) {
                     console.error("Core bootstrap failed:", err);
                     alert(
-                        "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: " +
-                            (err.message || err)
+                        t_(
+                            "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: " +
+                                (err.message || err)
+                        )
                     );
                 }
             );

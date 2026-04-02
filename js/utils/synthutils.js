@@ -13,7 +13,7 @@
 /*
    global
 
-   _, last, Tone, require, getTemperament, pitchToNumber,
+   last, Tone, getTemperament, pitchToNumber,
    getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
    getOctaveRatio, isCustomTemperament, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
@@ -1098,7 +1098,7 @@ function Synth() {
             if (fileName) {
                 download(url, fileName + (platform.FF ? ".wav" : ".ogg"));
             } else {
-                alert("Download cancelled.");
+                alert(_("Download cancelled."));
             }
         };
         // this.recorder.start();
@@ -2038,17 +2038,6 @@ function Synth() {
             Tone.start().catch(function (e) {
                 console.warn("Audio start failed:", e);
             });
-
-            // Set a "Watchdog Timer" (Wait 2 seconds to avoid false positives)
-            setTimeout(function () {
-                // If it is STILL suspended after 2 seconds, it is definitely blocked
-                if (Tone.context.state !== "running" && !window.hasShownAudioWarning) {
-                    window.hasShownAudioWarning = true;
-                    alert(
-                        "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
-                    );
-                }
-            }, 2000);
         }
         try {
             // Ensure audio context is started

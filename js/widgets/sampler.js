@@ -13,9 +13,10 @@
 /*
    global
 
-   _, docById, DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP,
+   docById, DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP,
    CUSTOMSAMPLES, wheelnav, getVoiceSynthName, Singer, DRUMS, Tone,
-   instruments, slicePath, platformColor
+   instruments, slicePath, platformColor, activity, docByClass,
+   TunerUtils, TunerDisplay, A0, pitchToNumber, detectPitch
 */
 
 /* exported SampleWidget */
@@ -2235,7 +2236,7 @@ function SampleWidget() {
             this.pitchDetectionAnimationId = requestAnimationFrame(updatePitch);
         } catch (err) {
             console.error(`${err.name}: ${err.message}`);
-            alert("Microphone access failed: " + err.message);
+            alert(_("Microphone access failed: ") + err.message);
             // Clean up any partially initialized resources
             this.stopPitchDetection();
         }

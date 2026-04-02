@@ -12,7 +12,7 @@
 /*
    global
 
-   _, LeftBlock, FlowBlock, NOINPUTERRORMSG, getTargetTurtle, Turtle
+   LeftBlock, FlowBlock, NOINPUTERRORMSG, getTargetTurtle, Turtle
  */
 
 /* exported setupProgramBlocks */
@@ -1463,7 +1463,7 @@ function setupProgramBlocks(activity) {
                     win.focus();
                 } else {
                     // Browser has blocked it.
-                    alert("Please allow popups for this site");
+                    alert(_("Please allow popups for this site"));
                 }
             }
         }
