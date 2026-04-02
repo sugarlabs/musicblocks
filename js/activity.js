@@ -7007,10 +7007,11 @@ class Activity {
             }
 
             const cleanData = rawData.replace("\n", " ");
+
             try {
                 obj = JSON.parse(cleanData);
             } catch (e) {
-                this.errorMsg(_("Could not parse JSON input."));
+                this.errorMsg(_("Invalid clipboard data. Please copy valid block code."));
                 return;
             }
 
