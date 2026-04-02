@@ -18,7 +18,7 @@
    instrumentsEffects, Singer, Tone, CAMERAVALUE, doUseCamera,
    VIDEOVALUE, last, getIntervalDirection, getIntervalNumber,
    mixedNumber, rationalToFraction, doStopVideoCam, StatusMatrix,
-   getStatsFromNotation, delayExecution, DEFAULTVOICE, performanceTracker, window
+   getStatsFromNotation, delayExecution, DEFAULTVOICE, performanceTracker, requirejs, window
  */
 
 /*
@@ -1116,12 +1116,31 @@ class Logo {
      * @returns {void}
      */
     runLogoCommands(startHere, env) {
+        const performanceModeEnabled =
+            typeof window !== "undefined" &&
+            (window.DEBUG_PERFORMANCE === true ||
+                (window.location && window.location.search.includes("performance=true")));
+
+        if (
+            performanceModeEnabled &&
+            typeof performanceTracker === "undefined" &&
+            typeof requirejs === "function" &&
+            !this._performanceTrackerLoadFailed
+        ) {
+            requirejs(
+                ["utils/performanceTracker"],
+                () => this.runLogoCommands(startHere, env),
+                () => {
+                    this._performanceTrackerLoadFailed = true;
+                    this.runLogoCommands(startHere, env);
+                }
+            );
+            return;
+        }
+
         // Performance instrumentation: enable/disable based on URL flag
         if (typeof performanceTracker !== "undefined") {
-            if (
-                typeof window !== "undefined" &&
-                window.location.search.includes("performance=true")
-            ) {
+            if (performanceModeEnabled) {
                 performanceTracker.enable();
             } else {
                 performanceTracker.disable();
