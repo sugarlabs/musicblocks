@@ -9,6 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/* eslint-disable no-redeclare */
 /*
    global
 
@@ -37,7 +38,7 @@
   EIGHTHNOTEWIDTH, MATRIXBUTTONHEIGHT, MATRIXBUTTONHEIGHT2,
   MATRIXSOLFEHEIGHT, NOTESYMBOLS, SELECTORSTRINGS, ACCIDENTALLABELS,
   ACCIDENTALNAMES, ACCIDENTALVALUES, INTERVALS, MODE_PIE_MENUS,
-  updateTemperaments, DEFAULTINVERT, DEFAULTINTERVAL, DEFAULTEFFECT,
+  DEFAULTINVERT, DEFAULTINTERVAL, DEFAULTEFFECT,
   DEFAULTMODE, DEFAULTOSCILLATORTYPE, DEFAULTACCIDENTAL,
   getInvertMode, getIntervalNumber, getIntervalDirection,
   getModeNumbers, getDrumIndex, getDrumName, getDrumSymbol,
@@ -2851,6 +2852,10 @@ const getVoiceSynthName = name => {
  * @returns {boolean} True if the temperament is custom, false otherwise.
  */
 const isCustomTemperament = temperament => {
+    // Treat invalid/null temperaments as custom to avoid errors
+    if (!temperament || typeof temperament !== "string") {
+        return true;
+    }
     return !(temperament in PreDefinedTemperaments);
 };
 
@@ -4020,6 +4025,11 @@ const numberToPitch = (i, temperament, startPitch, offset) => {
     let interval;
     if (isCustomTemperament(temperament)) {
         // The index may be outside of the octave.
+        // Ensure the temperament exists in TEMPERAMENT before accessing it
+        if (!TEMPERAMENT[temperament] || !TEMPERAMENT[temperament]["pitchNumber"]) {
+            // Fallback to equal temperament if custom temperament is not found
+            temperament = "equal";
+        }
         const octaveLength = TEMPERAMENT[temperament]["pitchNumber"];
         const pitchIdx = pitchNumber % octaveLength;
         const octaveFactor = Math.floor(pitchNumber / octaveLength);
@@ -4605,22 +4615,25 @@ function getNote(
     } else if (isCustomTemperament(temperament)) {
         note = getCustomNote(noteArg);
         let pitchNumber = null;
-        for (const number in TEMPERAMENT[temperament]) {
-            if (number !== "pitchNumber" && number != "interval") {
-                if (note === TEMPERAMENT[temperament][number][3]) {
-                    if (typeof number === "string") {
-                        pitchNumber = Number(number);
-                    } else {
-                        pitchNumber = number;
+        // Ensure the temperament exists before accessing it
+        if (TEMPERAMENT[temperament]) {
+            for (const number in TEMPERAMENT[temperament]) {
+                if (number !== "pitchNumber" && number != "interval") {
+                    if (note === TEMPERAMENT[temperament][number][3]) {
+                        if (typeof number === "string") {
+                            pitchNumber = Number(number);
+                        } else {
+                            pitchNumber = number;
+                        }
+                        break;
+                    } else if (note === TEMPERAMENT[temperament][number][1]) {
+                        if (typeof number === "string") {
+                            pitchNumber = Number(number);
+                        } else {
+                            pitchNumber = number;
+                        }
+                        break;
                     }
-                    break;
-                } else if (note === TEMPERAMENT[temperament][number][1]) {
-                    if (typeof number === "string") {
-                        pitchNumber = Number(number);
-                    } else {
-                        pitchNumber = number;
-                    }
-                    break;
                 }
             }
         }
@@ -4640,7 +4653,7 @@ function getNote(
         }
 
         let inOctave = octave;
-        const octaveLength = TEMPERAMENT[temperamentFloor]["pitchNumber"];
+        const octaveLength = TEMPERAMENT[temperament]["pitchNumber"];
         let deltaOctave, deltaNote;
         if (transpositionFloor !== 0) {
             if (transpositionFloor < 0) {

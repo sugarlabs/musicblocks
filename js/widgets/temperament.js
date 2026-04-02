@@ -16,6 +16,7 @@
  * MA 02110-1335 USA.
  */
 
+/* eslint-disable no-redeclare */
 /*
    global
 
@@ -432,9 +433,8 @@ function TemperamentWidget() {
                     docById("noteInfo").remove();
                 }
 
-                docById(
-                    "information"
-                ).innerHTML += `<div class="popup" id="noteInfo" style="left: ${x}px; top: ${y}px;">
+                docById("information").innerHTML +=
+                    `<div class="popup" id="noteInfo" style="left: ${x}px; top: ${y}px;">
                         <span class="popuptext" id="myPopup"></span>
                     </div>`;
                 if (i !== 0) {
@@ -520,19 +520,17 @@ function TemperamentWidget() {
         docById("noteInfo").style.height = "130px";
         docById("note").innerHTML = "";
         docById("frequency").innerHTML = "";
-        docById(
-            "noteInfo"
-        ).innerHTML += `<center><input type="range" class="sliders" id="frequencySlider1" style="width:170px; background:white; border:0;" min="${
-            this.frequencies[i - 1]
-        }" max="${this.frequencies[i + 1]}"></center>`;
+        docById("noteInfo").innerHTML +=
+            `<center><input type="range" class="sliders" id="frequencySlider1" style="width:170px; background:white; border:0;" min="${
+                this.frequencies[i - 1]
+            }" max="${this.frequencies[i + 1]}"></center>`;
         docById("noteInfo").innerHTML += `<br>&nbsp;&nbsp;${_(
             "frequency"
         )}<span class="rangeslidervalue" id="frequencydiv1">${this.frequencies[i]}</span>`;
-        docById(
-            "noteInfo"
-        ).innerHTML += `<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>${_(
-            "done"
-        )}</center><div>`;
+        docById("noteInfo").innerHTML +=
+            `<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>${_(
+                "done"
+            )}</center><div>`;
 
         docById("frequencySlider1").oninput = function () {
             docById("frequencydiv1").innerHTML = docById("frequencySlider1").value;
@@ -890,7 +888,7 @@ function TemperamentWidget() {
             try {
                 that.performEqualEdit(event);
             } catch {
-                activity.errorMsg(_("The Number of divisions is too large."), 3000);
+                that.activity.errorMsg(_("The Number of divisions is too large."), 3000);
             }
         });
 
@@ -1443,19 +1441,17 @@ function TemperamentWidget() {
                     '" alt="' +
                     _("Close") +
                     '" height=20px width=20px align="right">';
-                docById(
-                    "noteInfo1"
-                ).innerHTML += `<br><center><input type="range" class="sliders" id = "frequencySlider" style="width:170px; background:white; border:0;" min="${
-                    frequencies[i]
-                }" max="${frequencies[i + 1]}" value="30"></center>`;
+                docById("noteInfo1").innerHTML +=
+                    `<br><center><input type="range" class="sliders" id = "frequencySlider" style="width:170px; background:white; border:0;" min="${
+                        frequencies[i]
+                    }" max="${frequencies[i + 1]}" value="30"></center>`;
                 docById("noteInfo1").innerHTML += `&nbsp;&nbsp;${_(
                     "frequency"
                 )} : <span class="rangeslidervalue" id="frequencydiv">${frequencies[i]}</span>`;
-                docById(
-                    "noteInfo1"
-                ).innerHTML += `<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>${_(
-                    "done"
-                )}</center><div>`;
+                docById("noteInfo1").innerHTML +=
+                    `<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>${_(
+                        "done"
+                    )}</center><div>`;
 
                 docById("noteInfo1").style.top = "100px";
                 docById("noteInfo1").style.left = "90px";
@@ -1595,6 +1591,11 @@ function TemperamentWidget() {
             const temperament = keys[i];
             if (!isCustomTemperament(temperament)) {
                 const t = getTemperament(temperament);
+                // Ensure we have a valid temperament object with intervals
+                if (!t || !t.interval || !Array.isArray(t.interval)) {
+                    console.warn("Invalid temperament in checkTemperament, skipping:", temperament);
+                    continue;
+                }
                 const temperamentRatios = [];
                 for (let j = 0; j < t.interval.length; j++) {
                     intervals[j] = t.interval[j];
@@ -1874,7 +1875,7 @@ function TemperamentWidget() {
         const that = this;
         setTimeout(() => {
             that.activity.blocks.loadNewBlocks(newStack);
-            activity.textMsg(_("New action block generated."), 3000);
+            that.activity.textMsg(_("New action block generated."), 3000);
         }, 500);
 
         if (isCustomTemperament(this.inTemperament)) {
@@ -2098,9 +2099,12 @@ function TemperamentWidget() {
             }
 
             if (i <= pitchNumber && i >= 0 && that._playing && p < 2) {
-                setTimeout(function () {
-                    __playLoop(i);
-                }, Singer.defaultBPMFactor * 1000 * duration);
+                setTimeout(
+                    function () {
+                        __playLoop(i);
+                    },
+                    Singer.defaultBPMFactor * 1000 * duration
+                );
             } else {
                 that.inbetween = true;
             }
@@ -2117,13 +2121,16 @@ function TemperamentWidget() {
                 that._playing = false;
                 that.playbackForward = true;
                 this.inbetween = false;
-                setTimeout(function () {
-                    that.notesCircle.navItems[0].fillAttr = "#c8C8C8";
-                    that.notesCircle.navItems[0].sliceHoverAttr.fill = "#c8C8C8";
-                    that.notesCircle.navItems[0].slicePathAttr.fill = "#c8C8C8";
-                    that.notesCircle.navItems[0].sliceSelectedAttr.fill = "#c8C8C8";
-                    that.notesCircle.refreshWheel();
-                }, Singer.defaultBPMFactor * 1000 * duration);
+                setTimeout(
+                    function () {
+                        that.notesCircle.navItems[0].fillAttr = "#c8C8C8";
+                        that.notesCircle.navItems[0].sliceHoverAttr.fill = "#c8C8C8";
+                        that.notesCircle.navItems[0].slicePathAttr.fill = "#c8C8C8";
+                        that.notesCircle.navItems[0].sliceSelectedAttr.fill = "#c8C8C8";
+                        that.notesCircle.refreshWheel();
+                    },
+                    Singer.defaultBPMFactor * 1000 * duration
+                );
             }
         };
         if (
@@ -2222,6 +2229,11 @@ function TemperamentWidget() {
         const noteCell = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Table"));
 
         let t = getTemperament(this.inTemperament);
+        // Ensure we have a valid temperament object
+        if (!t || !t.pitchNumber) {
+            console.warn("Invalid temperament, falling back to equal temperament");
+            t = getTemperament("equal");
+        }
         this.pitchNumber = t.pitchNumber;
         this.octaveChanged = false;
         this.scale = this.scale[0] + " " + this.scale[1];
@@ -2267,6 +2279,11 @@ function TemperamentWidget() {
                     // yet defined by the user then custom temperament
                     // behaves like equal temperament.
                     t = getTemperament("equal");
+                }
+                // Ensure t has a valid interval array before accessing it
+                if (!t || !t.interval || i >= t.interval.length) {
+                    console.warn("Invalid temperament interval data, skipping note:", i);
+                    continue;
                 }
                 str[i] = getNoteFromInterval(startingPitch, t.interval[i]);
                 this.notes[i] = str[i];
