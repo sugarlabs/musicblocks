@@ -3332,10 +3332,28 @@ class Activity {
 
             const that = this;
             const $search = $j("#search");
-
             if (!$search.data("autocomplete-init")) {
                 $search.autocomplete({
-                    source: that.searchSuggestions,
+                    source: function (request, response) {
+                        const term = request.term.toLowerCase();
+                        // Filter suggestions that contain the search term
+                        const matches = that.searchSuggestions.filter(item =>
+                            item.label.toLowerCase().includes(term)
+                        );
+                        // Sort with prefix matches first, then others
+                        matches.sort((a, b) => {
+                            const aLabel = a.label.toLowerCase();
+                            const bLabel = b.label.toLowerCase();
+                            const aStartsWith = aLabel.startsWith(term);
+                            const bStartsWith = bLabel.startsWith(term);
+                            // Prefix matches come first
+                            if (aStartsWith && !bStartsWith) return -1;
+                            if (!aStartsWith && bStartsWith) return 1;
+                            // Both start with term or both don't - sort alphabetically
+                            return aLabel.localeCompare(bLabel);
+                        });
+                        response(matches);
+                    },
                     appendTo: "body",
                     select: (event, ui) => {
                         event.preventDefault();
@@ -3349,6 +3367,7 @@ class Activity {
                         event.preventDefault();
                     }
                 });
+                $search.data("autocomplete-init", true);
 
                 const instance = $search.autocomplete("instance");
                 if (instance) {
@@ -3460,7 +3479,6 @@ class Activity {
                         );
                     };
                 }
-                $search.data("autocomplete-init", true);
             }
 
             const searchInput = this.searchWidget.idInput_custom;
@@ -6820,10 +6838,28 @@ class Activity {
 
             const that = this;
             const $helpfulSearch = $j("#helpfulSearch");
-
             if (!$helpfulSearch.data("autocomplete-init")) {
                 $helpfulSearch.autocomplete({
-                    source: that.searchSuggestions,
+                    source: function (request, response) {
+                        const term = request.term.toLowerCase();
+                        // Filter suggestions that contain the search term
+                        const matches = that.searchSuggestions.filter(item =>
+                            item.label.toLowerCase().includes(term)
+                        );
+                        // Sort with prefix matches first, then others
+                        matches.sort((a, b) => {
+                            const aLabel = a.label.toLowerCase();
+                            const bLabel = b.label.toLowerCase();
+                            const aStartsWith = aLabel.startsWith(term);
+                            const bStartsWith = bLabel.startsWith(term);
+                            // Prefix matches come first
+                            if (aStartsWith && !bStartsWith) return -1;
+                            if (!aStartsWith && bStartsWith) return 1;
+                            // Both start with term or both don't - sort alphabetically
+                            return aLabel.localeCompare(bLabel);
+                        });
+                        response(matches);
+                    },
                     appendTo: "body",
                     select: (event, ui) => {
                         event.preventDefault();
@@ -6836,6 +6872,7 @@ class Activity {
                         event.preventDefault();
                     }
                 });
+                $helpfulSearch.data("autocomplete-init", true);
 
                 const instance = $helpfulSearch.autocomplete("instance");
                 if (instance) {
@@ -6853,7 +6890,6 @@ class Activity {
                             .appendTo(ul.css("z-index", 35000));
                     };
                 }
-                $helpfulSearch.data("autocomplete-init", true);
             }
 
             const searchInput = this.helpfulSearchWidget.idInput_custom;
