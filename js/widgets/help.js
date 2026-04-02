@@ -89,7 +89,12 @@ class HelpWidget {
 
         this._helpDiv.insertAdjacentHTML("afterbegin", innerHTML);
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
+         
+        const helpBodyDiv = this._helpDiv.querySelector("#helpBodyDiv");
 
+        helpBodyDiv.style.overflowY = "auto";
+        helpBodyDiv.style.height = "100%";
+        helpBodyDiv.style.paddingRight = "12px";
         let leftArrow, rightArrow;
         if (!useActiveBlock) {
             if (page == 0) {
@@ -177,8 +182,8 @@ class HelpWidget {
 
         if (!useActiveBlock) {
             // display help menu
-            docById("helpBodyDiv").style.height = "325px";
-            docById("helpBodyDiv").style.width = "345px";
+            //docById("helpBodyDiv").style.height = "325px";
+            //docById("helpBodyDiv").style.width = "345px";
             this._showPage(page);
         } else {
             // display help for this block
@@ -217,7 +222,7 @@ class HelpWidget {
 
                 if (message) {
                     const helpBody = docById("helpBodyDiv");
-                    helpBody.style.height = "70vh";
+                    //helpBody.style.height = "70vh";
 
                     let body = "";
                     if (message.length > 1) {
@@ -548,7 +553,9 @@ class HelpWidget {
             const message = block.helpString;
 
             const helpBody = docById("helpBodyDiv");
-            helpBody.style.height = "70vh";
+            helpBody.style.overflowY = "auto";
+            helpBody.style.height = "100%";
+            helpBody.style.paddingRight = "12px";
             // helpBody.style.backgroundColor = "#e8e8e8";
             if (message) {
                 let body = "";
