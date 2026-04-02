@@ -73,6 +73,7 @@ class Toolbar {
                 ["highcontrast", _("High Contrast Mode")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["chooseKeyIcon", _("Set Pitch Preview")],
+                ["keyboardShortcutsIcon", _("Keyboard shortcuts")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
                 ["restoreIcon", _("Restore")],
                 ["beginnerMode", _("Switch to beginner mode")],
@@ -143,6 +144,7 @@ class Toolbar {
                 _("High Contrast Mode"),
                 _("Merge with current project"),
                 _("Set Pitch Preview"),
+                _("Keyboard shortcuts"),
                 _("JavaScript Editor"),
                 _("Restore"),
                 _("Switch to beginner mode"),
@@ -216,6 +218,7 @@ class Toolbar {
                 ["dark", _("Dark Mode")],
                 ["highcontrast", _("High Contrast Mode")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
+                ["keyboardShortcutsIcon", _("Keyboard shortcuts")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
                 ["restoreIcon", _("Restore")],
                 ["beginnerMode", _("Switch to beginner mode")],
@@ -280,6 +283,7 @@ class Toolbar {
                 _("Dark Mode"),
                 _("High Contrast Mode"),
                 _("Merge with current project"),
+                _("Keyboard shortcuts"),
                 _("JavaScript Editor"),
                 _("Restore"),
                 _("Switch to beginner mode"),
@@ -1373,6 +1377,21 @@ class Toolbar {
     }
 
     /**
+     * Renders the keyboard shortcuts icon with the provided onclick handler.
+     *
+     * @public
+     * @param {Function} onclick - The onclick handler for the keyboard shortcuts icon.
+     * @returns {void}
+     */
+    renderKeyboardShortcutsIcon(onclick) {
+        const keyboardShortcutsIcon = docById("keyboardShortcutsIcon");
+
+        keyboardShortcutsIcon.onclick = () => {
+            onclick(this.activity);
+        };
+    }
+
+    /**
      * Renders the choose key icon with the provided onclick handler.
      *
      * @public
@@ -1560,7 +1579,7 @@ class Toolbar {
                 "#runSlowlyIcon, #runStepByStepIcon, #displayStatsIcon, " +
                 "#loadPluginIcon, #delPluginIcon, #enableHorizScrollIcon, " +
                 "#disableHorizScrollIcon, #themeSelectIcon, #mergeWithCurrentIcon, " +
-                "#wrapTurtle, #chooseKeyIcon, #toggleJavaScriptIcon, #restoreIcon, " +
+                "#wrapTurtle, #chooseKeyIcon, #keyboardShortcutsIcon, #toggleJavaScriptIcon, #restoreIcon, " +
                 "#beginnerMode, #advancedMode, #languageSelectIcon";
 
             const isVisible = btn => {

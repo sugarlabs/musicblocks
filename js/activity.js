@@ -6921,6 +6921,272 @@ class Activity {
             new HelpWidget(this, false);
         };
 
+        const showKeyboardShortcuts = activity => {
+            activity._showKeyboardShortcuts();
+        };
+
+        this._showKeyboardShortcuts = () => {
+            const platformKeys = (windowsKeys, macKeys = windowsKeys) =>
+                `${_("Windows/Linux")}: ${windowsKeys}\n${_("Mac")}: ${macKeys}`;
+
+            const shortcutSections = [
+                {
+                    title: _("Workspace"),
+                    items: [
+                        {
+                            keys: platformKeys("Alt + R", "Option + R"),
+                            action: _("Play project")
+                        },
+                        {
+                            keys: platformKeys("Alt + S", "Option + S"),
+                            action: _("Stop project")
+                        },
+                        {
+                            keys: platformKeys("Alt + Enter", "Option + Enter"),
+                            action: _("Play or stop depending on the current state")
+                        },
+                        {
+                            keys: platformKeys("Space", "Space"),
+                            action: _("Play or stop when no text input or widget is active")
+                        },
+                        {
+                            keys: platformKeys("Shift + Space", "Shift + Space"),
+                            action: _("Toggle stage scale")
+                        },
+                        {
+                            keys: platformKeys("Home", "Home"),
+                            action: _("Jump to home position")
+                        },
+                        {
+                            keys: platformKeys("End", "End"),
+                            action: _("Jump to the bottom of the workspace")
+                        },
+                        {
+                            keys: platformKeys("Page Up", "Page Up"),
+                            action: _("Scroll workspace up")
+                        },
+                        {
+                            keys: platformKeys("Page Down", "Page Down"),
+                            action: _("Scroll workspace down")
+                        },
+                        {
+                            keys: platformKeys("Esc", "Esc"),
+                            action: _("Hide block search when it is open")
+                        }
+                    ]
+                },
+                {
+                    title: _("Editing"),
+                    items: [
+                        {
+                            keys: platformKeys("Alt + C", "Option + C"),
+                            action: _("Copy selected stack")
+                        },
+                        {
+                            keys: platformKeys("Alt + V", "Option + V"),
+                            action: _("Paste previous stack")
+                        },
+                        {
+                            keys: platformKeys("Ctrl + V", "Control + V"),
+                            action: _("Open the JSON paste box")
+                        },
+                        {
+                            keys: platformKeys("Enter", "Enter"),
+                            action: _("Paste JSON when the paste box is focused")
+                        },
+                        {
+                            keys: platformKeys("Delete", "Delete"),
+                            action: _("Extract the active block")
+                        },
+                        {
+                            keys: platformKeys("Alt + E", "Option + E"),
+                            action: _("Clear workspace")
+                        },
+                        {
+                            keys: platformKeys("Alt + B", "Option + B"),
+                            action: _("Save block artwork")
+                        },
+                        {
+                            keys: platformKeys("Alt + H", "Option + H"),
+                            action: _("Save block help")
+                        }
+                    ]
+                },
+                {
+                    title: _("Navigation"),
+                    items: [
+                        {
+                            keys: platformKeys(_("Arrow keys"), _("Arrow keys")),
+                            action: _(
+                                "Move the active block, scroll palettes, adjust the tempo widget, or pan the workspace depending on context"
+                            )
+                        },
+                        {
+                            keys: platformKeys("/", "/"),
+                            action: _("Pan workspace right when horizontal scrolling is enabled")
+                        },
+                        {
+                            keys: platformKeys("\\", "\\"),
+                            action: _("Pan workspace left when horizontal scrolling is enabled")
+                        }
+                    ]
+                },
+                {
+                    title: _("Toolbar"),
+                    items: [
+                        {
+                            keys: platformKeys(
+                                _("Arrow Left / Arrow Right"),
+                                _("Arrow Left / Arrow Right")
+                            ),
+                            action: _("Move focus within the current toolbar")
+                        },
+                        {
+                            keys: platformKeys(
+                                _("Arrow Up / Arrow Down"),
+                                _("Arrow Up / Arrow Down")
+                            ),
+                            action: _("Move focus between main and auxiliary toolbars")
+                        },
+                        {
+                            keys: platformKeys("Enter", "Enter"),
+                            action: _("Activate the focused toolbar button")
+                        },
+                        {
+                            keys: platformKeys("Esc", "Esc"),
+                            action: _("Exit toolbar keyboard navigation")
+                        }
+                    ]
+                },
+                {
+                    title: _("Widget Windows"),
+                    items: [
+                        {
+                            keys: platformKeys("Esc", "Esc"),
+                            action: _("Close the focused widget window")
+                        },
+                        {
+                            keys: platformKeys("Ctrl + Shift + M", "Command + Shift + M"),
+                            action: _("Maximize or restore the focused widget window")
+                        }
+                    ]
+                },
+                {
+                    title: _("Help and Pitch Slider"),
+                    items: [
+                        {
+                            keys: platformKeys(
+                                _("Arrow Left / Arrow Right"),
+                                _("Arrow Left / Arrow Right")
+                            ),
+                            action: _("Move between help pages when Help is open")
+                        },
+                        {
+                            keys: platformKeys(_("Arrow keys"), _("Arrow keys")),
+                            action: _("Adjust pitch by semitone when Pitch Slider is open")
+                        }
+                    ]
+                }
+            ];
+
+            const widgetWindow = window.widgetWindows.windowFor(
+                this,
+                _("Keyboard shortcuts"),
+                "keyboard-shortcuts",
+                true
+            );
+            widgetWindow.clear();
+            widgetWindow.show();
+
+            const widgetBody = widgetWindow.getWidgetBody();
+            widgetBody.style.background = "linear-gradient(180deg, #f2f8ff 0%, #ffffff 100%)";
+            widgetBody.style.padding = "0";
+            widgetBody.style.display = "block";
+            widgetBody.style.height = "min(70vh, 640px)";
+            widgetBody.style.width = "min(72vw, 720px)";
+            widgetBody.style.maxWidth = "100%";
+            widgetBody.style.overflow = "hidden";
+
+            const wrapper = document.createElement("div");
+            wrapper.style.boxSizing = "border-box";
+            wrapper.style.height = "100%";
+            wrapper.style.padding = "18px";
+            wrapper.style.overflowY = "auto";
+            wrapper.style.overflowX = "hidden";
+            wrapper.style.fontFamily = '"Fira Sans", sans-serif';
+            wrapper.style.color = "#17324d";
+
+            const intro = document.createElement("div");
+            intro.style.background = "#1e88e5";
+            intro.style.color = "white";
+            intro.style.borderRadius = "14px";
+            intro.style.padding = "14px 16px";
+            intro.style.marginBottom = "16px";
+            intro.innerHTML =
+                `<div style="font-size:18px;font-weight:700;">${_("Keyboard shortcuts")}</div>` +
+                `<div style="font-size:13px;opacity:0.92;margin-top:4px;">${_(
+                    "Shortcuts are context-sensitive. Some only work when a related panel, widget, or mode is active. Windows/Linux and Mac equivalents are shown together."
+                )}</div>`;
+            wrapper.appendChild(intro);
+
+            shortcutSections.forEach(section => {
+                const sectionCard = document.createElement("section");
+                sectionCard.style.background = "white";
+                sectionCard.style.border = "1px solid #d7e6f6";
+                sectionCard.style.borderRadius = "14px";
+                sectionCard.style.padding = "14px 16px";
+                sectionCard.style.marginBottom = "12px";
+                sectionCard.style.boxShadow = "0 4px 14px rgba(20, 68, 112, 0.08)";
+
+                const heading = document.createElement("div");
+                heading.textContent = section.title;
+                heading.style.fontSize = "15px";
+                heading.style.fontWeight = "700";
+                heading.style.marginBottom = "10px";
+                heading.style.color = "#125a9c";
+                sectionCard.appendChild(heading);
+
+                section.items.forEach(item => {
+                    const row = document.createElement("div");
+                    row.style.display = "grid";
+                    row.style.gridTemplateColumns = "minmax(140px, 220px) 1fr";
+                    row.style.gap = "12px";
+                    row.style.alignItems = "start";
+                    row.style.padding = "8px 0";
+                    row.style.borderTop = "1px solid #edf4fb";
+
+                    const key = document.createElement("div");
+                    key.textContent = item.keys;
+                    key.style.fontFamily = '"Fira Mono", monospace';
+                    key.style.fontSize = "12px";
+                    key.style.fontWeight = "700";
+                    key.style.whiteSpace = "pre-line";
+                    key.style.background = "#eef6ff";
+                    key.style.border = "1px solid #cde3fb";
+                    key.style.borderRadius = "14px";
+                    key.style.padding = "6px 10px";
+                    key.style.color = "#114a80";
+                    key.style.display = "inline-block";
+
+                    const action = document.createElement("div");
+                    action.textContent = item.action;
+                    action.style.fontSize = "13px";
+                    action.style.lineHeight = "1.45";
+                    action.style.color = "#284761";
+
+                    row.appendChild(key);
+                    row.appendChild(action);
+                    sectionCard.appendChild(row);
+                });
+
+                wrapper.appendChild(sectionCard);
+            });
+
+            widgetBody.appendChild(wrapper);
+            widgetWindow.sendToCenter();
+            requestAnimationFrame(() => widgetWindow.sendToCenter());
+        };
+
         /*
          * Shows about page
          */
@@ -7565,6 +7831,7 @@ class Activity {
             this.toolbar.renderThemeSelectIcon(this.themeBox, this.themes);
             this.toolbar.renderMergeIcon(_doMergeLoad);
             this.toolbar.renderRestoreIcon(restoreTrash);
+            this.toolbar.renderKeyboardShortcutsIcon(showKeyboardShortcuts);
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.toolbar.renderChooseKeyIcon(chooseKeyMenu);
             }

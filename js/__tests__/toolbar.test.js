@@ -102,14 +102,14 @@ describe("Toolbar Class", () => {
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ true", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = true;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(137);
+        expect(global._).toHaveBeenCalledTimes(139);
         expect(global._).toHaveBeenNthCalledWith(1, "About Music Blocks");
     });
 
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ false", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = false;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(119);
+        expect(global._).toHaveBeenCalledTimes(121);
         expect(global._).toHaveBeenNthCalledWith(1, "About Turtle Blocks");
     });
 
@@ -881,6 +881,16 @@ describe("Toolbar Class", () => {
         toolbar.renderRestoreIcon(mockOnClick);
         expect(restoreIcon.onclick).toBeInstanceOf(Function);
         restoreIcon.onclick();
+        expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity);
+    });
+
+    test("renderKeyboardShortcutsIcon sets onclick and triggers shortcuts guide", () => {
+        const keyboardShortcutsIcon = { onclick: null };
+        global.docById.mockReturnValue(keyboardShortcutsIcon);
+        const mockOnClick = jest.fn();
+        toolbar.renderKeyboardShortcutsIcon(mockOnClick);
+        expect(keyboardShortcutsIcon.onclick).toBeInstanceOf(Function);
+        keyboardShortcutsIcon.onclick();
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity);
     });
 
