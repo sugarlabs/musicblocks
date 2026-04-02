@@ -43,6 +43,12 @@ function AIDebuggerWidget() {
     };
 
     /**
+     * Flag to track if the backend is currently processing a request
+     * @type {boolean}
+     */
+    this.isProcessing = false;
+
+    /**
      * Chat history array to store conversation
      * @type {Array}
      */
@@ -277,6 +283,8 @@ function AIDebuggerWidget() {
      * @private
      */
     this._sendMessage = function () {
+        if (this.isProcessing) return;
+
         const messageText = this.messageInput.value.trim();
         if (messageText === "") return;
         if (this._isProcessing) return;
@@ -348,6 +356,7 @@ function AIDebuggerWidget() {
      * @private
      */
     this._sendToBackend = function (message) {
+        this.isProcessing = true;
         this._showTypingIndicator();
         this.promptCount++;
         let projectData;
@@ -389,6 +398,7 @@ function AIDebuggerWidget() {
                 return response.json();
             })
             .then(data => {
+                this.isProcessing = false;
                 this._hideTypingIndicator();
                 this._isProcessing = false;
 
@@ -408,6 +418,7 @@ function AIDebuggerWidget() {
                 }
             })
             .catch(error => {
+                this.isProcessing = false;
                 this._hideTypingIndicator();
                 this._isProcessing = false;
                 console.error("Backend connection error:", error.message);
@@ -549,6 +560,7 @@ function AIDebuggerWidget() {
         };
 
         // Show typing indicator during initialization
+        this.isProcessing = true;
         this._showTypingIndicator();
 
         fetch(`${BACKEND_CONFIG.BASE_URL}${BACKEND_CONFIG.ENDPOINTS.ANALYZE}`, {
@@ -565,6 +577,7 @@ function AIDebuggerWidget() {
                 return response.json();
             })
             .then(data => {
+                this.isProcessing = false;
                 this._hideTypingIndicator();
 
                 if (data.response) {
@@ -585,6 +598,7 @@ function AIDebuggerWidget() {
                 }
             })
             .catch(error => {
+                this.isProcessing = false;
                 this._hideTypingIndicator();
                 console.error("Backend initialization error:", error.message);
                 this.activity.textMsg(_("Server error: Failed to initialize AI debugger."));
