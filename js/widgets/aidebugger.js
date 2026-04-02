@@ -129,6 +129,7 @@ function AIDebuggerWidget() {
         widgetWindow.getWidgetBody().style.height = CHATHEIGHT + "px";
 
         widgetWindow.onclose = () => {
+            this._hideTypingIndicator();
             widgetWindow.destroy();
             this.activity.isInputON = false;
         };
