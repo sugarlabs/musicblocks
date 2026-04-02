@@ -1674,6 +1674,10 @@ class Activity {
                     helpfulWheelDiv.style.display = "none";
                     this.__tick();
                 }
+
+                if (this.cleanupIdleWatcher) {
+                    this.cleanupIdleWatcher();
+                }
             };
 
             if (skipConfirmation) {
@@ -2177,6 +2181,10 @@ class Activity {
                     }
                     break;
                 }
+            }
+
+            if (this.cleanupIdleWatcher) {
+                this.cleanupIdleWatcher();
             }
         };
 
@@ -3005,6 +3013,11 @@ class Activity {
 
             let lastActivity = Date.now();
             this.isAppIdle = false;
+
+            // Prevent duplicate intervals
+            if (this._idleWatcherIntervalId) {
+                clearInterval(this._idleWatcherIntervalId);
+            }
 
             // Wake up function - restores full framerate
             // Stored as instance property for cleanup
@@ -5140,7 +5153,7 @@ class Activity {
           The parseABC function converts ABC notation to Music Blocks
           and is able to convert almost all the ABC notation to Music
           Blocks. However, the following aspects need work:
-
+        
           Hammers, pulls, and sliding offs grace notes (breaking the
           conversion) Alternate endings (not failing but not showing
           correctly) and DS al coda Bass voicing (failing)
