@@ -20,8 +20,5 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Install Dependencies
-        run: npm ci
-
       - name: Run npm Audit
         run: npm audit --omit=dev --audit-level=high
