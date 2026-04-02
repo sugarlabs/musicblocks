@@ -549,21 +549,23 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             }
 
             const deltaPitch = i - prevPitch;
+            const noteCount = noteLabels.length;
+            const halfSpan = noteCount / 2;
             let delta;
-            if (deltaPitch > 3) {
-                delta = deltaPitch - 7;
-            } else if (deltaPitch < -3) {
-                delta = deltaPitch + 7;
+            if (deltaPitch > halfSpan) {
+                delta = deltaPitch - noteCount;
+            } else if (deltaPitch < -halfSpan) {
+                delta = deltaPitch + noteCount;
             } else {
                 delta = deltaPitch;
             }
 
             // If we wrapped across C, we need to adjust the octave.
             let deltaOctave = 0;
-            if (prevPitch + delta > 6) {
-                deltaOctave = -1;
-            } else if (prevPitch + delta < 0) {
+            if (prevPitch + delta > noteCount - 1) {
                 deltaOctave = 1;
+            } else if (prevPitch + delta < 0) {
+                deltaOctave = -1;
             }
             let attr;
             prevPitch = i;
