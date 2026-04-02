@@ -91,10 +91,10 @@ function setupBooleanBlocks(activity) {
         arg(logo, turtle, blk, receivedArg) {
             const cblk = activity.blocks.blockList[blk].connections[1];
 
-            if (cblk === null) {
-                activity.errorMsg(NOINPUTERRORMSG, blk);
-                return false;
-            }
+            if (!cblk) {
+    activity.errorMsg("Missing input connection: expected a connected block.", blk);
+    return false;
+}
 
             const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
 
@@ -180,15 +180,14 @@ function setupBooleanBlocks(activity) {
         arg(logo, turtle, blk, receivedArg) {
             const cblk1 = activity.blocks.blockList[blk].connections[1];
             const cblk2 = activity.blocks.blockList[blk].connections[2];
-
-            if (cblk1 === null || cblk2 === null) {
-                activity.errorMsg(NOINPUTERRORMSG, blk);
-                return false;
-            } else {
+if (!cblk1 || !cblk2) {
+    activity.errorMsg("Missing input connection: AND block requires two inputs.", blk);
+    return false;
+} 
                 const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 return a && b;
-            }
+            
         }
     }
     /**
@@ -262,18 +261,19 @@ function setupBooleanBlocks(activity) {
          * @returns {boolean} - The result of the argument handling.
          */
         arg(logo, turtle, blk, receivedArg) {
-            const cblk1 = activity.blocks.blockList[blk].connections[1];
-            const cblk2 = activity.blocks.blockList[blk].connections[2];
+    const cblk1 = activity.blocks.blockList[blk].connections[1];
+    const cblk2 = activity.blocks.blockList[blk].connections[2];
 
-            if (cblk1 === null || cblk2 === null) {
-                activity.errorMsg(NOINPUTERRORMSG, blk);
-                return false;
-            } else {
-                const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                return a || b;
-            }
-        }
+    if (!cblk1 || !cblk2) {
+        activity.errorMsg("Missing input connection: OR block requires two inputs.", blk);
+        return false;
+    }
+
+    const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+    const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+
+    return a || b;
+}
     }
     /**
      * Represents a block for the logical XOR operator.
@@ -349,14 +349,14 @@ function setupBooleanBlocks(activity) {
             const cblk1 = activity.blocks.blockList[blk].connections[1];
             const cblk2 = activity.blocks.blockList[blk].connections[2];
 
-            if (cblk1 === null || cblk2 === null) {
-                activity.errorMsg(NOINPUTERRORMSG, blk);
+            if (!cblk1 || !cblk2) {
+                activity.errorMsg("Missing input connection: XOR block requires two inputs.", blk);
                 return false;
-            } else {
+            } 
                 const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 return (a && !b) || (!a && b);
-            }
+            
         }
     }
     /**
@@ -447,10 +447,10 @@ function setupBooleanBlocks(activity) {
             const cblk1 = activity.blocks.blockList[blk].connections[1];
             const cblk2 = activity.blocks.blockList[blk].connections[2];
 
-            if (cblk1 === null || cblk2 === null) {
-                activity.errorMsg(NOINPUTERRORMSG, blk);
-                return false;
-            }
+            if (!cblk1 || !cblk2) {
+    activity.errorMsg("Missing input connection.", blk);
+    return false;
+}
 
             const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
             const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
@@ -552,10 +552,10 @@ function setupBooleanBlocks(activity) {
             const cblk1 = activity.blocks.blockList[blk].connections[1];
             const cblk2 = activity.blocks.blockList[blk].connections[2];
 
-            if (cblk1 === null || cblk2 === null) {
-                activity.errorMsg(NOINPUTERRORMSG, blk);
-                return false;
-            }
+            if (!cblk1 || !cblk2) {
+    activity.errorMsg("Missing input connection.", blk);
+    return false;
+}
 
             const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
             const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
@@ -652,10 +652,10 @@ function setupBooleanBlocks(activity) {
             const cblk1 = activity.blocks.blockList[blk].connections[1];
             const cblk2 = activity.blocks.blockList[blk].connections[2];
 
-            if (cblk1 === null || cblk2 === null) {
-                activity.errorMsg(NOINPUTERRORMSG, blk);
-                return false;
-            }
+            if (!cblk1 || !cblk2) {
+    activity.errorMsg("Missing input connection.", blk);
+    return false;
+}
 
             const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
             const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
@@ -752,10 +752,10 @@ function setupBooleanBlocks(activity) {
             const cblk1 = activity.blocks.blockList[blk].connections[1];
             const cblk2 = activity.blocks.blockList[blk].connections[2];
 
-            if (cblk1 === null || cblk2 === null) {
-                activity.errorMsg(NOINPUTERRORMSG, blk);
-                return false;
-            }
+            if (!cblk1 || !cblk2) {
+    activity.errorMsg("Missing input connection.", blk);
+    return false;
+}
 
             const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
             const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
@@ -856,10 +856,10 @@ function setupBooleanBlocks(activity) {
             const cblk1 = activity.blocks.blockList[blk].connections[1];
             const cblk2 = activity.blocks.blockList[blk].connections[2];
 
-            if (cblk1 === null || cblk2 === null) {
-                activity.errorMsg(NOINPUTERRORMSG, blk);
-                return false;
-            }
+            if (!cblk1 || !cblk2) {
+    activity.errorMsg("Missing input connection.", blk);
+    return false;
+}
 
             const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
             const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
@@ -957,10 +957,10 @@ function setupBooleanBlocks(activity) {
             const cblk1 = activity.blocks.blockList[blk].connections[1];
             const cblk2 = activity.blocks.blockList[blk].connections[2];
 
-            if (cblk1 === null || cblk2 === null) {
-                activity.errorMsg(NOINPUTERRORMSG, blk);
-                return false;
-            }
+            if (!cblk1 || !cblk2) {
+    activity.errorMsg("Missing input connection.", blk);
+    return false;
+}
 
             const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
             const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
