@@ -37,6 +37,12 @@ global.getStepSizeUp = mockGlobals.getStepSizeUp;
 global.numberToPitch = mockGlobals.numberToPitch;
 global.pitchToNumber = mockGlobals.pitchToNumber;
 global.last = jest.fn(array => array[array.length - 1]);
+global.deepClone = value => {
+    if (typeof structuredClone === "function") {
+        return structuredClone(value);
+    }
+    return JSON.parse(JSON.stringify(value));
+};
 
 global.SEMITONES = 12;
 global.pitchToFrequency = jest.fn().mockReturnValue(440);
