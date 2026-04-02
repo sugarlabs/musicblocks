@@ -31,6 +31,7 @@ class RequestManager {
         this.maxRetries = options.maxRetries || 3;
         this.baseRetryDelay = options.baseRetryDelay || 1000;
         this.maxConcurrent = options.maxConcurrent || 3;
+        this.requestTimeout = options.requestTimeout || 30000;
 
         // Track pending requests to prevent duplicates
         this.pendingRequests = new Map();
@@ -48,7 +49,8 @@ class RequestManager {
             totalRequests: 0,
             cachedResponses: 0,
             retries: 0,
-            failures: 0
+            failures: 0,
+            timeouts: 0
         };
     }
 
@@ -100,12 +102,41 @@ class RequestManager {
      */
     async _executeWithQueueAndRetry(data, requestFn, key) {
         return new Promise((resolve, reject) => {
+            let settled = false;
+
+            const timeoutId = setTimeout(() => {
+                if (settled) return;
+                settled = true;
+                this.stats.timeouts++;
+                this.pendingRequests.delete(key);
+                reject(
+                    new Error(
+                        `[RequestManager] Request timed out after ${this.requestTimeout}ms (key: ${key})`
+                    )
+                );
+            }, this.requestTimeout);
+
+            const safeResolve = result => {
+                if (settled) return;
+                settled = true;
+                clearTimeout(timeoutId);
+                resolve(result);
+            };
+
+            const safeReject = error => {
+                if (settled) return;
+                settled = true;
+                clearTimeout(timeoutId);
+                this.pendingRequests.delete(key);
+                reject(error);
+            };
+
             this.requestQueue.push({
                 data,
                 requestFn,
                 key,
-                resolve,
-                reject,
+                resolve: safeResolve,
+                reject: safeReject,
                 attempts: 0
             });
 
@@ -217,8 +248,7 @@ class RequestManager {
             }
 
             this.stats.failures++;
-            // Return the last failure or a generic error response
-            return lastFailure || { success: false, error: "MAX_RETRIES_EXCEEDED" };
+            throw error;
         }
     }
 
@@ -272,7 +302,8 @@ class RequestManager {
             totalRequests: 0,
             cachedResponses: 0,
             retries: 0,
-            failures: 0
+            failures: 0,
+            timeouts: 0
         };
     }
 

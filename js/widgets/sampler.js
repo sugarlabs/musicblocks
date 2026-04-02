@@ -2179,6 +2179,8 @@ function SampleWidget() {
      * @param {HTMLElement} noteElement - Widget-local span for displaying detected note
      * @returns {Promise<void>}
      */
+    // accepts pre-built element references
+    const startPitchDetection = async (cachedPitchEl = null, cachedNoteEl = null) => {
     const startPitchDetection = async (pitchElement, noteElement) => {
         // Stop any existing pitch detection first to avoid multiple instances
         this.stopPitchDetection();
@@ -2203,8 +2205,11 @@ function SampleWidget() {
 
             this.isPitchDetectionRunning = true;
 
+            // DOM queried once, before the loop starts
+            // Cache DOM references ONCE before the animation loop
+            const pitchElement = cachedPitchEl || document.getElementById("pitch");
+            const noteElement = cachedNoteEl || document.getElementById("note");
             const updatePitch = () => {
-                // Check if we should stop the loop
                 if (!this.isPitchDetectionRunning) {
                     return;
                 }
@@ -2212,6 +2217,7 @@ function SampleWidget() {
                 analyser.getFloatTimeDomainData(buffer);
                 const pitch = detectPitch(buffer);
 
+                // Use cached references
                 // Update widget-local DOM elements (passed in from makeTuner — no global query)
                 if (pitchElement && noteElement) {
                     if (pitch > 0) {
@@ -2295,6 +2301,9 @@ function SampleWidget() {
 
         this.widgetWindow.getWidgetBody().appendChild(container);
 
+        document.getElementById("start").addEventListener("click", () => {
+            startPitchDetection(pitchSpan, noteSpan);
+        });
         startButton.addEventListener("click", () => startPitchDetection(pitchSpan, noteSpan));
     };
 

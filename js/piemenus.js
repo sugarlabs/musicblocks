@@ -661,9 +661,10 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                 return;
             }
 
-            // Trigger note with proper error handling
+            // TRIGGER LOGIC FIXED
             if (!that._triggerLock) {
                 that._triggerLock = true;
+
                 try {
                     await that.activity.logo.synth.trigger(
                         0,
@@ -675,6 +676,10 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                         false
                     );
                 } catch (e) {
+                    console.error("Error triggering pitch preview:", e);
+                }
+
+                // Always release the lock When success or failure
                     console.error("Synth trigger error:", e);
                 }
                 setTimeout(() => {
