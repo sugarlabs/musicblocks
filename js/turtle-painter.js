@@ -826,49 +826,23 @@ class Painter {
             this._scheduleCanvasUpdate();
         } else {
             const stepUnit = 5;
-            let xIncrease, yIncrease;
-            if (steps > 0) {
-                xIncrease = stepUnit * Math.sin(angleRadians);
-                yIncrease = stepUnit * Math.cos(angleRadians);
-            } else {
-                xIncrease = -stepUnit * Math.sin(angleRadians);
-                yIncrease = -stepUnit * Math.cos(angleRadians);
-                steps = -steps;
-            }
+        let remainingSteps = Math.abs(steps);
 
-            while (steps >= 0) {
-                if (this.turtle.container.x > w) {
-                    this.turtle.container.x = 0;
-                    this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
-                }
-                if (this.turtle.container.x < 0) {
-                    this.turtle.container.x = w;
-                    this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
-                }
-                if (this.turtle.container.y > h) {
-                    this.turtle.container.y = 0;
-                    this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
-                }
-                if (this.turtle.container.y < 0) {
-                    this.turtle.container.y = h;
-                    this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
-                }
+        while (remainingSteps > 0) {
+        let currentStep = Math.min(stepUnit, remainingSteps);
+        let xIncrease, yIncrease;
 
-                // Get old turtle point
-                oy = turtles.screenY2turtleY(this.turtle.container.y);
-                ox = turtles.screenX2turtleX(this.turtle.container.x);
+        if (steps > 0) {
+        xIncrease = currentStep * Math.sin(angleRadians);
+        yIncrease = currentStep * Math.cos(angleRadians);
+        } else {
+        xIncrease = -currentStep * Math.sin(angleRadians);
+        yIncrease = -currentStep * Math.cos(angleRadians);
+       }
 
-                // Increment new turtle point
-                nx = ox + xIncrease;
-                ny = oy + yIncrease;
-
-                this._move(ox, oy, nx, ny, true);
-                this.turtle.container.x = turtles.turtleX2screenX(nx);
-                this.turtle.container.y = turtles.turtleY2screenY(ny);
-                this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
-
-                steps -= stepUnit;
-            }
+    
+       remainingSteps -= currentStep;
+       }
 
             this._scheduleCanvasUpdate();
         }
