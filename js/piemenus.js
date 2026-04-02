@@ -1192,7 +1192,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
         docById("wheelDiv").style.display = "none";
     };
 
-    const __selectionChanged = () => {
+    const __selectionChanged = async () => {
         const label = that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
         const note = that._cusNoteWheel.navItems[that._cusNoteWheel.selectedNavItemIndex].title;
         that.value = note;
@@ -1211,23 +1211,109 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
 
-        const obj = getNote(note, octave, 0, "C major", false, null, that.activity.errorMsg, label);
-        const tur = that.activity.turtles.ithTurtle(0);
-
-        if (!tur.singer.instrumentNames.includes(DEFAULTVOICE)) {
-            that.activity.logo.synth.createDefaultSynth(0);
-            that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
+        try {
+            // Ensure audio context is started (required by modern browsers)
+            await Tone.start();
+        } catch (e) {
+            console.debug("Tone.start() skipped or failed", e);
         }
 
-        that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
-        that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+        // Ensure synth is initialized before proceeding
+        if (!that.activity.logo.synth) {
+            return;
+        }
 
+        // Always ensure tone is initialized
+        if (!that.activity.logo.synth.tone) {
+            that.activity.logo.synth.newTone();
+        }
+
+        // Create and load synth if needed
+        if (!instruments[0] || !instruments[0][DEFAULTVOICE]) {
+            try {
+                that.activity.logo.synth.createDefaultSynth(0);
+                await that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
+            } catch (e) {
+                return;
+            }
+        }
+
+        // Set volume
+        try {
+            that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
+            that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+        } catch (e) {
+            return;
+        }
+
+        // Trigger note with proper error handling
         if (!that._triggerLock) {
             that._triggerLock = true;
-            // Get the frequency of the custom note for the preview.
-            const no = that.activity.logo.synth.getCustomFrequency([note + obj[1]], that.customID);
-            if (no !== undefined && no !== "undefined") {
-                instruments[0][DEFAULTVOICE].triggerAttackRelease(no, 1 / 8);
+            try {
+                const customID = that.customID || label;
+                let freq = null;
+
+                // Try to compute frequency from the temperament data directly.
+                // noteLabels[customID] contains the temperament data. Entries can be:
+                //   - Plain numbers (ratios) when no custom notes are defined
+                //   - Arrays [ratio, noteName, octave] when custom notes are saved
+                const tempData = noteLabels[customID];
+                if (tempData) {
+                    // Find the entry that matches the displayed note label.
+                    for (const pitchNum in tempData) {
+                        if (pitchNum === "pitchNumber" || pitchNum === "interval") continue;
+                        const entry = tempData[pitchNum];
+                        let entryLabel, entryRatio, entryOctave;
+
+                        if (typeof entry === "number") {
+                            // Equal-style format: key is the label, value is the ratio
+                            entryLabel = pitchNum;
+                            entryRatio = entry;
+                            entryOctave = 4; // default octave
+                        } else if (Array.isArray(entry) && entry.length >= 3) {
+                            // Custom format: [ratio, noteName, octave]
+                            entryLabel = entry[1];
+                            entryRatio = entry[0];
+                            entryOctave = Number(entry[2]);
+                        }
+
+                        if (entryLabel === note && entryRatio != null) {
+                            // Compute frequency: ratio * startingPitchFrequency * octaveOffset
+                            const startPitch = that.activity.logo.synth.startingPitch;
+                            const startFreq = Tone.Frequency(startPitch).toFrequency();
+                            const octaveDiff = octave - entryOctave;
+                            freq = entryRatio * startFreq * Math.pow(2, octaveDiff);
+                            break;
+                        }
+                    }
+                }
+
+                // If direct computation failed, try getCustomFrequency
+                if (freq === null || isNaN(freq)) {
+                    const noteWithOctave = note + octave;
+                    const result = that.activity.logo.synth.getCustomFrequency(
+                        noteWithOctave,
+                        customID
+                    );
+                    if (typeof result === "number" && !isNaN(result)) {
+                        freq = result;
+                    }
+                }
+
+                if (freq !== null && typeof freq === "number" && !isNaN(freq)) {
+                    // Play the frequency directly via synth.trigger
+                    await that.activity.logo.synth.trigger(
+                        0,
+                        freq,
+                        1 / 8,
+                        DEFAULTVOICE,
+                        null,
+                        null,
+                        false
+                    );
+                }
+            } catch (e) {
+                console.error("Error in custom pitch preview:", e);
             }
         }
 
