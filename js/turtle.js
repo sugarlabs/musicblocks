@@ -693,7 +693,7 @@ Turtle.TurtleView = class {
         this._orientation = 0; // orientation of the turtle sprite
 
         this._canvas = document.getElementById("overlayCanvas");
-        this._ctx = this._canvas.getContext("2d");
+        this._ctx = this._canvas.getContext("2d", { willReadFrequently: true });
     }
 
     /**

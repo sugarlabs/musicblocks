@@ -1,4 +1,5 @@
 // Copyright (c) 2014-22 Walter Bender
+import { SoundManager } from "../src/managers/SoundManager.js";
 // Copyright (c) Yash Khandelwal, GSoC'15
 //
 // This program is free software; you can redistribute it and/or
@@ -220,7 +221,7 @@ const doAnalyzeProject = function () {
  * Represents an activity in the application.
  */
 
-class Activity {
+export class Activity {
     /**
      * Creates an Activity instance.
      */
@@ -235,6 +236,7 @@ class Activity {
         }
 
         this._listeners = [];
+        this.soundManager = new SoundManager({ activity: this });
 
         this.cellSize = 55;
         this.searchSuggestions = [];
@@ -1481,7 +1483,7 @@ class Activity {
 
             const svgContent = this.printBlockSVG();
             const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
+            const ctx = canvas.getContext("2d", { willReadFrequently: true });
             const parser = new DOMParser();
             const svgDoc = parser.parseFromString(decodeURIComponent(svgContent), "image/svg+xml");
             const svgElement = svgDoc.documentElement;
@@ -1630,7 +1632,7 @@ class Activity {
                     this.gifAnimator.stopAll();
                     const overlayCanvas = document.getElementById("overlayCanvas");
                     if (overlayCanvas) {
-                        const ctx = overlayCanvas.getContext("2d");
+                        const ctx = overlayCanvas.getContext("2d", { willReadFrequently: true });
                         ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
                     }
                 }
@@ -1698,7 +1700,7 @@ class Activity {
 
             const currentDelay = this.logo.turtleDelay;
             this.logo.turtleDelay = 0;
-            this.logo.synth.resume();
+            this.soundManager.resume();
             const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
                 if (widgetTitle[i].innerHTML === "tempo") {
@@ -1743,21 +1745,7 @@ class Activity {
          * @param {object} activity - The activity context.
          */
         const doRecordButton = activity => {
-            /**
-             * Executes the record button functionality if execution is not already in progress.
-             */
-            if (isExecuting) {
-                return; // Exit the function if execution is already in progress
-            }
-
-            if (!activity || typeof activity._doRecordButton !== "function") {
-                console.warn("doRecordButton called without valid activity context");
-                isExecuting = false;
-                return;
-            }
-
-            isExecuting = true; // Set the flag to indicate execution has started
-            activity._doRecordButton();
+            activity.soundManager.doRecordButton();
         };
 
         /**
@@ -1765,309 +1753,7 @@ class Activity {
          * @private
          */
         this._doRecordButton = () => {
-            const that = this;
-            const start = document.getElementById("record"),
-                recInside = document.getElementById("rec_inside");
-            let mediaRecorder;
-            const clickEvent = new Event("click");
-            let flag = 0;
-            let currentStream = null;
-            let audioDestination = null;
-
-            /**
-             * Records the screen using the browser's media devices API.
-             * @returns {Promise<MediaStream>} A promise resolving to the recorded media stream.
-             */
-
-            async function recordScreen() {
-                const mode = localStorage.getItem("musicBlocksRecordMode");
-
-                if (mode === "canvas") {
-                    return await recordCanvasOnly();
-                } else {
-                    return await recordScreenWithTools();
-                }
-            }
-
-            async function recordCanvasOnly() {
-                flag = 1;
-                const canvas = document.getElementById("myCanvas");
-                if (!canvas) {
-                    throw new Error("Canvas element not found");
-                }
-
-                // Get the toolbar height to exclude from recording
-                const toolbar = document.getElementById("toolbars");
-                const toolbarHeight = toolbar ? toolbar.offsetHeight : 0;
-
-                // Get canvas dimensions
-                const canvasRect = canvas.getBoundingClientRect();
-
-                // Get the actual canvas dimensions
-                const canvasWidth = canvas.width;
-                const canvasHeight = canvas.height;
-
-                // Calculate the visible area (excluding toolbar)
-                const visibleHeight = canvasHeight - toolbarHeight;
-
-                // Create a clean recording canvas
-                const recordCanvas = document.createElement("canvas");
-                recordCanvas.width = canvasWidth;
-                recordCanvas.height = canvasHeight;
-                const recordCtx = recordCanvas.getContext("2d");
-
-                // Set background to match the canvas (white/light gray)
-                recordCtx.fillStyle = "#f5f5f5"; // Adjust this color to match your canvas background
-                let animationFrameId;
-
-                // Function to continuously copy canvas content
-                const copyFrame = () => {
-                    // Fill background
-                    recordCtx.fillRect(0, 0, canvasWidth, canvasHeight);
-
-                    // Draw only the visible portion of the canvas (skip the toolbar area)
-                    recordCtx.drawImage(
-                        canvas,
-                        0,
-                        toolbarHeight, // Source x, y (skip toolbar)
-                        canvasWidth,
-                        visibleHeight, // Source width, height
-                        0,
-                        0, // Destination x, y
-                        canvasWidth,
-                        visibleHeight // Destination width, height
-                    );
-
-                    // Continue if still recording
-                    if (flag === 1) {
-                        animationFrameId = requestAnimationFrame(copyFrame);
-                    }
-                };
-
-                // Start copying frames
-                copyFrame();
-
-                // Capture the canvas stream directly at 30fps
-                const canvasStream = recordCanvas.captureStream(30);
-
-                // Add audio track if available
-                const Tone = that.logo.synth.tone;
-                if (Tone && Tone.context) {
-                    const dest = Tone.context.createMediaStreamDestination();
-                    Tone.Destination.connect(dest);
-                    audioDestination = dest;
-                    const audioTrack = dest.stream.getAudioTracks()[0];
-                    if (audioTrack) {
-                        canvasStream.addTrack(audioTrack);
-                    }
-                }
-                currentStream = canvasStream;
-
-                // Clean up animation frame when recording stops
-                canvasStream.getTracks()[0].addEventListener("ended", () => {
-                    if (animationFrameId) {
-                        cancelAnimationFrame(animationFrameId);
-                    }
-                });
-
-                return canvasStream;
-            }
-            async function recordScreenWithTools() {
-                flag = 1;
-
-                try {
-                    return await navigator.mediaDevices.getDisplayMedia({
-                        preferCurrentTab: "True",
-                        systemAudio: "include",
-                        audio: "True",
-                        video: { mediaSource: "tab" },
-                        bandwidthProfile: {
-                            video: {
-                                clientTrackSwitchOffControl: "auto",
-                                contentPreferencesMode: "auto"
-                            }
-                        },
-                        preferredVideoCodecs: "auto"
-                    });
-                } catch (error) {
-                    console.error("Screen capture failed:", error);
-                    flag = 0;
-                    throw error;
-                }
-            }
-
-            /**
-             * Saves the recorded chunks as a video file.
-             * @param {Blob[]} recordedChunks - The recorded video chunks.
-             */
-            function saveFile(recordedChunks) {
-                flag = 1;
-                recInside.classList.remove("blink");
-                // Prevent zero-byte files
-                if (!recordedChunks || recordedChunks.length === 0) {
-                    alert(_("Recorded file is empty. File not saved."));
-                    flag = 0;
-                    recording();
-                    doRecordButton();
-                    return;
-                }
-                const blob = new Blob(recordedChunks, {
-                    type: "video/webm"
-                });
-                if (blob.size === 0) {
-                    alert(_("Recorded file is empty. File not saved."));
-                    flag = 0;
-                    recording();
-                    doRecordButton();
-                    return;
-                }
-                // Clean up stream after recording
-                if (currentStream) {
-                    currentStream.getTracks().forEach(track => track.stop());
-                    currentStream = null;
-                }
-                if (audioDestination && audioDestination.stream) {
-                    audioDestination.stream.getTracks().forEach(track => track.stop());
-                    audioDestination = null;
-                }
-                mediaRecorder = null;
-                // Prompt to save file
-                const filename = window.prompt(_("Enter file name"));
-                if (filename === null || filename.trim() === "") {
-                    alert(_("File save canceled"));
-                    flag = 0;
-                    recording();
-                    doRecordButton();
-                    return; // Exit without saving the file
-                }
-                const downloadLink = document.createElement("a");
-                downloadLink.href = URL.createObjectURL(blob);
-                downloadLink.download = `${filename}.webm`;
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                URL.revokeObjectURL(blob);
-                document.body.removeChild(downloadLink);
-                flag = 0;
-                // Allow multiple recordings
-                recording();
-                doRecordButton();
-                that.textMsg(_("Recording stopped. File saved."));
-            }
-            /**
-             * Stops the recording process.
-             */
-            function stopRec() {
-                flag = 0;
-
-                if (mediaRecorder && typeof mediaRecorder.stop === "function") {
-                    mediaRecorder.stop();
-                }
-
-                // Clean up the recording canvas stream
-                if (currentStream) {
-                    currentStream.getTracks().forEach(track => track.stop());
-                }
-                const node = document.createElement("p");
-                node.textContent = "Stopped recording";
-                document.body.appendChild(node);
-            }
-
-            /**
-             * Creates a media recorder instance.
-             * @param {MediaStream} stream - The media stream to be recorded.
-             * @param {string} mimeType - The MIME type of the recording.
-             * @returns {MediaRecorder} The created media recorder instance.
-             */
-            function createRecorder(stream, mimeType) {
-                flag = 1;
-                recInside.classList.add("blink");
-                that.textMsg(_("Recording started. Click stop to finish."));
-                start.removeEventListener("click", createRecorder, true);
-                let recordedChunks = [];
-                mediaRecorder = new MediaRecorder(stream);
-                stream.oninactive = function () {
-                    console.log("Recording is ready to save");
-                    stopRec();
-                    flag = 0;
-                };
-
-                mediaRecorder.onstop = function () {
-                    saveFile(recordedChunks);
-                    recordedChunks = [];
-                    flag = 0;
-                    recInside.setAttribute("fill", "#ffffff");
-                };
-
-                mediaRecorder.ondataavailable = function (e) {
-                    if (e.data.size > 0) {
-                        recordedChunks.push(e.data);
-                    }
-                };
-
-                mediaRecorder.start(200);
-                setTimeout(() => {
-                    console.log("Resizing for Record", that.canvas.height);
-                    that._onResize();
-                }, 500);
-                return mediaRecorder;
-            }
-
-            /**
-             * Handles the recording process.
-             */
-            function recording() {
-                // Remove any previous handler to avoid multiple triggers
-                if (start._recordHandler) {
-                    start.removeEventListener("click", start._recordHandler);
-                }
-                const handler = async function handler() {
-                    try {
-                        const stream = await recordScreen();
-                        const mimeType = "video/webm";
-                        mediaRecorder = createRecorder(stream, mimeType);
-                        if (flag == 1) {
-                            start.removeEventListener("click", handler);
-                            // Add stop handler
-                            const stopHandler = function stopHandler() {
-                                if (mediaRecorder && mediaRecorder.state === "recording") {
-                                    mediaRecorder.stop();
-                                    mediaRecorder = new MediaRecorder(stream);
-                                    recInside.classList.remove("blink");
-                                    flag = 0;
-                                    // Clean up stream
-                                    if (currentStream) {
-                                        currentStream.getTracks().forEach(track => track.stop());
-                                    }
-                                    if (audioDestination && audioDestination.stream) {
-                                        audioDestination.stream
-                                            .getTracks()
-                                            .forEach(track => track.stop());
-                                    }
-                                }
-                                start.removeEventListener("click", stopHandler);
-                                // Re-enable recording for next time
-                                recording();
-                            };
-                            start.addEventListener("click", stopHandler);
-                        }
-                        recInside.setAttribute("fill", "red");
-                    } catch (error) {
-                        console.error("Recording failed:", error);
-                        that.textMsg(_("Recording failed: ") + error.message);
-                        flag = 0;
-                        // Re-enable recording button
-                        recording();
-                    }
-                };
-                start.addEventListener("click", handler);
-                start._recordHandler = handler;
-            }
-
-            // Start recording process if not already executing
-            if (flag == 0 && isExecuting) {
-                recording();
-                start.dispatchEvent(clickEvent);
-            }
+            this.soundManager.doRecordButton();
         };
 
         /*
@@ -2088,7 +1774,7 @@ class Activity {
             hideDOMLabel();
 
             this.logo.turtleDelay = DEFAULTDELAY;
-            this.logo.synth.resume();
+            this.soundManager.resume();
 
             if (!this.turtles.running()) {
                 this.logo.runLogoCommands();
@@ -2115,7 +1801,7 @@ class Activity {
             hideDOMLabel();
 
             const turtleCount = Object.keys(this.logo.stepQueue).length;
-            this.logo.synth.resume();
+            this.soundManager.resume();
 
             if (turtleCount === 0 || this.logo.turtleDelay !== this.TURTLESTEP) {
                 // Either we haven't set up a queue or we are
@@ -4929,6 +4615,9 @@ class Activity {
                     }
                     // Set flag to 1 to enable keyboard after MB finishes loading
                     that.keyboardEnableFlag = 1;
+
+                    // Auto-center blocks on load
+                    that._findBlocks();
                 }
 
                 document.removeEventListener("finishedLoading", __afterLoad);

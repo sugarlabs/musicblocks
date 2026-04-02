@@ -44,7 +44,7 @@ const CONTAINERSCALEFACTOR = 4;
  * This component contains properties and controls relevant to the set
  * of all turtles like maintaining the canvases on which turtles draw.
  */
-class Turtles {
+export class Turtles {
     /**
      * @constructor
      */

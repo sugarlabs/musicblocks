@@ -148,7 +148,7 @@ const ALLOWED_CONNECTIONS = new Set([
  * @returns {void}
  */
 
-class Blocks {
+export class Blocks {
     constructor(activity) {
         this.activity = activity;
         this.storage = this.activity.storage;

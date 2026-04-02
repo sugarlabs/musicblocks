@@ -397,7 +397,7 @@ class Tempo {
                 }
             }
 
-            ctx = tempoCanvas.getContext("2d");
+            ctx = tempoCanvas.getContext("2d", { willReadFrequently: true });
             ctx.clearRect(0, 0, tempoCanvas.width, tempoCanvas.height);
             ctx.beginPath();
             ctx.fillStyle = "rgba(0,0,0,1)";

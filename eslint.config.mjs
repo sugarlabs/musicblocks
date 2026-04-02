@@ -23,7 +23,7 @@ export default [
         files: ["**/*.js", "**/*.mjs"],
         languageOptions: {
             ecmaVersion: "latest",
-            sourceType: "script",
+            sourceType: "module",
             globals: {
                 ...globals.browser,
                 ...globals.node,
@@ -35,6 +35,8 @@ export default [
                 Turtles: "readonly",
                 Activity: "readonly",
                 _: "readonly",
+                _THIS_IS_TURTLE_BLOCKS_: "readonly",
+                _THIS_IS_MUSIC_BLOCKS_: "readonly",
 
                 // Project-wide globals used throughout the codebase
                 TONEBPM: "readonly",

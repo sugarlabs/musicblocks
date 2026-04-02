@@ -546,7 +546,7 @@ describe("Tempo Widget", () => {
 
         test("should clear previous frame and draw ellipse", () => {
             tempoWidget._draw();
-            const ctx = tempoWidget.tempoCanvases[0].getContext("2d");
+            const ctx = tempoWidget.tempoCanvases[0].getContext("2d", { willReadFrequently: true });
 
             expect(ctx.clearRect).toHaveBeenCalledTimes(1);
             expect(ctx.beginPath).toHaveBeenCalledTimes(1);
@@ -689,7 +689,7 @@ describe("Tempo Widget", () => {
 
             tempoWidget._draw();
 
-            const ctx = mockCanvas.getContext("2d");
+            const ctx = mockCanvas.getContext("2d", { willReadFrequently: true });
             expect(ctx.ellipse).toHaveBeenCalled();
         });
 
@@ -786,8 +786,8 @@ describe("Tempo Widget", () => {
 
             tempoWidget._draw();
 
-            const ctx1 = canvas1.getContext("2d");
-            const ctx2 = canvas2.getContext("2d");
+            const ctx1 = canvas1.getContext("2d", { willReadFrequently: true });
+            const ctx2 = canvas2.getContext("2d", { willReadFrequently: true });
 
             expect(ctx1.ellipse).toHaveBeenCalled();
             expect(ctx2.ellipse).toHaveBeenCalled();

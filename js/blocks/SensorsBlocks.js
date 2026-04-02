@@ -639,7 +639,7 @@ function setupSensorsBlocks(activity) {
          */
         getPixelData(x, y) {
             const canvas = docById("overlayCanvas");
-            const ctx = canvas?.getContext("2d");
+            const ctx = canvas?.getContext("2d", { willReadFrequently: true });
             if (!ctx) {
                 throw new Error("Canvas context unavailable");
             }

@@ -18,7 +18,10 @@
         "serve": "http-server -a 127.0.0.1 -p 3000 --gzip --brotli",
         "serve:dev": "http-server -a 127.0.0.1 -p 3000 -c-1",
         "start": "node index.js",
-        "dev": "cross-env NODE_ENV=development nodemon index.js",
+        "dev:legacy": "cross-env NODE_ENV=development nodemon index.js",
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview",
         "prod": "cross-env NODE_ENV=production node index.js",
         "test": "jest",
         "cypress:run": "cypress run",
@@ -65,6 +68,9 @@
         "postcss": "^8.5.6",
         "sass": "^1.97.2",
         "tone": "^15.1.22"
+    },
+    "engines": {
+        "node": ">=24.2.0"
     },
     "build": {
         "appId": "com.musicblocks.app",

@@ -1865,7 +1865,7 @@ function SampleWidget() {
         canvas.width = width;
         canvas.className = "samplerCanvas";
         this.widgetWindow.getWidgetBody().appendChild(canvas);
-        const canvasCtx = canvas.getContext("2d");
+        const canvasCtx = canvas.getContext("2d", { willReadFrequently: true });
         canvasCtx.clearRect(0, 0, width, height);
 
         // If tuner is enabled, create a separate tuner display
