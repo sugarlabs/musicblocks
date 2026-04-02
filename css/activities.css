@@ -46,6 +46,36 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 .highcontrast .ui-menu .ui-menu-item {
     color: #ffffff !important;
 }
+.ui-menu .ui-menu-item {
+  color: #ffffff !important;
+}
+
+.ui-menu .ui-menu-item:hover,
+.ui-menu .ui-state-focus {
+  color: #ffffff !important;
+}
+.ui-menu-item-wrapper {
+  color: #ffffff !important;
+}
+.ui-menu-item-wrapper {
+  color: #ffffff !important;
+}
+
+.ui-menu-item-wrapper:hover,
+.ui-menu-item-wrapper.ui-state-active,
+.ui-menu-item-wrapper.ui-state-focus {
+  color: #ffffff !important;
+}
+#toolbars .ui-menu-item-wrapper {
+  color: #ffffff !important;
+}
+/* Fix sidebar text contrast */
+#toolbars li,
+#toolbars li *,
+#toolbars .ui-menu-item,
+#toolbars .ui-menu-item * {
+  color: #ffffff !important;
+}
 
 .highcontrast .ui-menu .ui-menu-item:hover,
 .highcontrast .ui-menu .ui-state-focus {
