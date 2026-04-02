@@ -1692,6 +1692,11 @@ class Activity {
         };
 
         this._doFastButton = env => {
+            // Prevent spam-clicking by checking if already running
+            if (this.logo._alreadyRunning) {
+                return;
+            }
+
             this._onResize();
             this.blocks.activeBlock = null;
             hideDOMLabel();
