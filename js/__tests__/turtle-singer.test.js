@@ -917,6 +917,10 @@ describe("processNote regression behavior", () => {
         singer = turtleMock.singer;
     });
 
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
     test("should not modify bpm stack during execution", () => {
         singer.bpm.push(120);
         const originalLength = singer.bpm.length;
@@ -930,21 +934,26 @@ describe("processNote regression behavior", () => {
         Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
         expect(singer.bpm).toEqual(before);
     });
-    test("should execute callback after processing note", () => {
+
+    test("should execute callback exactly once per processNote call", () => {
         const callback = jest.fn();
         Singer.processNote(activityMock, 4, false, "mockBlk", 0, callback);
-        expect(callback).toHaveBeenCalled();
+        expect(callback).toHaveBeenCalledTimes(1);
     });
 
-    test("should execute without errors when bpm stack is empty", () => {
-        singer.bpm = [];
+    test("should handle empty bpm without corrupting state", () => {
         const callback = jest.fn();
+        singer.bpm = [];
+        const beforeBpm = [...singer.bpm];
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, callback);
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(singer.bpm).toEqual(beforeBpm);
+    });
 
-        expect(() => {
-            Singer.processNote(activityMock, 4, false, "mockBlk", 0, callback);
-        }).not.toThrow();
-
-        expect(callback).toHaveBeenCalled();
+    test("should NOT schedule unhighlight timer under current test conditions (diagnostic)", () => {
+        const setTimeoutSpy = jest.spyOn(global, "setTimeout");
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+        expect(setTimeoutSpy).not.toHaveBeenCalled();
     });
 });
 
