@@ -19,7 +19,7 @@
    PALETTEFILLCOLORS, PALETTESTROKECOLORS, last, getTextWidth,
     STANDARDBLOCKHEIGHT, CLOSEICON, BUILTINPALETTES,
     safeSVG, blockIsMacro, getMacroExpansion,
-    cameraPALETTE, mediaPALETTE, videoPALETTE
+    cameraPALETTE, mediaPALETTE, videoPALETTE, UndoRedo, Action
 */
 
 /* exported Palettes, initPalettes */
@@ -30,7 +30,42 @@ const PALETTE_SCALE_FACTOR = 0.5;
 const PALETTE_WIDTH_FACTOR = 3;
 
 const paletteBlockButtonPush = (blocks, name, arg) => {
+    const beforeCount = blocks.blockList.length;
     const blk = blocks.makeBlock(name, arg);
+    if (UndoRedo && typeof UndoRedo.addAction === "function") {
+        const createdIndices = [];
+        for (let i = beforeCount; i < blocks.blockList.length; i++) {
+            if (blocks.blockList[i]) {
+                createdIndices.push(i);
+            }
+        }
+
+        if (createdIndices.length > 0) {
+            UndoRedo.addAction(
+                new Action(
+                    () => {
+                        createdIndices.forEach(index => {
+                            const block = blocks.blockList[index];
+                            if (!block) return;
+                            block.trash = false;
+                            block.show();
+                        });
+                        blocks.activity.refreshCanvas();
+                    },
+                    () => {
+                        for (let i = createdIndices.length - 1; i >= 0; i--) {
+                            const block = blocks.blockList[createdIndices[i]];
+                            if (!block) continue;
+                            block.trash = true;
+                            block.hide();
+                        }
+                        blocks.activity.refreshCanvas();
+                    },
+                    "Add block"
+                )
+            );
+        }
+    }
     return blk;
 };
 
@@ -1934,7 +1969,7 @@ class Palette {
             }
 
             if (macroExpansion !== null) {
-                this.activity.blocks.loadNewBlocks(macroExpansion);
+                this.activity.blocks.loadNewBlocks(macroExpansion, true);
                 const thisBlock = this.activity.blocks.blockList.length - 1;
                 const topBlk = this.activity.blocks.findTopBlock(thisBlock);
                 // Ensure that the newly created block is not under
@@ -1994,7 +2029,7 @@ class Palette {
                 // before loading.
                 obj[0][2] = saveX;
                 obj[0][3] = saveY;
-                this.activity.blocks.loadNewBlocks(obj);
+                this.activity.blocks.loadNewBlocks(obj, true);
 
                 const thisBlock = this.activity.blocks.blockList.length - 1;
                 const topBlk = this.activity.blocks.findTopBlock(thisBlock);
