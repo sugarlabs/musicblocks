@@ -576,6 +576,68 @@ describe("Toolbar Class", () => {
         expect(recordButton.style.display).toBe("");
     });
 
+    test("updateRecordButton keeps only one outside-click listener and dispose removes it", () => {
+        global.RECORDBUTTON = "fiber_manual_record";
+
+        const recordButton = {
+            classList: { add: jest.fn(), remove: jest.fn() },
+            style: { display: "" },
+            innerHTML: "",
+            onclick: null
+        };
+
+        const recordDropdownArrow = {
+            classList: { add: jest.fn(), remove: jest.fn() },
+            style: { display: "" },
+            innerHTML: "",
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn(),
+            querySelector: jest.fn(() => ({ textContent: "arrow_drop_down" })),
+            contains: jest.fn(() => false)
+        };
+
+        const recordDropdown = {
+            style: { display: "none" },
+            offsetParent: null,
+            contains: jest.fn(() => false)
+        };
+
+        const recordWithMenus = { style: {}, onclick: null };
+        const recordCanvasOnly = { style: {}, onclick: null };
+
+        global.docById.mockImplementation(id => {
+            if (id === "record") return recordButton;
+            if (id === "recordDropdownArrow") return recordDropdownArrow;
+            if (id === "recorddropdown") return recordDropdown;
+            if (id === "record-with-menus") return recordWithMenus;
+            if (id === "record-canvas-only") return recordCanvasOnly;
+            return createMockElement(id);
+        });
+
+        global.fnBrowserDetect = jest.fn(() => "chrome");
+        const addSpy = jest.spyOn(document, "addEventListener");
+        const removeSpy = jest.spyOn(document, "removeEventListener");
+
+        toolbar.activity = { beginnerMode: false };
+
+        toolbar.updateRecordButton(jest.fn());
+        toolbar.updateRecordButton(jest.fn());
+
+        const addClickHandlers = addSpy.mock.calls.filter(([type]) => type === "click");
+        const removeClickHandlers = removeSpy.mock.calls.filter(([type]) => type === "click");
+
+        expect(addClickHandlers.length).toBe(2);
+        expect(removeClickHandlers.length).toBe(1);
+
+        toolbar.dispose();
+
+        const removeAfterDispose = removeSpy.mock.calls.filter(([type]) => type === "click");
+        expect(removeAfterDispose.length).toBe(2);
+
+        addSpy.mockRestore();
+        removeSpy.mockRestore();
+    });
+
     test("renderPlanetIcon sets onclick and updates planet icon behavior", () => {
         const elements = {
             planetIcon: {

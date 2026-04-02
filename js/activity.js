@@ -421,6 +421,9 @@ class Activity {
         this.setupDependencies = () => {
             this._stopRenderLoop();
             this.cleanupEventListeners();
+            if (this.toolbar && typeof this.toolbar.dispose === "function") {
+                this.toolbar.dispose();
+            }
             createDefaultStack();
             createHelpContent(this);
             window.scroll(0, 0);
