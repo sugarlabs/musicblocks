@@ -108,8 +108,20 @@ class Arpeggio {
 
         this.arpeggioDiv = document.createElement("div");
         widgetWindow.getWidgetBody().append(this.arpeggioDiv);
-        widgetWindow.getWidgetBody().style.height = "400px";
-        widgetWindow.getWidgetBody().style.width = "400px";
+        widgetWindow.getWidgetBody().style.minHeight = "400px";
+        widgetWindow.getWidgetBody().style.minWidth = "400px";
+
+        const body = this.widgetWindow.getWidgetBody();
+
+        body.style.resize = "both";
+        body.style.overflow = "hidden";
+        body.style.display = "block";
+        body.style.minWidth = "400px";
+        body.style.minHeight = "300px";
+
+
+        body.style.flex = "none";
+
 
         const arpeggioTableDiv = this.arpeggioDiv;
         arpeggioTableDiv.style.display = "inline";
