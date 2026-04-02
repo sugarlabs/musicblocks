@@ -273,6 +273,15 @@ class JSEditor {
      */
 
     _setup() {
+        this.widgetWindow.onclose = () => {
+            if (this._resizeHandlers) {
+                document.removeEventListener("mousemove", this._resizeHandlers.doResize);
+                document.removeEventListener("mouseup", this._resizeHandlers.stopResize);
+                this._resizeHandlers = null;
+            }
+            this.isOpen = false;
+        };
+
         this.widgetWindow.onmaximize = () => {
             const editor = this.widgetWindow.getWidgetBody().childNodes[0];
             editor.style.width = this.widgetWindow._maximized ? "100%" : "39rem";
@@ -807,6 +816,9 @@ class JSEditor {
 
         document.addEventListener("mousemove", doResize);
         document.addEventListener("mouseup", stopResize);
+
+        // Store references so onclose can remove them
+        this._resizeHandlers = { doResize, stopResize };
     }
 
     /**
