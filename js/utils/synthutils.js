@@ -13,7 +13,7 @@
 /*
    global
 
-   _, last, Tone, require, getTemperament, pitchToNumber,
+   last, Tone, getTemperament, pitchToNumber,
    getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
    getOctaveRatio, isCustomTemperament, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
@@ -536,6 +536,18 @@ function Synth() {
      * @type {Object.<string, [number, number]>}
      */
     this.noteFrequencies = {};
+
+    /**
+     * Resets temperament state to the same defaults used during initialization.
+     * @function
+     */
+    this.resetTemperamentState = () => {
+        this.inTemperament = "equal";
+        this.startingPitch = "C4";
+        this.noteFrequencies = {};
+        this.changeInTemperament = false;
+    };
+
     /**
      * Tuner microphone input.
      * @type {Tone.UserMedia|null}
