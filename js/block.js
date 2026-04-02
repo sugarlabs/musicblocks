@@ -2640,8 +2640,8 @@ class Block {
                 if (this.blocks.blockList[c2].name === "number") {
                     if (this.blocks.blockList[c1].name === "number") {
                         const degrees = DEGREES.split(" ");
-                        const i = this.blocks.blockList[c1].value - 1;
-                        if (i > 0 && i < degrees.length) {
+                        const i = this.blocks.blockList[c1].value;
+                        if (i >= 0 && i < degrees.length) {
                             return degrees[i] + " " + this.blocks.blockList[c2].value;
                         } else {
                             return (
