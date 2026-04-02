@@ -769,13 +769,11 @@ class Toolbar {
                 saveButtonAdvanced.style.display = "none";
                 saveButton.onclick = () => {
                     const saveHTML = docById("save-html-beg");
-                    console.debug(saveHTML);
                     saveHTML.onclick = () => {
                         html_onclick(this.activity);
                     };
 
                     const savePNG = docById("save-png-beg");
-                    console.debug(savePNG);
                     const svgData = doSVG_onclick(
                         this.activity.canvas,
                         this.activity.logo,
@@ -798,7 +796,6 @@ class Toolbar {
                 };
             }
         } else {
-            console.debug("ADVANCED MODE BUTTONS");
             saveButton.style.display = "none";
             saveButtonAdvanced.style.display = "block";
             saveButtonAdvanced.onclick = () => {
@@ -810,7 +807,6 @@ class Toolbar {
                 };
                 const saveSVG = docById("save-svg");
                 const savePNG = docById("save-png");
-                console.debug(savePNG);
                 const svgData = doSVG_onclick(
                     this.activity.canvas,
                     this.activity.logo,
