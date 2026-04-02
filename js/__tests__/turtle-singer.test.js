@@ -970,3 +970,72 @@ describe("scalarDistance edge cases", () => {
         expect(result).toBeLessThanOrEqual(0);
     });
 });
+
+describe("processPitch internal addPitch behavior", () => {
+    let turtleMock;
+    let activityMock;
+
+    beforeEach(() => {
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+
+        const blk = "blk";
+        turtleMock.singer.notePitches = { [blk]: [] };
+        turtleMock.singer.noteOctaves = { [blk]: [] };
+        turtleMock.singer.noteCents = { [blk]: [] };
+        turtleMock.singer.noteHertz = { [blk]: [] };
+        turtleMock.singer.noteBeatValues = { [blk]: [] };
+        turtleMock.singer.inNoteBlock = [];
+        activityMock = createActivityMock(turtleMock);
+        activityMock.logo.clearNoteParams = jest.fn((tur, blkId) => {
+            tur.singer.notePitches[blkId] = [];
+            tur.singer.noteOctaves[blkId] = [];
+            tur.singer.noteCents[blkId] = [];
+            tur.singer.noteHertz[blkId] = [];
+            tur.singer.noteBeatValues[blkId] = [];
+        });
+
+        // Prevent deep runtime execution
+        jest.spyOn(Singer, "processNote").mockImplementation(() => {});
+    });
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    test("should push pitch data through internal addPitch", () => {
+        const blk = "blk";
+        Singer.processPitch(activityMock, "C", 4, 0, turtleMock, blk);
+        expect(turtleMock.singer.notePitches[blk].length).toBe(1);
+        expect(turtleMock.singer.noteOctaves[blk].length).toBe(1);
+        expect(turtleMock.singer.noteCents[blk][0]).toBe(0);
+        expect(turtleMock.singer.noteHertz[blk][0]).toBe(0);
+        expect(turtleMock.singer.pushedNote).toBe(true);
+    });
+
+    test("should map pitch to drum when drumStyle is active", () => {
+        const blk = "blk";
+        turtleMock.singer.drumStyle = ["snare"];
+        Singer.processPitch(activityMock, "C", 4, 0, turtleMock, blk);
+        expect(Object.keys(turtleMock.singer.pitchDrumTable).length).toBe(1);
+    });
+
+    test("should compute hertz when cents is non-zero", () => {
+        const blk = "blk";
+        Singer.processPitch(activityMock, "C", 4, 50, turtleMock, blk);
+        expect(turtleMock.singer.noteHertz[blk][0]).toBe(440);
+    });
+
+    test("should compute hertz when cents is negative", () => {
+        const blk = "blk";
+        Singer.processPitch(activityMock, "C", 4, -25, turtleMock, blk);
+        expect(turtleMock.singer.noteHertz[blk][0]).toBe(440);
+    });
+
+    test("should store correct pitch-to-drum mapping", () => {
+        const blk = "blk";
+        turtleMock.singer.drumStyle = ["snare"];
+        Singer.processPitch(activityMock, "C", 4, 0, turtleMock, blk);
+        const mapping = turtleMock.singer.pitchDrumTable;
+        expect(mapping["C4"]).toBe("snare");
+    });
+});
