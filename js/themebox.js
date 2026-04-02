@@ -381,12 +381,12 @@ class ThemeBox {
         }
 
         if (themeToggleIcon) {
-            // Update toggle button icon based on current theme
-            let toggleIcon = "brightness_7"; // Default to light mode icon
+            // Update toggle button icon to show what will happen when clicked
+            let toggleIcon = "brightness_4"; // Default to dark mode icon (will switch to dark)
             if (this._theme === "dark") {
-                toggleIcon = "brightness_4";
+                toggleIcon = "brightness_7"; // Show light icon (will switch to light)
             } else if (this._theme === "highcontrast") {
-                toggleIcon = "brightness_6";
+                toggleIcon = "brightness_7"; // Show light icon (will switch to light)
             }
             themeToggleIcon.innerHTML = `<i class="material-icons md-48">${toggleIcon}</i>`;
         }
