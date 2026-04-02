@@ -1466,8 +1466,8 @@ class Palette {
                     document.body.style.cursor = "default";
                     document.removeEventListener("mousemove", onMouseMove);
                     document.removeEventListener("touchmove", onMouseMove);
-                    img.onmouseup = null;
-                    img.ontouchend = null;
+                    document.removeEventListener("mouseup", up);
+                    document.removeEventListener("touchend", up);
 
                     const x = parseInt(img.style.left);
                     const y = parseInt(img.style.top);
@@ -1491,8 +1491,8 @@ class Palette {
                     );
                 };
 
-                img.ontouchend = up;
-                img.onmouseup = up;
+                document.addEventListener("touchend", up);
+                document.addEventListener("mouseup", up);
             };
 
             img.ontouchstart = down;
@@ -1513,7 +1513,8 @@ class Palette {
         let posY, top;
 
         const mouseUpGrab = () => {
-            // paletteList.onmousemove = null;
+            document.removeEventListener("mousemove", mouseMoveGrab);
+            document.removeEventListener("mouseup", mouseUpGrab);
             document.body.style.cursor = "default";
         };
 
@@ -1527,9 +1528,8 @@ class Palette {
             posY = event.clientY;
             top = paletteList.scrollTop;
 
-            paletteList.onmousemove = mouseMoveGrab;
-            paletteList.onmouseup = mouseUpGrab;
-            paletteList.onmouseleave = mouseUpGrab;
+            document.addEventListener("mousemove", mouseMoveGrab);
+            document.addEventListener("mouseup", mouseUpGrab);
         };
 
         paletteList.onmousedown = mouseDownGrab;
