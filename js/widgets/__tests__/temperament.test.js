@@ -315,6 +315,133 @@ describe("TemperamentWidget basic tests", () => {
         );
     });
 
+    test("playNote uses note-name mapping for default temperaments", () => {
+        widget._logo = {
+            resetSynth: jest.fn(),
+            synth: {
+                trigger: jest.fn(),
+                inTemperament: "equal",
+                changeInTemperament: false
+            }
+        };
+
+        widget.inTemperament = "equal19";
+        widget.editMode = null;
+        widget.notes = [["D♭", 4]];
+        widget.frequencies = [440];
+
+        global.isCustomTemperament = jest.fn(() => false);
+        global.docById = jest.fn(() => null);
+
+        widget.playNote(0);
+
+        expect(widget._logo.synth.inTemperament).toBe("equal19");
+        expect(widget._logo.synth.changeInTemperament).toBe(true);
+        expect(widget._logo.synth.trigger).toHaveBeenCalledWith(
+            0,
+            "Db4",
+            expect.any(Number),
+            "electronic synth",
+            null,
+            null
+        );
+    });
+
+    test("playNote keeps equal temperament on frequency path", () => {
+        widget._logo = {
+            resetSynth: jest.fn(),
+            synth: {
+                trigger: jest.fn(),
+                inTemperament: "equal",
+                changeInTemperament: false
+            }
+        };
+
+        widget.inTemperament = "equal";
+        widget.editMode = null;
+        widget.notes = [["D♭", 4]];
+        widget.frequencies = [440];
+
+        global.isCustomTemperament = jest.fn(() => false);
+        global.docById = jest.fn(() => null);
+
+        widget.playNote(0);
+
+        expect(widget._logo.synth.trigger).toHaveBeenCalledWith(
+            0,
+            440,
+            expect.any(Number),
+            "electronic synth",
+            null,
+            null
+        );
+    });
+
+    test("playNote keeps custom temperament on frequency path", () => {
+        widget._logo = {
+            resetSynth: jest.fn(),
+            synth: {
+                trigger: jest.fn(),
+                inTemperament: "custom",
+                changeInTemperament: false
+            }
+        };
+
+        widget.inTemperament = "custom";
+        widget.editMode = null;
+        widget.notes = [["D♭", 4]];
+        widget.frequencies = [441.25];
+
+        global.isCustomTemperament = jest.fn(() => true);
+        global.docById = jest.fn(() => null);
+
+        widget.playNote(0);
+
+        expect(widget._logo.synth.trigger).toHaveBeenCalledWith(
+            0,
+            441.25,
+            expect.any(Number),
+            "electronic synth",
+            null,
+            null
+        );
+    });
+
+    test("playNote no-ops on out-of-range pitch index", () => {
+        widget._logo = {
+            resetSynth: jest.fn(),
+            synth: {
+                trigger: jest.fn(),
+                inTemperament: "equal19",
+                changeInTemperament: false
+            }
+        };
+
+        widget.inTemperament = "equal19";
+        widget.editMode = null;
+        widget.notes = [];
+        widget.frequencies = [];
+
+        global.isCustomTemperament = jest.fn(() => false);
+        global.docById = jest.fn(() => null);
+
+        widget.playNote(999);
+
+        expect(widget._logo.synth.trigger).not.toHaveBeenCalled();
+    });
+
+    test("playNote no-ops when synth is unavailable", () => {
+        widget._logo = null;
+        widget.inTemperament = "equal19";
+        widget.editMode = null;
+        widget.notes = [["C", 4]];
+        widget.frequencies = [440];
+
+        global.docById = jest.fn(() => null);
+
+        expect(() => widget.playNote(0)).not.toThrow();
+    });
+
     test("toggleNotesButton switches icon when circle visible", () => {
         widget.toggleNotesButton = function () {
             this.circleIsVisible = false;
