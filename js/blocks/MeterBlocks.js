@@ -1212,7 +1212,6 @@ function setupMeterBlocks(activity) {
                 const listenerName = "_bpm_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
-                // eslint-disable-next-line no-unused-vars
                 const __listener = event => {
                     tur.singer.bpm.pop();
                 };
@@ -1287,7 +1286,6 @@ function setupMeterBlocks(activity) {
                 const listenerName = "_bpm_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
-                // eslint-disable-next-line no-unused-vars
                 const __listener = event => {
                     tur.singer.bpm.pop();
                 };

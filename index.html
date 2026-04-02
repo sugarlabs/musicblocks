@@ -68,12 +68,6 @@
             as="style"
             onload="this.onload=null;this.rel='stylesheet'"
         />
-        <link
-            rel="preload"
-            href="css/program-explorer.css"
-            as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
-        />
         <link rel="prefetch" as="video" href="loading-animation.webm" type="video/webm" />
         <link rel="prefetch" as="video" href="loading-animation.mp4" type="video/mp4" />
 
@@ -1025,6 +1019,16 @@
                                 ><i class="material-icons">brightness_4</i></a
                             >
                         </li>
+                        <li>
+                            <a
+                                id="highcontrast"
+                                class="tooltipped"
+                                data-tooltip="High Contrast Mode"
+                                role="button"
+                                tabindex="0"
+                                ><i class="material-icons">brightness_6</i></a
+                            >
+                        </li>
                     </ul>
 
                     <div id="modal-container" style="display: none; z-index: 999">
@@ -1190,21 +1194,21 @@
                     }, 1500);
                 }, 3000);
 
-                const languageDropdown = document.getElementById("languagedropdown");
-                if (languageDropdown) {
-                    const langLinks = languageDropdown.querySelectorAll("a");
-                    langLinks.forEach(link => {
-                        link.addEventListener("click", function (e) {
-                            e.preventDefault(); // prevent default <a> behavior
-                            const selectedLang = this.id; // ID corresponds to language code
-                            const currentLang = localStorage.getItem("languagePreference");
-                            if (currentLang !== selectedLang) {
-                                localStorage.setItem("languagePreference", selectedLang);
-                                location.reload(); // automatically reload
-                            }
-                        });
-                    });
+            const languageDropdown = document.getElementById("languagedropdown");
+            if (languageDropdown) {
+            const langLinks = languageDropdown.querySelectorAll("a");
+            langLinks.forEach(link => {
+            link.addEventListener("click", function (e) {
+                e.preventDefault(); // prevent default <a> behavior
+                const selectedLang = this.id; // ID corresponds to language code
+                const currentLang = localStorage.getItem("languagePreference");
+                if (currentLang !== selectedLang) {
+                    localStorage.setItem("languagePreference", selectedLang);
+                    location.reload(); // automatically reload
                 }
+            });
+        });
+            }
             });
         </script>
 

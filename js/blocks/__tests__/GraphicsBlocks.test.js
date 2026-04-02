@@ -81,9 +81,9 @@ describe("GraphicsBlocks", () => {
         };
         activity = {
             blocks: {
-                blockList: [
-                    { connections: [null] } // Mock block at index 0
-                ]
+                blockList: {
+                    0: { connections: [null] }
+                }
             },
             errorMsg: jest.fn(),
             turtles: {
