@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Bottersnike
+﻿// Copyright (c) 2019 Bottersnike
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -27,6 +27,22 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
 
 function setupRhythmBlockPaletteBlocks(activity) {
     /**
+     * Schedules a note to be played after a timeout.
+     * @param {object} activity - The activity object.
+     * @param {number} beat - The beat value.
+     * @param {string} blk - The block ID.
+     * @param {string} turtle - The turtle ID.
+     * @param {function} callback - The callback function.
+     * @param {number} timeout - The timeout in milliseconds.
+     */
+    const scheduleNote = (activity, beat, blk, turtle, callback, timeout) => {
+        setTimeout(
+            () => Singer.processNote(activity, beat, false, blk, turtle, callback),
+            timeout
+        );
+    };
+
+    /**
      * Represents a block for handling rhythms.
      * @extends {FlowBlock}
      */
@@ -47,9 +63,9 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 name:
                     this.lang === "ja"
                         ? //.TRANS: rhythm block
-                          _("rhythm1")
+                        _("rhythm1")
                         : //.TRANS: an arrangement of notes based on duration
-                          _("rhythm"),
+                        _("rhythm"),
 
                 /**
                  * @type {number}
@@ -113,7 +129,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 if (logo.inMatrix) {
                     logo.phraseMaker.addColBlock(blk, arg0);
 
-                    // Add individual entries for each beat to avoid extra × blocks
+                    // Add individual entries for each beat to avoid extra ├ù blocks
                     for (let i = 0; i < arg0; i++) {
                         logo.tupletRhythms.push(["individual", 1, noteBeatValue]);
                     }
@@ -171,21 +187,6 @@ function setupRhythmBlockPaletteBlocks(activity) {
 
                 const beatValue = bpmFactor == null ? 1 : bpmFactor / noteBeatValue;
 
-                /**
-                 * Plays a note in the rhythm.
-                 *
-                 * @param {number} thisBeat - Beat value for the note.
-                 * @param {string} blk - Block identifier.
-                 * @param {string} turtle - Turtle identifier.
-                 * @param {Function} callback - Callback function.
-                 * @param {number} timeout - Timeout value.
-                 */
-                const __rhythmPlayNote = (thisBeat, blk, turtle, callback, timeout) => {
-                    setTimeout(
-                        () => Singer.processNote(activity, thisBeat, false, blk, turtle, callback),
-                        timeout
-                    );
-                };
                 let __callback;
 
                 for (let i = 0; i < arg0; i++) {
@@ -198,8 +199,10 @@ function setupRhythmBlockPaletteBlocks(activity) {
                         __callback = null;
                     }
 
-                    __rhythmPlayNote(noteBeatValue, blk, turtle, __callback, i * beatValue * 1000);
+                    scheduleNote(activity, noteBeatValue, blk, turtle, __callback, i * beatValue * 1000);
                 }
+
+
 
                 tur.doWait((arg0 - 1) * beatValue);
             }
@@ -234,7 +237,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 name:
                     this.lang === "ja"
                         ? //.TRANS: translate "rhythm1" as rhythm
-                          _("rhythm1")
+                        _("rhythm1")
                         : _("rhythm"),
 
                 /**
@@ -287,7 +290,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("sixtyfourthNote", _("1/64 note") + " 𝅘𝅥𝅱");
+                super("sixtyfourthNote", _("1/64 note") + " ≡¥àú");
             }
 
             this.setPalette(rhythmBlockPalette, activity);
@@ -318,7 +321,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("thirtysecondNote", _("1/32 note") + " 𝅘𝅥𝅰");
+                super("thirtysecondNote", _("1/32 note") + " ≡¥àó");
             }
 
             // Set the palette and activity for the block
@@ -352,7 +355,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("sixteenthNote", _("1/16 note") + " 𝅘𝅥𝅯");
+                super("sixteenthNote", _("1/16 note") + " ≡¥àí");
             }
 
             // Set the palette and activity for the block
@@ -381,7 +384,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         constructor() {
             // TRANS: Do not modify the following line
-            super("eighthNote", _("eighth note") + " ♪");
+            super("eighthNote", _("eighth note") + " ΓÖ¬");
 
             // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
@@ -409,7 +412,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         constructor() {
             // TRANS: Do not modify the following line
-            super("quarterNote", _("quarter note") + " ♩");
+            super("quarterNote", _("quarter note") + " ΓÖ⌐");
 
             // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
@@ -442,7 +445,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("halfNote", _("half note") + " 𝅗𝅥");
+                super("halfNote", _("half note") + " ≡¥à₧");
             }
 
             // Set the palette and activity for the block
@@ -476,7 +479,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("wholeNote", _("whole note") + " 𝅝");
+                super("wholeNote", _("whole note") + " ≡¥à¥");
             }
 
             // Set the palette and activity for the block
@@ -737,23 +740,6 @@ function setupRhythmBlockPaletteBlocks(activity) {
                             ? last(tur.singer.bpm)
                             : Singer.masterBPM;
 
-                    let totalBeats = 0;
-
-                    const __tupletPlayNote = (thisBeat, blk, turtle, callback, timeout) => {
-                        setTimeout(
-                            () =>
-                                Singer.processNote(
-                                    activity,
-                                    thisBeat,
-                                    false,
-                                    blk,
-                                    turtle,
-                                    callback
-                                ),
-                            timeout
-                        );
-                    };
-
                     let timeout = 0;
                     let beatValue;
                     let __callback = null;
@@ -773,11 +759,12 @@ function setupRhythmBlockPaletteBlocks(activity) {
                             __callback = null;
                         }
 
-                        __tupletPlayNote(thisBeat, blk, turtle, __callback, timeout);
+                        scheduleNote(activity, thisBeat, blk, turtle, __callback, timeout);
 
                         timeout += beatValue * 1000;
                         totalBeats += beatValue;
                     }
+
 
                     tur.doWait(totalBeats - beatValue);
                 }
@@ -893,10 +880,10 @@ function setupRhythmBlockPaletteBlocks(activity) {
             // Set the help string for the block
             this.setHelpString([
                 _("Tuplets are a collection of notes that get scaled to a specific duration.") +
-                    " " +
-                    _(
-                        "Using tuplets makes it easy to create groups of notes that are not based on a power of 2."
-                    ),
+                " " +
+                _(
+                    "Using tuplets makes it easy to create groups of notes that are not based on a power of 2."
+                ),
                 "documentation",
                 null,
                 "matrix"
