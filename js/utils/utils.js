@@ -1767,27 +1767,31 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
 };
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = {
-        _,
-        last,
-        fileExt,
-        fileBasename,
-        toTitleCase,
-        safeSVG,
-        toFixed2,
-        mixedNumber,
-        nearestBeat,
-        oneHundredToFraction,
-        rationalToFraction,
-        rationalSum,
-        rgbToHex,
-        hexToRGB,
-        hex2rgb,
-        format,
-        delayExecution,
-        closeWidgets,
-        closeBlkWidgets,
-        resolveObject,
-        importMembers
-    };
+   module.exports = {
+    last,
+    fileExt,
+    fileBasename,
+    toTitleCase,
+    safeSVG,
+    toFixed2,
+    mixedNumber,
+    nearestBeat,
+    oneHundredToFraction,
+    rationalToFraction,
+    rationalSum,
+    rgbToHex,
+    hexToRGB,
+    hex2rgb,
+    format,
+    delayExecution,
+    closeWidgets,
+    closeBlkWidgets,
+    resolveObject,
+    importMembers,
+
+    // ✅ ADD THESE
+    fnBrowserDetect,
+    windowHeight,
+    windowWidth
+};
 }
