@@ -185,21 +185,7 @@ class Logo {
         this.reflection = null;
         this.phraseMaker = null;
         this.legoWidget = null;
-        this.pitchDrumMatrix = null;
-        this.arpeggio = null;
-        this.rhythmRuler = null;
-        this.timbre = null;
-        this.pitchStaircase = null;
-        this.temperament = null;
-        this.tempo = null;
-        this.pitchSlider = null;
-        this.musicKeyboard = null;
-        this.modeWidget = null;
-        this.Oscilloscope = null;
-        this.oscilloscopeTurtles = [];
-        this.meterWidget = null;
-        this.statusMatrix = null;
-        this.legobricks = null;
+        this._statusMatrix = null; // Fallback for when no turtles are available
 
         this.evalFlowDict = {};
         this.evalArgDict = {};
@@ -242,13 +228,6 @@ class Logo {
         this.lastKeyCode = null;
 
         // Widget-related attributes
-        this.showPitchDrumMatrix = false;
-        this.inPitchDrumMatrix = false;
-        this.inRhythmRuler = false;
-        this.rhythmRulerMeasure = null;
-        this.inPitchStaircase = false;
-        this.inTempo = false;
-        this.inPitchSlider = false;
         this.inMusicKeyboard = false;
         this._currentDrumBlock = null;
         this.inTimbre = false;
@@ -262,8 +241,6 @@ class Logo {
         this.inLegoWidget = false;
         this.tupletRhythms = [];
         this.addingNotesToTuplet = false;
-        this.drumBlocks = [];
-        this.pitchBlocks = [];
 
         // Parameters used by duplicate block
         this.connectionStore = {};
@@ -300,8 +277,6 @@ class Logo {
             notationDrumStaging: {}
         };
 
-        this.temperamentSelected = [];
-        this.customTemperamentDefined = false;
         this.specialArgs = [];
 
         // Load the default synthesizer
@@ -338,9 +313,6 @@ class Logo {
         // is queued here.
         this.stepQueue = {};
         this._unhighlightStepQueue = {};
-
-        this.svgOutput = "";
-        this.svgBackground = true;
 
         this.mic = null;
         this.volumeAnalyser = null;
@@ -389,6 +361,719 @@ class Logo {
      */
     get turtleDelay() {
         return this._turtleDelay;
+    }
+
+    /**
+     * @param {String} svgOutput - SVG output
+     */
+    set svgOutput(svgOutput) {
+        // Delegate to the primary turtle's painter for backward compatibility
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.painter) {
+                primaryTurtle.painter.svgOutput = svgOutput;
+            }
+        }
+    }
+
+    /**
+     * @returns {String} SVG output
+     */
+    get svgOutput() {
+        // Get from the primary turtle's painter for backward compatibility
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.painter) {
+                return primaryTurtle.painter.svgOutput;
+            }
+        }
+        return "";
+    }
+
+    /**
+     * @param {Boolean} svgBackground - SVG background state
+     */
+    set svgBackground(svgBackground) {
+        // Delegate to the primary turtle's painter for backward compatibility
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.painter) {
+                primaryTurtle.painter.svgBackground = svgBackground;
+            }
+        }
+    }
+
+    /**
+     * @returns {Boolean} SVG background state
+     */
+    get svgBackground() {
+        // Get from the primary turtle's painter for backward compatibility
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.painter) {
+                return primaryTurtle.painter.svgBackground;
+            }
+        }
+        return true;
+    }
+
+    // Music widget state getters/setters for backward compatibility
+    // These properties were moved to turtle-singer.js to improve modularity
+
+    /**
+     * @param {Object} pitchDrumMatrix - Pitch drum matrix widget
+     */
+    set pitchDrumMatrix(pitchDrumMatrix) {
+        // Delegate to the primary turtle's singer for backward compatibility
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.pitchDrumMatrix = pitchDrumMatrix;
+            }
+        }
+    }
+
+    /**
+     * @returns {Object} Pitch drum matrix widget
+     */
+    get pitchDrumMatrix() {
+        // Get from the primary turtle's singer for backward compatibility
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.pitchDrumMatrix;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param {Object} arpeggio - Arpeggio widget
+     */
+    set arpeggio(arpeggio) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.arpeggio = arpeggio;
+            }
+        }
+    }
+
+    /**
+     * @returns {Object} Arpeggio widget
+     */
+    get arpeggio() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.arpeggio;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param {Object} rhythmRuler - Rhythm ruler widget
+     */
+    set rhythmRuler(rhythmRuler) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.rhythmRuler = rhythmRuler;
+            }
+        }
+    }
+
+    /**
+     * @returns {Object} Rhythm ruler widget
+     */
+    get rhythmRuler() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.rhythmRuler;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param {Object} timbre - Timbre widget
+     */
+    set timbre(timbre) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.timbre = timbre;
+            }
+        }
+    }
+
+    /**
+     * @returns {Object} Timbre widget
+     */
+    get timbre() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.timbre;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param {Object} pitchStaircase - Pitch staircase widget
+     */
+    set pitchStaircase(pitchStaircase) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.pitchStaircase = pitchStaircase;
+            }
+        }
+    }
+
+    /**
+     * @returns {Object} Pitch staircase widget
+     */
+    get pitchStaircase() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.pitchStaircase;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param {Object} temperament - Temperament widget
+     */
+    set temperament(temperament) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.temperament = temperament;
+            }
+        }
+    }
+
+    /**
+     * @returns {Object} Temperament widget
+     */
+    get temperament() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.temperament;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param {Object} tempo - Tempo widget
+     */
+    set tempo(tempo) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.tempo = tempo;
+            }
+        }
+    }
+
+    /**
+     * @returns {Object} Tempo widget
+     */
+    get tempo() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.tempo;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param {Object} pitchSlider - Pitch slider widget
+     */
+    set pitchSlider(pitchSlider) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.pitchSlider = pitchSlider;
+            }
+        }
+    }
+
+    /**
+     * @returns {Object} Pitch slider widget
+     */
+    get pitchSlider() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.pitchSlider;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param {Object} musicKeyboard - Music keyboard widget
+     */
+    set musicKeyboard(musicKeyboard) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.musicKeyboard = musicKeyboard;
+            }
+        }
+    }
+
+    /**
+     * @returns {Object} Music keyboard widget
+     */
+    get musicKeyboard() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.musicKeyboard;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param {Object} modeWidget - Mode widget
+     */
+    set modeWidget(modeWidget) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.modeWidget = modeWidget;
+            }
+        }
+    }
+
+    /**
+     * @returns {Object} Mode widget
+     */
+    get modeWidget() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.modeWidget;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param {Object} Oscilloscope - Oscilloscope widget
+     */
+    set Oscilloscope(Oscilloscope) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.Oscilloscope = Oscilloscope;
+            }
+        }
+    }
+
+    /**
+     * @returns {Object} Oscilloscope widget
+     */
+    get Oscilloscope() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.Oscilloscope;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param {Array} oscilloscopeTurtles - Oscilloscope turtles list
+     */
+    set oscilloscopeTurtles(oscilloscopeTurtles) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.oscilloscopeTurtles = oscilloscopeTurtles;
+            }
+        }
+    }
+
+    /**
+     * @returns {Array} Oscilloscope turtles list
+     */
+    get oscilloscopeTurtles() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.oscilloscopeTurtles;
+            }
+        }
+        return [];
+    }
+
+    /**
+     * @param {Object} meterWidget - Meter widget
+     */
+    set meterWidget(meterWidget) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.meterWidget = meterWidget;
+            }
+        }
+    }
+
+    /**
+     * @returns {Object} Meter widget
+     */
+    get meterWidget() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.meterWidget;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param {Object} statusMatrix - Status matrix widget
+     */
+    set statusMatrix(statusMatrix) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.statusMatrix = statusMatrix;
+            }
+        }
+        // Fallback for when no turtles are available (e.g., in tests)
+        this._statusMatrix = statusMatrix;
+    }
+
+    /**
+     * @returns {Object} Status matrix widget
+     */
+    get statusMatrix() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.statusMatrix;
+            }
+        }
+        // Fallback for when no turtles are available (e.g., in tests)
+        return this._statusMatrix || null;
+    }
+
+    /**
+     * @param {Object} legobricks - Legobricks widget
+     */
+    set legobricks(legobricks) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.legobricks = legobricks;
+            }
+        }
+    }
+
+    /**
+     * @returns {Object} Legobricks widget
+     */
+    get legobricks() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.legobricks;
+            }
+        }
+        return null;
+    }
+
+    // Widget state flags getters/setters
+    /**
+     * @param {Boolean} showPitchDrumMatrix - Show pitch drum matrix flag
+     */
+    set showPitchDrumMatrix(showPitchDrumMatrix) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.showPitchDrumMatrix = showPitchDrumMatrix;
+            }
+        }
+    }
+
+    /**
+     * @returns {Boolean} Show pitch drum matrix flag
+     */
+    get showPitchDrumMatrix() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.showPitchDrumMatrix;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param {Boolean} inPitchDrumMatrix - In pitch drum matrix flag
+     */
+    set inPitchDrumMatrix(inPitchDrumMatrix) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.inPitchDrumMatrix = inPitchDrumMatrix;
+            }
+        }
+    }
+
+    /**
+     * @returns {Boolean} In pitch drum matrix flag
+     */
+    get inPitchDrumMatrix() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.inPitchDrumMatrix;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param {Boolean} inRhythmRuler - In rhythm ruler flag
+     */
+    set inRhythmRuler(inRhythmRuler) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.inRhythmRuler = inRhythmRuler;
+            }
+        }
+    }
+
+    /**
+     * @returns {Boolean} In rhythm ruler flag
+     */
+    get inRhythmRuler() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.inRhythmRuler;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param {Object} rhythmRulerMeasure - Rhythm ruler measure
+     */
+    set rhythmRulerMeasure(rhythmRulerMeasure) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.rhythmRulerMeasure = rhythmRulerMeasure;
+            }
+        }
+    }
+
+    /**
+     * @returns {Object} Rhythm ruler measure
+     */
+    get rhythmRulerMeasure() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.rhythmRulerMeasure;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param {Boolean} inPitchStaircase - In pitch staircase flag
+     */
+    set inPitchStaircase(inPitchStaircase) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.inPitchStaircase = inPitchStaircase;
+            }
+        }
+    }
+
+    /**
+     * @returns {Boolean} In pitch staircase flag
+     */
+    get inPitchStaircase() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.inPitchStaircase;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param {Boolean} inTempo - In tempo flag
+     */
+    set inTempo(inTempo) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.inTempo = inTempo;
+            }
+        }
+    }
+
+    /**
+     * @returns {Boolean} In tempo flag
+     */
+    get inTempo() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.inTempo;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param {Boolean} inPitchSlider - In pitch slider flag
+     */
+    set inPitchSlider(inPitchSlider) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.inPitchSlider = inPitchSlider;
+            }
+        }
+    }
+
+    /**
+     * @returns {Boolean} In pitch slider flag
+     */
+    get inPitchSlider() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.inPitchSlider;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param {Array} temperamentSelected - Temperament selected array
+     */
+    set temperamentSelected(temperamentSelected) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.temperamentSelected = temperamentSelected;
+            }
+        }
+    }
+
+    /**
+     * @returns {Array} Temperament selected array
+     */
+    get temperamentSelected() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.temperamentSelected;
+            }
+        }
+        return [];
+    }
+
+    /**
+     * @param {Boolean} customTemperamentDefined - Custom temperament defined flag
+     */
+    set customTemperamentDefined(customTemperamentDefined) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.customTemperamentDefined = customTemperamentDefined;
+            }
+        }
+    }
+
+    /**
+     * @returns {Boolean} Custom temperament defined flag
+     */
+    get customTemperamentDefined() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.customTemperamentDefined;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param {Array} pitchBlocks - Pitch blocks array
+     */
+    set pitchBlocks(pitchBlocks) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.pitchBlocks = pitchBlocks;
+            }
+        }
+    }
+
+    /**
+     * @returns {Array} Pitch blocks array
+     */
+    get pitchBlocks() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.pitchBlocks;
+            }
+        }
+        return [];
+    }
+
+    /**
+     * @param {Array} drumBlocks - Drum blocks array
+     */
+    set drumBlocks(drumBlocks) {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                primaryTurtle.singer.drumBlocks = drumBlocks;
+            }
+        }
+    }
+
+    /**
+     * @returns {Array} Drum blocks array
+     */
+    get drumBlocks() {
+        if (this.activity.turtles.turtleList.length > 0) {
+            const primaryTurtle = this.activity.turtles.ithTurtle(0);
+            if (primaryTurtle && primaryTurtle.singer) {
+                return primaryTurtle.singer.drumBlocks;
+            }
+        }
+        return [];
     }
 
     /**
@@ -1249,11 +1934,14 @@ class Logo {
         // Set up status block.
         if (this.deps.widgetWindows.isOpen("status")) {
             // Ensure widget has been created before trying to initialize it
-            if (this.statusMatrix === null) {
+            if (this.statusMatrix == null) {
                 this.statusMatrix = new this.deps.classes.StatusMatrix();
             }
 
-            this.statusMatrix.init(this.activity);
+            // Double-check after setting, in case the delegation returns null
+            if (this.statusMatrix != null) {
+                this.statusMatrix.init(this.activity);
+            }
         }
 
         // Execute turtle code here
