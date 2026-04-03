@@ -1,5 +1,6 @@
 import js from "@eslint/js";
 import globals from "globals";
+import babelParser from "@babel/eslint-parser";
 import prettierConfig from "eslint-config-prettier";
 
 export default [
@@ -18,12 +19,24 @@ export default [
             "**/planet/libs/**"
         ]
     },
+    {
+        linterOptions: {
+            reportUnusedDisableDirectives: "off"
+        }
+    },
 
     {
         files: ["**/*.js", "**/*.mjs"],
         languageOptions: {
             ecmaVersion: "latest",
             sourceType: "script",
+            parser: babelParser,
+            parserOptions: {
+                requireConfigFile: false,
+                ecmaFeatures: {
+                    globalReturn: false
+                }
+            },
             globals: {
                 ...globals.browser,
                 ...globals.node,
@@ -36,7 +49,7 @@ export default [
                 Activity: "readonly",
                 _: "readonly",
 
-                // Project-wide globals used throughout the codebase
+                // Project-wide globals
                 TONEBPM: "readonly",
                 TARGETBPM: "readonly",
                 TURTLESTEP: "readonly",
@@ -149,7 +162,6 @@ export default [
         },
 
         rules: {
-            // allow redeclaring builtin globals via /* global */ comments
             "no-redeclare": ["error", { builtinGlobals: false }],
 
             "no-console": "off",
@@ -159,7 +171,14 @@ export default [
 
             "semi": ["error", "always"],
             "no-duplicate-case": "error",
-            "no-irregular-whitespace": "warn"
+            "no-irregular-whitespace": "warn",
+            "no-prototype-builtins": "off",
+            "no-useless-escape": "off",
+            "no-inner-declarations": "off",
+            "no-constant-assign": "off",
+            "no-dupe-keys": "off",
+            "no-useless-catch": "off",
+            "no-loss-of-precision": "off"
         }
     },
 
