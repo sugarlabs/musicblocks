@@ -1438,10 +1438,14 @@ class Palette {
                 // to make it positioned relative to the body
                 document.body.appendChild(img);
 
+                // Cache dimensions once to avoid forced layout on every mousemove
+                const halfW = img.offsetWidth / 2;
+                const halfH = img.offsetHeight / 2;
+
                 // centers the img at (pageX, pageY) coordinates
                 const moveAt = (pageX, pageY) => {
-                    img.style.left = pageX - img.offsetWidth / 2 + "px";
-                    img.style.top = pageY - img.offsetHeight / 2 + "px";
+                    img.style.left = pageX - halfW + "px";
+                    img.style.top = pageY - halfH + "px";
                 };
 
                 const onMouseMove = e => {
