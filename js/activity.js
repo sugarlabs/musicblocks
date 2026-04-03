@@ -1941,11 +1941,12 @@ class Activity {
                     return; // Exit without saving the file
                 }
                 const downloadLink = document.createElement("a");
-                downloadLink.href = URL.createObjectURL(blob);
+                const downloadUrl = URL.createObjectURL(blob);
+                downloadLink.href = downloadUrl;
                 downloadLink.download = `${filename}.webm`;
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
-                URL.revokeObjectURL(blob);
+                URL.revokeObjectURL(downloadUrl);
                 document.body.removeChild(downloadLink);
                 flag = 0;
                 // Allow multiple recordings

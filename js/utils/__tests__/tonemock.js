@@ -47,7 +47,10 @@ class Player {
         this.sample = sample;
         this.toDestination = jest.fn().mockReturnThis();
         this.connect = jest.fn().mockReturnThis();
+        this.load = jest.fn().mockResolvedValue(this);
         this.start = jest.fn().mockReturnThis();
+        this.stop = jest.fn().mockReturnThis();
+        this.dispose = jest.fn().mockReturnThis();
         this.triggerAttackRelease = jest.fn().mockReturnThis();
     }
 }
