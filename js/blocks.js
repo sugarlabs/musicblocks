@@ -5115,17 +5115,14 @@ class Blocks {
 
             /** Reposition the paste location relative to the stage position. */
             if (this.selectedBlocksObj != null) {
-                if (docById("helpfulWheelDiv").style.display !== "none") {
+                const helpfulWheelDiv = docById("helpfulWheelDiv");
+                if (helpfulWheelDiv.style.display !== "none") {
                     this.selectedBlocksObj[0][2] =
-                        docById("helpfulWheelDiv").offsetLeft +
-                        240 -
-                        this.activity.blocksContainer.x;
+                        helpfulWheelDiv.offsetLeft + 240 - this.activity.blocksContainer.x;
                     this.selectedBlocksObj[0][3] =
-                        docById("helpfulWheelDiv").offsetTop +
-                        130 -
-                        this.activity.blocksContainer.y;
+                        helpfulWheelDiv.offsetTop + 130 - this.activity.blocksContainer.y;
 
-                    docById("helpfulWheelDiv").style.display = "none";
+                    helpfulWheelDiv.style.display = "none";
                 } else {
                     this.selectedBlocksObj[0][2] =
                         175 - this.activity.blocksContainer.x + this.pasteDx;

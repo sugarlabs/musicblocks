@@ -3611,15 +3611,21 @@ class Activity {
             const KEYCODE_DOWN = 40;
             const DEL = 46;
             const V = 86;
+            const lilypondModal = document.getElementById("lilypondModal");
+            const samplerPrompt = document.getElementById("samplerPrompt");
+            const planetIframe = document.getElementById("planet-iframe");
+            const pasteEl = this.paste;
+            const wheelDiv = document.getElementById("wheelDiv");
+            const stopbtn = document.getElementById("stop");
             const disableKeys =
-                document.getElementById("lilypondModal").style.display === "block" ||
+                lilypondModal.style.display === "block" ||
                 this.searchWidget.style.visibility === "visible" ||
                 this.helpfulSearchWidget.style.visibility === "visible" ||
                 this.isInputON ||
-                document.getElementById("samplerPrompt") ||
-                document.getElementById("planet-iframe").style.display === "" ||
-                document.getElementById("paste").style.visibility === "visible" ||
-                document.getElementById("wheelDiv").style.display === "" ||
+                samplerPrompt ||
+                planetIframe.style.display === "" ||
+                pasteEl.style.visibility === "visible" ||
+                wheelDiv.style.display === "" ||
                 this.turtles.running();
             const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
@@ -3650,7 +3656,6 @@ class Activity {
                     case 82: {
                         // 'R or ENTER'
                         this.textMsg("Alt-R " + _("Play"));
-                        const stopbtn = document.getElementById("stop");
                         if (stopbtn) {
                             stopbtn.style.color = platformColor.stopIconcolor;
                         }
@@ -3664,9 +3669,9 @@ class Activity {
                         if (this.searchWidget.style.visibility === "visible") {
                             return;
                         }
-                        if (document.getElementById("paste").style.visibility === "visible") {
+                        if (pasteEl.style.visibility === "visible") {
                             this.pasted();
-                            document.getElementById("paste").style.visibility = "hidden";
+                            pasteEl.style.visibility = "hidden";
                             return;
                         }
 
@@ -3677,7 +3682,6 @@ class Activity {
                         if (this.turtles.running()) {
                             this._doHardStopButton();
                         } else if (!hasOpenWidget) {
-                            const stopbtn = document.getElementById("stop");
                             if (stopbtn) {
                                 stopbtn.style.color = platformColor.stopIconcolor;
                             }
@@ -3723,12 +3727,12 @@ class Activity {
                         // this.textMsg("Ctl-V " + _("Paste"));
                         this.pasteBox.createBox(this.turtleBlocksScale, 200, 200);
                         this.pasteBox.show();
-                        document.getElementById("paste").style.left =
+                        pasteEl.style.left =
                             (this.pasteBox.getPos()[0] + 10) * this.turtleBlocksScale + "px";
-                        document.getElementById("paste").style.top =
+                        pasteEl.style.top =
                             (this.pasteBox.getPos()[1] + 10) * this.turtleBlocksScale + "px";
-                        document.getElementById("paste").focus();
-                        document.getElementById("paste").style.visibility = "visible";
+                        pasteEl.focus();
+                        pasteEl.style.visibility = "visible";
                         this.update = true;
                         break;
                 }
@@ -3744,11 +3748,8 @@ class Activity {
                         break;
                 }
             } else {
-                if (
-                    document.getElementById("paste").style.visibility === "visible" &&
-                    event.keyCode === RETURN
-                ) {
-                    if (document.getElementById("paste").value.length > 0) {
+                if (pasteEl.style.visibility === "visible" && event.keyCode === RETURN) {
+                    if (pasteEl.value.length > 0) {
                         this.pasted();
                     }
                 } else if (event.keyCode === SPACE) {
@@ -3761,7 +3762,6 @@ class Activity {
                         this._doHardStopButton();
                     } else if (!disableKeys && !hasOpenWidget) {
                         event.preventDefault();
-                        const stopbtn = document.getElementById("stop");
                         if (stopbtn) {
                             stopbtn.style.color = platformColor.stopIconcolor;
                         }
