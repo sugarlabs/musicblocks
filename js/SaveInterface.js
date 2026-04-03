@@ -25,6 +25,21 @@ const STR_MY_PROJECT = _("My Project");
 const STR_SHOW = _("Show");
 const STR_HIDE = _("Hide");
 
+// function showToast(message) {
+//     const toast = document.createElement("div");
+//     toast.className = "toast";
+//     toast.innerText = message;
+
+//     document.body.appendChild(toast);
+
+//     setTimeout(() => toast.classList.add("show"), 100);
+
+//     setTimeout(() => {
+//         toast.classList.remove("show");
+//         setTimeout(() => toast.remove(), 300);
+//     }, 3000);
+// }
+
 class SaveInterface {
     /**
      * Creates an instance of SaveInterface.
@@ -154,6 +169,30 @@ class SaveInterface {
         });
     }
 
+    showToast(message) {
+        const toast = document.createElement("div");
+        toast.className = "toast";
+        toast.innerText = message;
+
+        const canvas = document.querySelector("#canvas");
+        const container = canvas ? canvas.parentElement : document.body;
+
+        container.appendChild(toast);
+
+        toast.style.position = "absolute";
+        toast.style.bottom = "20px";
+        toast.style.right = "20px";
+        toast.style.background = "#4caf50";
+        toast.style.color = "white";
+        toast.style.padding = "12px 16px";
+        toast.style.borderRadius = "6px";
+        toast.style.zIndex = "9999999";
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
     /**
      * Download a file to the user's computer.
      * Uses MBDialog prompt when available to collect a filename with a modal UI.
@@ -164,6 +203,7 @@ class SaveInterface {
      */
     download(extension, dataurl, defaultfilename) {
         let filename = null;
+        //const self = this;
         const finishDownload = name => {
             if (name === null) {
                 console.debug("save cancelled");
@@ -175,6 +215,7 @@ class SaveInterface {
             }
 
             this.downloadURL(name, dataurl);
+            this.showToast("Project saved successfully");
         };
         if (defaultfilename === undefined || defaultfilename === null) {
             if (this.activity.PlanetInterface === undefined) {

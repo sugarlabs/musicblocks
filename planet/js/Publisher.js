@@ -305,7 +305,7 @@ class Publisher {
         try {
             tb = JSON.parse(tb);
         } catch (e) {
-            console.log(e);
+            console.error(e);
             return "";
         }
 

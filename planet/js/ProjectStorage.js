@@ -187,7 +187,7 @@ class ProjectStorage {
         try {
             return JSON.parse(jsonobj);
         } catch (e) {
-            console.log(e);
+            console.error(e);
             return null;
         }
     }
@@ -203,7 +203,7 @@ class ProjectStorage {
         try {
             this.data = typeof currentData === "string" ? JSON.parse(currentData) : currentData;
         } catch (e) {
-            console.log(e);
+            console.error(e);
             return null;
         }
     }
