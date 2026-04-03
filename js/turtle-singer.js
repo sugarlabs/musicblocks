@@ -22,9 +22,9 @@
    pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp,
    getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
-   getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
+   getInterval, instrumentsEffects, instrumentsFilters, DEFAULTVOICE,
    noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction,
-   SEMITONES
+   SEMITONES, Tone, define
  */
 
 /*
@@ -377,7 +377,7 @@ class Singer {
                     tur.singer.keySignature,
                     tur.singer.movable,
                     null,
-                    activity.logo.errorMsg,
+                    activity.errorMsg,
                     logo.synth.inTemperament
                 );
             }
