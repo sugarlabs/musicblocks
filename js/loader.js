@@ -302,6 +302,25 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 "activity/logo"
             ];
 
+            /**
+             * Displays a non-blocking, DOM-based error message for fatal load failures.
+             * Used instead of alert() since activity is not yet initialized at this stage.
+             * @param {string} message - The error message to display.
+             */
+            function showFatalError(message) {
+                var errorDiv = document.createElement("div");
+                errorDiv.style.cssText =
+                    "padding:2rem;text-align:center;font-family:sans-serif;";
+                errorDiv.innerHTML =
+                    "<h2>Music Blocks failed to load</h2>" +
+                    "<p>" +
+                    message +
+                    "</p>" +
+                    "<p>Please refresh the page. If the problem persists, " +
+                    "check your internet connection.</p>";
+                document.body.appendChild(errorDiv);
+            }
+
             requirejs(
                 CORE_BOOTSTRAP_MODULES,
                 function () {
@@ -321,7 +340,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                             console.error(
                                 "FATAL: createjs (EaselJS/TweenJS) not found. Cannot proceed."
                             );
-                            alert("Failed to load EaselJS. Please refresh the page.");
+                            showFatalError("Failed to load EaselJS.");
                             return;
                         }
 
@@ -333,15 +352,15 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                             },
                             function (err) {
                                 console.error("Failed to load activity/activity:", err);
-                                alert("Failed to load Music Blocks. Please refresh the page.");
+                                showFatalError("Failed to load Music Blocks.");
                             }
                         );
                     }, 100); // Small delay to allow globals to be set
                 },
                 function (err) {
                     console.error("Core bootstrap failed:", err);
-                    alert(
-                        "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: " +
+                    showFatalError(
+                        "Failed to initialize Music Blocks core. Error: " +
                             (err.message || err)
                     );
                 }

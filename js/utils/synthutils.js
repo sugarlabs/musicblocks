@@ -1098,7 +1098,13 @@ function Synth() {
             if (fileName) {
                 download(url, fileName + (platform.FF ? ".wav" : ".ogg"));
             } else {
-                alert("Download cancelled.");
+                // activity is a global available after app initialization
+                if (typeof activity !== "undefined") {
+                    activity.textMsg(_("Download cancelled."));
+                } else {
+                    // eslint-disable-next-line no-console
+                    console.log(_("Download cancelled."));
+                }
             }
         };
         // this.recorder.start();

@@ -1463,7 +1463,7 @@ function setupProgramBlocks(activity) {
                     win.focus();
                 } else {
                     // Browser has blocked it.
-                    alert("Please allow popups for this site");
+                    activity.textMsg(_("Please allow popups for this site"));
                 }
             }
         }
