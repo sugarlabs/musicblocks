@@ -491,8 +491,6 @@ class Palettes {
             document.getElementById("paletteToggle").innerHTML = "◀";
             this.paletteWidth = 55 * PALETTE_WIDTH_FACTOR;
         }
-
-        window.dispatchEvent(new Event("resize"));
     }
 
     _makeSelectorButton(i) {
