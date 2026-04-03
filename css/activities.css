@@ -2185,84 +2185,98 @@ table {
 
 /* Mobile breakpoint for tablets and small screens */
 @media screen and (max-width: 768px) {
-    /* Hide help sidebar by default on mobile - handles both old and new widget systems */
-    #helpDiv,
-    .widget-window[data-widget-type="help"] {
-        display: none !important;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 80% !important;
-        max-width: 300px !important;
-        height: 100vh !important;
-        z-index: 1000 !important;
-        background: rgba(0, 0, 0, 0.9) !important;
-        transform: translateX(-100%) !important;
-        transition: transform 0.3s ease !important;
-    }
+  /* Hide help sidebar by default on mobile - handles both old and new widget systems */
+  #helpDiv,
+  .widget-window[data-widget-type='help'] {
+    display: none !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 80% !important;
+    max-width: 300px !important;
+    height: 100vh !important;
+    z-index: 1000 !important;
+    background: rgba(0, 0, 0, 0.9) !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.3s ease !important;
+  }
 
-    /* Show help sidebar when active */
-    #helpDiv.show,
-    .widget-window[data-widget-type="help"].show {
-        display: block !important;
-        transform: translateX(0) !important;
-    }
+  /* Show help sidebar when active - using classes only */
+  #helpDiv.show,
+  .widget-window[data-widget-type='help'].show {
+    display: block !important;
+    transform: translateX(0) !important;
+  }
 
-    /* Hide help when marked as hidden */
-    #helpDiv.hidden,
-    .widget-window[data-widget-type="help"].hidden {
-        display: none !important;
-    }
+  /* Hide help when marked as hidden - using classes only */
+  #helpDiv.hidden,
+  .widget-window[data-widget-type='help'].hidden {
+    display: none !important;
+  }
 
-    /* Add mobile toggle button for help */
-    .mobile-help-toggle {
-        display: block !important;
-        position: fixed !important;
-        top: 80px !important;
-        left: 10px !important;
-        z-index: 1001 !important;
-        background: #2196f3 !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 50% !important;
-        width: 50px !important;
-        height: 50px !important;
-        font-size: 18px !important;
-        cursor: pointer !important;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3) !important;
-        transition: all 0.2s ease !important;
-    }
+  /* Add mobile toggle button for help */
+  .mobile-help-toggle {
+    display: block !important;
+    position: fixed !important;
+    top: 80px !important;
+    left: 10px !important;
+    z-index: 1001 !important;
+    background: #2196f3 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 50px !important;
+    height: 50px !important;
+    font-size: 18px !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.2s ease !important;
+  }
 
-    .mobile-help-toggle:hover {
-        background: #1976d2 !important;
-        transform: scale(1.1) !important;
-    }
+  .mobile-help-toggle:hover {
+    background: #1976D2 !important;
+    transform: scale(1.1) !important;
+  }
 
-    .mobile-help-toggle:active {
-        transform: scale(0.95) !important;
-    }
+  .mobile-help-toggle:active {
+    transform: scale(0.95) !important;
+  }
 
-    /* Ensure main canvas gets full width */
-    .canvasHolder {
-        margin-left: 0 !important;
-        width: 100% !important;
-    }
+  /* Ensure main canvas gets full width */
+  .canvasHolder {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
 
-    /* Fix wheel navigation positioning */
-    .wheelNav {
-        transform: scale(0.8) !important;
-    }
+  /* Fix wheel navigation positioning */
+  .wheelNav {
+    transform: scale(0.8) !important;
+  }
 
-    /* Make toolbars more touch-friendly */
-    #toolbars {
-        padding: 5px !important;
-    }
+  /* Make toolbars more touch-friendly */
+  #toolbars {
+    padding: 5px !important;
+  }
 
-    #toolbars button {
-        min-height: 44px !important;
-        min-width: 44px !important;
-        margin: 2px !important;
-    }
+  #toolbars button {
+    min-height: 44px !important;
+    min-width: 44px !important;
+    margin: 2px !important;
+  }
+}
+
+/* Hide mobile toggle on desktop */
+@media screen and (min-width: 769px) {
+  .mobile-help-toggle {
+    display: none !important;
+  }
+
+  #helpDiv,
+  .widget-window[data-widget-type='help'] {
+    display: block !important;
+    position: relative !important;
+    transform: none !important;
+  }
 }
 
 /* Small mobile breakpoint */
@@ -2337,20 +2351,6 @@ table {
 
     .mobile-help-toggle {
         top: 60px !important;
-    }
-}
-
-/* Hide mobile toggle on desktop */
-@media screen and (min-width: 769px) {
-    .mobile-help-toggle {
-        display: none !important;
-    }
-
-    #helpDiv,
-    .widget-window[data-widget-type="help"] {
-        display: block !important;
-        position: relative !important;
-        transform: none !important;
     }
 }
 

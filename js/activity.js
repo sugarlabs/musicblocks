@@ -639,15 +639,17 @@ class Activity {
                 this._toggleMobileHelp();
             });
 
-            // Close help when clicking outside on mobile
-            document.addEventListener("click", e => {
-                const helpDiv = document.querySelector(
-                    "#helpDiv, .widget-window[data-widget-type='help']"
-                );
-                if (helpDiv && !helpDiv.contains(e.target) && e.target !== mobileHelpToggle) {
-                    this._hideMobileHelp();
-                }
-            });
+            // Close help when clicking outside - only on mobile devices
+            if (window.innerWidth <= 768) {
+                document.addEventListener("click", e => {
+                    const helpDiv = document.querySelector(
+                        "#helpDiv, .widget-window[data-widget-type='help']"
+                    );
+                    if (helpDiv && !helpDiv.contains(e.target) && e.target !== mobileHelpToggle) {
+                        this._hideMobileHelp();
+                    }
+                });
+            }
         };
 
         /*
@@ -660,7 +662,7 @@ class Activity {
             );
             if (!helpDiv) return;
 
-            if (helpDiv.style.display === "none" || helpDiv.classList.contains("hidden")) {
+            if (helpDiv.classList.contains("hidden")) {
                 this._showMobileHelp();
             } else {
                 this._hideMobileHelp();
@@ -677,7 +679,6 @@ class Activity {
             );
             if (!helpDiv) return;
 
-            helpDiv.style.display = "block";
             helpDiv.classList.remove("hidden");
             helpDiv.classList.add("show");
         };
