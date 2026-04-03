@@ -544,9 +544,7 @@ nav {
     background-color: #8bc34a;
     height: 64px;
     width: 100%;
-    box-shadow:
-        0px 2px 5px 0px rgba(0, 0, 0, 0.16),
-        0px 2px 10px 0px rgba(0, 0, 0, 0.12);
+    box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.16), 0px 2px 10px 0px rgba(0, 0, 0, 0.12);
     font: 32px sans;
     vertical-align: middle;
     line-height: 64px;
@@ -2000,9 +1998,7 @@ table {
     width: 28px;
     height: 28px;
     filter: invert(100%);
-    transition:
-        background-color 0.3s,
-        filter 0.3s;
+    transition: background-color 0.3s, filter 0.3s;
 }
 
 .msgCloseIcon:hover {
@@ -2366,7 +2362,6 @@ table {
         /* 1. Fit the screen width */
         width: 90% !important;
 
-        /* 2. Center Horizontally */
         left: 50% !important;
         transform: translateX(-50%);
         /* Moves it back by half its width to center it */
