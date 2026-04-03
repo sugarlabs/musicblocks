@@ -141,6 +141,7 @@ describe("Palettes Class", () => {
             createElement: jest.fn(() => ({
                 id: "",
                 setAttribute: jest.fn(),
+                addEventListener: jest.fn(),
                 classList: { add: jest.fn() },
                 appendChild: jest.fn(),
                 style: {},
@@ -1235,13 +1236,22 @@ describe("Palettes Class", () => {
 
             palettes.add("test");
             const palette = palettes.dict.test;
+            global.document.addEventListener = jest.fn();
             palette.setupGrabScroll(paletteList);
 
             paletteList.onmousedown({ clientY: 10 });
-            paletteList.onmousemove({ clientY: 5 });
+
+            const mouseMoveHandler = global.document.addEventListener.mock.calls.find(
+                call => call[0] === "mousemove"
+            )[1];
+            mouseMoveHandler({ clientY: 5 });
 
             expect(paletteList.scrollTop).toBe(105);
-            paletteList.onmouseup();
+
+            const mouseUpHandler = global.document.addEventListener.mock.calls.find(
+                call => call[0] === "mouseup"
+            )[1];
+            mouseUpHandler();
             expect(document.body.style.cursor).toBe("default");
         });
 
@@ -1516,7 +1526,9 @@ describe("Palettes Class", () => {
                     style: {},
                     appendChild: jest.fn(),
                     children: [],
-                    classList: { add: jest.fn() }
+                    classList: { add: jest.fn() },
+                    setAttribute: jest.fn(),
+                    addEventListener: jest.fn()
                 };
             };
             global.document.createElement = jest.fn(elementFactory);
@@ -1655,7 +1667,7 @@ describe("Palettes Class", () => {
                 pageY: 20,
                 preventDefault: jest.fn()
             });
-            const mouseMoveHandler = document.addEventListener.mock.calls.find(
+            const mouseMoveHandler = global.document.addEventListener.mock.calls.find(
                 call => call[0] === "mousemove"
             )[1];
             mouseMoveHandler({
@@ -1665,7 +1677,10 @@ describe("Palettes Class", () => {
                 preventDefault: jest.fn()
             });
 
-            img.onmouseup({});
+            const mouseUpHandler = global.document.addEventListener.mock.calls.find(
+                call => call[0] === "mouseup"
+            )[1];
+            mouseUpHandler({});
         });
 
         test("_showMenuItems handles touch drag", () => {
@@ -1685,7 +1700,9 @@ describe("Palettes Class", () => {
                         children: [],
                         appendChild(child) {
                             this.children.push(child);
-                        }
+                        },
+                        setAttribute: jest.fn(),
+                        addEventListener: jest.fn()
                     };
                 }
 
@@ -1694,10 +1711,21 @@ describe("Palettes Class", () => {
                         style: {},
                         appendChild(img) {
                             capturedImg = img;
-                        }
+                        },
+                        setAttribute: jest.fn(),
+                        addEventListener: jest.fn()
                     };
                 }
-                return {};
+                return {
+                    id: "",
+                    setAttribute: jest.fn(),
+                    addEventListener: jest.fn(),
+                    classList: { add: jest.fn() },
+                    appendChild: jest.fn(),
+                    style: {},
+                    innerHTML: "",
+                    childNodes: [{ style: {} }]
+                };
             });
             document.addEventListener = jest.fn();
             document.removeEventListener = jest.fn();
@@ -1731,7 +1759,7 @@ describe("Palettes Class", () => {
                 touches: [{ clientX: 10, clientY: 20 }],
                 preventDefault: jest.fn()
             });
-            const touchMoveHandler = document.addEventListener.mock.calls.find(
+            const touchMoveHandler = global.document.addEventListener.mock.calls.find(
                 call => call[0] === "touchmove"
             )[1];
             touchMoveHandler({
@@ -1739,7 +1767,11 @@ describe("Palettes Class", () => {
                 touches: [{ clientX: 12, clientY: 22 }],
                 preventDefault: jest.fn()
             });
-            img.ontouchend({});
+
+            const touchEndHandler = global.document.addEventListener.mock.calls.find(
+                call => call[0] === "touchend"
+            )[1];
+            touchEndHandler({});
         });
 
         test("_showMenuItems hides palette when mobile", () => {
