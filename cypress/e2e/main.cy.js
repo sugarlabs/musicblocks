@@ -135,6 +135,36 @@ describe("MusicBlocks Application", () => {
                 .should("be.visible")
                 .and("have.attr", "src")
                 .and("not.be.empty");
+
+            cy.window().then(win => {
+                const activity = win.ActivityContext?.getActivity();
+                if (activity?.planet) {
+                    activity.planet.closePlanet();
+                }
+            });
+
+            cy.get("#planet-iframe").should("not.be.visible");
+            cy.get("#canvas").should("exist").and("be.visible");
+        });
+    });
+
+    describe("Core Workflows", () => {
+        it("should transition audio context correctly on play and stop", () => {
+            cy.get("#play").click();
+
+            cy.window().then(win => {
+                const ctx = win.Tone.context;
+                expect(ctx.state).to.eq("running");
+            });
+
+            cy.get("#stop").click();
+
+            cy.window().then(win => {
+                const ctx = win.Tone.context;
+                expect(ctx.state === "suspended" || ctx.state === "running").to.be.true;
+            });
+
+            cy.get("#canvas").should("exist").and("be.visible");
         });
     });
 });
