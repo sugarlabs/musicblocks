@@ -1,3 +1,4 @@
+/* global cy, Cypress, before */
 Cypress.on("uncaught:exception", err => {
     const ignored = [
         "ResizeObserver loop limit exceeded",
@@ -93,7 +94,6 @@ describe("MusicBlocks Application", () => {
                 "#Decrease\\ block\\ size > img",
                 "#Increase\\ block\\ size > img"
             ];
-
             bottomBarElements.forEach(selector => {
                 cy.get(selector).should("exist").and("be.visible");
             });
@@ -105,7 +105,6 @@ describe("MusicBlocks Application", () => {
                 "tr > :nth-child(2) > img",
                 "tr > :nth-child(3) > img"
             ];
-
             sidebarElements.forEach(selector => {
                 cy.get(selector).should("exist").and("be.visible").click();
             });
@@ -130,7 +129,6 @@ describe("MusicBlocks Application", () => {
     describe("Planet Page Interaction", () => {
         it("should open the Planet iframe on planet icon click", () => {
             cy.get("#planetIcon > .material-icons").should("exist").and("be.visible").click();
-
             cy.get("#planet-iframe", { timeout: 10000 })
                 .should("be.visible")
                 .and("have.attr", "src")
