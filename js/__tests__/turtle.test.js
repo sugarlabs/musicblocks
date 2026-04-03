@@ -250,3 +250,11 @@ describe("Turtle", () => {
         });
     });
 });
+
+test("doWait sets wait time correctly", () => {
+    const turtle = new Turtle({}, 0, "t1", {}, null);
+
+    turtle.doWait(1);
+
+    expect(turtle._waitTime).toBe(1000);
+});
