@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+require("../../tests/fix-turtle-singer");
 
 global.DEFAULTVOLUME = 100;
 global.TARGETBPM = 120;
