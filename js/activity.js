@@ -498,6 +498,9 @@ class Activity {
 
             this.setHelpfulSearchDiv();
 
+            // Setup mobile help toggle functionality
+            this._setupMobileHelpToggle();
+
             // Late initialization of GIF animator if it was missed in constructor
             if (!this.gifAnimator && typeof GIFAnimator !== "undefined") {
                 this.gifAnimator = new GIFAnimator();
@@ -622,6 +625,75 @@ class Activity {
                 this.helpfulSearchDiv.parentNode.removeChild(this.helpfulSearchDiv);
             }
             that.__tick();
+        };
+
+        /*
+         * Setup mobile help toggle functionality
+         * Adds event listener to mobile help toggle button
+         */
+        this._setupMobileHelpToggle = () => {
+            const mobileHelpToggle = document.getElementById("mobileHelpToggle");
+            if (!mobileHelpToggle) return;
+
+            mobileHelpToggle.addEventListener("click", () => {
+                this._toggleMobileHelp();
+            });
+
+            // Close help when clicking outside on mobile
+            document.addEventListener("click", e => {
+                const helpDiv = document.querySelector(
+                    "#helpDiv, .widget-window[data-widget-type='help']"
+                );
+                if (helpDiv && !helpDiv.contains(e.target) && e.target !== mobileHelpToggle) {
+                    this._hideMobileHelp();
+                }
+            });
+        };
+
+        /*
+         * Toggle mobile help visibility
+         * Shows or hides help on mobile devices
+         */
+        this._toggleMobileHelp = () => {
+            const helpDiv = document.querySelector(
+                "#helpDiv, .widget-window[data-widget-type='help']"
+            );
+            if (!helpDiv) return;
+
+            if (helpDiv.style.display === "none" || helpDiv.classList.contains("hidden")) {
+                this._showMobileHelp();
+            } else {
+                this._hideMobileHelp();
+            }
+        };
+
+        /*
+         * Show mobile help
+         * Makes help visible on mobile devices
+         */
+        this._showMobileHelp = () => {
+            const helpDiv = document.querySelector(
+                "#helpDiv, .widget-window[data-widget-type='help']"
+            );
+            if (!helpDiv) return;
+
+            helpDiv.style.display = "block";
+            helpDiv.classList.remove("hidden");
+            helpDiv.classList.add("show");
+        };
+
+        /*
+         * Hide mobile help
+         * Hides help on mobile devices
+         */
+        this._hideMobileHelp = () => {
+            const helpDiv = document.querySelector(
+                "#helpDiv, .widget-window[data-widget-type='help']"
+            );
+            if (!helpDiv) return;
+
+            helpDiv.classList.remove("show");
+            helpDiv.classList.add("hidden");
         };
 
         /*

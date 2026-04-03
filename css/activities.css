@@ -145,14 +145,14 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 }
 
 .cancel-button {
-  border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  background-color: #e0e0e0;
-  color: black;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    background-color: #e0e0e0;
+    color: black;
 }
 
 .cancel-button:hover {
@@ -544,7 +544,9 @@ nav {
     background-color: #8bc34a;
     height: 64px;
     width: 100%;
-    box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.16), 0px 2px 10px 0px rgba(0, 0, 0, 0.12);
+    box-shadow:
+        0px 2px 5px 0px rgba(0, 0, 0, 0.16),
+        0px 2px 10px 0px rgba(0, 0, 0, 0.12);
     font: 32px sans;
     vertical-align: middle;
     line-height: 64px;
@@ -1998,7 +2000,9 @@ table {
     width: 28px;
     height: 28px;
     filter: invert(100%);
-    transition: background-color 0.3s, filter 0.3s;
+    transition:
+        background-color 0.3s,
+        filter 0.3s;
 }
 
 .msgCloseIcon:hover {
@@ -2180,28 +2184,203 @@ table {
 }
 
 /* ======================================================
+   MOBILE RESPONSIVE FIXES
+   ====================================================== */
+
+/* Mobile breakpoint for tablets and small screens */
+@media screen and (max-width: 768px) {
+    /* Hide help sidebar by default on mobile - handles both old and new widget systems */
+    #helpDiv,
+    .widget-window[data-widget-type="help"] {
+        display: none !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 80% !important;
+        max-width: 300px !important;
+        height: 100vh !important;
+        z-index: 1000 !important;
+        background: rgba(0, 0, 0, 0.9) !important;
+        transform: translateX(-100%) !important;
+        transition: transform 0.3s ease !important;
+    }
+
+    /* Show help sidebar when active */
+    #helpDiv.show,
+    .widget-window[data-widget-type="help"].show {
+        display: block !important;
+        transform: translateX(0) !important;
+    }
+
+    /* Hide help when marked as hidden */
+    #helpDiv.hidden,
+    .widget-window[data-widget-type="help"].hidden {
+        display: none !important;
+    }
+
+    /* Add mobile toggle button for help */
+    .mobile-help-toggle {
+        display: block !important;
+        position: fixed !important;
+        top: 80px !important;
+        left: 10px !important;
+        z-index: 1001 !important;
+        background: #2196f3 !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 50% !important;
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 18px !important;
+        cursor: pointer !important;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3) !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .mobile-help-toggle:hover {
+        background: #1976d2 !important;
+        transform: scale(1.1) !important;
+    }
+
+    .mobile-help-toggle:active {
+        transform: scale(0.95) !important;
+    }
+
+    /* Ensure main canvas gets full width */
+    .canvasHolder {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Fix wheel navigation positioning */
+    .wheelNav {
+        transform: scale(0.8) !important;
+    }
+
+    /* Make toolbars more touch-friendly */
+    #toolbars {
+        padding: 5px !important;
+    }
+
+    #toolbars button {
+        min-height: 44px !important;
+        min-width: 44px !important;
+        margin: 2px !important;
+    }
+}
+
+/* Small mobile breakpoint */
+@media screen and (max-width: 480px) {
+    /* Further reduce help sidebar on small mobile */
+    #helpDiv,
+    .widget-window[data-widget-type="help"] {
+        width: 90% !important;
+        max-width: 250px !important;
+    }
+
+    /* Adjust toggle button position */
+    .mobile-help-toggle {
+        top: 70px !important;
+        left: 5px !important;
+        width: 44px !important;
+        height: 44px !important;
+        font-size: 16px !important;
+    }
+
+    /* Scale down wheel navigation further */
+    .wheelNav {
+        transform: scale(0.6) !important;
+    }
+
+    /* Make toolbar buttons more compact but still touchable */
+    #toolbars button {
+        min-height: 40px !important;
+        min-width: 40px !important;
+        padding: 5px !important;
+    }
+
+    /* Reduce font sizes for small screens */
+    #helpDiv h1,
+    .widget-window[data-widget-type="help"] h1 {
+        font-size: 1.2em !important;
+    }
+
+    #helpDiv p,
+    .widget-window[data-widget-type="help"] p {
+        font-size: 0.8em !important;
+    }
+}
+
+/* Extra small mobile breakpoint */
+@media screen and (max-width: 320px) {
+    /* Minimum viable sizing for very small screens */
+    #helpDiv,
+    .widget-window[data-widget-type="help"] {
+        width: 95% !important;
+        max-width: 200px !important;
+    }
+
+    .wheelNav {
+        transform: scale(0.5) !important;
+    }
+
+    #toolbars button {
+        min-height: 36px !important;
+        min-width: 36px !important;
+        font-size: 12px !important;
+    }
+}
+
+/* Landscape mobile optimizations */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    #helpDiv,
+    .widget-window[data-widget-type="help"] {
+        height: 80vh !important;
+        top: 10vh !important;
+    }
+
+    .mobile-help-toggle {
+        top: 60px !important;
+    }
+}
+
+/* Hide mobile toggle on desktop */
+@media screen and (min-width: 769px) {
+    .mobile-help-toggle {
+        display: none !important;
+    }
+
+    #helpDiv,
+    .widget-window[data-widget-type="help"] {
+        display: block !important;
+        position: relative !important;
+        transform: none !important;
+    }
+}
+
+/* ======================================================
    FIX: Center the Welcome Modal on Mobile
    ====================================================== */
 @media screen and (max-width: 600px) {
-  #helpDiv {
-    /* 1. Fit the screen width */
-    width: 90% !important;
+    #helpDiv {
+        /* 1. Fit the screen width */
+        width: 90% !important;
 
-    /* 2. Center Horizontally */
-    left: 50% !important;
-    transform: translateX(-50%);
-    /* Moves it back by half its width to center it */
+        /* 2. Center Horizontally */
+        left: 50% !important;
+        transform: translateX(-50%);
+        /* Moves it back by half its width to center it */
 
-    /* 3. Reset Top position if needed */
-    top: 15% !important;
-  }
+        /* 3. Reset Top position if needed */
+        top: 15% !important;
+    }
 
-  /* Fix the inner text box width so it doesn't overflow */
-  #helpBodyDiv {
-    width: calc(100% - 110px) !important;
-    margin: 0 auto !important;
-    left: 0 !important;
-    padding: 0 10px;
-    box-sizing: border-box;
-  }
+    /* Fix the inner text box width so it doesn't overflow */
+    #helpBodyDiv {
+        width: calc(100% - 110px) !important;
+        margin: 0 auto !important;
+        left: 0 !important;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
 }
