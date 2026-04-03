@@ -460,6 +460,30 @@ describe("getDrum", () => {
     });
 });
 
+describe("getDrum actual implementations", () => {
+    let actualModule;
+
+    beforeEach(() => {
+        actualModule = jest.requireActual("../musicutils");
+        global.DEFAULTDRUM = "kick drum";
+        global.DRUMNAMES = [
+            ["snare drum", "snare", "images/snare.svg", "sn"],
+            ["kick drum", "kick", "images/kick.svg", "kk"],
+            ["hi hat", "hi hat", "images/hihat.svg", "hh"]
+        ];
+    });
+
+    it("should cover default, alias, url, and fallback branches", () => {
+        expect(actualModule.getDrumIndex("")).toBe(1);
+        expect(actualModule.getDrumIndex("http://example.com")).toBe(1);
+        expect(actualModule.getDrumName("kick")).toBe("kick");
+        expect(actualModule.getDrumSymbol("kick")).toBe("hh");
+        expect(actualModule.getDrumIcon("http://example.com")).toBe("images/drum.svg");
+        expect(actualModule.getDrumSynthName("unknown")).toBe("kick drum");
+        expect(actualModule.getDrumSynthName("http://example.com")).toBe("http://example.com");
+    });
+});
+
 describe("getFilterTypes", () => {
     it("should return default filter type", () => {
         expect(getFilterTypes("")).toBe("highpass"); //DEFAULTFILTERTYPES
@@ -467,6 +491,21 @@ describe("getFilterTypes", () => {
     it("should return correct filter types", () => {
         expect(getFilterTypes("highpass")).toBe("highpass");
         expect(getFilterTypes("notch")).toBe("notch");
+    });
+});
+
+describe("getFilterTypes actual implementation", () => {
+    beforeEach(() => {
+        global.DEFAULTFILTERTYPE = "highpass";
+        global.FILTERTYPES = [
+            ["highpass", "highpass"],
+            ["bandpass", "bandpass"],
+            ["lowpass", "lowpass"]
+        ];
+    });
+
+    it("should return the default for unknown filters", () => {
+        expect(jest.requireActual("../musicutils").getFilterTypes("nope")).toBe("highpass");
     });
 });
 
@@ -491,6 +530,21 @@ describe("getOscillatorTypes", () => {
     it("should return null for invalid oscillator types", () => {
         expect(getOscillatorTypes("invalid")).toBe(null);
         expect(getOscillatorTypes("random")).toBe(null);
+    });
+});
+
+describe("getOscillatorTypes actual implementation", () => {
+    beforeEach(() => {
+        global.OSCTYPES = [
+            ["sine", "sine"],
+            ["triangle", "triangle"]
+        ];
+    });
+
+    it("should throw after converting empty input to null", () => {
+        expect(() => jest.requireActual("../musicutils").getOscillatorTypes("")).toThrow(
+            "Cannot read properties of null (reading 'toLowerCase')"
+        );
     });
 });
 
@@ -621,6 +675,25 @@ describe("getNoiseSynthName", () => {
     });
 });
 
+describe("Noise actual implementations", () => {
+    let actualModule;
+
+    beforeEach(() => {
+        actualModule = jest.requireActual("../musicutils");
+        global.DEFAULTNOISE = "noise1";
+        global.NOISENAMES = [
+            ["white noise", "noise1", "images/noise1.svg"],
+            ["", "custom noise", "images/custom.svg"]
+        ];
+    });
+
+    it("should cover custom, url, and fallback branches", () => {
+        expect(actualModule.getNoiseName("custom noise")).toBe("custom noise");
+        expect(actualModule.getNoiseIcon("http://example.com")).toBe("images/noises.svg");
+        expect(actualModule.getNoiseSynthName("unknown")).toBe("noise1");
+    });
+});
+
 describe("getVoiceName", () => {
     beforeEach(() => {
         global.VOICENAMES = [
@@ -709,6 +782,29 @@ describe("Voice and Temperament Functions", () => {
     });
 });
 
+describe("Voice actual implementations", () => {
+    let actualModule;
+
+    beforeEach(() => {
+        actualModule = jest.requireActual("../musicutils");
+        global.DEFAULTVOICE = "electronic synth";
+        global.VOICENAMES = [
+            ["piano", "piano", "images/piano.svg"],
+            ["electronic synth", "synth", "images/synth.svg"],
+            ["", "custom voice", "images/customvoice.svg"]
+        ];
+        global.CUSTOMSAMPLES = [["customSample", "sample-id", "images/sample.svg"]];
+    });
+
+    it("should cover custom sample, url, and fallback branches", () => {
+        expect(actualModule.getVoiceName("custom voice")).toBe("electronic synth");
+        expect(actualModule.getVoiceIcon("sample-id")).toBe("customSample");
+        expect(actualModule.getVoiceIcon("http://example.com")).toBe("images/voices.svg");
+        expect(actualModule.getVoiceSynthName("unknown")).toBe("electronic synth");
+        expect(actualModule.getVoiceSynthName("http://example.com")).toBe("http://example.com");
+    });
+});
+
 describe("getTemperamentName", () => {
     beforeEach(() => {
         global.TEMPERAMENTS = [
@@ -725,6 +821,10 @@ describe("getTemperamentName", () => {
     it("should be case insensitive when matching names", () => {
         expect(getTemperamentName("EQUAL")).toBe("equal");
         expect(getTemperamentName("Equal")).toBe("equal");
+    });
+
+    it("should return the default temperament for unknown names", () => {
+        expect(getTemperamentName("nope")).toBe("equal");
     });
 });
 
@@ -843,6 +943,13 @@ describe("keySignatureToMode", () => {
         expect(keySignatureToMode("A minor")).toEqual(["A", "minor"]);
         expect(keySignatureToMode("E minor")).toEqual(["E", "minor"]);
     });
+
+    it("should handle maqam aliases, shorthand minor keys, and invalid keys", () => {
+        global.MAQAMTABLE = { "hijaz kar": "C maqam" };
+        expect(keySignatureToMode("hijaz kar")).toEqual(["C", "maqam"]);
+        expect(keySignatureToMode("Am")).toEqual(["A", "natural minor"]);
+        expect(keySignatureToMode("nonsense")).toEqual(["C", "major"]);
+    });
 });
 
 describe("getScaleAndHalfSteps", () => {
@@ -895,6 +1002,24 @@ describe("getScaleAndHalfSteps", () => {
             "minor"
         ]);
     });
+
+    it("should handle chromatic modes with accidentals", () => {
+        expect(getScaleAndHalfSteps("C chromatic")).toEqual([
+            ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"],
+            ["do", "do♯", "re", "re♯", "mi", "fa", "fa♯", "sol", "sol♯", "la", "la♯", "ti"],
+            "C",
+            "chromatic"
+        ]);
+    });
+
+    it("should handle pentatonic modes without duplicate solfege names", () => {
+        expect(getScaleAndHalfSteps("C major pentatonic")).toEqual([
+            ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"],
+            ["do", "", "re", "", "mi", "", "", "sol", "", "la", "", ""],
+            "C",
+            "major pentatonic"
+        ]);
+    });
 });
 
 describe("modeMapper", () => {
@@ -942,6 +1067,63 @@ describe("modeMapper", () => {
 
     it("should normalize uppercase input", () => {
         expect(modeMapper("C", "DORIAN")).toEqual(["a♯", "major"]);
+    });
+
+    it.each([
+        ["C", "dorian", ["a♯", "major"]],
+        ["D", "dorian", ["c", "major"]],
+        ["E", "dorian", ["d", "major"]],
+        ["F", "dorian", ["c", "minor"]],
+        ["G", "dorian", ["f", "major"]],
+        ["A", "dorian", ["g", "major"]],
+        ["B", "dorian", ["a", "major"]],
+        ["C♯", "dorian", ["b", "major"]],
+        ["D♭", "dorian", ["e♭", "minor"]],
+        ["G♭", "dorian", ["d", "minor"]],
+        ["C", "phrygian", ["g♯", "major"]],
+        ["D", "phrygian", ["a♯", "major"]],
+        ["E", "phrygian", ["c", "major"]],
+        ["F", "phrygian", ["b", "major"]],
+        ["G", "phrygian", ["c", "minor"]],
+        ["A", "phrygian", ["f", "major"]],
+        ["B", "phrygian", ["g", "major"]],
+        ["C♯", "phrygian", ["a", "major"]],
+        ["A♭", "phrygian", ["d♭", "minor"]],
+        ["B♭", "phrygian", ["e♭", "minor"]],
+        ["C", "lydian", ["g", "major"]],
+        ["D", "lydian", ["a", "major"]],
+        ["E", "lydian", ["b", "major"]],
+        ["F", "lydian", ["c", "major"]],
+        ["G", "lydian", ["d", "major"]],
+        ["A", "lydian", ["e", "major"]],
+        ["B", "lydian", ["b", "major"]],
+        ["C♯", "lydian", ["g♯", "major"]],
+        ["G♯", "lydian", ["c", "minor"]],
+        ["D♭", "lydian", ["f", "minor"]],
+        ["B♭", "lydian", ["d", "minor"]],
+        ["C", "mixolydian", ["f", "major"]],
+        ["D", "mixolydian", ["g", "major"]],
+        ["E", "mixolydian", ["a", "major"]],
+        ["F", "mixolydian", ["a♯", "major"]],
+        ["G", "mixolydian", ["c", "major"]],
+        ["A", "mixolydian", ["d", "major"]],
+        ["B", "mixolydian", ["e", "major"]],
+        ["D♯", "mixolydian", ["g♯", "major"]],
+        ["E♭", "mixolydian", ["f", "minor"]],
+        ["B♭", "mixolydian", ["c", "minor"]],
+        ["C", "locrian", ["b", "major"]],
+        ["D", "locrian", ["c", "minor"]],
+        ["E", "locrian", ["f", "major"]],
+        ["F", "locrian", ["b", "major"]],
+        ["G", "locrian", ["g♯", "major"]],
+        ["A", "locrian", ["a♯", "major"]],
+        ["B", "locrian", ["c", "major"]],
+        ["C♯", "locrian", ["d", "major"]],
+        ["E♭", "locrian", ["d♭", "minor"]],
+        ["G♭", "locrian", ["f", "minor"]],
+        ["A♭", "locrian", ["g♭", "minor"]]
+    ])("should map %s %s to %j", (key, mode, expected) => {
+        expect(modeMapper(key, mode)).toEqual(expected);
     });
 });
 
@@ -2254,6 +2436,26 @@ describe("scaleDegreeToPitchMapping", () => {
     it("handles edge cases for pitch alterations", () => {
         const result = scaleDegreeToPitchMapping("C major", null, false, "C#");
         expect(result).toEqual(["1", "8"]);
+    });
+
+    it("maps scale degrees and pitches in chromatic fallback mode", () => {
+        expect(scaleDegreeToPitchMapping("C chromatic", 1, false, null)).toBe("C");
+        expect(scaleDegreeToPitchMapping("C chromatic", 4, false, null)).toBe("F");
+        expect(scaleDegreeToPitchMapping("C chromatic", null, false, "C#")).toEqual(["1"]);
+        expect(scaleDegreeToPitchMapping("C chromatic", null, false, "F#")).toEqual(["4"]);
+    });
+
+    it("maps scale degrees and pitches in pentatonic fallback mode", () => {
+        expect(scaleDegreeToPitchMapping("C major pentatonic", 4, false, null)).toBe("F");
+        expect(scaleDegreeToPitchMapping("C major pentatonic", 6, false, null)).toBe("A");
+        expect(scaleDegreeToPitchMapping("C major pentatonic", null, false, "A")).toEqual([
+            "6",
+            "♮"
+        ]);
+        expect(scaleDegreeToPitchMapping("C major pentatonic", null, false, "B♭")).toEqual([
+            "7",
+            "♭"
+        ]);
     });
 });
 
