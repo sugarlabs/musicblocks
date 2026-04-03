@@ -1056,15 +1056,20 @@
 
                 loadL10nSplashScreen();
 
+                // use i18next directly, which is already initialized before this runs
                 setTimeout(function () {
                     const loadingText = document.getElementById("loadingText");
+                    
+                    // Use i18next directly instead of _ from utils/utils
+                    const t = (window.i18next && window.i18next.t.bind(window.i18next)) 
+                            || function(s) { return s; }; // fallback: return string as-is
+                    
                     const texts = [
-                        _("Do, Re, Mi, Fa, Sol, La, Ti, Do"),
-                        _("Loading Music Blocks..."),
-                        _("Reading Music...")
+                        t("Do, Re, Mi, Fa, Sol, La, Ti, Do"),
+                        t("Loading Music Blocks..."),
+                        t("Reading Music...")
                     ];
                     let index = 0;
-
                     window.intervalId = setInterval(function () {
                         loadingText.textContent = texts[index];
                         index = (index + 1) % texts.length;
