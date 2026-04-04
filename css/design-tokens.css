@@ -1,0 +1,379 @@
+/**
+ * MusicBlocks Modern Design System - Design Tokens
+ *
+ * This file contains all design tokens (colors, spacing, typography, etc.)
+ * used throughout the MusicBlocks application.
+ */
+
+:root {
+  /* 
+     COLOR SYSTEM
+     */
+
+  /* Primary Brand Colors */
+  --mb-primary-50: #e3f2fd;
+  --mb-primary-100: #bbdefb;
+  --mb-primary-200: #90caf9;
+  --mb-primary-300: #64b5f6;
+  --mb-primary-400: #42a5f5;
+  --mb-primary-500: #2196f3;
+  --mb-primary-600: #1e88e5;
+  --mb-primary-700: #1976d2;
+  --mb-primary-800: #1565c0;
+  --mb-primary-900: #0d47a1;
+
+  /* Secondary/Accent Colors */
+  --mb-accent-50: #e0f7fa;
+  --mb-accent-100: #b2ebf2;
+  --mb-accent-200: #80deea;
+  --mb-accent-300: #4dd0e1;
+  --mb-accent-400: #26c6da;
+  --mb-accent-500: #00bcd4;
+  --mb-accent-600: #00acc1;
+  --mb-accent-700: #0097a7;
+  --mb-accent-800: #00838f;
+  --mb-accent-900: #006064;
+
+  /* Semantic Colors */
+  --mb-success-light: #e8f5e9;
+  --mb-success: #4caf50;
+  --mb-success-dark: #2e7d32;
+
+  --mb-warning-light: #fff3e0;
+  --mb-warning: #ff9800;
+  --mb-warning-dark: #e65100;
+
+  --mb-error-light: #ffebee;
+  --mb-error: #f44336;
+  --mb-error-dark: #c62828;
+
+  --mb-info-light: #e3f2fd;
+  --mb-info: #2196f3;
+  --mb-info-dark: #1565c0;
+
+  /* Neutral Colors (Light Theme) */
+  --mb-neutral-0: #ffffff;
+  --mb-neutral-50: #fafafa;
+  --mb-neutral-100: #f5f5f5;
+  --mb-neutral-200: #eeeeee;
+  --mb-neutral-300: #e0e0e0;
+  --mb-neutral-400: #bdbdbd;
+  --mb-neutral-500: #9e9e9e;
+  --mb-neutral-600: #757575;
+  --mb-neutral-700: #616161;
+  --mb-neutral-800: #424242;
+  --mb-neutral-900: #212121;
+  --mb-neutral-950: #121212;
+
+  /* Block Palette Colors - Music Categories */
+  --mb-palette-pitch: #00b0a0;
+  --mb-palette-rhythm: #ff6b6b;
+  --mb-palette-meter: #ffa726;
+  --mb-palette-tone: #ab47bc;
+  --mb-palette-ornament: #5c6bc0;
+  --mb-palette-volume: #ec407a;
+  --mb-palette-drum: #8d6e63;
+  --mb-palette-flow: #78909c;
+  --mb-palette-action: #26a69a;
+  --mb-palette-boxes: #42a5f5;
+  --mb-palette-number: #66bb6a;
+  --mb-palette-boolean: #7e57c2;
+  --mb-palette-heap: #ff7043;
+  --mb-palette-dict: #5c6bc0;
+  --mb-palette-extras: #26c6da;
+  --mb-palette-graphics: #9ccc65;
+  --mb-palette-pen: #29b6f6;
+  --mb-palette-media: #ffca28;
+  --mb-palette-sensors: #ef5350;
+  --mb-palette-ensemble: #8d6e63;
+
+  /* 
+     SEMANTIC THEME TOKENS
+    */
+
+  /* Surface Colors */
+  --mb-surface-primary: var(--mb-neutral-0);
+  --mb-surface-secondary: var(--mb-neutral-50);
+  --mb-surface-tertiary: var(--mb-neutral-100);
+  --mb-surface-elevated: var(--mb-neutral-0);
+
+  /* Background Colors */
+  --mb-bg-canvas: var(--mb-neutral-100);
+  --mb-bg-toolbar: var(--mb-primary-500);
+  --mb-bg-sidebar: var(--mb-neutral-50);
+  --mb-bg-widget: var(--mb-neutral-0);
+  --mb-bg-overlay: rgba(0, 0, 0, 0.5);
+
+  /* Text Colors */
+  --mb-text-primary: var(--mb-neutral-900);
+  --mb-text-secondary: var(--mb-neutral-600);
+  --mb-text-tertiary: var(--mb-neutral-500);
+  --mb-text-disabled: var(--mb-neutral-400);
+  --mb-text-inverse: var(--mb-neutral-0);
+  --mb-text-link: var(--mb-primary-600);
+  --mb-text-link-hover: var(--mb-primary-800);
+
+  /* Border Colors */
+  --mb-border-light: var(--mb-neutral-200);
+  --mb-border-default: var(--mb-neutral-300);
+  --mb-border-strong: var(--mb-neutral-400);
+  --mb-border-focus: var(--mb-primary-500);
+
+  /* Interactive States */
+  --mb-interactive-hover: rgba(0, 0, 0, 0.04);
+  --mb-interactive-active: rgba(0, 0, 0, 0.08);
+  --mb-interactive-selected: rgba(33, 150, 243, 0.12);
+  --mb-interactive-disabled: rgba(0, 0, 0, 0.12);
+
+  /* 
+     SPACING SYSTEM (8px base grid)
+     */
+
+  --mb-space-0: 0;
+  --mb-space-1: 4px;
+  --mb-space-2: 8px;
+  --mb-space-3: 12px;
+  --mb-space-4: 16px;
+  --mb-space-5: 20px;
+  --mb-space-6: 24px;
+  --mb-space-8: 32px;
+  --mb-space-10: 40px;
+  --mb-space-12: 48px;
+  --mb-space-16: 64px;
+  --mb-space-20: 80px;
+  --mb-space-24: 96px;
+
+  /* ========================================
+     TYPOGRAPHY
+     ======================================== */
+
+  /* Font Families */
+  --mb-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  --mb-font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+  /* Font Sizes */
+  --mb-text-xs: 0.75rem;    /* 12px */
+  --mb-text-sm: 0.875rem;   /* 14px */
+  --mb-text-base: 1rem;     /* 16px */
+  --mb-text-lg: 1.125rem;   /* 18px */
+  --mb-text-xl: 1.25rem;    /* 20px */
+  --mb-text-2xl: 1.5rem;    /* 24px */
+  --mb-text-3xl: 1.875rem;  /* 30px */
+  --mb-text-4xl: 2.25rem;   /* 36px */
+
+  /* Font Weights */
+  --mb-font-normal: 400;
+  --mb-font-medium: 500;
+  --mb-font-semibold: 600;
+  --mb-font-bold: 700;
+
+  /* Line Heights */
+  --mb-leading-none: 1;
+  --mb-leading-tight: 1.25;
+  --mb-leading-snug: 1.375;
+  --mb-leading-normal: 1.5;
+  --mb-leading-relaxed: 1.625;
+
+  /* Letter Spacing */
+  --mb-tracking-tight: -0.025em;
+  --mb-tracking-normal: 0;
+  --mb-tracking-wide: 0.025em;
+
+  /* ========================================
+     BORDER RADIUS
+     ======================================== */
+
+  --mb-radius-none: 0;
+  --mb-radius-sm: 4px;
+  --mb-radius-md: 8px;
+  --mb-radius-lg: 12px;
+  --mb-radius-xl: 16px;
+  --mb-radius-2xl: 24px;
+  --mb-radius-full: 9999px;
+
+  /* ========================================
+     SHADOWS
+     ======================================== */
+
+  --mb-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --mb-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --mb-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --mb-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --mb-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --mb-shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --mb-shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+
+  /* Focus Ring */
+  --mb-ring-width: 3px;
+  --mb-ring-color: rgba(33, 150, 243, 0.4);
+  --mb-ring-offset: 2px;
+
+  /* ========================================
+     TRANSITIONS & ANIMATIONS
+     ======================================== */
+
+  /* Durations */
+  --mb-duration-instant: 0ms;
+  --mb-duration-fast: 100ms;
+  --mb-duration-normal: 200ms;
+  --mb-duration-slow: 300ms;
+  --mb-duration-slower: 400ms;
+
+  /* Timing Functions */
+  --mb-ease-linear: linear;
+  --mb-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --mb-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --mb-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --mb-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ========================================
+     Z-INDEX SCALE
+     ======================================== */
+
+  --mb-z-base: 0;
+  --mb-z-dropdown: 100;
+  --mb-z-sticky: 200;
+  --mb-z-fixed: 300;
+  --mb-z-modal-backdrop: 400;
+  --mb-z-modal: 500;
+  --mb-z-popover: 600;
+  --mb-z-tooltip: 700;
+  --mb-z-toast: 800;
+
+  /* ========================================
+     COMPONENT-SPECIFIC TOKENS
+     ======================================== */
+
+  /* Toolbar */
+  --mb-toolbar-height: 56px;
+  --mb-toolbar-bg: var(--mb-primary-500);
+  --mb-toolbar-text: var(--mb-neutral-0);
+
+  /* Sidebar/Palette */
+  --mb-sidebar-width: 280px;
+  --mb-sidebar-collapsed-width: 56px;
+
+  /* Widget Windows */
+  --mb-widget-min-width: 320px;
+  --mb-widget-header-height: 40px;
+  --mb-widget-toolbar-width: 48px;
+
+  /* Buttons */
+  --mb-btn-height-sm: 32px;
+  --mb-btn-height-md: 40px;
+  --mb-btn-height-lg: 48px;
+  --mb-btn-padding-sm: var(--mb-space-2) var(--mb-space-3);
+  --mb-btn-padding-md: var(--mb-space-2) var(--mb-space-4);
+  --mb-btn-padding-lg: var(--mb-space-3) var(--mb-space-6);
+
+  /* Icons */
+  --mb-icon-xs: 16px;
+  --mb-icon-sm: 20px;
+  --mb-icon-md: 24px;
+  --mb-icon-lg: 32px;
+  --mb-icon-xl: 48px;
+
+  /* Touch Targets (WCAG) */
+  --mb-touch-target-min: 44px;
+}
+
+/* ========================================
+   DARK THEME OVERRIDES
+   ======================================== */
+
+body.dark {
+  /* Surface Colors */
+  --mb-surface-primary: var(--mb-neutral-900);
+  --mb-surface-secondary: var(--mb-neutral-800);
+  --mb-surface-tertiary: var(--mb-neutral-700);
+  --mb-surface-elevated: #2d2d30;
+
+  /* Background Colors */
+  --mb-bg-canvas: var(--mb-neutral-950);
+  --mb-bg-toolbar: #1e1e1e;
+  --mb-bg-sidebar: var(--mb-neutral-900);
+  --mb-bg-widget: #2d2d30;
+  --mb-bg-overlay: rgba(0, 0, 0, 0.7);
+
+  /* Text Colors */
+  --mb-text-primary: var(--mb-neutral-100);
+  --mb-text-secondary: var(--mb-neutral-300);
+  --mb-text-tertiary: var(--mb-neutral-400);
+  --mb-text-disabled: var(--mb-neutral-600);
+  --mb-text-inverse: var(--mb-neutral-900);
+  --mb-text-link: var(--mb-accent-400);
+  --mb-text-link-hover: var(--mb-accent-300);
+
+  /* Border Colors */
+  --mb-border-light: var(--mb-neutral-700);
+  --mb-border-default: var(--mb-neutral-600);
+  --mb-border-strong: var(--mb-neutral-500);
+  --mb-border-focus: var(--mb-accent-400);
+
+  /* Interactive States */
+  --mb-interactive-hover: rgba(255, 255, 255, 0.08);
+  --mb-interactive-active: rgba(255, 255, 255, 0.12);
+  --mb-interactive-selected: rgba(77, 208, 225, 0.15);
+  --mb-interactive-disabled: rgba(255, 255, 255, 0.12);
+
+  /* Shadows (darker for dark mode) */
+  --mb-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --mb-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --mb-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+
+  /* Focus Ring */
+  --mb-ring-color: rgba(77, 208, 225, 0.5);
+
+  /* Toolbar */
+  --mb-toolbar-bg: #1e1e1e;
+  --mb-toolbar-text: var(--mb-neutral-100);
+}
+
+/*
+   HIGH CONTRAST THEME OVERRIDES
+ */
+
+body.highcontrast {
+  /* Surface Colors */
+  --mb-surface-primary: #000000;
+  --mb-surface-secondary: #000000;
+  --mb-surface-tertiary: #1a1a1a;
+  --mb-surface-elevated: #000000;
+
+  /* Background Colors */
+  --mb-bg-canvas: #000000;
+  --mb-bg-toolbar: #000000;
+  --mb-bg-sidebar: #000000;
+  --mb-bg-widget: #000000;
+  --mb-bg-overlay: rgba(0, 0, 0, 0.9);
+
+  /* Text Colors */
+  --mb-text-primary: #ffffff;
+  --mb-text-secondary: #ffffff;
+  --mb-text-tertiary: #cccccc;
+  --mb-text-disabled: #666666;
+  --mb-text-inverse: #000000;
+  --mb-text-link: #00ffff;
+  --mb-text-link-hover: #ffffff;
+
+  /* Border Colors */
+  --mb-border-light: #ffffff;
+  --mb-border-default: #ffffff;
+  --mb-border-strong: #ffffff;
+  --mb-border-focus: #00ffff;
+
+  /* High Contrast Specific */
+  --mb-primary-500: #00ffff;
+  --mb-accent-500: #ffff00;
+  --mb-success: #00ff00;
+  --mb-warning: #ffff00;
+  --mb-error: #ff0000;
+
+  /* Focus Ring */
+  --mb-ring-width: 4px;
+  --mb-ring-color: #00ffff;
+
+  /* Toolbar */
+  --mb-toolbar-bg: #000000;
+  --mb-toolbar-text: #ffffff;
+}
