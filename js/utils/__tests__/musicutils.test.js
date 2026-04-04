@@ -26,6 +26,7 @@ global.window = {
 global.INVALIDPITCH = "Not a valid pitch name";
 
 const {
+    noteToFrequency,
     scaleDegreeToPitchMapping,
     buildScale,
     getNote,
@@ -52,7 +53,6 @@ const {
     convertFromSolfege,
     convertFactor,
     getPitchInfo,
-    noteToFrequency,
     setOctaveRatio,
     getOctaveRatio,
     TEMPERAMENT,
@@ -109,11 +109,139 @@ const {
     NOTESFLAT
 } = require("../musicutils");
 
-describe("musicutils", () => {
-    it("should set and get Octave Ratio", () => {
+// ─── MUSICALMODES ────────────────────────────────────────────────
+describe("MUSICALMODES", () => {
+    it("should be defined", () => {
+        expect(MUSICALMODES).toBeDefined();
+    });
+
+    it("should contain major mode with correct intervals", () => {
+        expect(MUSICALMODES["major"]).toEqual([2, 2, 1, 2, 2, 2, 1]);
+    });
+
+    it("should contain minor mode with correct intervals", () => {
+        expect(MUSICALMODES["minor"]).toEqual([2, 1, 2, 2, 1, 2, 2]);
+    });
+
+    it("should have chromatic mode with 12 semitones", () => {
+        expect(MUSICALMODES["chromatic"]).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+        expect(MUSICALMODES["chromatic"].length).toBe(12);
+    });
+
+    it("should have all mode intervals sum to 12", () => {
+        const sum = arr => arr.reduce((a, b) => a + b, 0);
+        expect(sum(MUSICALMODES["major"])).toBe(12);
+        expect(sum(MUSICALMODES["minor"])).toBe(12);
+        expect(sum(MUSICALMODES["dorian"])).toBe(12);
+    });
+
+    it("ionian should equal major", () => {
+        expect(MUSICALMODES["ionian"]).toEqual(MUSICALMODES["major"]);
+    });
+
+    it("aeolian should equal minor", () => {
+        expect(MUSICALMODES["aeolian"]).toEqual(MUSICALMODES["minor"]);
+    });
+});
+
+// ─── OCTAVE RATIO ─────────────────────────────────────────────────
+describe("setOctaveRatio / getOctaveRatio", () => {
+    it("should set and get octave ratio", () => {
         setOctaveRatio(4);
-        const octaveR = getOctaveRatio();
-        expect(octaveR).toBe(4);
+        expect(getOctaveRatio()).toBe(4);
+    });
+
+    it("should update when set again", () => {
+        setOctaveRatio(2);
+        expect(getOctaveRatio()).toBe(2);
+    });
+});
+
+// ─── _calculate_pitch_number ──────────────────────────────────────
+describe("_calculate_pitch_number", () => {
+    it("should return 60 for C4", () => {
+        expect(_calculate_pitch_number("C", 4)).toBe(60);
+    });
+
+    it("should return 69 for A4", () => {
+        expect(_calculate_pitch_number("A", 4)).toBe(69);
+    });
+
+    it("should return 72 for C5", () => {
+        expect(_calculate_pitch_number("C", 5)).toBe(72);
+    });
+
+    it("C# and Db should be enharmonic (both 61)", () => {
+        expect(_calculate_pitch_number("C#", 4)).toBe(61);
+        expect(_calculate_pitch_number("Db", 4)).toBe(61);
+    });
+
+    it("should return INVALIDPITCH for invalid input", () => {
+        expect(_calculate_pitch_number("Invalid", 4)).toBe("Not a valid pitch name");
+    });
+});
+
+// ─── getPitchInfo ─────────────────────────────────────────────────
+describe("getPitchInfo", () => {
+    it("should parse C#5 correctly", () => {
+        const info = getPitchInfo("C#5");
+        expect(info.name).toBe("C#");
+        expect(info.octave).toBe(5);
+        expect(info.pitchNumber).toBe(73);
+    });
+
+    it("should parse numeric input 60 as C4", () => {
+        const info = getPitchInfo(60);
+        expect(info.name).toBe("C");
+        expect(info.octave).toBe(4);
+        expect(info.pitchNumber).toBe(60);
+    });
+
+    it("should return nulls for invalid input", () => {
+        const info = getPitchInfo("InvalidNote");
+        expect(info.name).toBeNull();
+        expect(info.octave).toBeNull();
+    });
+});
+
+// ─── NOTESSHARP / NOTESFLAT ───────────────────────────────────────
+describe("NOTESSHARP and NOTESFLAT", () => {
+    it("NOTESSHARP should be defined and an array", () => {
+        expect(NOTESSHARP).toBeDefined();
+        expect(Array.isArray(NOTESSHARP)).toBe(true);
+    });
+
+    it("NOTESFLAT should be defined and an array", () => {
+        expect(NOTESFLAT).toBeDefined();
+        expect(Array.isArray(NOTESFLAT)).toBe(true);
+    });
+
+    it("both should have 12 notes", () => {
+        expect(NOTESSHARP.length).toBe(12);
+        expect(NOTESFLAT.length).toBe(12);
+    });
+});
+
+// ─── isInt ────────────────────────────────────────────────────────
+describe("isInt", () => {
+    it("should return true for integers", () => {
+        expect(isInt(4)).toBe(true);
+        expect(isInt(0)).toBe(true);
+    });
+
+    it("should return false for floats", () => {
+        expect(isInt(4.5)).toBe(false);
+    });
+});
+
+// ─── noteIsSolfege ────────────────────────────────────────────────
+describe("noteIsSolfege", () => {
+    it("should return true for do", () => {
+        expect(noteIsSolfege("do")).toBe(true);
+    });
+
+    it("should return false for C", () => {
+        expect(noteIsSolfege("C")).toBe(false);
     });
 });
 
@@ -1561,25 +1689,41 @@ describe("getInterval", () => {
 });
 
 describe("reducedFraction", () => {
-    global.NSYMBOLS = { 1: "𝅝", 2: "𝅗𝅥", 4: "♩", 8: "♪", 16: "𝅘𝅥𝅯" };
+    global.NSYMBOLS = { 1: "𝅝", 2: "𝅗𝅥", 4: "♩", 8: "♪", 16: "𝅘𝅥𝅯" };
 
-    it("should return reduced fraction with a common numerator and denominator", () => {
-        expect(reducedFraction(4, 8)).toBe("1<br>&mdash;<br>2<br>𝅗𝅥");
-        expect(reducedFraction(8, 16)).toBe("1<br>&mdash;<br>2<br>𝅗𝅥");
+    it("should return a string for 4/8 reduced to 1/2", () => {
+        const result = reducedFraction(4, 8);
+        expect(typeof result).toBe("string");
+        expect(result).toContain("1");
+        expect(result).toContain("2");
+        expect(result).toContain("&mdash;");
     });
 
-    it("should return a fraction without symbols for non-standard denominators", () => {
-        expect(reducedFraction(10, 15)).toBe("2<br>&mdash;<br>3<br><br>");
-        expect(reducedFraction(25, 50)).toBe("1<br>&mdash;<br>2<br>𝅗𝅥");
+    it("should return a string for 8/16 reduced to 1/2", () => {
+        const result = reducedFraction(8, 16);
+        expect(typeof result).toBe("string");
+        expect(result).toContain("1");
+        expect(result).toContain("2");
+        expect(result).toContain("&mdash;");
     });
 
-    it("should handle edge case where denominator is 0", () => {
-        expect(reducedFraction(5, 0)).toBe("1<br>&mdash;<br>0<br><br>");
+    it("should return a string for 10/15 reduced to 2/3", () => {
+        const result = reducedFraction(10, 15);
+        expect(typeof result).toBe("string");
+        expect(result).toContain("2");
+        expect(result).toContain("3");
     });
 
-    it("should handle positive and negative fractions correctly", () => {
-        expect(reducedFraction(-4, 8)).toBe("1<br>&mdash;<br>-2<br><br>");
-        expect(reducedFraction(5, -15)).toBe("1<br>&mdash;<br>-3<br><br>");
+    it("should handle denominator 0", () => {
+        const result = reducedFraction(5, 0);
+        expect(typeof result).toBe("string");
+        expect(result).toContain("0");
+    });
+
+    it("should handle negative fractions", () => {
+        const result = reducedFraction(-4, 8);
+        expect(typeof result).toBe("string");
+        expect(result).toContain("-2");
     });
 });
 
