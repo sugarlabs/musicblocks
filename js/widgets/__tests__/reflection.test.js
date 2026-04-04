@@ -6,7 +6,7 @@
  * @copyright 2026 kh-ub-ayb
  *
  * @license
- * This program is free software: you can redistribute it and/or modify
+ * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
@@ -23,6 +23,53 @@
 const fs = require("fs");
 const path = require("path");
 
+// Simple DOM mocks (like palette.test.js)
+global.document = {
+    createElement: jest.fn(tag => {
+        const element = {
+            tagName: tag.toUpperCase(),
+            style: {},
+            innerHTML: "",
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                contains: jest.fn(() => false)
+            },
+            append: jest.fn(),
+            insertAdjacentHTML: jest.fn(),
+            querySelector: jest.fn(() => null),
+            querySelectorAll: jest.fn(() => []),
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn()
+        };
+        return element;
+    }),
+    body: {
+        appendChild: jest.fn(),
+        removeChild: jest.fn(),
+        innerHTML: ""
+    }
+};
+
+global.window = {
+    location: { href: "http://localhost" },
+    localStorage: {
+        getItem: jest.fn(),
+        setItem: jest.fn(),
+        removeItem: jest.fn()
+    },
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn()
+};
+
+global.navigator = {
+    userAgent: "test"
+};
+
+// Mock globals
+global._ = str => str;
+global.docById = jest.fn(() => ({ style: {}, innerHTML: "" }));
+
 // Load the ReflectionMatrix class by reading the source and evaluating it
 const source = fs.readFileSync(path.resolve(__dirname, "../reflection.js"), "utf-8");
 // We put ReflectionMatrix in global scope
@@ -30,18 +77,15 @@ new Function(
     source + "\nif (typeof global !== 'undefined') { global.ReflectionMatrix = ReflectionMatrix; }"
 )();
 
-// Mock globals
-global._ = str => str;
-
 // Mock window.widgetWindows and widget
 function createMockWidgetWindow() {
-    const widgetBody = document.createElement("div");
+    const widgetBody = global.document.createElement("div");
     return {
         clear: jest.fn(),
         show: jest.fn(),
         onclose: null,
         addButton: jest.fn(() => {
-            const btn = document.createElement("button");
+            const btn = global.document.createElement("button");
             return btn;
         }),
         getWidgetBody: jest.fn(() => widgetBody),

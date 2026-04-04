@@ -3,7 +3,7 @@
  * MusicBlocks v3.4.1
  * Copyright (C) 2025 Om Santosh Suneri
  *
- * This program is free software: you can redistribute it and/or modify
+ * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
@@ -17,12 +17,49 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+// Simple DOM mocks (like palette.test.js)
+global.document = {
+    createElement: jest.fn(tag => ({
+        tagName: tag.toUpperCase(),
+        style: {},
+        innerHTML: "",
+        appendChild: jest.fn(),
+        removeChild: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn()
+    })),
+    body: {
+        appendChild: jest.fn(),
+        removeChild: jest.fn(),
+        innerHTML: ""
+    },
+    getElementById: jest.fn(() => ({ style: {}, innerHTML: "" }))
+};
+
+global.window = {
+    location: { href: "http://localhost" },
+    localStorage: {
+        getItem: jest.fn(),
+        setItem: jest.fn(),
+        removeItem: jest.fn()
+    },
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    getComputedStyle: jest.fn(() => ({ display: "block", visibility: "visible" }))
+};
+
+global.navigator = {
+    userAgent: "test"
+};
+
 const PlanetInterface = require("../planetInterface");
 global.platformColor = {
     header: "#8bc34a"
 };
 global._THIS_IS_MUSIC_BLOCKS_ = {};
 global.doSVG = jest.fn();
+global._ = jest.fn(str => str);
+global.docById = jest.fn(() => ({ style: {}, innerHTML: "" }));
 
 const mockActivity = {
     hideSearchWidget: jest.fn(),

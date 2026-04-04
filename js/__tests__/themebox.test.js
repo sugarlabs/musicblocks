@@ -3,7 +3,7 @@
  * MusicBlocks v3.4.1
  * Copyright (C) 2025 Om Santosh Suneri
  *
- * This program is free software: you can redistribute it and/or modify
+ * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
@@ -17,7 +17,43 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+// Simple DOM mocks (like palette.test.js)
+global.document = {
+    createElement: jest.fn(tag => ({
+        tagName: tag.toUpperCase(),
+        style: {},
+        innerHTML: "",
+        appendChild: jest.fn(),
+        removeChild: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn()
+    })),
+    body: {
+        appendChild: jest.fn(),
+        removeChild: jest.fn(),
+        innerHTML: ""
+    },
+    querySelector: jest.fn(() => ({ content: "#4DA6FF" })),
+    querySelectorAll: jest.fn(() => [])
+};
+
+global.window = {
+    location: { href: "http://localhost" },
+    localStorage: {
+        getItem: jest.fn(),
+        setItem: jest.fn(),
+        removeItem: jest.fn()
+    },
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn()
+};
+
+global.navigator = {
+    userAgent: "test"
+};
+
 global._ = jest.fn(str => str);
+global.docById = jest.fn(() => ({ style: {}, innerHTML: "" }));
 
 // Mock global palette color variables
 global.PALETTEFILLCOLORS = {};
