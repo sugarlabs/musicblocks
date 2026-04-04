@@ -29,11 +29,12 @@
    MIN_HIGHLIGHT_DURATION_MS,
    NOMICERRORMSG, NANERRORMSG, NOSTRINGERRORMSG, NOBOXERRORMSG,
    NOACTIONERRORMSG, NOINPUTERRORMSG, NOSQRTERRORMSG,
-   ZERODIVIDEERRORMSG, EMPTYHEAPERRORMSG, INVALIDPITCH, POSNUMBER,
+   ZERODIVIDEERRORMSG, EMPTYHEAPERRORMSG, INVALIDPITCH, POSNUMBER,run
    NOTATIONNOTE, NOTATIONDURATION, NOTATIONDOTCOUNT,
    NOTATIONTUPLETVALUE, NOTATIONROUNDDOWN, NOTATIONINSIDECHORD,
    NOTATIONSTACCATO
  */
+// Clean up after all tests are done
 
 // Constants moved to js/logoconstants.js to resolve circular dependency
 
@@ -1116,18 +1117,26 @@ class Logo {
      * @returns {void}
      */
     runLogoCommands(startHere, env) {
-        // Performance instrumentation: enable/disable based on URL flag
-        if (typeof performanceTracker !== "undefined") {
+        // Performance instrumentation: resolve tracker from whichever environment set it
+        const _pt =
+            typeof window !== "undefined"
+                ? window.performanceTrackerInstance
+                : typeof global !== "undefined"
+                  ? global.performanceTrackerInstance
+                  : null;
+
+        if (_pt) {
             if (
                 typeof window !== "undefined" &&
+                window.location.search &&
                 window.location.search.includes("performance=true")
             ) {
-                performanceTracker.enable();
+                _pt.enable();
             } else {
-                performanceTracker.disable();
+                _pt.disable();
             }
+            _pt.startRun();
         }
-
         this._prematureRestart = this._alreadyRunning;
         if (this._alreadyRunning && this._runningBlock !== null) {
             this._ignoringBlock = this._runningBlock;
@@ -1323,10 +1332,16 @@ class Logo {
         }
 
         // Performance instrumentation: begin tracking
-        if (typeof performanceTracker !== "undefined") {
-            performanceTracker.startRun();
-        }
+        const tracker =
+            typeof window !== "undefined"
+                ? window.performanceTrackerInstance
+                : typeof global !== "undefined"
+                  ? global.performanceTrackerInstance
+                  : null;
 
+        if (tracker) {
+            tracker.enterBlock();
+        }
         /*
         ===========================================================================
         (2) Execute the stack. (A bit complicated due to lots of corner cases.)
@@ -1467,8 +1482,8 @@ class Logo {
      * @returns {void}
      */
     runFromBlockNow(logo, turtle, blk, isflow, receivedArg, queueStart) {
-        if (typeof performanceTracker !== "undefined") {
-            performanceTracker.enterBlock();
+        if (window.performanceTrackerInstance) {
+            window.performanceTrackerInstance.enterBlock();
         }
 
         this._alreadyRunning = true;
@@ -1645,9 +1660,13 @@ class Logo {
                 if (cf !== undefined) childFlow = cf;
                 if (cfc !== undefined) childFlowCount = cfc;
                 if (ret) {
-                    if (typeof performanceTracker !== "undefined") {
-                        performanceTracker.exitBlock();
-                    }
+                    const _pt3 =
+                        typeof window !== "undefined"
+                            ? window.performanceTrackerInstance
+                            : typeof global !== "undefined"
+                              ? global.performanceTrackerInstance
+                              : null;
+                    if (_pt3) _pt3.exitBlock();
                     return ret;
                 }
             }
@@ -1911,9 +1930,15 @@ class Logo {
                     tur.singer.justCounting.length === 0
                 ) {
                     // Performance instrumentation: end tracking and log stats
-                    if (typeof performanceTracker !== "undefined") {
-                        performanceTracker.endRun();
-                        performanceTracker.logStats();
+                    const _pt4 =
+                        typeof window !== "undefined"
+                            ? window.performanceTrackerInstance
+                            : typeof global !== "undefined"
+                              ? global.performanceTrackerInstance
+                              : null;
+                    if (_pt4) {
+                        _pt4.endRun();
+                        _pt4.logStats();
                     }
 
                     if (logo.runningLilypond) {
@@ -1991,9 +2016,13 @@ class Logo {
             setTimeout(__checkCompletionState, 100);
         }
 
-        if (typeof performanceTracker !== "undefined") {
-            performanceTracker.exitBlock();
-        }
+        const _pt5 =
+            typeof window !== "undefined"
+                ? window.performanceTrackerInstance
+                : typeof global !== "undefined"
+                  ? global.performanceTrackerInstance
+                  : null;
+        if (_pt5) _pt5.exitBlock();
     }
 
     /**
