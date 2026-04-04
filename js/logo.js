@@ -14,17 +14,25 @@
 /*
    global
 
-   _, Notation, Synth, instruments, instrumentsFilters,
+   Notation, Synth, instruments, instrumentsFilters,
    instrumentsEffects, Singer, Tone, CAMERAVALUE, doUseCamera,
    VIDEOVALUE, last, getIntervalDirection, getIntervalNumber,
    mixedNumber, rationalToFraction, doStopVideoCam, StatusMatrix,
-   getStatsFromNotation, delayExecution, DEFAULTVOICE, performanceTracker, window
+   getStatsFromNotation, delayExecution, DEFAULTVOICE, performanceTracker,
+   define, DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY, OSCVOLUMEADJUSTMENT,
+   TONEBPM, TARGETBPM, TURTLESTEP, NOTEDIV, MIN_HIGHLIGHT_DURATION_MS,
+   NOMICERRORMSG, NANERRORMSG, NOSTRINGERRORMSG, NOBOXERRORMSG,
+   NOACTIONERRORMSG, NOINPUTERRORMSG, NOSQRTERRORMSG,
+   ZERODIVIDEERRORMSG, EMPTYHEAPERRORMSG, POSNUMBER,
+   NOTATIONNOTE, NOTATIONDURATION, NOTATIONDOTCOUNT,
+   NOTATIONTUPLETVALUE, NOTATIONROUNDDOWN, NOTATIONINSIDECHORD,
+   NOTATIONSTACCATO
  */
 
 /*
    exported
 
-   Queue, Logo, LogoDependencies, DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY,
+   DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY,
    OSCVOLUMEADJUSTMENT, TONEBPM, TARGETBPM, TURTLESTEP, NOTEDIV,
    MIN_HIGHLIGHT_DURATION_MS,
    NOMICERRORMSG, NANERRORMSG, NOSTRINGERRORMSG, NOBOXERRORMSG,
@@ -57,6 +65,7 @@ class Queue {
     }
 }
 
+/* eslint-disable-next-line no-redeclare */
 class Logo {
     /**
      * @constructor
@@ -1928,9 +1937,16 @@ class Logo {
                         logo.collectingStats = false;
                         logo.runningLilypond = false;
                     } else if (logo.runningAbc) {
-                        // console.debug("saving abc output:");
-                        logo.activity.save.afterSaveAbc();
-                        logo.runningAbc = false;
+                        try {
+                            logo.activity.save.afterSaveAbc();
+                        } catch (e) {
+                            // eslint-disable-next-line no-console
+                            console.error("Error generating ABC output:", e);
+                            logo.activity.errorMsg(_("Error generating ABC output. ") + e.message);
+                        } finally {
+                            logo.runningAbc = false;
+                            document.body.style.cursor = "default";
+                        }
                     } else if (logo.runningMxml) {
                         // console.log("saving mxml output");
                         logo.activity.save.afterSaveMxml();
