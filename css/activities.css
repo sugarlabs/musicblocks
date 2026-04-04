@@ -2271,8 +2271,8 @@ table {
     display: none !important;
   }
 
-  #helpDiv,
-  .widget-window[data-widget-type='help'] {
+  /* Only override help visibility if it's explicitly marked as open on desktop */
+  .widget-window[data-widget-type='help'].is-open {
     display: block !important;
     position: relative !important;
     transform: none !important;
