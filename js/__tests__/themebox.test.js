@@ -17,11 +17,40 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const { JSDOM } = require('jsdom');
-const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>');
-global.document = dom.window.document;
-global.window = dom.window;
-global.navigator = dom.window.navigator;
+// Simple DOM mocks (like palette.test.js)
+global.document = {
+    createElement: jest.fn(tag => ({
+        tagName: tag.toUpperCase(),
+        style: {},
+        innerHTML: "",
+        appendChild: jest.fn(),
+        removeChild: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn()
+    })),
+    body: {
+        appendChild: jest.fn(),
+        removeChild: jest.fn(),
+        innerHTML: ""
+    },
+    querySelector: jest.fn(() => ({ content: "#4DA6FF" })),
+    querySelectorAll: jest.fn(() => [])
+};
+
+global.window = {
+    location: { href: "http://localhost" },
+    localStorage: {
+        getItem: jest.fn(),
+        setItem: jest.fn(),
+        removeItem: jest.fn()
+    },
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn()
+};
+
+global.navigator = {
+    userAgent: "test"
+};
 
 global._ = jest.fn(str => str);
 global.docById = jest.fn(() => ({ style: {}, innerHTML: "" }));
