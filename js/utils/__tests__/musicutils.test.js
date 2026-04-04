@@ -26,6 +26,7 @@ global.window = {
 global.INVALIDPITCH = "Not a valid pitch name";
 
 const {
+    noteToFrequency,
     scaleDegreeToPitchMapping,
     buildScale,
     getNote,
@@ -52,7 +53,6 @@ const {
     convertFromSolfege,
     convertFactor,
     getPitchInfo,
-    noteToFrequency,
     setOctaveRatio,
     getOctaveRatio,
     TEMPERAMENT,

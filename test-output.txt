@@ -1,0 +1,236 @@
+FAIL js/__tests__/logo.production.boundary.test.js
+  logo.js production boundary — regression tests for PR #6451
+    × logo.js source file exists and is readable (5 ms)
+    × logo.js does not contain afterAll (1 ms)
+    × logo.js does not contain beforeAll (1 ms)
+    × logo.js does not contain afterEach (1 ms)
+    × logo.js does not contain beforeEach (1 ms)
+
+  ● logo.js production boundary — regression tests for PR #6451 › logo.js source file exists and is readable
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+    [0m [90m 26 |[39m
+     [90m 27 |[39m     test([32m"logo.js source file exists and is readable"[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 28 |[39m         expect(fs[33m.[39mexistsSync(logoPath))[33m.[39mtoBe([36mtrue[39m)[33m;[39m
+     [90m    |[39m                                         [31m[1m^[22m[39m
+     [90m 29 |[39m     })[33m;[39m
+     [90m 30 |[39m
+     [90m 31 |[39m     test([32m"logo.js does not contain afterAll"[39m[33m,[39m () [33m=>[39m {[0m
+
+      at Object.toBe (js/__tests__/logo.production.boundary.test.js:28:41)
+
+  ● logo.js production boundary — regression tests for PR #6451 › logo.js does not contain afterAll
+
+    ENOENT: no such file or directory, open 'C:\Users\Swapna Choudhary\musicblocks\js\js\logo.js'
+
+    [0m [90m 30 |[39m
+     [90m 31 |[39m     test([32m"logo.js does not contain afterAll"[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 32 |[39m         [36mconst[39m source [33m=[39m fs[33m.[39mreadFileSync(logoPath[33m,[39m [32m"utf8"[39m)[33m;[39m
+     [90m    |[39m                           [31m[1m^[22m[39m
+     [90m 33 |[39m         expect(source)[33m.[39mnot[33m.[39mtoMatch([35m/\bafterAll\b/[39m)[33m;[39m
+     [90m 34 |[39m     })[33m;[39m
+     [90m 35 |[39m[0m
+
+      at Object.readFileSync (js/__tests__/logo.production.boundary.test.js:32:27)
+
+  ● logo.js production boundary — regression tests for PR #6451 › logo.js does not contain beforeAll
+
+    ENOENT: no such file or directory, open 'C:\Users\Swapna Choudhary\musicblocks\js\js\logo.js'
+
+    [0m [90m 35 |[39m
+     [90m 36 |[39m     test([32m"logo.js does not contain beforeAll"[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 37 |[39m         [36mconst[39m source [33m=[39m fs[33m.[39mreadFileSync(logoPath[33m,[39m [32m"utf8"[39m)[33m;[39m
+     [90m    |[39m                           [31m[1m^[22m[39m
+     [90m 38 |[39m         expect(source)[33m.[39mnot[33m.[39mtoMatch([35m/\bbeforeAll\b/[39m)[33m;[39m
+     [90m 39 |[39m     })[33m;[39m
+     [90m 40 |[39m[0m
+
+      at Object.readFileSync (js/__tests__/logo.production.boundary.test.js:37:27)
+
+  ● logo.js production boundary — regression tests for PR #6451 › logo.js does not contain afterEach
+
+    ENOENT: no such file or directory, open 'C:\Users\Swapna Choudhary\musicblocks\js\js\logo.js'
+
+    [0m [90m 40 |[39m
+     [90m 41 |[39m     test([32m"logo.js does not contain afterEach"[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 42 |[39m         [36mconst[39m source [33m=[39m fs[33m.[39mreadFileSync(logoPath[33m,[39m [32m"utf8"[39m)[33m;[39m
+     [90m    |[39m                           [31m[1m^[22m[39m
+     [90m 43 |[39m         expect(source)[33m.[39mnot[33m.[39mtoMatch([35m/\bafterEach\b/[39m)[33m;[39m
+     [90m 44 |[39m     })[33m;[39m
+     [90m 45 |[39m[0m
+
+      at Object.readFileSync (js/__tests__/logo.production.boundary.test.js:42:27)
+
+  ● logo.js production boundary — regression tests for PR #6451 › logo.js does not contain beforeEach
+
+    ENOENT: no such file or directory, open 'C:\Users\Swapna Choudhary\musicblocks\js\js\logo.js'
+
+    [0m [90m 45 |[39m
+     [90m 46 |[39m     test([32m"logo.js does not contain beforeEach"[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 47 |[39m         [36mconst[39m source [33m=[39m fs[33m.[39mreadFileSync(logoPath[33m,[39m [32m"utf8"[39m)[33m;[39m
+     [90m    |[39m                           [31m[1m^[22m[39m
+     [90m 48 |[39m         expect(source)[33m.[39mnot[33m.[39mtoMatch([35m/\bbeforeEach\b/[39m)[33m;[39m
+     [90m 49 |[39m     })[33m;[39m
+     [90m 50 |[39m[0m
+
+      at Object.readFileSync (js/__tests__/logo.production.boundary.test.js:47:27)
+
+
+=============================== Coverage summary ===============================
+Statements   : 0% ( 0/52719 )
+Branches     : 0% ( 0/21950 )
+Functions    : 0% ( 0/5046 )
+Lines        : 0% ( 0/50971 )
+================================================================================
+------------------------------|---------|----------|---------|---------|-------------------
+File                          | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+------------------------------|---------|----------|---------|---------|-------------------
+All files                     |       0 |        0 |       0 |       0 |                   
+ js                           |       0 |        0 |       0 |       0 |                   
+  LogoDependencies.js         |       0 |        0 |       0 |       0 | 86-270            
+  SaveInterface.js            |       0 |        0 |       0 |       0 | 24-920            
+  abc.js                      |       0 |        0 |       0 |       0 | 23-431            
+  activity-context.js         |       0 |        0 |       0 |       0 | 12-63             
+  activity.js                 |       0 |        0 |       0 |       0 | 53-8363           
+  artwork.js                  |       0 |        0 |       0 |       0 | 63-804            
+  background.js               |       0 |        0 |       0 |       0 | 16-34             
+  base64Utils.js              |       0 |        0 |       0 |       0 | 31-50             
+  basicblocks.js              |       0 |        0 |       0 |       0 | 40-121            
+  block.js                    |       0 |        0 |       0 |       0 | 82-4694           
+  blockfactory.js             |       0 |        0 |       0 |       0 | 20-1964           
+  blocks.js                   |       0 |        0 |       0 |       0 | 57-7294           
+  boundary.js                 |       0 |        0 |       0 |       0 | 28-125            
+  gif-animator.js             |       0 |        0 |       0 |       0 | 30-274            
+  languagebox.js              |       0 |        0 |       0 |       0 | 25-293            
+  lilypond.js                 |       0 |        0 |       0 |       0 | 41-995            
+  loader.js                   |       0 |        0 |       0 |       0 | 14-354            
+  logo.js                     |       0 |        0 |       0 |       0 | 53-2697           
+  logoconstants.js            |       0 |        0 |       0 |       0 | 14-98             
+  macros.js                   |       0 |        0 |       0 |       0 | 50-1761           
+  midi.js                     |       0 |        0 |       0 |       0 | 16-452            
+  mxml.js                     |       0 |        0 |       0 |       0 | 15-263            
+  notation.js                 |       0 |        0 |       0 |       0 | 48-504            
+  p5-adapter.js               |       0 |        0 |       0 |       0 | 2-27              
+  p5-sound-adapter.js         |       0 |        0 |       0 |       0 | 2-55              
+  palette.js                  |       0 |        0 |       0 |       0 | 29-2050           
+  pastebox.js                 |       0 |        0 |       0 |       0 | 13-158            
+  piemenus.js                 |       0 |        0 |       0 |       0 | 69-4468           
+  planetInterface.js          |       0 |        0 |       0 |       0 | 30-332            
+  protoblocks.js              |       0 |        0 |       0 |       0 | 40-2101           
+  rubrics.js                  |       0 |        0 |       0 |       0 | 41-883            
+  tempCodeRunnerFile.js       |       0 |        0 |       0 |       0 | 39-2729           
+  themebox.js                 |       0 |        0 |       0 |       0 | 24-509            
+  toolbar.js                  |       0 |        0 |       0 |       0 | 19-2065           
+  trash.js                    |       0 |        0 |       0 |       0 | 22-274            
+  turtle-painter.js           |       0 |        0 |       0 |       0 | 38-1565           
+  turtle-singer.js            |       0 |        0 |       0 |       0 | 70-2582           
+  turtle.js                   |       0 |        0 |       0 |       0 | 55-988            
+  turtledefs.js               |       0 |        0 |       0 |       0 | 38-809            
+  turtles.js                  |       0 |        0 |       0 |       0 | 31-1338           
+ js/blocks                    |       0 |        0 |       0 |       0 |                   
+  ActionBlocks.js             |       0 |        0 |       0 |       0 | 38-1554           
+  BooleanBlocks.js            |       0 |        0 |       0 |       0 | 30-1047           
+  BoxesBlocks.js              |       0 |        0 |       0 |       0 | 32-861            
+  DictBlocks.js               |       0 |        0 |       0 |       0 | 30-460            
+  DrumBlocks.js               |       0 |        0 |       0 |       0 | 32-611            
+  EnsembleBlocks.js           |       0 |        0 |       0 |       0 | 30-1360           
+  ExtrasBlocks.js             |       0 |        0 |       0 |       0 | 33-916            
+  FlowBlocks.js               |       0 |        0 |       0 |       0 | 32-1262           
+  GraphicsBlocks.js           |       0 |        0 |       0 |       0 | 46-1263           
+  HeapBlocks.js               |       0 |        0 |       0 |       0 | 31-737            
+  IntervalsBlocks.js          |       0 |        0 |       0 |       0 | 45-1560           
+  MediaBlocks.js              |       0 |        0 |       0 |       0 | 35-1088           
+  MeterBlocks.js              |       0 |        0 |       0 |       0 | 34-1465           
+  NumberBlocks.js             |       0 |        0 |       0 |       0 | 25-1007           
+  OrnamentBlocks.js           |       0 |        0 |       0 |       0 | 32-746            
+  PenBlocks.js                |       0 |        0 |       0 |       0 | 30-1253           
+  PitchBlocks.js              |       0 |        0 |       0 |       0 | 31-2152           
+  ProgramBlocks.js            |       0 |        0 |       0 |       0 | 30-1490           
+  RhythmBlockPaletteBlocks.js |       0 |        0 |       0 |       0 | 22-1046           
+  RhythmBlocks.js             |       0 |        0 |       0 |       0 | 33-1258           
+  SensorsBlocks.js            |       0 |        0 |       0 |       0 | 32-1035           
+  ToneBlocks.js               |       0 |        0 |       0 |       0 | 34-1161           
+  VolumeBlocks.js             |       0 |        0 |       0 |       0 | 35-953            
+  WidgetBlocks.js             |       0 |        0 |       0 |       0 | 86-1912           
+ js/js-export                 |       0 |        0 |       0 |       0 |                   
+  ASTutils.js                 |       0 |        0 |       0 |       0 | 36-773            
+  ast2blocklist.js            |       0 |        0 |       0 |       0 | 33-715            
+  constraints.js              |       0 |        0 |       0 |       0 | 25-1221           
+  export.js                   |       0 |        0 |       0 |       0 | 29-453            
+  generate.js                 |       0 |        0 |       0 |       0 | 35-385            
+  interface.js                |       0 |        0 |       0 |       0 | 33-1837           
+  minify.js                   |       0 |      100 |     100 |       0 | 1-7               
+ js/js-export/API             |       0 |        0 |       0 |       0 |                   
+  DictBlocksAPI.js            |       0 |        0 |       0 |       0 | 31-58             
+  DrumBlocksAPI.js            |       0 |        0 |       0 |       0 | 31-58             
+  GraphicsBlocksAPI.js        |       0 |        0 |       0 |       0 | 31-104            
+  IntervalsBlocksAPI.js       |       0 |        0 |       0 |       0 | 31-65             
+  MeterBlocksAPI.js           |       0 |        0 |       0 |       0 | 31-81             
+  OrnamentBlocksAPI.js        |       0 |        0 |       0 |       0 | 31-55             
+  PenBlocksAPI.js             |       0 |        0 |       0 |       0 | 31-116            
+  PitchBlocksAPI.js           |       0 |        0 |       0 |       0 | 37-186            
+  RhythmBlocksAPI.js          |       0 |        0 |       0 |       0 | 37-120            
+  ToneBlocksAPI.js            |       0 |        0 |       0 |       0 | 37-136            
+  VolumeBlocksAPI.js          |       0 |        0 |       0 |       0 | 31-65             
+ js/js-export/samples         |       0 |      100 |     100 |       0 |                   
+  sample.js                   |       0 |      100 |     100 |       0 | 19-299            
+ js/turtleactions             |       0 |        0 |       0 |       0 |                   
+  DictActions.js              |       0 |        0 |       0 |       0 | 52-267            
+  DrumActions.js              |       0 |        0 |       0 |       0 | 52-234            
+  IntervalsActions.js         |       0 |        0 |       0 |       0 | 49-476            
+  MeterActions.js             |       0 |        0 |       0 |       0 | 54-387            
+  OrnamentActions.js          |       0 |        0 |       0 |       0 | 36-133            
+  PitchActions.js             |       0 |        0 |       0 |       0 | 58-682            
+  RhythmActions.js            |       0 |        0 |       0 |       0 | 40-472            
+  ToneActions.js              |       0 |        0 |       0 |       0 | 47-494            
+  VolumeActions.js            |       0 |        0 |       0 |       0 | 49-315            
+ js/utils                     |       0 |        0 |       0 |       0 |                   
+  mathutils.js                |       0 |        0 |       0 |       0 | 59-333            
+  mb-dialog.js                |       0 |        0 |       0 |       0 | 34-325            
+  munsell.js                  |       0 |        0 |       0 |       0 | 31-6862           
+  musicutils.js               |       0 |        0 |       0 |       0 | 67-6384           
+  performanceTracker.js       |       0 |        0 |       0 |       0 | 38-345            
+  platformstyle.js            |       0 |        0 |       0 |       0 | 22-548            
+  synthutils.js               |       0 |        0 |       0 |       0 | 57-3626           
+  utils.js                    |       0 |        0 |       0 |       0 | 52-1770           
+ js/utils/__tests__           |       0 |      100 |       0 |       0 |                   
+  tonemock.js                 |       0 |      100 |       0 |       0 | 22-210            
+ js/widgets                   |       0 |        0 |       0 |       0 |                   
+  PhraseMakerAudio.js         |       0 |        0 |       0 |       0 | 19-599            
+  PhraseMakerGrid.js          |       0 |        0 |       0 |       0 | 17-268            
+  PhraseMakerUI.js            |       0 |        0 |       0 |       0 | 19-179            
+  PhraseMakerUtils.js         |       0 |        0 |       0 |       0 | 17-99             
+  aidebugger.js               |       0 |        0 |       0 |       0 | 22-1220           
+  aiwidget.js                 |       0 |        0 |       0 |       0 | 26-1254           
+  arpeggio.js                 |       0 |        0 |       0 |       0 | 33-821            
+  help.js                     |       0 |        0 |       0 |       0 | 32-665            
+  jseditor.js                 |       0 |        0 |       0 |       0 | 34-1171           
+  legobricks.js               |       0 |        0 |       0 |       0 | 16-3064           
+  meterwidget.js              |       0 |        0 |       0 |       0 | 61-663            
+  modewidget.js               |       0 |        0 |       0 |       0 | 55-1215           
+  musickeyboard.js            |       0 |        0 |       0 |       0 | 49-3505           
+  oscilloscope.js             |       0 |        0 |       0 |       0 | 41-325            
+  phrasemaker.js              |       0 |        0 |       0 |       0 | 57-4745           
+  pitchdrummatrix.js          |       0 |        0 |       0 |       0 | 51-1066           
+  pitchslider.js              |       0 |        0 |       0 |       0 | 26-228            
+  pitchstaircase.js           |       0 |        0 |       0 |       0 | 33-687            
+  reflection.js               |       0 |        0 |       0 |       0 | 20-707            
+  rhythmruler.js              |       0 |        0 |       0 |       0 | 67-2771           
+  sampler.js                  |       0 |        0 |       0 |       0 | 27-2374           
+  statistics.js               |       0 |        0 |       0 |       0 | 27-136            
+  status.js                   |       0 |        0 |       0 |       0 | 20-357            
+  temperament.js              |       0 |        0 |       0 |       0 | 38-2339           
+  tempo.js                    |       0 |        0 |       0 |       0 | 34-460            
+  timbre.js                   |       0 |        0 |       0 |       0 | 40-2591           
+  tuner.js                    |       0 |        0 |       0 |       0 | 6-215             
+  widgetWindows.js            |       0 |        0 |       0 |       0 | 20-780            
+------------------------------|---------|----------|---------|---------|-------------------
+Test Suites: 1 failed, 1 total
+Tests:       5 failed, 5 total
+Snapshots:   0 total
+Time:        8.156 s
+Ran all test suites matching /__tests__\\logo.production.boundary.test.js/i.
