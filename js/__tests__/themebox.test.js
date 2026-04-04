@@ -3,7 +3,7 @@
  * MusicBlocks v3.4.1
  * Copyright (C) 2025 Om Santosh Suneri
  *
- * This program is free software: you can redistribute it and/or modify
+ * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
@@ -17,7 +17,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+const { JSDOM } = require('jsdom');
+const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>');
+global.document = dom.window.document;
+global.window = dom.window;
+global.navigator = dom.window.navigator;
+
 global._ = jest.fn(str => str);
+global.docById = jest.fn(() => ({ style: {}, innerHTML: "" }));
 
 // Mock global palette color variables
 global.PALETTEFILLCOLORS = {};

@@ -6,7 +6,7 @@
  * @copyright 2026 kh-ub-ayb
  *
  * @license
- * This program is free software: you can redistribute it and/or modify
+ * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
@@ -22,6 +22,13 @@
 
 const fs = require("fs");
 const path = require("path");
+const { JSDOM } = require('jsdom');
+
+// Setup DOM environment
+const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>');
+global.document = dom.window.document;
+global.window = dom.window;
+global.navigator = dom.window.navigator;
 
 // Load the ReflectionMatrix class by reading the source and evaluating it
 const source = fs.readFileSync(path.resolve(__dirname, "../reflection.js"), "utf-8");
@@ -32,6 +39,7 @@ new Function(
 
 // Mock globals
 global._ = str => str;
+global.docById = jest.fn(() => ({ style: {}, innerHTML: "" }));
 
 // Mock window.widgetWindows and widget
 function createMockWidgetWindow() {

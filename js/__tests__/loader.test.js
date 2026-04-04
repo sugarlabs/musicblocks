@@ -1,3 +1,9 @@
+const { JSDOM } = require('jsdom');
+const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>');
+global.document = dom.window.document;
+global.window = dom.window;
+global.navigator = dom.window.navigator;
+
 describe("loader.js coverage", () => {
     let mockRequireJS;
     let mockRequireJSConfig;
@@ -40,6 +46,7 @@ describe("loader.js coverage", () => {
             Stage: jest.fn(),
             Ticker: { framerate: 60, addEventListener: jest.fn() }
         };
+        global._ = jest.fn(str => str);
     });
 
     afterEach(() => {
