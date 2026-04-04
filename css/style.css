@@ -114,3 +114,25 @@ input[type="range"]:focus::-ms-fill-upper {
 .lego-size-1 { width: 20px; height: 10px; }
 .lego-size-2 { width: 40px; height: 10px; }
 /* ... more sizes ... */
+
+/* Zoom percentage overlay */
+.zoom-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 42px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(0,0,0,0.45);
+  padding: 18px 36px;
+  border-radius: 14px;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.zoom-overlay.visible {
+  opacity: 1;
+}

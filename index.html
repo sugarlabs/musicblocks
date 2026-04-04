@@ -1162,6 +1162,90 @@
         <script>
             var elem = document.documentElement;
 
+        function openFullscreen() {
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            } else if (elem.mozRequestFullscreen) {
+                elem.mozRequestFullscreen();
+            }
+        }
+
+        function closeFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            } else if (document.mozExitFullscreen) {
+                document.mozExitFullscreen();
+            }
+        }
+
+        function setIcon() {
+            var iconCode = document.querySelector('#FullScrIcon');
+            // Determine fullscreen state using the browser fullscreen API
+            // instead of relying on a manual counter. This keeps the icon
+            // in sync when fullscreen is exited via ESC or browser controls.
+            var isFullscreen =
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
+
+            if (!isFullscreen) {
+                openFullscreen();
+                iconCode.textContent = '\ue5d1'; // fullscreen_exit icon
+            } else {
+                closeFullscreen();
+                iconCode.textContent = '\ue5d0'; // fullscreen icon
+            }
+        }
+
+        function handleFullscreenChange() {
+            var iconCode = document.querySelector('#FullScrIcon');
+            // Update fullscreen icon based on actual fullscreen state.
+            // This removes the need for a separate state variable and
+            // prevents incorrect icon state when fullscreen is toggled
+            // outside the button (e.g., ESC key).
+            var isFullscreen =
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
+
+            iconCode.textContent = isFullscreen ? '\ue5d1' : '\ue5d0';
+        }
+
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+    </script>
+
+    <style>
+        #installButton.hidden {
+            display: none !important;
+        }
+    </style>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let persistentNotification = null;
+
+            function showPersistentNotification() {
+                if (!persistentNotification) {
+                    persistentNotification = document.createElement("div");
+                    persistentNotification.id = "persistentNotification";
+                    persistentNotification.innerHTML = "Play only mode enabled. For full Music Blocks experience, use a larger display.";
+                    document.body.appendChild(persistentNotification);
+                }
+            }} )
+
             function openFullscreen() {
                 if (elem.requestFullscreen) {
                     elem.requestFullscreen();
@@ -1232,6 +1316,8 @@
                 display: none !important;
             }
         </style>
+        
+        <script src="js/utils/zoomOverlay.js"></script>
 
         <script>
             document.addEventListener("DOMContentLoaded", function () {
