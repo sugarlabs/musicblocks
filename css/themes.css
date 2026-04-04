@@ -376,3 +376,37 @@ body.highcontrast {
 .dark .material-tooltip span {
     color: #ffffff !important;
 }
+
+/* ================================= */
+/* FINAL Sidebar Fix */
+/* ================================= */
+
+/* FORCE hover override */
+#palette tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+/* FORCE selected override */
+#palette tbody tr.selected,
+#palette tbody tr.active {
+    background-color: rgba(33, 150, 243, 0.35) !important;
+    border-left: 4px solid #2196F3 !important;
+    font-weight: bold;
+}
+
+/* 🔥 Override inline style */
+#palette tbody tr[style] {
+    background-color: inherit !important;
+}
+
+/* High contrast */
+body.highcontrast #palette tbody tr:hover {
+    background-color: #222 !important;
+}
+
+body.highcontrast #palette tbody tr.selected,
+body.highcontrast #palette tbody tr.active {
+    background-color: #00FFFF !important;
+    color: black !important;
+    border-left: 5px solid yellow !important;
+}
