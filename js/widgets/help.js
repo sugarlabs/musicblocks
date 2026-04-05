@@ -52,6 +52,17 @@ class HelpWidget {
         widgetWindow.onclose = () => {
             this.isOpen = false;
             document.onkeydown = activity.__keyPressed;
+            
+            // Remove tour-active class when closing
+            if (this._helpDiv) {
+                this._helpDiv.classList.remove("tour-active");
+            }
+            
+            // Remove tour-active class from window frame
+            if (this.widgetWindow && this.widgetWindow._frame) {
+                this.widgetWindow._frame.classList.remove("tour-active");
+            }
+            
             widgetWindow.destroy();
         };
         // Position the widget and make it visible.
@@ -458,6 +469,22 @@ class HelpWidget {
      * @param {ProtoBlock} block
      * @returns {void}
      */
+    _blockHelp(block) {
+        const widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
+        this.widgetWindow = widgetWindow;
+        widgetWindow.clear();
+        this._helpDiv = document.createElement("div");
+        this._helpDiv.classList.add("tour-active");
+        
+        // Add tour-active class to window frame
+        if (widgetWindow._frame) {
+            widgetWindow._frame.classList.add("tour-active");
+        }
+
+        //this._helpDiv.style.width = "500px";
+        //this._helpDiv.style.height = "70vh";
+        //this._helpDiv.style.backgroundColor = "#e8e8e8";
+
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
         let cell = docById("right-arrow");
         const rightArrow = docById("right-arrow");
