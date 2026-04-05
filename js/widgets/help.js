@@ -52,17 +52,17 @@ class HelpWidget {
         widgetWindow.onclose = () => {
             this.isOpen = false;
             document.onkeydown = activity.__keyPressed;
-            
+
             // Remove tour-active class when closing
             if (this._helpDiv) {
                 this._helpDiv.classList.remove("tour-active");
             }
-            
+
             // Remove tour-active class from window frame
             if (this.widgetWindow && this.widgetWindow._frame) {
                 this.widgetWindow._frame.classList.remove("tour-active");
             }
-            
+
             widgetWindow.destroy();
         };
         // Position the widget and make it visible.
@@ -475,7 +475,7 @@ class HelpWidget {
         widgetWindow.clear();
         this._helpDiv = document.createElement("div");
         this._helpDiv.classList.add("tour-active");
-        
+
         // Add tour-active class to window frame
         if (widgetWindow._frame) {
             widgetWindow._frame.classList.add("tour-active");
