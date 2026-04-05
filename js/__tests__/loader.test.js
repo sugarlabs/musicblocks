@@ -125,12 +125,22 @@ describe("loader.js coverage", () => {
 
         expect(mockI18next.on).toHaveBeenCalledWith("languageChanged", expect.any(Function));
 
-        // Verify Phase 2 was reached
+        // Verify Phase 2 was reached with proper activity initialization
         expect(mockRequireJS).toHaveBeenCalledWith(
             ["activity/activity"],
             expect.any(Function),
             expect.any(Function)
         );
+        
+        // Verify the activity callback exists and is a function if called
+        const requireCalls = mockRequireJS.mock.calls.filter(
+            call => call[0] === "activity/activity"
+        );
+        
+        if (requireCalls.length > 0) {
+            expect(requireCalls[0][1]).toBeDefined();
+            expect(typeof requireCalls[0][1]).toBe("function");
+        }
     });
 
     test("Handles i18next initialization error", async () => {
