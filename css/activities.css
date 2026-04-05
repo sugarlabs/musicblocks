@@ -2377,6 +2377,10 @@ table {
     font-size: 14px !important;
     line-height: 1.4 !important;
     margin-bottom: 8px !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+    hyphens: auto !important;
   }
   
   #floatingWindows > .windowFrame .wfWinBody button,
@@ -2392,6 +2396,58 @@ table {
     min-width: 44px;
     min-height: 44px;
     font-size: 14px !important;
+  }
+}
+
+/* iPhone SE specific fix (375px) */
+@media screen and (max-width: 375px) {
+  #floatingWindows > .windowFrame {
+    width: 98% !important;
+    left: 1% !important;
+    padding: 6px !important;
+    min-width: 280px !important;
+  }
+  
+  #floatingWindows > .windowFrame .wfTopBar {
+    padding: 4px 6px !important;
+    min-height: 36px !important;
+  }
+  
+  #floatingWindows > .windowFrame .wftTitle {
+    font-size: 14px !important;
+    line-height: 1.1 !important;
+  }
+  
+  #floatingWindows > .windowFrame .wfWinBody {
+    padding: 8px !important;
+    font-size: 12px !important;
+    line-height: 1.3 !important;
+  }
+  
+  #floatingWindows > .windowFrame .wfWinBody p,
+  #floatingWindows > .windowFrame .wfWinBody li {
+    font-size: 12px !important;
+    line-height: 1.3 !important;
+    margin-bottom: 6px !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+    hyphens: auto !important;
+  }
+  
+  #floatingWindows > .windowFrame .wfWinBody button,
+  #floatingWindows > .windowFrame .wfWinBody .btn {
+    min-width: 40px;
+    min-height: 40px;
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+    margin: 3px !important;
+  }
+  
+  #left-arrow, #right-arrow {
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 12px !important;
   }
 }
 
