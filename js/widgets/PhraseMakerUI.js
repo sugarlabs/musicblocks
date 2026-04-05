@@ -86,7 +86,7 @@ const PhraseMakerUI = {
 
         if (isPlaying) {
             pm._playButton.innerHTML = `&nbsp;&nbsp;<img 
-                src="musicblocks\header-icons\add.svg" 
+                src="header-icons/stop-button.svg"
                 title="${pm._("Stop")}" 
                 alt="${pm._("Stop")}" 
                 height="${pm.constructor.ICONSIZE}" 
