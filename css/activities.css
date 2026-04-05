@@ -2177,60 +2177,217 @@ table {
 
 /* Tour-specific mobile responsive styles */
 @media (max-width: 768px) {
-    /* Hide other floating windows when tour is active */
-    #floatingWindows > .windowFrame:not(.tour-active) {
-        display: none;
-    }
+  /* Tour modal styling - specific to tour only */
+  #floatingWindows > .windowFrame.tour-active {
+    position: fixed !important;
+    top: 5% !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 95% !important;
+    max-width: 380px !important;
+    min-width: 300px !important;
+    height: auto !important;
+    max-height: 85vh !important;
+    z-index: 99999 !important;
+    background: white !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3) !important;
+    border: 1px solid #ddd !important;
+    overflow: hidden !important;
+    backdrop-filter: blur(5px) !important;
+  }
+  
+  /* Tour content styling */
+  #floatingWindows > .windowFrame.tour-active .wfWinBody {
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    padding: 20px !important;
+    padding-bottom: 80px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    max-height: 65vh !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    -webkit-overflow-scrolling: touch !important;
+    position: relative !important;
+  }
+  
+  /* Tour navigation styling */
+  #floatingWindows > .windowFrame.tour-active #right-arrow,
+  #floatingWindows > .windowFrame.tour-active #left-arrow {
+    min-width: 48px !important;
+    min-height: 48px !important;
+    display: inline-block !important;
+    position: absolute !important;
+    bottom: 15px !important;
+    z-index: 100000 !important;
+    background: rgba(33, 150, 243, 0.9) !important;
+    border-radius: 50% !important;
+    border: 2px solid #2196F3 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    font-size: 18px !important;
+    color: white !important;
+    text-align: center !important;
+    line-height: 44px !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+  }
+  
+  #floatingWindows > .windowFrame.tour-active #right-arrow {
+    right: 20px !important;
+  }
+  
+  #floatingWindows > .windowFrame.tour-active #left-arrow {
+    left: 20px !important;
+  }
+  
+  #floatingWindows > .windowFrame.tour-active #right-arrow:hover,
+  #floatingWindows > .windowFrame.tour-active #left-arrow:hover {
+    background: #2196F3 !important;
+    color: white !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+  }
+  
+  #floatingWindows > .windowFrame.tour-active #right-arrow:active,
+  #floatingWindows > .windowFrame.tour-active #left-arrow:active {
+    background: #1976D2 !important;
+    transform: scale(0.95) !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2) !important;
+  }
+  
+  /* Fix for navigation arrow visibility */
+  #floatingWindows > .windowFrame.tour-active #right-arrow.disabled,
+  #floatingWindows > .windowFrame.tour-active #left-arrow.disabled {
+    opacity: 0.3 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+  }
+  
+  #floatingWindows > .windowFrame.tour-active h3 {
+    font-size: 20px !important;
+    margin-bottom: 20px !important;
+    color: #333 !important;
+    font-weight: 600 !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    clear: both !important;
+  }
+  
+  /* Fix content overflow and layout */
+  #floatingWindows > .windowFrame.tour-active p,
+  #floatingWindows > .windowFrame.tour-active li {
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    margin-bottom: 12px !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    clear: both !important;
+  }
+  
+  #floatingWindows > .windowFrame.tour-active ul {
+    padding-left: 20px !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+  }
+  
+  #floatingWindows > .windowFrame.tour-active ol {
+    padding-left: 20px !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+  }
+  
+  #floatingWindows > .windowFrame.tour-active img {
+    max-width: 100% !important;
+    height: auto !important;
+    border-radius: 8px !important;
+    margin: 10px 0 !important;
+    display: block !important;
+    clear: both !important;
+  }
+  
+  #floatingWindows > .windowFrame.tour-active code {
+    background: #f5f5f5 !important;
+    padding: 2px 4px !important;
+    border-radius: 4px !important;
+    font-size: 12px !important;
+    display: inline-block !important;
+    word-wrap: break-word !important;
+  }
+  
+  #floatingWindows > .windowFrame.tour-active pre {
+    background: #f8f8f8 !important;
+    padding: 10px !important;
+    border-radius: 4px !important;
+    font-size: 12px !important;
+    overflow-x: auto !important;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    max-width: 100% !important;
+  }
+}
 
-    /* Tour modal styling - specific to tour only */
-    #floatingWindows > .windowFrame.tour-active {
-        position: fixed;
-        top: 10%;
-        left: 5%;
-        width: 90%;
-        max-width: 350px;
-        min-width: 300px;
-        height: auto;
-        max-height: 80vh;
-        z-index: 99999;
-        background: white;
-        border-radius: 10px;
-        padding: 15px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-        border: 1px solid #ccc;
-    }
+/* iPhone SE specific fixes */
+@media (max-width: 375px) {
+  #floatingWindows > .windowFrame.tour-active {
+    width: 98% !important;
+    max-width: 320px !important;
+    min-width: 280px !important;
+    padding: 15px !important;
+    top: 3% !important;
+  }
+  
+  #floatingWindows > .windowFrame.tour-active .wfWinBody {
+    font-size: 13px !important;
+    padding: 12px !important;
+    max-height: 70vh !important;
+  }
+  
+  #floatingWindows > .windowFrame.tour-active h3 {
+    font-size: 18px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  #floatingWindows > .windowFrame.tour-active #right-arrow,
+  #floatingWindows > .windowFrame.tour-active #left-arrow {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    bottom: 20px !important;
+  }
+  
+  #floatingWindows > .windowFrame.tour-active p,
+  #floatingWindows > .windowFrame.tour-active li {
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+    margin-bottom: 10px !important;
+  }
+}
 
-    /* Tour content styling */
-    #floatingWindows > .windowFrame.tour-active .wfWinBody {
-        font-size: 14px;
-        line-height: 1.4;
-        padding: 10px;
-        overflow-y: auto;
-        max-height: 60vh;
-    }
-
-    #floatingWindows > .windowFrame.tour-active h3 {
-        font-size: 18px;
-        margin-bottom: 10px;
-        color: #333;
-    }
-
-    /* Tour navigation styling */
-    #floatingWindows > .windowFrame.tour-active #right-arrow,
-    #floatingWindows > .windowFrame.tour-active #left-arrow {
-        min-width: 44px;
-        min-height: 44px;
-        display: inline-block;
-    }
-
-    #floatingWindows > .windowFrame.tour-active p,
-    #floatingWindows > .windowFrame.tour-active li {
-        font-size: 13px;
-        line-height: 1.5;
-        margin-bottom: 8px;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-    }
+/* Small mobile fixes */
+@media (max-width: 320px) {
+  #floatingWindows > .windowFrame.tour-active {
+    width: 96% !important;
+    max-width: 280px !important;
+    min-width: 260px !important;
+    padding: 12px !important;
+  }
+  
+  #floatingWindows > .windowFrame.tour-active .wfWinBody {
+    font-size: 12px !important;
+    padding: 10px !important;
+    max-height: 75vh !important;
+  }
+  
+  #floatingWindows > .windowFrame.tour-active h3 {
+    font-size: 16px !important;
+    margin-bottom: 10px !important;
+  }
 }
 
 /* --- Desktop View (Screens wider than 900px) --- */
