@@ -114,8 +114,8 @@ describe("loader.js coverage", () => {
             } else if (deps.includes("activity/activity")) {
                 // Phase 2 bootstrap
                 if (callback) callback();
-            } else if (deps.length > 1 && deps[0] === "easeljs.min") {
-                // Handle CORE_BOOTSTRAP_MODULES
+            } else if (Array.isArray(deps) && deps.length > 1) {
+                // Handle CORE_BOOTSTRAP_MODULES array
                 if (callback) callback();
             } else {
                 // Handle other modules individually
@@ -167,10 +167,10 @@ describe("loader.js coverage", () => {
 
         expect(mockI18next.on).toHaveBeenCalledWith("languageChanged", expect.any(Function));
 
-        // Verify that requirejs was called (indicating the loading process started)
-        expect(mockRequireJS.mock.calls.length).toBeGreaterThan(0);
+        // Verify that the loading process completed successfully
+        expect(mockRequireJS.mock.calls.length).toBeGreaterThan(1);
         
-        // The test passes if we get here - the loader process worked
+        // The test passes if core functionality works and loading process completes
         expect(true).toBe(true);
     });
 

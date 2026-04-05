@@ -2340,58 +2340,53 @@ table {
 /* ======================================================
    FIX: Make "Take a Tour" responsive on mobile
    ====================================================== */
+
+/* Tour-specific responsive styles */
 @media screen and (max-width: 768px) {
-  #floatingWindows > .windowFrame {
-    width: 95% !important;
-    max-width: 95% !important;
-    left: 2.5% !important;
-    padding: 12px !important;
-    min-width: 300px !important;
+  #floatingWindows > .windowFrame#helpDiv {
+    width: 95%;
+    max-width: 95%;
+    left: 2.5%;
+    padding: 12px;
+    min-width: 300px;
   }
   
-  #floatingWindows > .windowFrame .wfTopBar {
-    padding: 8px 12px !important;
-    min-height: 44px !important;
+  #floatingWindows > .windowFrame#helpDiv .wfTopBar {
+    padding: 8px 12px;
+    min-height: 44px;
   }
   
-  #floatingWindows > .windowFrame .wftTitle {
-    font-size: 16px !important;
-    line-height: 1.2 !important;
+  #floatingWindows > .windowFrame#helpDiv .wftTitle {
+    font-size: 16px;
+    line-height: 1.2;
   }
   
-  #floatingWindows > .windowFrame .wftButton {
+  #floatingWindows > .windowFrame#helpDiv .wftButton {
     min-width: 44px;
     min-height: 44px;
-    padding: 8px !important;
-    font-size: 14px !important;
+    padding: 8px;
+    font-size: 14px;
   }
   
-  #floatingWindows > .windowFrame .wfWinBody {
-    padding: 12px !important;
-    font-size: 14px !important;
-    line-height: 1.4 !important;
+  #floatingWindows > .windowFrame#helpDiv .wfWinBody {
+    padding: 12px;
+    font-size: 14px;
+    line-height: 1.4;
   }
   
-  #floatingWindows > .windowFrame .wfWinBody p,
-  #floatingWindows > .windowFrame .wfWinBody li {
-    font-size: 14px !important;
-    line-height: 1.4 !important;
-    margin-bottom: 8px !important;
+  #floatingWindows > .windowFrame#helpDiv .wfWinBody p,
+  #floatingWindows > .windowFrame#helpDiv .wfWinBody li {
+    font-size: 14px;
+    line-height: 1.4;
+    margin-bottom: 8px;
   }
   
-  #floatingWindows > .windowFrame .wfWinBody button,
-  #floatingWindows > .windowFrame .wfWinBody .btn {
+  #floatingWindows > .windowFrame#helpDiv .wfWinBody button,
+  #floatingWindows > .windowFrame#helpDiv .wfWinBody .btn {
     min-width: 44px;
     min-height: 44px;
-    padding: 10px 16px !important;
-    font-size: 14px !important;
-    margin: 4px !important;
-  }
-  
-  #left-arrow, #right-arrow {
-    min-width: 44px;
-    min-height: 44px;
-    font-size: 14px !important;
+    padding: 10px 16px;
+    font-size: 14px;
   }
 }
 
