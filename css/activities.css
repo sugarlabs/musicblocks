@@ -2337,17 +2337,49 @@ table {
   }
 }
 
-/* ======================================================
-   FIX: Make "Take a Tour" responsive on mobile
-   ====================================================== */
-@media screen and (max-width: 768px) {
-  #floatingWindows > .windowFrame {
-    width: 95% !important;
-    max-width: 95% !important;
-    left: 2.5% !important;
-    padding: 12px !important;
-    min-width: 300px !important;
+/* Force tour to show properly on mobile */
+@media (max-width: 768px) {
+  /* Hide raw HTML elements that shouldn't be visible */
+  #popdown-palette,
+  #floatingWindows:not(.tour-active),
+  .windowFrame:not(.tour-active) {
+    display: none !important;
   }
+  
+  /* Show only the tour when active */
+  #helpDiv.tour-active,
+  #helpDiv.show {
+    display: block !important;
+    position: fixed !important;
+    top: 10% !important;
+    left: 5% !important;
+    width: 90% !important;
+    max-width: 350px !important;
+    z-index: 99999 !important;
+    background: white !important;
+    border-radius: 10px !important;
+    padding: 15px !important;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3) !important;
+  }
+  
+  /* Fix text inside tour */
+  #helpDiv .take-tour {
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+  }
+  
+  #helpDiv h3 {
+    font-size: 18px !important;
+    margin-bottom: 10px !important;
+  }
+  
+  /* Fix navigation */
+  #right-arrow, #left-arrow {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    display: inline-block !important;
+  }
+}
   
   #floatingWindows > .windowFrame .wfTopBar {
     padding: 8px 12px !important;
