@@ -290,7 +290,8 @@ body.highcontrast {
 
 .highcontrast #helpfulSearchDiv {
     color: #ffffff !important;
-    background-color: transparent !important;
+    background-color: trans
+    parent !important;
 }
 
 .highcontrast #crossButton {
