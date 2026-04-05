@@ -2394,9 +2394,6 @@ class Activity {
          * Sets the status of the smaller and larger block icons based on the current block size.
          */
         this.setSmallerLargerStatus = async () => {
-            // Guard: containers are null before _setupPaletteMenu() runs
-            if (!this.smallerContainer || !this.largerContainer) return;
-
             if (BLOCKSCALES[this.blockscale] < DEFAULTBLOCKSCALE) {
                 await changeImage(
                     this.smallerContainer.children[0],
