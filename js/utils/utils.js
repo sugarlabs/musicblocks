@@ -1399,7 +1399,7 @@ let rationalSum = (a, b) => {
         return [0, 1];
     }
 
-    if (a === 0 || b === 0) {
+    if (a[1] === 0 || b[1] === 0) {
         return [0, 1];
     }
 
