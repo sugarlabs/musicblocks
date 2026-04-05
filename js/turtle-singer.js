@@ -2096,7 +2096,7 @@ class Singer {
                             if (duration > 0) {
                                 if (carry > 0) {
                                     if (duration === carry) {
-                                        d = duration;
+                                        d = 0;
                                     } else {
                                         d = 1 / (1 / duration - 1 / carry);
                                     }
