@@ -2167,6 +2167,68 @@ table {
     /* Stick to the right edge */
 }
 
+/* ======================================================
+   FIX: Responsive Tour (Mobile) - Issue #6238
+   ====================================================== */
+
+/* Tour-specific mobile responsive styles */
+@media (max-width: 768px) {
+  /* Hide other floating windows when tour is active */
+  #floatingWindows > .windowFrame:not(.tour-active) {
+    display: none;
+  }
+  
+  /* Tour modal styling - specific to tour only */
+  #floatingWindows > .windowFrame.tour-active {
+    position: fixed;
+    top: 10%;
+    left: 5%;
+    width: 90%;
+    max-width: 350px;
+    min-width: 300px;
+    height: auto;
+    max-height: 80vh;
+    z-index: 99999;
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    border: 1px solid #ccc;
+  }
+  
+  /* Tour content styling */
+  #floatingWindows > .windowFrame.tour-active .wfWinBody {
+    font-size: 14px;
+    line-height: 1.4;
+    padding: 10px;
+    overflow-y: auto;
+    max-height: 60vh;
+  }
+  
+  #floatingWindows > .windowFrame.tour-active h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  /* Tour navigation styling */
+  #floatingWindows > .windowFrame.tour-active #right-arrow,
+  #floatingWindows > .windowFrame.tour-active #left-arrow {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-block;
+  }
+  
+  #floatingWindows > .windowFrame.tour-active p,
+  #floatingWindows > .windowFrame.tour-active li {
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
 /* --- Desktop View (Screens wider than 900px) --- */
 @media screen and (min-width: 900px) {
     #left-arrow {

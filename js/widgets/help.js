@@ -458,20 +458,6 @@ class HelpWidget {
      * @param {ProtoBlock} block
      * @returns {void}
      */
-    _blockHelp(block) {
-        const widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
-        this.widgetWindow = widgetWindow;
-        widgetWindow.clear();
-        this._helpDiv = document.createElement("div");
-
-        //this._helpDiv.style.width = "500px";
-        this._helpDiv.style.height = "70vh";
-        // this._helpDiv.style.backgroundColor = "#e8e8e8";
-
-        const helpDivHTML =
-            '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpScrollWrapper"><div id="helpBodyDiv" tabindex="-1"></div></div>';
-        this._helpDiv.insertAdjacentHTML("afterbegin", helpDivHTML);
-
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
         let cell = docById("right-arrow");
         const rightArrow = docById("right-arrow");
