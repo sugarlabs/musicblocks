@@ -2241,7 +2241,7 @@ table {
     padding: 10px;
     border-radius: 12px;
     max-width: 60%;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
     display: flex;
     flex-direction: column;
     word-wrap: break-word;
@@ -2407,10 +2407,11 @@ table {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 95%;
-    max-width: 350px;
-    padding: 12px;
+    max-width: 90vw;
+    max-height: 80vh;
+    padding: 16px;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow-y: auto;
   }
   
   #helpDiv h2 {
@@ -2426,7 +2427,7 @@ table {
     text-align: center;
     word-wrap: break-word;
     overflow-wrap: break-word;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
   }
   
   #helpDiv .take-tour {
@@ -2434,13 +2435,15 @@ table {
     flex-direction: column;
     align-items: center;
     width: 100%;
+    gap: 16px;
   }
   
   #helpDiv .take-tour .controls {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    margin-top: 15px;
+    margin-top: 20px;
+    gap: 12px;
   }
   
   #left-arrow, #right-arrow {
@@ -2460,10 +2463,11 @@ table {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 95%;
-    max-width: 320px;
+    max-width: 90vw;
+    max-height: 80vh;
     padding: 15px;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow-y: auto;
   }
   
   #helpDiv h2 {
@@ -2479,7 +2483,7 @@ table {
     text-align: center;
     word-wrap: break-word;
     overflow-wrap: break-word;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
   }
   
   #helpDiv .take-tour {
@@ -2487,13 +2491,15 @@ table {
     flex-direction: column;
     align-items: center;
     width: 100%;
+    gap: 16px;
   }
   
   #helpDiv .take-tour .controls {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    margin-top: 15px;
+    margin-top: 20px;
+    gap: 12px;
   }
   
   #floatingWindows > .windowFrame .wfTopBar {
