@@ -2341,14 +2341,12 @@ table {
 @media (max-width: 768px) {
   /* Hide raw HTML elements that shouldn't be visible */
   #popdown-palette,
-  #floatingWindows:not(.tour-active),
-  .windowFrame:not(.tour-active) {
+  #floatingWindows > .windowFrame:not(.tour-active) {
     display: none !important;
   }
   
-  /* Show only the tour when active */
-  #helpDiv.tour-active,
-  #helpDiv.show {
+  /* Show only tour when active */
+  #floatingWindows > .windowFrame.tour-active {
     display: block !important;
     position: fixed !important;
     top: 10% !important;
@@ -2363,23 +2361,25 @@ table {
   }
   
   /* Fix text inside tour */
-  #helpDiv .take-tour {
+  #floatingWindows .tour-active .wfWinBody {
     font-size: 14px !important;
     line-height: 1.4 !important;
   }
   
-  #helpDiv h3 {
+  #floatingWindows .tour-active h3 {
     font-size: 18px !important;
     margin-bottom: 10px !important;
   }
   
   /* Fix navigation */
-  #right-arrow, #left-arrow {
+  #floatingWindows .tour-active #right-arrow,
+  #floatingWindows .tour-active #left-arrow {
     min-width: 44px !important;
     min-height: 44px !important;
     display: inline-block !important;
   }
 }
+
   
   #floatingWindows > .windowFrame .wfTopBar {
     padding: 8px 12px !important;
