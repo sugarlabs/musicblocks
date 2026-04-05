@@ -2172,11 +2172,30 @@ table {
 }
 
 /* ======================================================
-   FIX: Responsive Tour (Mobile) - Issue #6238
+   FIX: Responsive Tour (Mobile) - Issue #6237
    ====================================================== */
 
 /* Tour-specific mobile responsive styles */
 @media (max-width: 768px) {
+  /* Ensure tour is accessible and visible on mobile */
+  #helpIcon {
+    display: block !important;
+    visibility: visible !important;
+    z-index: 1000 !important;
+    position: relative !important;
+  }
+  
+  /* Tour button styling for better accessibility */
+  #helpIcon:hover {
+    transform: scale(1.1) !important;
+    transition: transform 0.2s ease !important;
+  }
+  
+  #helpIcon:focus {
+    outline: 2px solid #2196F3 !important;
+    outline-offset: 2px !important;
+  }
+  
   /* Tour modal styling - specific to tour only */
   #floatingWindows > .windowFrame.tour-active {
     position: fixed !important;
@@ -2192,7 +2211,7 @@ table {
     background: white !important;
     border-radius: 12px !important;
     padding: 20px !important;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3) !important;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2) !important;
     border: 1px solid #ddd !important;
     overflow: hidden !important;
     backdrop-filter: blur(5px) !important;
