@@ -2341,7 +2341,7 @@ table {
    FIX: Make "Take a Tour" responsive on mobile
    ====================================================== */
 
-/* Tour-specific responsive styles */
+/* Tour-specific responsive styles - More specific, no !important */
 @media screen and (max-width: 768px) {
   #floatingWindows > .windowFrame#helpDiv {
     width: 95%;

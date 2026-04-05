@@ -589,7 +589,7 @@ describe("Palettes Class", () => {
 
     describe("PaletteModel makeBlockInfo", () => {
         test("update rebuilds blocks list", () => {
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const block = { name: "box" };
             palette.protoList = [block];
@@ -619,7 +619,7 @@ describe("Palettes Class", () => {
                 disabled: false
             };
             mockActivity.blocks.protoBlockDict = { storein: protoBlock };
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const block = {
                 name: "storein",
@@ -655,7 +655,7 @@ describe("Palettes Class", () => {
                 disabled: true
             };
             mockActivity.blocks.protoBlockDict = { box: protoBlock };
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const block = {
                 name: "box",
@@ -693,7 +693,7 @@ describe("Palettes Class", () => {
                 disabled: false
             };
             mockActivity.blocks.protoBlockDict = { nameddo: protoBlock };
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const block = {
                 name: "nameddo",
@@ -728,7 +728,7 @@ describe("Palettes Class", () => {
                 disabled: false
             };
             mockActivity.blocks.protoBlockDict = { box: protoBlock };
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const block = {
                 name: "box",
@@ -780,7 +780,7 @@ describe("Palettes Class", () => {
                 storein2: protoBlock,
                 namedarg: protoNamedArg
             };
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
 
             const storeBlock = {
@@ -834,7 +834,7 @@ describe("Palettes Class", () => {
                 namedcalc: protoNamedCalc,
                 namedcalcArg: protoNamedCalcArg
             };
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
 
             const namedDoArg = {
@@ -899,7 +899,7 @@ describe("Palettes Class", () => {
                 disabled: false
             };
             mockActivity.blocks.protoBlockDict = { outputtools: protoBlock };
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const block = {
                 name: "outputtools",
@@ -933,7 +933,7 @@ describe("Palettes Class", () => {
                 disabled: false
             };
             mockActivity.blocks.protoBlockDict = { less: protoBlock };
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const block = {
                 name: "less",
@@ -972,7 +972,7 @@ describe("Palettes Class", () => {
                 ["outputtools", "pitch converter"]
             ];
 
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
 
             labelCases.forEach(([name, expected]) => {
@@ -1039,7 +1039,7 @@ describe("Palettes Class", () => {
                 disabled: false
             };
             mockActivity.blocks.protoBlockDict = { loadFile: protoLoad, box: protoCustom };
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
 
             const loadBlock = {
@@ -1084,7 +1084,7 @@ describe("Palettes Class", () => {
                 disabled: false
             };
             mockActivity.blocks.protoBlockDict = { storein2: protoBlock };
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const block = {
                 name: "storein2",
@@ -1118,7 +1118,7 @@ describe("Palettes Class", () => {
                 disabled: false
             };
             mockActivity.blocks.protoBlockDict = { custom: protoBlock };
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const block = {
                 name: "custom",
@@ -1147,7 +1147,7 @@ describe("Palettes Class", () => {
                 disabled: false
             };
             mockActivity.blocks.protoBlockDict = { box: protoBlock };
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const block = {
                 name: "box",
@@ -1181,7 +1181,7 @@ describe("Palettes Class", () => {
                 disabled: false
             };
             mockActivity.blocks.protoBlockDict = { namedbox: protoBlock };
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const block = {
                 name: "namedbox",
@@ -1200,7 +1200,7 @@ describe("Palettes Class", () => {
 
     describe("Palette methods", () => {
         test("hide and show toggle menu", () => {
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             palette.hideMenu = jest.fn();
             palette.showMenu = jest.fn();
@@ -1233,7 +1233,7 @@ describe("Palettes Class", () => {
             const paletteList = { scrollTop: 100 };
             document.body.style.cursor = "default";
 
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             palette.setupGrabScroll(paletteList);
 
@@ -1246,7 +1246,7 @@ describe("Palettes Class", () => {
         });
 
         test("remove deletes protoList entry and model block", () => {
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const protoBlock = { name: "nameddo" };
             palette.protoList = [protoBlock];
@@ -1259,7 +1259,7 @@ describe("Palettes Class", () => {
         });
 
         test("remove deletes storein model block", () => {
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const protoBlock = { name: "storein" };
             palette.protoList = [protoBlock];
@@ -1271,7 +1271,7 @@ describe("Palettes Class", () => {
         });
 
         test("add ignores duplicates", () => {
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const protoBlock = { name: "box" };
 
@@ -1282,7 +1282,7 @@ describe("Palettes Class", () => {
         });
 
         test("makeBlockFromSearch creates block and hides search", () => {
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const protoblk = { name: "box", defaults: ["box1"] };
             mockActivity.blocks.blockList = [];
@@ -1297,7 +1297,7 @@ describe("Palettes Class", () => {
         });
 
         test("_makeBlockFromPalette handles null protoblk", () => {
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
 
             const result = palette._makeBlockFromPalette(null, "box", jest.fn());
@@ -1306,7 +1306,7 @@ describe("Palettes Class", () => {
         });
 
         test("_makeBlockFromPalette uses namedbox default when undefined", () => {
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             mockActivity.blocks.blockList = [];
             mockActivity.blocks.makeBlock = jest.fn(() => "created");
@@ -1321,7 +1321,7 @@ describe("Palettes Class", () => {
         });
 
         test("_makeBlockFromPalette calls macro path", () => {
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const callback = jest.fn();
             const protoblk = { name: "box", defaults: ["box1"] };
@@ -1346,7 +1346,7 @@ describe("Palettes Class", () => {
         });
 
         test("_makeBlockFromPalette uses plugin macro path", () => {
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const callback = jest.fn();
             const protoblk = { name: "box", defaults: ["box1"] };
@@ -1366,7 +1366,7 @@ describe("Palettes Class", () => {
         });
 
         test("_makeBlockFromPalette handles specific block types", () => {
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             mockActivity.blocks.blockList = [];
             mockActivity.blocks.makeBlock = jest.fn(() => "blk");
@@ -1442,7 +1442,7 @@ describe("Palettes Class", () => {
         });
 
         test("_makeBlockFromProtoblock runs drag-group callback", () => {
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const protoblk = { name: "box", defaults: ["box1"] };
 
@@ -1478,7 +1478,7 @@ describe("Palettes Class", () => {
                 return null;
             });
 
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const outsideListener = jest.fn();
             palette._outsideClickListener = outsideListener;
@@ -1499,6 +1499,7 @@ describe("Palettes Class", () => {
                 insertAdjacentHTML: jest.fn(),
                 style: {},
                 childNodes: [{ style: {} }, { style: {} }],
+                setAttribute: jest.fn(),
                 children: [
                     {
                         insertRow: jest.fn(() => ({
@@ -1516,7 +1517,10 @@ describe("Palettes Class", () => {
                     style: {},
                     appendChild: jest.fn(),
                     children: [],
-                    classList: { add: jest.fn() }
+                    classList: { add: jest.fn() },
+                    setAttribute: jest.fn(),
+                    innerHTML: "",
+                    childNodes: [{ style: {} }]
                 };
             };
             global.document.createElement = jest.fn(elementFactory);
@@ -1526,7 +1530,7 @@ describe("Palettes Class", () => {
                 return null;
             });
 
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             palette._showMenuItems = jest.fn();
 
@@ -1552,7 +1556,7 @@ describe("Palettes Class", () => {
                 return null;
             });
 
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             palette.protoList = [{ name: "box" }];
             palette.model.update = jest.fn(() => {
@@ -1588,6 +1592,7 @@ describe("Palettes Class", () => {
                 if (tag === "tr") {
                     return {
                         children: [],
+                        setAttribute: jest.fn(),
                         appendChild(child) {
                             this.children.push(child);
                         }
@@ -1597,6 +1602,7 @@ describe("Palettes Class", () => {
                 if (tag === "td") {
                     return {
                         style: {},
+                        setAttribute: jest.fn(),
                         appendChild(img) {
                             capturedImg = img;
                         }
@@ -1612,7 +1618,7 @@ describe("Palettes Class", () => {
             document.addEventListener = jest.fn();
             document.removeEventListener = jest.fn();
 
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             mockActivity.blocksContainer = { x: 0, y: 0 };
             palette._makeBlockFromProtoblock = jest.fn();
@@ -1665,7 +1671,7 @@ describe("Palettes Class", () => {
                 preventDefault: jest.fn()
             });
 
-            img.onmouseup({});
+            img.onmouseup({}));
         });
 
         test("_showMenuItems handles touch drag", () => {
@@ -1677,32 +1683,8 @@ describe("Palettes Class", () => {
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
                 return null;
-            });
-
-            document.createElement = jest.fn(tag => {
-                if (tag === "tr") {
-                    return {
-                        children: [],
-                        appendChild(child) {
-                            this.children.push(child);
-                        }
-                    };
-                }
-
-                if (tag === "td") {
-                    return {
-                        style: {},
-                        appendChild(img) {
-                            capturedImg = img;
-                        }
-                    };
-                }
-                return {};
-            });
-            document.addEventListener = jest.fn();
-            document.removeEventListener = jest.fn();
-
-            palettes.add("test");
+            };
+            palettes.add("test");;
             const palette = palettes.dict.test;
             palette._makeBlockFromProtoblock = jest.fn();
             mockActivity.blocksContainer = { x: 0, y: 0 };
@@ -1759,7 +1741,7 @@ describe("Palettes Class", () => {
                 return null;
             });
 
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             palette.palettes.mobile = true;
             const hideSpy = jest.spyOn(palette, "hide");
@@ -1782,7 +1764,7 @@ describe("Palettes Class", () => {
         });
 
         test("_makeBlockFromProtoblock creates status macro", () => {
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const protoblk = { name: "status" };
 
@@ -1818,7 +1800,7 @@ describe("Palettes Class", () => {
         });
 
         test("_makeBlockFromProtoblock skips duplicate status", () => {
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const protoblk = { name: "status" };
 
@@ -1834,7 +1816,7 @@ describe("Palettes Class", () => {
         });
 
         test("_makeBlockFromProtoblock builds status fields from variables and boxes", () => {
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const protoblk = { name: "status" };
 
@@ -1869,7 +1851,7 @@ describe("Palettes Class", () => {
         });
 
         test("_makeBlockFromProtoblock loads macro expansion", () => {
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const protoblk = { name: "box" };
 
@@ -1893,7 +1875,7 @@ describe("Palettes Class", () => {
         });
 
         test("_makeBlockFromProtoblock loads plugin macro expansion", () => {
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const protoblk = { name: "box" };
 
@@ -1966,7 +1948,7 @@ describe("Palettes Class", () => {
         });
 
         test("_makeBlockFromProtoblock falls back to palette block creation", () => {
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             const protoblk = { name: "box" };
 
@@ -1986,7 +1968,7 @@ describe("Palettes Class", () => {
         });
 
         test("outside click listener hides menu", () => {
-            palettes.add("test");
+            palettes.add("test");;
             const palette = palettes.dict.test;
             palette.menuContainer = { contains: jest.fn(() => false) };
             const hideSpy = jest.spyOn(palette, "hideMenu");
@@ -2056,7 +2038,12 @@ describe("Palettes Class", () => {
                 ]
             };
             global.docById = jest.fn(() => palette);
-            global.document.createElement = jest.fn(() => ({}));
+            global.document.createElement = jest.fn(() => ({
+                setAttribute: jest.fn(),
+                innerHTML: "",
+                childNodes: [],
+                appendChild: jest.fn()
+            }));
 
             mockActivity.beginnerMode = true;
             jest.spyOn(palettes, "makeSearchButton").mockImplementation(() => {});
@@ -2095,7 +2082,12 @@ describe("Palettes Class", () => {
                 ]
             };
             global.docById = jest.fn(() => palette);
-            global.document.createElement = jest.fn(() => ({}));
+            global.document.createElement = jest.fn(() => ({
+                setAttribute: jest.fn(),
+                innerHTML: "",
+                childNodes: [],
+                appendChild: jest.fn()
+            }));
 
             jest.spyOn(palettes, "makeSearchButton").mockImplementation(() => {});
             const makeButtonSpy = jest.spyOn(palettes, "makeButton").mockImplementation(() => {});
