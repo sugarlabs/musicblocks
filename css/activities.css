@@ -2337,68 +2337,61 @@ table {
   }
 }
 
-/* Force tour to show properly on mobile */
+/* Tour-specific mobile responsive styles */
 @media (max-width: 768px) {
-  /* Hide raw HTML elements that shouldn't be visible */
-  #popdown-palette,
+  /* Hide other floating windows when tour is active */
   #floatingWindows > .windowFrame:not(.tour-active) {
-    display: none !important;
-    visibility: hidden !important;
+    display: none;
   }
   
-  /* Show only tour when active - MAXIMUM SPECIFICITY */
+  /* Tour modal styling - specific to tour only */
   #floatingWindows > .windowFrame.tour-active {
-    display: block !important;
-    visibility: visible !important;
-    position: fixed !important;
-    top: 10% !important;
-    left: 5% !important;
-    width: 90% !important;
-    max-width: 350px !important;
-    min-width: 300px !important;
-    height: auto !important;
-    max-height: 80vh !important;
-    z-index: 99999 !important;
-    background: white !important;
-    border-radius: 10px !important;
-    padding: 15px !important;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.3) !important;
-    border: 1px solid #ccc !important;
+    position: fixed;
+    top: 10%;
+    left: 5%;
+    width: 90%;
+    max-width: 350px;
+    min-width: 300px;
+    height: auto;
+    max-height: 80vh;
+    z-index: 99999;
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    border: 1px solid #ccc;
   }
   
-  /* Force tour body to be visible */
+  /* Tour content styling */
   #floatingWindows > .windowFrame.tour-active .wfWinBody {
-    display: block !important;
-    visibility: visible !important;
-    font-size: 14px !important;
-    line-height: 1.4 !important;
-    padding: 10px !important;
-    overflow-y: auto !important;
-    max-height: 60vh !important;
+    font-size: 14px;
+    line-height: 1.4;
+    padding: 10px;
+    overflow-y: auto;
+    max-height: 60vh;
   }
   
   #floatingWindows > .windowFrame.tour-active h3 {
-    font-size: 18px !important;
-    margin-bottom: 10px !important;
-    color: #333 !important;
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
   }
   
-  /* Fix navigation */
+  /* Tour navigation styling */
   #floatingWindows > .windowFrame.tour-active #right-arrow,
   #floatingWindows > .windowFrame.tour-active #left-arrow {
-    min-width: 44px !important;
-    min-height: 44px !important;
-    display: inline-block !important;
-    visibility: visible !important;
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-block;
   }
   
   #floatingWindows > .windowFrame.tour-active p,
   #floatingWindows > .windowFrame.tour-active li {
-    font-size: 13px !important;
-    line-height: 1.5 !important;
-    margin-bottom: 8px !important;
-    word-wrap: break-word !important;
-    overflow-wrap: break-word !important;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 }
 
