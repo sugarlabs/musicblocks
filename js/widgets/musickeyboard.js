@@ -2095,6 +2095,9 @@ function MusicKeyboard(activity) {
                     i = (i + 1) % pitchLabels.length;
                     iterations++;
                     if (iterations > pitchLabels.length) {
+                        this.activity.errorMsg(
+                            _("All 12 pitches are already in the keyboard. Adding duplicate.")
+                        );
                         break;
                     }
                 } while (this.layout.some(note => note.noteName === rLabel));
