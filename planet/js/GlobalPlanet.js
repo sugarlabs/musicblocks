@@ -283,12 +283,12 @@ class GlobalPlanet {
         if (data.success) {
             this.cache[id] = data.data;
             this.cache[id].ProjectData = null;
-        }else {
+        } else {
             this.throwOfflineError();
         }
 
         this.loadCount -= 1;
-        if(this.loadCount<=0) callback();
+        if (this.loadCount <= 0) callback();
     }
 
     forceAddToCache(id, callback) {
