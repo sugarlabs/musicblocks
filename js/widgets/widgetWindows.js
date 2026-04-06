@@ -70,7 +70,7 @@ class WidgetWindow {
      * @param {boolean} fullscreen
      */
     constructor(key, title, fullscreen = true) {
-        // Keep a refernce to the object within handlers
+        // Keep a reference to the object within handlers
         this._key = key;
         this._buttons = [];
         this._first = true;
