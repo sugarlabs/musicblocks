@@ -1416,9 +1416,6 @@ class Blocks {
 
             let block = thisBlockobj;
             while (block?.name == "vspace") {
-                if (block?.name != "vspace") {
-                    break;
-                }
                 block = this.blockList[block.connections[0]];
                 if (block?.name == "newnote") {
                     return;
