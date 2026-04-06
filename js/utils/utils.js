@@ -1380,7 +1380,6 @@ const LCD = (a, b) => {
  * @returns {Array} The sum of the two rational numbers in the form [numerator, denominator].
  */
 let rationalSum = (a, b) => {
-     // ✅ ADD THIS BLOCK AT VERY TOP
     if (
         !Array.isArray(a) || a.length < 2 ||
         !Array.isArray(b) || b.length < 2 ||
