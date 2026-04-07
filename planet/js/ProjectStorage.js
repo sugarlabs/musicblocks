@@ -53,7 +53,7 @@ class ProjectStorage {
         return prefix + suffix;
     }
 
-    saveLocally(data, image) {
+    async saveLocally(data, image) {
         if (this.data.CurrentProject === undefined) this.initialiseNewProject();
 
         const c = this.data.CurrentProject;
@@ -69,7 +69,7 @@ class ProjectStorage {
         this.data.Projects[c].ProjectData = data;
         this.data.Projects[c].ProjectImage = image;
         this.data.Projects[c].DateLastModified = Date.now();
-        this.save();
+        await this.save();
     }
 
     async getCurrentProjectData() {
@@ -101,7 +101,7 @@ class ProjectStorage {
         return this.ImageDataURL;
     }
 
-    initialiseNewProject(name, data, image) {
+    async initialiseNewProject(name, data, image) {
         name = name ?? this.defaultProjectName;
         data = data ?? null;
         image = image ?? null;
@@ -114,22 +114,22 @@ class ProjectStorage {
         this.data.Projects[c].ProjectImage = image;
         this.data.Projects[c].PublishedData = null;
         this.data.Projects[c].DateLastModified = Date.now();
-        this.save();
+        await this.save();
     }
 
-    renameProject(id, name) {
+    async renameProject(id, name) {
         this.data.Projects[id].ProjectName = name;
-        this.save();
+        await this.save();
     }
 
-    addPublishedData(id, data) {
+    async addPublishedData(id, data) {
         this.data.Projects[id].PublishedData = data;
-        this.save();
+        await this.save();
     }
 
-    deleteProject(id) {
+    async deleteProject(id) {
         delete this.data.Projects[id];
-        this.save();
+        await this.save();
         this.Planet.LocalPlanet.updateProjects();
     }
 
@@ -153,18 +153,18 @@ class ProjectStorage {
         return this.data.LikedProjects[id] === true;
     }
 
-    like(id, like) {
+    async like(id, like) {
         this.data.LikedProjects[id] = like;
-        this.save();
+        await this.save();
     }
 
     isReported(id) {
         return this.data.ReportedProjects[id] === true;
     }
 
-    report(id, report) {
+    async report(id, report) {
         this.data.ReportedProjects[id] = report;
-        this.save();
+        await this.save();
     }
 
     // Ancillary Functions
