@@ -2113,10 +2113,10 @@ class Blocks {
                         }
                     }
                 }
- 
-                 this.adjustDocks(newBlock, true);
- 
-                 // Graphical feedback for new connection
+
+                this.adjustDocks(newBlock, true);
+
+                // Graphical feedback for new connection
                 this.findDragGroup(thisBlock);
                 const blocksToHighlight = [...this.dragGroup];
                 if (this.blockList[newBlock]) {
