@@ -14,7 +14,7 @@
 
    _, docById, DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP,
    CUSTOMSAMPLES, wheelnav, getVoiceSynthName, Singer, DRUMS, Tone,
-   instruments, slicePath, platformColor
+   instruments, slicePath, platformColor, ABCJS, ensureABCJS
 */
 
 /* exported Abhijeet Singh */
@@ -717,7 +717,8 @@ function AIWidget() {
      * @private
      * @returns {void}
      */
-    this.__save = function () {
+    this.__save = async function () {
+        await ensureABCJS();
         const tunebook = new ABCJS.parseOnly(abcNotationSong);
 
         tunebook.forEach(tune => {
@@ -885,7 +886,8 @@ function AIWidget() {
         return _sharedAudioContext;
     }
 
-    this._playABCSong = function () {
+    this._playABCSong = async function () {
+        await ensureABCJS();
         const abc = abcNotationSong;
         const stopAudioButton = document.querySelector(".stop-audio");
 

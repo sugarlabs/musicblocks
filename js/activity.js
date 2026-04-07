@@ -41,7 +41,7 @@
    SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
    MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
-   SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS
+   SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS
  */
 
 /*
@@ -7815,11 +7815,12 @@ class Activity {
                 };
 
                 // Music Block Parser from abc to MB
-                abcReader.onload = event => {
+                abcReader.onload = async event => {
                     //get the abc data and replace the / so that the block does not break
                     let abcData = event.target.result;
                     abcData = abcData.replace(/\\/g, "");
 
+                    await ensureABCJS();
                     const tunebook = new ABCJS.parseOnly(abcData);
 
                     console.log(tunebook);
