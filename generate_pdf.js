@@ -47,7 +47,9 @@ const path = require("path");
         };
 
         if (!langMap[lang]) {
-            console.error(`Unsupported language: ${lang}. Supported: ${Object.keys(langMap).join(", ")}`);
+            console.error(
+                `Unsupported language: ${lang}. Supported: ${Object.keys(langMap).join(", ")}`
+            );
             process.exit(1);
         }
 
