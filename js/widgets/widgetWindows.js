@@ -17,7 +17,51 @@ Globals location
   _, docById
 */
 
-window.widgetWindows = { openWindows: {}, _posCache: {} };
+window.widgetWindows = {
+    openWindows: {},
+    _posCache: {},
+    focused: null,
+    _shortcutsInitialized: false,
+    _handleGlobalKeyDown(e) {
+        const focused = window.widgetWindows.focused;
+        if (!focused || e.repeat) return; // Guard against no focus or rapid-fire repeat
+
+        // Ignore shortcuts when focus is inside an input, textarea, or contenteditable element
+        const activeElement = document.activeElement;
+        const isInput =
+            activeElement &&
+            (activeElement.tagName === "INPUT" ||
+                activeElement.tagName === "TEXTAREA" ||
+                activeElement.isContentEditable);
+
+        if (isInput) return;
+
+        // Handle Escape (Close)
+        if (e.key === "Escape") {
+            focused.onclose();
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+
+        // Handle Maximize (Cmd/Ctrl + Shift + M)
+        const isModifierActive = e.metaKey || e.ctrlKey;
+        if (isModifierActive && e.shiftKey && e.code === "KeyM") {
+            if (focused._fullscreenEnabled) {
+                if (focused._maximized) {
+                    focused._restore();
+                    focused.sendToCenter();
+                } else {
+                    focused._maximize();
+                }
+                focused.takeFocus();
+                focused.onmaximize();
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }
+    }
+};
 
 class WidgetWindow {
     /**
@@ -54,6 +98,14 @@ class WidgetWindow {
         document.addEventListener("mouseup", this._dragTopHandler, true);
         document.addEventListener("mousemove", this._docMouseMoveHandler, true);
         document.addEventListener("mousedown", this._docMouseDownHandler, true);
+
+        if (!window.widgetWindows._shortcutsInitialized) {
+            // Use capture phase (true) to ensure global window control shortcuts are handled
+            // before individual widgets/blocks can intercept them via stopPropagation().
+            window.removeEventListener("keydown", window.widgetWindows._handleGlobalKeyDown, true);
+            window.addEventListener("keydown", window.widgetWindows._handleGlobalKeyDown, true);
+            window.widgetWindows._shortcutsInitialized = true;
+        }
 
         if (window.widgetWindows._posCache[this._key]) {
             const _pos = window.widgetWindows._posCache[this._key];
@@ -261,9 +313,13 @@ class WidgetWindow {
         if (e.target === this._frame || this._frame.contains(e.target) || this._fullscreenEnabled) {
             this._frame.style.opacity = "1";
             this._frame.style.zIndex = "10000";
+            window.widgetWindows.focused = this;
         } else {
             this._frame.style.opacity = ".7";
             this._frame.style.zIndex = "0";
+            if (window.widgetWindows.focused === this) {
+                window.widgetWindows.focused = null;
+            }
         }
     }
 
@@ -408,6 +464,7 @@ class WidgetWindow {
      * @returns {void}
      */
     takeFocus() {
+        window.widgetWindows.focused = this;
         const windows = docById("floatingWindows");
         const siblings = windows.children;
         for (let i = 0; i < siblings.length; i++) {
@@ -556,6 +613,9 @@ class WidgetWindow {
         if (this._overlayframe && this._overlayframe.parentElement) {
             this._overlayframe.parentElement.removeChild(this._overlayframe);
         }
+        if (window.widgetWindows.focused === this) {
+            window.widgetWindows.focused = null;
+        }
         window.widgetWindows.openWindows[this._key] = undefined;
     }
 
@@ -696,6 +756,7 @@ window.widgetWindows.hideAllWindows = () => {
     Object.values(window.widgetWindows.openWindows).forEach(win => {
         if (win !== undefined) win._frame.style.display = "none";
     });
+    window.widgetWindows.focused = null;
 };
 
 /**
@@ -706,6 +767,9 @@ window.widgetWindows.hideWindow = name => {
     const win = window.widgetWindows.openWindows[name];
     if (!win) return;
     win._frame.style.display = "none";
+    if (window.widgetWindows.focused === win) {
+        window.widgetWindows.focused = null;
+    }
 };
 
 /**

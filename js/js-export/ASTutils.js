@@ -620,6 +620,10 @@ class ASTUtils {
 
         const ASTs = [];
         for (const flow of flows) {
+            if (flow[0] === "comment") {
+                // Comment blocks have no effect in JS output.
+                continue;
+            }
             if (flow[0] === "if") {
                 ASTs.push(ASTUtils._getIfAST(flow[1], flow[2], iterMax));
             } else if (flow[0] === "ifthenelse") {

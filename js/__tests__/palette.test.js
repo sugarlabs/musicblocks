@@ -17,6 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* global MULTIPALETTES, platformColor, docById, TEXTWIDTH */
+
 const { Palettes, initPalettes } = require("../palette");
 
 global.LEADING = 10;
@@ -97,6 +99,8 @@ describe("Palettes Class", () => {
     beforeEach(() => {
         const paletteMock = {
             style: { visibility: "visible", top: "100px" },
+            setAttribute: jest.fn(),
+            addEventListener: jest.fn(),
             children: [
                 {
                     children: [
@@ -351,6 +355,7 @@ describe("Palettes Class", () => {
                 const row = {
                     insertCell: jest.fn(),
                     style: {},
+                    dataset: {},
                     addEventListener: jest.fn((event, handler) => {
                         handlers[event] = handler;
                     })

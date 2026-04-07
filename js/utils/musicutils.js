@@ -55,7 +55,7 @@
   DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
   INTERVALVALUES, getIntervalRatio, frequencyToPitch, NOTESTEP,
   GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
-  SEMITONES
+  SEMITONES, CHROMATIC_SOLFEGE
 */
 
 /**
@@ -184,6 +184,25 @@ const STOSHARP = {
     "c#": "C" + SHARP,
     "f#": "F" + SHARP
 };
+
+/**
+ * Array containing the solfege names for the chromatic scale.
+ * @constant {string[]}
+ */
+const CHROMATIC_SOLFEGE = [
+    "Do", // 0
+    "Di", // 1
+    "Re", // 2
+    "Ri", // 3
+    "Mi", // 4
+    "Fa", // 5
+    "Fi", // 6
+    "Sol", // 7
+    "Si", // 8
+    "La", // 9
+    "Li", // 10
+    "Ti" // 11
+];
 
 /**
  * Array of notes with sharps.
@@ -4745,50 +4764,115 @@ function getNote(
 }
 
 /**
- * Calculate the pitch number based on the activity, pitch value, and tur parameters.
- * @function
- * @param {Object} activity - The activity object.
- * @param {string|number} np - The pitch value (note name or frequency in Hertz).
- * @param {Object} tur - The tur parameters containing singer information.
- * @returns {number} The calculated pitch number.
+ * Maps accidental characters to their semitone offsets.
+ * Named distinctly to avoid collision with the ACCIDENTAL_MAP in abc.js
+ * (which maps accidentals to ABC notation strings, not semitone offsets).
+ * @constant {Object.<string, number>}
  */
-const _calculate_pitch_number = (activity, np, tur) => {
-    let obj;
-    if (tur.singer.lastNotePlayed !== null) {
-        if (typeof np === "string") {
-            obj = noteToObj(np);
-        } else {
-            // Hertz
-            obj = frequencyToPitch(np);
-        }
-    } else if (
-        tur.singer.inNoteBlock in tur.singer.notePitches &&
-        tur.singer.notePitches[last(tur.singer.inNoteBlock)].length > 0
-    ) {
-        obj = getNote(
-            tur.singer.notePitches[last(tur.singer.inNoteBlock)][0],
-            tur.singer.noteOctaves[last(tur.singer.inNoteBlock)][0],
-            0,
-            tur.singer.keySignature,
-            tur.singer.movable,
-            null,
-            activity.errorMsg
-        );
-    } else {
-        try {
-            if (typeof np === "string") {
-                obj = noteToObj(np);
-            } else {
-                // Hertz
-                obj = frequencyToPitch(np);
-            }
-        } catch (e) {
-            activity.errorMsg(INVALIDPITCH);
-            obj = ["G", 4];
-        }
-    }
-    return pitchToNumber(obj[0], obj[1], tur.singer.keySignature) - tur.singer.pitchNumberOffset;
+const ACCIDENTAL_SEMITONE_MAP = {
+    "#": 1,
+    "♯": 1,
+    "b": -1,
+    "♭": -1,
+    "x": 2, // double-sharp (textual)
+    "𝄪": 2, // double-sharp (Unicode)
+    "𝄫": -2 // double-flat (Unicode)
 };
+
+/**
+ * Parses a pitch string into its note name and octave components.
+ * Handles single and double accidentals (#, b, ♯, ♭, x, 𝄪, 𝄫).
+ * @param {string} str - The pitch string (e.g. "C4", "A#10", "F𝄪5").
+ * @returns {Array} An array containing [normalizedNoteName, octave].
+ */
+function _parse_pitch_string(str) {
+    const match = str.match(/^([A-Ga-g])([#b♭♯𝄪𝄫x]*)(-?\d+)$/u);
+    if (match) {
+        const baseLetter = match[1].toUpperCase();
+        const accidentalStr = match[2];
+        const octave = parseInt(match[3], 10);
+
+        if (!accidentalStr) {
+            // No accidentals; return as-is
+            return [baseLetter, octave];
+        }
+
+        // Sum up semitone offsets for all accidental characters.
+        // 𝄪 and 𝄫 are multi-byte but treated as single code points by spread.
+        const accidentalChars = [...accidentalStr];
+        const semitoneOffset = accidentalChars.reduce(
+            (sum, char) => sum + (ACCIDENTAL_SEMITONE_MAP[char] || 0),
+            0
+        );
+
+        // Build a normalized name using canonical SHARP/FLAT symbols.
+        let normalizedName;
+        if (semitoneOffset === 0) {
+            normalizedName = baseLetter;
+        } else if (semitoneOffset === 1) {
+            normalizedName = baseLetter + SHARP;
+        } else if (semitoneOffset === -1) {
+            normalizedName = baseLetter + FLAT;
+        } else if (semitoneOffset === 2) {
+            normalizedName = baseLetter + DOUBLESHARP;
+        } else if (semitoneOffset === -2) {
+            normalizedName = baseLetter + DOUBLEFLAT;
+        } else {
+            // For unusual combinations, keep semitone representation as extra sharps/flats
+            const sym = semitoneOffset > 0 ? SHARP : FLAT;
+            normalizedName = baseLetter + sym.repeat(Math.abs(semitoneOffset));
+        }
+
+        return [normalizedName, octave];
+    }
+    // Fallback: no octave digit found – normalize accidentals and default octave to 4
+    return [str.replaceAll("#", SHARP).replaceAll("b", FLAT), 4];
+}
+
+/**
+ * Calculates a pitch number from a note name and octave.
+ * @param {string} noteName - The name of the note (e.g. "C", "C#").
+ * @param {number} octave - The octave number.
+ * @returns {number|string} The calculated pitch number or INVALIDPITCH if calculation fails.
+ */
+function _calculate_pitch_number(noteName, octave, applyOffset = 0) {
+    if (typeof noteName !== "string") {
+        return INVALIDPITCH;
+    }
+
+    let name = noteName.replaceAll("#", SHARP).replaceAll("b", FLAT);
+
+    // Handle double accidentals (𝄪 / 𝄫) by computing offset directly from
+    // the base note letter, since they won't appear in NOTESSHARP/NOTESFLAT.
+    if (name.includes(DOUBLESHARP) || name.includes(DOUBLEFLAT)) {
+        const offset = name.includes(DOUBLESHARP) ? 2 : -2;
+        const baseLetter = name.replace(DOUBLESHARP, "").replace(DOUBLEFLAT, "");
+        let baseIndex = NOTESSHARP.indexOf(baseLetter);
+        if (baseIndex === -1) baseIndex = NOTESFLAT.indexOf(baseLetter);
+        if (baseIndex === -1) return INVALIDPITCH;
+        const rawPitch = (parseInt(octave, 10) + 1) * 12 + baseIndex + offset;
+        return rawPitch - applyOffset;
+    }
+
+    if (EQUIVALENTSHARPS[name]) {
+        name = EQUIVALENTSHARPS[name];
+    } else if (EQUIVALENTFLATS[name]) {
+        name = EQUIVALENTFLATS[name];
+    } else if (EQUIVALENTNATURALS[name]) {
+        name = EQUIVALENTNATURALS[name];
+    }
+
+    let pitchIndex = NOTESSHARP.indexOf(name);
+    if (pitchIndex === -1) {
+        pitchIndex = NOTESFLAT.indexOf(name);
+    }
+
+    if (pitchIndex === -1) {
+        return INVALIDPITCH;
+    }
+
+    return (parseInt(octave, 10) + 1) * 12 + pitchIndex - applyOffset;
+}
 
 /**
  * Build the scale based on the given key signature.
@@ -5787,11 +5871,15 @@ const noteToFrequency = (note, keySignature) => {
  * @returns {boolean} True if the note is in solfege, false otherwise.
  */
 const noteIsSolfege = note => {
-    if (SOLFEGECONVERSIONTABLE[note] === undefined) {
-        return true;
-    } else {
+    if (SOLFEGECONVERSIONTABLE[note] !== undefined) {
         return false;
     }
+    // Check normalized version (ASCII to Unicode)
+    const altNote = note.replace("#", SHARP).replace("b", FLAT);
+    if (SOLFEGECONVERSIONTABLE[altNote] !== undefined) {
+        return false;
+    }
+    return true;
 };
 
 /**
@@ -5800,13 +5888,61 @@ const noteIsSolfege = note => {
  * @param {string} note - The note string.
  * @returns {string} The solfege representation.
  */
-const getSolfege = note => {
-    // TODO: Use mode-specific conversion.
+const getSolfege = (note, keySignature, movable) => {
     if (noteIsSolfege(note)) {
         return note;
-    } else {
-        return SOLFEGECONVERSIONTABLE[note];
     }
+
+    if (movable && keySignature) {
+        const scaleResult = buildScale(keySignature);
+        if (!scaleResult) return SOLFEGECONVERSIONTABLE[note];
+
+        const scale = scaleResult[0];
+
+        // 1) exact match
+        let index = scale.indexOf(note);
+
+        // 2) normalized accidental match
+        if (index === -1) {
+            const altNote = note.replace("#", SHARP).replace("b", FLAT);
+            index = scale.indexOf(altNote);
+        }
+
+        const isMinor = Array.isArray(keySignature)
+            ? keySignature[1].toLowerCase() === "minor"
+            : keySignature.toLowerCase().includes("minor");
+
+        // diatonic note
+        if (index !== -1 && index < SOLFEGENAMES.length) {
+            let solfegeIndex = index;
+
+            // minor movable-do → la-based
+            if (isMinor) {
+                solfegeIndex = (index + 5) % 7;
+            }
+
+            return SOLFEGENAMES[solfegeIndex].toLowerCase();
+        }
+
+        // 3) chromatic fallback (interval based)
+        const tonic = scale[0];
+        const tonicPitch = pitchToNumber(tonic, 4, keySignature);
+        const notePitch = pitchToNumber(note, 4, keySignature);
+
+        // semitones from tonic
+        let semitones = (notePitch - tonicPitch + 12) % 12;
+
+        if (isMinor) {
+            // For minor, relative major is 3 semitones up.
+            // We want solfege relative to the relative major.
+            // e.g. Minor tonic (La) -> +9 -> La
+            semitones = (semitones + 9) % 12;
+        }
+
+        return CHROMATIC_SOLFEGE[semitones].toLowerCase();
+    }
+
+    return SOLFEGECONVERSIONTABLE[note];
 };
 
 /**
@@ -6112,19 +6248,43 @@ const convertFactor = factor => {
 };
 
 /**
- * Get pitch information based on the activity, type, current note, and tur.
+ * Get pitch information based on the note or pitch provided.
  * @function
- * @param {string} activity - The activity information.
- * @param {string} type - The type of pitch information to retrieve.
- * @param {string|number} currentNote - The current note or frequency.
- * @param {*} tur - The tur object.
- * @returns {*} The pitch information based on the specified type.
+ * @param {string|number} noteOrPitch - The note name (e.g. "C4") or a numeric pitch index.
+ * @returns {Object|string} If called with one argument, returns { name, octave, pitchNumber }. Otherwise returns legacy values.
  */
-const getPitchInfo = (activity, type, currentNote, tur) => {
-    // A variety of conversions.
+const getPitchInfo = function (activity, type, currentNote, tur) {
+    if (arguments.length === 1) {
+        const noteOrPitch = activity;
+        let name, octave, pitchNumber;
+
+        if (typeof noteOrPitch === "number") {
+            pitchNumber = noteOrPitch;
+            octave = Math.floor(pitchNumber / 12) - 1;
+            name = NOTESSHARP[pitchNumber % 12];
+        } else if (typeof noteOrPitch === "string") {
+            [name, octave] = _parse_pitch_string(noteOrPitch);
+            pitchNumber = _calculate_pitch_number(name, octave);
+        } else {
+            return INVALIDPITCH;
+        }
+
+        if (pitchNumber === INVALIDPITCH) {
+            return { name: null, octave: null, pitchNumber: INVALIDPITCH };
+        }
+
+        return {
+            name: name.replaceAll(SHARP, "#").replaceAll(FLAT, "b"),
+            octave: parseInt(octave, 10),
+            pitchNumber: pitchNumber
+        };
+    }
+
+    // Legacy behavior for 4 arguments
     let pitch;
     let octave;
     let obj;
+    let cents;
     if (Number(currentNote)) {
         // If it is a frequency, convert it to a pitch/octave.
         obj = frequencyToPitch(currentNote);
@@ -6133,8 +6293,7 @@ const getPitchInfo = (activity, type, currentNote, tur) => {
         cents = obj[2];
     } else {
         // Turn the note into pitch and octave.
-        pitch = currentNote.substr(0, currentNote.length - 1);
-        octave = currentNote[currentNote.length - 1];
+        [pitch, octave] = _parse_pitch_string(currentNote);
     }
     // Remap double sharps/double flats.
     if (pitch.includes(DOUBLESHARP)) {
@@ -6153,7 +6312,7 @@ const getPitchInfo = (activity, type, currentNote, tur) => {
         }
     }
     // Map the pitch to the current scale.
-    pitch = pitch.replace("#", SHARP).replace("b", FLAT);
+    pitch = pitch.replaceAll("#", SHARP).replaceAll("b", FLAT);
     if (!buildScale(tur.singer.keySignature)[0].includes(pitch)) {
         if (pitch in EQUIVALENTFLATS) {
             pitch = EQUIVALENTFLATS[pitch];
@@ -6173,7 +6332,7 @@ const getPitchInfo = (activity, type, currentNote, tur) => {
             case "solfege class":
                 if (type === "solfege class") {
                     // Remove sharps and flats.
-                    pitch = pitch.replace(SHARP).replace(FLAT);
+                    pitch = pitch.replace(SHARP, "").replace(FLAT, "");
                 }
                 if (tur.singer.movable === false) {
                     return SOLFEGECONVERSIONTABLE[pitch];
@@ -6205,7 +6364,7 @@ const getPitchInfo = (activity, type, currentNote, tur) => {
                     (octave - 4) * YSTAFFOCTAVEHEIGHT
                 );
             case "pitch number":
-                return _calculate_pitch_number(activity, pitch, tur);
+                return _calculate_pitch_number(pitch, octave, tur?.singer?.pitchNumberOffset || 0);
             case "pitch in hertz":
                 // This function ignores cents.
                 return activity.logo.synth._getFrequency(

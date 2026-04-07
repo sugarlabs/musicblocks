@@ -48,11 +48,13 @@
 
 /**
  * The number of voices in polyphony.
+ * Raised from 3 to 6 to prevent voice exhaustion and audio engine crashes
+ * during infinite-loop playback with chords or multiple turtles.
  * @constant
  * @type {number}
- * @default 3
+ * @default 6
  */
-const POLYCOUNT = 3;
+const POLYCOUNT = 6;
 
 /**
  * Array of names and details for various noise synthesizers.
@@ -1410,8 +1412,6 @@ function Synth() {
             console.debug("Cannot parse " + fragment);
         }
         const pitchNumber = octave * 12 + chromaticNumber + attr;
-        // eslint-disable-next-line no-console
-        console.log(solfege + octave + " = " + pitchNumber);
         return pitchNumber.toString();
     };
 
@@ -1562,6 +1562,13 @@ function Synth() {
             }
         } else if (sourceName in BUILTIN_SYNTHS) {
             if (instruments[turtle] && instruments[turtle][instrumentName]) {
+                if (typeof instruments[turtle][instrumentName].dispose === "function") {
+                    try {
+                        instruments[turtle][instrumentName].dispose();
+                    } catch (e) {
+                        console.debug("Error disposing instrument:", e);
+                    }
+                }
                 delete instruments[turtle][instrumentName];
             }
 
@@ -1575,6 +1582,13 @@ function Synth() {
             }
         } else if (sourceName in CUSTOM_SYNTHS) {
             if (instruments[turtle] && instruments[turtle][instrumentName]) {
+                if (typeof instruments[turtle][instrumentName].dispose === "function") {
+                    try {
+                        instruments[turtle][instrumentName].dispose();
+                    } catch (e) {
+                        console.debug("Error disposing instrument:", e);
+                    }
+                }
                 delete instruments[turtle][instrumentName];
             }
 
@@ -1585,6 +1599,13 @@ function Synth() {
             instrumentsSource[instrumentName] = [0, "poly"];
         } else if (sourceName in CUSTOMSAMPLES) {
             if (instruments[turtle] && instruments[turtle][instrumentName]) {
+                if (typeof instruments[turtle][instrumentName].dispose === "function") {
+                    try {
+                        instruments[turtle][instrumentName].dispose();
+                    } catch (e) {
+                        console.debug("Error disposing instrument:", e);
+                    }
+                }
                 delete instruments[turtle][instrumentName];
             }
 
@@ -1727,6 +1748,59 @@ function Synth() {
                     console.debug("Error triggering note:", e);
                 }
             } else {
+                // ── Perf fix: fast-path for notes with no real graph-level effect nodes ──
+                // doPartials and doPortamento only mutate synth properties in-place and
+                // do NOT require new audio graph nodes.  Skipping disconnect/reconnect
+                // for every plain note eliminates per-note audio-graph rewiring, which
+                // is the primary cause of buffer underruns in long/infinite sessions.
+                const _needsGraphRewire =
+                    (paramsFilters !== null &&
+                        paramsFilters !== undefined &&
+                        paramsFilters.length > 0) ||
+                    (paramsEffects !== null &&
+                        paramsEffects !== undefined &&
+                        (paramsEffects.doVibrato ||
+                            paramsEffects.doDistortion ||
+                            paramsEffects.doTremolo ||
+                            paramsEffects.doPhaser ||
+                            paramsEffects.doChorus ||
+                            paramsEffects.doNeighbor));
+
+                if (!_needsGraphRewire) {
+                    // Apply in-place property mutations then take the fast path.
+                    if (paramsEffects !== null && paramsEffects !== undefined) {
+                        if (paramsEffects.doPartials) {
+                            if (synth.oscillator !== undefined) {
+                                synth.oscillator.partials = paramsEffects.partials;
+                            } else if (synth.voices !== undefined) {
+                                for (let i = 0; i < synth.voices.length; i++) {
+                                    if (synth.voices[i].oscillator) {
+                                        synth.voices[i].oscillator.partials =
+                                            paramsEffects.partials;
+                                    }
+                                }
+                            }
+                        }
+                        if (paramsEffects.doPortamento) {
+                            if (synth.oscillator !== undefined) {
+                                synth.portamento = paramsEffects.portamento;
+                            } else if (synth.voices !== undefined) {
+                                for (let i = 0; i < synth.voices.length; i++) {
+                                    synth.voices[i].portamento = paramsEffects.portamento;
+                                }
+                            }
+                        }
+                    }
+                    try {
+                        await Tone.ToneAudioBuffer.loaded();
+                        synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
+                    } catch (e) {
+                        console.debug("Error triggering note (no-graph-rewire fast path):", e);
+                    }
+                    return;
+                }
+                // ─────────────────────────────────────────────────────────────────────
+
                 // Remove the dry path so effects are routed serially, not in parallel
                 synth.disconnect(Tone.Destination);
                 const chainNodes = [];
@@ -1871,7 +1945,10 @@ function Synth() {
                     }
                 }
 
-                // Schedule cleanup after the note duration
+                // Schedule cleanup after the note duration.
+                // A 500 ms safety buffer is added beyond the note duration to prevent
+                // premature disposal caused by audio-clock drift or scheduler jitter,
+                // which would otherwise produce crackling artefacts in long sessions.
                 setTimeout(() => {
                     try {
                         // Dispose of effects
@@ -1892,7 +1969,7 @@ function Synth() {
                     } catch (e) {
                         console.debug("Error disposing effects:", e);
                     }
-                }, beatValue * 1000);
+                }, beatValue * 1000 + 500);
             }
         } catch (e) {
             console.error("Error in _performNotes:", e);
@@ -2312,12 +2389,12 @@ function Synth() {
         await this.mic
             .open()
             .then(() => {
-                console.log("Mic opened");
                 this.mic.connect(this.recorder);
                 this.recorder.start();
             })
             .catch(error => {
-                console.log(error);
+                // eslint-disable-next-line no-console
+                console.error(error);
             });
     };
 
@@ -2563,14 +2640,6 @@ function Synth() {
                     // Show current note in display but calculate cents from target
                     note = currentNote.note; // Show the current note being played
 
-                    // Debug logging
-                    console.log("Debug values:", {
-                        detectedPitch: pitch,
-                        targetNote: targetPitch.note,
-                        targetFrequency: targetPitch.frequency,
-                        currentNote: note
-                    });
-
                     // Ensure we have valid frequencies before calculation
                     if (pitch > 0 && targetPitch.frequency > 0) {
                         // Calculate cents from target frequency
@@ -2610,14 +2679,6 @@ function Synth() {
                         this.displayText = "0 cents";
                     }
                 }
-
-                // Debug logging
-                console.log({
-                    frequency: pitch.toFixed(1),
-                    detectedNote: note,
-                    centsDeviation: cents,
-                    mode: tunerMode
-                });
 
                 // Initialize display elements if they don't exist
                 let noteDisplayContainer = document.getElementById("noteDisplayContainer");
@@ -2917,12 +2978,6 @@ function Synth() {
                                         freq *= Math.pow(2, octaveDiff);
 
                                         targetPitch.frequency = freq;
-
-                                        // Debug logging
-                                        console.log("Target pitch updated:", {
-                                            note: noteWithOctave,
-                                            frequency: targetPitch.frequency
-                                        });
 
                                         // Validate frequency
                                         if (
@@ -3493,6 +3548,68 @@ function Synth() {
         this.sliderVisible = false;
         this.centsSliderBtn.getElementsByTagName("img")[0].style.filter = "";
         this.centsSliderBtn.style.backgroundColor = "";
+    };
+
+    /**
+     * Disposes all Tone.js instruments, filters, and effects for every turtle
+     * to free audio memory (decoded AudioBuffers, Web Audio nodes, etc.).
+     * Instruments will be re-created by prepSynths() on the next run.
+     * @function
+     * @memberof Synth
+     * @returns {void}
+     */
+    this.disposeAllInstruments = () => {
+        for (const turtle in instruments) {
+            for (const instrumentName in instruments[turtle]) {
+                if (
+                    instruments[turtle][instrumentName] &&
+                    typeof instruments[turtle][instrumentName].dispose === "function"
+                ) {
+                    try {
+                        instruments[turtle][instrumentName].dispose();
+                    } catch (e) {
+                        console.debug("Error disposing instrument:", e);
+                    }
+                }
+                delete instruments[turtle][instrumentName];
+            }
+        }
+
+        for (const turtle in instrumentsFilters) {
+            for (const instrumentName in instrumentsFilters[turtle]) {
+                const filters = instrumentsFilters[turtle][instrumentName];
+                if (Array.isArray(filters)) {
+                    filters.forEach(f => {
+                        if (f && typeof f.dispose === "function") {
+                            try {
+                                f.dispose();
+                            } catch (e) {
+                                console.debug("Error disposing filter:", e);
+                            }
+                        }
+                    });
+                }
+                delete instrumentsFilters[turtle][instrumentName];
+            }
+        }
+
+        for (const turtle in instrumentsEffects) {
+            for (const instrumentName in instrumentsEffects[turtle]) {
+                const effects = instrumentsEffects[turtle][instrumentName];
+                if (Array.isArray(effects)) {
+                    effects.forEach(fx => {
+                        if (fx && typeof fx.dispose === "function") {
+                            try {
+                                fx.dispose();
+                            } catch (e) {
+                                console.debug("Error disposing effect:", e);
+                            }
+                        }
+                    });
+                }
+                delete instrumentsEffects[turtle][instrumentName];
+            }
+        }
     };
 
     this.tone = null;
