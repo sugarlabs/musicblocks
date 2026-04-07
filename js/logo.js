@@ -777,8 +777,7 @@ class Logo {
                     ) {
                         logo.statusFields.push([blk, "color"]);
                     } else {
-                        const turtleObj = logo.activity.turtles.getTurtle(turtle);
-                        currentBlock.value = turtleObj.painter.color;
+                        currentBlock.value = tur.painter.color;
                     }
                     break;
 
@@ -798,7 +797,7 @@ class Logo {
                         if (typeof pluginFn === "function") {
                             pluginFn(logo, turtle, blk, parentBlk, receivedArg, tur);
                         } else {
-                            console.error("Invalid or failed ARGPLUGIN:", blockName);
+                            logo.activity.errorMsg(_("Plugin failed to load: ") + blockName);
                         }
                     } else {
                         console.error("I do not know how to " + blockName);

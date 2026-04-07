@@ -801,6 +801,7 @@ const processPluginData = (activity, pluginData, pluginSource) => {
             try {
                 // Pre-compile the plugin code into a function to avoid eval() in parseArg
                 // NOTE: Plugins are trusted code.
+                // SECURITY: Only safe because ARGPLUGINS are trusted code.
                 // new Function is used intentionally to precompile plugin execution.
                 // Standard scope exposure: logo, turtle, blk, parentBlk, receivedArg, tur
                 activity.logo.evalArgDict[arg] = new Function(
