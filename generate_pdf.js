@@ -1,22 +1,53 @@
-const puppeteer = require('puppeteer');
-const path = require('path');
+const puppeteer = require("puppeteer");
+const path = require("path");
 
 (async () => {
     try {
+        const args = process.argv.slice(2);
+        const lang = args[0] || "en"; // Default to English
+
+        const langMap = {
+            en: {
+                dir: "guide",
+                file: "MusicBlocks_Guide.pdf",
+                title: "Music Blocks Programming Guide"
+            },
+            es: {
+                dir: "guide-es",
+                file: "MusicBlocks_Guide_ES.pdf",
+                title: "Guía de Programación con Bloques de Música"
+            },
+            zh: {
+                dir: "guide-zhCN",
+                file: "MusicBlocks_Guide_ZH.pdf",
+                title: "《音乐拼块》程序设计说明"
+            },
+            pt: {
+                dir: "guide-pt",
+                file: "MusicBlocks_Guide_PT.pdf",
+                title: "Guia de Programação com Music Blocks"
+            }
+        };
+
+        if (!langMap[lang]) {
+            console.error(`Unsupported language: ${lang}. Supported: en, es, zh, pt`);
+            process.exit(1);
+        }
+
+        const config = langMap[lang];
         const browser = await puppeteer.launch();
         const page = await browser.newPage();
-        
-        const guideUrl = 'file:///c:/Users/govin/OneDrive/Desktop/Open%20Source/musicblocks/Docs/guide/index.html';
-        
+
+        const guideUrl = `file:///${path.join(__dirname, "Docs", config.dir, "index.html").replace(/\\/g, "/")}`;
+
         console.log(`Navigating to ${guideUrl}...`);
-        await page.goto(guideUrl, { waitUntil: 'networkidle0' });
+        await page.goto(guideUrl, { waitUntil: "networkidle0" });
 
         // Inject custom CSS for printing
         await page.addStyleTag({
             content: `
             @media print {
-                /* Hide web-only elements */
-                .top-nav, .download-btn, p > a[href*="index.html"] {
+                .top-nav, .download-btn, .language-switcher {
                     display: none !important;
                 }
                 
@@ -61,43 +92,12 @@ const path = require('path');
                     padding-bottom: 5px !important;
                 }
                 
-                h3 {
-                    font-size: 14pt !important;
-                    margin-top: 1.5em !important;
-                }
-                
-                p, li {
-                    orphans: 3 !important;
-                    widows: 3 !important;
-                }
-                
                 img, svg {
                     max-width: 100% !important;
                     height: auto !important;
                     page-break-inside: avoid !important;
                     margin: 15px auto !important;
                     display: block !important;
-                }
-                
-                table {
-                    page-break-inside: auto !important;
-                    width: 100% !important;
-                    border-collapse: collapse !important;
-                }
-                
-                tr {
-                    page-break-inside: avoid !important;
-                    page-break-after: auto !important;
-                }
-                
-                th, td {
-                    border: 1px solid #ddd !important;
-                    padding: 8px !important;
-                }
-                
-                th {
-                    background-color: #f5f5f5 !important;
-                    font-weight: bold !important;
                 }
                 
                 a {
@@ -107,24 +107,24 @@ const path = require('path');
             }
             `
         });
-        
-        const pdfPath = path.join('c:', 'Users', 'govin', 'OneDrive', 'Desktop', 'Open Source', 'musicblocks', 'Docs', 'guide', 'MusicBlocks_Guide.pdf');
+
+        const pdfPath = path.join(__dirname, "Docs", config.dir, config.file);
         console.log(`Saving PDF to ${pdfPath}...`);
-        
+
         await page.pdf({
             path: pdfPath,
-            format: 'A4',
+            format: "A4",
             printBackground: true,
-            margin: { top: '25mm', right: '20mm', bottom: '25mm', left: '20mm' },
+            margin: { top: "25mm", right: "20mm", bottom: "25mm", left: "20mm" },
             displayHeaderFooter: true,
-            headerTemplate: '<div></div>',
-            footerTemplate: '<div style="font-size: 10px; text-align: center; width: 100%; border-top: 1px solid #ccc; padding-top: 5px;">Music Blocks Programming Guide - Page <span class="pageNumber"></span> of <span class="totalPages"></span></div>'
+            headerTemplate: "<div></div>",
+            footerTemplate: `<div style="font-size: 10px; text-align: center; width: 100%; border-top: 1px solid #ccc; padding-top: 5px;">${config.title} - Page <span class="pageNumber"></span> of <span class="totalPages"></span></div>`
         });
 
-        console.log('PDF generated successfully!');
+        console.log(`PDF for ${lang} generated successfully!`);
         await browser.close();
     } catch (error) {
-        console.error('Error generating PDF:', error);
+        console.error("Error generating PDF:", error);
         process.exit(1);
     }
 })();
