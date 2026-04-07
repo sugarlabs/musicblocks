@@ -1,3 +1,6 @@
+const lighthouseProfile = process.env.LHCI_PROFILE || "desktop";
+const isMobileProfile = lighthouseProfile === "mobile";
+
 module.exports = {
     ci: {
         collect: {
@@ -12,8 +15,19 @@ module.exports = {
                 chromeFlags: "--headless --no-sandbox --disable-gpu",
                 // Categories to audit
                 onlyCategories: ["performance", "accessibility", "best-practices", "seo"],
-                // Emulate mobile device for realistic testing
-                preset: "desktop",
+                // Local runs stay desktop; CI flips this to mobile when needed.
+                ...(isMobileProfile
+                    ? {
+                          formFactor: "mobile",
+                          screenEmulation: {
+                              mobile: true,
+                              width: 360,
+                              height: 640,
+                              deviceScaleFactor: 2,
+                              disabled: false
+                          }
+                      }
+                    : { preset: "desktop" }),
                 // Set throttling for consistent results
                 throttling: {
                     rttMs: 40,
