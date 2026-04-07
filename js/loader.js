@@ -121,6 +121,9 @@ requirejs.config({
         "highlight": {
             exports: "hljs"
         },
+        "activity/logoconstants": {
+            deps: ["utils/utils"]
+        },
         "activity/js-export/constraints": {
             deps: ["activity/js-export/interface"]
         },
