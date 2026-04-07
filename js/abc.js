@@ -57,7 +57,7 @@ const processABCNotes = function (logo, turtle) {
     // obj = [instructions] or
     // obj = [[notes], duration, dotCount, tupletValue, roundDown,
     //        insideChord, staccato]
-    logo.notationNotes[turtle] = "";
+    const parts = [];
 
     const __convertDuration = function (duration) {
         const durationMap = {
@@ -124,7 +124,7 @@ const processABCNotes = function (logo, turtle) {
             switch (obj) {
                 case "break":
                     if (i > 0) {
-                        logo.notationNotes[turtle] += "\n";
+                        parts.push("\n");
                     }
                     counter = 0;
                     break;
@@ -135,66 +135,67 @@ const processABCNotes = function (logo, turtle) {
                     articulation = false;
                     break;
                 case "begin crescendo":
-                    logo.notationNotes[turtle] += "!<(!";
+                    parts.push("!<(!");
                     break;
                 case "end crescendo":
-                    logo.notationNotes[turtle] += "!<)!";
+                    parts.push("!<)!");
                     break;
                 case "begin decrescendo":
-                    logo.notationNotes[turtle] += "!>(!";
+                    parts.push("!>(!");
                     break;
                 case "end decrescendo":
-                    logo.notationNotes[turtle] += "!<(!";
+                    parts.push("!<(!");
                     break;
                 case "begin slur":
                     queueSlur = true;
                     break;
                 case "end slur":
-                    logo.notationNotes[turtle] += "";
+                    parts.push("");
                     break;
                 case "tie":
-                    logo.notationNotes[turtle] += "";
+                    parts.push("");
                     break;
                 case "meter":
-                    logo.notationNotes[turtle] +=
+                    parts.push(
                         "M:" +
-                        logo.notation.notationStaging[turtle][i + 1] +
-                        "/" +
-                        logo.notation.notationStaging[turtle][i + 2] +
-                        "\n";
+                            logo.notation.notationStaging[turtle][i + 1] +
+                            "/" +
+                            logo.notation.notationStaging[turtle][i + 2] +
+                            "\n"
+                    );
                     i += 2;
                     break;
                 case "pickup":
                     {
                         // Handle pickup measure
                         const pickupDuration = logo.notation.notationStaging[turtle][i + 1];
-                        logo.notationNotes[turtle] += `K: pickup=${pickupDuration}\n`;
+                        parts.push(`K: pickup=${pickupDuration}\n`);
                         i += 1;
                     } // <- made a separate block for this since JS doesn't allow declaration of variables using let or const directly inside a case block
                     break;
                 case "voice one":
-                    logo.notationNotes[turtle] += "V:1\n";
+                    parts.push("V:1\n");
                     break;
                 case "voice two":
-                    logo.notationNotes[turtle] += "V:2\n";
+                    parts.push("V:2\n");
                     break;
                 case "voice three":
-                    logo.notationNotes[turtle] += "V:3\n";
+                    parts.push("V:3\n");
                     break;
                 case "voice four":
-                    logo.notationNotes[turtle] += "V:4\n";
+                    parts.push("V:4\n");
                     break;
                 case "one voice":
                     // Return to a single voice
-                    logo.notationNotes[turtle] += "V:1\n";
+                    parts.push("V:1\n");
                     break;
                 default:
-                    logo.notationNotes[turtle] += obj;
+                    parts.push(obj);
                     break;
             }
         } else {
             if (counter % 8 === 0 && counter > 0) {
-                logo.notationNotes[turtle] += "\n";
+                parts.push("\n");
             }
             counter += 1;
 
@@ -264,24 +265,23 @@ const processABCNotes = function (logo, turtle) {
 
                     if (typeof notes === "object") {
                         if (notes.length > 1) {
-                            logo.notationNotes[turtle] += "[";
+                            parts.push("[");
                         }
 
                         for (let ii = 0; ii < notes.length; ii++) {
-                            logo.notationNotes[turtle] += __toABCnote(notes[ii]);
-                            logo.notationNotes[turtle] += " ";
+                            parts.push(__toABCnote(notes[ii]));
+                            parts.push(" ");
                         }
 
                         if (obj[NOTATIONSTACCATO]) {
-                            logo.notationNotes[turtle] += ".";
+                            parts.push(".");
                         }
 
                         if (notes.length > 1) {
-                            logo.notationNotes[turtle] += "]";
+                            parts.push("]");
                         }
 
-                        logo.notationNotes[turtle] +=
-                            logo.notation.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
+                        parts.push(logo.notation.notationStaging[turtle][i + j][NOTATIONROUNDDOWN]);
                     }
                     j++; // Jump to next note.
                     k++; // Increment notes in tuplet.
@@ -293,13 +293,11 @@ const processABCNotes = function (logo, turtle) {
             if (obj[NOTATIONTUPLETVALUE] > 0) {
                 if (incompleteTuplet === 0) {
                     const tupletFraction = toFraction(tupletDuration / targetDuration);
-                    logo.notationNotes[turtle] +=
-                        "(" + tupletFraction[0] + ":" + tupletFraction[1] + "";
+                    parts.push("(" + tupletFraction[0] + ":" + tupletFraction[1] + "");
                     i += __processTuplet(logo, turtle, i, obj[NOTATIONTUPLETVALUE]) - 1;
                 } else {
                     const tupletFraction = toFraction(obj[NOTATIONTUPLETVALUE] / incompleteTuplet);
-                    logo.notationNotes[turtle] +=
-                        "(" + tupletFraction[0] + ":" + tupletFraction[1] + "";
+                    parts.push("(" + tupletFraction[0] + ":" + tupletFraction[1] + "");
                     i += __processTuplet(logo, turtle, i, incompleteTuplet) - 1;
                 }
 
@@ -308,27 +306,27 @@ const processABCNotes = function (logo, turtle) {
             } else {
                 if (typeof notes === "object") {
                     if (notes.length > 1) {
-                        logo.notationNotes[turtle] += "[";
+                        parts.push("[");
                     }
 
                     for (let ii = 0; ii < notes.length; ii++) {
-                        logo.notationNotes[turtle] += __toABCnote(notes[ii]);
+                        parts.push(__toABCnote(notes[ii]));
                     }
 
                     if (notes.length > 1) {
-                        logo.notationNotes[turtle] += "]";
+                        parts.push("]");
                     }
 
-                    logo.notationNotes[turtle] += obj[NOTATIONDURATION];
+                    parts.push(obj[NOTATIONDURATION]);
                     for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
-                        logo.notationNotes[turtle] += ".";
+                        parts.push(".");
                     }
 
-                    logo.notationNotes[turtle] += " ";
+                    parts.push(" ");
                 }
 
                 if (obj[NOTATIONSTACCATO]) {
-                    logo.notationNotes[turtle] += ".";
+                    parts.push(".");
                 }
 
                 if (obj[NOTATIONINSIDECHORD] > 0) {
@@ -339,10 +337,10 @@ const processABCNotes = function (logo, turtle) {
                             obj[NOTATIONINSIDECHORD]
                     ) {
                         // Open the chord.
-                        logo.notationNotes[turtle] += "[";
+                        parts.push("[");
                     }
 
-                    logo.notationNotes[turtle] += note;
+                    parts.push(note);
 
                     // Is logo the last note in the chord?
                     if (
@@ -351,46 +349,48 @@ const processABCNotes = function (logo, turtle) {
                             obj[NOTATIONINSIDECHORD]
                     ) {
                         // Close the chord and add note duration.
-                        logo.notationNotes[turtle] += "]";
-                        logo.notationNotes[turtle] += __convertDuration(obj[NOTATIONDURATION]);
+                        parts.push("]");
+                        parts.push(__convertDuration(obj[NOTATIONDURATION]));
                         for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
-                            logo.notationNotes[turtle] += " ";
+                            parts.push(" ");
                         }
 
                         if (articulation) {
-                            logo.notationNotes[turtle] += " ";
+                            parts.push(" ");
                         }
 
-                        logo.notationNotes[turtle] += " ";
+                        parts.push(" ");
                     }
                 } else {
-                    logo.notationNotes[turtle] += note;
-                    logo.notationNotes[turtle] += __convertDuration(obj[NOTATIONDURATION]);
+                    parts.push(note);
+                    parts.push(__convertDuration(obj[NOTATIONDURATION]));
                     for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
-                        logo.notationNotes[turtle] += ".";
+                        parts.push(".");
                     }
 
                     if (articulation) {
-                        logo.notationNotes[turtle] += "";
+                        parts.push("");
                     }
                 }
 
                 if (obj[NOTATIONSTACCATO]) {
-                    logo.notationNotes[turtle] += ".";
+                    parts.push(".");
                 }
 
                 targetDuration = 0;
                 tupletDuration = 0;
             }
 
-            logo.notationNotes[turtle] += " ";
+            parts.push(" ");
 
             if (queueSlur) {
                 queueSlur = false;
-                logo.notationNotes[turtle] += "";
+                parts.push("");
             }
         }
     }
+
+    logo.notationNotes[turtle] = parts.join("");
 };
 
 /**
@@ -399,31 +399,25 @@ const processABCNotes = function (logo, turtle) {
  * @returns {string} The generated ABC notation output.
  */
 const saveAbcOutput = function (activity) {
-    // let turtleCount = 0;
-
-    activity.logo.notationOutput = getABCHeader();
-
-    // for (const t in activity.logo.notation.notationStaging) {
-    //     turtleCount += 1;
-    // }
-
-    // console.debug("saving as abc: " + turtleCount);
+    const outputParts = [getABCHeader()];
 
     for (const t in activity.logo.notation.notationStaging) {
-        activity.logo.notationOutput +=
+        outputParts.push(
             "K:" +
-            activity.turtles
-                .ithTurtle(t)
-                .singer.keySignature.toUpperCase()
-                .replace(" ", "")
-                .replace("♭", "b")
-                .replace("♯", "#") +
-            "\n";
+                activity.turtles
+                    .ithTurtle(t)
+                    .singer.keySignature.toUpperCase()
+                    .replace(" ", "")
+                    .replace("♭", "b")
+                    .replace("♯", "#") +
+                "\n"
+        );
         processABCNotes(activity.logo, t);
-        activity.logo.notationOutput += activity.logo.notationNotes[t];
+        outputParts.push(activity.logo.notationNotes[t]);
     }
 
-    activity.logo.notationOutput += "\n";
+    outputParts.push("\n");
+    activity.logo.notationOutput = outputParts.join("");
     return activity.logo.notationOutput;
 };
 
