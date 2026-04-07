@@ -31,7 +31,7 @@
 /* exported
 
    canvasPixelRatio, changeImage, closeBlkWidgets, closeWidgets,
-   delayExecution, displayMsg, doBrowserCheck, docByClass, docByName,
+   deepClone, delayExecution, displayMsg, doBrowserCheck, docByClass, docByName,
    docBySelector, docByTagName, doPublish, doStopVideoCam, doSVG,
    doUseCamera, fileBasename, fileExt, format, getTextWidth, hex2rgb,
    hexToRGB, hideDOMLabel, httpGet, httpPost, HttpRequest,
@@ -516,6 +516,20 @@ let last = myList => {
     } else {
         return myList[i - 1];
     }
+};
+
+/**
+ * Creates a deep clone of a value. Uses structuredClone when available
+ * (modern browsers) for better performance, falling back to
+ * JSON.parse(JSON.stringify()) for compatibility with test environments.
+ * @param {*} value - The value to deep clone.
+ * @returns {*} A deep clone of the value.
+ */
+let deepClone = value => {
+    if (typeof structuredClone === "function") {
+        return structuredClone(value);
+    }
+    return JSON.parse(JSON.stringify(value));
 };
 
 /**
