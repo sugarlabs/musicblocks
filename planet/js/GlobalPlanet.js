@@ -275,7 +275,7 @@ class GlobalPlanet {
                         this.addProjectToCache(tempid, d, callback);
                     }.bind(this)
                 );
-            }.bind(this)());
+            }).bind(this)();
         }
     }
 
@@ -283,10 +283,12 @@ class GlobalPlanet {
         if (data.success) {
             this.cache[id] = data.data;
             this.cache[id].ProjectData = null;
-            this.loadCount -= 1;
+        } else {
+            this.throwOfflineError();
+        }
 
-            if (this.loadCount <= 0) callback();
-        } else this.throwOfflineError();
+        this.loadCount -= 1;
+        if (this.loadCount <= 0) callback();
     }
 
     forceAddToCache(id, callback) {
@@ -501,7 +503,6 @@ class GlobalPlanet {
                 .getElementById("globalcontents")
                 .insertAdjacentHTML("afterbegin", this.offlineHTML);
         } else {
-            // eslint-disable-next-line no-unused-vars
             jQuery("#sort-select").material_select(evt => {
                 this.sortBy = document.getElementById("sort-select").value;
                 this.refreshProjects();
@@ -539,7 +540,6 @@ class GlobalPlanet {
 
             this.initTagList();
 
-            // eslint-disable-next-line no-unused-vars
             document.getElementById("load-more-projects").addEventListener("click", evt => {
                 if (this.loadButtonShown) {
                     this.loadMoreProjects();
@@ -548,7 +548,6 @@ class GlobalPlanet {
 
             const debouncedfunction = debounce(this.search.bind(this), 250);
 
-            // eslint-disable-next-line no-unused-vars
             document.getElementById("global-search").addEventListener("input", evt => {
                 this.searchString = document.getElementById("global-search").value;
                 debouncedfunction();
@@ -559,7 +558,6 @@ class GlobalPlanet {
                 debouncedfunction();
             });
 
-            // eslint-disable-next-line no-unused-vars
             document.getElementById("search-close").addEventListener("click", evt => {
                 document.getElementById("global-search").value = "";
                 this.searchString = "";

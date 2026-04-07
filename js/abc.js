@@ -406,7 +406,7 @@ const saveAbcOutput = function (activity) {
     // for (const t in activity.logo.notation.notationStaging) {
     //     turtleCount += 1;
     // }
-    // eslint-disable-next-line no-console
+
     // console.debug("saving as abc: " + turtleCount);
 
     for (const t in activity.logo.notation.notationStaging) {

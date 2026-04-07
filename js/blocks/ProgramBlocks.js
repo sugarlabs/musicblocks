@@ -85,7 +85,6 @@ function setupProgramBlocks(activity) {
             fetch(url)
                 .then(response => {
                     if (!response.ok) {
-                        // eslint-disable-next-line no-console
                         console.debug("fetched the wrong page or network error...");
                         activity.errorMsg(_("404: Page not found"));
                         throw new Error("Network response was not ok");
@@ -93,20 +92,17 @@ function setupProgramBlocks(activity) {
                     return response.text();
                 })
                 .then(responseText => {
-                    // eslint-disable-next-line no-console
                     console.debug(responseText);
                     try {
                         const data = JSON.parse(responseText);
                         logo.turtleHeaps[name] = data;
                     } catch (e) {
-                        // eslint-disable-next-line no-console
                         console.debug(e);
                         activity.errorMsg(_("Error parsing JSON data:") + e);
                         logo.turtleHeaps[name] = oldHeap;
                     }
                 })
                 .catch(error => {
-                    // eslint-disable-next-line no-console
                     console.debug("Fetch error:", error);
                     logo.turtleHeaps[name] = oldHeap;
                 });
@@ -988,7 +984,7 @@ function setupProgramBlocks(activity) {
             if (activity.blocks.blockList[args[0]].name === "start") {
                 const thisTurtle = activity.blocks.blockList[args[0]].value;
                 const tur = activity.turtles.ithTurtle(thisTurtle);
-                // eslint-disable-next-line no-console
+
                 console.debug("run start " + thisTurtle);
 
                 logo.initTurtle(thisTurtle);
@@ -1052,28 +1048,24 @@ function setupProgramBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             if (args.length < 3) {
-                // eslint-disable-next-line no-console
                 console.debug(args.length + " < 3");
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
             if (args[0] < 0 || args[0] > activity.blocks.blockList.length - 1) {
-                // eslint-disable-next-line no-console
                 console.debug(args[0] + " > " + activity.blocks.blockList.length - 1);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
             if (args[0] === args[2]) {
-                // eslint-disable-next-line no-console
                 console.debug(args[0] + " == " + args[2]);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
             if (args[2] < 0 || args[2] > activity.blocks.blockList.length - 1) {
-                // eslint-disable-next-line no-console
                 console.debug(args[2] + " > " + activity.blocks.blockList.length - 1);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
@@ -1086,7 +1078,6 @@ function setupProgramBlocks(activity) {
                 args[1] < 1 ||
                 args[1] > activity.blocks.blockList[args[0]].connections.length - 1
             ) {
-                // eslint-disable-next-line no-console
                 console.debug(args[1] + " out of bounds");
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
@@ -1328,7 +1319,7 @@ function setupProgramBlocks(activity) {
                 const protoName = obj[2];
                 if (protoblk === null) {
                     activity.errorMsg(_("Cannot find block") + " " + name);
-                    // eslint-disable-next-line no-console
+
                     console.debug("Cannot find block " + name);
                     return 0;
                 } else {
@@ -1365,7 +1356,7 @@ function setupProgramBlocks(activity) {
                                 activity.errorMsg(
                                     _("Warning: block argument type unhandled: ") + typeof arg
                                 );
-                                // eslint-disable-next-line no-console
+
                                 console.warn("Unhandled argument type", arg);
                                 newBlock[0][4].push(null);
                             }
@@ -1375,7 +1366,7 @@ function setupProgramBlocks(activity) {
                     }
 
                     activity.blocks.loadNewBlocks(newBlock);
-                    // eslint-disable-next-line no-console
+
                     console.debug("BLOCKNUMBER " + blockNumber);
                     return blockNumber;
                 }

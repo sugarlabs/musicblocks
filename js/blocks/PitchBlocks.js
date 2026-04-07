@@ -721,7 +721,6 @@ function setupPitchBlocks(activity) {
                     activity.errorMsg(NOINPUTERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else {
-                    // eslint-disable-next-line no-console
                     console.error(e);
                 }
             }
@@ -1010,7 +1009,6 @@ function setupPitchBlocks(activity) {
             const listenerName = "_invert_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => tur.singer.invertList.pop();
             logo.setTurtleListener(turtle, listenerName, __listener);
 
@@ -1176,7 +1174,6 @@ function setupPitchBlocks(activity) {
                 if (intervalName in INTERVALVALUES) {
                     r = INTERVALVALUES[intervalName][2];
                 } else {
-                    // eslint-disable-next-line no-console
                     console.log("could not find " + intervalName + " in INTERVALVALUES");
                     r = 1;
                 }
@@ -1184,7 +1181,7 @@ function setupPitchBlocks(activity) {
 
             if (isNaN(r) || r < 0) {
                 r = 1;
-                // eslint-disable-next-line no-console
+
                 console.debug("ratio " + r + " must be a number > 0");
             }
             Singer.PitchActions.setRatioTranspose(r, turtle, blk);
@@ -1527,7 +1524,6 @@ function setupPitchBlocks(activity) {
             const listenerName = "_flat_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event =>
                 (tur.singer.transposition += tur.singer.invertList.length > 0 ? -1 : 1);
 
@@ -1993,8 +1989,8 @@ function setupPitchBlocks(activity) {
                             ? 1
                             : 0
                         : semitones < ref
-                        ? 1
-                        : 0;
+                          ? 1
+                          : 0;
 
                     octave =
                         (isNegativeArg ? -1 : 1) * (deltaOctave + deltaSemi) +

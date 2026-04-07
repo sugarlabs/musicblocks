@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 /**
  * @file This contains the prototype of the Turtles component.
  * @author Walter Bender

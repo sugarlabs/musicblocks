@@ -136,7 +136,6 @@ let format = (str, data) => {
         let x = data;
         name.split(".").forEach(v => {
             if (x === undefined) {
-                // eslint-disable-next-line no-console
                 console.debug("Undefined value in template string", str, name, x, v);
             }
 
@@ -294,9 +293,8 @@ function HttpRequest(url, loadCallback, userCallback) {
         req.send("");
     } catch (e) {
         if (self.console) {
-            // eslint-disable-next-line no-console
             console.debug("Failed to load resource from " + url + ": Network error.");
-            // eslint-disable-next-line no-console
+
             console.debug(e);
         }
 
@@ -390,12 +388,12 @@ function waitForReadiness(callback, options = {}) {
 
         if (elapsed >= minWait && isReady()) {
             // Ready! Initialize the app
-            // eslint-disable-next-line no-console
+
             console.log(`[Firefox] Initialized in ${elapsed}ms (readiness-based)`);
             callback();
         } else if (elapsed >= maxWait) {
             // Timeout - initialize anyway as fallback
-            // eslint-disable-next-line no-console
+
             console.warn(
                 `[Firefox] Initialization timed out after ${maxWait}ms, proceeding anyway`
             );
@@ -671,7 +669,6 @@ const processPluginData = (activity, pluginData, pluginSource) => {
 
         // basic sanity limit (prevents huge payloads)
         if (code.length > 500000) {
-            // eslint-disable-next-line no-console
             console.warn("Plugin code too large:", label);
             return;
         }
@@ -679,16 +676,13 @@ const processPluginData = (activity, pluginData, pluginSource) => {
         // NOTE: This eval is required for the Plugin system to load dynamic block definitions.
         // The content comes from plugin JSON files which satisfy the isTrustedPluginSource check.
         try {
-            // eslint-disable-next-line no-eval
             eval(code);
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.error("Plugin execution failed:", label, e);
         }
     };
 
     if (!isTrustedPluginSource(pluginSource)) {
-        // eslint-disable-next-line no-console
         console.warn("Blocked untrusted plugin source:", pluginSource);
         return null;
     }
@@ -697,9 +691,8 @@ const processPluginData = (activity, pluginData, pluginSource) => {
     try {
         obj = JSON.parse(pluginData);
     } catch (e) {
-        // eslint-disable-next-line no-console
         console.log(pluginData);
-        // eslint-disable-next-line no-console
+
         console.log(e);
         return null;
     }
@@ -754,10 +747,8 @@ const processPluginData = (activity, pluginData, pluginSource) => {
             ];
 
             if (name in activity.palettes.buttons) {
-                // eslint-disable-next-line no-console
                 console.debug("palette " + name + " already exists");
             } else {
-                // eslint-disable-next-line no-console
                 console.debug("adding palette " + name);
                 activity.palettes.add(name);
                 if (!MULTIPALETTES[2].includes(name)) MULTIPALETTES[2].push(name);
@@ -771,7 +762,6 @@ const processPluginData = (activity, pluginData, pluginSource) => {
             // console.debug("Calling makePalettes");
             activity.palettes.makePalettes(1);
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.debug("makePalettes: " + e);
         }
     }
@@ -806,9 +796,8 @@ const processPluginData = (activity, pluginData, pluginSource) => {
             try {
                 activity.palettes.pluginMacros[macro] = JSON.parse(obj["MACROPLUGINS"][macro]);
             } catch (e) {
-                // eslint-disable-next-line no-console
                 console.debug("could not parse macro " + macro);
-                // eslint-disable-next-line no-console
+
                 console.debug(e);
             }
         }
@@ -830,7 +819,6 @@ const processPluginData = (activity, pluginData, pluginSource) => {
 
     if ("BLOCKPLUGINS" in obj) {
         for (const block in obj["BLOCKPLUGINS"]) {
-            // eslint-disable-next-line no-console
             console.debug("adding plugin block " + block);
             safeEval(obj["BLOCKPLUGINS"][block], "BLOCKPLUGINS:" + block);
         }
@@ -872,10 +860,8 @@ const processPluginData = (activity, pluginData, pluginSource) => {
         try {
             // Push the protoblocks onto their palettes.
             if (activity.blocks.protoBlockDict[protoblock].palette === undefined) {
-                // eslint-disable-next-line no-console
                 console.debug("Cannot find palette for protoblock " + protoblock);
             } else if (activity.blocks.protoBlockDict[protoblock].palette === null) {
-                // eslint-disable-next-line no-console
                 console.debug("Cannot find palette for protoblock " + protoblock);
             } else {
                 activity.blocks.protoBlockDict[protoblock].palette.add(
@@ -883,7 +869,6 @@ const processPluginData = (activity, pluginData, pluginSource) => {
                 );
             }
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.debug(e);
         }
     }
@@ -932,9 +917,9 @@ const processRawPluginData = (activity, rawData, pluginSource) => {
         obj = processPluginData(activity, cleanData.replace(/\n/g, ""), pluginSource);
     } catch (e) {
         obj = null;
-        // eslint-disable-next-line no-console
+
         console.log(rawData);
-        // eslint-disable-next-line no-console
+
         console.log(cleanData);
         activity.errorMsg("Error loading plugin: " + e);
     }
@@ -1045,9 +1030,8 @@ let processMacroData = (macroData, palettes, blocks, macroDict) => {
 
             palettes.makePalettes(1);
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.log(macroData);
-            // eslint-disable-next-line no-console
+
             console.debug(e);
         }
     }
@@ -1124,7 +1108,7 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
             })
             .catch(error => {
                 errorMsg("Could not connect to camera");
-                // eslint-disable-next-line no-console
+
                 console.debug(error);
             });
     } else {
@@ -1710,7 +1694,6 @@ const resolveObject = path => {
 
         return result;
     } catch (e) {
-        // eslint-disable-next-line no-console
         console.warn("Failed to resolve object path: " + path, e);
         return undefined;
     }

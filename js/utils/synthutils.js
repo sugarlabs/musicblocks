@@ -499,7 +499,6 @@ function Synth() {
     this.tone = null;
 
     Tone.Buffer.onload = () => {
-        // eslint-disable-next-line no-console
         console.debug("sample loaded");
     };
     /**
@@ -552,6 +551,21 @@ function Synth() {
      * @type {function|null}
      */
     this.detectPitch = null;
+    /**
+     * Flag to track whether tuner update loop is active.
+     * @type {boolean}
+     */
+    this._tunerActive = false;
+    /**
+     * Animation frame id for the tuner update loop.
+     * @type {number|null}
+     */
+    this._tunerRafId = null;
+    /**
+     * Cached tuner segments to avoid querying on every frame.
+     * @type {NodeList|null}
+     */
+    this._tunerSegments = null;
 
     /**
      * Function to initialize a new Tone.js instance.
@@ -693,7 +707,7 @@ function Synth() {
             if (key.substring(1, key.length) === FLAT || key.substring(1, key.length) === "b") {
                 note = key.substring(0, 1) + "" + "b";
                 this.noteFrequencies[note] = this.noteFrequencies[key];
-                // eslint-disable-next-line no-delete-var
+
                 delete this.noteFrequencies[key];
             } else if (
                 key.substring(1, key.length) === SHARP ||
@@ -701,7 +715,7 @@ function Synth() {
             ) {
                 note = key.substring(0, 1) + "" + "#";
                 this.noteFrequencies[note] = this.noteFrequencies[key];
-                // eslint-disable-next-line no-delete-var
+
                 delete this.noteFrequencies[key];
             }
         }
@@ -869,13 +883,11 @@ function Synth() {
         this.tone.context.resume();
     };
 
-    /*eslint-disable no-undef*/
     /**
      * Function to load samples.
      * @function
      */
     this.loadSamples = () => {
-        /*eslint-disable no-prototype-builtins*/
         if (this.samples === null) {
             this.samples = { voice: {}, drum: {} };
             // Pre-populate with null to indicate they exist as valid instruments but are not loaded
@@ -931,7 +943,6 @@ function Synth() {
             // Load the sample module using require
             require([sampleInfo.path], () => {
                 try {
-                    // eslint-disable-next-line no-undef
                     const sampleData = window[sampleInfo.global];
                     if (sampleData) {
                         this.samples[sampleType][sampleName] = sampleData();
@@ -1308,7 +1319,6 @@ function Synth() {
      * @param {string} turtle - The turtle identifier.
      */
     this.createDefaultSynth = turtle => {
-        // eslint-disable-next-line no-console
         console.debug("create default poly/default/custom synth for turtle " + turtle);
         const default_synth = new Tone.PolySynth(Tone.AMSynth, POLYCOUNT).toDestination();
         instruments[turtle]["electronic synth"] = default_synth;
@@ -1408,7 +1418,6 @@ function Synth() {
         } else if (fragment in letterDict) {
             chromaticNumber = letterDict[fragment];
         } else {
-            // eslint-disable-next-line no-console
             console.debug("Cannot parse " + fragment);
         }
         const pitchNumber = octave * 12 + chromaticNumber + attr;
@@ -1949,27 +1958,30 @@ function Synth() {
                 // A 500 ms safety buffer is added beyond the note duration to prevent
                 // premature disposal caused by audio-clock drift or scheduler jitter,
                 // which would otherwise produce crackling artefacts in long sessions.
-                setTimeout(() => {
-                    try {
-                        // Dispose of effects
-                        effectsToDispose.forEach(effect => {
-                            if (effect && typeof effect.dispose === "function") {
-                                effect.dispose();
-                            }
-                        });
-
-                        // Dispose of filters
-                        if (temp_filters.length > 0) {
-                            temp_filters.forEach(filter => {
-                                if (filter && typeof filter.dispose === "function") {
-                                    filter.dispose();
+                setTimeout(
+                    () => {
+                        try {
+                            // Dispose of effects
+                            effectsToDispose.forEach(effect => {
+                                if (effect && typeof effect.dispose === "function") {
+                                    effect.dispose();
                                 }
                             });
+
+                            // Dispose of filters
+                            if (temp_filters.length > 0) {
+                                temp_filters.forEach(filter => {
+                                    if (filter && typeof filter.dispose === "function") {
+                                        filter.dispose();
+                                    }
+                                });
+                            }
+                        } catch (e) {
+                            console.debug("Error disposing effects:", e);
                         }
-                    } catch (e) {
-                        console.debug("Error disposing effects:", e);
-                    }
-                }, beatValue * 1000 + 500);
+                    },
+                    beatValue * 1000 + 500
+                );
             }
         } catch (e) {
             console.error("Error in _performNotes:", e);
@@ -2277,7 +2289,6 @@ function Synth() {
             synth = instruments[turtle][instrumentName];
         }
 
-        // eslint-disable-next-line no-console
         console.debug(
             "Crescendo(decibels)",
             instrumentName,
@@ -2288,7 +2299,7 @@ function Synth() {
             "t:",
             rampTime
         );
-        // eslint-disable-next-line no-console
+
         console.debug("Crescendo", instrumentName, ":", oldVol, "to", volume, "t:", rampTime);
 
         synth.volume.linearRampToValueAtTime(db, Tone.now() + rampTime);
@@ -2393,7 +2404,6 @@ function Synth() {
                 this.recorder.start();
             })
             .catch(error => {
-                // eslint-disable-next-line no-console
                 console.error(error);
             });
     };
@@ -2471,7 +2481,6 @@ function Synth() {
             // In practice this runs in the browser; keep a safe fallback for tests.
             try {
                 if (typeof module !== "undefined" && module.exports) {
-                    // eslint-disable-next-line global-require
                     const ctx = require("../activity-context");
                     if (ctx && typeof ctx.getActivity === "function") {
                         return ctx.getActivity();
@@ -2541,6 +2550,12 @@ function Synth() {
 
         this.tunerAnalyser = new Tone.Analyser("waveform", 2048);
         this.tunerMic.connect(this.tunerAnalyser);
+        this._tunerActive = true;
+        this._tunerSegments = null;
+        if (this._tunerRafId !== null && typeof cancelAnimationFrame === "function") {
+            cancelAnimationFrame(this._tunerRafId);
+        }
+        this._tunerRafId = null;
 
         const YIN = (sampleRate, bufferSize = 2048, threshold = 0.1) => {
             // Low-Pass Filter to remove high-frequency noise
@@ -2622,6 +2637,15 @@ function Synth() {
         let targetPitch = { note: "A4", frequency: 440 }; // Default target pitch
 
         const updatePitch = () => {
+            if (!this._tunerActive) return;
+
+            const tunerContainer = document.getElementById("tunerContainer");
+            if (!tunerContainer || !this.tunerAnalyser || !this.detectPitch) {
+                this._tunerActive = false;
+                this._tunerRafId = null;
+                return;
+            }
+
             const buffer = this.tunerAnalyser.getValue();
             const pitch = this.detectPitch(buffer);
 
@@ -2682,7 +2706,6 @@ function Synth() {
 
                 // Initialize display elements if they don't exist
                 let noteDisplayContainer = document.getElementById("noteDisplayContainer");
-                const tunerContainer = document.getElementById("tunerContainer");
 
                 if (!noteDisplayContainer && tunerContainer) {
                     // Create container
@@ -3177,7 +3200,11 @@ function Synth() {
                 }
 
                 // Update tuner segments
-                const tunerSegments = document.querySelectorAll("#tunerContainer svg path");
+                let tunerSegments = this._tunerSegments;
+                if (!tunerSegments || tunerSegments.length === 0 || !tunerSegments[0].isConnected) {
+                    tunerSegments = tunerContainer.querySelectorAll("svg path");
+                    this._tunerSegments = tunerSegments;
+                }
 
                 // Define colors for the gradient
                 const colors = {
@@ -3333,16 +3360,25 @@ function Synth() {
                 });
             }
 
-            requestAnimationFrame(updatePitch);
+            if (this._tunerActive && typeof requestAnimationFrame === "function") {
+                this._tunerRafId = requestAnimationFrame(updatePitch);
+            }
         };
 
         updatePitch();
     };
 
     this.stopTuner = () => {
+        this._tunerActive = false;
+        if (this._tunerRafId !== null && typeof cancelAnimationFrame === "function") {
+            cancelAnimationFrame(this._tunerRafId);
+        }
+        this._tunerRafId = null;
+        this._tunerSegments = null;
         if (this.tunerMic) {
             this.tunerMic.close();
         }
+        this.tunerAnalyser = null;
     };
 
     const frequencyToNote = frequency => {

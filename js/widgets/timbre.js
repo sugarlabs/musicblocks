@@ -16,7 +16,7 @@
 
    DEFAULTOSCILLATORTYPE, platformColor, rationalToFraction, last,
    Singer, instrumentsEffects:writeable, instrumentsFilters:writeable,
-   _, docById, DEFAULTFILTERTYPE, docByName, OSCTYPES, FILTERTYPES,
+   docById, DEFAULTFILTERTYPE, docByName, OSCTYPES, FILTERTYPES,
    oneHundredToFraction, delayExecution
  */
 
@@ -443,9 +443,12 @@ class TimbreWidget {
 
             i += 1;
             if (i < this.notesToPlay.length && this._playing) {
-                setTimeout(() => {
-                    __playLoop(i);
-                }, Singer.defaultBPMFactor * 1000 * this.notesToPlay[i - 1][1]);
+                setTimeout(
+                    () => {
+                        __playLoop(i);
+                    },
+                    Singer.defaultBPMFactor * 1000 * this.notesToPlay[i - 1][1]
+                );
             } else {
                 cell.innerHTML = `&nbsp;&nbsp;<img 
                         src="header-icons/play-button.svg" 
@@ -1038,17 +1041,17 @@ class TimbreWidget {
         let lastBlk = 0;
         if (this.AMSynthesizer.length !== 0 && synthChosen !== "AMSynth") {
             lastBlk = this.AMSynthesizer.pop();
-            setTimeout(this._blockReplace(lastBlk, newblk), 500);
+            setTimeout(() => this._blockReplace(lastBlk, newblk), 500);
         } else if (this.FMSynthesizer.length !== 0 && synthChosen !== "FMSynth") {
             lastBlk = this.FMSynthesizer.pop();
-            setTimeout(this._blockReplace(lastBlk, newblk), 500);
+            setTimeout(() => this._blockReplace(lastBlk, newblk), 500);
         } else if (this.duoSynthesizer.length !== 0 && synthChosen !== "DuoSynth") {
             lastBlk = this.duoSynthesizer.pop();
-            setTimeout(this._blockReplace(lastBlk, newblk), 500);
+            setTimeout(() => this._blockReplace(lastBlk, newblk), 500);
         } else if (synthChosen === "FMSynth" || synthChosen === "AMSynth") {
-            setTimeout(this.blockConnection(2, bottomOfClamp), 500);
+            setTimeout(() => this.blockConnection(2, bottomOfClamp), 500);
         } else {
-            setTimeout(this.blockConnection(3, bottomOfClamp), 500);
+            setTimeout(() => this.blockConnection(3, bottomOfClamp), 500);
         }
     }
 
@@ -1933,7 +1936,7 @@ class TimbreWidget {
                     el => el.filterType === target.value
                 );
                 if (error.length > 1) {
-                    activity.errorMsg(_("Filter already present."), 3000);
+                    this.activity.errorMsg(_("Filter already present."), 3000);
                 }
                 this._playNote("G4", 1 / 8);
             } else if (targetId.startsWith("radio") && event.type === "click") {

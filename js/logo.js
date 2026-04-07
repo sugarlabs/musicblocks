@@ -19,10 +19,10 @@
    VIDEOVALUE, last, getIntervalDirection, getIntervalNumber,
    mixedNumber, rationalToFraction, doStopVideoCam, StatusMatrix,
    getStatsFromNotation, delayExecution, DEFAULTVOICE, performanceTracker,
-   define, DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY, OSCVOLUMEADJUSTMENT,
-   TONEBPM, TARGETBPM, TURTLESTEP, NOTEDIV, MIN_HIGHLIGHT_DURATION_MS,
-   NOMICERRORMSG, NANERRORMSG, NOSTRINGERRORMSG, NOBOXERRORMSG,
-   NOACTIONERRORMSG, NOINPUTERRORMSG, NOSQRTERRORMSG,
+   requirejs, window, define, DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY,
+   OSCVOLUMEADJUSTMENT, TONEBPM, TARGETBPM, TURTLESTEP, NOTEDIV,
+   MIN_HIGHLIGHT_DURATION_MS, NOMICERRORMSG, NANERRORMSG, NOSTRINGERRORMSG,
+   NOBOXERRORMSG, NOACTIONERRORMSG, NOINPUTERRORMSG, NOSQRTERRORMSG,
    ZERODIVIDEERRORMSG, EMPTYHEAPERRORMSG, POSNUMBER,
    NOTATIONNOTE, NOTATIONDURATION, NOTATIONDOTCOUNT,
    NOTATIONTUPLETVALUE, NOTATIONROUNDDOWN, NOTATIONINSIDECHORD,
@@ -798,7 +798,6 @@ class Logo {
                         // Debug logging removed to avoid console noise in production
                         eval(logo.evalArgDict[logo.blockList[blk].name]);
                     } else {
-                        // eslint-disable-next-line no-console
                         console.error("I do not know how to " + logo.blockList[blk].name);
                     }
                     break;
@@ -1126,12 +1125,31 @@ class Logo {
      * @returns {void}
      */
     runLogoCommands(startHere, env) {
+        const performanceModeEnabled =
+            typeof window !== "undefined" &&
+            (window.DEBUG_PERFORMANCE === true ||
+                (window.location && window.location.search.includes("performance=true")));
+
+        if (
+            performanceModeEnabled &&
+            typeof performanceTracker === "undefined" &&
+            typeof requirejs === "function" &&
+            !this._performanceTrackerLoadFailed
+        ) {
+            requirejs(
+                ["utils/performanceTracker"],
+                () => this.runLogoCommands(startHere, env),
+                () => {
+                    this._performanceTrackerLoadFailed = true;
+                    this.runLogoCommands(startHere, env);
+                }
+            );
+            return;
+        }
+
         // Performance instrumentation: enable/disable based on URL flag
         if (typeof performanceTracker !== "undefined") {
-            if (
-                typeof window !== "undefined" &&
-                window.location.search.includes("performance=true")
-            ) {
+            if (performanceModeEnabled) {
                 performanceTracker.enable();
             } else {
                 performanceTracker.disable();
@@ -1927,16 +1945,25 @@ class Logo {
                     }
 
                     if (logo.runningLilypond) {
-                        if (logo.collectingStats) {
-                            // console.debug("stats collection completed");
-                            logo.projectStats = logo.deps.utils.getStatsFromNotation(logo.activity);
-                            logo.activity.statsWindow.displayInfo(logo.projectStats);
-                        } else {
-                            // console.debug("saving lilypond output:");
-                            logo.activity.save.afterSaveLilypond();
+                        try {
+                            if (logo.collectingStats) {
+                                logo.projectStats = logo.deps.utils.getStatsFromNotation(
+                                    logo.activity
+                                );
+                                logo.activity.statsWindow.displayInfo(logo.projectStats);
+                            } else {
+                                logo.activity.save.afterSaveLilypond();
+                            }
+                        } catch (e) {
+                            console.error("Error generating Lilypond output:", e);
+                            logo.activity.errorMsg(
+                                _("Error generating Lilypond output. ") + e.message
+                            );
+                        } finally {
+                            logo.collectingStats = false;
+                            logo.runningLilypond = false;
+                            document.body.style.cursor = "default";
                         }
-                        logo.collectingStats = false;
-                        logo.runningLilypond = false;
                     } else if (logo.runningAbc) {
                         try {
                             logo.activity.save.afterSaveAbc();

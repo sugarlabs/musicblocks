@@ -167,7 +167,6 @@ class SaveInterface {
         let filename = null;
         const finishDownload = name => {
             if (name === null) {
-                // eslint-disable-next-line no-console
                 console.debug("save cancelled");
                 return;
             }
@@ -210,7 +209,6 @@ class SaveInterface {
             filename = defaultfilename;
         }
 
-        // eslint-disable-next-line no-console
         console.debug("saving to " + filename);
         finishDownload(filename);
     }
@@ -752,7 +750,14 @@ class SaveInterface {
 
             // Trigger save after a short delay to let UI update
             setTimeout(() => {
-                this.afterSaveLilypond();
+                try {
+                    this.afterSaveLilypond();
+                } catch (e) {
+                    console.error("Error generating Lilypond output:", e);
+                    this.activity.errorMsg(_("Error generating Lilypond output. ") + e.message);
+                } finally {
+                    document.body.style.cursor = "default";
+                }
             }, 100);
         } else {
             // No buffered data - run the program to generate notation (original behavior)
@@ -791,16 +796,23 @@ class SaveInterface {
      */
     afterSaveLilypond(filename) {
         filename = docById("fileName").value;
-        const ly = saveLilypondOutput(this.activity);
-        switch (this.notationConvert) {
-            case "pdf":
-                this.afterSaveLilypondPDF(ly, filename);
-                break;
-            default:
-                this.afterSaveLilypondLY(ly, filename);
-                break;
+        try {
+            const ly = saveLilypondOutput(this.activity);
+            switch (this.notationConvert) {
+                case "pdf":
+                    this.afterSaveLilypondPDF(ly, filename);
+                    break;
+                default:
+                    this.afterSaveLilypondLY(ly, filename);
+                    break;
+            }
+        } catch (e) {
+            console.error("Error in Lilypond output generation:", e);
+            this.activity.errorMsg(_("Error generating Lilypond output. ") + e.message);
+        } finally {
+            this.notationConvert = "";
+            document.body.style.cursor = "default";
         }
-        this.notationConvert = "";
     }
 
     /**
@@ -849,7 +861,6 @@ class SaveInterface {
                     if (copied) {
                         showCopiedMessage();
                     } else {
-                        // eslint-disable-next-line no-console
                         console.debug("Clipboard copy failed:", err);
                     }
                 });
@@ -858,7 +869,6 @@ class SaveInterface {
             if (copied) {
                 showCopiedMessage();
             } else {
-                // eslint-disable-next-line no-console
                 console.debug("Clipboard copy failed");
             }
         }
@@ -882,7 +892,6 @@ class SaveInterface {
         window.Converter.ly2pdf(lydata, (success, dataurl) => {
             document.body.style.cursor = "default";
             if (!success) {
-                // eslint-disable-next-line no-console
                 console.debug("Error: " + dataurl);
                 this.activity.errorMsg(
                     _("Failed to convert Lilypond to PDF. Please try saving as .ly file instead."),
@@ -907,7 +916,7 @@ class SaveInterface {
      * @instance
      *
      */
-    // eslint-disable-next-line no-unused-vars
+
     saveMxml(filename) {
         this.activity.logo.runningMxml = true;
         for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {

@@ -1164,8 +1164,6 @@ class Painter {
 
             // IMPORTANT: allow next normal stroke to start a new SVG path
             this._svgPath = false;
-
-            /* eslint-enable no-unused-vars */
         } else if (this._penDown) {
             this._processColor();
             this.turtle.ctx.lineWidth = this.stroke;

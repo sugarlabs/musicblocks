@@ -404,7 +404,6 @@ class Toolbar {
             if (!isPlayIconRunning) {
                 playIcon.onclick = null;
             } else {
-                // eslint-disable-next-line no-use-before-define
                 playIcon.onclick = tempClick;
                 isPlayIconRunning = false;
             }
@@ -621,16 +620,17 @@ class Toolbar {
     }
 
     renderThemeSelectIcon(themeBox, themes) {
-        const icon = document.getElementById("themeSelectIcon");
+        const icon = docById("themeSelectIcon");
+        if (!icon) return;
+    
         themes.forEach(theme => {
             if (localStorage.themePreference === theme) {
-                icon.innerHTML = document.getElementById(theme).innerHTML;
+                icon.innerHTML = docById(theme).innerHTML;
             }
         });
-        const themeSelectIcon = docById("themeSelectIcon");
-        const themeList = themes;
-        themeSelectIcon.onclick = () => {
-            themeList.forEach(theme => {
+
+        icon.onclick = () => {
+            themes.forEach(theme => {
                 docById(theme).onclick = () => themeBox[`${theme}_onclick`](this.activity);
             });
         };
@@ -925,8 +925,8 @@ class Toolbar {
             }
             RecordDropdownArrow.innerHTML = `<i class="material-icons main" style="font-size: 28px;">arrow_drop_down</i>`;
 
-            // Toggle arrow on click
-            RecordDropdownArrow.addEventListener("click", function () {
+            // Create handler function for arrow click
+            const arrowClickHandler = function () {
                 setTimeout(() => {
                     const dropdown = docById("recorddropdown");
                     const arrowIcon = RecordDropdownArrow.querySelector("i");
@@ -940,7 +940,19 @@ class Toolbar {
                         arrowIcon.textContent = "arrow_drop_down";
                     }
                 }, 50);
-            });
+            };
+
+            // Remove old listener to prevent accumulation
+            if (RecordDropdownArrow._arrowClickHandler) {
+                RecordDropdownArrow.removeEventListener(
+                    "click",
+                    RecordDropdownArrow._arrowClickHandler
+                );
+            }
+
+            // Store reference and attach fresh listener
+            RecordDropdownArrow._arrowClickHandler = arrowClickHandler;
+            RecordDropdownArrow.addEventListener("click", arrowClickHandler);
 
             // Reset arrow when clicking outside (close dropdown)
             document.addEventListener("click", function (e) {
