@@ -101,7 +101,7 @@ function shouldCacheResponse(request, response) {
     return isStaticAssetRequest(request) || isPrecachedRequest(request);
 }
 */
-//filter out unsupported URL schemes before caching
+// Filter out unsupported URL schemes before caching
 function updateCache(request, response) {
     // Cache API only supports http:// and https:// requests.
     // Attempting to cache other schemes (e.g. chrome-extension://, moz-extension://)
@@ -141,7 +141,7 @@ function fromCache(request) {
 
 // If any fetch fails, it will look for the request in the cache and
 // serve it from there first
-//add URL scheme check at the top
+// add URL scheme check at the top
 self.addEventListener("fetch", function (event) {
     // Only handle http/https requests.
     // chrome-extension:// and other schemes are not supported by Cache API.
