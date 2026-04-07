@@ -12,7 +12,7 @@
     },
     "amd": {},
     "scripts": {
-        "lint": "eslint js/ planet/js/",
+        "lint": "eslint .",
         "lint:staged": "lint-staged",
         "prepare": "husky",
         "serve": "http-server -a 127.0.0.1 -p 3000 --gzip --brotli",

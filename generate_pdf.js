@@ -4,7 +4,19 @@ const path = require("path");
 (async () => {
     try {
         const args = process.argv.slice(2);
-        const lang = args[0] || "en"; // Default to English
+        let lang = (args[0] || "en").toLowerCase(); // Default to English and normalize case
+
+        // Map common aliases to supported language keys
+        const aliases = {
+            "zh-cn": "zh",
+            "zhcn": "zh",
+            "ja-jp": "ja",
+            "jajp": "ja"
+        };
+
+        if (aliases[lang]) {
+            lang = aliases[lang];
+        }
 
         const langMap = {
             en: {
@@ -26,11 +38,16 @@ const path = require("path");
                 dir: "guide-pt",
                 file: "MusicBlocks_Guide_PT.pdf",
                 title: "Guia de Programação com Music Blocks"
+            },
+            ja: {
+                dir: "guide-ja",
+                file: "MusicBlocks_Guide_JA.pdf",
+                title: "ミュージック・ブロックスのプログラミング案内"
             }
         };
 
         if (!langMap[lang]) {
-            console.error(`Unsupported language: ${lang}. Supported: en, es, zh, pt`);
+            console.error(`Unsupported language: ${lang}. Supported: ${Object.keys(langMap).join(", ")}`);
             process.exit(1);
         }
 
