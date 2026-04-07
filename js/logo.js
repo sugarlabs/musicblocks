@@ -65,7 +65,6 @@ class Queue {
     }
 }
 
-/* eslint-disable-next-line no-redeclare */
 class Logo {
     /**
      * @constructor
@@ -703,6 +702,7 @@ class Logo {
     parseArg(logo, turtle, blk, parentBlk, receivedArg) {
         const tur = logo.activity.turtles.ithTurtle(turtle);
 
+        // Using loose null check to catch both null and undefined input blocks
         if (blk == null) {
             logo.activity.errorMsg(NOINPUTERRORMSG, parentBlk);
             return null;
@@ -753,6 +753,7 @@ class Logo {
                         logo.statusFields.push([blk, "dectofrac"]);
                     } else {
                         const cblk = currentBlock.connections[1];
+                        // Using loose null check for undefined acceptance
                         if (cblk == null) {
                             logo.activity.errorMsg(NOINPUTERRORMSG, blk);
                             currentBlock.value = 0;
@@ -776,7 +777,8 @@ class Logo {
                     ) {
                         logo.statusFields.push([blk, "color"]);
                     } else {
-                        currentBlock.value = logo.activity.turtles.getTurtle(turtle).painter.color;
+                        const turtleObj = logo.activity.turtles.getTurtle(turtle);
+                        currentBlock.value = turtleObj.painter.color;
                     }
                     break;
 
@@ -796,8 +798,7 @@ class Logo {
                         if (typeof pluginFn === "function") {
                             pluginFn(logo, turtle, blk, parentBlk, receivedArg, tur);
                         } else {
-                            // Support legacy string-based eval if necessary
-                            eval(pluginFn);
+                            console.error("Invalid or failed ARGPLUGIN:", blockName);
                         }
                     } else {
                         console.error("I do not know how to " + blockName);
@@ -1962,7 +1963,6 @@ class Logo {
                         try {
                             logo.activity.save.afterSaveAbc();
                         } catch (e) {
-                            // eslint-disable-next-line no-console
                             console.error("Error generating ABC output:", e);
                             logo.activity.errorMsg(_("Error generating ABC output. ") + e.message);
                         } finally {
