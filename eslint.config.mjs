@@ -15,8 +15,7 @@ export default [
             "**/coverage/**",
             "**/*.min.js",
             "**/bower_components/**",
-            "**/planet/libs/**",
-            "**/sounds/**"
+            "**/planet/libs/**"
         ]
     },
 
@@ -94,7 +93,7 @@ export default [
                 acorn: "readonly",
                 ast2blocklist_config: "readonly",
                 calcNoteValueToDisplay: "readonly",
-                createjs: "writable",
+                createjs: "readonly",
                 delayExecution: "readonly",
                 detectPitch: "readonly",
                 doStopVideoCam: "readonly",
@@ -175,20 +174,6 @@ export default [
         files: ["**/*.mjs"],
         languageOptions: {
             sourceType: "module"
-        }
-    },
-    {
-        files: ["cypress/**/*.js", "cypress/**/*.mjs", "cypress/**/*.cy.js"],
-        languageOptions: {
-            sourceType: "module",
-            globals: {
-                ...globals.browser,
-                ...globals.mocha,
-                cy: "readonly",
-                Cypress: "readonly",
-                expect: "readonly",
-                assert: "readonly"
-            }
         }
     }
 ];

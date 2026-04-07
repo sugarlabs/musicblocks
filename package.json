@@ -12,8 +12,7 @@
     },
     "amd": {},
     "scripts": {
-        "lint": "eslint .",
-        "lint:fix": "eslint . --fix",
+        "lint": "eslint js/ planet/js/",
         "lint:staged": "lint-staged",
         "prepare": "husky",
         "serve": "http-server -a 127.0.0.1 -p 3000 --gzip --brotli",
@@ -89,11 +88,6 @@
         "svgo": "^4.0.1",
         "@gulp-sourcemaps/identity-map": {
             "postcss": "^8.4.31"
-        },
-        "path-to-regexp": "^8.4.0",
-        "yaml": "^2.8.3",
-        "@parcel/watcher": {
-            "picomatch": "^4.0.4"
         }
     },
     "lint-staged": {
