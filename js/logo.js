@@ -797,7 +797,6 @@ class Logo {
                             pluginFn(logo, turtle, blk, parentBlk, receivedArg, tur);
                         } else {
                             // Support legacy string-based eval if necessary
-                            // eslint-disable-next-line no-eval
                             eval(pluginFn);
                         }
                     } else {

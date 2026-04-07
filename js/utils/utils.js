@@ -801,7 +801,6 @@ const processPluginData = (activity, pluginData, pluginSource) => {
             try {
                 // Pre-compile the plugin code into a function to avoid eval() in parseArg
                 // Standard scope exposure: logo, turtle, blk, parentBlk, receivedArg, tur
-                // eslint-disable-next-line no-new-func
                 activity.logo.evalArgDict[arg] = new Function(
                     "logo",
                     "turtle",
@@ -812,7 +811,6 @@ const processPluginData = (activity, pluginData, pluginSource) => {
                     obj["ARGPLUGINS"][arg]
                 );
             } catch (e) {
-                // eslint-disable-next-line no-console
                 console.error("Failed to compile ARGPLUGIN:", arg, e);
                 activity.logo.evalArgDict[arg] = null;
             }
