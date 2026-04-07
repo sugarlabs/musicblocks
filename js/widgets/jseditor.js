@@ -260,10 +260,19 @@ class JSEditor {
         const beforeError = text.substring(0, start);
         const afterError = text.substring(end);
 
-        const highlightedHTML =
-            beforeError + `<span class="error" title="${message}">${errorText}</span>` + afterError;
+        const highlightedContent = document.createDocumentFragment();
+        highlightedContent.appendChild(document.createTextNode(beforeError));
 
-        editor.innerHTML = highlightedHTML;
+        const errorSpan = document.createElement("span");
+        errorSpan.className = "error";
+        errorSpan.title = String(message);
+        errorSpan.textContent = errorText;
+        highlightedContent.appendChild(errorSpan);
+
+        highlightedContent.appendChild(document.createTextNode(afterError));
+
+        editor.textContent = "";
+        editor.appendChild(highlightedContent);
     }
 
     /**
