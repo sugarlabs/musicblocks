@@ -107,6 +107,28 @@ name of one of the plugin blocks.
 '''
 
 
+def detect_image_format(value):
+    """Figure out what kind of image we're dealing with."""
+    stripped = value.strip()
+    
+    # looks like svg
+    if stripped.startswith('<svg') or stripped.startswith('<?xml'):
+        if '<svg' in stripped:
+            return 'svg'
+    
+    # base64 magic bytes for the usual suspects
+    if stripped.startswith('iVBORw0KGgo'):
+        return 'png'
+    
+    if stripped.startswith('/9j/'):
+        return 'jpeg'
+    
+    if stripped.startswith('R0lGOD'):
+        return 'gif'
+    
+    return None
+
+
 def clear():
     global NAMES, JS_TYPES, IMAGES
     NAMES = {
@@ -170,9 +192,18 @@ def pluginify(data):
             outp[type_][name] = value
 
         if type_ == 'image':
-            # TODO: Detect if its png
-            # Assume for now it is SVG.
-            IMAGES[name] = value  # 'data:image/svg+xml;utf8,' + value
+            image_format = detect_image_format(value)
+            if image_format == 'svg':
+                IMAGES[name] = 'data:image/svg+xml;utf8,' + value
+            elif image_format == 'png':
+                IMAGES[name] = 'data:image/png;base64,' + value
+            elif image_format == 'jpeg':
+                IMAGES[name] = 'data:image/jpeg;base64,' + value
+            elif image_format == 'gif':
+                IMAGES[name] = 'data:image/gif;base64,' + value
+            else:
+                # no idea what this is, just keep it
+                IMAGES[name] = value
 
     if IMAGES:
         outp['IMAGES'] = IMAGES

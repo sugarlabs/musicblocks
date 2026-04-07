@@ -32,14 +32,13 @@
      inkscape:window-y="-9"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg1" />
-  <rect
-     id="backgroundrect"
-     width="100%"
-     height="100%"
-     x="-28.156382"
-     y="-26.747662"
-     fill="none"
-     stroke="none" />
+   <!-- White background -->
+   <rect
+    x="0"
+    y="0"
+    width="100%"
+    height="100%"
+    fill="#ffffff" />
   <title
      id="title4653">Ties Chart</title>
   <defs

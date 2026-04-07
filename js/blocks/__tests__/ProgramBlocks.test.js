@@ -181,53 +181,63 @@ describe("ProgramBlocks", () => {
             expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 1);
         });
 
-        test("loads heap from successful HTTP request", () => {
-            const mockHttp = {
-                open: jest.fn(),
-                send: jest.fn(),
-                readyState: 4,
-                status: 200,
-                responseText: '["item1", "item2"]'
-            };
-            global.XMLHttpRequest.mockImplementation(() => mockHttp);
+        test("loads heap from successful HTTP request", async () => {
+            global.fetch = jest.fn().mockResolvedValue({
+                ok: true,
+                text: jest.fn().mockResolvedValue('["item1", "item2"]')
+            });
 
             const block = getBlock("loadHeapFromApp");
             block.flow(["testHeap", "http://test.com"], logo, 0, 1);
 
-            expect(mockHttp.open).toHaveBeenCalledWith("GET", "http://test.com", false);
+            // Wait for the async fetch to complete
+            await new Promise(resolve => setTimeout(resolve, 0));
+
+            expect(global.fetch).toHaveBeenCalledWith("http://test.com");
             expect(logo.turtleHeaps.testHeap).toEqual(["item1", "item2"]);
         });
 
-        test("handles 404 error", () => {
-            const mockHttp = {
-                open: jest.fn(),
-                send: jest.fn(),
-                readyState: 4,
-                status: 404,
-                responseText: ""
-            };
-            global.XMLHttpRequest.mockImplementation(() => mockHttp);
+        test("handles 404 error", async () => {
+            global.fetch = jest.fn().mockResolvedValue({
+                ok: false,
+                status: 404
+            });
 
             const block = getBlock("loadHeapFromApp");
             block.flow(["testHeap", "http://test.com"], logo, 0, 1);
+
+            // Wait for the async fetch to complete
+            await new Promise(resolve => setTimeout(resolve, 0));
 
             expect(activity.errorMsg).toHaveBeenCalledWith("404: Page not found");
         });
 
-        test("handles JSON parse error", () => {
-            const mockHttp = {
-                open: jest.fn(),
-                send: jest.fn(),
-                readyState: 4,
-                status: 200,
-                responseText: "invalid json"
-            };
-            global.XMLHttpRequest.mockImplementation(() => mockHttp);
+        test("handles JSON parse error", async () => {
+            global.fetch = jest.fn().mockResolvedValue({
+                ok: true,
+                text: jest.fn().mockResolvedValue("invalid json")
+            });
 
             const block = getBlock("loadHeapFromApp");
             block.flow(["testHeap", "http://test.com"], logo, 0, 1);
 
+            // Wait for the async fetch to complete
+            await new Promise(resolve => setTimeout(resolve, 0));
+
             expect(activity.errorMsg).toHaveBeenCalled();
+        });
+
+        test("handles network error", async () => {
+            global.fetch = jest.fn().mockRejectedValue(new Error("Network error"));
+
+            const block = getBlock("loadHeapFromApp");
+            block.flow(["testHeap", "http://test.com"], logo, 0, 1);
+
+            // Wait for the async fetch to complete
+            await new Promise(resolve => setTimeout(resolve, 0));
+
+            // Should not throw, error is handled gracefully
+            expect(global.fetch).toHaveBeenCalled();
         });
     });
 

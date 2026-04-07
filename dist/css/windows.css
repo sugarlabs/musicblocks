@@ -189,7 +189,6 @@
     height: 100vh;
     left: 0 !important;
     top: 0 !important;
-    background-color: #e8e8e8;
     display: flex;
     flex-direction: column;
   }
@@ -292,7 +291,6 @@
     height: 100vh;
     left: 0 !important;
     top: 0 !important;
-    background-color: #e8e8e8;
     display: flex;
     flex-direction: column;
   }
@@ -369,7 +367,6 @@
     height: 100vh;
     left: 0;
     top: 0;
-    background-color: #e8e8e8;
     display: flex;
     flex-direction: column;
   }

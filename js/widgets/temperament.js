@@ -1717,8 +1717,14 @@ function TemperamentWidget() {
             [4, ["number", { value: this.frequencies[0] }], 0, 0, [2]],
             [5, ["octavespace"], 0, 0, [2, 6, 9]],
             [6, ["divide"], 0, 0, [5, 7, 8]],
-            [7, ["number", { value: rationalToFraction(getOctaveRatio())[0] }], 0, 0, [6]],
-            [8, ["number", { value: rationalToFraction(getOctaveRatio())[1] }], 0, 0, [6]],
+            // Cache rationalToFraction result to avoid duplicate calls
+            ...(function () {
+                const octaveFraction = rationalToFraction(getOctaveRatio());
+                return [
+                    [7, ["number", { value: octaveFraction[0] }], 0, 0, [6]],
+                    [8, ["number", { value: octaveFraction[1] }], 0, 0, [6]]
+                ];
+            })(),
             [9, "vspace", 0, 0, [5, 10]]
         ];
         let previousBlock = 9;
@@ -1812,20 +1818,10 @@ function TemperamentWidget() {
                     [idx + 1]
                 ]);
                 newStack.push([idx + 3, ["divide"], 0, 0, [idx + 1, idx + 4, idx + 5]]);
-                newStack.push([
-                    idx + 4,
-                    ["number", { value: rationalToFraction(this.ratios[i])[0] }],
-                    0,
-                    0,
-                    [idx + 3]
-                ]);
-                newStack.push([
-                    idx + 5,
-                    ["number", { value: rationalToFraction(this.ratios[i])[1] }],
-                    0,
-                    0,
-                    [idx + 3]
-                ]);
+                // Cache rationalToFraction result to avoid duplicate calls
+                const ratioFraction = rationalToFraction(this.ratios[i]);
+                newStack.push([idx + 4, ["number", { value: ratioFraction[0] }], 0, 0, [idx + 3]]);
+                newStack.push([idx + 5, ["number", { value: ratioFraction[1] }], 0, 0, [idx + 3]]);
                 newStack.push([idx + 6, "vspace", 0, 0, [idx, idx + 7]]);
                 newStack.push([idx + 7, ["pitch"], 0, 0, [idx + 6, idx + 8, idx + 9, null]]);
 
@@ -2199,7 +2195,9 @@ function TemperamentWidget() {
         row.id = "buttonsRow";
 
         temperamentCell = row.insertCell();
-        temperamentCell.innerHTML = this.inTemperament;
+        if (temperamentCell) {
+            temperamentCell.innerHTML = this.inTemperament;
+        }
         temperamentCell.style.width = 2 * BUTTONSIZE + "px";
         temperamentCell.style.minWidth = temperamentCell.style.width;
         temperamentCell.style.maxWidth = temperamentCell.style.width;
@@ -2221,7 +2219,7 @@ function TemperamentWidget() {
             that._save();
         };
 
-        var noteCell = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Table"));
+        const noteCell = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Table"));
 
         let t = getTemperament(this.inTemperament);
         this.pitchNumber = t.pitchNumber;
@@ -2335,4 +2333,8 @@ function TemperamentWidget() {
 
         widgetWindow.sendToCenter();
     };
+}
+
+if (typeof module !== "undefined") {
+    module.exports = TemperamentWidget;
 }

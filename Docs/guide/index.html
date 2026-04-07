@@ -9,29 +9,101 @@
       crossorigin="anonymous"
     />
     <style type="text/css">
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+        background-color: #f9f9f9;
+      }
+      .jumbotron {
+        background-color: #5bc0de;
+        color: white;
+        text-align: center;
+        border-radius: 8px;
+        margin-top: 20px;
+        padding: 40px 20px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      }
+      .jumbotron h1 {
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+      .content-wrapper {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-bottom: 40px;
+      }
+      .top-nav {
+        margin-bottom: 20px;
+        text-align: right;
+      }
+      .top-nav a {
+        color: #777;
+        margin-left: 10px;
+        text-decoration: none;
+      }
+      .top-nav a:hover {
+        color: #333;
+      }
       ol {
         counter-reset: item;
       }
       li {
         display: block;
+        margin-bottom: 8px;
       }
       li:before {
         content: counters(item, ".") " ";
         counter-increment: item;
+        font-weight: bold;
+        color: #5bc0de;
+      }
+      h2, h3, h4 {
+        color: #2c3e50;
+        margin-top: 30px;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+        margin: 15px 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .download-btn {
+        margin-top: 20px;
+        font-size: 1.1em;
+        padding: 10px 20px;
+        border-radius: 30px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        transition: all 0.3s;
+      }
+      .download-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0,0,0,0.3);
       }
     </style>
   </head>
   <body>
-    <div class="container">
+    <div class="container content-wrapper">
+      <div class="top-nav">
+        <a href="../guide/index.html">English</a> |
+        <a href="../guide-es/index.html">Español</a> |
+        <a href="../guide-ja/index.html">日本語</a> |
+        <a href="../guide-zhCN/index.html">中文</a> |
+        <a href="../guide-pt/index.html">Português</a>
+      </div>
       <div id="content">
-        <p>
-          <a href="../guide/index.html">English</a> |
-          <a href="../guide-es/index.html">Español</a> |
-          <a href="../guide-ja/index.html">日本語</a> |
-          <a href="../guide-zhCN/index.html">中文</a> |
-          <a href="../guide-pt/index.html">Português</a>
-        </p>
-        <h1 id="guide-to-programming-with-music-blocks">Guide to Programming with Music Blocks</h1>
+        <div class="jumbotron">
+          <h1 id="guide-to-programming-with-music-blocks">Music Blocks Programming Guide</h1>
+          <p class="lead">A complete guide to learning and programming with Music Blocks</p>
+          <a href="MusicBlocks_Guide.pdf" class="btn btn-warning btn-lg download-btn" download>
+             <span class="glyphicon glyphicon-download-alt"></span> Download PDF Guide
+          </a>
+        </div>
+        
         <p>
           Music Blocks is a programming environment for children interested in music and graphics.
           It expands upon Turtle Blocks by adding a collection of features relating to pitch and
@@ -46,7 +118,7 @@
           musical features by walking the reader through numerous examples.
         </p>
         <p>
-          The Music Blocks <a href="../documentation/README.md">basic documentation</a> is also a
+          The Music Blocks <a href="https://github.com/sugarlabs/musicblocks/blob/master/Docs/documentation/README.md">basic documentation</a> is also a
           good resource.
         </p>
         <p>
@@ -187,7 +259,7 @@
         </p>
         <h2 id="1-getting-started"><a name="#GETTING-STARTED">1. Getting Started</a></h2>
         <p>
-          <a href="#TOC">Back to Table of Contents</a> |
+          <a href="#table-of-contents">Back to Table of Contents</a> |
           <a href="#NOTES">Next Section (2. Making Sounds)</a>
         </p>
         <p>
@@ -208,7 +280,7 @@
         </p>
         <p>
           For more details on how to use Music Blocks, see
-          <a href="http://github.com/sugarlabs/musicblocks/tree/master/documentation"
+          <a href="https://github.com/sugarlabs/musicblocks/blob/master/Docs/documentation/README.md"
             >Using Music Blocks</a
           >. For more details on how to use Turtle Blocks, see
           <a href="http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation"
@@ -218,7 +290,7 @@
         <h2 id="2-making-sounds"><a name="NOTES">2. Making Sounds</a></h2>
         <p>
           <a href="#1-getting-started">Previous Section (1. Getting Started)</a> |
-          <a href="#TOC">Back to Table of Contents</a> |
+          <a href="#table-of-contents">Back to Table of Contents</a> |
           <a href="#3-programming-with-music">Next Section (3. Programming with Music)</a>
         </p>
         <p>
@@ -480,7 +552,7 @@
         </h2>
         <p>
           <a href="#2-making-sounds">Previous Section (2. Making Sounds)</a> |
-          <a href="#TOC">Back to Table of Contents</a> |
+          <a href="#table-of-contents">Back to Table of Contents</a> |
           <a href="#4-widgets">Next Section (4. Widgets)</a>
         </p>
         <p>
@@ -2564,7 +2636,7 @@
         <h2 id="4-widgets"><a name="WIDGETS">4. Widgets</a></h2>
         <p>
           <a href="#3-programming-with-music">Previous Section (3. Programming with Music)</a> |
-          <a href="#TABLE-OF-CONTENTS">Back to Table of Contents</a> |
+          <a href="#table-of-contents">Back to Table of Contents</a> |
           <a href="#5-beyond-music-blocks">Next Section (5. Beyond Music Blocks)</a>
         </p>
         <p>
@@ -3326,7 +3398,7 @@ the stairs"
         <h2 id="5-beyond-music-blocks"><a name="BEYOND-MUSIC-BLOCKS">5. Beyond Music Blocks</a></h2>
         <p>
           <a href="#4-widgets">Previous Section (4. Widgets)</a> |
-          <a href="#TABLE-OF-CONTENTS">Back to Table of Contents</a>
+          <a href="#table-of-contents">Back to Table of Contents</a>
         </p>
         <p>
           Music Blocks is a waypoint, not a destination. One of the goals is to point the learner
@@ -3477,7 +3549,7 @@ MusicBlocks.run();</code></pre>
         <h2 id="6-appendix"><a name="APPENDIX">6. Appendix</a></h2>
         <p>
           <a href="#5-beyond-music-blocks">Previous Section (5. Beyond Music Blocks)</a> |
-          <a href="#TABLE-OF-CONTENTS">Back to Table of Contents</a>
+          <a href="#table-of-contents">Back to Table of Contents</a>
         </p>
         <h3 id="61-beginner-palettes"><a name="BEGINNER_PALETTES">6.1 Beginner Palettes</a></h3>
         <p>

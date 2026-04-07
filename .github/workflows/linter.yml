@@ -1,47 +1,47 @@
-name: ESLint
-
+name: ESLint & Prettier
 on:
-  pull_request:
-    branches: [master]
-
+    pull_request:
+        branches: [master]
 jobs:
-  lint:
-    name: Lint updated JavaScript files with ESLint
+    lint:
+        name: Lint and format-check changed JS files
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+                  ref: ${{ github.event.pull_request.head.sha }}
 
-    runs-on: ubuntu-latest
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22.x
+                  cache: "npm"
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha }}
+            - name: Install dependencies
+              run: npm ci
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.x
+            - name: Get changed JavaScript files
+              id: get_files
+              run: |
+                  git diff --diff-filter=ACMRT --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} -- '*.js' '*.mjs' ':!node_modules/**' > changed-js-files.txt
+                  if [ -s changed-js-files.txt ]; then
+                    echo "has_files=true" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "has_files=false" >> "$GITHUB_OUTPUT"
+                  fi
 
-      - name: Get changed JavaScript files
-        id: get_files
-        run: |
-          CHANGED_FILES=$(git diff --diff-filter=ACMRT --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} -- '*.js')
-          echo "files<<EOF" >> $GITHUB_ENV
-          echo "$CHANGED_FILES" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+            - name: Run ESLint on changed files
+              if: steps.get_files.outputs.has_files == 'true'
+              run: |
+                  echo "Linting the following files:"
+                  cat changed-js-files.txt
+                  xargs -r npx eslint < changed-js-files.txt
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run ESLint on changed files
-        if: env.files != ''
-        run: |
-          echo "Linting the following files:"
-          echo "$files"
-          echo "$files" | xargs npx eslint
-      - name: Run Prettier check on changed files
-        if: env.files != ''
-        run: |
-          echo "Checking formatting for the following files:"
-          echo "$files"
-          echo "$files" | xargs npx prettier --check
+            - name: Run Prettier check on changed files
+              if: steps.get_files.outputs.has_files == 'true'
+              run: |
+                  echo "Checking formatting for the following files:"
+                  cat changed-js-files.txt
+                  xargs -r npx prettier --check < changed-js-files.txt

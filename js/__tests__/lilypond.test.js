@@ -226,7 +226,15 @@ describe("processLilypondNotes", () => {
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\staccato ");
     });
-
+    test("should process custom key modes (freygish) correctly", () => {
+        getScaleAndHalfSteps.mockReturnValueOnce([
+            ["C", "D", "E", "F", "G", "A", "B"],
+            ["", "♭", "", "", "", "♭", ""]
+        ]);
+        logo.notation.notationStaging[turtle] = ["key", "C", "myCustomMode"];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("\\myCustomMode");
+    });
     test("should insert newline after 8 notes", () => {
         const notesArray = [];
         for (let i = 0; i < 9; i++) {
@@ -239,6 +247,107 @@ describe("processLilypondNotes", () => {
 
     test("should handle incomplete tuplet gracefully", () => {
         logo.notation.notationStaging[turtle] = [[["G4"], 4, 0, [3, 2], 0, -1, false]];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("\\tuplet");
+    });
+    test("should handle tuplet with non-integer fraction", () => {
+        toFraction.mockReturnValueOnce([3.5, 2]).mockReturnValueOnce([7, 4]);
+
+        logo.notation.notationStaging[turtle] = [[["G4"], 4, 0, [3, 2], 0, -1, false]];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("\\tuplet 7/4");
+    });
+    test("should process chord with multiple notes correctly", () => {
+        logo.notation.notationStaging[turtle] = [[["G4", "B4", "D5"], 4, 0, null, 0, -1, false]];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("<");
+        expect(logo.notationNotes[turtle]).toContain(">");
+        expect(logo.notationNotes[turtle]).toContain("g'");
+        expect(logo.notationNotes[turtle]).toContain("b'");
+    });
+    test("should handle tuplet with notes of varying durations", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["G4"], 8, 4, [3, 2], 0, -1, false],
+            [["A4"], 4, 2, [3, 2], 0, -1, false],
+            [["B4"], 8, 4, [3, 2], 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("\\tuplet");
+    });
+
+    test("should handle tuplet with varying tuplet factors", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["G4"], 4, 2, [3, 4], 0, -1, false],
+            [["A4"], 4, 2, [3, 2], 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("\\tuplet");
+    });
+
+    test("should handle tie command within tuplet", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["G4"], 4, 2, [3, 2], 0, -1, false],
+            "tie",
+            [["A4"], 4, 2, [3, 2], 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("~");
+        expect(logo.notationNotes[turtle]).toContain("\\tuplet");
+    });
+
+    test("should break tuplet when reaching POW2 duration (0.5)", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["G4"], 4, 2, [3, 2], 0, -1, false],
+            [["A4"], 4, 2, [3, 2], 0, -1, false],
+            [["B4"], 4, 2, [3, 2], 0, -1, false],
+            [["C4"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("\\tuplet");
+    });
+    test("should handle null tuplet value interrupting tuplet", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["G4"], 4, 2, [3, 2], 0, -1, false],
+            [["A4"], 4, 0, null, 0, -1, false],
+            [["B4"], 4, 2, [3, 2], 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("\\tuplet");
+    });
+    test("should break tuplet when tuplet factor changes", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["G4"], 4, 2, [3, 2], 0, -1, false],
+            [["A4"], 4, 2, [5, 2], 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("\\tuplet");
+    });
+    test("should handle tuplet with mixed NOTATIONROUNDDOWN values (greater)", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["G4"], 4, 2, [3, 2], 0, -1, false],
+            [["A4"], 8, 4, [3, 2], 0, -1, false],
+            [["B4"], 4, 2, [3, 2], 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("\\tuplet");
+    });
+
+    test("should handle tuplet with mixed NOTATIONROUNDDOWN values (less)", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["G4"], 4, 4, [3, 2], 0, -1, false],
+            [["A4"], 8, 2, [3, 2], 0, -1, false],
+            [["B4"], 4, 4, [3, 2], 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("\\tuplet");
+    });
+
+    test("should handle tuplet with equal NOTATIONROUNDDOWN values", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["G4"], 4, 2, [3, 2], 0, -1, false],
+            [["A4"], 4, 2, [3, 2], 0, -1, false],
+            [["B4"], 4, 2, [3, 2], 0, -1, false]
+        ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
     });
@@ -434,5 +543,103 @@ describe("saveLilypondOutput", () => {
         activity.logo.MIDIOutput = "% MIDI Output";
         const result = saveLilypondOutput(activity);
         expect(result).toContain("% MIDI Output");
+    });
+    test("should handle instrument short name collisions (no spaces)", () => {
+        activity.turtles.turtleList = {
+            "0": { name: "Trumpet" },
+            "1": { name: "Trombone" },
+            "2": { name: "Tuba" }
+        };
+        activity.logo.notation.notationStaging = {
+            "0": ["note"],
+            "1": ["note"],
+            "2": ["note"]
+        };
+        frequencyToPitch.mockReturnValue(["C", 4]);
+
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain('shortInstrumentName = "Tr"');
+        expect(result).toContain('instrumentName = "Trombone"');
+    });
+
+    test("should handle instrument short name collisions (with spaces)", () => {
+        activity.turtles.turtleList = {
+            "0": { name: "Violin One" },
+            "1": { name: "Violin Two" }
+        };
+        activity.logo.notation.notationStaging = { "0": ["note"], "1": ["note"] };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain('shortInstrumentName = "Vi"');
+        expect(result).toContain('shortInstrumentName = "Vio"');
+    });
+    test("should map special turtle names (start, numeric) to Rodent names", () => {
+        activity.turtles.turtleList = {
+            "0": { name: "start" },
+            "1": { name: "start drum" },
+            "2": { name: "2" }
+        };
+
+        activity.logo.notation.notationStaging = {
+            "0": ["note"],
+            "1": ["note"],
+            "2": ["note"]
+        };
+
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain('instrumentName = "mouse"');
+        expect(result).toContain('instrumentName = "mole"');
+    });
+    test("should select bass_8 clef for very low notes", () => {
+        frequencyToPitch.mockReturnValue(["C", 1]);
+
+        activity.logo.notation.notationStaging = {
+            "0": [[["C1"], 4, 0, null, 0, -1, false]]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain('\\clef "bass_8"');
+    });
+    test("should select bass clef for mid-low notes", () => {
+        frequencyToPitch.mockReturnValue(["C", 3]);
+        activity.logo.notation.notationStaging = {
+            "0": [[["C3"], 4, 0, null, 0, -1, false]]
+        };
+
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain('\\clef "bass"');
+    });
+
+    test("should handle rest notes in octave calculation", () => {
+        activity.logo.notation.notationStaging = {
+            "0": [[["R"], 4, 0, null, 0, -1, false]]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toBeDefined();
+    });
+
+    test("should handle numeric frequency in octave calculation", () => {
+        frequencyToPitch.mockReturnValue(["A", 4]);
+        activity.logo.notation.notationStaging = {
+            "0": [[[440], 4, 0, null, 0, -1, false]]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toBeDefined();
+        expect(frequencyToPitch).toHaveBeenCalledWith(440);
+    });
+    test("should handle short name collision for names without spaces (longer loop)", () => {
+        activity.turtles.turtleList = {
+            "0": { name: "Trumpet" },
+            "1": { name: "Trombone" },
+            "2": { name: "Triangle" }
+        };
+        activity.logo.notation.notationStaging = {
+            "0": ["note"],
+            "1": ["note"],
+            "2": ["note"]
+        };
+        const result = saveLilypondOutput(activity);
+
+        expect(result).toContain('shortInstrumentName = "Tr"');
+        expect(result).toContain('shortInstrumentName = "Tro"');
+        expect(result).toContain('shortInstrumentName = "Tri"');
     });
 });

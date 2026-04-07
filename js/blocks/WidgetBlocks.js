@@ -368,12 +368,10 @@ function setupWidgetBlocks(activity) {
                 logo.sample = new SampleWidget();
             }
             logo.inSample = true;
-            logo.sample = new SampleWidget();
 
             const listenerName = "_sampler_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 logo.sample.init(activity);
             };
@@ -593,7 +591,6 @@ function setupWidgetBlocks(activity) {
                 let blocks = [[0, "oscilloscope", x, y, [null, 1, null]]];
                 for (const turtle of activity.turtles.turtleList) {
                     if (!turtle.inTrash)
-                        // eslint-disable-next-line max-len
                         blocks = addPrintTurtle(
                             blocks,
                             turtle,
@@ -1473,7 +1470,43 @@ function setupWidgetBlocks(activity) {
             logo.inMatrix = true;
 
             if (logo.phraseMaker === null) {
-                logo.phraseMaker = new PhraseMaker();
+                // Create explicit dependency object for PhraseMaker
+                const phraseMakerDeps = {
+                    activity: activity,
+                    _: _,
+                    platformColor: platformColor,
+                    docById: docById,
+                    docBySelector: docBySelector,
+                    MATRIXSOLFEHEIGHT: MATRIXSOLFEHEIGHT,
+                    MATRIXSOLFEWIDTH: MATRIXSOLFEWIDTH,
+                    toFraction: toFraction,
+                    Singer: Singer,
+                    SOLFEGECONVERSIONTABLE: SOLFEGECONVERSIONTABLE,
+                    slicePath: slicePath,
+                    wheelnav: wheelnav,
+                    delayExecution: delayExecution,
+                    DEFAULTVOICE: DEFAULTVOICE,
+                    getDrumName: getDrumName,
+                    getDrumIcon: getDrumIcon,
+                    noteIsSolfege: noteIsSolfege,
+                    isCustomTemperament: isCustomTemperament,
+                    i18nSolfege: i18nSolfege,
+                    getNote: getNote,
+                    DEFAULTDRUM: DEFAULTDRUM,
+                    last: last,
+                    DRUMS: DRUMS,
+                    SHARP: SHARP,
+                    FLAT: FLAT,
+                    PREVIEWVOLUME: PREVIEWVOLUME,
+                    DEFAULTVOLUME: DEFAULTVOLUME,
+                    noteToFrequency: noteToFrequency,
+                    LCD: LCD,
+                    calcNoteValueToDisplay: calcNoteValueToDisplay,
+                    NOTESYMBOLS: NOTESYMBOLS,
+                    EIGHTHNOTEWIDTH: EIGHTHNOTEWIDTH,
+                    getTemperament: getTemperament
+                };
+                logo.phraseMaker = new PhraseMaker(phraseMakerDeps);
             }
             logo.phraseMaker.blockNo = blk;
 
@@ -1641,12 +1674,10 @@ function setupWidgetBlocks(activity) {
                 logo.sample = new AIWidget();
             }
             logo.inSample = true;
-            logo.sample = new AIWidget();
 
             const listenerName = "_sampler_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 logo.sample.init(activity);
             };
@@ -1831,7 +1862,6 @@ function setupWidgetBlocks(activity) {
                 logo.sample = new AIDebuggerWidget();
             }
             logo.inSample = true;
-            logo.sample = new AIDebuggerWidget();
 
             const listenerName = "_sampler_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
@@ -1876,4 +1906,8 @@ function setupWidgetBlocks(activity) {
     new AIDebugger().setup(activity);
     // Instantiate and set up the StatusBlock
     new StatusBlock().setup(activity);
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupWidgetBlocks };
 }

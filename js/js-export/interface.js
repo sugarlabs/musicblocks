@@ -61,6 +61,9 @@ class JSInterface {
         "newstaccato",
         "newslur",
         "neighbor2",
+        // Pen blocks
+        "fill",
+        "hollowline",
         // Volume blocks
         "crescendo",
         "decrescendo",
@@ -84,7 +87,8 @@ class JSInterface {
         // Meter blocks
         pickup: "PICKUP",
         // Intervals blocks
-        moveble: "MOVABLE",
+        movable: "MOVABLEDO",
+        moveble: "MOVABLEDO",
         // Volume blocks
         setnotevolume: "MASTERVOLUME",
         setpanning: "PANNING"
@@ -164,11 +168,16 @@ class JSInterface {
         number2pitch: "numToPitch",
         number2octave: "numToOctave",
         // Intervals blocks
+        definemode: "defineMode",
         setkey2: "setKey",
-        // "definemode": "defineMode",
         interval: "setScalarInterval",
         semitoneinterval: "setSemitoneInterval",
         settemperament: "setTemperament",
+        // Pen blocks
+        beginfill: "beginFill",
+        endfill: "endFill",
+        fill: "fillShape",
+        hollowline: "hollowLine",
         // Tone blocks
         settimbre: "setInstrument",
         vibrato: "doVibrato",
@@ -209,6 +218,8 @@ class JSInterface {
         controlpoint2: "setBezierControlPoint2",
         clear: "clear",
         scrollxy: "scrollXY",
+        erasemedia: "clearMedia",
+        wait: "doWait",
         // Pen blocks
         setcolor: "setColor",
         setgrey: "setGrey",
@@ -1807,6 +1818,21 @@ class JSInterface {
         ]
     };
 }
+// If constraints were loaded before this file and stashed on the global,
+// attach them now to the newly-defined `JSInterface` class.
+if (typeof globalThis !== "undefined" && globalThis.__MB_pending_methodArgConstraints) {
+    JSInterface._methodArgConstraints = globalThis.__MB_pending_methodArgConstraints;
+    try {
+        delete globalThis.__MB_pending_methodArgConstraints;
+    } catch (e) {
+        // ignore
+    }
+}
+
 if (typeof module !== "undefined" && module.exports) {
     module.exports = JSInterface;
+}
+
+if (typeof window !== "undefined") {
+    window.JSInterface = JSInterface;
 }

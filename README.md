@@ -17,7 +17,7 @@
 “_Music is a hidden arithmetic exercise of the soul, which does not
 know that it is counting._” — Leibniz
 
-Music Blocks is a _Visual Programming Language_ and collection of
+Music Blocks is a _Visual Programming Language_ and a collection of
 _manipulative tools_ for exploring musical and mathematical concepts
 in an integrative and entertaining way.
 
@@ -164,6 +164,20 @@ Before you begin, ensure you have Docker installed on your machine. You can down
 
 To stop the Docker container, use `Ctrl + C` in your terminal. This
 will stop the container and free up the port it was using.
+
+## Troubleshooting
+When running Music Blocks locally using `npm run dev`, the UI may load successfully even if some interactions appear unresponsive.
+
+New contributors may observe console errors such as:
+- `$ is not defined`
+- `lang is not defined`
+- `p5 is not defined`
+
+These errors can occur due to script loading order and initialization differences in local environments.
+
+If the UI loads and assets render correctly, the setup is generally considered successful for development purposes.
+
+Future improvements may address these issues as part of ongoing refactoring efforts.
 
 ## Additional Notes
 

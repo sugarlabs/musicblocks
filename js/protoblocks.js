@@ -628,7 +628,7 @@ class ProtoBlock {
 
     /**
      * Sets up a media block. Media blocks invoke a chooser and a thumbnail
-     * image is overlayed to represent the data associated with the block.
+     * image is overlaid to represent the data associated with the block.
      */
     mediaBlock() {
         this.style = "value";
@@ -1913,9 +1913,7 @@ class BaseBlock extends ProtoBlock {
         }
 
         if (this._style.name) this.adjustWidthToLabel();
-        if (!this.palette)
-            // eslint-disable-next-line no-console
-            console.warn("Block " + this.name + " was not added to a palette!");
+        if (!this.palette) console.warn("Block " + this.name + " was not added to a palette!");
         else this.palette.add(this);
     }
 }
