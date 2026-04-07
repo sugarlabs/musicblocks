@@ -1390,9 +1390,8 @@ class Palette {
     }
 
     hideMenu() {
-        docById(
-            "palette"
-        ).childNodes[0].style.borderRight = `1px solid ${platformColor.selectorSelected}`;
+        docById("palette").childNodes[0].style.borderRight =
+            `1px solid ${platformColor.selectorSelected}`;
         if (this._outsideClickListener) {
             document.removeEventListener("click", this._outsideClickListener);
             this._outsideClickListener = null;
@@ -1506,6 +1505,7 @@ class Palette {
         blocks.reverse();
         const protoListScope = [...this.protoList];
         if (last(blocks).blkname != last(protoListScope).name) protoListScope.reverse();
+        const fragment = document.createDocumentFragment();
         for (const blk in blocks) {
             const b = blocks[blk];
 
@@ -1607,8 +1607,10 @@ class Palette {
             itemCell.style.width = `${img.width}px`;
             itemCell.style.paddingRight = `${this.palettes.cellSize}px`;
             itemCell.appendChild(img);
-            paletteList.appendChild(itemRow);
+            fragment.appendChild(itemRow);
         }
+
+        paletteList.appendChild(fragment);
 
         if (this.palettes.mobile) {
             this.hide();

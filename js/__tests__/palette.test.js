@@ -1547,6 +1547,9 @@ describe("Palettes Class", () => {
                 })),
                 appendChild: jest.fn()
             };
+            document.createDocumentFragment = jest.fn(() => ({
+                appendChild: jest.fn()
+            }));
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
                 return null;
@@ -1577,6 +1580,9 @@ describe("Palettes Class", () => {
             const paletteList = {
                 appendChild: jest.fn()
             };
+            document.createDocumentFragment = jest.fn(() => ({
+                appendChild: jest.fn()
+            }));
 
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
@@ -1673,6 +1679,9 @@ describe("Palettes Class", () => {
             const paletteList = {
                 appendChild: jest.fn()
             };
+            document.createDocumentFragment = jest.fn(() => ({
+                appendChild: jest.fn()
+            }));
 
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
