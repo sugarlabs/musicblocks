@@ -788,18 +788,50 @@ const processPluginData = (activity, pluginData, pluginSource) => {
     }
 
     // Populate the flow-block dictionary, i.e., the code that is
-    // eval'd by this block.
+    // compiled into a function for hot-path execution.
     if ("FLOWPLUGINS" in obj) {
         for (const flow in obj["FLOWPLUGINS"]) {
-            activity.logo.evalFlowDict[flow] = obj["FLOWPLUGINS"][flow];
+            try {
+                // SECURITY: Plugins are trusted code.
+                activity.logo.evalFlowDict[flow] = new Function(
+                    "logo",
+                    "turtle",
+                    "blk",
+                    "receivedArg",
+                    "actionArgs",
+                    "args",
+                    "isflow",
+                    obj["FLOWPLUGINS"][flow]
+                );
+            } catch (e) {
+                console.error("Failed to compile FLOWPLUGIN:", flow, e);
+                activity.logo.evalFlowDict[flow] = null;
+            }
         }
     }
 
-    // Populate the arg-block dictionary, i.e., the code that is
-    // eval'd by this block.
+    // Populate the arg-block dictionary
     if ("ARGPLUGINS" in obj) {
         for (const arg in obj["ARGPLUGINS"]) {
-            activity.logo.evalArgDict[arg] = obj["ARGPLUGINS"][arg];
+            try {
+                // Pre-compile the plugin code into a function to avoid eval() in parseArg
+                // NOTE: Plugins are trusted code.
+                // SECURITY: Only safe because ARGPLUGINS are trusted code.
+                // new Function is used intentionally to precompile plugin execution.
+                // Standard scope exposure: logo, turtle, blk, parentBlk, receivedArg, tur
+                activity.logo.evalArgDict[arg] = new Function(
+                    "logo",
+                    "turtle",
+                    "blk",
+                    "parentBlk",
+                    "receivedArg",
+                    "tur",
+                    obj["ARGPLUGINS"][arg]
+                );
+            } catch (e) {
+                console.error("Failed to compile ARGPLUGIN:", arg, e);
+                activity.logo.evalArgDict[arg] = null;
+            }
         }
     }
 
@@ -817,11 +849,22 @@ const processPluginData = (activity, pluginData, pluginSource) => {
         }
     }
 
-    // Populate the setter dictionary, i.e., the code that is
-    // used to set a value block.
+    // Populate the setter dictionary
     if ("SETTERPLUGINS" in obj) {
         for (const setter in obj["SETTERPLUGINS"]) {
-            activity.logo.evalSetterDict[setter] = obj["SETTERPLUGINS"][setter];
+            try {
+                // SECURITY: Plugins are trusted code.
+                activity.logo.evalSetterDict[setter] = new Function(
+                    "logo",
+                    "blk",
+                    "value",
+                    "turtle",
+                    obj["SETTERPLUGINS"][setter]
+                );
+            } catch (e) {
+                console.error("Failed to compile SETTERPLUGIN:", setter, e);
+                activity.logo.evalSetterDict[setter] = null;
+            }
         }
     }
 
@@ -845,7 +888,18 @@ const processPluginData = (activity, pluginData, pluginSource) => {
 
     if ("PARAMETERPLUGINS" in obj) {
         for (const parameter in obj["PARAMETERPLUGINS"]) {
-            activity.logo.evalParameterDict[parameter] = obj["PARAMETERPLUGINS"][parameter];
+            try {
+                // SECURITY: Plugins are trusted code.
+                activity.logo.evalParameterDict[parameter] = new Function(
+                    "logo",
+                    "turtle",
+                    "blk",
+                    obj["PARAMETERPLUGINS"][parameter]
+                );
+            } catch (e) {
+                console.error("Failed to compile PARAMETERPLUGIN:", parameter, e);
+                activity.logo.evalParameterDict[parameter] = null;
+            }
         }
     }
 
@@ -859,14 +913,26 @@ const processPluginData = (activity, pluginData, pluginSource) => {
     // Code to execute when turtle code is started
     if ("ONSTART" in obj) {
         for (const arg in obj["ONSTART"]) {
-            activity.logo.evalOnStartList[arg] = obj["ONSTART"][arg];
+            try {
+                // SECURITY: Plugins are trusted code.
+                activity.logo.evalOnStartList[arg] = new Function("logo", obj["ONSTART"][arg]);
+            } catch (e) {
+                console.error("Failed to compile ONSTART plugin:", arg, e);
+                activity.logo.evalOnStartList[arg] = null;
+            }
         }
     }
 
     // Code to execute when turtle code is stopped
     if ("ONSTOP" in obj) {
         for (const arg in obj["ONSTOP"]) {
-            activity.logo.evalOnStopList[arg] = obj["ONSTOP"][arg];
+            try {
+                // SECURITY: Plugins are trusted code.
+                activity.logo.evalOnStopList[arg] = new Function("logo", obj["ONSTOP"][arg]);
+            } catch (e) {
+                console.error("Failed to compile ONSTOP plugin:", arg, e);
+                activity.logo.evalOnStopList[arg] = null;
+            }
         }
     }
 
