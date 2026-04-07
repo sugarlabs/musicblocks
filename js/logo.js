@@ -797,7 +797,9 @@ class Logo {
                         if (typeof pluginFn === "function") {
                             pluginFn(logo, turtle, blk, parentBlk, receivedArg, tur);
                         } else {
-                            logo.activity.errorMsg(_("Plugin failed to load: ") + blockName);
+                            logo.activity.errorMsg(
+                                _("Plugin failed to load: %s").replace(/%s/g, blockName)
+                            );
                         }
                     } else {
                         console.error("I do not know how to " + blockName);
@@ -1173,7 +1175,10 @@ class Logo {
         this.activity.saveLocally(); // Save the state before running.
 
         for (const arg in this.evalOnStartList) {
-            eval(this.evalOnStartList[arg]);
+            const pluginFn = this.evalOnStartList[arg];
+            if (typeof pluginFn === "function") {
+                pluginFn(this);
+            }
         }
 
         this.stopTurtle = false;
@@ -1642,16 +1647,20 @@ class Logo {
             }
         }
 
-        if (!logo.blockList[blk].isArgBlock()) {
+        const currentBlock = logo.blockList[blk];
+        if (!currentBlock.isArgBlock()) {
             let res = null;
             // Is it a plugin?
-            if (logo.blockList[blk].name in logo.evalFlowDict) {
+            if (currentBlock.name in logo.evalFlowDict) {
                 logo.pluginReturnValue = null;
-                eval(logo.evalFlowDict[logo.blockList[blk].name]);
+                const pluginFn = logo.evalFlowDict[currentBlock.name];
+                if (typeof pluginFn === "function") {
+                    pluginFn(logo, turtle, blk, receivedArg, actionArgs, args, isflow);
+                }
                 // Clamp blocks will return the child flow.
                 res = logo.pluginReturnValue;
             } else {
-                res = logo.blockList[blk].protoblock.flow(
+                res = currentBlock.protoblock.flow(
                     args,
                     logo,
                     turtle,
@@ -1676,9 +1685,9 @@ class Logo {
         } else {
             if (
                 // If it's an arg block, print its value.
-                logo.blockList[blk].isArgBlock() ||
+                currentBlock.isArgBlock() ||
                 ["anyout", "numberout", "textout", "booleanout"].includes(
-                    logo.blockList[blk].protoblock.dockTypes[0]
+                    currentBlock.protoblock.dockTypes[0]
                 )
             ) {
                 args.push(logo.parseArg(logo, turtle, blk, logo.receivedArg));
@@ -1693,21 +1702,18 @@ class Logo {
                     toppos: _("top (screen)"),
                     bottompos: _("bottom (screen)")
                 };
-                const blockName = logo.blockList[blk].name;
+                const blockName = currentBlock.name;
                 const label = blockLabels[blockName];
 
-                if (logo.blockList[blk].value == null) {
+                if (currentBlock.value == null) {
                     logo.activity.textMsg("null block value");
                 } else {
-                    const value = logo.blockList[blk].value.toString();
+                    const value = currentBlock.value.toString();
                     const displayText = label ? label + ": " + value : value;
                     logo.activity.textMsg(displayText);
                 }
             } else {
-                logo.activity.errorMsg(
-                    "I do not know how to " + logo.blockList[blk].name + ".",
-                    blk
-                );
+                logo.activity.errorMsg("I do not know how to " + currentBlock.name + ".", blk);
             }
 
             logo.stopTurtle = true;
