@@ -141,6 +141,9 @@ function setupNumberBlocks(activity) {
                 ""
             ]);
 
+            // Allow searching this block by common math terms, not just the '^' symbol.
+            this.extraSearchTerms = ["power", "exponent", "raise to power", "to the power"];
+
             this.fontsize = 14;
             this.formBlock({
                 name: "^",
@@ -364,6 +367,8 @@ function setupNumberBlocks(activity) {
                 "note1"
             ]);
 
+            this.extraSearchTerms = ["divide", "division"];
+
             this.fontsize = 9;
             this.formBlock({
                 name: this.lang === "ja" ? "➗" : "/",
@@ -439,6 +444,8 @@ function setupNumberBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([_("The Multiply block is used to multiply."), "documentation", ""]);
+
+            this.extraSearchTerms = ["multiply", "product", "times"];
 
             this.fontsize = 14;
             this.formBlock({
@@ -608,6 +615,9 @@ function setupNumberBlocks(activity) {
 
             this.setHelpString([_("The Minus block is used to subtract."), "documentation", ""]);
 
+            // Make this block discoverable by common subtraction terms.
+            this.extraSearchTerms = ["minus", "subtract", "subtraction", "difference", "negative"];
+
             this.fontsize = 14;
             this.formBlock({
                 name: "–",
@@ -714,6 +724,9 @@ function setupNumberBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([_("The Plus block is used to add."), "documentation", ""]);
+
+            // Make this block discoverable by common addition terms.
+            this.extraSearchTerms = ["plus", "add", "addition", "sum", "increment"];
 
             this.fontsize = 14;
             this.formBlock({
