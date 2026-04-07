@@ -2095,7 +2095,7 @@ class Singer {
                             let d;
                             if (duration > 0) {
                                 if (carry > 0) {
-                                    if (duration === carry) {
+                                    if (Math.abs(duration - carry) < 1e-10) {
                                         d = 0;
                                     } else {
                                         d = 1 / (1 / duration - 1 / carry);
