@@ -11,6 +11,9 @@
 
 /* global requirejs, define */
 
+// Localization helper for early bootstrap
+const t_ = typeof _ === "function" ? _ : s => s;
+
 requirejs.config({
     baseUrl: "./",
     urlArgs: window.location.protocol === "file:" ? "" : "v=999999_fix7",
@@ -334,7 +337,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                             console.error(
                                 "FATAL: createjs (EaselJS/TweenJS) not found. Cannot proceed."
                             );
-                            alert("Failed to load EaselJS. Please refresh the page.");
+                            alert(t_("Failed to load EaselJS. Please refresh the page."));
                             return;
                         }
 
@@ -346,7 +349,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                             },
                             function (err) {
                                 console.error("Failed to load activity/activity:", err);
-                                alert("Failed to load Music Blocks. Please refresh the page.");
+                                alert(t_("Failed to load Music Blocks. Please refresh the page."));
                             }
                         );
                     }, 100); // Small delay to allow globals to be set
@@ -354,8 +357,9 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 function (err) {
                     console.error("Core bootstrap failed:", err);
                     alert(
-                        "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: " +
-                            (err.message || err)
+                        t_(
+                            "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: %s"
+                        ).replace(/%s/g, err.message || err)
                     );
                 }
             );

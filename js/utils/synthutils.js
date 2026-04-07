@@ -13,7 +13,7 @@
 /*
    global
 
-   _, last, Tone, require, getTemperament, pitchToNumber,
+   last, Tone, getTemperament, pitchToNumber,
    getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
    getOctaveRatio, isCustomTemperament, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
@@ -1109,11 +1109,11 @@ function Synth() {
             chunks = [];
             const url = URL.createObjectURL(blob);
             // Prompt the user for the file name
-            const fileName = window.prompt("Enter file name", "recording");
+            const fileName = window.prompt(_("Enter file name"), _("recording"));
             if (fileName) {
                 download(url, fileName + (platform.FF ? ".wav" : ".ogg"));
             } else {
-                alert("Download cancelled.");
+                alert(_("Download cancelled."));
             }
         };
         // this.recorder.start();
@@ -2060,7 +2060,9 @@ function Synth() {
                 if (Tone.context.state !== "running" && !window.hasShownAudioWarning) {
                     window.hasShownAudioWarning = true;
                     alert(
-                        "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
+                        _(
+                            "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
+                        )
                     );
                 }
             }, 2000);
