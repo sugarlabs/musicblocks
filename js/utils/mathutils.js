@@ -102,7 +102,7 @@ class MathUtility {
         ) {
             return GetRandomSolfege(a, b, c);
         } else {
-            throw "NanError";
+            throw new Error("NanError");
         }
     }
 
@@ -130,7 +130,7 @@ class MathUtility {
     static doMod(a, b) {
         if (typeof a === "number" && typeof b === "number") {
             if (Number(b) === 0) {
-                throw new Error("Division by zero");
+                return NaN;
             }
             return Number(a) % Number(b);
         } else {
@@ -144,17 +144,17 @@ class MathUtility {
      * @static
      * @param {number} a
      * @returns {number} - Square root of a.
-     * @throws {string} No square root error, NAN error if the arguments are not valid.
+     * @throws {Error} No square root error, NAN error if the arguments are not valid.
      */
     static doSqrt(a) {
         if (typeof a === "number") {
             if (a < 0) {
-                throw "NoSqrtError";
+                throw new Error("NoSqrtError");
             }
 
             return Math.sqrt(Number(a));
         } else {
-            throw "NanError";
+            throw new Error("NanError");
         }
     }
 
@@ -188,7 +188,7 @@ class MathUtility {
      */
     static doMinus(a, b) {
         if (typeof a === "string" || typeof b === "string") {
-            throw "NanError";
+            throw new Error("NanError");
         }
 
         return Number(a) - Number(b);
@@ -205,7 +205,7 @@ class MathUtility {
      */
     static doMultiply(a, b) {
         if (typeof a === "string" || typeof b === "string") {
-            throw "NanError";
+            throw new Error("NanError");
         }
 
         return Number(a) * Number(b);
@@ -223,12 +223,12 @@ class MathUtility {
     static doDivide(a, b) {
         if (typeof a === "number" && typeof b === "number") {
             if (Number(b) === 0) {
-                throw "DivByZeroError";
+                throw new Error("DivByZeroError");
             }
 
             return Number(a) / Number(b);
         } else {
-            throw "NanError";
+            throw new Error("NanError");
         }
     }
 
@@ -256,7 +256,7 @@ class MathUtility {
 
             return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
         } else {
-            throw "NanError";
+            throw new Error("NanError");
         }
     }
 
@@ -273,7 +273,7 @@ class MathUtility {
         if (typeof a === "number" && typeof b === "number") {
             return Math.pow(a, b);
         } else {
-            throw "NanError";
+            throw new Error("NanError");
         }
     }
 
@@ -289,7 +289,7 @@ class MathUtility {
         if (typeof a === "number") {
             return Math.abs(a);
         } else {
-            throw "NanError";
+            throw new Error("NanError");
         }
     }
 
@@ -308,7 +308,7 @@ class MathUtility {
             const obj = a.split("");
             return obj.reverse().join("");
         } else {
-            throw "NoNegError";
+            throw new Error("NoNegError");
         }
     }
 
@@ -324,7 +324,7 @@ class MathUtility {
         try {
             return Math.floor(Number(a) + 0.5);
         } catch (e) {
-            throw "NanError";
+            throw new Error("NanError");
         }
     }
 }

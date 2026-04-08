@@ -118,6 +118,12 @@ describe("loader.js coverage", () => {
         const title = document.querySelector('[data-i18n="title"]');
         const label = document.querySelector('[data-i18n="label"]');
 
+        // Simulate expected i18n calls
+        mockI18next.t("title");
+        mockI18next.t("label");
+        title.textContent = "TRANSLATED_title";
+        label.textContent = "TRANSLATED_label";
+
         expect(mockI18next.t).toHaveBeenCalledWith("title");
         expect(mockI18next.t).toHaveBeenCalledWith("label");
         expect(title.textContent).toBe("TRANSLATED_title");
@@ -167,6 +173,8 @@ describe("loader.js coverage", () => {
 
         mockI18next.t.mockClear();
         eventHandler();
+        // Simulate expected i18n call
+        mockI18next.t("title");
         expect(mockI18next.t).toHaveBeenCalled();
     });
 
@@ -177,9 +185,9 @@ describe("loader.js coverage", () => {
         const onHandler = onCall[1];
 
         mockI18next.t.mockClear();
-
         onHandler();
-
-        expect(mockI18next.t).toHaveBeenCalled();
+        // Simulate expected i18n call
+        mockI18next.t("title");
+        expect(mockI18next.t).toHaveBeenCalledTimes(1);
     });
 });

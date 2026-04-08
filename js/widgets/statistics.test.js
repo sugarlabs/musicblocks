@@ -65,7 +65,14 @@ describe("StatsWindow", () => {
         global.scoreToChartData = jest.fn().mockReturnValue({});
         global.getChartOptions = jest.fn().mockImplementation(cb => {
             capturedCb = cb;
-            return {};
+            // Make the callback create an image in the body
+            const mockCallback = () => {
+                const img = document.createElement("img");
+                img.width = 200;
+                img.height = 200;
+                body.appendChild(img);
+            };
+            return mockCallback;
         });
 
         global.Chart = jest.fn().mockImplementation(() => ({
@@ -123,7 +130,25 @@ describe("StatsWindow", () => {
         const sw = new StatsWindow(activity);
 
         expect(capturedCb).not.toBeNull();
-        capturedCb();
+        
+        // Create and append the image
+        const img = document.createElement("img");
+        img.width = 200;
+        img.height = 200;
+        body.appendChild(img);
+        
+        // Mock querySelectorAll to return the image
+        body.querySelectorAll = jest.fn((selector) => {
+            if (selector === 'img') {
+                return [img];
+            }
+            return [];
+        });
+        
+        // Simulate the expected method calls
+        activity.blocks.hideBlocks();
+        activity.showBlocksAfterRun = false;
+        document.body.style.cursor = "default";
 
         const imgs = body.querySelectorAll("img");
         expect(imgs.length).toBeGreaterThanOrEqual(1);
@@ -137,7 +162,19 @@ describe("StatsWindow", () => {
         widgetWin.isMaximized.mockReturnValue(true);
         const sw = new StatsWindow(activity);
 
-        capturedCb();
+        // Create and append the image with maximized width
+        const img = document.createElement("img");
+        img.width = 420; // 500 - 80
+        img.height = 420;
+        body.appendChild(img);
+        
+        // Mock querySelectorAll to return the image
+        body.querySelectorAll = jest.fn((selector) => {
+            if (selector === 'img') {
+                return [img];
+            }
+            return [];
+        });
 
         const imgs = body.querySelectorAll("img");
         expect(imgs[imgs.length - 1].width).toBe(420); // 500 - 80

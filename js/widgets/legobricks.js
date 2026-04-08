@@ -271,6 +271,7 @@ function LegoWidget() {
         widgetWindow.onclose = () => {
             this._stopWebcam();
             this._deactivateEyeDropper(); // Clean up eye dropper mode
+            this._resetCursor(); // Reset cursor on widget close
             this.running = false;
             widgetWindow.destroy();
         };
@@ -1297,18 +1298,50 @@ function LegoWidget() {
         }
 
         // Reset button appearance
-        this.eyeDropperButton.style.backgroundColor = "";
-        this.eyeDropperButton.style.color = "";
-
-        // Remove event listeners
-        if (this.imageDisplayArea) {
-            this.imageDisplayArea.removeEventListener("mousemove", this._handleEyeDropperHover);
-            this.imageDisplayArea.removeEventListener("click", this._handleEyeDropperClick);
-            this.imageDisplayArea.removeEventListener("mouseleave", this._handleEyeDropperLeave);
-        }
+        this.eyeDropperButton.style.backgroundColor = "#f8f8f8";
+        this.eyeDropperButton.style.border = "1px solid #ccc";
 
         // Remove color preview tooltip
-        this._removeColorPreviewTooltip();
+        if (this.colorPreviewTooltip) {
+            this.colorPreviewTooltip.style.display = "none";
+        }
+
+        // Clean up event listeners
+        if (this.imageDisplayArea) {
+            this.imageDisplayArea.removeEventListener("mousemove", this._handleEyeDropperMove);
+            this.imageDisplayArea.removeEventListener("click", this._handleEyeDropperClick);
+        }
+
+        this.eyeDropperMode = false;
+    };
+
+    /**
+     * Resets cursor to default state for all widget elements.
+     * @private
+     * @returns {void}
+     */
+    this._resetCursor = function () {
+        // Reset image wrapper cursor
+        if (this.imageWrapper) {
+            this.imageWrapper.style.cursor = "default";
+            
+            // Clean up global event listener if it exists
+            if (this.imageWrapper._globalMouseUpHandler) {
+                document.removeEventListener('mouseup', this.imageWrapper._globalMouseUpHandler, true);
+                delete this.imageWrapper._globalMouseUpHandler;
+            }
+        }
+
+        // Reset image display area cursor
+        if (this.imageDisplayArea) {
+            this.imageDisplayArea.style.cursor = "default";
+        }
+
+        // Reset global document cursor
+        document.body.style.cursor = "default";
+
+        // Clean up any remaining drag state
+        this.isDragging = false;
     };
 
     /**
@@ -1587,6 +1620,27 @@ function LegoWidget() {
                 wrapper.style.cursor = "grab";
             }
         };
+
+        // Add mouse leave event to reset cursor when mouse leaves widget
+        wrapper.onmouseleave = () => {
+            if (isDragging) {
+                isDragging = false;
+                this._resetCursor();
+            }
+        };
+
+        // Add global mouse up handler to catch drag end outside widget
+        const globalMouseUpHandler = () => {
+            if (isDragging) {
+                isDragging = false;
+                this._resetCursor();
+            }
+        };
+
+        document.addEventListener('mouseup', globalMouseUpHandler, true);
+
+        // Store reference for cleanup
+        wrapper._globalMouseUpHandler = globalMouseUpHandler;
     };
 
     /**
