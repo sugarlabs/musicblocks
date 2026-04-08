@@ -37,7 +37,7 @@
    - js/piemenus.js
         piemenuBlockContext
    - js/protoblocks.js
-        ProtoBlock 
+        ProtoBlock
    - js/utils/mathutils.js
         MathUtility
    - js/utils/utils.js
