@@ -64,7 +64,7 @@ const changeImage = (imgElement, from, to) => {
  * @param {string} text - The input text to be translated.
  * @returns {string} The translated text.
  */
-// eslint-disable-next-line no-redeclare
+
 function _(text, options = {}) {
     if (!text) return "";
 
@@ -684,7 +684,6 @@ const processPluginData = (activity, pluginData, pluginSource) => {
     let userConfirmed = isVettedPlugin(pluginSource);
 
     if (!userConfirmed) {
-        // eslint-disable-next-line no-alert
         userConfirmed = confirm(
             _("Security Warning") +
                 "\n\n" +
@@ -699,7 +698,6 @@ const processPluginData = (activity, pluginData, pluginSource) => {
         );
 
         if (!userConfirmed) {
-            // eslint-disable-next-line no-console
             console.warn("User declined unvetted plugin execution:", pluginSource);
             return null;
         }

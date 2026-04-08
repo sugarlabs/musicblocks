@@ -2700,7 +2700,6 @@ class Logo {
             try {
                 return code(logo, turtle, blk, value, ...args);
             } catch (e) {
-                // eslint-disable-next-line no-console
                 console.error("Plugin function execution failed: ", e);
                 return;
             }
@@ -2726,7 +2725,7 @@ class Logo {
             },
             {
                 // Binary Math operations (Math.pow)
-                regex: /^const mathBlock = globalActivity\.logo\.blockList\[blk\];const conns = mathBlock\.connections;var base = logo\.parseArg\(logo, turtle, conns\[1\]\);var exp  = logo\.parseArg\(logo, turtle, conns\[2\]\);mathBlock\.value = Math\.pow\(base, exp\);$/,
+                regex: /^const mathBlock = globalActivity\.logo\.blockList\[blk\];const conns = mathBlock\.connections;var base = logo\.parseArg\(logo, turtle, conns\[1\]\);var exp {2}= logo\.parseArg\(logo, turtle, conns\[2\]\);mathBlock\.value = Math\.pow\(base, exp\);$/,
                 exec: () => {
                     const mathBlock = logo.blockList[blk];
                     const conns = mathBlock.connections;
@@ -2766,8 +2765,10 @@ class Logo {
 
         // If not a function and not whitelisted, we block arbitrary string execution (eval).
         // This is the core of the security fix for #5449.
-        // eslint-disable-next-line no-console
-        console.warn("Blocked arbitrary JavaScript execution in plugin:", code.substring(0, 100) + "...");
+        console.warn(
+            "Blocked arbitrary JavaScript execution in plugin:",
+            code.substring(0, 100) + "..."
+        );
     }
 }
 

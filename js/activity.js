@@ -6705,7 +6705,6 @@ class Activity {
                         }
                     }, 1000);
                 } else {
-                    // eslint-disable-next-line no-console
                     console.error("Could not load built-in plugin: " + name);
                 }
             };

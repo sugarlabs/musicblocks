@@ -7222,7 +7222,6 @@ class Blocks {
                             blk,
                             name
                         );
-                    }
                     } else {
                         return;
                     }
@@ -7274,7 +7273,6 @@ class Blocks {
                         blk,
                         value
                     );
-                }
                 } else {
                     throw new Error();
                 }
