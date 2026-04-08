@@ -104,32 +104,3 @@ This instrumentation layer is only the first step toward better performance anal
 If you are working on performance-related changes in Music Blocks, enabling this instrumentation can help you quickly evaluate how your changes affect runtime behavior.
 
 Even small improvements in execution time or interpreter depth can significantly improve the experience when running large block programs.
-
----
-
-## Startup Performance Instrumentation (mbPerf)
-
-Music Blocks also includes an opt-in startup/boot timing tracker to profile load performance. It is disabled by default and only intended for local developer profiling (no telemetry).
-
-### Enable
-
-Use one of these:
-
-- Query string: `?mbPerf=1`
-- Local storage flag (persists across reloads): `localStorage.setItem("mbPerf", "1")`
-
-Disable with:
-
-- Remove the query param, and/or
-- `localStorage.removeItem("mbPerf")`
-
-### Output
-
-When enabled, timings are stored in `window.__mbPerf`:
-
-- `marks`: timestamp marks
-- `measures`: computed durations in milliseconds
-
-It prints a summary table in the console after startup. You can re-print it manually with:
-
-- `window.__mbPerf.report()`
