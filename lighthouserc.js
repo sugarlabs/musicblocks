@@ -73,7 +73,6 @@ module.exports = {
             assertions: {
                 ...sharedAssertions,
                 ...performanceAssertions
-               
             }
         },
         upload: {
