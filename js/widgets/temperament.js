@@ -1593,7 +1593,12 @@ function TemperamentWidget() {
                 const t = getTemperament(temperament);
                 // Ensure we have a valid temperament object with intervals
                 if (!t || !t.interval || !Array.isArray(t.interval)) {
-                    console.warn("Invalid temperament in checkTemperament, skipping:", temperament);
+                    this.activity.errorMsg(
+                        _("Invalid temperament: ") +
+                            temperament +
+                            _(". Skipping to next temperament."),
+                        3000
+                    );
                     continue;
                 }
                 const temperamentRatios = [];
@@ -2231,7 +2236,10 @@ function TemperamentWidget() {
         let t = getTemperament(this.inTemperament);
         // Ensure we have a valid temperament object
         if (!t || !t.pitchNumber) {
-            console.warn("Invalid temperament, falling back to equal temperament");
+            that.activity.errorMsg(
+                _("Invalid temperament. Falling back to equal temperament."),
+                3000
+            );
             t = getTemperament("equal");
         }
         this.pitchNumber = t.pitchNumber;
@@ -2282,7 +2290,10 @@ function TemperamentWidget() {
                 }
                 // Ensure t has a valid interval array before accessing it
                 if (!t || !t.interval || i >= t.interval.length) {
-                    console.warn("Invalid temperament interval data, skipping note:", i);
+                    that.activity.errorMsg(
+                        _("Invalid temperament interval data. Skipping note ") + i,
+                        3000
+                    );
                     continue;
                 }
                 str[i] = getNoteFromInterval(startingPitch, t.interval[i]);

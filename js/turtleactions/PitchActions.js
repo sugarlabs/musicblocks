@@ -22,7 +22,7 @@
 
 /*
    globals Singer, pitchToNumber, getStepSizeUp, getStepSizeDown, calcOctave, last, getNote,
-   nthDegreeToPitch, SHARP, FLAT, _, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
+   nthDegreeToPitch, SHARP, FLAT, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    numberToPitch, ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
    keySignatureToMode, getInterval, EFFECTSNAMES, NANERRORMSG, frequencyToPitch,
    MusicBlocks, Mouse, isCustomTemperament
@@ -42,7 +42,7 @@
         MusicBlocks, Mouse
     - js/utils/musicutils.js
         pitchToNumber, getStepSizeUp, getStepSizeDown, calcOctave, getNote, nthDegreeToPitch,
-        SHARP, FLAT, _, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE, numberToPitch,
+        SHARP, FLAT, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE, numberToPitch,
         ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
         keySignatureToMode, getInterval, frequencyToPitch, isCustomTemperament
 */
@@ -279,7 +279,8 @@ function setupPitchActions(activity) {
                     pitchNumber + tur.singer.pitchNumberOffset,
                     activity.logo.synth.inTemperament,
                     activity.logo.synth.startingPitch,
-                    tur.singer.pitchNumberOffset
+                    tur.singer.pitchNumberOffset,
+                    activity
                 );
                 Singer.processPitch(activity, obj[0], obj[1], 0, turtle, blk);
                 return;
@@ -549,7 +550,12 @@ function setupPitchActions(activity) {
         static numToPitch(number, outType, turtle) {
             if (number !== null && typeof number === "number") {
                 const obj = numberToPitch(
-                    Math.floor(number) + activity.turtles.ithTurtle(turtle).singer.pitchNumberOffset
+                    Math.floor(number) +
+                        activity.turtles.ithTurtle(turtle).singer.pitchNumberOffset,
+                    undefined,
+                    undefined,
+                    undefined,
+                    activity
                 );
                 if (outType === "pitch") {
                     return obj[0];

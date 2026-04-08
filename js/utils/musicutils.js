@@ -3988,7 +3988,7 @@ const getNoteFromInterval = (pitch, interval) => {
  * @param {number} [offset=0] - The offset value (default is 0).
  * @returns {Array} An array containing the note and octave.
  */
-const numberToPitch = (i, temperament, startPitch, offset) => {
+const numberToPitch = (i, temperament, startPitch, offset, activity) => {
     // Calculate the pitch and octave based on index.
     // We start at A0.
     if (temperament === undefined) {
@@ -4028,6 +4028,12 @@ const numberToPitch = (i, temperament, startPitch, offset) => {
         // Ensure the temperament exists in TEMPERAMENT before accessing it
         if (!TEMPERAMENT[temperament] || !TEMPERAMENT[temperament]["pitchNumber"]) {
             // Fallback to equal temperament if custom temperament is not found
+            if (activity && activity.errorMsg) {
+                activity.errorMsg(
+                    _("Invalid temperament. Falling back to equal temperament."),
+                    3000
+                );
+            }
             temperament = "equal";
         }
         const octaveLength = TEMPERAMENT[temperament]["pitchNumber"];
