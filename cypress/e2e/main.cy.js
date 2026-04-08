@@ -1,3 +1,5 @@
+/* global Cypress, cy, before */
+
 Cypress.on("uncaught:exception", err => {
     const ignored = [
         "ResizeObserver loop limit exceeded",
@@ -11,15 +13,15 @@ Cypress.on("uncaught:exception", err => {
 describe("MusicBlocks Application", () => {
     before(() => {
         cy.visit("http://localhost:3000");
-        cy.waitForAppReady();
     });
 
     describe("Loading and Initial Render", () => {
         it("should display the loading animation container", () => {
-            cy.get("#loading-image-container").should("exist");
+            cy.get("#loading-image-container").should("be.visible");
         });
 
         it("should display the canvas after loading", () => {
+            cy.waitForAppReady();
             cy.get("#canvas").should("be.visible");
         });
 
