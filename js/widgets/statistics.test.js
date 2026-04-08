@@ -115,7 +115,7 @@ describe("StatsWindow", () => {
         widgetWin.isMaximized.mockReturnValue(false);
         widgetWin.onmaximize();
 
-        expect(body.style.padding).toBe("0px 0px");
+        expect(body.style.padding).toBe("0px");
     });
 
     test("chart callback sets img width to 200 when not maximized", () => {

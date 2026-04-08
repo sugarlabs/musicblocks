@@ -60,11 +60,9 @@ class CacheManager {
             // Clean up expired entries on init
             await this.clearExpired();
 
-            // eslint-disable-next-line no-console
             console.debug("[CacheManager] Initialized successfully");
             return true;
         } catch (error) {
-            // eslint-disable-next-line no-console
             console.error("[CacheManager] Initialization failed:", error);
             return false;
         }
@@ -143,7 +141,6 @@ class CacheManager {
 
             return null;
         } catch (error) {
-            // eslint-disable-next-line no-console
             console.debug("[CacheManager] Error getting metadata:", error);
             return null;
         }
@@ -171,7 +168,6 @@ class CacheManager {
             await this._enforceMaxSize(this.STORES.METADATA);
             return true;
         } catch (error) {
-            // eslint-disable-next-line no-console
             console.debug("[CacheManager] Error caching metadata:", error);
             return false;
         }
@@ -195,7 +191,6 @@ class CacheManager {
 
             return null;
         } catch (error) {
-            // eslint-disable-next-line no-console
             console.debug("[CacheManager] Error getting project:", error);
             return null;
         }
@@ -223,7 +218,6 @@ class CacheManager {
             await this._enforceMaxSize(this.STORES.PROJECTS);
             return true;
         } catch (error) {
-            // eslint-disable-next-line no-console
             console.debug("[CacheManager] Error caching project:", error);
             return false;
         }
@@ -288,13 +282,11 @@ class CacheManager {
             try {
                 cleared += await this._clearExpiredFromStore(storeName, now);
             } catch (error) {
-                // eslint-disable-next-line no-console
                 console.debug(`[CacheManager] Error clearing expired from ${storeName}:`, error);
             }
         }
 
         if (cleared > 0) {
-            // eslint-disable-next-line no-console
             console.debug(`[CacheManager] Cleared ${cleared} expired entries`);
         }
 
@@ -441,11 +433,9 @@ class CacheManager {
                 });
             }
 
-            // eslint-disable-next-line no-console
             console.debug("[CacheManager] All cache cleared");
             return true;
         } catch (error) {
-            // eslint-disable-next-line no-console
             console.error("[CacheManager] Error clearing cache:", error);
             return false;
         }

@@ -1913,9 +1913,7 @@ class BaseBlock extends ProtoBlock {
         }
 
         if (this._style.name) this.adjustWidthToLabel();
-        if (!this.palette)
-            // eslint-disable-next-line no-console
-            console.warn("Block " + this.name + " was not added to a palette!");
+        if (!this.palette) console.warn("Block " + this.name + " was not added to a palette!");
         else this.palette.add(this);
     }
 }

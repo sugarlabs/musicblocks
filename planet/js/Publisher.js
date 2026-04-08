@@ -305,8 +305,7 @@ class Publisher {
         try {
             tb = JSON.parse(tb);
         } catch (e) {
-            // eslint-disable-next-line no-console
-            console.log(e);
+            console.error(e);
             return "";
         }
 
