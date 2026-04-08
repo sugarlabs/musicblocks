@@ -12,7 +12,7 @@
 /* global requirejs, define */
 
 // Localization helper for early bootstrap
-const t_ = typeof _ === "function" ? _ : (s) => s;
+const t_ = typeof _ === "function" ? _ : s => s;
 
 requirejs.config({
     baseUrl: "./",
@@ -220,14 +220,12 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
 
         const report = () => {
             if (!state.enabled) return;
-            // eslint-disable-next-line no-console
             console.log("[mbPerf] Startup measures (ms):", state.measures);
             if (typeof console.table === "function") {
                 const rows = Object.keys(state.measures).map(name => ({
                     measure: name,
                     ms: state.measures[name]
                 }));
-                // eslint-disable-next-line no-console
                 console.table(rows);
             }
         };
