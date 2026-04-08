@@ -1379,6 +1379,7 @@ describe("Palettes Class", () => {
                     const img = realCreate.call(document, "img");
                     img.width = 50;
                     img.style = {};
+                    img.style = {};
                     return img;
                 }
                 return realCreate.call(document, tag);
@@ -1415,9 +1416,11 @@ describe("Palettes Class", () => {
             const paletteList = {
                 appendChild: jest.fn()
             };
-            const realFragment = document.createDocumentFragment.bind(document);
+            const realCreateFragment = document.createDocumentFragment;
 
-            document.createDocumentFragment = jest.fn(() => realFragment());
+            document.createDocumentFragment = jest.fn(() => {
+                return realCreateFragment.call(document);
+            });
 
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
@@ -1514,9 +1517,11 @@ describe("Palettes Class", () => {
             const paletteList = {
                 appendChild: jest.fn()
             };
-            const realFragment = document.createDocumentFragment.bind(document);
+            const realCreateFragment = document.createDocumentFragment;
 
-            document.createDocumentFragment = jest.fn(() => realFragment());
+            document.createDocumentFragment = jest.fn(() => {
+                return realCreateFragment.call(document);
+            });
 
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
