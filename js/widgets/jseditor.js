@@ -908,7 +908,7 @@ class JSEditor {
                 throw new Error(
                     window.ast2blocklist_config_failed
                         ? _(
-                              "JavaScript block conversion is unavailable because its configurations file failed to load."
+                              "JavaScript block conversion is unavailable because its configuration file failed to load."
                           )
                         : _("JavaScript block conversion is still loading. Please try again.")
                 );
