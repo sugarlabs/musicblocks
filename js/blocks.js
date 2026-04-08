@@ -17,14 +17,15 @@
    DEFAULTFILTERTYPE, DEFAULTINTERVAL, DEFAULTINVERT, DEFAULTMODE,
    DEFAULTNOISE, DEFAULTOSCILLATORTYPE, DEFAULTTEMPERAMENT,
    DEFAULTVOICE, INLINECOLLAPSIBLES, NATURAL, NUMBERBLOCKDEFAULT,
-   SPECIALINPUTS, STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH,
-   WESTERN2EISOLFEGENAMES, WIDENAMES, _, addTemperamentToDictionary,
+    SPECIALINPUTS, STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH,
+    WESTERN2EISOLFEGENAMES, WIDENAMES, addTemperamentToDictionary,
    Block, closeBlkWidgets, createjs, delayExecution, DEFAULTCHORD,
    deleteTemperamentFromList, getDrumSynthName, getNoiseName,
    getNoiseSynthName, getTemperamentsList, getTextWidth,
    getVoiceSynthName, i18nSolfege, last, MathUtility, mixedNumber,
    piemenuBlockContext, prepareMacroExports, ProtoBlock,
-   setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments
+    setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments,
+    docById, define
 */
 
 /*
@@ -49,10 +50,6 @@
         setOctaveRatio, splitScaleDegree, splitSolfege,
         updateTemperaments
 */
-/*
-   exported Blocks
-*/
-
 /**
  * Minimum distance (squared) between two docks required before
  * connecting them.
@@ -150,6 +147,7 @@ const ALLOWED_CONNECTIONS = new Set([
  * @public
  * @returns {void}
  */
+
 class Blocks {
     constructor(activity) {
         this.activity = activity;
@@ -164,6 +162,10 @@ class Blocks {
 
         /** We keep a list of stacks in the trash. */
         this.trashStacks = [];
+
+        /** When true, checkBounds() calls are suppressed until
+         *  _endDeferCheckBounds() runs one final check. */
+        this._deferCheckBounds = false;
 
         /** We keep a dictionary for the proto blocks, */
         this.protoBlockDict = {};
@@ -239,6 +241,16 @@ class Blocks {
 
         this.selectedBlocks = [];
 
+        // --- Performance: drag interaction optimizations ---
+        // rAF-debounced checkBounds to avoid O(n) iteration on every block move
+        this._checkBoundsScheduled = false;
+        // Cached drag group computed once on mousedown, reused during pressmove
+        this._cachedDragGroup = null;
+        // Cached top-block map for moveAllBlocksExcept edge-scroll
+        this._topBlockCache = null;
+        // Throttle timestamp for edge-scroll calls
+        this._lastEdgeScrollTime = 0;
+
         /**
          * We stage deletion of prototype action blocks on the palette so
          * as to avoid palette refresh race conditions.
@@ -270,13 +282,13 @@ class Blocks {
          * @returns {void}
          */
         this.setBlockScale = async scale => {
-            // eslint-disable-next-line no-console
             console.debug("New block scale is " + scale);
             this.blockScale = scale;
 
             let palette;
             /** Regenerate all of the artwork at the new scale. */
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 block.resize(scale);
             }
 
@@ -401,6 +413,7 @@ class Blocks {
         this.bottomMostBlock = () => {
             let maxy = -1000;
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 if (block.container.y > maxy) {
                     maxy = block.container.y;
                 }
@@ -766,7 +779,7 @@ class Blocks {
                     vspaceBlock.container.x = thisBlock.container.x + dx;
                     /** Math.floor(thisBlock.container.y + dy + 0.5); */
                     vspaceBlock.container.y = thisBlock.container.y + dy;
-                    vspaceBlock.connections[0] = that.blockList.indexOf(thisBlock);
+                    vspaceBlock.connections[0] = thisBlock.blockIndex;
                     vspaceBlock.connections[1] = nextBlock;
                     thisBlock.connections[thisBlock.connections.length - 1] = vspace;
                     if (nextBlock) {
@@ -814,7 +827,6 @@ class Blocks {
             let size = 0;
             this._sizeCounter += 1;
             if (this._sizeCounter > this.blockList.length * 2) {
-                // eslint-disable-next-line no-console
                 console.debug(
                     "Infinite loop encountered detecting size of expandable block? " + blk
                 );
@@ -827,7 +839,6 @@ class Blocks {
 
             const myBlock = this.blockList[blk];
             if (myBlock == null) {
-                // eslint-disable-next-line no-console
                 console.debug("Something very broken in _getStackSize.");
             }
 
@@ -916,19 +927,16 @@ class Blocks {
              * should have connections.
              */
             if (myBlock == null) {
-                // eslint-disable-next-line no-console
                 console.debug("Saw a null block: " + blk);
                 return;
             }
 
             if (myBlock.connections == null) {
-                // eslint-disable-next-line no-console
                 console.debug("Saw a block with null connections: " + blk);
                 return;
             }
 
             if (myBlock.connections.length === 0) {
-                // eslint-disable-next-line no-console
                 console.debug("Saw a block with [] connections: " + blk);
                 return;
             }
@@ -940,7 +948,6 @@ class Blocks {
 
             this._loopCounter += 1;
             if (this._loopCounter > this.blockList.length * 2) {
-                // eslint-disable-next-line no-console
                 console.debug(
                     "Infinite loop encountered while adjusting docks: " + blk + " " + this.blockList
                 );
@@ -972,7 +979,6 @@ class Blocks {
 
                 /** Another database integrity check. */
                 if (this.blockList[cblk] === null) {
-                    // eslint-disable-next-line no-console
                     console.debug("This is not good: we encountered a null block: " + cblk);
                     continue;
                 }
@@ -993,7 +999,6 @@ class Blocks {
 
                 /** Yet another database integrity check. */
                 if (!foundMatch) {
-                    // eslint-disable-next-line no-console
                     console.debug(
                         "Did not find match for " +
                             myBlock.name +
@@ -1005,9 +1010,9 @@ class Blocks {
                             cblk +
                             ")"
                     );
-                    // eslint-disable-next-line no-console
+
                     console.debug(myBlock.connections);
-                    // eslint-disable-next-line no-console
+
                     console.debug(this.blockList[cblk].connections);
                     break;
                 }
@@ -1029,7 +1034,6 @@ class Blocks {
                     }
 
                     if (myBlock.container == null) {
-                        // eslint-disable-next-line no-console
                         console.debug("Does this ever happen any more?");
                     } else {
                         nx = myBlock.container.x + dx;
@@ -1334,12 +1338,11 @@ class Blocks {
             /** Find the top of the stack */
             let c = this.blockList[thisBlock].connections[0];
             if (c === null) {
-                // eslint-disable-next-line no-console
                 console.debug("Silence block was not inside a note block");
             }
 
             let counter = 0;
-            // eslint-disable-next-line no-constant-condition
+
             while (true) {
                 if (NOTEBLOCKS.includes(this.blockList[c].name)) {
                     break;
@@ -1348,14 +1351,12 @@ class Blocks {
                 thisBlock = c;
                 c = this.blockList[c].connections[0];
                 if (c === null) {
-                    // eslint-disable-next-line no-console
                     console.debug("Silence block was not inside a note block");
                     break;
                 }
 
                 counter += 1;
                 if (counter > this.blockList.length) {
-                    // eslint-disable-next-line no-console
                     console.debug("Connection loop???");
                     break;
                 }
@@ -1364,7 +1365,6 @@ class Blocks {
             counter = 0;
             while (thisBlock != null) {
                 if (this.blockList[thisBlock].connections.length < 2) {
-                    // eslint-disable-next-line no-console
                     console.debug("value block encountered??? " + thisBlock);
                     break;
                 }
@@ -1384,7 +1384,6 @@ class Blocks {
 
                 counter += 1;
                 if (counter > this.blockList.length) {
-                    // eslint-disable-next-line no-console
                     console.debug("Connection loop???");
                     break;
                 }
@@ -1419,9 +1418,6 @@ class Blocks {
 
             let block = thisBlockobj;
             while (block?.name == "vspace") {
-                if (block?.name != "vspace") {
-                    break;
-                }
                 block = this.blockList[block.connections[0]];
                 if (block?.name == "newnote") {
                     return;
@@ -1436,7 +1432,6 @@ class Blocks {
                  * block is inserted anywhere above the silence block.
                  */
                 if (thisBlockobj && thisBlockobj.connections.length === 1) {
-                    // eslint-disable-next-line no-console
                     console.debug("Value block encountered? " + thisBlockobj.name);
                     return;
                 }
@@ -1500,7 +1495,7 @@ class Blocks {
                                 silenceBlock
                             ) {
                                 this.blockList[silenceBlockobj.connections[0]].connections[c] =
-                                    this.blockList.indexOf(thisBlockobj);
+                                    thisBlockobj.blockIndex;
                                 break;
                             }
                         }
@@ -1559,7 +1554,6 @@ class Blocks {
             /** Find any containing expandable blocks. */
             this.clampBlocksToCheck = [];
             if (thisBlock == null) {
-                // eslint-disable-next-line no-console
                 console.debug("blockMoved called with null block.");
                 return;
             }
@@ -1577,7 +1571,6 @@ class Blocks {
             while (blk != null) {
                 expandableLoopCounter += 1;
                 if (expandableLoopCounter > 2 * this.blockList.length) {
-                    // eslint-disable-next-line no-console
                     console.debug("Infinite loop encountered checking for expandables?");
                     break;
                 }
@@ -1595,7 +1588,6 @@ class Blocks {
             const checkArgBlocks = [];
             const myBlock = this.blockList[thisBlock];
             if (myBlock == null) {
-                // eslint-disable-next-line no-console
                 console.debug("null block found in blockMoved method: " + thisBlock);
                 return;
             }
@@ -2063,7 +2055,6 @@ class Blocks {
                             this.blockList[bottom].connections.length - 1
                         ] = connection;
                     } else {
-                        // eslint-disable-next-line no-console
                         console.debug("HOW DID WE GET HERE?");
                     }
                 }
@@ -2091,6 +2082,10 @@ class Blocks {
                     // Is there already another action block with this name?
                     for (let b = 0; b < this.blockList.length; b++) {
                         if (b === newBlock) {
+                            continue;
+                        }
+
+                        if (this.blockList[b].trash) {
                             continue;
                         }
 
@@ -2123,7 +2118,29 @@ class Blocks {
                 }
 
                 this.adjustDocks(newBlock, true);
-                /** TODO: some graphical feedback re new connection? */
+
+                // Graphical feedback for new connection
+                this.findDragGroup(thisBlock);
+                const blocksToHighlight = [...this.dragGroup];
+                if (this.blockList[newBlock]) {
+                    blocksToHighlight.push(newBlock);
+                }
+
+                blocksToHighlight.forEach(b => {
+                    if (this.blockList[b]) {
+                        this.blockList[b].highlight();
+                    }
+                });
+                this.activity.refreshCanvas();
+
+                setTimeout(() => {
+                    blocksToHighlight.forEach(b => {
+                        if (this.blockList[b]) {
+                            this.blockList[b].unhighlight();
+                        }
+                    });
+                    this.activity.refreshCanvas();
+                }, 500);
 
                 /** Check if top block is one of the widget blocks. */
                 let lockInit = false;
@@ -2217,9 +2234,8 @@ class Blocks {
                 /** Extra check for malformed data. */
                 expandableLoopCounter += 1;
                 if (expandableLoopCounter > 2 * this.blockList.length) {
-                    // eslint-disable-next-line no-console
                     console.debug("Infinite loop checking for expandables?");
-                    // eslint-disable-next-line no-console
+
                     console.debug(this.blockList);
                     break;
                 }
@@ -2263,6 +2279,7 @@ class Blocks {
          */
         this.updateBlockPositions = () => {
             for (const [blk, block] of this.blockList.entries()) {
+                if (block.trash) continue;
                 this._moveBlock(blk, block.container.x, block.container.y);
             }
         };
@@ -2276,6 +2293,7 @@ class Blocks {
             this._adjustTheseStacks = [];
 
             for (const [blk, myBlock] of this.blockList.entries()) {
+                if (myBlock.trash) continue;
                 if (myBlock.connections[0] == null) {
                     this._adjustTheseStacks.push(blk);
                 }
@@ -2294,8 +2312,11 @@ class Blocks {
          * @returns {void}
          */
         this.checkBounds = () => {
+            if (this._deferCheckBounds) return;
+
             let onScreen = true;
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 if (block.connections[0] == null) {
                     if (block.offScreen(this.boundary)) {
                         this.activity.setHomeContainers(true);
@@ -2311,6 +2332,23 @@ class Blocks {
                 this.activity.setHomeContainers(false);
                 this.boundary.hide();
             }
+        };
+
+        /**
+         * Schedule a bounds check on the next animation frame.
+         * Coalesces multiple calls per frame into a single O(n) scan.
+         * @public
+         * @returns {void}
+         */
+        this.scheduleCheckBounds = () => {
+            if (this._checkBoundsScheduled) {
+                return;
+            }
+            this._checkBoundsScheduled = true;
+            requestAnimationFrame(() => {
+                this._checkBoundsScheduled = false;
+                this.checkBounds();
+            });
         };
 
         /**
@@ -2340,7 +2378,6 @@ class Blocks {
 
                 this.checkBounds();
             } else {
-                // eslint-disable-next-line no-console
                 console.debug("No container yet for block " + myBlock.name);
             }
         };
@@ -2363,8 +2400,27 @@ class Blocks {
 
                 this.checkBounds();
             } else {
-                // eslint-disable-next-line no-console
                 console.debug("No container yet for block " + myBlock.name);
+            }
+        };
+
+        /**
+         * Move a block by dx, dy without running checkBounds.
+         * Used during drag operations where checkBounds is deferred
+         * to a single rAF-scheduled call at the end of the frame.
+         * @param - blk - block index
+         * @param - dx - delta x
+         * @param - dy - delta y
+         * @public
+         * @returns {void}
+         */
+        this.moveBlockRelativeBatched = (blk, dx, dy) => {
+            this.inLongPress = false;
+            this.isBlockMoving = true;
+            const myBlock = this.blockList[blk];
+            if (myBlock.container != null) {
+                myBlock.container.x += dx;
+                myBlock.container.y += dy;
             }
         };
 
@@ -2387,17 +2443,36 @@ class Blocks {
 
         /**
          * Moves all blocks except given stack
-         * @param blk - exception
+         * @param blk - exception block (the block object, not index)
          * @param dx - delta x
          * @param dy - delta y
          * @public
          * @returns {void}
          */
         this.moveAllBlocksExcept = (blk, dx, dy) => {
-            for (const [blockIdx, block] of this.blockList.entries()) {
-                const topBlock = this.blockList[this.findTopBlock(blockIdx)];
-                if (topBlock !== blk) this.moveBlockRelative(blockIdx, dx, dy);
+            // Build top-block cache if not available.
+            // The cache maps each block index to its top block index,
+            // avoiding repeated O(depth) findTopBlock walks.
+            if (this._topBlockCache == null) {
+                this._topBlockCache = new Map();
+                for (let i = 0; i < this.blockList.length; i++) {
+                    if (this.blockList[i].trash) continue;
+                    this._topBlockCache.set(i, this.findTopBlock(i));
+                }
             }
+
+            const blkIdx = this.blockList.indexOf(blk);
+            const excludeTop = blkIdx >= 0 ? this._topBlockCache.get(blkIdx) : -1;
+
+            for (let i = 0; i < this.blockList.length; i++) {
+                if (this.blockList[i].trash) continue;
+                if (this._topBlockCache.get(i) !== excludeTop) {
+                    this.moveBlockRelativeBatched(i, dx, dy);
+                }
+            }
+
+            // Single deferred bounds check instead of one per block
+            this.scheduleCheckBounds();
         };
 
         /**
@@ -2586,7 +2661,6 @@ class Blocks {
             if (myBlock.loadComplete) {
                 myBlock.container.updateCache();
             } else {
-                // eslint-disable-next-line no-console
                 console.debug("Load not yet complete for (" + blk + ") " + myBlock.name);
             }
         };
@@ -2618,7 +2692,6 @@ class Blocks {
                 myBlock.connections[0] != null &&
                 myBlock.connections[0] === last(myBlock.connections)
             ) {
-                // eslint-disable-next-line no-console
                 console.debug(
                     "WARNING: CORRUPTED BLOCK DATA. Block " +
                         myBlock.name +
@@ -2638,10 +2711,11 @@ class Blocks {
                 topBlockLoop += 1;
                 if (topBlockLoop > 2 * this.blockList.length) {
                     /** Could happen if the block data is malformed. */
-                    // eslint-disable-next-line no-console
+
                     console.debug("infinite loop finding topBlock?");
-                    // eslint-disable-next-line no-console
-                    console.debug(this.blockList.indexOf(myBlock) + " " + myBlock.name);
+                    if (myBlock.garbage) {
+                        console.debug(myBlock.blockIndex + " " + myBlock.name);
+                    }
                     break;
                 }
                 blk = myBlock.connections[0];
@@ -2681,7 +2755,7 @@ class Blocks {
                 bottomBlockLoop += 1;
                 if (bottomBlockLoop > 2 * this.blockList.length) {
                     /** Could happen if the block data is malformed. */
-                    // eslint-disable-next-line no-console
+
                     console.debug("infinite loop finding bottomBlock?");
                     break;
                 }
@@ -2719,7 +2793,6 @@ class Blocks {
                 /** Just in case there is a loop in the block list. */
                 counter += 1;
                 if (counter > this.blockList.length) {
-                    // eslint-disable-next-line no-console
                     console.debug("infinite loop finding block name in stack");
                     break;
                 }
@@ -2754,7 +2827,7 @@ class Blocks {
                 bottomBlockLoop += 1;
                 if (bottomBlockLoop > 2 * this.blockList.length) {
                     /** Could happen if the block data is malformed. */
-                    // eslint-disable-next-line no-console
+
                     console.debug("infinite loop finding bottomBlock?");
                     break;
                 }
@@ -2794,6 +2867,7 @@ class Blocks {
         this.findStacks = () => {
             this.stackList = [];
             for (let i = 0; i < this.blockList.length; i++) {
+                if (this.blockList[i].trash) continue;
                 if (this.blockList[i].connections[0] == null) {
                     this.stackList.push(i);
                 }
@@ -2824,6 +2898,7 @@ class Blocks {
         this._findTwoArgs = () => {
             this._expandablesList = [];
             for (let i = 0; i < this.blockList.length; i++) {
+                if (this.blockList[i].trash) continue;
                 if (this.blockList[i].isArgBlock() && this.blockList[i].isExpandableBlock()) {
                     this._expandablesList.push(i);
                 } else if (this.blockList[i].isTwoArgBlock()) {
@@ -2839,6 +2914,7 @@ class Blocks {
          */
         this._searchForArgFlow = () => {
             for (const [blk, block] of this.blockList.entries()) {
+                if (block.trash) continue;
                 if (block.isArgFlowClampBlock()) {
                     this._searchCounter = 0;
                     this._searchForExpandables(blk);
@@ -2863,11 +2939,10 @@ class Blocks {
                 /** More checks for malformed or corrupted block data. */
                 this._searchCounter += 1;
                 if (this._searchCounter > 2 * this.blockList.length) {
-                    // eslint-disable-next-line no-console
                     console.debug(
                         "infinite loop searching for Expandables? " + this._searchCounter
                     );
-                    // eslint-disable-next-line no-console
+
                     console.debug(blk + " " + this.blockList[blk].name);
                     break;
                 }
@@ -2937,6 +3012,7 @@ class Blocks {
          */
         this.changeDisabledStatus = (name, flag) => {
             for (const myBlock of this.blockList) {
+                if (myBlock.trash) continue;
                 if (myBlock.name === name) {
                     myBlock.protoblock.disabled = flag;
                     myBlock.regenerateArtwork(false);
@@ -2950,7 +3026,8 @@ class Blocks {
          * @returns {void}
          */
         this.unhighlightAll = () => {
-            for (const [blk] of this.blockList.entries()) {
+            for (const [blk, block] of this.blockList.entries()) {
+                if (block.trash) continue;
                 this.unhighlight(blk);
             }
         };
@@ -3019,6 +3096,7 @@ class Blocks {
          */
         this.show = () => {
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 block.show();
             }
             this.visible = true;
@@ -3043,7 +3121,6 @@ class Blocks {
         ) => {
             const myBlock = this.makeNewBlock(name, postProcess, postProcessArg);
             if (myBlock === null) {
-                // eslint-disable-next-line no-console
                 console.debug("could not make block " + name);
                 return;
             }
@@ -3073,7 +3150,6 @@ class Blocks {
              * Create a new block
              */
             if (this.protoBlockDict[name] == null) {
-                // eslint-disable-next-line no-console
                 console.debug("makeNewBlock: no prototype for " + name);
                 return null;
             }
@@ -3104,13 +3180,16 @@ class Blocks {
 
             if (last(this.blockList) == null) {
                 /** Should never happen */
-                // eslint-disable-next-line no-console
+
                 console.debug("failed to make protoblock for " + name);
                 return null;
             }
 
             /** We copy the dock because expandable blocks modify it. */
             const myBlock = last(this.blockList);
+            // Cache the block's index for O(1) lookups instead of
+            // O(N) blockList.indexOf() scans.
+            myBlock.blockIndex = this.blockList.length - 1;
             myBlock.copySize();
 
             /** We may need to do some postProcessing to the block */
@@ -3428,7 +3507,6 @@ class Blocks {
             }
 
             if (!protoFound) {
-                // eslint-disable-next-line no-console
                 console.debug(name + " not found!!");
             }
 
@@ -3458,7 +3536,6 @@ class Blocks {
                 thisBlock = this.blockList.length;
                 if (myBlock.docks.length > i && myBlock.docks[i + 1][2] === "anyin") {
                     if (value == null) {
-                        // eslint-disable-next-line no-console
                         console.debug("cannot set default value");
                     } else if (typeof value === "string") {
                         postProcess = args => {
@@ -3572,7 +3649,6 @@ class Blocks {
          */
         this.findDragGroup = blk => {
             if (blk == null) {
-                // eslint-disable-next-line no-console
                 console.debug("null block passed to findDragGroup");
                 return;
             }
@@ -3580,6 +3656,37 @@ class Blocks {
             this.dragLoopCounter = 0;
             this.dragGroup = [];
             this._calculateDragGroup(blk);
+        };
+
+        /**
+         * Cache the drag group for a block. Call on mousedown so the
+         * expensive tree traversal runs once, not on every pressmove.
+         * @param - blk - block index
+         * @public
+         * @returns {void}
+         */
+        this.cacheDragGroup = blk => {
+            this.findDragGroup(blk);
+            this._cachedDragGroup = this.dragGroup.slice();
+        };
+
+        /**
+         * Invalidate the cached drag group (call on pressup/mouseout).
+         * @public
+         * @returns {void}
+         */
+        this.clearCachedDragGroup = () => {
+            this._cachedDragGroup = null;
+        };
+
+        /**
+         * Invalidate the top-block cache (call when blocks are
+         * added, removed, or connections change).
+         * @public
+         * @returns {void}
+         */
+        this.invalidateTopBlockCache = () => {
+            this._topBlockCache = null;
         };
 
         /**
@@ -3591,7 +3698,6 @@ class Blocks {
         this._calculateDragGroup = blk => {
             this.dragLoopCounter += 1;
             if (this.dragLoopCounter > this.blockList.length) {
-                // eslint-disable-next-line no-console
                 console.debug(
                     "Maximum loop counter exceeded in calculateDragGroup... this is bad. " + blk
                 );
@@ -3599,7 +3705,6 @@ class Blocks {
             }
 
             if (blk == null) {
-                // eslint-disable-next-line no-console
                 console.debug("null block passed to calculateDragGroup");
                 return;
             }
@@ -3607,7 +3712,6 @@ class Blocks {
             const myBlock = this.blockList[blk];
             /** If this happens, something is really broken. */
             if (myBlock == null) {
-                // eslint-disable-next-line no-console
                 console.debug("null block encountered... this is bad. " + blk);
                 return;
             }
@@ -3772,6 +3876,7 @@ class Blocks {
          */
         this._findDrumURLs = () => {
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 if (block.name === "text" || block.name === "string") {
                     const c = block.connections[0];
                     if (
@@ -3803,6 +3908,7 @@ class Blocks {
             // Collect blocks to update for batched cache update
             const blocksToUpdate = [];
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 if (block.name === "text") {
                     const c = block.connections[0];
                     if (c != null && this.blockList[c].name === "box") {
@@ -3822,7 +3928,6 @@ class Blocks {
                         try {
                             block.container.updateCache();
                         } catch (e) {
-                            // eslint-disable-next-line no-console
                             console.debug(e);
                         }
                     }
@@ -3845,6 +3950,7 @@ class Blocks {
             // Collect blocks to update for batched cache update
             const blocksToUpdate = [];
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 if (block.name === "text") {
                     const c = block.connections[0];
                     if (c != null && this.blockList[c].name === "storein") {
@@ -3877,7 +3983,6 @@ class Blocks {
                         try {
                             block.container.updateCache();
                         } catch (e) {
-                            // eslint-disable-next-line no-console
                             console.debug(e);
                         }
                     }
@@ -3900,6 +4005,7 @@ class Blocks {
             // Collect blocks to update for batched cache update
             const blocksToUpdate = [];
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 if (block.name === "storein2") {
                     if (block.privateData === oldName) {
                         block.privateData = newName;
@@ -3923,7 +4029,6 @@ class Blocks {
                         try {
                             block.container.updateCache();
                         } catch (e) {
-                            // eslint-disable-next-line no-console
                             console.debug(e);
                         }
                     }
@@ -3946,6 +4051,7 @@ class Blocks {
             // Collect blocks to update for batched cache update
             const blocksToUpdate = [];
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 if (block.name === "namedbox") {
                     if (block.privateData === oldName) {
                         block.privateData = newName;
@@ -3970,7 +4076,6 @@ class Blocks {
                         try {
                             block.container.updateCache();
                         } catch (e) {
-                            // eslint-disable-next-line no-console
                             console.debug(e);
                         }
                     }
@@ -3998,6 +4103,9 @@ class Blocks {
                 }
 
                 const myBlock = this.blockList[blk];
+                if (myBlock.trash) {
+                    continue;
+                }
                 const blkParent = this.blockList[myBlock.connections[0]];
                 if (blkParent == null) {
                     continue;
@@ -4052,6 +4160,10 @@ class Blocks {
 
             /** Update the blocks, do->oldName should be do->newName */
             for (const blk in this.blockList) {
+                if (this.blockList[blk].trash) {
+                    continue;
+                }
+
                 if (
                     ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].includes(
                         this.blockList[blk].name
@@ -4103,20 +4215,16 @@ class Blocks {
          */
         this.newStoreinBlock = name => {
             if (name == null) {
-                // eslint-disable-next-line no-console
                 console.debug("null name passed to newStoreinBlock");
                 return;
             } else if (name == undefined) {
-                // eslint-disable-next-line no-console
                 console.debug("undefined name passed to newStoreinBlock");
                 return;
             } else if ("myStorein_" + name in this.protoBlockDict) {
-                // eslint-disable-next-line no-console
                 /** console.debug(name + ' already in palette'); */
                 return;
             }
 
-            // eslint-disable-next-line no-console
             /** console.debug('new storein block ' + name); */
             const myStoreinBlock = new ProtoBlock("storein");
             this.protoBlockDict["myStorein_" + name] = myStoreinBlock;
@@ -4143,11 +4251,9 @@ class Blocks {
          */
         this.newStorein2Block = name => {
             if (name == null) {
-                // eslint-disable-next-line no-console
                 console.debug("null name passed to newStorein2Block");
                 return;
             } else if (name == undefined) {
-                // eslint-disable-next-line no-console
                 console.debug("undefined name passed to newStorein2Block");
                 return;
             } else if ("yourStorein2_" + name in this.protoBlockDict) {
@@ -4177,11 +4283,9 @@ class Blocks {
          */
         this.newNamedboxBlock = name => {
             if (name == null) {
-                // eslint-disable-next-line no-console
                 console.debug("null name passed to newNamedboxBlock");
                 return;
             } else if (name == undefined) {
-                // eslint-disable-next-line no-console
                 console.debug("undefined name passed to newNamedboxBlock");
                 return;
             } else if ("myBox_" + name in this.protoBlockDict) {
@@ -4242,7 +4346,7 @@ class Blocks {
          */
         this._removeNamedoEntries = name => {
             /** Delete any old palette entries. */
-            // eslint-disable-next-line no-console
+
             /** console.debug('DELETE: removing old palette entries for ' + name); */
             if (this.protoBlockDict["myDo_" + name]) {
                 this.protoBlockDict["myDo_" + name].hide = true;
@@ -4366,7 +4470,7 @@ class Blocks {
             /** Returns a containing arg clamp block or null */
             if (this.blockList[blk] == null) {
                 /** race condition? */
-                // eslint-disable-next-line no-console
+
                 console.debug("null block in blockList? " + blk);
                 return null;
             } else if (this.blockList[blk].connections[0] == null) {
@@ -4390,7 +4494,6 @@ class Blocks {
          */
         this.findNestedClampBlocks = (blk, clampList) => {
             if (this.blockList[blk] == null) {
-                // eslint-disable-next-line no-console
                 console.debug("null block in blockList? " + blk);
                 return [];
             } else if (this.blockList[blk].connections[0] == null) {
@@ -4423,7 +4526,7 @@ class Blocks {
         this.insideExpandableBlock = blk => {
             if (this.blockList[blk] == null) {
                 /** race condition? */
-                // eslint-disable-next-line no-console
+
                 console.debug("null block in blockList? " + blk);
                 return null;
             } else if (this.blockList[blk].connections[0] == null) {
@@ -4456,7 +4559,6 @@ class Blocks {
          */
         this._insideNoteBlock = blk => {
             if (this.blockList[blk] == null) {
-                // eslint-disable-next-line no-console
                 console.debug("null block in blockList? " + blk);
                 return null;
             } else if (this.blockList[blk].connections[0] == null) {
@@ -4789,7 +4891,7 @@ class Blocks {
                 this.blockList[dblk].name === "divide"
             ) {
                 /** Are we the denominator (c == 2) or numerator (c == 1)? */
-                if (this.blockList[dblk].connections[c] === this.blockList.indexOf(myBlock)) {
+                if (this.blockList[dblk].connections[c] === blk) {
                     /** Is the divide block connected to a note value block? */
                     const cblk = this.blockList[dblk].connections[0];
                     if (cblk !== null) {
@@ -4967,6 +5069,7 @@ class Blocks {
 
             const c2v = this.blockList[c2].value;
             for (let i = 0; i < this.blockList.length; i++) {
+                if (this.blockList[i].trash) continue;
                 if (["setbpm3", "setmasterbpm2"].includes(this.blockList[i].name)) {
                     const bn = this.blockList[i].connections[1];
                     if (bn === null || this.blockList[bn].name !== "number") {
@@ -5014,7 +5117,7 @@ class Blocks {
         this.prepareStackForCopy = () => {
             if (this.activeBlock == null) {
                 this.activity.errorMsg(_("There is no block selected."));
-                // eslint-disable-next-line no-console
+
                 console.debug("No active block to copy.");
                 return;
             }
@@ -5092,7 +5195,6 @@ class Blocks {
          * @returns {void}
          */
         this.saveStack = () => {
-            // eslint-disable-next-line no-console
             console.debug(this.selectedStack);
             if (this.selectedStack === null) {
                 return;
@@ -5107,7 +5209,6 @@ class Blocks {
             if (["temperament1", "definemode", "action"].includes(blockObjs[0][1])) {
                 const nameBlk = blockObjs[0][4][1];
                 if (nameBlk == null) {
-                    // eslint-disable-next-line no-console
                     console.debug("action not named... skipping");
                 } else {
                     if (typeof blockObjs[nameBlk][1][1] === "string") {
@@ -5239,7 +5340,7 @@ class Blocks {
             const myBlock = new ProtoBlock("macro_" + name);
             const blkName = "macro_" + name;
             this.protoBlockDict[blkName] = myBlock;
-            // eslint-disable-next-line no-console
+
             console.debug("Adding " + name + " to myblocks palette");
             if (!("myblocks" in this.activity.palettes.dict)) {
                 this.activity.palettes.add("myblocks");
@@ -5289,7 +5390,6 @@ class Blocks {
             }
 
             if (playbackQueueStartsHere !== null) {
-                // eslint-disable-next-line no-console
                 console.debug("Removing deprecated playback queue from project");
                 blockObjs.splice(
                     playbackQueueStartsHere,
@@ -5304,11 +5404,10 @@ class Blocks {
 
                 for (const c in blkData[4]) {
                     if (blkData[4][c] === blkData[0]) {
-                        // eslint-disable-next-line no-console
                         console.debug("Circular connection in block data: " + blkData);
-                        // eslint-disable-next-line no-console
+
                         console.debug("Punting loading of new blocks!");
-                        // eslint-disable-next-line no-console
+
                         console.debug(blockObjs);
                         return;
                     }
@@ -5376,7 +5475,6 @@ class Blocks {
                             name = "text";
                             break;
                         default:
-                            // eslint-disable-next-line no-console
                             console.debug("skipping " + name);
                             continue;
                     }
@@ -5488,7 +5586,6 @@ class Blocks {
                     i += 1;
                     /** Should never happen... but just in case. */
                     if (i > this.blockList.length) {
-                        // eslint-disable-next-line no-console
                         console.debug("Could not generate unique action name.");
                         break;
                     }
@@ -5499,7 +5596,7 @@ class Blocks {
 
                 if (oldName !== name) {
                     /** Change the name of the action... */
-                    // eslint-disable-next-line no-console
+
                     console.debug("action " + oldName + " is being renamed " + name);
                     blkData[1][1] = { value: name };
                 }
@@ -5593,11 +5690,11 @@ class Blocks {
                         len = blockObjs[b][4].length;
                         if (last(blockObjs[b][4]) == null) {
                             /** If there is no next block, add a hidden block; */
-                            // eslint-disable-next-line no-console
+
                             console.debug(
                                 "last connection of " + name + " is null: adding hidden block"
                             );
-                            // eslint-disable-next-line no-console
+
                             console.debug(blockObjs[b][4]);
                             blockObjs[b][4][len - 1] = blockObjsLength + extraBlocksLength;
                             blockObjs.push([
@@ -5618,7 +5715,6 @@ class Blocks {
                             }
 
                             if (nextName !== "hidden") {
-                                // eslint-disable-next-line no-console
                                 console.debug(
                                     "last connection of " +
                                         name +
@@ -5733,7 +5829,7 @@ class Blocks {
                         len = blockObjs[b][4].length;
                         if (blockObjs[b][4][2] == null) {
                             /** If there is no child flow block, add a hidden block; */
-                            // eslint-disable-next-line no-console
+
                             console.debug(
                                 "last connection of " + name + " is null: adding hidden block"
                             );
@@ -5756,7 +5852,6 @@ class Blocks {
                             }
 
                             if (nextName !== "hidden") {
-                                // eslint-disable-next-line no-console
                                 console.debug(
                                     "last connection of " +
                                         name +
@@ -5797,7 +5892,38 @@ class Blocks {
             const blockOffset = this.blockList.length;
             const firstBlock = this.blockList.length;
 
-            for (let b = 0; b < this._loadCounter; b++) {
+            /**
+             * Chunked block-loading: yield to the main thread every ~50ms
+             * so the browser can paint and remain interactive during
+             * large-project loads.  Each chunk processes CHUNK_SIZE blocks
+             * synchronously, then schedules the next chunk via setTimeout(0).
+             */
+            const CHUNK_SIZE = 20;
+            const totalBlocks = this._loadCounter;
+            let bIndex = 0;
+
+            const processChunk = () => {
+                const chunkEnd = Math.min(bIndex + CHUNK_SIZE, totalBlocks);
+                for (let b = bIndex; b < chunkEnd; b++) {
+                    this._processOneBlock(b, blockObjs, blockOffset, firstBlock);
+                }
+                bIndex = chunkEnd;
+                if (bIndex < totalBlocks) {
+                    setTimeout(processChunk, 0);
+                }
+            };
+
+            processChunk();
+        };
+
+        /**
+         * Processes a single block object during load.  Extracted from
+         * the former monolithic for-loop inside loadNewBlocks so the
+         * loop can be chunked across frames.
+         * @private
+         */
+        this._processOneBlock = (b, blockObjs, blockOffset, firstBlock) => {
+            {
                 const thisBlock = blockOffset + b;
                 const blkData = blockObjs[b];
                 let blkInfo;
@@ -6277,7 +6403,6 @@ class Blocks {
                             }
                             this.activity.logo.synth.loadSynth(0, getVoiceSynthName(value));
                         } catch (e) {
-                            // eslint-disable-next-line no-console
                             console.debug(e);
                         }
                         break;
@@ -6304,7 +6429,6 @@ class Blocks {
                             }
                             this.activity.logo.synth.loadSynth(0, getNoiseSynthName(value));
                         } catch (e) {
-                            // eslint-disable-next-line no-console
                             console.debug(e);
                         }
                         break;
@@ -6562,10 +6686,8 @@ class Blocks {
                             }
 
                             if (flowBlock) {
-                                // eslint-disable-next-line no-console
                                 console.debug(n + ": substituting nop flow block for " + name);
                             } else {
-                                // eslint-disable-next-line no-console
                                 console.debug(n + ": substituting nop arg block for " + name);
                             }
 
@@ -6594,7 +6716,6 @@ class Blocks {
                                 case 5:
                                 default:
                                     if (n > 5) {
-                                        // eslint-disable-next-line no-console
                                         console.debug("WARNING: arg count exceed.");
                                     }
                                     newName = "nopThreeArgBlock";
@@ -6840,6 +6961,7 @@ class Blocks {
                 /** Look for any "orphan" action blocks. */
                 for (const blk in this.blockList) {
                     const thisBlock = this.blockList[blk];
+                    if (thisBlock.trash) continue;
 
                     /** We are only interested in do and nameddo blocks. */
                     if (
@@ -6938,7 +7060,7 @@ class Blocks {
 
             this.activity.refreshCanvas();
 
-            const thisBlock = this.blockList.indexOf(myBlock);
+            const thisBlock = myBlock.blockIndex;
 
             /** Add this block to the list of blocks in the trash so we can undo this action. */
             this.trashStacks.push(thisBlock);
@@ -6970,7 +7092,6 @@ class Blocks {
             if (myBlock.name === "start" || myBlock.name === "drum") {
                 const turtle = myBlock.value;
                 if (turtle != null) {
-                    // eslint-disable-next-line no-console
                     console.debug("putting turtle " + turtle + " in the trash");
                     const comp = this.turtles.turtleList[turtle].companionTurtle;
                     if (comp) {
@@ -7093,8 +7214,9 @@ class Blocks {
                 if (typeof this.blockList[blk].protoblock.updateParameter === "function") {
                     value = this.blockList[blk].protoblock.updateParameter(logo, turtle, blk);
                 } else {
-                    if (name in logo.evalParameterDict) {
-                        eval(logo.evalParameterDict[name]);
+                    const pluginFn = logo.evalParameterDict[name];
+                    if (typeof pluginFn === "function") {
+                        value = pluginFn(logo, turtle, blk);
                     } else {
                         return;
                     }
@@ -7138,8 +7260,9 @@ class Blocks {
             if (typeof this.blockList[blk].protoblock.setter === "function") {
                 this.blockList[blk].protoblock.setter(logo, value, turtle, blk);
             } else {
-                if (this.blockList[blk].name in logo.evalSetterDict) {
-                    eval(logo.evalSetterDict[this.blockList[blk].name]);
+                const pluginFn = logo.evalSetterDict[this.blockList[blk].name];
+                if (typeof pluginFn === "function") {
+                    pluginFn(logo, blk, value, turtle);
                 } else {
                     throw new Error();
                 }

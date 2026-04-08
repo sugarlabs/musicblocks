@@ -12,9 +12,10 @@
 /*
    globals
 
-   _, TITLESTRING, GUIDEURL, jQuery, docById, docByClass, doSVG,
+   TITLESTRING, GUIDEURL, docById, docByClass, doSVG,
    fileExt, ABCHEADER, LILYPONDHEADER, platform, saveAbcOutput,
-   saveLilypondOutput, saveMxmlOutput
+   saveLilypondOutput, saveMxmlOutput, getMidiInstrument, getMidiDrum,
+   Midi, activity
  */
 
 /**
@@ -156,6 +157,7 @@ class SaveInterface {
 
     /**
      * Download a file to the user's computer.
+     * Uses MBDialog prompt when available to collect a filename with a modal UI.
      * @param {string} extension - The file extension (including the dot).
      * @param {string} dataurl - The base64 data url of the file.
      * @param {string} defaultfilename - The default filename to be used.
@@ -163,6 +165,18 @@ class SaveInterface {
      */
     download(extension, dataurl, defaultfilename) {
         let filename = null;
+        const finishDownload = name => {
+            if (name === null) {
+                console.debug("save cancelled");
+                return;
+            }
+
+            if (fileExt(name) !== extension) {
+                name += "." + extension;
+            }
+
+            this.downloadURL(name, dataurl);
+        };
         if (defaultfilename === undefined || defaultfilename === null) {
             if (this.activity.PlanetInterface === undefined) {
                 defaultfilename = STR_MY_PROJECT;
@@ -176,8 +190,17 @@ class SaveInterface {
 
             if (window.isElectron === true) {
                 filename = defaultfilename;
+            } else if (window.MBDialog && typeof window.MBDialog.prompt === "function") {
+                window.MBDialog.prompt({
+                    title: _("Save file"),
+                    message: _("Filename:"),
+                    defaultValue: defaultfilename,
+                    okText: _("Save"),
+                    cancelText: _("Cancel")
+                }).then(result => finishDownload(result));
+                return;
             } else {
-                filename = prompt("Filename:", defaultfilename);
+                filename = prompt(_("Filename:"), defaultfilename);
             }
         } else {
             if (fileExt(defaultfilename) !== extension) {
@@ -186,19 +209,8 @@ class SaveInterface {
             filename = defaultfilename;
         }
 
-        // eslint-disable-next-line no-console
         console.debug("saving to " + filename);
-        if (filename === null) {
-            // eslint-disable-next-line no-console
-            console.debug("save cancelled");
-            return;
-        }
-
-        if (fileExt(filename) !== extension) {
-            filename += "." + extension;
-        }
-
-        this.downloadURL(filename, dataurl);
+        finishDownload(filename);
     }
 
     /**
@@ -526,7 +538,15 @@ class SaveInterface {
 
             // Save immediately
             setTimeout(() => {
-                activity.save.afterSaveAbc();
+                try {
+                    activity.save.afterSaveAbc();
+                } catch (e) {
+                    // eslint-disable-next-line no-console
+                    console.error("Error generating ABC output:", e);
+                    activity.errorMsg(_("Error generating ABC output. ") + e.message);
+                } finally {
+                    document.body.style.cursor = "default";
+                }
             }, 100);
         } else {
             // No buffered data - run the program to generate notation (original behavior)
@@ -554,8 +574,16 @@ class SaveInterface {
      * @instance
      */
     afterSaveAbc() {
-        const abc = encodeURIComponent(saveAbcOutput(this.activity));
-        this.activity.save.download("abc", "data:text;utf8," + abc, null);
+        try {
+            const abc = encodeURIComponent(saveAbcOutput(this.activity));
+            this.activity.save.download("abc", "data:text;utf8," + abc, null);
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error("Error in ABC output generation:", e);
+            this.activity.errorMsg(_("Error generating ABC output. ") + e.message);
+        } finally {
+            document.body.style.cursor = "default";
+        }
     }
 
     /**
@@ -722,7 +750,14 @@ class SaveInterface {
 
             // Trigger save after a short delay to let UI update
             setTimeout(() => {
-                this.afterSaveLilypond();
+                try {
+                    this.afterSaveLilypond();
+                } catch (e) {
+                    console.error("Error generating Lilypond output:", e);
+                    this.activity.errorMsg(_("Error generating Lilypond output. ") + e.message);
+                } finally {
+                    document.body.style.cursor = "default";
+                }
             }, 100);
         } else {
             // No buffered data - run the program to generate notation (original behavior)
@@ -761,16 +796,23 @@ class SaveInterface {
      */
     afterSaveLilypond(filename) {
         filename = docById("fileName").value;
-        const ly = saveLilypondOutput(this.activity);
-        switch (this.notationConvert) {
-            case "pdf":
-                this.afterSaveLilypondPDF(ly, filename);
-                break;
-            default:
-                this.afterSaveLilypondLY(ly, filename);
-                break;
+        try {
+            const ly = saveLilypondOutput(this.activity);
+            switch (this.notationConvert) {
+                case "pdf":
+                    this.afterSaveLilypondPDF(ly, filename);
+                    break;
+                default:
+                    this.afterSaveLilypondLY(ly, filename);
+                    break;
+            }
+        } catch (e) {
+            console.error("Error in Lilypond output generation:", e);
+            this.activity.errorMsg(_("Error generating Lilypond output. ") + e.message);
+        } finally {
+            this.notationConvert = "";
+            document.body.style.cursor = "default";
         }
-        this.notationConvert = "";
     }
 
     /**
@@ -819,7 +861,6 @@ class SaveInterface {
                     if (copied) {
                         showCopiedMessage();
                     } else {
-                        // eslint-disable-next-line no-console
                         console.debug("Clipboard copy failed:", err);
                     }
                 });
@@ -828,7 +869,6 @@ class SaveInterface {
             if (copied) {
                 showCopiedMessage();
             } else {
-                // eslint-disable-next-line no-console
                 console.debug("Clipboard copy failed");
             }
         }
@@ -852,7 +892,6 @@ class SaveInterface {
         window.Converter.ly2pdf(lydata, (success, dataurl) => {
             document.body.style.cursor = "default";
             if (!success) {
-                // eslint-disable-next-line no-console
                 console.debug("Error: " + dataurl);
                 this.activity.errorMsg(
                     _("Failed to convert Lilypond to PDF. Please try saving as .ly file instead."),
@@ -877,7 +916,7 @@ class SaveInterface {
      * @instance
      *
      */
-    // eslint-disable-next-line no-unused-vars
+
     saveMxml(filename) {
         this.activity.logo.runningMxml = true;
         for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {

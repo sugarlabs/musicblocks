@@ -18,7 +18,7 @@
 /*
    global
 
-   DEFAULTVOLUME, TARGETBPM, TONEBPM, MIN_HIGHLIGHT_DURATION_MS, frequencyToPitch, last,
+   DEFAULTVOLUME, TARGETBPM, TONEBPM, MIN_HIGHLIGHT_DURATION_MS, deepClone, frequencyToPitch, last,
    pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp,
    getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
@@ -514,9 +514,11 @@ class Singer {
         const saveSuppressStatus = tur.singer.suppressOutput;
 
         // We need to save the state of the boxes and heap although there is a potential of a boxes collision with other turtles
-        const saveBoxes = JSON.stringify(logo.boxes);
-        const saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
-        const saveTurtleDicts = JSON.stringify(logo.turtleDicts[turtle]);
+        const saveBoxes = logo.boxes != null ? deepClone(logo.boxes) : undefined;
+        const saveTurtleHeaps =
+            logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle]) : undefined;
+        const saveTurtleDicts =
+            logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle]) : undefined;
         // .. and the turtle state
         const saveX = tur.x;
         const saveY = tur.y;
@@ -538,7 +540,7 @@ class Singer {
 
         for (const b in tur.endOfClampSignals) {
             tur.butNotThese[b] = [];
-            for (const i in tur.endOfClampSignals[b]) {
+            for (const i of tur.endOfClampSignals[b]) {
                 tur.butNotThese[b].push(i);
             }
         }
@@ -570,17 +572,17 @@ class Singer {
         if (saveBoxes == undefined) {
             logo.boxes = {};
         } else {
-            logo.boxes = JSON.parse(saveBoxes);
+            logo.boxes = saveBoxes;
         }
         if (saveTurtleHeaps == undefined) {
             logo.turtleHeaps = {};
         } else {
-            logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
+            logo.turtleHeaps[turtle] = saveTurtleHeaps;
         }
         if (saveTurtleDicts == undefined) {
             logo.turtleDicts = {};
         } else {
-            logo.turtleDicts[turtle] = JSON.parse(saveTurtleDicts);
+            logo.turtleDicts[turtle] = saveTurtleDicts;
         }
 
         tur.painter.doPenUp();
@@ -626,9 +628,11 @@ class Singer {
 
         const saveState = {
             suppressOutput: tur.singer.suppressOutput,
-            boxes: JSON.stringify(logo.boxes),
-            turtleHeaps: JSON.stringify(logo.turtleHeaps[turtle]),
-            turtleDicts: JSON.stringify(logo.turtleDicts[turtle]),
+            boxes: logo.boxes != null ? deepClone(logo.boxes) : undefined,
+            turtleHeaps:
+                logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle]) : undefined,
+            turtleDicts:
+                logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle]) : undefined,
             x: tur.x,
             y: tur.y,
             color: tur.painter.color,
@@ -685,9 +689,11 @@ class Singer {
             penState: saveState.penState
         });
 
-        activity.logo.boxes = JSON.parse(saveState.boxes);
-        activity.logo.turtleHeaps[turtle] = JSON.parse(saveState.turtleHeaps);
-        activity.logo.turtleDicts[turtle] = JSON.parse(saveState.turtleDicts);
+        activity.logo.boxes = saveState.boxes != null ? saveState.boxes : {};
+        activity.logo.turtleHeaps[turtle] =
+            saveState.turtleHeaps != null ? saveState.turtleHeaps : {};
+        activity.logo.turtleDicts[turtle] =
+            saveState.turtleDicts != null ? saveState.turtleDicts : {};
 
         tur.painter.doPenUp();
         tur.painter.doSetXY(saveState.x, saveState.y);
@@ -711,15 +717,23 @@ class Singer {
         const activity = logo.activity;
         volume = Math.min(Math.max(volume, 0), 100);
         if (blk) {
-            const firstConnection = activity.logo.blockList[blk].connections[0];
-            const lastConnection = last(activity.logo.blockList[blk].connections);
+            const firstConnection = activity.blocks.blockList[blk].connections[0];
+            const lastConnection = last(activity.blocks.blockList[blk].connections);
             logo.synth.setMasterVolume(volume, firstConnection, lastConnection);
         } else {
             logo.synth.setMasterVolume(volume);
         }
         for (const turtle of activity.turtles.turtleList) {
             for (const synth in turtle.singer.synthVolume) {
-                turtle.singer.synthVolume[synth].push(volume);
+                // Replace last value instead of pushing to prevent unbounded
+                // array growth. Master volume doesn't use stack semantics,
+                // so only the current volume matters.
+                const arr = turtle.singer.synthVolume[synth];
+                if (arr.length > 0) {
+                    arr[arr.length - 1] = volume;
+                } else {
+                    arr.push(volume);
+                }
             }
         }
     }
@@ -879,7 +893,9 @@ class Singer {
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
                 );
-                nnote[0] = noteIsSolfege(note) ? getSolfege(nnote[0]) : nnote[0];
+                nnote[0] = noteIsSolfege(note)
+                    ? getSolfege(nnote[0], tur.singer.keySignature, tur.singer.movable)
+                    : nnote[0];
 
                 if (tur.singer.drumStyle.length > 0) {
                     activity.logo.pitchDrumMatrix.drums.push(last(tur.singer.drumStyle));
@@ -925,7 +941,11 @@ class Singer {
                     tur.singer.keySignature[1].toLowerCase() === "major" &&
                     noteIsSolfege(note)
                 ) {
-                    noteObj[0] = getSolfege(noteObj[0]);
+                    noteObj[0] = getSolfege(
+                        noteObj[0],
+                        tur.singer.keySignature,
+                        tur.singer.movable
+                    );
                 }
 
                 // If we are in a setdrum clamp, override the pitch.
@@ -988,7 +1008,11 @@ class Singer {
                     tur.singer.keySignature[1].toLowerCase() === "major" &&
                     noteIsSolfege(note)
                 ) {
-                    noteObj[0] = getSolfege(noteObj[0]);
+                    noteObj[0] = getSolfege(
+                        noteObj[0],
+                        tur.singer.keySignature,
+                        tur.singer.movable
+                    );
                 }
 
                 // If we are in a setdrum clamp, override the pitch.
@@ -1074,7 +1098,6 @@ class Singer {
                 // Cents may have been added through a transposition.
                 if (noteObj[2] !== 0 && cents === 0) {
                     cents = noteObj[2];
-                    // eslint-disable-next-line no-console
                 }
 
                 if (Math.abs(cents) < 1e-9) {
@@ -1236,7 +1259,9 @@ class Singer {
                 null,
                 activity.errorMsg
             );
-            nnote[0] = noteIsSolfege(note) ? getSolfege(nnote[0]) : nnote[0];
+            nnote[0] = noteIsSolfege(note)
+                ? getSolfege(nnote[0], tur.singer.keySignature, tur.singer.movable)
+                : nnote[0];
 
             if (tur.singer.drumStyle.length === 0) {
                 activity.logo.musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
@@ -1881,7 +1906,6 @@ class Singer {
                             break;
                         }
                     }
-                    // eslint-disable-next-line no-console
                 }
             }
             let forceSilence = false;
@@ -2085,7 +2109,11 @@ class Singer {
                             let d;
                             if (duration > 0) {
                                 if (carry > 0) {
-                                    d = 1 / (1 / duration - 1 / carry);
+                                    if (Math.abs(duration - carry) < 1e-10) {
+                                        d = 0;
+                                    } else {
+                                        d = 1 / (1 / duration - 1 / carry);
+                                    }
                                 } else {
                                     d = duration;
                                 }
@@ -2480,14 +2508,24 @@ class Singer {
                 tur.singer.embeddedGraphics[blk] = [];
 
                 // Ensure note value block unhighlights after note plays (minimum duration so highlight is visible).
+                // Cancel any previously pending unhighlight timer for this block to
+                // prevent unbounded timer accumulation in tight infinite loops, which
+                // would otherwise saturate the JS timer queue and stall the main thread.
+                if (!tur.singer._unhighlightTimers) {
+                    tur.singer._unhighlightTimers = {};
+                }
+                if (tur.singer._unhighlightTimers[blk]) {
+                    clearTimeout(tur.singer._unhighlightTimers[blk]);
+                }
                 const highlightDurationMs = Math.max(beatValue * 1000, MIN_HIGHLIGHT_DURATION_MS);
-                setTimeout(() => {
+                tur.singer._unhighlightTimers[blk] = setTimeout(() => {
                     if (activity.blocks.visible && blk in activity.blocks.blockList) {
                         activity.blocks.unhighlight(blk);
                         if (activity.stage) {
                             activity.stage.update();
                         }
                     }
+                    delete tur.singer._unhighlightTimers[blk];
                 }, highlightDurationMs);
             };
 
@@ -2541,15 +2579,23 @@ class Singer {
             callback();
         }
 
-        activity.stage.update();
+        activity.stageDirty = true;
     }
 }
 
+// Maintain CommonJS compatibility for tests
 if (typeof module !== "undefined" && module.exports) {
     module.exports = Singer;
 }
 
-// Export to global scope for browser (RequireJS shim)
+// Implement additive AMD define
+if (typeof define === "function" && define.amd) {
+    define(["activity/logoconstants"], function () {
+        return Singer;
+    });
+}
+
+// Preserve existing global exposure exactly as before
 if (typeof window !== "undefined") {
     window.Singer = Singer;
 }
