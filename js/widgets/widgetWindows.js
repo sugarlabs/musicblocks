@@ -471,7 +471,7 @@ class WidgetWindow {
         const siblings = windows.children;
         for (let i = 0; i < siblings.length; i++) {
             siblings[i].style.zIndex = "0";
-            siblings[i].style.opacity = "0";
+            siblings[i].style.opacity = "0.7";
         }
 
         // When in focus, the zIndex of the help must be the highest. Even greater than the input search display block
