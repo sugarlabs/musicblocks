@@ -57,21 +57,6 @@
 function setupPitchActions(activity) {
     Singer.PitchActions = class {
         /**
-         * Helper function to get the number of pitches in the current temperament.
-         *
-         * @static
-         * @returns {Number}
-         */
-        static getTemperamentLength() {
-            const currentTemperament = activity.logo.synth.inTemperament;
-            if (isCustomTemperament(currentTemperament)) {
-                return TEMPERAMENT[currentTemperament]["pitchNumber"];
-            } else {
-                return 12; // Standard equal temperament
-            }
-        }
-
-        /**
          * Processes (and/or plays) a pitch.
          *
          * @param {String} notenote - note value or solfege
@@ -199,7 +184,13 @@ function setupPitchActions(activity) {
             number = Math.abs(number);
 
             const obj = keySignatureToMode(tur.singer.keySignature);
-            const modeLength = MUSICALMODES[obj[1]].length;
+            let modeLength;
+
+            if (isCustomTemperament(activity.logo.synth.inTemperament)) {
+                modeLength = Singer.IntervalsActions.getTemperamentLength();
+            } else {
+                modeLength = MUSICALMODES[obj[1]].length;
+            }
             let scaleDegree;
 
             // Choose a reference based on the key selected.
