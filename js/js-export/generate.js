@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * @file This contains the utilities for generating code from block stacks for JS Editor widget.
  * @author Anindya Kundu

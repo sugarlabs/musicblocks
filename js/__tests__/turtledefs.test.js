@@ -66,3 +66,92 @@ describe("turtledefs.js", () => {
         expect(typeof createDefaultStack).toBe("function");
     });
 });
+describe("Music Blocks mode (_THIS_IS_TURTLE_BLOCKS_ = false)", () => {
+    let mb;
+
+    beforeAll(() => {
+        const buttons = [
+            "ADVANCEDBUTTON",
+            "BIGGERBUTTON",
+            "CARTESIANBUTTON",
+            "CLEARBUTTON",
+            "COLLAPSEBLOCKSBUTTON",
+            "COLLAPSEBUTTON",
+            "GOHOMEBUTTON",
+            "HELPBUTTON",
+            "HIDEBLOCKSBUTTON",
+            "LANGUAGEBUTTON",
+            "LOADBUTTON",
+            "MENUBUTTON",
+            "NEWBUTTON",
+            "PLANETBUTTON",
+            "PLUGINSDELETEBUTTON",
+            "RESTORETRASHBUTTON",
+            "RHYTHMPALETTEICON",
+            "RUNBUTTON",
+            "SAVEBUTTON",
+            "SCROLLUNLOCKBUTTON",
+            "SHORTCUTSBUTTON",
+            "SLOWBUTTON",
+            "SMALLERBUTTON",
+            "STATSBUTTON",
+            "STEPBUTTON",
+            "STOPTURTLEBUTTON",
+            "WRAPTURTLEBUTTON",
+            "MOUSEPALETTEICON",
+            "FULLSCREENBUTTON",
+            "RECORDBUTTON",
+            "PLUGINSBUTTON",
+            "OPENMERGEBUTTON",
+            "PITCHPREVIEWBUTTON",
+            "JAVASCRIPTBUTTON",
+            "RECORDHELPBUTTON",
+            "DARKMODEBUTTON",
+            "SELECTHELPBUTTON",
+            "BLOCKMENUBUTTON",
+            "CANVASMENUBUTTON",
+            "RHYTHMPALETTEHELPICON",
+            "PITCHPREVIEWHELPBUTTON"
+        ];
+        buttons.forEach(b => {
+            global[b] = b;
+        });
+
+        global._ = jest.fn(str => str);
+        global._THIS_IS_TURTLE_BLOCKS_ = false;
+        global._THIS_IS_MUSIC_BLOCKS_ = true;
+        global.window = { btoa: jest.fn(s => s) };
+        global.localStorage = { languagePreference: undefined };
+        global.navigator = { language: "en" };
+        global.base64Encode = jest.fn(s => s);
+
+        jest.resetModules();
+        mb = require("../turtledefs");
+    });
+
+    it("TITLESTRING should be Music Blocks", () => {
+        expect(mb.TITLESTRING).toBe("Music Blocks");
+    });
+
+    it("NUMBERBLOCKDEFAULT should be 4", () => {
+        expect(mb.NUMBERBLOCKDEFAULT).toBe(4);
+    });
+
+    it("DEFAULTPALETTE should be rhythm", () => {
+        expect(mb.DEFAULTPALETTE).toBe("rhythm");
+    });
+
+    it("LOGOJA1 should be defined as SVG string", () => {
+        expect(mb.LOGOJA1).toBeDefined();
+        expect(typeof mb.LOGOJA1).toBe("string");
+        expect(mb.LOGOJA1).toContain("svg");
+    });
+
+    it("createDefaultStack should be callable", () => {
+        expect(typeof mb.createDefaultStack).toBe("function");
+    });
+
+    it("createDefaultStack should not throw when called", () => {
+        expect(() => mb.createDefaultStack()).not.toThrow();
+    });
+});

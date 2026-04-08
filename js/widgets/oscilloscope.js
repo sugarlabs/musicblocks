@@ -40,6 +40,7 @@
 class Oscilloscope {
     static ICONSIZE = 40;
     static analyserSize = 8192;
+    static DRAW_TIMEOUT = 1000;
 
     constructor(activity) {
         this.activity = activity;
@@ -47,7 +48,12 @@ class Oscilloscope {
         // RAF lifecycle control
         this._running = false;
         this._rafId = null;
+        this._timeoutId = null;
+        this._isIdle = false;
         this.draw = this.draw.bind(this);
+
+        this._handleVisibilityChange = this._handleVisibilityChange.bind(this);
+        document.addEventListener("visibilitychange", this._handleVisibilityChange);
 
         this.pitchAnalysers = {};
         this._canvasState = {};
@@ -109,6 +115,11 @@ class Oscilloscope {
             this._rafId = null;
         }
 
+        if (this._timeoutId !== null) {
+            clearTimeout(this._timeoutId);
+            this._timeoutId = null;
+        }
+
         // Backward compatibility: if any per-turtle RAF ids were stored, cancel them too.
         for (const id of Object.values(this.drawVisualIDs || {})) {
             if (id !== null && id !== undefined) {
@@ -123,8 +134,54 @@ class Oscilloscope {
         this.draw();
     }
 
+    _throttle() {
+        if (!this._running) return;
+
+        // Cancel any active RAF
+        if (this._rafId !== null) {
+            cancelAnimationFrame(this._rafId);
+            this._rafId = null;
+        }
+
+        // Enter idle mode
+        this._isIdle = true;
+
+        // Start timeout scheduler if not already running
+        if (this._timeoutId === null) {
+            this._timeoutId = setTimeout(this.draw, Oscilloscope.DRAW_TIMEOUT);
+        }
+    }
+
+    _wakeUp() {
+        if (!this._running) return;
+
+        // Cancel any active timeout
+        if (this._timeoutId !== null) {
+            clearTimeout(this._timeoutId);
+            this._timeoutId = null;
+        }
+
+        // Exit idle mode
+        this._isIdle = false;
+
+        // Restart RAF scheduler if not already running
+        if (this._rafId === null) {
+            this.draw();
+        }
+    }
+
+    _handleVisibilityChange() {
+        if (document.visibilityState === "visible") {
+            this._wakeUp();
+        } else {
+            this._throttle();
+        }
+    }
+
     close() {
         this._stopAnimation();
+
+        document.removeEventListener("visibilitychange", this._handleVisibilityChange);
 
         this.drawVisualIDs = {};
         this._canvasState = {};
@@ -214,9 +271,22 @@ class Oscilloscope {
     draw() {
         if (!this._running) return;
 
+        // Render the current frame
         this._renderFrame();
 
-        this._rafId = requestAnimationFrame(this.draw);
+        // Schedule next frame based on idle state
+        if (
+            this._isIdle ||
+            (this.activity && this.activity.isAppIdle) ||
+            document.visibilityState === "hidden" ||
+            this.widgetWindow._rolled
+        ) {
+            // Use setTimeout for idle mode (1 FPS)
+            this._timeoutId = setTimeout(this.draw, Oscilloscope.DRAW_TIMEOUT);
+        } else {
+            // Use RAF for active mode (~60 FPS)
+            this._rafId = requestAnimationFrame(this.draw);
+        }
     }
 
     /* ---------------- Resize ---------------- */

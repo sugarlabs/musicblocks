@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 /**
  * @file This contains the prototype of the Turtles component.
  * @author Walter Bender
@@ -906,15 +905,14 @@ Turtles.TurtlesView = class {
             };
             const img = new Image();
             img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svg));
+            img.setAttribute("alt", object.label || object.name || "Canvas button");
 
+            // Batch DOM reads before writes to avoid forced synchronous layout
+            const rightPos = document.body.clientWidth - x;
             container.appendChild(img);
             container.setAttribute(
                 "style",
-                "position: absolute; right:" +
-                    (document.body.clientWidth - x) +
-                    "px;  top: " +
-                    y +
-                    "px;"
+                "position: absolute; right:" + rightPos + "px;  top: " + y + "px;"
             );
             docById("buttoncontainerTOP").appendChild(container);
             return container;
@@ -1297,7 +1295,7 @@ Turtles.TurtlesView = class {
         let resizeTimeout;
         let ticking = false;
 
-        window.addEventListener("resize", () => {
+        const resizeHandler = () => {
             const isHighEndDevice =
                 navigator.hardwareConcurrency && navigator.hardwareConcurrency >= 4;
 
@@ -1319,7 +1317,14 @@ Turtles.TurtlesView = class {
                     __makeBoundary2();
                 }, 150); // Wait 150ms after the last resize event to execute
             }
-        });
+        };
+
+        if (this._resizeHandler) {
+            window.removeEventListener("resize", this._resizeHandler);
+        }
+
+        this._resizeHandler = resizeHandler;
+        window.addEventListener("resize", this._resizeHandler);
 
         return this;
     }

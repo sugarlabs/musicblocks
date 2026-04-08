@@ -183,7 +183,6 @@ class RequestManager {
                     // Exponential backoff: 50ms, 100ms, 200ms, 400ms...
                     const delay = this.baseRetryDelay * Math.pow(2, attempt);
 
-                    // eslint-disable-next-line no-console
                     console.debug(
                         `[RequestManager] Retry attempt ${attempt + 1}/${
                             this.maxRetries
@@ -207,7 +206,6 @@ class RequestManager {
                 // Exponential backoff
                 const delay = this.baseRetryDelay * Math.pow(2, attempt);
 
-                // eslint-disable-next-line no-console
                 console.debug(
                     `[RequestManager] Retry attempt ${attempt + 1}/${
                         this.maxRetries
