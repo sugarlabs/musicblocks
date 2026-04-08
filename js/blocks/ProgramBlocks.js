@@ -1099,7 +1099,7 @@ function setupProgramBlocks(activity) {
                         }
                     }
 
-                    activity.blocks.blockList[args[0]].connections[args][1] = null;
+                    activity.blocks.blockList[args[0]].connections[args[1]] = null;
                 }
             }
 
