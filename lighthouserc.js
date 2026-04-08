@@ -70,11 +70,10 @@ module.exports = {
             }
         },
         assert: {
-            // Assertions for performance budgets
-            // These will warn but not fail the build initially
             assertions: {
                 ...sharedAssertions,
                 ...performanceAssertions
+               
             }
         },
         upload: {

@@ -32,6 +32,40 @@ class Toolbar {
             this.language = navigator.language;
         }
         this.tooltipsDisabled = false;
+        this._recordDropdownArrowElement = null;
+        this._recordDropdownArrowClickHandler = null;
+        this._recordDropdownOutsideClickHandler = null;
+    }
+
+    /**
+     * Removes record dropdown listeners attached by updateRecordButton.
+     *
+     * @returns {void}
+     */
+    _cleanupRecordDropdownListeners() {
+        if (this._recordDropdownArrowElement && this._recordDropdownArrowClickHandler) {
+            this._recordDropdownArrowElement.removeEventListener(
+                "click",
+                this._recordDropdownArrowClickHandler
+            );
+        }
+
+        if (this._recordDropdownOutsideClickHandler) {
+            document.removeEventListener("click", this._recordDropdownOutsideClickHandler);
+        }
+
+        this._recordDropdownArrowElement = null;
+        this._recordDropdownArrowClickHandler = null;
+        this._recordDropdownOutsideClickHandler = null;
+    }
+
+    /**
+     * Disposes transient toolbar listeners.
+     *
+     * @returns {void}
+     */
+    dispose() {
+        this._cleanupRecordDropdownListeners();
     }
 
     /**
@@ -473,6 +507,10 @@ class Toolbar {
         const modalContainer = docById("modal-container");
         const newDropdown = docById("newdropdown");
 
+        // Cleanup any existing modal listeners from previous opens
+        // Prevents listener accumulation when renderNewProjectIcon is called multiple times
+        this._cleanupModalListeners?.();
+
         newDropdown.innerHTML = "";
         const title = document.createElement("div");
         title.classList.add("new-project-title");
@@ -503,18 +541,9 @@ class Toolbar {
         newDropdown.appendChild(buttonRowLi);
 
         modalContainer.style.display = "flex";
-        confirmationButton.onclick = () => {
-            modalContainer.style.display = "none";
-            onclick(this.activity);
-        };
 
         // Add tabindex for accessibility
         cancelButton.setAttribute("tabindex", "0"); // Make focusable
-
-        cancelButton.onclick = () => {
-            modalContainer.style.display = "none";
-        };
-        modalContainer.style.display = "flex";
 
         // Make modal container focusable
         modalContainer.setAttribute("tabindex", "-1");
@@ -523,8 +552,51 @@ class Toolbar {
         const modalButtons = [confirmationButton, cancelButton];
         let currentModalFocusIndex = 0;
 
+        // Store handler references and focus handler map for proper cleanup
+        let modalKeyHandler = null;
+        const focusHandlerMap = new Map();
+
+        /**
+         * Clean up all modal event listeners to prevent accumulation.
+         * Called defensively at the start of renderNewProjectIcon and when modal closes.
+         */
+        const cleanupModalListeners = () => {
+            // Remove keyboard handlers
+            if (modalKeyHandler) {
+                modalButtons.forEach(btn => {
+                    if (btn) {
+                        btn.removeEventListener("keydown", modalKeyHandler);
+                    }
+                });
+                if (modalContainer) {
+                    modalContainer.removeEventListener("keydown", modalKeyHandler);
+                }
+                modalKeyHandler = null;
+            }
+
+            // Remove previously stored focus handlers
+            focusHandlerMap.forEach((handler, btn) => {
+                if (btn) {
+                    btn.removeEventListener("focus", handler);
+                }
+            });
+            focusHandlerMap.clear();
+
+            // Clear focus styles
+            modalButtons.forEach(btn => {
+                if (btn) {
+                    btn.classList.remove("modal-btn-focused");
+                }
+            });
+        };
+
+        // Store cleanup function for access from other calls
+        this._cleanupModalListeners = cleanupModalListeners;
+
         // Handle keyboard events for modal
-        const modalKeyHandler = e => {
+        modalKeyHandler = e => {
+            if (modalButtons.length === 0) return; // Guard clause
+
             switch (e.key) {
                 case "ArrowDown":
                     e.preventDefault();
@@ -560,20 +632,25 @@ class Toolbar {
             }
         };
 
-        // Add event listeners to each button AND the modal container
+        // Add keyboard handlers to each button AND the modal container
         modalButtons.forEach(btn => {
             btn.addEventListener("keydown", modalKeyHandler);
-            // Track focus changes
-            btn.addEventListener("focus", () => {
+        });
+        modalContainer.addEventListener("keydown", modalKeyHandler);
+
+        // Add focus handlers with proper tracking for cleanup
+        modalButtons.forEach(btn => {
+            const focusHandler = () => {
                 const index = modalButtons.indexOf(btn);
                 if (index >= 0) {
                     currentModalFocusIndex = index;
                     modalButtons.forEach(b => b.classList.remove("modal-btn-focused"));
                     btn.classList.add("modal-btn-focused");
                 }
-            });
+            };
+            btn.addEventListener("focus", focusHandler);
+            focusHandlerMap.set(btn, focusHandler); // Store for cleanup
         });
-        modalContainer.addEventListener("keydown", modalKeyHandler);
 
         // Auto-focus the Confirm button when modal opens
         setTimeout(() => {
@@ -581,26 +658,16 @@ class Toolbar {
             confirmationButton.classList.add("modal-btn-focused");
         }, 150);
 
-        // Clean up listener when modal closes
-        const closeModal = () => {
-            modalButtons.forEach(btn => {
-                btn.removeEventListener("keydown", modalKeyHandler);
-                btn.classList.remove("modal-btn-focused");
-            });
-            modalContainer.removeEventListener("keydown", modalKeyHandler);
-        };
-
-        // Update onclick handlers to clean up
-        const originalConfirmClick = confirmationButton.onclick;
+        // Setup onclick handlers with proper cleanup on close
         confirmationButton.onclick = () => {
-            closeModal();
-            originalConfirmClick();
+            cleanupModalListeners();
+            modalContainer.style.display = "none";
+            onclick(this.activity);
         };
 
-        const originalCancelClick = cancelButton.onclick;
         cancelButton.onclick = () => {
-            closeModal();
-            originalCancelClick();
+            cleanupModalListeners();
+            modalContainer.style.display = "none";
         };
     }
 
@@ -620,16 +687,17 @@ class Toolbar {
     }
 
     renderThemeSelectIcon(themeBox, themes) {
-        const icon = document.getElementById("themeSelectIcon");
+        const icon = docById("themeSelectIcon");
+        if (!icon) return;
+
         themes.forEach(theme => {
             if (localStorage.themePreference === theme) {
-                icon.innerHTML = document.getElementById(theme).innerHTML;
+                icon.innerHTML = docById(theme).innerHTML;
             }
         });
-        const themeSelectIcon = docById("themeSelectIcon");
-        const themeList = themes;
-        themeSelectIcon.onclick = () => {
-            themeList.forEach(theme => {
+
+        icon.onclick = () => {
+            themes.forEach(theme => {
                 docById(theme).onclick = () => themeBox[`${theme}_onclick`](this.activity);
             });
         };
@@ -890,6 +958,8 @@ class Toolbar {
         const browser = fnBrowserDetect();
         const hideIn = ["firefox", "safari"];
 
+        this._cleanupRecordDropdownListeners();
+
         if (hideIn.includes(browser)) {
             Record.classList.add("hide");
             if (RecordDropdownArrow) RecordDropdownArrow.classList.add("hide");
@@ -925,7 +995,7 @@ class Toolbar {
             RecordDropdownArrow.innerHTML = `<i class="material-icons main" style="font-size: 28px;">arrow_drop_down</i>`;
 
             // Create handler function for arrow click
-            const arrowClickHandler = function () {
+            const arrowClickHandler = () => {
                 setTimeout(() => {
                     const dropdown = docById("recorddropdown");
                     const arrowIcon = RecordDropdownArrow.querySelector("i");
@@ -941,30 +1011,26 @@ class Toolbar {
                 }, 50);
             };
 
-            // Remove old listener to prevent accumulation
-            if (RecordDropdownArrow._arrowClickHandler) {
-                RecordDropdownArrow.removeEventListener(
-                    "click",
-                    RecordDropdownArrow._arrowClickHandler
-                );
-            }
-
-            // Store reference and attach fresh listener
-            RecordDropdownArrow._arrowClickHandler = arrowClickHandler;
+            this._recordDropdownArrowElement = RecordDropdownArrow;
+            this._recordDropdownArrowClickHandler = arrowClickHandler;
             RecordDropdownArrow.addEventListener("click", arrowClickHandler);
 
             // Reset arrow when clicking outside (close dropdown)
-            document.addEventListener("click", function (e) {
+            const outsideClickHandler = e => {
                 const dropdown = docById("recorddropdown");
                 const arrowIcon = RecordDropdownArrow.querySelector("i");
-                if (
-                    arrowIcon &&
-                    !RecordDropdownArrow.contains(e.target) &&
-                    !dropdown.contains(e.target)
-                ) {
+
+                if (!arrowIcon || !dropdown) {
+                    return;
+                }
+
+                if (!RecordDropdownArrow.contains(e.target) && !dropdown.contains(e.target)) {
                     arrowIcon.textContent = "arrow_drop_down";
                 }
-            });
+            };
+
+            this._recordDropdownOutsideClickHandler = outsideClickHandler;
+            document.addEventListener("click", outsideClickHandler);
         }
 
         // Set up click handlers for dropdown options
