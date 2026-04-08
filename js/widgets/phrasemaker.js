@@ -3897,10 +3897,17 @@ class PhraseMaker {
                     };
                 }
             } else {
-                cell.removeEventListener("mousedown", __mouseDownHandler);
-                cell.addEventListener("mousedown", __mouseDownHandler);
+                // Remove previously stored handlers to prevent listener accumulation
+                if (cell._pmMouseDown) {
+                    cell.removeEventListener("mousedown", cell._pmMouseDown);
+                }
+                if (cell._pmMouseUp) {
+                    cell.removeEventListener("mouseup", cell._pmMouseUp);
+                }
 
-                cell.removeEventListener("mouseup", __mouseUpHandler);
+                cell._pmMouseDown = __mouseDownHandler;
+                cell._pmMouseUp = __mouseUpHandler;
+                cell.addEventListener("mousedown", __mouseDownHandler);
                 cell.addEventListener("mouseup", __mouseUpHandler);
             }
         }

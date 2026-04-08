@@ -12,9 +12,10 @@
 /*
    globals
 
-   _, TITLESTRING, GUIDEURL, jQuery, docById, docByClass, doSVG,
+   TITLESTRING, GUIDEURL, docById, docByClass, doSVG,
    fileExt, ABCHEADER, LILYPONDHEADER, platform, saveAbcOutput,
-   saveLilypondOutput, saveMxmlOutput
+   saveLilypondOutput, saveMxmlOutput, getMidiInstrument, getMidiDrum,
+   Midi, activity
  */
 
 /**
@@ -537,7 +538,15 @@ class SaveInterface {
 
             // Save immediately
             setTimeout(() => {
-                activity.save.afterSaveAbc();
+                try {
+                    activity.save.afterSaveAbc();
+                } catch (e) {
+                    // eslint-disable-next-line no-console
+                    console.error("Error generating ABC output:", e);
+                    activity.errorMsg(_("Error generating ABC output. ") + e.message);
+                } finally {
+                    document.body.style.cursor = "default";
+                }
             }, 100);
         } else {
             // No buffered data - run the program to generate notation (original behavior)
@@ -565,8 +574,16 @@ class SaveInterface {
      * @instance
      */
     afterSaveAbc() {
-        const abc = encodeURIComponent(saveAbcOutput(this.activity));
-        this.activity.save.download("abc", "data:text;utf8," + abc, null);
+        try {
+            const abc = encodeURIComponent(saveAbcOutput(this.activity));
+            this.activity.save.download("abc", "data:text;utf8," + abc, null);
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error("Error in ABC output generation:", e);
+            this.activity.errorMsg(_("Error generating ABC output. ") + e.message);
+        } finally {
+            document.body.style.cursor = "default";
+        }
     }
 
     /**
@@ -733,7 +750,14 @@ class SaveInterface {
 
             // Trigger save after a short delay to let UI update
             setTimeout(() => {
-                this.afterSaveLilypond();
+                try {
+                    this.afterSaveLilypond();
+                } catch (e) {
+                    console.error("Error generating Lilypond output:", e);
+                    this.activity.errorMsg(_("Error generating Lilypond output. ") + e.message);
+                } finally {
+                    document.body.style.cursor = "default";
+                }
             }, 100);
         } else {
             // No buffered data - run the program to generate notation (original behavior)
@@ -772,16 +796,23 @@ class SaveInterface {
      */
     afterSaveLilypond(filename) {
         filename = docById("fileName").value;
-        const ly = saveLilypondOutput(this.activity);
-        switch (this.notationConvert) {
-            case "pdf":
-                this.afterSaveLilypondPDF(ly, filename);
-                break;
-            default:
-                this.afterSaveLilypondLY(ly, filename);
-                break;
+        try {
+            const ly = saveLilypondOutput(this.activity);
+            switch (this.notationConvert) {
+                case "pdf":
+                    this.afterSaveLilypondPDF(ly, filename);
+                    break;
+                default:
+                    this.afterSaveLilypondLY(ly, filename);
+                    break;
+            }
+        } catch (e) {
+            console.error("Error in Lilypond output generation:", e);
+            this.activity.errorMsg(_("Error generating Lilypond output. ") + e.message);
+        } finally {
+            this.notationConvert = "";
+            document.body.style.cursor = "default";
         }
-        this.notationConvert = "";
     }
 
     /**

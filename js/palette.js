@@ -9,17 +9,15 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/*
-   global
-
-   _, docById, LEADING, DEFAULTPALETTE, MULTIPALETTES, platformColor,
+/* global
+   docById, LEADING, DEFAULTPALETTE, MULTIPALETTES, platformColor,
    PALETTEICONS, MULTIPALETTEICONS, SKIPPALETTES, toTitleCase,
    i18nSolfege, NUMBERBLOCKDEFAULT, TEXTWIDTH, STRINGLEN,
    DEFAULTBLOCKSCALE, SVG, DISABLEDFILLCOLOR, DISABLEDSTROKECOLOR,
    PALETTEFILLCOLORS, PALETTESTROKECOLORS, last, getTextWidth,
-    STANDARDBLOCKHEIGHT, CLOSEICON, BUILTINPALETTES,
-    safeSVG, blockIsMacro, getMacroExpansion,
-    cameraPALETTE, mediaPALETTE, videoPALETTE
+   STANDARDBLOCKHEIGHT, CLOSEICON, BUILTINPALETTES, base64Encode,
+   safeSVG, blockIsMacro, getMacroExpansion, StatusMatrix,
+   activity, cameraPALETTE, mediaPALETTE, videoPALETTE
 */
 
 /* exported Palettes, initPalettes */
@@ -67,6 +65,7 @@ class Palettes {
         this.activity = activity;
         // this.blocks = null;
         this.cellSize = Math.floor(this.activity.cellSize * PALETTE_SCALE_FACTOR + 0.5);
+        this.collapsed = false;
         this.paletteWidth = 55 * PALETTE_WIDTH_FACTOR;
         this.scrollDiff = 0;
         this.originalSize = 55; // this is the original svg size
@@ -102,6 +101,10 @@ class Palettes {
         this._navBlockIndex = 0;
         this._navPaletteBlockIndex = 0; // For navigating actual blocks in the right panel
         this._keyboardNavActive = false;
+        this._menuOpenTimeout = null;
+        // Tracks whether the palette was collapsed before Tab focus entered,
+        // so we can restore its state when focus leaves.
+        this._wasCollapsedBeforeFocus = false;
     }
 
     init() {
@@ -250,6 +253,28 @@ class Palettes {
             }
         });
 
+        // Auto-expand the palette when it receives Tab focus (if it was collapsed),
+        // and restore the previous state when focus leaves.
+        palette.addEventListener("focus", () => {
+            // Record the state at the moment Tab focus enters.
+            this._wasCollapsedBeforeFocus = this.collapsed;
+            // If the palette is collapsed, open it so the user can see it.
+            if (this.collapsed) {
+                this.toggleCollapse();
+            }
+        });
+
+        palette.addEventListener("focusout", event => {
+            // relatedTarget is where focus is moving to.
+            // If it's still inside the palette, do nothing.
+            if (palette.contains(event.relatedTarget)) return;
+            // Restore the palette to the state it was in before Tab focus entered.
+            if (this._wasCollapsedBeforeFocus) {
+                this.toggleCollapse();
+            }
+            this._wasCollapsedBeforeFocus = false;
+        });
+
         // Clear keyboard nav highlight on mouse movement and restore mouse hover
         palette.addEventListener("mousemove", () => {
             if (this._keyboardNavActive) {
@@ -326,6 +351,50 @@ class Palettes {
             el.style.backgroundColor = platformColor.paletteBackground;
             delete el.dataset.keyboardFocus;
         });
+    }
+
+    /**
+     * Clears any delayed hover-triggered palette open so it cannot fire
+     * after keyboard focus has already moved to another zone.
+     */
+    _clearPendingMenuOpen() {
+        if (this._menuOpenTimeout !== null) {
+            clearTimeout(this._menuOpenTimeout);
+            this._menuOpenTimeout = null;
+        }
+    }
+
+    /**
+     * Resets palette keyboard navigation and optionally closes open menus.
+     * Used when focus leaves the palette via Tab or mouse interaction.
+     *
+     * @param {{closeMenus?: boolean, blur?: boolean}} options
+     * @returns {void}
+     */
+    resetKeyboardNavigation(options = {}) {
+        const { closeMenus = false, blur = false } = options;
+
+        this._keyboardNavActive = false;
+        this._navSection = "type";
+        this._navTypeIndex = 0;
+        this._navBlockIndex = 0;
+        this._navPaletteBlockIndex = 0;
+        this.activePalette = null;
+        this._clearPendingMenuOpen();
+        this._clearKeyboardFocus();
+
+        if (closeMenus) {
+            for (const name in this.dict) {
+                if (this.dict[name] && typeof this.dict[name].hideMenu === "function") {
+                    this.dict[name].hideMenu();
+                }
+            }
+            this._hideMenus();
+        }
+
+        if (blur) {
+            docById("palette")?.blur?.();
+        }
     }
 
     /**
@@ -474,16 +543,38 @@ class Palettes {
         palette.style.top = curr + dy + "px";
     }
 
+    toggleCollapse() {
+        const palette = document.getElementById("palette");
+
+        if (!palette) return;
+
+        this.collapsed = !this.collapsed;
+
+        if (this.collapsed) {
+            palette.style.transform = "translateX(-100%)";
+            document.getElementById("paletteToggle").innerHTML = "▶";
+            palette.style.transition = "transform 0.3s ease";
+            this.paletteWidth = 0;
+        } else {
+            palette.style.transform = "translateX(0)";
+            document.getElementById("paletteToggle").innerHTML = "◀";
+            this.paletteWidth = 55 * PALETTE_WIDTH_FACTOR;
+        }
+    }
+
     _makeSelectorButton(i) {
         if (!document.getElementById("palette")) {
             const element = document.createElement("div");
             element.id = "palette";
             element.setAttribute("class", "disable_highlighting");
             element.classList.add("flex-palette");
-            element.setAttribute(
-                "style",
-                "position: absolute; z-index: 1000; left :0px; top:" + this.top + "px"
-            );
+
+            element.style.position = "absolute";
+            element.style.zIndex = "1000";
+            element.style.left = "0px";
+            element.style.top = this.top + "px";
+            element.style.transition = "transform 0.3s ease";
+
             element.innerHTML = `<div style="height:fit-content">
                     <table width="${1.5 * this.cellSize}" bgcolor="white">
                         <thead>
@@ -493,22 +584,77 @@ class Palettes {
                     <table width ="${4.5 * this.cellSize}" bgcolor="white">
                         <thead>
                             <tr>
-                                <td style= "width:28px"></td>
+                                <td style="width:28px"></td>
                             </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
                 </div>`;
+
             element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
+
             document.body.appendChild(element);
+
+            const toggleBtn = document.createElement("div");
+            toggleBtn.innerHTML = "◀";
+            toggleBtn.id = "paletteToggle";
+
+            toggleBtn.style.position = "absolute";
+            toggleBtn.style.top = "10px";
+            toggleBtn.style.right = "-30px";
+            toggleBtn.style.width = "30px";
+            toggleBtn.style.height = "30px";
+            toggleBtn.style.display = "flex";
+            toggleBtn.style.alignItems = "center";
+            toggleBtn.style.justifyContent = "center";
+            toggleBtn.style.cursor = "pointer";
+
+            toggleBtn.style.color = "white";
+            toggleBtn.style.backgroundColor = platformColor.paletteBackground;
+            toggleBtn.addEventListener("mouseover", () => {
+                toggleBtn.style.backgroundColor = platformColor.selectorSelected;
+            });
+            toggleBtn.addEventListener("mouseout", () => {
+                toggleBtn.style.backgroundColor = platformColor.paletteLabelBackground;
+            });
+
+            toggleBtn.style.borderRadius = "0 4px 4px 0";
+            toggleBtn.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
+
+            toggleBtn.onclick = () => this.toggleCollapse();
+
+            element.appendChild(toggleBtn);
+            toggleBtn.style.position = "absolute";
+            toggleBtn.style.top = "50%";
+            toggleBtn.style.right = "-25px";
+            toggleBtn.style.transform = "translateY(-50%)";
+
+            toggleBtn.style.height = "52px";
+            toggleBtn.style.width = "24px";
+
+            toggleBtn.style.display = "flex";
+            toggleBtn.style.alignItems = "center";
+            toggleBtn.style.justifyContent = "center";
+
+            toggleBtn.style.cursor = "pointer";
+            toggleBtn.style.background = platformColor.paletteLabelBackground;
+            toggleBtn.style.color = "white";
+
+            toggleBtn.style.borderRadius = "0 30px 30px 0";
+            toggleBtn.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
+
+            toggleBtn.style.fontWeight = "bold";
+            toggleBtn.style.fontSize = "14px";
         }
 
         const tr = docById("palette").children[0].children[0].children[0].children[0];
+
         const td = tr.insertCell();
         td.width = 1.5 * this.cellSize;
         td.height = 1.5 * this.cellSize;
         td.style.position = "relative";
         td.style.backgroundColor = platformColor.paletteBackground;
+
         td.appendChild(
             makePaletteIcons(
                 PALETTEICONS[MULTIPALETTEICONS[i]]
@@ -519,14 +665,17 @@ class Palettes {
                 1.5 * this.cellSize
             )
         );
+
         const cover = document.createElement("div");
         cover.style.position = "absolute";
         cover.style.zIndex = "10";
         cover.style.top = "0";
         cover.style.width = "100%";
         cover.style.height = "1px";
-        cover.style.background = "white";
+        cover.style.background = platformColor.paletteLabelBackground;
+
         td.appendChild(cover);
+
         // Mouse hover for type selectors - only if not in keyboard nav mode
         td.onmouseover = () => {
             if (!this._keyboardNavActive) {
@@ -771,6 +920,7 @@ class Palettes {
         // Hide the menu buttons and the palettes themselves.
 
         this.activity.hideSearchWidget(true);
+        this.activePalette = null;
 
         if (docById("PaletteBody"))
             docById("PaletteBody").parentNode.removeChild(docById("PaletteBody"));
@@ -865,6 +1015,31 @@ class Palettes {
                 </div>`;
             element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
             document.body.appendChild(element);
+
+            const toggleBtn = document.createElement("div");
+            toggleBtn.innerHTML = "◀";
+            toggleBtn.id = "paletteToggle";
+
+            toggleBtn.style.position = "absolute";
+            toggleBtn.style.top = "12px";
+            toggleBtn.style.right = "-18px";
+            toggleBtn.style.width = "22px";
+            toggleBtn.style.height = "40px";
+            toggleBtn.style.display = "flex";
+            toggleBtn.style.alignItems = "center";
+            toggleBtn.style.justifyContent = "center";
+            toggleBtn.style.cursor = "pointer";
+            toggleBtn.style.background = platformColor.selectorSelected;
+            toggleBtn.style.color = "white";
+
+            toggleBtn.style.borderRadius = "0 6px 6px 0";
+            toggleBtn.style.boxShadow = "0 2px 4px rgba(0,0,0,0.15)";
+            toggleBtn.style.fontWeight = "bold";
+            toggleBtn.style.fontSize = "14px";
+
+            toggleBtn.onclick = () => this.toggleCollapse();
+
+            element.appendChild(toggleBtn);
         } catch (e) {
             console.error("Error clearing palettes:", e);
         }
@@ -882,19 +1057,20 @@ class Palettes {
 
     // Palette Button event handlers
     _loadPaletteButtonHandler(name, row) {
-        let timeout;
-
         row.onmouseover = () => {
             if (name === "search") {
                 document.body.style.cursor = "text";
             } else {
                 document.body.style.cursor = "pointer";
-                clearTimeout(timeout);
-                timeout = setTimeout(() => this.showPalette(name), 400);
+                this._clearPendingMenuOpen();
+                this._menuOpenTimeout = setTimeout(() => {
+                    this._menuOpenTimeout = null;
+                    this.showPalette(name);
+                }, 400);
             }
         };
 
-        row.onmouseout = () => clearTimeout(timeout);
+        row.onmouseout = () => this._clearPendingMenuOpen();
 
         row.onclick = () => {
             if (name == "search") {
@@ -1400,6 +1576,7 @@ class Palette {
         blocks.reverse();
         const protoListScope = [...this.protoList];
         if (last(blocks).blkname != last(protoListScope).name) protoListScope.reverse();
+        const fragment = document.createDocumentFragment();
         for (const blk in blocks) {
             const b = blocks[blk];
 
@@ -1501,8 +1678,10 @@ class Palette {
             itemCell.style.width = `${img.width}px`;
             itemCell.style.paddingRight = `${this.palettes.cellSize}px`;
             itemCell.appendChild(img);
-            paletteList.appendChild(itemRow);
+            fragment.appendChild(itemRow);
         }
+
+        paletteList.appendChild(fragment);
 
         if (this.palettes.mobile) {
             this.hide();
@@ -1848,7 +2027,7 @@ class Palette {
                 // Add variables first
                 for (let i = 0; i < foundVariables.length; i++) {
                     const [blockId, blockType] = foundVariables[i];
-                    const block = activity.blocks.blockList[blockId];
+                    const block = this.activity.blocks.blockList[blockId];
                     const isLastVar = i === foundVariables.length - 1;
                     const hasBoxes = boxBlocks.length > 0;
 
@@ -1879,7 +2058,7 @@ class Palette {
                 // Then add box blocks
                 for (let i = 0; i < boxBlocks.length; i++) {
                     const boxBlockId = boxBlocks[i];
-                    const boxBlock = activity.blocks.blockList[boxBlockId];
+                    const boxBlock = this.activity.blocks.blockList[boxBlockId];
 
                     statusBlocks.push([
                         lastBlockIndex + 1,

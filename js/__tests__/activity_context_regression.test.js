@@ -30,6 +30,7 @@
  * Test environment: jsdom (configured in jest.config.js).
  */
 
+const fs = require("fs");
 const path = require("path");
 
 // ─── Load ActivityContext via CommonJS (module supports both AMD and CJS) ────
@@ -195,5 +196,10 @@ describe("window.activity — deprecation guard contract", () => {
         const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
         expect(window.activity).toBeUndefined();
         warnSpy.mockRestore();
+    });
+
+    test("activity.js does not assign the Activity singleton back onto window.activity", () => {
+        const activitySource = fs.readFileSync(path.resolve(__dirname, "../activity.js"), "utf8");
+        expect(activitySource).not.toMatch(/\bwindow\.activity\s*=/);
     });
 });

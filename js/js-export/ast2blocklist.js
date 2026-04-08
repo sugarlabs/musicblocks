@@ -210,8 +210,17 @@ class AST2BlockList {
                 // Set arguments
                 if (pair.arguments !== undefined) {
                     let argArray = [];
-                    for (const argPath of pair.ast.argument_properties) {
-                        argArray.push(_getPropertyValue(bodyAST, argPath));
+                    if ("arguments_property" in pair.ast) {
+                        let args = _getPropertyValue(bodyAST, pair.ast.arguments_property) || [];
+                        if (!Array.isArray(args)) {
+                            args = [args];
+                        }
+                        const offset = pair.ast.arguments_offset || 0;
+                        argArray = args.slice(offset);
+                    } else {
+                        for (const argPath of pair.ast.argument_properties) {
+                            argArray.push(_getPropertyValue(bodyAST, argPath));
+                        }
                     }
                     let args = _createArgNode(argArray);
                     if (args.length > 0) {
@@ -303,9 +312,7 @@ class AST2BlockList {
                         }
                     }
 
-                    if (argNode !== null) {
-                        argNodes.push(argNode);
-                    }
+                    argNodes.push(argNode);
                 }
                 return argNodes;
             }
@@ -567,7 +574,16 @@ class AST2BlockList {
                 // Process each argument with its corresponding configuration
                 for (let i = 0; i < node.arguments.length; i++) {
                     const arg = node.arguments[i];
-                    const argConfig = blockConfig.arguments[i];
+                    if (arg === null) {
+                        continue;
+                    }
+                    let argConfig = blockConfig.arguments[i];
+                    if (!argConfig && blockConfig.arguments_repeat) {
+                        argConfig = blockConfig.arguments[blockConfig.arguments.length - 1];
+                    }
+                    if (!argConfig) {
+                        throw new Error(`Missing argument configuration for: ${block_name}`);
+                    }
                     if (argConfig.type === "note_or_solfege") {
                         // Handle pitch notes (solfege or note names)
                         const notes = new Set(["A", "B", "C", "D", "E", "F", "G"]);
