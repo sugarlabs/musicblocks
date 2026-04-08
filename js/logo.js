@@ -4,7 +4,7 @@
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
-// License as published by the Free Software Foundatioff; either
+// License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
 //
 // You should have received a copy of the GNU Affero General Public
@@ -14,59 +14,28 @@
 /*
    global
 
-   _, Notation, Synth, instruments, instrumentsFilters,
+   Notation, Synth, instruments, instrumentsFilters,
    instrumentsEffects, Singer, Tone, CAMERAVALUE, doUseCamera,
    VIDEOVALUE, last, getIntervalDirection, getIntervalNumber,
    mixedNumber, rationalToFraction, doStopVideoCam, StatusMatrix,
-   getStatsFromNotation, delayExecution, DEFAULTVOICE
-*/
+   getStatsFromNotation, delayExecution, DEFAULTVOICE, performanceTracker,
+   requirejs, define, DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY,
+   OSCVOLUMEADJUSTMENT, TONEBPM, TARGETBPM, TURTLESTEP, NOTEDIV,
+   MIN_HIGHLIGHT_DURATION_MS,
+   NOMICERRORMSG, NANERRORMSG, NOSTRINGERRORMSG, NOBOXERRORMSG,
+   NOACTIONERRORMSG, NOINPUTERRORMSG, NOSQRTERRORMSG, ZERODIVIDEERRORMSG,
+   EMPTYHEAPERRORMSG, INVALIDPITCH, POSNUMBER, NOTATIONNOTE, NOTATIONDURATION,
+   NOTATIONDOTCOUNT, NOTATIONTUPLETVALUE, NOTATIONROUNDDOWN,
+   NOTATIONINSIDECHORD, NOTATIONSTACCATO
+ */
 
 /*
    exported
 
-   Queue, Logo, DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY,
-   OSCVOLUMEADJUSTMENT, TONEBPM, TARGETBPM, TURTLESTEP, NOTEDIV,
-   NOMICERRORMSG, NANERRORMSG, NOSTRINGERRORMSG, NOBOXERRORMSG,
-   NOACTIONERRORMSG, NOINPUTERRORMSG, NOSQRTERRORMSG,
-   ZERODIVIDEERRORMSG, EMPTYHEAPERRORMSG, INVALIDPITCH, POSNUMBER,
-   NOTATIONNOTE, NOTATIONDURATION, NOTATIONDOTCOUNT,
-   NOTATIONTUPLETVALUE, NOTATIONROUNDDOWN, NOTATIONINSIDECHORD,
-   NOTATIONSTACCATO
+   Queue, Logo, LogoDependencies
  */
 
-const DEFAULTVOLUME = 50;
-const PREVIEWVOLUME = 80;
-const DEFAULTDELAY = 500; // milliseconds
-// The oscillator runs hot. We must scale back its volume.
-const OSCVOLUMEADJUSTMENT = 1.5;
-
-const TONEBPM = 240; // seems to be the default
-const TARGETBPM = 90; // what we'd like to use for beats per minute
-const TURTLESTEP = -1; // run in step-by-step mode
-const NOTEDIV = 8; // number of steps to divide turtle graphics
-
-// These error messages don't need translation since they are
-// converted into artwork w/o text.
-const NOMICERRORMSG = "The microphone is not available.";
-const NANERRORMSG = "Not a number.";
-const NOSTRINGERRORMSG = "Not a string.";
-const NOBOXERRORMSG = "Cannot find box";
-const NOACTIONERRORMSG = "Cannot find action.";
-const NOINPUTERRORMSG = "Missing argument.";
-const NOSQRTERRORMSG = "Cannot take square root of negative number.";
-const ZERODIVIDEERRORMSG = "Cannot divide by zero.";
-const EMPTYHEAPERRORMSG = "empty heap.";
-const POSNUMBER = "Argument must be a positive number";
-
-const INVALIDPITCH = _("Not a valid pitch name");
-
-const NOTATIONNOTE = 0;
-const NOTATIONDURATION = 1;
-const NOTATIONDOTCOUNT = 2;
-const NOTATIONTUPLETVALUE = 3;
-const NOTATIONROUNDDOWN = 4;
-const NOTATIONINSIDECHORD = 5; // deprecated
-const NOTATIONSTACCATO = 6;
+// Constants moved to js/logoconstants.js to resolve circular dependency
 
 /**
  * @class
@@ -88,26 +57,129 @@ class Queue {
     }
 }
 
-/**
- * Class dealing with executing the programs.
- *
- * @class
- * @classdesc This contains all the variables and the methods which
- * control the execution of the programs. Contains a method to dispatch
- * turtle commands which call methods of Turtle and Turles. Also contains
- * notation code.
- */
 class Logo {
     /**
      * @constructor
+     * @param {Object|LogoDependencies} activityOrDeps - Either an Activity object (old pattern)
+     *                                                    or a LogoDependencies object (new pattern)
+     *
+     * @example
+     * // Old pattern (still supported)
+     * const logo = new Logo(activity);
+     *
+     * @example
+     * // New pattern (explicit dependencies)
+     * const deps = new LogoDependencies({
+     *     blocks: activity.blocks,
+     *     turtles: activity.turtles,
+     *     // ... other dependencies
+     * });
+     * const logo = new Logo(deps);
      */
-    constructor(activity) {
-        this.activity = activity;
+    constructor(activityOrDeps) {
+        // Check if this is a LogoDependencies instance
+        const isExplicitDeps =
+            activityOrDeps &&
+            activityOrDeps.blocks &&
+            activityOrDeps.turtles &&
+            activityOrDeps.stage &&
+            activityOrDeps.errorHandler;
+
+        if (isExplicitDeps) {
+            // New pattern: explicit dependencies
+            this.deps = activityOrDeps;
+            // For backward compatibility, also expose activity facade
+            const deps = this.deps;
+            this.activity = {
+                blocks: deps.blocks,
+                turtles: deps.turtles,
+                stage: deps.stage,
+                errorMsg: (msg, blk) => deps.errorHandler(msg, blk),
+                hideMsgs: () => deps.messageHandler.hide(),
+                saveLocally: () => deps.storage.saveLocally(),
+                get showBlocksAfterRun() {
+                    return deps.config.showBlocksAfterRun;
+                },
+                set showBlocksAfterRun(value) {
+                    deps.config.showBlocksAfterRun = value;
+                },
+                onStopTurtle: deps.callbacks.onStopTurtle,
+                onRunTurtle: deps.callbacks.onRunTurtle,
+
+                logo: this // Self-reference for compatibility
+            };
+        } else {
+            // Old pattern: Activity facade
+            this.activity = activityOrDeps;
+            // Create deps as a view over activity for future migration
+            this.deps = {
+                blocks: this.activity.blocks,
+                turtles: this.activity.turtles,
+                stage: this.activity.stage,
+                errorHandler: (msg, blk) => this.activity.errorMsg(msg, blk),
+                messageHandler: {
+                    hide: () => this.activity.hideMsgs()
+                },
+                storage: {
+                    saveLocally: () => this.activity.saveLocally()
+                },
+                config: {
+                    get showBlocksAfterRun() {
+                        return this.activity.showBlocksAfterRun;
+                    },
+                    set showBlocksAfterRun(value) {
+                        this.activity.showBlocksAfterRun = value;
+                    }
+                },
+                callbacks: {
+                    get onStopTurtle() {
+                        return this.activity.onStopTurtle;
+                    },
+                    get onRunTurtle() {
+                        return this.activity.onRunTurtle;
+                    }
+                },
+
+                // Audio and utility dependencies
+                instruments: typeof instruments !== "undefined" ? instruments : null,
+                instrumentsFilters:
+                    typeof instrumentsFilters !== "undefined" ? instrumentsFilters : null,
+                instrumentsEffects:
+                    typeof instrumentsEffects !== "undefined" ? instrumentsEffects : null,
+                widgetWindows: typeof window !== "undefined" ? window.widgetWindows : null,
+                Singer: typeof Singer !== "undefined" ? Singer : null,
+                Tone: typeof Tone !== "undefined" ? Tone : null,
+                utils: {
+                    doUseCamera: typeof doUseCamera !== "undefined" ? doUseCamera : null,
+                    doStopVideoCam: typeof doStopVideoCam !== "undefined" ? doStopVideoCam : null,
+                    getIntervalDirection:
+                        typeof getIntervalDirection !== "undefined" ? getIntervalDirection : null,
+                    getIntervalNumber:
+                        typeof getIntervalNumber !== "undefined" ? getIntervalNumber : null,
+                    mixedNumber: typeof mixedNumber !== "undefined" ? mixedNumber : null,
+                    rationalToFraction:
+                        typeof rationalToFraction !== "undefined" ? rationalToFraction : null,
+                    getStatsFromNotation:
+                        typeof getStatsFromNotation !== "undefined" ? getStatsFromNotation : null,
+                    delayExecution: typeof delayExecution !== "undefined" ? delayExecution : null,
+                    last: typeof last !== "undefined" ? last : null
+                },
+                classes: {
+                    Notation: typeof Notation !== "undefined" ? Notation : null,
+                    Synth: typeof Synth !== "undefined" ? Synth : null,
+                    StatusMatrix: typeof StatusMatrix !== "undefined" ? StatusMatrix : null
+                }
+            };
+        }
+
+        // Bind commonly-used dependencies locally for readability
+        this.blocks = this.deps.blocks;
+        this.turtles = this.deps.turtles;
+        this.stage = this.deps.stage;
+
         this.blockList = this.activity.blocks.blockList;
         this._onStopTurtle = this.activity.onStopTurtle;
         this._onRunTurtle = this.activity.onRunTurtle;
-
-        this._meSpeak = this.activity.meSpeak;
 
         // Widgets
         this.reflection = null;
@@ -162,6 +234,7 @@ class Logo {
 
         this.time = 0;
         this.firstNoteTime = null;
+        this.firstNoteAudioTime = null;
         this._turtleDelay = 0;
         this.sounds = [];
         this.cameraID = null;
@@ -177,7 +250,7 @@ class Logo {
         this.inTempo = false;
         this.inPitchSlider = false;
         this.inMusicKeyboard = false;
-        this._currentDrumlock = null;
+        this._currentDrumBlock = null;
         this.inTimbre = false;
         this.inArpeggio = false;
         this.insideModeWidget = false;
@@ -201,7 +274,7 @@ class Logo {
         this.tupletParams = [];
 
         // object that deals with notations
-        this._notation = new Notation(this.activity);
+        this._notation = new this.deps.classes.Notation(this.activity);
 
         // parameters used by notations
         this.notationOutput = "";
@@ -232,7 +305,8 @@ class Logo {
         this.specialArgs = [];
 
         // Load the default synthesizer
-        this.synth = new Synth();
+        this.synth = new this.deps.classes.Synth();
+        this.synth.activity = this.activity; // Reference for voice tracking
         this.synth.changeInTemperament = false;
 
         // Mode widget
@@ -249,6 +323,11 @@ class Logo {
 
         // Midi Data
         this._midiData = {};
+
+        this._syncCounter = 0;
+        this._YIELD_AFTER_SYNC_RUNS = 1000;
+        this._totalIterations = 0;
+        this._MAX_ITERATIONS = 1000000;
 
         // When running in step-by-step mode, the next command to run
         // is queued here.
@@ -347,32 +426,32 @@ class Logo {
         for (const turtle in this.activity.turtles.turtleList) {
             const tur = this.activity.turtles.ithTurtle(turtle);
 
-            if (!(turtle in instruments)) {
-                instruments[turtle] = {};
-                instrumentsFilters[turtle] = {};
-                instrumentsEffects[turtle] = {};
+            if (!(turtle in this.deps.instruments)) {
+                this.deps.instruments[turtle] = {};
+                this.deps.instrumentsFilters[turtle] = {};
+                this.deps.instrumentsEffects[turtle] = {};
             }
 
             // Make sure there is a default synth for each turtle
-            if (!(DEFAULTVOICE in instruments[turtle])) {
+            if (!(DEFAULTVOICE in this.deps.instruments[turtle])) {
                 this.synth.createDefaultSynth(turtle);
             }
 
             // Copy any preloaded synths from the default turtle
-            for (const instrumentName in instruments[0]) {
-                if (!(instrumentName in instruments[turtle])) {
+            for (const instrumentName in this.deps.instruments[0]) {
+                if (!(instrumentName in this.deps.instruments[turtle])) {
                     this.synth.loadSynth(turtle, instrumentName);
 
                     // Copy any filters
-                    if (instrumentName in instrumentsFilters[0]) {
-                        instrumentsFilters[turtle][instrumentName] =
-                            instrumentsFilters[0][instrumentName];
+                    if (instrumentName in this.deps.instrumentsFilters[0]) {
+                        this.deps.instrumentsFilters[turtle][instrumentName] =
+                            this.deps.instrumentsFilters[0][instrumentName];
                     }
 
                     // ...and any effects
-                    if (instrumentName in instrumentsEffects[0]) {
-                        instrumentsEffects[turtle][instrumentName] =
-                            instrumentsEffects[0][instrumentName];
+                    if (instrumentName in this.deps.instrumentsEffects[0]) {
+                        this.deps.instrumentsEffects[turtle][instrumentName] =
+                            this.deps.instrumentsEffects[0][instrumentName];
                     }
                 }
             }
@@ -387,8 +466,10 @@ class Logo {
         }
 
         for (const turtle in this.activity.turtles.turtleList) {
-            for (const synth in this.activity.turtles.ithTurtle(turtle).singer.synthVolume) {
-                Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
+            // Cache ithTurtle result to avoid redundant function calls in inner loop
+            const tur = this.activity.turtles.ithTurtle(turtle);
+            for (const synth in tur.singer.synthVolume) {
+                this.deps.Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
             }
         }
     }
@@ -400,14 +481,16 @@ class Logo {
      * @returns {void}
      */
     resetSynth(turtle) {
-        if (!(DEFAULTVOICE in instruments[turtle])) {
+        if (!(DEFAULTVOICE in this.deps.instruments[turtle])) {
             this.synth.createDefaultSynth(turtle);
         }
 
-        Singer.setMasterVolume(this.activity.logo, DEFAULTVOLUME);
+        this.deps.Singer.setMasterVolume(this.activity.logo, DEFAULTVOLUME);
         for (const turtle in this.activity.turtles.turtleList) {
-            for (const synth in this.activity.turtles.ithTurtle(turtle).singer.synthVolume) {
-                Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
+            // Cache ithTurtle result to avoid redundant function calls in inner loop
+            const tur = this.activity.turtles.ithTurtle(turtle);
+            for (const synth in tur.singer.synthVolume) {
+                this.deps.Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
             }
         }
 
@@ -420,7 +503,7 @@ class Logo {
      * @returns {void}
      */
     initMediaDevices() {
-        let mic = new Tone.UserMedia();
+        let mic = new this.deps.Tone.UserMedia();
         try {
             mic.open();
         } catch (e) {
@@ -460,14 +543,7 @@ class Logo {
      * @returns {void}
      */
     processSpeak(text) {
-        let new_text = "";
-        for (const i in text) {
-            if (new RegExp("^[A-Za-z,. ]$").test(text[i])) new_text += text[i];
-        }
-
-        if (this.meSpeak !== null) {
-            this.meSpeak.speak(new_text);
-        }
+        // meSpeak was removed from the codebase.
     }
 
     /**
@@ -484,7 +560,7 @@ class Logo {
         if (typeof arg1 === "string") {
             const len = arg1.length;
             if (len === 14 && arg1.substr(0, 14) === CAMERAVALUE) {
-                doUseCamera(
+                this.deps.utils.doUseCamera(
                     [arg0],
                     this.activity.turtles,
                     turtle,
@@ -494,7 +570,7 @@ class Logo {
                     this.activity.errorMsg
                 );
             } else if (len === 13 && arg1.substr(0, 13) === VIDEOVALUE) {
-                doUseCamera(
+                this.deps.utils.doUseCamera(
                     [arg0],
                     this.activity.turtles,
                     turtle,
@@ -578,19 +654,22 @@ class Logo {
 
         let nextBlock = null;
         if (!tur.singer.inDuplicate && tur.singer.backward.length > 0) {
-            const c = this.blockList[last(tur.singer.backward)].name === "backward" ? 1 : 2;
+            const c =
+                this.blockList[this.deps.utils.last(tur.singer.backward)].name === "backward"
+                    ? 1
+                    : 2;
             if (
                 this.activity.blocks.sameGeneration(
-                    this.blockList[last(tur.singer.backward)].connections[c],
+                    this.blockList[this.deps.utils.last(tur.singer.backward)].connections[c],
                     blk
                 )
             ) {
                 nextBlock = this.blockList[blk].connections[0];
             } else {
-                nextBlock = last(this.blockList[blk].connections);
+                nextBlock = this.deps.utils.last(this.blockList[blk].connections);
             }
         } else {
-            nextBlock = last(this.blockList[blk].connections);
+            nextBlock = this.deps.utils.last(this.blockList[blk].connections);
         }
 
         if (nextBlock !== null) {
@@ -615,60 +694,69 @@ class Logo {
     parseArg(logo, turtle, blk, parentBlk, receivedArg) {
         const tur = logo.activity.turtles.ithTurtle(turtle);
 
-        // Retrieve the value of a block
+        // Using loose null check to catch both null and undefined input blocks
         if (blk == null) {
             logo.activity.errorMsg(NOINPUTERRORMSG, parentBlk);
-            // logo.stopTurtle = true;
             return null;
         }
 
-        if (logo.blockList[blk].protoblock.parameter) {
+        const currentBlock = logo.blockList[blk];
+        const proto = currentBlock.protoblock;
+
+        // Retrieve the value of a block
+        if (proto.parameter) {
             if (!tur.parameterQueue.includes(blk)) {
                 tur.parameterQueue.push(blk);
             }
         }
 
-        if (typeof logo.blockList[blk].protoblock.arg === "function") {
-            return (logo.blockList[blk].value = logo.blockList[blk].protoblock.arg(
-                logo,
-                turtle,
-                blk,
-                receivedArg
-            ));
+        if (typeof proto.arg === "function") {
+            return (currentBlock.value = proto.arg(logo, turtle, blk, receivedArg));
         }
 
-        if (logo.blockList[blk].name === "intervalname") {
-            if (typeof logo.blockList[blk].value === "string") {
-                tur.singer.noteDirection = getIntervalDirection(logo.blockList[blk].value);
-                return getIntervalNumber(logo.blockList[blk].value);
-            } else return 0;
-        } else if (logo.blockList[blk].isValueBlock()) {
-            return logo.blockList[blk].value;
-        } else if (
-            ["anyout", "numberout", "textout", "booleanout"].includes(
-                logo.blockList[blk].protoblock.dockTypes[0]
-            )
+        const blockName = currentBlock.name;
+        const utils = logo.deps.utils;
+
+        if (blockName === "intervalname") {
+            if (typeof currentBlock.value === "string") {
+                tur.singer.noteDirection = utils.getIntervalDirection(currentBlock.value);
+                return utils.getIntervalNumber(currentBlock.value);
+            }
+            return 0;
+        }
+
+        if (currentBlock.isValueBlock()) {
+            return currentBlock.value;
+        }
+
+        const firstDockType = proto.dockTypes[0];
+        if (
+            firstDockType === "anyout" ||
+            firstDockType === "numberout" ||
+            firstDockType === "textout" ||
+            firstDockType === "booleanout"
         ) {
-            switch (logo.blockList[blk].name) {
+            switch (blockName) {
                 case "dectofrac":
                     if (
                         logo.inStatusMatrix &&
-                        logo.blockList[logo.blockList[blk].connections[0]].name === "print"
+                        logo.blockList[currentBlock.connections[0]].name === "print"
                     ) {
                         logo.statusFields.push([blk, "dectofrac"]);
                     } else {
-                        const cblk = logo.blockList[blk].connections[1];
-                        if (cblk === null) {
+                        const cblk = currentBlock.connections[1];
+                        // Using loose null check for undefined acceptance
+                        if (cblk == null) {
                             logo.activity.errorMsg(NOINPUTERRORMSG, blk);
-                            logo.blockList[blk].value = 0;
+                            currentBlock.value = 0;
                         } else {
                             const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                             if (typeof a === "number") {
-                                logo.blockList[blk].value =
-                                    a < 0 ? "-" + mixedNumber(-a) : mixedNumber(a);
+                                currentBlock.value =
+                                    a < 0 ? "-" + utils.mixedNumber(-a) : utils.mixedNumber(a);
                             } else {
                                 logo.activity.errorMsg(NANERRORMSG, blk);
-                                logo.blockList[blk].value = 0;
+                                currentBlock.value = 0;
                             }
                         }
                     }
@@ -677,42 +765,45 @@ class Logo {
                 case "hue":
                     if (
                         logo.inStatusMatrix &&
-                        logo.blockList[logo.blockList[blk].connections[0]].name === "print"
+                        logo.blockList[currentBlock.connections[0]].name === "print"
                     ) {
                         logo.statusFields.push([blk, "color"]);
                     } else {
-                        logo.blockList[blk].value = logo.activity.turtles.getTurtle(
-                            turtle
-                        ).painter.color;
+                        currentBlock.value = tur.painter.color;
                     }
                     break;
 
                 /** @deprecated */
                 case "returnValue":
                     if (logo.returns[turtle].length > 0) {
-                        logo.blockList[blk].value = logo.returns[turtle].pop();
+                        currentBlock.value = logo.returns[turtle].pop();
                     } else {
-                        logo.blockList[blk].value = 0;
+                        currentBlock.value = 0;
                     }
                     break;
 
                 default:
                     // Is it a plugin?
-                    if (logo.blockList[blk].name in logo.evalArgDict) {
-                        // eslint-disable-next-line no-console
-                        console.log("running eval on " + logo.blockList[blk].name);
-                        eval(logo.evalArgDict[logo.blockList[blk].name]);
+                    if (blockName in logo.evalArgDict) {
+                        this.safePluginExecute(
+                            logo.evalArgDict[blockName],
+                            logo,
+                            turtle,
+                            blk,
+                            parentBlk,
+                            receivedArg,
+                            tur
+                        );
                     } else {
-                        // eslint-disable-next-line no-console
-                        console.error("I do not know how to " + logo.blockList[blk].name);
+                        console.error("I do not know how to " + blockName);
                     }
                     break;
             }
 
-            return logo.blockList[blk].value;
-        } else {
-            return blk;
+            return currentBlock.value;
         }
+
+        return blk;
     }
 
     /**
@@ -752,7 +843,7 @@ class Logo {
             let d2 = timeLeftInMeasure;
             const b = tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat;
             // console.debug("splitting note across measure boundary.");
-            const obj = rationalToFraction(d);
+            const obj = this.deps.utils.rationalToFraction(d);
 
             if (d2 > 0) {
                 // Check to see if the note straddles multiple measures
@@ -762,7 +853,7 @@ class Logo {
                     d2 -= b;
                 }
 
-                let obj2 = rationalToFraction(d2);
+                let obj2 = this.deps.utils.rationalToFraction(d2);
                 if (obj2[0] !== 0) {
                     this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
                 }
@@ -772,7 +863,7 @@ class Logo {
                         this.notation.notationInsertTie(turtle);
                         this.notation.notationDrumStaging[turtle].push("tie");
                     }
-                    obj2 = rationalToFraction(1 / b);
+                    obj2 = this.deps.utils.rationalToFraction(1 / b);
                 }
 
                 // Add any measures we straddled
@@ -888,7 +979,7 @@ class Logo {
 
         // For while and until, we need to add any childflow from the parent to the queue
         if (parentLoopBlock.name === "while" || parentLoopBlock.name === "until") {
-            const childFlow = last(parentLoopBlock.connections);
+            const childFlow = this.deps.utils.last(parentLoopBlock.connections);
             if (childFlow != null) {
                 const queueBlock = new Queue(childFlow, 1, loopBlkIdx);
                 // We need to keep track of the parent block to the child flow so we can
@@ -942,8 +1033,14 @@ class Logo {
 
         this.sounds = [];
 
+        // Kill all active audio voices to prevent "zombie audio"
         for (const turtle in this.activity.turtles.turtleList) {
-            for (const instrumentName in instruments[turtle]) {
+            const tur = this.activity.turtles.getTurtle(turtle);
+            if (tur && tur.singer && typeof tur.singer.killAllVoices === "function") {
+                tur.singer.killAllVoices();
+            }
+
+            for (const instrumentName in this.deps.instruments[turtle]) {
                 this.synth.stopSound(turtle, instrumentName);
             }
             const comp = this.activity.turtles.getTurtle(turtle).companionTurtle;
@@ -958,16 +1055,26 @@ class Logo {
         if (this.synth.recorder && this.synth.recorder.state == "recording")
             this.synth.recorder.stop();
 
+        // Dispose all Tone.js instruments to free decoded AudioBuffers
+        // and Web Audio nodes. They will be re-created by prepSynths()
+        // on the next run.
+        this.synth.disposeAllInstruments();
+
         if (this.cameraID != null) {
-            doStopVideoCam(this.cameraID, this.setCameraID);
+            this.deps.utils.doStopVideoCam(this.cameraID, this.setCameraID);
         }
 
         this.onStopTurtle();
         this.activity.blocks.bringToTop();
 
+        this._alreadyRunning = false;
         this.stepQueue = {};
         for (const turtle of this.activity.turtles.turtleList) {
             turtle.unhighlightQueue = [];
+            if (turtle.delayTimeout !== null) {
+                clearTimeout(turtle.delayTimeout);
+                turtle.delayTimeout = null;
+            }
         }
 
         this._restoreConnections();
@@ -1015,6 +1122,36 @@ class Logo {
      * @returns {void}
      */
     runLogoCommands(startHere, env) {
+        const performanceModeEnabled =
+            typeof window !== "undefined" &&
+            (window.DEBUG_PERFORMANCE === true ||
+                (window.location && window.location.search.includes("performance=true")));
+
+        if (
+            performanceModeEnabled &&
+            typeof performanceTracker === "undefined" &&
+            typeof requirejs === "function" &&
+            !this._performanceTrackerLoadFailed
+        ) {
+            requirejs(
+                ["utils/performanceTracker"],
+                () => this.runLogoCommands(startHere, env),
+                () => {
+                    this._performanceTrackerLoadFailed = true;
+                    this.runLogoCommands(startHere, env);
+                }
+            );
+            return;
+        }
+
+        if (typeof performanceTracker !== "undefined") {
+            if (performanceModeEnabled) {
+                performanceTracker.enable();
+            } else {
+                performanceTracker.disable();
+            }
+        }
+
         this._prematureRestart = this._alreadyRunning;
         if (this._alreadyRunning && this._runningBlock !== null) {
             this._ignoringBlock = this._runningBlock;
@@ -1031,10 +1168,13 @@ class Logo {
         this.activity.saveLocally(); // Save the state before running.
 
         for (const arg in this.evalOnStartList) {
-            eval(this.evalOnStartList[arg]);
+            this.safePluginExecute(this.evalOnStartList[arg], this);
         }
 
         this.stopTurtle = false;
+
+        this._syncCounter = 0;
+        this._totalIterations = 0;
 
         this.activity.blocks.unhighlightAll();
         this.activity.blocks.bringToTop(); // Draw under the blocks.
@@ -1044,14 +1184,15 @@ class Logo {
         // Run the Logo commands here.
         this.time = new Date().getTime();
         this.firstNoteTime = null;
+        this.firstNoteAudioTime = null;
 
         // Ensure we have at least one turtle.
         if (this.activity.turtles.getTurtleCount() === 0) {
             this.activity.turtles.add(null);
         }
 
-        Singer.masterBPM = TARGETBPM;
-        Singer.defaultBPMFactor = TONEBPM / TARGETBPM;
+        this.deps.Singer.masterBPM = TARGETBPM;
+        this.deps.Singer.defaultBPMFactor = TONEBPM / TARGETBPM;
         this.synth.changeInTemperament = false;
 
         this._checkingCompletionState = false;
@@ -1064,6 +1205,23 @@ class Logo {
 
         this.notation.notationStaging = {};
         this.notation.notationDrumStaging = {};
+
+        this.turtleHeaps = {};
+        this.turtleDicts = {};
+        this.notationNotes = {};
+        this._midiData = {};
+        this.statusFields = [];
+        this.specialArgs = [];
+        this.connectionStore = {};
+        if (this.recordingBuffer && !this.recording) {
+            this.recordingBuffer = {
+                hasData: false,
+                notationOutput: "",
+                notationNotes: {},
+                notationStaging: {},
+                notationDrumStaging: {}
+            };
+        }
 
         // Each turtle needs to keep its own wait time and music states.
         for (const turtle in this.activity.turtles.turtleList) {
@@ -1110,10 +1268,9 @@ class Logo {
         }
 
         // Set up status block.
-        if (window.widgetWindows.isOpen("status")) {
-            // Ensure widget has been created before trying to initialize it
+        if (this.deps.widgetWindows.isOpen("status")) {
             if (this.statusMatrix === null) {
-                this.statusMatrix = new StatusMatrix();
+                this.statusMatrix = new this.deps.classes.StatusMatrix();
             }
 
             this.statusMatrix.init(this.activity);
@@ -1130,7 +1287,8 @@ class Logo {
         this.activity.blocks.findStacks();
         this.actions = {};
 
-        for (let blk = 0; blk < this.activity.blocks.stackList.length; blk++) {
+        const stackListLength = this.activity.blocks.stackList.length;
+        for (let blk = 0; blk < stackListLength; blk++) {
             if (
                 ["start", "drum", "status", "oscilloscope"].includes(
                     this.blockList[this.activity.blocks.stackList[blk]].name
@@ -1184,6 +1342,11 @@ class Logo {
             this.activity.turtles.getTurtle(turtle).running = false;
         }
 
+        // Performance instrumentation: begin tracking
+        if (typeof performanceTracker !== "undefined") {
+            performanceTracker.startRun();
+        }
+
         /*
         ===========================================================================
         (2) Execute the stack. (A bit complicated due to lots of corner cases.)
@@ -1217,8 +1380,9 @@ class Logo {
             this.runFromBlock(this, turtle, startHere, 0, env);
         } else if (startBlocks.length > 0) {
             let delayStart = 0;
+            const startBlocksLength = startBlocks.length;
             // Look for status and oscilloscope blocks.
-            for (let b = 0; b < startBlocks.length; b++) {
+            for (let b = 0; b < startBlocksLength; b++) {
                 if (
                     ["status", "oscilloscope"].includes(this.blockList[startBlocks[b]].name) &&
                     !this.blockList[startBlocks[b]].trash
@@ -1245,7 +1409,7 @@ class Logo {
                 }
 
                 // If there are multiple start blocks, run them all.
-                for (let b = 0; b < startBlocks.length; b++) {
+                for (let b = 0; b < startBlocksLength; b++) {
                     if (!["status", "oscilloscope"].includes(this.blockList[startBlocks[b]].name)) {
                         const turtle = this.blockList[startBlocks[b]].value;
                         const tur = this.activity.turtles.ithTurtle(turtle);
@@ -1285,6 +1449,10 @@ class Logo {
 
         this.receivedArg = receivedArg;
 
+        // Reset async yield counters – execution will go through
+        // setTimeout below, giving the event loop a chance to breathe.
+        logo._syncCounter = 0;
+
         const tur = logo.activity.turtles.ithTurtle(turtle);
 
         const delay = logo.turtleDelay + tur.waitTime;
@@ -1319,9 +1487,26 @@ class Logo {
      * @returns {void}
      */
     runFromBlockNow(logo, turtle, blk, isflow, receivedArg, queueStart) {
+        if (typeof performanceTracker !== "undefined") {
+            performanceTracker.enterBlock();
+        }
+
         this._alreadyRunning = true;
 
         this.receivedArg = receivedArg;
+
+        logo._totalIterations++;
+        if (logo._totalIterations > logo._MAX_ITERATIONS) {
+            logo.activity.errorMsg(
+                _("Infinite loop detected. Execution stopped to prevent browser freeze."),
+                blk
+            );
+            logo.stopTurtle = true;
+            logo._alreadyRunning = false;
+            logo._syncCounter = 0;
+            logo._totalIterations = 0;
+            return;
+        }
 
         // Sometimes we don't want to unwind the entire queue.
         if (queueStart === undefined) queueStart = 0;
@@ -1379,15 +1564,18 @@ class Logo {
             // it can be null (i.e., end of a flow).
             if (tur.singer.backward.length > 0) {
                 // We only run backwards in the "first generation" children.
-                const c = logo.blockList[last(tur.singer.backward)].name === "backward" ? 1 : 2;
+                const c =
+                    logo.blockList[logo.deps.utils.last(tur.singer.backward)].name === "backward"
+                        ? 1
+                        : 2;
 
                 if (
                     !logo.activity.blocks.sameGeneration(
-                        logo.blockList[last(tur.singer.backward)].connections[c],
+                        logo.blockList[logo.deps.utils.last(tur.singer.backward)].connections[c],
                         blk
                     )
                 ) {
-                    nextFlow = last(logo.blockList[blk].connections);
+                    nextFlow = logo.deps.utils.last(logo.blockList[blk].connections);
                 } else {
                     nextFlow = logo.blockList[blk].connections[0];
                     if (
@@ -1398,18 +1586,19 @@ class Logo {
                     } else {
                         if (
                             !logo.activity.blocks.sameGeneration(
-                                logo.blockList[last(tur.singer.backward)].connections[c],
+                                logo.blockList[logo.deps.utils.last(tur.singer.backward)]
+                                    .connections[c],
                                 nextFlow
                             )
                         ) {
-                            nextFlow = last(logo.blockList[blk].connections);
+                            nextFlow = logo.deps.utils.last(logo.blockList[blk].connections);
                         } else {
                             nextFlow = logo.blockList[blk].connections[0];
                         }
                     }
                 }
             } else {
-                nextFlow = last(logo.blockList[blk].connections);
+                nextFlow = logo.deps.utils.last(logo.blockList[blk].connections);
             }
 
             if (nextFlow === -1) {
@@ -1441,21 +1630,33 @@ class Logo {
                 // Highlight the current block
                 logo.activity.blocks.highlight(blk, false);
                 logo._currentlyHighlightedBlock = blk;
+                // Force stage update so highlight is visible when blocks were shown during execution
+                if (logo.activity.stage) {
+                    logo.activity.stage.update();
+                }
             }
         }
 
-        if (!logo.blockList[blk].isArgBlock()) {
+        const currentBlock = logo.blockList[blk];
+        if (!currentBlock.isArgBlock()) {
             let res = null;
             // Is it a plugin?
-            if (logo.blockList[blk].name in logo.evalFlowDict) {
-                // eslint-disable-next-line no-console
-                console.log("running eval on " + logo.blockList[blk].name);
+            if (currentBlock.name in logo.evalFlowDict) {
                 logo.pluginReturnValue = null;
-                eval(logo.evalFlowDict[logo.blockList[blk].name]);
+                logo.safePluginExecute(
+                    logo.evalFlowDict[currentBlock.name],
+                    logo,
+                    turtle,
+                    blk,
+                    receivedArg,
+                    actionArgs,
+                    args,
+                    isflow
+                );
                 // Clamp blocks will return the child flow.
                 res = logo.pluginReturnValue;
             } else {
-                res = logo.blockList[blk].protoblock.flow(
+                res = currentBlock.protoblock.flow(
                     args,
                     logo,
                     turtle,
@@ -1470,14 +1671,19 @@ class Logo {
                 const [cf, cfc, ret] = res;
                 if (cf !== undefined) childFlow = cf;
                 if (cfc !== undefined) childFlowCount = cfc;
-                if (ret) return ret;
+                if (ret) {
+                    if (typeof performanceTracker !== "undefined") {
+                        performanceTracker.exitBlock();
+                    }
+                    return ret;
+                }
             }
         } else {
             if (
                 // If it's an arg block, print its value.
-                logo.blockList[blk].isArgBlock() ||
+                currentBlock.isArgBlock() ||
                 ["anyout", "numberout", "textout", "booleanout"].includes(
-                    logo.blockList[blk].protoblock.dockTypes[0]
+                    currentBlock.protoblock.dockTypes[0]
                 )
             ) {
                 args.push(logo.parseArg(logo, turtle, blk, logo.receivedArg));
@@ -1492,21 +1698,18 @@ class Logo {
                     toppos: _("top (screen)"),
                     bottompos: _("bottom (screen)")
                 };
-                const blockName = logo.blockList[blk].name;
+                const blockName = currentBlock.name;
                 const label = blockLabels[blockName];
 
-                if (logo.blockList[blk].value == null) {
+                if (currentBlock.value == null) {
                     logo.activity.textMsg("null block value");
                 } else {
-                    const value = logo.blockList[blk].value.toString();
+                    const value = currentBlock.value.toString();
                     const displayText = label ? label + ": " + value : value;
                     logo.activity.textMsg(displayText);
                 }
             } else {
-                logo.activity.errorMsg(
-                    "I do not know how to " + logo.blockList[blk].name + ".",
-                    blk
-                );
+                logo.activity.errorMsg("I do not know how to " + currentBlock.name + ".", blk);
             }
 
             logo.stopTurtle = true;
@@ -1560,17 +1763,17 @@ class Logo {
 
         // Run the last flow in the queue.
         if (tur.queue.length > queueStart) {
-            nextBlock = last(tur.queue).blk;
-            parentBlk = last(tur.queue).parentBlk;
-            passArg = last(tur.queue).args;
+            nextBlock = logo.deps.utils.last(tur.queue).blk;
+            parentBlk = logo.deps.utils.last(tur.queue).parentBlk;
+            passArg = logo.deps.utils.last(tur.queue).args;
 
             // Since the forever block starts at -1, it will never === 1.
-            if (last(tur.queue).count === 1) {
+            if (logo.deps.utils.last(tur.queue).count === 1) {
                 // Finished child so pop it off the queue.
                 tur.queue.pop();
             } else {
                 // Decrement the counter for repeating the flow.
-                last(tur.queue).count -= 1;
+                logo.deps.utils.last(tur.queue).count -= 1;
             }
         }
 
@@ -1582,6 +1785,10 @@ class Logo {
                     logo._unhighlightStepQueue[turtle] = blk;
                 } else {
                     if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
+                        const unhighlightDelay = Math.max(
+                            logo.turtleDelay + tur.waitTime,
+                            MIN_HIGHLIGHT_DURATION_MS
+                        );
                         setTimeout(() => {
                             if (logo.activity.blocks.visible) {
                                 logo.activity.blocks.unhighlight(blk);
@@ -1589,15 +1796,19 @@ class Logo {
                                 if (logo._currentlyHighlightedBlock === blk) {
                                     logo._currentlyHighlightedBlock = null;
                                 }
+                                if (logo.activity.stage) {
+                                    logo.activity.stage.update();
+                                }
                             }
-                        }, logo.turtleDelay + tur.waitTime);
+                        }, unhighlightDelay);
                     }
                 }
             }
 
             if (
                 (tur.singer.backward.length > 0 && logo.blockList[blk].connections[0] == null) ||
-                (tur.singer.backward.length === 0 && last(logo.blockList[blk].connections) == null)
+                (tur.singer.backward.length === 0 &&
+                    logo.deps.utils.last(logo.blockList[blk].connections) == null)
             ) {
                 if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
                     // If we are at the end of the child flow, queue
@@ -1608,11 +1819,16 @@ class Logo {
                     } else if (
                         tur.parentFlowQueue.length > 0 &&
                         tur.queue.length > 0 &&
-                        last(tur.queue).parentBlk !== last(tur.parentFlowQueue)
+                        logo.deps.utils.last(tur.queue).parentBlk !==
+                            logo.deps.utils.last(tur.parentFlowQueue)
                     ) {
-                        tur.unhighlightQueue.push(last(tur.parentFlowQueue));
+                        tur.unhighlightQueue.push(logo.deps.utils.last(tur.parentFlowQueue));
                     } else if (tur.unhighlightQueue.length > 0) {
                         // The child flow is finally complete, so unhighlight.
+                        const unhighlightDelay = Math.max(
+                            logo.turtleDelay,
+                            MIN_HIGHLIGHT_DURATION_MS
+                        );
                         setTimeout(() => {
                             if (logo.activity.blocks.visible) {
                                 const unhighlightBlock = tur.unhighlightQueue.pop();
@@ -1621,27 +1837,56 @@ class Logo {
                                 if (logo._currentlyHighlightedBlock === unhighlightBlock) {
                                     logo._currentlyHighlightedBlock = null;
                                 }
+                                if (logo.activity.stage) {
+                                    logo.activity.stage.update();
+                                }
                             } else {
                                 tur.unhighlightQueue.pop();
                             }
-                        }, logo.turtleDelay);
+                        }, unhighlightDelay);
                     }
                 }
             }
 
             // We don't update parameter blocks when running full speed.
             if (logo.turtleDelay !== 0) {
+                let updatedParameterBlocks = false;
                 for (const pblk in tur.parameterQueue) {
                     logo.activity.blocks.updateParameterBlock(
                         logo,
                         turtle,
                         tur.parameterQueue[pblk]
                     );
+                    updatedParameterBlocks = true;
+                }
+
+                if (updatedParameterBlocks) {
+                    logo.activity.refreshCanvas();
                 }
             }
 
             if (isflow) {
-                logo.runFromBlockNow(logo, turtle, nextBlock, isflow, passArg, queueStart);
+                // Async yield: periodically yield to the event loop so the
+                // browser can process paint/input events and the UI does not
+                // freeze during long-running or infinitely-recursive programs.
+                logo._syncCounter++;
+                if (logo._syncCounter >= logo._YIELD_AFTER_SYNC_RUNS) {
+                    logo._syncCounter = 0;
+                    setTimeout(() => {
+                        if (!logo.stopTurtle) {
+                            logo.runFromBlockNow(
+                                logo,
+                                turtle,
+                                nextBlock,
+                                isflow,
+                                passArg,
+                                queueStart
+                            );
+                        }
+                    }, 0);
+                } else {
+                    logo.runFromBlockNow(logo, turtle, nextBlock, isflow, passArg, queueStart);
+                }
             } else {
                 logo.runFromBlock(logo, turtle, nextBlock, isflow, passArg);
             }
@@ -1651,7 +1896,8 @@ class Logo {
             if (!logo._prematureRestart) {
                 // Make sure any unissued signals are dispatched.
                 for (const b in tur.endOfClampSignals) {
-                    for (let i = 0; i < tur.endOfClampSignals[b].length; i++) {
+                    const signalsLength = tur.endOfClampSignals[b].length;
+                    for (let i = 0; i < signalsLength; i++) {
                         if (tur.endOfClampSignals[b][i] != null) {
                             if (
                                 tur.butNotThese[b] == null ||
@@ -1694,21 +1940,42 @@ class Logo {
                     queueStart === 0 &&
                     tur.singer.justCounting.length === 0
                 ) {
+                    // Performance instrumentation: end tracking and log stats
+                    if (typeof performanceTracker !== "undefined") {
+                        performanceTracker.endRun();
+                        performanceTracker.logStats();
+                    }
+
                     if (logo.runningLilypond) {
-                        if (logo.collectingStats) {
-                            // console.debug("stats collection completed");
-                            logo.projectStats = getStatsFromNotation(logo.activity);
-                            logo.activity.statsWindow.displayInfo(logo.projectStats);
-                        } else {
-                            // console.debug("saving lilypond output:");
-                            logo.activity.save.afterSaveLilypond();
+                        try {
+                            if (logo.collectingStats) {
+                                logo.projectStats = logo.deps.utils.getStatsFromNotation(
+                                    logo.activity
+                                );
+                                logo.activity.statsWindow.displayInfo(logo.projectStats);
+                            } else {
+                                logo.activity.save.afterSaveLilypond();
+                            }
+                        } catch (e) {
+                            console.error("Error generating Lilypond output:", e);
+                            logo.activity.errorMsg(
+                                _("Error generating Lilypond output. ") + e.message
+                            );
+                        } finally {
+                            logo.collectingStats = false;
+                            logo.runningLilypond = false;
+                            document.body.style.cursor = "default";
                         }
-                        logo.collectingStats = false;
-                        logo.runningLilypond = false;
                     } else if (logo.runningAbc) {
-                        // console.debug("saving abc output:");
-                        logo.activity.save.afterSaveAbc();
-                        logo.runningAbc = false;
+                        try {
+                            logo.activity.save.afterSaveAbc();
+                        } catch (e) {
+                            console.error("Error generating ABC output:", e);
+                            logo.activity.errorMsg(_("Error generating ABC output. ") + e.message);
+                        } finally {
+                            logo.runningAbc = false;
+                            document.body.style.cursor = "default";
+                        }
                     } else if (logo.runningMxml) {
                         // console.log("saving mxml output");
                         logo.activity.save.afterSaveMxml();
@@ -1768,6 +2035,10 @@ class Logo {
 
             setTimeout(__checkCompletionState, 100);
         }
+
+        if (typeof performanceTracker !== "undefined") {
+            performanceTracker.exitBlock();
+        }
     }
 
     /**
@@ -1786,19 +2057,7 @@ class Logo {
 
         const tur = this.activity.turtles.ithTurtle(turtle);
 
-        if (Object.keys) {
-            if (Object.keys(tur.singer.embeddedGraphics).length === 0) return;
-        } else {
-            const isEmpty = true;
-            for (const key in tur.singer.embeddedGraphics) {
-                if (tur.singer.embeddedGraphics.hasOwnProperty(key)) {
-                    isEmpty = false;
-                    break;
-                }
-            }
-
-            if (isEmpty) return;
-        }
+        if (Object.keys(tur.singer.embeddedGraphics).length === 0) return;
 
         if (!(blk in tur.singer.embeddedGraphics)) return;
 
@@ -2271,8 +2530,9 @@ class Logo {
             }
         };
 
+        const embeddedGraphicsLength = tur.singer.embeddedGraphics[blk].length;
         let extendedGraphicsCounter = 0;
-        for (let i = 0; i < tur.singer.embeddedGraphics[blk].length; i++) {
+        for (let i = 0; i < embeddedGraphicsLength; i++) {
             const b = tur.singer.embeddedGraphics[blk][i];
             switch (this.blockList[b].name) {
                 case "forward":
@@ -2315,7 +2575,7 @@ class Logo {
             tur.singer.dispatchFactor = NOTEDIV;
         }
 
-        for (let i = 0; i < tur.singer.embeddedGraphics[blk].length; i++) {
+        for (let i = 0; i < embeddedGraphicsLength; i++) {
             const b = tur.singer.embeddedGraphics[blk][i];
             const name = this.blockList[b].name;
 
@@ -2337,7 +2597,7 @@ class Logo {
                     break;
 
                 case "clear":
-                    __clear(turtle, waitTime);
+                    __clear();
                     break;
 
                 case "fill":
@@ -2419,39 +2679,151 @@ class Logo {
         }
 
         // Mark the end time of this note's graphics operations.
-        await delayExecution(beatValue * 1000);
+        await this.deps.utils.delayExecution(beatValue * 1000);
         tur.embeddedGraphicsFinished = true;
+    }
+
+    /**
+     * Executes plugin code safely.
+     * @param code - The plugin code (function or string) to execute.
+     * @param logo - The logo object.
+     * @param turtle - The turtle index.
+     * @param blk - The block index.
+     * @param value - An optional value for setters or additional context.
+     * @param args - Additional arguments for different plugin types.
+     * @returns {*} - The result of the execution if applicable.
+     */
+    safePluginExecute(code, logo, turtle, blk, value, ...args) {
+        if (typeof code === "function") {
+            try {
+                return code(logo, turtle, blk, value, ...args);
+            } catch (e) {
+                console.error("Plugin function execution failed: ", e);
+                return;
+            }
+        }
+
+        if (typeof code !== "string") {
+            return;
+        }
+
+        // Whitelist for common, safe math patterns used by plugins (e.g. maths.json)
+        // These are checked against the exact string format used in built-in plugins.
+        const mathPatterns = [
+            {
+                // Unary Math operations (Math.sin, etc.)
+                regex: /^const mathBlock = globalActivity\.logo\.blockList\[blk\];const conns = mathBlock\.connections;mathBlock\.value = Math\.(sin|cos|tan|asin|acos|atan|sqrt|log|exp|abs|ceil|floor|round)\(logo\.parseArg\(logo, turtle, conns\[1\]\)\);$/,
+                exec: match => {
+                    const op = match[1];
+                    const mathBlock = logo.blockList[blk];
+                    const conns = mathBlock.connections;
+                    mathBlock.value = Math[op](logo.parseArg(logo, turtle, conns[1], blk));
+                    return mathBlock.value;
+                }
+            },
+            {
+                // Binary Math operations (Math.pow)
+                regex: /^const mathBlock = globalActivity\.logo\.blockList\[blk\];const conns = mathBlock\.connections;var base = logo\.parseArg\(logo, turtle, conns\[1\]\);var exp {2}= logo\.parseArg\(logo, turtle, conns\[2\]\);mathBlock\.value = Math\.pow\(base, exp\);$/,
+                exec: () => {
+                    const mathBlock = logo.blockList[blk];
+                    const conns = mathBlock.connections;
+                    const base = logo.parseArg(logo, turtle, conns[1], blk);
+                    const exp = logo.parseArg(logo, turtle, conns[2], blk);
+                    mathBlock.value = Math.pow(base, exp);
+                    return mathBlock.value;
+                }
+            },
+            {
+                // Math Constants (Math.PI, Math.E)
+                regex: /^const mathBlock = globalActivity\.logo\.blockList\[blk\];const conns = mathBlock\.connections;mathBlock\.value = Math\.(PI|E);$/,
+                exec: match => {
+                    const constName = match[1];
+                    const mathBlock = logo.blockList[blk];
+                    mathBlock.value = Math[constName];
+                    return mathBlock.value;
+                }
+            },
+            {
+                // Parameter plugin patterns (simple assignment)
+                regex: /^logo\.blockList\[blk\]\.value = Math\.(PI|E);$/,
+                exec: match => {
+                    const constName = match[1];
+                    logo.blockList[blk].value = Math[constName];
+                    return logo.blockList[blk].value;
+                }
+            }
+        ];
+
+        for (const pattern of mathPatterns) {
+            const match = code.match(pattern.regex);
+            if (match) {
+                return pattern.exec(match);
+            }
+        }
+
+        // If not a function and not whitelisted, we block arbitrary string execution (eval).
+        // This is the core of the security fix for #5449.
+        console.warn(
+            "Blocked arbitrary JavaScript execution in plugin:",
+            code.substring(0, 100) + "..."
+        );
     }
 }
 
+// Export Logo
+if (typeof define === "function" && define.amd) {
+    define([], function () {
+        return Logo;
+    });
+}
+
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = {
-        Queue,
-        Logo,
-        DEFAULTVOLUME,
-        PREVIEWVOLUME,
-        DEFAULTDELAY,
-        OSCVOLUMEADJUSTMENT,
-        TONEBPM,
-        TARGETBPM,
-        TURTLESTEP,
-        NOTEDIV,
-        NOMICERRORMSG,
-        NANERRORMSG,
-        NOSTRINGERRORMSG,
-        NOBOXERRORMSG,
-        NOACTIONERRORMSG,
-        NOINPUTERRORMSG,
-        NOSQRTERRORMSG,
-        ZERODIVIDEERRORMSG,
-        EMPTYHEAPERRORMSG,
-        POSNUMBER,
-        NOTATIONNOTE,
-        NOTATIONDURATION,
-        NOTATIONDOTCOUNT,
-        NOTATIONTUPLETVALUE,
-        NOTATIONROUNDDOWN,
-        NOTATIONINSIDECHORD,
-        NOTATIONSTACCATO
-    };
+    let exportsObj = { Logo, Queue };
+
+    // In Node.js / Jest environment, we need to include constants
+    if (typeof DEFAULTVOLUME === "undefined") {
+        try {
+            const constants = require("./logoconstants");
+            Object.assign(global, constants);
+            Object.assign(exportsObj, constants);
+        } catch (e) {
+            // Ignore
+        }
+    } else {
+        // If they are already global (e.g. via logoconstants.js loaded before)
+        exportsObj = Object.assign(exportsObj, {
+            DEFAULTVOLUME,
+            PREVIEWVOLUME,
+            DEFAULTDELAY,
+            OSCVOLUMEADJUSTMENT,
+            TONEBPM,
+            TARGETBPM,
+            TURTLESTEP,
+            NOTEDIV,
+            NOMICERRORMSG,
+            NANERRORMSG,
+            NOSTRINGERRORMSG,
+            NOBOXERRORMSG,
+            NOACTIONERRORMSG,
+            NOINPUTERRORMSG,
+            NOSQRTERRORMSG,
+            ZERODIVIDEERRORMSG,
+            EMPTYHEAPERRORMSG,
+            POSNUMBER,
+            NOTATIONNOTE,
+            NOTATIONDURATION,
+            NOTATIONDOTCOUNT,
+            NOTATIONTUPLETVALUE,
+            NOTATIONROUNDDOWN,
+            NOTATIONINSIDECHORD,
+            NOTATIONSTACCATO
+        });
+    }
+
+    module.exports = exportsObj;
+}
+
+if (typeof window !== "undefined") {
+    window.Logo = Logo;
+    window.Queue = Queue;
 }

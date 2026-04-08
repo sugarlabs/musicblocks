@@ -116,3 +116,6 @@ class RhythmBlocksAPI {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = RhythmBlocksAPI;
 }
+if (typeof window !== "undefined") {
+    window.RhythmBlocksAPI = RhythmBlocksAPI;
+}

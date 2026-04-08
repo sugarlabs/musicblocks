@@ -37,30 +37,37 @@ global.window = {
     navigator: { language: "en-US" },
     document: {
         getElementById: jest.fn(() => ({ style: {} }))
-    }
+    },
+    getComputedStyle: jest.fn(() => ({ display: "block", visibility: "visible" }))
 };
 
 global.localStorage = window.localStorage;
 
 const Toolbar = require("../toolbar");
 
-global.document.getElementById = jest.fn(id => ({
+const createMockElement = id => ({
     id,
     style: {},
     setAttribute: jest.fn(),
+    getAttribute: jest.fn(),
     innerHTML: "",
-    classList: { add: jest.fn() },
-    appendChild: jest.fn()
-}));
+    classList: {
+        add: jest.fn(),
+        remove: jest.fn(),
+        contains: jest.fn()
+    },
+    appendChild: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    querySelectorAll: jest.fn(() => []),
+    querySelector: jest.fn(() => null),
+    focus: jest.fn(),
+    click: jest.fn(),
+    getBoundingClientRect: jest.fn(() => ({ top: 0, left: 0, width: 10, height: 10 }))
+});
 
-global.docById = jest.fn(id => ({
-    id,
-    setAttribute: jest.fn(),
-    innerHTML: "",
-    style: {},
-    classList: { add: jest.fn() },
-    appendChild: jest.fn()
-}));
+global.document.getElementById = jest.fn(createMockElement);
+global.docById = jest.fn(createMockElement);
 
 global._ = jest.fn(str => str);
 
@@ -95,14 +102,14 @@ describe("Toolbar Class", () => {
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ true", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = true;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(134);
+        expect(global._).toHaveBeenCalledTimes(137);
         expect(global._).toHaveBeenNthCalledWith(1, "About Music Blocks");
     });
 
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ false", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = false;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(116);
+        expect(global._).toHaveBeenCalledTimes(119);
         expect(global._).toHaveBeenNthCalledWith(1, "About Turtle Blocks");
     });
 
@@ -136,7 +143,10 @@ describe("Toolbar Class", () => {
             return {
                 setAttribute: jest.fn(),
                 style: {},
-                classList: { add: jest.fn() }
+                classList: { add: jest.fn() },
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn(),
+                querySelectorAll: jest.fn(() => [])
             };
         });
 
@@ -179,7 +189,9 @@ describe("Toolbar Class", () => {
             }
         };
 
-        global.docById = jest.fn(id => elements[id]);
+        global.docById = jest.fn(
+            id => elements[id] || { addEventListener: jest.fn(), querySelectorAll: jest.fn() }
+        );
         global.document = {
             body: {
                 style: {
@@ -228,14 +240,17 @@ describe("Toolbar Class", () => {
             },
             stop: {
                 style: { color: "" },
-                addEventListener: jest.fn()
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn()
             },
             record: {
                 className: ""
             }
         };
 
-        global.docById.mockImplementation(id => elements[id] || {});
+        global.docById.mockImplementation(
+            id => elements[id] || { addEventListener: jest.fn(), querySelectorAll: jest.fn() }
+        );
 
         const mockActivity = {
             hideMsgs: jest.fn(),
@@ -253,6 +268,10 @@ describe("Toolbar Class", () => {
         expect(global.saveButtonAdvanced.disabled).toBe(true);
         expect(global.saveButton.className).toBe("grey-text inactiveLink");
         expect(elements.record.className).toBe("grey-text inactiveLink");
+        expect(elements.stop.removeEventListener).toHaveBeenCalledWith(
+            "click",
+            expect.any(Function)
+        );
         expect(elements.stop.addEventListener).toHaveBeenCalledWith("click", expect.any(Function));
 
         const stopClickHandler = elements.stop.addEventListener.mock.calls[0][1];
@@ -268,7 +287,11 @@ describe("Toolbar Class", () => {
         const recordButton = { className: "recording" };
 
         global.docById.mockImplementation(id =>
-            id === "stop" ? stopIcon : id === "record" ? recordButton : {}
+            id === "stop"
+                ? stopIcon
+                : id === "record"
+                  ? recordButton
+                  : { addEventListener: jest.fn(), querySelectorAll: jest.fn() }
         );
 
         const mockOnClick = jest.fn();
@@ -288,14 +311,19 @@ describe("Toolbar Class", () => {
     test("renderNewProjectIcon displays modal and handles confirmation", () => {
         const elements = {
             "modal-container": {
-                style: { display: "" }
+                style: { display: "" },
+                setAttribute: jest.fn(),
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn()
             },
             "newdropdown": {
                 innerHTML: "",
                 appendChild: jest.fn()
             }
         };
-        global.docById = jest.fn(id => elements[id]);
+        global.docById.mockImplementation(
+            id => elements[id] || { addEventListener: jest.fn(), querySelectorAll: jest.fn() }
+        );
         global.document = {
             createElement: jest.fn(tagName => ({
                 tagName,
@@ -546,6 +574,68 @@ describe("Toolbar Class", () => {
         toolbar.updateRecordButton(jest.fn());
         expect(recordButton.classList.add).toHaveBeenCalledWith("hide");
         expect(recordButton.style.display).toBe("");
+    });
+
+    test("updateRecordButton keeps only one outside-click listener and dispose removes it", () => {
+        global.RECORDBUTTON = "fiber_manual_record";
+
+        const recordButton = {
+            classList: { add: jest.fn(), remove: jest.fn() },
+            style: { display: "" },
+            innerHTML: "",
+            onclick: null
+        };
+
+        const recordDropdownArrow = {
+            classList: { add: jest.fn(), remove: jest.fn() },
+            style: { display: "" },
+            innerHTML: "",
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn(),
+            querySelector: jest.fn(() => ({ textContent: "arrow_drop_down" })),
+            contains: jest.fn(() => false)
+        };
+
+        const recordDropdown = {
+            style: { display: "none" },
+            offsetParent: null,
+            contains: jest.fn(() => false)
+        };
+
+        const recordWithMenus = { style: {}, onclick: null };
+        const recordCanvasOnly = { style: {}, onclick: null };
+
+        global.docById.mockImplementation(id => {
+            if (id === "record") return recordButton;
+            if (id === "recordDropdownArrow") return recordDropdownArrow;
+            if (id === "recorddropdown") return recordDropdown;
+            if (id === "record-with-menus") return recordWithMenus;
+            if (id === "record-canvas-only") return recordCanvasOnly;
+            return createMockElement(id);
+        });
+
+        global.fnBrowserDetect = jest.fn(() => "chrome");
+        const addSpy = jest.spyOn(document, "addEventListener");
+        const removeSpy = jest.spyOn(document, "removeEventListener");
+
+        toolbar.activity = { beginnerMode: false };
+
+        toolbar.updateRecordButton(jest.fn());
+        toolbar.updateRecordButton(jest.fn());
+
+        const addClickHandlers = addSpy.mock.calls.filter(([type]) => type === "click");
+        const removeClickHandlers = removeSpy.mock.calls.filter(([type]) => type === "click");
+
+        expect(addClickHandlers.length).toBe(2);
+        expect(removeClickHandlers.length).toBe(1);
+
+        toolbar.dispose();
+
+        const removeAfterDispose = removeSpy.mock.calls.filter(([type]) => type === "click");
+        expect(removeAfterDispose.length).toBe(2);
+
+        addSpy.mockRestore();
+        removeSpy.mockRestore();
     });
 
     test("renderPlanetIcon sets onclick and updates planet icon behavior", () => {
@@ -886,8 +976,25 @@ describe("Toolbar Class", () => {
 
     test("renderLanguageSelectIcon sets onclick and updates language selection", () => {
         const languageSelectIcon = { onclick: null };
-        const languageBox = { setAttribute: jest.fn() };
-        global.docById.mockReturnValue(languageSelectIcon);
+        const languageBox = { enUS_onclick: jest.fn() };
+
+        // Mock elements for all language IDs with classList
+        const mockLangElement = {
+            onclick: null,
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn()
+            }
+        };
+
+        global.docById.mockImplementation(id => {
+            if (id === "languageSelectIcon") return languageSelectIcon;
+            // Return mock element with classList for any language ID
+            return mockLangElement;
+        });
+
+        global.localStorage.languagePreference = "enUS";
+
         toolbar.renderLanguageSelectIcon(languageBox);
         expect(languageSelectIcon.onclick).toBeInstanceOf(Function);
         languageSelectIcon.onclick();
@@ -917,5 +1024,96 @@ describe("Toolbar Class", () => {
         expect(elements["aux-toolbar"].style.display).toBe("none");
         expect(elements.menu.innerHTML).toBe("menu");
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, false);
+    });
+});
+
+describe("FocusCycleManager", () => {
+    test("leaving the palette uses the shared palette reset helper", () => {
+        const resetKeyboardNavigation = jest.fn();
+        const paletteElement = {
+            classList: { remove: jest.fn() }
+        };
+
+        global.ActivityContext = {
+            getActivity: jest.fn(() => ({ palettes: { resetKeyboardNavigation } }))
+        };
+        global.window.ActivityContext = global.ActivityContext;
+        global.document = {
+            getElementById: jest.fn(id => (id === "palette" ? paletteElement : null))
+        };
+
+        const manager = new Toolbar.FocusCycleManager();
+        manager._leaveZone("palette");
+
+        expect(resetKeyboardNavigation).toHaveBeenCalledWith({
+            closeMenus: true,
+            blur: true
+        });
+    });
+
+    test("workspace click clears toolbar focus and shifts focus to workspace", () => {
+        const resetKeyboardNavigation = jest.fn();
+        const workspaceTarget = { id: "canvas" };
+        const blocks = { activeBlock: 123 };
+        const toolbarButton = {
+            blur: jest.fn(),
+            classList: { remove: jest.fn() }
+        };
+        const toolbars = {
+            contains: jest.fn(node => node === toolbarButton),
+            classList: { remove: jest.fn() }
+        };
+        const palette = {
+            contains: jest.fn(() => false),
+            classList: { remove: jest.fn() }
+        };
+        const canvasHolder = {
+            contains: jest.fn(node => node === workspaceTarget),
+            hasAttribute: jest.fn(() => false),
+            setAttribute: jest.fn(),
+            focus: jest.fn(),
+            classList: { remove: jest.fn() }
+        };
+        const canvasContainer = {
+            contains: jest.fn(() => false)
+        };
+        const overlayCanvas = {
+            contains: jest.fn(() => false)
+        };
+        const canvas = {
+            contains: jest.fn(() => false),
+            dispatchEvent: jest.fn()
+        };
+
+        global.PointerEvent = function PointerEvent(type, init) {
+            return { type, ...init };
+        };
+        global.ActivityContext = {
+            getActivity: jest.fn(() => ({ palettes: { resetKeyboardNavigation }, blocks }))
+        };
+        global.window.ActivityContext = global.ActivityContext;
+        global.document = {
+            activeElement: toolbarButton,
+            querySelectorAll: jest.fn(() => [toolbarButton]),
+            getElementById: jest.fn(id => {
+                if (id === "toolbars") return toolbars;
+                if (id === "palette") return palette;
+                if (id === "canvasHolder") return canvasHolder;
+                if (id === "canvasContainer") return canvasContainer;
+                if (id === "canvas") return canvas;
+                if (id === "myCanvas") return overlayCanvas;
+                return null;
+            })
+        };
+
+        const manager = new Toolbar.FocusCycleManager();
+        manager._onMouseDown({ target: workspaceTarget });
+
+        expect(resetKeyboardNavigation).toHaveBeenCalledWith({
+            closeMenus: true,
+            blur: true
+        });
+        expect(blocks.activeBlock).toBeNull();
+        expect(manager._currentZone).toBe("workspace");
     });
 });

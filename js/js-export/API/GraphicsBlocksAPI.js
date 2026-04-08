@@ -85,7 +85,21 @@ class GraphicsBlocksAPI {
         const args = JSInterface.validateArgs("scrollXY", [x, y]);
         return this.runCommand("doScrollXY", [args[0], args[1]]);
     }
+
+    clearMedia() {
+        return this.runCommand("doClearMedia", []);
+    }
+
+    doWait(seconds) {
+        const args = JSInterface.validateArgs("doWait", [seconds]);
+        return this.runCommand("_anonymous", () => {
+            this.turtle.doWait(args[0]);
+        });
+    }
 }
 if (typeof module !== "undefined" && module.exports) {
     module.exports = GraphicsBlocksAPI;
+}
+if (typeof window !== "undefined") {
+    window.GraphicsBlocksAPI = GraphicsBlocksAPI;
 }

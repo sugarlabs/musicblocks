@@ -1,7 +1,7 @@
 Why the arts and why music?
 ===========================
 
-Music is the perfect entry point for learning computation. For one, music, like computation, requires a person to think on an abstract level. Another reason is because computation and music share important concepts (detailed below in “Pedagogical Approach”). Moreover, music has some benefits that the traditional computer pedagogy does not, including the potential to improve social-emotional skills. 
+Music is the perfect entry point for learning computation. For one, music, like computation, requires a person to think at an abstract level. Another reason is that computation and music share important concepts (detailed below in “Pedagogical Approach”). Moreover, music has benefits that traditional computer pedagogy does not, including the potential to improve social-emotional skills. 
 
 According to the NEA: Childhood arts education provides important gateway and formative experiences in the arts... School-based arts education is of particular importance because schools are the only institutions that reach vast numbers of children, particularly low-income children, who are unlikely to receive arts education any other way... [A] body of solid research and innovative practice continues to grow and show that arts education has serious benefits to students as students, and that arts learning is strongly associated with higher levels of achievement, positive social and emotional development, and successful transitions into adulthood. (NEA Survey of Public Participation in the Arts, 2010) 
 
@@ -15,7 +15,7 @@ Asserting that computational thinking is about more than learning to program lea
 
 Firm footing in computation as a “Cognitive Tower” 
 ==================================================
-In a 2008 memo (Minsky, 2019) questioning “general” education, Minsky proposed that we “re- aim our schools towards encouraging children to pursue more focused hobbies and specialties —to provide them with more time for (and earlier experience with) developing more powerful sets of mental skills, which they later can extend to more academic activities.”
+In a 2008 memo (Minsky, 2019) questioning “general” education, Minsky proposed that we “re-aim our schools toward encouraging children to pursue more focused hobbies and specialties—to provide them with more time for (and earlier experience with) developing more powerful sets of mental skills, which they can later extend to more academic activities.”
 
 Minsky argues that the organization of our cognitive resources into towers with different levels of processes is what “enables our minds to generate so many new kinds of things and ideas.” (Minsky, 2019) These levels span agencies, each of which specializes in areas such as gaining knowledge from experience, planning and causal attribution, the construction of models, and identifying values and ideals. A focus on achieving meaningful goals, not just the accumulation of simple knowledge objects, exercises all of the levels in a cognitive tower, helping a child “develop proficiencies that can be used in other domains.” 
 
@@ -23,11 +23,11 @@ As a model for learning, the levels within Minsky’s cognitive towers represent
 
 A focus on achieving meaningful goals, not just the accumulation of trivial knowledge, exercises all of the levels in a cognitive tower, helping a child “develop proficiencies that can be used in other domains.” A focus on hobbies, where interest is authentic and sustained, as opposed to curricula organized around the sequential achievement of fragmented goals, has the potential for deep engagement across multiple levels. Albert Einstein summed up the focus on hobbies succinctly when he said, “Love is a better master than duty.” It is in this spirit that we are proposing music as a vehicle for deep engagement. 
 
-Music Blocks is a “thing to think with” that allows for enough flexibility for young learners to explore math, music, and code—both independently and mutually integrated.
+Music Blocks is a “thing to think with” that provides enough flexibility for young learners to explore math, music, and code—both independently and in an integrated manner.
 
 Hard fun: What EdTech of today needs 
 ====================================
-There is a strong temptation in today’s EdTech industry to make things as simple as possible so as to reach the broadest possible audience. However some things are inherently complex. Single purpose “Apps”, for example might be fun, but they are simple, lacking complexity. Multi- purpose tools, such as we have created with Music Blocks, is fun and hard—”hard fun”. The hard part of “hard fun” of learning is in reaching towards complexity. Children should not miss out on the learning that takes place when learning to use tools. 
+There is a strong temptation in today’s EdTech industry to make things as simple as possible in order to reach the broadest possible audience. However, some things are inherently complex. Single-purpose “apps,” for example, might be fun, but they are simple and lack complexity. Multi-purpose tools, such as those we have created with Music Blocks, are fun and hard—“hard fun.” The hard part of “hard fun” in learning is reaching toward complexity. Children should not miss out on the learning that takes place when using tools.
 
 Music: A great vehicle for computer science instruction 
 =======================================================
@@ -68,4 +68,4 @@ We encourage learners to engage in a semi-structured discussion about their goal
 
 Beyond Music Blocks
 ===================
-Music Blocks is not a destinations. Rather, it is a waypoint along a road to achieving fluency in both musical comprehension and computational thinking. We want the students to dive deeper into musical representations and programming constructs than they could do in a single session. Therefore we provide mechanism to go beyond tools such as Music Blocks to give the learner both the ability to communicate with the mainstream worlds of music and computer science and access to a rich set of tools that they may use to further augment their explorations. Music Blocks, by design, does not confine a user to its tools—rather it is a tool to propel the ambitious learner to other rich and authentic discoveries. (See Bender, Ulibarri, and Khandelwal 2016 for more details.) 
+Music Blocks is not a destination. Rather, it is a waypoint along a road to achieving fluency in both musical comprehension and computational thinking. We want students to dive deeper into musical representations and programming constructs than they could in a single session. Therefore, we provide mechanisms to go beyond tools such as Music Blocks to give the learner both the ability to communicate with the mainstream worlds of music and computer science and access to a rich set of tools that they may use to further augment their explorations. Music Blocks, by design, does not confine a user to its tools—rather, it is a tool to propel the ambitious learner to other rich and authentic discoveries. (See Bender, Ulibarri, and Khandelwal 2016 for more details.)

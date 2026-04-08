@@ -17,7 +17,7 @@
         platformColor
 */
 /* exported SVG */
-
+const __svgCache = new Map();
 class SVG {
     // Interface to the graphical representation of blocks, turtles,
     // palettes, etc. on screen.
@@ -74,7 +74,6 @@ class SVG {
         this._expandY2 = 0;
         this._clampCount = 1;
         this._clampSlots = [1];
-        this._slotSize = 21; // TODO: Compute this.
         this._arm = true;
         this._else = false;
         this._draw_inniess = true;
@@ -83,6 +82,7 @@ class SVG {
         this.margins = [0, 0, 0, 0];
         this._fontSize = 10;
         this._labelOffset = 0;
+        this._computeSlotSize();
     }
 
     // Attribute methods
@@ -145,6 +145,7 @@ class SVG {
      */
     setScale(scale) {
         this._scale = scale;
+        this._computeSlotSize();
     }
 
     /**
@@ -179,7 +180,7 @@ class SVG {
      * @returns {void}
      */
     setClampSlots(clamp, number) {
-        if (clamp > this._clampCount.length - 1) {
+        if (clamp > this._clampCount - 1) {
             this.setClampCount(clamp + 1);
         }
         this._clampSlots[clamp] = number;
@@ -208,6 +209,7 @@ class SVG {
     setstrokeWidth(stroke_width) {
         this._strokeWidth = stroke_width;
         this._calc_porch_params();
+        this._computeSlotSize();
     }
 
     /**
@@ -344,6 +346,14 @@ class SVG {
     }
 
     // SVG-related helper methods
+
+    /**
+     * @private
+     * @returns {void}
+     */
+    _computeSlotSize() {
+        this._slotSize = 2 * this._innieY2 + this._inniesSpacer + this._padding;
+    }
 
     /**
      * @private
@@ -859,7 +869,7 @@ class SVG {
      * @returns {string}
      */
     _header(center) {
-        // FIXME: Why are our calculations off by 2 x strokeWidth?
+        // Note: Calculations are intentionally offset by 2 x strokeWidth to ensure valid SVG dimensions.
         return (
             '<svg xmlns="http://www.w3.org/2000/svg" width="' +
             Math.floor(this._width + 2 * this._strokeWidth + 0.5) +
@@ -955,6 +965,37 @@ class SVG {
 
         this.margins[2] = 0;
         this.margins[3] = 0;
+        const cacheKey =
+            "bb|" +
+            this._scale +
+            "|" +
+            this._expandX +
+            "|" +
+            this._expandY +
+            "|" +
+            (this._expandY2 || 0) +
+            "|" +
+            this._innies.join("") +
+            "|" +
+            (this._slot ? 1 : 0) +
+            "|" +
+            (this._tab ? 1 : 0) +
+            "|" +
+            (this._outie ? 1 : 0) +
+            "|" +
+            (this._bool ? 1 : 0) +
+            "|" +
+            (this._porch ? 1 : 0) +
+            "|" +
+            (this._tail ? 1 : 0);
+
+        if (__svgCache.has(cacheKey)) {
+            const cached = __svgCache.get(cacheKey);
+            this.docks = cached.docks.map(d => [...d]);
+            this._width = cached.width;
+            this._height = cached.height;
+            return cached.svg;
+        }
 
         let svg = this._newPath(x, y);
         svg += this._corner(1, -1, 90, 0, 1, true, true, false);
@@ -1064,7 +1105,14 @@ class SVG {
         }
 
         svg += this._footer();
-        return this._header(false) + svg;
+        const finalSvg = this._header(false) + svg;
+        __svgCache.set(cacheKey, {
+            svg: finalSvg,
+            docks: JSON.parse(JSON.stringify(this.docks)),
+            width: this._width,
+            height: this._height
+        });
+        return finalSvg;
     }
 
     /**
@@ -1292,6 +1340,27 @@ class SVG {
         const xoffset = this._strokeWidth / 2.0;
 
         const yoff = this._radius * 2;
+        const cacheKey =
+            "boolcmp|" +
+            this._scale +
+            "|" +
+            this._expandX +
+            "|" +
+            this._expandY +
+            "|" +
+            (this._expandY2 || 0) +
+            "|" +
+            this._innies.join("") +
+            "|" +
+            (this._porch ? 1 : 0);
+
+        if (__svgCache.has(cacheKey)) {
+            const cached = __svgCache.get(cacheKey);
+            this.docks = cached.docks.map(d => [...d]);
+            this._width = cached.width;
+            this._height = cached.height;
+            return cached.svg;
+        }
         let svg = '<g transform="matrix(1,0,0,1,0,-' + yoff + ')"> ';
 
         svg += this._newPath(xoffset, yoffset + this._radius);
@@ -1358,7 +1427,14 @@ class SVG {
         );
 
         svg += this._footer();
-        return this._header(false) + svg;
+        const finalSvg = this._header(false) + svg;
+        __svgCache.set(cacheKey, {
+            svg: finalSvg,
+            docks: JSON.parse(JSON.stringify(this.docks)),
+            width: this._width,
+            height: this._height
+        });
+        return finalSvg;
     }
 
     /**
@@ -1389,6 +1465,41 @@ class SVG {
         this.margins[1] = (this._strokeWidth + 0.5) * this._scale;
         this.margins[2] = 0;
         this.margins[3] = 0;
+        const cacheKey =
+            "bc|" +
+            this._scale +
+            "|" +
+            this._expandX +
+            "|" +
+            this._expandY +
+            "|" +
+            (this._expandY2 || 0) +
+            "|" +
+            this._innies.join("") +
+            "|" +
+            (this._slot ? 1 : 0) +
+            "|" +
+            (this._tab ? 1 : 0) +
+            "|" +
+            (this._outie ? 1 : 0) +
+            "|" +
+            (this._bool ? 1 : 0) +
+            "|" +
+            this._clampCount +
+            "|" +
+            JSON.stringify(this._clampSlots) +
+            "|" +
+            (this._tail ? 1 : 0) +
+            "|" +
+            (this._cap ? 1 : 0);
+
+        if (__svgCache.has(cacheKey)) {
+            const cached = __svgCache.get(cacheKey);
+            this.docks = cached.docks.map(d => [...d]);
+            this._width = cached.width;
+            this._height = cached.height;
+            return cached.svg;
+        }
 
         let svg = this._newPath(x, y);
         svg += this._corner(1, -1, 90, 0, 1, true, true, false);
@@ -1565,7 +1676,14 @@ class SVG {
         }
 
         svg += this._footer();
-        return this._header(false) + svg;
+        const finalSvg = this._header(false) + svg;
+        __svgCache.set(cacheKey, {
+            svg: finalSvg,
+            docks: JSON.parse(JSON.stringify(this.docks)),
+            width: this._width,
+            height: this._height
+        });
+        return finalSvg;
     }
 
     /**
@@ -1587,6 +1705,37 @@ class SVG {
         this.margins[1] = (this._strokeWidth + 0.5) * this._scale;
         this.margins[2] = 0;
         this.margins[3] = 0;
+        const cacheKey =
+            "ac|" +
+            this._scale +
+            "|" +
+            this._expandX +
+            "|" +
+            this._expandY +
+            "|" +
+            (this._expandY2 || 0) +
+            "|" +
+            this._innies.join("") +
+            "|" +
+            (this._slot ? 1 : 0) +
+            "|" +
+            (this._tab ? 1 : 0) +
+            "|" +
+            (this._outie ? 1 : 0) +
+            "|" +
+            (this._bool ? 1 : 0) +
+            "|" +
+            JSON.stringify(this._clampSlots) +
+            "|" +
+            (this._tail ? 1 : 0);
+
+        if (__svgCache.has(cacheKey)) {
+            const cached = __svgCache.get(cacheKey);
+            this.docks = cached.docks.map(d => [...d]);
+            this._width = cached.width;
+            this._height = cached.height;
+            return cached.svg;
+        }
 
         let svg = this._newPath(x, y);
         svg += this._corner(1, -1, 90, 0, 1, true, true, false);
@@ -1682,7 +1831,14 @@ class SVG {
         );
 
         svg += this._footer();
-        return this._header(false) + svg;
+        const finalSvg = this._header(false) + svg;
+        __svgCache.set(cacheKey, {
+            svg: finalSvg,
+            docks: JSON.parse(JSON.stringify(this.docks)),
+            width: this._width,
+            height: this._height
+        });
+        return finalSvg;
     }
 
     /**

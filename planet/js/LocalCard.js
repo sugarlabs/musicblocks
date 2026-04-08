@@ -104,7 +104,6 @@ class LocalCard {
     render() {
         const Planet = this.Planet;
 
-        // TODO: Have a TB placeholder image specific to TB projects
         const html = this.renderData.replace(new RegExp("{ID}", "g"), this.id);
         const frag = document.createRange().createContextualFragment(html);
 
@@ -124,49 +123,49 @@ class LocalCard {
         frag.getElementById(`local-project-input-${this.id}`).value = this.ProjectData.ProjectName;
 
         // set edit modify listener
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`local-project-edit-${this.id}`).addEventListener("click", evt => {
             Planet.LocalPlanet.openProject(this.id);
         });
 
         // set image listener
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(imageId).addEventListener("click", evt => {
             Planet.LocalPlanet.openProject(this.id);
         });
 
         // set merge modify listener
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`local-project-merge-${this.id}`).addEventListener("click", evt => {
             Planet.LocalPlanet.openProject(this.id);
         });
 
         // set input modify listener
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`local-project-input-${this.id}`).addEventListener("input", evt => {
             Planet.ProjectStorage.renameProject(this.id, evt.target.value);
         });
 
         // set delete button listener
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`local-project-delete-${this.id}`).addEventListener("click", evt => {
             Planet.LocalPlanet.openDeleteModal(this.id);
         });
 
         // set publish button listener
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`local-project-publish-${this.id}`).addEventListener("click", evt => {
             Planet.LocalPlanet.Publisher.open(this.id);
         });
 
         // set download button listener
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`local-project-download-${this.id}`).addEventListener("click", evt => {
             this.download();
         });
 
         // set duplicate button listener
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`local-project-duplicate-${this.id}`).addEventListener("click", evt => {
             this.duplicate();
         });
@@ -174,9 +173,8 @@ class LocalCard {
         // set published cloud listener
         if (this.ProjectData.PublishedData !== null) {
             frag.getElementById(`local-project-cloud-${this.id}`).style.display = "initial";
-            // eslint-disable-next-line no-unused-vars
+
             frag.getElementById(`local-project-cloud-${this.id}`).addEventListener("click", evt => {
-                // TODO: Implement view-published-project thing
                 document.getElementById("global-tab").click();
                 Planet.GlobalPlanet.forceAddToCache(this.id, () => {
                     Planet.GlobalPlanet.ProjectViewer.open(this.id);

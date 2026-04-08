@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014-21 Walter Bender
+// Copyright (c) 2014-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -10,10 +10,10 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 //
 
-/*
-   global
+/* eslint-disable no-redeclare */
+/* global
 
-   _, ACCIDENTALLABELS, ACCIDENTALNAMES, addTemperamentToDictionary,
+    ACCIDENTALLABELS, ACCIDENTALNAMES, addTemperamentToDictionary,
    blockBlocks, COLLAPSEBUTTON, COLLAPSETEXTX, COLLAPSETEXTY,
    createjs, DEFAULTACCIDENTAL, DEFAULTDRUM, DEFAULTEFFECT,
    DEFAULTFILTERTYPE, DEFAULTINTERVAL, DEFAULTINVERT, DEFAULTMODE,
@@ -21,9 +21,9 @@
    DEFAULTVOICE, DEGREES, delayExecution, deleteTemperamentFromList,
    DISABLEDFILLCOLOR, DISABLEDSTROKECOLOR, docById, DOUBLEFLAT,
    DOUBLESHARP, DRUMNAMES, EASTINDIANSOLFNOTES, EFFECTSNAMES,
-   EXPANDBUTTON, FILTERTYPES, FLAT, getDrumName, getDrumSynthName,
+    EXPANDBUTTON, FILTERTYPES, FLAT, getDrumName, getDrumSynthName,
    getModeNumbers, getNoiseName, getTemperament, getTemperamentKeys,
-   getTemperamentsList, getTextWidth, hideDOMLabel, HIGHLIGHTSTROKECOLORS,
+    getTemperamentsList, getTextWidth, hideDOMLabel, HIGHLIGHTSTROKECOLORS,
    i18nSolfege, INVERTMODES, isCustomTemperament, last, MEDIASAFEAREA,
    NATURAL, NOISENAMES, NSYMBOLS, NUMBERBLOCKDEFAULT, OSCTYPES,
    PALETTEFILLCOLORS, PALETTEHIGHLIGHTCOLORS, PALETTESTROKECOLORS,
@@ -31,9 +31,9 @@
    piemenuBoolean, piemenuColor, piemenuCustomNotes, piemenuIntervals,
    piemenuModes, piemenuNoteValue, piemenuNumber, piemenuPitches,
    piemenuVoices, piemenuChords, platformColor, ProtoBlock, RSYMBOLS,
-   safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
+    safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
    splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
-   topBlock, updateTemperaments, VALUETEXTX, DEFAULTCHORD,
+    topBlock, updateTemperaments, VALUETEXTX, DEFAULTCHORD, base64Encode,
    VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_
  */
 
@@ -71,7 +71,7 @@
         platformColor
  */
 
-/* exported Block, $ */
+/* exported Block */
 
 // Length of a long touch
 
@@ -125,6 +125,13 @@ const COLLAPSIBLES = [
  * @type {string[]}
  */
 const NOHIT = ["hidden", "hiddennoflow"];
+
+/**
+ * List of blocks that behave like argument blocks even though they are not
+ * strictly classified as arg/value blocks.
+ * @type {string[]}
+ */
+const ARG_LIKE_BLOCKS = ["doArg", "calcArg", "namedcalcArg", "makeblock"];
 
 /**
  * List of special input types.
@@ -224,7 +231,7 @@ const _blockMakeBitmap = (data, callback, args) => {
         callback(bitmap, args);
     };
 
-    img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
+    img.src = "data:image/svg+xml;base64," + window.btoa(window.base64Encode(data));
 };
 
 // Optimization: Cache static DOM elements to avoid repetitive querySelector/getElementById calls
@@ -266,6 +273,11 @@ class Block {
 
         this.name = protoblock.name;
         this.activity = this.blocks.activity;
+
+        // Cached index in blocks.blockList — set when block is added
+        // to blockList. Avoids O(N) blockList.indexOf() lookups that
+        // are scattered across the codebase (33+ call sites).
+        this.blockIndex = -1;
 
         this.collapsed = false; // Is this collapsible block collapsed?
         this.inCollapsed = false; // Is this block in a collapsed stack?
@@ -346,21 +358,23 @@ class Block {
         const that = this;
         return new Promise((resolve, reject) => {
             let loopCount = 0;
+            const MAX_RETRIES = 20;
+            const INITIAL_DELAY = 50;
 
             const checkBounds = async counter => {
                 try {
                     if (counter !== undefined) {
                         loopCount = counter;
                     }
-                    if (loopCount > 10) {
-                        // race condition?
+                    if (loopCount > MAX_RETRIES) {
                         throw new Error("COULD NOT CREATE CACHE");
                     }
 
                     that.bounds = that.container.getBounds();
 
                     if (that.bounds === null) {
-                        await delayExecution(100);
+                        const delayTime = INITIAL_DELAY * Math.pow(2, loopCount);
+                        await delayExecution(delayTime);
                         that.regenerateArtwork(true, []);
                         checkBounds(loopCount + 1);
                     } else {
@@ -390,7 +404,16 @@ class Block {
     updateCache() {
         const that = this;
         return new Promise((resolve, reject) => {
+            // If the container has no active bitmap cache (e.g., trashed
+            // blocks whose cache was freed), skip the update silently.
+            if (that.container && !that.container.bitmapCache) {
+                resolve();
+                return;
+            }
+
             let loopCount = 0;
+            const MAX_RETRIES = 15;
+            const INITIAL_DELAY = 100;
 
             const updateBounds = async counter => {
                 try {
@@ -398,13 +421,15 @@ class Block {
                         loopCount = counter;
                     }
 
-                    if (loopCount > 5) {
+                    if (loopCount > MAX_RETRIES) {
                         throw new Error("COULD NOT UPDATE CACHE");
                     }
 
                     if (that.bounds === null) {
+                        const delayTime = INITIAL_DELAY * Math.pow(2, loopCount);
+                        await delayExecution(delayTime);
+                        await new Promise(resolve => setTimeout(resolve, delayTime));
                         updateBounds(loopCount + 1);
-                        await that.pause(200);
                     } else {
                         that.container.updateCache();
                         that.activity.refreshCanvas();
@@ -552,7 +577,7 @@ class Block {
             this.disconnectedBitmap.visible = false;
         }
 
-        // If it is a collapsed collapsable, hightlight the collapsed state.
+        // If it is a collapsed collapsable, highlight the collapsed state.
         if (this.collapsed) {
             // Show the highlighted collapsed artwork.
             if (this.highlightCollapseBlockBitmap !== null) {
@@ -639,7 +664,7 @@ class Block {
 
         this.container.visible = true;
 
-        // If it is a collapsed collapsable, unhightlight the collapsed state.
+        // If it is a collapsed collapsable, unhighlight the collapsed state.
         if (this.collapsed) {
             // Show the unhighlighted collapsed artwork.'
             // We may have a race condition...
@@ -792,10 +817,14 @@ class Block {
              * @returns {void}
              */
             const _postProcess = that => {
-                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
-                    scale / 3;
-                that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale =
-                    scale / 3;
+                that.collapseButtonBitmap.scaleX =
+                    that.collapseButtonBitmap.scaleY =
+                    that.collapseButtonBitmap.scale =
+                        scale / 3;
+                that.expandButtonBitmap.scaleX =
+                    that.expandButtonBitmap.scaleY =
+                    that.expandButtonBitmap.scale =
+                        scale / 3;
                 that.updateCache();
                 that._calculateBlockHitArea();
             };
@@ -1010,8 +1039,30 @@ class Block {
             this.container.removeChild(this.highlightCollapseBlockBitmap);
         }
 
+        // Temporarily remove imageBitmap to prevent it from corrupting bounds during regeneration
+        let tempImageBitmap = null;
+        if (this.imageBitmap != null) {
+            tempImageBitmap = this.imageBitmap;
+            this.container.removeChild(this.imageBitmap);
+            this.imageBitmap = null;
+        }
+
         // Then we generate new artwork.
         this.generateArtwork(false);
+
+        // Restore the imageBitmap after artwork generation
+        if (tempImageBitmap != null) {
+            this.imageBitmap = tempImageBitmap;
+            this.container.addChild(this.imageBitmap);
+            this._positionMedia(
+                this.imageBitmap,
+                this.imageBitmap.image.width,
+                this.imageBitmap.image.height,
+                this.protoblock.scale
+            );
+            const zIndex = this.container.children.length - 1;
+            this.container.setChildIndex(this.imageBitmap, zIndex);
+        }
     }
 
     /**
@@ -1023,7 +1074,7 @@ class Block {
     generateArtwork(firstTime) {
         // Get the block labels from the protoblock.
         const that = this;
-        const thisBlock = this.blocks.blockList.indexOf(this);
+        const thisBlock = this.blockIndex;
         let block_label = "";
 
         /**
@@ -1055,7 +1106,7 @@ class Block {
 
             const __callback = (that, firstTime) => {
                 that.activity.refreshCanvas();
-                const thisBlock = that.blocks.blockList.indexOf(that);
+                const thisBlock = that.blockIndex;
 
                 if (firstTime) {
                     that._loadEventHandlers();
@@ -1105,7 +1156,7 @@ class Block {
             that.container.addChild(that.disconnectedHighlightBitmap);
             that.disconnectedHighlightBitmap.x = 0;
             that.disconnectedHighlightBitmap.y = 0;
-            that.disconnectedHighlightBitmap.name = "bmp_disconnect_hightlight_" + thisBlock;
+            that.disconnectedHighlightBitmap.name = "bmp_disconnect_highlight_" + thisBlock;
             if (!that.activity.logo.runningLilypond) {
                 that.disconnectedHighlightBitmap.cursor = "pointer";
             }
@@ -1273,7 +1324,7 @@ class Block {
             artwork = artwork.replace("arg_label_" + i, this.protoblock.staticLabels[i]);
         }
 
-        that.blocks.blockArt[that.blocks.blockList.indexOf(that)] = artwork;
+        that.blocks.blockArt[that.blockIndex] = artwork;
 
         _blockMakeBitmap(artwork, __processBitmap, this);
     }
@@ -1284,7 +1335,7 @@ class Block {
      * @returns {void}
      */
     _finishImageLoad() {
-        // const thisBlock = this.blocks.blockList.indexOf(this);
+        // const thisBlock = this.blockIndex;
         let proto, obj, label, attr;
         // Value blocks get a modifiable text label.
         if (SPECIALINPUTS.includes(this.name)) {
@@ -1396,7 +1447,7 @@ class Block {
             } else if (this.name === "grid") {
                 label = _(this.value);
             } else {
-                if (this.value !== null) {
+                if (this.value != null) {
                     label = this.value.toString();
                 } else {
                     label = "???";
@@ -1453,7 +1504,7 @@ class Block {
             const postProcess = that => {
                 that.loadComplete = true;
 
-                if (that.postProcess !== null) {
+                if (that.postProcess != null) {
                     that.postProcess(that.postProcessArg);
                     that.postProcess = null;
                 }
@@ -1474,7 +1525,7 @@ class Block {
      * @returns {void}
      */
     _generateCollapseArtwork(postProcess) {
-        const thisBlock = this.blocks.blockList.indexOf(this);
+        const thisBlock = this.blockIndex;
 
         /**
          * Run the postprocess function after the artwork is loaded.
@@ -1505,8 +1556,10 @@ class Block {
             const image = new Image();
             image.onload = () => {
                 that.collapseButtonBitmap = new createjs.Bitmap(image);
-                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
-                    that.protoblock.scale / 3;
+                that.collapseButtonBitmap.scaleX =
+                    that.collapseButtonBitmap.scaleY =
+                    that.collapseButtonBitmap.scale =
+                        that.protoblock.scale / 3;
                 that.container.addChild(that.collapseButtonBitmap);
                 that.collapseButtonBitmap.x = 2 * that.protoblock.scale;
                 if (that.isInlineCollapsible()) {
@@ -1520,7 +1573,8 @@ class Block {
                 __finishCollapse(that);
             };
 
-            image.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBUTTON));
+            image.src =
+                "data:image/svg+xml;base64," + window.btoa(window.base64Encode(COLLAPSEBUTTON));
         };
 
         /**
@@ -1533,8 +1587,10 @@ class Block {
             const image = new Image();
             image.onload = () => {
                 that.expandButtonBitmap = new createjs.Bitmap(image);
-                that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale =
-                    that.protoblock.scale / 3;
+                that.expandButtonBitmap.scaleX =
+                    that.expandButtonBitmap.scaleY =
+                    that.expandButtonBitmap.scale =
+                        that.protoblock.scale / 3;
 
                 that.container.addChild(that.expandButtonBitmap);
                 that.expandButtonBitmap.visible = that.collapsed;
@@ -1549,7 +1605,8 @@ class Block {
                 __processCollapseButton(that);
             };
 
-            image.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(EXPANDBUTTON));
+            image.src =
+                "data:image/svg+xml;base64," + window.btoa(window.base64Encode(EXPANDBUTTON));
         };
 
         /**
@@ -1726,7 +1783,7 @@ class Block {
             that._ensureDecorationOnTop();
 
             // Save the collapsed block artwork for export.
-            that.blocks.blockCollapseArt[that.blocks.blockList.indexOf(that)] = that.collapseArtwork
+            that.blocks.blockCollapseArt[that.blockIndex] = that.collapseArtwork
                 .replace(/fill_color/g, PALETTEFILLCOLORS[that.protoblock.palette.name])
                 .replace(/stroke_color/g, PALETTESTROKECOLORS[that.protoblock.palette.name])
                 .replace("block_label", safeSVG(that.collapseText.text));
@@ -1926,6 +1983,17 @@ class Block {
     }
 
     /**
+     * Checks if the block behaves like an argument block.
+     * Some blocks (e.g., doArg, calcArg, namedcalcArg, makeblock) are not styled
+     * strictly as arg/value blocks but are treated as argument blocks in
+     * certain contexts.
+     * @returns {boolean} - True if the block is argument-like, false otherwise.
+     */
+    isArgumentLikeBlock() {
+        return this.isArgBlock() || ARG_LIKE_BLOCKS.includes(this.name);
+    }
+
+    /**
      * Checks if the block is a two-argument block.
      * @returns {boolean} - True if the block is a two-argument block, false otherwise.
      */
@@ -2002,12 +2070,50 @@ class Block {
     }
 
     /**
+     * Determines what type of layout update this block requires when a child is connected
+     * at the specified connection index.
+     *
+     * This is a behavioral abstraction that encapsulates the logic of which blocks
+     * need pre-layout updates based on their child connections, rather than having
+     * the engine infer this from block type categories.
+     *
+     * @param {number} connectionIndex - The index of the connection where a child was attached
+     * @returns {string|null} - "ARG" for argument layout updates, "FLOW" for flow layout updates, null otherwise
+     */
+    getLayoutUpdateType(connectionIndex) {
+        // Guard against invalid indices (can occur during drag/undo/intermediate states)
+        if (connectionIndex < 0) {
+            return null;
+        }
+
+        // Two-argument blocks and expandable argument blocks need ARG layout updates
+        // when a child connects to their first argument slot (connection index 1)
+        if (connectionIndex === 1) {
+            if (this.isTwoArgBlock() || (this.isArgBlock() && this.isExpandableBlock())) {
+                return "ARG";
+            }
+        }
+
+        const n = this.connections.length;
+        if (
+            connectionIndex === n - 2 &&
+            !this.isArgClamp() &&
+            this.docks[n - 1] &&
+            this.docks[n - 1][2] === "in"
+        ) {
+            return "FLOW";
+        }
+
+        return null;
+    }
+
+    /**
      * Gets the unique identifier for the block.
      * @returns {string} - The unique identifier for the block.
      */
     getBlockId() {
         // Generate a UID based on the block index into the blockList.
-        const number = blockBlocks.blockList.indexOf(this);
+        const number = this.blockIndex;
         return "_" + number.toString();
     }
 
@@ -2030,7 +2136,7 @@ class Block {
      */
     loadThumbnail(imagePath) {
         // Load an image thumbnail onto block.
-        const thisBlock = this.blocks.blockList.indexOf(this);
+        const thisBlock = this.blockIndex;
         const that = this;
 
         if (this.blocks.blockList[thisBlock].value === null && imagePath === null) {
@@ -2097,7 +2203,7 @@ class Block {
      */
     _doOpenMedia(thisBlock) {
         const that = this;
-        const fileChooser = that.name == "media" ? docById("myMedia") : docById("audio");
+        const fileChooser = that.name === "media" ? docById("myMedia") : docById("audio");
 
         const __readerAction = () => {
             window.scroll(0, 0);
@@ -2167,7 +2273,7 @@ class Block {
     collapseToggle() {
         // Find the blocks to collapse/expand inside of a collapable
         // block.
-        const thisBlock = this.blocks.blockList.indexOf(this);
+        const thisBlock = this.blockIndex;
         this.blocks.findDragGroup(thisBlock);
 
         if (this.collapseBlockBitmap === null) {
@@ -2184,7 +2290,7 @@ class Block {
         this.collapseButtonBitmap.visible = isCollapsed;
         this.expandButtonBitmap.visible = !isCollapsed;
 
-        // These are the collpase-state bitmaps.
+        // These are the collapse-state bitmaps.
         this.collapseBlockBitmap.visible = !isCollapsed;
         this.highlightCollapseBlockBitmap.visible = false;
         this.collapseText.visible = !isCollapsed;
@@ -2286,7 +2392,7 @@ class Block {
         const intervals = [];
         let i = 0;
 
-        let c = this.blocks.blockList.indexOf(this),
+        let c = this.blockIndex,
             lastIntervalBlock;
         while (c !== null) {
             lastIntervalBlock = c;
@@ -2558,8 +2664,8 @@ class Block {
                 if (this.blocks.blockList[c2].name === "number") {
                     if (this.blocks.blockList[c1].name === "number") {
                         const degrees = DEGREES.split(" ");
-                        const i = this.blocks.blockList[c1].value - 1;
-                        if (i > 0 && i < degrees.length) {
+                        const i = this.blocks.blockList[c1].value;
+                        if (i >= 0 && i < degrees.length) {
                             return degrees[i] + " " + this.blocks.blockList[c2].value;
                         } else {
                             return (
@@ -2741,17 +2847,22 @@ class Block {
      * @returns {void}
      */
     _positionMedia(bitmap, width, height, blockScale) {
-        if (width > height) {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale =
-                ((MEDIASAFEAREA[2] / width) * blockScale) / 2;
-        } else {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale =
-                ((MEDIASAFEAREA[3] / height) * blockScale) / 2;
-        }
+        // Use actual block dimensions instead of MEDIASAFEAREA to ensure image fits
+        // Account for padding (approximately 20% of block size for margins)
+        const maxWidth = this.width * 0.6; // Leave 40% for block chrome
+        const maxHeight = this.height * 0.6; // Leave 40% for block chrome
+
+        // Calculate scale to fit within both dimensions
+        const scaleX = maxWidth / width;
+        const scaleY = maxHeight / height;
+
+        // Use the minimum to ensure it fits in both dimensions
+        bitmap.scaleX = bitmap.scaleY = bitmap.scale = Math.min(scaleX, scaleY);
+
+        // Center the image within the block
         bitmap.x = ((MEDIASAFEAREA[0] - 10) * blockScale) / 2;
         bitmap.y = (MEDIASAFEAREA[1] * blockScale) / 2;
     }
-
     /**
      * Position the label for a collapsed block.
      * @private
@@ -2795,7 +2906,7 @@ class Block {
      */
     _loadEventHandlers() {
         const that = this;
-        const thisBlock = this.blocks.blockList.indexOf(this);
+        const thisBlock = this.blockIndex;
 
         this._calculateBlockHitArea();
 
@@ -2817,6 +2928,11 @@ class Block {
         let locked = false;
         let getInput = window.hasMouse;
 
+        // Cached drag state: computed once at mousedown, reused during pressmove.
+        // This avoids redundant O(N) findDragGroup and O(D) rest2 chain walks
+        // on every mouse move event (which fires 60+ times per second).
+        let _dragHasRest2 = false;
+
         /**
          * Handles the click event on the block container.
          * @param {Event} event - The click event.
@@ -2830,7 +2946,7 @@ class Block {
             }
             // We might be able to check which button was clicked.
             if ("nativeEvent" in event) {
-                if ("button" in event.nativeEvent && event.nativeEvent.button == 2) {
+                if ("button" in event.nativeEvent && event.nativeEvent.button === 2) {
                     that.blocks.stageClick = true;
                     _getStatic("wheelDiv").style.display = "none";
                     that.blocks.activeBlock = thisBlock;
@@ -2939,7 +3055,7 @@ class Block {
             that.blocks.mouseDownTime = new Date().getTime();
 
             that.blocks.longPressTimeout = setTimeout(() => {
-                that.blocks.activeBlock = that.blocks.blockList.indexOf(that);
+                that.blocks.activeBlock = that.blockIndex;
                 that._triggerLongPress = true;
                 that.blocks.triggerLongPress();
             }, LONGPRESSTIME);
@@ -2983,14 +3099,37 @@ class Block {
                 x: Math.round(that.container.x - that.original.x),
                 y: Math.round(that.container.y - that.original.y)
             };
+
+            // Cache the drag group once on mousedown instead of
+            // recomputing the tree traversal on every pressmove.
+            that.blocks.cacheDragGroup(thisBlock);
+            // Invalidate the top-block cache since a drag may
+            // disconnect blocks, changing the topology.
+            that.blocks.invalidateTopBlockCache();
+
+            // Pre-compute whether the chain below contains a rest2 block.
+            // This avoids walking the entire connection chain on every
+            // mouse move event.
+            _dragHasRest2 = false;
+            let checkBlock = that.blocks.blockList[that.connections[1]];
+            while (checkBlock != null) {
+                if (checkBlock?.name === "rest2") {
+                    _dragHasRest2 = true;
+                    break;
+                }
+                checkBlock = checkBlock?.blocks.blockList[checkBlock.connections[1]];
+            }
         });
 
         /**
          * Handles the pressmove event on the block container.
+         * Performance-optimized: uses cached drag group, batched block
+         * moves, throttled edge scroll, and a single deferred
+         * checkBounds + refreshCanvas per frame.
          * @param {Event} event - The pressmove event.
          */
         this.container.on("pressmove", event => {
-            // FIXME: More voodoo
+            // Prevent the browser's default drag behavior
             event.nativeEvent.preventDefault();
 
             // Don't allow silence block to be dragged out of a note.
@@ -3006,20 +3145,17 @@ class Block {
                 return;
             }
 
-            // Do not allow a stack of blocks to be dragged if the stack contains a silence block.
-            let block = that.blocks.blockList[that.connections[1]];
-            while (block != undefined) {
-                if (block?.name === "rest2") {
-                    this.activity.errorMsg(_("Silence block cannot be removed."), block);
-                    return;
-                }
-                block = block?.blocks.blockList[block.connections[1]];
+            // Use the cached rest2 check from mousedown instead of
+            // walking the chain on every mouse move event.
+            if (_dragHasRest2) {
+                this.activity.errorMsg(_("Silence block cannot be removed."), that);
+                return;
             }
 
             if (window.hasMouse) {
                 moved = true;
             } else {
-                // Make it eaiser to select text on mobile.
+                // Make it easier to select text on mobile.
                 setTimeout(() => {
                     moved =
                         Math.abs(event.stageX / that.activity.getStageScale() - that.original.x) +
@@ -3046,14 +3182,27 @@ class Block {
                 dy += 45 - finalPos;
             }
 
-            // scroll when reached edges.
-            if (event.stageX < 10 && that.activity.scrollBlockContainer)
-                that.blocks.moveAllBlocksExcept(that, 10, 0);
-            else if (event.stageX > window.innerWidth - 10 && that.activity.scrollBlockContainer)
-                that.blocks.moveAllBlocksExcept(that, -10, 0);
-            else if (event.stageY > window.innerHeight - 10)
-                that.blocks.moveAllBlocksExcept(that, 0, -10);
-            else if (event.stageY < 60) that.blocks.moveAllBlocksExcept(that, 0, 10);
+            // Edge-scroll: throttled to ~60fps (16ms) to avoid
+            // running moveAllBlocksExcept on every mouse event.
+            const now = Date.now();
+            if (now - that.blocks._lastEdgeScrollTime >= 16) {
+                if (event.stageX < 10 && that.activity.scrollBlockContainer) {
+                    that.blocks.moveAllBlocksExcept(that, 10, 0);
+                    that.blocks._lastEdgeScrollTime = now;
+                } else if (
+                    event.stageX > window.innerWidth - 10 &&
+                    that.activity.scrollBlockContainer
+                ) {
+                    that.blocks.moveAllBlocksExcept(that, -10, 0);
+                    that.blocks._lastEdgeScrollTime = now;
+                } else if (event.stageY > window.innerHeight - 10) {
+                    that.blocks.moveAllBlocksExcept(that, 0, -10);
+                    that.blocks._lastEdgeScrollTime = now;
+                } else if (event.stageY < 60) {
+                    that.blocks.moveAllBlocksExcept(that, 0, 10);
+                    that.blocks._lastEdgeScrollTime = now;
+                }
+            }
 
             if (that.blocks.longPressTimeout != null) {
                 clearTimeout(that.blocks.longPressTimeout);
@@ -3065,7 +3214,8 @@ class Block {
                 that.label.style.display = "none";
             }
 
-            that.blocks.moveBlockRelative(thisBlock, dx, dy);
+            // Move the dragged block itself (batched — no checkBounds).
+            that.blocks.moveBlockRelativeBatched(thisBlock, dx, dy);
 
             // If we are over the trash, warn the user.
             if (
@@ -3084,17 +3234,31 @@ class Block {
                 that.container.setChildIndex(that.text, that.container.children.length - 1);
             }
 
-            // ...and move any connected blocks.
-            that.blocks.findDragGroup(thisBlock);
-            if (that.blocks.dragGroup.length > 0) {
-                for (let b = 0; b < that.blocks.dragGroup.length; b++) {
-                    const blk = that.blocks.dragGroup[b];
-                    if (b !== 0) {
-                        that.blocks.moveBlockRelative(blk, dx, dy);
+            // Move connected blocks using the cached drag group
+            // (computed once on mousedown, not every pressmove).
+            const cachedGroup = that.blocks._cachedDragGroup;
+            if (cachedGroup != null && cachedGroup.length > 0) {
+                for (let b = 0; b < cachedGroup.length; b++) {
+                    const blk = cachedGroup[b];
+                    if (blk !== thisBlock) {
+                        that.blocks.moveBlockRelativeBatched(blk, dx, dy);
+                    }
+                }
+            } else {
+                // Fallback: recompute if cache is missing
+                that.blocks.findDragGroup(thisBlock);
+                if (that.blocks.dragGroup.length > 0) {
+                    for (let b = 0; b < that.blocks.dragGroup.length; b++) {
+                        const blk = that.blocks.dragGroup[b];
+                        if (b !== 0) {
+                            that.blocks.moveBlockRelativeBatched(blk, dx, dy);
+                        }
                     }
                 }
             }
 
+            // Single deferred checkBounds + single canvas refresh per frame
+            that.blocks.scheduleCheckBounds();
             that.activity.refreshCanvas();
         });
 
@@ -3117,7 +3281,12 @@ class Block {
                 that.blocks.unhighlight(thisBlock, true);
             }
             that.blocks.activeBlock = null;
+            // Release cached drag group and top-block map
+            that.blocks.clearCachedDragGroup();
+            that.blocks.invalidateTopBlockCache();
 
+            // Clear cached drag state.
+            _dragHasRest2 = false;
             moved = false;
         });
 
@@ -3139,7 +3308,12 @@ class Block {
 
             that.blocks.unhighlight(thisBlock, true);
             that.blocks.activeBlock = null;
+            // Release cached drag group and top-block map
+            that.blocks.clearCachedDragGroup();
+            that.blocks.invalidateTopBlockCache();
 
+            // Clear cached drag state.
+            _dragHasRest2 = false;
             moved = false;
         });
     }
@@ -3155,7 +3329,7 @@ class Block {
      * @returns {void}
      */
     _mouseoutCallback(event, moved, haveClick, hideDOM) {
-        const thisBlock = this.blocks.blockList.indexOf(this);
+        const thisBlock = this.blockIndex;
         if (!this.activity.logo.runningLilypond) {
             document.body.style.cursor = "default";
         }
@@ -3197,7 +3371,7 @@ class Block {
                 // Just in case the blocks are not properly docked after
                 // the move (workaround for issue #38 -- Blocks fly
                 // apart). Still need to get to the root cause.
-                this.blocks.adjustDocks(this.blocks.blockList.indexOf(this), true);
+                this.blocks.adjustDocks(this.blockIndex, true);
             }
         } else if (SPECIALINPUTS.includes(this.name) || ["media", "loadFile"].includes(this.name)) {
             if (!haveClick) {
@@ -3255,7 +3429,7 @@ class Block {
         }
 
         // Numeric pie menus
-        const blk = this.blocks.blockList.indexOf(this);
+        const blk = this.blockIndex;
 
         if (this.blocks.octaveNumber(blk)) {
             return true;
@@ -3308,11 +3482,14 @@ class Block {
             return false;
         }
 
-        if (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC1.length === 0) {
+        if (
+            (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC1?.length ?? 0) ===
+            0
+        ) {
             return false;
         }
 
-        return this.blocks.blockList[cblk].connections[1] === this.blocks.blockList.indexOf(this);
+        return this.blocks.blockList[cblk].connections[1] === this.blockIndex;
     }
 
     /**
@@ -3330,11 +3507,14 @@ class Block {
             return false;
         }
 
-        if (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC2.length === 0) {
+        if (
+            (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC2?.length ?? 0) ===
+            0
+        ) {
             return false;
         }
 
-        return this.blocks.blockList[cblk].connections[2] === this.blocks.blockList.indexOf(this);
+        return this.blocks.blockList[cblk].connections[2] === this.blockIndex;
     }
 
     /**
@@ -3352,11 +3532,14 @@ class Block {
             return false;
         }
 
-        if (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC3.length === 0) {
+        if (
+            (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC3?.length ?? 0) ===
+            0
+        ) {
             return false;
         }
 
-        return this.blocks.blockList[cblk].connections[3] === this.blocks.blockList.indexOf(this);
+        return this.blocks.blockList[cblk].connections[3] === this.blockIndex;
     }
 
     /**
@@ -3518,7 +3701,11 @@ class Block {
                 const noteLabels = {};
                 const customLabels = [];
                 for (let i = 0; i < keys.length; i++) {
-                    noteLabels[keys[i]] = getTemperament(keys[i]);
+                    const temperament = getTemperament(keys[i]);
+                    // Only add valid temperaments to noteLabels
+                    if (temperament && typeof temperament === "object") {
+                        noteLabels[keys[i]] = temperament;
+                    }
                     if (isCustomTemperament(keys[i])) {
                         customLabels.push(keys[i]);
                     }
@@ -3530,10 +3717,21 @@ class Block {
                     selectedCustom = customLabels[0];
                 }
 
-                if (this.value !== null) {
+                if (this.value != null) {
                     selectedNote = this.value;
                 } else {
-                    selectedNote = getTemperament(selectedCustom)["0"][1];
+                    // Ensure we have a valid temperament before accessing its properties
+                    const selectedTemperament = getTemperament(selectedCustom);
+                    if (
+                        selectedTemperament &&
+                        selectedTemperament["0"] &&
+                        selectedTemperament["0"][1]
+                    ) {
+                        selectedNote = selectedTemperament["0"][1];
+                    } else {
+                        // Fallback to a default note
+                        selectedNote = "C";
+                    }
                 }
 
                 piemenuCustomNotes(this, noteLabels, customLabels, selectedCustom, selectedNote);
@@ -3903,7 +4101,7 @@ class Block {
         } else {
             // If the number block is connected to a pitch block, then
             // use the pie menu for octaves. Other special cases as well.
-            const blk = this.blocks.blockList.indexOf(this);
+            const blk = this.blockIndex;
             if (this.blocks.octaveNumber(blk)) {
                 piemenuNumber(this, [8, 7, 6, 5, 4, 3, 2, 1], this.value);
             } else if (this.blocks.noteValueNumber(blk, 2)) {
@@ -3989,7 +4187,7 @@ class Block {
                         for (let i = 0; i < this.blocks.blockList.length; i++) {
                             if (
                                 this.blocks.blockList[i].name === "settemperament" &&
-                                this.blocks.blockList[i].connections[0] !== null
+                                this.blocks.blockList[i].connections[0] != null
                             ) {
                                 const index = this.blocks.blockList[i].connections[1];
                                 temperament = this.blocks.blockList[index].value;
@@ -4051,7 +4249,7 @@ class Block {
             }
         }
 
-        // const blk = this.blocks.blockList.indexOf(this);
+        // const blk = this.blockIndex;
         if (!this._usePiemenu()) {
             let focused = false;
 
@@ -4076,7 +4274,7 @@ class Block {
                 labelElem.classList.remove("hasKeyboard");
 
                 window.scroll(0, 0);
-                // eslint-disable-next-line no-use-before-define
+
                 that.label.removeEventListener("keypress", __keypress);
 
                 if (movedStage) {
@@ -4128,7 +4326,6 @@ class Block {
             this.label.style.transform = `translate3d(${left}px, ${top}px, 0)`;
             this.label.style.left = "0px";
             this.label.style.top = "0px";
-
             this.label.style.width =
                 Math.round((selectorWidth * this.blocks.blockScale * this.protoblock.scale) / 2) +
                 "px";
@@ -4178,123 +4375,13 @@ class Block {
     }
 
     /**
-     * Checks if the block's input is a number value.
-     * @private
-     * @param {number} c - The index of the connection.
-     * @returns {boolean} - True if the input is a number value, false otherwise.
-     */
-    _noteValueNumber(c) {
-        // Is this a number block being used as a note value
-        // denominator argument?
-        const dblk = this.connections[0];
-        // Are we connected to a divide block?
-        if (
-            this.name === "number" &&
-            dblk !== null &&
-            this.blocks.blockList[dblk].name === "divide"
-        ) {
-            // Are we the denominator (c == 2) or numerator (c == 1)?
-            if (
-                this.blocks.blockList[dblk].connections[c] === this.blocks.blockList.indexOf(this)
-            ) {
-                // Is the divide block connected to a note value block?
-                const cblk = this.blocks.blockList[dblk].connections[0];
-                if (cblk !== null) {
-                    // Is it the first or second arg?
-                    switch (this.blocks.blockList[cblk].name) {
-                        case "newnote":
-                        case "pickup":
-                        case "tuplet4":
-                        case "newstaccato":
-                        case "newslur":
-                        case "elapsednotes2":
-                            return this.blocks.blockList[cblk].connections[1] === dblk;
-                        case "meter":
-                            this._check_meter_block = cblk;
-                        // eslint-disable-next-line no-fallthrough
-                        case "setbpm2":
-                        case "setmasterbpm2":
-                        case "stuplet":
-                        case "rhythm2":
-                        case "newswing2":
-                        case "vibrato":
-                        case "neighbor":
-                        case "neighbor2":
-                            return this.blocks.blockList[cblk].connections[2] === dblk;
-                        default:
-                            return false;
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Gets the value of the number block being used as a note value.
-     * @private
-     * @returns {number} - The value of the number block being used as a note value.
-     */
-    _noteValueValue() {
-        // Return the number block value being used as a note value
-        // denominator argument.
-        const dblk = this.connections[0];
-        // We are connected to a divide block.
-        // Is the divide block connected to a note value block?
-        let cblk = this.blocks.blockList[dblk].connections[0];
-        if (cblk !== null) {
-            // Is it the first or second arg?
-            switch (this.blocks.blockList[cblk].name) {
-                case "newnote":
-                case "pickup":
-                case "tuplet4":
-                case "newstaccato":
-                case "newslur":
-                case "elapsednotes2":
-                    if (this.blocks.blockList[cblk].connections[1] === dblk) {
-                        cblk = this.blocks.blockList[dblk].connections[2];
-                        return this.blocks.blockList[cblk].value;
-                    } else {
-                        return 1;
-                    }
-                case "meter":
-                    this._check_meter_block = cblk;
-                // eslint-disable-next-line no-fallthrough
-                case "setbpm2":
-                case "setmasterbpm2":
-                case "stuplet":
-                case "rhythm2":
-                case "newswing2":
-                case "vibrato":
-                case "neighbor":
-                case "neighbor2":
-                    if (this.blocks.blockList[cblk].connections[2] === dblk) {
-                        if (this.blocks.blockList[cblk].connections[1] === dblk) {
-                            cblk = this.blocks.blockList[dblk].connections[2];
-                            return this.blocks.blockList[cblk].value;
-                        } else {
-                            return 1;
-                        }
-                    } else {
-                        return 1;
-                    }
-                default:
-                    return 1;
-            }
-        }
-
-        return 1;
-    }
-
-    /**
      * Checks and reinitializes widget windows if their labels are changed.
      * @param {boolean} closeInput - Flag indicating whether to close input.
      */
     _checkWidgets(closeInput) {
         // Detect if label is changed, then reinit widget windows
         // if they are open.
-        const thisBlock = this.blocks.blockList.indexOf(this);
+        const thisBlock = this.blockIndex;
         const topBlock = this.blocks.findTopBlock(thisBlock);
         const widgetTitle = document.getElementsByClassName("wftTitle");
         let lockInit = false;
@@ -4452,7 +4539,7 @@ class Block {
             const cblk1 = this.connections[0];
             let cblk2;
 
-            if (cblk1 !== null) {
+            if (cblk1 != null) {
                 cblk2 = this.blocks.blockList[cblk1].connections[0];
             } else {
                 cblk2 = null;
@@ -4464,7 +4551,7 @@ class Block {
                 cblk2 !== null &&
                 newValue < 0 &&
                 (this.blocks.blockList[cblk1].name === "newnote" ||
-                    this.blocks.blockList[cblk2].name == "newnote")
+                    this.blocks.blockList[cblk2].name === "newnote")
             ) {
                 this.label.value = 0;
                 this.value = 0;
@@ -4473,7 +4560,7 @@ class Block {
             }
 
             if (isNaN(this.value)) {
-                const thisBlock = this.blocks.blockList.indexOf(this);
+                const thisBlock = this.blockIndex;
                 this.activity.errorMsg(newValue + ": " + _("Not a number"), thisBlock);
                 this.activity.refreshCanvas();
                 this.value = oldValue;
@@ -4484,7 +4571,7 @@ class Block {
                 this.blocks.blockList[cblk1].name === "pitch" &&
                 (this.value > 8 || this.value < 1)
             ) {
-                const thisBlock = this.blocks.blockList.indexOf(this);
+                const thisBlock = this.blockIndex;
                 this.activity.errorMsg(_("Octave value must be between 1 and 8."), thisBlock);
                 this.activity.refreshCanvas();
                 this.label.value = oldValue;
@@ -4492,7 +4579,7 @@ class Block {
             }
 
             if (String(this.value).length > 10) {
-                const thisBlock = this.blocks.blockList.indexOf(this);
+                const thisBlock = this.blockIndex;
                 this.activity.errorMsg(_("Numbers can have at most 10 digits."), thisBlock);
                 this.activity.refreshCanvas();
                 this.label.value = oldValue;
@@ -4564,20 +4651,14 @@ class Block {
                     // Rename both do <- name and nameddo blocks.
                     this.blocks.renameDos(oldValue, newValue);
 
+                    // eslint-disable-next-line no-case-declarations
+                    const metadata = this.blocks.actionMetadata(c);
                     if (oldValue === _("action")) {
-                        this.blocks.newNameddoBlock(
-                            newValue,
-                            this.blocks.actionHasReturn(c),
-                            this.blocks.actionHasArgs(c)
-                        );
-                        this.blocks.setActionProtoVisiblity(false);
+                        this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
+                        this.blocks.setActionProtoVisibility(false);
                     }
 
-                    this.blocks.newNameddoBlock(
-                        newValue,
-                        this.blocks.actionHasReturn(c),
-                        this.blocks.actionHasArgs(c)
-                    );
+                    this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
                     // eslint-disable-next-line no-case-declarations
                     const blockPalette = this.blocks.palettes.dict["action"];
                     for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
@@ -4594,12 +4675,8 @@ class Block {
                     }
 
                     if (oldValue === _("action")) {
-                        this.blocks.newNameddoBlock(
-                            newValue,
-                            this.blocks.actionHasReturn(c),
-                            this.blocks.actionHasArgs(c)
-                        );
-                        this.blocks.setActionProtoVisiblity(false);
+                        this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
+                        this.blocks.setActionProtoVisibility(false);
                     }
                     this.blocks.renameNameddos(oldValue, newValue);
                     this.blocks.palettes.hide();
@@ -4610,10 +4687,7 @@ class Block {
                     // Check to see which connection we are using in
                     // cblock.  We only do something if blk is attached to
                     // the name connection (1).
-                    if (
-                        cblock.connections[1] === this.blocks.blockList.indexOf(this) &&
-                        closeInput
-                    ) {
+                    if (cblock.connections[1] === this.blockIndex && closeInput) {
                         // If the label was the name of a storein, update the
                         // associated box this.blocks and the palette buttons.
                         if (this.value !== "box") {
@@ -4660,30 +4734,6 @@ class Block {
         }
     }
 }
-
-/**
- * Set elements to an array; if element is string, then set element's id to element.
- * @public
- * @returns {Array|HTMLElement} - An array of elements or a single element.
- */
-const $ = () => {
-    const elements = new Array();
-
-    for (let i = 0; i < elements.length; i++) {
-        let element = elements[i];
-        if (typeof element === "string") {
-            element = docById(element);
-        }
-
-        if (elements.length === 1) {
-            return element;
-        }
-
-        elements.push(element);
-    }
-
-    return elements;
-};
 
 // Track mouse presence
 window.hasMouse = false;

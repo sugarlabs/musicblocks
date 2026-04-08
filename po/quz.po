@@ -1742,7 +1742,7 @@ msgstr ""
 #: planet/js/GlobalTag.js:48
 #. TRANS: On the Planet, we use labels to tag projects.
 #. TRANS: sensores
-msgid "Sensors"
+msgid "sensors"
 msgstr "musyapakuq"
 
 #: js/rubrics.js:532
@@ -1752,7 +1752,7 @@ msgstr "musyapakuq"
 #: planet/js/GlobalTag.js:46
 #. TRANS: On the Planet, we use labels to tag projects.
 #. TRANS: medios
-msgid "Media"
+msgid "media"
 msgstr "imayna llamk’anapaq"
 
 #: js/rubrics.js:533
@@ -2761,7 +2761,7 @@ msgstr ""
 
 #: js/turtledefs.js:587
 #. TRANS: Haga clic en este botón para expandir o contraer la barra de herramientas auxiliar.
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxiliary toolbar."
 msgstr ""
 
 #: js/turtledefs.js:593

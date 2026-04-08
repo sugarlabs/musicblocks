@@ -67,6 +67,33 @@ class ReflectionMatrix {
         this.code = "";
     }
 
+    escapeHTML(text) {
+        const escapeMap = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        };
+
+        return text.replace(/[&<>"']/g, char => escapeMap[char]);
+    }
+
+    sanitizeLinks(html) {
+        return html.replace(
+            /<a\s+[^>]*href\s*=\s*(['"]?)([^'">\s]+)\1/gi,
+            (match, quote, url) => {
+                const unsafeSchemes = /^(javascript|data|vbscript):/i;
+
+                if (unsafeSchemes.test(url.trim())) {
+                    return match.replace(url, "#");
+                }
+
+                return match;
+            }
+        );
+    }
+
     /**
      * Initializes the reflection widget.
      */
@@ -296,7 +323,6 @@ class ReflectionMatrix {
     async updateProjectCode() {
         const code = await this.activity.prepareExport();
         if (code === this.code) {
-            console.log("No changes in code detected.");
             return; // No changes in code
         }
 
@@ -308,8 +334,6 @@ class ReflectionMatrix {
             if (data.algorithm !== "unchanged") {
                 this.projectAlgorithm = data.algorithm; // update algorithm
                 this.code = code;
-            } else {
-                console.log("No changes in algorithm detected.");
             }
             this.botReplyDiv(data, false, false);
         } else {
@@ -416,7 +440,6 @@ class ReflectionMatrix {
      */
     async generateAnalysis() {
         try {
-            console.log("Summary stored", this.summary);
             const response = await fetch(`${this.PORT}/analysis`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -443,7 +466,6 @@ class ReflectionMatrix {
         let reply;
         // check if message is from user or bot
         if (user_query === true) {
-            if (this.typingDiv) return;
             reply = await this.generateBotReply(
                 message,
                 this.chatHistory,
@@ -483,7 +505,10 @@ class ReflectionMatrix {
         const botReply = document.createElement("div");
 
         if (md) {
-            botReply.innerHTML = this.mdToHTML(reply.response);
+            const safeText = this.escapeHTML(reply.response);
+            let html = this.mdToHTML(safeText);
+            html = this.sanitizeLinks(html);
+            botReply.innerHTML = html;
         } else {
             botReply.innerText = reply.response;
         }
@@ -502,6 +527,9 @@ class ReflectionMatrix {
     sendMessage() {
         const text = this.input.value.trim();
         if (text === "") return;
+
+        // Prevent sending while the bot is still processing a previous query
+        if (this.typingDiv) return;
         this.chatHistory.push({
             role: "user",
             content: text
@@ -575,8 +603,11 @@ class ReflectionMatrix {
      */
     saveReport(data) {
         const key = "musicblocks_analysis";
-        localStorage.setItem(key, data.response);
-        console.log("Conversation saved in localStorage.");
+        try {
+            localStorage.setItem(key, data.response);
+        } catch (e) {
+            console.warn("Could not save analysis report to localStorage:", e);
+        }
     }
 
     /** Reads the analysis report from localStorage.
@@ -616,12 +647,75 @@ class ReflectionMatrix {
     }
 
     /**
+     * Escapes HTML special characters to prevent XSS attacks.
+     * @param {string} text - The text to escape.
+     * @returns {string} - The escaped text.
+     */
+    escapeHTML(text) {
+        const escapeMap = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#x27;"
+        };
+        return text.replace(/[&<>"']/g, char => escapeMap[char]);
+    }
+
+    /**
+     * Sanitizes HTML content using DOMParser to prevent XSS.
+     * Removes unsafe attributes and ensures links are safe.
+     * @param {string} htmlString - The HTML string to sanitize.
+     * @returns {string} - The sanitized HTML string.
+     */
+    sanitizeHTML(htmlString) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlString, "text/html");
+
+        // Sanitize links
+        const links = doc.getElementsByTagName("a");
+        for (let i = 0; i < links.length; i++) {
+            const link = links[i];
+            const href = link.getAttribute("href");
+
+            // If no href, or it's unsafe, remove the attribute
+            if (!href || this.isUnsafeUrl(href)) {
+                link.removeAttribute("href");
+            } else {
+                // Enforce security attributes for external links
+                link.setAttribute("target", "_blank");
+                link.setAttribute("rel", "noopener noreferrer");
+            }
+        }
+
+        return doc.body.innerHTML;
+    }
+
+    /**
+     * Checks if a URL is unsafe (javascript:, data:, vbscript:).
+     * @param {string} url - The URL to check.
+     * @returns {boolean} - True if unsafe, false otherwise.
+     */
+    isUnsafeUrl(url) {
+        const trimmed = url.trim().toLowerCase();
+        const unsafeSchemes = ["javascript:", "data:", "vbscript:"];
+        // Check if it starts with any unsafe scheme
+        // Note: DOMParser handles HTML entity decoding, so we check the raw attribute safely here
+        // But for extra safety against control characters, we rely on the fact that
+        // we are operating on the parsed DOM attribute.
+        return unsafeSchemes.some(scheme => trimmed.replace(/\s+/g, "").startsWith(scheme));
+    }
+
+    /**
      * Converts Markdown text to HTML.
      * @param {string} md - The Markdown text.
      * @returns {string} - The converted HTML text.
      */
     mdToHTML(md) {
-        let html = md;
+        // Step 1: Escape HTML first to prevent XSS attacks from raw tags
+        let html = this.escapeHTML(md);
+
+        // Step 2: Convert Markdown syntax to HTML
 
         // Headings
         html = html.replace(/^###### (.*$)/gim, "<h6>$1</h6>");
@@ -635,12 +729,13 @@ class ReflectionMatrix {
         html = html.replace(/\*\*(.*?)\*\*/gim, "<b>$1</b>");
         html = html.replace(/\*(.*?)\*/gim, "<i>$1</i>");
 
-        // Links
-        html = html.replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2' target='_blank'>$1</a>");
+        // Links - Create raw anchor tags, sanitization happens in Step 3
+        html = html.replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2'>$1</a>");
 
         // Line breaks
         html = html.replace(/\n/gim, "<br>");
 
-        return html.trim();
+        // Step 3: Sanitize the generated HTML using DOMParser
+        return this.sanitizeHTML(html);
     }
 }

@@ -12,9 +12,9 @@
 /*
    globals
 
-   jQuery, PALETTEICONS, PALETTEFILLCOLORS, PALETTESTROKECOLORS,
+   PALETTEICONS, PALETTEFILLCOLORS, PALETTESTROKECOLORS,
    PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS, MULTIPALETTES,
-   platformColor
+   platformColor, base64Encode, i18next, createjs
 */
 
 /*
@@ -31,7 +31,7 @@
 /* exported
 
    canvasPixelRatio, changeImage, closeBlkWidgets, closeWidgets,
-   delayExecution, displayMsg, doBrowserCheck, docByClass, docByName,
+   deepClone, delayExecution, displayMsg, doBrowserCheck, docByClass, docByName,
    docBySelector, docByTagName, doPublish, doStopVideoCam, doSVG,
    doUseCamera, fileBasename, fileExt, format, getTextWidth, hex2rgb,
    hexToRGB, hideDOMLabel, httpGet, httpPost, HttpRequest,
@@ -39,7 +39,7 @@
    oneHundredToFraction, prepareMacroExports, preparePluginExports,
    processMacroData, processRawPluginData, rationalSum, rgbToHex,
    safeSVG, toFixed2, toTitleCase, windowHeight, windowWidth,
-   fnBrowserDetect
+    fnBrowserDetect, waitForReadiness
 */
 
 /**
@@ -64,6 +64,7 @@ const changeImage = (imgElement, from, to) => {
  * @param {string} text - The input text to be translated.
  * @returns {string} The translated text.
  */
+
 function _(text, options = {}) {
     if (!text) return "";
 
@@ -136,14 +137,13 @@ let format = (str, data) => {
         let x = data;
         name.split(".").forEach(v => {
             if (x === undefined) {
-                // eslint-disable-next-line no-console
                 console.debug("Undefined value in template string", str, name, x, v);
             }
 
             x = x[v];
         });
 
-        return x;
+        return x === undefined ? "" : x;
     });
 
     return str.replace(/{_([a-zA-Z0-9]+)}/g, (match, item) => {
@@ -224,43 +224,48 @@ function windowWidth() {
 
 /**
  * Performs an HTTP GET request to retrieve data from the server.
+ * Uses async fetch to avoid blocking the UI during network requests.
  * @param {string|null} projectName - The name of the project (or null for the base URL).
- * @throws {string} Throws an error if the HTTP status code is greater than 299.
- * @returns {string} The response text from the server.
+ * @throws {Error} Throws an error if the HTTP status code is greater than 299.
+ * @returns {Promise<string>} A promise that resolves to the response text from the server.
  */
-let httpGet = projectName => {
-    let xmlHttp = null;
-    xmlHttp = new XMLHttpRequest();
-    if (projectName === null) {
-        xmlHttp.open("GET", window.server, false);
-        xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
-    } else {
-        xmlHttp.open("GET", window.server + projectName, false);
-        xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
+let httpGet = async projectName => {
+    const url = projectName === null ? window.server : window.server + projectName;
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+            "x-api-key": "3tgTzMXbbw6xEKX7"
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error("Error from server");
     }
 
-    xmlHttp.send();
-    if (xmlHttp.status > 299) {
-        throw "Error from server";
-    }
-
-    return xmlHttp.responseText;
+    return response.text();
 };
 
 /**
  * Performs an HTTP POST request to send data to the server.
+ * Uses async fetch to avoid blocking the UI during network requests.
  * @param {string} projectName - The name of the project.
  * @param {string} data - The data to be sent in the POST request.
- * @returns {string} The response text from the server.
+ * @returns {Promise<string>} A promise that resolves to the response text from the server.
  */
-let httpPost = (projectName, data) => {
-    let xmlHttp = null;
-    xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("POST", window.server + projectName, false);
-    xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
-    xmlHttp.send(data);
-    return xmlHttp.responseText;
-    // return 'https://apps.facebook.com/turtleblocks/?file=' + projectName;
+let httpPost = async (projectName, data) => {
+    const response = await fetch(window.server + projectName, {
+        method: "POST",
+        headers: {
+            "x-api-key": "3tgTzMXbbw6xEKX7"
+        },
+        body: data
+    });
+
+    if (!response.ok) {
+        throw new Error("Error from server");
+    }
+
+    return response.text();
 };
 
 /**
@@ -289,9 +294,8 @@ function HttpRequest(url, loadCallback, userCallback) {
         req.send("");
     } catch (e) {
         if (self.console) {
-            // eslint-disable-next-line no-console
             console.debug("Failed to load resource from " + url + ": Network error.");
-            // eslint-disable-next-line no-console
+
             console.debug(e);
         }
 
@@ -341,6 +345,68 @@ function doBrowserCheck() {
     }
 
     jQuery.browser = browser;
+}
+
+/**
+ * Wait for critical dependencies to be ready before calling callback.
+ * Uses polling with exponential backoff and maximum timeout.
+ * This replaces the arbitrary 5-second delay for Firefox with actual readiness checks.
+ *
+ * @param {Function} callback - The function to call when ready
+ * @param {Object} options - Configuration options
+ * @param {number} options.maxWait - Maximum wait time in ms (default: 10000)
+ * @param {number} options.minWait - Minimum wait time in ms (default: 500)
+ * @param {number} options.checkInterval - Initial check interval in ms (default: 100)
+ */
+function waitForReadiness(callback, options = {}) {
+    const { maxWait = 10000, minWait = 500, checkInterval = 100 } = options;
+    const startTime = Date.now();
+
+    /**
+     * Check if critical dependencies and DOM elements are ready
+     * @returns {boolean} True if all critical dependencies are loaded
+     */
+    const isReady = () => {
+        // Check if critical JavaScript libraries are loaded
+        const createjsLoaded = typeof createjs !== "undefined" && createjs.Stage;
+        const howlerLoaded = typeof Howler !== "undefined";
+        const jqueryLoaded = typeof jQuery !== "undefined";
+
+        // Check if critical DOM elements exist
+        const canvas = document.getElementById("myCanvas");
+        const loader = document.getElementById("loader");
+        const toolbars = document.getElementById("toolbars");
+        const domReady = canvas && loader && toolbars;
+
+        return createjsLoaded && howlerLoaded && jqueryLoaded && domReady;
+    };
+
+    /**
+     * Polling function that checks readiness and calls callback when ready
+     */
+    const check = () => {
+        const elapsed = Date.now() - startTime;
+
+        if (elapsed >= minWait && isReady()) {
+            // Ready! Initialize the app
+
+            console.log(`[Firefox] Initialized in ${elapsed}ms (readiness-based)`);
+            callback();
+        } else if (elapsed >= maxWait) {
+            // Timeout - initialize anyway as fallback
+
+            console.warn(
+                `[Firefox] Initialization timed out after ${maxWait}ms, proceeding anyway`
+            );
+            callback();
+        } else {
+            // Not ready yet, check again on next animation frame
+            requestAnimationFrame(check);
+        }
+    };
+
+    // Start the readiness check loop
+    requestAnimationFrame(check);
 }
 
 // Check for Internet Explorer
@@ -454,6 +520,20 @@ let last = myList => {
 };
 
 /**
+ * Creates a deep clone of a value. Uses structuredClone when available
+ * (modern browsers) for better performance, falling back to
+ * JSON.parse(JSON.stringify()) for compatibility with test environments.
+ * @param {*} value - The value to deep clone.
+ * @returns {*} A deep clone of the value.
+ */
+let deepClone = value => {
+    if (typeof structuredClone === "function") {
+        return structuredClone(value);
+    }
+    return JSON.parse(JSON.stringify(value));
+};
+
+/**
  * Gets the width of a text string given a specific font.
  * @param {string} text - The text string.
  * @param {string} font - The font style and size.
@@ -562,12 +642,18 @@ let fileBasename = file => {
  * @param {string} str - The input string.
  * @returns {string} The string with the first character in uppercase.
  */
-let toTitleCase = str => {
+function toTitleCase(str) {
     if (typeof str !== "string") return;
-    let tempStr = "";
-    if (str.length > 1) tempStr = str.substring(1);
-    return str.toUpperCase()[0] + tempStr;
-};
+    if (str.length === 0) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports.toTitleCase = toTitleCase;
+}
+if (typeof window !== "undefined") {
+    window.toTitleCase = toTitleCase;
+}
 
 /**
  * Processes plugin data and updates the activity based on the provided JSON-encoded dictionary.
@@ -581,50 +667,69 @@ const processPluginData = (activity, pluginData, pluginSource) => {
         return null;
     }
 
-    const isTrustedPluginSource = src => {
-        if (!src) return false;
-
-        // allow only local paths
-        return (
-            src.startsWith("./") ||
-            src.startsWith("../") ||
-            src.startsWith("/") ||
-            (!src.includes("http://") && !src.includes("https://"))
-        );
+    const isVettedPlugin = source => {
+        if (!source) return false;
+        // Plugins from the local plugins folder are considered vetted (provenance)
+        if (source.startsWith("plugins/") || source.startsWith("./plugins/")) {
+            return true;
+        }
+        // Known plugins from local storage are also trusted as they were approved previously
+        if (source === "localStorage:plugins") {
+            return true;
+        }
+        return false;
     };
 
-    const safeEval = (code, label = "plugin") => {
-        if (typeof code !== "string") return;
+    // Use the vetted check to determine initial trust
+    let userConfirmed = isVettedPlugin(pluginSource);
 
-        // basic sanity limit (prevents huge payloads)
+    if (!userConfirmed) {
+        userConfirmed = confirm(
+            _("Security Warning") +
+                "\n\n" +
+                _(
+                    "This plugin contains code that will be executed in your browser. It has not been loaded from the built-in plugins directory and may contain unsafe code."
+                ) +
+                "\n\n" +
+                _("Do you want to allow this plugin to run?") +
+                "\n\n" +
+                _("Source: ") +
+                (pluginSource || _("unknown"))
+        );
+
+        if (!userConfirmed) {
+            console.warn("User declined unvetted plugin execution:", pluginSource);
+            return null;
+        }
+    }
+
+    // safeEval is now restricted to vetted or confirmed plugins and used only for setup logic.
+    // Hot-path execution is handled via safePluginExecute in logo.js.
+    const safeEval = (code, label = "plugin") => {
+        if (typeof code !== "string" || !userConfirmed) return;
+
+        // Basic sanity limit
         if (code.length > 500000) {
-            // eslint-disable-next-line no-console
             console.warn("Plugin code too large:", label);
             return;
         }
 
         try {
-            // eslint-disable-next-line no-eval
-            eval(code);
+            // We use new Function for setup-time evaluation of trusted logic.
+            // This is safer than eval() as it doesn't grant access to the local scope.
+            const setupFn = new Function("activity", "globalActivity", code);
+            setupFn(activity, activity);
         } catch (e) {
-            // eslint-disable-next-line no-console
-            console.error("Plugin execution failed:", label, e);
+            console.error("Plugin setup failed:", label, e);
         }
     };
-
-    if (!isTrustedPluginSource(pluginSource)) {
-        // eslint-disable-next-line no-console
-        console.warn("Blocked untrusted plugin source:", pluginSource);
-        return null;
-    }
 
     let obj;
     try {
         obj = JSON.parse(pluginData);
     } catch (e) {
-        // eslint-disable-next-line no-console
         console.log(pluginData);
-        // eslint-disable-next-line no-console
+
         console.log(e);
         return null;
     }
@@ -679,10 +784,8 @@ const processPluginData = (activity, pluginData, pluginSource) => {
             ];
 
             if (name in activity.palettes.buttons) {
-                // eslint-disable-next-line no-console
                 console.debug("palette " + name + " already exists");
             } else {
-                // eslint-disable-next-line no-console
                 console.debug("adding palette " + name);
                 activity.palettes.add(name);
                 if (!MULTIPALETTES[2].includes(name)) MULTIPALETTES[2].push(name);
@@ -696,7 +799,6 @@ const processPluginData = (activity, pluginData, pluginSource) => {
             // console.debug("Calling makePalettes");
             activity.palettes.makePalettes(1);
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.debug("makePalettes: " + e);
         }
     }
@@ -709,18 +811,55 @@ const processPluginData = (activity, pluginData, pluginSource) => {
     }
 
     // Populate the flow-block dictionary, i.e., the code that is
-    // eval'd by this block.
+    // compiled into a function for hot-path execution.
     if ("FLOWPLUGINS" in obj) {
         for (const flow in obj["FLOWPLUGINS"]) {
-            activity.logo.evalFlowDict[flow] = obj["FLOWPLUGINS"][flow];
+            try {
+                // Pre-compile trusted plugins for performance.
+                // UNTRUSTED plugins (if any made it past confirmation) are stored as strings
+                // and handled via whitelist in safePluginExecute.
+                if (isVettedPlugin(pluginSource)) {
+                    activity.logo.evalFlowDict[flow] = new Function(
+                        "logo",
+                        "turtle",
+                        "blk",
+                        "receivedArg",
+                        "actionArgs",
+                        "args",
+                        "isflow",
+                        obj["FLOWPLUGINS"][flow]
+                    );
+                } else {
+                    activity.logo.evalFlowDict[flow] = obj["FLOWPLUGINS"][flow];
+                }
+            } catch (e) {
+                console.error("Failed to compile FLOWPLUGIN:", flow, e);
+                activity.logo.evalFlowDict[flow] = null;
+            }
         }
     }
 
-    // Populate the arg-block dictionary, i.e., the code that is
-    // eval'd by this block.
+    // Populate the arg-block dictionary
     if ("ARGPLUGINS" in obj) {
         for (const arg in obj["ARGPLUGINS"]) {
-            activity.logo.evalArgDict[arg] = obj["ARGPLUGINS"][arg];
+            try {
+                if (isVettedPlugin(pluginSource)) {
+                    activity.logo.evalArgDict[arg] = new Function(
+                        "logo",
+                        "turtle",
+                        "blk",
+                        "parentBlk",
+                        "receivedArg",
+                        "tur",
+                        obj["ARGPLUGINS"][arg]
+                    );
+                } else {
+                    activity.logo.evalArgDict[arg] = obj["ARGPLUGINS"][arg];
+                }
+            } catch (e) {
+                console.error("Failed to compile ARGPLUGIN:", arg, e);
+                activity.logo.evalArgDict[arg] = null;
+            }
         }
     }
 
@@ -731,19 +870,32 @@ const processPluginData = (activity, pluginData, pluginSource) => {
             try {
                 activity.palettes.pluginMacros[macro] = JSON.parse(obj["MACROPLUGINS"][macro]);
             } catch (e) {
-                // eslint-disable-next-line no-console
                 console.debug("could not parse macro " + macro);
-                // eslint-disable-next-line no-console
+
                 console.debug(e);
             }
         }
     }
 
-    // Populate the setter dictionary, i.e., the code that is
-    // used to set a value block.
+    // Populate the setter dictionary
     if ("SETTERPLUGINS" in obj) {
         for (const setter in obj["SETTERPLUGINS"]) {
-            activity.logo.evalSetterDict[setter] = obj["SETTERPLUGINS"][setter];
+            try {
+                if (isVettedPlugin(pluginSource)) {
+                    activity.logo.evalSetterDict[setter] = new Function(
+                        "logo",
+                        "blk",
+                        "value",
+                        "turtle",
+                        obj["SETTERPLUGINS"][setter]
+                    );
+                } else {
+                    activity.logo.evalSetterDict[setter] = obj["SETTERPLUGINS"][setter];
+                }
+            } catch (e) {
+                console.error("Failed to compile SETTERPLUGIN:", setter, e);
+                activity.logo.evalSetterDict[setter] = null;
+            }
         }
     }
 
@@ -755,7 +907,6 @@ const processPluginData = (activity, pluginData, pluginSource) => {
 
     if ("BLOCKPLUGINS" in obj) {
         for (const block in obj["BLOCKPLUGINS"]) {
-            // eslint-disable-next-line no-console
             console.debug("adding plugin block " + block);
             safeEval(obj["BLOCKPLUGINS"][block], "BLOCKPLUGINS:" + block);
         }
@@ -768,7 +919,21 @@ const processPluginData = (activity, pluginData, pluginSource) => {
 
     if ("PARAMETERPLUGINS" in obj) {
         for (const parameter in obj["PARAMETERPLUGINS"]) {
-            activity.logo.evalParameterDict[parameter] = obj["PARAMETERPLUGINS"][parameter];
+            try {
+                if (isVettedPlugin(pluginSource)) {
+                    activity.logo.evalParameterDict[parameter] = new Function(
+                        "logo",
+                        "turtle",
+                        "blk",
+                        obj["PARAMETERPLUGINS"][parameter]
+                    );
+                } else {
+                    activity.logo.evalParameterDict[parameter] = obj["PARAMETERPLUGINS"][parameter];
+                }
+            } catch (e) {
+                console.error("Failed to compile PARAMETERPLUGIN:", parameter, e);
+                activity.logo.evalParameterDict[parameter] = null;
+            }
         }
     }
 
@@ -782,14 +947,26 @@ const processPluginData = (activity, pluginData, pluginSource) => {
     // Code to execute when turtle code is started
     if ("ONSTART" in obj) {
         for (const arg in obj["ONSTART"]) {
-            activity.logo.evalOnStartList[arg] = obj["ONSTART"][arg];
+            try {
+                // SECURITY: Plugins are trusted code.
+                activity.logo.evalOnStartList[arg] = new Function("logo", obj["ONSTART"][arg]);
+            } catch (e) {
+                console.error("Failed to compile ONSTART plugin:", arg, e);
+                activity.logo.evalOnStartList[arg] = null;
+            }
         }
     }
 
     // Code to execute when turtle code is stopped
     if ("ONSTOP" in obj) {
         for (const arg in obj["ONSTOP"]) {
-            activity.logo.evalOnStopList[arg] = obj["ONSTOP"][arg];
+            try {
+                // SECURITY: Plugins are trusted code.
+                activity.logo.evalOnStopList[arg] = new Function("logo", obj["ONSTOP"][arg]);
+            } catch (e) {
+                console.error("Failed to compile ONSTOP plugin:", arg, e);
+                activity.logo.evalOnStopList[arg] = null;
+            }
         }
     }
 
@@ -797,10 +974,8 @@ const processPluginData = (activity, pluginData, pluginSource) => {
         try {
             // Push the protoblocks onto their palettes.
             if (activity.blocks.protoBlockDict[protoblock].palette === undefined) {
-                // eslint-disable-next-line no-console
                 console.debug("Cannot find palette for protoblock " + protoblock);
             } else if (activity.blocks.protoBlockDict[protoblock].palette === null) {
-                // eslint-disable-next-line no-console
                 console.debug("Cannot find palette for protoblock " + protoblock);
             } else {
                 activity.blocks.protoBlockDict[protoblock].palette.add(
@@ -808,7 +983,6 @@ const processPluginData = (activity, pluginData, pluginSource) => {
                 );
             }
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.debug(e);
         }
     }
@@ -857,9 +1031,9 @@ const processRawPluginData = (activity, rawData, pluginSource) => {
         obj = processPluginData(activity, cleanData.replace(/\n/g, ""), pluginSource);
     } catch (e) {
         obj = null;
-        // eslint-disable-next-line no-console
+
         console.log(rawData);
-        // eslint-disable-next-line no-console
+
         console.log(cleanData);
         activity.errorMsg("Error loading plugin: " + e);
     }
@@ -970,9 +1144,8 @@ let processMacroData = (macroData, palettes, blocks, macroDict) => {
 
             palettes.makePalettes(1);
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.log(macroData);
-            // eslint-disable-next-line no-console
+
             console.debug(e);
         }
     }
@@ -993,9 +1166,21 @@ let prepareMacroExports = (name, stack, macroDict) => {
     return JSON.stringify(macroDict);
 };
 
-// Some block-specific code
-// TODO: Move to camera plugin
-let hasSetupCamera = false;
+// Camera functionality module
+// Encapsulates camera-related operations for video/image capture
+const CameraManager = {
+    isSetup: false,
+    canPlayHandler: null,
+    intervalId: null,
+
+    /**
+     * Resets the camera setup state
+     */
+    reset() {
+        this.isSetup = false;
+    }
+};
+
 /**
  * Uses the camera to capture images or video frames and displays them on the turtle's canvas.
  * @param {Array} args - Arguments passed to the function.
@@ -1013,74 +1198,85 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
     let streaming = false;
     const video = document.querySelector("#camVideo");
     const canvas = document.querySelector("#camCanvas");
-    navigator.getMedia =
-        navigator.getUserMedia ||
-        navigator.mozGetUserMedia ||
-        navigator.webkitGetUserMedia ||
-        navigator.msGetUserMedia;
-    if (navigator.getMedia === undefined) {
-        errorMsg("Your browser does not support the webcam");
+    const context = canvas.getContext("2d");
+
+    if (canvas.width !== w) {
+        canvas.width = w;
+    }
+    if (canvas.height !== h) {
+        canvas.height = h;
     }
 
     function draw() {
-        canvas.width = w;
-        canvas.height = h;
-        canvas.getContext("2d").drawImage(video, 0, 0, w, h);
+        context.drawImage(video, 0, 0, w, h);
         const data = canvas.toDataURL("image/png");
         turtles.getTurtle(turtle).doShowImage(args[0], data);
     }
 
-    if (!hasSetupCamera) {
-        navigator.getMedia(
-            { video: true, audio: false },
-            stream => {
-                if (navigator.mozGetUserMedia) {
-                    video.mozSrcObject = stream;
-                } else {
-                    video.srcObject = stream;
-                }
+    if (!CameraManager.isSetup) {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            errorMsg("Your browser does not support the webcam");
+            return;
+        }
 
+        navigator.mediaDevices
+            .getUserMedia({ video: true, audio: false })
+            .then(stream => {
+                video.srcObject = stream;
                 video.play();
-                hasSetupCamera = true;
-            },
-            error => {
+                CameraManager.isSetup = true;
+            })
+            .catch(error => {
                 errorMsg("Could not connect to camera");
-                // eslint-disable-next-line no-console
+
                 console.debug(error);
-            }
-        );
+            });
     } else {
         streaming = true;
         video.play();
         if (isVideo) {
+            if (CameraManager.intervalId !== null) {
+                window.clearInterval(CameraManager.intervalId);
+                CameraManager.intervalId = null;
+            }
             cameraID = window.setInterval(draw, 100);
+            CameraManager.intervalId = cameraID;
             setCameraID(cameraID);
         } else {
             draw();
         }
     }
 
-    video.addEventListener(
-        "canplay",
-        () => {
-            // console.debug("canplay", streaming, hasSetupCamera);
-            if (!streaming) {
-                video.setAttribute("width", w);
-                video.setAttribute("height", h);
-                canvas.setAttribute("width", w);
-                canvas.setAttribute("height", h);
-                streaming = true;
+    if (CameraManager.canPlayHandler) {
+        video.removeEventListener("canplay", CameraManager.canPlayHandler, false);
+    }
 
-                if (isVideo) {
-                    cameraID = window.setInterval(draw, 100);
-                    setCameraID(cameraID);
-                } else {
-                    draw();
+    function handleCanPlay() {
+        // console.debug("canplay", streaming, CameraManager.isSetup);
+        if (!streaming) {
+            video.setAttribute("width", w);
+            video.setAttribute("height", h);
+            canvas.setAttribute("width", w);
+            canvas.setAttribute("height", h);
+            streaming = true;
+
+            if (isVideo) {
+                if (CameraManager.intervalId !== null) {
+                    window.clearInterval(CameraManager.intervalId);
+                    CameraManager.intervalId = null;
                 }
+                cameraID = window.setInterval(draw, 100);
+                CameraManager.intervalId = cameraID;
+                setCameraID(cameraID);
+            } else {
+                draw();
             }
-        },
-        false
-    );
+        }
+    }
+
+    CameraManager.canPlayHandler = handleCanPlay;
+
+    video.addEventListener("canplay", CameraManager.canPlayHandler, false);
 };
 
 /**
@@ -1139,7 +1335,7 @@ function displayMsg(/*blocks, text*/) {
  */
 function safeSVG(label) {
     if (typeof label === "string") {
-        return label.replace(/&/, "&amp;").replace(/</, "&lt;").replace(/>/, "&gt;");
+        return label.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     } else {
         return label;
     }
@@ -1295,11 +1491,25 @@ const LCD = (a, b) => {
 
 /**
  * Adds two rational numbers represented as arrays [numerator, denominator].
+ *
+ * This helper is used internally where rational arithmetic is required
+ * to avoid floating-point precision issues (e.g., turtle singer logic).
+ *
  * @param {Array} a - The first rational number.
  * @param {Array} b - The second rational number.
  * @returns {Array} The sum of the two rational numbers in the form [numerator, denominator].
  */
 let rationalSum = (a, b) => {
+    if (
+        !Array.isArray(a) || a.length < 2 ||
+        !Array.isArray(b) || b.length < 2 ||
+        typeof a[0] !== "number" || typeof a[1] !== "number" ||
+        typeof b[0] !== "number" || typeof b[1] !== "number" ||
+        a[1] === 0 || b[1] === 0
+    ) {
+        console.warn("Invalid input passed to rationalSum:", a, b);
+        return [0, 1];
+    }
     if (a === 0 || b === 0) {
         // console.debug("divide by zero?");
         return [0, 1];
@@ -1330,16 +1540,15 @@ let rationalSum = (a, b) => {
     } else {
         objb1 = [b[1], 1];
     }
-
-    a[0] = obja0[0] * obja1[1];
-    a[1] = obja0[1] * obja1[0];
-    b[0] = objb0[0] * objb1[1];
-    b[1] = objb0[1] * objb1[0];
+    // Use local variables to avoid mutating the caller's arrays
+    const a0 = obja0[0] * obja1[1];
+    const a1 = obja0[1] * obja1[0];
+    const b0 = objb0[0] * objb1[1];
+    const b1 = objb0[1] * objb1[0];
 
     // Find the least common denomenator
-    const lcd = LCD(a[1], b[1]);
-    // const c0 = (a[0] * lcd) / a[1] + (b[0] * lcd) / b[1];
-    return [(a[0] * lcd) / a[1] + (b[0] * lcd) / b[1], lcd];
+    const lcd = LCD(a1, b1);
+    return [(a0 * lcd) / a1 + (b0 * lcd) / b1, lcd];
 };
 
 /**
@@ -1595,6 +1804,32 @@ let closeBlkWidgets = name => {
 };
 
 /**
+ * Safely resolves a dot-notation string path to an object property globally.
+ * @param {string} path - The dot-notation path (e.g., "MyClass.Model").
+ * @returns {Object|undefined} The resolved object or undefined.
+ */
+const resolveObject = path => {
+    if (!path || typeof path !== "string") return undefined;
+
+    // Support both browser and Node.js environments
+    const globalObj = typeof window !== "undefined" ? window : global;
+
+    try {
+        const result = path.split(".").reduce((obj, prop) => {
+            if (obj === null || obj === undefined) {
+                return undefined;
+            }
+            return obj[prop];
+        }, globalObj);
+
+        return result;
+    } catch (e) {
+        console.warn("Failed to resolve object path: " + path, e);
+        return undefined;
+    }
+};
+
+/**
  * Imports methods and variables of model and view objects to the controller object.
  *
  * @param {Object} obj - The component object (controller) to which members of its model and view are imported.
@@ -1650,15 +1885,15 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
     const cname = obj.constructor.name; // class name of component object
 
     if (className !== "" && className !== undefined) {
-        addMembers(obj, eval(className));
+        addMembers(obj, resolveObject(className));
         return;
     }
 
     // Add members of Model (class type has to be controller's name + "Model")
-    addMembers(obj, eval(cname + "." + cname + "Model"), modelArgs);
+    addMembers(obj, resolveObject(cname + "." + cname + "Model"), modelArgs);
 
     // Add members of View (class type has to be controller's name + "View")
-    addMembers(obj, eval(cname + "." + cname + "View"), viewArgs);
+    addMembers(obj, resolveObject(cname + "." + cname + "View"), viewArgs);
 };
 
 if (typeof module !== "undefined" && module.exports) {
@@ -1674,8 +1909,15 @@ if (typeof module !== "undefined" && module.exports) {
         nearestBeat,
         oneHundredToFraction,
         rationalToFraction,
+        rationalSum,
         rgbToHex,
         hexToRGB,
-        hex2rgb
+        hex2rgb,
+        format,
+        delayExecution,
+        closeWidgets,
+        closeBlkWidgets,
+        resolveObject,
+        importMembers
     };
 }

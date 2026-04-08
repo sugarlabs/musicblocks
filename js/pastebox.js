@@ -84,7 +84,7 @@ class PasteBox {
     show() {
         this._container.visible = true;
         this.activity.refreshCanvas();
-        // this._paste.visibile = true;
+        // this._paste.visible = true;
         docById("paste").style.visibility = "visible";
     }
 
@@ -113,7 +113,7 @@ class PasteBox {
         let locked = false;
 
         this._container.on("click", event => {
-            // We need a lock to "debouce" the click.
+            // We need a lock to "debounce" the click.
             if (locked) {
                 // console.debug("debouncing click");
                 return;
@@ -127,7 +127,6 @@ class PasteBox {
 
             const x = event.stageX / this._scale - this._container.x;
             const y = event.stageY / this._scale - this._container.y;
-            console.log(x, y);
 
             if (x > 200 && x < 250 && y < 55) {
                 this.activity.pasted();

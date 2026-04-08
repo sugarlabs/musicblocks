@@ -72,7 +72,7 @@ function setupToneActions(activity) {
             }
 
             if (!accounted && typeof instrument === "object") {
-                if (instrument[0] != "") {
+                if (instrument[0] !== "") {
                     synth = "customsample_" + instrument[0];
                     CUSTOMSAMPLES[synth] = [instrument[1], instrument[2], instrument[3]];
                 } else {
@@ -88,8 +88,10 @@ function setupToneActions(activity) {
                 activity.logo.phraseMaker._instrumentName = synth;
             }
 
+            let pushed = false;
             if (!tur.singer.instrumentNames.includes(synth)) {
                 tur.singer.instrumentNames.push(synth);
+                pushed = true;
                 activity.logo.synth.loadSynth(turtle, synth);
 
                 if (tur.singer.synthVolume[synth] === undefined) {
@@ -113,7 +115,9 @@ function setupToneActions(activity) {
 
             const __listener = () => {
                 tur.inSetTimbre = false;
-                tur.singer.instrumentNames.pop();
+                if (pushed) {
+                    tur.singer.instrumentNames.pop();
+                }
             };
 
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
@@ -159,9 +163,8 @@ function setupToneActions(activity) {
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
 
             if (activity.logo.inTimbre) {
-                instrumentsEffects[turtle][activity.logo.timbre.instrumentName][
-                    "vibratoActive"
-                ] = true;
+                instrumentsEffects[turtle][activity.logo.timbre.instrumentName]["vibratoActive"] =
+                    true;
                 activity.logo.timbre.vibratoEffect.push(blk);
                 activity.logo.timbre.vibratoParams.push(last(tur.singer.vibratoIntensity) * 100);
                 instrumentsEffects[turtle][activity.logo.timbre.instrumentName][
@@ -372,7 +375,7 @@ function setupToneActions(activity) {
         static defFMSynth(modulationIndex, turtle, blk) {
             if (activity.logo.inTimbre) {
                 activity.logo.timbre.FMSynthParams = [];
-                if (activity.logo.timbre.osc.length != 0) {
+                if (activity.logo.timbre.osc.length !== 0) {
                     activity.errorMsg(_("Unable to use synth due to existing oscillator"));
                 }
             }
@@ -411,7 +414,7 @@ function setupToneActions(activity) {
         static defAMSynth(harmonicity, turtle, blk) {
             if (activity.logo.inTimbre) {
                 activity.logo.timbre.AMSynthParams = [];
-                if (activity.logo.timbre.osc.length != 0) {
+                if (activity.logo.timbre.osc.length !== 0) {
                     activity.errorMsg(_("Unable to use synth due to existing oscillator"));
                 }
             }
@@ -450,7 +453,7 @@ function setupToneActions(activity) {
          */
         static defDuoSynth(synthVibratoRate, synthVibratoAmount, turtle, blk) {
             if (activity.logo.inTimbre) {
-                if (activity.logo.timbre.osc.length != 0) {
+                if (activity.logo.timbre.osc.length !== 0) {
                     activity.errorMsg(_("Unable to use synth due to existing oscillator"));
                 }
                 activity.logo.timbre.duoSynthParams = [];

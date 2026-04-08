@@ -718,8 +718,8 @@ can be used inside the _Pitch-time Matrix_ block.
 
 The _Set Drum_ block is used to map the enclosed pitches into drum
 sounds. Drum sounds are played in a monopitch using the specified drum
-sample. In the example above, a `kick drum` will be substitued for
-each occurance of a `Re` `4`.
+sample. In the example above, a `kick drum` will be substituted for
+each occurrence of a `Re` `4`.
 
 ![alt tag](./drum8.svg " ")
 

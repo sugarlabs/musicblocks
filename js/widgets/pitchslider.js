@@ -38,7 +38,7 @@ class PitchSlider {
     }
 
     /**
-     * Intializes the pitch/slider
+     * Initializes the pitch/slider
      * @returns {void}
      */
     init(activity) {
