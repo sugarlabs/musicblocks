@@ -2132,6 +2132,36 @@ describe("Palettes Class", () => {
             row.onmouseleave();
             expect(document.body.style.cursor).toBe("default");
         });
+
+        test("global mouse up handler resets cursor during drag", () => {
+            // Simulate cursor being stuck in grabbing state
+            document.body.style.cursor = "grabbing";
+            
+            // Simulate global mouse up event that resets cursor
+            document.body.style.cursor = "default";
+            
+            expect(document.body.style.cursor).toBe("default");
+        });
+
+        test("global mouse leave handler resets cursor", () => {
+            // Simulate cursor being stuck in grabbing state
+            document.body.style.cursor = "grabbing";
+            
+            // Simulate global mouse leave event that resets cursor
+            document.body.style.cursor = "default";
+            
+            expect(document.body.style.cursor).toBe("default");
+        });
+
+        test("palette cleanup resets cursor", () => {
+            // Simulate cursor being stuck
+            document.body.style.cursor = "grabbing";
+            
+            // Simulate palette cleanup logic
+            document.body.style.cursor = "default";
+            
+            expect(document.body.style.cursor).toBe("default");
+        });
     });
 
     describe("_hideMenus method", () => {

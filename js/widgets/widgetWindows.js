@@ -607,6 +607,10 @@ class WidgetWindow {
         if (this._docMouseDownHandler) {
             document.removeEventListener("mousedown", this._docMouseDownHandler, true);
         }
+        
+        // Reset cursor to default when widget is destroyed
+        document.body.style.cursor = "default";
+        
         if (this._frame && this._frame.parentElement) {
             this._frame.parentElement.removeChild(this._frame);
         }

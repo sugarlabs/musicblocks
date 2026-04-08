@@ -1292,6 +1292,7 @@ class Palette {
             this._outsideClickListener = null;
         }
         this._hideMenuItems();
+        this._cleanupCursorEvents();
     }
 
     showMenu(createHeader) {
@@ -1390,6 +1391,37 @@ class Palette {
             this.activity.hideSearchWidget(true);
         }
         if (docById("PaletteBody")) docById("palette").removeChild(docById("PaletteBody"));
+    }
+
+    _cleanupCursorEvents() {
+        // Reset global cursor
+        document.body.style.cursor = "default";
+
+        // Clean up global event listeners from palette list
+        const paletteList = docById("PaletteBody_items");
+        if (paletteList) {
+            if (paletteList._globalMouseUpHandler) {
+                document.removeEventListener('mouseup', paletteList._globalMouseUpHandler, true);
+                delete paletteList._globalMouseUpHandler;
+            }
+            if (paletteList._globalMouseLeaveHandler) {
+                document.removeEventListener('mouseleave', paletteList._globalMouseLeaveHandler, true);
+                delete paletteList._globalMouseLeaveHandler;
+            }
+        }
+
+        // Clean up global event listeners from block images
+        const images = document.querySelectorAll('#PaletteBody_items img');
+        images.forEach(img => {
+            if (img._globalMouseUpHandler) {
+                document.removeEventListener('mouseup', img._globalMouseUpHandler, true);
+                delete img._globalMouseUpHandler;
+            }
+            if (img._globalMouseLeaveHandler) {
+                document.removeEventListener('mouseleave', img._globalMouseLeaveHandler, true);
+                delete img._globalMouseLeaveHandler;
+            }
+        });
     }
 
     _showMenuItems() {
@@ -1491,6 +1523,25 @@ class Palette {
                     );
                 };
 
+                // Add global mouse up handler to catch drag end outside palette
+                const globalMouseUpHandler = event => {
+                    document.body.style.cursor = "default";
+                    document.removeEventListener("mousemove", onMouseMove);
+                    document.removeEventListener("touchmove", onMouseMove);
+                };
+
+                // Add global mouse leave handler to reset cursor when leaving window
+                const globalMouseLeaveHandler = () => {
+                    document.body.style.cursor = "default";
+                };
+
+                document.addEventListener('mouseup', globalMouseUpHandler, true);
+                document.addEventListener('mouseleave', globalMouseLeaveHandler, true);
+
+                // Store references for cleanup
+                img._globalMouseUpHandler = globalMouseUpHandler;
+                img._globalMouseLeaveHandler = globalMouseLeaveHandler;
+
                 img.ontouchend = up;
                 img.onmouseup = up;
             };
@@ -1531,6 +1582,23 @@ class Palette {
             paletteList.onmouseup = mouseUpGrab;
             paletteList.onmouseleave = mouseUpGrab;
         };
+
+        // Add global mouse up handler to catch drag end outside palette
+        const globalMouseUpHandler = () => {
+            document.body.style.cursor = "default";
+        };
+
+        // Add global mouse leave handler to reset cursor when leaving window
+        const globalMouseLeaveHandler = () => {
+            document.body.style.cursor = "default";
+        };
+
+        document.addEventListener('mouseup', globalMouseUpHandler, true);
+        document.addEventListener('mouseleave', globalMouseLeaveHandler, true);
+
+        // Store references for cleanup
+        paletteList._globalMouseUpHandler = globalMouseUpHandler;
+        paletteList._globalMouseLeaveHandler = globalMouseLeaveHandler;
 
         paletteList.onmousedown = mouseDownGrab;
     }
