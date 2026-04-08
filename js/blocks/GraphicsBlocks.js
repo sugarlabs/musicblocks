@@ -449,7 +449,7 @@ function setupGraphicsBlocks(activity) {
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
-                    tur.painter.doControlPoint2(args[0], args[1]);
+                    tur.painter.setControlPoint2(args);
                 }
             }
         }
@@ -500,7 +500,7 @@ function setupGraphicsBlocks(activity) {
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
-                    tur.painter.doControlPoint1(args[0], args[1]);
+                    tur.painter.setControlPoint1(args);
                 }
             }
         }

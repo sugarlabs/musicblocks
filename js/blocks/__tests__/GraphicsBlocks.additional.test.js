@@ -66,8 +66,8 @@ function buildSetup() {
             doArc: jest.fn(),
             doForward: jest.fn(),
             doRight: jest.fn(),
-            doControlPoint1: jest.fn(),
-            doControlPoint2: jest.fn(),
+            setControlPoint1: jest.fn(),
+            setControlPoint2: jest.fn(),
             penState: true,
             wrap: false
         },
@@ -231,18 +231,18 @@ describe("GraphicsBlocks — Additional Coverage", () => {
             expect(setup.activity.blocks.controlpoint1).toBeDefined();
         });
 
-        test("ControlPoint1Block flow calls doControlPoint1", () => {
+        test("ControlPoint1Block flow calls setControlPoint1", () => {
             const Block = setup.activity.blocks.controlpoint1;
             const block = new Block();
             block.flow([50, 60], setup.logo, setup.turtle, 1);
-            expect(setup.turtleObj.painter.doControlPoint1).toHaveBeenCalledWith(50, 60);
+            expect(setup.turtleObj.painter.setControlPoint1).toHaveBeenCalledWith([50, 60]);
         });
 
         test("ControlPoint1Block flow with zero values", () => {
             const Block = setup.activity.blocks.controlpoint1;
             const block = new Block();
             block.flow([0, 0], setup.logo, setup.turtle, 1);
-            expect(setup.turtleObj.painter.doControlPoint1).toHaveBeenCalledWith(0, 0);
+            expect(setup.turtleObj.painter.setControlPoint1).toHaveBeenCalledWith([0, 0]);
         });
     });
 
@@ -258,18 +258,18 @@ describe("GraphicsBlocks — Additional Coverage", () => {
             expect(setup.activity.blocks.controlpoint2).toBeDefined();
         });
 
-        test("ControlPoint2Block flow calls doControlPoint2", () => {
+        test("ControlPoint2Block flow calls setControlPoint2", () => {
             const Block = setup.activity.blocks.controlpoint2;
             const block = new Block();
             block.flow([70, 80], setup.logo, setup.turtle, 1);
-            expect(setup.turtleObj.painter.doControlPoint2).toHaveBeenCalledWith(70, 80);
+            expect(setup.turtleObj.painter.setControlPoint2).toHaveBeenCalledWith([70, 80]);
         });
 
         test("ControlPoint2Block flow with negative values", () => {
             const Block = setup.activity.blocks.controlpoint2;
             const block = new Block();
             block.flow([-30, -40], setup.logo, setup.turtle, 1);
-            expect(setup.turtleObj.painter.doControlPoint2).toHaveBeenCalledWith(-30, -40);
+            expect(setup.turtleObj.painter.setControlPoint2).toHaveBeenCalledWith([-30, -40]);
         });
     });
 
