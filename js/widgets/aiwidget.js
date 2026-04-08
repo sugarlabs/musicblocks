@@ -241,16 +241,18 @@ function AIWidget() {
 
     //function to search index for particular type of block mainly used to find nammeddo block in repeat block
     function searchIndexForMusicBlock(array, x) {
-        // Iterate over each sub-array in the main array
-        for (let i = 0; i < array.length; i++) {
-            // Check if the 0th element of the sub-array matches x
-            if (array[i][0] === x) {
-                // Return the index if a match is found
-                return i;
+        // Cache an index map on the array to convert O(n) array scanning
+        // into O(1) map lookups. Rebuild the map if the array length changes.
+        if (!array._indexMap || array.length !== array._indexMap.size) {
+            array._indexMap = new Map();
+            for (let i = 0; i < array.length; i++) {
+                if (array[i] && array[i][0] !== undefined) {
+                    array._indexMap.set(array[i][0], i);
+                }
             }
         }
-        // Return -1 if no match is found
-        return -1;
+        const index = array._indexMap.get(x);
+        return index !== undefined ? index : -1;
     }
 
     this._parseABC = async function (tune) {
@@ -687,11 +689,8 @@ function AIWidget() {
                 }
             }
 
-            const lineBlock = staffBlocksMap[staffIndex].baseBlocks.reduce(
-                (acc, curr) => acc.concat(curr),
-                []
-            );
-            const flattenedLineBlock = lineBlock.flat(); // Flatten the multidimensional array
+            // Flatten the multidimensional array (equivalent to flat(1) + flat(1))
+            const flattenedLineBlock = staffBlocksMap[staffIndex].baseBlocks.flat(2);
             const combinedBlock = [...staffBlocksMap[staffIndex].startBlock, ...flattenedLineBlock];
 
             finalBlock.push(...staffBlocksMap[staffIndex].startBlock);
