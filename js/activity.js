@@ -234,6 +234,8 @@ class Activity {
         }
 
         this._listeners = [];
+        this._idleWatcherIntervalId = null;
+        this._idleWatcherResetHandler = null;
 
         this.cellSize = 55;
         this.searchSuggestions = [];
@@ -3038,6 +3040,18 @@ class Activity {
             const IDLE_THRESHOLD = 5000; // 5 seconds
             const ACTIVE_FPS = 60;
             const IDLE_FPS = 1;
+            const idleEvents = ["mousemove", "mousedown", "keydown", "touchstart", "wheel"];
+
+            if (this._idleWatcherResetHandler) {
+                idleEvents.forEach(eventType => {
+                    window.removeEventListener(eventType, this._idleWatcherResetHandler);
+                });
+            }
+
+            if (this._idleWatcherIntervalId) {
+                clearInterval(this._idleWatcherIntervalId);
+                this._idleWatcherIntervalId = null;
+            }
 
             let lastActivity = Date.now();
             this.isAppIdle = false;
@@ -8340,6 +8354,18 @@ class Activity {
             if (target && typeof target.removeEventListener === "function") {
                 target.removeEventListener(type, listener, options);
             }
+        }
+
+        if (this._idleWatcherResetHandler) {
+            ["mousemove", "mousedown", "keydown", "touchstart", "wheel"].forEach(eventType => {
+                window.removeEventListener(eventType, this._idleWatcherResetHandler);
+            });
+            this._idleWatcherResetHandler = null;
+        }
+
+        if (this._idleWatcherIntervalId) {
+            clearInterval(this._idleWatcherIntervalId);
+            this._idleWatcherIntervalId = null;
         }
     }
 
