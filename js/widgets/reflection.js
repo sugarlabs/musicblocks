@@ -297,7 +297,7 @@ class ReflectionMatrix {
     async updateProjectCode() {
         const code = await this.activity.prepareExport();
         if (code === this.code) {
-            this.activity.textMsg(_("No changes detected in your project"), 2500);
+            this.activity.textMsg(_("No changes were detected in your project."), 2500);
             return; // No changes in code
         }
 
