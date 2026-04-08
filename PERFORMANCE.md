@@ -81,10 +81,10 @@ This can help identify recursive or deeply nested block structures that may impa
 
 The performance instrumentation was implemented with a few guiding goals:
 
-- **No impact on normal users** – instrumentation is disabled by default.
-- **Developer-focused visibility** – metrics are printed to the console rather than displayed in the UI.
-- **Safe fallbacks** – memory APIs are detected at runtime to avoid crashes in unsupported browsers.
-- **Minimal overhead** – when the feature is disabled, it introduces virtually no runtime cost.
+* **No impact on normal users** – instrumentation is disabled by default.
+* **Developer-focused visibility** – metrics are printed to the console rather than displayed in the UI.
+* **Safe fallbacks** – memory APIs are detected at runtime to avoid crashes in unsupported browsers.
+* **Minimal overhead** – when the feature is disabled, it introduces virtually no runtime cost.
 
 ---
 
@@ -92,10 +92,10 @@ The performance instrumentation was implemented with a few guiding goals:
 
 This instrumentation layer is only the first step toward better performance analysis in Music Blocks. Possible future improvements include:
 
-- A visual performance panel for developers
-- Block-level execution profiling
-- Automated benchmarking in CI
-- Historical performance comparison between runs
+* A visual performance panel for developers
+* Block-level execution profiling
+* Automated benchmarking in CI
+* Historical performance comparison between runs
 
 ---
 
