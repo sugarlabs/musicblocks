@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014-21 Walter Bender
+// Copyright (c) 2014-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -3480,7 +3480,10 @@ class Block {
             return false;
         }
 
-        if (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC1.length === 0) {
+        if (
+            (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC1?.length ?? 0) ===
+            0
+        ) {
             return false;
         }
 
@@ -3502,7 +3505,10 @@ class Block {
             return false;
         }
 
-        if (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC2.length === 0) {
+        if (
+            (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC2?.length ?? 0) ===
+            0
+        ) {
             return false;
         }
 
@@ -3524,7 +3530,10 @@ class Block {
             return false;
         }
 
-        if (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC3.length === 0) {
+        if (
+            (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC3?.length ?? 0) ===
+            0
+        ) {
             return false;
         }
 
