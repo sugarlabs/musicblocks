@@ -1383,8 +1383,8 @@ let rationalSum = (a, b) => {
     if (
         !Array.isArray(a) || a.length < 2 ||
         !Array.isArray(b) || b.length < 2 ||
-        typeof a[0] !== 'number' || typeof a[1] !== 'number' ||
-        typeof b[0] !== 'number' || typeof b[1] !== 'number' ||
+        typeof a[0] !== "number" || typeof a[1] !== "number" ||
+        typeof b[0] !== "number" || typeof b[1] !== "number" ||
         a[1] === 0 || b[1] === 0
     ) {
         console.warn("Invalid input passed to rationalSum:", a, b);
