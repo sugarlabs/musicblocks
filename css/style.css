@@ -116,23 +116,37 @@ input[type="range"]:focus::-ms-fill-upper {
 /* ... more sizes ... */
 
 /* Zoom percentage overlay */
-.zoom-overlay {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 42px;
-  font-weight: 600;
-  color: #fff;
-  background: rgba(0,0,0,0.45);
-  padding: 18px 36px;
-  border-radius: 14px;
-  z-index: 9999;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.2s ease;
+#zoomOverlay {
+    /* Positioning: Center of the screen */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%); /* Safari/Old Chrome */
+    -ms-transform: translate(-50%, -50%);     /* IE 9 */
+
+    /* Visuals */
+    background-color: rgba(0, 0, 0, 0.6); /* Slightly transparent */
+    color: #ffffff;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-size: 40px;
+    font-weight: bold;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    
+    /* Cross-browser glass effect */
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+
+    /* Behavior */
+    z-index: 10000;
+    pointer-events: none; /* Allows clicking through the overlay */
+    opacity: 0;           /* Hidden by default */
+    transition: opacity 0.3s ease-in-out;
+    -webkit-transition: opacity 0.3s ease-in-out;
 }
 
-.zoom-overlay.visible {
-  opacity: 1;
+/* Class to trigger the fade-in */
+#zoomOverlay.visible {
+    opacity: 1;
 }
