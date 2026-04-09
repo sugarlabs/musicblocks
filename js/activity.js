@@ -6597,7 +6597,7 @@ class Activity {
                                 args = {
                                     customName: customName,
                                     customTemperamentNotes: getTemperament(customName),
-                                    startingPitch: this.logo?.synth?.startingPitch || 440,
+                                    startingPitch: this.logo?.synth?.startingPitch || 392,
                                     octaveSpace: getOctaveRatio()
                                 };
                             }
