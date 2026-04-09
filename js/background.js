@@ -14,22 +14,18 @@
  */
 
 if (navigator.userAgent.search("Firefox") !== -1) {
-    // eslint-disable-next-line no-unused-vars
     browser.browserAction.onClicked.addListener(tab => {
         browser.tabs.create({ url: "index.html" });
     });
 
-    // eslint-disable-next-line no-unused-vars
     browser.runtime.onInstalled.addListener(details => {
         browser.tabs.create({ url: "index.html" });
     });
 } else {
-    // eslint-disable-next-line no-unused-vars
     chrome.browserAction.onClicked.addListener(tab => {
         window.open(chrome.runtime.getURL("index.html"));
     });
 
-    // eslint-disable-next-line no-unused-vars
     chrome.runtime.onInstalled.addListener(details => {
         window.open(chrome.runtime.getURL("index.html"));
     });

@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 // Copyright (c) 2014-23 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
@@ -14,15 +13,15 @@
 /*
    global
 
-   _, platformColor, docById, Singer, slicePath, wheelnav,
+   platformColor, docById, Singer, slicePath, wheelnav,
    DEFAULTVOICE, getDrumName, getNote, MUSICALMODES last, SHARP, FLAT,
    PREVIEWVOLUME, DEFAULTVOLUME, MODE_PIE_MENUS, HelpWidget,
    INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName,
    getMunsellColor, COLORS40, frequencyToPitch, instruments,
    DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
-   FIXEDSOLFEGE, NOTENAMES, FIXEDSOLFEGE, NOTENAMES, numberToPitch,
+   FIXEDSOLFEGE, NOTENAMES, numberToPitch,
    nthDegreeToPitch, SOLFEGENAMES, buildScale, _THIS_IS_TURTLE_BLOCKS_,
-   CHORDNAMES
+   CHORDNAMES, Synth, Tone, activity
 */
 
 /*
@@ -676,11 +675,11 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                         false
                     );
                 } catch (e) {
-                    // Ensure trigger lock is released after a delay
-                    setTimeout(() => {
-                        that._triggerLock = false;
-                    }, 125); // 1/8 second in milliseconds
+                    console.error("Synth trigger error:", e);
                 }
+                setTimeout(() => {
+                    that._triggerLock = false;
+                }, 125);
             }
         } catch (e) {
             console.error("Error in pitch preview:", e);
@@ -771,7 +770,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             ["setkey", "setkey2"].includes(that.blocks.blockList[that.connections[0]].name)
         ) {
             // We may need to update the mode widget.
-            that.activity.logo.modeBlock = that.blocks.blockList.indexOf(that);
+            that.activity.logo.modeBlock = that.blockIndex;
         }
     };
 
@@ -3689,7 +3688,7 @@ const piemenuBlockContext = block => {
     let pasteDy = 0;
 
     const that = block;
-    const blockBlock = block.blocks.blockList.indexOf(block);
+    const blockBlock = block.blockIndex;
 
     // Position the widget centered over the active block.
     docById("contextWheelDiv").style.position = "absolute";
@@ -3812,7 +3811,7 @@ const piemenuBlockContext = block => {
         that.blocks.sendStackToTrash(that.blocks.blockList[blockBlock]);
         docById("contextWheelDiv").style.display = "none";
         // prompting a notification on deleting any block
-        activity.textMsg(
+        that.activity.textMsg(
             _("You can restore deleted blocks from the trash with the Restore From Trash button."),
             3000
         );
@@ -3822,20 +3821,22 @@ const piemenuBlockContext = block => {
         docById("contextWheelDiv").style.display = "none";
     };
 
-    // Named function for proper cleanup
-    const hideContextWheelOnClick = event => {
+    // Use a named handler stored globally so we can remove the previous one
+    // before adding a new one, preventing accumulation of click listeners.
+    if (window._contextWheelClickHandler) {
+        document.body.removeEventListener("click", window._contextWheelClickHandler);
+    }
+
+    window._contextWheelClickHandler = event => {
         const wheelElement = document.getElementById("contextWheelDiv");
         const displayStyle = window.getComputedStyle(wheelElement).display;
         if (displayStyle === "block") {
             wheelElement.style.display = "none";
-            // Remove listener after hiding to prevent memory leak
-            document.body.removeEventListener("click", hideContextWheelOnClick);
+            document.body.removeEventListener("click", window._contextWheelClickHandler);
         }
     };
 
-    // Remove any existing listener before adding a new one
-    document.body.removeEventListener("click", hideContextWheelOnClick);
-    document.body.addEventListener("click", hideContextWheelOnClick);
+    document.body.addEventListener("click", window._contextWheelClickHandler);
 
     if (
         ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].includes(
@@ -3869,6 +3870,7 @@ const piemenuBlockContext = block => {
  */
 const piemenuGrid = activity => {
     docById("wheelDivptm").style.display = "none";
+    docById("wheelDivptm").classList.add("grid-wheel");
     const x = activity.turtles.gridButton.getBoundingClientRect().x;
     const y = activity.turtles.gridButton.getBoundingClientRect().y;
     docById("wheelDivptm").style.position = "absolute";
@@ -3976,6 +3978,7 @@ const piemenuGrid = activity => {
 
     const hidePiemenu = activity => {
         docById("wheelDivptm").style.display = "none";
+        docById("wheelDivptm").classList.remove("grid-wheel");
         activity.turtles.gridWheel.removeWheel();
         activity.turtles._exitWheel.removeWheel();
     };

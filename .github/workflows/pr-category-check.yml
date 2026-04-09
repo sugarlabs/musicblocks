@@ -13,6 +13,7 @@ on:
 permissions:
   pull-requests: write
   contents: read
+  issues: write
 
 jobs:
   check-pr-category:
@@ -69,6 +70,11 @@ jobs:
             const uncheckedCategories = categories.filter(cat => !cat.pattern.test(prBody));
 
             // --- Step 1: Fail CI if no category is selected ---
+            if (!prBody.trim()) {
+              core.setFailed('PR description is empty. Please fill in the PR template and check at least one category checkbox.');
+              return;
+            }
+
             if (checkedCategories.length === 0) {
               const message = [
                 '## PR Category Required',
@@ -94,7 +100,8 @@ jobs:
             }
 
             // --- Step 2: Ensure labels exist with proper colors ---
-            const { data: existingLabels } = await github.rest.issues.listLabelsForRepo({
+            // Paginated to correctly handle repos with more than 100 labels.
+            const existingLabels = await github.paginate(github.rest.issues.listLabelsForRepo, {
               owner: context.repo.owner,
               repo: context.repo.repo,
               per_page: 100,
@@ -167,3 +174,281 @@ jobs:
             const selected = checkedCategories.map(c => c.displayName).join(', ');
             core.info(`PR categories selected: ${selected}`);
             core.info(`Labels synced: ${labelsToAdd.join(', ')}`);
+
+      - name: Apply PR size label
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber  = context.payload.pull_request.number;
+            const additions = context.payload.pull_request.additions;
+            const deletions = context.payload.pull_request.deletions;
+            const totalChanges = additions + deletions;
+
+            const sizeTiers = [
+              { label: 'size/XS',  color: '3CBF00', description: 'Extra small: < 10 lines changed',    max: 9 },
+              { label: 'size/S',   color: '5D9801', description: 'Small: 10-49 lines changed',          max: 49 },
+              { label: 'size/M',   color: 'EEB800', description: 'Medium: 50-249 lines changed',        max: 249 },
+              { label: 'size/L',   color: 'EA8700', description: 'Large: 250-499 lines changed',        max: 499 },
+              { label: 'size/XL',  color: 'E05000', description: 'Extra large: 500-999 lines changed',  max: 999 },
+              { label: 'size/XXL', color: 'D73A4A', description: 'XXL: 1000+ lines changed',            max: Infinity },
+            ];
+
+            // size/XXL has max: Infinity so find() always matches; no fallback is needed.
+            const applicable = sizeTiers.find(t => totalChanges <= t.max);
+            core.info(`PR has ${totalChanges} total line changes -> ${applicable.label}`);
+
+            // Ensure all size labels exist in the repo (paginated to handle > 100 labels).
+            const repoLabels = await github.paginate(github.rest.issues.listLabelsForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100,
+            });
+            const repoLabelNames = repoLabels.map(l => l.name);
+
+            for (const tier of sizeTiers) {
+              if (!repoLabelNames.includes(tier.label)) {
+                try {
+                  await github.rest.issues.createLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name: tier.label,
+                    color: tier.color,
+                    description: tier.description,
+                  });
+                } catch (e) {
+                  core.warning(`Could not create label "${tier.label}": ${e.message}`);
+                }
+              }
+            }
+
+            // Sync: remove stale size labels, add applicable one
+            const { data: currentLabels } = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            const currentLabelNames = currentLabels.map(l => l.name);
+
+            for (const tier of sizeTiers) {
+              if (tier.label !== applicable.label && currentLabelNames.includes(tier.label)) {
+                try {
+                  await github.rest.issues.removeLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: prNumber,
+                    name: tier.label,
+                  });
+                } catch (e) {
+                  core.warning(`Could not remove label "${tier.label}": ${e.message}`);
+                }
+              }
+            }
+
+            if (!currentLabelNames.includes(applicable.label)) {
+              try {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: prNumber,
+                  labels: [applicable.label],
+                });
+                core.info(`Added size label: "${applicable.label}"`);
+              } catch (e) {
+                core.warning(`Could not add label "${applicable.label}": ${e.message}`);
+              }
+            }
+
+      - name: Apply PR area labels
+
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+
+            // Fetch all changed files (paginated)
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+              per_page: 100,
+            });
+            const filePaths = files.map(f => f.filename);
+
+            const areaMappings = [
+              { label: 'area/javascript', color: 'F7DF1E', description: 'Changes to JS source files',          pattern: /^js\// },
+              { label: 'area/css',        color: '264DE4', description: 'Changes to CSS/SASS style files',     pattern: /^css\// },
+              { label: 'area/plugins',    color: '6E40C9', description: 'Changes to plugin files',             pattern: /^plugins\// },
+              { label: 'area/docs',       color: '0075CA', description: 'Changes to documentation',            pattern: /^(Docs\/|README|CONTRIBUTING|.*\.md$)/i },
+              { label: 'area/tests',      color: '3B82F6', description: 'Changes to test files',               pattern: /^(cypress\/|jest\.config|.*\.test\.|.*\.spec\.)/i },
+              { label: 'area/i18n',       color: 'E4E669', description: 'Changes to localization files',       pattern: /^(locales|po)\// },
+              { label: 'area/assets',     color: 'D93F0B', description: 'Changes to images, sounds, or fonts', pattern: /^(images|sounds|fonts|header-icons|screenshots)\// },
+              { label: 'area/ci-cd',      color: '0052CC', description: 'Changes to CI/CD workflows',          pattern: /^\.github\// },
+              { label: 'area/lib',        color: 'BFD4F2', description: 'Changes to library files',            pattern: /^lib\// },
+              // Explicit extension list prevents .md files from matching and colliding with area/docs.
+              { label: 'area/core',       color: 'E11D48', description: 'Changes to core app entry files',     pattern: /^(index|sw|script|env)\.(js|ts|mjs|cjs|html|json)$/i },
+            ];
+
+            const touchedAreas = areaMappings.filter(area =>
+              filePaths.some(fp => area.pattern.test(fp))
+            );
+            core.info(`Areas touched: ${touchedAreas.map(a => a.label).join(', ') || 'none'}`);
+
+            // Ensure all area labels exist in the repo (paginated to handle > 100 labels).
+            const repoLabels = await github.paginate(github.rest.issues.listLabelsForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100,
+            });
+            const repoLabelNames = repoLabels.map(l => l.name);
+
+            for (const area of areaMappings) {
+              if (!repoLabelNames.includes(area.label)) {
+                try {
+                  await github.rest.issues.createLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name: area.label,
+                    color: area.color,
+                    description: area.description,
+                  });
+                } catch (e) {
+                  core.warning(`Could not create label "${area.label}": ${e.message}`);
+                }
+              }
+            }
+
+            // Sync area labels on the PR
+            const { data: currentLabels } = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            const currentLabelNames = currentLabels.map(l => l.name);
+            const touchedLabelNames = touchedAreas.map(a => a.label);
+
+            for (const area of touchedAreas) {
+              if (!currentLabelNames.includes(area.label)) {
+                try {
+                  await github.rest.issues.addLabels({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: prNumber,
+                    labels: [area.label],
+                  });
+                  core.info(`Added area label: "${area.label}"`);
+                } catch (e) {
+                  core.warning(`Could not add label "${area.label}": ${e.message}`);
+                }
+              }
+            }
+
+            for (const area of areaMappings) {
+              if (!touchedLabelNames.includes(area.label) && currentLabelNames.includes(area.label)) {
+                try {
+                  await github.rest.issues.removeLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: prNumber,
+                    name: area.label,
+                  });
+                  core.info(`Removed area label: "${area.label}"`);
+                } catch (e) {
+                  core.warning(`Could not remove label "${area.label}": ${e.message}`);
+                }
+              }
+            }
+
+#      - name: Check release notes
+#        if: success()
+#        uses: actions/github-script@v7
+#        with:
+#          script: |
+#            const prNumber = context.payload.pull_request.number;
+#            const prBody   = context.payload.pull_request.body || '';
+#
+#            // Detect a "## Release Notes" heading with non-empty, meaningful content.
+#            // Uses [\r\n]+ to handle Windows (CRLF) and Unix (LF) line endings.
+#            // Content that is only "N/A", "none", or an HTML comment counts as absent.
+#            const rnPattern = /#+\s*release\s+notes\s*[\r\n]+([\s\S]+?)(?=\n#|\s*$)/i;
+#            const match = prBody.match(rnPattern);
+#            const rnContent = match ? match[1].trim() : '';
+#            // Strip all HTML comments first, then check if anything meaningful remains.
+#            // This correctly handles trailing text after a comment and multiple comments.
+#            const stripped = rnContent.replace(/<!--[\s\S]*?-->/g, '').trim();
+#            const isPlaceholder = !stripped || /^(n\/a|none)$/i.test(stripped);
+#            const hasReleaseNotes = rnContent.length > 0 && !isPlaceholder;
+#
+#            const rnLabel   = 'release-notes';
+#            const noRnLabel = 'needs-release-notes';
+#            const labelDefs = [
+#              { label: rnLabel,   color: '0E8A16', description: 'PR includes release notes' },
+#              { label: noRnLabel, color: 'FBCA04', description: 'PR is missing a release notes section' },
+#            ];
+#
+#            // Ensure both labels exist in the repo (paginated to handle > 100 labels).
+#            const repoLabels = await github.paginate(github.rest.issues.listLabelsForRepo, {
+#              owner: context.repo.owner,
+#              repo: context.repo.repo,
+#              per_page: 100,
+#            });
+#            const repoLabelNames = repoLabels.map(l => l.name);
+#
+#            for (const def of labelDefs) {
+#              if (!repoLabelNames.includes(def.label)) {
+#                try {
+#                  await github.rest.issues.createLabel({
+#                    owner: context.repo.owner,
+#                    repo: context.repo.repo,
+#                    name: def.label,
+#                    color: def.color,
+#                    description: def.description,
+#                  });
+#                } catch (e) {
+#                  core.warning(`Could not create label "${def.label}": ${e.message}`);
+#                }
+#              }
+#            }
+#
+#            const { data: currentLabels } = await github.rest.issues.listLabelsOnIssue({
+#              owner: context.repo.owner,
+#              repo: context.repo.repo,
+#              issue_number: prNumber,
+#            });
+#            const currentLabelNames = currentLabels.map(l => l.name);
+#
+#            const labelToAdd    = hasReleaseNotes ? rnLabel   : noRnLabel;
+#            const labelToRemove = hasReleaseNotes ? noRnLabel : rnLabel;
+#
+#            if (!currentLabelNames.includes(labelToAdd)) {
+#              try {
+#                await github.rest.issues.addLabels({
+#                  owner: context.repo.owner,
+#                  repo: context.repo.repo,
+#                  issue_number: prNumber,
+#                  labels: [labelToAdd],
+#                });
+#              } catch (e) {
+#                core.warning(`Could not add label "${labelToAdd}": ${e.message}`);
+#              }
+#            }
+#
+#            if (currentLabelNames.includes(labelToRemove)) {
+#              try {
+#                await github.rest.issues.removeLabel({
+#                  owner: context.repo.owner,
+#                  repo: context.repo.repo,
+#                  issue_number: prNumber,
+#                  name: labelToRemove,
+#                });
+#              } catch (e) {
+#                core.warning(`Could not remove label "${labelToRemove}": ${e.message}`);
+#              }
+#            }
+#
+#            if (hasReleaseNotes) {
+#              core.info('Release notes section found.');
+#            } else {
+#              core.warning('No release notes section found. Add a "## Release Notes" heading with content.');
+#            }
