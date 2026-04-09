@@ -200,6 +200,35 @@ describe("save HTML methods", () => {
         expect(file).toContain("<div>Mock Exported Data</div>");
     });
 
+    it("should escape HTML special characters in prepareHTML to prevent XSS", () => {
+        const xssActivity = {
+            beginnerMode: false,
+            PlanetInterface: {
+                getCurrentProjectName: jest.fn(() => '<script>alert("XSS")</script>'),
+                getCurrentProjectDescription: jest.fn(() => "<img src=x onerror=alert(1)>"),
+                getCurrentProjectImage: jest.fn(() => '" onload="alert(1)')
+            },
+            prepareExport: jest.fn(() => '"><script>steal()</script>')
+        };
+
+        const si = new SaveInterface(xssActivity);
+        const html = si.prepareHTML();
+
+        // Raw HTML tags must be escaped — no unescaped script or img tags from user input
+        expect(html).not.toContain("<script>alert");
+        expect(html).not.toContain("<img src=x");
+
+        // Escaped values MUST contain encoded entities
+        expect(html).toContain("&lt;script&gt;");
+        expect(html).toContain("&lt;img src=x onerror=alert(1)&gt;");
+        expect(html).toContain("&lt;/script&gt;");
+    });
+
+    it("_escapeHTML should encode all five HTML special characters", () => {
+        const si = new SaveInterface({ beginnerMode: false });
+        expect(si._escapeHTML("&<>\"'")).toBe("&amp;&lt;&gt;&quot;&#039;");
+    });
+
     it("should call prepareHTML and download the file", () => {
         const mockPrepareHTML = jest.fn(() => "<html>Mock HTML</html>");
 
