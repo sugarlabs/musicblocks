@@ -91,16 +91,19 @@ function setupIntervalsActions(activity) {
             let { firstNote, secondNote, octave } = GetNotesForInterval(tur);
             let totalIntervals = Math.abs(ALLNOTESTEP[firstNote] - ALLNOTESTEP[secondNote]);
 
-            if (ALLNOTESTEP[secondNote] < ALLNOTESTEP[firstNote] && octave !== 0)
-                totalIntervals = 12 - totalIntervals;
+            // Use dynamic temperament length for custom tunings
+            const temperamentLength = this.getTemperamentLength();
 
-            if (octave < 0 && totalIntervals !== 0 && totalIntervals !== 12)
-                totalIntervals = 12 - totalIntervals;
+            if (ALLNOTESTEP[secondNote] < ALLNOTESTEP[firstNote] && octave !== 0)
+                totalIntervals = temperamentLength - totalIntervals;
+
+            if (octave < 0 && totalIntervals !== 0 && totalIntervals !== temperamentLength)
+                totalIntervals = temperamentLength - totalIntervals;
 
             if (octave < -1 || totalIntervals === 0) octave = Math.abs(octave);
 
             while (octave > 0) {
-                totalIntervals += 12;
+                totalIntervals += temperamentLength;
                 octave--;
             }
 
@@ -122,6 +125,9 @@ function setupIntervalsActions(activity) {
             const index2 = NOTENAMES.indexOf(secondNote.substring(0, 1));
             let lastWord = "";
             let letterGap = Math.abs(index2 - index1);
+
+            // Use dynamic temperament length for custom tunings
+            const temperamentLength = this.getTemperamentLength();
 
             if (index1 > index2 && octave !== 0) letterGap = NOTENAMES.length - letterGap;
 
@@ -157,7 +163,7 @@ function setupIntervalsActions(activity) {
                 if (octave >= 1) {
                     lastWord = ", " + _("plus") + " " + os + " " + plural;
                 }
-                while (totalIntervals > 12) totalIntervals -= 12;
+                while (totalIntervals > temperamentLength) totalIntervals -= temperamentLength;
             }
 
             if (octave < 0) {
@@ -168,7 +174,7 @@ function setupIntervalsActions(activity) {
             }
 
             const interval =
-                totalIntervals % 12 === 0 && letterGap === 0
+                totalIntervals % temperamentLength === 0 && letterGap === 0
                     ? SEMITONETOINTERVALMAP[totalIntervals][letterGap]
                     : SEMITONETOINTERVALMAP[totalIntervals][letterGap] + lastWord;
             return interval;

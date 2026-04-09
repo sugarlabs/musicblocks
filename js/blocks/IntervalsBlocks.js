@@ -1530,7 +1530,49 @@ function setupIntervalsBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for getting the length of the current temperament.
+     * @extends {ValueBlock}
+     */
+    class TemperamentLengthBlock extends ValueBlock {
+        constructor() {
+            //.TRANS: the number of pitches in the current temperament system
+            super("temperamentlength", _("temperament length"));
+            this.setPalette("intervals", activity);
+            this.beginnerBlock(true);
+            this.parameter = true;
+            this.setHelpString([
+                _(
+                    "The Temperament length block returns the number of pitches in the current temperament system. For example, 12 for standard equal temperament or 31 for a 31-tone temperament."
+                ),
+                "documentation",
+                ""
+            ]);
+            this.formBlock({ outType: "numberout" });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return activity.blocks.blockList[blk].value;
+        }
+
+        arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
+            if (
+                logo.inStatusMatrix &&
+                parentId != null &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
+            ) {
+                logo.statusFields.push([blk, "temperamentlength"]);
+            } else {
+                return Singer.IntervalsActions.getTemperamentLength();
+            }
+        }
+    }
+
     new SetTemperamentBlock().setup(activity);
+    new TemperamentLengthBlock().setup(activity);
     new TemperamentNameBlock().setup(activity);
     new ChordNameBlock().setup(activity);
     new ModeNameBlock().setup(activity);
