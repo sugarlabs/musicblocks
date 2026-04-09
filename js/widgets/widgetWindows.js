@@ -609,6 +609,10 @@ class WidgetWindow {
         if (this._docMouseDownHandler) {
             document.removeEventListener("mousedown", this._docMouseDownHandler, true);
         }
+        // Clear the scroll lock that may have been set by the disableScroll
+        // handler in _createUIelements(). Without this, window.onscroll remains
+        // permanently overridden after the widget is closed, freezing page scroll.
+        window.onscroll = null;
         if (this._frame && this._frame.parentElement) {
             this._frame.parentElement.removeChild(this._frame);
         }
