@@ -270,6 +270,34 @@ describe("Tests for Singer.PitchActions setup", () => {
         expect(spyMark).toHaveBeenCalled();
     });
 
+    test("playHertz exports Hertz rounded to 2 decimal places for Lilypond", () => {
+        turtle.singer.notePitches = { 1: [] };
+        turtle.singer.noteOctaves = { 1: [] };
+        turtle.singer.noteCents = { 1: [] };
+        turtle.singer.inNoteBlock = [1];
+        activity.logo.runningLilypond = true;
+
+        // Simulate a microtonal pitch producing a long decimal frequency
+        Singer.processPitch.mockImplementation(() => {
+            turtle.singer.notePitches[1].push("A");
+            turtle.singer.noteOctaves[1].push(4);
+            turtle.singer.noteCents[1].push(23); // non-clean cents value
+        });
+
+        const spyMark = jest.spyOn(activity.logo.notation, "notationMarkup");
+
+        Singer.PitchActions.playHertz(440, 0, blkId);
+
+        expect(spyMark).toHaveBeenCalled();
+
+        const exportedHertz = spyMark.mock.calls.at(-1)[1];
+
+        // proves value is rounded to 2 decimal places
+        expect(exportedHertz).toBe(Number(exportedHertz.toFixed(2)));
+
+        spyMark.mockRestore();
+    });
+
     test("playHertz notationMarkup occurs only when both inNoteBlock AND runningLilypond AND microtonal", () => {
         const spyMark = jest.spyOn(activity.logo.notation, "notationMarkup");
         turtle.singer.inNoteBlock = [1];

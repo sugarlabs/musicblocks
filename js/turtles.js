@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 /**
  * @file This contains the prototype of the Turtles component.
  * @author Walter Bender
@@ -676,11 +675,11 @@ Turtles.TurtlesView = class {
                 }
 
                 // Call the updateDimensions function when resizing occurs
-                var screenWidth =
+                const screenWidth =
                     window.innerWidth ||
                     document.documentElement.clientWidth ||
                     document.body.clientWidth;
-                var screenHeight =
+                const screenHeight =
                     window.innerHeight ||
                     document.documentElement.clientHeight ||
                     document.body.clientHeight;
@@ -691,11 +690,11 @@ Turtles.TurtlesView = class {
                 }
 
                 // Set a scaling factor to adjust the dimensions based on the screen size
-                var scale = Math.min(screenWidth / 1200, screenHeight / 900);
+                const scale = Math.min(screenWidth / 1200, screenHeight / 900);
 
                 // Calculate the new dimensions
-                var newWidth = Math.round(1200 * scale);
-                var newHeight = Math.round(900 * scale);
+                const newWidth = Math.round(1200 * scale);
+                const newHeight = Math.round(900 * scale);
 
                 // Update the dimensions
                 this._w = newWidth;
@@ -857,12 +856,23 @@ Turtles.TurtlesView = class {
     makeBackground(setCollapsed) {
         const activity = this.activity;
 
-        const doCollapse = setCollapsed === undefined ? false : setCollapsed;
+        const _doCollapse = setCollapsed === undefined ? false : setCollapsed;
 
         const borderContainer = this.borderContainer;
 
         // Remove any old background containers
         borderContainer.removeAllChildren();
+
+        // Update the canvas background color
+        const canvas = this.canvas;
+        if (canvas) {
+            canvas.style.backgroundColor = this._backgroundColor;
+        }
+
+        // Also update body background if available
+        if (typeof document !== "undefined") {
+            document.body.style.backgroundColor = this._backgroundColor;
+        }
 
         const turtlesStage = this.stage;
         // We put the buttons on the stage so they will be on top
@@ -895,15 +905,14 @@ Turtles.TurtlesView = class {
             };
             const img = new Image();
             img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svg));
+            img.setAttribute("alt", object.label || object.name || "Canvas button");
 
+            // Batch DOM reads before writes to avoid forced synchronous layout
+            const rightPos = document.body.clientWidth - x;
             container.appendChild(img);
             container.setAttribute(
                 "style",
-                "position: absolute; right:" +
-                    (document.body.clientWidth - x) +
-                    "px;  top: " +
-                    y +
-                    "px;"
+                "position: absolute; right:" + rightPos + "px;  top: " + y + "px;"
             );
             docById("buttoncontainerTOP").appendChild(container);
             return container;
@@ -1286,7 +1295,7 @@ Turtles.TurtlesView = class {
         let resizeTimeout;
         let ticking = false;
 
-        window.addEventListener("resize", () => {
+        const resizeHandler = () => {
             const isHighEndDevice =
                 navigator.hardwareConcurrency && navigator.hardwareConcurrency >= 4;
 
@@ -1308,7 +1317,14 @@ Turtles.TurtlesView = class {
                     __makeBoundary2();
                 }, 150); // Wait 150ms after the last resize event to execute
             }
-        });
+        };
+
+        if (this._resizeHandler) {
+            window.removeEventListener("resize", this._resizeHandler);
+        }
+
+        this._resizeHandler = resizeHandler;
+        window.addEventListener("resize", this._resizeHandler);
 
         return this;
     }
