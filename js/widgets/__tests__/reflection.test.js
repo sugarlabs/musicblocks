@@ -549,7 +549,7 @@ describe("ReflectionMatrix", () => {
 
         test("escapeHTML replaces special characters", () => {
             const input = "<div id='test'>&\"</div>";
-            const output = reflection.escapeHTML(input);
+            const output = escapeHTML(input);
             expect(output).toBe("&lt;div id=&#039;test&#039;&gt;&amp;&quot;&lt;/div&gt;");
         });
 

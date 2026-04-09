@@ -67,10 +67,6 @@ class ReflectionMatrix {
         this.code = "";
     }
 
-    escapeHTML(text) {
-        return escapeHTML(text);
-    }
-
     sanitizeLinks(html) {
         return html.replace(/<a\s+[^>]*href\s*=\s*(['"]?)([^'">\s]+)\1/gi, (match, quote, url) => {
             const unsafeSchemes = /^(javascript|data|vbscript):/i;
@@ -494,7 +490,7 @@ class ReflectionMatrix {
         const botReply = document.createElement("div");
 
         if (md) {
-            const safeText = this.escapeHTML(reply.response);
+            const safeText = escapeHTML(reply.response);
             let html = this.mdToHTML(safeText);
             html = this.sanitizeLinks(html);
             botReply.innerHTML = html;
@@ -686,7 +682,7 @@ class ReflectionMatrix {
      */
     mdToHTML(md) {
         // Step 1: Escape HTML first to prevent XSS attacks from raw tags
-        let html = this.escapeHTML(md);
+        let html = escapeHTML(md);
 
         // Step 2: Convert Markdown syntax to HTML
 
