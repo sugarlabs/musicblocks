@@ -822,4 +822,133 @@ describe("ProgramBlocks", () => {
             expect(block.formDefn.outType).toBe("numberout");
         });
     });
+    describe("MakeBlockBlock branch coverage", () => {
+        const setupArg = (name, argValues = []) => {
+            activity.blocks.blockList = [
+                {
+                    connections: [null, 10, ...argValues.map((_, i) => i + 10)],
+                    argClampSlots: argValues.map((_, i) => i)
+                }
+            ];
+            const allMocks = [...argValues, name];
+            logo.parseArg = jest.fn();
+            allMocks.forEach(v => logo.parseArg.mockReturnValueOnce(v));
+        };
+
+        test("creates 'start' block", () => {
+            setupArg("start");
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        });
+
+        test("creates 'silence' block", () => {
+            setupArg("silence");
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        });
+
+        test("creates 'tempo' block with 1 arg", () => {
+            setupArg("tempo", [90]);
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        });
+
+        test("creates 'tempo' block with 2 args", () => {
+            setupArg("tempo", [90, 4]);
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        });
+
+        test("creates 'tempo' block with 3 args", () => {
+            setupArg("tempo", [90, 4, 8]);
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        });
+
+        test("creates 'volume' block with 1 arg", () => {
+            setupArg("volume", [50]);
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        });
+
+        test("creates 'volume' block with 2 args", () => {
+            setupArg("volume", ["piano", 50]);
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        });
+
+        test("creates 'volume' block with 3 args", () => {
+            setupArg("volume", ["piano", 75, "extra"]);
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        });
+
+        test("creates 'instrument' block with default", () => {
+            setupArg("instrument", []);
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        });
+
+        test("creates 'instrument' block with specified instrument", () => {
+            setupArg("instrument", ["guitar"]);
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        });
+
+        test("returns 0 when block not found", () => {
+            setupArg("unknownblock");
+            activity.blocks.palettes.getProtoNameAndPalette.mockReturnValue([null, null, null]);
+            const result = getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.errorMsg).toHaveBeenCalled();
+            expect(result).toBe(0);
+        });
+
+        test("handles number arg with dock type mismatch", () => {
+            setupArg("customblock", [42]);
+            activity.blocks.palettes.getProtoNameAndPalette.mockReturnValue([
+                "proto1",
+                "program",
+                "customblock"
+            ]);
+            activity.blocks.protoBlockDict["proto1"] = { dockTypes: [null, "textin"] };
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Warning"));
+        });
+
+        test("handles string arg with dock type mismatch", () => {
+            setupArg("customblock", ["hello"]);
+            activity.blocks.palettes.getProtoNameAndPalette.mockReturnValue([
+                "proto1",
+                "program",
+                "customblock"
+            ]);
+            activity.blocks.protoBlockDict["proto1"] = { dockTypes: [null, "numberin"] };
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Warning"));
+        });
+
+        test("handles boolean arg with dock type mismatch", () => {
+            setupArg("customblock", [true]);
+            activity.blocks.palettes.getProtoNameAndPalette.mockReturnValue([
+                "proto1",
+                "program",
+                "customblock"
+            ]);
+            activity.blocks.protoBlockDict["proto1"] = { dockTypes: [null, "textin"] };
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Warning"));
+        });
+
+        test("handles unhandled arg type (object)", () => {
+            setupArg("customblock", [{ obj: true }]);
+            activity.blocks.palettes.getProtoNameAndPalette.mockReturnValue([
+                "proto1",
+                "program",
+                "customblock"
+            ]);
+            activity.blocks.protoBlockDict["proto1"] = { dockTypes: [null, "textin"] };
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Warning"));
+        });
+    });
 });

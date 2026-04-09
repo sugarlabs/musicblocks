@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 /**
  * @file This contains the prototype of the Turtle component.
  * @author Walter Bender
@@ -94,6 +93,7 @@ class Turtle {
     _createCache() {
         this.bounds = this.container.getBounds();
 
+        // eslint-disable-next-line eqeqeq
         if (this.bounds == null) {
             setTimeout(() => {
                 this._createCache();
@@ -115,8 +115,8 @@ class Turtle {
      * @async
      */
     async updateCache() {
+        // eslint-disable-next-line eqeqeq
         if (this.bounds == null) {
-            // eslint-disable-next-line no-console
             console.debug("Block container for " + this.name + " not yet ready.");
             await delayExecution(300);
             this.updateCache();
@@ -132,6 +132,7 @@ class Turtle {
      * (if they have not been already changed).
      */
     stopBlink() {
+        // eslint-disable-next-line eqeqeq
         if (this._blinkTimeout != null || !this._blinkFinished) {
             clearTimeout(this._blinkTimeout);
             this._blinkTimeout = null;
@@ -145,7 +146,7 @@ class Turtle {
     /**
      * Causes turtle to blink (toggle turtle's visibility) every 100 ms.
      */
-    // eslint-disable-next-line no-unused-vars
+
     async blink(duration, volume) {
         // Suppress blinking when using cursorout and cursorover
         // sensors to prevent multiple triggers.
@@ -199,6 +200,7 @@ class Turtle {
         this.singer.scalarTranspositionValues = [];
         this.singer.transposition = 0;
         this.singer.transpositionValues = [];
+        this.singer.transpositionRatios = [];
 
         this.singer.register = 0;
         this.singer.beatFactor = 1;
@@ -245,6 +247,8 @@ class Turtle {
         this.singer.crescendoInitialVolume = { DEFAULTVOICE: [DEFAULTVOLUME] };
         this.singer.intervals = [];
         this.singer.semitoneIntervals = [];
+        this.singer.chordIntervals = [];
+        this.singer.ratioIntervals = [];
         this.singer.staccato = [];
         this.singer.glide = [];
         this.singer.glideOverride = 0;
@@ -655,6 +659,7 @@ Turtle.TurtleModel = class {
 
         const startBlock = this._startBlock;
         // Use the name on the label of the start block
+        // eslint-disable-next-line eqeqeq
         if (startBlock != null) {
             startBlock.overrideName = this._name;
             startBlock.collapseText.text = this._name;
@@ -851,8 +856,12 @@ Turtle.TurtleView = class {
             this.container.hitArea = hitArea;
 
             const startBlock = this._startBlock;
+            // eslint-disable-next-line eqeqeq
             if (startBlock != null) {
-                startBlock.container.removeChild(this._decorationBitmap);
+                // eslint-disable-next-line eqeqeq
+                if (this._decorationBitmap != null) {
+                    startBlock.container.removeChild(this._decorationBitmap);
+                }
                 this._decorationBitmap = new createjs.Bitmap(myImage);
                 startBlock.container.addChild(this._decorationBitmap);
                 this._decorationBitmap.name = "decoration";
@@ -959,6 +968,7 @@ Turtle.TurtleView = class {
             this._createCache();
 
             const startBlock = this._startBlock;
+            // eslint-disable-next-line eqeqeq
             if (useTurtleArtwork && startBlock != null) {
                 startBlock.updateCache();
                 this._decorationBitmap = this._bitmap.clone();

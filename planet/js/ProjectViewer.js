@@ -134,7 +134,6 @@ class ProjectViewer {
     }
 
     openReporter() {
-        // eslint-disable-next-line no-console
         document.getElementById("reportdescription").value = "";
         document.getElementById("projectviewer-report-content").style.display = "block";
         document.getElementById("projectviewer-reportsubmit-content").style.display = "none";
@@ -159,9 +158,8 @@ class ProjectViewer {
             document.getElementById("report-error").style.display = "block";
             return;
         } else if (text.length > 1000) {
-            document.getElementById(
-                "report-error"
-            ).textContent = this.ReportDescriptionTooLongError;
+            document.getElementById("report-error").textContent =
+                this.ReportDescriptionTooLongError;
             document.getElementById("report-error").style.display = "block";
             return;
         } else {
@@ -189,32 +187,26 @@ class ProjectViewer {
     }
 
     init() {
-        // eslint-disable-next-line no-unused-vars
         document.getElementById("projectviewer-download-file").addEventListener("click", evt => {
             this.download();
         });
 
-        // eslint-disable-next-line no-unused-vars
         document.getElementById("projectviewer-open-mb").addEventListener("click", evt => {
             this.openProject();
         });
 
-        // eslint-disable-next-line no-unused-vars
         document.getElementById("projectviewer-merge-mb").addEventListener("click", evt => {
             this.mergeProject();
         });
 
-        // eslint-disable-next-line no-unused-vars
         document.getElementById("projectviewer-report-project").addEventListener("click", evt => {
             this.openReporter();
         });
 
-        // eslint-disable-next-line no-unused-vars
         document.getElementById("projectviewer-report-submit").addEventListener("click", evt => {
             this.submitReporter();
         });
 
-        // eslint-disable-next-line no-unused-vars
         document.getElementById("projectviewer-report-close").addEventListener("click", evt => {
             this.closeReporter();
         });

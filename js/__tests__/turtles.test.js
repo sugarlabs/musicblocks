@@ -40,6 +40,15 @@ global.setupVolumeActions = jest.fn();
 global.setupDrumActions = jest.fn();
 global.setupDictActions = jest.fn();
 
+global.LEADING = 35;
+global.CARTESIANBUTTON = "";
+global.CLEARBUTTON = "";
+global.COLLAPSEBUTTON = "";
+global.EXPANDBUTTON = "";
+global.MBOUNDARY = "";
+global.piemenuGrid = {};
+global.base64Encode = jest.fn(str => str);
+
 global.Turtle = jest.fn().mockImplementation(() => ({
     painter: {
         doSetHeading: jest.fn(),
@@ -153,6 +162,9 @@ describe("Turtles Class", () => {
         turtles.addTurtleGraphicProps = jest.fn();
         turtles.isShrunk = jest.fn().mockReturnValue(false);
         document.body.innerHTML = '<div id="loader"></div>';
+        window.jQuery = jest.fn().mockReturnValue({
+            tooltip: jest.fn()
+        });
     });
 
     test("should initialize properly", () => {
@@ -422,6 +434,8 @@ describe("setBackgroundColor", () => {
         turtles._scale = 1.0;
         global.platformColor = { background: "#ffffff" };
         turtles._backgroundColor = platformColor.background;
+        turtles.makeBackground = jest.fn();
+        turtles._borderContainer = new createjs.Container();
     });
 
     test("should set default background color when index is -1", () => {
@@ -445,22 +459,20 @@ describe("setBackgroundColor", () => {
         expect(activityMock.refreshCanvas).toHaveBeenCalled();
     });
 
-    test("should update DOM body background color", () => {
+    test("should call makeBackground when setting color", () => {
         turtles.setBackgroundColor(-1);
 
-        // jsdom normalizes hex colors to rgb format
-        const bgColor = document.body.style.backgroundColor;
-        expect(bgColor === platformColor.background || bgColor === "rgb(255, 255, 255)").toBe(true);
+        expect(turtles.makeBackground).toHaveBeenCalled();
     });
 
-    test("should update canvas background color", () => {
+    test("should store background color before calling makeBackground", () => {
+        turtles.makeBackground = jest.fn(() => {
+            expect(turtles._backgroundColor).toBe(platformColor.background);
+        });
+
         turtles.setBackgroundColor(-1);
 
-        // Canvas style object is a plain object, not a DOM style, so it keeps the original value
-        const canvasBg = activityMock.canvas.style.backgroundColor;
-        expect(canvasBg === platformColor.background || canvasBg === "rgb(255, 255, 255)").toBe(
-            true
-        );
+        expect(turtles.makeBackground).toHaveBeenCalled();
     });
 });
 
@@ -487,6 +499,8 @@ describe("doScale", () => {
         turtles._locked = false;
         turtles._queue = [];
         turtles._backgroundColor = "#ffffff";
+        turtles.makeBackground = jest.fn();
+        turtles._borderContainer = new createjs.Container();
     });
 
     test("should update scale, width, and height when not locked", () => {
