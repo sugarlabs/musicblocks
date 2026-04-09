@@ -20,7 +20,7 @@
    global
 
    _, addTemperamentToDictionary, buildScale,
-   deleteTemperamentFromList, docById, FLAT, getNoteFromInterval,
+   deleteTemperamentFromList, docById, FLAT, generateEqualTemperament, getNoteFromInterval,
    getOctaveRatio, getTemperament, getTemperamentKeys,
    isCustomTemperament, pitchToFrequency, platformColor,
    rationalToFraction, setOctaveRatio, setOctaveRatio, SHARP, Singer,
