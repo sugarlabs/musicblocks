@@ -14,7 +14,7 @@
 /*
 Globals location
 - js/utils/utils.js
-  _, docById
+_, docById
 */
 
 window.widgetWindows = {
@@ -70,7 +70,7 @@ class WidgetWindow {
      * @param {boolean} fullscreen
      */
     constructor(key, title, fullscreen = true) {
-        // Keep a refernce to the object within handlers
+        // Keep a reference to the object within handlers
         this._key = key;
         this._buttons = [];
         this._first = true;
@@ -176,7 +176,7 @@ class WidgetWindow {
 
         const titleEl = this._create("div", "wftTitle", this._nonclose);
         titleEl.innerHTML = "";
-        titleEl.insertAdjacentHTML("afterbegin", _(this._title));
+        titleEl.textContent = _(this._title);
         titleEl.id = `${this._key}WidgetID`;
 
         this._nonclose.onmousedown = e => {
@@ -368,8 +368,10 @@ class WidgetWindow {
     addInputButton(initial, parent) {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
         el.innerHTML = "";
-        el.insertAdjacentHTML("afterbegin", `<input value="${initial}" />`);
-        return el.querySelector("input");
+        const input = document.createElement("input");
+        input.value = initial; // Safe - DOM API escapes automatically
+        el.insertAdjacentElement("afterbegin", input);
+        return input;
     }
 
     /**
@@ -383,15 +385,15 @@ class WidgetWindow {
      */
     addRangeSlider(initial, parent, min, max, classNm) {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
-        const elInput = `
-          <input type="range" class="${classNm}" min="${min}" max="${max}" value="${initial}" />
-        `;
+        const slider = document.createElement("input");
+        slider.type = "range";
+        if (classNm) slider.className = classNm; // Safe - DOM API escapes automatically
+        slider.min = min;
+        slider.max = max;
+        slider.value = initial;
 
         el.style.height = "250px";
-        el.innerHTML = "";
-        el.insertAdjacentHTML("afterbegin", elInput);
-
-        const slider = el.querySelector("input");
+        el.insertAdjacentElement("afterbegin", slider);
         slider.style = " position:absolute;transform:rotate(270deg);height:10px;width:250px;";
         return slider;
     }
@@ -456,7 +458,7 @@ class WidgetWindow {
      */
     updateTitle(title) {
         const wftTitle = docById(this._key + "WidgetID");
-        wftTitle.innerHTML = title;
+        wftTitle.textContent = title;
     }
 
     /**
@@ -469,7 +471,7 @@ class WidgetWindow {
         const siblings = windows.children;
         for (let i = 0; i < siblings.length; i++) {
             siblings[i].style.zIndex = "0";
-            siblings[i].style.opacity = "0";
+            siblings[i].style.opacity = "0.7";
         }
 
         // When in focus, the zIndex of the help must be the highest. Even greater than the input search display block

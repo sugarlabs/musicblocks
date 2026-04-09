@@ -17,7 +17,7 @@
 “_Music is a hidden arithmetic exercise of the soul, which does not
 know that it is counting._” — Leibniz
 
-Music Blocks is a _Visual Programming Language_ and collection of
+Music Blocks is a _Visual Programming Language_ and a collection of
 _manipulative tools_ for exploring musical and mathematical concepts
 in an integrative and entertaining way.
 

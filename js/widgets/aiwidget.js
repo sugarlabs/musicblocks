@@ -14,7 +14,7 @@
 
    _, docById, DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP,
    CUSTOMSAMPLES, wheelnav, getVoiceSynthName, Singer, DRUMS, Tone,
-   instruments, slicePath, platformColor
+   instruments, slicePath, platformColor, ABCJS, ensureABCJS
 */
 
 /* exported Abhijeet Singh */
@@ -208,7 +208,7 @@ function AIWidget() {
         const pitch = pitches;
         pitchDuration = toFraction(pitchDuration);
         const adjustedNote = adjustPitch(pitch.name, keySignature).toUpperCase();
-        if (triplet !== undefined && triplet !== null) {
+        if (triplet != null) {
             pitchDuration[1] = meterDen * triplet;
         }
 
@@ -244,15 +244,19 @@ function AIWidget() {
     const _indexMaps = new WeakMap();
     function searchIndexForMusicBlock(array, x) {
         let map = _indexMaps.get(array);
-        if (!map) {
+        // Cache an index map on the array using WeakMap to convert O(n) array scanning
+        // into O(1) map lookups. Rebuild the map if the array length changes.
+        if (!map || array.length !== map.size) {
             map = new Map();
             for (let i = 0; i < array.length; i++) {
-                map.set(array[i][0], i);
+                if (array[i] && array[i][0] !== undefined) {
+                    map.set(array[i][0], i);
+                }
             }
             _indexMaps.set(array, map);
         }
-        const idx = map.get(x);
-        return idx !== undefined ? idx : -1;
+        const index = map.get(x);
+        return index !== undefined ? index : -1;
     }
 
     this._parseABC = async function (tune) {
@@ -405,7 +409,7 @@ function AIWidget() {
                                 tripletFinder,
                                 entry.meterDen
                             );
-                            if (element?.endTriplet !== null && element?.endTriplet !== undefined) {
+                            if (element?.endTriplet != null) {
                                 tripletFinder = null;
                             }
                             blockId = blockId + 9;
@@ -684,11 +688,8 @@ function AIWidget() {
                 }
             }
 
-            const lineBlock = staffBlocksMap[staffIndex].baseBlocks.reduce(
-                (acc, curr) => acc.concat(curr),
-                []
-            );
-            const flattenedLineBlock = lineBlock.flat(); // Flatten the multidimensional array
+            // Flatten the multidimensional array (equivalent to flat(1) + flat(1))
+            const flattenedLineBlock = staffBlocksMap[staffIndex].baseBlocks.flat(2);
             const combinedBlock = [...staffBlocksMap[staffIndex].startBlock, ...flattenedLineBlock];
 
             finalBlock.push(...staffBlocksMap[staffIndex].startBlock);
@@ -717,7 +718,8 @@ function AIWidget() {
      * @private
      * @returns {void}
      */
-    this.__save = function () {
+    this.__save = async function () {
+        await ensureABCJS();
         const tunebook = new ABCJS.parseOnly(abcNotationSong);
 
         tunebook.forEach(tune => {
@@ -885,7 +887,8 @@ function AIWidget() {
         return _sharedAudioContext;
     }
 
-    this._playABCSong = function () {
+    this._playABCSong = async function () {
+        await ensureABCJS();
         const abc = abcNotationSong;
         const stopAudioButton = document.querySelector(".stop-audio");
 

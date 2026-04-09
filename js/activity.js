@@ -14,6 +14,17 @@
 // (https://github.com/walterbender/turtleart), but implemented from
 // scratch. -- Walter Bender, October 2014.
 
+try {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has("layoutProfiling")) {
+        window.__ENABLE_REFRESH_PROFILING__ = urlParams.get("layoutProfiling") !== "false";
+    } else {
+        window.__ENABLE_REFRESH_PROFILING__ = false;
+    }
+} catch (e) {
+    window.__ENABLE_REFRESH_PROFILING__ = false;
+}
+
 /*
    global
 
@@ -41,7 +52,7 @@
    SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
    MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
-   SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS
+   SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS
  */
 
 /*
@@ -81,7 +92,6 @@ let MYDEFINES = [
     "utils/utils",
     "activity/artwork",
     "widgets/status",
-    "widgets/help",
     "utils/munsell",
     "activity/toolbar",
     "activity/trash",
@@ -109,28 +119,9 @@ let MYDEFINES = [
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
-    "utils/performanceTracker",
     "activity/pastebox",
     "prefixfree.min",
     "Tone",
-    "activity/js-export/samples/sample",
-    "activity/js-export/export",
-    "activity/js-export/interface",
-    "activity/js-export/constraints",
-    "activity/js-export/ASTutils",
-    "activity/js-export/generate",
-    "activity/js-export/ast2blocklist",
-    "activity/js-export/API/GraphicsBlocksAPI",
-    "activity/js-export/API/PenBlocksAPI",
-    "activity/js-export/API/RhythmBlocksAPI",
-    "activity/js-export/API/MeterBlocksAPI",
-    "activity/js-export/API/PitchBlocksAPI",
-    "activity/js-export/API/IntervalsBlocksAPI",
-    "activity/js-export/API/ToneBlocksAPI",
-    "activity/js-export/API/OrnamentBlocksAPI",
-    "activity/js-export/API/VolumeBlocksAPI",
-    "activity/js-export/API/DrumBlocksAPI",
-    "activity/js-export/API/DictBlocksAPI",
     "activity/turtleactions/RhythmActions",
     "activity/turtleactions/MeterActions",
     "activity/turtleactions/PitchActions",
@@ -164,41 +155,29 @@ let MYDEFINES = [
     "activity/blocks/MediaBlocks",
     "activity/blocks/SensorsBlocks",
     "activity/blocks/EnsembleBlocks",
-    "widgets/widgetWindows",
-    "widgets/statistics",
-    "widgets/jseditor"
+    "widgets/widgetWindows"
 ];
 
-if (_THIS_IS_MUSIC_BLOCKS_) {
-    const MUSICBLOCKS_EXTRAS = [
-        "widgets/modewidget",
-        "widgets/meterwidget",
-        "widgets/PhraseMakerUtils",
-        "widgets/PhraseMakerGrid",
-        "widgets/PhraseMakerUI",
-        "widgets/PhraseMakerAudio",
-        "widgets/phrasemaker",
-        "widgets/arpeggio",
-        "widgets/aiwidget",
-        "widgets/aidebugger",
-        "widgets/pitchdrummatrix",
-        "widgets/rhythmruler",
-        "widgets/pitchstaircase",
-        "widgets/temperament",
-        "widgets/tempo",
-        "widgets/pitchslider",
-        "widgets/musickeyboard",
-        "widgets/timbre",
-        "widgets/oscilloscope",
-        "widgets/sampler",
-        "widgets/reflection",
-        "widgets/legobricks",
-        "activity/lilypond",
-        "activity/abc",
-        "activity/midi",
-        "activity/mxml"
-    ];
-    MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
+/**
+ * Dynamically load one or more RequireJS modules on demand.
+ * Returns a Promise that resolves once all modules are loaded.
+ * RequireJS caches modules, so subsequent calls are instant.
+ *
+ * @param {string|string[]} modulePaths - Module path(s) to load.
+ * @returns {Promise<void>}
+ */
+function lazyLoad(modulePaths) {
+    // In Node/Jest (CommonJS), modules are already available as globals — resolve immediately.
+    if (typeof define !== "function" || !define.amd) {
+        return Promise.resolve();
+    }
+
+    // In browser with RequireJS (AMD), load modules dynamically.
+    return new Promise(resolve => {
+        require(Array.isArray(modulePaths) ? modulePaths : [modulePaths], function () {
+            resolve();
+        });
+    });
 }
 
 // Module-scoped singleton reference to the active Activity instance.
@@ -219,7 +198,6 @@ const doAnalyzeProject = function () {
 /**
  * Represents an activity in the application.
  */
-
 class Activity {
     /**
      * Creates an Activity instance.
@@ -235,6 +213,8 @@ class Activity {
         }
 
         this._listeners = [];
+        this._idleWatcherIntervalId = null;
+        this._idleWatcherResetHandler = null;
 
         this.cellSize = 55;
         this.searchSuggestions = [];
@@ -421,6 +401,9 @@ class Activity {
         this.setupDependencies = () => {
             this._stopRenderLoop();
             this.cleanupEventListeners();
+            if (this.toolbar && typeof this.toolbar.dispose === "function") {
+                this.toolbar.dispose();
+            }
             createDefaultStack();
             createHelpContent(this);
             window.scroll(0, 0);
@@ -1296,11 +1279,10 @@ class Activity {
             }
 
             let i = 0;
-            for (const name in blockHelpList) {
-                this.__saveHelpBlock(blockHelpList[name], i * 2000);
-                i += 1;
+            for (const name of blockHelpList) {
+                this.__saveHelpBlock(name, i * 2000);
+                i++;
             }
-
             this.sendAllToTrash(true, true);
         };
 
@@ -1324,7 +1306,7 @@ class Activity {
         this.printBlockSVG = () => {
             this.blocks.activeBlock = null;
             let startCounter = 0;
-            let svg = "";
+            const svgParts = [];
             let xMax = 0;
             let yMax = 0;
             let parts;
@@ -1346,18 +1328,19 @@ class Activity {
                     : this.blocks.blockArt[i];
 
                 if (this.blocks.blockList[i].isCollapsible()) {
-                    svg += "<g>";
+                    svgParts.push("<g>");
                 }
 
-                svg +=
+                svgParts.push(
                     '<g transform="translate(' +
-                    this.blocks.blockList[i].container.x +
-                    ", " +
-                    this.blocks.blockList[i].container.y +
-                    ')">';
+                        this.blocks.blockList[i].container.x +
+                        ", " +
+                        this.blocks.blockList[i].container.y +
+                        ')">'
+                );
 
                 if (!SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
-                    svg += extractSVGInner(rawSVG);
+                    svgParts.push(extractSVGInner(rawSVG));
                 } else {
                     // Safer SVG manipulation using DOM instead of string splitting
                     const parser = new DOMParser();
@@ -1399,10 +1382,10 @@ class Activity {
                     // remove outer svg tags because original code skipped them
                     serialized = serialized.replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "");
 
-                    svg += serialized;
+                    svgParts.push(serialized);
                 }
 
-                svg += "</g>";
+                svgParts.push("</g>");
 
                 if (this.blocks.blockList[i].isCollapsible()) {
                     let y;
@@ -1412,12 +1395,13 @@ class Activity {
                         y = this.blocks.blockList[i].container.y + 12;
                     }
 
-                    svg +=
+                    svgParts.push(
                         '<g transform="translate(' +
-                        this.blocks.blockList[i].container.x +
-                        ", " +
-                        y +
-                        ') scale(0.5 0.5)">';
+                            this.blocks.blockList[i].container.x +
+                            ", " +
+                            y +
+                            ') scale(0.5 0.5)">'
+                    );
                     if (this.blocks.blockList[i].collapsed) {
                         parts = EXPANDBUTTON.split("><");
                     } else {
@@ -1425,16 +1409,16 @@ class Activity {
                     }
 
                     for (let p = 2; p < parts.length - 1; p++) {
-                        svg += "<" + parts[p] + ">";
+                        svgParts.push("<" + parts[p] + ">");
                     }
 
-                    svg += "</g>";
+                    svgParts.push("</g>");
                 }
 
                 if (this.blocks.blockList[i].name === "start") {
                     const x = this.blocks.blockList[i].container.x + 110;
                     const y = this.blocks.blockList[i].container.y + 12;
-                    svg += '<g transform="translate(' + x + ", " + y + ') scale(0.4 0.4)">';
+                    svgParts.push('<g transform="translate(' + x + ", " + y + ') scale(0.4 0.4)">');
 
                     parts = TURTLESVG.replace(/fill_color/g, FILLCOLORS[startCounter])
                         .replace(/stroke_color/g, STROKECOLORS[startCounter])
@@ -1446,18 +1430,18 @@ class Activity {
                     }
 
                     for (let p = 2; p < parts.length - 1; p++) {
-                        svg += "<" + parts[p] + ">";
+                        svgParts.push("<" + parts[p] + ">");
                     }
 
-                    svg += "</g>";
+                    svgParts.push("</g>");
                 }
 
                 if (this.blocks.blockList[i].isCollapsible()) {
-                    svg += "</g>";
+                    svgParts.push("</g>");
                 }
             }
 
-            svg += "</svg>";
+            svgParts.push("</svg>");
 
             return (
                 '<svg xmlns="http://www.w3.org/2000/svg" width="' +
@@ -1465,7 +1449,7 @@ class Activity {
                 '" height="' +
                 yMax +
                 '">' +
-                encodeURIComponent(svg)
+                encodeURIComponent(svgParts.join(""))
             );
         };
 
@@ -1696,6 +1680,11 @@ class Activity {
         };
 
         this._doFastButton = env => {
+            // Prevent spam-clicking by checking if already running
+            if (this.logo._alreadyRunning) {
+                return;
+            }
+
             this._onResize();
             this.blocks.activeBlock = null;
             hideDOMLabel();
@@ -1907,9 +1896,37 @@ class Activity {
             function saveFile(recordedChunks) {
                 flag = 1;
                 recInside.classList.remove("blink");
+                const showDialog = message => {
+                    if (window.MBDialog && typeof window.MBDialog.alert === "function") {
+                        window.MBDialog.alert(message, _("Save recording"));
+                    } else {
+                        alert(message);
+                    }
+                };
+                const finalizeSave = filename => {
+                    if (filename === null || filename.trim() === "") {
+                        showDialog(_("File save canceled"));
+                        flag = 0;
+                        recording();
+                        doRecordButton();
+                        return; // Exit without saving the file
+                    }
+                    const downloadLink = document.createElement("a");
+                    downloadLink.href = URL.createObjectURL(blob);
+                    downloadLink.download = `${filename}.webm`;
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    URL.revokeObjectURL(blob);
+                    document.body.removeChild(downloadLink);
+                    flag = 0;
+                    // Allow multiple recordings
+                    recording();
+                    doRecordButton();
+                    that.textMsg(_("Recording stopped. File saved."));
+                };
                 // Prevent zero-byte files
                 if (!recordedChunks || recordedChunks.length === 0) {
-                    alert(_("Recorded file is empty. File not saved."));
+                    showDialog(_("Recorded file is empty. File not saved."));
                     flag = 0;
                     recording();
                     doRecordButton();
@@ -1919,7 +1936,7 @@ class Activity {
                     type: "video/webm"
                 });
                 if (blob.size === 0) {
-                    alert(_("Recorded file is empty. File not saved."));
+                    showDialog(_("Recorded file is empty. File not saved."));
                     flag = 0;
                     recording();
                     doRecordButton();
@@ -1936,26 +1953,18 @@ class Activity {
                 }
                 mediaRecorder = null;
                 // Prompt to save file
-                const filename = window.prompt(_("Enter file name"));
-                if (filename === null || filename.trim() === "") {
-                    alert(_("File save canceled"));
-                    flag = 0;
-                    recording();
-                    doRecordButton();
-                    return; // Exit without saving the file
+                if (window.MBDialog && typeof window.MBDialog.prompt === "function") {
+                    window.MBDialog.prompt({
+                        title: _("Save recording"),
+                        message: _("Filename:"),
+                        defaultValue: _("recording"),
+                        okText: _("Save"),
+                        cancelText: _("Cancel")
+                    }).then(result => finalizeSave(result));
+                } else {
+                    const filename = window.prompt(_("Enter file name"));
+                    finalizeSave(filename);
                 }
-                const downloadLink = document.createElement("a");
-                downloadLink.href = URL.createObjectURL(blob);
-                downloadLink.download = `${filename}.webm`;
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                URL.revokeObjectURL(blob);
-                document.body.removeChild(downloadLink);
-                flag = 0;
-                // Allow multiple recordings
-                recording();
-                doRecordButton();
-                that.textMsg(_("Recording stopped. File saved."));
             }
             /**
              * Stops the recording process.
@@ -2588,7 +2597,6 @@ class Activity {
          * Sets up block actions with regards to different mouse events
          */
         this._setupBlocksContainerEvents = () => {
-            const moving = false;
             const that = this;
             let lastCoords = { x: 0, y: 0, delta: 0 };
 
@@ -2922,6 +2930,15 @@ class Activity {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 1;
             bitmap.visible = false;
 
+            // Apply color filter based on theme
+            const isDarkMode = document.body.classList.contains("dark");
+            const isHighContrastMode = document.body.classList.contains("highcontrast");
+            if (isDarkMode || isHighContrastMode) {
+                // Create an invert filter to turn black elements white
+                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
+                bitmap.filters = [invertFilter];
+            }
+
             return bitmap;
         };
 
@@ -3010,6 +3027,18 @@ class Activity {
             const IDLE_THRESHOLD = 5000; // 5 seconds
             const ACTIVE_FPS = 60;
             const IDLE_FPS = 1;
+            const idleEvents = ["mousemove", "mousedown", "keydown", "touchstart", "wheel"];
+
+            if (this._idleWatcherResetHandler) {
+                idleEvents.forEach(eventType => {
+                    window.removeEventListener(eventType, this._idleWatcherResetHandler);
+                });
+            }
+
+            if (this._idleWatcherIntervalId) {
+                clearInterval(this._idleWatcherIntervalId);
+                this._idleWatcherIntervalId = null;
+            }
 
             let lastActivity = Date.now();
             this.isAppIdle = false;
@@ -3054,11 +3083,6 @@ class Activity {
                     this._resetIdleTimer();
                 }
             }, 1000);
-
-            // Expose activity instance for external checks
-            if (typeof window !== "undefined") {
-                window.activity = this;
-            }
         };
 
         /**
@@ -3131,8 +3155,8 @@ class Activity {
         };
 
         /*
-          Prepare a list of blocks for the search bar autocompletion.
-         */
+             Prepare a list of blocks for the search bar autocompletion.
+            */
         this.prepSearchWidget = () => {
             //searchWidget.style.visibility = "hidden";
             this.searchBlockPosition = [100, 100];
@@ -3156,9 +3180,11 @@ class Activity {
                     if (block.deprecated) {
                         this.deprecatedBlockNames.push(blockLabel);
                     } else {
-                        if (blockLabel.length === 0) {
-                            // Swap in a preferred name when there is no label.
-                            let label = _(block.name);
+                        // Determine the primary label to display for this block.
+                        let label = blockLabel;
+                        if (label.length === 0) {
+                            // Swap in a preferred, localized name when there is no label.
+                            label = _(block.name);
                             switch (block.name) {
                                 case "scaledegree2":
                                     label = _("scale degree");
@@ -3221,30 +3247,30 @@ class Activity {
                                     label = _("load file");
                                     break;
                             }
-                            this.searchSuggestions.push({
-                                label: label,
-                                value: block.name,
-                                specialDict: block,
-                                artwork: artwork
-                            });
-                        } else {
-                            this.searchSuggestions.push({
-                                label: blockLabel,
-                                value: block.name,
-                                specialDict: block,
-                                artwork: artwork
-                            });
                         }
-                        if (block.extraSearchTerms !== undefined) {
-                            for (let i = 0; i < block.extraSearchTerms.length; i++) {
-                                this.searchSuggestions.push({
-                                    label: block.extraSearchTerms[i],
-                                    value: block.name,
-                                    specialDict: block,
-                                    artwork: artwork
-                                });
+
+                        // Build a list of lowercased search terms (primary label + extra terms)
+                        // so we can match synonyms without duplicating the visual entry.
+                        const searchTerms = [];
+                        if (label && label.length > 0) {
+                            searchTerms.push(label.toLowerCase());
+                        }
+                        if (block.extraSearchTerms && Array.isArray(block.extraSearchTerms)) {
+                            for (let j = 0; j < block.extraSearchTerms.length; j++) {
+                                const term = block.extraSearchTerms[j];
+                                if (typeof term === "string" && term.length > 0) {
+                                    searchTerms.push(term.toLowerCase());
+                                }
                             }
                         }
+
+                        this.searchSuggestions.push({
+                            label: label,
+                            value: block.name,
+                            specialDict: block,
+                            artwork: artwork,
+                            searchTerms: searchTerms
+                        });
                     }
                 }
             }
@@ -3348,7 +3374,29 @@ class Activity {
 
             if (!$search.data("autocomplete-init")) {
                 $search.autocomplete({
-                    source: that.searchSuggestions,
+                    // Custom source so we can match on extraSearchTerms but show each block only once.
+                    source: (request, response) => {
+                        const term = (request.term || "").toLowerCase();
+                        const results = that.searchSuggestions.filter(item => {
+                            // If there is no active term, show all items.
+                            if (!term || term.length === 0) {
+                                return true;
+                            }
+
+                            // Prefer matching against searchTerms when present.
+                            if (item.searchTerms && Array.isArray(item.searchTerms)) {
+                                return item.searchTerms.some(t => t && t.indexOf(term) !== -1);
+                            }
+
+                            // Fallback to label matching for legacy entries.
+                            return (
+                                item.label &&
+                                typeof item.label === "string" &&
+                                item.label.toLowerCase().indexOf(term) !== -1
+                            );
+                        });
+                        response(results);
+                    },
                     appendTo: "body",
                     select: (event, ui) => {
                         event.preventDefault();
@@ -3624,15 +3672,21 @@ class Activity {
             const KEYCODE_DOWN = 40;
             const DEL = 46;
             const V = 86;
+            const lilypondModal = document.getElementById("lilypondModal");
+            const samplerPrompt = document.getElementById("samplerPrompt");
+            const planetIframe = document.getElementById("planet-iframe");
+            const pasteEl = this.paste;
+            const wheelDiv = document.getElementById("wheelDiv");
+            const stopbtn = document.getElementById("stop");
             const disableKeys =
-                document.getElementById("lilypondModal").style.display === "block" ||
+                lilypondModal.style.display === "block" ||
                 this.searchWidget.style.visibility === "visible" ||
                 this.helpfulSearchWidget.style.visibility === "visible" ||
                 this.isInputON ||
-                document.getElementById("samplerPrompt") ||
-                document.getElementById("planet-iframe").style.display === "" ||
-                document.getElementById("paste").style.visibility === "visible" ||
-                document.getElementById("wheelDiv").style.display === "" ||
+                samplerPrompt ||
+                planetIframe.style.display === "" ||
+                pasteEl.style.visibility === "visible" ||
+                wheelDiv.style.display === "" ||
                 this.turtles.running();
             const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
@@ -3663,7 +3717,6 @@ class Activity {
                     case 82: {
                         // 'R or ENTER'
                         this.textMsg("Alt-R " + _("Play"));
-                        const stopbtn = document.getElementById("stop");
                         if (stopbtn) {
                             stopbtn.style.color = platformColor.stopIconcolor;
                         }
@@ -3677,9 +3730,9 @@ class Activity {
                         if (this.searchWidget.style.visibility === "visible") {
                             return;
                         }
-                        if (document.getElementById("paste").style.visibility === "visible") {
+                        if (pasteEl.style.visibility === "visible") {
                             this.pasted();
-                            document.getElementById("paste").style.visibility = "hidden";
+                            pasteEl.style.visibility = "hidden";
                             return;
                         }
 
@@ -3690,7 +3743,6 @@ class Activity {
                         if (this.turtles.running()) {
                             this._doHardStopButton();
                         } else if (!hasOpenWidget) {
-                            const stopbtn = document.getElementById("stop");
                             if (stopbtn) {
                                 stopbtn.style.color = platformColor.stopIconcolor;
                             }
@@ -3736,12 +3788,12 @@ class Activity {
                         // this.textMsg("Ctl-V " + _("Paste"));
                         this.pasteBox.createBox(this.turtleBlocksScale, 200, 200);
                         this.pasteBox.show();
-                        document.getElementById("paste").style.left =
+                        pasteEl.style.left =
                             (this.pasteBox.getPos()[0] + 10) * this.turtleBlocksScale + "px";
-                        document.getElementById("paste").style.top =
+                        pasteEl.style.top =
                             (this.pasteBox.getPos()[1] + 10) * this.turtleBlocksScale + "px";
-                        document.getElementById("paste").focus();
-                        document.getElementById("paste").style.visibility = "visible";
+                        pasteEl.focus();
+                        pasteEl.style.visibility = "visible";
                         this.update = true;
                         break;
                 }
@@ -3757,11 +3809,8 @@ class Activity {
                         break;
                 }
             } else {
-                if (
-                    document.getElementById("paste").style.visibility === "visible" &&
-                    event.keyCode === RETURN
-                ) {
-                    if (document.getElementById("paste").value.length > 0) {
+                if (pasteEl.style.visibility === "visible" && event.keyCode === RETURN) {
+                    if (pasteEl.value.length > 0) {
                         this.pasted();
                     }
                 } else if (event.keyCode === SPACE) {
@@ -3774,7 +3823,6 @@ class Activity {
                         this._doHardStopButton();
                     } else if (!disableKeys && !hasOpenWidget) {
                         event.preventDefault();
-                        const stopbtn = document.getElementById("stop");
                         if (stopbtn) {
                             stopbtn.style.color = platformColor.stopIconcolor;
                         }
@@ -4004,21 +4052,21 @@ class Activity {
             if (smallSide < this.cellSize * 9) {
                 mobileSize = false;
                 /*
-                if (w < this.cellSize * 10) {
-                    this.turtleBlocksScale = smallSide / (this.cellSize * 11);
-                } else {
-                    this.turtleBlocksScale = Math.max(smallSide / (this.cellSize * 11), 0.75);
-                }
-                */
+                   if (w < this.cellSize * 10) {
+                       this.turtleBlocksScale = smallSide / (this.cellSize * 11);
+                   } else {
+                       this.turtleBlocksScale = Math.max(smallSide / (this.cellSize * 11), 0.75);
+                   }
+                   */
             } else {
                 mobileSize = false;
                 /*
-                if (w / 1200 > h / 900) {
-                    this.turtleBlocksScale = w / 1200;
-                } else {
-                    this.turtleBlocksScale = h / 900;
-                }
-                */
+                   if (w / 1200 > h / 900) {
+                       this.turtleBlocksScale = w / 1200;
+                   } else {
+                       this.turtleBlocksScale = h / 900;
+                   }
+                   */
             }
 
             this.turtleBlocksScale = 1.0;
@@ -4182,7 +4230,7 @@ class Activity {
                 canvas.width = defaultWidth;
                 canvas.height = defaultHeight;
                 overCanvas.width = canvas.width;
-                overCanvas.height = canvas.width;
+                overCanvas.height = canvas.height;
                 canvasHolder.width = defaultWidth;
                 canvasHolder.height = defaultHeight;
             } else {
@@ -4196,10 +4244,8 @@ class Activity {
 
                 container.style.width = windowWidth + "px";
                 container.style.height = windowHeight + "px";
-                canvas.width = windowWidth;
-                canvas.height = windowHeight;
                 overCanvas.width = canvas.width;
-                overCanvas.height = canvas.width;
+                overCanvas.height = canvas.height;
                 canvasHolder.width = canvas.width;
                 canvasHolder.height = canvas.height;
             }
@@ -4639,6 +4685,21 @@ class Activity {
                 this.blocks.blockList[blk].trash = true;
                 this.blocks.moveBlockRelative(blk, dx, dy);
                 this.blocks.blockList[blk].hide();
+
+                // Free the backing canvas memory for trashed blocks.
+                // Each cached block holds a bitmap canvas (~0.5-2 MB).
+                // This matches the cleanup pattern in sendStackToTrash().
+                if (this.blocks.blockList[blk].container) {
+                    this.blocks.blockList[blk].container.uncache();
+                }
+
+                // Clean up SVG art strings to free memory.
+                if (this.blocks.blockArt[blk]) {
+                    delete this.blocks.blockArt[blk];
+                }
+                if (this.blocks.blockCollapseArt[blk]) {
+                    delete this.blocks.blockCollapseArt[blk];
+                }
             }
 
             if (addStartBlock) {
@@ -4760,13 +4821,19 @@ class Activity {
          * Updates all canvas elements by marking stage as dirty.
          * The actual render will happen on the next animation frame.
          */
+        let refreshCount = 0;
+        let totalRefreshTime = 0;
+        let maxRefreshTime = 0;
+        let lastRefreshReport = performance.now();
+
         this.refreshCanvas = () => {
             if (this.blockRefreshCanvas) {
                 return;
             }
 
+            const start = window.__ENABLE_REFRESH_PROFILING__ ? performance.now() : 0;
+
             this.blockRefreshCanvas = true;
-            // Mark stage as needing update
             this.stageDirty = true;
             this.update = true;
 
@@ -4774,6 +4841,27 @@ class Activity {
             setTimeout(() => {
                 that.blockRefreshCanvas = false;
                 that.stageDirty = true;
+
+                if (window.__ENABLE_REFRESH_PROFILING__) {
+                    const duration = performance.now() - start;
+                    refreshCount++;
+                    totalRefreshTime += duration;
+                    maxRefreshTime = Math.max(maxRefreshTime, duration);
+
+                    if (refreshCount % 25 === 0) {
+                        const now = performance.now();
+                        const cps = (25 / (now - lastRefreshReport)) * 1000;
+                        console.log(
+                            `refreshCanvas | Avg: ${(totalRefreshTime / refreshCount).toFixed(
+                                2
+                            )}ms | Max: ${maxRefreshTime.toFixed(2)}ms | Rate: ${cps.toFixed(
+                                1
+                            )} calls/sec`
+                        );
+                        maxRefreshTime = 0;
+                        lastRefreshReport = now;
+                    }
+                }
             }, 5);
         };
 
@@ -5150,14 +5238,14 @@ class Activity {
         }
 
         /*
-          The parseABC function converts ABC notation to Music Blocks
-          and is able to convert almost all the ABC notation to Music
-          Blocks. However, the following aspects need work:
-        
-          Hammers, pulls, and sliding offs grace notes (breaking the
-          conversion) Alternate endings (not failing but not showing
-          correctly) and DS al coda Bass voicing (failing)
-        */
+             The parseABC function converts ABC notation to Music Blocks
+             and is able to convert almost all the ABC notation to Music
+             Blocks. However, the following aspects need work:
+   
+             Hammers, pulls, and sliding offs grace notes (breaking the
+             conversion) Alternate endings (not failing but not showing
+             correctly) and DS al coda Bass voicing (failing)
+           */
         this.parseABC = async function (tune) {
             const musicBlocksJSON = [];
             const staffBlocksMap = {};
@@ -5934,6 +6022,15 @@ class Activity {
          */
         this._showCartesian = () => {
             this.cartesianBitmap.visible = true;
+            // Apply color filter based on theme
+            const isDarkMode = document.body.classList.contains("dark");
+            const isHighContrastMode = document.body.classList.contains("highcontrast");
+            if (isDarkMode || isHighContrastMode) {
+                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
+                this.cartesianBitmap.filters = [invertFilter];
+            } else {
+                this.cartesianBitmap.filters = [];
+            }
             this.cartesianBitmap.cache(0, 0, 1200, 900);
             this.cartesianBitmap.updateCache();
             this.update = true;
@@ -5953,6 +6050,15 @@ class Activity {
          */
         this._showPolar = () => {
             this.polarBitmap.visible = true;
+            // Apply color filter based on theme
+            const isDarkMode = document.body.classList.contains("dark");
+            const isHighContrastMode = document.body.classList.contains("highcontrast");
+            if (isDarkMode || isHighContrastMode) {
+                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
+                this.polarBitmap.filters = [invertFilter];
+            } else {
+                this.polarBitmap.filters = [];
+            }
             this.polarBitmap.cache(0, 0, 1200, 900);
             this.polarBitmap.updateCache();
             this.update = true;
@@ -6012,6 +6118,15 @@ class Activity {
          */
         this._showTreble = () => {
             this.trebleBitmap.visible = true;
+            // Apply color filter based on theme
+            const isDarkMode = document.body.classList.contains("dark");
+            const isHighContrastMode = document.body.classList.contains("highcontrast");
+            if (isDarkMode || isHighContrastMode) {
+                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
+                this.trebleBitmap.filters = [invertFilter];
+            } else {
+                this.trebleBitmap.filters = [];
+            }
             this.trebleBitmap.cache(0, 0, 1200, 900);
             this.trebleBitmap.updateCache();
             this._hideAccidentals();
@@ -6070,6 +6185,15 @@ class Activity {
          */
         this._showGrand = () => {
             this.grandBitmap.visible = true;
+            // Apply color filter based on theme
+            const isDarkMode = document.body.classList.contains("dark");
+            const isHighContrastMode = document.body.classList.contains("highcontrast");
+            if (isDarkMode || isHighContrastMode) {
+                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
+                this.grandBitmap.filters = [invertFilter];
+            } else {
+                this.grandBitmap.filters = [];
+            }
             this.grandBitmap.cache(0, 0, 1200, 900);
             this.grandBitmap.updateCache();
             this._hideAccidentals();
@@ -6126,6 +6250,15 @@ class Activity {
          */
         this._showSoprano = () => {
             this.sopranoBitmap.visible = true;
+            // Apply color filter based on theme
+            const isDarkMode = document.body.classList.contains("dark");
+            const isHighContrastMode = document.body.classList.contains("highcontrast");
+            if (isDarkMode || isHighContrastMode) {
+                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
+                this.sopranoBitmap.filters = [invertFilter];
+            } else {
+                this.sopranoBitmap.filters = [];
+            }
             this.sopranoBitmap.cache(0, 0, 1200, 900);
             this.sopranoBitmap.updateCache();
             this._hideAccidentals();
@@ -6188,6 +6321,15 @@ class Activity {
          */
         this._showAlto = () => {
             this.altoBitmap.visible = true;
+            // Apply color filter based on theme
+            const isDarkMode = document.body.classList.contains("dark");
+            const isHighContrastMode = document.body.classList.contains("highcontrast");
+            if (isDarkMode || isHighContrastMode) {
+                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
+                this.altoBitmap.filters = [invertFilter];
+            } else {
+                this.altoBitmap.filters = [];
+            }
             this.altoBitmap.cache(0, 0, 1200, 900);
             this.altoBitmap.updateCache();
             this._hideAccidentals();
@@ -6245,6 +6387,15 @@ class Activity {
          */
         this._showTenor = () => {
             this.tenorBitmap.visible = true;
+            // Apply color filter based on theme
+            const isDarkMode = document.body.classList.contains("dark");
+            const isHighContrastMode = document.body.classList.contains("highcontrast");
+            if (isDarkMode || isHighContrastMode) {
+                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
+                this.tenorBitmap.filters = [invertFilter];
+            } else {
+                this.tenorBitmap.filters = [];
+            }
             this.tenorBitmap.cache(0, 0, 1200, 900);
             this.tenorBitmap.updateCache();
             this._hideAccidentals();
@@ -6303,6 +6454,15 @@ class Activity {
          */
         this._showBass = () => {
             this.bassBitmap.visible = true;
+            // Apply color filter based on theme
+            const isDarkMode = document.body.classList.contains("dark");
+            const isHighContrastMode = document.body.classList.contains("highcontrast");
+            if (isDarkMode || isHighContrastMode) {
+                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
+                this.bassBitmap.filters = [invertFilter];
+            } else {
+                this.bassBitmap.filters = [];
+            }
             this.bassBitmap.cache(0, 0, 1200, 900);
             this.bassBitmap.updateCache();
             this._hideAccidentals();
@@ -6543,10 +6703,45 @@ class Activity {
             activity._doOpenPlugin();
         };
 
+        this._loadBuiltInPlugin = name => {
+            const url = "plugins/" + name + ".json";
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            const that = this;
+            xhr.onload = () => {
+                if (xhr.status === 200) {
+                    const obj = processRawPluginData(that, xhr.responseText, url);
+                    // Save plugins to local storage.
+                    if (obj !== null) {
+                        that.storage.plugins = preparePluginExports(that, obj);
+                    }
+                    // Refresh the palettes.
+                    setTimeout(() => {
+                        if (that.palettes.visible) {
+                            that.palettes.hide();
+                        }
+                    }, 1000);
+                } else {
+                    console.error("Could not load built-in plugin: " + name);
+                }
+            };
+            xhr.send();
+        };
+
         this._doOpenPlugin = () => {
             this.toolbar.closeAuxToolbar(showHideAuxMenu);
-            this.pluginChooser.focus();
-            this.pluginChooser.click();
+            const name = prompt(
+                _("Enter the name of a built-in plugin, or leave blank to upload a plugin file:")
+            );
+            if (name === null) {
+                return; // User cancelled the operation
+            }
+            if (name.trim() !== "") {
+                this._loadBuiltInPlugin(name.trim().toLowerCase());
+            } else {
+                this.pluginChooser.focus();
+                this.pluginChooser.click();
+            }
         };
 
         /*
@@ -6836,7 +7031,25 @@ class Activity {
 
             if (!$helpfulSearch.data("autocomplete-init")) {
                 $helpfulSearch.autocomplete({
-                    source: that.searchSuggestions,
+                    source: (request, response) => {
+                        const term = (request.term || "").toLowerCase();
+                        const results = that.searchSuggestions.filter(item => {
+                            if (!term || term.length === 0) {
+                                return true;
+                            }
+
+                            if (item.searchTerms && Array.isArray(item.searchTerms)) {
+                                return item.searchTerms.some(t => t && t.indexOf(term) !== -1);
+                            }
+
+                            return (
+                                item.label &&
+                                typeof item.label === "string" &&
+                                item.label.toLowerCase().indexOf(term) !== -1
+                            );
+                        });
+                        response(results);
+                    },
                     appendTo: "body",
                     select: (event, ui) => {
                         event.preventDefault();
@@ -6912,12 +7125,34 @@ class Activity {
         /**
          * Toggles display of javaScript editor widget.
          */
-        const toggleJSWindow = activity => {
+        const toggleJSWindow = async activity => {
+            await lazyLoad([
+                "widgets/jseditor",
+                "activity/js-export/samples/sample",
+                "activity/js-export/export",
+                "activity/js-export/interface",
+                "activity/js-export/constraints",
+                "activity/js-export/ASTutils",
+                "activity/js-export/generate",
+                "activity/js-export/ast2blocklist",
+                "activity/js-export/API/GraphicsBlocksAPI",
+                "activity/js-export/API/PenBlocksAPI",
+                "activity/js-export/API/RhythmBlocksAPI",
+                "activity/js-export/API/MeterBlocksAPI",
+                "activity/js-export/API/PitchBlocksAPI",
+                "activity/js-export/API/IntervalsBlocksAPI",
+                "activity/js-export/API/ToneBlocksAPI",
+                "activity/js-export/API/OrnamentBlocksAPI",
+                "activity/js-export/API/VolumeBlocksAPI",
+                "activity/js-export/API/DrumBlocksAPI",
+                "activity/js-export/API/DictBlocksAPI"
+            ]);
             new JSEditor(activity);
         };
 
-        const doAnalytics = activity => {
+        const doAnalytics = async activity => {
             if (!activity.statsWindow || !activity.statsWindow.isOpen) {
+                await lazyLoad("widgets/statistics");
                 activity.statsWindow = new StatsWindow(activity);
             }
         };
@@ -6929,8 +7164,9 @@ class Activity {
             activity._showHelp();
         };
 
-        this._showHelp = () => {
+        this._showHelp = async () => {
             // Will show welcome page by default.
+            await lazyLoad("widgets/help");
             new HelpWidget(this, false);
         };
 
@@ -6941,8 +7177,9 @@ class Activity {
             activity._showAboutPage();
         };
 
-        this._showAboutPage = () => {
+        this._showAboutPage = async () => {
             // Will show welcome page by default.
+            await lazyLoad("widgets/help");
             new HelpWidget(this, false);
         };
 
@@ -7020,10 +7257,15 @@ class Activity {
             }
 
             const cleanData = rawData.replace("\n", " ");
+
             try {
                 obj = JSON.parse(cleanData);
             } catch (e) {
-                this.errorMsg(_("Could not parse JSON input."));
+                this.errorMsg(
+                    _(
+                        "Invalid clipboard data. To paste blocks, first copy them from the Music Blocks canvas. To paste text, click inside an input field."
+                    )
+                );
                 return;
             }
 
@@ -7071,7 +7313,14 @@ class Activity {
             this.update = true;
 
             // Get things started
+            this._perfMark("activity.domReady.start");
             await this.init();
+            this._perfMark("activity.domReady.end");
+            this._perfMeasure(
+                "activity.domReady_total",
+                "activity.domReady.start",
+                "activity.domReady.end"
+            );
         };
 
         this.__saveLocally = () => {
@@ -7362,25 +7611,27 @@ class Activity {
         // Unhighlight the selected blocks
 
         this.unhighlightSelectedBlocks = (unhighlight, selectionModeOn) => {
-            // Build a Set of selected block indices for O(1) lookup
-            // instead of O(n*m) deep-equality comparisons.
-            const selectedSet = new Set();
+            const blockIndexMap = new Map();
+            for (const [index, block] of this.blocks.blockList.entries()) {
+                if (block) {
+                    blockIndexMap.set(block, index);
+                }
+            }
+
             for (let i = 0; i < this.selectedBlocks.length; i++) {
-                const idx = this.blocks.blockList.indexOf(this.selectedBlocks[i]);
-                if (idx >= 0) {
-                    selectedSet.add(idx);
+                const blockIndex = blockIndexMap.get(this.selectedBlocks[i]);
+                if (blockIndex === undefined) {
+                    continue;
                 }
-            }
 
-            for (const blk of selectedSet) {
                 if (unhighlight) {
-                    this.blocks.unhighlightSelectedBlocks(blk, true);
+                    this.blocks.unhighlightSelectedBlocks(blockIndex, true);
                 } else {
-                    this.blocks.highlight(blk, true);
+                    this.blocks.highlight(blockIndex, true);
                 }
             }
 
-            if (!unhighlight && selectedSet.size > 0) {
+            if (!unhighlight && this.selectedBlocks.length > 0) {
                 this.refreshCanvas();
             }
         };
@@ -7416,6 +7667,7 @@ class Activity {
             this._initialized = true;
 
             // Batch DOM reads before any writes to avoid forced synchronous layout
+            this._perfMark("activity.init.start");
             this._clientWidth = document.body.clientWidth;
             this._clientHeight = document.body.clientHeight;
             this._innerWidth = window.innerWidth;
@@ -7526,6 +7778,10 @@ class Activity {
             this.pasteBox = new PasteBox(this);
             this.languageBox = new LanguageBox(this);
             this.themeBox = new ThemeBox(this);
+            // Initialize theme state on page load if method exists
+            if (this.themeBox && typeof this.themeBox.initializeTheme === "function") {
+                this.themeBox.initializeTheme();
+            }
 
             // Show help on startup if first-time user.
             if (this.firstTimeUser) {
@@ -7584,6 +7840,7 @@ class Activity {
             this.toolbar.renderJavaScriptIcon(toggleJSWindow);
             this.toolbar.renderLanguageSelectIcon(this.languageBox);
             this.toolbar.renderWrapIcon();
+            this._perfMark("activity.init.ui_ready");
 
             initPalettes(this.palettes);
 
@@ -7828,11 +8085,12 @@ class Activity {
                 };
 
                 // Music Block Parser from abc to MB
-                abcReader.onload = event => {
+                abcReader.onload = async event => {
                     //get the abc data and replace the / so that the block does not break
                     let abcData = event.target.result;
                     abcData = abcData.replace(/\\/g, "");
 
+                    await ensureABCJS();
                     const tunebook = new ABCJS.parseOnly(abcData);
 
                     console.log(tunebook);
@@ -7900,7 +8158,9 @@ class Activity {
                             const obj = processRawPluginData(
                                 that,
                                 reader.result,
-                                pluginFile && pluginFile.name ? pluginFile.name : "local-file"
+                                pluginFile && pluginFile.name
+                                    ? "file:" + pluginFile.name
+                                    : "file:local-file"
                             );
                             // Save plugins to local storage.
                             if (obj !== null) {
@@ -8067,7 +8327,9 @@ class Activity {
                                         },
                                         () => {
                                             alert(
-                                                "Something went wrong reading JSON-encoded project data."
+                                                _(
+                                                    "Something went wrong reading JSON-encoded project data."
+                                                )
                                             );
                                         }
                                     );
@@ -8112,9 +8374,9 @@ class Activity {
             this._create2Ddrag();
 
             /*
-            document.addEventListener("mousewheel", scrollEvent, false);
-            document.addEventListener("DOMMouseScroll", scrollEvent, false);
-            */
+               document.addEventListener("mousewheel", scrollEvent, false);
+               document.addEventListener("DOMMouseScroll", scrollEvent, false);
+               */
 
             // Named event handler for proper cleanup
             const activity = this;
@@ -8128,7 +8390,71 @@ class Activity {
             if (this.planet !== undefined) {
                 this.planet.planet.setAnalyzeProject(doAnalyzeProject);
             }
+
+            this._perfMark("activity.init.end");
+            this._perfMeasure("activity.init_total", "activity.init.start", "activity.init.end");
+            this._perfMeasure(
+                "activity.init_to_ui_ready",
+                "activity.init.start",
+                "activity.init.ui_ready"
+            );
+            this._perfMeasure(
+                "loader_to_activity_init_complete",
+                "loader.main.start",
+                "activity.init.end"
+            );
+
+            if (
+                typeof window !== "undefined" &&
+                window.__mbPerf &&
+                typeof window.__mbPerf.report === "function"
+            ) {
+                window.__mbPerf.report();
+            }
         };
+    }
+
+    /**
+     * Record a named performance mark in the global mbPerf tracker.
+     * @param {string} markName - The mark identifier.
+     * @returns {void}
+     */
+    _perfMark(markName) {
+        if (
+            typeof window === "undefined" ||
+            !window.__mbPerf ||
+            !window.__mbPerf.enabled ||
+            !window.__mbPerf.marks
+        ) {
+            return;
+        }
+        if (typeof performance === "undefined" || typeof performance.now !== "function") {
+            return;
+        }
+        window.__mbPerf.marks[markName] = performance.now();
+    }
+
+    /**
+     * Measure elapsed milliseconds between two mbPerf marks.
+     * @param {string} measureName - The measure identifier.
+     * @param {string} startMark - Start mark name.
+     * @param {string} endMark - End mark name.
+     * @returns {void}
+     */
+    _perfMeasure(measureName, startMark, endMark) {
+        if (
+            typeof window === "undefined" ||
+            !window.__mbPerf ||
+            !window.__mbPerf.enabled ||
+            !window.__mbPerf.marks ||
+            !window.__mbPerf.measures
+        ) {
+            return;
+        }
+        const start = window.__mbPerf.marks[startMark];
+        const end = window.__mbPerf.marks[endMark];
+        if (typeof start !== "number" || typeof end !== "number") return;
+        window.__mbPerf.measures[measureName] = +(end - start).toFixed(2);
     }
 
     /**
@@ -8188,6 +8514,18 @@ class Activity {
             if (target && typeof target.removeEventListener === "function") {
                 target.removeEventListener(type, listener, options);
             }
+        }
+
+        if (this._idleWatcherResetHandler) {
+            ["mousemove", "mousedown", "keydown", "touchstart", "wheel"].forEach(eventType => {
+                window.removeEventListener(eventType, this._idleWatcherResetHandler);
+            });
+            this._idleWatcherResetHandler = null;
+        }
+
+        if (this._idleWatcherIntervalId) {
+            clearInterval(this._idleWatcherIntervalId);
+            this._idleWatcherIntervalId = null;
         }
     }
 

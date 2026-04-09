@@ -343,8 +343,9 @@ class PhraseMaker {
      * Initializes the PhraseMaker matrix widget.
      * This method sets up the PhraseMaker matrix in the DOM (Document Object Model) and initializes its functionality.
      * @param {Activity} activity - The activity instance associated with the PhraseMaker widget.
+     * @param {number} [turtleIndex=0] - Index of the turtle that triggered this widget.
      */
-    init(activity) {
+    init(activity, turtleIndex = 0) {
         // Initializes the matrix. First removes the previous matrix
         // and then make another one in DOM (document object model)
         let tempTable;
@@ -352,15 +353,14 @@ class PhraseMaker {
 
         this._currentMusicalTime = 0; // Tracks duration used in the current bar
 
-        // Get the meter from the turtle's singer (Meter Block sets this)
-        const turtle = activity.turtles.ithTurtle(0); // Get turtle 0
-        const beatsPerMeasure = turtle.singer.beatsPerMeasure || 4; // Default to 4
-        const noteValuePerBeat = turtle.singer.noteValuePerBeat || 4; // Default to 4
+        // Read the meter from the turtle that triggered this widget so that
+        // bar-line separators reflect the correct time signature.
+        const turtle = activity.turtles.ithTurtle(turtleIndex);
+        const beatsPerMeasure = turtle.singer.beatsPerMeasure || 4;
+        const noteValuePerBeat = turtle.singer.noteValuePerBeat || 4;
 
-        // Calculate the duration of ONE measure
-        // beatsPerMeasure is the number of beats (e.g., 3 for 3/4)
-        // noteValuePerBeat is the note type that gets one beat (e.g., 4 for quarter note)
-        // For 3/4: 3 beats * (1/4) = 0.75
+        // Calculate the duration of ONE measure.
+        // For 3/4: 3 beats × (1/4) = 0.75
         this._measureLimit = beatsPerMeasure / noteValuePerBeat;
 
         this._noteStored = [];
@@ -3897,10 +3897,17 @@ class PhraseMaker {
                     };
                 }
             } else {
-                cell.removeEventListener("mousedown", __mouseDownHandler);
-                cell.addEventListener("mousedown", __mouseDownHandler);
+                // Remove previously stored handlers to prevent listener accumulation
+                if (cell._pmMouseDown) {
+                    cell.removeEventListener("mousedown", cell._pmMouseDown);
+                }
+                if (cell._pmMouseUp) {
+                    cell.removeEventListener("mouseup", cell._pmMouseUp);
+                }
 
-                cell.removeEventListener("mouseup", __mouseUpHandler);
+                cell._pmMouseDown = __mouseDownHandler;
+                cell._pmMouseUp = __mouseUpHandler;
+                cell.addEventListener("mousedown", __mouseDownHandler);
                 cell.addEventListener("mouseup", __mouseUpHandler);
             }
         }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014-21 Walter Bender
+// Copyright (c) 2014-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -10,8 +10,8 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 //
 
-/*
-   global
+/* eslint-disable no-redeclare */
+/* global
 
     ACCIDENTALLABELS, ACCIDENTALNAMES, addTemperamentToDictionary,
    blockBlocks, COLLAPSEBUTTON, COLLAPSETEXTX, COLLAPSETEXTY,
@@ -231,7 +231,7 @@ const _blockMakeBitmap = (data, callback, args) => {
         callback(bitmap, args);
     };
 
-    img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
+    img.src = "data:image/svg+xml;base64," + window.btoa(window.base64Encode(data));
 };
 
 // Optimization: Cache static DOM elements to avoid repetitive querySelector/getElementById calls
@@ -1039,8 +1039,30 @@ class Block {
             this.container.removeChild(this.highlightCollapseBlockBitmap);
         }
 
+        // Temporarily remove imageBitmap to prevent it from corrupting bounds during regeneration
+        let tempImageBitmap = null;
+        if (this.imageBitmap != null) {
+            tempImageBitmap = this.imageBitmap;
+            this.container.removeChild(this.imageBitmap);
+            this.imageBitmap = null;
+        }
+
         // Then we generate new artwork.
         this.generateArtwork(false);
+
+        // Restore the imageBitmap after artwork generation
+        if (tempImageBitmap != null) {
+            this.imageBitmap = tempImageBitmap;
+            this.container.addChild(this.imageBitmap);
+            this._positionMedia(
+                this.imageBitmap,
+                this.imageBitmap.image.width,
+                this.imageBitmap.image.height,
+                this.protoblock.scale
+            );
+            const zIndex = this.container.children.length - 1;
+            this.container.setChildIndex(this.imageBitmap, zIndex);
+        }
     }
 
     /**
@@ -1551,7 +1573,8 @@ class Block {
                 __finishCollapse(that);
             };
 
-            image.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBUTTON));
+            image.src =
+                "data:image/svg+xml;base64," + window.btoa(window.base64Encode(COLLAPSEBUTTON));
         };
 
         /**
@@ -1582,7 +1605,8 @@ class Block {
                 __processCollapseButton(that);
             };
 
-            image.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(EXPANDBUTTON));
+            image.src =
+                "data:image/svg+xml;base64," + window.btoa(window.base64Encode(EXPANDBUTTON));
         };
 
         /**
@@ -2640,8 +2664,8 @@ class Block {
                 if (this.blocks.blockList[c2].name === "number") {
                     if (this.blocks.blockList[c1].name === "number") {
                         const degrees = DEGREES.split(" ");
-                        const i = this.blocks.blockList[c1].value - 1;
-                        if (i > 0 && i < degrees.length) {
+                        const i = this.blocks.blockList[c1].value;
+                        if (i >= 0 && i < degrees.length) {
                             return degrees[i] + " " + this.blocks.blockList[c2].value;
                         } else {
                             return (
@@ -2823,21 +2847,22 @@ class Block {
      * @returns {void}
      */
     _positionMedia(bitmap, width, height, blockScale) {
-        if (width > height) {
-            bitmap.scaleX =
-                bitmap.scaleY =
-                bitmap.scale =
-                    ((MEDIASAFEAREA[2] / width) * blockScale) / 2;
-        } else {
-            bitmap.scaleX =
-                bitmap.scaleY =
-                bitmap.scale =
-                    ((MEDIASAFEAREA[3] / height) * blockScale) / 2;
-        }
+        // Use actual block dimensions instead of MEDIASAFEAREA to ensure image fits
+        // Account for padding (approximately 20% of block size for margins)
+        const maxWidth = this.width * 0.6; // Leave 40% for block chrome
+        const maxHeight = this.height * 0.6; // Leave 40% for block chrome
+
+        // Calculate scale to fit within both dimensions
+        const scaleX = maxWidth / width;
+        const scaleY = maxHeight / height;
+
+        // Use the minimum to ensure it fits in both dimensions
+        bitmap.scaleX = bitmap.scaleY = bitmap.scale = Math.min(scaleX, scaleY);
+
+        // Center the image within the block
         bitmap.x = ((MEDIASAFEAREA[0] - 10) * blockScale) / 2;
         bitmap.y = (MEDIASAFEAREA[1] * blockScale) / 2;
     }
-
     /**
      * Position the label for a collapsed block.
      * @private
@@ -3457,7 +3482,10 @@ class Block {
             return false;
         }
 
-        if (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC1.length === 0) {
+        if (
+            (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC1?.length ?? 0) ===
+            0
+        ) {
             return false;
         }
 
@@ -3479,7 +3507,10 @@ class Block {
             return false;
         }
 
-        if (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC2.length === 0) {
+        if (
+            (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC2?.length ?? 0) ===
+            0
+        ) {
             return false;
         }
 
@@ -3501,7 +3532,10 @@ class Block {
             return false;
         }
 
-        if (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC3.length === 0) {
+        if (
+            (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC3?.length ?? 0) ===
+            0
+        ) {
             return false;
         }
 
@@ -3667,7 +3701,11 @@ class Block {
                 const noteLabels = {};
                 const customLabels = [];
                 for (let i = 0; i < keys.length; i++) {
-                    noteLabels[keys[i]] = getTemperament(keys[i]);
+                    const temperament = getTemperament(keys[i]);
+                    // Only add valid temperaments to noteLabels
+                    if (temperament && typeof temperament === "object") {
+                        noteLabels[keys[i]] = temperament;
+                    }
                     if (isCustomTemperament(keys[i])) {
                         customLabels.push(keys[i]);
                     }
@@ -3682,7 +3720,18 @@ class Block {
                 if (this.value != null) {
                     selectedNote = this.value;
                 } else {
-                    selectedNote = getTemperament(selectedCustom)["0"][1];
+                    // Ensure we have a valid temperament before accessing its properties
+                    const selectedTemperament = getTemperament(selectedCustom);
+                    if (
+                        selectedTemperament &&
+                        selectedTemperament["0"] &&
+                        selectedTemperament["0"][1]
+                    ) {
+                        selectedNote = selectedTemperament["0"][1];
+                    } else {
+                        // Fallback to a default note
+                        selectedNote = "C";
+                    }
                 }
 
                 piemenuCustomNotes(this, noteLabels, customLabels, selectedCustom, selectedNote);
@@ -4277,7 +4326,6 @@ class Block {
             this.label.style.transform = `translate3d(${left}px, ${top}px, 0)`;
             this.label.style.left = "0px";
             this.label.style.top = "0px";
-
             this.label.style.width =
                 Math.round((selectorWidth * this.blocks.blockScale * this.protoblock.scale) / 2) +
                 "px";
