@@ -159,7 +159,7 @@ class Blocks {
             activityOrDeps &&
             activityOrDeps.storage &&
             activityOrDeps.turtles &&
-            activityOrDeps.refreshCanvas;
+            activityOrDeps.tick;
 
         if (isExplicitDeps) {
             this.deps = activityOrDeps;
@@ -172,8 +172,12 @@ class Blocks {
                 turtles: deps.turtles,
                 boundary: deps.boundary,
                 macroDict: deps.macroDict,
-                palettes: deps.palettes,
-                logo: deps.logo,
+                get palettes() {
+                    return deps.palettes;
+                },
+                get logo() {
+                    return deps.logo;
+                },
                 blocksContainer: deps.blocksContainer,
                 canvas: deps.canvas,
                 refreshCanvas: () => deps.refreshCanvas(),
@@ -187,22 +191,27 @@ class Blocks {
         } else {
             this.activity = activityOrDeps;
             // Create a deps view over the activity object
+            const activity = this.activity;
             this.deps = {
-                storage: this.activity.storage,
-                trashcan: this.activity.trashcan,
-                turtles: this.activity.turtles,
-                boundary: this.activity.boundary,
-                macroDict: this.activity.macroDict,
-                palettes: this.activity.palettes,
-                logo: this.activity.logo,
-                blocksContainer: this.activity.blocksContainer,
-                canvas: this.activity.canvas,
-                refreshCanvas: () => this.activity.refreshCanvas(),
-                errorMsg: (msg, blk) => this.activity.errorMsg(msg, blk),
-                setSelectionMode: selection => this.activity.setSelectionMode(selection),
-                stopLoadAnimation: () => this.activity.stopLoadAnimation(),
-                setHomeContainers: val => this.activity.setHomeContainers(val),
-                tick: () => this.activity.__tick()
+                storage: activity.storage,
+                trashcan: activity.trashcan,
+                turtles: activity.turtles,
+                boundary: activity.boundary,
+                macroDict: activity.macroDict,
+                get palettes() {
+                    return activity.palettes;
+                },
+                get logo() {
+                    return activity.logo;
+                },
+                blocksContainer: activity.blocksContainer,
+                canvas: activity.canvas,
+                refreshCanvas: () => activity.refreshCanvas(),
+                errorMsg: (msg, blk) => activity.errorMsg(msg, blk),
+                setSelectionMode: selection => activity.setSelectionMode(selection),
+                stopLoadAnimation: () => activity.stopLoadAnimation(),
+                setHomeContainers: val => activity.setHomeContainers(val),
+                tick: () => activity.__tick()
             };
         }
 
@@ -211,8 +220,18 @@ class Blocks {
         this.turtles = this.deps.turtles;
         this.boundary = this.deps.boundary;
         this.macroDict = this.deps.macroDict;
-        this.palettes = this.deps.palettes;
-        this.logo = this.deps.logo;
+
+        // Use getters for dependencies that may be initialized after Blocks
+        Object.defineProperty(this, "palettes", {
+            get: () => this.deps.palettes,
+            configurable: true,
+            enumerable: true
+        });
+        Object.defineProperty(this, "logo", {
+            get: () => this.deps.logo,
+            configurable: true,
+            enumerable: true
+        });
 
         /** Did the user right click? */
         this.stageClick = false;
@@ -7489,7 +7508,7 @@ class Blocks {
 }
 // Export Blocks
 if (typeof define === "function" && define.amd) {
-    define(["js/BlocksDependencies"], function (BlocksDependencies) {
+    define([], function () {
         return Blocks;
     });
 }
