@@ -50,6 +50,20 @@ class HelpWidget {
         widgetWindow.clear();
         widgetWindow.show();
         widgetWindow.onclose = () => {
+            // Clean up all event listeners
+            this._cleanupEventListeners();
+            this.activity.hideMsgs();
+            
+            // Remove tour-active class when closing
+            if (this._helpDiv) {
+                this._helpDiv.classList.remove("tour-active");
+            }
+            
+            // Remove tour-active class from window frame
+            if (this.widgetWindow && this.widgetWindow._frame) {
+                this.widgetWindow._frame.classList.remove("tour-active");
+            }
+            
             this.isOpen = false;
             document.onkeydown = activity.__keyPressed;
             widgetWindow.destroy();
@@ -89,6 +103,11 @@ class HelpWidget {
 
         this._helpDiv.insertAdjacentHTML("afterbegin", innerHTML);
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
+        
+        // Add tour-active class to window frame
+        if (this.widgetWindow._frame) {
+            this.widgetWindow._frame.classList.add("tour-active");
+        }
 
         let leftArrow, rightArrow;
         if (!useActiveBlock) {
@@ -458,20 +477,6 @@ class HelpWidget {
      * @param {ProtoBlock} block
      * @returns {void}
      */
-    _blockHelp(block) {
-        const widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
-        this.widgetWindow = widgetWindow;
-        widgetWindow.clear();
-        this._helpDiv = document.createElement("div");
-
-        //this._helpDiv.style.width = "500px";
-        this._helpDiv.style.height = "70vh";
-        // this._helpDiv.style.backgroundColor = "#e8e8e8";
-
-        const helpDivHTML =
-            '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpScrollWrapper"><div id="helpBodyDiv" tabindex="-1"></div></div>';
-        this._helpDiv.insertAdjacentHTML("afterbegin", helpDivHTML);
-
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
         let cell = docById("right-arrow");
         const rightArrow = docById("right-arrow");
@@ -505,6 +510,13 @@ class HelpWidget {
                 this.widgetWindow = widgetWindow;
                 widgetWindow.clear();
                 this._helpDiv = document.createElement("div");
+                this._helpDiv.classList.add("tour-active");
+                
+                // Add tour-active class to the window frame
+                if (widgetWindow._frame) {
+                    widgetWindow._frame.classList.add("tour-active");
+                }
+
                 this._setup(false, HELPCONTENT.length - 1);
             } else {
                 this.index -= 1;
