@@ -182,34 +182,27 @@ export default [
     },
     // Override for Cypress files to use ES Module syntax
     {
-        files: ['cypress/**/*.js'],
+        files: ["cypress/**/*.js"],
         languageOptions: {
-            ecmaVersion: 'latest',
-            sourceType: 'module',
-            parser: babelParser,
-            parserOptions: {
-                requireConfigFile: false,
-                ecmaFeatures: {
-                    globalReturn: false,
-                },
-            },
+            ecmaVersion: "latest",
+            sourceType: "module",
             globals: {
                 ...globals.browser,
                 ...globals.node,
                 ...globals.jest,
-                cy: 'readonly',
-                Cypress: 'readonly',
-                describe: 'readonly',
-                it: 'readonly',
-                beforeEach: 'readonly',
-                afterEach: 'readonly',
-                before: 'readonly',
-                after: 'readonly',
-            },
+                cy: "readonly",
+                Cypress: "readonly",
+                describe: "readonly",
+                it: "readonly",
+                beforeEach: "readonly",
+                afterEach: "readonly",
+                before: "readonly",
+                after: "readonly"
+            }
         },
         rules: {
-            'no-unused-vars': 'off',
-        },
+            "no-unused-vars": "off"
+        }
     },
 
     {
