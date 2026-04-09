@@ -690,12 +690,10 @@ class Activity {
          * Shows or hides help on mobile devices
          */
         this._toggleMobileHelp = () => {
-            const helpDiv = document.querySelector(
-                "#helpDiv, .widget-window[data-widget-type='help']"
-            );
-            if (!helpDiv) return;
+            const helpWidget = document.querySelector(".widget-window[data-widget-type='help']");
+            if (!helpWidget) return;
 
-            if (helpDiv.classList.contains("hidden")) {
+            if (helpWidget.classList.contains("hidden")) {
                 this._showMobileHelp();
             } else {
                 this._hideMobileHelp();
@@ -1379,8 +1377,12 @@ class Activity {
                         const protoblk = obj[0];
                         const paletteName = obj[1];
                         const protoName = obj[2];
-
-                        if (that.blocks.protoBlockDict.hasOwnProperty(protoName)) {
+                        if (
+                            Object.prototype.hasOwnProperty.call(
+                                that.blocks.protoBlockDict,
+                                protoName
+                            )
+                        ) {
                             that.palettes.dict[paletteName].makeBlockFromSearch(
                                 protoblk,
                                 protoName,
@@ -5903,6 +5905,7 @@ class Activity {
                     ) {
                         continue;
                     }
+
 
                     if (repeatId.start === 0) {
                         staffBlocksMap[staffIndex].repeatBlock.push([

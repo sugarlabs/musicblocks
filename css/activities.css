@@ -2248,30 +2248,29 @@ table {
 
   /* Add mobile toggle button for help */
   .mobile-help-toggle {
-    display: block !important;
-    position: fixed !important;
-    top: 80px !important;
-    left: 10px !important;
-    z-index: 1001 !important;
-    background: #2196f3 !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 50% !important;
-    width: 50px !important;
-    height: 50px !important;
-    font-size: 18px !important;
-    cursor: pointer !important;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3) !important;
-    transition: all 0.2s ease !important;
+    display: block;
+    position: fixed;
+    top: 80px;
+    left: 10px;
+    z-index: 1001;
+    background: #2196f3;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.2s ease;
   }
 
   .mobile-help-toggle:hover {
-    background: #1976D2 !important;
-    transform: scale(1.1) !important;
+    background: #1976D2;
   }
 
   .mobile-help-toggle:active {
-    transform: scale(0.95) !important;
+    transform: scale(0.95);
   }
 
   /* Ensure main canvas gets full width */
@@ -2314,19 +2313,16 @@ table {
 /* Small mobile breakpoint */
 @media screen and (max-width: 480px) {
   /* Further reduce help sidebar on small mobile */
-  #helpDiv,
   .widget-window[data-widget-type="help"] {
-    width: 90% !important;
-    max-width: 250px !important;
+    width: 90%;
+    max-width: 250px;
   }
 
   /* Adjust toggle button position */
   .mobile-help-toggle {
-    top: 70px !important;
-    left: 5px !important;
-    width: 44px !important;
-    height: 44px !important;
-    font-size: 16px !important;
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
   }
 
   /* Scale down wheel navigation further */
@@ -2342,24 +2338,21 @@ table {
   }
 
   /* Reduce font sizes for small screens */
-  #helpDiv h1,
   .widget-window[data-widget-type="help"] h1 {
-    font-size: 1.2em !important;
+    font-size: 1.2em;
   }
 
-  #helpDiv p,
   .widget-window[data-widget-type="help"] p {
-    font-size: 0.8em !important;
+    font-size: 0.8em;
   }
 }
 
 /* Extra small mobile breakpoint */
 @media screen and (max-width: 320px) {
   /* Minimum viable sizing for very small screens */
-  #helpDiv,
   .widget-window[data-widget-type="help"] {
-    width: 95% !important;
-    max-width: 200px !important;
+    width: 95%;
+    max-width: 200px;
   }
 
   .wheelNav {
@@ -2375,13 +2368,12 @@ table {
 
 /* Landscape mobile optimizations */
 @media screen and (max-height: 500px) and (orientation: landscape) {
-  #helpDiv,
   .widget-window[data-widget-type="help"] {
-    height: 80vh !important;
-    top: 10vh !important;
+    height: 80vh;
+    top: 10vh;
   }
 
   .mobile-help-toggle {
-    top: 60px !important;
+    top: 60px;
   }
 }
