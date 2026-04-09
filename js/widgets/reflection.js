@@ -68,30 +68,19 @@ class ReflectionMatrix {
     }
 
     escapeHTML(text) {
-        const escapeMap = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#39;'
-        };
-
-        return text.replace(/[&<>"']/g, char => escapeMap[char]);
+        return escapeHTML(text);
     }
 
     sanitizeLinks(html) {
-        return html.replace(
-            /<a\s+[^>]*href\s*=\s*(['"]?)([^'">\s]+)\1/gi,
-            (match, quote, url) => {
-                const unsafeSchemes = /^(javascript|data|vbscript):/i;
+        return html.replace(/<a\s+[^>]*href\s*=\s*(['"]?)([^'">\s]+)\1/gi, (match, quote, url) => {
+            const unsafeSchemes = /^(javascript|data|vbscript):/i;
 
-                if (unsafeSchemes.test(url.trim())) {
-                    return match.replace(url, "#");
-                }
-
-                return match;
+            if (unsafeSchemes.test(url.trim())) {
+                return match.replace(url, "#");
             }
-        );
+
+            return match;
+        });
     }
 
     /**
@@ -294,7 +283,7 @@ class ReflectionMatrix {
      *  @returns {Promise<void>}
      */
     async startChatSession() {
-        if (this.triggerFirst == true) return;
+        if (this.triggerFirst === true) return;
 
         this.triggerFirst = true;
         setTimeout(() => {
@@ -644,22 +633,6 @@ class ReflectionMatrix {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-    }
-
-    /**
-     * Escapes HTML special characters to prevent XSS attacks.
-     * @param {string} text - The text to escape.
-     * @returns {string} - The escaped text.
-     */
-    escapeHTML(text) {
-        const escapeMap = {
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#x27;"
-        };
-        return text.replace(/[&<>"']/g, char => escapeMap[char]);
     }
 
     /**

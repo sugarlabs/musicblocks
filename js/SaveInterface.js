@@ -252,23 +252,6 @@ class SaveInterface {
      * @method
      * @instance
      */
-    /**
-     * Escapes HTML special characters to prevent XSS when injecting
-     * user-provided values into HTML templates.
-     *
-     * @param {string} str - The string to escape.
-     * @returns {string} The escaped string safe for HTML insertion.
-     * @private
-     */
-    _escapeHTML(str) {
-        return String(str)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
     prepareHTML() {
         let file = this.htmlSaveTemplate;
         let description = _("No description provided");
@@ -290,10 +273,10 @@ class SaveInterface {
         }
 
         file = file
-            .replace(new RegExp("{{ project_description }}", "g"), this._escapeHTML(description))
-            .replace(new RegExp("{{ project_name }}", "g"), this._escapeHTML(name))
-            .replace(new RegExp("{{ data }}", "g"), this._escapeHTML(data))
-            .replace(new RegExp("{{ project_image }}", "g"), this._escapeHTML(image));
+            .replace(new RegExp("{{ project_description }}", "g"), escapeHTML(description))
+            .replace(new RegExp("{{ project_name }}", "g"), escapeHTML(name))
+            .replace(new RegExp("{{ data }}", "g"), escapeHTML(data))
+            .replace(new RegExp("{{ project_image }}", "g"), escapeHTML(image));
         return file;
     }
 

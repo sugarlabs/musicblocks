@@ -68,6 +68,8 @@ global.mockRunLogoCommands = jest.fn();
 global.mockDownload = jest.fn();
 
 const { SaveInterface } = require("../SaveInterface");
+const { escapeHTML } = require("../utils/utils");
+global.escapeHTML = escapeHTML;
 const { LILYPONDHEADER } = require("../lilypond");
 global.LILYPONDHEADER = LILYPONDHEADER;
 global.instance = new SaveInterface();
@@ -224,9 +226,8 @@ describe("save HTML methods", () => {
         expect(html).toContain("&lt;/script&gt;");
     });
 
-    it("_escapeHTML should encode all five HTML special characters", () => {
-        const si = new SaveInterface({ beginnerMode: false });
-        expect(si._escapeHTML("&<>\"'")).toBe("&amp;&lt;&gt;&quot;&#039;");
+    it("escapeHTML should encode all five HTML special characters", () => {
+        expect(escapeHTML("&<>\"'")).toBe("&amp;&lt;&gt;&quot;&#039;");
     });
 
     it("should call prepareHTML and download the file", () => {
