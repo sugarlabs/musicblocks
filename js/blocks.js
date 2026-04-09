@@ -27,7 +27,7 @@
    getVoiceSynthName, i18nSolfege, last, MathUtility, mixedNumber,
    piemenuBlockContext, prepareMacroExports, ProtoBlock,
     setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments,
-    docById, define
+    docById, define, BlocksDependencies
 */
 
 /* global showZoomOverlay */
@@ -153,13 +153,66 @@ const ALLOWED_CONNECTIONS = new Set([
  */
 
 class Blocks {
-    constructor(activity) {
-        this.activity = activity;
-        this.storage = this.activity.storage;
-        this.trashcan = this.activity.trashcan;
-        this.turtles = this.activity.turtles;
-        this.boundary = this.activity.boundary;
-        this.macroDict = this.activity.macroDict;
+    constructor(activityOrDeps) {
+        // Build dependencies container
+        const isExplicitDeps =
+            activityOrDeps &&
+            activityOrDeps.storage &&
+            activityOrDeps.turtles &&
+            activityOrDeps.refreshCanvas;
+
+        if (isExplicitDeps) {
+            this.deps = activityOrDeps;
+            // Build a shim for activity facade to maintain backward compatibility
+            // for any internal references that still use this.activity
+            const deps = this.deps;
+            this.activity = {
+                storage: deps.storage,
+                trashcan: deps.trashcan,
+                turtles: deps.turtles,
+                boundary: deps.boundary,
+                macroDict: deps.macroDict,
+                palettes: deps.palettes,
+                logo: deps.logo,
+                blocksContainer: deps.blocksContainer,
+                canvas: deps.canvas,
+                refreshCanvas: () => deps.refreshCanvas(),
+                errorMsg: (msg, blk) => deps.errorMsg(msg, blk),
+                setSelectionMode: selection => deps.setSelectionMode(selection),
+                stopLoadAnimation: () => deps.stopLoadAnimation(),
+                setHomeContainers: val => deps.setHomeContainers(val),
+                __tick: () => deps.tick(),
+                blocks: this
+            };
+        } else {
+            this.activity = activityOrDeps;
+            // Create a deps view over the activity object
+            this.deps = {
+                storage: this.activity.storage,
+                trashcan: this.activity.trashcan,
+                turtles: this.activity.turtles,
+                boundary: this.activity.boundary,
+                macroDict: this.activity.macroDict,
+                palettes: this.activity.palettes,
+                logo: this.activity.logo,
+                blocksContainer: this.activity.blocksContainer,
+                canvas: this.activity.canvas,
+                refreshCanvas: () => this.activity.refreshCanvas(),
+                errorMsg: (msg, blk) => this.activity.errorMsg(msg, blk),
+                setSelectionMode: selection => this.activity.setSelectionMode(selection),
+                stopLoadAnimation: () => this.activity.stopLoadAnimation(),
+                setHomeContainers: val => this.activity.setHomeContainers(val),
+                tick: () => this.activity.__tick()
+            };
+        }
+
+        this.storage = this.deps.storage;
+        this.trashcan = this.deps.trashcan;
+        this.turtles = this.deps.turtles;
+        this.boundary = this.deps.boundary;
+        this.macroDict = this.deps.macroDict;
+        this.palettes = this.deps.palettes;
+        this.logo = this.deps.logo;
 
         /** Did the user right click? */
         this.stageClick = false;
@@ -7436,7 +7489,7 @@ class Blocks {
 }
 // Export Blocks
 if (typeof define === "function" && define.amd) {
-    define([], function () {
+    define(["js/BlocksDependencies"], function (BlocksDependencies) {
         return Blocks;
     });
 }
