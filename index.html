@@ -82,7 +82,12 @@
         <script src="lib/jquery-3.7.1.min.js" defer></script>
         <script src="lib/jquery-ui.js" defer></script>
         <script src="lib/materialize.min.js" defer></script>
-        <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+        <link
+            rel="preload"
+            href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"
+            as="style"
+            onload="this.onload=null;this.rel='stylesheet'"
+        />
         <script src="js/utils/jquery-setup.js" defer></script>
         <script src="lib/Tone.js" defer></script>
         <script src="lib/midi.js" defer></script>
@@ -94,10 +99,12 @@
         <script src="lib/codejar/codejar.min.js" defer></script>
         <script src="lib/codejar/highlight.pack.js" defer></script>
         <link
-            rel="stylesheet"
+            rel="preload"
             href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css"
+            as="style"
             integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07"
             crossorigin="anonymous"
+            onload="this.onload=null;this.rel='stylesheet'"
         />
 
         <!-- libgif.js (SuperGif) provides low-level GIF frame extraction.
@@ -121,13 +128,16 @@
 
 
     <script data-main="js/loader" src="lib/require.js" defer></script>
-    <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
     <link rel="preload" href="/fonts/material-icons.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-    <link rel="stylesheet" href="lib/materialize-iso.css">
-    <link rel="stylesheet" href="css/themes.css?v=fixed">
+    <link
+        rel="preload"
+        href="css/themes.css?v=fixed"
+        as="style"
+        onload="this.onload=null;this.rel='stylesheet'"
+    />
     <script src="lib/easeljs.min.js" defer></script>
     <script src="lib/tweenjs.min.js" defer></script>
-    <script>
+    <script defer>
         let ast2blocklist_config;
         document.addEventListener("DOMContentLoaded", function () {
             fetch("js/js-export/ast2blocks.min.json")
