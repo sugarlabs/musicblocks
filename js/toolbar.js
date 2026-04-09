@@ -133,6 +133,7 @@ class Toolbar {
                 ["helpIcon", _("Help and shortcuts")],
                 ["helpGuideItem", _("Help"), "innerHTML"],
                 ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
+                ["practiceLessonsItem", _("Practice levels"), "innerHTML"],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -266,6 +267,7 @@ class Toolbar {
                 ["helpIcon", _("Help and shortcuts")],
                 ["helpGuideItem", _("Help"), "innerHTML"],
                 ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
+                ["practiceLessonsItem", _("Practice levels"), "innerHTML"],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -1221,7 +1223,8 @@ class Toolbar {
         const helpIcon = docById("helpIcon");
         const helpGuideItem = docById("helpGuideItem");
         const shortcutsGuideItem = docById("shortcutsGuideItem");
-        const hasDropdownMenu = !!helpGuideItem || !!shortcutsGuideItem;
+        const practiceLessonsItem = docById("practiceLessonsItem");
+        const hasDropdownMenu = !!helpGuideItem || !!shortcutsGuideItem || !!practiceLessonsItem;
 
         if (helpGuideItem) {
             helpGuideItem.onclick = event => {
@@ -1241,6 +1244,18 @@ class Toolbar {
                 }
                 if (shortcutsOnclick) {
                     shortcutsOnclick(this.activity);
+                }
+            };
+        }
+
+        if (practiceLessonsItem) {
+            practiceLessonsItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                if (typeof window.startPracticeMode === "function") {
+                    window.startPracticeMode();
                 }
             };
         }
