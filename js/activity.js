@@ -3686,7 +3686,13 @@ class Activity {
             const searchInput = this.searchWidget.idInput_custom;
             if (!searchInput || searchInput.length <= 0) {
                 if (this.searchWidget.value && this.searchWidget.value.length > 0) {
-                    $search.autocomplete("search", this.searchWidget.value);
+                    if ($search.length > 0 && typeof $search[0].getClientRects === "function") {
+                        try {
+                            $search.autocomplete("search", this.searchWidget.value);
+                        } catch (e) {
+                            console.debug("search autocomplete skipped", e);
+                        }
+                    }
                 }
                 return;
             }
@@ -7456,7 +7462,16 @@ class Activity {
             const searchInput = this.helpfulSearchWidget.idInput_custom;
             if (!searchInput || searchInput.length <= 0) {
                 if (this.helpfulSearchWidget.value && this.helpfulSearchWidget.value.length > 0) {
-                    $helpfulSearch.autocomplete("search", this.helpfulSearchWidget.value);
+                    if (
+                        $helpfulSearch.length > 0 &&
+                        typeof $helpfulSearch[0].getClientRects === "function"
+                    ) {
+                        try {
+                            $helpfulSearch.autocomplete("search", this.helpfulSearchWidget.value);
+                        } catch (e) {
+                            console.debug("helpful search autocomplete skipped", e);
+                        }
+                    }
                 }
                 return;
             }

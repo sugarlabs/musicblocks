@@ -4514,9 +4514,12 @@ function base64Encode(str) {
     const uint8Array = encoder.encode(str);
     // String.fromCharCode(...uint8Array) throws RangeError for inputs > ~128KB.
     // Use a loop instead — identical output, no argument-count limit.
+    const chunkSize = 0x8000;
     let binaryString = "";
-    for (let i = 0; i < uint8Array.length; i++) {
-        binaryString += String.fromCharCode(uint8Array[i]);
+
+    for (let i = 0; i < uint8Array.length; i += chunkSize) {
+        const chunk = uint8Array.subarray(i, i + chunkSize);
+        binaryString += String.fromCharCode.apply(null, chunk);
     }
     if (_b64Cache.size > 1000) {
         _b64Cache.clear();

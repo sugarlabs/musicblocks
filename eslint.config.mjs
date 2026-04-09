@@ -181,6 +181,20 @@ export default [
         }
     },
 
+
+    {
+        files: ["js/practice/**/*.js"],
+        languageOptions: {
+            sourceType: "module"
+        }
+    },
+    {
+        files: ["js/badges/**/*.js"],
+        languageOptions: {
+            sourceType: "module"
+        }
+    },
+
     {
         files: ["cypress/**/*.js", "cypress/**/*.mjs", "cypress/**/*.cy.js"],
         languageOptions: {

@@ -115,7 +115,10 @@
             rel="preload"
             href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"
             as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <noscript
             ><link
@@ -136,7 +139,10 @@
             as="style"
             integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07"
             crossorigin="anonymous"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <noscript
             ><link
@@ -165,6 +171,12 @@
         <script src="js/svgAssetSelector.js" defer></script>
         <script src="lib/acorn.min.js" defer></script>
         <script src="env.js" defer></script>
+        <link rel="stylesheet" href="js/practiceLessons/practice.css" />
+        <script src="js/practiceLessons/practiceProblems.js" defer></script>
+        <script src="js/practiceLessons/practiceManager.js" defer></script>
+        <script src="js/practiceLessons/practiceValidator.js" defer></script>
+        <script src="js/practiceLessons/practiceUI.js" defer></script>
+        <script src="js/practiceLessons/practiceEntry.js" defer></script>
 
         <script data-main="js/loader" src="lib/require.js" defer></script>
         <link
@@ -178,7 +190,10 @@
             rel="preload"
             href="css/themes.css?v=fixed"
             as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <noscript><link rel="stylesheet" href="css/themes.css?v=fixed" /></noscript>
         <script>
@@ -260,13 +275,7 @@
             ></canvas>
 
             <!--hidden at the beginning whilst everything loads-->
-            <div
-                class="popupMsg"
-                id="printText"
-                tabindex="-1"
-                aria-live="polite"
-                role="status"
-            >
+            <div class="popupMsg" id="printText" tabindex="-1" aria-live="polite" role="status">
                 <div class="contentWrapper">
                     <span id="printTextContent"></span>
                     <img
@@ -277,13 +286,7 @@
                     />
                 </div>
             </div>
-            <div
-                class="popupMsg"
-                id="errorText"
-                tabindex="-1"
-                aria-live="assertive"
-                role="alert"
-            >
+            <div class="popupMsg" id="errorText" tabindex="-1" aria-live="assertive" role="alert">
                 <div class="contentWrapper">
                     <span id="errorTextContent"></span>
                     <img
@@ -520,8 +523,12 @@
                                 "
                                 data-position="bottom"
                             >
-                                <img alt="MusicBlocks Logo" width="100%" src="images/logo.svg" loading="lazy">
-                                </img>
+                                <img
+                                    alt="MusicBlocks Logo"
+                                    width="100%"
+                                    src="images/logo.svg"
+                                    loading="lazy"
+                                />
                             </div>
                             <ul class="main left">
                                 <li>
@@ -917,6 +924,7 @@
                     <ul id="helpdropdown" class="dropdown-content helpdropdown-menu">
                         <li><a id="helpGuideItem" role="button" tabindex="0"></a></li>
                         <li><a id="shortcutsGuideItem" role="button" tabindex="0"></a></li>
+                        <li><a id="practiceLessonsItem" role="button" tabindex="0"></a></li>
                     </ul>
 
                     <ul id="languagedropdown" class="dropdown-content">
@@ -925,8 +933,8 @@
                         <li><a id="es" role="button" tabindex="0"></a></li>
                         <li><a id="pt" role="button" tabindex="0"></a></li>
                         <li><a id="fr" role="button" tabindex="0"></a></li>
-			<li><a id="it" role="button" tabindex="0"></a></li>
-			<li><a id="de" role="button" tabindex="0"></a></li>
+                        <li><a id="it" role="button" tabindex="0"></a></li>
+                        <li><a id="de" role="button" tabindex="0"></a></li>
                         <li><a id="ja" role="button" tabindex="0"></a></li>
                         <li><a id="kana" role="button" tabindex="0"></a></li>
                         <li><a id="ko" role="button" tabindex="0"></a></li>
@@ -936,7 +944,7 @@
                         <li><a id="quz" role="button" tabindex="0"></a></li>
                         <li><a id="gug" role="button" tabindex="0"></a></li>
                         <li><a id="hi" role="button" tabindex="0"></a></li>
-			<li><a id="ta" role="button" tabindex="0"></a></li>
+                        <li><a id="ta" role="button" tabindex="0"></a></li>
                         <li><a id="te" role="button" tabindex="0"></a></li>
                         <li><a id="bn" role="button" tabindex="0"></a></li>
                         <li><a id="ibo" role="button" tabindex="0"></a></li>
@@ -1165,8 +1173,6 @@
                         index = (index + 1) % texts.length;
                     }, 1500);
                 }, 3000);
-
-
             });
         </script>
 
@@ -1298,7 +1304,7 @@
 
                 iconCode.textContent = isFullscreen ? "\ue5d1" : "\ue5d0";
 
-                if (fullScreenBtn && typeof _ === 'function') {
+                if (fullScreenBtn && typeof _ === "function") {
                     var tooltipText = isFullscreen ? _("Exit Fullscreen") : _("Enter Fullscreen");
                     fullScreenBtn.setAttribute("data-tooltip", tooltipText);
                     if (window.jQuery) {

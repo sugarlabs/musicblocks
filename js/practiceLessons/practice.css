@@ -1,0 +1,162 @@
+#practice-panel {
+  position: fixed;
+  top: 64px; /* below top toolbar */
+  right: 0;
+  width: 360px;
+  height: calc(100% - 64px);
+  background: #fdfefe;
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  border-left: 2px solid #e0e0e0;
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.08);
+  font-family: "Arial Rounded MT Bold", "Segoe UI", sans-serif;
+}
+
+/* === HEADER === */
+.practice-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #2196f3, #1e88e5);
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+#close-practice {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: white;
+  font-size: 18px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+#close-practice:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* === CONTENT AREA === */
+#practice-content {
+  flex: 1;
+  padding: 14px;
+  overflow-y: auto;
+  background: #f5f7fa;
+}
+
+/* === LEVEL BUTTONS === */
+.level-btn {
+  width: 100%;
+  margin: 8px 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: none;
+  background: white;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.level-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.level-btn::before {
+  content: "🎵 ";
+}
+
+/* Completed level */
+.level-btn.done {
+  background: linear-gradient(135deg, #81c784, #66bb6a);
+  color: white;
+}
+
+.level-btn.done::before {
+  content: "✅ ";
+}
+
+/* === BACK BUTTON === */
+#back-to-levels {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: none;
+  background: #e3f2fd;
+  color: #1565c0;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+#back-to-levels:hover {
+  background: #bbdefb;
+}
+
+/* === LEVEL CONTENT === */
+.practice-sidebar h2 {
+  margin-top: 4px;
+  margin-bottom: 4px;
+  font-size: 22px;
+  color: #1e88e5;
+}
+
+.practice-sidebar h4 {
+  margin: 6px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.practice-sidebar p {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #444;
+}
+
+/* === REFERENCE IMAGE === */
+.practice-ref {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 14px;
+  border: 2px solid #d0d7de;
+  margin: 12px 0;
+  background: white;
+}
+
+/* === CHECK BUTTON === */
+#check-level {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 18px;
+  border: none;
+  background: linear-gradient(135deg, #42a5f5, #1e88e5);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+#check-level:hover {
+  background: linear-gradient(135deg, #1e88e5, #1565c0);
+}
+
+/* === SUCCESS MESSAGE === */
+.success {
+  margin-top: 10px;
+  padding: 8px;
+  background: #e8f5e9;
+  border-radius: 10px;
+  color: #2e7d32;
+  font-weight: 600;
+  text-align: center;
+}
