@@ -1672,7 +1672,10 @@ class Activity {
 
             const currentDelay = this.logo.turtleDelay;
             this.logo.turtleDelay = 0;
-            this.logo.synth.resume();
+            if (this.logo?.synth?.resume) {
+                this.logo.synth.resume();
+            }
+
             const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
                 if (widgetTitle[i].innerHTML === "tempo") {
@@ -2064,7 +2067,9 @@ class Activity {
             hideDOMLabel();
 
             this.logo.turtleDelay = DEFAULTDELAY;
-            this.logo.synth.resume();
+            if (this.logo?.synth?.resume) {
+                this.logo.synth.resume();
+            }
 
             if (!this.turtles.running()) {
                 this.logo.runLogoCommands();
@@ -2091,7 +2096,9 @@ class Activity {
             hideDOMLabel();
 
             const turtleCount = Object.keys(this.logo.stepQueue).length;
-            this.logo.synth.resume();
+            if (this.logo?.synth?.resume) {
+                this.logo.synth.resume();
+            }
 
             if (turtleCount === 0 || this.logo.turtleDelay !== this.TURTLESTEP) {
                 // Either we haven't set up a queue or we are
@@ -6345,7 +6352,7 @@ class Activity {
                                 args = {
                                     customName: customName,
                                     customTemperamentNotes: getTemperament(customName),
-                                    startingPitch: this.logo.synth.startingPitch,
+                                    startingPitch: this.logo?.synth?.startingPitch || 440,
                                     octaveSpace: getOctaveRatio()
                                 };
                             }
