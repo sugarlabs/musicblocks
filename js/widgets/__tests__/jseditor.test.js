@@ -539,7 +539,7 @@ describe("JSEditor", () => {
             await editor._codeToBlocks();
 
             expect(consoleEl.textContent).toContain(
-                "JavaScript block conversion is unavailable because its config failed to load."
+                "JavaScript block conversion is unavailable because its configuration file failed to load."
             );
             expect(AST2BlockList.toBlockList).not.toHaveBeenCalled();
             expect(editor.activity.sendAllToTrash).not.toHaveBeenCalled();
