@@ -6,3 +6,6 @@
 *.md text eol=lf
 *.yml text eol=lf
 *.yaml text eol=lf
+# Mark locale files as generated - hides them from PR diffs by default
+# These files are auto-generated from PO files via convert_po_to_json.py
+locales/*.json linguist-generated=true

@@ -2,21 +2,103 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <title>Guía de Programación con Bloques de Música</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <style type="text/css">
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+        background-color: #f9f9f9;
+      }
+      .jumbotron {
+        background-color: #5bc0de;
+        color: white;
+        text-align: center;
+        border-radius: 8px;
+        margin-top: 20px;
+        padding: 40px 20px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      }
+      .jumbotron h1 {
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+      .content-wrapper {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-bottom: 40px;
+      }
+      .top-nav {
+        margin-bottom: 20px;
+        text-align: right;
+      }
+      .top-nav a {
+        color: #777;
+        margin-left: 10px;
+        text-decoration: none;
+      }
+      .top-nav a:hover {
+        color: #333;
+      }
+      ol {
+        counter-reset: item;
+      }
+      li {
+        display: block;
+        margin-bottom: 8px;
+      }
+      li:before {
+        content: counters(item, ".") " ";
+        counter-increment: item;
+        font-weight: bold;
+        color: #5bc0de;
+      }
+      h2, h3, h4 {
+        color: #2c3e50;
+        margin-top: 30px;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+        margin: 15px 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .download-btn {
+        margin-top: 20px;
+        font-size: 1.1em;
+        padding: 10px 20px;
+        border-radius: 30px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        transition: all 0.3s;
+      }
+      .download-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0,0,0,0.3);
+      }
+    </style>
   </head>
   <body>
-    <div class="container">
+    <div class="container content-wrapper">
+      <div class="top-nav">
+        <a href="../guide/index.html">English</a> |
+        <a href="../guide-es/index.html">Español</a> |
+        <a href="../guide-ja/index.html">日本語</a> |
+        <a href="../guide-zhCN/index.html">中文</a> |
+        <a href="../guide-pt/index.html">Português</a>
+      </div>
       <div id="content">
-        <p>
-          <a href="../guide/index.html">English</a> |
-          <a href="../guide-es/index.html">Español</a> |
-          <a href="../guide-ja/index.html">日本語</a> |
-          <a href="../guide-zhCN/index.html">中文</a> |
-          <a href="../guide-pt/index.html">Português</a>
-</div>
-
-        </p>
-<h1 id="gu-a-de-programaci-n-con-bloques-de-m-sica">Guía de Programación con Bloques de Música</h1>
+        <div class="jumbotron">
+          <h1 id="gu-a-de-programaci-n-con-bloques-de-m-sica">Guía de Programación con Bloques de Música</h1>
+          <p class="lead">Una guía completa para aprender y programar con Bloques de Música</p>
+          <a href="MusicBlocks_Guide_ES.pdf" class="btn btn-warning btn-lg download-btn" download>
+             <span class="glyphicon glyphicon-download-alt"></span> Descargar guía en PDF
+          </a>
+        </div>
 <p>Bloques de Música es un entorno de programación para lqs niños
 interesados en música y gráficos. Se amplía la Tortugaarte en que
 tiene una colección de funciones relacionadas con el tono y el ritmo.</p>
@@ -33,7 +115,7 @@ copia del código y se ejecuta directamente desde el archivo sistema de
 su computadora.</p>
 <p>Para más detalles sobre el uso de Bloques de Música, ver [Uso de
 Bloques de Música]
-(<a href="http://github.com/sugarlabs/musicblocks/tree/master/documentation">http://github.com/sugarlabs/musicblocks/tree/master/documentation</a>)
+(<a href="https://github.com/sugarlabs/musicblocks/blob/master/Docs/documentation/README.md">https://github.com/sugarlabs/musicblocks/blob/master/Docs/documentation/README.md</a>)
 y para más detalles sobre cómo utilizar los bloques de la tortuga, ver
 [Uso de la tortuga bloques</p>
 <h2 id="acerca-de-esta-gu-a">ACERCA DE ESTA GUÍA</h2>
@@ -589,7 +671,7 @@ o entre columnas.</p>
 <h2 id="iv-mas-alla-de-bloques-de-musica">IV. MÁS ALLÁ DE BLOQUES DE MÚSICA</h2>
 <p>Bloques de Música es un punto de paso, no un destino. Uno de los objetivos es
 apuntar al aprendiz hacia otras herramientas poderosas. Una de esas herramientas es
-<a href="http://lilypond.org">Lilypond</a>, un programa de grabado musical.</p>
+<a href="https://lilypond.org">Lilypond</a>, un programa de grabado musical.</p>
 <p><img src="./lilypond1.svg" alt="alt tag" title=" "></p>
 <p>El bloque <em>Guardar como Lilypond</em> transcribirá tu composición. La
 salida del programa anterior se guarda en <code>Downloads/hotdog.ly</code>. También hay
@@ -616,5 +698,16 @@ e<span class="hljs-symbol">'4</span> e<span class="hljs-symbol">'4</span> d<span
 <p><a href="https://musicblocks.sugarlabs.org/index.html?id=1523043053377623&amp;run=True">EJECUTAR EN VIVO</a></p>
       </div>
     </div>
+    <script>
+      function toggleImageSize(img) {
+        if (img.style.maxWidth === "none") {
+          img.style.maxWidth = "500px";
+          img.style.maxHeight = "500px";
+        } else {
+          img.style.maxWidth = "none";
+          img.style.maxHeight = "none";
+        }
+      }
+    </script>
   </body>
 </html>

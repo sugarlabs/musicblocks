@@ -66,8 +66,30 @@ global.docById = jest.fn(id => document.getElementById(id));
 global.docByClass = jest.fn(classname => document.getElementsByClassName(classname));
 global.mockRunLogoCommands = jest.fn();
 global.mockDownload = jest.fn();
+// Load SaveInterface with an AMD-compatible require shim.
+// Jest's CommonJS require does not support the RequireJS pattern:
+//     require(["module"], callback)
+// Since SaveInterface.js uses this pattern for lazy-loaded exports,
+// we load it manually with a custom require that detects array arguments
+// and immediately invokes the callback (globals are already mocked above).
+const fs = require("fs");
+const path = require("path");
 
-const { SaveInterface } = require("../SaveInterface");
+const _jestRequire = require;
+const _amdRequire = function (moduleName, callback) {
+    if (Array.isArray(moduleName) && typeof callback === "function") {
+        callback();
+        return;
+    }
+    return _jestRequire(moduleName);
+};
+
+const _moduleObj = { exports: {} };
+const _code = fs.readFileSync(path.resolve(__dirname, "../SaveInterface.js"), "utf8");
+new Function("require", "module", "exports", _code)(_amdRequire, _moduleObj, _moduleObj.exports);
+const { SaveInterface } = _moduleObj.exports;
+const { escapeHTML } = require("../utils/utils");
+global.escapeHTML = escapeHTML;
 const { LILYPONDHEADER } = require("../lilypond");
 global.LILYPONDHEADER = LILYPONDHEADER;
 global.instance = new SaveInterface();
@@ -200,6 +222,34 @@ describe("save HTML methods", () => {
         expect(file).toContain("<div>Mock Exported Data</div>");
     });
 
+    it("should escape HTML special characters in prepareHTML to prevent XSS", () => {
+        const xssActivity = {
+            beginnerMode: false,
+            PlanetInterface: {
+                getCurrentProjectName: jest.fn(() => '<script>alert("XSS")</script>'),
+                getCurrentProjectDescription: jest.fn(() => "<img src=x onerror=alert(1)>"),
+                getCurrentProjectImage: jest.fn(() => '" onload="alert(1)')
+            },
+            prepareExport: jest.fn(() => '"><script>steal()</script>')
+        };
+
+        const si = new SaveInterface(xssActivity);
+        const html = si.prepareHTML();
+
+        // Raw HTML tags must be escaped — no unescaped script or img tags from user input
+        expect(html).not.toContain("<script>alert");
+        expect(html).not.toContain("<img src=x");
+
+        // Escaped values MUST contain encoded entities
+        expect(html).toContain("&lt;script&gt;");
+        expect(html).toContain("&lt;img src=x onerror=alert(1)&gt;");
+        expect(html).toContain("&lt;/script&gt;");
+    });
+
+    it("escapeHTML should encode all five HTML special characters", () => {
+        expect(escapeHTML("&<>\"'")).toBe("&amp;&lt;&gt;&quot;&#039;");
+    });
+
     it("should call prepareHTML and download the file", () => {
         const mockPrepareHTML = jest.fn(() => "<html>Mock HTML</html>");
 
@@ -273,7 +323,7 @@ describe("afterSaveMIDI", () => {
         global.activity = {
             logo: {
                 _midiData: {
-                    "0": [
+                    0: [
                         {
                             note: ["G4"],
                             duration: 4,
@@ -514,8 +564,13 @@ describe("saveWAV & saveABC methods", () => {
 
 describe("saveLilypond Methods", () => {
     let activity, saveInterface, mockActivity, mockDocById;
+    let originalClipboard;
+    let originalSecureContext;
 
     beforeEach(() => {
+        jest.useRealTimers();
+        originalClipboard = navigator.clipboard;
+        originalSecureContext = window.isSecureContext;
         // Set up the DOM structure
         document.body.innerHTML = `
             <div id="lilypondModal" style="display: none;">
@@ -553,6 +608,7 @@ describe("saveLilypond Methods", () => {
                 return { on: jest.fn() };
             }
             return {
+                0: { setSelectionRange: jest.fn() },
                 appendTo: jest.fn().mockReturnThis(),
                 val: jest.fn().mockReturnThis(),
                 select: jest.fn(),
@@ -661,6 +717,15 @@ describe("saveLilypond Methods", () => {
 
     afterEach(() => {
         jest.clearAllMocks();
+        if (originalClipboard === undefined) {
+            delete navigator.clipboard;
+        } else {
+            navigator.clipboard = originalClipboard;
+        }
+        Object.defineProperty(window, "isSecureContext", {
+            value: originalSecureContext,
+            configurable: true
+        });
     });
 
     it("should save a Lilypond file with default settings", () => {
@@ -748,6 +813,58 @@ describe("saveLilypond Methods", () => {
         );
         // Verify activity.save.download is not called
         expect(activity.save.download).not.toHaveBeenCalled();
+    });
+
+    it("should show copied message when Clipboard API succeeds", async () => {
+        const writeText = jest.fn().mockResolvedValue();
+        navigator.clipboard = { writeText };
+        Object.defineProperty(window, "isSecureContext", { value: true, configurable: true });
+
+        saveInterface.afterSaveLilypondLY(lydata, filename);
+        await writeText.mock.results[0].value;
+
+        expect(writeText).toHaveBeenCalledWith(lydata);
+        expect(document.execCommand).not.toHaveBeenCalled();
+        expect(mockActivity.textMsg).toHaveBeenCalled();
+    });
+
+    it("should fall back to legacy copy when Clipboard API fails", async () => {
+        const writeText = jest.fn().mockRejectedValue(new Error("denied"));
+        navigator.clipboard = { writeText };
+        Object.defineProperty(window, "isSecureContext", { value: true, configurable: true });
+        document.execCommand.mockReturnValue(true);
+
+        saveInterface.afterSaveLilypondLY(lydata, filename);
+        await writeText.mock.results[0].value.catch(() => {});
+
+        expect(writeText).toHaveBeenCalledWith(lydata);
+        expect(document.execCommand).toHaveBeenCalledWith("copy");
+        expect(mockActivity.textMsg).toHaveBeenCalled();
+    });
+
+    it("should not show copied message when all copy methods fail", async () => {
+        const writeText = jest.fn().mockRejectedValue(new Error("denied"));
+        navigator.clipboard = { writeText };
+        Object.defineProperty(window, "isSecureContext", { value: true, configurable: true });
+        document.execCommand.mockReturnValue(false);
+
+        saveInterface.afterSaveLilypondLY(lydata, filename);
+        await writeText.mock.results[0].value.catch(() => {});
+
+        expect(writeText).toHaveBeenCalledWith(lydata);
+        expect(document.execCommand).toHaveBeenCalledWith("copy");
+        expect(mockActivity.textMsg).not.toHaveBeenCalled();
+    });
+
+    it("should use legacy copy when Clipboard API is unavailable", () => {
+        delete navigator.clipboard;
+        Object.defineProperty(window, "isSecureContext", { value: true, configurable: true });
+        document.execCommand.mockReturnValue(true);
+
+        saveInterface.afterSaveLilypondLY(lydata, filename);
+
+        expect(document.execCommand).toHaveBeenCalledWith("copy");
+        expect(mockActivity.textMsg).toHaveBeenCalled();
     });
 });
 

@@ -51,3 +51,6 @@ class OrnamentBlocksAPI {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = OrnamentBlocksAPI;
 }
+if (typeof window !== "undefined") {
+    window.OrnamentBlocksAPI = OrnamentBlocksAPI;
+}

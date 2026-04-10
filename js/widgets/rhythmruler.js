@@ -420,9 +420,11 @@ class RhythmRuler {
             }
 
             // Look for any old entries that we may have missed.
+            // Use Set for O(1) lookup instead of Array.includes() O(n)
+            const drumsSet = new Set(drums);
             for (let i = 0; i < this._dissectHistory.length; i++) {
                 const drum = this._dissectHistory[i][1];
-                if (!drums.includes(drum)) {
+                if (!drumsSet.has(drum)) {
                     const history = JSON.parse(JSON.stringify(this._dissectHistory[i][0]));
                     dissectHistory.push([history, drum]);
                 }
@@ -475,25 +477,22 @@ class RhythmRuler {
          * @private
          * @returns {void}
          */
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            iconSize,
-            _("Save rhythms")
-        ).onclick = async () => {
-            // this._save(0);
-            // Debounce button
-            if (!this._get_save_lock()) {
-                this._save_lock = true;
+        widgetWindow.addButton("export-chunk.svg", iconSize, _("Save rhythms")).onclick =
+            async () => {
+                // this._save(0);
+                // Debounce button
+                if (!this._get_save_lock()) {
+                    this._save_lock = true;
 
-                // Save a merged version of the rulers.
-                this._saveTupletsMerged(this._mergeRulers());
+                    // Save a merged version of the rulers.
+                    this._saveTupletsMerged(this._mergeRulers());
 
-                // Rather than each ruler individually.
-                // this._saveTuplets(0);
-                await delayExecution(1000);
-                this._save_lock = false;
-            }
-        };
+                    // Rather than each ruler individually.
+                    // this._saveTuplets(0);
+                    await delayExecution(1000);
+                    this._save_lock = false;
+                }
+            };
 
         /**
          * Event handler for the click event of the save drum machine button.
@@ -501,19 +500,16 @@ class RhythmRuler {
          * @private
          * @returns {void}
          */
-        widgetWindow.addButton(
-            "export-drums.svg",
-            iconSize,
-            _("Save drum machine")
-        ).onclick = async () => {
-            // Debounce button
-            if (!this._get_save_lock()) {
-                this._save_lock = true;
-                this._saveMachine(0);
-                await delayExecution(1000);
-                this._save_lock = false;
-            }
-        };
+        widgetWindow.addButton("export-drums.svg", iconSize, _("Save drum machine")).onclick =
+            async () => {
+                // Debounce button
+                if (!this._get_save_lock()) {
+                    this._save_lock = true;
+                    this._saveMachine(0);
+                    await delayExecution(1000);
+                    this._save_lock = false;
+                }
+            };
 
         // An input for setting the dissect number
         this._dissectNumber = widgetWindow.addInputButton("2");
@@ -639,7 +635,7 @@ class RhythmRuler {
                                 this._startingTime = null;
                                 this._elapsedTimes[id] = 0;
                                 this._offsets[id] = 0;
-                                setTimeout(this._calculateZebraStripes(id), 1000);
+                                setTimeout(() => this._calculateZebraStripes(id), 1000);
                             }
                         } else if (this._playingOne === false) {
                             this._rulerSelected = id;
@@ -946,9 +942,9 @@ class RhythmRuler {
                 if (this.Drums[this._rulerSelected] === null) {
                     drum = "snare drum";
                 } else {
-                    const drumBlockNo = this.activity.blocks.blockList[
-                        this.Drums[this._rulerSelected]
-                    ].connections[1];
+                    const drumBlockNo =
+                        this.activity.blocks.blockList[this.Drums[this._rulerSelected]]
+                            .connections[1];
                     drum = this.activity.blocks.blockList[drumBlockNo].value;
                 }
 
@@ -2224,8 +2220,8 @@ class RhythmRuler {
         if (this.Drums[selectedRuler] === null) {
             drum = "snare drum";
         } else {
-            const drumBlockNo = this.activity.blocks.blockList[this.Drums[selectedRuler]]
-                .connections[1];
+            const drumBlockNo =
+                this.activity.blocks.blockList[this.Drums[selectedRuler]].connections[1];
             drum = this.activity.blocks.blockList[drumBlockNo].value;
         }
 
@@ -2729,9 +2725,11 @@ class RhythmRuler {
         }
 
         // Look for any old entries that we may have missed.
+        // Use Set for O(1) lookup instead of Array.includes() O(n)
+        const drumsSet = new Set(drums);
         for (let i = 0; i < this._dissectHistory.length; i++) {
             drum = this._dissectHistory[i][1];
-            if (!drums.includes(drum)) {
+            if (!drumsSet.has(drum)) {
                 history = JSON.parse(JSON.stringify(this._dissectHistory[i][0]));
                 dissectHistory.push([history, drum]);
             }
