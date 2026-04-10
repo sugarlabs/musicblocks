@@ -88,6 +88,7 @@
             as="style"
             onload="this.onload=null;this.rel='stylesheet'"
         />
+        <noscript><link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" /></noscript>
         <script src="js/utils/jquery-setup.js" defer></script>
         <script src="lib/Tone.js" defer></script>
         <script src="lib/midi.js" defer></script>
@@ -106,6 +107,7 @@
             crossorigin="anonymous"
             onload="this.onload=null;this.rel='stylesheet'"
         />
+        <noscript><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css" integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07" crossorigin="anonymous" /></noscript>
 
         <!-- libgif.js (SuperGif) provides low-level GIF frame extraction.
              Browsers expose only the first frame of a GIF; SuperGif lets us
@@ -135,9 +137,10 @@
         as="style"
         onload="this.onload=null;this.rel='stylesheet'"
     />
+    <noscript><link rel="stylesheet" href="css/themes.css?v=fixed" /></noscript>
     <script src="lib/easeljs.min.js" defer></script>
     <script src="lib/tweenjs.min.js" defer></script>
-    <script defer>
+    <script>
         let ast2blocklist_config;
         document.addEventListener("DOMContentLoaded", function () {
             fetch("js/js-export/ast2blocks.min.json")
