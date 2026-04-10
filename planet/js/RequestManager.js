@@ -31,6 +31,7 @@ class RequestManager {
         this.maxRetries = options.maxRetries || 3;
         this.baseRetryDelay = options.baseRetryDelay || 1000;
         this.maxConcurrent = options.maxConcurrent || 3;
+        this.timeoutMs = options.timeoutMs || 30000;
 
         // Track pending requests to prevent duplicates
         this.pendingRequests = new Map();
@@ -173,7 +174,10 @@ class RequestManager {
      */
     async _executeWithRetry(requestFn, attempt = 0, lastFailure = null) {
         try {
-            const result = await this._promisifyRequest(requestFn);
+            const result = await this._withTimeout(
+                this._promisifyRequest(requestFn),
+                this.timeoutMs
+            );
 
             // Check if the result indicates a failure that should be retried
             if (result && result.success === false && result.error === "ERROR_CONNECTION_FAILURE") {
@@ -217,19 +221,34 @@ class RequestManager {
             }
 
             this.stats.failures++;
-            // Return error response if max retries exceeded
-            return lastFailure || { success: false, error: "REQUEST_FAILED" };
+            // Return the last failure or a generic error response
+            return lastFailure || { success: false, error: "MAX_RETRIES_EXCEEDED" };
         }
     }
 
     /**
-     * Wraps a promise with a timeout
+     * Converts callback-based request to Promise
      * @private
+     */
+    _promisifyRequest(requestFn) {
+        return new Promise((resolve, reject) => {
+            try {
+                requestFn(result => {
+                    resolve(result);
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    /**
+     * Wraps a promise with a timeout
      * @param {Promise} promise - The promise to wrap
-     * @param {number} timeoutMs - Timeout in milliseconds (default: 30000)
+     * @param {number} timeoutMs - Timeout in milliseconds
      * @returns {Promise}
      */
-    _withTimeout(promise, timeoutMs = 30000) {
+    _withTimeout(promise, timeoutMs) {
         let timeoutId;
 
         const timeoutPromise = new Promise((_, reject) => {
@@ -240,29 +259,7 @@ class RequestManager {
             }, timeoutMs);
         });
 
-        return Promise.race([
-            promise.finally(() => clearTimeout(timeoutId)),
-            timeoutPromise
-        ]);
-    }
-
-    /**
-     * Converts callback-based request to Promise with timeout
-     * @private
-     */
-    _promisifyRequest(requestFn) {
-        const promise = new Promise((resolve, reject) => {
-            try {
-                requestFn(result => {
-                    resolve(result);
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
-
-        // Wrap with 30 second timeout
-        return this._withTimeout(promise, 30000);
+        return Promise.race([promise.finally(() => clearTimeout(timeoutId)), timeoutPromise]);
     }
 
     /**
