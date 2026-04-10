@@ -58,12 +58,16 @@ requirejs.config({
             deps: ["utils/platformstyle"],
             exports: "_"
         },
+        "utils/retryWithBackoff": {
+            deps: ["utils/utils"],
+            exports: "retryWithBackoff"
+        },
         "activity/turtledefs": {
             deps: ["utils/utils"],
             exports: "createDefaultStack"
         },
         "activity/block": {
-            deps: ["activity/turtledefs"],
+            deps: ["activity/turtledefs", "utils/retryWithBackoff"],
             exports: "Block"
         },
         "activity/blocks": {
@@ -77,7 +81,12 @@ requirejs.config({
             exports: "Painter"
         },
         "activity/turtle": {
-            deps: ["activity/turtledefs", "activity/turtle-singer", "activity/turtle-painter"],
+            deps: [
+                "activity/turtledefs",
+                "activity/turtle-singer",
+                "activity/turtle-painter",
+                "utils/retryWithBackoff"
+            ],
             exports: "Turtle"
         },
         "activity/turtles": {

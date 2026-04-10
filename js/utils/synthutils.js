@@ -2365,12 +2365,48 @@ function Synth() {
             });
     };
 
+    const _disposeRecordingPlayer = () => {
+        if (this.player) {
+            try {
+                if (typeof this.player.stop === "function") {
+                    this.player.stop();
+                }
+            } catch (e) {
+                console.debug("Error stopping recording player:", e);
+            }
+
+            try {
+                if (typeof this.player.dispose === "function") {
+                    this.player.dispose();
+                }
+            } catch (e) {
+                console.debug("Error disposing recording player:", e);
+            }
+
+            this.player = null;
+        }
+    };
+
+    const _revokeRecordingURL = () => {
+        if (this.audioURL) {
+            try {
+                URL.revokeObjectURL(this.audioURL);
+            } catch (e) {
+                console.debug("Error revoking recording URL:", e);
+            }
+
+            this.audioURL = null;
+        }
+    };
+
     /**
      * Stops Recording
      * @function
      * @memberof Synth
      */
     this.stopRecording = async () => {
+        _disposeRecordingPlayer();
+        _revokeRecordingURL();
         this.recording = await this.recorder.stop();
         this.mic.close();
         this.audioURL = URL.createObjectURL(this.recording);
@@ -2383,6 +2419,7 @@ function Synth() {
      * @memberof Synth
      */
     this.playRecording = async () => {
+        _disposeRecordingPlayer();
         this.player = new Tone.Player().toDestination();
         await this.player.load(this.audioURL);
         this.player.start();
@@ -2394,7 +2431,7 @@ function Synth() {
      * @memberof Synth
      */
     this.stopPlayBackRecording = () => {
-        this.player.stop();
+        _disposeRecordingPlayer();
     };
 
     /**
@@ -3552,6 +3589,9 @@ function Synth() {
      * @returns {void}
      */
     this.disposeAllInstruments = () => {
+        _disposeRecordingPlayer();
+        _revokeRecordingURL();
+
         for (const turtle in instruments) {
             for (const instrumentName in instruments[turtle]) {
                 if (
@@ -3608,6 +3648,9 @@ function Synth() {
     this.tone = null;
     this.noteFrequencies = {};
     this.startingPitch = "C4";
+    this.audioURL = null;
+    this.player = null;
+    this.recording = null;
     this.startingPitchOctave = 4;
     this.octaveTranspose = 0;
     this.inTemperament = "equal";

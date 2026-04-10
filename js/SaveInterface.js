@@ -273,10 +273,10 @@ class SaveInterface {
         }
 
         file = file
-            .replace(new RegExp("{{ project_description }}", "g"), description)
-            .replace(new RegExp("{{ project_name }}", "g"), name)
-            .replace(new RegExp("{{ data }}", "g"), data)
-            .replace(new RegExp("{{ project_image }}", "g"), image);
+            .replace(new RegExp("{{ project_description }}", "g"), escapeHTML(description))
+            .replace(new RegExp("{{ project_name }}", "g"), escapeHTML(name))
+            .replace(new RegExp("{{ data }}", "g"), escapeHTML(data))
+            .replace(new RegExp("{{ project_image }}", "g"), escapeHTML(image));
         return file;
     }
 
@@ -386,7 +386,10 @@ class SaveInterface {
 
                         const drumTrack = trackMap.get(drum);
 
-                        const midiNumber = drumMIDI[drum] || 36; // default to Bass Drum
+                        const midiNumber =
+                            Object.prototype.hasOwnProperty.call(drumMIDI, drum) && drumMIDI[drum]
+                                ? drumMIDI[drum]
+                                : 36; // default to Bass Drum
                         drumTrack.addNote({
                             midi: midiNumber,
                             time: globalTime,
@@ -400,7 +403,9 @@ class SaveInterface {
                                 parseInt(blockIndex) + 1
                             } - ${instrument}`;
                             instrumentTrack.instrument.number =
-                                instrumentMIDI[instrument] ?? instrumentMIDI["default"];
+                                Object.prototype.hasOwnProperty.call(instrumentMIDI, instrument)
+                                    ? instrumentMIDI[instrument]
+                                    : instrumentMIDI["default"];
                             trackMap.set(instrument, instrumentTrack);
                         }
 
@@ -533,6 +538,7 @@ class SaveInterface {
         document.body.style.cursor = "wait";
 
         // Lazy-load abc module before using ABCHEADER
+
         _lazyRequire(["activity/abc"], function () {
             // Check if we have buffered notation data (Issue #2330)
             if (activity.logo.recordingBuffer.hasData) {
@@ -540,11 +546,23 @@ class SaveInterface {
                 activity.logo.notationOutput = activity.logo.recordingBuffer.notationOutput;
                 activity.logo.notationNotes = activity.logo.recordingBuffer.notationNotes;
                 for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
-                    if (activity.logo.recordingBuffer.notationStaging[t]) {
+                    if (
+                        Object.prototype.hasOwnProperty.call(
+                            activity.logo.recordingBuffer.notationStaging,
+                            t
+                        ) &&
+                        activity.logo.recordingBuffer.notationStaging[t]
+                    ) {
                         activity.logo.notation.notationStaging[t] =
                             activity.logo.recordingBuffer.notationStaging[t];
                     }
-                    if (activity.logo.recordingBuffer.notationDrumStaging[t]) {
+                    if (
+                        Object.prototype.hasOwnProperty.call(
+                            activity.logo.recordingBuffer.notationDrumStaging,
+                            t
+                        ) &&
+                        activity.logo.recordingBuffer.notationDrumStaging[t]
+                    ) {
                         activity.logo.notation.notationDrumStaging[t] =
                             activity.logo.recordingBuffer.notationDrumStaging[t];
                     }
@@ -589,6 +607,7 @@ class SaveInterface {
      */
     afterSaveAbc() {
         // Lazy-load abc module before using saveAbcOutput
+
         _lazyRequire(["activity/abc"], () => {
             try {
                 const abc = encodeURIComponent(saveAbcOutput(this.activity));
@@ -621,11 +640,23 @@ class SaveInterface {
             activity.logo.notationOutput = activity.logo.recordingBuffer.notationOutput;
             activity.logo.notationNotes = activity.logo.recordingBuffer.notationNotes;
             for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
-                if (activity.logo.recordingBuffer.notationStaging[t]) {
+                if (
+                    Object.prototype.hasOwnProperty.call(
+                        activity.logo.recordingBuffer.notationStaging,
+                        t
+                    ) &&
+                    activity.logo.recordingBuffer.notationStaging[t]
+                ) {
                     activity.logo.notation.notationStaging[t] =
                         activity.logo.recordingBuffer.notationStaging[t];
                 }
-                if (activity.logo.recordingBuffer.notationDrumStaging[t]) {
+                if (
+                    Object.prototype.hasOwnProperty.call(
+                        activity.logo.recordingBuffer.notationDrumStaging,
+                        t
+                    ) &&
+                    activity.logo.recordingBuffer.notationDrumStaging[t]
+                ) {
                     activity.logo.notation.notationDrumStaging[t] =
                         activity.logo.recordingBuffer.notationDrumStaging[t];
                 }
@@ -724,6 +755,7 @@ class SaveInterface {
         };
 
         // Lazy-load lilypond module before using LILYPONDHEADER
+
         _lazyRequire(["activity/lilypond"], () => {
             const lyheader = LILYPONDHEADER.replace(
                 /My Music Blocks Creation|Mr. Mouse/gi,
@@ -768,7 +800,14 @@ class SaveInterface {
 
                 // Trigger save after a short delay to let UI update
                 setTimeout(() => {
-                    this.afterSaveLilypond();
+                    try {
+                        this.afterSaveLilypond();
+                    } catch (e) {
+                        console.error("Error generating Lilypond output:", e);
+                        this.activity.errorMsg(_("Error generating Lilypond output. ") + e.message);
+                    } finally {
+                        document.body.style.cursor = "default";
+                    }
                 }, 100);
             } else {
                 // No buffered data - run the program to generate notation (original behavior)
@@ -808,6 +847,7 @@ class SaveInterface {
      */
     afterSaveLilypond(filename) {
         // Lazy-load lilypond module before using saveLilypondOutput
+
         _lazyRequire(["activity/lilypond"], () => {
             filename = docById("fileName").value;
             try {
@@ -957,6 +997,7 @@ class SaveInterface {
      */
     afterSaveMxml(filename) {
         // Lazy-load mxml module before using saveMxmlOutput
+
         _lazyRequire(["activity/mxml"], () => {
             const data = saveMxmlOutput(this.activity.logo);
             this.download("xml", "data:text;utf8," + encodeURIComponent(data), filename);

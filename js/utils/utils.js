@@ -442,7 +442,7 @@ window.onload = () => {
         );
     }
 
-    if (typeof DetectVersionOfIE != "undefined") {
+    if (typeof DetectVersionOfIE !== "undefined") {
         document.body.innerHTML = "<div style='margin: 200px;'>";
         document.body.innerHTML +=
             "<h1 style='font-size: 100px; font-family: Arial; text-align: center; color: #F00;'>Music Blocks</h1>";
@@ -653,6 +653,30 @@ if (typeof module !== "undefined" && module.exports) {
 }
 if (typeof window !== "undefined") {
     window.toTitleCase = toTitleCase;
+}
+
+/**
+ * Escapes HTML special characters to prevent XSS when injecting
+ * user-provided values into HTML.
+ * @param {string} str - The string to escape.
+ * @returns {string} The escaped string safe for HTML insertion.
+ */
+function escapeHTML(str) {
+    const escapeMap = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+    };
+    return String(str).replace(/[&<>"']/g, char => escapeMap[char]);
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports.escapeHTML = escapeHTML;
+}
+if (typeof window !== "undefined") {
+    window.escapeHTML = escapeHTML;
 }
 
 /**
@@ -1501,11 +1525,16 @@ const LCD = (a, b) => {
  */
 let rationalSum = (a, b) => {
     if (
-        !Array.isArray(a) || a.length < 2 ||
-        !Array.isArray(b) || b.length < 2 ||
-        typeof a[0] !== "number" || typeof a[1] !== "number" ||
-        typeof b[0] !== "number" || typeof b[1] !== "number" ||
-        a[1] === 0 || b[1] === 0
+        !Array.isArray(a) ||
+        a.length < 2 ||
+        !Array.isArray(b) ||
+        b.length < 2 ||
+        typeof a[0] !== "number" ||
+        typeof a[1] !== "number" ||
+        typeof b[0] !== "number" ||
+        typeof b[1] !== "number" ||
+        a[1] === 0 ||
+        b[1] === 0
     ) {
         console.warn("Invalid input passed to rationalSum:", a, b);
         return [0, 1];
@@ -1918,6 +1947,7 @@ if (typeof module !== "undefined" && module.exports) {
         closeWidgets,
         closeBlkWidgets,
         resolveObject,
-        importMembers
+        importMembers,
+        escapeHTML
     };
 }
