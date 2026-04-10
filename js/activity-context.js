@@ -55,5 +55,10 @@
         return _activity;
     }
 
-    return { setActivity, getActivity };
+    // Freeze the public interface so no runtime code can accidentally (or
+    // maliciously) override setActivity / getActivity after the module loads.
+    // Object.freeze is shallow, which is sufficient here: we only need to
+    // protect the two method references, not their internal closures.
+    const ActivityContextAPI = Object.freeze({ setActivity, getActivity });
+    return ActivityContextAPI;
 });

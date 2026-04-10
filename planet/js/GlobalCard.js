@@ -17,7 +17,7 @@
 /*
    exported
 
-   GlobalCard, copyURLToClipboard
+   GlobalCard
 */
 
 class GlobalCard {
@@ -26,6 +26,7 @@ class GlobalCard {
         this.ProjectData = null;
         this.id = null;
         this.likeTimeout = null;
+        this.clipboard = null;
         this.PlaceholderMBImage = "images/mbgraphic.png";
         this.PlaceholderTBImage = "images/tbgraphic.png";
 
@@ -67,7 +68,7 @@ class GlobalCard {
                                     <div class="card-content shareurltext"> 
                                             <div class="shareurltitle">${_("Share")}</div> 
                                             <input type="text" name="shareurl" class="shareurlinput" data-originalurl="https://musicblocks.sugarlabs.org/index.html?id={ID}"> 
-                                            <a class="copyshareurl tooltipped" onclick="copyURLToClipboard()" data-clipboard-text="https://musicblocks.sugarlabs.org/index.html?id={ID}&run=True" data-delay="50" data-tooltip="${_(
+                                            <a class="copyshareurl tooltipped" data-clipboard-text="https://musicblocks.sugarlabs.org/index.html?id={ID}&run=True" data-delay="50" data-tooltip="${_(
                                                 "Copy link to clipboard"
                                             )}"><i class="material-icons"alt="Copy!">file_copy</i></a>
                                             <div class="shareurl-advanced" id="global-advanced-{ID}"> 
@@ -139,7 +140,7 @@ class GlobalCard {
             this.ProjectData.ProjectLikes.toString();
 
         // set view button listener
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`global-project-more-details-${this.id}`).addEventListener(
             "click",
             evt => {
@@ -148,25 +149,25 @@ class GlobalCard {
         );
 
         // set open button listener
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`global-project-open-${this.id}`).addEventListener("click", evt => {
             Planet.GlobalPlanet.openGlobalProject(this.id);
         });
 
         // set image listener
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`global-project-image-${this.id}`).addEventListener("click", evt => {
             Planet.GlobalPlanet.ProjectViewer.open(this.id);
         });
 
         // set merge modify listener
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`global-project-merge-${this.id}`).addEventListener("click", evt => {
             Planet.GlobalPlanet.mergeGlobalProject(this.id);
         });
 
         // set share button listener
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`global-project-share-${this.id}`).addEventListener("click", evt => {
             const s = document.getElementById(`global-sharebox-${this.id}`);
 
@@ -180,15 +181,15 @@ class GlobalCard {
         });
 
         // set share checkbox listener
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`global-checkboxrun-${this.id}`).addEventListener("click", evt => {
             updateCheckboxes(`global-sharebox-${this.id}`);
         });
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`global-checkboxshow-${this.id}`).addEventListener("click", evt => {
             updateCheckboxes(`global-sharebox-${this.id}`);
         });
-        // eslint-disable-next-line no-unused-vars
+
         frag.getElementById(`global-checkboxcollapse-${this.id}`).addEventListener("click", evt => {
             updateCheckboxes(`global-sharebox-${this.id}`);
         });
@@ -200,13 +201,45 @@ class GlobalCard {
             ? "favorite"
             : "favorite_border";
 
-        // eslint-disable-next-line no-unused-vars
         frag.getElementById(`global-like-icon-${this.id}`).addEventListener("click", evt => {
             this.like();
         });
 
         document.getElementById("global-projects").appendChild(frag);
         updateCheckboxes(`global-sharebox-${this.id}`);
+
+        if (this.clipboard) {
+            this.clipboard.destroy();
+        }
+
+        this.clipboard = new ClipboardJS(`.copyshareurl[data-clipboard-text*="${this.id}"]`);
+
+        this.clipboard.on("success", e => {
+            // eslint-disable-next-line no-console
+            console.info("Copied:", e.text);
+            e.clearSelection();
+        });
+
+        this.clipboard.on("error", e => {
+            alert("Failed to copy!");
+            // eslint-disable-next-line no-console
+            console.error("Failed to copy:", e.action);
+        });
+    }
+
+    cleanup() {
+        if (this.likeTimeout) {
+            clearTimeout(this.likeTimeout);
+            this.likeTimeout = null;
+        }
+
+        if (this.clipboard) {
+            this.clipboard.destroy();
+            this.clipboard = null;
+        }
+
+        this.ProjectData = null;
+        this.Planet = null;
     }
 
     like() {
@@ -246,20 +279,4 @@ class GlobalCard {
         this.id = id;
         this.ProjectData = this.Planet.GlobalPlanet.cache[id];
     }
-}
-
-function copyURLToClipboard() {
-    const clipboard = new ClipboardJS(".copyshareurl");
-
-    clipboard.on("success", e => {
-        // eslint-disable-next-line no-console
-        console.info("Copied:", e.text);
-        e.clearSelection();
-    });
-
-    clipboard.on("error", e => {
-        alert("Failed to copy!");
-        // eslint-disable-next-line no-console
-        console.error("Failed to copy:", e.action);
-    });
 }

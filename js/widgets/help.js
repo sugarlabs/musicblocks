@@ -354,9 +354,9 @@ class HelpWidget {
             ].includes(HELPCONTENT[page][0])
         ) {
             // body = body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"></p>';
-            body = `<figure>&nbsp;<img src=" ${HELPCONTENT[page][2]}"></figure>`;
+            body = `<figure><img src="${HELPCONTENT[page][2]}" alt="${HELPCONTENT[page][0]} icon" loading="lazy"></figure>`;
         } else {
-            body = `<figure>&nbsp;<img src=" ${HELPCONTENT[page][2]}" width="64px" height="64px"></figure>`;
+            body = `<figure><img src="${HELPCONTENT[page][2]}" alt="${HELPCONTENT[page][0]} icon" loading="lazy" width="64px" height="64px"></figure>`;
         }
 
         const helpContentHTML = `<h1 class="heading">${HELPCONTENT[page][0]}</h1> 

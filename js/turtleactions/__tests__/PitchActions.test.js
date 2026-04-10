@@ -36,7 +36,6 @@ Object.assign(global, {
     frequencyToPitch: musicUtils.frequencyToPitch,
     pitchToFrequency: musicUtils.pitchToFrequency,
     numberToPitch: musicUtils.numberToPitch,
-    isCustomTemperament: musicUtils.isCustomTemperament,
     ACCIDENTALNAMES: musicUtils.ACCIDENTALNAMES,
     ACCIDENTALVALUES: musicUtils.ACCIDENTALVALUES,
     NOTESFLAT: musicUtils.NOTESFLAT,
@@ -65,6 +64,10 @@ describe("Tests for Singer.PitchActions setup", () => {
     let activity, turtle, blkId;
 
     beforeEach(() => {
+        // Add temperament globals only for this test
+        global.isCustomTemperament = musicUtils.isCustomTemperament;
+        global.TEMPERAMENT = musicUtils.TEMPERAMENT;
+
         blkId = 1;
         turtle = {
             singer: {
@@ -108,6 +111,12 @@ describe("Tests for Singer.PitchActions setup", () => {
         };
         setupPitchActions(activity);
         Singer.processPitch.mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        // Clean up globals to prevent test pollution
+        delete global.isCustomTemperament;
+        delete global.TEMPERAMENT;
     });
 
     test("playPitch → always calls processPitch", () => {
@@ -268,6 +277,34 @@ describe("Tests for Singer.PitchActions setup", () => {
         // Should call markup for microtonal note
         // transformedHertz calculated from A4 + 20 cents
         expect(spyMark).toHaveBeenCalled();
+    });
+
+    test("playHertz exports Hertz rounded to 2 decimal places for Lilypond", () => {
+        turtle.singer.notePitches = { 1: [] };
+        turtle.singer.noteOctaves = { 1: [] };
+        turtle.singer.noteCents = { 1: [] };
+        turtle.singer.inNoteBlock = [1];
+        activity.logo.runningLilypond = true;
+
+        // Simulate a microtonal pitch producing a long decimal frequency
+        Singer.processPitch.mockImplementation(() => {
+            turtle.singer.notePitches[1].push("A");
+            turtle.singer.noteOctaves[1].push(4);
+            turtle.singer.noteCents[1].push(23); // non-clean cents value
+        });
+
+        const spyMark = jest.spyOn(activity.logo.notation, "notationMarkup");
+
+        Singer.PitchActions.playHertz(440, 0, blkId);
+
+        expect(spyMark).toHaveBeenCalled();
+
+        const exportedHertz = spyMark.mock.calls.at(-1)[1];
+
+        // proves value is rounded to 2 decimal places
+        expect(exportedHertz).toBe(Number(exportedHertz.toFixed(2)));
+
+        spyMark.mockRestore();
     });
 
     test("playHertz notationMarkup occurs only when both inNoteBlock AND runningLilypond AND microtonal", () => {
