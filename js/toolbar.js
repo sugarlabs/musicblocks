@@ -1647,7 +1647,10 @@ class Toolbar {
          * Removes focus class from all buttons
          */
         const clearFocus = () => {
-            buttons.allButtons.forEach(btn => btn.classList.remove("toolbar-btn-focused"));
+            buttons.allButtons.forEach(btn => {
+                btn.classList.remove("toolbar-btn-focused");
+                btn.blur(); // Remove DOM focus to prevent browser blue outline
+            });
         };
 
         /**

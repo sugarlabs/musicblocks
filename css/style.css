@@ -14,6 +14,7 @@ input[type="range"]:focus {
     outline: none;
 }
 
+
 input[type="range"]:not(.pitchSlider)::-webkit-slider-runnable-track {
     width: 10px;
     height: 11px;
@@ -106,14 +107,23 @@ input[type="range"]:focus::-ms-fill-upper {
 }
 
 /* ===== Toggle Button Visual States ===== */
-/* Turtle Wrap button - ON state with custom blue color */
+/* Turtle Wrap button - ON state (darker blue - clearly distinguishable from OFF) */
 #wrapTurtle.toggle-button-active {
-    background-color: #055499 !important;
+    background-color: #0D4FA0 !important;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    transform: scale(0.98) !important;
+}
+
+/* Click animation - same smooth transition */
+#wrapTurtle.toggle-button-active:active {
+    transform: scale(0.95) !important;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
 /* Turtle Wrap button - OFF state (transparent) */
 #wrapTurtle.toggle-button-inactive {
     background-color: transparent !important;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
 /* Hover effect for OFF state - 10% black overlay (matches toolbar buttons) */
@@ -121,24 +131,129 @@ input[type="range"]:focus::-ms-fill-upper {
     background-color: rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Hover effect for ON state - darken the blue with 10% black overlay effect */
+/* Hover effect for ON state - much darker (clear hover feedback) */
 #wrapTurtle.toggle-button-active:hover {
-    background-color: rgba(18, 95, 162, 1) !important;
+    background-color: #1565C0 !important;
 }
 
-/* Dark mode - ON state */
+/* Dark mode - ON state (darker blue, consistent with light mode) */
 .dark #wrapTurtle.toggle-button-active {
-    background-color: #00102b !important;
+    background-color: #0D4FA0 !important;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    transform: scale(0.98) !important;
 }
 
-/* Dark mode - ON state hover (apply 10% black overlay effect) */
+/* Dark mode - click animation (same smooth transition) */
+.dark #wrapTurtle.toggle-button-active:active {
+    transform: scale(0.95) !important;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+/* Dark mode - ON state hover */
 .dark #wrapTurtle.toggle-button-active:hover {
-    background-color: rgb(0, 14, 35) !important;
+    background-color: #1565C0 !important;
 }
 
 /* Dark mode - OFF state hover */
 .dark #wrapTurtle.toggle-button-inactive:hover {
     background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ========================================
+   Keyboard Focus States for Toolbar Buttons
+   ======================================== */
+
+/* Light mode - white outline INSIDE button boundary with rounded corners */
+.toolbar-btn-focused {
+    outline: 2px solid rgba(255, 255, 255, 0.9) !important;
+    outline-offset: -2px !important;
+    border-radius: 4px !important;
+    transition: outline 0.2s ease !important;
+}
+
+/* Override browser defaults on :focus */
+.toolbar-btn-focused:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.9) !important;
+    outline-offset: -2px !important;
+}
+
+/* Override browser defaults on :focus-visible */
+.toolbar-btn-focused:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.9) !important;
+    outline-offset: -2px !important;
+}
+
+/* Specific rule for wrapTurtle when focused with class */
+#wrapTurtle.toolbar-btn-focused {
+    outline: 2px solid rgba(255, 255, 255, 0.9) !important;
+    outline-offset: -2px !important;
+}
+
+#wrapTurtle.toolbar-btn-focused:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.9) !important;
+    outline-offset: -2px !important;
+}
+
+/* Dark mode - bright white outline INSIDE button boundary with rounded corners */
+.dark .toolbar-btn-focused {
+    outline: 2.5px solid rgba(255, 255, 255, 0.95) !important;
+    outline-offset: -2px !important;
+    border-radius: 4px !important;
+    transition: outline 0.2s ease !important;
+}
+
+/* Dark mode - override on :focus */
+.dark .toolbar-btn-focused:focus {
+    outline: 2.5px solid rgba(255, 255, 255, 0.95) !important;
+    outline-offset: -2px !important;
+}
+
+/* Dark mode - override on :focus-visible */
+.dark .toolbar-btn-focused:focus-visible {
+    outline: 2.5px solid rgba(255, 255, 255, 0.95) !important;
+    outline-offset: -2px !important;
+}
+
+/* Dark mode - specific rule for wrapTurtle when focused with class */
+.dark #wrapTurtle.toolbar-btn-focused {
+    outline: 2.5px solid rgba(255, 255, 255, 0.95) !important;
+    outline-offset: -2px !important;
+}
+
+.dark #wrapTurtle.toolbar-btn-focused:focus {
+    outline: 2.5px solid rgba(255, 255, 255, 0.95) !important;
+    outline-offset: -2px !important;
+}
+
+/* High contrast mode - bright cyan outline INSIDE boundary with rounded corners */
+.highcontrast .toolbar-btn-focused {
+    outline: 2px solid rgba(0, 255, 255, 0.95) !important;
+    outline-offset: -2px !important;
+    border-radius: 4px !important;
+    transition: outline 0.2s ease !important;
+}
+
+/* High contrast - override on :focus */
+.highcontrast .toolbar-btn-focused:focus {
+    outline: 2px solid rgba(0, 255, 255, 0.95) !important;
+    outline-offset: -2px !important;
+}
+
+/* High contrast - override on :focus-visible */
+.highcontrast .toolbar-btn-focused:focus-visible {
+    outline: 2px solid rgba(0, 255, 255, 0.95) !important;
+    outline-offset: -2px !important;
+}
+
+/* High contrast - specific rule for wrapTurtle when focused with class */
+.highcontrast #wrapTurtle.toolbar-btn-focused {
+    outline: 2px solid rgba(0, 255, 255, 0.95) !important;
+    outline-offset: -2px !important;
+}
+
+.highcontrast #wrapTurtle.toolbar-btn-focused:focus {
+    outline: 2px solid rgba(0, 255, 255, 0.95) !important;
+    outline-offset: -2px !important;
 }
 
 .lego-brick {
