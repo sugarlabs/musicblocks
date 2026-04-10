@@ -18,7 +18,7 @@
 /*
    global
 
-   DEFAULTVOLUME, TARGETBPM, TONEBPM, MIN_HIGHLIGHT_DURATION_MS, frequencyToPitch, last,
+   DEFAULTVOLUME, TARGETBPM, TONEBPM, MIN_HIGHLIGHT_DURATION_MS, deepClone, frequencyToPitch, last,
    pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp,
    getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
@@ -42,6 +42,23 @@
  */
 
 /* exported Singer */
+
+/**
+ * Gets the number of pitch intervals per octave for the current temperament.
+ * Defaults to 12 (standard Western tuning) if temperament is not found.
+ * @param {Object} activity - The activity object containing synth information.
+ * @returns {number} The number of intervals per octave.
+ */
+const getOctaveInterval = activity => {
+    let temperamentName = "equal";
+    if (activity && activity.logo && activity.logo.synth && activity.logo.synth.inTemperament) {
+        temperamentName = activity.logo.synth.inTemperament;
+    }
+    const temperament = getTemperament(temperamentName);
+    return temperament && typeof temperament.pitchNumber === "number"
+        ? temperament.pitchNumber
+        : 12;
+};
 
 /**
  * Class pertaining to music related actions for each turtle.
@@ -377,7 +394,7 @@ class Singer {
                     tur.singer.keySignature,
                     tur.singer.movable,
                     null,
-                    activity.logo.errorMsg,
+                    activity.errorMsg,
                     logo.synth.inTemperament
                 );
             }
@@ -514,9 +531,11 @@ class Singer {
         const saveSuppressStatus = tur.singer.suppressOutput;
 
         // We need to save the state of the boxes and heap although there is a potential of a boxes collision with other turtles
-        const saveBoxes = JSON.stringify(logo.boxes);
-        const saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
-        const saveTurtleDicts = JSON.stringify(logo.turtleDicts[turtle]);
+        const saveBoxes = logo.boxes != null ? deepClone(logo.boxes) : undefined;
+        const saveTurtleHeaps =
+            logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle]) : undefined;
+        const saveTurtleDicts =
+            logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle]) : undefined;
         // .. and the turtle state
         const saveX = tur.x;
         const saveY = tur.y;
@@ -538,7 +557,7 @@ class Singer {
 
         for (const b in tur.endOfClampSignals) {
             tur.butNotThese[b] = [];
-            for (const i in tur.endOfClampSignals[b]) {
+            for (const i of tur.endOfClampSignals[b]) {
                 tur.butNotThese[b].push(i);
             }
         }
@@ -570,17 +589,17 @@ class Singer {
         if (saveBoxes == undefined) {
             logo.boxes = {};
         } else {
-            logo.boxes = JSON.parse(saveBoxes);
+            logo.boxes = saveBoxes;
         }
         if (saveTurtleHeaps == undefined) {
             logo.turtleHeaps = {};
         } else {
-            logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
+            logo.turtleHeaps[turtle] = saveTurtleHeaps;
         }
         if (saveTurtleDicts == undefined) {
             logo.turtleDicts = {};
         } else {
-            logo.turtleDicts[turtle] = JSON.parse(saveTurtleDicts);
+            logo.turtleDicts[turtle] = saveTurtleDicts;
         }
 
         tur.painter.doPenUp();
@@ -626,9 +645,11 @@ class Singer {
 
         const saveState = {
             suppressOutput: tur.singer.suppressOutput,
-            boxes: JSON.stringify(logo.boxes),
-            turtleHeaps: JSON.stringify(logo.turtleHeaps[turtle]),
-            turtleDicts: JSON.stringify(logo.turtleDicts[turtle]),
+            boxes: logo.boxes != null ? deepClone(logo.boxes) : undefined,
+            turtleHeaps:
+                logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle]) : undefined,
+            turtleDicts:
+                logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle]) : undefined,
             x: tur.x,
             y: tur.y,
             color: tur.painter.color,
@@ -685,9 +706,11 @@ class Singer {
             penState: saveState.penState
         });
 
-        activity.logo.boxes = JSON.parse(saveState.boxes);
-        activity.logo.turtleHeaps[turtle] = JSON.parse(saveState.turtleHeaps);
-        activity.logo.turtleDicts[turtle] = JSON.parse(saveState.turtleDicts);
+        activity.logo.boxes = saveState.boxes != null ? saveState.boxes : {};
+        activity.logo.turtleHeaps[turtle] =
+            saveState.turtleHeaps != null ? saveState.turtleHeaps : {};
+        activity.logo.turtleDicts[turtle] =
+            saveState.turtleDicts != null ? saveState.turtleDicts : {};
 
         tur.painter.doPenUp();
         tur.painter.doSetXY(saveState.x, saveState.y);
@@ -719,7 +742,15 @@ class Singer {
         }
         for (const turtle of activity.turtles.turtleList) {
             for (const synth in turtle.singer.synthVolume) {
-                turtle.singer.synthVolume[synth].push(volume);
+                // Replace last value instead of pushing to prevent unbounded
+                // array growth. Master volume doesn't use stack semantics,
+                // so only the current volume matters.
+                const arr = turtle.singer.synthVolume[synth];
+                if (arr.length > 0) {
+                    arr[arr.length - 1] = volume;
+                } else {
+                    arr.push(volume);
+                }
             }
         }
     }
@@ -1055,7 +1086,7 @@ class Singer {
                 noteObj = getNote(
                     anote,
                     octave,
-                    atrans + tur.singer.register * SEMITONES,
+                    atrans + tur.singer.register * getOctaveInterval(activity),
                     tur.singer.keySignature,
                     tur.singer.movable,
                     direction,
@@ -1084,7 +1115,6 @@ class Singer {
                 // Cents may have been added through a transposition.
                 if (noteObj[2] !== 0 && cents === 0) {
                     cents = noteObj[2];
-                    // eslint-disable-next-line no-console
                 }
 
                 if (Math.abs(cents) < 1e-9) {
@@ -1274,7 +1304,7 @@ class Singer {
                 const noteObj = getNote(
                     note,
                     octave,
-                    transposition + tur.singer.register * SEMITONES,
+                    transposition + tur.singer.register * getOctaveInterval(activity),
                     tur.singer.keySignature,
                     tur.singer.movable,
                     direction,
@@ -1893,7 +1923,6 @@ class Singer {
                             break;
                         }
                     }
-                    // eslint-disable-next-line no-console
                 }
             }
             let forceSilence = false;
@@ -2097,7 +2126,11 @@ class Singer {
                             let d;
                             if (duration > 0) {
                                 if (carry > 0) {
-                                    d = 1 / (1 / duration - 1 / carry);
+                                    if (Math.abs(duration - carry) < 1e-10) {
+                                        d = 0;
+                                    } else {
+                                        d = 1 / (1 / duration - 1 / carry);
+                                    }
                                 } else {
                                     d = duration;
                                 }

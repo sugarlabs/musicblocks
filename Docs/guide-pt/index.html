@@ -9,30 +9,100 @@
       crossorigin="anonymous"
     />
     <style type="text/css">
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+        background-color: #f9f9f9;
+      }
+      .jumbotron {
+        background-color: #5bc0de;
+        color: white;
+        text-align: center;
+        border-radius: 8px;
+        margin-top: 20px;
+        padding: 40px 20px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      }
+      .jumbotron h1 {
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+      .content-wrapper {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-bottom: 40px;
+      }
+      .top-nav {
+        margin-bottom: 20px;
+        text-align: right;
+      }
+      .top-nav a {
+        color: #777;
+        margin-left: 10px;
+        text-decoration: none;
+      }
+      .top-nav a:hover {
+        color: #333;
+      }
       ol {
         counter-reset: item;
       }
       li {
         display: block;
+        margin-bottom: 8px;
       }
       li:before {
         content: counters(item, ".") " ";
         counter-increment: item;
+        font-weight: bold;
+        color: #5bc0de;
+      }
+      h2, h3, h4 {
+        color: #2c3e50;
+        margin-top: 30px;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+        margin: 15px 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .download-btn {
+        margin-top: 20px;
+        font-size: 1.1em;
+        padding: 10px 20px;
+        border-radius: 30px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        transition: all 0.3s;
+      }
+      .download-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0,0,0,0.3);
       }
     </style>
   </head>
-  <body> 
-     
-    <div class="container">
+  <body>
+    <div class="container content-wrapper">
+      <div class="top-nav">
+        <a href="../guide/index.html">English</a> |
+        <a href="../guide-es/index.html">Español</a> |
+        <a href="../guide-ja/index.html">日本語</a> |
+        <a href="../guide-zhCN/index.html">中文</a> |
+        <a href="../guide-pt/index.html">Português</a>
+      </div>
       <div id="content">
-        <h1 id="guide-to-programming-with-music-blocks">Guia de Programação com Music Blocks</h1>
-        <p>
-          <a href="../guide/index.html">English</a> |
-          <a href="../guide-es/index.html">Español</a> |
-          <a href="../guide-ja/index.html">日本語</a> |
-          <a href="../guide-zhCN/index.html">中文</a> |
-          <a href="../guide-pt/index.html">Português</a>
-        </p>
+        <div class="jumbotron">
+          <h1>Guia de Programação com Music Blocks</h1>
+          <p class="lead">Um guia completo para aprender e programar com o Music Blocks</p>
+          <a href="MusicBlocks_Guide_PT.pdf" class="btn btn-warning btn-lg download-btn" download>
+             <span class="glyphicon glyphicon-download-alt"></span> Baixar Guia em PDF
+          </a>
+        </div>
         <p>
           O
           <a href="https://github.com/sugarlabs/turtleblocksjs/blob/master/guide/README.md"
@@ -184,7 +254,7 @@
         </p>
         <h2 id="1-getting-started"><a name="#GETTING-STARTED">1. Começando</a></h2>
         <p>
-          <a href="#TOC">Voltar para o Índice</a> |
+          <a href="#table-of-contents">Voltar ao Índice</a> |
           <a href="#NOTES">Próxima Seção (2. Fazendo Sons)</a>
         </p>
         <p>
@@ -199,23 +269,23 @@
         <p>
           Este guia detalha os recursos específicos de música do Music Blocks. Você também pode estar interessado
           no
-          <a href="http://github.com/sugarlabs/turtleblocksjs/tree/master/guide"
+          <a href="https://github.com/sugarlabs/turtleblocksjs/tree/master/guide"
             >Guia do Turtle Blocks</a
           >, que revisa muitos recursos de programação comuns a ambos os projetos.
         </p>
         <p>
           Para mais detalhes sobre como usar o Music Blocks, veja
-          <a href="http://github.com/sugarlabs/musicblocks/tree/master/documentation"
+          <a href="https://github.com/sugarlabs/musicblocks/tree/master/documentation"
             >Usando Music Blocks</a
           >. Para mais detalhes sobre como usar o Turtle Blocks, veja
-          <a href="http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation"
+          <a href="https://github.com/sugarlabs/turtleblocksjs/tree/master/documentation"
             >Usando Turtle Blocks JS</a
           >.
         </p>
         <h2 id="2-making-sounds"><a name="NOTES">2. Fazendo Sons</a></h2>
         <p>
           <a href="#1-getting-started">Seção Anterior (1. Começando)</a> |
-          <a href="#TOC">Voltar para o Índice</a> |
+          <a href="#table-of-contents">Voltar ao Índice</a> |
           <a href="#3-programming-with-music">Próxima Seção (3. Programando com Música)</a>
         </p>
         <p>
@@ -476,7 +546,7 @@
         </h2>
         <p>
           <a href="#2-making-sounds">Seção Anterior (2. Fazendo Sons)</a> |
-          <a href="#TOC">Voltar para o Índice</a> |
+          <a href="#table-of-contents">Voltar ao Índice</a> |
           <a href="#4-widgets">Próxima Seção (4. Widgets)</a>
         </p>
         <p>
@@ -960,7 +1030,7 @@
         <h2 id="4-widgets"><a name="WIDGETS">4. Widgets</a></h2>
         <p>
           <a href="#3-programming-with-music">Seção Anterior (3. Programando com Música)</a> |
-          <a href="#TABLE-OF-CONTENTS">Voltar ao Índice</a> |
+          <a href="#table-of-contents">Voltar ao Índice</a> |
           <a href="#5-beyond-music-blocks">Próxima Seção (5. Além do Music Blocks)</a>
         </p>
         <p>
@@ -1720,7 +1790,7 @@
         <h2 id="5-beyond-music-blocks"><a name="BEYOND-MUSIC-BLOCKS">5. Além do Music Blocks</a></h2>
         <p>
           <a href="#4-widgets">Seção Anterior (4. Widgets)</a> |
-          <a href="#TABLE-OF-CONTENTS">Voltar ao Índice</a>
+          <a href="#table-of-contents">Voltar ao Índice</a>
         </p>
         <p>
           O Music Blocks é um ponto de passagem, não um destino. Um dos objetivos é apontar o aprendiz
@@ -1728,7 +1798,7 @@
         </p>
         <h2 id="51-lilypond"><a name="LILYPOND">5.1 Lilypond</a></h2>
         <p>
-          Uma dessas ferramentas é o <a href="http://lilypond.org">Lilypond</a>, um programa de gravação de música.
+          Uma dessas ferramentas é o <a href="https://lilypond.org">Lilypond</a>, um programa de gravação de música.
         </p>
         <p><img src="./lilypond1.svg" title="adicionando bloco Salvar como Lilypond" alt="lilypond" /></p>
         <p>
@@ -1871,7 +1941,7 @@
         <h2 id="6-appendix"><a name="APPENDIX">6. Apêndice</a></h2>
         <p>
           <a href="#5-beyond-music-blocks">Seção Anterior (5. Além do Music Blocks)</a> |
-          <a href="#TABLE-OF-CONTENTS">Voltar ao Índice</a>
+          <a href="#table-of-contents">Voltar ao Índice</a>
         </p>
         <h3 id="61-beginner-palettes"><a name="BEGINNER_PALETTES">6.1 Paletas para Iniciantes</a></h3>
         <p>
@@ -2403,6 +2473,7 @@
               <td style="text-align: center"></td>
               <td style="text-align: center"></td>
             </tr>
+            <tr class="odd">
               <td style="text-align: center"></td>
               <td style="text-align: center"></td>
               <td style="text-align: center"></td>
@@ -3986,8 +4057,19 @@
             </tr>
           </tbody>
         </table>
-        <p><a href="#TABLE-OF-CONTENTS">Voltar ao Índice</a></p>
+        <p><a href="#table-of-contents">Voltar ao Índice</a></p>
       </div>
     </div>
+    <script>
+      function toggleImageSize(img) {
+        if (img.style.maxWidth === "none") {
+          img.style.maxWidth = "500px";
+          img.style.maxHeight = "500px";
+        } else {
+          img.style.maxWidth = "none";
+          img.style.maxHeight = "none";
+        }
+      }
+    </script>
   </body>
 </html>

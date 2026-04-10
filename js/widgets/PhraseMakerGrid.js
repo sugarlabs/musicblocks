@@ -192,7 +192,6 @@ const PhraseMakerGrid = {
             }
 
             if (pm.activity.blocks.blockList[blk] === undefined) {
-                //eslint-disable-next-line no-console
                 console.debug("block " + blk + " is undefined");
                 continue;
             }

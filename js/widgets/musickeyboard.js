@@ -2089,9 +2089,17 @@ function MusicKeyboard(activity) {
                     }
                 }
 
+                let iterations = 0;
                 do {
                     rLabel = pitchLabels[(i + 1) % pitchLabels.length];
                     i = (i + 1) % pitchLabels.length;
+                    iterations++;
+                    if (iterations > pitchLabels.length) {
+                        this.activity.errorMsg(
+                            _("All 12 pitches are already in the keyboard. Adding duplicate.")
+                        );
+                        break;
+                    }
                 } while (this.layout.some(note => note.noteName === rLabel));
                 for (let j = this.layout.length; j > 0; j--) {
                     rArg = this.layout[j - 1].noteOctave;
@@ -2144,7 +2152,6 @@ function MusicKeyboard(activity) {
                     ]);
                     break;
                 default:
-                    // eslint-disable-next-line no-console
                     console.log("Nothing to do for " + label);
             }
 
@@ -2193,7 +2200,6 @@ function MusicKeyboard(activity) {
                         key.objId; //convet solfege to alphabetic.
                 }, 500);
             } else {
-                // eslint-disable-next-line no-console
                 console.log("Could not find anywhere to insert new block.");
             }
         };

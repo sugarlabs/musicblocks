@@ -12,7 +12,7 @@
 /*
 global
 
-_, FlowBlock, LeftBlock, FlowClampBlock, StackClampBlock, ValueBlock,
+FlowBlock, LeftBlock, FlowClampBlock, StackClampBlock, ValueBlock,
 Queue, NOACTIONERRORMSG, NOINPUTERRORMSG
 */
 
@@ -201,7 +201,7 @@ function setupActionBlocks(activity) {
                 // Call a function when the state changes.
                 xmlHttp.onreadystatechange = () => {
                     if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
-                        alert(xmlHttp.responseText);
+                        activity.textMsg(xmlHttp.responseText);
                     }
                 };
 
@@ -472,7 +472,6 @@ function setupActionBlocks(activity) {
                         }
                     }
 
-                    // eslint-disable-next-line no-unused-vars
                     const __listener = event => tur.singer.backward.pop();
 
                     logo.setTurtleListener(turtle, listenerName, __listener);
@@ -993,7 +992,6 @@ function setupActionBlocks(activity) {
                 return [logo.actions[args[0]], 1];
             }
 
-            // eslint-disable-next-line no-console
             console.debug("action " + args[0] + " not found");
             activity.errorMsg(NOACTIONERRORMSG, blk, args[0]);
         }
@@ -1077,7 +1075,6 @@ function setupActionBlocks(activity) {
             } else {
                 const tur = activity.turtles.ithTurtle(turtle);
 
-                // eslint-disable-next-line no-unused-vars
                 const __listener = event => {
                     if (tur.running) {
                         const queueBlock = new Queue(logo.actions[args[1]], 1, blk);
@@ -1369,7 +1366,6 @@ function setupActionBlocks(activity) {
                 return [logo.actions[args[0]], 1];
             }
 
-            // eslint-disable-next-line no-console
             console.debug("action " + args[0] + " not found");
             activity.errorMsg(NOACTIONERRORMSG, blk, args[0]);
         }
@@ -1463,7 +1459,6 @@ function setupActionBlocks(activity) {
                     }
                 }
 
-                // eslint-disable-next-line no-unused-vars
                 const __listener = event => tur.singer.backward.pop();
 
                 logo.setTurtleListener(turtle, listenerName, __listener);

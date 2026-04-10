@@ -23,6 +23,10 @@
 const fs = require("fs");
 const path = require("path");
 
+// Make shared escapeHTML available globally before loading reflection.js
+const { escapeHTML } = require("../../utils/utils");
+global.escapeHTML = escapeHTML;
+
 // Load the ReflectionMatrix class by reading the source and evaluating it
 const source = fs.readFileSync(path.resolve(__dirname, "../reflection.js"), "utf-8");
 // We put ReflectionMatrix in global scope
@@ -545,8 +549,8 @@ describe("ReflectionMatrix", () => {
 
         test("escapeHTML replaces special characters", () => {
             const input = "<div id='test'>&\"</div>";
-            const output = reflection.escapeHTML(input);
-            expect(output).toBe("&lt;div id=&#x27;test&#x27;&gt;&amp;&quot;&lt;/div&gt;");
+            const output = escapeHTML(input);
+            expect(output).toBe("&lt;div id=&#039;test&#039;&gt;&amp;&quot;&lt;/div&gt;");
         });
 
         test("isUnsafeUrl flags javascript/data/vbscript correctly", () => {

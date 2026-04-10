@@ -260,10 +260,19 @@ class JSEditor {
         const beforeError = text.substring(0, start);
         const afterError = text.substring(end);
 
-        const highlightedHTML =
-            beforeError + `<span class="error" title="${message}">${errorText}</span>` + afterError;
+        const highlightedContent = document.createDocumentFragment();
+        highlightedContent.appendChild(document.createTextNode(beforeError));
 
-        editor.innerHTML = highlightedHTML;
+        const errorSpan = document.createElement("span");
+        errorSpan.className = "error";
+        errorSpan.title = String(message);
+        errorSpan.textContent = errorText;
+        highlightedContent.appendChild(errorSpan);
+
+        highlightedContent.appendChild(document.createTextNode(afterError));
+
+        editor.textContent = "";
+        editor.appendChild(highlightedContent);
     }
 
     /**
@@ -892,10 +901,28 @@ class JSEditor {
      *
      * @returns {Void}
      */
-    _codeToBlocks() {
+    async _codeToBlocks() {
         JSEditor.clearConsole();
 
         try {
+            if (!ast2blocklist_config && window.ast2blocklist_config_ready) {
+                try {
+                    await window.ast2blocklist_config_ready;
+                } catch {
+                    window.ast2blocklist_config_failed = true;
+                }
+            }
+
+            if (!ast2blocklist_config) {
+                throw new Error(
+                    window.ast2blocklist_config_failed
+                        ? _(
+                              "JavaScript block conversion is unavailable because its configuration file failed to load."
+                          )
+                        : _("JavaScript block conversion is still loading. Please try again.")
+                );
+            }
+
             let ast = acorn.parse(this._code, { ecmaVersion: 2020 });
             let blockList = AST2BlockList.toBlockList(ast, ast2blocklist_config);
             const activity = this.activity;

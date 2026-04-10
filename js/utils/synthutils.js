@@ -13,7 +13,7 @@
 /*
    global
 
-   _, last, Tone, require, getTemperament, pitchToNumber,
+   last, Tone, getTemperament, pitchToNumber,
    getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
    getOctaveRatio, isCustomTemperament, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
@@ -499,7 +499,6 @@ function Synth() {
     this.tone = null;
 
     Tone.Buffer.onload = () => {
-        // eslint-disable-next-line no-console
         console.debug("sample loaded");
     };
     /**
@@ -552,6 +551,21 @@ function Synth() {
      * @type {function|null}
      */
     this.detectPitch = null;
+    /**
+     * Flag to track whether tuner update loop is active.
+     * @type {boolean}
+     */
+    this._tunerActive = false;
+    /**
+     * Animation frame id for the tuner update loop.
+     * @type {number|null}
+     */
+    this._tunerRafId = null;
+    /**
+     * Cached tuner segments to avoid querying on every frame.
+     * @type {NodeList|null}
+     */
+    this._tunerSegments = null;
 
     /**
      * Function to initialize a new Tone.js instance.
@@ -578,6 +592,10 @@ function Synth() {
     this.temperamentChanged = (temperament, startingPitch) => {
         let startPitch = startingPitch;
         const t = getTemperament(temperament);
+        if (!t) {
+            console.error("Temperament not found: " + temperament);
+            return;
+        }
         const len = startPitch.length;
         const number = pitchToNumber(
             startPitch.substring(0, len - 1),
@@ -598,102 +616,29 @@ function Synth() {
 
         const frequency = Tone.Frequency(startPitch).toFrequency();
 
-        // Cache getNoteFromInterval results to avoid duplicate calls (performance optimization)
-        const intervalCache = {
-            "minor 2": getNoteFromInterval(startingPitch, "minor 2"),
-            "augmented 1": getNoteFromInterval(startingPitch, "augmented 1"),
-            "major 2": getNoteFromInterval(startingPitch, "major 2"),
-            "minor 3": getNoteFromInterval(startingPitch, "minor 3"),
-            "augmented 2": getNoteFromInterval(startingPitch, "augmented 2"),
-            "major 3": getNoteFromInterval(startingPitch, "major 3"),
-            "augmented 3": getNoteFromInterval(startingPitch, "augmented 3"),
-            "diminished 4": getNoteFromInterval(startingPitch, "diminished 4"),
-            "perfect 4": getNoteFromInterval(startingPitch, "perfect 4"),
-            "augmented 4": getNoteFromInterval(startingPitch, "augmented 4"),
-            "diminished 5": getNoteFromInterval(startingPitch, "diminished 5"),
-            "perfect 5": getNoteFromInterval(startingPitch, "perfect 5"),
-            "augmented 5": getNoteFromInterval(startingPitch, "augmented 5"),
-            "minor 6": getNoteFromInterval(startingPitch, "minor 6"),
-            "major 6": getNoteFromInterval(startingPitch, "major 6"),
-            "augmented 6": getNoteFromInterval(startingPitch, "augmented 6"),
-            "minor 7": getNoteFromInterval(startingPitch, "minor 7"),
-            "major 7": getNoteFromInterval(startingPitch, "major 7"),
-            "augmented 7": getNoteFromInterval(startingPitch, "augmented 7"),
-            "diminished 8": getNoteFromInterval(startingPitch, "diminished 8"),
-            "perfect 8": getNoteFromInterval(startingPitch, "perfect 8")
-        };
-
         this.noteFrequencies = {
             // note: [octave, Frequency]
-            [startingPitch.substring(0, len - 1)]: [Number(startingPitch.slice(-1)), frequency],
-            [intervalCache["minor 2"][0]]: [intervalCache["minor 2"][1], t["minor 2"] * frequency],
-            [intervalCache["augmented 1"][0]]: [
-                intervalCache["augmented 1"][1],
-                t["augmented 1"] * frequency
-            ],
-            [intervalCache["major 2"][0]]: [intervalCache["major 2"][1], t["major 2"] * frequency],
-            [intervalCache["minor 3"][0]]: [intervalCache["minor 3"][1], t["minor 3"] * frequency],
-            [intervalCache["augmented 2"][0]]: [
-                intervalCache["augmented 2"][1],
-                t["augmented 2"] * frequency
-            ],
-            [intervalCache["major 3"][0]]: [intervalCache["major 3"][1], t["major 3"] * frequency],
-            [intervalCache["augmented 3"][0]]: [
-                intervalCache["augmented 3"][1],
-                t["augmented 3"] * frequency
-            ],
-            [intervalCache["diminished 4"][0]]: [
-                intervalCache["diminished 4"][1],
-                t["diminished 4"] * frequency
-            ],
-            [intervalCache["perfect 4"][0]]: [
-                intervalCache["perfect 4"][1],
-                t["perfect 4"] * frequency
-            ],
-            [intervalCache["augmented 4"][0]]: [
-                intervalCache["augmented 4"][1],
-                t["augmented 4"] * frequency
-            ],
-            [intervalCache["diminished 5"][0]]: [
-                intervalCache["diminished 5"][1],
-                t["diminished 5"] * frequency
-            ],
-            [intervalCache["perfect 5"][0]]: [
-                intervalCache["perfect 5"][1],
-                t["perfect 5"] * frequency
-            ],
-            [intervalCache["augmented 5"][0]]: [
-                intervalCache["augmented 5"][1],
-                t["augmented 5"] * frequency
-            ],
-            [intervalCache["minor 6"][0]]: [intervalCache["minor 6"][1], t["minor 6"] * frequency],
-            [intervalCache["major 6"][0]]: [intervalCache["major 6"][1], t["major 6"] * frequency],
-            [intervalCache["augmented 6"][0]]: [
-                intervalCache["augmented 6"][1],
-                t["augmented 6"] * frequency
-            ],
-            [intervalCache["minor 7"][0]]: [intervalCache["minor 7"][1], t["minor 7"] * frequency],
-            [intervalCache["major 7"][0]]: [intervalCache["major 7"][1], t["major 7"] * frequency],
-            [intervalCache["augmented 7"][0]]: [
-                intervalCache["augmented 7"][1],
-                t["augmented 7"] * frequency
-            ],
-            [intervalCache["diminished 8"][0]]: [
-                intervalCache["diminished 8"][1],
-                t["diminished 8"] * frequency
-            ],
-            [intervalCache["perfect 8"][0]]: [
-                intervalCache["perfect 8"][1],
-                t["perfect 8"] * frequency
-            ]
+            [startingPitch.substring(0, len - 1)]: [Number(startingPitch.slice(-1)), frequency]
         };
+
+        for (const interval in t) {
+            if (
+                interval !== "pitchNumber" &&
+                interval !== "interval" &&
+                interval !== "octave" &&
+                typeof t[interval] === "number"
+            ) {
+                const noteInfo = getNoteFromInterval(startingPitch, interval);
+                this.noteFrequencies[noteInfo[0]] = [noteInfo[1], t[interval] * frequency];
+            }
+        }
 
         for (const key in this.noteFrequencies) {
             let note;
             if (key.substring(1, key.length) === FLAT || key.substring(1, key.length) === "b") {
                 note = key.substring(0, 1) + "" + "b";
                 this.noteFrequencies[note] = this.noteFrequencies[key];
-                // eslint-disable-next-line no-delete-var
+
                 delete this.noteFrequencies[key];
             } else if (
                 key.substring(1, key.length) === SHARP ||
@@ -701,7 +646,7 @@ function Synth() {
             ) {
                 note = key.substring(0, 1) + "" + "#";
                 this.noteFrequencies[note] = this.noteFrequencies[key];
-                // eslint-disable-next-line no-delete-var
+
                 delete this.noteFrequencies[key];
             }
         }
@@ -869,13 +814,11 @@ function Synth() {
         this.tone.context.resume();
     };
 
-    /*eslint-disable no-undef*/
     /**
      * Function to load samples.
      * @function
      */
     this.loadSamples = () => {
-        /*eslint-disable no-prototype-builtins*/
         if (this.samples === null) {
             this.samples = { voice: {}, drum: {} };
             // Pre-populate with null to indicate they exist as valid instruments but are not loaded
@@ -931,7 +874,6 @@ function Synth() {
             // Load the sample module using require
             require([sampleInfo.path], () => {
                 try {
-                    // eslint-disable-next-line no-undef
                     const sampleData = window[sampleInfo.global];
                     if (sampleData) {
                         this.samples[sampleType][sampleName] = sampleData();
@@ -1097,12 +1039,36 @@ function Synth() {
             }
             chunks = [];
             const url = URL.createObjectURL(blob);
-            // Prompt the user for the file name
-            const fileName = window.prompt("Enter file name", "recording");
-            if (fileName) {
-                download(url, fileName + (platform.FF ? ".wav" : ".ogg"));
+            const t = text => (typeof window._ === "function" ? window._(text) : text);
+            const ext = platform.FF ? ".wav" : ".ogg";
+            const showCancelMessage = () => {
+                if (window.MBDialog && typeof window.MBDialog.alert === "function") {
+                    window.MBDialog.alert(t("Download cancelled."), t("Save recording"));
+                } else {
+                    alert(t("Download cancelled."));
+                }
+            };
+            const finishDownload = name => {
+                if (name === null || name.trim() === "") {
+                    showCancelMessage();
+                    return;
+                }
+
+                download(url, name + ext);
+            };
+
+            if (window.MBDialog && typeof window.MBDialog.prompt === "function") {
+                window.MBDialog.prompt({
+                    title: t("Save recording"),
+                    message: t("Filename:"),
+                    defaultValue: t("recording"),
+                    okText: t("Save"),
+                    cancelText: t("Cancel")
+                }).then(result => finishDownload(result));
             } else {
-                alert("Download cancelled.");
+                // Fallback to browser prompt if MBDialog is not available.
+                const fileName = window.prompt(t("Enter file name"), t("recording"));
+                finishDownload(fileName);
             }
         };
         // this.recorder.start();
@@ -1308,7 +1274,6 @@ function Synth() {
      * @param {string} turtle - The turtle identifier.
      */
     this.createDefaultSynth = turtle => {
-        // eslint-disable-next-line no-console
         console.debug("create default poly/default/custom synth for turtle " + turtle);
         const default_synth = new Tone.PolySynth(Tone.AMSynth, POLYCOUNT).toDestination();
         instruments[turtle]["electronic synth"] = default_synth;
@@ -1408,7 +1373,6 @@ function Synth() {
         } else if (fragment in letterDict) {
             chromaticNumber = letterDict[fragment];
         } else {
-            // eslint-disable-next-line no-console
             console.debug("Cannot parse " + fragment);
         }
         const pitchNumber = octave * 12 + chromaticNumber + attr;
@@ -1949,27 +1913,30 @@ function Synth() {
                 // A 500 ms safety buffer is added beyond the note duration to prevent
                 // premature disposal caused by audio-clock drift or scheduler jitter,
                 // which would otherwise produce crackling artefacts in long sessions.
-                setTimeout(() => {
-                    try {
-                        // Dispose of effects
-                        effectsToDispose.forEach(effect => {
-                            if (effect && typeof effect.dispose === "function") {
-                                effect.dispose();
-                            }
-                        });
-
-                        // Dispose of filters
-                        if (temp_filters.length > 0) {
-                            temp_filters.forEach(filter => {
-                                if (filter && typeof filter.dispose === "function") {
-                                    filter.dispose();
+                setTimeout(
+                    () => {
+                        try {
+                            // Dispose of effects
+                            effectsToDispose.forEach(effect => {
+                                if (effect && typeof effect.dispose === "function") {
+                                    effect.dispose();
                                 }
                             });
+
+                            // Dispose of filters
+                            if (temp_filters.length > 0) {
+                                temp_filters.forEach(filter => {
+                                    if (filter && typeof filter.dispose === "function") {
+                                        filter.dispose();
+                                    }
+                                });
+                            }
+                        } catch (e) {
+                            console.debug("Error disposing effects:", e);
                         }
-                    } catch (e) {
-                        console.debug("Error disposing effects:", e);
-                    }
-                }, beatValue * 1000 + 500);
+                    },
+                    beatValue * 1000 + 500
+                );
             }
         } catch (e) {
             console.error("Error in _performNotes:", e);
@@ -2048,7 +2015,9 @@ function Synth() {
                 if (Tone.context.state !== "running" && !window.hasShownAudioWarning) {
                     window.hasShownAudioWarning = true;
                     alert(
-                        "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
+                        _(
+                            "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
+                        )
                     );
                 }
             }, 2000);
@@ -2277,7 +2246,6 @@ function Synth() {
             synth = instruments[turtle][instrumentName];
         }
 
-        // eslint-disable-next-line no-console
         console.debug(
             "Crescendo(decibels)",
             instrumentName,
@@ -2288,7 +2256,7 @@ function Synth() {
             "t:",
             rampTime
         );
-        // eslint-disable-next-line no-console
+
         console.debug("Crescendo", instrumentName, ":", oldVol, "to", volume, "t:", rampTime);
 
         synth.volume.linearRampToValueAtTime(db, Tone.now() + rampTime);
@@ -2393,9 +2361,42 @@ function Synth() {
                 this.recorder.start();
             })
             .catch(error => {
-                // eslint-disable-next-line no-console
                 console.error(error);
             });
+    };
+
+    const _disposeRecordingPlayer = () => {
+        if (this.player) {
+            try {
+                if (typeof this.player.stop === "function") {
+                    this.player.stop();
+                }
+            } catch (e) {
+                console.debug("Error stopping recording player:", e);
+            }
+
+            try {
+                if (typeof this.player.dispose === "function") {
+                    this.player.dispose();
+                }
+            } catch (e) {
+                console.debug("Error disposing recording player:", e);
+            }
+
+            this.player = null;
+        }
+    };
+
+    const _revokeRecordingURL = () => {
+        if (this.audioURL) {
+            try {
+                URL.revokeObjectURL(this.audioURL);
+            } catch (e) {
+                console.debug("Error revoking recording URL:", e);
+            }
+
+            this.audioURL = null;
+        }
     };
 
     /**
@@ -2404,6 +2405,8 @@ function Synth() {
      * @memberof Synth
      */
     this.stopRecording = async () => {
+        _disposeRecordingPlayer();
+        _revokeRecordingURL();
         this.recording = await this.recorder.stop();
         this.mic.close();
         this.audioURL = URL.createObjectURL(this.recording);
@@ -2416,6 +2419,7 @@ function Synth() {
      * @memberof Synth
      */
     this.playRecording = async () => {
+        _disposeRecordingPlayer();
         this.player = new Tone.Player().toDestination();
         await this.player.load(this.audioURL);
         this.player.start();
@@ -2427,7 +2431,7 @@ function Synth() {
      * @memberof Synth
      */
     this.stopPlayBackRecording = () => {
-        this.player.stop();
+        _disposeRecordingPlayer();
     };
 
     /**
@@ -2471,7 +2475,6 @@ function Synth() {
             // In practice this runs in the browser; keep a safe fallback for tests.
             try {
                 if (typeof module !== "undefined" && module.exports) {
-                    // eslint-disable-next-line global-require
                     const ctx = require("../activity-context");
                     if (ctx && typeof ctx.getActivity === "function") {
                         return ctx.getActivity();
@@ -2541,6 +2544,12 @@ function Synth() {
 
         this.tunerAnalyser = new Tone.Analyser("waveform", 2048);
         this.tunerMic.connect(this.tunerAnalyser);
+        this._tunerActive = true;
+        this._tunerSegments = null;
+        if (this._tunerRafId !== null && typeof cancelAnimationFrame === "function") {
+            cancelAnimationFrame(this._tunerRafId);
+        }
+        this._tunerRafId = null;
 
         const YIN = (sampleRate, bufferSize = 2048, threshold = 0.1) => {
             // Low-Pass Filter to remove high-frequency noise
@@ -2622,6 +2631,15 @@ function Synth() {
         let targetPitch = { note: "A4", frequency: 440 }; // Default target pitch
 
         const updatePitch = () => {
+            if (!this._tunerActive) return;
+
+            const tunerContainer = document.getElementById("tunerContainer");
+            if (!tunerContainer || !this.tunerAnalyser || !this.detectPitch) {
+                this._tunerActive = false;
+                this._tunerRafId = null;
+                return;
+            }
+
             const buffer = this.tunerAnalyser.getValue();
             const pitch = this.detectPitch(buffer);
 
@@ -2682,7 +2700,6 @@ function Synth() {
 
                 // Initialize display elements if they don't exist
                 let noteDisplayContainer = document.getElementById("noteDisplayContainer");
-                const tunerContainer = document.getElementById("tunerContainer");
 
                 if (!noteDisplayContainer && tunerContainer) {
                     // Create container
@@ -3177,7 +3194,11 @@ function Synth() {
                 }
 
                 // Update tuner segments
-                const tunerSegments = document.querySelectorAll("#tunerContainer svg path");
+                let tunerSegments = this._tunerSegments;
+                if (!tunerSegments || tunerSegments.length === 0 || !tunerSegments[0].isConnected) {
+                    tunerSegments = tunerContainer.querySelectorAll("svg path");
+                    this._tunerSegments = tunerSegments;
+                }
 
                 // Define colors for the gradient
                 const colors = {
@@ -3333,16 +3354,25 @@ function Synth() {
                 });
             }
 
-            requestAnimationFrame(updatePitch);
+            if (this._tunerActive && typeof requestAnimationFrame === "function") {
+                this._tunerRafId = requestAnimationFrame(updatePitch);
+            }
         };
 
         updatePitch();
     };
 
     this.stopTuner = () => {
+        this._tunerActive = false;
+        if (this._tunerRafId !== null && typeof cancelAnimationFrame === "function") {
+            cancelAnimationFrame(this._tunerRafId);
+        }
+        this._tunerRafId = null;
+        this._tunerSegments = null;
         if (this.tunerMic) {
             this.tunerMic.close();
         }
+        this.tunerAnalyser = null;
     };
 
     const frequencyToNote = frequency => {
@@ -3559,6 +3589,9 @@ function Synth() {
      * @returns {void}
      */
     this.disposeAllInstruments = () => {
+        _disposeRecordingPlayer();
+        _revokeRecordingURL();
+
         for (const turtle in instruments) {
             for (const instrumentName in instruments[turtle]) {
                 if (
@@ -3615,6 +3648,9 @@ function Synth() {
     this.tone = null;
     this.noteFrequencies = {};
     this.startingPitch = "C4";
+    this.audioURL = null;
+    this.player = null;
+    this.recording = null;
     this.startingPitchOctave = 4;
     this.octaveTranspose = 0;
     this.inTemperament = "equal";

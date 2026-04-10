@@ -12,7 +12,7 @@
 /*
    global
 
-   _, ValueBlock, NOINPUTERRORMSG, NANERRORMSG, last, FlowBlock,
+   ValueBlock, NOINPUTERRORMSG, NANERRORMSG, last, FlowBlock,
    FlowClampBlock, Singer, numberToPitch, frequencyToPitch, getNote,
    INVALIDPITCH, pitchToNumber, LeftBlock, SHARP, FLAT, DOUBLEFLAT,
    DOUBLESHARP, NATURAL, FIXEDSOLFEGE, SOLFEGENAMES1, buildScale,
@@ -276,7 +276,13 @@ function setupPitchBlocks(activity) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
-            const obj = numberToPitch(Math.floor(value) + tur.singer.pitchNumberOffset);
+            const obj = numberToPitch(
+                Math.floor(value) + tur.singer.pitchNumberOffset,
+                undefined,
+                undefined,
+                undefined,
+                activity
+            );
             tur.singer.lastNotePlayed = [obj[0] + obj[1], tur.singer.lastNotePlayed[1]];
         }
 
@@ -515,7 +521,11 @@ function setupPitchBlocks(activity) {
                     // less than 55 hertz (A1)
                     if (activity.blocks.blockList[cblk1].value < 55) {
                         const obj = numberToPitch(
-                            activity.blocks.blockList[cblk1].value + tur.singer.pitchNumberOffset
+                            activity.blocks.blockList[cblk1].value + tur.singer.pitchNumberOffset,
+                            undefined,
+                            undefined,
+                            undefined,
+                            activity
                         );
                         notePlayed = obj[0] + obj[1];
                     } else {
@@ -593,7 +603,11 @@ function setupPitchBlocks(activity) {
                             // less than 55 hertz (A1)
                             if (foundNumber < 55) {
                                 const obj = numberToPitch(
-                                    foundNumber + tur.singer.pitchNumberOffset
+                                    foundNumber + tur.singer.pitchNumberOffset,
+                                    undefined,
+                                    undefined,
+                                    undefined,
+                                    activity
                                 );
                                 notePlayed = obj[0] + obj[1];
                             } else {
@@ -605,7 +619,11 @@ function setupPitchBlocks(activity) {
                         if (activity.blocks.blockList[cblk1].value < 55) {
                             const obj = numberToPitch(
                                 activity.blocks.blockList[cblk1].value +
-                                    tur.singer.pitchNumberOffset
+                                    tur.singer.pitchNumberOffset,
+                                undefined,
+                                undefined,
+                                undefined,
+                                activity
                             );
                             notePlayed = obj[0] + obj[1];
                         } else {
@@ -721,7 +739,6 @@ function setupPitchBlocks(activity) {
                     activity.errorMsg(NOINPUTERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else {
-                    // eslint-disable-next-line no-console
                     console.error(e);
                 }
             }
@@ -1010,7 +1027,6 @@ function setupPitchBlocks(activity) {
             const listenerName = "_invert_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => tur.singer.invertList.pop();
             logo.setTurtleListener(turtle, listenerName, __listener);
 
@@ -1176,7 +1192,6 @@ function setupPitchBlocks(activity) {
                 if (intervalName in INTERVALVALUES) {
                     r = INTERVALVALUES[intervalName][2];
                 } else {
-                    // eslint-disable-next-line no-console
                     console.log("could not find " + intervalName + " in INTERVALVALUES");
                     r = 1;
                 }
@@ -1184,7 +1199,7 @@ function setupPitchBlocks(activity) {
 
             if (isNaN(r) || r < 0) {
                 r = 1;
-                // eslint-disable-next-line no-console
+
                 console.debug("ratio " + r + " must be a number > 0");
             }
             Singer.PitchActions.setRatioTranspose(r, turtle, blk);
@@ -1527,7 +1542,6 @@ function setupPitchBlocks(activity) {
             const listenerName = "_flat_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event =>
                 (tur.singer.transposition += tur.singer.invertList.length > 0 ? -1 : 1);
 
@@ -1993,8 +2007,8 @@ function setupPitchBlocks(activity) {
                             ? 1
                             : 0
                         : semitones < ref
-                        ? 1
-                        : 0;
+                          ? 1
+                          : 0;
 
                     octave =
                         (isNegativeArg ? -1 : 1) * (deltaOctave + deltaSemi) +

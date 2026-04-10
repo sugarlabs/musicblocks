@@ -106,6 +106,8 @@ const {
     numberToPitch,
     GetNotesForInterval,
     base64Encode,
+    NOTESTEP,
+    ACCIDENTALNAMES,
     NOTESFLAT
 } = require("../musicutils");
 
@@ -1733,7 +1735,7 @@ describe("noteToPitchOctave", () => {
 
 describe("pitchToFrequency", () => {
     global.TWELTHROOT2 = 1.0594630943592953;
-    global.TWELVEHUNDRETHROOT2 = 1.0005777895065549;
+    global.TWELVEHUNDRETHROOT2 = Number("1.0005777895065549");
     global.A0 = 27.5;
 
     it("calculates frequency with 0 cents", () => {
@@ -1758,7 +1760,7 @@ describe("pitchToFrequency", () => {
 
 describe("noteToFrequency", () => {
     global.TWELTHROOT2 = 1.0594630943592953;
-    global.TWELVEHUNDRETHROOT2 = 1.0005777895065549;
+    global.TWELVEHUNDRETHROOT2 = Number("1.0005777895065549");
     global.A0 = 27.5;
     it("converts note to frequency correctly", () => {
         const result = noteToFrequency("A4", "C");
@@ -2575,5 +2577,31 @@ describe("getPitchInfo", () => {
         const infoFx10 = getPitchInfo("Fx10");
         expect(infoFx10.pitchNumber).toBe(139);
         expect(infoFx10.octave).toBe(10);
+    });
+
+    describe("NOTESTEP", () => {
+        it("should map all seven natural notes to their correct step values", () => {
+            expect(NOTESTEP).toEqual({
+                C: 1,
+                D: 3,
+                E: 5,
+                F: 6,
+                G: 8,
+                A: 10,
+                B: 12
+            });
+        });
+    });
+
+    describe("ACCIDENTALNAMES", () => {
+        it("should contain all five accidental names with correct symbols", () => {
+            expect(ACCIDENTALNAMES).toEqual([
+                "double sharp \ud834\udd2a",
+                "sharp \u266f",
+                "natural \u266e",
+                "flat \u266d",
+                "double flat \ud834\udd2b"
+            ]);
+        });
     });
 });

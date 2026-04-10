@@ -13,15 +13,15 @@
 /*
    global
 
-    platformColor, docById, Singer, slicePath, wheelnav,
+   platformColor, docById, Singer, slicePath, wheelnav,
    DEFAULTVOICE, getDrumName, getNote, MUSICALMODES last, SHARP, FLAT,
    PREVIEWVOLUME, DEFAULTVOLUME, MODE_PIE_MENUS, HelpWidget,
    INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName,
    getMunsellColor, COLORS40, frequencyToPitch, instruments,
    DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
-   FIXEDSOLFEGE, NOTENAMES, FIXEDSOLFEGE, NOTENAMES, numberToPitch,
+   FIXEDSOLFEGE, NOTENAMES, numberToPitch,
    nthDegreeToPitch, SOLFEGENAMES, buildScale, _THIS_IS_TURTLE_BLOCKS_,
-    CHORDNAMES, Tone, Synth
+   CHORDNAMES, Synth, Tone, activity
 */
 
 /*
@@ -2189,13 +2189,19 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         const actualPitch = frequencyToPitch(wheelValues[i]);
         const tur = that.activity.turtles.ithTurtle(0);
         if (!tur.singer.instrumentNames.includes(DEFAULTVOICE)) {
-            that.activity.logo.synth.createDefaultSynth(0);
-            that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
+            if (that.activity?.logo?.synth?.createDefaultSynth) {
+                that.activity.logo.synth.createDefaultSynth(0);
+            }
+            if (that.activity?.logo?.synth?.loadSynth) {
+                that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
+            }
         }
-        that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
-        that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+        if (that.activity?.logo?.synth) {
+            that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
+            that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+        }
         actualPitch[0] = actualPitch[0].replace(SHARP, "#").replace(FLAT, "b");
-        if (!that._triggerLock) {
+        if (!that._triggerLock && that.activity?.logo?.synth?.trigger) {
             that._triggerLock = true;
             that.activity.logo.synth.trigger(
                 0,
@@ -3864,6 +3870,7 @@ const piemenuBlockContext = block => {
  */
 const piemenuGrid = activity => {
     docById("wheelDivptm").style.display = "none";
+    docById("wheelDivptm").classList.add("grid-wheel");
     const x = activity.turtles.gridButton.getBoundingClientRect().x;
     const y = activity.turtles.gridButton.getBoundingClientRect().y;
     docById("wheelDivptm").style.position = "absolute";
@@ -3971,6 +3978,7 @@ const piemenuGrid = activity => {
 
     const hidePiemenu = activity => {
         docById("wheelDivptm").style.display = "none";
+        docById("wheelDivptm").classList.remove("grid-wheel");
         activity.turtles.gridWheel.removeWheel();
         activity.turtles._exitWheel.removeWheel();
     };

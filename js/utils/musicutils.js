@@ -9,6 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/* eslint-disable no-redeclare */
 /*
    global
 
@@ -37,7 +38,7 @@
   EIGHTHNOTEWIDTH, MATRIXBUTTONHEIGHT, MATRIXBUTTONHEIGHT2,
   MATRIXSOLFEHEIGHT, NOTESYMBOLS, SELECTORSTRINGS, ACCIDENTALLABELS,
   ACCIDENTALNAMES, ACCIDENTALVALUES, INTERVALS, MODE_PIE_MENUS,
-  updateTemperaments, DEFAULTINVERT, DEFAULTINTERVAL, DEFAULTEFFECT,
+  DEFAULTINVERT, DEFAULTINTERVAL, DEFAULTEFFECT,
   DEFAULTMODE, DEFAULTOSCILLATORTYPE, DEFAULTACCIDENTAL,
   getInvertMode, getIntervalNumber, getIntervalDirection,
   getModeNumbers, getDrumIndex, getDrumName, getDrumSymbol,
@@ -880,7 +881,6 @@ const CENTS_PER_OCTAVE = SEMITONES * CENTS_PER_SEMITONE;
  */
 const POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
 
-// eslint-disable-next-line no-loss-of-precision
 const TWELTHROOT2 = 1.0594630943592953;
 // eslint-disable-next-line no-loss-of-precision
 const TWELVEHUNDRETHROOT2 = 1.0005777895065549;
@@ -2852,6 +2852,10 @@ const getVoiceSynthName = name => {
  * @returns {boolean} True if the temperament is custom, false otherwise.
  */
 const isCustomTemperament = temperament => {
+    // Treat invalid/null temperaments as custom to avoid errors
+    if (!temperament || typeof temperament !== "string") {
+        return true;
+    }
     return !(temperament in PreDefinedTemperaments);
 };
 
@@ -3009,10 +3013,9 @@ const keySignatureToMode = keySignature => {
         key = "F" + FLAT;
     } else if (SOLFEGENAMES1.includes(key)) {
         // This conversion will be a bit iffy depending upon the current mode.
-        // eslint-disable-next-line no-use-before-define
+
         key = getNote(key, 4, 0, "C Major", false)[0];
     } else if (!NOTESSHARP.includes(key) && !NOTESFLAT.includes(key)) {
-        // eslint-disable-next-line no-console
         console.debug("Invalid key or missing name; reverting to C.");
         // Is is possible that the key was left out?
         keySignature = "C " + keySignature;
@@ -3045,7 +3048,6 @@ const keySignatureToMode = keySignature => {
     if (mode in MUSICALMODES) {
         return [key, mode];
     } else {
-        // eslint-disable-next-line no-console
         console.debug("Invalid mode name: " + mode + " reverting to major.");
         return [key, "major"];
     }
@@ -3601,7 +3603,6 @@ const pitchToNumber = (pitch, octave, keySignature) => {
         if (obj[1].includes(pitch.toLowerCase())) {
             pitchNumber = obj[1].indexOf(pitch.toLowerCase());
         } else {
-            // eslint-disable-next-line no-console
             console.debug("pitch " + pitch + " not found in mode.");
             // Try an equivalent pitch.
             if (pitch.toLowerCase() in FIXEDSOLFEGE1) {
@@ -3716,7 +3717,7 @@ const getNoteFromInterval = (pitch, interval) => {
         //Same technique is used to code the findMajorInterval.
         const halfSteps = INTERVALVALUES[interval][0];
         // const direction = INTERVALVALUES[interval][1];
-        // eslint-disable-next-line no-use-before-define
+
         let note = numberToPitch(number + halfSteps);
         const num = interval.split(" ");
         const pitchIndex = pitches.indexOf(pitch1);
@@ -3987,7 +3988,7 @@ const getNoteFromInterval = (pitch, interval) => {
  * @param {number} [offset=0] - The offset value (default is 0).
  * @returns {Array} An array containing the note and octave.
  */
-const numberToPitch = (i, temperament, startPitch, offset) => {
+const numberToPitch = (i, temperament, startPitch, offset, activity) => {
     // Calculate the pitch and octave based on index.
     // We start at A0.
     if (temperament === undefined) {
@@ -4024,6 +4025,17 @@ const numberToPitch = (i, temperament, startPitch, offset) => {
     let interval;
     if (isCustomTemperament(temperament)) {
         // The index may be outside of the octave.
+        // Ensure the temperament exists in TEMPERAMENT before accessing it
+        if (!TEMPERAMENT[temperament] || !TEMPERAMENT[temperament]["pitchNumber"]) {
+            // Fallback to equal temperament if custom temperament is not found
+            if (activity && activity.errorMsg) {
+                activity.errorMsg(
+                    _("Invalid temperament. Falling back to equal temperament."),
+                    3000
+                );
+            }
+            temperament = "equal";
+        }
         const octaveLength = TEMPERAMENT[temperament]["pitchNumber"];
         const pitchIdx = pitchNumber % octaveLength;
         const octaveFactor = Math.floor(pitchNumber / octaveLength);
@@ -4140,6 +4152,11 @@ function getNote(
         temperament = "equal";
     }
 
+    const octaveLength =
+        TEMPERAMENT[temperament] && typeof TEMPERAMENT[temperament].pitchNumber === "number"
+            ? TEMPERAMENT[temperament].pitchNumber
+            : 12;
+
     let sharpFlat = false;
     let rememberFlat = false;
     let rememberSharp = false;
@@ -4209,7 +4226,7 @@ function getNote(
             }
             if (kOffset === -1) {
                 kOffset = 0;
-                // eslint-disable-next-line no-console
+
                 console.log("Cannot find " + keySignature.split(" ")[0] + ". Reverting to C");
             }
         }
@@ -4309,7 +4326,6 @@ function getNote(
                 // Ensure it is a valid key signature.
                 offset = thisScale.indexOf(myKeySignature);
                 if (offset === -1) {
-                    // eslint-disable-next-line no-console
                     console.debug(
                         "WARNING: Key " +
                             myKeySignature +
@@ -4327,7 +4343,7 @@ function getNote(
                 // All keys Gb -- B would be in octave three (since
                 // going down is closer than going up)
                 if (offset > 5) {
-                    transpositionFloor -= 12; // go down one octave
+                    transpositionFloor -= octaveLength; // go down one octave
                 }
             } else {
                 offset = 0;
@@ -4375,10 +4391,10 @@ function getNote(
                     case "dorian":
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 0) {
-                            transpositionFloor += 12;
+                            transpositionFloor += octaveLength;
                         }
 
-                        transpositionFloor -= 12;
+                        transpositionFloor -= octaveLength;
                         i += 6;
                         if (i > 6) {
                             i -= 7;
@@ -4389,7 +4405,7 @@ function getNote(
                     case "phrygian":
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 1) {
-                            transpositionFloor += 12;
+                            transpositionFloor += octaveLength;
                         }
 
                         i += 5;
@@ -4402,7 +4418,7 @@ function getNote(
                     case "lydian":
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 2) {
-                            transpositionFloor += 12;
+                            transpositionFloor += octaveLength;
                         }
 
                         i += 4;
@@ -4415,7 +4431,7 @@ function getNote(
                     case "mixolydian":
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 3) {
-                            transpositionFloor += 12;
+                            transpositionFloor += octaveLength;
                         }
 
                         i += 3;
@@ -4429,7 +4445,7 @@ function getNote(
                     case "aeolian":
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 4) {
-                            transpositionFloor += 12;
+                            transpositionFloor += octaveLength;
                         }
 
                         i += 2;
@@ -4442,7 +4458,7 @@ function getNote(
                     case "locrian":
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 5) {
-                            transpositionFloor += 12;
+                            transpositionFloor += octaveLength;
                         }
 
                         i += 1;
@@ -4462,17 +4478,16 @@ function getNote(
             let index;
             if (halfSteps.includes(solfegePart)) {
                 index = halfSteps.indexOf(solfegePart) + offset;
-                if (index > 11) {
-                    index -= 12;
+                if (index >= octaveLength) {
+                    index -= octaveLength;
                     octave += 1;
                 } else if (index < 0) {
-                    index += 12;
+                    index += octaveLength;
                     octave -= 1;
                 }
 
                 note = thisScale[index];
             } else {
-                // eslint-disable-next-line no-console
                 console.debug(
                     "WARNING: Note [" + noteArg + "] not found in " + halfSteps + ". Returning REST"
                 );
@@ -4492,11 +4507,11 @@ function getNote(
         if (transpositionFloor && transpositionFloor !== 0) {
             let deltaOctave, deltaNote;
             if (transpositionFloor < 0) {
-                deltaOctave = -Math.floor(-transpositionFloor / 12);
-                deltaNote = -(-transpositionFloor % 12);
+                deltaOctave = -Math.floor(-transpositionFloor / octaveLength);
+                deltaNote = -(-transpositionFloor % octaveLength);
             } else {
-                deltaOctave = Math.floor(transpositionFloor / 12);
-                deltaNote = transpositionFloor % 12;
+                deltaOctave = Math.floor(transpositionFloor / octaveLength);
+                deltaNote = transpositionFloor % octaveLength;
             }
 
             octave += deltaOctave;
@@ -4527,7 +4542,6 @@ function getNote(
 
                     note = NOTESFLAT[i];
                 } else {
-                    // eslint-disable-next-line no-console
                     console.debug("note not found? " + note);
                 }
             } else if (deltaNote < 0) {
@@ -4556,7 +4570,6 @@ function getNote(
 
                     note = NOTESSHARP[i];
                 } else {
-                    // eslint-disable-next-line no-console
                     console.debug("note not found? " + note);
                 }
             }
@@ -4613,22 +4626,25 @@ function getNote(
     } else if (isCustomTemperament(temperament)) {
         note = getCustomNote(noteArg);
         let pitchNumber = null;
-        for (const number in TEMPERAMENT[temperament]) {
-            if (number !== "pitchNumber" && number != "interval") {
-                if (note === TEMPERAMENT[temperament][number][3]) {
-                    if (typeof number === "string") {
-                        pitchNumber = Number(number);
-                    } else {
-                        pitchNumber = number;
+        // Ensure the temperament exists before accessing it
+        if (TEMPERAMENT[temperament]) {
+            for (const number in TEMPERAMENT[temperament]) {
+                if (number !== "pitchNumber" && number != "interval") {
+                    if (note === TEMPERAMENT[temperament][number][3]) {
+                        if (typeof number === "string") {
+                            pitchNumber = Number(number);
+                        } else {
+                            pitchNumber = number;
+                        }
+                        break;
+                    } else if (note === TEMPERAMENT[temperament][number][1]) {
+                        if (typeof number === "string") {
+                            pitchNumber = Number(number);
+                        } else {
+                            pitchNumber = number;
+                        }
+                        break;
                     }
-                    break;
-                } else if (note === TEMPERAMENT[temperament][number][1]) {
-                    if (typeof number === "string") {
-                        pitchNumber = Number(number);
-                    } else {
-                        pitchNumber = number;
-                    }
-                    break;
                 }
             }
         }
@@ -4648,7 +4664,7 @@ function getNote(
         }
 
         let inOctave = octave;
-        const octaveLength = TEMPERAMENT[temperamentFloor]["pitchNumber"];
+        // octaveLength already defined at top of function
         let deltaOctave, deltaNote;
         if (transpositionFloor !== 0) {
             if (transpositionFloor < 0) {
@@ -4718,11 +4734,11 @@ function getNote(
         let deltaOctave, deltaNote;
         if (transpositionFloor && transpositionFloor !== 0) {
             if (transpositionFloor < 0) {
-                deltaOctave = -Math.floor(-transpositionFloor / 12);
-                deltaNote = -(-transpositionFloor % 12);
+                deltaOctave = -Math.floor(-transpositionFloor / octaveLength);
+                deltaNote = -(-transpositionFloor % octaveLength);
             } else {
-                deltaOctave = Math.floor(transpositionFloor / 12);
-                deltaNote = transposition % 12;
+                deltaOctave = Math.floor(transpositionFloor / octaveLength);
+                deltaNote = transposition % octaveLength;
             }
 
             octave += deltaOctave;
@@ -4740,7 +4756,7 @@ function getNote(
                 octave1 = octave - 1;
                 pitch = note + "" + octave1;
                 for (const interval in INTERVALVALUES) {
-                    if (12 + deltaNote === INTERVALVALUES[interval][0]) {
+                    if (octaveLength + deltaNote === INTERVALVALUES[interval][0]) {
                         note1 = getNoteFromInterval(pitch, interval);
                         break;
                     }
@@ -5167,7 +5183,7 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
     }
 
     // Should never get here, but just in case.
-    // eslint-disable-next-line no-console
+
     console.debug(thisPitch + " not found");
     return 0;
 };
@@ -5621,7 +5637,7 @@ const getInterval = (interval, keySignature, pitch) => {
                     ii = scale.indexOf(pitch);
                 } else {
                     // Should never happen.
-                    // eslint-disable-next-line no-console
+
                     console.debug(pitch + " not found");
                     return 0;
                 }
@@ -6162,7 +6178,6 @@ const calcOctaveInterval = arg => {
             value = -2;
             break;
         default:
-            // eslint-disable-next-line no-console
             console.debug("Interval octave must be between -2 and 2.");
             value = 0;
             break;
@@ -6377,7 +6392,7 @@ const getPitchInfo = function (activity, type, currentNote, tur) {
                 } else if (NOTESFLAT.includes(pitch)) {
                     return NOTESFLAT.indexOf(pitch) * 8.33;
                 }
-                // eslint-disable-next-line no-console
+
                 console.debug("Pitch not found: " + pitch);
                 return 0;
             case "pitch to shade":
@@ -6386,7 +6401,6 @@ const getPitchInfo = function (activity, type, currentNote, tur) {
                 return "__INVALID_INPUT__";
         }
     } catch {
-        // eslint-disable-next-line no-console
         console.debug("Waiting for note to play");
     }
 };
@@ -6423,7 +6437,6 @@ if (typeof module !== "undefined" && module.exports) {
         TEMPERAMENT,
         setOctaveRatio,
         getOctaveRatio,
-        TEMPERAMENT,
         TEMPERAMENTS,
         INITIALTEMPERAMENTS,
         PreDefinedTemperaments,
@@ -6433,7 +6446,6 @@ if (typeof module !== "undefined" && module.exports) {
         addTemperamentToList,
         deleteTemperamentFromList,
         addTemperamentToDictionary,
-        updateTemperaments,
         DEFAULTINVERT,
         DEFAULTMODE,
         customMode,

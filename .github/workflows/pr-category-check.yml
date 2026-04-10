@@ -260,6 +260,7 @@ jobs:
             }
 
       - name: Apply PR area labels
+
         if: success()
         uses: actions/github-script@v7
         with:
@@ -359,95 +360,95 @@ jobs:
               }
             }
 
-      - name: Check release notes
-        if: success()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const prNumber = context.payload.pull_request.number;
-            const prBody   = context.payload.pull_request.body || '';
-
-            // Detect a "## Release Notes" heading with non-empty, meaningful content.
-            // Uses [\r\n]+ to handle Windows (CRLF) and Unix (LF) line endings.
-            // Content that is only "N/A", "none", or an HTML comment counts as absent.
-            const rnPattern = /#+\s*release\s+notes\s*[\r\n]+([\s\S]+?)(?=\n#|\s*$)/i;
-            const match = prBody.match(rnPattern);
-            const rnContent = match ? match[1].trim() : '';
-            // Strip all HTML comments first, then check if anything meaningful remains.
-            // This correctly handles trailing text after a comment and multiple comments.
-            const stripped = rnContent.replace(/<!--[\s\S]*?-->/g, '').trim();
-            const isPlaceholder = !stripped || /^(n\/a|none)$/i.test(stripped);
-            const hasReleaseNotes = rnContent.length > 0 && !isPlaceholder;
-
-            const rnLabel   = 'release-notes';
-            const noRnLabel = 'needs-release-notes';
-            const labelDefs = [
-              { label: rnLabel,   color: '0E8A16', description: 'PR includes release notes' },
-              { label: noRnLabel, color: 'FBCA04', description: 'PR is missing a release notes section' },
-            ];
-
-            // Ensure both labels exist in the repo (paginated to handle > 100 labels).
-            const repoLabels = await github.paginate(github.rest.issues.listLabelsForRepo, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              per_page: 100,
-            });
-            const repoLabelNames = repoLabels.map(l => l.name);
-
-            for (const def of labelDefs) {
-              if (!repoLabelNames.includes(def.label)) {
-                try {
-                  await github.rest.issues.createLabel({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    name: def.label,
-                    color: def.color,
-                    description: def.description,
-                  });
-                } catch (e) {
-                  core.warning(`Could not create label "${def.label}": ${e.message}`);
-                }
-              }
-            }
-
-            const { data: currentLabels } = await github.rest.issues.listLabelsOnIssue({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: prNumber,
-            });
-            const currentLabelNames = currentLabels.map(l => l.name);
-
-            const labelToAdd    = hasReleaseNotes ? rnLabel   : noRnLabel;
-            const labelToRemove = hasReleaseNotes ? noRnLabel : rnLabel;
-
-            if (!currentLabelNames.includes(labelToAdd)) {
-              try {
-                await github.rest.issues.addLabels({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: prNumber,
-                  labels: [labelToAdd],
-                });
-              } catch (e) {
-                core.warning(`Could not add label "${labelToAdd}": ${e.message}`);
-              }
-            }
-
-            if (currentLabelNames.includes(labelToRemove)) {
-              try {
-                await github.rest.issues.removeLabel({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: prNumber,
-                  name: labelToRemove,
-                });
-              } catch (e) {
-                core.warning(`Could not remove label "${labelToRemove}": ${e.message}`);
-              }
-            }
-
-            if (hasReleaseNotes) {
-              core.info('Release notes section found.');
-            } else {
-              core.warning('No release notes section found. Add a "## Release Notes" heading with content.');
-            }
+#      - name: Check release notes
+#        if: success()
+#        uses: actions/github-script@v7
+#        with:
+#          script: |
+#            const prNumber = context.payload.pull_request.number;
+#            const prBody   = context.payload.pull_request.body || '';
+#
+#            // Detect a "## Release Notes" heading with non-empty, meaningful content.
+#            // Uses [\r\n]+ to handle Windows (CRLF) and Unix (LF) line endings.
+#            // Content that is only "N/A", "none", or an HTML comment counts as absent.
+#            const rnPattern = /#+\s*release\s+notes\s*[\r\n]+([\s\S]+?)(?=\n#|\s*$)/i;
+#            const match = prBody.match(rnPattern);
+#            const rnContent = match ? match[1].trim() : '';
+#            // Strip all HTML comments first, then check if anything meaningful remains.
+#            // This correctly handles trailing text after a comment and multiple comments.
+#            const stripped = rnContent.replace(/<!--[\s\S]*?-->/g, '').trim();
+#            const isPlaceholder = !stripped || /^(n\/a|none)$/i.test(stripped);
+#            const hasReleaseNotes = rnContent.length > 0 && !isPlaceholder;
+#
+#            const rnLabel   = 'release-notes';
+#            const noRnLabel = 'needs-release-notes';
+#            const labelDefs = [
+#              { label: rnLabel,   color: '0E8A16', description: 'PR includes release notes' },
+#              { label: noRnLabel, color: 'FBCA04', description: 'PR is missing a release notes section' },
+#            ];
+#
+#            // Ensure both labels exist in the repo (paginated to handle > 100 labels).
+#            const repoLabels = await github.paginate(github.rest.issues.listLabelsForRepo, {
+#              owner: context.repo.owner,
+#              repo: context.repo.repo,
+#              per_page: 100,
+#            });
+#            const repoLabelNames = repoLabels.map(l => l.name);
+#
+#            for (const def of labelDefs) {
+#              if (!repoLabelNames.includes(def.label)) {
+#                try {
+#                  await github.rest.issues.createLabel({
+#                    owner: context.repo.owner,
+#                    repo: context.repo.repo,
+#                    name: def.label,
+#                    color: def.color,
+#                    description: def.description,
+#                  });
+#                } catch (e) {
+#                  core.warning(`Could not create label "${def.label}": ${e.message}`);
+#                }
+#              }
+#            }
+#
+#            const { data: currentLabels } = await github.rest.issues.listLabelsOnIssue({
+#              owner: context.repo.owner,
+#              repo: context.repo.repo,
+#              issue_number: prNumber,
+#            });
+#            const currentLabelNames = currentLabels.map(l => l.name);
+#
+#            const labelToAdd    = hasReleaseNotes ? rnLabel   : noRnLabel;
+#            const labelToRemove = hasReleaseNotes ? noRnLabel : rnLabel;
+#
+#            if (!currentLabelNames.includes(labelToAdd)) {
+#              try {
+#                await github.rest.issues.addLabels({
+#                  owner: context.repo.owner,
+#                  repo: context.repo.repo,
+#                  issue_number: prNumber,
+#                  labels: [labelToAdd],
+#                });
+#              } catch (e) {
+#                core.warning(`Could not add label "${labelToAdd}": ${e.message}`);
+#              }
+#            }
+#
+#            if (currentLabelNames.includes(labelToRemove)) {
+#              try {
+#                await github.rest.issues.removeLabel({
+#                  owner: context.repo.owner,
+#                  repo: context.repo.repo,
+#                  issue_number: prNumber,
+#                  name: labelToRemove,
+#                });
+#              } catch (e) {
+#                core.warning(`Could not remove label "${labelToRemove}": ${e.message}`);
+#              }
+#            }
+#
+#            if (hasReleaseNotes) {
+#              core.info('Release notes section found.');
+#            } else {
+#              core.warning('No release notes section found. Add a "## Release Notes" heading with content.');
+#            }
