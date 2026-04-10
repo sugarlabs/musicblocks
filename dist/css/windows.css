@@ -1,3 +1,12 @@
+/* CSS Custom Properties for Responsive Design */
+:root {
+  --touch-target-min: 44px;
+  --spacing-fluid: clamp(0.5rem, 2vw, 1rem);
+  --button-width-fluid: clamp(3rem, 10vw, 3.5rem);
+  --toolbar-height-fluid: clamp(48px, 8vh, 56px);
+  --padding-fluid: clamp(0.5rem, 2vw, 1rem);
+}
+
 #floatingWindows {
   position: absolute;
   top: 0;
@@ -41,6 +50,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  /* WCAG 2.5.5 touch target compliance */
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
 }
 
 #floatingWindows > .windowFrame > .wfTopBar .wftButton.close:hover {
@@ -170,7 +182,8 @@
   margin: 1px 0;
 }
 
-@media (max-width: 600px) {
+/* Tablet and Mobile Responsive Design */
+@media (max-width: 768px) {
   .wheelNav {
     z-index: 2000;
   }
@@ -194,7 +207,7 @@
   }
 
   #floatingWindows > .windowFrame > .wfTopBar {
-    height: 56px;
+    height: var(--toolbar-height-fluid);
     background-color: #2196f3;
     border: none;
     padding: 0;
@@ -206,13 +219,16 @@
   }
 
   #floatingWindows > .windowFrame > .wfTopBar .wftButton {
-    padding: 0 15px;
+    padding: 0 var(--spacing-fluid);
     background: none;
     border-radius: 0;
     transition: background-color 300ms;
     height: 100%;
-    width: 56px;
+    width: var(--button-width-fluid);
     margin: 0;
+    /* Ensure WCAG touch target compliance */
+    min-width: var(--touch-target-min);
+    min-height: var(--touch-target-min);
   }
 
   #floatingWindows > .windowFrame > .wfTopBar .wftButton.wftMaxmin {
@@ -240,12 +256,12 @@
   #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
     flex-grow: 1;
     color: #fff;
-    font-size: 1.5em;
-    padding: 0 15px;
+    font-size: clamp(1.1em, 4vw, 1.5em);
+    padding: 0 var(--spacing-fluid);
     text-align: center;
     text-transform: uppercase;
     font-weight: 500;
-    letter-spacing: 1.5px;
+    letter-spacing: clamp(1px, 0.3vw, 1.5px);
   }
 
   #floatingWindows > .windowFrame > .wfWinBody {
@@ -254,13 +270,13 @@
   }
 
   #floatingWindows > .windowFrame > .wfWinBody > .wfbToolbar {
-    width: 54px;
+    width: clamp(44px, 8vw, 54px);
     flex-shrink: 0;
     display: flex;
     overflow-y: auto;
     background-color: rgba(0, 0, 0, 0.1);
     width: 100%;
-    padding: 2px 4px;
+    padding: clamp(1px, 0.5vw, 2px) clamp(3px, 1vw, 4px);
   }
 
   #floatingWindows > .windowFrame > .wfWinBody > .wfbToolbar > * {
@@ -268,109 +284,14 @@
   }
 
   #floatingWindows > .windowFrame > .wfWinBody > .wfbWidget {
-    padding: 10px;
+    padding: var(--spacing-fluid);
   }
 }
 
-@media (max-width: 450px) {
-  .wheelNav {
-    z-index: 2000;
-  }
-
-  #floatingWindows {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 10000;
-  }
-
-  #floatingWindows > .windowFrame {
-    border-radius: 0;
-    border: none;
-    width: 100vw;
-    height: 100vh;
-    left: 0 !important;
-    top: 0 !important;
-    display: flex;
-    flex-direction: column;
-  }
-
-  #floatingWindows > .windowFrame > .wfTopBar {
-    height: 56px;
-    background-color: #2196f3;
-    border: none;
-    padding: 0;
-    align-items: center;
-    flex-direction: row-reverse;
-    flex-shrink: 0;
-    box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.16), 0px 2px 10px 0px rgba(0, 0, 0, 0.12);
-    min-width: auto;
-  }
-
-  #floatingWindows > .windowFrame > .wfTopBar .wftButton {
-    padding: 0 10px;
-    background: none;
-    border-radius: 0;
-    transition: background-color 300ms;
-    height: 100%;
-    width: 56px;
-    margin: 0;
-  }
-
-  #floatingWindows > .windowFrame > .wfTopBar .wftButton:hover {
-    opacity: 1;
-    background-color: rgba(0, 0, 0, 0.1);
-  }
-
-  #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
-    flex-grow: 1;
-    color: #fff;
-    font-size: 1.2em;
-    padding: 0 10px;
-    text-align: center;
-    text-transform: uppercase;
-    font-weight: 500;
-    letter-spacing: 1px;
-  }
-
-  #floatingWindows > .windowFrame > .wfWinBody > .wfbToolbar {
-    width: 50px;
-    flex-shrink: 0;
-    display: flex;
-    overflow-y: auto;
-    background-color: rgba(0, 0, 0, 0.1);
-    width: 100%;
-    padding: 2px 4px;
-  }
-
-  #floatingWindows > .windowFrame > .wfWinBody > .wfbWidget {
-    padding: 5px;
-  }
-}
-
+/* Small Device Optimization */
 @media (max-width: 320px) {
-  .wheelNav {
-    z-index: 2000;
-  }
-
-  #floatingWindows {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 10000;
-  }
-
-  #floatingWindows > .windowFrame {
-    border-radius: 0;
-    border: none;
-    width: 100vw;
-    height: 100vh;
-    left: 0;
-    top: 0;
-    display: flex;
-    flex-direction: column;
-  }
-
+  /* Inherit common styles from 768px breakpoint */
+  
   #floatingWindows > .windowFrame > .wfTopBar {
     height: 48px;
     background-color: #2196f3;
@@ -391,6 +312,9 @@
     height: 100%;
     width: 48px;
     margin: 0;
+    /* Ensure WCAG touch target compliance */
+    min-width: var(--touch-target-min);
+    min-height: var(--touch-target-min);
   }
 
   #floatingWindows > .windowFrame > .wfTopBar .wftButton:hover {
