@@ -67,31 +67,16 @@ class ReflectionMatrix {
         this.code = "";
     }
 
-    escapeHTML(text) {
-        const escapeMap = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#39;'
-        };
-
-        return text.replace(/[&<>"']/g, char => escapeMap[char]);
-    }
-
     sanitizeLinks(html) {
-        return html.replace(
-            /<a\s+[^>]*href\s*=\s*(['"]?)([^'">\s]+)\1/gi,
-            (match, quote, url) => {
-                const unsafeSchemes = /^(javascript|data|vbscript):/i;
+        return html.replace(/<a\s+[^>]*href\s*=\s*(['"]?)([^'">\s]+)\1/gi, (match, quote, url) => {
+            const unsafeSchemes = /^(javascript|data|vbscript):/i;
 
-                if (unsafeSchemes.test(url.trim())) {
-                    return match.replace(url, "#");
-                }
-
-                return match;
+            if (unsafeSchemes.test(url.trim())) {
+                return match.replace(url, "#");
             }
-        );
+
+            return match;
+        });
     }
 
     /**
