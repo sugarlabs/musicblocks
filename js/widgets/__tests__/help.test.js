@@ -138,7 +138,7 @@ function createMockActivity(options = {}) {
             loadNewBlocks: jest.fn()
         },
         logo: {},
-        textMsg: jest.fn()
+        errorMsg: jest.fn()
     };
 }
 
@@ -636,3 +636,4 @@ describe("HelpWidget", () => {
         });
     });
 });
+
