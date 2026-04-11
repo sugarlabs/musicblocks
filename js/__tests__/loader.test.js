@@ -296,12 +296,6 @@ describe("loader.js coverage", () => {
 
     // ─── DOMContentLoaded when document is still loading ─────────────────────
     test("Handles DOMContentLoaded when document is loading", async () => {
-        Object.defineProperty(document, "readyState", {
-            value: "loading",
-            configurable: true
-        });
-
-    test("Handles DOMContentLoaded when document is loading", async () => {
         const addEventListenerSpy = jest.spyOn(document, "addEventListener");
 
         await loadScript({ readyState: "loading" });
