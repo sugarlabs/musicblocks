@@ -272,6 +272,35 @@ describe("PhraseMaker Widget", () => {
             expect(Object.keys(phraseMaker._blockMap)).toHaveLength(2);
         });
 
+        test("loads default drum row synths before grid preview playback", () => {
+            const loadSynth = jest.fn();
+            const setSynthVolume = jest.fn();
+            const instrumentNames = [];
+            const pm = new PhraseMaker({
+                getDrumName: jest.fn(label => (label === "snare drum" ? "snare drum" : null)),
+                Singer: { setSynthVolume }
+            });
+
+            pm.activity = {
+                logo: {
+                    synth: { loadSynth }
+                },
+                turtles: {
+                    ithTurtle: jest.fn(() => ({
+                        singer: { instrumentNames }
+                    }))
+                }
+            };
+            pm.rowLabels = ["snare drum", "sol", "snare drum"];
+
+            pm._loadDrumSynthsForRows();
+
+            expect(instrumentNames).toEqual(["snare drum"]);
+            expect(loadSynth).toHaveBeenCalledTimes(1);
+            expect(loadSynth).toHaveBeenCalledWith(0, "snare drum");
+            expect(setSynthVolume).toHaveBeenCalledWith(pm.activity.logo, 0, "snare drum", 50);
+        });
+
         test("should track lyrics", () => {
             phraseMaker._lyrics.push("do");
             phraseMaker._lyrics.push("re");
@@ -336,6 +365,80 @@ describe("PhraseMaker Widget", () => {
             phraseMaker.paramsEffects.chorusDepth = 70;
             expect(phraseMaker.paramsEffects.doChorus).toBe(true);
             expect(phraseMaker.paramsEffects.chorusRate).toBe(0.5);
+        });
+    });
+
+    describe("init() turtleIndex parameter", () => {
+        /**
+         * Builds a minimal activity mock. ithTurtle() returns singer data for
+         * turtles defined in meterByIndex; omitted turtles return undefined
+         * beats/noteValue, which exercises the `|| 4` fallback in init().
+         */
+        function makeActivity(meterByIndex) {
+            return {
+                turtles: {
+                    ithTurtle: jest.fn(i => ({
+                        singer: {
+                            beatsPerMeasure: meterByIndex[i]?.beats,
+                            noteValuePerBeat: meterByIndex[i]?.noteValue,
+                            keySignature: "C major"
+                        }
+                    }))
+                }
+            };
+        }
+
+        /**
+         * Invoke init() and absorb any downstream errors thrown once the DOM
+         * setup begins (after _measureLimit has already been set). This lets us
+         * assert on _measureLimit without providing full DOM stubs for the rest
+         * of the 400-line init() method.
+         */
+        function callInitPartial(pm, activity, turtleIndex) {
+            try {
+                pm.init(activity, turtleIndex);
+            } catch (_) {
+                // Tolerated: errors from un-stubbed DOM APIs further in init().
+                // _measureLimit is computed before any DOM access.
+            }
+        }
+
+        test("defaults to turtle 0 when turtleIndex is omitted", () => {
+            const pm = new PhraseMaker(mockDeps);
+            const activity = makeActivity({ 0: { beats: 4, noteValue: 4 } });
+            callInitPartial(pm, activity, undefined);
+            // 4/4: 4 / 4 = 1.0
+            expect(pm._measureLimit).toBeCloseTo(1.0);
+            expect(activity.turtles.ithTurtle).toHaveBeenCalledWith(0);
+        });
+
+        test("uses turtleIndex 0 explicitly to read 4/4 meter", () => {
+            const pm = new PhraseMaker(mockDeps);
+            const activity = makeActivity({ 0: { beats: 4, noteValue: 4 } });
+            callInitPartial(pm, activity, 0);
+            expect(pm._measureLimit).toBeCloseTo(1.0);
+            expect(activity.turtles.ithTurtle).toHaveBeenCalledWith(0);
+        });
+
+        test("uses turtleIndex 1 to read 3/4 meter from turtle 1", () => {
+            const pm = new PhraseMaker(mockDeps);
+            const activity = makeActivity({
+                0: { beats: 4, noteValue: 4 },
+                1: { beats: 3, noteValue: 4 }
+            });
+            callInitPartial(pm, activity, 1);
+            // 3/4: 3 / 4 = 0.75
+            expect(pm._measureLimit).toBeCloseTo(0.75);
+            expect(activity.turtles.ithTurtle).toHaveBeenCalledWith(1);
+        });
+
+        test("falls back to 4/4 when singer meter is not yet initialized", () => {
+            const pm = new PhraseMaker(mockDeps);
+            // meterByIndex is empty: beats/noteValue are undefined, || 4 applies
+            const activity = makeActivity({});
+            callInitPartial(pm, activity, 0);
+            // undefined || 4 = 4; 4 / 4 = 1.0
+            expect(pm._measureLimit).toBeCloseTo(1.0);
         });
     });
 
