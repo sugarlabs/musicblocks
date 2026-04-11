@@ -124,6 +124,7 @@ afterEach(() => {
 function createMockActivity(options = {}) {
     return {
         __keyPressed: jest.fn(),
+        textMsg: jest.fn(),
         blocks: {
             activeBlock: options.activeBlock || null,
             blockList: options.blockList || {},
@@ -136,7 +137,8 @@ function createMockActivity(options = {}) {
             moveBlock: jest.fn(),
             loadNewBlocks: jest.fn()
         },
-        logo: {}
+        logo: {},
+        textMsg: jest.fn()
     };
 }
 

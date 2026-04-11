@@ -72,7 +72,7 @@ function setupToneBlocks(activity) {
             }
 
             if (logo.inTimbre) {
-                if (logo.timbre.osc.length != 0) {
+                if (logo.timbre.osc.length !== 0) {
                     activity.errorMsg(_("You are adding multiple oscillator blocks."));
                 } else {
                     logo.timbre.oscParams = [];
@@ -487,9 +487,13 @@ function setupToneBlocks(activity) {
                     " " +
                     _("Tremolo makes the sound pulse louder and quieter.") +
                     " " +
-                    _("The rate controls how fast the sound pulses.") +
+                    _(
+                        "The rate (first argument) controls how fast the sound pulses (cycles per second)."
+                    ) +
                     " " +
-                    _("The depth controls the strength of the pulsing effect."),
+                    _(
+                        "The depth (second argument) controls the strength of the pulsing effect (0-100%)."
+                    ),
                 "documentation",
                 null,
                 "tremolohelp"
@@ -621,7 +625,17 @@ function setupToneBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Chorus block adds a chorus effect."),
+                _("The Chorus block adds a chorus effect.") +
+                    " " +
+                    _(
+                        "The rate (first argument) controls the speed of the chorus modulation (cycles per second)."
+                    ) +
+                    " " +
+                    _(
+                        "The delay (second argument) sets the time delay between chorus voices (milliseconds)."
+                    ) +
+                    " " +
+                    _("The depth (third argument) controls the amount of chorus effect (0-100%)."),
                 "documentation",
                 null,
                 "chorushelp"
@@ -680,7 +694,15 @@ function setupToneBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Vibrato block adds a rapid, slight variation in pitch."),
+                _("The Vibrato block adds a rapid, slight variation in pitch.") +
+                    " " +
+                    _(
+                        "The intensity (first argument) controls how much the pitch varies (semitones)."
+                    ) +
+                    " " +
+                    _(
+                        "The rate (second argument) controls the speed of the pitch variation (cycles per second)."
+                    ),
                 "documentation",
                 null,
                 "vibratohelp"
@@ -1068,7 +1090,7 @@ function setupToneBlocks(activity) {
                     activity.blocks.blockList[blk].value = ["", "", "do", 4];
                 }
                 const cblk1 = activity.blocks.blockList[blk].connections[1];
-                if (cblk1 != null) {
+                if (cblk1 !== null) {
                     if (activity.blocks.blockList[cblk1].value !== null) {
                         const namevalue = activity.blocks.blockList[cblk1].value[0];
                         const datavalue = activity.blocks.blockList[cblk1].value[1];
@@ -1077,12 +1099,12 @@ function setupToneBlocks(activity) {
                     }
                 }
                 const cblk2 = activity.blocks.blockList[blk].connections[2];
-                if (cblk2 != null) {
+                if (cblk2 !== null) {
                     const svalue = activity.blocks.blockList[cblk2].value;
                     activity.blocks.blockList[blk].value[2] = svalue;
                 }
                 const cblk3 = activity.blocks.blockList[blk].connections[3];
-                if (cblk3 != null) {
+                if (cblk3 !== null) {
                     const ovalue = activity.blocks.blockList[cblk3].value;
                     activity.blocks.blockList[blk].value[3] = ovalue;
                 }

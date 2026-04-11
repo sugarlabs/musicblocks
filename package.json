@@ -12,7 +12,7 @@
     },
     "amd": {},
     "scripts": {
-        "lint": "eslint js/ planet/js/",
+        "lint": "eslint .",
         "lint:staged": "lint-staged",
         "prepare": "husky",
         "serve": "http-server -a 127.0.0.1 -p 3000 --gzip --brotli",
@@ -31,7 +31,7 @@
         "@babel/preset-env": "^7.28.5",
         "cross-env": "^7.0.3",
         "cypress": "^15.9.0",
-        "electron": "40.0.0",
+        "electron": "40.8.5",
         "electron-builder": "26.8.1",
         "eslint": "^9.0.0",
         "eslint-config-prettier": "^9.0.0",
@@ -62,7 +62,6 @@
         "http-server": "^14.1.1",
         "i18next": "^25.3.2",
         "i18next-http-backend": "^3.0.2",
-        "node": "^24.2.0",
         "postcss": "^8.5.6",
         "sass": "^1.97.2",
         "tone": "^15.1.22"
@@ -82,7 +81,14 @@
         }
     },
     "overrides": {
+        "electron": "40.8.5",
+        "flatted": "3.4.2",
+        "lodash": "4.18.1",
+        "brace-expansion": "2.0.3",
         "tar": "^7.5.10",
+        "path-to-regexp": "^8.4.0",
+        "picomatch": "^4.0.4",
+        "yaml": "^2.8.3",
         "ajv": "^6.14.0",
         "@isaacs/brace-expansion": "^5.0.1",
         "immutable": "^5.1.5",

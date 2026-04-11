@@ -273,8 +273,8 @@ Feel free. But, please don't spam :p.
    [discussions](https://github.com/sugarlabs/musicblocks/discussions)
    tab on top the the repository, or the _Sugar-dev Devel
    <[sugar-devel@lists.sugarlabs.org](mailto:sugar-devel@lists.sugarlabs.org)>_
-   mailing list. Don't ask silly questions (unless you don't know it is
-   silly ;p) before searching it on the web.
+   mailing list. We also have a
+   [matrix channel](https://matrix.to/#/#music-blocks:matrix.org).
 
 10. Work on things that matter. Follow three milestones: `Port Ready`,
     `Migration`, and `Future`. Those tagged `Port Ready` are
