@@ -72,7 +72,7 @@ function setupToneBlocks(activity) {
             }
 
             if (logo.inTimbre) {
-                if (logo.timbre.osc.length != 0) {
+                if (logo.timbre.osc.length !== 0) {
                     activity.errorMsg(_("You are adding multiple oscillator blocks."));
                 } else {
                     logo.timbre.oscParams = [];
@@ -505,6 +505,10 @@ function setupToneBlocks(activity) {
                     _("rate"),
                     //.TRANS: amplitude of tremolo waver
                     _("depth")
+                ],
+                argTooltips: [
+                    _("How fast the sound pulses (cycles per second)"),
+                    _("How strong the volume variation is (0-100%)")
                 ]
             });
             this.makeMacro((x, y) => [
@@ -632,7 +636,12 @@ function setupToneBlocks(activity) {
                 name: _("chorus"),
                 args: 3,
                 defaults: [1.5, 3.5, 70],
-                argLabels: [_("rate"), _("delay (MS)"), _("depth")]
+                argLabels: [_("rate"), _("delay (MS)"), _("depth")],
+                argTooltips: [
+                    _("Speed of the chorus modulation (cycles per second)"),
+                    _("Time delay between chorus voices (milliseconds)"),
+                    _("Amount of chorus effect (0-100%)")
+                ]
             });
         }
 
@@ -691,7 +700,11 @@ function setupToneBlocks(activity) {
                 name: _("vibrato"),
                 args: 2,
                 defaults: [5, 1 / 16],
-                argLabels: [_("intensity"), _("rate")]
+                argLabels: [_("intensity"), _("rate")],
+                argTooltips: [
+                    _("How much the pitch varies (semitones)"),
+                    _("Speed of the pitch variation (cycles per second)")
+                ]
             });
             this.makeMacro((x, y) => [
                 [0, "vibrato", x, y, [null, 1, 3, 2, 6]],
@@ -1068,7 +1081,7 @@ function setupToneBlocks(activity) {
                     activity.blocks.blockList[blk].value = ["", "", "do", 4];
                 }
                 const cblk1 = activity.blocks.blockList[blk].connections[1];
-                if (cblk1 != null) {
+                if (cblk1 !== null) {
                     if (activity.blocks.blockList[cblk1].value !== null) {
                         const namevalue = activity.blocks.blockList[cblk1].value[0];
                         const datavalue = activity.blocks.blockList[cblk1].value[1];
@@ -1077,12 +1090,12 @@ function setupToneBlocks(activity) {
                     }
                 }
                 const cblk2 = activity.blocks.blockList[blk].connections[2];
-                if (cblk2 != null) {
+                if (cblk2 !== null) {
                     const svalue = activity.blocks.blockList[cblk2].value;
                     activity.blocks.blockList[blk].value[2] = svalue;
                 }
                 const cblk3 = activity.blocks.blockList[blk].connections[3];
-                if (cblk3 != null) {
+                if (cblk3 !== null) {
                     const ovalue = activity.blocks.blockList[cblk3].value;
                     activity.blocks.blockList[blk].value[3] = ovalue;
                 }

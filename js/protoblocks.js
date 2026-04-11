@@ -1623,6 +1623,7 @@ class BaseBlock extends ProtoBlock {
         this._style.args ||= 0;
         this._style.argTypes ||= [];
         this._style.argLabels ||= [];
+        this._style.argTooltips ||= [];
         this._style.defaults ||= [];
         this._style.flows ||= {};
         this._style.flows.labels ||= [];
@@ -1634,7 +1635,7 @@ class BaseBlock extends ProtoBlock {
         if (this._style.flows.labels.length > 0) {
             if (this._style.flows.type === "arg") this.style = "argclamp";
             else if (this._style.flows.type === "value") this.style = "value";
-            else if (this._style.flows.labels.length == 2) this.style = "doubleclamp";
+            else if (this._style.flows.labels.length === 2) this.style = "doubleclamp";
             else this.style = "clamp";
             this.expandable = true;
         } else {
@@ -1663,7 +1664,21 @@ class BaseBlock extends ProtoBlock {
         this.staticLabels = [this._style.name || ""];
         this.dockTypes = [];
         this.defaults = [];
-        this._style.argLabels.forEach(i => this.staticLabels.push(i));
+
+        // Process argLabels with optional tooltips
+        this._style.argLabels.forEach((label, index) => {
+            let labelWithTooltip = label;
+            if (this._style.argTooltips && this._style.argTooltips[index]) {
+                // Add tooltip icon and attributes using Materialize CSS pattern
+                labelWithTooltip =
+                    label +
+                    ' <span class="tooltipped" data-tooltip="' +
+                    this._style.argTooltips[index] +
+                    '" data-position="top" data-delay="50">ⓘ</span>';
+            }
+            this.staticLabels.push(labelWithTooltip);
+        });
+
         this._style.flows.labels.forEach(i => this.staticLabels.push(i));
 
         if (this._style.flows.left) this.dockTypes.push(this._style.outType || "numberout");
@@ -1713,14 +1728,14 @@ class BaseBlock extends ProtoBlock {
             svg.setClampCount(this._style.flows.labels.length);
 
             for (let i = 0; i < arguments.length; i++) {
-                if (this._style.flows.type == undefined) {
+                if (this._style.flows.type === undefined) {
                     svg.setExpand(
                         30 + this.extraWidth,
                         ((arguments[arguments.length - i - 1] - 1) * STANDARDBLOCKHEIGHT) / 2,
                         0,
                         0
                     );
-                } else if (this._style.flows.type == "value") {
+                } else if (this._style.flows.type === "value") {
                     svg.setExpand(
                         60 + this.extraWidth,
                         ((arguments[arguments.length - i - 1] - 1) * STANDARDBLOCKHEIGHT) / 2,
@@ -1770,9 +1785,9 @@ class BaseBlock extends ProtoBlock {
             let clickHeight;
             this.isLeftClamp =
                 this.style === "clamp" &&
-                this._style.flows.left == true &&
+                this._style.flows.left === true &&
                 this._style.args === 0 &&
-                this._style.flows.type == "flow";
+                this._style.flows.type === "flow";
 
             if (this._style.flows.top || this._style.flows.bottom)
                 clickHeight = svg.docks[svg.docks.length - this._style.flows.labels.length - 1][1];
@@ -1790,6 +1805,18 @@ class BaseBlock extends ProtoBlock {
 
             return [artwork, svg.docks, svg.getWidth(), svg.getHeight(), clickHeight];
         };
+
+        // Initialize tooltips for this block if it has argTooltips
+        if (this._style.argTooltips && this._style.argTooltips.length > 0) {
+            setTimeout(() => {
+                if (window.jQuery && window.jQuery().tooltip) {
+                    window.jQuery(".tooltipped").tooltip({
+                        delay: 50,
+                        position: "top"
+                    });
+                }
+            }, 100);
+        }
     }
 
     /**
