@@ -19,7 +19,9 @@ global.MATRIXBUTTONHEIGHT = 40;
 global.MATRIXSOLFEHEIGHT = 30;
 
 global.rationalToFraction = jest.fn().mockReturnValue([4, 1]);
-global.mixedNumber = jest.fn().mockImplementation(val => (val !== null && val !== undefined ? val.toString() : ""));
+global.mixedNumber = jest
+    .fn()
+    .mockImplementation(val => (val !== null && val !== undefined ? val.toString() : ""));
 global.toFixed2 = jest.fn().mockImplementation(val => val.toFixed(2));
 
 global.platformColor = {
