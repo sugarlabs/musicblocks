@@ -65,6 +65,12 @@ class ReflectionMatrix {
          * @type {string}
          */
         this.code = "";
+
+        /**
+         * Timeout id for delayed typing indicators
+         * @type {number|null}
+         */
+        this.typingIndicatorTimeout = null;
     }
 
     sanitizeLinks(html) {
@@ -100,9 +106,7 @@ class ReflectionMatrix {
         widgetWindow.onclose = () => {
             this.isOpen = false;
             this.activity.isInputON = false;
-            if (this.dotsInterval) {
-                clearInterval(this.dotsInterval);
-            }
+            this.hideTypingIndicator();
             widgetWindow.destroy();
         };
 
@@ -215,6 +219,8 @@ class ReflectionMatrix {
     showTypingIndicator(action) {
         if (this.typingDiv) return;
 
+        this.clearPendingTypingIndicator();
+
         this.typingDiv = document.createElement("div");
         this.typingDiv.className = "typing-indicator";
 
@@ -242,10 +248,45 @@ class ReflectionMatrix {
      * @returns {void}
      */
     hideTypingIndicator() {
+        this.clearPendingTypingIndicator();
+
         if (this.typingDiv) {
             clearInterval(this.dotsInterval);
             this.typingDiv.remove();
             this.typingDiv = null;
+        }
+    }
+
+    /**
+     * Schedules a typing indicator after an optional delay.
+     * @param {string} action - Status text to show in the indicator.
+     * @param {number} delay - Delay before showing the indicator.
+     * @returns {void}
+     */
+    scheduleTypingIndicator(action, delay = 0) {
+        this.clearPendingTypingIndicator();
+
+        if (delay <= 0) {
+            this.showTypingIndicator(action);
+            return;
+        }
+
+        this.typingIndicatorTimeout = setTimeout(() => {
+            this.typingIndicatorTimeout = null;
+            if (this.isOpen) {
+                this.showTypingIndicator(action);
+            }
+        }, delay);
+    }
+
+    /**
+     * Clears any delayed typing indicator that has not rendered yet.
+     * @returns {void}
+     */
+    clearPendingTypingIndicator() {
+        if (this.typingIndicatorTimeout) {
+            clearTimeout(this.typingIndicatorTimeout);
+            this.typingIndicatorTimeout = null;
         }
     }
 
@@ -283,9 +324,7 @@ class ReflectionMatrix {
         if (this.triggerFirst === true) return;
 
         this.triggerFirst = true;
-        setTimeout(() => {
-            this.showTypingIndicator("Reading code");
-        }, 1000);
+        this.scheduleTypingIndicator("Reading code", 1000);
 
         const code = await this.activity.prepareExport();
         const data = await this.generateAlgorithm(code);
