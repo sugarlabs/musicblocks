@@ -659,18 +659,18 @@ class MeterWidget {
      * @returns {void}
      */
     _setupDefaultStrongWeakBeats(numberOfBeats, beatValue) {
-        if (beatValue == 0.25 && numberOfBeats == 4) {
+        if (beatValue === 0.25 && numberOfBeats === 4) {
             this._strongBeats[0] = true;
             this._strongBeats[2] = true;
             this._beatWheel.navItems[0].navItem.show();
             this._beatWheel.navItems[2].navItem.show();
-        } else if (beatValue == 0.25 && numberOfBeats == 2) {
+        } else if (beatValue === 0.25 && numberOfBeats === 2) {
             this._strongBeats[0] = true;
             this._beatWheel.navItems[0].navItem.show();
-        } else if (beatValue == 0.25 && numberOfBeats == 3) {
+        } else if (beatValue === 0.25 && numberOfBeats === 3) {
             this._strongBeats[0] = true;
             this._beatWheel.navItems[0].navItem.show();
-        } else if (beatValue == 0.125 && numberOfBeats == 6) {
+        } else if (beatValue === 0.125 && numberOfBeats === 6) {
             this._strongBeats[0] = true;
             this._strongBeats[3] = true;
             this._beatWheel.navItems[0].navItem.show();

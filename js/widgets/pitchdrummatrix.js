@@ -235,7 +235,7 @@ class PitchDrumMatrix {
 
             drumName = getDrumName(this.rowLabels[i]);
 
-            if (drumName != null) {
+            if (drumName !== null) {
                 // if it is a drum, we'll make it a column below.
                 this.drums.push(drumName);
                 continue;
@@ -633,7 +633,7 @@ class PitchDrumMatrix {
 
                 cell = cellRow.cells[col];
 
-                if (cell != undefined) {
+                if (cell !== undefined) {
                     cell.style.backgroundColor = "black";
                     this._setPairCell(row, col, cell, false);
                 }
@@ -731,7 +731,7 @@ class PitchDrumMatrix {
         }
         let isEmpty = true;
         for (let i = 0; i < pairs.length; i++) {
-            if (pairs[i][1] != -1) {
+            if (pairs[i][1] !== -1) {
                 isEmpty = false;
                 break;
             }

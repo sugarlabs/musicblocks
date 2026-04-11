@@ -144,7 +144,7 @@ function AIWidget() {
      */
     this._usePitch = function (p) {
         const number = SOLFEGENAMES.indexOf(p);
-        this.pitchCenter = number == -1 ? 0 : number;
+        this.pitchCenter = number === -1 ? 0 : number;
     };
 
     /**
@@ -208,7 +208,7 @@ function AIWidget() {
         const pitch = pitches;
         pitchDuration = toFraction(pitchDuration);
         const adjustedNote = adjustPitch(pitch.name, keySignature).toUpperCase();
-        if (triplet != null) {
+        if (triplet !== null) {
             pitchDuration[1] = meterDen * triplet;
         }
 
@@ -355,7 +355,7 @@ function AIWidget() {
                             ],
                             [
                                 blockId + 13,
-                                ["modename", { value: staff.key.mode == "m" ? "minor" : "major" }],
+                                ["modename", { value: staff.key.mode === "m" ? "minor" : "major" }],
                                 0,
                                 0,
                                 [blockId + 11]
@@ -409,7 +409,7 @@ function AIWidget() {
                                 tripletFinder,
                                 entry.meterDen
                             );
-                            if (element?.endTriplet != null) {
+                            if (element?.endTriplet !== null) {
                                 tripletFinder = null;
                             }
                             blockId = blockId + 9;
@@ -426,7 +426,7 @@ function AIWidget() {
                                 const endBlockSearch = staffBlocksMap[lineId].repeatArray;
 
                                 for (const repeatbar in endBlockSearch) {
-                                    if (endBlockSearch[repeatbar].end == -1) {
+                                    if (endBlockSearch[repeatbar].end === -1) {
                                         staffBlocksMap[lineId].repeatArray[repeatbar].end =
                                             staffBlocksMap[lineId].baseBlocks.length;
                                     }
@@ -441,7 +441,7 @@ function AIWidget() {
 
                     //update the namedo block if not first nameddo block appear
                     const baseBlocks = entry.baseBlocks;
-                    if (baseBlocks.length != 0) {
+                    if (baseBlocks.length !== 0) {
                         const lastBase = baseBlocks[baseBlocks.length - 1];
                         lastBase[0][lastBase[0].length - 4][4][1] = blockId;
                     }
@@ -532,7 +532,7 @@ function AIWidget() {
 
             const repeatblockids = staffBlocksMap[staffIndex].repeatArray;
             for (const repeatId of repeatblockids) {
-                if (repeatId.start == 0) {
+                if (repeatId.start === 0) {
                     staffBlocksMap[staffIndex].repeatBlock.push([
                         blockId,
                         "repeat",
@@ -585,7 +585,7 @@ function AIWidget() {
                             staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end + 1]
                         );
 
-                        if (secondnammedo != -1) {
+                        if (secondnammedo !== -1) {
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0][
                                 secondnammedo
                             ][4][0] = blockId;
@@ -614,7 +614,7 @@ function AIWidget() {
                         ][4][1]
                     );
                     let prevrepeatnameddo = -1;
-                    if (prevnameddo == -1) {
+                    if (prevnameddo === -1) {
                         prevrepeatnameddo = searchIndexForMusicBlock(
                             staffBlocksMap[staffIndex].repeatBlock,
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
@@ -658,14 +658,14 @@ function AIWidget() {
                         [blockId]
                     ]);
 
-                    if (prevnameddo != -1) {
+                    if (prevnameddo !== -1) {
                         staffBlocksMap[staffIndex].baseBlocks[repeatId.start - 1][0][
                             prevnameddo
                         ][4][1] = blockId;
                     } else {
                         staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3] = blockId;
                     }
-                    if (afternamedo != -1) {
+                    if (afternamedo !== -1) {
                         staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][afternamedo][4][1] =
                             null;
                     }
@@ -674,7 +674,7 @@ function AIWidget() {
                         currentnammeddo
                     ][4][0] = blockId;
 
-                    if (nextBlockId != null) {
+                    if (nextBlockId !== null) {
                         const nextnameddo = searchIndexForMusicBlock(
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0],
                             nextBlockId
@@ -824,7 +824,7 @@ function AIWidget() {
                     >`;
                 this.isMoving = false;
             } else {
-                if (!(abcNotationSong == "")) {
+                if (!(abcNotationSong === "")) {
                     this.resume();
                     this._playABCSong();
                 }
@@ -861,7 +861,7 @@ function AIWidget() {
      */
     this._addSample = function () {
         for (let i = 0; i < CUSTOMSAMPLES.length; i++) {
-            if (CUSTOMSAMPLES[i][0] == this.sampleName) {
+            if (CUSTOMSAMPLES[i][0] === this.sampleName) {
                 return;
             }
         }
@@ -940,7 +940,7 @@ function AIWidget() {
      * @returns {void}
      */
     this._playSample = function () {
-        if (this.sampleName != null && this.sampleName != "") {
+        if (this.sampleName !== null && this.sampleName !== "") {
             this.reconnectSynthsToAnalyser();
 
             this.activity.logo.synth.trigger(

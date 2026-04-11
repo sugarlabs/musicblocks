@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 // Copyright (c) 2016-20 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
@@ -293,7 +292,7 @@ class StatusMatrix {
                         break;
                     case "pitchinhertz":
                         value = "";
-                        if (tur.singer.noteStatus != null) {
+                        if (tur.singer.noteStatus !== null) {
                             notes = tur.singer.noteStatus[0];
                             for (let j = 0; j < notes.length; j++) {
                                 if (j > 0) {
@@ -322,7 +321,7 @@ class StatusMatrix {
                 this.activity.logo.inStatusMatrix = saveStatus;
 
                 cell = this._statusTable.rows[i + 1].cells[activeTurtles + 1];
-                if (cell != null) {
+                if (cell !== null) {
                     cell.textContent = value;
                 }
                 i++;
@@ -333,7 +332,7 @@ class StatusMatrix {
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 note = "";
                 value = "";
-                if (tur.singer.noteStatus != null) {
+                if (tur.singer.noteStatus !== null) {
                     notes = tur.singer.noteStatus[0];
                     for (let j = 0; j < notes.length; j++) {
                         if (typeof notes[j] === "number") {
@@ -351,7 +350,7 @@ class StatusMatrix {
                 }
 
                 cell = this._statusTable.rows[i + 1].cells[activeTurtles + 1];
-                if (cell != null) {
+                if (cell !== null) {
                     cell.textContent = note.replace(/#/g, "♯").replace(/b/g, "♭");
                 }
             }

@@ -184,62 +184,62 @@ class TimbreWidget {
     _update = async (i, value, k) => {
         const updateParams = [];
 
-        if (this.isActive["envelope"] === true && this.env[i] != null) {
+        if (this.isActive["envelope"] === true && this.env[i] !== null) {
             for (let j = 0; j < 4; j++) {
                 updateParams[j] = this.activity.blocks.blockList[this.env[i]].connections[j + 1];
             }
         }
 
-        if (this.isActive["filter"] === true && this.fil[i] != null) {
+        if (this.isActive["filter"] === true && this.fil[i] !== null) {
             for (let j = 0; j < 3; j++) {
                 updateParams[j] = this.activity.blocks.blockList[this.fil[i]].connections[j + 1];
             }
         }
 
-        if (this.isActive["oscillator"] === true && this.osc[i] != null) {
+        if (this.isActive["oscillator"] === true && this.osc[i] !== null) {
             for (let j = 0; j < 2; j++) {
                 updateParams[j] = this.activity.blocks.blockList[this.osc[i]].connections[j + 1];
             }
         }
 
-        if (this.isActive["amsynth"] === true && this.AMSynthesizer[i] != null) {
+        if (this.isActive["amsynth"] === true && this.AMSynthesizer[i] !== null) {
             updateParams[0] = this.activity.blocks.blockList[this.AMSynthesizer[i]].connections[1];
         }
 
-        if (this.isActive["fmsynth"] === true && this.FMSynthesizer[i] != null) {
+        if (this.isActive["fmsynth"] === true && this.FMSynthesizer[i] !== null) {
             updateParams[0] = this.activity.blocks.blockList[this.FMSynthesizer[i]].connections[1];
         }
 
-        if (this.isActive["noisesynth"] === true && this.NoiseSynthesizer[i] != null) {
+        if (this.isActive["noisesynth"] === true && this.NoiseSynthesizer[i] !== null) {
             updateParams[0] =
                 this.activity.blocks.blockList[this.NoiseSynthesizer[i]].connections[1];
         }
 
-        if (this.isActive["duosynth"] === true && this.duoSynthesizer[i] != null) {
+        if (this.isActive["duosynth"] === true && this.duoSynthesizer[i] !== null) {
             for (let j = 0; j < 2; j++) {
                 updateParams[j] =
                     this.activity.blocks.blockList[this.duoSynthesizer[i]].connections[j + 1];
             }
         }
 
-        if (this.isActive["tremolo"] === true && this.tremoloEffect[i] != null) {
+        if (this.isActive["tremolo"] === true && this.tremoloEffect[i] !== null) {
             for (let j = 0; j < 2; j++) {
                 updateParams[j] =
                     this.activity.blocks.blockList[this.tremoloEffect[i]].connections[j + 1];
             }
         }
 
-        if (this.isActive["vibrato"] === true && this.vibratoEffect[i] != null) {
+        if (this.isActive["vibrato"] === true && this.vibratoEffect[i] !== null) {
             updateParams[0] = this.activity.blocks.blockList[this.vibratoEffect[i]].connections[1];
             // The rate arg of the vibrato block must be in the form: a / b
             const divBlock = this.activity.blocks.blockList[this.vibratoEffect[i]].connections[2];
             if (
                 this.activity.blocks.blockList[divBlock].name === "divide" &&
-                this.activity.blocks.blockList[divBlock].connections[1] != null &&
+                this.activity.blocks.blockList[divBlock].connections[1] !== null &&
                 this.activity.blocks.blockList[
                     this.activity.blocks.blockList[divBlock].connections[1]
                 ].name === "number" &&
-                this.activity.blocks.blockList[divBlock].connections[2] != null &&
+                this.activity.blocks.blockList[divBlock].connections[2] !== null &&
                 this.activity.blocks.blockList[
                     this.activity.blocks.blockList[divBlock].connections[2]
                 ].name === "number"
@@ -277,26 +277,26 @@ class TimbreWidget {
             }
         }
 
-        if (this.isActive["chorus"] === true && this.chorusEffect[i] != null) {
+        if (this.isActive["chorus"] === true && this.chorusEffect[i] !== null) {
             for (let j = 0; j < 3; j++) {
                 updateParams[j] =
                     this.activity.blocks.blockList[this.chorusEffect[i]].connections[j + 1];
             }
         }
 
-        if (this.isActive["phaser"] === true && this.phaserEffect[i] != null) {
+        if (this.isActive["phaser"] === true && this.phaserEffect[i] !== null) {
             for (let j = 0; j < 3; j++) {
                 updateParams[j] =
                     this.activity.blocks.blockList[this.phaserEffect[i]].connections[j + 1];
             }
         }
 
-        if (this.isActive["distortion"] === true && this.distortionEffect[i] != null) {
+        if (this.isActive["distortion"] === true && this.distortionEffect[i] !== null) {
             updateParams[0] =
                 this.activity.blocks.blockList[this.distortionEffect[i]].connections[1];
         }
 
-        if (updateParams[0] != null) {
+        if (updateParams[0] !== null) {
             if (typeof value === "string") {
                 this.activity.blocks.blockList[updateParams[k]].value = value;
             } else {
@@ -992,7 +992,7 @@ class TimbreWidget {
         this.activity.blocks.blockList[n].connections[0] = this.blockNo;
 
         // If there were blocks in the Widget, move them inside the clamp.
-        if (topOfClamp != null) {
+        if (topOfClamp !== null) {
             this.activity.blocks.blockList[n].connections[clamp] = topOfClamp;
             this.activity.blocks.blockList[topOfClamp].connections[0] = n;
         }
@@ -1020,7 +1020,7 @@ class TimbreWidget {
         this.activity.blocks.blockList[n].connections[0] = this.blockNo;
 
         // If there were blocks in the Widget, move them inside the clamp.
-        if (topOfClamp != null) {
+        if (topOfClamp !== null) {
             this.activity.blocks.blockList[vspace].connections[1] = topOfClamp;
             this.activity.blocks.blockList[topOfClamp].connections[0] = vspace;
         }
@@ -1078,7 +1078,7 @@ class TimbreWidget {
             this.activity.blocks.blockList[newblk].connections.length - 1
         ] = c1;
 
-        if (c0 != null) {
+        if (c0 !== null) {
             for (let i = 0; i < this.activity.blocks.blockList[c0].connections.length; i++) {
                 if (this.activity.blocks.blockList[c0].connections[i] === oldblk) {
                     this.activity.blocks.blockList[c0].connections[i] = newblk;
@@ -1088,7 +1088,7 @@ class TimbreWidget {
 
             // Look for a containing clamp, which may need to be resized.
             let blockAbove = c0;
-            while (blockAbove != this.blockNo) {
+            while (blockAbove !== this.blockNo) {
                 if (this.activity.blocks.blockList[blockAbove].isClampBlock()) {
                     this.activity.blocks.clampBlocksToCheck.push([blockAbove, 0]);
                 }
@@ -1099,7 +1099,7 @@ class TimbreWidget {
             this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
         }
 
-        if (c1 != null) {
+        if (c1 !== null) {
             for (let i = 0; i < this.activity.blocks.blockList[c1].connections.length; i++) {
                 if (this.activity.blocks.blockList[c1].connections[i] === oldblk) {
                     this.activity.blocks.blockList[c1].connections[i] = newblk;
@@ -1130,7 +1130,7 @@ class TimbreWidget {
      */
     blockConnection = async (len, bottomOfClamp) => {
         const n = this.activity.blocks.blockList.length - len;
-        if (bottomOfClamp == null) {
+        if (bottomOfClamp === null) {
             this.activity.blocks.blockList[this.blockNo].connections[2] = n;
             this.activity.blocks.blockList[n].connections[0] = this.blockNo;
         } else {
@@ -1147,7 +1147,7 @@ class TimbreWidget {
                 const cblk = this.activity.blocks.blockList[bottomOfClamp].connections[0];
                 c = this.activity.blocks.blockList[cblk].connections.length - 2;
                 this.activity.blocks.clampBlocksToCheck.push([cblk, 0]);
-                if (this.activity.blocks.blockList[cblk].connections[c] == null) {
+                if (this.activity.blocks.blockList[cblk].connections[c] === null) {
                     bottomOfClamp = cblk;
                 } else {
                     // Find bottom of stack

@@ -16,7 +16,6 @@
  * MA 02110-1335 USA.
  */
 
-/* eslint-disable no-redeclare */
 /*
    global
 
@@ -278,7 +277,7 @@ function TemperamentWidget() {
                     "20 20px Impact, Charcoal, sans-serif";
                 angle[i] = 270 + 360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase));
                 if (i !== 0) {
-                    if (i == pitchNumber - 1) {
+                    if (i === pitchNumber - 1) {
                         angleDiff[i - 1] = angle[0] + 360 - angle[i];
                     } else {
                         angleDiff[i - 1] = angle[i] - angle[i - 1];
@@ -435,8 +434,8 @@ function TemperamentWidget() {
     this.showNoteInfo = function (event) {
         for (let i = 0; i < this.notesCircle.navItemCount; i++) {
             if (
-                event.target.id == "wheelnav-wheelDiv2-slice-" + i ||
-                (event.target.textContent == i && event.target.textContent !== "")
+                event.target.id === "wheelnav-wheelDiv2-slice-" + i ||
+                (event.target.textContent === i && event.target.textContent !== "")
             ) {
                 const x = event.clientX - docById("wheelDiv2").getBoundingClientRect().left;
                 const y = event.clientY - docById("wheelDiv2").getBoundingClientRect().top;
@@ -483,7 +482,7 @@ function TemperamentWidget() {
 
                 let noteDefined = false;
                 for (let j = 0; j < this.ratiosNotesPair.length; j++) {
-                    if (this.ratios[i] == this.ratiosNotesPair[j][0]) {
+                    if (this.ratios[i] === this.ratiosNotesPair[j][0]) {
                         noteDefined = true;
                         const noteDiv = document.createElement("div");
                         noteDiv.id = "note";
@@ -492,7 +491,7 @@ function TemperamentWidget() {
                         break;
                     }
                 }
-                if (noteDefined == false) {
+                if (noteDefined === false) {
                     const cents = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
                     const centsDiff = [];
                     const centsDiff1 = [];
@@ -630,7 +629,7 @@ function TemperamentWidget() {
         this.circleIsVisible = true;
         this.toggleNotesButton();
         temperamentTableDiv.textContent = "";
-        if (docById("wheelDiv2") != null) {
+        if (docById("wheelDiv2") !== null) {
             docById("wheelDiv2").style.display = "none";
             this.notesCircle.removeWheel();
         }
@@ -786,7 +785,7 @@ function TemperamentWidget() {
                 //Mode
                 notesCell[(i, 5)] = notesRow[i].insertCell(-1);
                 for (let j = 0; j < this.scaleNotes.length; j++) {
-                    if (this.notes[i][0] == this.scaleNotes[j]) {
+                    if (this.notes[i][0] === this.scaleNotes[j]) {
                         notesCell[(i, 5)].textContent = j;
                         break;
                     }
@@ -826,7 +825,7 @@ function TemperamentWidget() {
         this._logo.synth.setMasterVolume(0);
         this._logo.synth.stop();
         const that = this;
-        if (docById("wheelDiv2") != null) {
+        if (docById("wheelDiv2") !== null) {
             docById("wheelDiv2").style.display = "none";
             this.notesCircle.removeWheel();
         }
@@ -1016,7 +1015,7 @@ function TemperamentWidget() {
                     ratio2[i] = ratio2[i].toFixed(2);
                 }
                 const ratio4 = ratio1.filter(function (val) {
-                    return ratio2.indexOf(val) == -1;
+                    return ratio2.indexOf(val) === -1;
                 });
 
                 for (let i = 0; i < ratio4.length; i++) {
@@ -1220,7 +1219,7 @@ function TemperamentWidget() {
                             that.tempRatios.splice(index[i], 0, ratio[i]);
                             break;
                         }
-                        if (ratioDifference[j] == 0) {
+                        if (ratioDifference[j] === 0) {
                             index.push(j);
                             that.tempRatios.splice(index[i], 1, ratio[i]);
                             break;
@@ -1355,10 +1354,10 @@ function TemperamentWidget() {
                 docById("wheelDiv4").display = "none";
                 this.wheel1.removeWheel();
             }
-            if (ratios == undefined) {
+            if (ratios === undefined) {
                 ratios = this.ratios;
             }
-            if (pitchNumber == undefined) {
+            if (pitchNumber === undefined) {
                 pitchNumber = this.pitchNumber;
             }
             const labels = [];
@@ -1392,7 +1391,7 @@ function TemperamentWidget() {
                     "20 20px Impact, Charcoal, sans-serif";
                 angle[i] = 270 + 360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase));
                 if (i !== 0) {
-                    if (i == this.pitchNumber - 1) {
+                    if (i === this.pitchNumber - 1) {
                         angleDiff[i - 1] = angle[0] + 360 - angle[i];
                     } else {
                         angleDiff[i - 1] = angle[i] - angle[i - 1];
@@ -1458,10 +1457,10 @@ function TemperamentWidget() {
                 docById("wheelDiv3").display = "none";
                 this.wheel.removeWheel();
             }
-            if (pitchNumber == undefined) {
+            if (pitchNumber === undefined) {
                 pitchNumber = this.pitchNumber;
             }
-            if (ratios == undefined) {
+            if (ratios === undefined) {
                 ratios = this.ratios;
             }
             docById("wheelDiv3").style.display = "";
@@ -1491,7 +1490,7 @@ function TemperamentWidget() {
                 //Change angles of outer circle
                 angle[i] = 270 + 360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase));
                 if (i !== 0) {
-                    if (i == pitchNumber - 1) {
+                    if (i === pitchNumber - 1) {
                         angleDiff1[i - 1] = angle[0] + 360 - angle[i];
                     } else {
                         angleDiff1[i - 1] = angle[i] - angle[i - 1];
@@ -1576,7 +1575,7 @@ function TemperamentWidget() {
             frequencies[j] = frequencies[j].toFixed(2);
         }
         for (let i = 0; i < pitchNumber; i++) {
-            if (event.target.parentNode.id == "wheelnav-wheelDiv3-title-" + i) {
+            if (event.target.parentNode.id === "wheelnav-wheelDiv3-title-" + i) {
                 const that = this;
                 if (docById("noteInfo1") !== null) {
                     docById("noteInfo1").remove();
@@ -1769,7 +1768,7 @@ function TemperamentWidget() {
             that.powerBase = ratio;
             that.typeOfEdit = "nonequal";
             that.checkTemperament(compareRatios);
-            if (ratio != 2) {
+            if (ratio !== 2) {
                 that.octaveChanged = true;
             }
             that._circleOfNotes();
@@ -1807,7 +1806,7 @@ function TemperamentWidget() {
                     temperamentRatios[j] = temperamentRatios[j].toFixed(2);
                 }
                 const ratiosEqual =
-                    ratios.length == temperamentRatios.length &&
+                    ratios.length === temperamentRatios.length &&
                     ratios.every(function (element, index) {
                         return element === temperamentRatios[index];
                     });
@@ -2000,7 +1999,7 @@ function TemperamentWidget() {
                     ]);
                 }
 
-                if (i == this.pitchNumber - 1) {
+                if (i === this.pitchNumber - 1) {
                     newStack.push([idx + 12, "hidden", 0, 0, [idx, null]]);
                 } else {
                     newStack.push([idx + 12, "hidden", 0, 0, [idx, idx + 13]]);
@@ -2067,7 +2066,7 @@ function TemperamentWidget() {
                     ]);
                 }
 
-                if (i == this.pitchNumber - 1) {
+                if (i === this.pitchNumber - 1) {
                     newStack.push([idx + 10, "hidden", 0, 0, [idx, null]]);
                 } else {
                     newStack.push([idx + 10, "hidden", 0, 0, [idx, idx + 11]]);
@@ -2134,9 +2133,9 @@ function TemperamentWidget() {
         this._logo.synth.changeInTemperament = true;
 
         if (docById("wheelDiv4") === null) {
-            if (this.editMode == "equal" && this.eqTempHzs && this.eqTempHzs.length) {
+            if (this.editMode === "equal" && this.eqTempHzs && this.eqTempHzs.length) {
                 notes = this.eqTempHzs[pitchIndex];
-            } else if (this.editMode == "ratio" && this.NEqTempHzs && this.NEqTempHzs.length) {
+            } else if (this.editMode === "ratio" && this.NEqTempHzs && this.NEqTempHzs.length) {
                 notes = this.NEqTempHzs[pitchIndex];
             } else if (isCustomTemperament(this.inTemperament)) {
                 notes = this.frequencies[pitchIndex];
@@ -2228,9 +2227,9 @@ function TemperamentWidget() {
 
         const that = this;
         let pitchNumber = this.pitchNumber;
-        if (this.editMode == "equal" && this.eqTempPitchNumber) {
+        if (this.editMode === "equal" && this.eqTempPitchNumber) {
             pitchNumber = this.eqTempPitchNumber;
-        } else if (this.editMode == "ratio" && this.NEqTempPitchNumber) {
+        } else if (this.editMode === "ratio" && this.NEqTempPitchNumber) {
             pitchNumber = this.NEqTempPitchNumber;
         }
 
@@ -2258,7 +2257,7 @@ function TemperamentWidget() {
                 that.playNote(i);
             }
 
-            if (that.circleIsVisible == false && docById("wheelDiv4") == null) {
+            if (that.circleIsVisible === false && docById("wheelDiv4") === null) {
                 if (i === pitchNumber && that._playing) {
                     that.notesCircle.navItems[0].fillAttr = "#808080";
                     that.notesCircle.navItems[0].sliceHoverAttr.fill = "#808080";
@@ -2271,7 +2270,7 @@ function TemperamentWidget() {
                     that.notesCircle.navItems[i].sliceSelectedAttr.fill = "#808080";
                 }
 
-                if (that.playbackForward == false && i < pitchNumber) {
+                if (that.playbackForward === false && i < pitchNumber) {
                     if (i === pitchNumber - 1) {
                         that.notesCircle.navItems[0].fillAttr = "#c8C8C8";
                         that.notesCircle.navItems[0].sliceHoverAttr.fill = "#c8C8C8";
@@ -2293,9 +2292,9 @@ function TemperamentWidget() {
                 }
 
                 that.notesCircle.refreshWheel();
-            } else if (that.circleIsVisible == true && docById("wheelDiv4") == null) {
+            } else if (that.circleIsVisible === true && docById("wheelDiv4") === null) {
                 docById("pitchNumber_" + i).style.background = platformColor.labelColor;
-                if (that.playbackForward == false && i < pitchNumber) {
+                if (that.playbackForward === false && i < pitchNumber) {
                     const j = i + 1;
                     docById("pitchNumber_" + j).style.background = platformColor.selectorBackground;
                 } else {
@@ -2318,7 +2317,7 @@ function TemperamentWidget() {
                     that.wheel1.navItems[i].sliceSelectedAttr.fill = "#808080";
                 }
 
-                if (that.playbackForward == false && i < pitchNumber) {
+                if (that.playbackForward === false && i < pitchNumber) {
                     if (i === pitchNumber - 1) {
                         that.wheel1.navItems[0].fillAttr = "#e0e0e0";
                         that.wheel1.navItems[0].sliceHoverAttr.fill = "#e0e0e0";
@@ -2358,7 +2357,7 @@ function TemperamentWidget() {
             } else {
                 that.inbetween = true;
             }
-            if (!that.playbackForward && i == -1) {
+            if (!that.playbackForward && i === -1) {
                 cell.textContent = "\u00A0\u00A0";
                 const playImg = document.createElement("img");
                 playImg.src = "header-icons/play-button.svg";
@@ -2430,15 +2429,15 @@ function TemperamentWidget() {
         widgetWindow.onclose = function () {
             that._logo.synth.setMasterVolume(0);
             that._logo.synth.stop();
-            if (docById("wheelDiv2") != null) {
+            if (docById("wheelDiv2") !== null) {
                 docById("wheelDiv2").style.display = "none";
                 that.notesCircle.removeWheel();
             }
-            if (docById("wheelDiv3") != null) {
+            if (docById("wheelDiv3") !== null) {
                 docById("wheelDiv3").style.display = "none";
                 that.wheel.removeWheel();
             }
-            if (docById("wheelDiv4") != null) {
+            if (docById("wheelDiv4") !== null) {
                 docById("wheelDiv4").style.display = "none";
                 that.wheel1.removeWheel();
             }
@@ -2563,7 +2562,7 @@ function TemperamentWidget() {
                 this.intervals[i] = t.interval[i];
                 this.ratios[i] = t[this.intervals[i]];
                 this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
-                if (i == 0) {
+                if (i === 0) {
                     this.frequencies[i] = this._logo.synth
                         ._getFrequency(str[i], true, this.inTemperament)
                         .toFixed(2);

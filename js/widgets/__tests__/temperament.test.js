@@ -46,12 +46,12 @@ describe("TemperamentWidget basic tests", () => {
         }));
 
         global.docById = jest.fn(id => ({
-            innerHTML: "", textContent: "", appendChild: jest.fn(), setAttribute: jest.fn(),
+            innerHTML: "",
             textContent: "",
-            style: {},
-            append: jest.fn(), appendChild: jest.fn(), setAttribute: jest.fn(), textContent: "",
             appendChild: jest.fn(),
             setAttribute: jest.fn(),
+            style: {},
+            append: jest.fn(),
             getElementsByTagName: jest.fn(() => []),
             addEventListener: jest.fn()
         }));
@@ -176,7 +176,7 @@ describe("TemperamentWidget basic tests", () => {
         };
 
         widget.playButton = {
-            innerHTML: "", textContent: "", appendChild: jest.fn(), setAttribute: jest.fn(),
+            innerHTML: "",
             textContent: "",
             appendChild: jest.fn(),
             setAttribute: jest.fn(),
@@ -209,9 +209,12 @@ describe("TemperamentWidget basic tests", () => {
         };
 
         global.docById = jest.fn(() => ({
-            innerHTML: "", textContent: "", appendChild: jest.fn(), setAttribute: jest.fn(),
+            innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn(),
+            setAttribute: jest.fn(),
             style: {},
-            append: jest.fn(), appendChild: jest.fn(), setAttribute: jest.fn(), textContent: "",
+            append: jest.fn()
         }));
         document.querySelectorAll = jest.fn(() => [
             { style: {} },
@@ -227,9 +230,12 @@ describe("TemperamentWidget basic tests", () => {
 
     test("equalEdit sets editMode to equal", () => {
         global.docById = jest.fn(() => ({
-            innerHTML: "", textContent: "", appendChild: jest.fn(), setAttribute: jest.fn(),
+            innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn(),
+            setAttribute: jest.fn(),
             style: {},
-            append: jest.fn(), appendChild: jest.fn(), setAttribute: jest.fn(), textContent: "",
+            append: jest.fn()
         }));
 
         widget.equalEdit();
@@ -239,9 +245,12 @@ describe("TemperamentWidget basic tests", () => {
 
     test("ratioEdit sets editMode to ratio", () => {
         global.docById = jest.fn(() => ({
-            innerHTML: "", textContent: "", appendChild: jest.fn(), setAttribute: jest.fn(),
+            innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn(),
+            setAttribute: jest.fn(),
             style: {},
-            append: jest.fn(), appendChild: jest.fn(), setAttribute: jest.fn(), textContent: "",
+            append: jest.fn()
         }));
 
         widget.ratioEdit();
@@ -269,9 +278,12 @@ describe("TemperamentWidget basic tests", () => {
             }
 
             return {
-                innerHTML: "", textContent: "", appendChild: jest.fn(), setAttribute: jest.fn(),
+                innerHTML: "",
+                textContent: "",
+                appendChild: jest.fn(),
+                setAttribute: jest.fn(),
                 style: {},
-                append: jest.fn(), appendChild: jest.fn(), setAttribute: jest.fn(), textContent: "",
+                append: jest.fn(),
                 addEventListener: jest.fn() // 👈 ADD THIS
             };
         });
@@ -285,9 +297,12 @@ describe("TemperamentWidget basic tests", () => {
         widget.ratios = [1, 2];
 
         global.docById = jest.fn(() => ({
-            innerHTML: "", textContent: "", appendChild: jest.fn(), setAttribute: jest.fn(),
+            innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn(),
+            setAttribute: jest.fn(),
             style: {},
-            append: jest.fn(), appendChild: jest.fn(), setAttribute: jest.fn(), textContent: "",
+            append: jest.fn()
         }));
 
         widget.octaveSpaceEdit();
@@ -481,15 +496,21 @@ describe("TemperamentWidget basic tests", () => {
         global.isCustomTemperament = jest.fn(() => false);
 
         global.docById = jest.fn(() => ({
-            innerHTML: "", textContent: "", appendChild: jest.fn(), setAttribute: jest.fn(),
+            innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn(),
+            setAttribute: jest.fn(),
             style: {},
-            insertCell: jest.fn(() => ({ appendChild: jest.fn(), textContent: "", setAttribute: jest.fn(),
-                innerHTML: "", textContent: "", appendChild: jest.fn(), setAttribute: jest.fn(),
+            insertCell: jest.fn(() => ({
+                innerHTML: "",
+                textContent: "",
+                appendChild: jest.fn(),
+                setAttribute: jest.fn(),
                 style: {},
                 onmouseover: jest.fn(),
                 onmouseout: jest.fn()
             })),
-            append: jest.fn(), appendChild: jest.fn(), setAttribute: jest.fn(), textContent: "",
+            append: jest.fn()
         }));
         document.querySelectorAll = jest.fn(() => [
             { style: {} },
@@ -516,11 +537,19 @@ describe("TemperamentWidget basic tests", () => {
                 return { value: 880 };
             }
             if (id === "frequencydiv") {
-                return { innerHTML: "", textContent: "", appendChild: jest.fn(), setAttribute: jest.fn(), };
+                return {
+                    innerHTML: "",
+                    textContent: "",
+                    appendChild: jest.fn(),
+                    setAttribute: jest.fn()
+                };
             }
             return {
                 style: {},
-                innerHTML: "", textContent: "", appendChild: jest.fn(), setAttribute: jest.fn(),
+                innerHTML: "",
+                textContent: "",
+                appendChild: jest.fn(),
+                setAttribute: jest.fn()
             };
         });
 
@@ -550,9 +579,12 @@ describe("TemperamentWidget basic tests", () => {
             if (id === "startNote") return { value: 3 };
             if (id === "endNote") return { value: 1 };
             return {
-                innerHTML: "", textContent: "", appendChild: jest.fn(), setAttribute: jest.fn(),
+                innerHTML: "",
+                textContent: "",
+                appendChild: jest.fn(),
+                setAttribute: jest.fn(),
                 style: {},
-                append: jest.fn(), appendChild: jest.fn(), setAttribute: jest.fn(), textContent: "",
+                append: jest.fn()
             };
         });
 
@@ -575,7 +607,13 @@ describe("TemperamentWidget basic tests", () => {
             }
         };
 
-        widget.playButton = { innerHTML: "", textContent: "", appendChild: jest.fn(), setAttribute: jest.fn(), style: {} };
+        widget.playButton = {
+            innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn(),
+            setAttribute: jest.fn(),
+            style: {}
+        };
         widget.pitchNumber = 1;
         widget.frequencies = [440, 880];
         widget.tempRatios1 = [1, 2];
@@ -605,7 +643,13 @@ describe("TemperamentWidget basic tests", () => {
             }
         };
 
-        widget.playButton = { innerHTML: "", textContent: "", appendChild: jest.fn(), setAttribute: jest.fn(), style: {} };
+        widget.playButton = {
+            innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn(),
+            setAttribute: jest.fn(),
+            style: {}
+        };
         widget._playing = true;
         widget.tempRatios1 = [1];
 

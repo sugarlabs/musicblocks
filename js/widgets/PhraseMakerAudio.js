@@ -58,7 +58,7 @@ const PhraseMakerAudio = {
 
                 if (typeof note[i] === "number") {
                     synthNotes.push(note[i]);
-                } else if (drumName != null) {
+                } else if (drumName !== null) {
                     drumNotes.push(drumName);
                 } else if (note[i].slice(0, 4) === "http") {
                     drumNotes.push(note[i]);
@@ -269,14 +269,14 @@ const PhraseMakerAudio = {
                     } else {
                         if (
                             // if graphic block
-                            PhraseMakerUtils.MATRIXGRAPHICS.indexOf(pm.rowLabels[j]) != -1 ||
-                            PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(pm.rowLabels[j]) != -1
+                            PhraseMakerUtils.MATRIXGRAPHICS.indexOf(pm.rowLabels[j]) !== -1 ||
+                            PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(pm.rowLabels[j]) !== -1
                         ) {
                             // push "action: value"
                             note.push(pm.rowLabels[j] + ": " + pm.rowArgs[j]);
                         } else if (
                             // if pitch represented by halftone
-                            MATRIXHALFTONES.indexOf(pm.rowLabels[j]) != -1
+                            MATRIXHALFTONES.indexOf(pm.rowLabels[j]) !== -1
                         ) {
                             // push "halftone" + "notevalue"
                             note.push(
@@ -363,7 +363,7 @@ const PhraseMakerAudio = {
                     row = pm._noteValueRow;
                     cell = row.cells[pm._colIndex];
 
-                    if (cell != undefined) {
+                    if (cell !== undefined) {
                         cell.style.backgroundColor = pm.platformColor.selectorBackground;
                         if (cell.colSpan > 1) {
                             row = pm._tupletNoteValueRow;
@@ -396,7 +396,7 @@ const PhraseMakerAudio = {
 
                             if (typeof note[i] === "number") {
                                 synthNotes.push(note[i]);
-                            } else if (drumName != null) {
+                            } else if (drumName !== null) {
                                 drumNotes.push(drumName);
                             } else if (note[i].slice(0, 4) === "http") {
                                 drumNotes.push(note[i]);
@@ -450,7 +450,7 @@ const PhraseMakerAudio = {
 
                 row = pm._noteValueRow;
                 cell = row.cells[pm._colIndex];
-                if (cell != undefined) {
+                if (cell !== undefined) {
                     if (cell.colSpan > 1) {
                         pm._spanCounter += 1;
                         if (pm._spanCounter === cell.colSpan) {

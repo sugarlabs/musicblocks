@@ -153,15 +153,15 @@ function SampleWidget() {
             this.sampleOctave,
             this.centAdjustmentValue || 0
         ];
-        if (this.timbreBlock != null) {
+        if (this.timbreBlock !== null) {
             mainSampleBlock = this.activity.blocks.blockList[this.timbreBlock].connections[1];
-            if (mainSampleBlock != null) {
+            if (mainSampleBlock !== null) {
                 this.activity.blocks.blockList[mainSampleBlock].value = this.sampleArray;
                 this.activity.blocks.blockList[mainSampleBlock].updateCache();
                 audiofileBlock = this.activity.blocks.blockList[mainSampleBlock].connections[1];
                 solfegeBlock = this.activity.blocks.blockList[mainSampleBlock].connections[2];
                 octaveBlock = this.activity.blocks.blockList[mainSampleBlock].connections[3];
-                if (audiofileBlock != null) {
+                if (audiofileBlock !== null) {
                     this.activity.blocks.blockList[audiofileBlock].value = [
                         this.sampleName,
                         this.sampleData
@@ -169,12 +169,12 @@ function SampleWidget() {
                     this.activity.blocks.blockList[audiofileBlock].text.text = this.sampleName;
                     this.activity.blocks.blockList[audiofileBlock].updateCache();
                 }
-                if (solfegeBlock != null) {
+                if (solfegeBlock !== null) {
                     this.activity.blocks.blockList[solfegeBlock].value = this.samplePitch;
                     this.activity.blocks.blockList[solfegeBlock].text.text = this.samplePitch;
                     this.activity.blocks.blockList[solfegeBlock].updateCache();
                 }
-                if (octaveBlock != null) {
+                if (octaveBlock !== null) {
                     this.activity.blocks.blockList[octaveBlock].value = this.sampleOctave;
                     this.activity.blocks.blockList[octaveBlock].text.text = this.sampleOctave;
                     this.activity.blocks.blockList[octaveBlock].updateCache();
@@ -243,7 +243,7 @@ function SampleWidget() {
      */
     this._usePitch = function (p) {
         const number = SOLFEGENAMES.indexOf(p);
-        this.pitchCenter = number == -1 ? 0 : number;
+        this.pitchCenter = number === -1 ? 0 : number;
     };
 
     /**
@@ -515,7 +515,7 @@ function SampleWidget() {
             if (this.isMoving) {
                 this.pause();
             } else {
-                if (!(this.sampleName == "")) {
+                if (!(this.sampleName === "")) {
                     this.resume();
                 }
                 this._playReferencePitch();
@@ -1398,7 +1398,7 @@ function SampleWidget() {
      */
     this._addSample = function () {
         for (let i = 0; i < CUSTOMSAMPLES.length; i++) {
-            if (CUSTOMSAMPLES[i][0] == this.sampleName) {
+            if (CUSTOMSAMPLES[i][0] === this.sampleName) {
                 // Update existing sample with new data and cent adjustment
                 CUSTOMSAMPLES[i] = [
                     this.sampleName,
@@ -1435,13 +1435,13 @@ function SampleWidget() {
         const sol = this.samplePitch;
 
         let lev;
-        if (sol.indexOf(SHARP) != -1) {
+        if (sol.indexOf(SHARP) !== -1) {
             lev = 1;
-        } else if (sol.indexOf(FLAT) != -1) {
+        } else if (sol.indexOf(FLAT) !== -1) {
             lev = -1;
-        } else if (sol.indexOf(DOUBLEFLAT) != -1) {
+        } else if (sol.indexOf(DOUBLEFLAT) !== -1) {
             lev = -2;
-        } else if (sol.indexOf(DOUBLESHARP) != -1) {
+        } else if (sol.indexOf(DOUBLESHARP) !== -1) {
             lev = 2;
         } else {
             lev = 0;
@@ -1483,7 +1483,7 @@ function SampleWidget() {
      * @returns {void}
      */
     this.setTimbre = function () {
-        if (this.sampleName != null && this.sampleName != "") {
+        if (this.sampleName !== null && this.sampleName !== "") {
             this.originalSampleName = this.sampleName + "_original";
             const sampleArray = [this.originalSampleName, this.sampleData, "la", 4];
             Singer.ToneActions.setTimbre(sampleArray, 0, this.timbreBlock);
@@ -1526,7 +1526,7 @@ function SampleWidget() {
      * @returns {void}
      */
     this._playSample = function () {
-        if (this.sampleName != null && this.sampleName != "") {
+        if (this.sampleName !== null && this.sampleName !== "") {
             this.reconnectSynthsToAnalyser();
 
             // Store the current note object for the cent adjustment
@@ -1946,7 +1946,7 @@ function SampleWidget() {
                 let oscText;
                 if (turtleIdx >= 0) {
                     //.TRANS: The sound sample that the user uploads.
-                    oscText = this.sampleName != "" ? this.sampleName : _("sample");
+                    oscText = this.sampleName !== "" ? this.sampleName : _("sample");
                 }
                 canvasCtx.fillStyle = "#000000";
                 //.TRANS: The reference tone is a sound used for comparison.

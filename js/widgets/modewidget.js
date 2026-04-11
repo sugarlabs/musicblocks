@@ -867,13 +867,13 @@ class ModeWidget {
             if (JSON.stringify(MUSICALMODES[mode]) === currentMode) {
                 // Update the value of the modename block inside of
                 // the mode widget block.
-                if (this._modeBlock != null) {
+                if (this._modeBlock !== null) {
                     for (const i in this.blocks.blockList) {
-                        if (this.blocks.blockList[i].name == "modename") {
+                        if (this.blocks.blockList[i].name === "modename") {
                             this.blocks.blockList[i].value = mode;
                             this.blocks.blockList[i].text.text = _(mode);
                             this.blocks.blockList[i].updateCache();
-                        } else if (this.blocks.blockList[i].name == "notename") {
+                        } else if (this.blocks.blockList[i].name === "notename") {
                             this.blocks.blockList[i].value = currentKey;
                             this.blocks.blockList[i].text.text = _(currentKey);
                         }
@@ -1184,7 +1184,7 @@ class ModeWidget {
         // If a noteWheel sector is selected, hide it.
         const __clearNote = () => {
             const i = this._noteWheel.selectedNavItemIndex;
-            if (i == 0) {
+            if (i === 0) {
                 return; // Never hide the first note.
             }
 

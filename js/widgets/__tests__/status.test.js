@@ -19,7 +19,7 @@ global.MATRIXBUTTONHEIGHT = 40;
 global.MATRIXSOLFEHEIGHT = 30;
 
 global.rationalToFraction = jest.fn().mockReturnValue([4, 1]);
-global.mixedNumber = jest.fn().mockImplementation(val => (val != null ? val.toString() : ""));
+global.mixedNumber = jest.fn().mockImplementation(val => (val !== null ? val.toString() : ""));
 global.toFixed2 = jest.fn().mockImplementation(val => val.toFixed(2));
 
 global.platformColor = {
@@ -29,9 +29,11 @@ global.platformColor = {
 const createMockElement = tagName => ({
     tagName,
     style: {},
+    append: jest.fn(),
+    innerHTML: "",
+    textContent: "",
     appendChild: jest.fn(),
-    append: jest.fn(), appendChild: jest.fn(), setAttribute: jest.fn(), textContent: "",
-    innerHTML: "", textContent: "", appendChild: jest.fn(), setAttribute: jest.fn(),
+    setAttribute: jest.fn(),
     querySelectorAll: jest.fn().mockReturnValue([]),
     addEventListener: jest.fn(),
     className: "",
@@ -55,7 +57,7 @@ const createMockWidgetWindow = () => ({
     clear: jest.fn(),
     show: jest.fn(),
     getWidgetBody: jest.fn().mockReturnValue({
-        append: jest.fn(), appendChild: jest.fn(), setAttribute: jest.fn(), textContent: "",
+        append: jest.fn()
     }),
     sendToCenter: jest.fn(),
     destroy: jest.fn(),

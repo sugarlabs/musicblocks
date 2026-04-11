@@ -510,8 +510,8 @@ class PhraseMaker {
             // Depending on the row, we choose a different background color.
             if (this.rowLabels[i] === "print") break;
             else if (
-                PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[i]) != -1 ||
-                PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) != -1
+                PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1 ||
+                PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1
             ) {
                 cellColor = this.platformColor.graphicsLabelBackground;
             } else {
@@ -537,7 +537,7 @@ class PhraseMaker {
             this._headcols[i] = cell;
 
             if (this.rowLabels[i] === "print") break;
-            else if (drumName != null) {
+            else if (drumName !== null) {
                 cell.textContent = "\u00A0\u00A0";
                 const img = document.createElement("img");
                 img.src = this._deps.getDrumIcon(drumName);
@@ -635,7 +635,7 @@ class PhraseMaker {
             this._labelcols[i] = cell;
 
             if (this.rowLabels[i] === "print") break;
-            else if (drumName != null) {
+            else if (drumName !== null) {
                 cell.textContent = this._(drumName);
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
                 cell.setAttribute("alt", i + "__" + "drumblocks");
@@ -2109,7 +2109,7 @@ class PhraseMaker {
             const noteName = this.rowLabels[index];
             const w = window.innerWidth;
             const iconSize = PhraseMaker.ICONSIZE * (w / 1200);
-            if (drumName != null) {
+            if (drumName !== null) {
                 cell.textContent = "\u00A0\u00A0";
                 const img = document.createElement("img");
                 img.src = this._deps.getDrumIcon(drumName);
@@ -2137,7 +2137,7 @@ class PhraseMaker {
             }
 
             cell = this._labelcols[index];
-            if (drumName != null) {
+            if (drumName !== null) {
                 cell.textContent = this._(drumName);
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
             } else if (
@@ -2297,7 +2297,7 @@ class PhraseMaker {
             this.activity.blocks.blockList[newblk].connections.length - 1
         ] = c1;
 
-        if (c0 != null) {
+        if (c0 !== null) {
             for (let i = 0; i < this.activity.blocks.blockList[c0].connections.length; i++) {
                 if (this.activity.blocks.blockList[c0].connections[i] === oldblk) {
                     this.activity.blocks.blockList[c0].connections[i] = newblk;
@@ -2318,7 +2318,7 @@ class PhraseMaker {
             this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
         }
 
-        if (c1 != null) {
+        if (c1 !== null) {
             for (let i = 0; i < this.activity.blocks.blockList[c1].connections.length; i++) {
                 if (this.activity.blocks.blockList[c1].connections[i] === oldblk) {
                     this.activity.blocks.blockList[c1].connections[i] = newblk;
@@ -2433,7 +2433,7 @@ class PhraseMaker {
             }
 
             drumName = this._deps.getDrumName(this.rowLabels[i]);
-            if (drumName != null) {
+            if (drumName !== null) {
                 continue;
             } else if (PhraseMakerUtils.MATRIXGRAPHICS.includes(this.rowLabels[i])) {
                 continue;
@@ -2462,7 +2462,7 @@ class PhraseMaker {
         // Add the stuff we didn't sort.
         for (let i = 0; i < this.rowLabels.length; i++) {
             drumName = this._deps.getDrumName(this.rowLabels[i]);
-            if (drumName != null) {
+            if (drumName !== null) {
                 sortableList.push([
                     -1 * i,
                     this.rowLabels[i],
@@ -2531,7 +2531,7 @@ class PhraseMaker {
             } else if (i > 0 && obj[1] !== "hertz" && obj[1] === this._deps.last(this.rowLabels)) {
                 console.debug("skipping " + obj[1] + " " + this._deps.last(this.rowLabels));
                 this._sortedRowMap.push(this._deps.last(this._sortedRowMap));
-                if (oldColumnBlockMap[sortedList[lastObj][3]] != undefined) {
+                if (oldColumnBlockMap[sortedList[lastObj][3]] !== undefined) {
                     setTimeout(
                         this._removePitchBlock(oldColumnBlockMap[sortedList[lastObj][3]][0]),
                         500
@@ -2630,7 +2630,7 @@ class PhraseMaker {
             exportLabel = exportRow.insertCell();
 
             drumName = this._deps.getDrumName(this.rowLabels[i]);
-            if (drumName != null) {
+            if (drumName !== null) {
                 exportLabel.textContent = this._(drumName);
                 exportLabel.style.fontSize = Math.floor(this._cellScale * 14) + "px";
             } else if (this.rowLabels[i].slice(0, 4) === "http") {
@@ -2684,7 +2684,7 @@ class PhraseMaker {
                     exportCell.appendChild(child.cloneNode(true))
                 );
                 exportCell.width = col.width;
-                if (exportCell.width == "") {
+                if (exportCell.width === "") {
                     exportCell.width = col.style.width;
                 }
                 exportCell.colSpan = col.colSpan;
@@ -2711,7 +2711,7 @@ class PhraseMaker {
                     exportCell.appendChild(child.cloneNode(true))
                 );
                 exportCell.width = col.width;
-                if (exportCell.width == "") {
+                if (exportCell.width === "") {
                     exportCell.width = col.style.width;
                 }
                 exportCell.colSpan = col.colSpan;
@@ -2735,7 +2735,7 @@ class PhraseMaker {
                     exportCell.appendChild(child.cloneNode(true))
                 );
                 exportCell.width = col.width;
-                if (exportCell.width == "") {
+                if (exportCell.width === "") {
                     exportCell.width = col.style.width;
                 }
                 exportCell.colSpan = col.colSpan;
@@ -2760,7 +2760,7 @@ class PhraseMaker {
                 exportCell.appendChild(child.cloneNode(true))
             );
             exportCell.width = col.width;
-            if (exportCell.width == "") {
+            if (exportCell.width === "") {
                 exportCell.width = col.style.width;
             }
             exportCell.colSpan = col.colSpan;
@@ -2932,7 +2932,7 @@ class PhraseMaker {
             obj = this._deps.toFraction(numerator / (totalNoteInterval / tupletTimeFactor));
 
             if (obj[1] < 13) {
-                if (NOTESYMBOLS != undefined && obj[1] in NOTESYMBOLS) {
+                if (NOTESYMBOLS !== undefined && obj[1] in NOTESYMBOLS) {
                     cell.textContent = "";
                     cell.appendChild(document.createTextNode(obj[0]));
                     cell.appendChild(document.createElement("br"));
@@ -2963,7 +2963,7 @@ class PhraseMaker {
             // Add the notes to the matrix a la addNote.
             for (let j = 0; j < this.rowLabels.length; j++) {
                 // Depending on the row, we choose a different background color.
-                if (PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[j]) != -1) {
+                if (PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[j]) !== -1) {
                     cellColor = this.platformColor.graphicsBackground;
                 } else {
                     drumName = this._deps.getDrumName(this.rowLabels[j]);
@@ -3100,8 +3100,8 @@ class PhraseMaker {
             for (let i = 0; i < rowCount; i++) {
                 // Depending on the row, we choose a different background color.
                 if (
-                    PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[i]) != -1 ||
-                    PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) != -1
+                    PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1 ||
+                    PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1
                 ) {
                     cellColor = this.platformColor.graphicsBackground;
                 } else {
@@ -3230,7 +3230,7 @@ class PhraseMaker {
     blockConnection(len, bottomOfClamp) {
         const n = this.activity.blocks.blockList.length - len;
         let c;
-        if (bottomOfClamp == null) {
+        if (bottomOfClamp === null) {
             this.activity.blocks.blockList[this.blockNo].connections[2] = n;
             this.activity.blocks.blockList[n].connections[0] = this.blockNo;
         } else {
@@ -3644,7 +3644,7 @@ class PhraseMaker {
         let l;
         if (oldTupletValue < newTupletValue) {
             for (let i = 0; i <= this.activity.logo.tupletRhythms.length; i++) {
-                if (i == noteToDivide) {
+                if (i === noteToDivide) {
                     break;
                 }
                 for (let j = 0; j < this.activity.logo.tupletRhythms[i].length - 2; j++) {
@@ -3882,7 +3882,7 @@ class PhraseMaker {
             };
 
             for (let i = 0; i < mainTabsLabels.length; i++) {
-                if (i === 9 || i == 3) {
+                if (i === 9 || i === 3) {
                     continue;
                 }
 
@@ -4199,7 +4199,7 @@ class PhraseMaker {
                     row = this._rows[r];
                     if (row !== null && typeof row !== "undefined") {
                         cell = row.cells[c];
-                        if (cell != undefined) {
+                        if (cell !== undefined) {
                             cell.style.backgroundColor = "black";
                             this._setNoteCell(r, c, cell, false, null);
                         }
@@ -4314,8 +4314,8 @@ class PhraseMaker {
             graphicsBlock = false;
             graphicNote = note.split(": ");
             if (
-                PhraseMakerUtils.MATRIXGRAPHICS.indexOf(graphicNote[0]) != -1 &&
-                PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(graphicNote[0]) != -1
+                PhraseMakerUtils.MATRIXGRAPHICS.indexOf(graphicNote[0]) !== -1 &&
+                PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(graphicNote[0]) !== -1
             ) {
                 graphicsBlock = true;
             }
@@ -4331,7 +4331,7 @@ class PhraseMaker {
 
         if (obj.length === 1) {
             if (playNote) {
-                if (drumName != null) {
+                if (drumName !== null) {
                     this.activity.logo.synth.trigger(0, "C2", noteValue, drumName, null, null);
                 } else if (this.rowLabels[j] === "hertz") {
                     this.activity.logo.synth.trigger(
@@ -4505,7 +4505,7 @@ class PhraseMaker {
             // const x = idx + delta;
             let lastConnection, previousBlock, thisBlock;
 
-            if (note[0][0] === "R" || note[0][0] == undefined) {
+            if (note[0][0] === "R" || note[0][0] === undefined) {
                 // The last connection in last pitch block is null.
                 lastConnection = null;
                 if (delta === 5 || delta === 7) {
@@ -4564,7 +4564,7 @@ class PhraseMaker {
                         ]);
                         thisBlock += 2;
                         previousBlock = thisBlock - 2;
-                    } else if (drumName != null) {
+                    } else if (drumName !== null) {
                         // add a playdrum block
                         // The last connection in last pitch block is null.
                         if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
@@ -4820,7 +4820,7 @@ class PhraseMaker {
                                 0,
                                 [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]
                             ]);
-                            if (this.activity.logo.synth.inTemperament == "custom") {
+                            if (this.activity.logo.synth.inTemperament === "custom") {
                                 newStack.push([
                                     thisBlock + 1,
                                     [

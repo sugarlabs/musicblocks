@@ -56,14 +56,14 @@ class Tempo {
         this._firstClickTimes = null;
         this._intervals = [];
         this.isMoving = true;
-        if (this._intervalID != undefined && this._intervalID != null) {
+        if (this._intervalID !== undefined && this._intervalID !== null) {
             clearInterval(this._intervalID);
         }
 
         this._intervalID = null;
         this.activity.logo.synth.loadSynth(0, getDrumSynthName(Tempo.TEMPOSYNTH));
 
-        if (this._intervalID != null) {
+        if (this._intervalID !== null) {
             clearInterval(this._intervalID);
         }
 
@@ -73,7 +73,7 @@ class Tempo {
         widgetWindow.show();
 
         widgetWindow.onclose = () => {
-            if (this._intervalID != null) {
+            if (this._intervalID !== null) {
                 clearInterval(this._intervalID);
             }
             widgetWindow.destroy();
@@ -167,7 +167,7 @@ class Tempo {
             this.tempoCanvases[i].onclick = (id => () => {
                 const d = new Date();
                 let newBPM, BPMInput;
-                if (this._firstClickTime == null) {
+                if (this._firstClickTime === null) {
                     this._firstClickTime = d.getTime();
                 } else {
                     newBPM = parseInt((60 * 1000) / (d.getTime() - this._firstClickTime));
@@ -207,11 +207,11 @@ class Tempo {
     _updateBPM(i) {
         this._intervals[i] = (60 / this.BPMs[i]) * 1000;
 
-        if (this.BPMBlocks[i] == null) return;
+        if (this.BPMBlocks[i] === null) return;
 
         const bpmBlock = this.activity.blocks.blockList[this.BPMBlocks[i]];
         const blockNumber = bpmBlock.connections[1];
-        if (blockNumber != null) {
+        if (blockNumber !== null) {
             this.activity.blocks.blockList[blockNumber].value = parseFloat(this.BPMs[i]);
             this.activity.blocks.blockList[blockNumber].text.text = this.BPMs[i];
             this.activity.blocks.blockList[blockNumber].updateCache();
@@ -335,7 +335,7 @@ class Tempo {
             if (!tempoCanvas) continue;
 
             // We start the music clock as the first note is being played.
-            if (this._widgetFirstTimes[i] == null) {
+            if (this._widgetFirstTimes[i] === null) {
                 this._widgetFirstTimes[i] = d.getTime();
                 this._widgetNextTimes[i] = this._widgetFirstTimes[i] + this._intervals[i];
             }
