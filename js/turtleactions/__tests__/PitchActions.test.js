@@ -36,7 +36,6 @@ Object.assign(global, {
     frequencyToPitch: musicUtils.frequencyToPitch,
     pitchToFrequency: musicUtils.pitchToFrequency,
     numberToPitch: musicUtils.numberToPitch,
-    isCustomTemperament: musicUtils.isCustomTemperament,
     ACCIDENTALNAMES: musicUtils.ACCIDENTALNAMES,
     ACCIDENTALVALUES: musicUtils.ACCIDENTALVALUES,
     NOTESFLAT: musicUtils.NOTESFLAT,
@@ -65,6 +64,10 @@ describe("Tests for Singer.PitchActions setup", () => {
     let activity, turtle, blkId;
 
     beforeEach(() => {
+        // Add temperament globals only for this test
+        global.isCustomTemperament = musicUtils.isCustomTemperament;
+        global.TEMPERAMENT = musicUtils.TEMPERAMENT;
+
         blkId = 1;
         turtle = {
             singer: {
@@ -108,6 +111,12 @@ describe("Tests for Singer.PitchActions setup", () => {
         };
         setupPitchActions(activity);
         Singer.processPitch.mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        // Clean up globals to prevent test pollution
+        delete global.isCustomTemperament;
+        delete global.TEMPERAMENT;
     });
 
     test("playPitch → always calls processPitch", () => {

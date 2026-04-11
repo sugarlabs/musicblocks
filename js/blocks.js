@@ -9,10 +9,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/*
-   global
+/* eslint-disable no-redeclare */
 
-   BACKWARDCOMPATIBILIYDICT, COLLAPSIBLES, DEFAULTACCIDENTAL,
+/*
+   global docById, define,
+
+   BACKWARDCOMPATIBILITYDICT, COLLAPSIBLES, DEFAULTACCIDENTAL,
    DEFAULTBLOCKSCALE, DEFAULTDRUM, DEFAULTEFFECT, DEFAULTFILTER,
    DEFAULTFILTERTYPE, DEFAULTINTERVAL, DEFAULTINVERT, DEFAULTMODE,
    DEFAULTNOISE, DEFAULTOSCILLATORTYPE, DEFAULTTEMPERAMENT,
@@ -25,8 +27,10 @@
    getVoiceSynthName, i18nSolfege, last, MathUtility, mixedNumber,
    piemenuBlockContext, prepareMacroExports, ProtoBlock,
     setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments,
-    docById, define
+    docById, define, BlocksDependencies
 */
+
+/* global showZoomOverlay */
 
 /*
    Global locations
@@ -37,7 +41,7 @@
    - js/piemenus.js
         piemenuBlockContext
    - js/protoblocks.js
-        ProtoBlock 
+        ProtoBlock
    - js/utils/mathutils.js
         MathUtility
    - js/utils/utils.js
@@ -149,13 +153,85 @@ const ALLOWED_CONNECTIONS = new Set([
  */
 
 class Blocks {
-    constructor(activity) {
-        this.activity = activity;
-        this.storage = this.activity.storage;
-        this.trashcan = this.activity.trashcan;
-        this.turtles = this.activity.turtles;
-        this.boundary = this.activity.boundary;
-        this.macroDict = this.activity.macroDict;
+    constructor(activityOrDeps) {
+        // Build dependencies container
+        const isExplicitDeps =
+            activityOrDeps &&
+            activityOrDeps.storage &&
+            activityOrDeps.turtles &&
+            activityOrDeps.tick;
+
+        if (isExplicitDeps) {
+            this.deps = activityOrDeps;
+            // Build a shim for activity facade to maintain backward compatibility
+            // for any internal references that still use this.activity
+            const deps = this.deps;
+            this.activity = {
+                storage: deps.storage,
+                trashcan: deps.trashcan,
+                turtles: deps.turtles,
+                boundary: deps.boundary,
+                macroDict: deps.macroDict,
+                get palettes() {
+                    return deps.palettes;
+                },
+                get logo() {
+                    return deps.logo;
+                },
+                blocksContainer: deps.blocksContainer,
+                canvas: deps.canvas,
+                refreshCanvas: () => deps.refreshCanvas(),
+                errorMsg: (msg, blk) => deps.errorMsg(msg, blk),
+                setSelectionMode: selection => deps.setSelectionMode(selection),
+                stopLoadAnimation: () => deps.stopLoadAnimation(),
+                setHomeContainers: val => deps.setHomeContainers(val),
+                __tick: () => deps.tick(),
+                blocks: this
+            };
+        } else {
+            this.activity = activityOrDeps;
+            // Create a deps view over the activity object
+            const activity = this.activity;
+            this.deps = {
+                storage: activity.storage,
+                trashcan: activity.trashcan,
+                turtles: activity.turtles,
+                boundary: activity.boundary,
+                macroDict: activity.macroDict,
+                get palettes() {
+                    return activity.palettes;
+                },
+                get logo() {
+                    return activity.logo;
+                },
+                blocksContainer: activity.blocksContainer,
+                canvas: activity.canvas,
+                refreshCanvas: () => activity.refreshCanvas(),
+                errorMsg: (msg, blk) => activity.errorMsg(msg, blk),
+                setSelectionMode: selection => activity.setSelectionMode(selection),
+                stopLoadAnimation: () => activity.stopLoadAnimation(),
+                setHomeContainers: val => activity.setHomeContainers(val),
+                tick: () => activity.__tick()
+            };
+        }
+
+        this.storage = this.deps.storage;
+        this.trashcan = this.deps.trashcan;
+        this.turtles = this.deps.turtles;
+        this.boundary = this.deps.boundary;
+        this.macroDict = this.deps.macroDict;
+
+        // Use getters for dependencies that may be initialized after Blocks
+        Object.defineProperty(this, "palettes", {
+            get: () => this.deps.palettes,
+            configurable: true,
+            enumerable: true
+        });
+        Object.defineProperty(this, "logo", {
+            get: () => this.deps.logo,
+            configurable: true,
+            enumerable: true
+        });
 
         /** Did the user right click? */
         this.stageClick = false;
@@ -230,6 +306,17 @@ class Blocks {
         this._homeButtonContainers = [];
         this.blockScale = DEFAULTBLOCKSCALE;
 
+        /**
+         * Deferred checkBounds batching state.
+         * When _deferCheckBoundsCount > 0, checkBounds calls are suppressed
+         * and _checkBoundsPending is set to true. When the count returns to 0,
+         * a single checkBounds call is made if any were pending.
+         * This eliminates O(N×M) overhead where N = blocks in stack,
+         * M = total blocks, during recursive layout operations like adjustDocks.
+         */
+        this._deferCheckBoundsCount = 0;
+        this._checkBoundsPending = false;
+
         /** We need to know if we are processing a copy or save stack command. */
         this.inLongPress = false;
         this.customTemperamentDefined = false;
@@ -288,6 +375,7 @@ class Blocks {
             let palette;
             /** Regenerate all of the artwork at the new scale. */
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 block.resize(scale);
             }
 
@@ -314,6 +402,9 @@ class Blocks {
             /** Force a refresh. */
             await delayExecution(100);
             this.activity.refreshCanvas();
+
+            //Show zoom percentage
+            showZoomOverlay(scale);
         };
 
         /**
@@ -412,6 +503,7 @@ class Blocks {
         this.bottomMostBlock = () => {
             let maxy = -1000;
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 if (block.container.y > maxy) {
                     maxy = block.container.y;
                 }
@@ -905,14 +997,47 @@ class Blocks {
         };
 
         /**
+         * Begin deferring checkBounds calls. Supports nesting.
+         * Call _endDeferCheckBounds when the batch operation is complete.
+         * @private
+         * @returns {void}
+         */
+        this._beginDeferCheckBounds = () => {
+            this._deferCheckBoundsCount++;
+        };
+
+        /**
+         * End deferring checkBounds calls. Runs a single checkBounds
+         * if any were suppressed during the deferred window.
+         * @private
+         * @returns {void}
+         */
+        this._endDeferCheckBounds = () => {
+            if (this._deferCheckBoundsCount > 0) {
+                this._deferCheckBoundsCount--;
+            }
+
+            if (this._deferCheckBoundsCount === 0 && this._checkBoundsPending) {
+                this._checkBoundsPending = false;
+                this.checkBounds();
+            }
+        };
+
+        /**
          * Given a block, adjust the dock position of all its connections.
+         * Uses deferred checkBounds to avoid O(N×M) overhead.
          * @param - blk - block
          * @param - resetLoopCounter (to prevent infinite loops in the
-                                      case the connections are broken).
+                                       case the connections are broken).
          * @public
          * @returns {void}
          */
         this.adjustDocks = (blk, resetLoopCounter) => {
+            const isOuterCall = this._deferCheckBoundsCount === 0;
+            if (isOuterCall) {
+                this._beginDeferCheckBounds();
+            }
+
             const myBlock = this.blockList[blk];
 
             /** For when we come in from makeBlock */
@@ -926,21 +1051,25 @@ class Blocks {
              */
             if (myBlock == null) {
                 console.debug("Saw a null block: " + blk);
+                if (isOuterCall) this._endDeferCheckBounds();
                 return;
             }
 
             if (myBlock.connections == null) {
                 console.debug("Saw a block with null connections: " + blk);
+                if (isOuterCall) this._endDeferCheckBounds();
                 return;
             }
 
             if (myBlock.connections.length === 0) {
                 console.debug("Saw a block with [] connections: " + blk);
+                if (isOuterCall) this._endDeferCheckBounds();
                 return;
             }
 
             /** Value blocks only have one dock. */
             if (myBlock.docks.length === 1) {
+                if (isOuterCall) this._endDeferCheckBounds();
                 return;
             }
 
@@ -949,6 +1078,7 @@ class Blocks {
                 console.debug(
                     "Infinite loop encountered while adjusting docks: " + blk + " " + this.blockList
                 );
+                if (isOuterCall) this._endDeferCheckBounds();
                 return;
             }
 
@@ -1051,6 +1181,10 @@ class Blocks {
                     /** Recurse on connected blocks. */
                     this.adjustDocks(cblk, true);
                 }
+            }
+
+            if (isOuterCall) {
+                this._endDeferCheckBounds();
             }
         };
 
@@ -1416,9 +1550,6 @@ class Blocks {
 
             let block = thisBlockobj;
             while (block?.name == "vspace") {
-                if (block?.name != "vspace") {
-                    break;
-                }
                 block = this.blockList[block.connections[0]];
                 if (block?.name == "newnote") {
                     return;
@@ -2086,6 +2217,10 @@ class Blocks {
                             continue;
                         }
 
+                        if (this.blockList[b].trash) {
+                            continue;
+                        }
+
                         if (this.blockList[b].name === "action") {
                             if (this.blockList[b].connections[1] != null) {
                                 if (
@@ -2115,7 +2250,29 @@ class Blocks {
                 }
 
                 this.adjustDocks(newBlock, true);
-                /** TODO: some graphical feedback re new connection? */
+
+                // Graphical feedback for new connection
+                this.findDragGroup(thisBlock);
+                const blocksToHighlight = [...this.dragGroup];
+                if (this.blockList[newBlock]) {
+                    blocksToHighlight.push(newBlock);
+                }
+
+                blocksToHighlight.forEach(b => {
+                    if (this.blockList[b]) {
+                        this.blockList[b].highlight();
+                    }
+                });
+                this.activity.refreshCanvas();
+
+                setTimeout(() => {
+                    blocksToHighlight.forEach(b => {
+                        if (this.blockList[b]) {
+                            this.blockList[b].unhighlight();
+                        }
+                    });
+                    this.activity.refreshCanvas();
+                }, 500);
 
                 /** Check if top block is one of the widget blocks. */
                 let lockInit = false;
@@ -2253,9 +2410,12 @@ class Blocks {
          * @returns {void}
          */
         this.updateBlockPositions = () => {
+            this._beginDeferCheckBounds();
             for (const [blk, block] of this.blockList.entries()) {
+                if (block.trash) continue;
                 this._moveBlock(blk, block.container.x, block.container.y);
             }
+            this._endDeferCheckBounds();
         };
 
         /**
@@ -2267,6 +2427,7 @@ class Blocks {
             this._adjustTheseStacks = [];
 
             for (const [blk, myBlock] of this.blockList.entries()) {
+                if (myBlock.trash) continue;
                 if (myBlock.connections[0] == null) {
                     this._adjustTheseStacks.push(blk);
                 }
@@ -2284,11 +2445,18 @@ class Blocks {
          * @public
          * @returns {void}
          */
+        let checkBoundsCount = 0;
+        let totalCheckBoundsTime = 0;
+        let maxCheckBoundsTime = 0;
+        let lastCheckBoundsReport = performance.now();
+
         this.checkBounds = () => {
             if (this._deferCheckBounds) return;
+            const start = window.__ENABLE_REFRESH_PROFILING__ ? performance.now() : 0;
 
             let onScreen = true;
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 if (block.connections[0] == null) {
                     if (block.offScreen(this.boundary)) {
                         this.activity.setHomeContainers(true);
@@ -2303,6 +2471,27 @@ class Blocks {
             if (onScreen) {
                 this.activity.setHomeContainers(false);
                 this.boundary.hide();
+            }
+
+            if (start > 0) {
+                const duration = performance.now() - start;
+                checkBoundsCount++;
+                totalCheckBoundsTime += duration;
+                maxCheckBoundsTime = Math.max(maxCheckBoundsTime, duration);
+
+                if (checkBoundsCount % 25 === 0) {
+                    const now = performance.now();
+                    const cps = (25 / (now - lastCheckBoundsReport)) * 1000;
+                    console.log(
+                        `checkBounds | Avg: ${(totalCheckBoundsTime / checkBoundsCount).toFixed(
+                            2
+                        )}ms | Max: ${maxCheckBoundsTime.toFixed(2)}ms | Rate: ${cps.toFixed(
+                            1
+                        )} calls/sec`
+                    );
+                    maxCheckBoundsTime = 0;
+                    lastCheckBoundsReport = now;
+                }
             }
         };
 
@@ -2348,7 +2537,11 @@ class Blocks {
                 myBlock.container.x = Math.floor(x + 0.5);
                 myBlock.container.y = Math.floor(y + 0.5);
 
-                this.checkBounds();
+                if (this._deferCheckBoundsCount > 0) {
+                    this._checkBoundsPending = true;
+                } else {
+                    this.checkBounds();
+                }
             } else {
                 console.debug("No container yet for block " + myBlock.name);
             }
@@ -2370,7 +2563,11 @@ class Blocks {
                 myBlock.container.x += dx;
                 myBlock.container.y += dy;
 
-                this.checkBounds();
+                if (this._deferCheckBoundsCount > 0) {
+                    this._checkBoundsPending = true;
+                } else {
+                    this.checkBounds();
+                }
             } else {
                 console.debug("No container yet for block " + myBlock.name);
             }
@@ -2407,9 +2604,11 @@ class Blocks {
         this.moveStackRelative = (blk, dx, dy) => {
             this.findDragGroup(blk);
             if (this.dragGroup.length > 0) {
+                this._beginDeferCheckBounds();
                 for (let b = 0; b < this.dragGroup.length; b++) {
                     this.moveBlockRelative(this.dragGroup[b], dx, dy);
                 }
+                this._endDeferCheckBounds();
             }
         };
 
@@ -2428,6 +2627,7 @@ class Blocks {
             if (this._topBlockCache == null) {
                 this._topBlockCache = new Map();
                 for (let i = 0; i < this.blockList.length; i++) {
+                    if (this.blockList[i].trash) continue;
                     this._topBlockCache.set(i, this.findTopBlock(i));
                 }
             }
@@ -2435,14 +2635,14 @@ class Blocks {
             const blkIdx = this.blockList.indexOf(blk);
             const excludeTop = blkIdx >= 0 ? this._topBlockCache.get(blkIdx) : -1;
 
+            this._beginDeferCheckBounds();
             for (let i = 0; i < this.blockList.length; i++) {
+                if (this.blockList[i].trash) continue;
                 if (this._topBlockCache.get(i) !== excludeTop) {
                     this.moveBlockRelativeBatched(i, dx, dy);
                 }
             }
-
-            // Single deferred bounds check instead of one per block
-            this.scheduleCheckBounds();
+            this._endDeferCheckBounds();
         };
 
         /**
@@ -2681,7 +2881,6 @@ class Blocks {
                 topBlockLoop += 1;
                 if (topBlockLoop > 2 * this.blockList.length) {
                     /** Could happen if the block data is malformed. */
-
                     console.debug("infinite loop finding topBlock?");
                     if (myBlock.garbage) {
                         console.debug(myBlock.blockIndex + " " + myBlock.name);
@@ -2837,6 +3036,7 @@ class Blocks {
         this.findStacks = () => {
             this.stackList = [];
             for (let i = 0; i < this.blockList.length; i++) {
+                if (this.blockList[i].trash) continue;
                 if (this.blockList[i].connections[0] == null) {
                     this.stackList.push(i);
                 }
@@ -2867,6 +3067,7 @@ class Blocks {
         this._findTwoArgs = () => {
             this._expandablesList = [];
             for (let i = 0; i < this.blockList.length; i++) {
+                if (this.blockList[i].trash) continue;
                 if (this.blockList[i].isArgBlock() && this.blockList[i].isExpandableBlock()) {
                     this._expandablesList.push(i);
                 } else if (this.blockList[i].isTwoArgBlock()) {
@@ -2882,6 +3083,7 @@ class Blocks {
          */
         this._searchForArgFlow = () => {
             for (const [blk, block] of this.blockList.entries()) {
+                if (block.trash) continue;
                 if (block.isArgFlowClampBlock()) {
                     this._searchCounter = 0;
                     this._searchForExpandables(blk);
@@ -2979,6 +3181,7 @@ class Blocks {
          */
         this.changeDisabledStatus = (name, flag) => {
             for (const myBlock of this.blockList) {
+                if (myBlock.trash) continue;
                 if (myBlock.name === name) {
                     myBlock.protoblock.disabled = flag;
                     myBlock.regenerateArtwork(false);
@@ -2992,7 +3195,8 @@ class Blocks {
          * @returns {void}
          */
         this.unhighlightAll = () => {
-            for (const [blk] of this.blockList.entries()) {
+            for (const [blk, block] of this.blockList.entries()) {
+                if (block.trash) continue;
                 this.unhighlight(blk);
             }
         };
@@ -3061,6 +3265,7 @@ class Blocks {
          */
         this.show = () => {
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 block.show();
             }
             this.visible = true;
@@ -3840,6 +4045,7 @@ class Blocks {
          */
         this._findDrumURLs = () => {
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 if (block.name === "text" || block.name === "string") {
                     const c = block.connections[0];
                     if (
@@ -3871,6 +4077,7 @@ class Blocks {
             // Collect blocks to update for batched cache update
             const blocksToUpdate = [];
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 if (block.name === "text") {
                     const c = block.connections[0];
                     if (c != null && this.blockList[c].name === "box") {
@@ -3912,6 +4119,7 @@ class Blocks {
             // Collect blocks to update for batched cache update
             const blocksToUpdate = [];
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 if (block.name === "text") {
                     const c = block.connections[0];
                     if (c != null && this.blockList[c].name === "storein") {
@@ -3966,6 +4174,7 @@ class Blocks {
             // Collect blocks to update for batched cache update
             const blocksToUpdate = [];
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 if (block.name === "storein2") {
                     if (block.privateData === oldName) {
                         block.privateData = newName;
@@ -4011,6 +4220,7 @@ class Blocks {
             // Collect blocks to update for batched cache update
             const blocksToUpdate = [];
             for (const block of this.blockList) {
+                if (block.trash) continue;
                 if (block.name === "namedbox") {
                     if (block.privateData === oldName) {
                         block.privateData = newName;
@@ -4062,6 +4272,9 @@ class Blocks {
                 }
 
                 const myBlock = this.blockList[blk];
+                if (myBlock.trash) {
+                    continue;
+                }
                 const blkParent = this.blockList[myBlock.connections[0]];
                 if (blkParent == null) {
                     continue;
@@ -4116,6 +4329,10 @@ class Blocks {
 
             /** Update the blocks, do->oldName should be do->newName */
             for (const blk in this.blockList) {
+                if (this.blockList[blk].trash) {
+                    continue;
+                }
+
                 if (
                     ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].includes(
                         this.blockList[blk].name
@@ -5021,6 +5238,7 @@ class Blocks {
 
             const c2v = this.blockList[c2].value;
             for (let i = 0; i < this.blockList.length; i++) {
+                if (this.blockList[i].trash) continue;
                 if (["setbpm3", "setmasterbpm2"].includes(this.blockList[i].name)) {
                     const bn = this.blockList[i].connections[1];
                     if (bn === null || this.blockList[bn].name !== "number") {
@@ -5115,17 +5333,14 @@ class Blocks {
 
             /** Reposition the paste location relative to the stage position. */
             if (this.selectedBlocksObj != null) {
-                if (docById("helpfulWheelDiv").style.display !== "none") {
+                const helpfulWheelDiv = docById("helpfulWheelDiv");
+                if (helpfulWheelDiv.style.display !== "none") {
                     this.selectedBlocksObj[0][2] =
-                        docById("helpfulWheelDiv").offsetLeft +
-                        240 -
-                        this.activity.blocksContainer.x;
+                        helpfulWheelDiv.offsetLeft + 240 - this.activity.blocksContainer.x;
                     this.selectedBlocksObj[0][3] =
-                        docById("helpfulWheelDiv").offsetTop +
-                        130 -
-                        this.activity.blocksContainer.y;
+                        helpfulWheelDiv.offsetTop + 130 - this.activity.blocksContainer.y;
 
-                    docById("helpfulWheelDiv").style.display = "none";
+                    helpfulWheelDiv.style.display = "none";
                 } else {
                     this.selectedBlocksObj[0][2] =
                         175 - this.activity.blocksContainer.x + this.pasteDx;
@@ -5911,8 +6126,8 @@ class Blocks {
                     }
                 }
 
-                if (name in BACKWARDCOMPATIBILIYDICT) {
-                    name = BACKWARDCOMPATIBILIYDICT[name];
+                if (name in BACKWARDCOMPATIBILITYDICT) {
+                    name = BACKWARDCOMPATIBILITYDICT[name];
                 }
 
                 const that = this;
@@ -6912,6 +7127,7 @@ class Blocks {
                 /** Look for any "orphan" action blocks. */
                 for (const blk in this.blockList) {
                     const thisBlock = this.blockList[blk];
+                    if (thisBlock.trash) continue;
 
                     /** We are only interested in do and nameddo blocks. */
                     if (
@@ -7141,7 +7357,9 @@ class Blocks {
                         continue;
                     }
                     this.blockList[blk].text.text = "";
-                    this.blockList[blk].container.updateCache();
+                    if (this.blockList[blk].container.cacheCanvas != null) {
+                        this.blockList[blk].container.updateCache();
+                    }
                 }
             }
             this.activity.refreshCanvas();
@@ -7165,7 +7383,13 @@ class Blocks {
                     value = this.blockList[blk].protoblock.updateParameter(logo, turtle, blk);
                 } else {
                     if (name in logo.evalParameterDict) {
-                        eval(logo.evalParameterDict[name]);
+                        value = logo.safePluginExecute(
+                            logo.evalParameterDict[name],
+                            logo,
+                            turtle,
+                            blk,
+                            name
+                        );
                     } else {
                         return;
                     }
@@ -7192,7 +7416,6 @@ class Blocks {
                 }
 
                 this.blockList[blk].container.updateCache();
-                this.activity.refreshCanvas();
             }
         };
 
@@ -7210,7 +7433,13 @@ class Blocks {
                 this.blockList[blk].protoblock.setter(logo, value, turtle, blk);
             } else {
                 if (this.blockList[blk].name in logo.evalSetterDict) {
-                    eval(logo.evalSetterDict[this.blockList[blk].name]);
+                    logo.safePluginExecute(
+                        logo.evalSetterDict[this.blockList[blk].name],
+                        logo,
+                        turtle,
+                        blk,
+                        value
+                    );
                 } else {
                     throw new Error();
                 }

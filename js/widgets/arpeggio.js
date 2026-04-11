@@ -470,7 +470,7 @@ class Arpeggio {
 
                 cell = cellRow.cells[col];
 
-                if (cell != undefined) {
+                if (cell !== undefined) {
                     cell.style.backgroundColor = "black";
                     this.__playCell(row, col, cell, false);
                 }

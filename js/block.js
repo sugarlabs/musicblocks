@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014-21 Walter Bender
+// Copyright (c) 2014-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -10,11 +10,10 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 //
 
-/*
-   global
+/* global
 
-    ACCIDENTALLABELS, ACCIDENTALNAMES, addTemperamentToDictionary,
-   blockBlocks, COLLAPSEBUTTON, COLLAPSETEXTX, COLLAPSETEXTY,
+   addTemperamentToDictionary, base64Encode,
+   ACCIDENTALLABELS, ACCIDENTALNAMES, blockBlocks, COLLAPSEBUTTON, COLLAPSETEXTX, COLLAPSETEXTY,
    createjs, DEFAULTACCIDENTAL, DEFAULTDRUM, DEFAULTEFFECT,
    DEFAULTFILTERTYPE, DEFAULTINTERVAL, DEFAULTINVERT, DEFAULTMODE,
    DEFAULTNOISE, DEFAULTOSCILLATORTYPE, DEFAULTTEMPERAMENT,
@@ -31,7 +30,7 @@
    piemenuBoolean, piemenuColor, piemenuCustomNotes, piemenuIntervals,
    piemenuModes, piemenuNoteValue, piemenuNumber, piemenuPitches,
    piemenuVoices, piemenuChords, platformColor, ProtoBlock, RSYMBOLS,
-    safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
+   retryWithBackoff, safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
    splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
     topBlock, updateTemperaments, VALUETEXTX, DEFAULTCHORD, base64Encode,
    VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_
@@ -231,7 +230,7 @@ const _blockMakeBitmap = (data, callback, args) => {
         callback(bitmap, args);
     };
 
-    img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
+    img.src = "data:image/svg+xml;base64," + window.btoa(window.base64Encode(data));
 };
 
 // Optimization: Cache static DOM elements to avoid repetitive querySelector/getElementById calls
@@ -344,6 +343,136 @@ class Block {
         // Mouse position in events
         this.original = { x: 0, y: 0 };
         this.offset = { x: 0, y: 0 };
+
+        // Track temporary drag scaling used when hovering over trash.
+        this._trashHoverScaled = false;
+        this._trashHoverGroupState = null;
+        this._dragPointerDown = false;
+    }
+
+    /**
+     * Animate the current drag group scale while hovering over trash.
+     * @param {boolean} isOverTrash
+     * @param {number} dx
+     * @param {number} dy
+     * @param {boolean} immediate
+     * @returns {void}
+     */
+    _setDragGroupTrashHoverScale(isOverTrash, dx = 0, dy = 0, immediate = false) {
+        const thisBlock = this.blockIndex;
+        const duration = immediate ? 0 : 140;
+        const shrinkRatio = 0.5;
+        const epsilon = 0.001;
+
+        const getGroupOrigin = positions => {
+            let originX = Infinity;
+            let originY = Infinity;
+            positions.forEach(pos => {
+                originX = Math.min(originX, pos.x);
+                originY = Math.min(originY, pos.y);
+            });
+            return { x: originX, y: originY };
+        };
+
+        // Initialize only when first entering trash; otherwise normal dragging should stay untouched.
+        if (isOverTrash && !this._trashHoverGroupState) {
+            const activeDragGroup =
+                this.blocks.dragGroup && this.blocks.dragGroup.length > 0
+                    ? [...this.blocks.dragGroup]
+                    : [thisBlock];
+            const blockStates = [];
+            activeDragGroup.forEach(blockId => {
+                const block = this.blocks.blockList[blockId];
+                if (!block || !block.container) {
+                    return;
+                }
+                blockStates.push({
+                    id: blockId,
+                    x: block.container.x,
+                    y: block.container.y,
+                    scaleX: block.container.scaleX ?? 1,
+                    scaleY: block.container.scaleY ?? 1
+                });
+            });
+
+            if (blockStates.length === 0) {
+                return;
+            }
+
+            const origin = getGroupOrigin(blockStates);
+            this._trashHoverGroupState = {
+                ratio: shrinkRatio,
+                originX: origin.x,
+                originY: origin.y,
+                blocks: blockStates
+            };
+        }
+
+        // Keep logical (unscaled) baseline aligned with user dragging while hover-state exists.
+        if (this._trashHoverGroupState) {
+            this._trashHoverGroupState.originX += dx;
+            this._trashHoverGroupState.originY += dy;
+            this._trashHoverGroupState.blocks.forEach(entry => {
+                entry.x += dx;
+                entry.y += dy;
+            });
+        }
+
+        if (!this._trashHoverGroupState) {
+            return;
+        }
+
+        const state = this._trashHoverGroupState;
+        state.ratio = shrinkRatio;
+        const blocksToApply = state.blocks;
+
+        for (let b = 0; b < blocksToApply.length; b++) {
+            const item = blocksToApply[b];
+            const blockId = item.id;
+            const block = this.blocks.blockList[blockId];
+            if (!block || !block.container) {
+                continue;
+            }
+
+            let targetScaleX;
+            let targetScaleY;
+            let targetX = block.container.x;
+            let targetY = block.container.y;
+
+            if (isOverTrash) {
+                targetScaleX = item.scaleX * state.ratio;
+                targetScaleY = item.scaleY * state.ratio;
+                targetX = state.originX + (item.x - state.originX) * state.ratio;
+                targetY = state.originY + (item.y - state.originY) * state.ratio;
+            } else {
+                targetScaleX = item.scaleX;
+                targetScaleY = item.scaleY;
+                targetX = item.x;
+                targetY = item.y;
+            }
+
+            if (
+                block._trashHoverScaled === isOverTrash &&
+                Math.abs((block.container.scaleX ?? 1) - targetScaleX) < epsilon &&
+                Math.abs((block.container.scaleY ?? 1) - targetScaleY) < epsilon &&
+                Math.abs(block.container.x - targetX) < epsilon &&
+                Math.abs(block.container.y - targetY) < epsilon
+            ) {
+                continue;
+            }
+
+            block._trashHoverScaled = isOverTrash;
+            createjs.Tween.get(block.container, { override: true }).to(
+                { x: targetX, y: targetY, scaleX: targetScaleX, scaleY: targetScaleY },
+                duration
+            );
+        }
+
+        if (!isOverTrash && immediate) {
+            this._trashHoverGroupState = null;
+        }
+
+        this.activity.refreshCanvas();
     }
 
     /**
@@ -356,42 +485,24 @@ class Block {
      */
     _createCache(callback, args) {
         const that = this;
-        return new Promise((resolve, reject) => {
-            let loopCount = 0;
-            const MAX_RETRIES = 20;
-            const INITIAL_DELAY = 50;
+        const MAX_RETRIES = 20;
+        const INITIAL_DELAY = 50;
 
-            const checkBounds = async counter => {
-                try {
-                    if (counter !== undefined) {
-                        loopCount = counter;
-                    }
-                    if (loopCount > MAX_RETRIES) {
-                        throw new Error("COULD NOT CREATE CACHE");
-                    }
-
-                    that.bounds = that.container.getBounds();
-
-                    if (that.bounds === null) {
-                        const delayTime = INITIAL_DELAY * Math.pow(2, loopCount);
-                        await delayExecution(delayTime);
-                        that.regenerateArtwork(true, []);
-                        checkBounds(loopCount + 1);
-                    } else {
-                        that.container.cache(
-                            that.bounds.x,
-                            that.bounds.y,
-                            that.bounds.width,
-                            that.bounds.height
-                        );
-                        callback(that, args);
-                        resolve();
-                    }
-                } catch (e) {
-                    reject(e);
-                }
-            };
-            checkBounds();
+        return retryWithBackoff({
+            check: () => {
+                that.bounds = that.container.getBounds();
+                return that.bounds;
+            },
+            onSuccess: bounds => {
+                that.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+                callback(that, args);
+            },
+            onRetry: () => {
+                that.regenerateArtwork(true, []);
+            },
+            maxRetries: MAX_RETRIES,
+            initialDelay: INITIAL_DELAY,
+            errorMessage: "COULD NOT CREATE CACHE"
         });
     }
 
@@ -403,43 +514,25 @@ class Block {
      */
     updateCache() {
         const that = this;
-        return new Promise((resolve, reject) => {
-            // If the container has no active bitmap cache (e.g., trashed
-            // blocks whose cache was freed), skip the update silently.
-            if (that.container && !that.container.bitmapCache) {
-                resolve();
-                return;
-            }
 
-            let loopCount = 0;
-            const MAX_RETRIES = 15;
-            const INITIAL_DELAY = 100;
+        // If the container has no active bitmap cache (e.g., trashed
+        // blocks whose cache was freed), skip the update silently.
+        if (that.container && !that.container.bitmapCache) {
+            return Promise.resolve();
+        }
 
-            const updateBounds = async counter => {
-                try {
-                    if (counter !== undefined) {
-                        loopCount = counter;
-                    }
+        const MAX_RETRIES = 15;
+        const INITIAL_DELAY = 100;
 
-                    if (loopCount > MAX_RETRIES) {
-                        throw new Error("COULD NOT UPDATE CACHE");
-                    }
-
-                    if (that.bounds === null) {
-                        const delayTime = INITIAL_DELAY * Math.pow(2, loopCount);
-                        await delayExecution(delayTime);
-                        await new Promise(resolve => setTimeout(resolve, delayTime));
-                        updateBounds(loopCount + 1);
-                    } else {
-                        that.container.updateCache();
-                        that.activity.refreshCanvas();
-                        resolve();
-                    }
-                } catch (e) {
-                    reject(e);
-                }
-            };
-            updateBounds();
+        return retryWithBackoff({
+            check: () => that.bounds !== null && that.container && that.container.bitmapCache,
+            onSuccess: () => {
+                that.container.updateCache();
+                that.activity.refreshCanvas();
+            },
+            maxRetries: MAX_RETRIES,
+            initialDelay: INITIAL_DELAY,
+            errorMessage: "COULD NOT UPDATE CACHE"
         });
     }
 
@@ -1016,19 +1109,19 @@ class Block {
      */
     regenerateArtwork(collapse) {
         // First we need to remove the old artwork.
-        if (this.bitmap != null) {
+        if (this.bitmap !== null) {
             this.container.removeChild(this.bitmap);
         }
 
-        if (this.highlightBitmap != null) {
+        if (this.highlightBitmap !== null) {
             this.container.removeChild(this.highlightBitmap);
         }
 
-        if (this.disconnectedBitmap != null) {
+        if (this.disconnectedBitmap !== null) {
             this.container.removeChild(this.disconnectedBitmap);
         }
 
-        if (this.disconnectedHighlightBitmap != null) {
+        if (this.disconnectedHighlightBitmap !== null) {
             this.container.removeChild(this.disconnectedHighlightBitmap);
         }
 
@@ -1039,8 +1132,30 @@ class Block {
             this.container.removeChild(this.highlightCollapseBlockBitmap);
         }
 
+        // Temporarily remove imageBitmap to prevent it from corrupting bounds during regeneration
+        let tempImageBitmap = null;
+        if (this.imageBitmap !== null) {
+            tempImageBitmap = this.imageBitmap;
+            this.container.removeChild(this.imageBitmap);
+            this.imageBitmap = null;
+        }
+
         // Then we generate new artwork.
         this.generateArtwork(false);
+
+        // Restore the imageBitmap after artwork generation
+        if (tempImageBitmap !== null) {
+            this.imageBitmap = tempImageBitmap;
+            this.container.addChild(this.imageBitmap);
+            this._positionMedia(
+                this.imageBitmap,
+                this.imageBitmap.image.width,
+                this.imageBitmap.image.height,
+                this.protoblock.scale
+            );
+            const zIndex = this.container.children.length - 1;
+            this.container.setChildIndex(this.imageBitmap, zIndex);
+        }
     }
 
     /**
@@ -1061,7 +1176,7 @@ class Block {
          * @param {object} that - Reference to the current object.
          */
         const __processHighlightBitmap = (bitmap, that) => {
-            if (that.highlightBitmap != null) {
+            if (that.highlightBitmap !== null) {
                 that.container.removeChild(that.highlightBitmap);
             }
 
@@ -1110,7 +1225,7 @@ class Block {
                         that.updateCache();
                     }
 
-                    if (that.postProcess != null) {
+                    if (that.postProcess !== null) {
                         that.postProcess(that.postProcessArg);
                         that.postProcess = null;
                     }
@@ -1126,7 +1241,7 @@ class Block {
          * @param {object} that - Reference to the current object.
          */
         const __processDisconnectedHighlightBitmap = (bitmap, that) => {
-            if (that.disconnectedHighlightBitmap != null) {
+            if (that.disconnectedHighlightBitmap !== null) {
                 that.container.removeChild(that.disconnectedHighlightBitmap);
             }
 
@@ -1166,7 +1281,7 @@ class Block {
          * @param {object} that - Reference to the current object.
          */
         const __processDisconnectedBitmap = (bitmap, that) => {
-            if (that.disconnectedBitmap != null) {
+            if (that.disconnectedBitmap !== null) {
                 that.container.removeChild(that.disconnectedBitmap);
             }
 
@@ -1209,7 +1324,7 @@ class Block {
          * @param {object} that - Reference to the current object.
          */
         const __processBitmap = (bitmap, that) => {
-            if (that.bitmap != null) {
+            if (that.bitmap !== null) {
                 that.container.removeChild(that.bitmap);
             }
 
@@ -1317,7 +1432,7 @@ class Block {
         let proto, obj, label, attr;
         // Value blocks get a modifiable text label.
         if (SPECIALINPUTS.includes(this.name)) {
-            if (this.value == null) {
+            if (this.value === null) {
                 switch (this.name) {
                     case "text":
                         this.value = "---";
@@ -1425,7 +1540,7 @@ class Block {
             } else if (this.name === "grid") {
                 label = _(this.value);
             } else {
-                if (this.value != null) {
+                if (this.value !== null) {
                     label = this.value.toString();
                 } else {
                     label = "???";
@@ -1482,7 +1597,7 @@ class Block {
             const postProcess = that => {
                 that.loadComplete = true;
 
-                if (that.postProcess != null) {
+                if (that.postProcess !== null) {
                     that.postProcess(that.postProcessArg);
                     that.postProcess = null;
                 }
@@ -1551,7 +1666,8 @@ class Block {
                 __finishCollapse(that);
             };
 
-            image.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBUTTON));
+            image.src =
+                "data:image/svg+xml;base64," + window.btoa(window.base64Encode(COLLAPSEBUTTON));
         };
 
         /**
@@ -1582,7 +1698,8 @@ class Block {
                 __processCollapseButton(that);
             };
 
-            image.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(EXPANDBUTTON));
+            image.src =
+                "data:image/svg+xml;base64," + window.btoa(window.base64Encode(EXPANDBUTTON));
         };
 
         /**
@@ -2198,9 +2315,7 @@ class Block {
                     fileChooser.value = "";
                 }
             };
-            if (that.name === "media") {
-                reader.readAsDataURL(fileChooser.files[0]);
-            } else if (that.name === "audiofile") {
+            if (that.name === "media" || that.name === "audiofile") {
                 reader.readAsDataURL(fileChooser.files[0]);
             } else {
                 reader.readAsText(fileChooser.files[0]);
@@ -2640,8 +2755,8 @@ class Block {
                 if (this.blocks.blockList[c2].name === "number") {
                     if (this.blocks.blockList[c1].name === "number") {
                         const degrees = DEGREES.split(" ");
-                        const i = this.blocks.blockList[c1].value - 1;
-                        if (i > 0 && i < degrees.length) {
+                        const i = this.blocks.blockList[c1].value;
+                        if (i >= 0 && i < degrees.length) {
                             return degrees[i] + " " + this.blocks.blockList[c2].value;
                         } else {
                             return (
@@ -2731,7 +2846,7 @@ class Block {
         }
 
         // Reposition the blocks below.
-        if (this.connections[3] != null) {
+        if (this.connections[3] !== null) {
             // The last connection is flow. The second to last
             // connection is child flow.  FIX ME: This will not work
             // if there is more than one arg, e.g. n > 4.
@@ -2823,21 +2938,22 @@ class Block {
      * @returns {void}
      */
     _positionMedia(bitmap, width, height, blockScale) {
-        if (width > height) {
-            bitmap.scaleX =
-                bitmap.scaleY =
-                bitmap.scale =
-                    ((MEDIASAFEAREA[2] / width) * blockScale) / 2;
-        } else {
-            bitmap.scaleX =
-                bitmap.scaleY =
-                bitmap.scale =
-                    ((MEDIASAFEAREA[3] / height) * blockScale) / 2;
-        }
+        // Use actual block dimensions instead of MEDIASAFEAREA to ensure image fits
+        // Account for padding (approximately 20% of block size for margins)
+        const maxWidth = this.width * 0.6; // Leave 40% for block chrome
+        const maxHeight = this.height * 0.6; // Leave 40% for block chrome
+
+        // Calculate scale to fit within both dimensions
+        const scaleX = maxWidth / width;
+        const scaleY = maxHeight / height;
+
+        // Use the minimum to ensure it fits in both dimensions
+        bitmap.scaleX = bitmap.scaleY = bitmap.scale = Math.min(scaleX, scaleY);
+
+        // Center the image within the block
         bitmap.x = ((MEDIASAFEAREA[0] - 10) * blockScale) / 2;
         bitmap.y = (MEDIASAFEAREA[1] * blockScale) / 2;
     }
-
     /**
      * Position the label for a collapsed block.
      * @private
@@ -3026,6 +3142,10 @@ class Block {
         this.container.on("mousedown", event => {
             docById("contextWheelDiv").style.display = "none";
 
+            // Reset any stale hover-scaling state from prior drags.
+            this._trashHoverGroupState = null;
+            this._dragPointerDown = true;
+
             // Track time for detecting long pause...
             that.blocks.mouseDownTime = new Date().getTime();
 
@@ -3058,10 +3178,13 @@ class Block {
 
             // And possibly the collapse button.
             if (that.collapseContainer != null) {
-                that.activity.blocksContainer.setChildIndex(
-                    that.collapseContainer,
-                    that.activity.blocksContainer.children.length - 1
-                );
+                // Ensure the blocksContainer still exisits.
+                if (that.activity.blocksContainer != null) {
+                    that.activity.blocksContainer.setChildIndex(
+                        that.collapseContainer,
+                        that.activity.blocksContainer.children.length - 1
+                    );
+                }
             }
 
             moved = false;
@@ -3179,13 +3302,13 @@ class Block {
                 }
             }
 
-            if (that.blocks.longPressTimeout != null) {
+            if (that.blocks.longPressTimeout !== null) {
                 clearTimeout(that.blocks.longPressTimeout);
                 that.blocks.longPressTimeout = null;
                 that.blocks.clearLongPress();
             }
 
-            if (!moved && that.label != null) {
+            if (!moved && that.label !== null) {
                 that.label.style.display = "none";
             }
 
@@ -3193,17 +3316,15 @@ class Block {
             that.blocks.moveBlockRelativeBatched(thisBlock, dx, dy);
 
             // If we are over the trash, warn the user.
-            if (
-                that.activity.trashcan.overTrashcan(
-                    event.stageX / that.activity.getStageScale(),
-                    event.stageY / that.activity.getStageScale()
-                )
-            ) {
+            const overTrash = that.activity.trashcan.overTrashcan(
+                event.stageX / that.activity.getStageScale(),
+                event.stageY / that.activity.getStageScale()
+            );
+            if (overTrash) {
                 that.activity.trashcan.startHighlightAnimation();
             } else {
                 that.activity.trashcan.stopHighlightAnimation();
             }
-
             if (that.isValueBlock() && that.name !== "media") {
                 // Ensure text is on top
                 that.container.setChildIndex(that.text, that.container.children.length - 1);
@@ -3212,7 +3333,7 @@ class Block {
             // Move connected blocks using the cached drag group
             // (computed once on mousedown, not every pressmove).
             const cachedGroup = that.blocks._cachedDragGroup;
-            if (cachedGroup != null && cachedGroup.length > 0) {
+            if (cachedGroup !== null && cachedGroup.length > 0) {
                 for (let b = 0; b < cachedGroup.length; b++) {
                     const blk = cachedGroup[b];
                     if (blk !== thisBlock) {
@@ -3232,8 +3353,11 @@ class Block {
                 }
             }
 
+            that._setDragGroupTrashHoverScale(overTrash, dx, dy);
+
             // Single deferred checkBounds + single canvas refresh per frame
             that.blocks.scheduleCheckBounds();
+            that._setDragGroupTrashHoverScale(overTrash, dx, dy);
             that.activity.refreshCanvas();
         });
 
@@ -3245,8 +3369,18 @@ class Block {
          * @param {Event} event - The mouseout event object.
          */
         this.container.on("mouseout", event => {
+            // Ignore transient mouseout while actively dragging.
+            if (that._dragPointerDown) {
+                if (that.blocks.longPressTimeout != null) {
+                    clearTimeout(that.blocks.longPressTimeout);
+                    that.blocks.longPressTimeout = null;
+                }
+                that.blocks.clearLongPress();
+                return;
+            }
+
             if (!that.blocks.getLongPressStatus()) {
-                that._mouseoutCallback(event, moved, haveClick, false);
+                that._mouseoutCallback(event, moved, haveClick, false, false);
             } else {
                 clearTimeout(that.blocks.longPressTimeout);
                 that.blocks.longPressTimeout = null;
@@ -3273,8 +3407,10 @@ class Block {
          * @param {Event} event - The pressup event object.
          */
         this.container.on("pressup", event => {
+            that._dragPointerDown = false;
+
             if (!that.blocks.getLongPressStatus()) {
-                that._mouseoutCallback(event, moved, haveClick, false);
+                that._mouseoutCallback(event, moved, haveClick, false, true);
             } else {
                 clearTimeout(that.blocks.longPressTimeout);
                 that.blocks.longPressTimeout = null;
@@ -3300,13 +3436,19 @@ class Block {
      * @param {boolean} moved - Indicates if the cursor moved.
      * @param {boolean} haveClick - Indicates if a click event occurred.
      * @param {boolean} hideDOM - Indicates whether to hide DOM elements.
+     * @param {boolean} dragEnded - Indicates whether this callback is from drag release.
      * Sets cursor style to default.
      * @returns {void}
      */
-    _mouseoutCallback(event, moved, haveClick, hideDOM) {
+    _mouseoutCallback(event, moved, haveClick, hideDOM, dragEnded = false) {
         const thisBlock = this.blockIndex;
         if (!this.activity.logo.runningLilypond) {
             document.body.style.cursor = "default";
+        }
+
+        // Restore drag scaling only when drag interaction actually ends.
+        if (dragEnded) {
+            this._setDragGroupTrashHoverScale(false, 0, 0, true);
         }
 
         // Always hide the trash when there is no block selected.
@@ -3314,13 +3456,13 @@ class Block {
             this.activity.trashcan.hide();
         }
 
-        if (this.blocks.longPressTimeout != null) {
+        if (this.blocks.longPressTimeout !== null) {
             clearTimeout(this.blocks.longPressTimeout);
             this.blocks.longPressTimeout = null;
             this.blocks.clearLongPress();
         }
 
-        if (moved) {
+        if (moved && dragEnded) {
             // Check if block is in the trash.
             if (
                 this.activity.trashcan.overTrashcan(
@@ -3457,7 +3599,10 @@ class Block {
             return false;
         }
 
-        if (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC1.length === 0) {
+        if (
+            (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC1?.length ?? 0) ===
+            0
+        ) {
             return false;
         }
 
@@ -3479,7 +3624,10 @@ class Block {
             return false;
         }
 
-        if (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC2.length === 0) {
+        if (
+            (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC2?.length ?? 0) ===
+            0
+        ) {
             return false;
         }
 
@@ -3501,7 +3649,10 @@ class Block {
             return false;
         }
 
-        if (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC3.length === 0) {
+        if (
+            (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC3?.length ?? 0) ===
+            0
+        ) {
             return false;
         }
 
@@ -3588,7 +3739,7 @@ class Block {
         }
 
         // A place in the DOM to put modifiable labels (textareas).
-        if (this.label != null) {
+        if (this.label !== null) {
             labelValue = this.label.value;
         } else {
             labelValue = this.value;
@@ -3667,7 +3818,11 @@ class Block {
                 const noteLabels = {};
                 const customLabels = [];
                 for (let i = 0; i < keys.length; i++) {
-                    noteLabels[keys[i]] = getTemperament(keys[i]);
+                    const temperament = getTemperament(keys[i]);
+                    // Only add valid temperaments to noteLabels
+                    if (temperament && typeof temperament === "object") {
+                        noteLabels[keys[i]] = temperament;
+                    }
                     if (isCustomTemperament(keys[i])) {
                         customLabels.push(keys[i]);
                     }
@@ -3679,10 +3834,21 @@ class Block {
                     selectedCustom = customLabels[0];
                 }
 
-                if (this.value != null) {
+                if (this.value !== null) {
                     selectedNote = this.value;
                 } else {
-                    selectedNote = getTemperament(selectedCustom)["0"][1];
+                    // Ensure we have a valid temperament before accessing its properties
+                    const selectedTemperament = getTemperament(selectedCustom);
+                    if (
+                        selectedTemperament &&
+                        selectedTemperament["0"] &&
+                        selectedTemperament["0"][1]
+                    ) {
+                        selectedNote = selectedTemperament["0"][1];
+                    } else {
+                        // Fallback to a default note
+                        selectedNote = "C";
+                    }
                 }
 
                 piemenuCustomNotes(this, noteLabels, customLabels, selectedCustom, selectedNote);
@@ -3697,7 +3863,7 @@ class Block {
             }
         } else if (this.name === "notename") {
             const NOTENOTES = ["B", "A", "G", "F", "E", "D", "C"];
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedNote = this.value[0];
                 if (this.value.length === 1) {
                     selectedAttr = "♮";
@@ -3719,7 +3885,7 @@ class Block {
                 piemenuPitches(this, NOTENOTES, NOTENOTES, SOLFATTRS, selectedNote, selectedAttr);
             }
         } else if (this.name === "modename") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedMode = this.value;
             } else {
                 selectedMode = DEFAULTMODE;
@@ -3727,7 +3893,7 @@ class Block {
 
             piemenuModes(this, selectedMode);
         } else if (this.name === "chordname") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedChord = this.value;
             } else {
                 selectedChord = DEFAULTCHORD;
@@ -3735,7 +3901,7 @@ class Block {
 
             piemenuChords(this, selectedChord);
         } else if (this.name === "accidentalname") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedAccidental = this.value;
             } else {
                 selectedAccidental = DEFAULTACCIDENTAL;
@@ -3745,7 +3911,7 @@ class Block {
                 piemenuAccidentals(this, ACCIDENTALLABELS, ACCIDENTALNAMES, selectedAccidental);
             }
         } else if (this.name === "intervalname") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedInterval = this.value;
             } else {
                 selectedInterval = DEFAULTINTERVAL;
@@ -3755,7 +3921,7 @@ class Block {
                 piemenuIntervals(this, selectedInterval);
             }
         } else if (this.name === "invertmode") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedInvert = this.value;
             } else {
                 selectedInvert = DEFAULTINVERT;
@@ -3773,7 +3939,7 @@ class Block {
                 piemenuBasic(this, invertLabels, invertValues, selectedInvert);
             }
         } else if (this.name === "drumname") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedDrum = this.value;
             } else {
                 selectedDrum = DEFAULTDRUM;
@@ -3804,7 +3970,7 @@ class Block {
 
             piemenuVoices(this, drumLabels, drumValues, categories, selectedDrum);
         } else if (this.name === "effectsname") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedDrum = this.value;
             } else {
                 selectedEffect = DEFAULTEFFECT;
@@ -3835,7 +4001,7 @@ class Block {
 
             piemenuVoices(this, effectLabels, effectValues, effectcategories, selectedEffect);
         } else if (this.name === "filtertype") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedType = this.value;
             } else {
                 selectedType = DEFAULTFILTERTYPE;
@@ -3856,7 +4022,7 @@ class Block {
                 platformColor.piemenuBasic
             );
         } else if (this.name === "oscillatortype") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedType = this.value;
             } else {
                 selectedType = DEFAULTOSCILLATORTYPE;
@@ -3871,7 +4037,7 @@ class Block {
 
             piemenuBasic(this, oscLabels, oscValues, selectedType, platformColor.piemenuBasic);
         } else if (this.name === "voicename") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedVoice = this.value;
             } else {
                 selectedVoice = DEFAULTVOICE;
@@ -3905,7 +4071,7 @@ class Block {
 
             piemenuVoices(this, voiceLabels, voiceValues, categories, selectedVoice);
         } else if (this.name === "noisename") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedNoise = this.value;
             } else {
                 selectedNoise = DEFAULTNOISE;
@@ -3934,7 +4100,7 @@ class Block {
 
             piemenuVoices(this, noiseLabels, noiseValues, categories, selectedNoise, 90);
         } else if (this.name === "temperamentname") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedTemperament = this.value;
             } else {
                 selectedTemperament = DEFAULTTEMPERAMENT;
@@ -3966,7 +4132,7 @@ class Block {
                 platformColor.piemenuBasic
             );
         } else if (this.name === "boolean") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedValue = this.value;
             } else {
                 selectedValue = true;
@@ -4028,7 +4194,7 @@ class Block {
             }
             piemenuBasic(this, labels, values, selectedValue, platformColor.piemenuBasic);
         } else if (this.name === "wrapmode") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedWrap = this.value;
             } else {
                 selectedWrap = "on";
@@ -4138,7 +4304,7 @@ class Block {
                         for (let i = 0; i < this.blocks.blockList.length; i++) {
                             if (
                                 this.blocks.blockList[i].name === "settemperament" &&
-                                this.blocks.blockList[i].connections[0] != null
+                                this.blocks.blockList[i].connections[0] !== null
                             ) {
                                 const index = this.blocks.blockList[i].connections[1];
                                 temperament = this.blocks.blockList[index].value;
@@ -4277,7 +4443,6 @@ class Block {
             this.label.style.transform = `translate3d(${left}px, ${top}px, 0)`;
             this.label.style.left = "0px";
             this.label.style.top = "0px";
-
             this.label.style.width =
                 Math.round((selectorWidth * this.blocks.blockScale * this.protoblock.scale) / 2) +
                 "px";
@@ -4286,7 +4451,7 @@ class Block {
                 Math.round((20 * this.blocks.blockScale * this.protoblock.scale) / 2) + "px";
             this.label.style.display = "";
             this.label.focus();
-            if (this.labelattr != null) {
+            if (this.labelattr !== null) {
                 this.labelattr.style.display = "";
             }
 
@@ -4358,7 +4523,7 @@ class Block {
                         case "timbre":
                             lockInit = true;
                             if (
-                                this.blocks.blockList[topBlock].protoblock.staticLabels[0] ==
+                                this.blocks.blockList[topBlock].protoblock.staticLabels[0] ===
                                 widgetTitle[i].innerHTML
                             ) {
                                 this.blocks.reInitWidget(topBlock, 1500);
@@ -4390,7 +4555,7 @@ class Block {
 
         if (closeInput) {
             this.label.style.display = "none";
-            if (this.labelattr != null) {
+            if (this.labelattr !== null) {
                 this.labelattr.style.display = "none";
             }
             docById("wheelDiv").style.display = "none";
@@ -4404,7 +4569,7 @@ class Block {
         const oldValue = this.value;
         let newValue = this.label.value;
 
-        if (this.labelattr != null) {
+        if (this.labelattr !== null) {
             const attrValue = this.labelattr.value;
             switch (attrValue) {
                 case "𝄪":
@@ -4429,7 +4594,7 @@ class Block {
         }
 
         c = this.connections[0];
-        if (this.name === "text" && c != null) {
+        if (this.name === "text" && c !== null) {
             const cblock = this.blocks.blockList[c];
             let uniqueValue;
             switch (cblock.name) {
@@ -4491,7 +4656,7 @@ class Block {
             const cblk1 = this.connections[0];
             let cblk2;
 
-            if (cblk1 != null) {
+            if (cblk1 !== null) {
                 cblk2 = this.blocks.blockList[cblk1].connections[0];
             } else {
                 cblk2 = null;
@@ -4519,7 +4684,7 @@ class Block {
             }
 
             if (
-                cblk1 != null &&
+                cblk1 !== null &&
                 this.blocks.blockList[cblk1].name === "pitch" &&
                 (this.value > 8 || this.value < 1)
             ) {
@@ -4594,7 +4759,7 @@ class Block {
         this.container.setChildIndex(this.text, this.container.children.length - 1);
         this.updateCache();
 
-        if (this.name === "text" && c != null) {
+        if (this.name === "text" && c !== null) {
             const cblock = this.blocks.blockList[c];
             switch (cblock.name) {
                 case "action":

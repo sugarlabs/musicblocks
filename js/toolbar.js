@@ -11,7 +11,7 @@
 
 /*
   global _THIS_IS_MUSIC_BLOCKS_, docById, doSVG, fnBrowserDetect,
-  RECORDBUTTON, saveButton, saveButtonAdvanced
+  RECORDBUTTON, saveButton, saveButtonAdvanced, ActivityContext
 */
 
 /* exported Toolbar */
@@ -32,6 +32,40 @@ class Toolbar {
             this.language = navigator.language;
         }
         this.tooltipsDisabled = false;
+        this._recordDropdownArrowElement = null;
+        this._recordDropdownArrowClickHandler = null;
+        this._recordDropdownOutsideClickHandler = null;
+    }
+
+    /**
+     * Removes record dropdown listeners attached by updateRecordButton.
+     *
+     * @returns {void}
+     */
+    _cleanupRecordDropdownListeners() {
+        if (this._recordDropdownArrowElement && this._recordDropdownArrowClickHandler) {
+            this._recordDropdownArrowElement.removeEventListener(
+                "click",
+                this._recordDropdownArrowClickHandler
+            );
+        }
+
+        if (this._recordDropdownOutsideClickHandler) {
+            document.removeEventListener("click", this._recordDropdownOutsideClickHandler);
+        }
+
+        this._recordDropdownArrowElement = null;
+        this._recordDropdownArrowClickHandler = null;
+        this._recordDropdownOutsideClickHandler = null;
+    }
+
+    /**
+     * Disposes transient toolbar listeners.
+     *
+     * @returns {void}
+     */
+    dispose() {
+        this._cleanupRecordDropdownListeners();
     }
 
     /**
@@ -59,7 +93,9 @@ class Toolbar {
                 ["planetIcon", _("Find and share projects")],
                 ["planetIconDisabled", _("Offline. Sharing is unavailable")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
-                ["helpIcon", _("Help")],
+                ["helpIcon", _("Help and shortcuts")],
+                ["helpGuideItem", _("Help"), "innerHTML"],
+                ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -129,7 +165,9 @@ class Toolbar {
                 _("Find and share projects"),
                 _("Offline. Sharing is unavailable"),
                 _("Auxiliary menu"),
+                _("Help and shortcuts"),
                 _("Help"),
+                _("Keyboard shortcuts"),
                 _("Run slowly"),
                 _("Run step by step"),
                 _("Display statistics"),
@@ -203,7 +241,9 @@ class Toolbar {
                 ["planetIcon", _("Find and share projects")],
                 ["planetIconDisabled", _("Offline. Sharing is unavailable")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
-                ["helpIcon", _("Help")],
+                ["helpIcon", _("Help and shortcuts")],
+                ["helpGuideItem", _("Help"), "innerHTML"],
+                ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -267,7 +307,9 @@ class Toolbar {
                 _("Find and share projects"),
                 _("Offline. Sharing is unavailable"),
                 _("Auxiliary menu"),
+                _("Help and shortcuts"),
                 _("Help"),
+                _("Keyboard shortcuts"),
                 _("Run slowly"),
                 _("Run step by step"),
                 _("Display statistics"),
@@ -352,14 +394,41 @@ class Toolbar {
             $j(this).tooltip("close");
         });
 
+        const restoreWidgetFocus = () => {
+            const focusedWindow = window.widgetWindows?.focused;
+            if (focusedWindow?.takeFocus) {
+                focusedWindow.takeFocus();
+                return;
+            }
+
+            const helpWindow = window.widgetWindows?.openWindows?.help;
+            if (helpWindow?.takeFocus) {
+                helpWindow.takeFocus();
+                return;
+            }
+
+            const shortcutsWindow = window.widgetWindows?.openWindows?.["keyboard-shortcuts"];
+            if (shortcutsWindow?.takeFocus) {
+                shortcutsWindow.takeFocus();
+            }
+        };
+
         $j(".materialize-iso, .dropdown-trigger").dropdown({
             constrainWidth: false,
             hover: false,
-            belowOrigin: true // Displays dropdown below the button
+            belowOrigin: true, // Displays dropdown below the button
+            onCloseEnd: restoreWidgetFocus
         });
 
         // Setup keyboard navigation for toolbar
         this.setupKeyboardNavigation();
+
+        // Initialize Tab focus cycling (keyboard-only, never hijacks mouse).
+        // Guard prevents double-init if toolbar is reconstructed.
+        if (!window._focusCycleManager) {
+            window._focusCycleManager = new FocusCycleManager();
+            window._focusCycleManager.init();
+        }
     }
 
     /**
@@ -473,6 +542,10 @@ class Toolbar {
         const modalContainer = docById("modal-container");
         const newDropdown = docById("newdropdown");
 
+        // Cleanup any existing modal listeners from previous opens
+        // Prevents listener accumulation when renderNewProjectIcon is called multiple times
+        this._cleanupModalListeners?.();
+
         newDropdown.innerHTML = "";
         const title = document.createElement("div");
         title.classList.add("new-project-title");
@@ -503,18 +576,9 @@ class Toolbar {
         newDropdown.appendChild(buttonRowLi);
 
         modalContainer.style.display = "flex";
-        confirmationButton.onclick = () => {
-            modalContainer.style.display = "none";
-            onclick(this.activity);
-        };
 
         // Add tabindex for accessibility
         cancelButton.setAttribute("tabindex", "0"); // Make focusable
-
-        cancelButton.onclick = () => {
-            modalContainer.style.display = "none";
-        };
-        modalContainer.style.display = "flex";
 
         // Make modal container focusable
         modalContainer.setAttribute("tabindex", "-1");
@@ -523,8 +587,51 @@ class Toolbar {
         const modalButtons = [confirmationButton, cancelButton];
         let currentModalFocusIndex = 0;
 
+        // Store handler references and focus handler map for proper cleanup
+        let modalKeyHandler = null;
+        const focusHandlerMap = new Map();
+
+        /**
+         * Clean up all modal event listeners to prevent accumulation.
+         * Called defensively at the start of renderNewProjectIcon and when modal closes.
+         */
+        const cleanupModalListeners = () => {
+            // Remove keyboard handlers
+            if (modalKeyHandler) {
+                modalButtons.forEach(btn => {
+                    if (btn) {
+                        btn.removeEventListener("keydown", modalKeyHandler);
+                    }
+                });
+                if (modalContainer) {
+                    modalContainer.removeEventListener("keydown", modalKeyHandler);
+                }
+                modalKeyHandler = null;
+            }
+
+            // Remove previously stored focus handlers
+            focusHandlerMap.forEach((handler, btn) => {
+                if (btn) {
+                    btn.removeEventListener("focus", handler);
+                }
+            });
+            focusHandlerMap.clear();
+
+            // Clear focus styles
+            modalButtons.forEach(btn => {
+                if (btn) {
+                    btn.classList.remove("modal-btn-focused");
+                }
+            });
+        };
+
+        // Store cleanup function for access from other calls
+        this._cleanupModalListeners = cleanupModalListeners;
+
         // Handle keyboard events for modal
-        const modalKeyHandler = e => {
+        modalKeyHandler = e => {
+            if (modalButtons.length === 0) return; // Guard clause
+
             switch (e.key) {
                 case "ArrowDown":
                     e.preventDefault();
@@ -560,20 +667,25 @@ class Toolbar {
             }
         };
 
-        // Add event listeners to each button AND the modal container
+        // Add keyboard handlers to each button AND the modal container
         modalButtons.forEach(btn => {
             btn.addEventListener("keydown", modalKeyHandler);
-            // Track focus changes
-            btn.addEventListener("focus", () => {
+        });
+        modalContainer.addEventListener("keydown", modalKeyHandler);
+
+        // Add focus handlers with proper tracking for cleanup
+        modalButtons.forEach(btn => {
+            const focusHandler = () => {
                 const index = modalButtons.indexOf(btn);
                 if (index >= 0) {
                     currentModalFocusIndex = index;
                     modalButtons.forEach(b => b.classList.remove("modal-btn-focused"));
                     btn.classList.add("modal-btn-focused");
                 }
-            });
+            };
+            btn.addEventListener("focus", focusHandler);
+            focusHandlerMap.set(btn, focusHandler); // Store for cleanup
         });
-        modalContainer.addEventListener("keydown", modalKeyHandler);
 
         // Auto-focus the Confirm button when modal opens
         setTimeout(() => {
@@ -581,26 +693,16 @@ class Toolbar {
             confirmationButton.classList.add("modal-btn-focused");
         }, 150);
 
-        // Clean up listener when modal closes
-        const closeModal = () => {
-            modalButtons.forEach(btn => {
-                btn.removeEventListener("keydown", modalKeyHandler);
-                btn.classList.remove("modal-btn-focused");
-            });
-            modalContainer.removeEventListener("keydown", modalKeyHandler);
-        };
-
-        // Update onclick handlers to clean up
-        const originalConfirmClick = confirmationButton.onclick;
+        // Setup onclick handlers with proper cleanup on close
         confirmationButton.onclick = () => {
-            closeModal();
-            originalConfirmClick();
+            cleanupModalListeners();
+            modalContainer.style.display = "none";
+            onclick(this.activity);
         };
 
-        const originalCancelClick = cancelButton.onclick;
         cancelButton.onclick = () => {
-            closeModal();
-            originalCancelClick();
+            cleanupModalListeners();
+            modalContainer.style.display = "none";
         };
     }
 
@@ -620,16 +722,17 @@ class Toolbar {
     }
 
     renderThemeSelectIcon(themeBox, themes) {
-        const icon = document.getElementById("themeSelectIcon");
+        const icon = docById("themeSelectIcon");
+        if (!icon) return;
+
         themes.forEach(theme => {
             if (localStorage.themePreference === theme) {
-                icon.innerHTML = document.getElementById(theme).innerHTML;
+                icon.innerHTML = docById(theme).innerHTML;
             }
         });
-        const themeSelectIcon = docById("themeSelectIcon");
-        const themeList = themes;
-        themeSelectIcon.onclick = () => {
-            themeList.forEach(theme => {
+
+        icon.onclick = () => {
+            themes.forEach(theme => {
                 docById(theme).onclick = () => themeBox[`${theme}_onclick`](this.activity);
             });
         };
@@ -769,13 +872,11 @@ class Toolbar {
                 saveButtonAdvanced.style.display = "none";
                 saveButton.onclick = () => {
                     const saveHTML = docById("save-html-beg");
-                    console.debug(saveHTML);
                     saveHTML.onclick = () => {
                         html_onclick(this.activity);
                     };
 
                     const savePNG = docById("save-png-beg");
-                    console.debug(savePNG);
                     const svgData = doSVG_onclick(
                         this.activity.canvas,
                         this.activity.logo,
@@ -798,7 +899,6 @@ class Toolbar {
                 };
             }
         } else {
-            console.debug("ADVANCED MODE BUTTONS");
             saveButton.style.display = "none";
             saveButtonAdvanced.style.display = "block";
             saveButtonAdvanced.onclick = () => {
@@ -810,7 +910,6 @@ class Toolbar {
                 };
                 const saveSVG = docById("save-svg");
                 const savePNG = docById("save-png");
-                console.debug(savePNG);
                 const svgData = doSVG_onclick(
                     this.activity.canvas,
                     this.activity.logo,
@@ -890,6 +989,8 @@ class Toolbar {
         const browser = fnBrowserDetect();
         const hideIn = ["firefox", "safari"];
 
+        this._cleanupRecordDropdownListeners();
+
         if (hideIn.includes(browser)) {
             Record.classList.add("hide");
             if (RecordDropdownArrow) RecordDropdownArrow.classList.add("hide");
@@ -925,7 +1026,7 @@ class Toolbar {
             RecordDropdownArrow.innerHTML = `<i class="material-icons main" style="font-size: 28px;">arrow_drop_down</i>`;
 
             // Create handler function for arrow click
-            const arrowClickHandler = function () {
+            const arrowClickHandler = () => {
                 setTimeout(() => {
                     const dropdown = docById("recorddropdown");
                     const arrowIcon = RecordDropdownArrow.querySelector("i");
@@ -941,30 +1042,26 @@ class Toolbar {
                 }, 50);
             };
 
-            // Remove old listener to prevent accumulation
-            if (RecordDropdownArrow._arrowClickHandler) {
-                RecordDropdownArrow.removeEventListener(
-                    "click",
-                    RecordDropdownArrow._arrowClickHandler
-                );
-            }
-
-            // Store reference and attach fresh listener
-            RecordDropdownArrow._arrowClickHandler = arrowClickHandler;
+            this._recordDropdownArrowElement = RecordDropdownArrow;
+            this._recordDropdownArrowClickHandler = arrowClickHandler;
             RecordDropdownArrow.addEventListener("click", arrowClickHandler);
 
             // Reset arrow when clicking outside (close dropdown)
-            document.addEventListener("click", function (e) {
+            const outsideClickHandler = e => {
                 const dropdown = docById("recorddropdown");
                 const arrowIcon = RecordDropdownArrow.querySelector("i");
-                if (
-                    arrowIcon &&
-                    !RecordDropdownArrow.contains(e.target) &&
-                    !dropdown.contains(e.target)
-                ) {
+
+                if (!arrowIcon || !dropdown) {
+                    return;
+                }
+
+                if (!RecordDropdownArrow.contains(e.target) && !dropdown.contains(e.target)) {
                     arrowIcon.textContent = "arrow_drop_down";
                 }
-            });
+            };
+
+            this._recordDropdownOutsideClickHandler = outsideClickHandler;
+            document.addEventListener("click", outsideClickHandler);
         }
 
         // Set up click handlers for dropdown options
@@ -1095,12 +1192,41 @@ class Toolbar {
      * @param {Function} onclick - The onclick handler for the help icon.
      * @returns {void}
      */
-    renderHelpIcon(onclick) {
+    renderHelpIcon(onclick, shortcutsOnclick) {
         const helpIcon = docById("helpIcon");
+        const helpGuideItem = docById("helpGuideItem");
+        const shortcutsGuideItem = docById("shortcutsGuideItem");
+        const hasDropdownMenu = !!helpGuideItem || !!shortcutsGuideItem;
 
-        helpIcon.onclick = () => {
-            onclick(this.activity);
-        };
+        if (helpGuideItem) {
+            helpGuideItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                onclick(this.activity);
+            };
+        }
+
+        if (shortcutsGuideItem) {
+            shortcutsGuideItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                if (shortcutsOnclick) {
+                    shortcutsOnclick(this.activity);
+                }
+            };
+        }
+
+        if (helpIcon) {
+            helpIcon.onclick = hasDropdownMenu
+                ? null
+                : () => {
+                      onclick(this.activity);
+                  };
+        }
     }
 
     /**
@@ -1296,10 +1422,30 @@ class Toolbar {
             }
 
             // Reinitialize dropdowns
+            const restoreWidgetFocus = () => {
+                const focusedWindow = window.widgetWindows?.focused;
+                if (focusedWindow?.takeFocus) {
+                    focusedWindow.takeFocus();
+                    return;
+                }
+
+                const helpWindow = window.widgetWindows?.openWindows?.help;
+                if (helpWindow?.takeFocus) {
+                    helpWindow.takeFocus();
+                    return;
+                }
+
+                const shortcutsWindow = window.widgetWindows?.openWindows?.["keyboard-shortcuts"];
+                if (shortcutsWindow?.takeFocus) {
+                    shortcutsWindow.takeFocus();
+                }
+            };
+
             $j(".materialize-iso, .dropdown-trigger").dropdown({
                 constrainWidth: false,
                 hover: false,
-                belowOrigin: true
+                belowOrigin: true,
+                onCloseEnd: restoreWidgetFocus
             });
 
             if (onclick) {
@@ -1368,6 +1514,25 @@ class Toolbar {
         const restoreIcon = docById("restoreIcon");
 
         restoreIcon.onclick = () => {
+            onclick(this.activity);
+        };
+    }
+
+    /**
+     * Renders the keyboard shortcuts icon with the provided onclick handler.
+     *
+     * @public
+     * @param {Function} onclick - The onclick handler for the keyboard shortcuts icon.
+     * @returns {void}
+     */
+    renderKeyboardShortcutsIcon(onclick) {
+        const keyboardShortcutsIcon = docById("keyboardShortcutsIcon");
+
+        if (!keyboardShortcutsIcon) {
+            return;
+        }
+
+        keyboardShortcutsIcon.onclick = () => {
             onclick(this.activity);
         };
     }
@@ -2061,6 +2226,452 @@ class Toolbar {
     };
 }
 
+/**
+ * FocusCycleManager
+ * ==================
+ * Cycles focus between Workspace → Toolbar → Palette on Tab / Shift+Tab.
+ *
+ * Design rules:
+ *  1. KEYBOARD ONLY – all zone logic is gated behind `_keyboardMode`.
+ *  2. Any mousedown immediately turns `_keyboardMode` off and removes all
+ *     visual rings – mouse clicks go through completely unchanged.
+ *  3. The focus rings / palette state are never changed unless the user
+ *     reached the current element via the Tab key.
+ */
+class FocusCycleManager {
+    constructor() {
+        this._zones = ["workspace", "toolbar", "palette"];
+        this._currentZone = null;
+        this._keyboardMode = false; // true only while Tab-navigating
+        this._lastFocusedButton = null; // last toolbar button focused by keyboard
+        this._liveRegion = null;
+
+        // Bind handlers so they can be removed if needed.
+        this._onKeyDown = this._onKeyDown.bind(this);
+        this._onMouseDown = this._onMouseDown.bind(this);
+        this._onFocusIn = this._onFocusIn.bind(this);
+    }
+
+    init() {
+        // Capture phase so we intercept Tab before anything else.
+        document.addEventListener("keydown", this._onKeyDown, true);
+        // BUBBLE phase for mousedown — canvas and other elements receive
+        // the click first; we only clean up keyboard state afterwards.
+        document.addEventListener("mousedown", this._onMouseDown, false);
+        // Track last-focused toolbar button for memory restoration.
+        document.addEventListener("focusin", this._onFocusIn, true);
+
+        // Visually-hidden ARIA live region for screen readers.
+        if (!document.getElementById("fcm-announcer")) {
+            const r = document.createElement("div");
+            r.id = "fcm-announcer";
+            r.setAttribute("aria-live", "polite");
+            Object.assign(r.style, {
+                position: "absolute",
+                width: "1px",
+                height: "1px",
+                margin: "-1px",
+                overflow: "hidden",
+                clip: "rect(0,0,0,0)",
+                whiteSpace: "nowrap",
+                border: "0"
+            });
+            document.body.appendChild(r);
+            this._liveRegion = r;
+        }
+    }
+
+    _getActivity() {
+        try {
+            if (
+                typeof ActivityContext !== "undefined" &&
+                ActivityContext &&
+                typeof ActivityContext.getActivity === "function"
+            ) {
+                return ActivityContext.getActivity();
+            }
+        } catch {
+            // ActivityContext is optional in older embeds and tests.
+        }
+
+        try {
+            const context = globalThis?.ActivityContext;
+            if (context && typeof context.getActivity === "function") {
+                return context.getActivity();
+            }
+        } catch {
+            // Global activity context may not exist.
+        }
+
+        return null;
+    }
+
+    _isWithin(el, target) {
+        return Boolean(el && target && typeof el.contains === "function" && el.contains(target));
+    }
+
+    _workspaceElements() {
+        return {
+            holder: document.getElementById("canvasHolder"),
+            container: document.getElementById("canvasContainer"),
+            overlay: document.getElementById("canvas"),
+            canvas: document.getElementById("myCanvas")
+        };
+    }
+
+    _isWorkspaceTarget(target) {
+        if (!target) return false;
+
+        if (
+            ["canvasHolder", "canvasContainer", "canvas", "myCanvas", "overlayCanvas"].includes(
+                target.id
+            )
+        ) {
+            return true;
+        }
+
+        if (typeof target.closest === "function") {
+            const workspaceAncestor = target.closest(
+                "#canvasHolder, #canvasContainer, #canvas, #myCanvas, #overlayCanvas"
+            );
+            if (workspaceAncestor) {
+                return true;
+            }
+        }
+
+        const ws = this._workspaceElements();
+        return (
+            this._isWithin(ws.holder, target) ||
+            this._isWithin(ws.container, target) ||
+            this._isWithin(ws.overlay, target) ||
+            this._isWithin(ws.canvas, target)
+        );
+    }
+
+    _clearToolbarFocus() {
+        document.querySelectorAll(".toolbar-btn-focused").forEach(btn => {
+            btn.classList.remove("toolbar-btn-focused");
+            if (typeof btn.blur === "function") {
+                btn.blur();
+            }
+        });
+
+        const active = document.activeElement;
+        const toolbars = document.getElementById("toolbars");
+        if (this._isWithin(toolbars, active) && typeof active.blur === "function") {
+            active.blur();
+        }
+    }
+
+    _focusWorkspaceFromMouse() {
+        const { holder, overlay } = this._workspaceElements();
+        if (!holder) return;
+
+        if (typeof holder.hasAttribute !== "function" || !holder.hasAttribute("tabindex")) {
+            holder.setAttribute("tabindex", "-1");
+        }
+
+        holder.focus({ preventScroll: true });
+
+        if (overlay && typeof overlay.dispatchEvent === "function") {
+            const opts = { bubbles: true, cancelable: false };
+            overlay.dispatchEvent(new PointerEvent("pointerdown", opts));
+            overlay.dispatchEvent(new PointerEvent("pointerup", opts));
+        }
+
+        this._currentZone = "workspace";
+    }
+
+    // ------------------------------------------------------------------
+    // Mouse interaction – runs AFTER the element receives the click
+    // (bubble phase). Clears keyboard-mode state and visual rings so
+    // that clicking the canvas/workspace always feels completely normal.
+    // ------------------------------------------------------------------
+    _onMouseDown(e) {
+        // Always exit keyboard mode on any mouse interaction.
+        this._keyboardMode = false;
+
+        const toolbars = document.getElementById("toolbars");
+        const paletteEl = document.getElementById("palette");
+        const clickedToolbar = this._isWithin(toolbars, e.target);
+        const clickedPalette = this._isWithin(paletteEl, e.target);
+        const clickedWorkspace = this._isWorkspaceTarget(e.target);
+
+        // Remove the keyboard focus ring from every zone container.
+        this._clearAllRings();
+
+        if (!clickedToolbar) {
+            this._clearToolbarFocus();
+        }
+
+        try {
+            const activity = this._getActivity();
+            const p = activity?.palettes;
+            if (p && typeof p.resetKeyboardNavigation === "function") {
+                p.resetKeyboardNavigation({
+                    closeMenus: clickedWorkspace,
+                    blur: !clickedPalette
+                });
+            } else if (p) {
+                p._keyboardNavActive = false;
+            }
+
+            if (clickedWorkspace && activity?.blocks) {
+                activity.blocks.activeBlock = null;
+            }
+        } catch {
+            // Mouse handoff should not fail if palette state is unavailable.
+        }
+
+        if (clickedWorkspace) {
+            this._focusWorkspaceFromMouse();
+            return;
+        }
+
+        // Reset tracked zone so next Tab always starts relative to the new
+        // focus position rather than stale keyboard-navigation state.
+        this._currentZone = null;
+    }
+
+    // ------------------------------------------------------------------
+    // Keep track of the last toolbar button focused by ANY means so
+    // we can restore it when re-entering via Tab.
+    // ------------------------------------------------------------------
+    _onFocusIn(e) {
+        const toolbars = document.getElementById("toolbars");
+        if (toolbars && toolbars.contains(e.target)) {
+            // Only record if it's an interactive element (button / link)
+            const tag = e.target.tagName.toLowerCase();
+            if (tag === "a" || tag === "button" || e.target.getAttribute("role") === "button") {
+                this._lastFocusedButton = e.target;
+            }
+            if (this._keyboardMode) this._currentZone = "toolbar";
+        } else if (this._keyboardMode) {
+            const palette = document.getElementById("palette");
+            if (palette && palette.contains(e.target)) {
+                this._currentZone = "palette";
+            } else if (["canvasHolder", "canvas", "canvasContainer"].includes(e.target.id)) {
+                this._currentZone = "workspace";
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // Tab key handler – the only place keyboard mode is turned ON.
+    // ------------------------------------------------------------------
+    _onKeyDown(e) {
+        if (e.key !== "Tab") return;
+        if (this._shouldBypass(e)) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        this._keyboardMode = true;
+        this._cycle(e.shiftKey);
+    }
+
+    _shouldBypass(e) {
+        if (e.ctrlKey || e.altKey || e.metaKey) return true;
+        const active = document.activeElement;
+        if (!active) return false;
+        const tag = active.nodeName.toLowerCase();
+        if ((tag === "input" && active.type !== "file") || tag === "textarea" || tag === "select")
+            return true;
+        if (active.isContentEditable) return true;
+        if (active.closest('.sweet-alert, .modal, [role="dialog"], .widget, .dropdown-content')) {
+            return true;
+        }
+        return false;
+    }
+
+    // ------------------------------------------------------------------
+    // Determine next zone and transfer focus.
+    // ------------------------------------------------------------------
+    _cycle(reverse) {
+        // Determine current zone. If unknown (no zone focused yet OR the active
+        // element is body/document), treat as 'workspace' so the first Tab
+        // always lands on the toolbar (workspace → Tab → toolbar).
+        if (this._currentZone === null) {
+            const detected = this._zoneOf(document.activeElement);
+            this._currentZone = detected ?? "workspace";
+        }
+
+        const idx = this._zones.indexOf(this._currentZone);
+        const nextIdx =
+            idx === -1
+                ? 1 // safety fallback → toolbar
+                : reverse
+                  ? (idx - 1 + this._zones.length) % this._zones.length
+                  : (idx + 1) % this._zones.length;
+
+        // Clean up the zone we are leaving.
+        this._leaveZone(this._currentZone);
+
+        const next = this._zones[nextIdx];
+        this._currentZone = next;
+        this._enterZone(next);
+    }
+
+    _zoneOf(el) {
+        if (!el) return null;
+        const toolbars = document.getElementById("toolbars");
+        const palette = document.getElementById("palette");
+        if (toolbars && toolbars.contains(el)) return "toolbar";
+        if (palette && palette.contains(el)) return "palette";
+        if (["canvasHolder", "canvas", "canvasContainer"].includes(el.id)) return "workspace";
+        return null;
+    }
+
+    // ------------------------------------------------------------------
+    // Visual cleanup when leaving a zone.
+    // ------------------------------------------------------------------
+    _leaveZone(zone) {
+        this._clearRingForZone(zone);
+
+        if (zone === "toolbar") {
+            // Strip the toolbar's own keyboard-focus class so arrow-key logic
+            // goes dormant.
+            document.querySelectorAll(".toolbar-btn-focused").forEach(b => {
+                b.classList.remove("toolbar-btn-focused");
+                b.blur();
+            });
+        }
+
+        if (zone === "palette") {
+            try {
+                const p = this._getActivity()?.palettes;
+                if (p && typeof p.resetKeyboardNavigation === "function") {
+                    p.resetKeyboardNavigation({ closeMenus: true, blur: true });
+                } else if (p) {
+                    p._keyboardNavActive = false;
+                }
+            } catch {
+                // Leaving the palette should still continue if cleanup is unavailable.
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // Set focus & visual ring when entering a zone.
+    // ------------------------------------------------------------------
+    _enterZone(zone) {
+        const container = this._containerEl(zone);
+
+        if (zone === "workspace") {
+            const ws = document.getElementById("canvasHolder");
+            const cv = document.getElementById("canvas");
+            if (ws) {
+                if (typeof ws.hasAttribute !== "function" || !ws.hasAttribute("tabindex")) {
+                    ws.setAttribute("tabindex", "-1");
+                }
+                if (container) container.classList.add("focus-zone-active");
+                ws.focus({ preventScroll: true });
+                // Dispatching a synthetic pointerdown+up on the canvas re-engages
+                // the browser's native scroll target. This is what normally happens
+                // when the user physically clicks the canvas, and is needed when
+                // focus moves here via keyboard (especially after using arrow keys
+                // in the palette which can steal the scroll-active element).
+                if (cv && typeof cv.dispatchEvent === "function") {
+                    const opts = { bubbles: true, cancelable: false };
+                    cv.dispatchEvent(new PointerEvent("pointerdown", opts));
+                    cv.dispatchEvent(new PointerEvent("pointerup", opts));
+                }
+                this._announce("Workspace active");
+            }
+            return;
+        }
+
+        if (zone === "toolbar") {
+            const toolbars = document.getElementById("toolbars");
+            if (!toolbars) return;
+            // Prefer the last button the user was on; fallback to first visible.
+            let target = this._lastFocusedButton;
+            if (!target || !toolbars.contains(target) || !this._visible(target)) {
+                const buttons = Array.from(
+                    toolbars.querySelectorAll('[tabindex="0"], a[role="button"], button')
+                );
+                target = buttons.find(b => this._visible(b)) || toolbars;
+            }
+            if (container) container.classList.add("focus-zone-active");
+            target.focus({ preventScroll: true });
+            this._announce("Toolbar active");
+            return;
+        }
+
+        if (zone === "palette") {
+            const palette = document.getElementById("palette");
+            if (!palette) return;
+            if (container) container.classList.add("focus-zone-active");
+
+            // Sync palette.js's internal state so arrow keys work immediately.
+            let p = null;
+            try {
+                p = this._getActivity()?.palettes;
+                if (p) {
+                    p._keyboardNavActive = true;
+                }
+            } catch {
+                // Palette keyboard state sync is best-effort.
+            }
+
+            // Give native focus to the palette container (it has tabindex).
+            // This must happen after palette.js knows we arrived via keyboard,
+            // otherwise the collapsed palette will not auto-expand on Tab.
+            palette.focus({ preventScroll: true });
+
+            try {
+                if (p) {
+                    // Only set to blocks section if there are rows and nothing is already focused.
+                    const listBody = palette.children[0]?.children[1]?.children[1];
+                    const rows = listBody ? Array.from(listBody.children) : [];
+                    const alreadyFocused = rows.some(r => r.dataset.keyboardFocus);
+                    if (!alreadyFocused && rows.length > 0) {
+                        const targetRow = rows.length > 1 ? rows[1] : rows[0];
+                        targetRow.dataset.keyboardFocus = "true";
+                        targetRow.style.backgroundColor =
+                            window.platformColor?.hoverColor || "#0CAFFF";
+                        p._navSection = "blocks";
+                        p._navBlockIndex = rows.length > 1 ? 1 : 0;
+                    }
+                }
+            } catch {
+                // Palette keyboard state sync is best-effort.
+            }
+            this._announce("Palette active");
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // Helpers
+    // ------------------------------------------------------------------
+    _containerEl(zone) {
+        if (zone === "workspace") return document.getElementById("canvasHolder");
+        if (zone === "toolbar") return document.getElementById("toolbars");
+        if (zone === "palette") return document.getElementById("palette");
+        return null;
+    }
+
+    _clearRingForZone(zone) {
+        const el = this._containerEl(zone);
+        if (el) el.classList.remove("focus-zone-active");
+    }
+
+    _clearAllRings() {
+        ["workspace", "toolbar", "palette"].forEach(z => this._clearRingForZone(z));
+    }
+
+    _visible(el) {
+        if (!el) return false;
+        const s = window.getComputedStyle(el);
+        return s.display !== "none" && s.visibility !== "hidden" && el.offsetWidth > 0;
+    }
+
+    _announce(msg) {
+        if (this._liveRegion) this._liveRegion.textContent = msg;
+    }
+}
+
 if (typeof module !== "undefined" && module.exports) {
     module.exports = Toolbar;
+    module.exports.FocusCycleManager = FocusCycleManager;
 }

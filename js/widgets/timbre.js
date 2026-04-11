@@ -144,15 +144,17 @@ class TimbreWidget {
      */
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
-        cell.innerHTML = `&nbsp;&nbsp;<img 
-                src="header-icons/${icon}" 
-                title="${label}" 
-                alt="${label}" 
-                height="${iconSize}" 
-                width="${iconSize}" 
-                vertical-align="middle" 
-                align-content="center"
-            >&nbsp;&nbsp;`;
+        cell.textContent = "\u00A0\u00A0";
+        const img = document.createElement("img");
+        img.src = `header-icons/${icon}`;
+        img.title = label;
+        img.alt = label;
+        img.setAttribute("height", iconSize);
+        img.setAttribute("width", iconSize);
+        img.setAttribute("vertical-align", "middle");
+        img.setAttribute("align-content", "center");
+        cell.appendChild(img);
+        cell.appendChild(document.createTextNode("\u00A0\u00A0"));
         cell.style.width = TimbreWidget.BUTTONSIZE + "px";
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
@@ -182,62 +184,62 @@ class TimbreWidget {
     _update = async (i, value, k) => {
         const updateParams = [];
 
-        if (this.isActive["envelope"] === true && this.env[i] != null) {
+        if (this.isActive["envelope"] === true && this.env[i] !== null) {
             for (let j = 0; j < 4; j++) {
                 updateParams[j] = this.activity.blocks.blockList[this.env[i]].connections[j + 1];
             }
         }
 
-        if (this.isActive["filter"] === true && this.fil[i] != null) {
+        if (this.isActive["filter"] === true && this.fil[i] !== null) {
             for (let j = 0; j < 3; j++) {
                 updateParams[j] = this.activity.blocks.blockList[this.fil[i]].connections[j + 1];
             }
         }
 
-        if (this.isActive["oscillator"] === true && this.osc[i] != null) {
+        if (this.isActive["oscillator"] === true && this.osc[i] !== null) {
             for (let j = 0; j < 2; j++) {
                 updateParams[j] = this.activity.blocks.blockList[this.osc[i]].connections[j + 1];
             }
         }
 
-        if (this.isActive["amsynth"] === true && this.AMSynthesizer[i] != null) {
+        if (this.isActive["amsynth"] === true && this.AMSynthesizer[i] !== null) {
             updateParams[0] = this.activity.blocks.blockList[this.AMSynthesizer[i]].connections[1];
         }
 
-        if (this.isActive["fmsynth"] === true && this.FMSynthesizer[i] != null) {
+        if (this.isActive["fmsynth"] === true && this.FMSynthesizer[i] !== null) {
             updateParams[0] = this.activity.blocks.blockList[this.FMSynthesizer[i]].connections[1];
         }
 
-        if (this.isActive["noisesynth"] === true && this.NoiseSynthesizer[i] != null) {
+        if (this.isActive["noisesynth"] === true && this.NoiseSynthesizer[i] !== null) {
             updateParams[0] =
                 this.activity.blocks.blockList[this.NoiseSynthesizer[i]].connections[1];
         }
 
-        if (this.isActive["duosynth"] === true && this.duoSynthesizer[i] != null) {
+        if (this.isActive["duosynth"] === true && this.duoSynthesizer[i] !== null) {
             for (let j = 0; j < 2; j++) {
                 updateParams[j] =
                     this.activity.blocks.blockList[this.duoSynthesizer[i]].connections[j + 1];
             }
         }
 
-        if (this.isActive["tremolo"] === true && this.tremoloEffect[i] != null) {
+        if (this.isActive["tremolo"] === true && this.tremoloEffect[i] !== null) {
             for (let j = 0; j < 2; j++) {
                 updateParams[j] =
                     this.activity.blocks.blockList[this.tremoloEffect[i]].connections[j + 1];
             }
         }
 
-        if (this.isActive["vibrato"] === true && this.vibratoEffect[i] != null) {
+        if (this.isActive["vibrato"] === true && this.vibratoEffect[i] !== null) {
             updateParams[0] = this.activity.blocks.blockList[this.vibratoEffect[i]].connections[1];
             // The rate arg of the vibrato block must be in the form: a / b
             const divBlock = this.activity.blocks.blockList[this.vibratoEffect[i]].connections[2];
             if (
                 this.activity.blocks.blockList[divBlock].name === "divide" &&
-                this.activity.blocks.blockList[divBlock].connections[1] != null &&
+                this.activity.blocks.blockList[divBlock].connections[1] !== null &&
                 this.activity.blocks.blockList[
                     this.activity.blocks.blockList[divBlock].connections[1]
                 ].name === "number" &&
-                this.activity.blocks.blockList[divBlock].connections[2] != null &&
+                this.activity.blocks.blockList[divBlock].connections[2] !== null &&
                 this.activity.blocks.blockList[
                     this.activity.blocks.blockList[divBlock].connections[2]
                 ].name === "number"
@@ -275,26 +277,26 @@ class TimbreWidget {
             }
         }
 
-        if (this.isActive["chorus"] === true && this.chorusEffect[i] != null) {
+        if (this.isActive["chorus"] === true && this.chorusEffect[i] !== null) {
             for (let j = 0; j < 3; j++) {
                 updateParams[j] =
                     this.activity.blocks.blockList[this.chorusEffect[i]].connections[j + 1];
             }
         }
 
-        if (this.isActive["phaser"] === true && this.phaserEffect[i] != null) {
+        if (this.isActive["phaser"] === true && this.phaserEffect[i] !== null) {
             for (let j = 0; j < 3; j++) {
                 updateParams[j] =
                     this.activity.blocks.blockList[this.phaserEffect[i]].connections[j + 1];
             }
         }
 
-        if (this.isActive["distortion"] === true && this.distortionEffect[i] != null) {
+        if (this.isActive["distortion"] === true && this.distortionEffect[i] !== null) {
             updateParams[0] =
                 this.activity.blocks.blockList[this.distortionEffect[i]].connections[1];
         }
 
-        if (updateParams[0] != null) {
+        if (updateParams[0] !== null) {
             if (typeof value === "string") {
                 this.activity.blocks.blockList[updateParams[k]].value = value;
             } else {
@@ -402,30 +404,31 @@ class TimbreWidget {
 
         const cell = this.playButton;
         if (this._playing) {
-            cell.innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/' +
-                "stop-button.svg" +
-                '" title="' +
-                _("Stop") +
-                '" alt="' +
-                _("Stop") +
-                '" height="' +
-                TimbreWidget.ICONSIZE +
-                '" width="' +
-                TimbreWidget.ICONSIZE +
-                '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            cell.textContent = "\u00A0\u00A0";
+            const stopImg = document.createElement("img");
+            stopImg.src = "header-icons/stop-button.svg";
+            stopImg.title = _("Stop");
+            stopImg.alt = _("Stop");
+            stopImg.setAttribute("height", TimbreWidget.ICONSIZE);
+            stopImg.setAttribute("width", TimbreWidget.ICONSIZE);
+            stopImg.setAttribute("vertical-align", "middle");
+            stopImg.setAttribute("align-content", "center");
+            cell.appendChild(stopImg);
+            cell.appendChild(document.createTextNode("\u00A0\u00A0"));
         } else {
             this.activity.logo.synth.setMasterVolume(0);
             this.activity.logo.synth.stop();
-            cell.innerHTML = `&nbsp;&nbsp;<img 
-                    src="header-icons/play-button.svg" 
-                    title="${_("Play")}" 
-                    alt="${_("Play")}" 
-                    height="${TimbreWidget.ICONSIZE}" 
-                    width="${TimbreWidget.ICONSIZE}" 
-                    vertical-align="middle" 
-                    align-content="center"
-                >&nbsp;&nbsp;`;
+            cell.textContent = "\u00A0\u00A0";
+            const playImg = document.createElement("img");
+            playImg.src = "header-icons/play-button.svg";
+            playImg.title = _("Play");
+            playImg.alt = _("Play");
+            playImg.setAttribute("height", TimbreWidget.ICONSIZE);
+            playImg.setAttribute("width", TimbreWidget.ICONSIZE);
+            playImg.setAttribute("vertical-align", "middle");
+            playImg.setAttribute("align-content", "center");
+            cell.appendChild(playImg);
+            cell.appendChild(document.createTextNode("\u00A0\u00A0"));
         }
 
         if (this.notesToPlay.length === 0) {
@@ -450,15 +453,17 @@ class TimbreWidget {
                     Singer.defaultBPMFactor * 1000 * this.notesToPlay[i - 1][1]
                 );
             } else {
-                cell.innerHTML = `&nbsp;&nbsp;<img 
-                        src="header-icons/play-button.svg" 
-                        title="${_("Play")}" 
-                        alt="${_("Play")}" 
-                        height="${TimbreWidget.ICONSIZE}" 
-                        width="${TimbreWidget.ICONSIZE}" 
-                        vertical-align="middle" 
-                        align-content="center"
-                    >&nbsp;&nbsp;`;
+                cell.textContent = "\u00A0\u00A0";
+                const playImg2 = document.createElement("img");
+                playImg2.src = "header-icons/play-button.svg";
+                playImg2.title = _("Play");
+                playImg2.alt = _("Play");
+                playImg2.setAttribute("height", TimbreWidget.ICONSIZE);
+                playImg2.setAttribute("width", TimbreWidget.ICONSIZE);
+                playImg2.setAttribute("vertical-align", "middle");
+                playImg2.setAttribute("align-content", "center");
+                cell.appendChild(playImg2);
+                cell.appendChild(document.createTextNode("\u00A0\u00A0"));
                 this._playing = false;
             }
         };
@@ -987,7 +992,7 @@ class TimbreWidget {
         this.activity.blocks.blockList[n].connections[0] = this.blockNo;
 
         // If there were blocks in the Widget, move them inside the clamp.
-        if (topOfClamp != null) {
+        if (topOfClamp !== null) {
             this.activity.blocks.blockList[n].connections[clamp] = topOfClamp;
             this.activity.blocks.blockList[topOfClamp].connections[0] = n;
         }
@@ -1015,7 +1020,7 @@ class TimbreWidget {
         this.activity.blocks.blockList[n].connections[0] = this.blockNo;
 
         // If there were blocks in the Widget, move them inside the clamp.
-        if (topOfClamp != null) {
+        if (topOfClamp !== null) {
             this.activity.blocks.blockList[vspace].connections[1] = topOfClamp;
             this.activity.blocks.blockList[topOfClamp].connections[0] = vspace;
         }
@@ -1073,7 +1078,7 @@ class TimbreWidget {
             this.activity.blocks.blockList[newblk].connections.length - 1
         ] = c1;
 
-        if (c0 != null) {
+        if (c0 !== null) {
             for (let i = 0; i < this.activity.blocks.blockList[c0].connections.length; i++) {
                 if (this.activity.blocks.blockList[c0].connections[i] === oldblk) {
                     this.activity.blocks.blockList[c0].connections[i] = newblk;
@@ -1083,7 +1088,7 @@ class TimbreWidget {
 
             // Look for a containing clamp, which may need to be resized.
             let blockAbove = c0;
-            while (blockAbove != this.blockNo) {
+            while (blockAbove !== this.blockNo) {
                 if (this.activity.blocks.blockList[blockAbove].isClampBlock()) {
                     this.activity.blocks.clampBlocksToCheck.push([blockAbove, 0]);
                 }
@@ -1094,7 +1099,7 @@ class TimbreWidget {
             this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
         }
 
-        if (c1 != null) {
+        if (c1 !== null) {
             for (let i = 0; i < this.activity.blocks.blockList[c1].connections.length; i++) {
                 if (this.activity.blocks.blockList[c1].connections[i] === oldblk) {
                     this.activity.blocks.blockList[c1].connections[i] = newblk;
@@ -1125,7 +1130,7 @@ class TimbreWidget {
      */
     blockConnection = async (len, bottomOfClamp) => {
         const n = this.activity.blocks.blockList.length - len;
-        if (bottomOfClamp == null) {
+        if (bottomOfClamp === null) {
             this.activity.blocks.blockList[this.blockNo].connections[2] = n;
             this.activity.blocks.blockList[n].connections[0] = this.blockNo;
         } else {
@@ -1142,7 +1147,7 @@ class TimbreWidget {
                 const cblk = this.activity.blocks.blockList[bottomOfClamp].connections[0];
                 c = this.activity.blocks.blockList[cblk].connections.length - 2;
                 this.activity.blocks.clampBlocksToCheck.push([cblk, 0]);
-                if (this.activity.blocks.blockList[cblk].connections[c] == null) {
+                if (this.activity.blocks.blockList[cblk].connections[c] === null) {
                     bottomOfClamp = cblk;
                 } else {
                     // Find bottom of stack
@@ -1179,15 +1184,18 @@ class TimbreWidget {
         this.timbreTableDiv.style.overflow = "auto";
         this.timbreTableDiv.style.backgroundColor = "white";
         this.timbreTableDiv.style.height = "300px";
-        this.timbreTableDiv.innerHTML = '<div id="timbreTable"></div>';
+        this.timbreTableDiv.textContent = "";
+        const timbreTable = document.createElement("div");
+        timbreTable.id = "timbreTable";
+        this.timbreTableDiv.appendChild(timbreTable);
 
         const env = docById("timbreTable");
-        let htmlElements = "";
+        env.textContent = "";
         for (let i = 0; i < 2; i++) {
-            htmlElements += '<div id ="synth' + i + '"></div>';
+            const synthDiv = document.createElement("div");
+            synthDiv.id = "synth" + i;
+            env.appendChild(synthDiv);
         }
-
-        env.innerHTML = htmlElements;
         const envAppend = document.createElement("div");
         envAppend.id = "envAppend";
         envAppend.style.backgroundColor = platformColor.widgetBackground;
@@ -1197,11 +1205,34 @@ class TimbreWidget {
         env.append(envAppend);
 
         const mainDiv = docById("synth0");
-        mainDiv.innerHTML = `<p>
-                <input type="radio" name="synthsName" value="AMSynth"/>${_("AM synth")}<br>
-                <input type="radio" name="synthsName" value="FMSynth"/>${_("FM synth")}<br>
-                <input type="radio" name="synthsName" value="DuoSynth"/>${_("duo synth")}<br>
-            </p>`;
+        mainDiv.textContent = "";
+        const pNode = document.createElement("p");
+
+        const amRadio = document.createElement("input");
+        amRadio.type = "radio";
+        amRadio.name = "synthsName";
+        amRadio.value = "AMSynth";
+        pNode.appendChild(amRadio);
+        pNode.appendChild(document.createTextNode(_("AM synth")));
+        pNode.appendChild(document.createElement("br"));
+
+        const fmRadio = document.createElement("input");
+        fmRadio.type = "radio";
+        fmRadio.name = "synthsName";
+        fmRadio.value = "FMSynth";
+        pNode.appendChild(fmRadio);
+        pNode.appendChild(document.createTextNode(_("FM synth")));
+        pNode.appendChild(document.createElement("br"));
+
+        const duoRadio = document.createElement("input");
+        duoRadio.type = "radio";
+        duoRadio.name = "synthsName";
+        duoRadio.value = "DuoSynth";
+        pNode.appendChild(duoRadio);
+        pNode.appendChild(document.createTextNode(_("duo synth")));
+        pNode.appendChild(document.createElement("br"));
+
+        mainDiv.appendChild(pNode);
 
         const subDiv = docById("synth1");
         const synthsName = docByName("synthsName");
@@ -1209,7 +1240,11 @@ class TimbreWidget {
         for (let i = 0; i < synthsName.length; i++) {
             synthsName[i].onclick = async event => {
                 synthChosen = event.target.value;
-                let subHtmlElements = '<div id="chosen">' + synthChosen + "</div>";
+                subDiv.textContent = "";
+                const chosenDiv = document.createElement("div");
+                chosenDiv.id = "chosen";
+                chosenDiv.textContent = synthChosen;
+                subDiv.appendChild(chosenDiv);
                 for (let j = 0; j < this.activeParams.length; j++) {
                     this.isActive[this.activeParams[j]] = false;
                 }
@@ -1246,15 +1281,36 @@ class TimbreWidget {
                         );
                     }
 
-                    subHtmlElements +=
-                        '<div id="wrapperS0"><div id="sS0"><span>' +
-                        _("harmonicity") +
-                        '</span></div><div class="insideDivSynth"><input type="range" id="myRangeS0" class="sliders" style="margin-top:20px" value="' +
-                        parseFloat(this.AMSynthParams[0]) +
-                        '"><span id="myspanS0" class="rangeslidervalue">' +
-                        this.AMSynthParams[0] +
-                        "</span></div></div>";
-                    subDiv.innerHTML = subHtmlElements;
+                    const wrapperS0 = document.createElement("div");
+                    wrapperS0.id = "wrapperS0";
+
+                    const labelDivS0 = document.createElement("div");
+                    labelDivS0.id = "sS0";
+                    const spanLabelS0 = document.createElement("span");
+                    spanLabelS0.textContent = _("harmonicity");
+                    labelDivS0.appendChild(spanLabelS0);
+                    wrapperS0.appendChild(labelDivS0);
+
+                    const insideDivS0 = document.createElement("div");
+                    insideDivS0.className = "insideDivSynth";
+
+                    const inputS0 = document.createElement("input");
+                    inputS0.type = "range";
+                    inputS0.id = "myRangeS0";
+                    inputS0.className = "sliders";
+                    inputS0.style.marginTop = "20px";
+                    inputS0.value = parseFloat(this.AMSynthParams[0]);
+
+                    const spanValS0 = document.createElement("span");
+                    spanValS0.id = "myspanS0";
+                    spanValS0.className = "rangeslidervalue";
+                    spanValS0.textContent = this.AMSynthParams[0];
+
+                    insideDivS0.appendChild(inputS0);
+                    insideDivS0.appendChild(spanValS0);
+                    wrapperS0.appendChild(insideDivS0);
+
+                    subDiv.appendChild(wrapperS0);
 
                     // docById('myRangeS0').value = parseFloat(this.AMSynthParams[0]);
                     // docById('myspanS0').textContent = this.AMSynthParams[0];
@@ -1312,15 +1368,36 @@ class TimbreWidget {
                         );
                     }
 
-                    subHtmlElements +=
-                        '<div id="wrapperS0"><div id="sS0"><span>' +
-                        _("modulation index") +
-                        '</span></div><div class="insideDivSynth"><input type="range" id="myRangeS0" class="sliders" style="margin-top:20px" value="' +
-                        parseFloat(this.FMSynthParams[0]) +
-                        '"><span id="myspanS0" class="rangeslidervalue">' +
-                        this.FMSynthParams[0] +
-                        "</span></div></div>";
-                    subDiv.innerHTML = subHtmlElements;
+                    const wrapperS0 = document.createElement("div");
+                    wrapperS0.id = "wrapperS0";
+
+                    const labelDivS0 = document.createElement("div");
+                    labelDivS0.id = "sS0";
+                    const spanLabelS0 = document.createElement("span");
+                    spanLabelS0.textContent = _("modulation index");
+                    labelDivS0.appendChild(spanLabelS0);
+                    wrapperS0.appendChild(labelDivS0);
+
+                    const insideDivS0 = document.createElement("div");
+                    insideDivS0.className = "insideDivSynth";
+
+                    const inputS0 = document.createElement("input");
+                    inputS0.type = "range";
+                    inputS0.id = "myRangeS0";
+                    inputS0.className = "sliders";
+                    inputS0.style.marginTop = "20px";
+                    inputS0.value = parseFloat(this.FMSynthParams[0]);
+
+                    const spanValS0 = document.createElement("span");
+                    spanValS0.id = "myspanS0";
+                    spanValS0.className = "rangeslidervalue";
+                    spanValS0.textContent = this.FMSynthParams[0];
+
+                    insideDivS0.appendChild(inputS0);
+                    insideDivS0.appendChild(spanValS0);
+                    wrapperS0.appendChild(insideDivS0);
+
+                    subDiv.appendChild(wrapperS0);
 
                     // docById('myRangeS0').value = parseFloat(this.FMSynthParams[0]);
                     // docById('myspanS0').textContent = this.FMSynthParams[0];
@@ -1377,15 +1454,36 @@ class TimbreWidget {
                         );
                     }
 
-                    subHtmlElements +=
-                        '<div id="wrapperS0"><div id="sS0"><span>' +
-                        _("modulation index") +
-                        '</span></div><div class="insideDivSynth"><input type="range" id="myRangeS0" class="sliders" style="margin-top:20px" value="' +
-                        this.NoiseSynthParams[0] +
-                        '"><span id="myspanS0" class="rangeslidervalue">' +
-                        this.NoiseSynthParams[0] +
-                        "</span></div></div>";
-                    subDiv.innerHTML = subHtmlElements;
+                    const wrapperS0 = document.createElement("div");
+                    wrapperS0.id = "wrapperS0";
+
+                    const labelDivS0 = document.createElement("div");
+                    labelDivS0.id = "sS0";
+                    const spanLabelS0 = document.createElement("span");
+                    spanLabelS0.textContent = _("modulation index");
+                    labelDivS0.appendChild(spanLabelS0);
+                    wrapperS0.appendChild(labelDivS0);
+
+                    const insideDivS0 = document.createElement("div");
+                    insideDivS0.className = "insideDivSynth";
+
+                    const inputS0 = document.createElement("input");
+                    inputS0.type = "range";
+                    inputS0.id = "myRangeS0";
+                    inputS0.className = "sliders";
+                    inputS0.style.marginTop = "20px";
+                    inputS0.value = this.NoiseSynthParams[0];
+
+                    const spanValS0 = document.createElement("span");
+                    spanValS0.id = "myspanS0";
+                    spanValS0.className = "rangeslidervalue";
+                    spanValS0.textContent = this.NoiseSynthParams[0];
+
+                    insideDivS0.appendChild(inputS0);
+                    insideDivS0.appendChild(spanValS0);
+                    wrapperS0.appendChild(insideDivS0);
+
+                    subDiv.appendChild(wrapperS0);
 
                     // docById('myRangeS0').value = parseFloat(this.FMSynthParams[0]);
                     // docById('myspanS0').textContent = this.FMSynthParams[0];
@@ -1446,23 +1544,67 @@ class TimbreWidget {
                         );
                     }
 
-                    subHtmlElements +=
-                        '<div id="wrapperS0"><div id="sS0"><span>' +
-                        _("vibrato rate") +
-                        '</span></div><div class="insideDivSynth"><input type="range" id="myRangeS0" class="sliders" style="margin-top:20px" value="' +
-                        parseFloat(this.duoSynthParams[0]) +
-                        '"><span id="myspanS0" class="rangeslidervalue">' +
-                        this.duoSynthParams[0] +
-                        "</span></div></div>";
-                    subHtmlElements +=
-                        '<div id="wrapperS1"><div id="sS1"><span>' +
-                        _("vibrato amount") +
-                        '</span></div><div class="insideDivSynth"><input type="range" id="myRangeS1" class="sliders" style="margin-top:20px" value="' +
-                        parseFloat(this.duoSynthParams[1]) +
-                        '"><span id="myspanS1" class="rangeslidervalue">' +
-                        this.duoSynthParams[1] +
-                        "</span></div></div>";
-                    subDiv.innerHTML = subHtmlElements;
+                    const wrapperS0 = document.createElement("div");
+                    wrapperS0.id = "wrapperS0";
+
+                    const labelDivS0 = document.createElement("div");
+                    labelDivS0.id = "sS0";
+                    const spanLabelS0 = document.createElement("span");
+                    spanLabelS0.textContent = _("vibrato rate");
+                    labelDivS0.appendChild(spanLabelS0);
+                    wrapperS0.appendChild(labelDivS0);
+
+                    const insideDivS0 = document.createElement("div");
+                    insideDivS0.className = "insideDivSynth";
+
+                    const inputS0 = document.createElement("input");
+                    inputS0.type = "range";
+                    inputS0.id = "myRangeS0";
+                    inputS0.className = "sliders";
+                    inputS0.style.marginTop = "20px";
+                    inputS0.value = parseFloat(this.duoSynthParams[0]);
+
+                    const spanValS0 = document.createElement("span");
+                    spanValS0.id = "myspanS0";
+                    spanValS0.className = "rangeslidervalue";
+                    spanValS0.textContent = this.duoSynthParams[0];
+
+                    insideDivS0.appendChild(inputS0);
+                    insideDivS0.appendChild(spanValS0);
+                    wrapperS0.appendChild(insideDivS0);
+
+                    subDiv.appendChild(wrapperS0);
+
+                    const wrapperS1 = document.createElement("div");
+                    wrapperS1.id = "wrapperS1";
+
+                    const labelDivS1 = document.createElement("div");
+                    labelDivS1.id = "sS1";
+                    const spanLabelS1 = document.createElement("span");
+                    spanLabelS1.textContent = _("vibrato amount");
+                    labelDivS1.appendChild(spanLabelS1);
+                    wrapperS1.appendChild(labelDivS1);
+
+                    const insideDivS1 = document.createElement("div");
+                    insideDivS1.className = "insideDivSynth";
+
+                    const inputS1 = document.createElement("input");
+                    inputS1.type = "range";
+                    inputS1.id = "myRangeS1";
+                    inputS1.className = "sliders";
+                    inputS1.style.marginTop = "20px";
+                    inputS1.value = parseFloat(this.duoSynthParams[1]);
+
+                    const spanValS1 = document.createElement("span");
+                    spanValS1.id = "myspanS1";
+                    spanValS1.className = "rangeslidervalue";
+                    spanValS1.textContent = this.duoSynthParams[1];
+
+                    insideDivS1.appendChild(inputS1);
+                    insideDivS1.appendChild(spanValS1);
+                    wrapperS1.appendChild(insideDivS1);
+
+                    subDiv.appendChild(wrapperS1);
 
                     if (this.duoSynthesizer.length !== 1) {
                         blockValue = this.duoSynthesizer.length - 1;
@@ -1520,23 +1662,55 @@ class TimbreWidget {
         this.timbreTableDiv.style.overflow = "auto";
         this.timbreTableDiv.style.backgroundColor = "white";
         this.timbreTableDiv.style.height = "300px";
-        this.timbreTableDiv.innerHTML = '<div id="timbreTable"></div>';
+        this.timbreTableDiv.textContent = "";
+        const timbreTable = document.createElement("div");
+        timbreTable.id = "timbreTable";
+        this.timbreTableDiv.appendChild(timbreTable);
 
         const env = docById("timbreTable");
-        let htmlElements =
-            '<div id="wrapperOsc0"><div id="sOsc0"><span>' +
-            _("type") +
-            '</span></div><div id="selOsc"></div></div>';
-        htmlElements +=
-            '<div id="wrapperOsc1"><div id="sOsc1"><span>' +
-            _("partials") +
-            '</span></div><div class="insideDivOsc"><input type="range" id="myRangeO0" class="sliders" style="margin-top:20px" min="0" max="20" value="' +
-            parseFloat(this.oscParams[1]) +
-            '"><span id="myspanO0" class="rangeslidervalue">' +
-            this.oscParams[1] +
-            "</span></div></div>";
+        env.textContent = "";
 
-        env.innerHTML = htmlElements;
+        const wrapperOsc0 = document.createElement("div");
+        wrapperOsc0.id = "wrapperOsc0";
+        const labelDivOsc0 = document.createElement("div");
+        labelDivOsc0.id = "sOsc0";
+        const spanLabelOsc0 = document.createElement("span");
+        spanLabelOsc0.textContent = _("type");
+        labelDivOsc0.appendChild(spanLabelOsc0);
+        wrapperOsc0.appendChild(labelDivOsc0);
+
+        const selOsc = document.createElement("div");
+        selOsc.id = "selOsc";
+        wrapperOsc0.appendChild(selOsc);
+        env.appendChild(wrapperOsc0);
+
+        const wrapperOsc1 = document.createElement("div");
+        wrapperOsc1.id = "wrapperOsc1";
+        const labelDivOsc1 = document.createElement("div");
+        labelDivOsc1.id = "sOsc1";
+        const spanLabelOsc1 = document.createElement("span");
+        spanLabelOsc1.textContent = _("partials");
+        labelDivOsc1.appendChild(spanLabelOsc1);
+        wrapperOsc1.appendChild(labelDivOsc1);
+
+        const insideDivOsc = document.createElement("div");
+        insideDivOsc.className = "insideDivOsc";
+        const inputOsc1 = document.createElement("input");
+        inputOsc1.type = "range";
+        inputOsc1.id = "myRangeO0";
+        inputOsc1.className = "sliders";
+        inputOsc1.style.marginTop = "20px";
+        inputOsc1.min = "0";
+        inputOsc1.max = "20";
+        inputOsc1.value = parseFloat(this.oscParams[1]);
+        const spanValOsc1 = document.createElement("span");
+        spanValOsc1.id = "myspanO0";
+        spanValOsc1.className = "rangeslidervalue";
+        spanValOsc1.textContent = this.oscParams[1];
+        insideDivOsc.appendChild(inputOsc1);
+        insideDivOsc.appendChild(spanValOsc1);
+        wrapperOsc1.appendChild(insideDivOsc);
+        env.appendChild(wrapperOsc1);
         const envAppend = document.createElement("div");
         envAppend.id = "envAppend";
         envAppend.style.backgroundColor = platformColor.widgetBackground;
@@ -1546,40 +1720,27 @@ class TimbreWidget {
         env.append(envAppend);
 
         const myDiv = docById("selOsc");
-        let selectOpt = '<select id="selOsc1">';
+        const selectOsc1 = document.createElement("select");
+        selectOsc1.id = "selOsc1";
 
         for (let i = 0; i < OSCTYPES.length; i++) {
-            // work around some weird i18n bug
+            const opt = document.createElement("option");
             if (OSCTYPES[i][0].length === 0) {
+                opt.value = OSCTYPES[i][1];
+                opt.textContent = OSCTYPES[i][1];
                 if (OSCTYPES[i][0] === this.oscParams[0] || OSCTYPES[i][1] === this.oscParams[0]) {
-                    selectOpt +=
-                        '<option value="' +
-                        OSCTYPES[i][1] +
-                        '" selected>' +
-                        OSCTYPES[i][1] +
-                        "</option>";
-                } else {
-                    selectOpt +=
-                        '<option value="' + OSCTYPES[i][1] + '">' + OSCTYPES[i][1] + "</option>";
+                    opt.selected = true;
                 }
             } else {
+                opt.value = OSCTYPES[i][0];
+                opt.textContent = OSCTYPES[i][0];
                 if (OSCTYPES[i][0] === this.oscParams[0] || OSCTYPES[i][1] === this.oscParams[0]) {
-                    selectOpt +=
-                        '<option value="' +
-                        OSCTYPES[i][0] +
-                        '" selected>' +
-                        OSCTYPES[i][0] +
-                        "</option>";
-                } else {
-                    selectOpt +=
-                        '<option value="' + OSCTYPES[i][0] + '">' + OSCTYPES[i][0] + "</option>";
+                    opt.selected = true;
                 }
             }
+            selectOsc1.appendChild(opt);
         }
-
-        selectOpt += "</select>";
-
-        myDiv.innerHTML = selectOpt;
+        myDiv.appendChild(selectOsc1);
 
         document.getElementById("wrapperOsc0").addEventListener("change", event => {
             const elem = event.target;
@@ -1647,28 +1808,44 @@ class TimbreWidget {
         this.timbreTableDiv.style.overflow = "auto";
         this.timbreTableDiv.style.backgroundColor = "white";
         this.timbreTableDiv.style.height = "300px";
-        this.timbreTableDiv.innerHTML = '<div id="timbreTable"></div>';
+        this.timbreTableDiv.textContent = "";
+        const timbreTable = document.createElement("div");
+        timbreTable.id = "timbreTable";
+        this.timbreTableDiv.appendChild(timbreTable);
 
         const env = docById("timbreTable");
-        let htmlElements = "";
-        for (let i = 0; i < 4; i++) {
-            htmlElements +=
-                '<div id="wrapperEnv' +
-                i +
-                '"><div class="circle">' +
-                "ADSR".charAt(i) +
-                '</div><div class="insideDivEnv"><input type="range" id="myRange' +
-                i +
-                '" class="sliders" style="margin-top:20px" value="' +
-                parseFloat(this.ENVs[i]) +
-                '"><span id="myspan' +
-                i +
-                '" class="rangeslidervalue">' +
-                this.ENVs[i] +
-                "</span></div></div>";
-        }
+        env.textContent = "";
 
-        env.innerHTML = htmlElements;
+        for (let i = 0; i < 4; i++) {
+            const wrapperEnv = document.createElement("div");
+            wrapperEnv.id = "wrapperEnv" + i;
+
+            const circleDiv = document.createElement("div");
+            circleDiv.className = "circle";
+            circleDiv.textContent = "ADSR".charAt(i);
+            wrapperEnv.appendChild(circleDiv);
+
+            const insideDivEnv = document.createElement("div");
+            insideDivEnv.className = "insideDivEnv";
+
+            const rangeEnv = document.createElement("input");
+            rangeEnv.type = "range";
+            rangeEnv.id = "myRange" + i;
+            rangeEnv.className = "sliders";
+            rangeEnv.style.marginTop = "20px";
+            rangeEnv.value = parseFloat(this.ENVs[i]);
+
+            const spanEnv = document.createElement("span");
+            spanEnv.id = "myspan" + i;
+            spanEnv.className = "rangeslidervalue";
+            spanEnv.textContent = this.ENVs[i];
+
+            insideDivEnv.appendChild(rangeEnv);
+            insideDivEnv.appendChild(spanEnv);
+            wrapperEnv.appendChild(insideDivEnv);
+
+            env.appendChild(wrapperEnv);
+        }
         const envAppend = document.createElement("div");
         envAppend.id = "envAppend";
         envAppend.style.backgroundColor = platformColor.widgetBackground;
@@ -1722,10 +1899,13 @@ class TimbreWidget {
         this.timbreTableDiv.style.overflow = "auto";
         this.timbreTableDiv.style.backgroundColor = "white";
         this.timbreTableDiv.style.height = "300px";
-        this.timbreTableDiv.innerHTML = '<div id="timbreTable"></div>';
+        this.timbreTableDiv.textContent = "";
+        const timbreTable = document.createElement("div");
+        timbreTable.id = "timbreTable";
+        this.timbreTableDiv.appendChild(timbreTable);
 
         const env = docById("timbreTable");
-        env.innerHTML = "";
+        env.textContent = "";
 
         for (let f = 0; f < this.fil.length; f++) {
             this._createFilter(f, env);
@@ -1753,11 +1933,11 @@ class TimbreWidget {
         if (f % 2 === 1) {
             containerDiv.className = "rectangle";
             const spacer = document.createElement("p");
-            spacer.innerHTML = "&nbsp;";
+            spacer.textContent = "\u00A0";
             containerDiv.appendChild(spacer);
         } else if (f > 0) {
             const spacer = document.createElement("p");
-            spacer.innerHTML = "&nbsp;";
+            spacer.textContent = "\u00A0";
             containerDiv.appendChild(spacer);
         }
 
@@ -2116,15 +2296,18 @@ class TimbreWidget {
             height: "300px"
         });
 
-        this.timbreTableDiv.innerHTML = '<div id="timbreTable"></div>';
+        this.timbreTableDiv.textContent = "";
+        const timbreTable = document.createElement("div");
+        timbreTable.id = "timbreTable";
+        this.timbreTableDiv.appendChild(timbreTable);
 
         const env = docById("timbreTable");
-        let htmlElements = "";
+        env.textContent = "";
         for (let i = 0; i < 2; i++) {
-            htmlElements += '<div id ="effect' + i + '"></div>';
+            const effectDiv = document.createElement("div");
+            effectDiv.id = "effect" + i;
+            env.appendChild(effectDiv);
         }
-
-        env.innerHTML = htmlElements;
         const envAppend = document.createElement("div");
         envAppend.id = "envAppend";
         envAppend.style.backgroundColor = platformColor.widgetBackground;
@@ -2135,15 +2318,18 @@ class TimbreWidget {
 
         const mainDiv = docById("effect0");
         const effects = ["Tremolo", "Vibrato", "Chorus", "Phaser", "Distortion"];
-        const effectsHtml = effects
-            .map(
-                effect =>
-                    `<input type="radio" name="effectsName" value="${effect}"/>${_(
-                        effect.toLowerCase()
-                    )}<br>`
-            )
-            .join("");
-        mainDiv.innerHTML = `<p>${effectsHtml}</p>`;
+        mainDiv.textContent = "";
+        const pNode = document.createElement("p");
+        effects.forEach(effect => {
+            const radioNode = document.createElement("input");
+            radioNode.type = "radio";
+            radioNode.name = "effectsName";
+            radioNode.value = effect;
+            pNode.appendChild(radioNode);
+            pNode.appendChild(document.createTextNode(_(effect.toLowerCase())));
+            pNode.appendChild(document.createElement("br"));
+        });
+        mainDiv.appendChild(pNode);
 
         const subDiv = docById("effect1");
         const effectsName = docByName("effectsName");
@@ -2152,7 +2338,40 @@ class TimbreWidget {
         for (let i = 0; i < effectsName.length; i++) {
             effectsName[i].onclick = async event => {
                 effectChosen = event.target.value;
-                let subHtmlElements = '<div id="chosen">' + effectChosen + "</div>";
+                subDiv.textContent = "";
+                const chosenNode = document.createElement("div");
+                chosenNode.id = "chosen";
+                chosenNode.textContent = effectChosen;
+                subDiv.appendChild(chosenNode);
+
+                const buildSliders = (numSliders, maxVal) => {
+                    for (let j = 0; j < numSliders; j++) {
+                        const wrapperFx = document.createElement("div");
+                        wrapperFx.id = "wrapperFx" + j;
+                        const labelFx = document.createElement("div");
+                        labelFx.id = "sFx" + j;
+                        const spanFx = document.createElement("span");
+                        labelFx.appendChild(spanFx);
+                        wrapperFx.appendChild(labelFx);
+                        const insideDivFx = document.createElement("div");
+                        insideDivFx.className = "insideDivEffects";
+                        const inputFx = document.createElement("input");
+                        inputFx.type = "range";
+                        inputFx.id = "myRangeFx" + j;
+                        inputFx.className = "sliders";
+                        inputFx.style.marginTop = "20px";
+                        if (maxVal) inputFx.max = maxVal;
+                        inputFx.value = "2";
+                        const spanValFx = document.createElement("span");
+                        spanValFx.id = "myspanFx" + j;
+                        spanValFx.className = "rangeslidervalue";
+                        spanValFx.textContent = "2";
+                        insideDivFx.appendChild(inputFx);
+                        insideDivFx.appendChild(spanValFx);
+                        wrapperFx.appendChild(insideDivFx);
+                        subDiv.appendChild(wrapperFx);
+                    }
+                };
                 if (effectChosen === "Tremolo") {
                     this.isActive["tremolo"] = true;
                     this.isActive["chorus"] = false;
@@ -2162,20 +2381,7 @@ class TimbreWidget {
 
                     instrumentsEffects[0][this.instrumentName]["tremoloActive"] = true;
 
-                    for (let j = 0; j < 2; j++) {
-                        subHtmlElements +=
-                            '<div id="wrapperFx' +
-                            j +
-                            '"><div id="sFx' +
-                            j +
-                            '"><span></span></div><div class="insideDivEffects"><input type="range" id="myRangeFx' +
-                            j +
-                            '" class="sliders" style="margin-top:20px" value="2"><span id="myspanFx' +
-                            j +
-                            '" class="rangeslidervalue">2</span></div></div>';
-                    }
-
-                    subDiv.innerHTML = subHtmlElements;
+                    buildSliders(2);
                     docById("sFx0").textContent = _("rate");
                     docById("myRangeFx0").value = 10;
                     docById("myspanFx0").textContent = "10";
@@ -2246,21 +2452,7 @@ class TimbreWidget {
                     this.isActive["phaser"] = false;
 
                     instrumentsEffects[0][this.instrumentName]["vibratoActive"] = true;
-                    for (let i = 0; i < 2; i++) {
-                        subHtmlElements +=
-                            '<div id="wrapperFx' +
-                            i +
-                            '"><div id="sFx' +
-                            i +
-                            '"><span></span></div><div class="insideDivEffects"><input type="range" id="myRangeFx' +
-                            i +
-                            '" class="sliders" style="margin-top:20px" max="25" value="2"><span id="myspanFx' +
-                            i +
-                            '" class="rangeslidervalue">2</span></div></div>';
-                    }
-
-                    // Set slider values
-                    subDiv.innerHTML = subHtmlElements;
+                    buildSliders(2, 25);
                     docById("sFx0").textContent = _("intensity");
                     docById("sFx1").textContent = _("rate");
 
@@ -2341,20 +2533,7 @@ class TimbreWidget {
 
                     instrumentsEffects[0][this.instrumentName]["chorusActive"] = true;
 
-                    for (let i = 0; i < 3; i++) {
-                        subHtmlElements +=
-                            '<div id="wrapperFx' +
-                            i +
-                            '"><div id="sFx' +
-                            i +
-                            '"><span></span></div><div class="insideDivEffects"><input type="range" id="myRangeFx' +
-                            i +
-                            '" class="sliders" style="margin-top:20px" value="2"><span id="myspanFx' +
-                            i +
-                            '" class="rangeslidervalue">2</span></div></div>';
-                    }
-
-                    subDiv.innerHTML = subHtmlElements;
+                    buildSliders(3);
                     docById("sFx0").textContent = _("rate");
                     docById("myRangeFx0").value = 2;
                     docById("myspanFx0").textContent = "2";
@@ -2444,20 +2623,10 @@ class TimbreWidget {
                     instrumentsEffects[0][this.instrumentName]["octaves"] = 3;
                     instrumentsEffects[0][this.instrumentName]["baseFrequency"] = 100;
 
-                    for (let i = 0; i < 3; i++) {
-                        subHtmlElements +=
-                            '<div id="wrapperFx' +
-                            i +
-                            '"><div id="sFx' +
-                            i +
-                            '"><span></span></div><div class="insideDivEffects"><input type="range" id="myRangeFx' +
-                            i +
-                            '" class="sliders" style="margin-top:20px" min="0" max="1000" value="2"><span id="myspanFx' +
-                            i +
-                            '" class="rangeslidervalue">2</span></div></div>';
-                    }
-
-                    subDiv.innerHTML = subHtmlElements;
+                    buildSliders(3, 1000);
+                    docById("myRangeFx0").min = 0;
+                    docById("myRangeFx1").min = 0;
+                    docById("myRangeFx2").min = 0;
                     docById("sFx0").textContent = _("rate");
                     docById("myRangeFx0").value = 5;
                     docById("myspanFx0").textContent = "5";
@@ -2538,10 +2707,7 @@ class TimbreWidget {
 
                     instrumentsEffects[0][this.instrumentName]["distortionActive"] = true;
 
-                    subHtmlElements +=
-                        '<div id="wrapperFx0"><div id="sFx0"><span></span></div><div class="insideDivEffects"><input type="range" id="myRangeFx0" class="sliders" style="margin-top:20px" value="2"><span id="myspanFx0" class="rangeslidervalue">2</span></div></div>';
-
-                    subDiv.innerHTML = subHtmlElements;
+                    buildSliders(1);
 
                     docById("sFx0").textContent = _("distortion amount");
                     docById("myRangeFx0").value = 40;

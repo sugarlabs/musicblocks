@@ -19,7 +19,7 @@
    RhythmRuler, FILTERTYPES, instrumentsFilters, DEFAULTFILTERTYPE,
    TemperamentWidget, TimbreWidget, ModeWidget, PitchSlider,
    MusicKeyboard, PitchStaircase, SampleWidget, _THIS_IS_MUSIC_BLOCKS_,
-   Arpeggio, LegoWidget
+   AIWidget, AIDebuggerWidget, Arpeggio, LegoWidget
  */
 
 /*
@@ -73,6 +73,18 @@
  * @param {string} activity - The activity for which blocks are being set up.
  */
 function setupWidgetBlocks(activity) {
+    /**
+     * Environment-aware lazy module loader.
+     * Uses AMD require() in the browser; calls callback synchronously in Node/Jest.
+     */
+    function _lazyRequire(modules, callback) {
+        if (typeof define === "function" && define.amd) {
+            require(Array.isArray(modules) ? modules : [modules], callback);
+        } else {
+            callback();
+        }
+    }
+
     /**
      * Represents a block for controlling sound envelope (ADSR).
      * @extends FlowBlock
@@ -286,7 +298,9 @@ function setupWidgetBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             if (logo.temperament === null) {
-                logo.temperament = new TemperamentWidget();
+                _lazyRequire(["widgets/temperament"], function () {
+                    logo.temperament = new TemperamentWidget();
+                });
             }
 
             logo.insideTemperament = true;
@@ -364,9 +378,6 @@ function setupWidgetBlocks(activity) {
          * @returns {number[]} - The output values.
          */
         flow(args, logo, turtle, blk) {
-            if (logo.sample === null) {
-                logo.sample = new SampleWidget();
-            }
             logo.inSample = true;
 
             const listenerName = "_sampler_" + turtle;
@@ -446,7 +457,9 @@ function setupWidgetBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             if (logo.timbre === null) {
-                logo.timbre = new TimbreWidget();
+                _lazyRequire(["widgets/timbre"], function () {
+                    logo.timbre = new TimbreWidget();
+                });
             }
 
             logo.inTimbre = true;
@@ -550,9 +563,10 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
-                logo.meterWidget = new MeterWidget(activity, blk);
-
-                logo.insideMeterWidget = false;
+                _lazyRequire(["widgets/meterwidget"], function () {
+                    logo.meterWidget = new MeterWidget(activity, blk);
+                    logo.insideMeterWidget = false;
+                });
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -621,8 +635,10 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
-                logo.Oscilloscope = new Oscilloscope(activity);
-                logo.inOscilloscope = false;
+                _lazyRequire(["widgets/oscilloscope"], function () {
+                    logo.Oscilloscope = new Oscilloscope(activity);
+                    logo.inOscilloscope = false;
+                });
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -678,8 +694,10 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
-                logo.modeWidget = new ModeWidget(activity);
-                logo.insideModeWidget = false;
+                _lazyRequire(["widgets/modewidget"], function () {
+                    logo.modeWidget = new ModeWidget(activity);
+                    logo.insideModeWidget = false;
+                });
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -732,7 +750,9 @@ function setupWidgetBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             if (logo.tempo === null) {
-                logo.tempo = new Tempo();
+                _lazyRequire(["widgets/tempo"], function () {
+                    logo.tempo = new Tempo();
+                });
             }
 
             logo.inTempo = true;
@@ -801,7 +821,9 @@ function setupWidgetBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             if (logo.arpeggio === null) {
-                logo.arpeggio = new Arpeggio();
+                _lazyRequire(["widgets/arpeggio"], function () {
+                    logo.arpeggio = new Arpeggio();
+                });
             }
 
             logo.inArpeggio = true;
@@ -875,7 +897,9 @@ function setupWidgetBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             if (logo.pitchDrumMatrix === null) {
-                logo.pitchDrumMatrix = new PitchDrumMatrix();
+                _lazyRequire(["widgets/pitchdrummatrix"], function () {
+                    logo.pitchDrumMatrix = new PitchDrumMatrix();
+                });
             }
 
             logo.inPitchDrumMatrix = true;
@@ -948,7 +972,9 @@ function setupWidgetBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             if (logo.pitchSlider === null) {
-                logo.pitchSlider = new PitchSlider();
+                _lazyRequire(["widgets/pitchslider"], function () {
+                    logo.pitchSlider = new PitchSlider();
+                });
             }
 
             logo.inPitchSlider = true;
@@ -1099,7 +1125,9 @@ function setupWidgetBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             if (logo.musicKeyboard === null) {
-                logo.musicKeyboard = new MusicKeyboard(activity);
+                _lazyRequire(["widgets/musickeyboard"], function () {
+                    logo.musicKeyboard = new MusicKeyboard(activity);
+                });
             }
 
             logo.inMusicKeyboard = true;
@@ -1163,7 +1191,9 @@ function setupWidgetBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             if (logo.pitchStaircase === null) {
-                logo.pitchStaircase = new PitchStaircase();
+                _lazyRequire(["widgets/pitchstaircase"], function () {
+                    logo.pitchStaircase = new PitchStaircase();
+                });
             }
 
             logo.pitchStaircase.Stairs = [];
@@ -1270,7 +1300,9 @@ function setupWidgetBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             if (logo.rhythmRuler == null) {
-                logo.rhythmRuler = new RhythmRuler();
+                _lazyRequire(["widgets/rhythmruler"], function () {
+                    logo.rhythmRuler = new RhythmRuler();
+                });
             }
 
             logo.rhythmRuler.Rulers = [];
@@ -1470,43 +1502,54 @@ function setupWidgetBlocks(activity) {
             logo.inMatrix = true;
 
             if (logo.phraseMaker === null) {
-                // Create explicit dependency object for PhraseMaker
-                const phraseMakerDeps = {
-                    activity: activity,
-                    _: _,
-                    platformColor: platformColor,
-                    docById: docById,
-                    docBySelector: docBySelector,
-                    MATRIXSOLFEHEIGHT: MATRIXSOLFEHEIGHT,
-                    MATRIXSOLFEWIDTH: MATRIXSOLFEWIDTH,
-                    toFraction: toFraction,
-                    Singer: Singer,
-                    SOLFEGECONVERSIONTABLE: SOLFEGECONVERSIONTABLE,
-                    slicePath: slicePath,
-                    wheelnav: wheelnav,
-                    delayExecution: delayExecution,
-                    DEFAULTVOICE: DEFAULTVOICE,
-                    getDrumName: getDrumName,
-                    getDrumIcon: getDrumIcon,
-                    noteIsSolfege: noteIsSolfege,
-                    isCustomTemperament: isCustomTemperament,
-                    i18nSolfege: i18nSolfege,
-                    getNote: getNote,
-                    DEFAULTDRUM: DEFAULTDRUM,
-                    last: last,
-                    DRUMS: DRUMS,
-                    SHARP: SHARP,
-                    FLAT: FLAT,
-                    PREVIEWVOLUME: PREVIEWVOLUME,
-                    DEFAULTVOLUME: DEFAULTVOLUME,
-                    noteToFrequency: noteToFrequency,
-                    LCD: LCD,
-                    calcNoteValueToDisplay: calcNoteValueToDisplay,
-                    NOTESYMBOLS: NOTESYMBOLS,
-                    EIGHTHNOTEWIDTH: EIGHTHNOTEWIDTH,
-                    getTemperament: getTemperament
-                };
-                logo.phraseMaker = new PhraseMaker(phraseMakerDeps);
+                _lazyRequire(
+                    [
+                        "widgets/PhraseMakerUtils",
+                        "widgets/PhraseMakerGrid",
+                        "widgets/PhraseMakerUI",
+                        "widgets/PhraseMakerAudio",
+                        "widgets/phrasemaker"
+                    ],
+                    function () {
+                        // Create explicit dependency object for PhraseMaker
+                        const phraseMakerDeps = {
+                            activity: activity,
+                            _: _,
+                            platformColor: platformColor,
+                            docById: docById,
+                            docBySelector: docBySelector,
+                            MATRIXSOLFEHEIGHT: MATRIXSOLFEHEIGHT,
+                            MATRIXSOLFEWIDTH: MATRIXSOLFEWIDTH,
+                            toFraction: toFraction,
+                            Singer: Singer,
+                            SOLFEGECONVERSIONTABLE: SOLFEGECONVERSIONTABLE,
+                            slicePath: slicePath,
+                            wheelnav: wheelnav,
+                            delayExecution: delayExecution,
+                            DEFAULTVOICE: DEFAULTVOICE,
+                            getDrumName: getDrumName,
+                            getDrumIcon: getDrumIcon,
+                            noteIsSolfege: noteIsSolfege,
+                            isCustomTemperament: isCustomTemperament,
+                            i18nSolfege: i18nSolfege,
+                            getNote: getNote,
+                            DEFAULTDRUM: DEFAULTDRUM,
+                            last: last,
+                            DRUMS: DRUMS,
+                            SHARP: SHARP,
+                            FLAT: FLAT,
+                            PREVIEWVOLUME: PREVIEWVOLUME,
+                            DEFAULTVOLUME: DEFAULTVOLUME,
+                            noteToFrequency: noteToFrequency,
+                            LCD: LCD,
+                            calcNoteValueToDisplay: calcNoteValueToDisplay,
+                            NOTESYMBOLS: NOTESYMBOLS,
+                            EIGHTHNOTEWIDTH: EIGHTHNOTEWIDTH,
+                            getTemperament: getTemperament
+                        };
+                        logo.phraseMaker = new PhraseMaker(phraseMakerDeps);
+                    }
+                );
             }
             logo.phraseMaker.blockNo = blk;
 
@@ -1537,7 +1580,7 @@ function setupWidgetBlocks(activity) {
                     // Process queued up rhythms.
                     logo.phraseMaker.blockNo = blk;
                     logo.phraseMaker.sorted = false;
-                    logo.phraseMaker.init(activity);
+                    logo.phraseMaker.init(activity, turtle);
 
                     for (let i = 0; i < logo.tupletRhythms.length; i++) {
                         // We have two cases: (1) notes in a tuplet;
@@ -1670,9 +1713,6 @@ function setupWidgetBlocks(activity) {
          * @returns {number[]} - The output values.
          */
         flow(args, logo, turtle, blk) {
-            if (logo.sample === null) {
-                logo.sample = new AIWidget();
-            }
             logo.inSample = true;
 
             const listenerName = "_sampler_" + turtle;
@@ -1720,7 +1760,9 @@ function setupWidgetBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             if (logo.reflection === null) {
-                logo.reflection = new ReflectionMatrix();
+                _lazyRequire(["widgets/reflection"], function () {
+                    logo.reflection = new ReflectionMatrix();
+                });
             }
 
             logo.reflection.init(activity);
@@ -1797,7 +1839,9 @@ function setupWidgetBlocks(activity) {
             logo.inLegoWidget = true;
 
             if (logo.legoWidget === null) {
-                logo.legoWidget = new LegoWidget();
+                _lazyRequire(["widgets/legobricks"], function () {
+                    logo.legoWidget = new LegoWidget();
+                });
             }
             logo.legoWidget.blockNo = blk;
 
@@ -1858,9 +1902,6 @@ function setupWidgetBlocks(activity) {
          * @returns {number[]} - The output values.
          */
         flow(args, logo, turtle, blk) {
-            if (logo.sample === null) {
-                logo.sample = new AIDebuggerWidget();
-            }
             logo.inSample = true;
 
             const listenerName = "_sampler_" + turtle;
