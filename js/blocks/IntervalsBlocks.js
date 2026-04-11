@@ -12,7 +12,7 @@
 /*
    global
 
-   last, _, ValueBlock, FlowClampBlock, FlowBlock, NOINPUTERRORMSG,
+   deepClone, last, _, ValueBlock, FlowClampBlock, FlowBlock, NOINPUTERRORMSG,
    LeftBlock, Singer, CHORDNAMES, CHORDVALUES, DEFAULTCHORD,
    Queue, INTERVALVALUES
  */
@@ -412,9 +412,11 @@ function setupIntervalsBlocks(activity) {
             const saveSuppressStatus = tur.singer.suppressOutput;
 
             // Save the state of the boxes, dicts, and heap
-            const saveBoxes = JSON.stringify(logo.boxes);
-            const saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
-            const saveTurtleDicts = JSON.stringify(logo.turtleDicts[turtle]);
+            const saveBoxes = deepClone(logo.boxes);
+            const saveTurtleHeaps =
+                logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle]) : undefined;
+            const saveTurtleDicts =
+                logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle]) : undefined;
 
             // Save the turtle state
             const saveX = tur.x;
@@ -427,7 +429,7 @@ function setupIntervalsBlocks(activity) {
             const saveOrientation = tur.orientation;
             const savePenState = tur.painter.penState;
             const previousButNotThese = tur.butNotThese;
-            tur.butNotThese = JSON.parse(JSON.stringify(tur.butNotThese));
+            tur.butNotThese = deepClone(tur.butNotThese);
 
             tur.singer.suppressOutput = true;
             tur.singer.justCounting.push(true);
@@ -463,9 +465,9 @@ function setupIntervalsBlocks(activity) {
             tur.singer.notesPlayed = saveNoteCount;
 
             // Restore previous state
-            logo.boxes = JSON.parse(saveBoxes);
-            logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
-            logo.turtleDicts[turtle] = JSON.parse(saveTurtleDicts);
+            logo.boxes = saveBoxes;
+            logo.turtleHeaps[turtle] = saveTurtleHeaps != null ? saveTurtleHeaps : {};
+            logo.turtleDicts[turtle] = saveTurtleDicts != null ? saveTurtleDicts : {};
 
             tur.painter.doPenUp();
             tur.painter.doSetXY(saveX, saveY);
@@ -531,9 +533,11 @@ function setupIntervalsBlocks(activity) {
             // We need to save the state of the boxes, dicts, and heap
             // although there is a potential of a boxes
             // collision with other turtles.
-            const saveBoxes = JSON.stringify(logo.boxes);
-            const saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
-            const saveTurtleDicts = JSON.stringify(logo.turtleDicts[turtle]);
+            const saveBoxes = deepClone(logo.boxes);
+            const saveTurtleHeaps =
+                logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle]) : undefined;
+            const saveTurtleDicts =
+                logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle]) : undefined;
             // And the turtle state
             const saveX = tur.x;
             const saveY = tur.y;
@@ -545,7 +549,7 @@ function setupIntervalsBlocks(activity) {
             const saveOrientation = tur.orientation;
             const savePenState = tur.painter.penState;
             const previousButNotThese = tur.butNotThese;
-            tur.butNotThese = JSON.parse(JSON.stringify(tur.butNotThese));
+            tur.butNotThese = deepClone(tur.butNotThese);
 
             tur.singer.suppressOutput = true;
 
@@ -582,9 +586,9 @@ function setupIntervalsBlocks(activity) {
             tur.singer.notesPlayed = saveNoteCount;
 
             // Restore previous state
-            logo.boxes = JSON.parse(saveBoxes);
-            logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
-            logo.turtleDicts[turtle] = JSON.parse(saveTurtleDicts);
+            logo.boxes = saveBoxes;
+            logo.turtleHeaps[turtle] = saveTurtleHeaps != null ? saveTurtleHeaps : {};
+            logo.turtleDicts[turtle] = saveTurtleDicts != null ? saveTurtleDicts : {};
 
             tur.painter.doPenUp();
             tur.painter.doSetXY(saveX, saveY);
@@ -832,7 +836,6 @@ function setupIntervalsBlocks(activity) {
                 });
             };
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = async event => {
                 tur.singer.inDuplicate = false;
                 tur.singer.duplicateFactor /= factor;
@@ -1051,7 +1054,6 @@ function setupIntervalsBlocks(activity) {
                 if (intervalName in INTERVALVALUES) {
                     r = INTERVALVALUES[intervalName][2];
                 } else {
-                    // eslint-disable-next-line no-console
                     console.log("could not find " + intervalName + " in INTERVALVALUES");
                     r = 1;
                 }
@@ -1059,7 +1061,7 @@ function setupIntervalsBlocks(activity) {
 
             if (isNaN(r) || r < 0) {
                 r = 1;
-                // eslint-disable-next-line no-console
+
                 console.debug("ratio " + r + " must be a number > 0");
             }
             Singer.IntervalsActions.setRatioInterval(r, turtle, blk);
@@ -1532,7 +1534,49 @@ function setupIntervalsBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for getting the length of the current temperament.
+     * @extends {ValueBlock}
+     */
+    class TemperamentLengthBlock extends ValueBlock {
+        constructor() {
+            //.TRANS: the number of pitches in the current temperament system
+            super("temperamentlength", _("temperament length"));
+            this.setPalette("intervals", activity);
+            this.beginnerBlock(true);
+            this.parameter = true;
+            this.setHelpString([
+                _(
+                    "The Temperament length block returns the number of pitches in the current temperament system. For example, 12 for standard equal temperament or 31 for a 31-tone temperament."
+                ),
+                "documentation",
+                ""
+            ]);
+            this.formBlock({ outType: "numberout" });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return activity.blocks.blockList[blk].value;
+        }
+
+        arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
+            if (
+                logo.inStatusMatrix &&
+                parentId != null &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
+            ) {
+                logo.statusFields.push([blk, "temperamentlength"]);
+            } else {
+                return Singer.IntervalsActions.getTemperamentLength();
+            }
+        }
+    }
+
     new SetTemperamentBlock().setup(activity);
+    new TemperamentLengthBlock().setup(activity);
     new TemperamentNameBlock().setup(activity);
     new ChordNameBlock().setup(activity);
     new ModeNameBlock().setup(activity);

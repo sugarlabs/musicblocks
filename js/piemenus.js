@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 // Copyright (c) 2014-23 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
@@ -14,15 +13,15 @@
 /*
    global
 
-   _, platformColor, docById, Singer, slicePath, wheelnav,
+   platformColor, docById, Singer, slicePath, wheelnav,
    DEFAULTVOICE, getDrumName, getNote, MUSICALMODES last, SHARP, FLAT,
    PREVIEWVOLUME, DEFAULTVOLUME, MODE_PIE_MENUS, HelpWidget,
    INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName,
    getMunsellColor, COLORS40, frequencyToPitch, instruments,
    DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
-   FIXEDSOLFEGE, NOTENAMES, FIXEDSOLFEGE, NOTENAMES, numberToPitch,
+   FIXEDSOLFEGE, NOTENAMES, numberToPitch,
    nthDegreeToPitch, SOLFEGENAMES, buildScale, _THIS_IS_TURTLE_BLOCKS_,
-   CHORDNAMES
+   CHORDNAMES, Synth, Tone, activity
 */
 
 /*
@@ -461,7 +460,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
         !pitchHasAccidental &&
         ((!block.activity.KeySignatureEnv[2] && block.name === "solfege") ||
             (block.name === "notename" &&
-                (block.connections[0] != undefined
+                (block.connections[0] !== undefined
                     ? !["setkey", "setkey2"].includes(
                           block.blocks.blockList[block.connections[0]].name
                       )
@@ -609,7 +608,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                 block.activity.KeySignatureEnv[0] + " " + block.activity.KeySignatureEnv[1];
 
             let obj;
-            if (that.name == "scaledegree2") {
+            if (that.name === "scaledegree2") {
                 note = note.replace(attr, "");
                 note = SOLFEGENAMES[note - 1];
                 note += attr;
@@ -676,11 +675,11 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                         false
                     );
                 } catch (e) {
-                    // Ensure trigger lock is released after a delay
-                    setTimeout(() => {
-                        that._triggerLock = false;
-                    }, 125); // 1/8 second in milliseconds
+                    console.error("Synth trigger error:", e);
                 }
+                setTimeout(() => {
+                    that._triggerLock = false;
+                }, 125);
             }
         } catch (e) {
             console.error("Error in pitch preview:", e);
@@ -700,7 +699,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
         if (
             (!block.activity.KeySignatureEnv[2] && that.name === "solfege") ||
             (that.name === "notename" &&
-                (that.connections[0] != undefined
+                (that.connections[0] !== undefined
                     ? !["setkey", "setkey2"].includes(
                           that.blocks.blockList[that.connections[0]].name
                       )
@@ -771,7 +770,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             ["setkey", "setkey2"].includes(that.blocks.blockList[that.connections[0]].name)
         ) {
             // We may need to update the mode widget.
-            that.activity.logo.modeBlock = that.blocks.blockList.indexOf(that);
+            that.activity.logo.modeBlock = that.blockIndex;
         }
     };
 
@@ -1178,7 +1177,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
 
     let j = selectedNote;
     for (const x in noteLabels[selectedCustom]) {
-        if (x != "pitchNumber" && noteLabels[selectedCustom][x][1] == j) {
+        if (x !== "pitchNumber" && noteLabels[selectedCustom][x][1] === j) {
             j = +x;
             break;
         }
@@ -2190,13 +2189,19 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         const actualPitch = frequencyToPitch(wheelValues[i]);
         const tur = that.activity.turtles.ithTurtle(0);
         if (!tur.singer.instrumentNames.includes(DEFAULTVOICE)) {
-            that.activity.logo.synth.createDefaultSynth(0);
-            that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
+            if (that.activity?.logo?.synth?.createDefaultSynth) {
+                that.activity.logo.synth.createDefaultSynth(0);
+            }
+            if (that.activity?.logo?.synth?.loadSynth) {
+                that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
+            }
         }
-        that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
-        that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+        if (that.activity?.logo?.synth) {
+            that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
+            that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+        }
         actualPitch[0] = actualPitch[0].replace(SHARP, "#").replace(FLAT, "b");
-        if (!that._triggerLock) {
+        if (!that._triggerLock && that.activity?.logo?.synth?.trigger) {
             that._triggerLock = true;
             that.activity.logo.synth.trigger(
                 0,
@@ -3577,15 +3582,18 @@ const piemenuModes = (block, selectedMode) => {
         docById("wheelnav-_exitWheel-title-1").style.fill = "#ffffff";
         docById("wheelnav-_exitWheel-title-1").style.pointerEvents = "none";
         docById("wheelnav-_exitWheel-slice-1").style.pointerEvents = "none";
-        setTimeout(() => {
-            const playButtonTitle = docById("wheelnav-_exitWheel-title-1");
-            const playButtonSlice = docById("wheelnav-_exitWheel-slice-1");
-            if (playButtonTitle && playButtonSlice) {
-                playButtonTitle.style.fill = "#000000";
-                playButtonTitle.style.pointerEvents = "auto";
-                playButtonSlice.style.pointerEvents = "auto";
-            }
-        }, (20 * 1000) / 10);
+        setTimeout(
+            () => {
+                const playButtonTitle = docById("wheelnav-_exitWheel-title-1");
+                const playButtonSlice = docById("wheelnav-_exitWheel-slice-1");
+                if (playButtonTitle && playButtonSlice) {
+                    playButtonTitle.style.fill = "#000000";
+                    playButtonTitle.style.pointerEvents = "auto";
+                    playButtonSlice.style.pointerEvents = "auto";
+                }
+            },
+            (20 * 1000) / 10
+        );
 
         __playScale(activeTabs, 0);
     };
@@ -3680,7 +3688,7 @@ const piemenuBlockContext = block => {
     let pasteDy = 0;
 
     const that = block;
-    const blockBlock = block.blocks.blockList.indexOf(block);
+    const blockBlock = block.blockIndex;
 
     // Position the widget centered over the active block.
     docById("contextWheelDiv").style.position = "absolute";
@@ -3803,7 +3811,7 @@ const piemenuBlockContext = block => {
         that.blocks.sendStackToTrash(that.blocks.blockList[blockBlock]);
         docById("contextWheelDiv").style.display = "none";
         // prompting a notification on deleting any block
-        activity.textMsg(
+        that.activity.textMsg(
             _("You can restore deleted blocks from the trash with the Restore From Trash button."),
             3000
         );
@@ -3813,20 +3821,22 @@ const piemenuBlockContext = block => {
         docById("contextWheelDiv").style.display = "none";
     };
 
-    // Named function for proper cleanup
-    const hideContextWheelOnClick = event => {
+    // Use a named handler stored globally so we can remove the previous one
+    // before adding a new one, preventing accumulation of click listeners.
+    if (window._contextWheelClickHandler) {
+        document.body.removeEventListener("click", window._contextWheelClickHandler);
+    }
+
+    window._contextWheelClickHandler = event => {
         const wheelElement = document.getElementById("contextWheelDiv");
         const displayStyle = window.getComputedStyle(wheelElement).display;
         if (displayStyle === "block") {
             wheelElement.style.display = "none";
-            // Remove listener after hiding to prevent memory leak
-            document.body.removeEventListener("click", hideContextWheelOnClick);
+            document.body.removeEventListener("click", window._contextWheelClickHandler);
         }
     };
 
-    // Remove any existing listener before adding a new one
-    document.body.removeEventListener("click", hideContextWheelOnClick);
-    document.body.addEventListener("click", hideContextWheelOnClick);
+    document.body.addEventListener("click", window._contextWheelClickHandler);
 
     if (
         ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].includes(
@@ -3860,6 +3870,7 @@ const piemenuBlockContext = block => {
  */
 const piemenuGrid = activity => {
     docById("wheelDivptm").style.display = "none";
+    docById("wheelDivptm").classList.add("grid-wheel");
     const x = activity.turtles.gridButton.getBoundingClientRect().x;
     const y = activity.turtles.gridButton.getBoundingClientRect().y;
     docById("wheelDivptm").style.position = "absolute";
@@ -3967,6 +3978,7 @@ const piemenuGrid = activity => {
 
     const hidePiemenu = activity => {
         docById("wheelDivptm").style.display = "none";
+        docById("wheelDivptm").classList.remove("grid-wheel");
         activity.turtles.gridWheel.removeWheel();
         activity.turtles._exitWheel.removeWheel();
     };
@@ -4181,7 +4193,7 @@ const piemenuKey = activity => {
         const ele = document.getElementsByName("movable");
         for (let i = 0; i < ele.length; i++) {
             if (ele[i].checked) {
-                activity.KeySignatureEnv[2] = ele[i].value == "true" ? true : false;
+                activity.KeySignatureEnv[2] = ele[i].value === "true" ? true : false;
             }
         }
         keyNameWheel.removeWheel();
@@ -4233,7 +4245,7 @@ const piemenuKey = activity => {
     const __setupActionKey = i => {
         keyNameWheel.navItems[i].navigateFunction = () => {
             for (let j = 0; j < keys2.length; j++) {
-                if (Math.floor(j / 2) != i) {
+                if (Math.floor(j / 2) !== i) {
                     keyNameWheel2.navItems[j].navItem.hide();
                 } else {
                     if (keys[i].length > 2) {
@@ -4290,7 +4302,7 @@ const piemenuKey = activity => {
         const ks = activity.storage.KeySignatureEnv.split(",");
         activity.KeySignatureEnv[0] = ks[0];
         activity.KeySignatureEnv[1] = ks[1];
-        activity.KeySignatureEnv[2] = ks[2] == "true" ? true : false;
+        activity.KeySignatureEnv[2] = ks[2] === "true" ? true : false;
         activity.storage.KeySignatureEnv = activity.KeySignatureEnv;
     } else {
         activity.KeySignatureEnv = ["C", "major", false];
@@ -4305,7 +4317,7 @@ const piemenuKey = activity => {
             keyNameWheel2.navigateWheel(i);
             for (let j = 0; j < keys2.length; j++) {
                 keyNameWheel2.navItems[j].navItem.hide();
-                if (i % 2 == 0) {
+                if (i % 2 === 0) {
                     keyNameWheel2.navItems[i].navItem.show();
                     keyNameWheel2.navItems[i + 1].navItem.show();
                 } else {

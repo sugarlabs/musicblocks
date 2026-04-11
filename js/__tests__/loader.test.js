@@ -70,7 +70,6 @@ describe("loader.js coverage", () => {
         mockI18next = {
             use: jest.fn().mockReturnThis(),
             init: jest.fn(),
-            changeLanguage: jest.fn(),
             t: jest.fn(key => `TRANSLATED_${key}`),
             on: jest.fn(),
             isInitialized: false
@@ -296,6 +295,11 @@ describe("loader.js coverage", () => {
     });
 
     // ─── DOMContentLoaded when document is still loading ─────────────────────
+    test("Handles DOMContentLoaded when document is loading", async () => {
+        Object.defineProperty(document, "readyState", {
+            value: "loading",
+            configurable: true
+        });
 
     test("Handles DOMContentLoaded when document is loading", async () => {
         const addEventListenerSpy = jest.spyOn(document, "addEventListener");

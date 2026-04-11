@@ -83,7 +83,6 @@ class PlanetInterface {
             try {
                 this.iframe.contentWindow.document.getElementById("local-tab").click();
             } catch (e) {
-                // eslint-disable-next-line no-console
                 console.error(e);
             }
         };
@@ -238,7 +237,6 @@ class PlanetInterface {
                         )
                     );
                 else {
-                    // eslint-disable-next-line no-console
                     console.error(e);
                     throw e;
                 }
@@ -321,7 +319,6 @@ class PlanetInterface {
                 this.planet.setLoadProjectFromFile(this.loadProjectFromFile.bind(this));
                 this.planet.setOnConverterLoad(this.onConverterLoad.bind(this));
             } catch (e) {
-                // eslint-disable-next-line no-console
                 console.error(e);
                 this.planet = null;
             }
