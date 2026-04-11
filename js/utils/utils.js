@@ -39,7 +39,7 @@
    oneHundredToFraction, prepareMacroExports, preparePluginExports,
    processMacroData, processRawPluginData, rationalSum, rgbToHex,
    safeSVG, toFixed2, toTitleCase, windowHeight, windowWidth,
-    fnBrowserDetect, waitForReadiness
+    fnBrowserDetect, waitForReadiness, isSafeUrl
 */
 
 /**
@@ -677,6 +677,30 @@ if (typeof module !== "undefined" && module.exports) {
 }
 if (typeof window !== "undefined") {
     window.escapeHTML = escapeHTML;
+}
+
+/**
+ * Validates that a URL string uses a safe protocol (http or https).
+ * Uses the URL API for robust parsing instead of fragile regex patterns.
+ * This prevents open redirect attacks via javascript:, data:, vbscript:,
+ * or other dangerous URI schemes.
+ * @param {string} urlString - The URL string to validate.
+ * @returns {boolean} True if the URL uses http: or https: protocol.
+ */
+function isSafeUrl(urlString) {
+    try {
+        const parsed = new URL(urlString);
+        return parsed.protocol === "http:" || parsed.protocol === "https:";
+    } catch (e) {
+        return false;
+    }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports.isSafeUrl = isSafeUrl;
+}
+if (typeof window !== "undefined") {
+    window.isSafeUrl = isSafeUrl;
 }
 
 /**

@@ -93,7 +93,9 @@ class Toolbar {
                 ["planetIcon", _("Find and share projects")],
                 ["planetIconDisabled", _("Offline. Sharing is unavailable")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
-                ["helpIcon", _("Help")],
+                ["helpIcon", _("Help and shortcuts")],
+                ["helpGuideItem", _("Help"), "innerHTML"],
+                ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -163,7 +165,9 @@ class Toolbar {
                 _("Find and share projects"),
                 _("Offline. Sharing is unavailable"),
                 _("Auxiliary menu"),
+                _("Help and shortcuts"),
                 _("Help"),
+                _("Keyboard shortcuts"),
                 _("Run slowly"),
                 _("Run step by step"),
                 _("Display statistics"),
@@ -237,7 +241,9 @@ class Toolbar {
                 ["planetIcon", _("Find and share projects")],
                 ["planetIconDisabled", _("Offline. Sharing is unavailable")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
-                ["helpIcon", _("Help")],
+                ["helpIcon", _("Help and shortcuts")],
+                ["helpGuideItem", _("Help"), "innerHTML"],
+                ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -301,7 +307,9 @@ class Toolbar {
                 _("Find and share projects"),
                 _("Offline. Sharing is unavailable"),
                 _("Auxiliary menu"),
+                _("Help and shortcuts"),
                 _("Help"),
+                _("Keyboard shortcuts"),
                 _("Run slowly"),
                 _("Run step by step"),
                 _("Display statistics"),
@@ -386,10 +394,30 @@ class Toolbar {
             $j(this).tooltip("close");
         });
 
+        const restoreWidgetFocus = () => {
+            const focusedWindow = window.widgetWindows?.focused;
+            if (focusedWindow?.takeFocus) {
+                focusedWindow.takeFocus();
+                return;
+            }
+
+            const helpWindow = window.widgetWindows?.openWindows?.help;
+            if (helpWindow?.takeFocus) {
+                helpWindow.takeFocus();
+                return;
+            }
+
+            const shortcutsWindow = window.widgetWindows?.openWindows?.["keyboard-shortcuts"];
+            if (shortcutsWindow?.takeFocus) {
+                shortcutsWindow.takeFocus();
+            }
+        };
+
         $j(".materialize-iso, .dropdown-trigger").dropdown({
             constrainWidth: false,
             hover: false,
-            belowOrigin: true // Displays dropdown below the button
+            belowOrigin: true, // Displays dropdown below the button
+            onCloseEnd: restoreWidgetFocus
         });
 
         // Setup keyboard navigation for toolbar
@@ -1164,12 +1192,41 @@ class Toolbar {
      * @param {Function} onclick - The onclick handler for the help icon.
      * @returns {void}
      */
-    renderHelpIcon(onclick) {
+    renderHelpIcon(onclick, shortcutsOnclick) {
         const helpIcon = docById("helpIcon");
+        const helpGuideItem = docById("helpGuideItem");
+        const shortcutsGuideItem = docById("shortcutsGuideItem");
+        const hasDropdownMenu = !!helpGuideItem || !!shortcutsGuideItem;
 
-        helpIcon.onclick = () => {
-            onclick(this.activity);
-        };
+        if (helpGuideItem) {
+            helpGuideItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                onclick(this.activity);
+            };
+        }
+
+        if (shortcutsGuideItem) {
+            shortcutsGuideItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                if (shortcutsOnclick) {
+                    shortcutsOnclick(this.activity);
+                }
+            };
+        }
+
+        if (helpIcon) {
+            helpIcon.onclick = hasDropdownMenu
+                ? null
+                : () => {
+                      onclick(this.activity);
+                  };
+        }
     }
 
     /**
@@ -1365,10 +1422,30 @@ class Toolbar {
             }
 
             // Reinitialize dropdowns
+            const restoreWidgetFocus = () => {
+                const focusedWindow = window.widgetWindows?.focused;
+                if (focusedWindow?.takeFocus) {
+                    focusedWindow.takeFocus();
+                    return;
+                }
+
+                const helpWindow = window.widgetWindows?.openWindows?.help;
+                if (helpWindow?.takeFocus) {
+                    helpWindow.takeFocus();
+                    return;
+                }
+
+                const shortcutsWindow = window.widgetWindows?.openWindows?.["keyboard-shortcuts"];
+                if (shortcutsWindow?.takeFocus) {
+                    shortcutsWindow.takeFocus();
+                }
+            };
+
             $j(".materialize-iso, .dropdown-trigger").dropdown({
                 constrainWidth: false,
                 hover: false,
-                belowOrigin: true
+                belowOrigin: true,
+                onCloseEnd: restoreWidgetFocus
             });
 
             if (onclick) {
@@ -1437,6 +1514,25 @@ class Toolbar {
         const restoreIcon = docById("restoreIcon");
 
         restoreIcon.onclick = () => {
+            onclick(this.activity);
+        };
+    }
+
+    /**
+     * Renders the keyboard shortcuts icon with the provided onclick handler.
+     *
+     * @public
+     * @param {Function} onclick - The onclick handler for the keyboard shortcuts icon.
+     * @returns {void}
+     */
+    renderKeyboardShortcutsIcon(onclick) {
+        const keyboardShortcutsIcon = docById("keyboardShortcutsIcon");
+
+        if (!keyboardShortcutsIcon) {
+            return;
+        }
+
+        keyboardShortcutsIcon.onclick = () => {
             onclick(this.activity);
         };
     }

@@ -241,7 +241,7 @@ repository.
 2. Run locally: `npm run dev`
 3. Before pushing: `npm run lint && npx prettier --check . && npm test`
 
-For writing tests, see [docs/TESTING.md](./docs/TESTING.md).
+For writing tests, see [Docs/TESTING.md](./Docs/TESTING.md).
 
 ## <a name="REPORTING_BUGS"></a>Reporting Bugs
 

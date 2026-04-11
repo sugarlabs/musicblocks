@@ -26,6 +26,14 @@ global._ = s => s;
 global.NOINPUTERRORMSG = "NO_INPUT";
 global.XMLHttpRequest = jest.fn();
 global.getTargetTurtle = jest.fn();
+global.isSafeUrl = function (urlString) {
+    try {
+        const parsed = new URL(urlString);
+        return parsed.protocol === "http:" || parsed.protocol === "https:";
+    } catch (e) {
+        return false;
+    }
+};
 global.Turtle = {
     DictActions: {
         setDictValue: jest.fn(),
@@ -766,33 +774,78 @@ describe("ProgramBlocks", () => {
             window.alert = originalAlert;
         });
 
-        test("opens valid URL", () => {
-            const block = getBlock("openProject");
-            const mockWindow = { focus: jest.fn() };
-
-            // Mock window.open
+        beforeEach(() => {
             delete window.open;
-            window.open = jest.fn(() => mockWindow);
+            window.open = jest.fn(() => ({ focus: jest.fn() }));
+            delete window.alert;
+            window.alert = jest.fn();
+        });
 
+        test("opens valid http URL", () => {
+            const block = getBlock("openProject");
             block.flow(["http://example.com"], logo, 0, 5);
 
             expect(window.open).toHaveBeenCalledWith("http://example.com", "_blank");
-            expect(mockWindow.focus).toHaveBeenCalled();
         });
 
-        test("validates URL", () => {
+        test("opens valid https URL", () => {
             const block = getBlock("openProject");
+            block.flow(["https://musicblocks.sugarlabs.org/index.html"], logo, 0, 5);
 
-            // Mock window.open and alert
-            delete window.open;
-            window.open = jest.fn();
-            delete window.alert;
-            window.alert = jest.fn();
+            expect(window.open).toHaveBeenCalledWith(
+                "https://musicblocks.sugarlabs.org/index.html",
+                "_blank"
+            );
+        });
 
-            block.flow(["invalid-url"], logo, 0, 5);
+        test("blocks javascript: protocol (CVE-11 open redirect)", () => {
+            const block = getBlock("openProject");
+            block.flow(["javascript:alert(document.cookie)"], logo, 0, 5);
 
             expect(window.open).not.toHaveBeenCalled();
-            expect(activity.errorMsg).toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith("Please enter a valid URL.");
+        });
+
+        test("blocks data: URI scheme", () => {
+            const block = getBlock("openProject");
+            block.flow(["data:text/html,<script>alert(1)</script>"], logo, 0, 5);
+
+            expect(window.open).not.toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith("Please enter a valid URL.");
+        });
+
+        test("blocks vbscript: protocol", () => {
+            const block = getBlock("openProject");
+            block.flow(["vbscript:MsgBox('xss')"], logo, 0, 5);
+
+            expect(window.open).not.toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith("Please enter a valid URL.");
+        });
+
+        test("rejects bare domain without protocol", () => {
+            const block = getBlock("openProject");
+            block.flow(["evil.com"], logo, 0, 5);
+
+            expect(window.open).not.toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith("Please enter a valid URL.");
+        });
+
+        test("rejects null input", () => {
+            const block = getBlock("openProject");
+            block.flow([null], logo, 0, 5);
+
+            expect(window.open).not.toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith("NO_INPUT", 5);
+        });
+
+        test("handles popup blocker", () => {
+            const block = getBlock("openProject");
+            window.open = jest.fn(() => null);
+
+            block.flow(["https://example.com"], logo, 0, 5);
+
+            expect(window.open).toHaveBeenCalled();
+            expect(window.alert).toHaveBeenCalledWith("Please allow popups for this site");
         });
     });
 

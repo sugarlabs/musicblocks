@@ -102,14 +102,14 @@ describe("Toolbar Class", () => {
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ true", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = true;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(137);
+        expect(global._).toHaveBeenCalledTimes(141);
         expect(global._).toHaveBeenNthCalledWith(1, "About Music Blocks");
     });
 
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ false", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = false;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(119);
+        expect(global._).toHaveBeenCalledTimes(123);
         expect(global._).toHaveBeenNthCalledWith(1, "About Turtle Blocks");
     });
 
@@ -771,12 +771,37 @@ describe("Toolbar Class", () => {
             setAttribute: jest.fn(),
             onclick: null
         };
-        global.docById.mockReturnValue(helpIcon);
+        global.docById.mockImplementation(id => (id === "helpIcon" ? helpIcon : null));
         const mockOnClick = jest.fn();
         toolbar.renderHelpIcon(mockOnClick);
         expect(helpIcon.onclick).toBeInstanceOf(Function);
         helpIcon.onclick();
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity);
+    });
+
+    test("renderHelpIcon leaves help icon as dropdown trigger when menu items exist", () => {
+        const helpIcon = {
+            setAttribute: jest.fn(),
+            onclick: "existing-handler"
+        };
+        const helpGuideItem = { onclick: null };
+        const shortcutsGuideItem = { onclick: null };
+
+        global.docById.mockImplementation(id => {
+            if (id === "helpIcon") return helpIcon;
+            if (id === "helpGuideItem") return helpGuideItem;
+            if (id === "shortcutsGuideItem") return shortcutsGuideItem;
+            return null;
+        });
+
+        const mockOnClick = jest.fn();
+        const mockShortcutsOnClick = jest.fn();
+
+        toolbar.renderHelpIcon(mockOnClick, mockShortcutsOnClick);
+
+        expect(helpIcon.onclick).toBeNull();
+        expect(helpGuideItem.onclick).toBeInstanceOf(Function);
+        expect(shortcutsGuideItem.onclick).toBeInstanceOf(Function);
     });
 
     test("renderModeSelectIcon handles mode switching and UI updates", () => {
@@ -943,6 +968,16 @@ describe("Toolbar Class", () => {
         toolbar.renderRestoreIcon(mockOnClick);
         expect(restoreIcon.onclick).toBeInstanceOf(Function);
         restoreIcon.onclick();
+        expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity);
+    });
+
+    test("renderKeyboardShortcutsIcon sets onclick and triggers shortcuts guide", () => {
+        const keyboardShortcutsIcon = { onclick: null };
+        global.docById.mockReturnValue(keyboardShortcutsIcon);
+        const mockOnClick = jest.fn();
+        toolbar.renderKeyboardShortcutsIcon(mockOnClick);
+        expect(keyboardShortcutsIcon.onclick).toBeInstanceOf(Function);
+        keyboardShortcutsIcon.onclick();
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity);
     });
 

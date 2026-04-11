@@ -319,7 +319,19 @@ class WidgetWindow {
      * @returns {void}
      */
     _docMouseDownHandler(e) {
-        if (e.target === this._frame || this._frame.contains(e.target) || this._fullscreenEnabled) {
+        const isToolbarInteraction =
+            e.target?.closest &&
+            (e.target.closest("#toolbars") ||
+                e.target.closest("#aux-toolbar") ||
+                e.target.closest(".dropdown-content") ||
+                e.target.closest(".dropdown-trigger"));
+
+        if (
+            e.target === this._frame ||
+            this._frame.contains(e.target) ||
+            this._fullscreenEnabled ||
+            isToolbarInteraction
+        ) {
             this._frame.style.opacity = "1";
             this._frame.style.zIndex = "10000";
             window.widgetWindows.focused = this;
