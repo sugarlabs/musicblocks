@@ -203,15 +203,26 @@
         let dragDx = 0;
         let dragDy = 0;
         let dragRafId = null;
+        let latestClientX = 0;
+        let latestClientY = 0;
 
         const onMouseMove = event => {
             if (!dragging) return;
+
+            latestClientX = event.clientX;
+            latestClientY = event.clientY;
+
             if (dragRafId) return;
 
-            const clientX = event.clientX;
-            const clientY = event.clientY;
-
             dragRafId = requestAnimationFrame(() => {
+                if (!dragging) {
+                    dragRafId = null;
+                    return;
+                }
+
+                const clientX = latestClientX;
+                const clientY = latestClientY;
+
                 const x = clientX - dragDx;
                 const y = clientY - dragDy;
                 const maxLeft = Math.max(window.innerWidth - frame.offsetWidth, 8);

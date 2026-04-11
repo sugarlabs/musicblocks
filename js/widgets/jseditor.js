@@ -625,14 +625,23 @@ class JSEditor {
     _setupDividerResize(divider, editorContainer, editorconsole, consolelabel) {
         let isResizing = false;
         let resizeRafId = null;
+        let latestClientY = 0;
 
         const onMouseMove = e => {
             if (!isResizing) return;
+
+            latestClientY = e.clientY;
+
             if (resizeRafId) return;
 
-            const clientY = e.clientY;
-
             resizeRafId = requestAnimationFrame(() => {
+                if (!isResizing) {
+                    resizeRafId = null;
+                    return;
+                }
+
+                const clientY = latestClientY;
+
                 const parentRect = this._editor.getBoundingClientRect();
                 const menubarHeight = this._menubar ? this._menubar.offsetHeight : 0;
                 const availableHeight = this._editor.clientHeight - menubarHeight;
@@ -755,6 +764,8 @@ class JSEditor {
         let resizeDirection = null;
         let startX, startY, startWidth, startHeight, startLeft, startTop;
         let resizeRafId = null;
+        let latestClientX = 0;
+        let latestClientY = 0;
 
         const startResize = (e, direction) => {
             if (this.widgetWindow._maximized) return; // Don't resize when maximized
@@ -776,12 +787,21 @@ class JSEditor {
 
         const doResize = e => {
             if (!isResizing) return;
+
+            latestClientX = e.clientX;
+            latestClientY = e.clientY;
+
             if (resizeRafId) return;
 
-            const clientX = e.clientX;
-            const clientY = e.clientY;
-
             resizeRafId = requestAnimationFrame(() => {
+                if (!isResizing || !resizeDirection) {
+                    resizeRafId = null;
+                    return;
+                }
+
+                const clientX = latestClientX;
+                const clientY = latestClientY;
+
                 const deltaX = clientX - startX;
                 const deltaY = clientY - startY;
 
