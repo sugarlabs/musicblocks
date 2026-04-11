@@ -646,7 +646,7 @@ class JSEditor {
 
                 editorContainer.style.flexBasis = `${newEditorHeight}px`;
                 editorconsole.style.flexBasis = `${newConsoleHeight}px`;
-                
+
                 resizeRafId = null;
             });
         };
@@ -818,7 +818,7 @@ class JSEditor {
                     editorDiv.style.width = newWidth + "px";
                     editorDiv.style.height = newHeight - 32 + "px"; // Subtract title bar height
                 }
-                
+
                 resizeRafId = null;
             });
         };
