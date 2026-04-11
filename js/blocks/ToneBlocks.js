@@ -487,9 +487,13 @@ function setupToneBlocks(activity) {
                     " " +
                     _("Tremolo makes the sound pulse louder and quieter.") +
                     " " +
-                    _("The rate controls how fast the sound pulses.") +
+                    _(
+                        "The rate (first argument) controls how fast the sound pulses (cycles per second)."
+                    ) +
                     " " +
-                    _("The depth controls the strength of the pulsing effect."),
+                    _(
+                        "The depth (second argument) controls the strength of the pulsing effect (0-100%)."
+                    ),
                 "documentation",
                 null,
                 "tremolohelp"
@@ -505,10 +509,6 @@ function setupToneBlocks(activity) {
                     _("rate"),
                     //.TRANS: amplitude of tremolo waver
                     _("depth")
-                ],
-                argTooltips: [
-                    _("How fast the sound pulses (cycles per second)"),
-                    _("How strong the volume variation is (0-100%)")
                 ]
             });
             this.makeMacro((x, y) => [
@@ -625,7 +625,17 @@ function setupToneBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Chorus block adds a chorus effect."),
+                _("The Chorus block adds a chorus effect.") +
+                    " " +
+                    _(
+                        "The rate (first argument) controls the speed of the chorus modulation (cycles per second)."
+                    ) +
+                    " " +
+                    _(
+                        "The delay (second argument) sets the time delay between chorus voices (milliseconds)."
+                    ) +
+                    " " +
+                    _("The depth (third argument) controls the amount of chorus effect (0-100%)."),
                 "documentation",
                 null,
                 "chorushelp"
@@ -636,12 +646,7 @@ function setupToneBlocks(activity) {
                 name: _("chorus"),
                 args: 3,
                 defaults: [1.5, 3.5, 70],
-                argLabels: [_("rate"), _("delay (MS)"), _("depth")],
-                argTooltips: [
-                    _("Speed of the chorus modulation (cycles per second)"),
-                    _("Time delay between chorus voices (milliseconds)"),
-                    _("Amount of chorus effect (0-100%)")
-                ]
+                argLabels: [_("rate"), _("delay (MS)"), _("depth")]
             });
         }
 
@@ -689,7 +694,15 @@ function setupToneBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Vibrato block adds a rapid, slight variation in pitch."),
+                _("The Vibrato block adds a rapid, slight variation in pitch.") +
+                    " " +
+                    _(
+                        "The intensity (first argument) controls how much the pitch varies (semitones)."
+                    ) +
+                    " " +
+                    _(
+                        "The rate (second argument) controls the speed of the pitch variation (cycles per second)."
+                    ),
                 "documentation",
                 null,
                 "vibratohelp"
@@ -700,11 +713,7 @@ function setupToneBlocks(activity) {
                 name: _("vibrato"),
                 args: 2,
                 defaults: [5, 1 / 16],
-                argLabels: [_("intensity"), _("rate")],
-                argTooltips: [
-                    _("How much the pitch varies (semitones)"),
-                    _("Speed of the pitch variation (cycles per second)")
-                ]
+                argLabels: [_("intensity"), _("rate")]
             });
             this.makeMacro((x, y) => [
                 [0, "vibrato", x, y, [null, 1, 3, 2, 6]],
