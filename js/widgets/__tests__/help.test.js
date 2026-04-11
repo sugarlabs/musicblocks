@@ -136,7 +136,8 @@ function createMockActivity(options = {}) {
             moveBlock: jest.fn(),
             loadNewBlocks: jest.fn()
         },
-        logo: {}
+        logo: {},
+        textMsg: jest.fn()
     };
 }
 
