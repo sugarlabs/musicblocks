@@ -97,6 +97,11 @@ const {
     POSNUMBER
 } = require("../logo");
 
+// Expose constants that logo.js references as bare globals at runtime
+// (e.g. TURTLESTEP in runFromBlock, NOTEDIV in dispatchTurtleSignals).
+const logoconstants = require("../logoconstants");
+Object.assign(global, logoconstants);
+
 describe("Queue Class", () => {
     test("constructor initializes all properties correctly", () => {
         const queue = new Queue(1, 5, 0, ["arg1", "arg2"]);

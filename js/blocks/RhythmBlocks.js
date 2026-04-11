@@ -249,7 +249,6 @@ function setupRhythmBlocks(activity) {
             const listenerName = "_swing_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 if (!tur.singer.suppressOutput) {
                     tur.singer.swingTarget.pop();
@@ -315,7 +314,6 @@ function setupRhythmBlocks(activity) {
             const listenerName = "_swing_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 if (!tur.singer.suppressOutput) {
                     tur.singer.swingTarget.pop();
@@ -458,7 +456,6 @@ function setupRhythmBlocks(activity) {
             const listenerName = "_skip_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 tur.singer.skipFactor -= arg;
             };
@@ -634,7 +631,6 @@ function setupRhythmBlocks(activity) {
             const listenerName = "_dot_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
                 tur.singer.beatFactor *= currentDotFactor;

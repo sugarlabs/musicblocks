@@ -189,24 +189,28 @@ class MeterWidget {
             } else {
                 this._click_lock = true;
                 if (this.__getPlayingStatus()) {
-                    playBtn.innerHTML = `&nbsp;&nbsp;<img 
-                            src="header-icons/play-button.svg" 
-                            title="${_("Play all")}" 
-                            alt="${_("Play all")}" 
-                            height="${MeterWidget.ICONSIZE}" 
-                            width="${MeterWidget.ICONSIZE}" 
-                            vertical-align="middle"
-                        >&nbsp;&nbsp;`;
+                    playBtn.textContent = "\u00A0\u00A0";
+                    const img = document.createElement("img");
+                    img.src = "header-icons/play-button.svg";
+                    img.title = _("Play all");
+                    img.alt = _("Play all");
+                    img.setAttribute("height", MeterWidget.ICONSIZE);
+                    img.setAttribute("width", MeterWidget.ICONSIZE);
+                    img.setAttribute("vertical-align", "middle");
+                    playBtn.appendChild(img);
+                    playBtn.appendChild(document.createTextNode("\u00A0\u00A0"));
                     this._playing = false;
                 } else {
-                    playBtn.innerHTML = `&nbsp;&nbsp;<img 
-                            src="header-icons/stop-button.svg" 
-                            title="${_("Stop")}" 
-                            alt="${_("Stop")}" 
-                            height="${MeterWidget.ICONSIZE}" 
-                            width="${MeterWidget.ICONSIZE}" 
-                            vertical-align="middle"
-                        >&nbsp;&nbsp;`;
+                    playBtn.textContent = "\u00A0\u00A0";
+                    const img = document.createElement("img");
+                    img.src = "header-icons/stop-button.svg";
+                    img.title = _("Stop");
+                    img.alt = _("Stop");
+                    img.setAttribute("height", MeterWidget.ICONSIZE);
+                    img.setAttribute("width", MeterWidget.ICONSIZE);
+                    img.setAttribute("vertical-align", "middle");
+                    playBtn.appendChild(img);
+                    playBtn.appendChild(document.createTextNode("\u00A0\u00A0"));
                     this._playing = true;
                     this.activity.logo.turtleDelay = 0;
                     this.activity.logo.resetSynth(0);
@@ -229,7 +233,10 @@ class MeterWidget {
         meterTableDiv.style.display = "inline";
         meterTableDiv.style.visibility = "visible";
         meterTableDiv.style.border = "0px";
-        meterTableDiv.innerHTML = '<div id="meterWheelDiv"></div>';
+        meterTableDiv.textContent = "";
+        const meterWheelDiv = document.createElement("div");
+        meterWheelDiv.id = "meterWheelDiv";
+        meterTableDiv.appendChild(meterWheelDiv);
 
         // Grab the number of beats and beat value from the meter block.
         let v1, c1, c2, c3;
@@ -249,13 +256,25 @@ class MeterWidget {
 
         const divInput = document.createElement("div");
         divInput.className = "wfbtItem";
-        divInput.innerHTML = `<input style="float: left;" value="${v1}" type="number" id="beatValue" min="1" max="16" >`;
+        const input1 = document.createElement("input");
+        input1.style.cssFloat = "left";
+        input1.value = v1;
+        input1.type = "number";
+        input1.id = "beatValue";
+        input1.setAttribute("min", "1");
+        input1.setAttribute("max", "16");
+        divInput.appendChild(input1);
 
         const divInput2 = document.createElement("div");
         divInput2.className = "wfbtItem";
-        divInput2.innerHTML = `<input style="float: left;" value="${
-            1 / this._beatValue
-        }" type="number" id="beatValue" min="1" max="35">`;
+        const input2 = document.createElement("input");
+        input2.style.cssFloat = "left";
+        input2.value = 1 / this._beatValue;
+        input2.type = "number";
+        input2.id = "beatValue";
+        input2.setAttribute("min", "1");
+        input2.setAttribute("max", "35");
+        divInput2.appendChild(input2);
 
         widgetWindow._toolbar.appendChild(divInput);
         widgetWindow._toolbar.appendChild(divInput2);
@@ -418,15 +437,17 @@ class MeterWidget {
      */
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
-        cell.innerHTML = `&nbsp;&nbsp;<img 
-                src="header-icons/${icon}" 
-                title="${label}" 
-                alt="${label}" 
-                height="${iconSize}" 
-                width="${iconSize}" 
-                vertical-align="middle" 
-                align-content="center"
-            >&nbsp;&nbsp;`;
+        cell.textContent = "\u00A0\u00A0";
+        const img = document.createElement("img");
+        img.src = `header-icons/${icon}`;
+        img.title = label;
+        img.alt = label;
+        img.setAttribute("height", iconSize);
+        img.setAttribute("width", iconSize);
+        img.setAttribute("vertical-align", "middle");
+        img.setAttribute("align-content", "center");
+        cell.appendChild(img);
+        cell.appendChild(document.createTextNode("\u00A0\u00A0"));
         cell.style.width = MeterWidget.BUTTONSIZE + "px";
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
@@ -490,7 +511,6 @@ class MeterWidget {
             n += 3;
         }
 
-        // console.debug(newStack);
         this.activity.blocks.loadNewBlocks(newStack);
     }
 
@@ -639,18 +659,18 @@ class MeterWidget {
      * @returns {void}
      */
     _setupDefaultStrongWeakBeats(numberOfBeats, beatValue) {
-        if (beatValue == 0.25 && numberOfBeats == 4) {
+        if (beatValue === 0.25 && numberOfBeats === 4) {
             this._strongBeats[0] = true;
             this._strongBeats[2] = true;
             this._beatWheel.navItems[0].navItem.show();
             this._beatWheel.navItems[2].navItem.show();
-        } else if (beatValue == 0.25 && numberOfBeats == 2) {
+        } else if (beatValue === 0.25 && numberOfBeats === 2) {
             this._strongBeats[0] = true;
             this._beatWheel.navItems[0].navItem.show();
-        } else if (beatValue == 0.25 && numberOfBeats == 3) {
+        } else if (beatValue === 0.25 && numberOfBeats === 3) {
             this._strongBeats[0] = true;
             this._beatWheel.navItems[0].navItem.show();
-        } else if (beatValue == 0.125 && numberOfBeats == 6) {
+        } else if (beatValue === 0.125 && numberOfBeats === 6) {
             this._strongBeats[0] = true;
             this._strongBeats[3] = true;
             this._beatWheel.navItems[0].navItem.show();

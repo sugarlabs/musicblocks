@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Music Blocks Guide - 3. Programming with Music</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous"/>
+    <style>
+      body { padding-top: 20px; }
+      .sidebar { background-color: #f8f9fa; padding: 20px; border-radius: 4px; border-right: 1px solid #eee; }
+      .content { padding: 20px; }
+      img { max-width: 100%; height: auto; display: block; margin: 10px 0; }
+      pre { background-color: #f8f8f8; padding: 10px; border: 1px solid #ccc; white-space: pre-wrap; }
+      table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+      th, td { border: 1px solid #ddd; padding: 8px; }
+      th { background-color: #f2f2f2; text-align: left; }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid" style="max-width: 1200px;">
+      <div class="row">
+        <div class="col-md-3 sidebar">
+          <h4 style="margin-top: 0;">Navigation</h4>
+          <ul class="nav nav-pills nav-stacked" style="position: sticky; top: 20px;">
+	    <li><a href="index.html">Introduction</a></li>
+	    <li><a href="01-getting-started.html">1. Getting Started</a></li>
+	    <li><a href="02-making-sounds.html">2. Making Sounds</a></li>
+	    <li class="active"><a href="03-programming-with-music.html">3. Programming with Music</a></li>
+	    <li><a href="04-widgets.html">4. Widgets</a></li>
+	    <li><a href="05-beyond-music-blocks.html">5. Beyond Music Blocks</a></li>
+	    <li><a href="06-appendix.html">6. Appendix</a></li>
+	  </ul>
+        </div>
+        <div class="col-md-9 content">
+          <p>
+            <a href="../guide/index.html">English</a> |
+            <a href="../guide-es/index.html">Español</a> |
+            <a href="../guide-ja/index.html">日本語</a> |
+            <a href="../guide-zhCN/index.html">中文</a> |
+            <a href="../guide-pt/index.html">Português</a>
+          </p>
+          <hr>
+          <h2><a name="PROGRAMMING-WITH-MUSIC">3. Programming with Music</a></h2>
+	  <p><a href="#2-making-sounds">Previous Section (2. Making Sounds)</a> | <a href="#table-of-contents">Back to Table of
+	      Contents</a> | <a href="#4-widgets">Next Section (4. Widgets)</a></p>
+	  <p>This section of the guide discusses how to use chunks of notes to
+	    program music. Note that you can program with chunks you create by
+	    hand or use <a href="#42-generating-chunks-of-notes"><em>The Phrase Maker</em></a>
+	    widget to help you get started.</p>
+	  <h3><a name="ACTIONS">3.1 Actions</a></h3>
+	  <p><img alt="action" src="./chunk-2.svg" title="working of action stack" /></p>
+	  <p><img alt="action" src="./chunk-1.svg" title="using action inside Start block" /></p>
+	  <p><a href="https://musicblocks.sugarlabs.org/index.html?id=1725788353457649&amp;run=True">RUN LIVE</a></p>
+	  <p>Every time you create a new <em>Action</em> stack, Music Blocks creates a new
+	    block specific to, and linked with, that stack. (The new block is
+	    found at the top of the <em>Block</em> palette, found on the left edge of the
+	    screen.) Clicking on and running this block is the same as clicking on
+	    your stack. By default, the new blocks are named <code>chunk</code>, <code>chunk1</code>,
+	    <code>chunk2</code>... but you can rename them by editing the labels on the
+	    <em>Action</em> blocks.</p>
+	  <p>An <em>Action</em> block contains a sequence of actions that will only be
+	    executed when the block is referred to by something else, such as a
+	    start block. This is useful in orchestrating more complex programs of
+	    music.</p>
+	  <p>A <em>Start</em> Block is an <em>Action</em> that will automatically be executed once
+	    the start button is pressed.  This is where most of your programs will
+	    begin at.  There are many ways to <em>Run</em> a program: you can click on
+	    the <em>Run</em> button at the upper-left corner of the screen to run the
+	    music at a fast speed; you can click the <em>Run Slowly</em> button to run it
+	    slower (useful for debugging); and the <em>Step</em> button can be used to
+	    step through the program one block per button press.</p>
+	  <p>In the example above, the <em>Action</em> block named "chunk" is inside of a
+	    <em>Start</em> block, which means that when any of the start buttons is
+	    pressed, the code inside the <em>Start</em> block (the <em>Action</em> block) will be
+	    executed. You can add more chunks after this one inside the <em>Start</em>
+	    block to execute them sequentially.</p>
+	  <p><img alt="action" src="./chunk-3.svg" title="usage of multiple`c action blocks" /></p>
+	  <p><img alt="repeat action" src="./chunk-4.svg" title="usage of Repeat block" /></p>
+	  <p>You can <a href="#333-repeating-notes">repeat</a> actions either by using
+	    multiple <em>Action</em> blocks or using a <em>Repeat</em> block.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1725788849659637&amp;run=True">RUN LIVE</a></p>
+	  <p><img alt="multiple actions" src="./chunk-6.svg" title="multiple action stacks" /></p>
+	  <p><img alt="mixing actions" src="./chunk-5.svg" title="mixing and matching chunks" /></p>
+	  <p>You can also mix and match actions. Here we play the <em>Action</em> block with
+	    name <code>chunk0</code>, followed by <code>chunk1</code> twice, and then <code>chunk0</code> again.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1725789807251793&amp;run=True">RUN LIVE</a></p>
+	  <p><img alt="actions" src="./chunk-8.svg" title="creating a song using actions" /></p>
+	  <p><img alt="repeat" src="./chunk-7.svg" title="usage of Repeat block in a song" /></p>
+	  <p>A few more chunks and we can make a song. (Can you read the block
+	    notation well enough to guess the outcome? Are you familiar with the
+	    song we created?)
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1725791527821787&amp;run=True">RUN LIVE</a></p>
+	  <h3><a name="PITCH-TRANSFORMATION">3.2 Pitch Transformations</a></h3>
+	  <p>There are many ways to transform pitch, rhythm, and other sonic qualities.</p>
+	  <h4><a name="STEP-PITCH">3.2.1 Step Pitch Block</a></h4>
+	  <p><img alt="step pitch" src="./transform0.svg" title="Using the Step Pitch block" /></p>
+	  <p>The <em>Step Pitch</em> block will move up or down notes in a scale from the
+	    last played note. In the example above, <em>Step Pitch</em> blocks are used
+	    inside of <em>Repeat</em> blocks to repeat the code <code>7</code> times, playing up and
+	    down a scale. <a href="https://musicblocks.sugarlabs.org/index.html?id=1732586286359989&amp;run=True">RUN LIVE</a></p>
+	  <p><img alt="scalar step" src="./transform16.svg" title="Using the Scalar Step Up and Down blocks" /></p>
+	  <p>Another way to move up and down notes in a scale is to use the <em>Scalar
+	      Step Up</em> and <em>Scalar Step Down</em> blocks. These blocks calculate the
+	    number of half-steps to the next note in the current mode. (You can
+	    read more about <a href="#44-musical-modes">Musical Modes</a> below.) Note that
+	    the <em>Mouse Pitch Number</em> block returns the pitch number of the most
+	    recent note played.</p>
+	  <p>In this example, we are using the <em>Mode length</em> block, which returns
+	    the number of scalar steps in the current mode (7 for Major and Minor
+	    modes). <a href="https://musicblocks.sugarlabs.org/index.html?id=1733192676935416&amp;run=True">RUN LIVE</a></p>
+	  <h4><a name="SHARPS-AND-FLATS">3.2.2 Sharps And Flats</a></h4>
+	  <p><img alt="sharp and flat" src="./transform1.svg" title="Using Sharp and Flat blocks" /></p>
+	  <p>The <em>Accidental</em> block can be wrapped around <em>Pitch</em> blocks, <em>Note
+	      value</em> blocks, or chunks of notes inside of <a href="#31-actions"><em>Action</em></a>
+	    blocks. A sharp will raise the pitch by one half step. A flat will
+	    lower by one half step. In the example, on the left, just the <em>Pitch</em>
+	    block <code>re</code> is lowered by one half step; on the right, both <em>Pitch</em>
+	    blocks are raised by one half step. (You can also use a double-sharp
+	    or double-flat accidental.) <a href="https://musicblocks.sugarlabs.org/index.html?id=1733231694757697&amp;run=True">RUN LIVE</a></p>
+	  <h5>Examples of Double-Sharp and Double-Flat Usage</h5>
+	  <p>Double-sharps (𝄪) and double-flats (𝄫) are used in certain keys and advanced compositions to preserve correct scale structure or harmonic context. Here are a few examples:</p>
+	  <ol>
+	    <li><strong>G♯ Major Scale</strong>  </li>
+	    <li>Notes: G♯, A♯, B♯, C♯, D♯, E♯, F𝄪  </li>
+	    <li>
+	      <p>F𝄪 is used instead of G to keep the pattern of moving step by step through the musical alphabet (A to G).</p>
+	    </li>
+	    <li>
+	      <p><strong>D♯ Major Scale</strong>  </p>
+	    </li>
+	    <li>Notes: D♯, E♯, F𝄪, G♯, A♯, B♯, C𝄪  </li>
+	    <li>
+	      <p>C𝄪 is written instead of D so that the note names follow the correct sequence and each letter is used only once.</p>
+	    </li>
+	    <li>
+	      <p><strong>F♭ Major Scale</strong>  </p>
+	    </li>
+	    <li>Notes: F♭, G♭, A♭, B𝄫, C♭, D♭, E♭  </li>
+	    <li>
+	      <p>B𝄫 is used instead of A to preserve the proper spacing between scale steps.</p>
+	    </li>
+	    <li>
+	      <p><strong>Béla Bartók’s Mikrokosmos No. 136 – "Whole-tone Scale"</strong>  </p>
+	    </li>
+	    <li>This piece uses double-flats to keep the note names in the right order, even if some notes sound the same as others.  </li>
+	    <li>Reference: <a href="https://en.wikipedia.org/wiki/Mikrokosmos_(Bart%C3%B3k)">Mikrokosmos on Wikipedia</a></li>
+	  </ol>
+	  <h4><a name="ADJUST-TRANSPOSITION">3.2.3 Adjusting Transposition</a></h4>
+	  <p><img alt="transposition" src="./transform2.svg" title="Adjusting transpositions" /></p>
+	  <p>There are multiple ways to transpose a pitch: by semitone or scalar
+	    steps or by a ratio. The <em>semitone-transposition</em> block (above left)
+	    can be used to make larger shifts in pitch in half-step units. A
+	    positive number shifts the pitch up and a negative number shifts the
+	    pitch down. The input must be a whole number. To shift up an entire
+	    octave, transpose by <code>12</code> half-steps. <code>-12</code> will shift down an entire
+	    octave.</p>
+	  <p>The <em>Scalar-transposition</em> block (above right) shifts a pitch based on
+	    the current key and mode. For example, in <code>C Major</code>, a scalar
+	    transposition of <code>1</code> would transpose <code>C</code> to <code>D</code> (even though it is a
+	    transposition of <code>2</code> half steps). To transpose <code>E</code> to <code>F</code> is <code>1</code>
+	    scalar step (or <code>1</code> half step). To shift an entire octave, scalar
+	    transpose by the mode length up or down. (In major scales, the mode
+	    length is <code>7</code>.) <a href="https://musicblocks.sugarlabs.org/index.html?id=1733306280056376&amp;run=True">RUN LIVE</a></p>
+	  <p><img alt="ratio transposition" src="../documentation/setratio_block.svg" title="raising by a fifth using transpose by ratio" /></p>
+	  <p>The <em>Transpose-by-ratio</em> block shifts a pitch based on a ratio. For
+	    example, a ratio of 2:1 would shift a pitch by an octave; a ratio of
+	    3:2 would shift a pitch by a fifth. <a href="https://musicblocks.sugarlabs.org/index.html?id=1733307313746261&amp;run=True">RUN LIVE</a></p>
+	  <p>As a convenience, a number of standard scalar transpositions are
+	    provided: <em>Unison</em>, <em>Second</em>, <em>Third</em>, ..., <em>Seventh</em>, <em>Down third</em>,
+	    and <em>Down sixth</em>, as well as a transposition for <em>Octave</em>.</p>
+	  <p><img alt="semitone transposition" src="./transform3.svg" title="raising an octave using semitone-transposition" /></p>
+	  <p>In the example above, we take the song we programmed previously and
+	    raise it by one octave. <a href="https://musicblocks.sugarlabs.org/index.html?id=1733340896349788&amp;run=True">RUN LIVE</a></p>
+	  <p><img alt="cents" src="./50cent_block.svg" title="adding 50 cents to a pitch using the semitone-transposition" /></p>
+	  <p>A cent is a unit of measure for the ratio between two frequencies. A
+	    semitone is defined as 100 cents. The frequency between two adjacent
+	    pitches would be 50 cents. You can use the <em>Semitone transpose</em> block
+	    to shift a pitch by cents.</p>
+	  <p>In the example above, G4 + 50 cents is 403Hz. (Recall that G4 is
+	    392Hz and G#4 is 415Hz). <a href="https://musicblocks.sugarlabs.org/index.html?id=1733411391096443&amp;run=True">RUN LIVE</a></p>
+	  <p><img alt="cents by ratio" src="./50cents_by_ratio.svg" title="adding 50 cents to a pitch  using the ratio block" /></p>
+	  <p>You can also use the ratio block for cents, although the math is a bit
+	    more complicated. <a href="https://musicblocks.sugarlabs.org/index.html?id=1733425512725578&amp;run=True">RUN LIVE</a></p>
+	  <p><img alt="register" src="./transform18.svg" title="The Register block" /></p>
+	  <p>The <em>Register</em> block provides an easy way to modify the register
+	    (octave) of the notes that follow it. In the example above it is first
+	    used to bump the <code>Mi 4</code> note up by one octave and then to bump the
+	    <code>Sol 4</code> note down by one octave. <a href="https://musicblocks.sugarlabs.org/index.html?id=1733426232664999&amp;run=True">RUN LIVE</a></p>
+	  <h4><a name="PITCH-MOVEMENT">3.2.4 Summary of Pitch Movements</a></h4>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Representation</th>
+		<th>Pitch Movement</th>
+		<th>Properties</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td>Scalar Step</td>
+		<td>scalar</td>
+		<td>0=no change</td>
+	      </tr>
+	      <tr>
+		<td></td>
+		<td></td>
+		<td>1=next scalar pitch in current key and mode</td>
+	      </tr>
+	      <tr>
+		<td></td>
+		<td></td>
+		<td>-1=previous scalar pitch in current key and mode</td>
+	      </tr>
+	      <tr>
+		<td></td>
+		<td></td>
+		<td>If the argument to scalar step is positive, it moves up the scale; if it is negative, it moves down the scale.</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Music Blocks Code for Scalar Step</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td><img alt="scalar" src="./pitchmovement1.svg" title="scalar" /></td>
+	      </tr>
+	      <tr>
+		<td>The example above demonstrates traveling up and down the major scale by moving an octave up from the starting note, do, one note at a time and then back down the same way. <a href="https://musicblocks.sugarlabs.org/index.html?id=1733440581953078&amp;run=True">RUN LIVE</a></td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Standard Notation with Scalar Step</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td><img alt="scalar step up and down" src="./pitchmovement1.png" title="scalar step up and down" /></td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Representation</th>
+		<th>Pitch Movement</th>
+		<th>Properties</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td>Transposition</td>
+		<td>semitone</td>
+		<td>Creates shifts in pitch by half-steps</td>
+	      </tr>
+	      <tr>
+		<td></td>
+		<td></td>
+		<td>If the argument to transpose is positive, it will shift upwards in pitch; if it is negative, there will be a downwards shift.</td>
+	      </tr>
+	      <tr>
+		<td></td>
+		<td></td>
+		<td>There are 12 half-steps shifts per octave.</td>
+	      </tr>
+	      <tr>
+		<td></td>
+		<td></td>
+		<td>An argument of -12 will shift down one octave.</td>
+	      </tr>
+	      <tr>
+		<td></td>
+		<td></td>
+		<td>An argument of zero will not change the pitch.</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Music Blocks Code with Scalar Transpose</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td><img alt="Scalar transpose Block" src="./pitchmovement2.svg" title="Scalar transpose Block" /> <br> <a href="https://musicblocks.sugarlabs.org/index.html?id=1733441522669991&amp;run=True">RUN LIVE</a></td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Standard Notation for Scalar Transpose</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td><img alt="semitone transposition" src="./pitchmovement2.png" title="semitone transposition" /></td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Representation</th>
+		<th>Pitch Movement</th>
+		<th>Properties</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td>Transposition</td>
+		<td>Scalar</td>
+		<td>Shifts the pitch based on the current key and mode</td>
+	      </tr>
+	      <tr>
+		<td></td>
+		<td></td>
+		<td>Each number represents a scalar step.</td>
+	      </tr>
+	      <tr>
+		<td></td>
+		<td></td>
+		<td>Scalar transposition can transform your original key to a new key by counting the notes between the keys.</td>
+	      </tr>
+	      <tr>
+		<td></td>
+		<td></td>
+		<td>For example: Transposing C-D-E-F by 4 (fifth) will give us G-A-B-C</td>
+	      </tr>
+	      <tr>
+		<td></td>
+		<td></td>
+		<td>To transpose an octave: shift by the mode length (7 in major scales) up or down.</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <h4><a name="SET-KEY">3.2.5 Set Key</a></h4>
+	  <p>The <em>Set key</em> block is used to change both the mode and key of the
+	    current scale. (The current scale is used to define the mapping of
+	    Solfege [when set Movable Do = True] to notes and also the number of half steps take by the the
+	    <em>Scalar step</em> block.) For example, by setting the key to C Major, the
+	    scale is defined by starting at C (or Do) and applying the pattern of half
+	    steps defined by a Major mode. In this case, the pattern of steps
+	    skips past all of the sharps and flats. (On a piano, C Major is just
+	    the white keys).</p>
+	  <p>When using the <em>Set key</em> block, the mode argument is used to define
+	    the pattern of half steps and the key argument is used to define the
+	    starting position of the pattern. For example, when mode = "major" and
+	    key = "C", the pattern of half steps is 2 2 1 2 2 2 1 and the first
+	    note in the scale from which the pattern is applied is "C".</p>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Set Key Example</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td><img alt="set key" src="./setkey1.svg" title="set key example" /></td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <p>Using the example above, one can modify the arguments to <em>Set key</em> in
+	    order to move up and down one octave in a scale. The example shows G
+	    Major scale, which has an F#, but it could be used for any combination
+	    of key and mode. <a href="https://musicblocks.sugarlabs.org/index.html?id=1662103714150464&amp;run=True">RUN LIVE</a></p>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Standard Notation for Set Key Example</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td><img alt="set key notation" src="./setkey2.png" title="Standard Notation Set Key" /></td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <p>Various examples for Major modes are shown in the following table.</p>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Key</th>
+		<th>Mode</th>
+		<th>Mode Pattern in Half Steps</th>
+		<th>Pitch Pattern</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td>C</td>
+		<td>Major</td>
+		<td>2 2 1 2 2 2 1</td>
+		<td>C, D, E, F, G, A, B, C</td>
+	      </tr>
+	      <tr>
+		<td>G</td>
+		<td>Major</td>
+		<td>2 2 1 2 2 2 1</td>
+		<td>G, A, B, C, D, E, F#, G</td>
+	      </tr>
+	      <tr>
+		<td>D</td>
+		<td>Major</td>
+		<td>2 2 1 2 2 2 1</td>
+		<td>D, E, F#, G, A, B, C#, D</td>
+	      </tr>
+	      <tr>
+		<td>F</td>
+		<td>Major</td>
+		<td>2 2 1 2 2 2 1</td>
+		<td>F, G, A, B♭, C, D, E, F</td>
+	      </tr>
+	      <tr>
+		<td>B♭</td>
+		<td>Major</td>
+		<td>2 2 1 2 2 2 1</td>
+		<td>B♭, C, D, E♭, F, G, A, B♭</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <p>The next table is the same sets of various keys (starting pitches),
+	    but the mode is set to "Dorian" instead of Major.</p>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Key</th>
+		<th>Mode</th>
+		<th>Mode Pattern in Half Steps</th>
+		<th>Pitch Pattern</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td>C</td>
+		<td>Dorian</td>
+		<td>2 1 2 2 2 1 2</td>
+		<td>C, D, E♭, F, G, A, B♭, C</td>
+	      </tr>
+	      <tr>
+		<td>G</td>
+		<td>Dorian</td>
+		<td>2 1 2 2 2 1 2</td>
+		<td>G, A, B♭, C, D, E, F, G</td>
+	      </tr>
+	      <tr>
+		<td>D</td>
+		<td>Dorian</td>
+		<td>2 1 2 2 2 1 2</td>
+		<td>D, E, F, G, A, B, C, D</td>
+	      </tr>
+	      <tr>
+		<td>F</td>
+		<td>Dorian</td>
+		<td>2 1 2 2 2 1 2</td>
+		<td>F, G, A♭, B♭, C, D, E♭, F</td>
+	      </tr>
+	      <tr>
+		<td>B♭</td>
+		<td>Dorian</td>
+		<td>2 1 2 2 2 1 2</td>
+		<td>B♭, C, D♭, E♭, F, G, A♭, B♭</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <p>This last table is the same set of keys as the above two tables, but
+	    the mode is set to "Phrygian".</p>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Key</th>
+		<th>Mode</th>
+		<th>Mode Pattern in Half Steps</th>
+		<th>Pitch Pattern</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td>C</td>
+		<td>Phrygian</td>
+		<td>1 2 2 2 1 2 2</td>
+		<td>C, D♭, E♭, F, G, A♭, B♭, C</td>
+	      </tr>
+	      <tr>
+		<td>G</td>
+		<td>Phrygian</td>
+		<td>1 2 2 2 1 2 2</td>
+		<td>G, A♭, B♭, C, D, E♭, F, G</td>
+	      </tr>
+	      <tr>
+		<td>D</td>
+		<td>Phrygian</td>
+		<td>1 2 2 2 1 2 2</td>
+		<td>D, E♭, F, G, A, B♭, C, D</td>
+	      </tr>
+	      <tr>
+		<td>F</td>
+		<td>Phrygian</td>
+		<td>1 2 2 2 1 2 2</td>
+		<td>F, G♭, A♭, B♭, C, D♭, E♭, F</td>
+	      </tr>
+	      <tr>
+		<td>B♭</td>
+		<td>Phrygian</td>
+		<td>1 2 2 2 1 2 2</td>
+		<td>B♭, C♭, D♭, E♭, F, G♭, A♭, B♭</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <p>Notice how in all the examples, the sets with the same mode results in
+	    the same "Mode Pattern of Half Steps", but the resultant "Pitch
+	    Pattern" is different. Also, notice how G Dorian and F Major have the
+	    same set of pitches in "Pitch Pattern" (they both have B♭ and no other
+	    sharps or flats). C Dorian, D Phrygian, and B♭ Major all have the same
+	    set of pitches as well (all three have B♭ and E♭).</p>
+	  <p>If these lists were expanded further, there would be many more such
+	    examples. These are because these modes (Major, Dorian, and Phrygian)
+	    all have essentially the same modal pattern; the starting point is
+	    just shifted slightly for each: Dorian could be thought of starting
+	    from the second scale degree of Major and Phrygian from the third, for
+	    example. Not all modes have this relationship to Major. The ones that
+	    do are: Ionian (Major), Dorian, Phrygian, Lydian, Myxolydian, Aeolian
+	    (Minor), and Locrian.</p>
+	  <p><strong>Set Key &amp; Scalar Step</strong></p>
+	  <p>The <em>Set key</em> block is used to select a subset of notes in the given
+	    temperament. (By default, Music Blocks uses equal temperament of 12
+	    equal divisions of the octave. The key and mode determine which of
+	    these notes will be used.)</p>
+	  <p><strong>Set Key &amp; Movable Do</strong></p>
+	  <p>The <em>Set Key</em> block will change the key and mode of the mapping
+	    between solfege, e.g., <code>Do</code>, <code>Re</code>, <code>Mi</code>, to note names, e.g., <code>F#</code>,
+	    <code>G#</code>, <code>A#</code>, when in F# Major.  It only impacts the mapping of solfege 
+	    when the <em>movable Do</em> block is set to True.</p>
+	  <p>You can find the <em>Set key</em> block on the <em>Intervals</em> palette.</p>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Music Blocks for Set Key and Movable Do</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td><img alt="scalar transposition" src="./pitchmovement3.svg" title="scalar transposition" /> <br> <a href="https://musicblocks.sugarlabs.org/index.html?id=1733441522669991&amp;run=True">RUN LIVE</a></td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Standard Notation for Set Key and Movable Do</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td><img alt="scalar transposition" src="./pitchmovement3.png" title="scalar transposition" /></td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Representation</th>
+		<th>Pitch Movement</th>
+		<th>Properties</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td>Scale Degree</td>
+		<td>Scalar</td>
+		<td>The key block sets the key and mode.</td>
+	      </tr>
+	      <tr>
+		<td></td>
+		<td></td>
+		<td>The scale degree blocks indicate which position the pitch is taking in the scale relative to the tonic which is "scale degree 1".</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Music Blocks Code with Scale Degrees 1-5</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td><img alt="scale degree" src="./pitchmovement4.svg" title="scale degree" /> <br> <a href="https://musicblocks.sugarlabs.org/index.html?id=1733480662614787&amp;run=True">RUN LIVE</a></td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Standard Notation for Scale Degrees 1-5</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td><img alt="scale degree" src="./pitchmovement4.png" title="scale degree" /></td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Representation</th>
+		<th>Pitch Movement</th>
+		<th>Properties</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td>Movable “Do”</td>
+		<td>Advanced transposition by mode</td>
+		<td>Movable Do in combination with the Scale/Mode blocks will transpose sections of music in a nuanced way.</td>
+	      </tr>
+	      <tr>
+		<td></td>
+		<td></td>
+		<td>The Set-key block allows you to  change both the mode and key of how solfege is mapped to the notes.</td>
+	      </tr>
+	      <tr>
+		<td></td>
+		<td></td>
+		<td>For example, in C major - Do is C, Re is D, Mi is E, etc.</td>
+	      </tr>
+	      <tr>
+		<td></td>
+		<td></td>
+		<td>In F major - Do is F, Re is G, Mi is A</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Music Blocks Code with Set Key and Movable Do</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td><img alt="movable do" src="./pitchmovement5.svg" title="movable do" />  <br> <a href="https://musicblocks.sugarlabs.org/index.html?id=1733481433887068&amp;run=True">RUN LIVE</a></td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Standard Notation Code for Set Key and Movable Do</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td><img alt="movable do" src="./pitchmovement5.png" title="movable do" /></td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Representation</th>
+		<th>Pitch Movement</th>
+		<th>Properties</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td>Movable “Do”</td>
+		<td>Advanced transposition by mode</td>
+		<td>You also have the option of changing the mode to Minor, Major, Chromatic, and many other exotic modes like hirajoshi, as shown in the example below.</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Music Blocks for Set Key and Scalar Step</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td><img alt="movable do" src="./pitchmovement6.svg" title="movable do" /> <br> <a href="https://musicblocks.sugarlabs.org/index.html?id=1733487475028348&amp;run=True">RUN LIVE</a></td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Standard Notation with Set Key and Scalar Step</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td><img alt="movable do" src="./pitchmovement6.png" title="movable do" /></td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <h4><a name="FIXED-AND-MOVABLE-PITCH-SYSTEMS">3.2.6 Fixed and Movable Pitch Systems</a></h4>
+	  <p>Music Blocks allows users to express and explore musical ideas in a
+	    variety of different systems. The main systems of expression are fixed
+	    and movable.</p>
+	  <p><strong>Fixed and Movable Systems</strong></p>
+	  <p>Fixed pitch systems represent pitches in an absolute way. Pitches in a
+	    fixed system do not change, regardless of a tonal context (such as key
+	    or mode). Movable systems, on the other hand, represent pitches in a
+	    relative way based on their tonal context.</p>
+	  <p>An example of a fixed system is Alphabet Notation. Pitches are
+	    expressed as <code>A</code>, <code>B</code>, <code>C</code>, <code>D</code>, <code>E</code>, <code>F</code>, and <code>G</code>. Regardless of
+	    whether the key is C major or G minor, the pitch of <code>G</code> is the
+	    same. In Alphabet Notation, pitches are the same ("fixed") regardless
+	    of the context.</p>
+	  <p><img alt="Alphabet Fixed
+		       System" src="./systems-alphabet.svg" title="Alphabet (Fixed) System" /></p>
+	  <p>An example of a movable system is Scale Degree. Pitches are expressed
+	    as <code>1</code>, <code>2</code>, <code>3</code>, <code>4</code>, <code>5</code>, <code>6</code>, and <code>7</code>. For C major, these pitches
+	    are <code>C</code>, <code>D</code>, <code>E</code>, <code>F</code>, <code>G</code>, <code>A</code>, and <code>B</code>. For G (natural) minor,
+	    these pitches are <code>G</code>, <code>A</code>, <code>B♭</code>, <code>C</code>, <code>D</code>, <code>E♭</code>, and <code>F</code>. For D
+	    dorian, these pitches are <code>D</code>, <code>E</code>, <code>F</code>, <code>G</code>, <code>A</code>, <code>B</code>, and <code>C</code>. In
+	    all three examples, the pitches are determined by the tonal context.</p>
+	  <p><img alt="Scale Degree Movable
+		       System" src="./systems-scale-degree.svg" title="Scale Degree (Movable) System" /></p>
+	  <p>Solfege is an example of a system that can be either fixed or movable;
+	    it can either be a fixed system (Fixed Solfege) or a movable system
+	    (Movable Solfege).</p>
+	  <p>Fixed Solfege works like the alphabet system; <code>La</code> is <code>A</code>, <code>Ti</code> is
+	    <code>B</code>, <code>Do</code> is <code>C</code>, etc. Context does not affect the sounding
+	    pitch. Movable Solfege works like the Scale Degree system; for any
+	    major, <code>Do</code> is 1st scale degree, <code>Re</code> is 2nd, <code>Mi</code> is 3rd, <code>Fa</code> is
+	    4th, etc. Hence, in Movable Solfege in the key of G (natural) minor,
+	    <code>Do</code> is <code>G</code>, <code>Re</code> is <code>A</code>, et al.</p>
+	  <p><img alt="Movable Solfege
+		       System" src="./systems-movable-solfege.svg" title="Movable Solfege System" /></p>
+	  <p>Music Blocks users can create and preview code in both Fixed Solfege
+	    and Movable Solfege. Teachers and learners may use either system (or
+	    both) to express their musical ideas as well as deepen their
+	    understanding of music.</p>
+	  <p><strong>Using Tonal Context with Movable Systems</strong></p>
+	  <p>For movable systems an important point of context is its key and
+	    mode. For "C Major", the key is "C" and the mode is "Major" (also
+	    called Ionian). Key and mode are important as they define the tonal
+	    framework, i.e., which pitches are "in" and which are "out". It also
+	    defines the function of the pitches within the framework. This is why
+	    for scale degrees <code>1</code>, <code>2</code>, <code>3</code>, <code>4</code>, and <code>5</code>, the expected result for
+	    C major is <code>C</code>, <code>D</code>, <code>E</code>, <code>F</code>, and <code>G</code> (skipping any sharps/flats),
+	    while those same scale degrees for D major are <code>D</code>, <code>E</code>, <code>F#</code>, <code>G</code>,
+	    and <code>A</code>. The set of pitches that make up C major have no sharps or
+	    flats, so they are skipped. D major has two sharps, <code>F#</code> and <code>C#</code>. The
+	    <code>F#</code> is the 3rd scale degree for D major.</p>
+	  <p>Scale Degree with <em>Set Key</em> is a very powerful tool for expression. It
+	    is also very common in music pedagogy. However, because the number
+	    values 1-7 are hard wired into this system, it is a tool that works
+	    best to express seven-pitch tonal frameworks (e.g. major, minor, and
+	    other common seven pitch scales). For musical ideas where a more
+	    purely mathematical form of expression is required, Music Blocks
+	    offers the user the <em>nth Modal Pitch</em> block.</p>
+	  <p><em>nth Modal Pitch</em> is similar to <em>Scale Degree</em> in that it is a movable
+	    system that uses numbers to express pitches. However, unlike <em>Scale
+	      Degree</em>, <em>nth Modal Pitch</em> starts at <code>0</code>, allows for negative
+	    numbers, and is not restricted to a seven-pitch tonal framework. <code>0</code>
+	    is the first pitch of the mode, <code>1</code> is the next pitch, <code>2</code> is the
+	    pitch above that, etc. <code>-1</code> is the pitch before the first pitch of
+	    the mode. This tool is especially helpful for expressing a musical
+	    idea that requires computation as you can run computations directly
+	    on the number value. It is also helpful if you are, for example,
+	    creating music in a whole tone (six note) pitch space. In the case of
+	    <em>Set Key</em> set to "whole tone", <code>6</code> would be the octave above.</p>
+	  <p><strong>Pitch Number, MIDI, and Set Pitch Number Offset</strong></p>
+	  <p><em>Pitch Number</em> is similar to <em>nth Modal Pitch</em> in that it is a
+	    zero-based, mathematical system to express pitches. However, unlike
+	    <em>nth Modal Pitch</em>, <em>Pitch Number</em> disregards any tonal framework. It
+	    is also chromatic by default, meaning that its pitch space includes
+	    the sharp/flat pitches (black keys on piano) as well as the natural
+	    pitches (white keys on piano). By default, middle C (C_4) is <code>0</code>. The
+	    C major scale in the 4th octave is <code>0</code>, <code>2</code>, <code>4</code>, <code>5</code>, <code>7</code>, <code>9</code>, and
+	    <code>11</code>. <code>12</code> is the C an octave above middle C (C_5). This system is
+	    useful mathematically, but because it disregards key, it is difficult
+	    to control when creating music. That being said, fretted instruments
+	    such as ukulele and guitar use this system to express pitch, so it is
+	    a good system for expressing how these instruments work.</p>
+	  <p>MIDI also uses a similar system to <em>Pitch Number</em> to express pitches,
+	    but the 0 is offset from Music Blocks' default. In order to change the
+	    sounding pitch of <code>0</code> for <em>Pitch Number</em>, use <em>set pitch number
+	      offset</em>. This makes <em>Pitch Number</em> blocks behave as a relative system
+	    as it transposes the pitches up or down accordingly (but has no effect
+	    on key).</p>
+	  <p><strong>Two Subsystems for Movable</strong></p>
+	  <p>For Movable Do, there exists yet two more systems. One system, which
+	    we call <code>Movable=Do</code>, allows the user to express solfege syllables in
+	    relation to the Major mode. Therefore, if a user were to specify A
+	    minor, then La would be A, the first scale degree in A Minor. The
+	    other system, which we call <code>Movable=La</code> allows the user to express
+	    solfege in relation to the particular mode specified. Therefore, if a
+	    user were to specify A Minor, then Do would be A. <em>Scale Degree</em> works
+	    like <code>Movable=La</code> by default such that <code>1</code> is always the first pitch
+	    of a given mode.</p>
+	  <p>Because some users may want to explicitly spell out all of the pitches
+	    regardless of the chosen key, we allow them to use Scale Degree with
+	    the <em>Movable Do</em> block (remember, Scale Degree works like Movable=La
+	    by default). Please see <a href="../../examples/2-spelling-systems-for-Scale-Degree.html">this
+	      code</a>
+	    as an example.</p>
+	  <p>The following chart describes the behavior of different blocks
+	    depending on whether or not a <em>Movable Do</em> block is present.</p>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Block(s)</th>
+		<th>Fixed or Movable? (Do or La?)</th>
+		<th>Set Key Transformation?</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td>Alphabet Pitch</td>
+		<td>Fixed</td>
+		<td>No effect.</td>
+	      </tr>
+	      <tr>
+		<td>Solfege</td>
+		<td>Fixed by default</td>
+		<td>No effect.</td>
+	      </tr>
+	      <tr>
+		<td>Solfege and Movable=Do</td>
+		<td>Specified via "movable" block set to Do</td>
+		<td>Yes.</td>
+	      </tr>
+	      <tr>
+		<td>Solfege and Movable=La</td>
+		<td>Specified via "movable" block set to La</td>
+		<td>Yes. Works like Scale Degree.</td>
+	      </tr>
+	      <tr>
+		<td>n<sup>th</sup> modal pitch</td>
+		<td>Movable</td>
+		<td>Yes. Good for modes of any length.</td>
+	      </tr>
+	      <tr>
+		<td>Scale Degree</td>
+		<td>Movable</td>
+		<td>Yes. Most useful for 7 note systems. Works just like Movable=La for Solfege by default.</td>
+	      </tr>
+	      <tr>
+		<td>Scale Degree and Movable=Do</td>
+		<td>Movable</td>
+		<td>Yes. When preceded by Movable=Do, the user can be explicit in their spelling.</td>
+	      </tr>
+	      <tr>
+		<td>Scalar Step</td>
+		<td>Movable</td>
+		<td>Yes. Navigates up/down within <em>nth modal pitch</em> space.</td>
+	      </tr>
+	      <tr>
+		<td>Scalar Interval</td>
+		<td>Movable</td>
+		<td>Yes. Adds above/under within <em>nth modal pitch</em> space.</td>
+	      </tr>
+	      <tr>
+		<td>Scalar Inversion</td>
+		<td>Movable</td>
+		<td>Yes. Inversion around a specified axis within <em>nth modal pitch</em> space.</td>
+	      </tr>
+	      <tr>
+		<td>Pitch Number</td>
+		<td>Movable</td>
+		<td>No effect. Pitches can be transformed via Set Pitch Number Offset.</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <p><strong>Illustrative example:</strong></p>
+	  <p>The following example demonstrates how the Scale Degree functionality
+	    combines math and musical modifiers. When combining numbers and
+	    accidentals, it recreates the same functionality as the <em>Scale Degree</em>
+	    block.</p>
+	  <p><img alt="Scale Degree Improv Example" src="./scale-degree-improv.svg" title="Scale Degree Improv" /></p>
+	  <p><a href="https://musicblocks.sugarlabs.org/index.html?id=1675577999425474&amp;run=True">RUN LIVE</a></p>
+	  <h4><a name="INTERVALS">3.2.7 Intervals</a></h4>
+	  <p><img alt="interval" src="./transform9.svg" title="Scalar interval block" /></p>
+	  <p><a href="https://musicblocks.sugarlabs.org/index.html?id=1726142617030713&amp;run=True">RUN LIVE</a></p>
+	  <p>The <em>Scalar interval</em> block calculates a relative interval based on
+	    the current mode, skipping all notes outside of the mode. For example,
+	    a <em>fifth</em>, and adds the additional pitches to a note's playback. In
+	    the figure, we add <code>La</code> to <code>Re</code> and <code>Ti</code> to <code>Mi</code>.</p>
+	  <p>As a convenience, a number of standard scalar intervals are provided
+	    on the <em>Intervals</em> palette: <em>Unison</em>, <em>Second</em>, <em>Third</em>, ...,
+	    <em>Seventh</em>, <em>Down third</em>, and <em>Down sixth</em>.</p>
+	  <p>The <em>Scalar interval measure</em> block can be used to measure the number
+	    of scalar steps between two pitched.</p>
+	  <h4><a name= "ABSOLUTE-INTERVALS">3.2.7.1 Absolute Intervals</a></h4>
+	  <p>Absolute (or semitone) intervals are based on half-steps.</p>
+	  <p><img alt="intervals" src="./transform14.svg" title="Using absolute intervals" /></p>
+	  <p><a href="https://musicblocks.sugarlabs.org/index.html?id=1726143428513328&amp;run=True">RUN LIVE</a></p>
+	  <p>The <em>Augmented</em> block calculates an absolute interval (in half-steps),
+	    e.g., an augmented fifth, and adds the additional pitches to a
+	    note. Similarly, the <em>Minor</em> block calculates an absolute interval,
+	    e.g., a minor third. Other absolute intervals include <em>Perfect</em>,
+	    <em>Diminished</em>, and <em>Major</em>.</p>
+	  <p>In the augmented fifth example above, a chord of <code>D5</code> and <code>A5</code> are
+	    played, followed by a chord of <code>E5</code> and <code>C5</code>. In the minor third
+	    example, which includes a shift of one octave, first a chord of <code>D5</code>
+	    and <code>F5</code> is played, followed by chord of <code>E5</code> and <code>G6</code>.</p>
+	  <p>As a convenience, a number of standard absolute intervals are provided
+	    on the <em>Intervals</em> palette: <em>Major 2</em>, <em>Minor 3</em>, <em>Perfect 4</em>,
+	    <em>Augmented 6</em>, <em>Diminished 8</em>, et al.</p>
+	  <p>The <em>Doubly</em> block can be used to create a double augmentation or
+	    double diminishment.</p>
+	  <p>The <em>semitone interval measure</em> block can be used to measure the
+	    number of half-steps between two pitches.</p>
+	  <h4><a name= "RATIO-INTERVALS">3.2.7.2 Ratio Intervals</a></h4>
+	  <p>Another way to think about intervals is in terms of ratios. For
+	    example, a ratio of 2:1 would be an octave shift up; 1:2 would be an
+	    octave shift down; 3/2 would be a fifth.</p>
+	  <p><img alt="ratio interval" src="../documentation/ratiointerval_block.svg" title="Ratio Interval example" /></p>
+	  <p><a href="https://musicblocks.sugarlabs.org/index.html?id=1726144197873608&amp;run=True">RUN LIVE</a></p>
+	  <p>The <em>Ratio Interval</em> block lets you generate an interval based on a
+	    ratio.</p>
+	  <h4><a name= "CHORDS">3.2.8 Chords</a></h4>
+	  <p>A chord is a group of notes that are played together (often used for
+	    harmony in music). There are triads (three notes), tetrachords (four
+	    notes), and even five-, six-, and seven-note chords.</p>
+	  <p>The <em>Chord</em> block builds a chord from a base note. <a href="https://musicblocks.sugarlabs.org/index.html?id=1733533569615271&amp;run=True">RUN LIVE</a></p>
+	  <p><img alt="chord" src="../documentation/chordinterval_block.svg" title="Chord Block" /></p>
+	  <p>We support many basic chords:</p>
+	  <table>
+	    <thead>
+	      <tr>
+		<th style="text-align: center;">chord</th>
+		<th style="text-align: center;">intervals</th>
+		<th style="text-align: center;">example</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td style="text-align: center;">major</td>
+		<td style="text-align: center;">1 4 7</td>
+		<td style="text-align: center;">C major C - E - G</td>
+	      </tr>
+	      <tr>
+		<td style="text-align: center;">minor</td>
+		<td style="text-align: center;">1 3 7</td>
+		<td style="text-align: center;">C minor C - E♭ - G</td>
+	      </tr>
+	      <tr>
+		<td style="text-align: center;">dominant 7</td>
+		<td style="text-align: center;">1 4 7 10</td>
+		<td style="text-align: center;">C7 C - E - G - B♭</td>
+	      </tr>
+	      <tr>
+		<td style="text-align: center;">minor 7</td>
+		<td style="text-align: center;">1 3 7 10</td>
+		<td style="text-align: center;">Cmin7 C - E♭ - G - B♭</td>
+	      </tr>
+	      <tr>
+		<td style="text-align: center;">major 7</td>
+		<td style="text-align: center;">1 4 7 11</td>
+		<td style="text-align: center;">Cmaj7 C - E - G - B</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <p>The <em>Arpeggio</em> block also builds a chord from a base note, but rather
+	    than playing all of the pitches at once, each pitch is played in
+	    sequence.</p>
+	  <p><img alt="arpeggio" src="../documentation/arpeggio_block.svg" title="Arpeggio Block" /></p>
+	  <p>In the example above, since the Major chord intervals are 1 4 7, the
+	    notes played are do, mi, sol, sol, ti, mi. <a href="https://musicblocks.sugarlabs.org/index.html?id=1733828377963278&amp;run=True">RUN LIVE</a></p>
+	  <h4><a name= "INVERSION">3.2.9 Inversion</a></h4>
+	  <p>The <em>Invert</em> block will rotate a series of notes around a target
+	    note. There are three different modes of the <em>Invert</em> block: <em>even</em>,
+	    <em>odd</em>, and <em>scalar</em>. In <em>even</em> and <em>odd</em> modes, the rotation is based
+	    on half-steps. In <em>even</em> and <em>scalar</em> mode, the point of rotation is
+	    the given note. In <em>odd</em> mode, the point of rotation is shifted up by
+	    a <code>1/4</code> step, enabling rotation around a point between two notes. In
+	    "scalar" mode, the scalar interval is preserved around the point of
+	    rotation.</p>
+	  <p><img alt="inversion" src="./transform13.svg" title="inversion" /></p>
+	  <p><a href="https://musicblocks.sugarlabs.org/index.html?id=1726144415115588&amp;run=True">RUN LIVE</a></p>
+	  <p>NOTE: The initial <code>C5</code> pitch (as a half note) remains unchanged (in
+	    all of the examples) as it is outside of the invert block.</p>
+	  <p>The above example code has an <em>even</em> inversion for two notes <code>F5</code> and
+	    <code>D5</code> around the reference pitch of <code>C5</code>. We would expect the following
+	    results:</p>
+	  <p><strong>Even inversion</strong></p>
+	  <table>
+	    <thead>
+	      <tr>
+		<th style="text-align: center;">Starting pitch</th>
+		<th style="text-align: center;">Distance from <code>C5</code></th>
+		<th style="text-align: center;">Inverse distance from <code>C5</code></th>
+		<th style="text-align: center;">Ending pitch</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td style="text-align: center;"><code>F5</code></td>
+		<td style="text-align: center;">5 half steps <em>above</em></td>
+		<td style="text-align: center;">5 half steps <em>below</em></td>
+		<td style="text-align: center;"><code>G4</code></td>
+	      </tr>
+	      <tr>
+		<td style="text-align: center;"><code>D5</code></td>
+		<td style="text-align: center;">2 half steps <em>above</em></td>
+		<td style="text-align: center;">2 half steps <em>below</em></td>
+		<td style="text-align: center;"><code>B♭4</code></td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <p>This operation can also be visualized on a pitch clock. The arrows on
+	    the following diagram point from the starting pitch, around the axis
+	    of the reference pitch, to its destination ending pitch.</p>
+	  <p><img alt="even invert" src="./even-invert-chart.svg" title="even invert chart" /></p>
+	  <p>In standard notation the result of this <em>even</em> inversion operation is
+	    depicted in the second measure of the following example. The first
+	    measure is the original reference.</p>
+	  <p><img alt="even invert" src="./invert-even.png" title="even invert example" /></p>
+	  <p>Underneath the <em>even</em> inversion in the example code is an <em>odd</em>
+	    inversion for the same two notes of <code>F5</code> and <code>D5</code> around the same
+	    reference pitch of <code>C5</code>. We would expect the following results:</p>
+	  <p><strong>Odd inversion</strong></p>
+	  <table>
+	    <thead>
+	      <tr>
+		<th style="text-align: center;">Starting pitch</th>
+		<th style="text-align: center;">Distance from midway-point between <code>C5</code> and <code>C♯5</code></th>
+		<th style="text-align: center;">Inverse distance from midway-point between <code>C5</code> and <code>C♯5</code></th>
+		<th style="text-align: center;">Ending pitch</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td style="text-align: center;"><code>F5</code></td>
+		<td style="text-align: center;">4.5 half steps <em>above</em></td>
+		<td style="text-align: center;">4.5 half steps <em>below</em></td>
+		<td style="text-align: center;"><code>A♭4</code></td>
+	      </tr>
+	      <tr>
+		<td style="text-align: center;"><code>D5</code></td>
+		<td style="text-align: center;">1.5 half steps <em>below</em></td>
+		<td style="text-align: center;">1.5 half steps <em>above</em></td>
+		<td style="text-align: center;"><code>B4</code></td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <p>This operation can be visualized on a pitch clock similar to <em>even</em>
+	    inversion except offset in-between <code>C5</code> and <code>C♯5</code> (i.e. quarter step
+	    <em>above</em> <code>C5</code>).</p>
+	  <p><img alt="odd invert" src="./odd-invert-chart.svg" title="odd invert chart" /></p>
+	  <p>In standard notation the result of this <em>odd</em> inversion operation is
+	    depicted in second measure of the following example. The first measure
+	    is the original reference. NOTE: The <code>C5</code> pitch remains unchanged as
+	    it is not operated upon in the example block code (above). If it were
+	    contained in the operation it would be changed to <code>C♯5</code> (i.e. <code>C5</code> is
+	    0.5 half steps <em>below</em> the axis of rotation, so the result of an
+	    inversion around <code>C5</code> and <code>odd</code> would be 0.5 half steps <em>above</em> the
+	    axis of rotation).</p>
+	  <p><img alt="odd invert" src="./invert-odd.png" title="odd invert example" /></p>
+	  <p><strong>Scalar inversion</strong></p>
+	  <p>Underneath the <em>even</em> and <em>odd</em> inversion blocks in the example code
+	    is an inversion block set to <em>scalar</em>. We would expect the following
+	    results:</p>
+	  <table>
+	    <thead>
+	      <tr>
+		<th style="text-align: center;">Starting pitch</th>
+		<th style="text-align: center;">Scalar distance from <code>C5</code> (in steps)</th>
+		<th style="text-align: center;">Inverse scalar distance from <code>C5</code> (in steps)</th>
+		<th style="text-align: center;">Ending pitch</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td style="text-align: center;"><code>F5</code></td>
+		<td style="text-align: center;">3 above (C5 --&gt; D5 --&gt; E5 --&gt; F5)</td>
+		<td style="text-align: center;">3 below (C5 --&gt; B4 --&gt; A4 --&gt; G4)</td>
+		<td style="text-align: center;"><code>G4</code></td>
+	      </tr>
+	      <tr>
+		<td style="text-align: center;"><code>D5</code></td>
+		<td style="text-align: center;">1 above (C5 --&gt; D5)</td>
+		<td style="text-align: center;">1 below (C5 --&gt; B4)</td>
+		<td style="text-align: center;"><code>B4</code></td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <p>This operation can be visualized on a pitch clock similar to <em>odd</em> and
+	    <em>even</em> except that all non-scalar pitches (i.e. pitches outside the
+	    chosen key) are skipped. NOTE: The scalar pitches are shown in bold in
+	    the following pitch clock diagram.</p>
+	  <p><img alt="scalar invert" src="./scalar-invert-chart.svg" title="scalar invert chart" /></p>
+	  <p>In standard notation the result of <em>scalar</em> inversion operation is
+	    depicted in the second measure of the following example. The first
+	    measure is the original reference.</p>
+	  <p><img alt="scalar invert" src="./invert-scalar.png" title="scalar invert example" /></p>
+	  <p>In the <em>invert (even)</em> example above, notes are inverted around <code>C5</code>.
+	    In the <em>invert (odd)</em> example, notes are inverted around a point
+	    midway between <code>C5</code> and <code>C♯5</code>.  In the <em>invert (scalar)</em> example,
+	    notes are inverted around <code>C5</code>, by scalar steps rather than
+	    half-steps.</p>
+	  <h4><a name="CONVERTERS">3.2.10 Converters</a></h4>
+	  <p>Converters are used to transform one form of inputs into other, more
+	    usable form of outputs. This section of the guide will talk about the
+	    various conversion options Music Blocks has to offer.</p>
+	  <p>Generalized shape of a converter is:</p>
+	  <p><img alt="converter" src="../documentation/number2pitch_block.svg" title="Generalized converter" /></p>
+	  <p>where the right argument is converted accordingly, and output is
+	    received on the left side.</p>
+	  <p><strong>Note:</strong> Before an introduction of the different types of converters,
+	    a little introduction on Y staff in Music Blocks. Staff is a set of
+	    horizontal lines and spaces and different positions along Y axis
+	    represents different notes. [C, D, E, F, G, A, B]</p>
+	  <p><img alt="staff" src="treble.svg" title="Treble clef staff" /></p>
+	  <h4><a name="y-to-pitch">3.2.10.1 Y to Pitch</a></h4>
+	  <p><img alt="y pos" src="../documentation/ytopitch_block.svg" title="Y to Pitch converter" /></p>
+	  <p>This converter takes input in the form of a number that represents
+	    Staff Y position in pixels, and processes the value such that it can
+	    be used with certain pitch blocks (pitch number, nth modal pitch,
+	    pitch) to produce notes corresponding to given Staff Y position as an
+	    argument.</p>
+	  <p>Additionally, the block can be plugged into a print block to view the
+	    converted note value.</p>
+	  <h4><a name="pitch-converter">3.2.10.2 Pitch converter</a></h4>
+	  <p><img alt="pitch converter" src="../documentation/outputtools_block.svg" title="Pitch converter block" /></p>
+	  <p>Pitch converter offers a range of options through a pie-menu based
+	    interface and it can potentially convert or extract info out of the
+	    current playing pitch using the current pitch block as an input.  It
+	    can also take custom input in form or solfege, hertz, pitch number
+	    etc.</p>
+	  <p>All these options are provided in the form of a pie-menu which can be
+	    accessed simply by clicking on the converter.</p>
+	  <p><img alt="pitch converter" src="./pitchconverter.svg" title="Pitch converter block" /></p>
+	  <p>Below explained is the utility of every conversion option:</p>
+	  <h4><strong>0. Alphabet:</strong></h4>
+	  <p>Prints the alphabet data of the note being played e.g A, B, C, D, E,
+	    F, G, including accidentals.</p>
+	  <h4><strong>1. Alphabet Class:</strong></h4>
+	  <p>Prints the alphabet data of the note being played e.g A, B, C, D, E,
+	    F, G. It doesn't print any info regarding accidentals.</p>
+	  <h4><strong>2. Solfege Syllable:</strong></h4>
+	  <p>Similar to Alphabet class, returns the data in form of solfege e.g do,
+	    re, mi.  It too, gives no info regarding accidentals.</p>
+	  <h4><strong>3. Pitch Class:</strong></h4>
+	  <p>Returns a number between 0 to 11, corresponding to the note played,
+	    where C is 0 and B is 11. Each increase in the number signifies an
+	    increase by one semitone.</p>
+	  <h4><strong>4. Pitch Number:</strong></h4>
+	  <p>Value of the pitch of the note currently being played. It is different
+	    from Pitch class in the way that it can go below 0 and above 11
+	    depending upon the octave.</p>
+	  <h4><strong>5. Pitch in Hertz:</strong></h4>
+	  <p>Returns the value in hertz of the pitch of the note being currently
+	    played.</p>
+	  <h4><strong>6. Scalar Class:</strong></h4>
+	  <p>Returns a number between 1-7 corresponding to the scale degree of the
+	    note being played, with reference to the chosen mode. Provides no info
+	    regarding accidentals.</p>
+	  <h4><strong>7. Scale Degree:</strong></h4>
+	  <p>Intuitively, returns the scale degree of the note being played with
+	    reference to the chosen mode. It can also be thought of as Scalar
+	    class with accidentals.</p>
+	  <h4><strong>8. N<sup>th</sup> Degree:</strong></h4>
+	  <p>Zero-based index of the degree of note being played in the chosen
+	    mode.</p>
+	  <h4><strong>9. Staff Y:</strong></h4>
+	  <p>Returns the Y staff position of the note being played according to
+	    staff dimensions. It takes into account only the alphabet class, no
+	    accidental info is processed.</p>
+	  <h4><a name="number-2-octave">3.2.10.3 Number to Octave  </a></h4>
+	  <p><img alt="pitch converter" src="../documentation/number2octave_block.svg" title="Y to Pitch converter" /></p>
+	  <p>This converter takes a numeric value which denotes pitch number and
+	    returns the octave corresponding to that pitch number.</p>
+	  <h4><a name="number-2-pitch">3.2.10.4 Number to Pitch</a></h4>
+	  <p><img alt="pitch converter" src="../documentation/number2pitch_block.svg" title="Y to Pitch converter" /></p>
+	  <p>This converter takes a numeric value which denotes pitch number and
+	    returns the pitch name corresponding to that pitch number. No octave
+	    is inferred.</p>
+	  <table>
+	    <thead>
+	      <tr>
+		<th>Converter Name</th>
+		<th>Description</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td>alphabet</td>
+		<td>Converts pitch to letter (as defined above). G maps to G. G♯ maps to G#.</td>
+	      </tr>
+	      <tr>
+		<td>alphabet class</td>
+		<td>Converts pitch to letter (as defined above). G maps to G. G♯ also maps to G.</td>
+	      </tr>
+	      <tr>
+		<td>solfege syllable</td>
+		<td>Converts pitch to solfege (as defined above). G maps to sol.</td>
+	      </tr>
+	      <tr>
+		<td>solfege class</td>
+		<td>Converts pitch to solfege class (as defined above). G maps to sol. G♯ maps to sol.</td>
+	      </tr>
+	      <tr>
+		<td>pitch class</td>
+		<td>Converts pitch to pitch class (as defined above). G maps to 7.</td>
+	      </tr>
+	      <tr>
+		<td>scalar class</td>
+		<td>Converts pitch to scalar class (as defined above). G maps to 5.</td>
+	      </tr>
+	      <tr>
+		<td>scale degree</td>
+		<td>Converts pitch to scale degree (as defined above). G maps to 5.</td>
+	      </tr>
+	      <tr>
+		<td>nth degree</td>
+		<td>Converts pitch to nth degree (as defined above). G maps to 4.</td>
+	      </tr>
+	      <tr>
+		<td>staff y</td>
+		<td>Maps the current pitch to a y value that corresponds to a position on the staff. G4 maps to 50.</td>
+	      </tr>
+	      <tr>
+		<td>pitch number</td>
+		<td>Converts pitch to pitch number (as defined above). G maps to 7.</td>
+	      </tr>
+	      <tr>
+		<td>pitch in hertz</td>
+		<td>Converts pitch to hertz. G4 maps to 392Hz.</td>
+	      </tr>
+	      <tr>
+		<td>pitch to color</td>
+		<td>Converts pitch to a color value (0-100). C maps to 0, G maps to 58.3, etc.</td>
+	      </tr>
+	      <tr>
+		<td>pitch to shade</td>
+		<td>Converts the octave value of the current pitch to a shade. Octave 4 maps to 50.</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <h3><a name="NOTE-VALUE-TRANSFORMATION">3.3 Note Value Transformations</a></h3>
+	  <h4><a name="DOTTED">3.3.1 Dotted Notes</a></h4>
+	  <p><img alt="dot" src="./transform4.svg" title="Creating dotted notes using the Dot block" /></p>
+	  <p>You can "dot" notes using the <em>Dot</em> block. A dotted note extends the
+	    rhythmic duration of a note by 50%. E.g., a dotted quarter note will
+	    play for <code>3/8</code> <code>(i.e. 1/4 + 1/8)</code> of a beat. A dotted eighth note will
+	    play for <code>3/16</code> <code>(i.e. 1/8 + 1/16)</code> of a beat. A double dot extends
+	    the duration by <code>75%</code> <code>(i.e. 50% + [50% of 50%])</code>. For example, a
+	    double-dotted quarter note will play for <code>7/16</code> <code>(i.e. 1/4 + 1/8 +
+	      1/16)</code> of a beat (which is the same as <code>4/16 + 2/16 + 1/16 =
+	      7/16</code>).
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1733856425527606&amp;run=True">RUN LIVE</a></p>
+	  <p>The dot block is useful as an expression of musical rhythm--it is
+	    convenient and helps to organize musical ideas (e.g. many melodies use
+	    dots as the basis of their rhythmic motifs), however you can achieve
+	    the same rhythmic result as dot by putting the calculation directly
+	    into note value as well. For example, indicating <code>3/8</code> instead of
+	    <code>1/4</code> will result in a dotted quarter note.</p>
+	  <p>The chart below shows two common examples, dotted quarter and dotted
+	    eighth, and how to achieve them with either the dot block or by direct
+	    calculation into a note's note value.</p>
+	  <p><img alt="dotted note" src="../charts/DotsChart.svg" title="using dotted notes" /></p>
+	  <h4><a name="MULTIPLY-AND-DIVIDE">3.3.2 Speeding Up and Slowing Down Notes via Mathematical Operations</a></h4>
+	  <p><img alt="duration" src="./transform5.svg" title="Changing note duration for a note or notes" /></p>
+	  <p>You can also multiply (or divide) the note value, which will change
+	    the duration of the notes by changing their note values. Multiplying
+	    the note value of an <code>1/8</code> note by <code>1/2</code> is the equivalent of playing
+	    a <code>1/16</code> note (i.e. <code>1/2 * 1/8 = 1/16</code>) . Multiplying the note value
+	    of an <code>1/8</code> note by <code>2/1</code> (which has the effect of dividing by <code>1/2</code>)
+	    will result in the equivalent of a <code>1/4</code> note.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1733894227395433&amp;run=True">RUN LIVE</a></p>
+	  <p><img alt="drums" src="./drum4.svg" title="speeding up drum beats over time" /></p>
+	  <p>In the above example, the sequence of <a href="#25-drums">drum</a> note values is
+	    decreased over time, at each repetition.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&amp;run=True">RUN LIVE</a></p>
+	  <h4><a name="REPETITION">3.3.3 Repeating Notes</a></h4>
+	  <p><img alt="repeat" src="./transform6.svg" title="repeating notes" /></p>
+	  <p>There are several ways to repeat notes. The <em>Repeat</em> block will play a
+	    sequence of notes multiple times; the <em>Duplicate</em> block will repeat each
+	    note in a sequence.</p>
+	  <p>In the example, on the left, the result would be <code>Sol, Re, Sol, Sol,
+	      Re, Sol, Sol, Re, Sol, Sol, Re, Sol</code>; on the right the result would be
+	    <code>Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol</code>.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1725794018017026&amp;run=True">RUN LIVE</a></p>
+	  <h4><a name="SWINGING">3.3.4 Swinging Notes and Tied Notes</a></h4>
+	  <p><img alt="swing" src="./transform7.svg" title="swinging notes and tied notes" /></p>
+	  <p><a href="https://musicblocks.sugarlabs.org/index.html?id=1725867425283695&amp;run=True">RUN LIVE</a></p>
+	  <p>The <em>Swing</em> block works on pairs of notes (specified by note value),
+	    adding some duration (specified by swing value) to the first note and
+	    taking the same amount from the second note. Notes that do not match
+	    note value are unchanged.</p>
+	  <p>In the example, <code>fa4</code> would be played as a <code>1/6</code> note and <code>sol4</code> would
+	    be played as a <code>1/12</code> note (<code>1/8 + 1/24 === 1/6</code> and <code>1/8 - 1/24 ===
+	      1/12</code>). Observe that the total duration of the pair of notes is
+	    unchanged.</p>
+	  <p>Tie also works on pairs of notes, combining them into one note. (The
+	    notes must be identical in pitch, but can vary in rhythm.)</p>
+	  <p><img alt="ties" src="../charts/TiesChart.svg" title="using notes with ties" /></p>
+	  <h4><a name="BEAT">3.3.5 Beat</a></h4>
+	  <p>The beat of the music is determined by the <em>Meter</em> block (by default,
+	    it is set to 4:4).</p>
+	  <p>The <em>Pickup</em> block can be used to accommodate any notes that come in
+	    before the beat.</p>
+	  <p><img alt="meter" src="./beat1.svg" title="meter and pickup" /></p>
+	  <p>The Beat count block is the number of the current beat, eg 1, 2, 3, or 4. 
+	    In the figure, it is used to take an action on the first beat of each measure.</p>
+	  <p><img alt="beat count" src="../documentation/beatvalue_block.svg" title="beat count" /></p>
+	  <p>The Measure count block returns the current measure.</p>
+	  <p><img alt="measure count" src="../documentation/measurevalue_block.svg" title="measure count" /></p>
+	  <p>Specifying beat is useful in that you can have the character of a note
+	    vary depending upon the beat. In the example below, the volume of
+	    notes on Beat <code>1</code> and Beat <code>3</code> are increased, while the volume of off
+	    beats is decreased.</p>
+	  <p><img alt="on beat" src="./beat2.svg" title="on-beat-do" /></p>
+	  <p>The <em>On-Beat-Do</em> and <em>Off-Beat-Do</em> blocks let you specify actions to
+	    take on specific beats. (Note that the action is run before any blocks
+	    inside the note block associated with the beat are run.)</p>
+	  <p>More examples can be found in the <a href="#36-adding-graphics">Graphics</a>
+	    section below.</p>
+	  <h4><a name="BEAT-TRANSFORMATIONS">3.3.6 Staccato and Slur</a></h4>
+	  <p><img alt="slur" src="./transform17.svg" title="Staccato, and Slur blocks" /></p>
+	  <p>The <em>Staccato</em> block shortens the length of the actual
+	    note&mdash;making them tighter bursts&mdash;while maintaining the
+	    specified rhythmic value of the notes.</p>
+	  <p>The <em>Slur</em> block lengthens the sustain of notes&mdash;running longer than
+	    the noted duration and blending it into the next note&mdash;while
+	    maintaining the specified rhythmic value of the notes.</p>
+	  <p><a href="https://musicblocks.sugarlabs.org/index.html?id=1725868210212676&amp;run=True">RUN LIVE</a></p>
+	  <h4><a name="BACKWARDS">3.3.7 Backwards</a></h4>
+	  <p><img alt="backwards" src="./transform11.svg" title="Backward block" /></p>
+	  <p>The <em>Backward</em> block will play the contained notes in reverse order
+	    (retrograde). In the example above, the notes in <code>chunk</code> are played as
+	    <code>Sol</code>, <code>Ti</code>, <code>La</code>, <code>Sol</code>, i.e., from the bottom to the top of the
+	    stack.</p>
+	  <p>An example from Bach is provided. In the example, there are two
+	    voices, one which plays the composition forward and one that plays the
+	    same composition backward.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1522885752309944&amp;run=True">RUN LIVE</a></p>
+	  <p>Note that all of the blocks inside a <em>Backward</em> block are reverse, so
+	    use this feature with caution if you include logic intermixed with
+	    notes.</p>
+	  <h3><a name="OTHER-TRANSFORMATION">3.4 Other Transformations</a></h3>
+	  <h4><a name="VOLUME-TRANSFORMATIONS">3.4.1 Set Volume and Crescendo</a></h4>
+	  <p><img alt="volume" src="./transform8.svg" title="Set master volume, set synth volume, set relative volume, crescendo" /></p>
+	  <p>The <em>Set master volume</em> block will change the master volume. The
+	    default is <code>50</code>; the range is <code>0</code> (silence) to <code>100</code> (full volume).</p>
+	  <p>The <em>Set synth volume</em> block will change the volume of a particular
+	    synth, e.g., <code>violin</code>, <code>snare drum</code>, etc. The default volume is <code>50</code>;
+	    the range is <code>0</code> (silence) to <code>100</code> (full volume). In the example, the
+	    <em>synth name</em> block is used to select the current synth.</p>
+	  <p>As a convenience, a number of standard volume blocks are provided:
+	    from loudest to quietest, there is <em>fff</em>, <em>ff</em> <em>f</em>, <em>mf</em>, <em>mp</em>, <em>p</em>,
+	    <em>pp</em>, and <em>ppp</em>. In musical terms "f" means "forte" or loud, "p" means
+	    "piano" or soft, and "m" means "mezzo" or middle.</p>
+	  <p>The <em>Set Relative Volume</em> block modifies the clamped note's volume
+	    according to the input value of the block in an added (or subtracted
+	    when negative) percentage with respect to the original volume. For
+	    example, <code>100</code> would mean doubling the current volume.</p>
+	  <p>The <em>Crescendo</em> block will increase (or decrease) the volume of the
+	    contained notes by a specified amount for every note played. For
+	    example, if you have 3 notes in sequence contained in a <em>Crescendo</em>
+	    block with a value of <code>5</code>, the final note will be at 15% more 
+	    than the original value for volume.</p>
+	  <p><a href="https://musicblocks.sugarlabs.org/index.html?id=1725868641106995&amp;run=True">RUN LIVE</a></p>
+	  <p>NOTE: The <em>Crescendo</em> block does not alter the volume of a note as it
+	    is being played. Music Blocks does not yet have this functionality.</p>
+	  <h4><a name= "SETTINGVOICE">3.4.2 Setting Instrument</a></h4>
+	  <p><img alt="set voice" src="./transform12.svg" title="setting voice and keys using Set Voice block" /></p>
+	  <p>The default instrument is an electronic synthesizer, so by default,
+	    that is the instrument used when playing notes. You can override this
+	    default for a group of notes by using the <em>Set Instrument</em> block. It
+	    will select an <a href="#342-setting-instrument">instrument</a> for the
+	    synthesizer for any contained blocks, e.g., violin.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1725869548034418&amp;run=True">RUN LIVE</a></p>
+	  <p><img alt="default voice" src="../documentation/setdefaultinstrument_block.svg" title="Set Default Instrument" /></p>
+	  <p>You can also override the default using the <em>Set default instrument</em>
+	    block. In the example above, the default instrument is set to piano,
+	    so any note that is not inside of a <em>Set instrument</em> block will be
+	    played using the piano synthesizer. The first note in this example is
+	    piano; the second note is guitar; and the third is piano.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1734599929166507&amp;run=True">RUN LIVE</a></p>
+	  <h4><a name= "SETTINGKEY"></a>3.4.3 Setting Key and Mode</h4>
+	  <p><img alt="set key" src="./transform10.svg" title="Set Key block" /></p>
+	  <p>The <em>Set Key</em> block will change the key and mode of the mapping
+	    between solfege, e.g., <code>Do</code>, <code>Re</code>, <code>Mi</code>, to note names, e.g., <code>C</code>,
+	    <code>D</code>, <code>E</code>, when in C Major. Modes include Major and Minor, Chromatic,
+	    and a number of more exotic modes, such as Bebop, Geez, Maqam, etc.
+	    This block allows users to access "movable Do" within Music Blocks,
+	    where the mapping of solfege to particular pitch changes depending on
+	    the user's specified tonality.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1725870361330836&amp;run=True">RUN LIVE</a></p>
+	  <p><img alt="mode" src="./transform19.svg" title="Define mode block" /></p>
+	  <p>The <em>Define mode</em> block can be used to define a custom mode by
+	    defining the number and size of the steps within an octave. You can
+	    use your custom mode with the <em>Set key</em> block.</p>
+	  <h4><a name="VIBRATO"></a>3.4.4 Vibrato, Tremelo, et al.</h4>
+	  <p><img alt="effects" src="./transform15.svg" title="Vibrato, tremelo, chorus, distortion, neighbor, and phaser blocks" /></p>
+	  <p>The <em>Vibrato</em> Block adds a rapid variation in pitch to any contained
+	    notes. The intensity of the variation ranges from <code>1</code> to <code>100</code> (cents),
+	    e.g. plus or minus up to one half step. The rate argument determines
+	    the rate of the variation.</p>
+	  <p>The other effects blocks also modulate pitch over time. Give them a try.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1725870963978517&amp;run=True">RUN LIVE</a></p>
+	  <h3><a name="VOICES">3.5 Voices</a></h3>
+	  <p>Each <em>Start</em> block runs as a separate voice in Music Blocks. (When
+	    you click on the Run button, all of the <em>Start</em> blocks are run
+	    concurrently.)</p>
+	  <p><img alt="voices" src="./voices1.svg" title="use of voices" /></p>
+	  <p>If we put our song into an action...</p>
+	  <p><img alt="voices" src="./voices2.svg" title="running the song using multiple Start blocks" /></p>
+	  <p>...we can run it from multiple <em>Start</em> blocks.</p>
+	  <p><img alt="octaves" src="./voices3.svg" title="shifting the octaves up and down" /></p>
+	  <p>It gets more interesting if we shift up and down octaves.</p>
+	  <p><img alt="voices" src="./voices4.svg" title="playing the various voices offset in time" /></p>
+	  <p>And even more interesting if we bring the various voices offset in time
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1523026536194324&amp;run=True">RUN LIVE</a></p>
+	  <p><img alt="events" src="./voices5.svg" title="queuing the various voices using events" /></p>
+	  <p>An alternative to use a preprogrammed delay is to use the <em>Broadcast</em>
+	    block to bring in multiple voices. In the example above, after each
+	    section of the song is played, a new event is broadcasted, bringing in
+	    a new voice. Note the use of the <em>Mouse Sync</em> block. This ensures that
+	    the multiple voices are synced to the same master clock.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1734439833660485&amp;run=True">RUN LIVE</a></p>
+	  <p><img alt="drum" src="./drum3.svg" title="usage of kick drum" /></p>
+	  <p>A special <em>Start drum</em> version of the <em>Start</em> block is available for
+	    laying down a drum track. Any <em>Pitch</em> blocks encountered while starting
+	    from a drum will be played as <code>C2</code> with the default drum sample. In
+	    the example above, all of the notes in <code>chunk</code> will be played with a
+	    kick drum.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1734456316657915&amp;run=True">RUN LIVE</a></p>
+	  <h3><a name="GRAPHICS">3.6 Adding graphics</a></h3>
+	  <p><img alt="graphics" src="./graphics1.svg" title="adding graphics" /></p>
+	  <p><img alt="graphics" src="./graphics2.svg" title="color range" /></p>
+	  <p>Turtle graphics can be combined with the music blocks. By placing
+	    graphics blocks, e.g., <em>Forward</em> and <em>Right</em>, inside of <em>Note value</em>
+	    blocks, the graphics stay in sync with the music. In this example, the
+	    turtle moves forward each time a quarter note is played. It turns
+	    right during the eighth note. The pitch is decreased by one half step,
+	    the pen size decreases, and the pen color increases at each step in
+	    the inner repeat loop.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1523494709674021&amp;run=True">RUN LIVE</a></p>
+	  <p><img alt="graphics" src="./graphics3.svg" title="synchronizing graphics and music" /></p>
+	  <p>Another example of graphics synchronized to the music by placing the
+	    graphics commands inside of <em>Note value</em> blocks. <a href="https://musicblocks.sugarlabs.org/index.html?id=1734456316657915&amp;run=True">RUN LIVE</a></p>
+	  <p><img alt="graphics" src="./graphics5.svg" title="using beat to synchronize graphics" /></p>
+	  <p>Another approach to graphics is to use modulate them based on the
+	    <a href="#335-beat">beat</a>. In the example above, we call the same graphics
+	    action for each note, but the parameters associated with the action,
+	    such as pen width, are dependent upon which beat we are on. On Beat 1,
+	    the pen size is set to <code>50</code> and the volume to <code>75</code>. On Beat <code>3</code>, the
+	    pen size is set to <code>25</code> and the volume to <code>50</code>. On off beats, the pen
+	    size is set to <code>5</code> and the volume to <code>5</code>. The resultant graphic is
+	    shown below. <a href="">RUN LIVE</a></p>
+	  <p><img alt="graphics" src="./graphics6.svg" title="graphics modulated by beat" /></p>
+	  <p>The <em>On-Every-Note-Do</em> block lets you specify an action to take
+	    whenever a note is played. In the example above, the note value is
+	    used to determine the portion of an arc to draw, i.e., a 1/4 note
+	    draws a 1/4 circle, a 1/2 note draw 1/2 circle, and a whole note draws
+	    a full circle.</p>
+	  <p><img alt="on-every-note-do" src="../documentation/arc_block.svg" /></p>
+	  <p>The <em>On-Every-Note-Do</em> block is found in the Crab Canon project on the
+	    Planet to "plot the music". The mouse moves up and down based on the
+	    change in pich between notes and to the right in proportion to the
+	    note value.</p>
+	  <p><img alt="crab-canon" src="./crab-canon.svg" /></p>
+	  <p><a href="https://musicblocks.sugarlabs.org/index.html?id=1522885323588493">RUN LIVE</a></p>
+	  <p>Music Blocks has an internal "conductor" maintaining the beat.  When
+	    the Run button is clicked, the program begins and an internal master
+	    (or "conductor") clock starts up. All of the music tries to stay
+	    synced to that clock.</p>
+	  <p><img alt="no clock" src="../documentation/drift_block.svg" title="No-clock block" /></p>
+	  <p>For example, if you have multiple voices (mice), they all share the
+	    same conductor in order to keep on the same beat. If a voice (mouse)
+	    is falling behind, Music Blocks tries to catch up on the next note by
+	    truncating it. If it is an 1/8 note behind and the next note is a 1/2
+	    note, then only an 3/8 note would be played, so as to catch up. That
+	    is a somewhat extreme example—usually the timing errors are only
+	    very very small differences.</p>
+	  <p>But in some situations, the timing errors can be very large. This is
+	    when the <em>No-clock</em> block is used.</p>
+	  <p>A typical problem is when the music is not played
+	    continuously. Imagine an interactive game where a hero is battling a
+	    monster. Our hero plays theme music whenever the monster is
+	    defeated. But that might occur at any time, hence it is not going to
+	    be in sync with the conductor. The offset could be tens of
+	    seconds. This would mean that all of the notes in the theme music
+	    might be consumed by trying to catch up with the conductor. The
+	    <em>No-clock</em> block essentially says, do your own thing and don't worry
+	    about the conductor.</p>
+	  <p><img alt="math" src="./fibonacci3.svg" title="usage of No-clock block" /></p>
+	  <p>In this example, because the computation and graphics are more
+	    complex, a <em>No-clock</em> block is used to decouple the graphics from the
+	    master clock. The "No-clock* block prioritizes the sequence of
+	    actions over the specified rhythm.</p>
+	  <p><img alt="graphics" src="./graphics4.png" title="rhythm sequence" /></p>
+	  <p><img alt="tree" src="./tree-example.svg" title="another example of the No-clock block" /></p>
+	  <p>Another example of embedding graphics into notes: in case, a recursive
+	    tree drawing, where the pitch goes up as the branches ascend.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1523029986215035&amp;run=True">RUN LIVE</a></p>
+	  <p><img alt="tree" src="./tree.svg" title="tree graphic" /></p>
+	  <h3><a name="INTERACTIONS">3.7 Interactions</a></h3>
+	  <p>There are many ways to be interactive with Music Blocks, including
+	    tracking the mouse position to impact some aspect of the music.</p>
+	  <p><img alt="interactivity" src="./interactive.svg" title="interactions" /></p>
+	  <p>For example, we can launch the phrases (chunks) interactively. We use
+	    the mouse position to generate a suffix: <code>0</code>, <code>1</code>, <code>2</code>, or <code>3</code>,
+	    depending on the quadrant. When the mouse is in the lower-left
+	    quadrant, <code>chunk0</code> is played; lower-right quadrant, <code>chunk1</code>;
+	    upper-left quadrant, <code>chunk2</code>; and upper-right quadrant, <code>chunk3</code>.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1523028011868930&amp;run=True">RUN LIVE</a></p>
+	  <p><img alt="piano" src="./interactive2.svg" title="creation of a two-key piano" /></p>
+	  <p>In the example above, a simple two-key piano is created by associating
+	    <em>click</em> events on two different turtles with individual notes. Can you
+	    make an 8-key piano?
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1734501444456205&amp;run=True">RUN LIVE</a></p>
+	  <p><img alt="random" src="./interactive3.svg" title="adding randomness to your music" /></p>
+	  <p>You can also add a bit of randomness to your music. In the top example
+	    above, the <em>One-of</em> block is used to randomly assign either <code>Do</code> or
+	    <code>Re</code> each time the <em>Note value</em> block is played. In the bottom example
+	    above, the <em>One-of</em> block is used to randomly select between <code>chunk1</code>
+	    and <code>chunk2</code>.</p>
+	  <p>Musical Paint has been a popular activity dating back to programs such
+	    as Dan Franzblau's <em>Vidsizer</em> (1979) or Morwaread Farbood's
+	    <em>Hyperscore</em> (2002). Music Blocks can be used to create musical paint
+	    as well. In the somewhat ambitious example below, we go a step further
+	    than the typical paint program in that you can not only paint music (a
+	    la Vidsizer) and playback your painting as a composition (a la
+	    Hyperscore), but also generate <em>Note</em> blocks from your composition.</p>
+	  <p><img alt="paint" src="./hyperscore.svg" title="musical paint" /></p>
+	  <p>The program works by first creating an array from the heap that
+	    corresponds to a 20x12 grid of notes on the screen: 20 columns,
+	    representing time from left to right; and 12 rows, corresponding to
+	    scalar pitch values, which increase in value from the bottom to the
+	    top.</p>
+	  <p>The <em>record</em> action repeatedly calls the <em>paint</em> action until the
+	    <em>playback</em> button is clicked.</p>
+	  <p>The <em>paint</em> action tracks the mouse (<em>Set XY</em> to <em>cursor x</em> and
+	    <em>cursor y</em>) and, if the mouse button is pressed, marks an entry in the
+	    array corresponding to that note, plays the note, and leaves behind a
+	    "drop of paint".</p>
+	  <p>The <em>playback</em> action is invoked by clicking on the <em>play</em> mouse,
+	    which sets <em>recording</em> to <code>0</code>, thus breaking out of the paint "while
+	    loop". Playback scans each column in the array from left to right for
+	    pitches to play and generates a chord of pitches for each column.</p>
+	  <p>Once the <em>playback</em> action is complete, the <em>save</em> action is
+	    invoked. Again each column in the array is scanned, but this time,
+	    instead of playing notes, the <em>Make Block</em> block is called in order to
+	    generate a stack of notes that correspond to the composition. This
+	    stack can be copied and pasted into another composition.</p>
+	  <p>While a bit fanciful, this example, which can be run by clicking on
+	    the link below, takes musical paint in a novel direction.</p>
+	  <p><a href="https://sugarlabs.github.io/musicblocks/index.html?id=1523896294964170&amp;run=True&amp;run=True">RUN LIVE</a></p>
+	  <h3><a name="ENSEMBLE">3.8 Ensemble</a></h3>
+	  <p>Much of music involves multiple instruments (voices or "mice" in Music
+	    Blocks) playing together. There are a number of special blocks that
+	    can be used to coordinate the actions of an ensemble of mice.</p>
+	  <p>This section will guide about different ensemble blocks, which
+	    communicate the status of mice by name, including notes played,
+	    current pen color, pitch number, etc.</p>
+	  <p>To use the ensemble blocks, you must assign a name to each mouse, as
+	    we will reference each mouse by its name.</p>
+	  <p><img alt="mouse name" src="../documentation/turtlenameonly_block.svg" title="mouse name" /></p>
+	  <p>Use the <em>Mouse count</em> block in combination with the <em>Nth mouse name</em>
+	    block to iterate through all of the mice.</p>
+	  <p><img alt="iterate" src="../documentation/turtleiteration.svg" title="mouse iteration" /></p>
+	  <p>The <em>Mouse sync</em> block aligns the beat count between mice.</p>
+	  <p><img alt="sync" src="../documentation/turtlesync_block.svg" title="mouse sync" /></p>
+	  <p>The <em>Mouse index heap</em> block returns a value in the heap at a specified
+	    location for a specified mouse.</p>
+	  <p><img alt="heap" src="../documentation/turtleheap_block.svg" title="mouse heap index" /></p>
+	  <p>You can use the dictionary entries to data between mice. The <em>Get
+	      value</em> block lets you specify a mouse name and the value you want to
+	    access. For example, you can access a mouse's pen attributes, such as
+	    color, shade, and grey values.</p>
+	  <p><img alt="pen" src="./dictionary-pen.svg" title="mouse pen attributes" /></p>
+	  <p>You can also access the mouse's graphics attributes, such as x, y, and
+	    heading. You can also set attributes of a mouse using the <em>Set value</em>
+	    block. In the example, a mouse's heading is set to 90.</p>
+	  <p><img alt="graphics" src="./dictionary-graphics.svg" title="mouse graphics attributes" /></p>
+	  <p>Some music status is also available through the dictionary. You can
+	    access a mouse's "current pitch", "pitch number", "note value", the
+	    number of "notes played".</p>
+	  <p><img alt="music" src="./dictionary-music.svg" title="mouse music attributes" /></p>
+	  <p>The dictionary can be used to share other things too. Just set a
+	    <em>key/value</em> pair with one mouse and access it from another.</p>
+	  <p><img alt="dictionary" src="./dictionary-key.svg" title="sharing key/value pairs" /></p>
+	  <p>Other Ensemble blocks include:</p>
+	  <p>The <em>Found mouse</em> block will return true if the specified mouse can be found.</p>
+	  <p><img alt="found" src="../documentation/foundturtle_block.svg" title="found mouse" /></p>
+	  <p>The <em>Set mouse</em> block sends a stack of blocks to be run by the specified mouse.</p>
+	  <p><img alt="set" src="../documentation/setturtle_block.svg" title="set mouse" /></p>
+	  <h3><a name="PROGRAM-BLOCKS">3.9 Program Blocks</a></h3>
+	  <p>The <em>Program</em> palette contains blocks that allow you to manipulate the program itself, manage data (heaps and dictionaries), and interact with the project environment.</p>
+	  <p>For a detailed reference of these blocks, please see the <a href="../documentation/README.md#8-program-palette">Program Palette</a> section in the documentation.</p>
+	  <p>These blocks are particularly useful for creating meta-programming projects, such as the <a href="#musical-paint">Musical Paint</a> example, where the <em>Make Block</em> is used to generate code from a drawing.</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
