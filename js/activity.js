@@ -3549,7 +3549,7 @@ class Activity {
                         });
 
                         li.append(img);
-                        li.append("<a> " + item.label + "</a>");
+                        li.append($j("<a>").text(" " + item.label));
 
                         return li.appendTo(
                             ul.css({
@@ -5231,7 +5231,7 @@ class Activity {
             const pitch = pitches;
             pitchDuration = toFraction(pitchDuration);
             const adjustedNote = _adjustPitch(pitch.name, keySignature).toUpperCase();
-            if (triplet != null) {
+            if (triplet !== null) {
                 pitchDuration[1] = meterDen * triplet;
             }
 
@@ -7105,17 +7105,13 @@ class Activity {
                 const instance = $helpfulSearch.autocomplete("instance");
                 if (instance) {
                     instance._renderItem = (ul, item) => {
-                        return $j("<li></li>")
-                            .append(
-                                '<img src="' +
-                                    (item.artwork || "") +
-                                    '" height = "20px">' +
-                                    "<a>" +
-                                    " " +
-                                    item.label +
-                                    "</a>"
-                            )
-                            .appendTo(ul.css("z-index", 35000));
+                        const li = $j("<li></li>");
+                        const img = document.createElement("img");
+                        img.src = item.artwork || "";
+                        img.height = 20;
+                        li.append(img);
+                        li.append($j("<a>").text(" " + item.label));
+                        return li.appendTo(ul.css("z-index", 35000));
                     };
                 }
                 $helpfulSearch.data("autocomplete-init", true);
