@@ -306,6 +306,39 @@ class PhraseMaker {
     }
 
     /**
+     * Loads drum synths used by existing PhraseMaker rows before cell preview playback.
+     * @private
+     * @param {number} [turtleIndex=0] - Index of the turtle that triggered this widget.
+     */
+    _loadDrumSynthsForRows(turtleIndex = 0) {
+        if (!this.activity?.logo?.synth) {
+            return;
+        }
+
+        const tur = this.activity.turtles?.ithTurtle?.(turtleIndex);
+        const instrumentNames = tur?.singer?.instrumentNames;
+        const loadedDrums = new Set();
+
+        for (let i = 0; i < this.rowLabels.length; i++) {
+            const drumName = this._deps.getDrumName(this.rowLabels[i]);
+            if (drumName === null || loadedDrums.has(drumName)) {
+                continue;
+            }
+
+            loadedDrums.add(drumName);
+
+            if (Array.isArray(instrumentNames) && !instrumentNames.includes(drumName)) {
+                instrumentNames.push(drumName);
+                this.activity.logo.synth.loadSynth(0, drumName);
+            } else if (!Array.isArray(instrumentNames)) {
+                this.activity.logo.synth.loadSynth(0, drumName);
+            }
+
+            this._deps.Singer?.setSynthVolume?.(this.activity.logo, 0, drumName, DEFAULTVOLUME);
+        }
+    }
+
+    /**
      * Adds a node to the PhraseMaker matrix.
      * This method is used to preserve and restore the state of a cell in the matrix.
      * @param {number} rowBlock - The pitch or drum block associated with the node.
@@ -382,6 +415,7 @@ class PhraseMaker {
 
         this._notesToPlay = [];
         this._matrixHasTuplets = false;
+        this._loadDrumSynthsForRows(turtleIndex);
 
         // Add the buttons to the top row.
 

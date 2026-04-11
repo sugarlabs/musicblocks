@@ -7357,7 +7357,9 @@ class Blocks {
                         continue;
                     }
                     this.blockList[blk].text.text = "";
-                    this.blockList[blk].container.updateCache();
+                    if (this.blockList[blk].container.cacheCanvas != null) {
+                        this.blockList[blk].container.updateCache();
+                    }
                 }
             }
             this.activity.refreshCanvas();
