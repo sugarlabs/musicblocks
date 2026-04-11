@@ -460,7 +460,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
         !pitchHasAccidental &&
         ((!block.activity.KeySignatureEnv[2] && block.name === "solfege") ||
             (block.name === "notename" &&
-                (block.connections[0] != undefined
+                (block.connections[0] !== undefined
                     ? !["setkey", "setkey2"].includes(
                           block.blocks.blockList[block.connections[0]].name
                       )
@@ -608,7 +608,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                 block.activity.KeySignatureEnv[0] + " " + block.activity.KeySignatureEnv[1];
 
             let obj;
-            if (that.name == "scaledegree2") {
+            if (that.name === "scaledegree2") {
                 note = note.replace(attr, "");
                 note = SOLFEGENAMES[note - 1];
                 note += attr;
@@ -699,7 +699,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
         if (
             (!block.activity.KeySignatureEnv[2] && that.name === "solfege") ||
             (that.name === "notename" &&
-                (that.connections[0] != undefined
+                (that.connections[0] !== undefined
                     ? !["setkey", "setkey2"].includes(
                           that.blocks.blockList[that.connections[0]].name
                       )
@@ -1177,7 +1177,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
 
     let j = selectedNote;
     for (const x in noteLabels[selectedCustom]) {
-        if (x != "pitchNumber" && noteLabels[selectedCustom][x][1] == j) {
+        if (x !== "pitchNumber" && noteLabels[selectedCustom][x][1] === j) {
             j = +x;
             break;
         }
@@ -4193,7 +4193,7 @@ const piemenuKey = activity => {
         const ele = document.getElementsByName("movable");
         for (let i = 0; i < ele.length; i++) {
             if (ele[i].checked) {
-                activity.KeySignatureEnv[2] = ele[i].value == "true" ? true : false;
+                activity.KeySignatureEnv[2] = ele[i].value === "true" ? true : false;
             }
         }
         keyNameWheel.removeWheel();
@@ -4245,7 +4245,7 @@ const piemenuKey = activity => {
     const __setupActionKey = i => {
         keyNameWheel.navItems[i].navigateFunction = () => {
             for (let j = 0; j < keys2.length; j++) {
-                if (Math.floor(j / 2) != i) {
+                if (Math.floor(j / 2) !== i) {
                     keyNameWheel2.navItems[j].navItem.hide();
                 } else {
                     if (keys[i].length > 2) {
@@ -4302,7 +4302,7 @@ const piemenuKey = activity => {
         const ks = activity.storage.KeySignatureEnv.split(",");
         activity.KeySignatureEnv[0] = ks[0];
         activity.KeySignatureEnv[1] = ks[1];
-        activity.KeySignatureEnv[2] = ks[2] == "true" ? true : false;
+        activity.KeySignatureEnv[2] = ks[2] === "true" ? true : false;
         activity.storage.KeySignatureEnv = activity.KeySignatureEnv;
     } else {
         activity.KeySignatureEnv = ["C", "major", false];
@@ -4317,7 +4317,7 @@ const piemenuKey = activity => {
             keyNameWheel2.navigateWheel(i);
             for (let j = 0; j < keys2.length; j++) {
                 keyNameWheel2.navItems[j].navItem.hide();
-                if (i % 2 == 0) {
+                if (i % 2 === 0) {
                     keyNameWheel2.navItems[i].navItem.show();
                     keyNameWheel2.navItems[i + 1].navItem.show();
                 } else {

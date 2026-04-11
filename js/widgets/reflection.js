@@ -204,6 +204,7 @@ class ReflectionMatrix {
             this.startChatSession();
         }
 
+        widgetWindow.sendToCenter();
         activity.textMsg(_("Reflect on your project."), 3000);
     }
 
@@ -308,6 +309,7 @@ class ReflectionMatrix {
     async updateProjectCode() {
         const code = await this.activity.prepareExport();
         if (code === this.code) {
+            this.activity.textMsg(_("No changes were detected in your project."), 2500);
             return; // No changes in code
         }
 
