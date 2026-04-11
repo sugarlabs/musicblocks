@@ -51,6 +51,13 @@ describe("MBDialog", () => {
             clear: jest.fn()
         };
         Object.defineProperty(window, "localStorage", { value: localStorageMock });
+
+        // Mock requestAnimationFrame and cancelAnimationFrame
+        window.requestAnimationFrame = jest.fn().mockImplementation(cb => {
+            cb();
+            return 1;
+        });
+        window.cancelAnimationFrame = jest.fn();
     });
 
     afterEach(() => {
