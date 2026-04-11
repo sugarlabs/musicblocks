@@ -772,9 +772,9 @@ class JSEditor {
         let isResizing = false;
         let resizeDirection = null;
         let startX, startY, startWidth, startHeight, startLeft, startTop;
+        let pendingClientX = 0;
+        let pendingClientY = 0;
         let resizeRafId = null;
-        let latestClientX = 0;
-        let latestClientY = 0;
 
         const startResize = (e, direction) => {
             if (this.widgetWindow._maximized) return; // Don't resize when maximized
@@ -794,69 +794,63 @@ class JSEditor {
             e.stopPropagation();
         };
 
-        const doResize = e => {
+        const applyResize = () => {
+            resizeRafId = null;
             if (!isResizing) return;
 
-            latestClientX = e.clientX;
-            latestClientY = e.clientY;
+            const deltaX = pendingClientX - startX;
+            const deltaY = pendingClientY - startY;
 
-            if (resizeRafId) return;
+            let newWidth = startWidth;
+            let newHeight = startHeight;
+            let newLeft = startLeft;
 
-            resizeRafId = requestAnimationFrame(() => {
-                if (!isResizing || !resizeDirection) {
-                    resizeRafId = null;
-                    return;
+            // Calculate new dimensions based on direction
+            if (resizeDirection.includes("right")) {
+                newWidth = Math.max(400, startWidth + deltaX);
+            }
+            if (resizeDirection.includes("left")) {
+                const widthDelta = startWidth - deltaX;
+                if (widthDelta >= 400) {
+                    newWidth = widthDelta;
+                    newLeft = startLeft + deltaX;
                 }
+            }
+            if (resizeDirection.includes("bottom")) {
+                newHeight = Math.max(300, startHeight + deltaY);
+            }
 
-                const clientX = latestClientX;
-                const clientY = latestClientY;
+            // Apply new dimensions
+            windowFrame.style.width = newWidth + "px";
+            windowFrame.style.height = newHeight + "px";
 
-                const deltaX = clientX - startX;
-                const deltaY = clientY - startY;
+            if (resizeDirection.includes("left")) {
+                windowFrame.style.left = newLeft + "px";
+            }
 
-                let newWidth = startWidth;
-                let newHeight = startHeight;
-                let newLeft = startLeft;
+            // Update editor content size
+            const editorDiv = this._editor;
+            if (editorDiv) {
+                editorDiv.style.width = newWidth + "px";
+                editorDiv.style.height = newHeight - 32 + "px"; // Subtract title bar height
+            }
+        };
 
-                // Calculate new dimensions based on direction
-                if (resizeDirection.includes("right")) {
-                    newWidth = Math.max(400, startWidth + deltaX);
-                }
-                if (resizeDirection.includes("left")) {
-                    const widthDelta = startWidth - deltaX;
-                    if (widthDelta >= 400) {
-                        newWidth = widthDelta;
-                        newLeft = startLeft + deltaX;
-                    }
-                }
-                if (resizeDirection.includes("bottom")) {
-                    newHeight = Math.max(300, startHeight + deltaY);
-                }
+        const doResize = e => {
+            if (!isResizing) return;
+            pendingClientX = e.clientX;
+            pendingClientY = e.clientY;
 
-                // Apply new dimensions
-                windowFrame.style.width = newWidth + "px";
-                windowFrame.style.height = newHeight + "px";
-
-                if (resizeDirection.includes("left")) {
-                    windowFrame.style.left = newLeft + "px";
-                }
-
-                // Update editor content size
-                const editorDiv = this._editor;
-                if (editorDiv) {
-                    editorDiv.style.width = newWidth + "px";
-                    editorDiv.style.height = newHeight - 32 + "px"; // Subtract title bar height
-                }
-
-                resizeRafId = null;
-            });
+            if (resizeRafId === null) {
+                resizeRafId = requestAnimationFrame(applyResize);
+            }
         };
 
         const stopResize = () => {
             if (!isResizing) return;
             isResizing = false;
             resizeDirection = null;
-            if (resizeRafId) {
+            if (resizeRafId !== null) {
                 cancelAnimationFrame(resizeRafId);
                 resizeRafId = null;
             }

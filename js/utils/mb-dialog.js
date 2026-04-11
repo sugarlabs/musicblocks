@@ -181,6 +181,10 @@
             document.removeEventListener("keydown", onKeyDown, true);
             document.removeEventListener("mousemove", onMouseMove, true);
             document.removeEventListener("mouseup", onMouseUp, true);
+            if (dragRafId !== null) {
+                cancelAnimationFrame(dragRafId);
+                dragRafId = null;
+            }
             frame.remove();
             overlay.remove();
             if (typeof options.onClose === "function") {
@@ -202,40 +206,35 @@
         let dragging = false;
         let dragDx = 0;
         let dragDy = 0;
+        let pendingClientX = 0;
+        let pendingClientY = 0;
         let dragRafId = null;
-        let latestClientX = 0;
-        let latestClientY = 0;
+
+        const applyDrag = () => {
+            dragRafId = null;
+            if (!dragging) return;
+
+            const x = pendingClientX - dragDx;
+            const y = pendingClientY - dragDy;
+            const maxLeft = Math.max(window.innerWidth - frame.offsetWidth, 8);
+            const maxTop = Math.max(window.innerHeight - frame.offsetHeight, 64);
+            frame.style.left = `${Math.min(Math.max(x, 8), maxLeft)}px`;
+            frame.style.top = `${Math.min(Math.max(y, 64), maxTop)}px`;
+        };
 
         const onMouseMove = event => {
             if (!dragging) return;
+            pendingClientX = event.clientX;
+            pendingClientY = event.clientY;
 
-            latestClientX = event.clientX;
-            latestClientY = event.clientY;
-
-            if (dragRafId) return;
-
-            dragRafId = requestAnimationFrame(() => {
-                if (!dragging) {
-                    dragRafId = null;
-                    return;
-                }
-
-                const clientX = latestClientX;
-                const clientY = latestClientY;
-
-                const x = clientX - dragDx;
-                const y = clientY - dragDy;
-                const maxLeft = Math.max(window.innerWidth - frame.offsetWidth, 8);
-                const maxTop = Math.max(window.innerHeight - frame.offsetHeight, 64);
-                frame.style.left = `${Math.min(Math.max(x, 8), maxLeft)}px`;
-                frame.style.top = `${Math.min(Math.max(y, 64), maxTop)}px`;
-                dragRafId = null;
-            });
+            if (dragRafId === null) {
+                dragRafId = requestAnimationFrame(applyDrag);
+            }
         };
 
         const onMouseUp = () => {
             dragging = false;
-            if (dragRafId) {
+            if (dragRafId !== null) {
                 cancelAnimationFrame(dragRafId);
                 dragRafId = null;
             }
