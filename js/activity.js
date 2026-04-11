@@ -662,70 +662,76 @@ class Activity {
 
         /*
          * Setup mobile help toggle functionality
-         * Adds event listener to mobile help toggle button
+         * Adds event listener to mobile help toggle button with proper cleanup
          */
         this._setupMobileHelpToggle = () => {
             const mobileHelpToggle = document.getElementById("mobileHelpToggle");
             if (!mobileHelpToggle) return;
 
-            mobileHelpToggle.addEventListener("click", () => {
-                this._toggleMobileHelp();
-            });
-
-            // Close help when clicking outside - only on mobile devices
-            if (window.innerWidth <= 768) {
-                document.addEventListener("click", e => {
-                    const helpDiv = document.querySelector(
-                        "#helpDiv, .widget-window[data-widget-type='help']"
-                    );
-                    if (helpDiv && !helpDiv.contains(e.target) && e.target !== mobileHelpToggle) {
-                        this._hideMobileHelp();
-                    }
-                });
+            // Clean up existing listeners to prevent duplicates
+            if (this._mobileHelpClickHandler) {
+                mobileHelpToggle.removeEventListener("click", this._mobileHelpClickHandler);
             }
+            if (this._mobileHelpOutsideClickHandler) {
+                document.removeEventListener("click", this._mobileHelpOutsideClickHandler);
+            }
+
+            // Store handler references for cleanup
+            this._mobileHelpClickHandler = () => {
+                this._toggleMobileHelp();
+            };
+
+            this._mobileHelpOutsideClickHandler = e => {
+                // Only handle click-outside on mobile screens
+                if (window.innerWidth > 768) return;
+
+                const helpWin = window.widgetWindows.openWindows["help"];
+                if (
+                    helpWin &&
+                    helpWin._frame.style.display !== "none" &&
+                    !helpWin._frame.contains(e.target) &&
+                    e.target !== mobileHelpToggle &&
+                    !mobileHelpToggle.contains(e.target)
+                ) {
+                    helpWin._frame.style.display = "none";
+                }
+            };
+
+            // Add click handler to toggle button
+            mobileHelpToggle.addEventListener("click", this._mobileHelpClickHandler);
+
+            // Add click-outside handler (checks screen size inside handler)
+            document.addEventListener("click", this._mobileHelpOutsideClickHandler);
         };
 
         /*
          * Toggle mobile help visibility
          * Shows or hides help on mobile devices
          */
-        this._toggleMobileHelp = () => {
-            const helpWidget = document.querySelector(".widget-window[data-widget-type='help']");
-            if (!helpWidget) return;
+        this._toggleMobileHelp = async () => {
+            // Check if help widget exists using the widgetWindows API
+            const isHelpOpen = window.widgetWindows.isOpen("help");
+            let helpWin = window.widgetWindows.openWindows["help"];
 
-            if (helpWidget.classList.contains("hidden")) {
-                this._showMobileHelp();
-            } else {
-                this._hideMobileHelp();
+            // If help widget doesn't exist, create it
+            if (!isHelpOpen || !helpWin) {
+                await this._showHelp();
+                helpWin = window.widgetWindows.openWindows["help"];
             }
-        };
 
-        /*
-         * Show mobile help
-         * Makes help visible on mobile devices
-         */
-        this._showMobileHelp = () => {
-            const helpDiv = document.querySelector(
-                "#helpDiv, .widget-window[data-widget-type='help']"
-            );
-            if (!helpDiv) return;
+            if (!helpWin) {
+                return;
+            }
 
-            helpDiv.classList.remove("hidden");
-            helpDiv.classList.add("show");
-        };
+            // Check if widget is currently visible by checking display style
+            const isCurrentlyVisible = helpWin._frame.style.display !== "none";
 
-        /*
-         * Hide mobile help
-         * Hides help on mobile devices
-         */
-        this._hideMobileHelp = () => {
-            const helpDiv = document.querySelector(
-                "#helpDiv, .widget-window[data-widget-type='help']"
-            );
-            if (!helpDiv) return;
-
-            helpDiv.classList.remove("show");
-            helpDiv.classList.add("hidden");
+            if (isCurrentlyVisible) {
+                helpWin._frame.style.display = "none";
+            } else {
+                helpWin._frame.style.display = "block";
+                helpWin.takeFocus();
+            }
         };
 
         /*
@@ -5905,7 +5911,6 @@ class Activity {
                     ) {
                         continue;
                     }
-
 
                     if (repeatId.start === 0) {
                         staffBlocksMap[staffIndex].repeatBlock.push([
