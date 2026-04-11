@@ -624,26 +624,39 @@ class JSEditor {
      */
     _setupDividerResize(divider, editorContainer, editorconsole, consolelabel) {
         let isResizing = false;
+        let resizeRafId = null;
 
         const onMouseMove = e => {
             if (!isResizing) return;
-            const parentRect = this._editor.getBoundingClientRect();
-            const menubarHeight = this._menubar ? this._menubar.offsetHeight : 0;
-            const availableHeight = this._editor.clientHeight - menubarHeight;
-            const dynamicTop = parentRect.top + menubarHeight;
+            if (resizeRafId) return;
 
-            const newEditorHeight = e.clientY - dynamicTop;
-            const dividerHeight = divider.offsetHeight;
-            const consoleHeaderHeight = consolelabel.offsetHeight;
-            const newConsoleHeight =
-                availableHeight - newEditorHeight - dividerHeight - consoleHeaderHeight;
+            const clientY = e.clientY;
 
-            editorContainer.style.flexBasis = `${newEditorHeight}px`;
-            editorconsole.style.flexBasis = `${newConsoleHeight}px`;
+            resizeRafId = requestAnimationFrame(() => {
+                const parentRect = this._editor.getBoundingClientRect();
+                const menubarHeight = this._menubar ? this._menubar.offsetHeight : 0;
+                const availableHeight = this._editor.clientHeight - menubarHeight;
+                const dynamicTop = parentRect.top + menubarHeight;
+
+                const newEditorHeight = clientY - dynamicTop;
+                const dividerHeight = divider.offsetHeight;
+                const consoleHeaderHeight = consolelabel.offsetHeight;
+                const newConsoleHeight =
+                    availableHeight - newEditorHeight - dividerHeight - consoleHeaderHeight;
+
+                editorContainer.style.flexBasis = `${newEditorHeight}px`;
+                editorconsole.style.flexBasis = `${newConsoleHeight}px`;
+                
+                resizeRafId = null;
+            });
         };
 
         const onMouseUp = () => {
             isResizing = false;
+            if (resizeRafId) {
+                cancelAnimationFrame(resizeRafId);
+                resizeRafId = null;
+            }
             document.removeEventListener("mousemove", onMouseMove);
             document.removeEventListener("mouseup", onMouseUp);
         };
@@ -741,6 +754,7 @@ class JSEditor {
         let isResizing = false;
         let resizeDirection = null;
         let startX, startY, startWidth, startHeight, startLeft, startTop;
+        let resizeRafId = null;
 
         const startResize = (e, direction) => {
             if (this.widgetWindow._maximized) return; // Don't resize when maximized
@@ -762,49 +776,61 @@ class JSEditor {
 
         const doResize = e => {
             if (!isResizing) return;
+            if (resizeRafId) return;
 
-            const deltaX = e.clientX - startX;
-            const deltaY = e.clientY - startY;
+            const clientX = e.clientX;
+            const clientY = e.clientY;
 
-            let newWidth = startWidth;
-            let newHeight = startHeight;
-            let newLeft = startLeft;
+            resizeRafId = requestAnimationFrame(() => {
+                const deltaX = clientX - startX;
+                const deltaY = clientY - startY;
 
-            // Calculate new dimensions based on direction
-            if (resizeDirection.includes("right")) {
-                newWidth = Math.max(400, startWidth + deltaX);
-            }
-            if (resizeDirection.includes("left")) {
-                const widthDelta = startWidth - deltaX;
-                if (widthDelta >= 400) {
-                    newWidth = widthDelta;
-                    newLeft = startLeft + deltaX;
+                let newWidth = startWidth;
+                let newHeight = startHeight;
+                let newLeft = startLeft;
+
+                // Calculate new dimensions based on direction
+                if (resizeDirection.includes("right")) {
+                    newWidth = Math.max(400, startWidth + deltaX);
                 }
-            }
-            if (resizeDirection.includes("bottom")) {
-                newHeight = Math.max(300, startHeight + deltaY);
-            }
+                if (resizeDirection.includes("left")) {
+                    const widthDelta = startWidth - deltaX;
+                    if (widthDelta >= 400) {
+                        newWidth = widthDelta;
+                        newLeft = startLeft + deltaX;
+                    }
+                }
+                if (resizeDirection.includes("bottom")) {
+                    newHeight = Math.max(300, startHeight + deltaY);
+                }
 
-            // Apply new dimensions
-            windowFrame.style.width = newWidth + "px";
-            windowFrame.style.height = newHeight + "px";
+                // Apply new dimensions
+                windowFrame.style.width = newWidth + "px";
+                windowFrame.style.height = newHeight + "px";
 
-            if (resizeDirection.includes("left")) {
-                windowFrame.style.left = newLeft + "px";
-            }
+                if (resizeDirection.includes("left")) {
+                    windowFrame.style.left = newLeft + "px";
+                }
 
-            // Update editor content size
-            const editorDiv = this._editor;
-            if (editorDiv) {
-                editorDiv.style.width = newWidth + "px";
-                editorDiv.style.height = newHeight - 32 + "px"; // Subtract title bar height
-            }
+                // Update editor content size
+                const editorDiv = this._editor;
+                if (editorDiv) {
+                    editorDiv.style.width = newWidth + "px";
+                    editorDiv.style.height = newHeight - 32 + "px"; // Subtract title bar height
+                }
+                
+                resizeRafId = null;
+            });
         };
 
         const stopResize = () => {
             if (!isResizing) return;
             isResizing = false;
             resizeDirection = null;
+            if (resizeRafId) {
+                cancelAnimationFrame(resizeRafId);
+                resizeRafId = null;
+            }
         };
 
         // Attach event listeners
