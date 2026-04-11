@@ -592,7 +592,7 @@ class Block {
 
         return false;
     }
- 
+
     /**
      * Checks if the block is off-screen based on the provided boundary.
      * @param {object} boundary - The boundary object representing the canvas dimensions.
@@ -3316,11 +3316,10 @@ class Block {
             that.blocks.moveBlockRelativeBatched(thisBlock, dx, dy);
 
             // If we are over the trash, warn the user.
-            const overTrash =
-                that.activity.trashcan.overTrashcan(
-                    event.stageX / that.activity.getStageScale(),
-                    event.stageY / that.activity.getStageScale()
-                );
+            const overTrash = that.activity.trashcan.overTrashcan(
+                event.stageX / that.activity.getStageScale(),
+                event.stageY / that.activity.getStageScale()
+            );
             if (overTrash) {
                 that.activity.trashcan.startHighlightAnimation();
             } else {
