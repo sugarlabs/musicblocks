@@ -3177,11 +3177,14 @@ class Block {
             that.blocks.raiseStackToTop(thisBlock);
 
             // And possibly the collapse button.
-            if (that.collapseContainer !== null) {
-                that.activity.blocksContainer.setChildIndex(
-                    that.collapseContainer,
-                    that.activity.blocksContainer.children.length - 1
-                );
+            if (that.collapseContainer != null) {
+                // Ensure the blocksContainer still exisits.
+                if (that.activity.blocksContainer != null) {
+                    that.activity.blocksContainer.setChildIndex(
+                        that.collapseContainer,
+                        that.activity.blocksContainer.children.length - 1
+                    );
+                }
             }
 
             moved = false;
@@ -3207,7 +3210,7 @@ class Block {
             // mouse move event.
             _dragHasRest2 = false;
             let checkBlock = that.blocks.blockList[that.connections[1]];
-            while (checkBlock !== null) {
+            while (checkBlock != null) {
                 if (checkBlock?.name === "rest2") {
                     _dragHasRest2 = true;
                     break;
