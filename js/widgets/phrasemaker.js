@@ -698,7 +698,9 @@ class PhraseMaker {
                 cell.textContent = "";
                 cell.appendChild(document.createTextNode(blockLabel));
                 cell.appendChild(document.createElement("br"));
-                cell.appendChild(document.createTextNode(`${this.rowArgs[i][0]} ${this.rowArgs[i][1]}`));
+                cell.appendChild(
+                    document.createTextNode(`${this.rowArgs[i][0]} ${this.rowArgs[i][1]}`)
+                );
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + "px";
                 cell.setAttribute("alt", i + "__" + "graphicsblocks2");
 
@@ -721,7 +723,9 @@ class PhraseMaker {
                     !this._deps.isCustomTemperament(this.activity.logo.synth.inTemperament)
                 ) {
                     cell.textContent = "";
-                    cell.appendChild(document.createTextNode(this._deps.i18nSolfege(this.rowLabels[i])));
+                    cell.appendChild(
+                        document.createTextNode(this._deps.i18nSolfege(this.rowLabels[i]))
+                    );
                     const subTitle1 = document.createElement("sub");
                     subTitle1.textContent = this.rowArgs[i].toString();
                     cell.appendChild(subTitle1);
@@ -1470,7 +1474,11 @@ class PhraseMaker {
                 cell.textContent = "";
                 cell.appendChild(document.createTextNode(blockLabel));
                 cell.appendChild(document.createElement("br"));
-                cell.appendChild(document.createTextNode(`${this.rowArgs[blockIndex][0]} ${this.rowArgs[blockIndex][1]}`));
+                cell.appendChild(
+                    document.createTextNode(
+                        `${this.rowArgs[blockIndex][0]} ${this.rowArgs[blockIndex][1]}`
+                    )
+                );
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + "px";
             }
 
@@ -2137,7 +2145,9 @@ class PhraseMaker {
                 !this._deps.isCustomTemperament(this.activity.logo.synth.inTemperament)
             ) {
                 cell.textContent = "";
-                cell.appendChild(document.createTextNode(this._deps.i18nSolfege(this.rowLabels[index])));
+                cell.appendChild(
+                    document.createTextNode(this._deps.i18nSolfege(this.rowLabels[index]))
+                );
                 const subTitle1 = document.createElement("sub");
                 subTitle1.textContent = this.rowArgs[index].toString();
                 cell.appendChild(subTitle1);
@@ -2643,12 +2653,16 @@ class PhraseMaker {
                 exportLabel.textContent = "";
                 exportLabel.appendChild(exportDocument.createTextNode(blockLabel));
                 exportLabel.appendChild(exportDocument.createElement("br"));
-                exportLabel.appendChild(exportDocument.createTextNode(`${this.rowArgs[i][0]} ${this.rowArgs[i][1]}`));
+                exportLabel.appendChild(
+                    exportDocument.createTextNode(`${this.rowArgs[i][0]} ${this.rowArgs[i][1]}`)
+                );
                 exportLabel.style.fontSize = Math.floor(this._cellScale * 12) + "px";
             } else {
                 if (this._deps.noteIsSolfege(this.rowLabels[i])) {
                     exportLabel.textContent = "";
-                    exportLabel.appendChild(exportDocument.createTextNode(this._deps.i18nSolfege(this.rowLabels[i])));
+                    exportLabel.appendChild(
+                        exportDocument.createTextNode(this._deps.i18nSolfege(this.rowLabels[i]))
+                    );
                     const subTitle1 = exportDocument.createElement("sub");
                     subTitle1.textContent = this.rowArgs[i].toString();
                     exportLabel.appendChild(subTitle1);
@@ -2666,7 +2680,9 @@ class PhraseMaker {
                 exportCell = exportRow.insertCell();
                 exportCell.style.backgroundColor = col.style.backgroundColor;
                 exportCell.textContent = "";
-                Array.from(col.childNodes).forEach(child => exportCell.appendChild(child.cloneNode(true)));
+                Array.from(col.childNodes).forEach(child =>
+                    exportCell.appendChild(child.cloneNode(true))
+                );
                 exportCell.width = col.width;
                 if (exportCell.width == "") {
                     exportCell.width = col.style.width;
@@ -2691,7 +2707,9 @@ class PhraseMaker {
                 col = noteValueRow.cells[i];
                 exportCell.style.backgroundColor = col.style.backgroundColor;
                 exportCell.textContent = "";
-                Array.from(col.childNodes).forEach(child => exportCell.appendChild(child.cloneNode(true)));
+                Array.from(col.childNodes).forEach(child =>
+                    exportCell.appendChild(child.cloneNode(true))
+                );
                 exportCell.width = col.width;
                 if (exportCell.width == "") {
                     exportCell.width = col.style.width;
@@ -2713,7 +2731,9 @@ class PhraseMaker {
                 col = noteValueRow.cells[i];
                 exportCell.style.backgroundColor = col.style.backgroundColor;
                 exportCell.textContent = "";
-                Array.from(col.childNodes).forEach(child => exportCell.appendChild(child.cloneNode(true)));
+                Array.from(col.childNodes).forEach(child =>
+                    exportCell.appendChild(child.cloneNode(true))
+                );
                 exportCell.width = col.width;
                 if (exportCell.width == "") {
                     exportCell.width = col.style.width;
@@ -2736,7 +2756,9 @@ class PhraseMaker {
             col = noteValueRow.cells[i];
             exportCell.style.backgroundColor = col.style.backgroundColor;
             exportCell.textContent = "";
-            Array.from(col.childNodes).forEach(child => exportCell.appendChild(child.cloneNode(true)));
+            Array.from(col.childNodes).forEach(child =>
+                exportCell.appendChild(child.cloneNode(true))
+            );
             exportCell.width = col.width;
             if (exportCell.width == "") {
                 exportCell.width = col.style.width;
@@ -2753,7 +2775,8 @@ class PhraseMaker {
         exportDocument.body.appendChild(exportDocument.createElement("br"));
         const downloadLink = exportDocument.createElement("a");
         downloadLink.id = "downloadb1";
-        downloadLink.style.cssText = "background: #C374E9; border-radius: 5%; padding: 0.3em; text-decoration: none; margin: 0.5em; color: white;";
+        downloadLink.style.cssText =
+            "background: #C374E9; border-radius: 5%; padding: 0.3em; text-decoration: none; margin: 0.5em; color: white;";
         downloadLink.setAttribute("download", "");
         downloadLink.textContent = "Download Matrix";
         exportDocument.body.appendChild(downloadLink);

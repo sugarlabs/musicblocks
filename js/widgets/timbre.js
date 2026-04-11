@@ -1207,7 +1207,7 @@ class TimbreWidget {
         const mainDiv = docById("synth0");
         mainDiv.textContent = "";
         const pNode = document.createElement("p");
-        
+
         const amRadio = document.createElement("input");
         amRadio.type = "radio";
         amRadio.name = "synthsName";
@@ -1215,7 +1215,7 @@ class TimbreWidget {
         pNode.appendChild(amRadio);
         pNode.appendChild(document.createTextNode(_("AM synth")));
         pNode.appendChild(document.createElement("br"));
-        
+
         const fmRadio = document.createElement("input");
         fmRadio.type = "radio";
         fmRadio.name = "synthsName";
@@ -1223,7 +1223,7 @@ class TimbreWidget {
         pNode.appendChild(fmRadio);
         pNode.appendChild(document.createTextNode(_("FM synth")));
         pNode.appendChild(document.createElement("br"));
-        
+
         const duoRadio = document.createElement("input");
         duoRadio.type = "radio";
         duoRadio.name = "synthsName";
@@ -1231,7 +1231,7 @@ class TimbreWidget {
         pNode.appendChild(duoRadio);
         pNode.appendChild(document.createTextNode(_("duo synth")));
         pNode.appendChild(document.createElement("br"));
-        
+
         mainDiv.appendChild(pNode);
 
         const subDiv = docById("synth1");
@@ -1283,33 +1283,33 @@ class TimbreWidget {
 
                     const wrapperS0 = document.createElement("div");
                     wrapperS0.id = "wrapperS0";
-                    
+
                     const labelDivS0 = document.createElement("div");
                     labelDivS0.id = "sS0";
                     const spanLabelS0 = document.createElement("span");
                     spanLabelS0.textContent = _("harmonicity");
                     labelDivS0.appendChild(spanLabelS0);
                     wrapperS0.appendChild(labelDivS0);
-                    
+
                     const insideDivS0 = document.createElement("div");
                     insideDivS0.className = "insideDivSynth";
-                    
+
                     const inputS0 = document.createElement("input");
                     inputS0.type = "range";
                     inputS0.id = "myRangeS0";
                     inputS0.className = "sliders";
                     inputS0.style.marginTop = "20px";
                     inputS0.value = parseFloat(this.AMSynthParams[0]);
-                    
+
                     const spanValS0 = document.createElement("span");
                     spanValS0.id = "myspanS0";
                     spanValS0.className = "rangeslidervalue";
                     spanValS0.textContent = this.AMSynthParams[0];
-                    
+
                     insideDivS0.appendChild(inputS0);
                     insideDivS0.appendChild(spanValS0);
                     wrapperS0.appendChild(insideDivS0);
-                    
+
                     subDiv.appendChild(wrapperS0);
 
                     // docById('myRangeS0').value = parseFloat(this.AMSynthParams[0]);
@@ -1370,33 +1370,33 @@ class TimbreWidget {
 
                     const wrapperS0 = document.createElement("div");
                     wrapperS0.id = "wrapperS0";
-                    
+
                     const labelDivS0 = document.createElement("div");
                     labelDivS0.id = "sS0";
                     const spanLabelS0 = document.createElement("span");
                     spanLabelS0.textContent = _("modulation index");
                     labelDivS0.appendChild(spanLabelS0);
                     wrapperS0.appendChild(labelDivS0);
-                    
+
                     const insideDivS0 = document.createElement("div");
                     insideDivS0.className = "insideDivSynth";
-                    
+
                     const inputS0 = document.createElement("input");
                     inputS0.type = "range";
                     inputS0.id = "myRangeS0";
                     inputS0.className = "sliders";
                     inputS0.style.marginTop = "20px";
                     inputS0.value = parseFloat(this.FMSynthParams[0]);
-                    
+
                     const spanValS0 = document.createElement("span");
                     spanValS0.id = "myspanS0";
                     spanValS0.className = "rangeslidervalue";
                     spanValS0.textContent = this.FMSynthParams[0];
-                    
+
                     insideDivS0.appendChild(inputS0);
                     insideDivS0.appendChild(spanValS0);
                     wrapperS0.appendChild(insideDivS0);
-                    
+
                     subDiv.appendChild(wrapperS0);
 
                     // docById('myRangeS0').value = parseFloat(this.FMSynthParams[0]);
@@ -1456,33 +1456,33 @@ class TimbreWidget {
 
                     const wrapperS0 = document.createElement("div");
                     wrapperS0.id = "wrapperS0";
-                    
+
                     const labelDivS0 = document.createElement("div");
                     labelDivS0.id = "sS0";
                     const spanLabelS0 = document.createElement("span");
                     spanLabelS0.textContent = _("modulation index");
                     labelDivS0.appendChild(spanLabelS0);
                     wrapperS0.appendChild(labelDivS0);
-                    
+
                     const insideDivS0 = document.createElement("div");
                     insideDivS0.className = "insideDivSynth";
-                    
+
                     const inputS0 = document.createElement("input");
                     inputS0.type = "range";
                     inputS0.id = "myRangeS0";
                     inputS0.className = "sliders";
                     inputS0.style.marginTop = "20px";
                     inputS0.value = this.NoiseSynthParams[0];
-                    
+
                     const spanValS0 = document.createElement("span");
                     spanValS0.id = "myspanS0";
                     spanValS0.className = "rangeslidervalue";
                     spanValS0.textContent = this.NoiseSynthParams[0];
-                    
+
                     insideDivS0.appendChild(inputS0);
                     insideDivS0.appendChild(spanValS0);
                     wrapperS0.appendChild(insideDivS0);
-                    
+
                     subDiv.appendChild(wrapperS0);
 
                     // docById('myRangeS0').value = parseFloat(this.FMSynthParams[0]);
@@ -1546,64 +1546,64 @@ class TimbreWidget {
 
                     const wrapperS0 = document.createElement("div");
                     wrapperS0.id = "wrapperS0";
-                    
+
                     const labelDivS0 = document.createElement("div");
                     labelDivS0.id = "sS0";
                     const spanLabelS0 = document.createElement("span");
                     spanLabelS0.textContent = _("vibrato rate");
                     labelDivS0.appendChild(spanLabelS0);
                     wrapperS0.appendChild(labelDivS0);
-                    
+
                     const insideDivS0 = document.createElement("div");
                     insideDivS0.className = "insideDivSynth";
-                    
+
                     const inputS0 = document.createElement("input");
                     inputS0.type = "range";
                     inputS0.id = "myRangeS0";
                     inputS0.className = "sliders";
                     inputS0.style.marginTop = "20px";
                     inputS0.value = parseFloat(this.duoSynthParams[0]);
-                    
+
                     const spanValS0 = document.createElement("span");
                     spanValS0.id = "myspanS0";
                     spanValS0.className = "rangeslidervalue";
                     spanValS0.textContent = this.duoSynthParams[0];
-                    
+
                     insideDivS0.appendChild(inputS0);
                     insideDivS0.appendChild(spanValS0);
                     wrapperS0.appendChild(insideDivS0);
-                    
+
                     subDiv.appendChild(wrapperS0);
 
                     const wrapperS1 = document.createElement("div");
                     wrapperS1.id = "wrapperS1";
-                    
+
                     const labelDivS1 = document.createElement("div");
                     labelDivS1.id = "sS1";
                     const spanLabelS1 = document.createElement("span");
                     spanLabelS1.textContent = _("vibrato amount");
                     labelDivS1.appendChild(spanLabelS1);
                     wrapperS1.appendChild(labelDivS1);
-                    
+
                     const insideDivS1 = document.createElement("div");
                     insideDivS1.className = "insideDivSynth";
-                    
+
                     const inputS1 = document.createElement("input");
                     inputS1.type = "range";
                     inputS1.id = "myRangeS1";
                     inputS1.className = "sliders";
                     inputS1.style.marginTop = "20px";
                     inputS1.value = parseFloat(this.duoSynthParams[1]);
-                    
+
                     const spanValS1 = document.createElement("span");
                     spanValS1.id = "myspanS1";
                     spanValS1.className = "rangeslidervalue";
                     spanValS1.textContent = this.duoSynthParams[1];
-                    
+
                     insideDivS1.appendChild(inputS1);
                     insideDivS1.appendChild(spanValS1);
                     wrapperS1.appendChild(insideDivS1);
-                    
+
                     subDiv.appendChild(wrapperS1);
 
                     if (this.duoSynthesizer.length !== 1) {
@@ -1678,12 +1678,12 @@ class TimbreWidget {
         spanLabelOsc0.textContent = _("type");
         labelDivOsc0.appendChild(spanLabelOsc0);
         wrapperOsc0.appendChild(labelDivOsc0);
-        
+
         const selOsc = document.createElement("div");
         selOsc.id = "selOsc";
         wrapperOsc0.appendChild(selOsc);
         env.appendChild(wrapperOsc0);
-        
+
         const wrapperOsc1 = document.createElement("div");
         wrapperOsc1.id = "wrapperOsc1";
         const labelDivOsc1 = document.createElement("div");
@@ -1692,7 +1692,7 @@ class TimbreWidget {
         spanLabelOsc1.textContent = _("partials");
         labelDivOsc1.appendChild(spanLabelOsc1);
         wrapperOsc1.appendChild(labelDivOsc1);
-        
+
         const insideDivOsc = document.createElement("div");
         insideDivOsc.className = "insideDivOsc";
         const inputOsc1 = document.createElement("input");
@@ -1722,7 +1722,7 @@ class TimbreWidget {
         const myDiv = docById("selOsc");
         const selectOsc1 = document.createElement("select");
         selectOsc1.id = "selOsc1";
-        
+
         for (let i = 0; i < OSCTYPES.length; i++) {
             const opt = document.createElement("option");
             if (OSCTYPES[i][0].length === 0) {
@@ -1819,31 +1819,31 @@ class TimbreWidget {
         for (let i = 0; i < 4; i++) {
             const wrapperEnv = document.createElement("div");
             wrapperEnv.id = "wrapperEnv" + i;
-            
+
             const circleDiv = document.createElement("div");
             circleDiv.className = "circle";
             circleDiv.textContent = "ADSR".charAt(i);
             wrapperEnv.appendChild(circleDiv);
-            
+
             const insideDivEnv = document.createElement("div");
             insideDivEnv.className = "insideDivEnv";
-            
+
             const rangeEnv = document.createElement("input");
             rangeEnv.type = "range";
             rangeEnv.id = "myRange" + i;
             rangeEnv.className = "sliders";
             rangeEnv.style.marginTop = "20px";
             rangeEnv.value = parseFloat(this.ENVs[i]);
-            
+
             const spanEnv = document.createElement("span");
             spanEnv.id = "myspan" + i;
             spanEnv.className = "rangeslidervalue";
             spanEnv.textContent = this.ENVs[i];
-            
+
             insideDivEnv.appendChild(rangeEnv);
             insideDivEnv.appendChild(spanEnv);
             wrapperEnv.appendChild(insideDivEnv);
-            
+
             env.appendChild(wrapperEnv);
         }
         const envAppend = document.createElement("div");

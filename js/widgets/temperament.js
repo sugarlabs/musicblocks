@@ -200,7 +200,7 @@ function TemperamentWidget() {
         const height = 2 * radius + 60;
 
         temperamentTable.textContent = "";
-        
+
         const canvasT = document.createElement("canvas");
         canvasT.id = "circ";
         canvasT.setAttribute("width", BUTTONDIVWIDTH + "px");
@@ -451,12 +451,12 @@ function TemperamentWidget() {
                 noteInfoDiv.id = "noteInfo";
                 noteInfoDiv.style.left = `${x}px`;
                 noteInfoDiv.style.top = `${y}px`;
-                
+
                 const myPopupSpan = document.createElement("span");
                 myPopupSpan.className = "popuptext";
                 myPopupSpan.id = "myPopup";
                 noteInfoDiv.appendChild(myPopupSpan);
-                
+
                 if (i !== 0) {
                     const editImg = document.createElement("img");
                     editImg.src = "header-icons/edit.svg";
@@ -468,7 +468,7 @@ function TemperamentWidget() {
                     editImg.setAttribute("data-message", i);
                     noteInfoDiv.appendChild(editImg);
                 }
-                
+
                 const closeImg = document.createElement("img");
                 closeImg.src = "header-icons/close-button.svg";
                 closeImg.id = "close";
@@ -478,7 +478,7 @@ function TemperamentWidget() {
                 closeImg.setAttribute("width", "20px");
                 closeImg.setAttribute("align", "right");
                 noteInfoDiv.appendChild(closeImg);
-                
+
                 noteInfoDiv.appendChild(document.createElement("br"));
 
                 let noteDefined = false;
@@ -518,7 +518,7 @@ function TemperamentWidget() {
                 frequencyDiv.id = "frequency";
                 frequencyDiv.textContent = `\u00A0${_("frequency")}\u00A0${frequency}`;
                 noteInfoDiv.appendChild(frequencyDiv);
-                
+
                 docById("information").appendChild(noteInfoDiv);
 
                 docById("noteInfo").style.top = "130px";
@@ -551,7 +551,7 @@ function TemperamentWidget() {
         docById("noteInfo").style.height = "130px";
         if (docById("note")) docById("note").textContent = "";
         if (docById("frequency")) docById("frequency").textContent = "";
-        
+
         const noteInfo = docById("noteInfo");
         const center = document.createElement("center");
         const slider = document.createElement("input");
@@ -658,7 +658,7 @@ function TemperamentWidget() {
         menuTr.id = "menu";
         tablehead.appendChild(menuTr);
         notesGraph.appendChild(tablehead);
-        
+
         const tablebody = document.createElement("tbody");
         tablebody.id = "tablebody";
         notesGraph.appendChild(tablebody);
@@ -698,7 +698,7 @@ function TemperamentWidget() {
         divGraph.id = "graph";
         const tableOfNotes = document.createElement("table");
         tableOfNotes.id = "tableOfNotes";
-        
+
         for (let i = 0; i <= this.pitchNumber; i++) {
             const trNotes = document.createElement("tr");
             trNotes.id = "notes_" + i;
@@ -910,13 +910,17 @@ function TemperamentWidget() {
         const equalEdit = docById("userEdit");
         equalEdit.style.backgroundColor = "#c8C8C8";
         equalEdit.appendChild(document.createElement("br"));
-        equalEdit.appendChild(document.createTextNode(_("pitch number") + "\u00A0\u00A0\u00A0\u00A0 "));
+        equalEdit.appendChild(
+            document.createTextNode(_("pitch number") + "\u00A0\u00A0\u00A0\u00A0 ")
+        );
         const octaveIn = document.createElement("input");
         octaveIn.type = "text";
         octaveIn.id = "octaveIn";
         octaveIn.value = "0";
         equalEdit.appendChild(octaveIn);
-        equalEdit.appendChild(document.createTextNode(" \u00A0\u00A0 " + _("to") + "\u00A0\u00A0 "));
+        equalEdit.appendChild(
+            document.createTextNode(" \u00A0\u00A0 " + _("to") + "\u00A0\u00A0 ")
+        );
         const octaveOut = document.createElement("input");
         octaveOut.type = "text";
         octaveOut.id = "octaveOut";
@@ -924,7 +928,9 @@ function TemperamentWidget() {
         equalEdit.appendChild(octaveOut);
         equalEdit.appendChild(document.createElement("br"));
         equalEdit.appendChild(document.createElement("br"));
-        equalEdit.appendChild(document.createTextNode(_("number of divisions") + " \u00A0\u00A0\u00A0\u00A0 "));
+        equalEdit.appendChild(
+            document.createTextNode(_("number of divisions") + " \u00A0\u00A0\u00A0\u00A0 ")
+        );
         const divisions = document.createElement("input");
         divisions.type = "text";
         divisions.id = "divisions";
@@ -1027,8 +1033,7 @@ function TemperamentWidget() {
                 this.typeOfEdit = "equal";
                 this.divisions = numDivs;
             } else {
-                pitchNumber =
-                    numDivs + Number(pitchNumber) - Math.abs(pitchNumber1 - pitchNumber2);
+                pitchNumber = numDivs + Number(pitchNumber) - Math.abs(pitchNumber1 - pitchNumber2);
                 const angle1 =
                     270 +
                     360 * (Math.log10(this.tempRatios[pitchNumber1]) / Math.log10(this.powerBase));
@@ -1141,7 +1146,9 @@ function TemperamentWidget() {
         ratioEdit.appendChild(ratioOut);
         ratioEdit.appendChild(document.createElement("br"));
         ratioEdit.appendChild(document.createElement("br"));
-        ratioEdit.appendChild(document.createTextNode(_("recursion") + " \u00A0\u00A0\u00A0\u00A0\u00A0\u00A0 "));
+        ratioEdit.appendChild(
+            document.createTextNode(_("recursion") + " \u00A0\u00A0\u00A0\u00A0\u00A0\u00A0 ")
+        );
         const recursion = document.createElement("input");
         recursion.type = "text";
         recursion.id = "recursion";
@@ -1700,7 +1707,9 @@ function TemperamentWidget() {
         octaveSpaceEdit.style.backgroundColor = "#c8C8C8";
         octaveSpaceEdit.appendChild(document.createElement("br"));
         octaveSpaceEdit.appendChild(document.createElement("br"));
-        octaveSpaceEdit.appendChild(document.createTextNode(_("octave space") + " \u00A0\u00A0\u00A0\u00A0 "));
+        octaveSpaceEdit.appendChild(
+            document.createTextNode(_("octave space") + " \u00A0\u00A0\u00A0\u00A0 ")
+        );
         const startNote = document.createElement("input");
         startNote.type = "text";
         startNote.id = "startNote";
