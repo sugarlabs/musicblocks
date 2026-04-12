@@ -868,14 +868,12 @@ describe("Tempo Widget", () => {
     describe("Targeted coverage for specific uncovered lines", () => {
         test("should call clearInterval if loadSynth synchronously sets _intervalID (line 63)", () => {
             const clearIntervalSpy = jest.spyOn(global, "clearInterval");
-            const setIntervalSpy = jest.spyOn(global, "setInterval").mockReturnValue(123);
             mockActivity.logo.synth.loadSynth.mockImplementationOnce(() => {
                 tempoWidget._intervalID = 999;
             });
             tempoWidget.init(mockActivity);
             expect(clearIntervalSpy).toHaveBeenCalledWith(999);
             clearIntervalSpy.mockRestore();
-            setIntervalSpy.mockRestore();
         });
 
         test("pause button onclick should toggle isMoving, call pause/resume, and update innerHTML (lines 80-101)", () => {
