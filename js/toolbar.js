@@ -2527,8 +2527,8 @@ class FocusCycleManager {
             idx === -1
                 ? 1 // safety fallback → toolbar
                 : reverse
-                  ? (idx - 1 + this._zones.length) % this._zones.length
-                  : (idx + 1) % this._zones.length;
+                ? (idx - 1 + this._zones.length) % this._zones.length
+                : (idx + 1) % this._zones.length;
 
         // Clean up the zone we are leaving.
         this._leaveZone(this._currentZone);

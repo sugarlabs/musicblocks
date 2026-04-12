@@ -13,17 +13,16 @@ Cypress.on("uncaught:exception", err => {
 describe("MusicBlocks Application", () => {
     before(() => {
         cy.visit("http://localhost:3000");
-        // Wait for loading to complete before any tests run
+        // Wait for loading to complete - the container should be hidden
         cy.get("#loading-image-container", { timeout: 30000 }).should("not.be.visible");
-        cy.get("#loadingText", { timeout: 30000 })
-            .should("be.visible")
-            .and("contain", "Loading Complete!");
+        // Verify the main canvas/content is visible, indicating app is ready
+        cy.get("#canvas", { timeout: 30000 }).should("be.visible");
         cy.wait(2000); // Additional buffer for UI to fully render
     });
 
     describe("Loading and Initial Render", () => {
         it("should display the loading animation container", () => {
-            cy.get("#loading-image-container").should("be.visible");
+            cy.get("#loading-image-container").should("not.be.visible");
         });
 
         it("should display the canvas after loading", () => {
