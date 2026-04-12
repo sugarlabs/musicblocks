@@ -7967,14 +7967,15 @@ class Activity {
          * Inits everything. The main function.
          */
         this.init = async () => {
+            // Guard against double initialization
+            if (this._initialized) return;
+            this._initialized = true;
+
             // Hide stop button on startup
             const stopBtn = document.getElementById("stop");
             if (stopBtn) {
                 stopBtn.style.display = "none";
             }
-            // Guard against double initialization
-            if (this._initialized) return;
-            this._initialized = true;
 
             // Batch DOM reads before any writes to avoid forced synchronous layout
             this._perfMark("activity.init.start");
