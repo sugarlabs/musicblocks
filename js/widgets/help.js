@@ -54,7 +54,7 @@ class HelpWidget {
             document.onkeydown = activity.__keyPressed;
             widgetWindow.destroy();
             // Trigger the hint only if they were on the first page of the tour
-            if (this.index === 0) {
+            if (this.index === 0 && typeof this.activity.textMsg === "function") {
                 this.activity.textMsg(
                     _(
                         "Start by dragging a block from the left panel and connect it to the Start block."
