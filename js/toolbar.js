@@ -912,7 +912,7 @@ class Toolbar {
                         1.0
                     );
 
-                    if (svgData == "") {
+                    if (svgData === "") {
                         savePNG.disabled = true;
                         savePNG.className = "grey-text inactiveLink";
                     } else {
@@ -946,7 +946,7 @@ class Toolbar {
                 );
 
                 // if there is no mouse artwork to save then grey out
-                if (svgData == "") {
+                if (svgData === "") {
                     saveSVG.disabled = true;
                     savePNG.disabled = true;
                     saveSVG.className = "grey-text inactiveLink";
@@ -1178,7 +1178,7 @@ class Toolbar {
         menuIcon.onclick = () => {
             const searchBar = docById("search");
             searchBar.classList.toggle("open");
-            if (auxToolbar.style.display == "" || auxToolbar.style.display == "none") {
+            if (auxToolbar.style.display === "" || auxToolbar.style.display === "none") {
                 onclick(this.activity, false);
                 auxToolbar.style.display = "block";
                 menuIcon.innerHTML = "more_vert";
