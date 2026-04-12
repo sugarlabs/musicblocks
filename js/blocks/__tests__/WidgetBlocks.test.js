@@ -444,5 +444,14 @@ describe("setupWidgetBlocks", () => {
                 "received"
             );
         });
+
+        it("returns interruption if widget is already loading (guard check)", () => {
+            const temperament = getBlock("temperament");
+            logo.temperament = "loading";
+            const res = temperament.flow([0, "childBlk"], logo, 0, "tempBlk", "received");
+            expect(res).toEqual([null, 0, true]);
+            // Should not trigger another runFromBlockNow or lazy load callback
+            expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+        });
     });
 });

@@ -100,6 +100,7 @@ function setupWidgetBlocks(activity) {
      */
     function _ensureWidget(logo, widgetKey, modules, initFn, turtle, blk, receivedArg) {
         if (logo[widgetKey] === null) {
+            logo[widgetKey] = "loading"; // Guard against multiple simultaneous loads
             _lazyRequire(modules, function () {
                 logo[widgetKey] = initFn();
                 if (typeof logo.runFromBlockNow === "function") {
@@ -107,6 +108,8 @@ function setupWidgetBlocks(activity) {
                 }
             });
             return [null, 0, true];
+        } else if (logo[widgetKey] === "loading") {
+            return [null, 0, true]; // Still loading, continue to interrupt
         }
         return null;
     }
