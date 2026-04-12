@@ -445,7 +445,9 @@ function setupVolumeBlocks(activity) {
 
             if (!tur.singer.instrumentNames.includes(synth)) {
                 tur.singer.instrumentNames.push(synth);
-                logo.synth.loadSynth(turtle, synth);
+                if (logo?.synth?.loadSynth) {
+                    logo.synth.loadSynth(turtle, synth);
+                }
 
                 if (tur.singer.synthVolume[synth] === undefined) {
                     tur.singer.synthVolume[synth] = [DEFAULTVOLUME];
@@ -461,7 +463,6 @@ function setupVolumeBlocks(activity) {
             const listenerName = "_synthvolume_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 tur.singer.synthVolume[synth].pop();
                 // Restore previous volume
@@ -751,7 +752,6 @@ function setupVolumeBlocks(activity) {
             const listenerName = "_volume_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 Singer.masterVolume.pop();
                 // Restore previous volume

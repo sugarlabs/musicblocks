@@ -1,3 +1,5 @@
+/* global Cypress, cy */
+
 // ***********************************************
 // This example commands.js shows you how to
 // create various custom commands and overwrite
@@ -23,3 +25,7 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+Cypress.Commands.add("waitForAppReady", () => {
+    cy.get("#loading-image-container", { timeout: 60000 }).should("not.be.visible");
+    cy.get("#canvas", { timeout: 60000 }).should("be.visible");
+});

@@ -145,15 +145,17 @@ function TemperamentWidget() {
      */
     this._addButton = function (row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
-        cell.innerHTML = `&nbsp;&nbsp;<img 
-                src="header-icons/${icon}" 
-                title="${label}" 
-                alt="${label}" 
-                height="${iconSize}" 
-                width="${iconSize}" 
-                vertical-align="middle" 
-                align-content="center"
-            >&nbsp;&nbsp;`;
+        cell.textContent = "\u00A0\u00A0";
+        const img = document.createElement("img");
+        img.src = `header-icons/${icon}`;
+        img.title = label;
+        img.alt = label;
+        img.setAttribute("height", iconSize);
+        img.setAttribute("width", iconSize);
+        img.setAttribute("vertical-align", "middle");
+        img.setAttribute("align-content", "center");
+        cell.appendChild(img);
+        cell.appendChild(document.createTextNode("\u00A0\u00A0"));
         cell.style.width = BUTTONSIZE + "px";
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
@@ -187,24 +189,31 @@ function TemperamentWidget() {
         temperamentTableDiv.style.overflow = "auto";
         temperamentTableDiv.style.backgroundColor = "white";
         temperamentTableDiv.style.height = "300px";
-        temperamentTableDiv.innerHTML = '<div id="temperamentTable"></div>';
-        const temperamentTable = docById("temperamentTable");
+        temperamentTableDiv.textContent = "";
+        const temperamentTable = document.createElement("div");
+        temperamentTable.id = "temperamentTable";
+        temperamentTableDiv.appendChild(temperamentTable);
         temperamentTable.style.position = "relative";
 
         const radius = 150;
         const height = 2 * radius + 60;
 
-        let html =
-            '<canvas id="circ" width = ' +
-            BUTTONDIVWIDTH +
-            "px height = " +
-            height +
-            "px></canvas>";
-        html += '<div id="wheelDiv2" class="wheelNav"></div>';
-        html += '<div id ="information"></div>';
+        temperamentTable.textContent = "";
 
-        temperamentTable.innerHTML = html;
-        temperamentTable.style.width = "300px";
+        const canvasT = document.createElement("canvas");
+        canvasT.id = "circ";
+        canvasT.setAttribute("width", BUTTONDIVWIDTH + "px");
+        canvasT.setAttribute("height", height + "px");
+        temperamentTable.appendChild(canvasT);
+
+        const wheelDiv2 = document.createElement("div");
+        wheelDiv2.id = "wheelDiv2";
+        wheelDiv2.className = "wheelNav";
+        temperamentTable.appendChild(wheelDiv2);
+
+        const informationDiv = document.createElement("div");
+        informationDiv.id = "information";
+        temperamentTable.appendChild(informationDiv);
 
         const canvas = docById("circ");
         canvas.style.position = "absolute";
@@ -268,7 +277,7 @@ function TemperamentWidget() {
                     "20 20px Impact, Charcoal, sans-serif";
                 angle[i] = 270 + 360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase));
                 if (i !== 0) {
-                    if (i == pitchNumber - 1) {
+                    if (i === pitchNumber - 1) {
                         angleDiff[i - 1] = angle[0] + 360 - angle[i];
                     } else {
                         angleDiff[i - 1] = angle[i] - angle[i - 1];
@@ -311,12 +320,16 @@ function TemperamentWidget() {
         if (this.octaveChanged) {
             const divAppend = document.createElement("div");
             divAppend.id = "divAppend";
-            divAppend.innerHTML =
-                '<div id="clearNotes" style="float:left;">' +
-                _("Clear") +
-                '</div><div id="standardOctave" style="float:right;">' +
-                _("back to 2:1 octave space") +
-                "</div>";
+            const clearNotesDiv = document.createElement("div");
+            clearNotesDiv.id = "clearNotes";
+            clearNotesDiv.style.cssFloat = "left";
+            clearNotesDiv.textContent = _("Clear");
+            const standardOctaveDiv = document.createElement("div");
+            standardOctaveDiv.id = "standardOctave";
+            standardOctaveDiv.style.cssFloat = "right";
+            standardOctaveDiv.textContent = _("back to 2:1 octave space");
+            divAppend.appendChild(clearNotesDiv);
+            divAppend.appendChild(standardOctaveDiv);
             divAppend.style.textAlign = "center";
             divAppend.style.position = "absolute";
             divAppend.style.zIndex = 2;
@@ -341,7 +354,7 @@ function TemperamentWidget() {
         } else {
             divAppend1 = document.createElement("div");
             divAppend1.id = "divAppend";
-            divAppend1.innerHTML = _("Clear");
+            divAppend1.textContent = _("Clear");
             divAppend1.style.textAlign = "center";
             divAppend1.style.position = "absolute";
             divAppend1.style.zIndex = 2;
@@ -421,8 +434,8 @@ function TemperamentWidget() {
     this.showNoteInfo = function (event) {
         for (let i = 0; i < this.notesCircle.navItemCount; i++) {
             if (
-                event.target.id == "wheelnav-wheelDiv2-slice-" + i ||
-                (event.target.innerHTML == i && event.target.innerHTML !== "")
+                event.target.id === "wheelnav-wheelDiv2-slice-" + i ||
+                (event.target.textContent === i && event.target.textContent !== "")
             ) {
                 const x = event.clientX - docById("wheelDiv2").getBoundingClientRect().left;
                 const y = event.clientY - docById("wheelDiv2").getBoundingClientRect().top;
@@ -432,39 +445,53 @@ function TemperamentWidget() {
                     docById("noteInfo").remove();
                 }
 
-                docById(
-                    "information"
-                ).innerHTML += `<div class="popup" id="noteInfo" style="left: ${x}px; top: ${y}px;">
-                        <span class="popuptext" id="myPopup"></span>
-                    </div>`;
+                const noteInfoDiv = document.createElement("div");
+                noteInfoDiv.className = "popup";
+                noteInfoDiv.id = "noteInfo";
+                noteInfoDiv.style.left = `${x}px`;
+                noteInfoDiv.style.top = `${y}px`;
+
+                const myPopupSpan = document.createElement("span");
+                myPopupSpan.className = "popuptext";
+                myPopupSpan.id = "myPopup";
+                noteInfoDiv.appendChild(myPopupSpan);
+
                 if (i !== 0) {
-                    docById("noteInfo").innerHTML += `<img 
-                            src="header-icons/edit.svg" 
-                            id="edit" 
-                            title="${_("edit")}" 
-                            alt="edit" 
-                            height="20px" 
-                            width="20px" 
-                            data-message="${i}"
-                        >`;
+                    const editImg = document.createElement("img");
+                    editImg.src = "header-icons/edit.svg";
+                    editImg.id = "edit";
+                    editImg.title = _("edit");
+                    editImg.alt = "edit";
+                    editImg.setAttribute("height", "20px");
+                    editImg.setAttribute("width", "20px");
+                    editImg.setAttribute("data-message", i);
+                    noteInfoDiv.appendChild(editImg);
                 }
-                docById("noteInfo").innerHTML +=
-                    '<img src="header-icons/close-button.svg" id="close" title="' +
-                    _("Close") +
-                    '" alt="' +
-                    _("Close") +
-                    '" height=20px width=20px align="right"><br>';
+
+                const closeImg = document.createElement("img");
+                closeImg.src = "header-icons/close-button.svg";
+                closeImg.id = "close";
+                closeImg.title = _("Close");
+                closeImg.alt = _("Close");
+                closeImg.setAttribute("height", "20px");
+                closeImg.setAttribute("width", "20px");
+                closeImg.setAttribute("align", "right");
+                noteInfoDiv.appendChild(closeImg);
+
+                noteInfoDiv.appendChild(document.createElement("br"));
+
                 let noteDefined = false;
                 for (let j = 0; j < this.ratiosNotesPair.length; j++) {
-                    if (this.ratios[i] == this.ratiosNotesPair[j][0]) {
+                    if (this.ratios[i] === this.ratiosNotesPair[j][0]) {
                         noteDefined = true;
-                        docById("noteInfo").innerHTML += `<div id="note">&nbsp;${_("note")}&nbsp;${
-                            this.ratiosNotesPair[j][1]
-                        }</div>`;
+                        const noteDiv = document.createElement("div");
+                        noteDiv.id = "note";
+                        noteDiv.textContent = `\u00A0${_("note")}\u00A0${this.ratiosNotesPair[j][1]}`;
+                        noteInfoDiv.appendChild(noteDiv);
                         break;
                     }
                 }
-                if (noteDefined == false) {
+                if (noteDefined === false) {
                     const cents = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
                     const centsDiff = [];
                     const centsDiff1 = [];
@@ -476,19 +503,22 @@ function TemperamentWidget() {
                         return Math.min(a, b);
                     });
                     const index = centsDiff1.indexOf(min);
+                    const noteDiv = document.createElement("div");
+                    noteDiv.id = "note";
                     if (centsDiff[index] < 0) {
-                        docById("noteInfo").innerHTML += `<div id="note">&nbsp;${_("note")}&nbsp;${
-                            this.ratiosNotesPair[index][1]
-                        }(-${centsDiff1[index].toFixed(2)}¢)</div>`;
+                        noteDiv.textContent = `\u00A0${_("note")}\u00A0${this.ratiosNotesPair[index][1]}(-${centsDiff1[index].toFixed(2)}¢)`;
                     } else {
-                        docById("noteInfo").innerHTML += `<div id="note">&nbsp;${_("note")}&nbsp;${
-                            this.ratiosNotesPair[index][1]
-                        }(${centsDiff1[index].toFixed(2)}¢)</div>`;
+                        noteDiv.textContent = `\u00A0${_("note")}\u00A0${this.ratiosNotesPair[index][1]}(+${centsDiff1[index].toFixed(2)}¢)`;
                     }
+                    noteInfoDiv.appendChild(noteDiv);
                 }
-                docById("noteInfo").innerHTML += `<div id="frequency">&nbsp;${_(
-                    "frequency"
-                )}&nbsp;${frequency}</div>`;
+
+                const frequencyDiv = document.createElement("div");
+                frequencyDiv.id = "frequency";
+                frequencyDiv.textContent = `\u00A0${_("frequency")}\u00A0${frequency}`;
+                noteInfoDiv.appendChild(frequencyDiv);
+
+                docById("information").appendChild(noteInfoDiv);
 
                 docById("noteInfo").style.top = "130px";
                 docById("noteInfo").style.left = "132px";
@@ -518,24 +548,43 @@ function TemperamentWidget() {
 
         docById("noteInfo").style.width = "180px";
         docById("noteInfo").style.height = "130px";
-        docById("note").innerHTML = "";
-        docById("frequency").innerHTML = "";
-        docById(
-            "noteInfo"
-        ).innerHTML += `<center><input type="range" class="sliders" id="frequencySlider1" style="width:170px; background:white; border:0;" min="${
-            this.frequencies[i - 1]
-        }" max="${this.frequencies[i + 1]}"></center>`;
-        docById("noteInfo").innerHTML += `<br>&nbsp;&nbsp;${_(
-            "frequency"
-        )}<span class="rangeslidervalue" id="frequencydiv1">${this.frequencies[i]}</span>`;
-        docById(
-            "noteInfo"
-        ).innerHTML += `<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>${_(
-            "done"
-        )}</center><div>`;
+        if (docById("note")) docById("note").textContent = "";
+        if (docById("frequency")) docById("frequency").textContent = "";
+
+        const noteInfo = docById("noteInfo");
+        const center = document.createElement("center");
+        const slider = document.createElement("input");
+        slider.type = "range";
+        slider.className = "sliders";
+        slider.id = "frequencySlider1";
+        slider.style.width = "170px";
+        slider.style.background = "white";
+        slider.style.border = "0";
+        slider.setAttribute("min", this.frequencies[i - 1]);
+        slider.setAttribute("max", this.frequencies[i + 1]);
+        center.appendChild(slider);
+        noteInfo.appendChild(center);
+
+        noteInfo.appendChild(document.createElement("br"));
+        noteInfo.appendChild(document.createTextNode(`\u00A0\u00A0${_("frequency")}`));
+        const freqSpan = document.createElement("span");
+        freqSpan.className = "rangeslidervalue";
+        freqSpan.id = "frequencydiv1";
+        freqSpan.textContent = this.frequencies[i];
+        noteInfo.appendChild(freqSpan);
+
+        noteInfo.appendChild(document.createElement("br"));
+        noteInfo.appendChild(document.createElement("br"));
+        const doneDiv = document.createElement("div");
+        doneDiv.id = "done";
+        doneDiv.style.background = "rgb(196, 196, 196)";
+        const doneCenter = document.createElement("center");
+        doneCenter.textContent = _("done");
+        doneDiv.appendChild(doneCenter);
+        noteInfo.appendChild(doneDiv);
 
         docById("frequencySlider1").oninput = function () {
-            docById("frequencydiv1").innerHTML = docById("frequencySlider1").value;
+            docById("frequencydiv1").textContent = docById("frequencySlider1").value;
             const frequency = docById("frequencySlider1").value;
             const ratio = frequency / that.frequencies[0];
             that.temporaryRatios = that.ratios.slice();
@@ -579,14 +628,15 @@ function TemperamentWidget() {
     this._graphOfNotes = function () {
         this.circleIsVisible = true;
         this.toggleNotesButton();
-        temperamentTableDiv.innerHTML = "";
-        if (docById("wheelDiv2") != null) {
+        temperamentTableDiv.textContent = "";
+        if (docById("wheelDiv2") !== null) {
             docById("wheelDiv2").style.display = "none";
             this.notesCircle.removeWheel();
         }
 
-        temperamentTableDiv.innerHTML = '<table id="notesGraph"></table>';
-        const notesGraph = docById("notesGraph");
+        const notesGraph = document.createElement("table");
+        notesGraph.id = "notesGraph";
+        temperamentTableDiv.appendChild(notesGraph);
         let menuLabels = [];
         if (isCustomTemperament(this.inTemperament)) {
             menuLabels = [_("Play"), _("pitch number"), _("ratio"), _("frequency")];
@@ -601,15 +651,23 @@ function TemperamentWidget() {
             ];
             menuLabels.splice(5, 0, this.scale);
         }
-        notesGraph.innerHTML =
-            '<thead id="tablehead"><tr id="menu"></tr></thead><tbody id="tablebody"></tbody>';
-        let menus = "";
+        const tablehead = document.createElement("thead");
+        tablehead.id = "tablehead";
+        const menuTr = document.createElement("tr");
+        menuTr.id = "menu";
+        tablehead.appendChild(menuTr);
+        notesGraph.appendChild(tablehead);
+
+        const tablebody = document.createElement("tbody");
+        tablebody.id = "tablebody";
+        notesGraph.appendChild(tablebody);
 
         for (let i = 0; i < menuLabels.length; i++) {
-            menus += '<th id="menuLabels">' + menuLabels[i] + "</th>";
+            const th = document.createElement("th");
+            th.id = "menuLabels";
+            th.textContent = menuLabels[i];
+            menuTr.appendChild(th);
         }
-
-        docById("menu").innerHTML = menus;
 
         const menuItems = document.querySelectorAll("#menuLabels");
         for (let i = 0; i < menuLabels.length; i++) {
@@ -632,14 +690,24 @@ function TemperamentWidget() {
                 menuItems[6].style.width = 95 + "px";
             }
         }
-        let pitchNumberColumn = "";
+        const trGraph = document.createElement("tr");
+        const tdGraph = document.createElement("td");
+        tdGraph.setAttribute("colspan", "7");
+        const divGraph = document.createElement("div");
+        divGraph.id = "graph";
+        const tableOfNotes = document.createElement("table");
+        tableOfNotes.id = "tableOfNotes";
+
         for (let i = 0; i <= this.pitchNumber; i++) {
-            pitchNumberColumn += '<tr id="notes_' + i + '"></tr>';
+            const trNotes = document.createElement("tr");
+            trNotes.id = "notes_" + i;
+            tableOfNotes.appendChild(trNotes);
         }
 
-        docById("tablebody").innerHTML +=
-            '<tr><td colspan="7"><div id="graph"><table id="tableOfNotes"></table></div></td></tr>';
-        docById("tableOfNotes").innerHTML = pitchNumberColumn;
+        divGraph.appendChild(tableOfNotes);
+        tdGraph.appendChild(divGraph);
+        trGraph.appendChild(tdGraph);
+        docById("tablebody").appendChild(trGraph);
 
         const that = this;
         const notesRow = [];
@@ -650,15 +718,17 @@ function TemperamentWidget() {
             notesRow[i] = docById("notes_" + i);
 
             notesCell[(i, 0)] = notesRow[i].insertCell(-1);
-            notesCell[(i, 0)].innerHTML = `&nbsp;&nbsp;<img 
-                    src="header-icons/play-button.svg" 
-                    title="${_("Play")}" 
-                    alt="${_("Play")}" 
-                    height="20px" 
-                    width="20px" 
-                    id="play_${i}" 
-                    data-id="${i}"
-                >&nbsp;&nbsp;`;
+            notesCell[(i, 0)].textContent = "\u00A0\u00A0";
+            const playImg = document.createElement("img");
+            playImg.src = "header-icons/play-button.svg";
+            playImg.title = _("Play");
+            playImg.alt = _("Play");
+            playImg.setAttribute("height", "20px");
+            playImg.setAttribute("width", "20px");
+            playImg.id = "play_" + i;
+            playImg.setAttribute("data-id", i);
+            notesCell[(i, 0)].appendChild(playImg);
+            notesCell[(i, 0)].appendChild(document.createTextNode("\u00A0\u00A0"));
             notesCell[(i, 0)].style.width = 40 + "px";
             notesCell[(i, 0)].style.backgroundColor = platformColor.selectorBackground;
             notesCell[(i, 0)].style.textAlign = "center";
@@ -684,7 +754,7 @@ function TemperamentWidget() {
             //Pitch Number
             notesCell[(i, 1)] = notesRow[i].insertCell(-1);
             notesCell[(i, 1)].id = "pitchNumber_" + i;
-            notesCell[(i, 1)].innerHTML = i;
+            notesCell[(i, 1)].textContent = i;
             notesCell[(i, 1)].style.backgroundColor = platformColor.selectorBackground;
             notesCell[(i, 1)].style.textAlign = "center";
 
@@ -693,21 +763,21 @@ function TemperamentWidget() {
 
             //Ratio
             notesCell[(i, 2)] = notesRow[i].insertCell(-1);
-            notesCell[(i, 2)].innerHTML = ratios[i];
+            notesCell[(i, 2)].textContent = ratios[i];
             notesCell[(i, 2)].style.backgroundColor = platformColor.selectorBackground;
             notesCell[(i, 2)].style.textAlign = "center";
 
             if (!isCustomTemperament(this.inTemperament)) {
                 //Interval
                 notesCell[(i, 3)] = notesRow[i].insertCell(-1);
-                notesCell[(i, 3)].innerHTML = this.intervals[i];
+                notesCell[(i, 3)].textContent = this.intervals[i];
                 notesCell[(i, 3)].style.width = 120 + "px";
                 notesCell[(i, 3)].style.backgroundColor = platformColor.selectorBackground;
                 notesCell[(i, 3)].style.textAlign = "center";
 
                 //Notes
                 notesCell[(i, 4)] = notesRow[i].insertCell(-1);
-                notesCell[(i, 4)].innerHTML = this.notes[i];
+                notesCell[(i, 4)].textContent = this.notes[i];
                 notesCell[(i, 4)].style.width = 50 + "px";
                 notesCell[(i, 4)].style.backgroundColor = platformColor.selectorBackground;
                 notesCell[(i, 4)].style.textAlign = "center";
@@ -715,13 +785,13 @@ function TemperamentWidget() {
                 //Mode
                 notesCell[(i, 5)] = notesRow[i].insertCell(-1);
                 for (let j = 0; j < this.scaleNotes.length; j++) {
-                    if (this.notes[i][0] == this.scaleNotes[j]) {
-                        notesCell[(i, 5)].innerHTML = j;
+                    if (this.notes[i][0] === this.scaleNotes[j]) {
+                        notesCell[(i, 5)].textContent = j;
                         break;
                     }
                 }
-                if (notesCell[(i, 5)].innerHTML === "") {
-                    notesCell[(i, 5)].innerHTML = _("non scalar");
+                if (notesCell[(i, 5)].textContent === "") {
+                    notesCell[(i, 5)].textContent = _("non scalar");
                 }
                 notesCell[(i, 5)].style.width = 100 + "px";
                 notesCell[(i, 5)].style.backgroundColor = platformColor.selectorBackground;
@@ -730,7 +800,7 @@ function TemperamentWidget() {
 
             //Frequency
             notesCell[(i, 6)] = notesRow[i].insertCell(-1);
-            notesCell[(i, 6)].innerHTML = this.frequencies[i];
+            notesCell[(i, 6)].textContent = this.frequencies[i];
             notesCell[(i, 6)].style.backgroundColor = platformColor.selectorBackground;
             notesCell[(i, 6)].style.textAlign = "center";
 
@@ -755,21 +825,36 @@ function TemperamentWidget() {
         this._logo.synth.setMasterVolume(0);
         this._logo.synth.stop();
         const that = this;
-        if (docById("wheelDiv2") != null) {
+        if (docById("wheelDiv2") !== null) {
             docById("wheelDiv2").style.display = "none";
             this.notesCircle.removeWheel();
         }
-        temperamentTableDiv.innerHTML = "";
-        temperamentTableDiv.innerHTML = `<table id="editOctave" width="${BUTTONDIVWIDTH}"><tbody><tr id="menu"></tr></tbody></table>`;
+        temperamentTableDiv.textContent = "";
+        const editOctaveTable = document.createElement("table");
+        editOctaveTable.id = "editOctave";
+        editOctaveTable.setAttribute("width", BUTTONDIVWIDTH);
+        const editOctaveTbody = document.createElement("tbody");
+        const editOctaveTr = document.createElement("tr");
+        editOctaveTr.id = "menu";
+        editOctaveTbody.appendChild(editOctaveTr);
+        editOctaveTable.appendChild(editOctaveTbody);
+        temperamentTableDiv.appendChild(editOctaveTable);
+
         const editMenus = [_("equal"), _("ratios"), _("arbitrary"), _("octave space")];
-        let menus = "";
 
         for (let i = 0; i < editMenus.length; i++) {
-            menus += '<td id="editMenus">' + editMenus[i] + "</td>";
+            const td = document.createElement("td");
+            td.id = "editMenus";
+            td.textContent = editMenus[i];
+            editOctaveTr.appendChild(td);
         }
 
-        docById("menu").innerHTML = menus;
-        docById("editOctave").innerHTML += '<tr><td colspan="4" id="userEdit"></td></tr>';
+        const userEditTr = document.createElement("tr");
+        const userEditTd = document.createElement("td");
+        userEditTd.setAttribute("colspan", "4");
+        userEditTd.id = "userEdit";
+        userEditTr.appendChild(userEditTd);
+        editOctaveTbody.appendChild(userEditTr);
         const menuItems = document.querySelectorAll("#editMenus");
         for (let i = 0; i < editMenus.length; i++) {
             menuItems[i].style.background = platformColor.selectorBackground;
@@ -820,19 +905,36 @@ function TemperamentWidget() {
      */
     this.equalEdit = function () {
         this.editMode = "equal";
-        docById("userEdit").innerHTML = "";
+        docById("userEdit").textContent = "";
         const equalEdit = docById("userEdit");
         equalEdit.style.backgroundColor = "#c8C8C8";
-        equalEdit.innerHTML = `<br>${_(
-            "pitch number"
-        )}&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="octaveIn" value="0"></input>
-            &nbsp;&nbsp; ${_("to")}&nbsp;&nbsp;
-            <input type="text" id="octaveOut" value="0"></input><br><br>`;
-        equalEdit.innerHTML += `${_(
-            "number of divisions"
-        )} &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="divisions" value="${
-            this.pitchNumber
-        }"></input>`;
+        equalEdit.appendChild(document.createElement("br"));
+        equalEdit.appendChild(
+            document.createTextNode(_("pitch number") + "\u00A0\u00A0\u00A0\u00A0 ")
+        );
+        const octaveIn = document.createElement("input");
+        octaveIn.type = "text";
+        octaveIn.id = "octaveIn";
+        octaveIn.value = "0";
+        equalEdit.appendChild(octaveIn);
+        equalEdit.appendChild(
+            document.createTextNode(" \u00A0\u00A0 " + _("to") + "\u00A0\u00A0 ")
+        );
+        const octaveOut = document.createElement("input");
+        octaveOut.type = "text";
+        octaveOut.id = "octaveOut";
+        octaveOut.value = "0";
+        equalEdit.appendChild(octaveOut);
+        equalEdit.appendChild(document.createElement("br"));
+        equalEdit.appendChild(document.createElement("br"));
+        equalEdit.appendChild(
+            document.createTextNode(_("number of divisions") + " \u00A0\u00A0\u00A0\u00A0 ")
+        );
+        const divisions = document.createElement("input");
+        divisions.type = "text";
+        divisions.id = "divisions";
+        divisions.value = this.pitchNumber;
+        equalEdit.appendChild(divisions);
         equalEdit.style.paddingLeft = "80px";
         const that = this;
 
@@ -841,13 +943,17 @@ function TemperamentWidget() {
         function addDivision(preview) {
             // Add Buttons
             divAppend.id = "divAppend";
-            if (preview) {
-                divAppend.innerHTML = `<div id="preview" style="float:left;">${_("back")}</div>
-                    <div id="done_" style="float:right;">${_("done")}</div>`;
-            } else {
-                divAppend.innerHTML = `<div id="preview" style="float:left;">${_("preview")}</div>
-                    <div id="done_" style="float:right;">${_("done")}</div>`;
-            }
+            divAppend.textContent = "";
+            const previewDiv = document.createElement("div");
+            previewDiv.id = "preview";
+            previewDiv.style.cssFloat = "left";
+            previewDiv.textContent = preview ? _("back") : _("preview");
+            const doneDiv = document.createElement("div");
+            doneDiv.id = "done_";
+            doneDiv.style.cssFloat = "right";
+            doneDiv.textContent = _("done");
+            divAppend.appendChild(previewDiv);
+            divAppend.appendChild(doneDiv);
             divAppend.style.textAlign = "center";
             divAppend.style.marginLeft = "-80px";
             divAppend.style.height = "32px";
@@ -877,7 +983,7 @@ function TemperamentWidget() {
         let pitchNumber = this.pitchNumber;
         let pitchNumber1 = Number(docById("octaveIn").value);
         let pitchNumber2 = Number(docById("octaveOut").value);
-        let divisions = Number(docById("divisions").value);
+        let numDivs = Number(docById("divisions").value);
         const ratio = [];
         const compareRatios = [];
         const ratio1 = [];
@@ -890,18 +996,18 @@ function TemperamentWidget() {
             try {
                 that.performEqualEdit(event);
             } catch {
-                activity.errorMsg(_("The Number of divisions is too large."), 3000);
+                that.activity.errorMsg(_("The Number of divisions is too large."), 3000);
             }
         });
 
         this.performEqualEdit = function (event) {
             pitchNumber1 = Number(docById("octaveIn").value);
             pitchNumber2 = Number(docById("octaveOut").value);
-            divisions = Number(docById("divisions").value);
+            numDivs = Number(docById("divisions").value);
             this.tempRatios = this.ratios.slice();
             if (pitchNumber1 === pitchNumber2) {
-                for (let i = 0; i < divisions; i++) {
-                    ratio[i] = Math.pow(this.powerBase, i / divisions);
+                for (let i = 0; i < numDivs; i++) {
+                    ratio[i] = Math.pow(this.powerBase, i / numDivs);
                     ratio1[i] = ratio[i].toFixed(2);
                 }
                 for (let i = 0; i < this.tempRatios.length; i++) {
@@ -909,7 +1015,7 @@ function TemperamentWidget() {
                     ratio2[i] = ratio2[i].toFixed(2);
                 }
                 const ratio4 = ratio1.filter(function (val) {
-                    return ratio2.indexOf(val) == -1;
+                    return ratio2.indexOf(val) === -1;
                 });
 
                 for (let i = 0; i < ratio4.length; i++) {
@@ -924,19 +1030,18 @@ function TemperamentWidget() {
 
                 pitchNumber = this.tempRatios.length - 1;
                 this.typeOfEdit = "equal";
-                this.divisions = divisions;
+                this.divisions = numDivs;
             } else {
-                pitchNumber =
-                    divisions + Number(pitchNumber) - Math.abs(pitchNumber1 - pitchNumber2);
+                pitchNumber = numDivs + Number(pitchNumber) - Math.abs(pitchNumber1 - pitchNumber2);
                 const angle1 =
                     270 +
                     360 * (Math.log10(this.tempRatios[pitchNumber1]) / Math.log10(this.powerBase));
                 const angle2 =
                     270 +
                     360 * (Math.log10(this.tempRatios[pitchNumber2]) / Math.log10(this.powerBase));
-                const divisionAngle = Math.abs(angle2 - angle1) / divisions;
+                const divisionAngle = Math.abs(angle2 - angle1) / numDivs;
                 this.tempRatios.splice(pitchNumber1 + 1, Math.abs(pitchNumber1 - pitchNumber2) - 1);
-                for (let i = 0; i < divisions - 1; i++) {
+                for (let i = 0; i < numDivs - 1; i++) {
                     const power = (Math.min(angle1, angle2) + divisionAngle * (i + 1) - 270) / 360;
                     ratio[i] = Math.pow(this.powerBase, power);
                     this.tempRatios.splice(pitchNumber1 + 1 + i, 0, ratio[i]);
@@ -946,7 +1051,7 @@ function TemperamentWidget() {
                 this.typeOfEdit = "nonequal";
             }
 
-            if (event.target.innerHTML === _("done")) {
+            if (event.target.textContent === _("done")) {
                 // Go to main "Circle of Notes"
                 this.ratios = this.tempRatios.slice();
                 const frequency = this.frequencies[0];
@@ -959,9 +1064,13 @@ function TemperamentWidget() {
                 this.pitchNumber = pitchNumber;
                 this.checkTemperament(compareRatios);
                 this._circleOfNotes();
-            } else if (event.target.innerHTML === _("preview")) {
+            } else if (event.target.textContent === _("preview")) {
                 //Preview Notes
-                docById("userEdit").innerHTML = '<div id="wheelDiv2" class="wheelNav"></div>';
+                docById("userEdit").textContent = "";
+                const wheelDiv2 = document.createElement("div");
+                wheelDiv2.id = "wheelDiv2";
+                wheelDiv2.className = "wheelNav";
+                docById("userEdit").appendChild(wheelDiv2);
                 this.createMainWheel(this.tempRatios, pitchNumber);
                 for (let i = 0; i < pitchNumber; i++) {
                     this.notesCircle.navItems[i].fillAttr = "#e0e0e0";
@@ -1018,15 +1127,32 @@ function TemperamentWidget() {
      */
     this.ratioEdit = function () {
         this.editMode = "ratio";
-        docById("userEdit").innerHTML = "";
+        docById("userEdit").textContent = "";
         const ratioEdit = docById("userEdit");
         ratioEdit.style.backgroundColor = "#c8C8C8";
-        ratioEdit.innerHTML = `<br>${_(
-            "ratio"
-        )} &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="ratioIn" value="1"></input> &nbsp;&nbsp; : &nbsp;&nbsp; <input type="text" id="ratioOut" value="1"></input><br><br>`;
-        ratioEdit.innerHTML += `${_(
-            "recursion"
-        )} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="recursion" value="1"></input>`;
+        ratioEdit.appendChild(document.createElement("br"));
+        ratioEdit.appendChild(document.createTextNode(_("ratio") + " \u00A0\u00A0\u00A0\u00A0 "));
+        const ratioIn = document.createElement("input");
+        ratioIn.type = "text";
+        ratioIn.id = "ratioIn";
+        ratioIn.value = "1";
+        ratioEdit.appendChild(ratioIn);
+        ratioEdit.appendChild(document.createTextNode(" \u00A0\u00A0 : \u00A0\u00A0 "));
+        const ratioOut = document.createElement("input");
+        ratioOut.type = "text";
+        ratioOut.id = "ratioOut";
+        ratioOut.value = "1";
+        ratioEdit.appendChild(ratioOut);
+        ratioEdit.appendChild(document.createElement("br"));
+        ratioEdit.appendChild(document.createElement("br"));
+        ratioEdit.appendChild(
+            document.createTextNode(_("recursion") + " \u00A0\u00A0\u00A0\u00A0\u00A0\u00A0 ")
+        );
+        const recursion = document.createElement("input");
+        recursion.type = "text";
+        recursion.id = "recursion";
+        recursion.value = "1";
+        ratioEdit.appendChild(recursion);
         ratioEdit.style.paddingLeft = "100px";
         const that = this;
 
@@ -1034,13 +1160,17 @@ function TemperamentWidget() {
 
         function addButtons(preview) {
             divAppend.id = "divAppend";
-            if (preview) {
-                divAppend.innerHTML = `<div id="preview" style="float:left;">${_("back")}</div>
-                    <div id="done_" style="float:right;">${_("done")}</div>`;
-            } else {
-                divAppend.innerHTML = `<div id="preview" style="float:left;">${_("preview")}</div>
-                    <div id="done_" style="float:right;">${_("done")}</div>`;
-            }
+            divAppend.textContent = "";
+            const previewDiv = document.createElement("div");
+            previewDiv.id = "preview";
+            previewDiv.style.cssFloat = "left";
+            previewDiv.textContent = preview ? _("back") : _("preview");
+            const doneDiv = document.createElement("div");
+            doneDiv.id = "done_";
+            doneDiv.style.cssFloat = "right";
+            doneDiv.textContent = _("done");
+            divAppend.appendChild(previewDiv);
+            divAppend.appendChild(doneDiv);
             divAppend.style.textAlign = "center";
             divAppend.style.marginLeft = "-100px";
             divAppend.style.height = "32px";
@@ -1089,7 +1219,7 @@ function TemperamentWidget() {
                             that.tempRatios.splice(index[i], 0, ratio[i]);
                             break;
                         }
-                        if (ratioDifference[j] == 0) {
+                        if (ratioDifference[j] === 0) {
                             index.push(j);
                             that.tempRatios.splice(index[i], 1, ratio[i]);
                             break;
@@ -1111,7 +1241,7 @@ function TemperamentWidget() {
                 return a - b;
             });
             const pitchNumber = that.tempRatios.length - 1;
-            if (event.target.innerHTML === _("done")) {
+            if (event.target.textContent === _("done")) {
                 that.ratios = that.tempRatios.slice();
                 that.typeOfEdit = "nonequal";
                 that.pitchNumber = that.ratios.length - 1;
@@ -1129,9 +1259,13 @@ function TemperamentWidget() {
 
                 that.checkTemperament(compareRatios);
                 that._circleOfNotes();
-            } else if (event.target.innerHTML === _("preview")) {
+            } else if (event.target.textContent === _("preview")) {
                 //Preview Notes
-                docById("userEdit").innerHTML = '<div id="wheelDiv2" class="wheelNav"></div>';
+                docById("userEdit").textContent = "";
+                const wheelDiv2 = document.createElement("div");
+                wheelDiv2.id = "wheelDiv2";
+                wheelDiv2.className = "wheelNav";
+                docById("userEdit").appendChild(wheelDiv2);
                 that.createMainWheel(that.tempRatios, pitchNumber);
                 for (let i = 0; i < pitchNumber; i++) {
                     that.notesCircle.navItems[i].fillAttr = "#e0e0e0";
@@ -1199,9 +1333,13 @@ function TemperamentWidget() {
      */
     this.arbitraryEdit = function () {
         this.editMode = "arbitrary";
-        docById("userEdit").innerHTML = "";
+        docById("userEdit").textContent = "";
         const arbitraryEdit = docById("userEdit");
-        arbitraryEdit.innerHTML = '<br><div id="wheelDiv3" class="wheelNav"></div>';
+        arbitraryEdit.appendChild(document.createElement("br"));
+        const wheelDiv3 = document.createElement("div");
+        wheelDiv3.id = "wheelDiv3";
+        wheelDiv3.className = "wheelNav";
+        arbitraryEdit.appendChild(wheelDiv3);
         arbitraryEdit.style.paddingLeft = "0px";
 
         const that = this;
@@ -1216,10 +1354,10 @@ function TemperamentWidget() {
                 docById("wheelDiv4").display = "none";
                 this.wheel1.removeWheel();
             }
-            if (ratios == undefined) {
+            if (ratios === undefined) {
                 ratios = this.ratios;
             }
-            if (pitchNumber == undefined) {
+            if (pitchNumber === undefined) {
                 pitchNumber = this.pitchNumber;
             }
             const labels = [];
@@ -1253,7 +1391,7 @@ function TemperamentWidget() {
                     "20 20px Impact, Charcoal, sans-serif";
                 angle[i] = 270 + 360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase));
                 if (i !== 0) {
-                    if (i == this.pitchNumber - 1) {
+                    if (i === this.pitchNumber - 1) {
                         angleDiff[i - 1] = angle[0] + 360 - angle[i];
                     } else {
                         angleDiff[i - 1] = angle[i] - angle[i - 1];
@@ -1286,10 +1424,17 @@ function TemperamentWidget() {
             }
             this.wheel1.createWheel();
         };
-        arbitraryEdit.innerHTML += '<div id="wheelDiv4" class="wheelNav"></div>';
+        const wheelDiv4 = document.createElement("div");
+        wheelDiv4.id = "wheelDiv4";
+        wheelDiv4.className = "wheelNav";
+        arbitraryEdit.appendChild(wheelDiv4);
         this._createInnerWheel();
 
-        arbitraryEdit.innerHTML += `<canvas id="circ1" width = "${BUTTONDIVWIDTH}" height = "${height}"></canvas>`;
+        const canvas1 = document.createElement("canvas");
+        canvas1.id = "circ1";
+        canvas1.setAttribute("width", BUTTONDIVWIDTH);
+        canvas1.setAttribute("height", height);
+        arbitraryEdit.appendChild(canvas1);
 
         const canvas = docById("circ1");
         canvas.style.position = "absolute";
@@ -1312,10 +1457,10 @@ function TemperamentWidget() {
                 docById("wheelDiv3").display = "none";
                 this.wheel.removeWheel();
             }
-            if (pitchNumber == undefined) {
+            if (pitchNumber === undefined) {
                 pitchNumber = this.pitchNumber;
             }
-            if (ratios == undefined) {
+            if (ratios === undefined) {
                 ratios = this.ratios;
             }
             docById("wheelDiv3").style.display = "";
@@ -1345,7 +1490,7 @@ function TemperamentWidget() {
                 //Change angles of outer circle
                 angle[i] = 270 + 360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase));
                 if (i !== 0) {
-                    if (i == pitchNumber - 1) {
+                    if (i === pitchNumber - 1) {
                         angleDiff1[i - 1] = angle[0] + 360 - angle[i];
                     } else {
                         angleDiff1[i - 1] = angle[i] - angle[i - 1];
@@ -1379,7 +1524,7 @@ function TemperamentWidget() {
 
         const divAppend = document.createElement("div");
         divAppend.id = "divAppend";
-        divAppend.innerHTML = _("done");
+        divAppend.textContent = _("done");
         divAppend.style.textAlign = "center";
         divAppend.style.paddingTop = "5px";
         divAppend.style.backgroundColor = platformColor.selectorBackground;
@@ -1430,32 +1575,63 @@ function TemperamentWidget() {
             frequencies[j] = frequencies[j].toFixed(2);
         }
         for (let i = 0; i < pitchNumber; i++) {
-            if (event.target.parentNode.id == "wheelnav-wheelDiv3-title-" + i) {
+            if (event.target.parentNode.id === "wheelnav-wheelDiv3-title-" + i) {
                 const that = this;
                 if (docById("noteInfo1") !== null) {
                     docById("noteInfo1").remove();
                 }
-                docById("wheelDiv3").innerHTML +=
-                    '<div class="popup" id="noteInfo1" style="width:180px; height:135px;"><span class="popuptext" id="myPopup"></span></div>';
-                docById("noteInfo1").innerHTML +=
-                    '<img src="header-icons/close-button.svg" id="close" title="' +
-                    _("Close") +
-                    '" alt="' +
-                    _("Close") +
-                    '" height=20px width=20px align="right">';
-                docById(
-                    "noteInfo1"
-                ).innerHTML += `<br><center><input type="range" class="sliders" id = "frequencySlider" style="width:170px; background:white; border:0;" min="${
-                    frequencies[i]
-                }" max="${frequencies[i + 1]}" value="30"></center>`;
-                docById("noteInfo1").innerHTML += `&nbsp;&nbsp;${_(
-                    "frequency"
-                )} : <span class="rangeslidervalue" id="frequencydiv">${frequencies[i]}</span>`;
-                docById(
-                    "noteInfo1"
-                ).innerHTML += `<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>${_(
-                    "done"
-                )}</center><div>`;
+                const noteInfo1 = document.createElement("div");
+                noteInfo1.className = "popup";
+                noteInfo1.id = "noteInfo1";
+                noteInfo1.style.width = "180px";
+                noteInfo1.style.height = "135px";
+                const myPopup = document.createElement("span");
+                myPopup.className = "popuptext";
+                myPopup.id = "myPopup";
+                noteInfo1.appendChild(myPopup);
+                docById("wheelDiv3").appendChild(noteInfo1);
+
+                const closeImg = document.createElement("img");
+                closeImg.src = "header-icons/close-button.svg";
+                closeImg.id = "close";
+                closeImg.title = _("Close");
+                closeImg.alt = _("Close");
+                closeImg.setAttribute("height", "20px");
+                closeImg.setAttribute("width", "20px");
+                closeImg.setAttribute("align", "right");
+                noteInfo1.appendChild(closeImg);
+
+                noteInfo1.appendChild(document.createElement("br"));
+                const centerNode = document.createElement("center");
+                const slider = document.createElement("input");
+                slider.type = "range";
+                slider.className = "sliders";
+                slider.id = "frequencySlider";
+                slider.style.width = "170px";
+                slider.style.background = "white";
+                slider.style.border = "0";
+                slider.setAttribute("min", frequencies[i]);
+                slider.setAttribute("max", frequencies[i + 1]);
+                slider.setAttribute("value", "30");
+                centerNode.appendChild(slider);
+                noteInfo1.appendChild(centerNode);
+
+                noteInfo1.appendChild(document.createTextNode(`\u00A0\u00A0${_("frequency")} : `));
+                const freqSpan = document.createElement("span");
+                freqSpan.className = "rangeslidervalue";
+                freqSpan.id = "frequencydiv";
+                freqSpan.textContent = frequencies[i];
+                noteInfo1.appendChild(freqSpan);
+
+                noteInfo1.appendChild(document.createElement("br"));
+                noteInfo1.appendChild(document.createElement("br"));
+                const doneDiv = document.createElement("div");
+                doneDiv.id = "done";
+                doneDiv.style.background = "rgb(196, 196, 196)";
+                const doneCenter = document.createElement("center");
+                doneCenter.textContent = _("done");
+                doneDiv.appendChild(doneCenter);
+                noteInfo1.appendChild(doneDiv);
 
                 docById("noteInfo1").style.top = "100px";
                 docById("noteInfo1").style.left = "90px";
@@ -1483,7 +1659,7 @@ function TemperamentWidget() {
      * @returns {void}
      */
     this._refreshInnerWheel = function () {
-        docById("frequencydiv").innerHTML = docById("frequencySlider").value;
+        docById("frequencydiv").textContent = docById("frequencySlider").value;
         const frequency = docById("frequencySlider").value;
         const ratio = frequency / this.frequencies[0];
         const ratioDifference = [];
@@ -1523,19 +1699,37 @@ function TemperamentWidget() {
      */
     this.octaveSpaceEdit = function () {
         this.editMode = "octave";
-        docById("userEdit").innerHTML = "";
+        docById("userEdit").textContent = "";
         const len = this.ratios.length;
         const octaveRatio = this.ratios[len - 1];
         const octaveSpaceEdit = docById("userEdit");
         octaveSpaceEdit.style.backgroundColor = "#c8C8C8";
-        octaveSpaceEdit.innerHTML = `<br><br>${_("octave space")} &nbsp;&nbsp;&nbsp;&nbsp; 
-            <input type="text" id="startNote" value="${octaveRatio}" style="width:50px;"></input> &nbsp;&nbsp; : &nbsp;&nbsp; <input type="text" id="endNote" value="1" style="width:50px;"></input><br><br>`;
+        octaveSpaceEdit.appendChild(document.createElement("br"));
+        octaveSpaceEdit.appendChild(document.createElement("br"));
+        octaveSpaceEdit.appendChild(
+            document.createTextNode(_("octave space") + " \u00A0\u00A0\u00A0\u00A0 ")
+        );
+        const startNote = document.createElement("input");
+        startNote.type = "text";
+        startNote.id = "startNote";
+        startNote.value = octaveRatio;
+        startNote.style.width = "50px";
+        octaveSpaceEdit.appendChild(startNote);
+        octaveSpaceEdit.appendChild(document.createTextNode(" \u00A0\u00A0 : \u00A0\u00A0 "));
+        const endNote = document.createElement("input");
+        endNote.type = "text";
+        endNote.id = "endNote";
+        endNote.value = "1";
+        endNote.style.width = "50px";
+        octaveSpaceEdit.appendChild(endNote);
+        octaveSpaceEdit.appendChild(document.createElement("br"));
+        octaveSpaceEdit.appendChild(document.createElement("br"));
         octaveSpaceEdit.style.paddingLeft = "70px";
         const that = this;
 
         const divAppend = document.createElement("div");
         divAppend.id = "divAppend";
-        divAppend.innerHTML = _("done");
+        divAppend.textContent = _("done");
         divAppend.style.textAlign = "center";
         divAppend.style.paddingTop = "5px";
         divAppend.style.marginLeft = "-70px";
@@ -1574,7 +1768,7 @@ function TemperamentWidget() {
             that.powerBase = ratio;
             that.typeOfEdit = "nonequal";
             that.checkTemperament(compareRatios);
-            if (ratio != 2) {
+            if (ratio !== 2) {
                 that.octaveChanged = true;
             }
             that._circleOfNotes();
@@ -1595,6 +1789,16 @@ function TemperamentWidget() {
             const temperament = keys[i];
             if (!isCustomTemperament(temperament)) {
                 const t = getTemperament(temperament);
+                // Ensure we have a valid temperament object with intervals
+                if (!t || !t.interval || !Array.isArray(t.interval)) {
+                    this.activity.errorMsg(
+                        _("Invalid temperament: ") +
+                            temperament +
+                            _(". Skipping to next temperament."),
+                        3000
+                    );
+                    continue;
+                }
                 const temperamentRatios = [];
                 for (let j = 0; j < t.interval.length; j++) {
                     intervals[j] = t.interval[j];
@@ -1602,7 +1806,7 @@ function TemperamentWidget() {
                     temperamentRatios[j] = temperamentRatios[j].toFixed(2);
                 }
                 const ratiosEqual =
-                    ratios.length == temperamentRatios.length &&
+                    ratios.length === temperamentRatios.length &&
                     ratios.every(function (element, index) {
                         return element === temperamentRatios[index];
                     });
@@ -1610,7 +1814,7 @@ function TemperamentWidget() {
                 if (ratiosEqual) {
                     selectedTemperament = temperament;
                     this.inTemperament = temperament;
-                    temperamentCell.innerHTML = this.inTemperament;
+                    temperamentCell.textContent = this.inTemperament;
                     break;
                 }
             }
@@ -1618,7 +1822,7 @@ function TemperamentWidget() {
 
         if (selectedTemperament === undefined) {
             this.inTemperament = "custom";
-            temperamentCell.innerHTML = this.inTemperament;
+            temperamentCell.textContent = this.inTemperament;
         }
     };
 
@@ -1795,7 +1999,7 @@ function TemperamentWidget() {
                     ]);
                 }
 
-                if (i == this.pitchNumber - 1) {
+                if (i === this.pitchNumber - 1) {
                     newStack.push([idx + 12, "hidden", 0, 0, [idx, null]]);
                 } else {
                     newStack.push([idx + 12, "hidden", 0, 0, [idx, idx + 13]]);
@@ -1862,7 +2066,7 @@ function TemperamentWidget() {
                     ]);
                 }
 
-                if (i == this.pitchNumber - 1) {
+                if (i === this.pitchNumber - 1) {
                     newStack.push([idx + 10, "hidden", 0, 0, [idx, null]]);
                 } else {
                     newStack.push([idx + 10, "hidden", 0, 0, [idx, idx + 11]]);
@@ -1874,7 +2078,7 @@ function TemperamentWidget() {
         const that = this;
         setTimeout(() => {
             that.activity.blocks.loadNewBlocks(newStack);
-            activity.textMsg(_("New action block generated."), 3000);
+            that.activity.textMsg(_("New action block generated."), 3000);
         }, 500);
 
         if (isCustomTemperament(this.inTemperament)) {
@@ -1905,19 +2109,61 @@ function TemperamentWidget() {
      * @returns {void}
      */
     this.playNote = function (pitchNumber) {
+        if (
+            !this._logo ||
+            !this._logo.synth ||
+            typeof this._logo.resetSynth !== "function" ||
+            typeof this._logo.synth.trigger !== "function"
+        ) {
+            return;
+        }
+
         this._logo.resetSynth(0);
         const duration = 1 / 2;
         let notes;
 
+        // Dataset ids are strings; normalize and guard invalid indexes.
+        const pitchIndex = Number.parseInt(pitchNumber, 10);
+        if (Number.isNaN(pitchIndex) || pitchIndex < 0) {
+            return;
+        }
+
+        // Ensure per-note playback uses the currently selected temperament mapping.
+        this._logo.synth.inTemperament = this.inTemperament;
+        this._logo.synth.changeInTemperament = true;
+
         if (docById("wheelDiv4") === null) {
-            notes = this.frequencies[pitchNumber];
-            if (this.editMode == "equal" && this.eqTempHzs && this.eqTempHzs.length) {
-                notes = this.eqTempHzs[pitchNumber];
-            } else if (this.editMode == "ratio" && this.NEqTempHzs && this.NEqTempHzs.length) {
-                notes = this.NEqTempHzs[pitchNumber];
+            if (this.editMode === "equal" && this.eqTempHzs && this.eqTempHzs.length) {
+                notes = this.eqTempHzs[pitchIndex];
+            } else if (this.editMode === "ratio" && this.NEqTempHzs && this.NEqTempHzs.length) {
+                notes = this.NEqTempHzs[pitchIndex];
+            } else if (isCustomTemperament(this.inTemperament)) {
+                notes = this.frequencies[pitchIndex];
+            } else if (this.inTemperament === "equal") {
+                // Preserve existing 12EDO/equal behavior by using direct frequency.
+                notes = this.frequencies[pitchIndex];
+            } else if (this.notes[pitchIndex] && Array.isArray(this.notes[pitchIndex])) {
+                const noteName = this.notes[pitchIndex][0];
+                const octave = this.notes[pitchIndex][1];
+                notes =
+                    noteName
+                        .replace(/♭/g, "b")
+                        .replace(/♯/g, "#")
+                        .replace(/𝄫/g, "bb")
+                        .replace(/𝄪/g, "x") + octave;
+            } else {
+                notes = this.frequencies[pitchIndex];
             }
         } else {
-            notes = this.tempRatios1[pitchNumber] * this.frequencies[0];
+            const ratio = this.tempRatios1 && this.tempRatios1[pitchIndex];
+            if (typeof ratio === "number" && this.frequencies && this.frequencies.length) {
+                notes = ratio * this.frequencies[0];
+            }
+        }
+
+        // Guard against undefined notes/frequencies to avoid invalid trigger calls.
+        if (notes === undefined || notes === null) {
+            return;
         }
 
         this._logo.synth.trigger(
@@ -1941,27 +2187,31 @@ function TemperamentWidget() {
 
         const cell = this.playButton;
         if (this._playing) {
-            cell.innerHTML = `&nbsp;&nbsp;<img 
-                    src="header-icons/stop-button.svg" 
-                    title="${_("Stop")}" 
-                    alt="${_("Stop")}" 
-                    height="${ICONSIZE}" 
-                    width="${ICONSIZE}" 
-                    vertical-align="middle" 
-                    align-content="center"
-                >&nbsp;&nbsp;`;
+            cell.textContent = "\u00A0\u00A0";
+            const stopImg = document.createElement("img");
+            stopImg.src = "header-icons/stop-button.svg";
+            stopImg.title = _("Stop");
+            stopImg.alt = _("Stop");
+            stopImg.setAttribute("height", ICONSIZE);
+            stopImg.setAttribute("width", ICONSIZE);
+            stopImg.setAttribute("vertical-align", "middle");
+            stopImg.setAttribute("align-content", "center");
+            cell.appendChild(stopImg);
+            cell.appendChild(document.createTextNode("\u00A0\u00A0"));
         } else {
             this._logo.synth.setMasterVolume(0);
             this._logo.synth.stop();
-            cell.innerHTML = `&nbsp;&nbsp;<img 
-                    src="header-icons/play-button.svg" 
-                    title="${_("Play")}" 
-                    alt="${_("Play")}" 
-                    height="${ICONSIZE}" 
-                    width="${ICONSIZE}" 
-                    vertical-align="middle" 
-                    align-content="center"
-                >&nbsp;&nbsp;`;
+            cell.textContent = "\u00A0\u00A0";
+            const playImg = document.createElement("img");
+            playImg.src = "header-icons/play-button.svg";
+            playImg.title = _("Play");
+            playImg.alt = _("Play");
+            playImg.setAttribute("height", ICONSIZE);
+            playImg.setAttribute("width", ICONSIZE);
+            playImg.setAttribute("vertical-align", "middle");
+            playImg.setAttribute("align-content", "center");
+            cell.appendChild(playImg);
+            cell.appendChild(document.createTextNode("\u00A0\u00A0"));
         }
 
         const duration = 1 / 2;
@@ -1977,9 +2227,9 @@ function TemperamentWidget() {
 
         const that = this;
         let pitchNumber = this.pitchNumber;
-        if (this.editMode == "equal" && this.eqTempPitchNumber) {
+        if (this.editMode === "equal" && this.eqTempPitchNumber) {
             pitchNumber = this.eqTempPitchNumber;
-        } else if (this.editMode == "ratio" && this.NEqTempPitchNumber) {
+        } else if (this.editMode === "ratio" && this.NEqTempPitchNumber) {
             pitchNumber = this.NEqTempPitchNumber;
         }
 
@@ -2007,7 +2257,7 @@ function TemperamentWidget() {
                 that.playNote(i);
             }
 
-            if (that.circleIsVisible == false && docById("wheelDiv4") == null) {
+            if (that.circleIsVisible === false && docById("wheelDiv4") === null) {
                 if (i === pitchNumber && that._playing) {
                     that.notesCircle.navItems[0].fillAttr = "#808080";
                     that.notesCircle.navItems[0].sliceHoverAttr.fill = "#808080";
@@ -2020,7 +2270,7 @@ function TemperamentWidget() {
                     that.notesCircle.navItems[i].sliceSelectedAttr.fill = "#808080";
                 }
 
-                if (that.playbackForward == false && i < pitchNumber) {
+                if (that.playbackForward === false && i < pitchNumber) {
                     if (i === pitchNumber - 1) {
                         that.notesCircle.navItems[0].fillAttr = "#c8C8C8";
                         that.notesCircle.navItems[0].sliceHoverAttr.fill = "#c8C8C8";
@@ -2042,9 +2292,9 @@ function TemperamentWidget() {
                 }
 
                 that.notesCircle.refreshWheel();
-            } else if (that.circleIsVisible == true && docById("wheelDiv4") == null) {
+            } else if (that.circleIsVisible === true && docById("wheelDiv4") === null) {
                 docById("pitchNumber_" + i).style.background = platformColor.labelColor;
-                if (that.playbackForward == false && i < pitchNumber) {
+                if (that.playbackForward === false && i < pitchNumber) {
                     const j = i + 1;
                     docById("pitchNumber_" + j).style.background = platformColor.selectorBackground;
                 } else {
@@ -2067,7 +2317,7 @@ function TemperamentWidget() {
                     that.wheel1.navItems[i].sliceSelectedAttr.fill = "#808080";
                 }
 
-                if (that.playbackForward == false && i < pitchNumber) {
+                if (that.playbackForward === false && i < pitchNumber) {
                     if (i === pitchNumber - 1) {
                         that.wheel1.navItems[0].fillAttr = "#e0e0e0";
                         that.wheel1.navItems[0].sliceHoverAttr.fill = "#e0e0e0";
@@ -2098,32 +2348,40 @@ function TemperamentWidget() {
             }
 
             if (i <= pitchNumber && i >= 0 && that._playing && p < 2) {
-                setTimeout(function () {
-                    __playLoop(i);
-                }, Singer.defaultBPMFactor * 1000 * duration);
+                setTimeout(
+                    function () {
+                        __playLoop(i);
+                    },
+                    Singer.defaultBPMFactor * 1000 * duration
+                );
             } else {
                 that.inbetween = true;
             }
-            if (!that.playbackForward && i == -1) {
-                cell.innerHTML = `&nbsp;&nbsp;<img 
-                        src="header-icons/play-button.svg" 
-                        title="${_("Play")}" 
-                        alt="${_("Play")}" 
-                        height="${ICONSIZE}" 
-                        width="${ICONSIZE}" 
-                        vertical-align="middle" 
-                        align-content="center"
-                    >&nbsp;&nbsp;`;
+            if (!that.playbackForward && i === -1) {
+                cell.textContent = "\u00A0\u00A0";
+                const playImg = document.createElement("img");
+                playImg.src = "header-icons/play-button.svg";
+                playImg.title = _("Play");
+                playImg.alt = _("Play");
+                playImg.setAttribute("height", ICONSIZE);
+                playImg.setAttribute("width", ICONSIZE);
+                playImg.setAttribute("vertical-align", "middle");
+                playImg.setAttribute("align-content", "center");
+                cell.appendChild(playImg);
+                cell.appendChild(document.createTextNode("\u00A0\u00A0"));
                 that._playing = false;
                 that.playbackForward = true;
                 this.inbetween = false;
-                setTimeout(function () {
-                    that.notesCircle.navItems[0].fillAttr = "#c8C8C8";
-                    that.notesCircle.navItems[0].sliceHoverAttr.fill = "#c8C8C8";
-                    that.notesCircle.navItems[0].slicePathAttr.fill = "#c8C8C8";
-                    that.notesCircle.navItems[0].sliceSelectedAttr.fill = "#c8C8C8";
-                    that.notesCircle.refreshWheel();
-                }, Singer.defaultBPMFactor * 1000 * duration);
+                setTimeout(
+                    function () {
+                        that.notesCircle.navItems[0].fillAttr = "#c8C8C8";
+                        that.notesCircle.navItems[0].sliceHoverAttr.fill = "#c8C8C8";
+                        that.notesCircle.navItems[0].slicePathAttr.fill = "#c8C8C8";
+                        that.notesCircle.navItems[0].sliceSelectedAttr.fill = "#c8C8C8";
+                        that.notesCircle.refreshWheel();
+                    },
+                    Singer.defaultBPMFactor * 1000 * duration
+                );
             }
         };
         if (
@@ -2171,15 +2429,15 @@ function TemperamentWidget() {
         widgetWindow.onclose = function () {
             that._logo.synth.setMasterVolume(0);
             that._logo.synth.stop();
-            if (docById("wheelDiv2") != null) {
+            if (docById("wheelDiv2") !== null) {
                 docById("wheelDiv2").style.display = "none";
                 that.notesCircle.removeWheel();
             }
-            if (docById("wheelDiv3") != null) {
+            if (docById("wheelDiv3") !== null) {
                 docById("wheelDiv3").style.display = "none";
                 that.wheel.removeWheel();
             }
-            if (docById("wheelDiv4") != null) {
+            if (docById("wheelDiv4") !== null) {
                 docById("wheelDiv4").style.display = "none";
                 that.wheel1.removeWheel();
             }
@@ -2196,7 +2454,7 @@ function TemperamentWidget() {
 
         temperamentCell = row.insertCell();
         if (temperamentCell) {
-            temperamentCell.innerHTML = this.inTemperament;
+            temperamentCell.textContent = this.inTemperament;
         }
         temperamentCell.style.width = 2 * BUTTONSIZE + "px";
         temperamentCell.style.minWidth = temperamentCell.style.width;
@@ -2222,6 +2480,14 @@ function TemperamentWidget() {
         const noteCell = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Table"));
 
         let t = getTemperament(this.inTemperament);
+        // Ensure we have a valid temperament object
+        if (!t || !t.pitchNumber) {
+            that.activity.errorMsg(
+                _("Invalid temperament. Falling back to equal temperament."),
+                3000
+            );
+            t = getTemperament("equal");
+        }
         this.pitchNumber = t.pitchNumber;
         this.octaveChanged = false;
         this.scale = this.scale[0] + " " + this.scale[1];
@@ -2268,6 +2534,14 @@ function TemperamentWidget() {
                     // behaves like equal temperament.
                     t = getTemperament("equal");
                 }
+                // Ensure t has a valid interval array before accessing it
+                if (!t || !t.interval || i >= t.interval.length) {
+                    that.activity.errorMsg(
+                        _("Invalid temperament interval data. Skipping note ") + i,
+                        3000
+                    );
+                    continue;
+                }
                 str[i] = getNoteFromInterval(startingPitch, t.interval[i]);
                 this.notes[i] = str[i];
                 note[i] = str[i][0];
@@ -2288,7 +2562,7 @@ function TemperamentWidget() {
                 this.intervals[i] = t.interval[i];
                 this.ratios[i] = t[this.intervals[i]];
                 this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
-                if (i == 0) {
+                if (i === 0) {
                     this.frequencies[i] = this._logo.synth
                         ._getFrequency(str[i], true, this.inTemperament)
                         .toFixed(2);
