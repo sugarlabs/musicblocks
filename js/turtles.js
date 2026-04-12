@@ -1025,6 +1025,8 @@ Turtles.TurtlesView = class {
                 this._speakToggleButton.style.opacity = enabled ? "1" : "0.4";
                 const label = enabled ? _("Pie menu speech on") : _("Pie menu speech off");
                 this._speakToggleButton.setAttribute("data-tooltip", label);
+                this._speakToggleButton.setAttribute("aria-pressed", enabled ? "true" : "false");
+                this._speakToggleButton.setAttribute("aria-label", label);
             };
 
             updateSpeakButton();
