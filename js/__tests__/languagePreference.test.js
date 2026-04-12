@@ -29,6 +29,7 @@
  * - Edge cases and error handling
  */
 
+const { initializeLanguagePreference } = require("../languagePreference");
 // Setup global mocks
 const localStorageMock = (() => {
     let store = {};
@@ -488,25 +489,3 @@ describe("Language Preference Feature", () => {
         });
     });
 });
-
-/**
- * Initialize the language preference feature
- * This function sets up click listeners on language dropdown links
- */
-function initializeLanguagePreference() {
-    const languageDropdown = document.getElementById("languagedropdown");
-    if (languageDropdown) {
-        const langLinks = languageDropdown.querySelectorAll("a");
-        langLinks.forEach(link => {
-            link.addEventListener("click", function (e) {
-                e.preventDefault();
-                const selectedLang = this.id;
-                const currentLang = localStorage.getItem("languagePreference");
-                if (currentLang !== selectedLang) {
-                    localStorage.setItem("languagePreference", selectedLang);
-                    location.reload();
-                }
-            });
-        });
-    }
-}
