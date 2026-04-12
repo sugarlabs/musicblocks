@@ -67,6 +67,18 @@ class ReflectionMatrix {
         this.code = "";
 
         this.startChatTypingTimeout = null;
+
+        /**
+         * User messages waiting to be sent to the backend
+         * @type {Array}
+         */
+        this.pendingMessages = [];
+
+        /**
+         * Whether a queued user message is currently being processed
+         * @type {boolean}
+         */
+        this.isProcessingPendingMessage = false;
     }
 
     sanitizeLinks(html) {
@@ -258,6 +270,116 @@ class ReflectionMatrix {
             this.typingDiv.remove();
             this.typingDiv = null;
         }
+    }
+
+    /**
+     * Appends a user message to the chat log.
+     * @param {string} text - The user's message.
+     * @returns {void}
+     */
+    appendUserMessage(text) {
+        const messageContainer = document.createElement("div");
+        messageContainer.classList.add("message-container", "user");
+
+        const senderName = document.createElement("div");
+        senderName.style.fontSize = "12px";
+        senderName.style.fontWeight = "bold";
+        senderName.style.marginBottom = "4px";
+        senderName.style.color = "#555";
+        senderName.style.overflowWrap = "break-word";
+        senderName.style.alignSelf = "flex-start";
+        senderName.innerText = "You";
+
+        const userMsg = document.createElement("div");
+        userMsg.innerText = text;
+
+        messageContainer.appendChild(senderName);
+        messageContainer.appendChild(userMsg);
+
+        this.chatLog.appendChild(messageContainer);
+        this.chatLog.scrollTop = this.chatLog.scrollHeight;
+    }
+
+    /**
+     * Appends a bot reply to the chat log.
+     * @param {Object} reply - The backend response containing the bot reply.
+     * @param {string} role - The mentor role that generated the reply.
+     * @param {boolean} md - Whether the reply should be rendered as markdown.
+     * @returns {void}
+     */
+    appendBotReply(reply, role = this.AImentor, md = false) {
+        this.chatHistory.push({
+            role: role,
+            content: reply.response
+        });
+
+        if (this.chatHistory.length > 10) {
+            this.summaryButton.style.removeProperty("background");
+        }
+
+        const messageContainer = document.createElement("div");
+        messageContainer.className = "message-container";
+
+        const senderName = document.createElement("div");
+        senderName.style.fontSize = "12px";
+        senderName.style.fontWeight = "bold";
+        senderName.style.marginBottom = "4px";
+        senderName.style.color = "#383838ff";
+        senderName.style.alignSelf = "flex-start";
+        senderName.innerText = this.mentorsMap[role];
+
+        const botReply = document.createElement("div");
+
+        if (md) {
+            const safeText = escapeHTML(reply.response);
+            let html = this.mdToHTML(safeText);
+            html = this.sanitizeLinks(html);
+            botReply.innerHTML = html;
+        } else {
+            botReply.innerText = reply.response;
+        }
+
+        messageContainer.appendChild(senderName);
+        messageContainer.appendChild(botReply);
+
+        this.chatLog.appendChild(messageContainer);
+        this.chatLog.scrollTop = this.chatLog.scrollHeight;
+    }
+
+    /**
+     * Sends queued user messages one at a time so input is not lost.
+     * @returns {Promise<void>}
+     */
+    async processPendingMessages() {
+        if (this.isProcessingPendingMessage) return;
+
+        this.isProcessingPendingMessage = true;
+
+        while (this.pendingMessages.length > 0) {
+            const nextMessage = this.pendingMessages.shift();
+
+            this.chatHistory.push({
+                role: "user",
+                content: nextMessage.text
+            });
+
+            const reply = await this.generateBotReply(
+                nextMessage.text,
+                this.chatHistory,
+                nextMessage.mentor,
+                nextMessage.algorithm
+            );
+
+            if (reply.error) {
+                this.hideTypingIndicator();
+                this.activity.errorMsg(_("Failed to send message"), 3000);
+                continue;
+            }
+
+            this.appendBotReply(reply, nextMessage.mentor);
+        }
+
+        this.isProcessingPendingMessage = false;
     }
 
     /**
@@ -481,42 +603,7 @@ class ReflectionMatrix {
             return;
         }
 
-        this.chatHistory.push({
-            role: this.AImentor,
-            content: reply.response
-        });
-
-        if (this.chatHistory.length > 10) {
-            this.summaryButton.style.removeProperty("background");
-        }
-
-        const messageContainer = document.createElement("div");
-        messageContainer.className = "message-container";
-
-        const senderName = document.createElement("div");
-        senderName.style.fontSize = "12px";
-        senderName.style.fontWeight = "bold";
-        senderName.style.marginBottom = "4px";
-        senderName.style.color = "#383838ff";
-        senderName.style.alignSelf = "flex-start";
-        senderName.innerText = this.mentorsMap[this.AImentor];
-
-        const botReply = document.createElement("div");
-
-        if (md) {
-            const safeText = escapeHTML(reply.response);
-            let html = this.mdToHTML(safeText);
-            html = this.sanitizeLinks(html);
-            botReply.innerHTML = html;
-        } else {
-            botReply.innerText = reply.response;
-        }
-
-        messageContainer.appendChild(senderName);
-        messageContainer.appendChild(botReply);
-
-        this.chatLog.appendChild(messageContainer);
-        this.chatLog.scrollTop = this.chatLog.scrollHeight;
+        this.appendBotReply(reply, this.AImentor, md);
     }
 
     /**
@@ -524,40 +611,16 @@ class ReflectionMatrix {
      * @returns {void}
      */
     sendMessage() {
-        // Prevent sending while bot is still processing (concurrency guard)
-        if (this.typingDiv) return;
         const text = this.input.value.trim();
         if (text === "") return;
-
-        // Prevent sending while the bot is still processing a previous query
-        if (this.typingDiv) return;
-        this.chatHistory.push({
-            role: "user",
-            content: text
+        this.appendUserMessage(text);
+        this.pendingMessages.push({
+            text: text,
+            mentor: this.AImentor,
+            algorithm: this.projectAlgorithm
         });
-
-        const messageContainer = document.createElement("div");
-        messageContainer.classList.add("message-container", "user");
-
-        const senderName = document.createElement("div");
-        senderName.style.fontSize = "12px";
-        senderName.style.fontWeight = "bold";
-        senderName.style.marginBottom = "4px";
-        senderName.style.color = "#555";
-        senderName.style.overflowWrap = "break-word";
-        senderName.style.alignSelf = "flex-start";
-        senderName.innerText = "You";
-
-        const userMsg = document.createElement("div");
-        userMsg.innerText = text;
-
-        messageContainer.appendChild(senderName);
-        messageContainer.appendChild(userMsg);
-
-        this.chatLog.appendChild(messageContainer);
         this.input.value = "";
-        this.botReplyDiv(text);
-        this.chatLog.scrollTop = this.chatLog.scrollHeight;
+        void this.processPendingMessages();
     }
 
     /**
