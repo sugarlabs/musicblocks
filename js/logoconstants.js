@@ -1,12 +1,8 @@
 /*
-   global
-   _
-*/
-
-/*
    exported
    DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY,
    OSCVOLUMEADJUSTMENT, TONEBPM, TARGETBPM, TURTLESTEP, NOTEDIV,
+   MIN_HIGHLIGHT_DURATION_MS,
    NOMICERRORMSG, NANERRORMSG, NOSTRINGERRORMSG, NOBOXERRORMSG,
    NOACTIONERRORMSG, NOINPUTERRORMSG, NOSQRTERRORMSG,
    ZERODIVIDEERRORMSG, EMPTYHEAPERRORMSG, INVALIDPITCH, POSNUMBER,
@@ -25,6 +21,8 @@ const TONEBPM = 240; // seems to be the default
 const TARGETBPM = 90; // what we'd like to use for beats per minute
 const TURTLESTEP = -1; // run in step-by-step mode
 const NOTEDIV = 8; // number of steps to divide turtle graphics
+/** Minimum time (ms) to keep a block highlighted during execution so users can see which block is active. */
+const MIN_HIGHLIGHT_DURATION_MS = 400;
 
 // These error messages don't need translation since they are
 // converted into artwork w/o text.
@@ -40,7 +38,8 @@ const EMPTYHEAPERRORMSG = "empty heap.";
 const POSNUMBER = "Argument must be a positive number";
 
 // NOTE: _() must be available globaly (shimmed or loaded)
-const INVALIDPITCH = _("Not a valid pitch name");
+const INVALIDPITCH =
+    typeof _ === "function" ? _("Not a valid pitch name") : "Not a valid pitch name";
 
 const NOTATIONNOTE = 0;
 const NOTATIONDURATION = 1;
@@ -50,7 +49,7 @@ const NOTATIONROUNDDOWN = 4;
 const NOTATIONINSIDECHORD = 5; // deprecated
 const NOTATIONSTACCATO = 6;
 
-const exportsObj = {
+const logoconstants = {
     DEFAULTVOLUME,
     PREVIEWVOLUME,
     DEFAULTDELAY,
@@ -59,6 +58,7 @@ const exportsObj = {
     TARGETBPM,
     TURTLESTEP,
     NOTEDIV,
+    MIN_HIGHLIGHT_DURATION_MS,
     NOMICERRORMSG,
     NANERRORMSG,
     NOSTRINGERRORMSG,
@@ -79,8 +79,21 @@ const exportsObj = {
     NOTATIONSTACCATO
 };
 
+// Maintain CommonJS compatibility for tests
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = exportsObj;
-} else if (typeof window !== "undefined") {
-    Object.assign(window, exportsObj);
+    module.exports = logoconstants;
+}
+
+// Implement additive AMD define
+/* global define */
+if (typeof define === "function" && define.amd) {
+    define(function () {
+        return logoconstants;
+    });
+}
+
+// Preserve existing global exposure when loaded as a plain browser script.
+// Skipped when running as a CommonJS module (e.g. Jest) to avoid polluting the global scope.
+if (typeof window !== "undefined" && typeof module === "undefined") {
+    Object.assign(window, logoconstants);
 }

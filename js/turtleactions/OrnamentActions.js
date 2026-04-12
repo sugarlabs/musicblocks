@@ -47,7 +47,7 @@ function setupOrnamentActions(activity) {
 
             tur.singer.staccato.push(1 / value);
 
-            const listenerName = "_staccato_" + turtle;
+            const listenerName = "_staccato_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
@@ -77,7 +77,7 @@ function setupOrnamentActions(activity) {
                 activity.logo.notation.notationBeginSlur(turtle);
             }
 
-            const listenerName = "_staccato_" + turtle;
+            const listenerName = "_staccato_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {

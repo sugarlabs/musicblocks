@@ -66,8 +66,30 @@ global.docById = jest.fn(id => document.getElementById(id));
 global.docByClass = jest.fn(classname => document.getElementsByClassName(classname));
 global.mockRunLogoCommands = jest.fn();
 global.mockDownload = jest.fn();
+// Load SaveInterface with an AMD-compatible require shim.
+// Jest's CommonJS require does not support the RequireJS pattern:
+//     require(["module"], callback)
+// Since SaveInterface.js uses this pattern for lazy-loaded exports,
+// we load it manually with a custom require that detects array arguments
+// and immediately invokes the callback (globals are already mocked above).
+const fs = require("fs");
+const path = require("path");
 
-const { SaveInterface } = require("../SaveInterface");
+const _jestRequire = require;
+const _amdRequire = function (moduleName, callback) {
+    if (Array.isArray(moduleName) && typeof callback === "function") {
+        callback();
+        return;
+    }
+    return _jestRequire(moduleName);
+};
+
+const _moduleObj = { exports: {} };
+const _code = fs.readFileSync(path.resolve(__dirname, "../SaveInterface.js"), "utf8");
+new Function("require", "module", "exports", _code)(_amdRequire, _moduleObj, _moduleObj.exports);
+const { SaveInterface } = _moduleObj.exports;
+const { escapeHTML } = require("../utils/utils");
+global.escapeHTML = escapeHTML;
 const { LILYPONDHEADER } = require("../lilypond");
 global.LILYPONDHEADER = LILYPONDHEADER;
 global.instance = new SaveInterface();
@@ -198,6 +220,34 @@ describe("save HTML methods", () => {
         expect(file).toContain("<p>Mock Description</p>");
         expect(file).toContain("<img src='mock-image.png'/>");
         expect(file).toContain("<div>Mock Exported Data</div>");
+    });
+
+    it("should escape HTML special characters in prepareHTML to prevent XSS", () => {
+        const xssActivity = {
+            beginnerMode: false,
+            PlanetInterface: {
+                getCurrentProjectName: jest.fn(() => '<script>alert("XSS")</script>'),
+                getCurrentProjectDescription: jest.fn(() => "<img src=x onerror=alert(1)>"),
+                getCurrentProjectImage: jest.fn(() => '" onload="alert(1)')
+            },
+            prepareExport: jest.fn(() => '"><script>steal()</script>')
+        };
+
+        const si = new SaveInterface(xssActivity);
+        const html = si.prepareHTML();
+
+        // Raw HTML tags must be escaped — no unescaped script or img tags from user input
+        expect(html).not.toContain("<script>alert");
+        expect(html).not.toContain("<img src=x");
+
+        // Escaped values MUST contain encoded entities
+        expect(html).toContain("&lt;script&gt;");
+        expect(html).toContain("&lt;img src=x onerror=alert(1)&gt;");
+        expect(html).toContain("&lt;/script&gt;");
+    });
+
+    it("escapeHTML should encode all five HTML special characters", () => {
+        expect(escapeHTML("&<>\"'")).toBe("&amp;&lt;&gt;&quot;&#039;");
     });
 
     it("should call prepareHTML and download the file", () => {
