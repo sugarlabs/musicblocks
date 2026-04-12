@@ -1052,7 +1052,7 @@ class Logo {
         }
 
         this.synth.stop();
-        if (this.synth.recorder && this.synth.recorder.state == "recording")
+        if (this.synth.recorder && this.synth.recorder.state === "recording")
             this.synth.recorder.stop();
 
         // Dispose all Tone.js instruments to free decoded AudioBuffers
