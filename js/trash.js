@@ -14,7 +14,7 @@
 // trash and hidden. There is a menu button that can be used to
 // restore trash.
 
-/* global createjs, platformColor, BORDER, TRASHICON, last */
+/* global createjs, platformColor, getSVG, last */
 
 /* exported Trashcan */
 
@@ -83,7 +83,13 @@ class Trashcan {
 
         img.src =
             "data:image/svg+xml;base64," +
-            window.btoa(base64Encode(BORDER.replace("stroke_color", highlightString)));
+            window.btoa(
+                base64Encode(
+                    getSVG("BORDER", {
+                        strokeColor: highlightString
+                    })
+                )
+            );
     }
 
     /**
@@ -103,7 +109,13 @@ class Trashcan {
 
         img.src =
             "data:image/svg+xml;base64," +
-            window.btoa(base64Encode(BORDER.replace("stroke_color", platformColor.trashBorder)));
+            window.btoa(
+                base64Encode(
+                    getSVG("BORDER", {
+                        strokeColor: platformColor.trashBorder
+                    })
+                )
+            );
     }
 
     /**
@@ -126,7 +138,13 @@ class Trashcan {
 
         img.src =
             "data:image/svg+xml;base64," +
-            window.btoa(base64Encode(TRASHICON.replace(/fill_color/g, platformColor.trashBorder)));
+            window.btoa(
+                base64Encode(
+                    getSVG("TRASHICON", {
+                        fillColor: platformColor.trashBorder
+                    })
+                )
+            );
     }
 
     /**

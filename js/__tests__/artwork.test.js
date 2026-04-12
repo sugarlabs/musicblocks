@@ -25,7 +25,9 @@ const {
     COLLAPSEBUTTONXOFF,
     STANDARDBLOCKHEIGHT,
     FILLCOLORS,
-    TURTLESVG
+    TURTLESVG,
+    AssetRegistry,
+    getSVG
 } = require("../artwork");
 
 global.createjs = {
@@ -85,5 +87,66 @@ describe("artwork.js Test Suite", () => {
         expect(typeof STANDARDBLOCKHEIGHT).toBe("number");
         expect(Array.isArray(FILLCOLORS)).toBe(true);
         expect(typeof TURTLESVG).toBe("string");
+    });
+
+    describe("AssetRegistry", () => {
+        test("is a non-empty object", () => {
+            expect(typeof AssetRegistry).toBe("object");
+            expect(Object.keys(AssetRegistry).length).toBeGreaterThan(0);
+        });
+
+        test("contains TURTLESVG matching the global", () => {
+            expect(AssetRegistry.TURTLESVG).toBe(TURTLESVG);
+        });
+
+        test("contains FILLCOLORS matching the global", () => {
+            expect(AssetRegistry.FILLCOLORS).toBe(FILLCOLORS);
+        });
+    });
+
+    describe("getSVG", () => {
+        test("returns the raw SVG when no options are provided", () => {
+            const result = getSVG("TURTLESVG");
+            expect(result).toBe(TURTLESVG);
+        });
+
+        test("replaces fill_color and stroke_color tokens", () => {
+            const result = getSVG("TURTLESVG", {
+                fillColor: "#ff0000",
+                strokeColor: "#00ff00"
+            });
+            expect(result).not.toContain("fill_color");
+            expect(result).not.toContain("stroke_color");
+            expect(result).toContain("#ff0000");
+            expect(result).toContain("#00ff00");
+        });
+
+        test("getSVG should handle arbitrary placeholders", () => {
+            const svg = getSVG("BOUNDARY", {
+                placeholders: {
+                    HEIGHT: "100",
+                    WIDTH: "200",
+                    X: "10",
+                    Y: "20"
+                }
+            });
+            expect(svg).toContain('height="100"');
+            expect(svg).toContain('width="200"');
+            expect(svg).toContain('x="10"');
+            expect(svg).toContain('y="20"');
+        });
+
+        test("getSVG should handle missing assets gracefully", () => {
+            const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+            const result = getSVG("DOES_NOT_EXIST");
+            expect(result).toBe("");
+            expect(warnSpy).toHaveBeenCalled();
+            warnSpy.mockRestore();
+        });
+
+        test("returns non-string values as-is", () => {
+            const result = getSVG("FILLCOLORS");
+            expect(Array.isArray(result)).toBe(true);
+        });
     });
 });

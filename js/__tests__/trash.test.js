@@ -73,6 +73,15 @@ global.base64Encode = jest.fn(data => data);
 global.BORDER = "mock_border_svg";
 global.TRASHICON = "mock_trash_icon_svg";
 global.last = jest.fn(array => array[array.length - 1]);
+global.getSVG = jest.fn((name, options) => {
+    const assets = { BORDER: global.BORDER, TRASHICON: global.TRASHICON };
+    let svg = assets[name] || "";
+    if (typeof svg === "string" && options) {
+        if (options.fillColor) svg = svg.replace(/fill_color/g, options.fillColor);
+        if (options.strokeColor) svg = svg.replace(/stroke_color/g, options.strokeColor);
+    }
+    return svg;
+});
 
 global.Image = jest.fn(() => {
     const img = {};

@@ -157,6 +157,17 @@ describe("setupEnsembleBlocks", () => {
         global.pitchToNumber = jest.fn(() => 40);
         global.getMunsellColor = jest.fn((hue, chroma, value) => `#${hue}${chroma}${value}`);
         global.TURTLESVG = "<svg>fill_color stroke_color</svg>";
+        global.getSVG = jest.fn((name, options) => {
+            if (name === "TURTLESVG") {
+                let svg = global.TURTLESVG;
+                if (options) {
+                    if (options.fillColor) svg = svg.replace("fill_color", options.fillColor);
+                    if (options.strokeColor) svg = svg.replace("stroke_color", options.strokeColor);
+                }
+                return svg;
+            }
+            return "";
+        });
         global.base64Encode = jest.fn(str => str);
 
         const mockTurtles = [0, 1, 2].map(index => ({

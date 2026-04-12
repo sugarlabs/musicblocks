@@ -17,7 +17,7 @@
 
 /*
    global _, getMunsellColor, getcolor, hex2rgb, STROKECOLORS, FILLCOLORS,
-   TURTLESVG, WRAP
+   WRAP, getSVG
  */
 
 /*
@@ -28,8 +28,8 @@
         getMunsellColor, getcolor
    - js/utils/utils.js
         hex2rgb
-   - js/artwork.js
-        STROKECOLORS, FILLCOLORS, TURTLESVG
+    - js/artwork.js
+         STROKECOLORS, FILLCOLORS, getSVG
    - js/toolbar.js
         WRAP
  */
@@ -1302,10 +1302,10 @@ class Painter {
             }
 
             if (this.turtle.skinChanged) {
-                let artwork = TURTLESVG;
-                artwork = artwork
-                    .replace(/fill_color/g, FILLCOLORS.at(i))
-                    .replace(/stroke_color/g, STROKECOLORS.at(i));
+                const artwork = getSVG("TURTLESVG", {
+                    fillColor: FILLCOLORS.at(i),
+                    strokeColor: STROKECOLORS.at(i)
+                });
 
                 this.turtle.doTurtleShell(
                     55,

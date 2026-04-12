@@ -11,13 +11,13 @@
 
 /* global
    docById, LEADING, DEFAULTPALETTE, MULTIPALETTES, platformColor,
-   PALETTEICONS, MULTIPALETTEICONS, SKIPPALETTES, toTitleCase,
+   MULTIPALETTEICONS, SKIPPALETTES, toTitleCase,
    i18nSolfege, NUMBERBLOCKDEFAULT, TEXTWIDTH, STRINGLEN,
    DEFAULTBLOCKSCALE, SVG, DISABLEDFILLCOLOR, DISABLEDSTROKECOLOR,
    PALETTEFILLCOLORS, PALETTESTROKECOLORS, last, getTextWidth,
-   STANDARDBLOCKHEIGHT, CLOSEICON, BUILTINPALETTES, base64Encode,
+   STANDARDBLOCKHEIGHT, BUILTINPALETTES, base64Encode,
    safeSVG, blockIsMacro, getMacroExpansion, StatusMatrix,
-   activity, cameraPALETTE, mediaPALETTE, videoPALETTE
+   activity, cameraPALETTE, mediaPALETTE, videoPALETTE, getSVG
 */
 
 /* exported Palettes, initPalettes */
@@ -674,10 +674,11 @@ class Palettes {
 
         td.appendChild(
             makePaletteIcons(
-                PALETTEICONS[MULTIPALETTEICONS[i]]
-                    .replace("background_fill_color", platformColor.paletteLabelBackground)
-                    .replace(/stroke_color/g, platformColor.strokeColor)
-                    .replace(/fill_color/g, platformColor.fillColor),
+                getSVG(MULTIPALETTEICONS[i], {
+                    backgroundFillColor: platformColor.paletteLabelBackground,
+                    strokeColor: platformColor.strokeColor,
+                    fillColor: platformColor.fillColor
+                }),
                 1.5 * this.cellSize,
                 1.5 * this.cellSize
             )
@@ -714,20 +715,22 @@ class Palettes {
             let img;
             if (j === i) {
                 img = makePaletteIcons(
-                    PALETTEICONS[MULTIPALETTEICONS[j]]
-                        .replace("background_fill_color", platformColor.paletteLabelSelected)
-                        .replace(/stroke_color/g, platformColor.strokeColor)
-                        .replace(/fill_color/g, platformColor.fillColor),
+                    getSVG(MULTIPALETTEICONS[j], {
+                        backgroundFillColor: platformColor.paletteLabelSelected,
+                        strokeColor: platformColor.strokeColor,
+                        fillColor: platformColor.fillColor
+                    }),
                     this.cellSize,
                     this.cellSize
                 );
                 tr.children[j].children[1].style.background = platformColor.paletteLabelSelected;
             } else {
                 img = makePaletteIcons(
-                    PALETTEICONS[MULTIPALETTEICONS[j]]
-                        .replace("background_fill_color", platformColor.paletteLabelBackground)
-                        .replace(/stroke_color/g, platformColor.strokeColor)
-                        .replace(/fill_color/g, platformColor.fillColor),
+                    getSVG(MULTIPALETTEICONS[j], {
+                        backgroundFillColor: platformColor.paletteLabelBackground,
+                        strokeColor: platformColor.strokeColor,
+                        fillColor: platformColor.fillColor
+                    }),
                     this.cellSize,
                     this.cellSize
                 );
@@ -819,7 +822,7 @@ class Palettes {
         // Make an icon/button for each palette
         this.makeSearchButton(
             "search",
-            makePaletteIcons(PALETTEICONS["search"], this.cellSize, this.cellSize),
+            makePaletteIcons(getSVG("search"), this.cellSize, this.cellSize),
             listBody
         );
         for (const name of MULTIPALETTES[i]) {
@@ -831,7 +834,7 @@ class Palettes {
             }
             this.makeButton(
                 name,
-                makePaletteIcons(PALETTEICONS[name], this.cellSize, this.cellSize),
+                makePaletteIcons(getSVG(name), this.cellSize, this.cellSize),
                 listBody
             );
         }
@@ -1481,8 +1484,9 @@ class Palette {
     }
 
     hideMenu() {
-        docById("palette").childNodes[0].style.borderRight =
-            `1px solid ${platformColor.selectorSelected}`;
+        docById(
+            "palette"
+        ).childNodes[0].style.borderRight = `1px solid ${platformColor.selectorSelected}`;
         if (this._outsideClickListener) {
             document.removeEventListener("click", this._outsideClickListener);
             this._outsideClickListener = null;
@@ -1528,7 +1532,7 @@ class Palette {
             header.style.padding = "8px";
 
             const labelImg = makePaletteIcons(
-                PALETTEICONS[this.name],
+                getSVG(this.name),
                 this.palettes.cellSize,
                 this.palettes.cellSize
             );
@@ -1546,7 +1550,9 @@ class Palette {
             const closeDownImg = document.createElement("span");
             closeDownImg.style.height = `${this.palettes.cellSize}px`;
             const closeImg = makePaletteIcons(
-                CLOSEICON.replace("fill_color", platformColor.selectorSelected),
+                getSVG("CLOSEICON", {
+                    fillColor: platformColor.selectorSelected
+                }),
                 this.palettes.cellSize,
                 this.palettes.cellSize
             );

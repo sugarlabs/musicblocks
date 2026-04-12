@@ -14,7 +14,7 @@
 
    _, last, FlowBlock, ValueBlock, FlowClampBlock, LeftBlock, BooleanBlock,
    NOINPUTERRORMSG, NANERRORMSG, INVALIDPITCH, getNote, pitchToNumber,
-   TURTLESVG, _THIS_IS_MUSIC_BLOCKS_, getMunsellColor
+   _THIS_IS_MUSIC_BLOCKS_, getMunsellColor, getSVG
 */
 
 /* exported setupEnsembleBlocks, getTargetTurtle */
@@ -1083,10 +1083,10 @@ function setupEnsembleBlocks(activity) {
                 fillColor = getMunsellColor(0, 50, 100);
                 strokeColor = getMunsellColor(0, 70, 80);
             }
-            const artwork = TURTLESVG.replace(/fill_color/g, fillColor).replace(
-                /stroke_color/g,
-                strokeColor
-            );
+            const artwork = getSVG("TURTLESVG", {
+                fillColor: fillColor,
+                strokeColor: strokeColor
+            });
 
             tur.doTurtleShell(
                 55,

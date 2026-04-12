@@ -88,6 +88,17 @@ global.getTextWidth = jest.fn(() => 10);
 global.STANDARDBLOCKHEIGHT = 18;
 global.CLOSEICON = "<svg fill_color></svg>";
 global.safeSVG = str => str;
+global.getSVG = jest.fn((name, options) => {
+    const assets = Object.assign({}, global.PALETTEICONS, { CLOSEICON: global.CLOSEICON });
+    let svg = assets[name] || "";
+    if (typeof svg === "string" && options) {
+        if (options.fillColor) svg = svg.replace(/fill_color/g, options.fillColor);
+        if (options.strokeColor) svg = svg.replace(/stroke_color/g, options.strokeColor);
+        if (options.backgroundFillColor)
+            svg = svg.replace(/background_fill_color/g, options.backgroundFillColor);
+    }
+    return svg;
+});
 global.blockIsMacro = jest.fn(() => false);
 global.getMacroExpansion = jest.fn();
 

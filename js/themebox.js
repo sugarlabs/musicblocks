@@ -11,15 +11,32 @@
 
 //A dropdown for selecting theme
 
-/*
-   global platformColor, getSystemThemePreference,
-   PALETTEFILLCOLORS, PALETTESTROKECOLORS,
-   PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
-   MULTIPALETTEICONS, PALETTEICONS, makePaletteIcons,
-   globalActivity, createjs
-*/
-
 /* exported ThemeBox, themeConfigs */
+
+// Use constants from artwork.js
+// In Node/Jest we require them; in browser we rely on them being available as globals
+let getSVG, hasSVG, AssetRegistry;
+if (typeof require !== "undefined" && typeof module !== "undefined") {
+    try {
+        const artwork = require("./artwork");
+        getSVG = artwork.getSVG;
+        hasSVG = artwork.hasSVG;
+        AssetRegistry = artwork.AssetRegistry;
+    } catch (e) {
+        // Fallback for environments where require fails but globals might exist
+        getSVG = window.getSVG;
+        hasSVG = window.hasSVG;
+        AssetRegistry = window.AssetRegistry;
+    }
+} else {
+    getSVG = window.getSVG;
+    hasSVG = window.hasSVG;
+    AssetRegistry = window.AssetRegistry;
+}
+// MULTIPALETTEICONS is a global from turtledefs.js, so we access it via window/global
+// to ensure it is always the most up-to-date reference.
+const getMultiPaletteIcons = () =>
+    typeof window !== "undefined" ? window.MULTIPALETTEICONS : global.MULTIPALETTEICONS;
 
 const themeConfigs = {
     dark: {
@@ -304,10 +321,10 @@ class ThemeBox {
         // Update palette colors in global variables used by blocks
         if (window.platformColor.paletteColors) {
             for (const p in window.platformColor.paletteColors) {
-                PALETTEFILLCOLORS[p] = window.platformColor.paletteColors[p][0];
-                PALETTESTROKECOLORS[p] = window.platformColor.paletteColors[p][1];
-                PALETTEHIGHLIGHTCOLORS[p] = window.platformColor.paletteColors[p][2];
-                HIGHLIGHTSTROKECOLORS[p] = window.platformColor.paletteColors[p][1];
+                AssetRegistry.PALETTEFILLCOLORS[p] = window.platformColor.paletteColors[p][0];
+                AssetRegistry.PALETTESTROKECOLORS[p] = window.platformColor.paletteColors[p][1];
+                AssetRegistry.PALETTEHIGHLIGHTCOLORS[p] = window.platformColor.paletteColors[p][2];
+                AssetRegistry.HIGHLIGHTSTROKECOLORS[p] = window.platformColor.paletteColors[p][1];
             }
         }
 
@@ -402,22 +419,21 @@ class ThemeBox {
             try {
                 // Update palette selector border color
                 const paletteElement = document.getElementById("palette");
-                if (paletteElement && paletteElement.childNodes[0]) {
-                    paletteElement.childNodes[0].style.border = `1px solid ${window.platformColor.selectorSelected}`;
+                if (paletteElement && paletteElement.children[0]) {
+                    paletteElement.children[0].style.border = `1px solid ${window.platformColor.selectorSelected}`;
                 }
 
                 // Refresh palette selector icons with new theme colors
                 const tr = document.querySelector("#palette > div > table > thead > tr");
                 if (tr) {
-                    for (let j = 0; j < MULTIPALETTEICONS.length; j++) {
+                    const multiPaletteIcons = getMultiPaletteIcons();
+                    for (let j = 0; j < multiPaletteIcons.length; j++) {
                         const img = makePaletteIcons(
-                            PALETTEICONS[MULTIPALETTEICONS[j]]
-                                .replace(
-                                    "background_fill_color",
-                                    platformColor.paletteLabelBackground
-                                )
-                                .replace(/stroke_color/g, platformColor.strokeColor)
-                                .replace(/fill_color/g, platformColor.fillColor),
+                            getSVG(multiPaletteIcons[j], {
+                                backgroundFillColor: platformColor.paletteLabelBackground,
+                                strokeColor: platformColor.strokeColor,
+                                fillColor: platformColor.fillColor
+                            }),
                             this.activity.palettes.cellSize,
                             this.activity.palettes.cellSize
                         );
@@ -434,7 +450,7 @@ class ThemeBox {
                     const searchRow = tbody.rows[0];
                     if (searchRow) {
                         const searchIcon = makePaletteIcons(
-                            PALETTEICONS["search"],
+                            getSVG("search"),
                             this.activity.palettes.cellSize,
                             this.activity.palettes.cellSize
                         );
@@ -447,9 +463,9 @@ class ThemeBox {
                     for (let i = 1; i < tbody.rows.length; i++) {
                         const row = tbody.rows[i];
                         const label = row.cells[1].textContent.trim().toLowerCase();
-                        if (label && PALETTEICONS[label]) {
+                        if (label && hasSVG(label)) {
                             const icon = makePaletteIcons(
-                                PALETTEICONS[label],
+                                getSVG(label),
                                 this.activity.palettes.cellSize,
                                 this.activity.palettes.cellSize
                             );

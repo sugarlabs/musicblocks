@@ -19,10 +19,10 @@
 /*
    global createjs, platformColor, last, importMembers, setupRhythmActions, setupMeterActions,
    setupPitchActions, setupIntervalsActions, setupToneActions, setupOrnamentActions,
-   setupVolumeActions, setupDrumActions, setupDictActions, _, Turtle, TURTLESVG, METRONOMESVG,
+   setupVolumeActions, setupDrumActions, setupDictActions, _, Turtle, getSVG,
    FILLCOLORS, STROKECOLORS, getMunsellColor, DEFAULTVALUE, DEFAULTCHROMA,
    jQuery, docById, LEADING, CARTESIANBUTTON, piemenuGrid, CLEARBUTTON, COLLAPSEBUTTON,
-   EXPANDBUTTON, MBOUNDARY
+   EXPANDBUTTON
  */
 
 /* exported Turtles */
@@ -833,10 +833,11 @@ Turtles.TurtlesView = class {
      * @returns {void}
      */
     createArtwork(turtle, i, useTurtleArtwork) {
-        let artwork = useTurtleArtwork ? TURTLESVG : METRONOMESVG;
-        artwork = artwork
-            .replace(/fill_color/g, FILLCOLORS[i])
-            .replace(/stroke_color/g, STROKECOLORS[i]);
+        const svgName = useTurtleArtwork ? "TURTLESVG" : "METRONOMESVG";
+        const artwork = getSVG(svgName, {
+            fillColor: FILLCOLORS[i],
+            strokeColor: STROKECOLORS[i]
+        });
 
         turtle.makeTurtleBitmap(artwork, this.activity, useTurtleArtwork);
 
@@ -1235,15 +1236,19 @@ Turtles.TurtlesView = class {
                 "data:image/svg+xml;base64," +
                 window.btoa(
                     base64Encode(
-                        MBOUNDARY.replace("HEIGHT", this._h)
-                            .replace("WIDTH", this._w)
-                            .replace("Y", 10)
-                            .replace("X", 10)
-                            .replace("DY", dy)
-                            .replace("DX", dx)
-                            .replace("stroke_color", platformColor.ruleColor)
-                            .replace("fill_color", this._backgroundColor)
-                            .replace("STROKE", 20)
+                        getSVG("MBOUNDARY", {
+                            strokeColor: platformColor.ruleColor,
+                            fillColor: this._backgroundColor,
+                            placeholders: {
+                                HEIGHT: this._h,
+                                WIDTH: this._w,
+                                Y: 10,
+                                X: 10,
+                                DY: dy,
+                                DX: dx,
+                                STROKE: 20
+                            }
+                        })
                     )
                 );
             __makeAllButtons();
@@ -1274,15 +1279,19 @@ Turtles.TurtlesView = class {
                 "data:image/svg+xml;base64," +
                 window.btoa(
                     base64Encode(
-                        MBOUNDARY.replace("HEIGHT", this._h)
-                            .replace("WIDTH", this._w)
-                            .replace("Y", 10 / CONTAINERSCALEFACTOR)
-                            .replace("X", 10 / CONTAINERSCALEFACTOR)
-                            .replace("DY", dy)
-                            .replace("DX", dx)
-                            .replace("stroke_color", platformColor.ruleColor)
-                            .replace("fill_color", this._backgroundColor)
-                            .replace("STROKE", 20 / CONTAINERSCALEFACTOR)
+                        getSVG("MBOUNDARY", {
+                            strokeColor: platformColor.ruleColor,
+                            fillColor: this._backgroundColor,
+                            placeholders: {
+                                HEIGHT: this._h,
+                                WIDTH: this._w,
+                                Y: 10 / CONTAINERSCALEFACTOR,
+                                X: 10 / CONTAINERSCALEFACTOR,
+                                DY: dy,
+                                DX: dx,
+                                STROKE: 20 / CONTAINERSCALEFACTOR
+                            }
+                        })
                     )
                 );
         };

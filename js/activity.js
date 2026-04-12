@@ -38,7 +38,7 @@ try {
    getMacroExpansion, getOctaveRatio, getTemperament, transcribeMidi,
    GOHOMEBUTTON, GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
    hideDOMLabel, initBasicProtoBlocks, initPalettes,
-   INLINECOLLAPSIBLES, JSEditor, LanguageBox, ThemeBox, MSGBLOCK,
+   INLINECOLLAPSIBLES, JSEditor, LanguageBox, ThemeBox, getSVG,
    NANERRORMSG, NOACTIONERRORMSG, NOBOXERRORMSG, NOINPUTERRORMSG,
    NOMICERRORMSG, NOSQRTERRORMSG, NOSTRINGERRORMSG, PALETTEFILLCOLORS,
    PALETTESTROKECOLORS, PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
@@ -47,7 +47,7 @@ try {
    processPluginData, processRawPluginData, SaveInterface,
    SHOWBLOCKSBUTTON, SMALLERBUTTON, SMALLERDISABLEBUTTON, SOPRANO,
    SPECIALINPUTS, STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
-   TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, TURTLESVG,
+   TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE,
    updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_F,
    SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
    MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
@@ -1451,9 +1451,10 @@ class Activity {
                     const y = this.blocks.blockList[i].container.y + 12;
                     svgParts.push('<g transform="translate(' + x + ", " + y + ') scale(0.4 0.4)">');
 
-                    parts = TURTLESVG.replace(/fill_color/g, FILLCOLORS[startCounter])
-                        .replace(/stroke_color/g, STROKECOLORS[startCounter])
-                        .split("><");
+                    parts = getSVG("TURTLESVG", {
+                        fillColor: FILLCOLORS[startCounter],
+                        strokeColor: STROKECOLORS[startCounter]
+                    }).split("><");
 
                     startCounter += 1;
                     if (startCounter > 9) {
@@ -3036,10 +3037,10 @@ class Activity {
             container.visible = false;
 
             const img = new Image();
-            const svgData = MSGBLOCK.replace("fill_color", fillColor).replace(
-                "stroke_color",
-                strokeColor
-            );
+            const svgData = getSVG("MSGBLOCK", {
+                fillColor: fillColor,
+                strokeColor: strokeColor
+            });
 
             const that = this;
 
@@ -5271,7 +5272,7 @@ class Activity {
             const pitch = pitches;
             pitchDuration = toFraction(pitchDuration);
             const adjustedNote = _adjustPitch(pitch.name, keySignature).toUpperCase();
-            if (triplet !== null) {
+            if (triplet != null) {
                 pitchDuration[1] = meterDen * triplet;
             }
 
@@ -8197,22 +8198,19 @@ class Activity {
             // data loss from browser crashes (see issue #2994).
             // Deferred while the project is actively running to avoid
             // interrupting playback.
-            this._autoSaveInterval = setInterval(
-                () => {
-                    try {
-                        if (this.logo && this.logo._alreadyRunning) {
-                            return;
-                        }
-
-                        if (this.saveLocally !== null && this.saveLocally !== undefined) {
-                            this.saveLocally();
-                        }
-                    } catch (e) {
-                        console.error("[AutoSave] Failed:", e);
+            this._autoSaveInterval = setInterval(() => {
+                try {
+                    if (this.logo && this.logo._alreadyRunning) {
+                        return;
                     }
-                },
-                5 * 60 * 1000
-            );
+
+                    if (this.saveLocally !== null && this.saveLocally !== undefined) {
+                        this.saveLocally();
+                    }
+                } catch (e) {
+                    console.error("[AutoSave] Failed:", e);
+                }
+            }, 5 * 60 * 1000);
 
             initBasicProtoBlocks(this);
 
