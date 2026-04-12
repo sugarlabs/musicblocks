@@ -153,7 +153,7 @@ function setupWidgetBlocks(activity) {
                 logo.timbre.synthVals["envelope"]["sustain"] = last(tur.singer.sustain);
                 logo.timbre.synthVals["envelope"]["release"] = last(tur.singer.release);
 
-                if (logo.timbre.env.length != 0) {
+                if (logo.timbre.env.length !== 0) {
                     activity.errorMsg(_("You are adding multiple envelope blocks."));
                 } else {
                     // Create the synth for the instrument.
@@ -295,12 +295,15 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
             if (logo.temperament === null) {
                 _lazyRequire(["widgets/temperament"], function () {
                     logo.temperament = new TemperamentWidget();
+                    logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
                 });
+                return [null, 0, true];
             }
 
             logo.insideTemperament = true;
@@ -453,13 +456,16 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {number[]} - The output values.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
             if (logo.timbre === null) {
                 _lazyRequire(["widgets/timbre"], function () {
                     logo.timbre = new TimbreWidget();
+                    logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
                 });
+                return [null, 0, true];
             }
 
             logo.inTimbre = true;
@@ -609,7 +615,7 @@ function setupWidgetBlocks(activity) {
                             blocks,
                             turtle,
                             Math.max(0, blocks.length - 2),
-                            turtle ==
+                            turtle ===
                                 activity.turtles.getTurtle(activity.turtles.getTurtleCount() - 1)
                         );
                 }
@@ -746,13 +752,16 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {number[]} - The output values.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
             if (logo.tempo === null) {
                 _lazyRequire(["widgets/tempo"], function () {
                     logo.tempo = new Tempo();
+                    logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
                 });
+                return [null, 0, true];
             }
 
             logo.inTempo = true;
@@ -817,13 +826,16 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {number[]} - The output values.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
             if (logo.arpeggio === null) {
                 _lazyRequire(["widgets/arpeggio"], function () {
                     logo.arpeggio = new Arpeggio();
+                    logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
                 });
+                return [null, 0, true];
             }
 
             logo.inArpeggio = true;
@@ -894,12 +906,15 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
             if (logo.pitchDrumMatrix === null) {
                 _lazyRequire(["widgets/pitchdrummatrix"], function () {
                     logo.pitchDrumMatrix = new PitchDrumMatrix();
+                    logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
                 });
+                return [null, 0, true];
             }
 
             logo.inPitchDrumMatrix = true;
@@ -968,13 +983,16 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {array} - The output array.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
             if (logo.pitchSlider === null) {
                 _lazyRequire(["widgets/pitchslider"], function () {
                     logo.pitchSlider = new PitchSlider();
+                    logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
                 });
+                return [null, 0, true];
             }
 
             logo.inPitchSlider = true;
@@ -1121,13 +1139,16 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {any[]} - Returns an array of arguments.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
             if (logo.musicKeyboard === null) {
                 _lazyRequire(["widgets/musickeyboard"], function () {
                     logo.musicKeyboard = new MusicKeyboard(activity);
+                    logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
                 });
+                return [null, 0, true];
             }
 
             logo.inMusicKeyboard = true;
@@ -1187,13 +1208,16 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {any[]} - Returns an array of arguments.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
             if (logo.pitchStaircase === null) {
                 _lazyRequire(["widgets/pitchstaircase"], function () {
                     logo.pitchStaircase = new PitchStaircase();
+                    logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
                 });
+                return [null, 0, true];
             }
 
             logo.pitchStaircase.Stairs = [];
@@ -1296,13 +1320,16 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {any[]} - Returns an array of arguments.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.rhythmRuler == null) {
+        flow(args, logo, turtle, blk, receivedArg) {
+            if (logo.rhythmRuler === null) {
                 _lazyRequire(["widgets/rhythmruler"], function () {
                     logo.rhythmRuler = new RhythmRuler();
+                    logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
                 });
+                return [null, 0, true];
             }
 
             logo.rhythmRuler.Rulers = [];
@@ -1497,8 +1524,9 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
             logo.inMatrix = true;
 
             if (logo.phraseMaker === null) {
@@ -1548,8 +1576,10 @@ function setupWidgetBlocks(activity) {
                             getTemperament: getTemperament
                         };
                         logo.phraseMaker = new PhraseMaker(phraseMakerDeps);
+                        logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
                     }
                 );
+                return [null, 0, true];
             }
             logo.phraseMaker.blockNo = blk;
 
@@ -1757,12 +1787,15 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
             if (logo.reflection === null) {
                 _lazyRequire(["widgets/reflection"], function () {
                     logo.reflection = new ReflectionMatrix();
+                    logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
                 });
+                return [null, 0, true];
             }
 
             logo.reflection.init(activity);
@@ -1833,15 +1866,18 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {number[]} - The output values.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
             logo.inLegoWidget = true;
 
             if (logo.legoWidget === null) {
                 _lazyRequire(["widgets/legobricks"], function () {
                     logo.legoWidget = new LegoWidget();
+                    logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
                 });
+                return [null, 0, true];
             }
             logo.legoWidget.blockNo = blk;
 
