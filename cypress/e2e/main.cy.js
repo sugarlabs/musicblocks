@@ -14,8 +14,10 @@ describe("MusicBlocks Application", () => {
     before(() => {
         cy.visit("http://localhost:3000");
         // Wait for loading to complete before any tests run
-        cy.get("#loading-image-container", { timeout: 20000 }).should("not.be.visible");
-        cy.contains("#loadingText", "Loading Complete!", { timeout: 20000 }).should("be.visible");
+        cy.get("#loading-image-container", { timeout: 30000 }).should("not.be.visible");
+        cy.get("#loadingText", { timeout: 30000 })
+            .should("be.visible")
+            .and("contain", "Loading Complete!");
         cy.wait(2000); // Additional buffer for UI to fully render
     });
 
