@@ -1084,7 +1084,6 @@ function setupEnsembleBlocks(activity) {
                 strokeColor
             );
 
-            // eslint-disable-next-line no-undef
             tur.doTurtleShell(
                 55,
                 "data:image/svg+xml;base64," + window.btoa(base64Encode(artwork))

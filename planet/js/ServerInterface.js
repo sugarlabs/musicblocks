@@ -21,7 +21,6 @@
    ServerInterface
 */
 
-// eslint-disable-next-line no-unused-vars
 class ServerInterface {
     constructor(Planet) {
         this.Planet = Planet;
@@ -82,7 +81,6 @@ class ServerInterface {
     request(data, callback) {
         data["api-key"] = this.APIKey;
 
-        // eslint-disable-next-line no-unused-vars
         const req = jQuery
             .ajax({
                 type: "POST",
@@ -123,7 +121,6 @@ class ServerInterface {
 
             callback(result);
         } catch (error) {
-            // eslint-disable-next-line no-console
             console.error("[ServerInterface] Request failed after retries:", error);
             callback(this.ConnectionFailureData);
         }
@@ -170,7 +167,6 @@ class ServerInterface {
             const cached = await this.cacheManager.getMetadata(ProjectID);
 
             if (cached) {
-                // eslint-disable-next-line no-console
                 console.debug("[ServerInterface] Returning cached metadata for:", ProjectID);
                 callback({ success: true, data: cached });
                 return;
@@ -212,7 +208,6 @@ class ServerInterface {
             const cached = await this.cacheManager.getProject(ProjectID);
 
             if (cached) {
-                // eslint-disable-next-line no-console
                 console.debug("[ServerInterface] Returning cached project:", ProjectID);
                 callback({ success: true, data: cached });
                 return;
@@ -291,7 +286,7 @@ class ServerInterface {
         if (!this.disablePlanetCache) {
             await this.initCache();
         }
-        // eslint-disable-next-line no-console
+
         console.debug(
             `[ServerInterface] Initialized with rate limiting and ${
                 this.disablePlanetCache ? "cache disabled (dev mode)" : "caching"

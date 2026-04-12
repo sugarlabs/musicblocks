@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Music Blocks Guide - 4. Widgets</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous"/>
+    <style>
+      body { padding-top: 20px; }
+      .sidebar { background-color: #f8f9fa; padding: 20px; border-radius: 4px; border-right: 1px solid #eee; }
+      .content { padding: 20px; }
+      img { max-width: 100%; height: auto; display: block; margin: 10px 0; }
+      pre { background-color: #f8f8f8; padding: 10px; border: 1px solid #ccc; white-space: pre-wrap; }
+      table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+      th, td { border: 1px solid #ddd; padding: 8px; }
+      th { background-color: #f2f2f2; text-align: left; }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid" style="max-width: 1200px;">
+      <div class="row">
+        <div class="col-md-3 sidebar">
+          <h4 style="margin-top: 0;">Navigation</h4>
+          <ul class="nav nav-pills nav-stacked" style="position: sticky; top: 20px;">
+	    <li><a href="index.html">Introduction</a></li>
+	    <li><a href="01-getting-started.html">1. Getting Started</a></li>
+	    <li><a href="02-making-sounds.html">2. Making Sounds</a></li>
+	    <li><a href="03-programming-with-music.html">3. Programming with Music</a></li>
+	    <li class="active"><a href="04-widgets.html">4. Widgets</a></li>
+	    <li><a href="05-beyond-music-blocks.html">5. Beyond Music Blocks</a></li>
+	    <li><a href="06-appendix.html">6. Appendix</a></li>
+	  </ul>
+        </div>
+        <div class="col-md-9 content">
+          <p>
+            <a href="../guide/index.html">English</a> |
+            <a href="../guide-es/index.html">Español</a> |
+            <a href="../guide-ja/index.html">日本語</a> |
+            <a href="../guide-zhCN/index.html">中文</a> |
+            <a href="../guide-pt/index.html">Português</a>
+          </p>
+          <hr>
+          <h2><a name="WIDGETS">4. Widgets</a></h2>
+	  <p><a href="#3-programming-with-music">Previous Section (3. Programming with Music)</a> | <a href="#table-of-contents">Back to Table of Contents</a> | <a href="#5-beyond-music-blocks">Next Section (5. Beyond Music Blocks)</a></p>
+	  <p>This section of the guide will talk about the various Widgets that can
+	    be used within Music Blocks to enhance your experience.</p>
+	  <p>Every widget has a menu with at least two buttons.</p>
+	  <p><img alt="widget" src="../header-icons/close-button.svg" title="close button" /></p>
+	  <p>You can hide the widget by clicking on the <em>Close</em> button.</p>
+	  <p>You can move the widget by dragging its containing the window.</p>
+	  <h3><a name="status">4.1 Monitoring Status</a></h3>
+	  <p><img alt="widget" src="../../images/Status_widget_debuggingMd.svg" title="given Music block" /></p>
+	  <p><img alt="widget" src="./status2.svg" title="status in tabular form" /></p>
+	  <p>The <em>Status widget</em> is a tool for inspecting the status of Music
+	    Blocks as it is running. By default, the key, BPM, and volume are
+	    displayed. Also, each note is displayed as it is played. There is one
+	    row per voice in the status table.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1732541757152077&amp;run=True">RUN LIVE</a></p>
+	  <p>Additional <em>Print</em> blocks can be added to the <em>Status</em> widget to
+	    display additional music factors, e.g., duplicate, transposition,
+	    skip, <a href="#336-staccato-and-slur">staccato and slur</a>, and
+	    <a href="#36-adding-graphics">graphics</a> factors, e.g., x, y, heading, color,
+	    shade, grey, and pensize.</p>
+	  <p><img alt="widget" src="../../images/Status_Widget_additional_programming_DebuggingMd.svg" title="additional programming within the Status  block" /></p>
+	  <p>You can do additional programming within the status block. In the
+	    example above, <code>whole notes played</code> is multiplied by <code>4</code> (to calculate
+	    quarter notes played) before being displayed.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1732553086132345&amp;run=True">RUN LIVE</a></p>
+	  <h3><a name="GENERATION"></a>4.2 Generating Chunks of Notes</h3>
+	  <p>Using the Phrase Maker, it is possible to generate chunks of
+	    notes at a much faster speed.</p>
+	  <h4><a name="pitch-time">4.2.1 The Phrase Maker</a></h4>
+	  <p><img alt="widget" src="./matrix1.svg" title="phrase maker" /></p>
+	  <p>Music Blocks provides a widget, the <em>Phrase maker</em>, as a scaffold
+	    for getting started.</p>
+	  <p>Once you've launched Music Blocks in your browser, start by clicking
+	    on the <em>Phrase maker</em> stack that appears in the middle of the
+	    screen. (For the moment, ignore the <em>Start</em> block.) You'll see a grid
+	    organized vertically by pitch and horizontally by rhythm.</p>
+	  <p><img alt="widget" src="./matrix2.svg" title="Pitch and Rhythm block matrix" /></p>
+	  <p>The matrix in the figure above has three <em>Pitch</em> blocks and one
+	    <em>Rhythm</em> block, which is used to create a 3 x 3 grid of pitch and
+	    time.</p>
+	  <p>Note that the default matrix has five <em>Pitch</em> blocks, one <em>Drum</em>
+	    block, and two <em>Mouse</em> (movement) blocks. Hence, you will see eight
+	    rows, one for each pitch, drum, and mouse (movement). (A ninth row at
+	    the bottom is used for specifying the rhythms associated with each
+	    note.) Also by default, there are two <em>Rhythm</em> blocks, which specifies
+	    six quarter <code>(1/4)</code> notes followed by one half <code>(1/2)</code> note.</p>
+	  <p><img alt="widget" src="./matrix3.svg" title="matrix" /></p>
+	  <p>By clicking on individual cells in the grid, you should hear
+	    individual notes (or chords if you click on more than one cell in a
+	    column). In the figure, three quarter notes are selected (black
+	    cells). First <code>Re 4</code>, followed by <code>Mi 4</code>, followed by <code>Sol 4</code>.</p>
+	  <p><img alt="widget" src="../header-icons/play-button.svg" title="play button" /></p>
+	  <p>If you click on the <em>Play</em> button (found in the top row of the grid),
+	    you will hear a sequence of notes played (from left to right): <code>Re 4</code>,
+	    <code>Mi 4</code>, <code>Sol 4</code>.</p>
+	  <p><img alt="widget" src="../header-icons/export-chunk.svg" title="save button" /></p>
+	  <p>Once you have a group of notes (a "chunk") that you like, click on the
+	    <em>Save</em> button (just to the right of the <em>Play</em> button). This will
+	    create a stack of blocks that can used to play these same notes
+	    programmatically. (More on that below.)</p>
+	  <p>You can rearrange the selected notes in the grid and save other chunks
+	    as well.</p>
+	  <p><img alt="widget" src="../header-icons/sort.svg" title="sort button" /></p>
+	  <p>The <em>Sort</em> button will reorder the pitches in the matrix from highest
+	    to lowest and eliminate any duplicate <em>Pitch</em> blocks.</p>
+	  <p><img alt="widget" src="../header-icons/erase-button.svg" title="erase button" /></p>
+	  <p>There is also an Erase button that will clear the grid.</p>
+	  <p>Don't worry. You can reopen the matrix at anytime (it will remember
+	    its previous state) and since you can define as many chunks as you
+	    want, feel free to experiment.</p>
+	  <p>Tip: You can put a chunk inside a <em>Phrase maker</em> block to generate
+	    the matrix to corresponds to that chunk.</p>
+	  <p><img alt="widget" src="./matrix4.svg" title="usage of octave for a pitch" /></p>
+	  <p>The chunk created when you click on the matrix is a stack of
+	    blocks. The blocks are nested: an <em>Action</em> block contains three <em>Note
+	      value</em> blocks, each of which contains a <em>Pitch</em> block. The <em>Action</em>
+	    block has a name automatically generated by the matrix, in this case,
+	    chunk. (You can rename the action by clicking on the name.). Each note
+	    has a duration (in this case 4, which represents a quarter note). Try
+	    putting different numbers in and see (hear) what happens. Each note
+	    block also has a pitch block (if it were a chord, there would be
+	    multiple <em>Pitch</em> blocks nested inside the Note block's clamp). Each
+	    pitch block has a pitch name (<code>Re</code>, <code>Mi</code>, and <code>Sol</code>), and a pitch
+	    octave; in this example, the octave is 4 for each pitch. (Try changing
+	    the pitch names and the pitch octaves.)</p>
+	  <p>To play the chuck, simply click on the action block (on the word
+	    action). You should hear the notes play, ordered from top to bottom.</p>
+	  <h4><a name="THE-RHYTHM-BLOCK">4.2.2 The Rhythm Block</a></h4>
+	  <p><img alt="widget" src="./matrix6.svg" title="the Rhythm block" /></p>
+	  <p><em>Rhythm</em> blocks are used to generate rhythm patterns in the
+	    <em>Phrase maker</em> block. The top argument to the <em>Rhythm</em> block
+	    is the number of notes. The bottom argument is the duration of the
+	    note. In the top example above, three columns for quarter notes
+	    would be generated in the matrix. In the middle example, one column
+	    for an eighth note would be generated. In the bottom example, seven
+	    columns for 16th notes would be generated.</p>
+	  <p><img alt="widget" src="./matrix7.svg" title="usage of Rhythm block" /></p>
+	  <p><img alt="widget" src="./matrix8.svg" title="resulting notes in tabular format" /></p>
+	  <p>You can use as many <em>Rhythm</em> blocks as you'd like inside the
+	    <em>Phrase maker</em> block. In the above example, two <em>Rhythm</em>
+	    blocks are used, resulting in three quarter notes and six eighth
+	    notes.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1725873372253840&amp;run=True">RUN LIVE</a></p>
+	  <h4><a name="CREATING-TUPLETS">4.2.3 Creating Tuplets</a></h4>
+	  <p><img alt="widget" src="./matrix9.svg" title="simple tuplet" /></p>
+	  <p><img alt="widget" src="./matrix10.svg" title="tuplet and rhythmic note values" /></p>
+	  <p>Tuplets are a collection of notes that get scaled to a specific
+	    duration. Using tuplets makes it easy to create groups of notes that
+	    are not based on a power of 2.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1725874435939635&amp;run=True">RUN LIVE</a>.</p>
+	  <p>In the example above, three quarter notes&mdash;defined in the <em>Simple
+	      Tuplet</em> block&mdash;are played in the time of a single quarter
+	    note. The result is three twelfth notes. (This form, which is quite
+	    common in music, is called a <em>triplet</em>. Other common tuplets include a
+	    <em>quintuplet</em> and a <em>septuplet</em>.)</p>
+	  <p><img alt="widget" src="./matrix11.svg" title="usage of tuplet" /></p>
+	  <p>In the example above, the three quarter notes are defined in the
+	    <em>Rhythm</em> block embedded in the <em>Tuplet</em> block. As with the <em>Simple
+	      Tuplet</em> example, they are played in the time of a single quarter
+	    note. The result is three twelfth notes. This more complex form allows
+	    for intermixing multiple rhythms within single tuplet.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1735745904945622&amp;run=True">RUN LIVE</a></p>
+	  <p><img alt="widget" src="./matrix12.svg" title="embedding rhythm and Tuplet block" /></p>
+	  <p><img alt="widget" src="./matrix13.svg" title="tuplet and rhythmic note values" /></p>
+	  <p>In the example above, the two <em>Rhythm</em> blocks are embedded in the
+	    <em>Tuplet</em> block, resulting in a more complex rhythm.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1725874743559698&amp;run=True">RUN LIVE</a></p>
+	  <p>Note: You can mix and match <em>Rhythm</em> blocks and <em>Tuplet</em> blocks when
+	    defining your matrix.</p>
+	  <h4><a name="WHAT-IS-TUPLET">4.2.4 What is a Tuplet?</a></h4>
+	  <p><img alt="tuplet" src="../charts/TupletChart.svg" title="tuplet chart" /></p>
+	  <p><img alt="tuplet" src="../charts/TripletChart.svg" title="triplet chart" /></p>
+	  <h4><a name="INDIVIDUAL-NOTES">4.2.5 Using Individual Notes</a></h4>
+	  <p><img alt="widget" src="./matrix14.svg" /></p>
+	  <p>You can also use individual notes when defining the grid. These blocks
+	    will expand into <em>Rhythm</em> blocks with the corresponding values.</p>
+	  <h4><a name="USING-A-SCALE">4.2.6 Using a Scale of Pitches</a></h4>
+	  <p><img alt="widget" src="./matrix15.svg" /></p>
+	  <p>You can use the <em>Scalar step</em> block to generate a scale of pitches in
+	    the matrix. In the example above, the pitches comprising the G major
+	    scale in the 4th octave are added to the grid. Note that in order to
+	    put the highest note on top, the first pitch is the <code>Sol</code> in <code>Octave
+	      5</code>. From there, we use <code>-1</code> as the argument to the <em>Scalar step</em> block
+	    inside the <em>Repeat</em>, working our way down to <code>Sol</code> in <code>Octave
+	      4</code>. Another detail to note is the use of the <em>Mode length</em> block.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1735824170382853&amp;run=True">RUN LIVE</a></p>
+	  <h4><a name="LEGO-BRICKS">4.2.7 LEGO Bricks Widget</a></h4>
+	  <p><img alt="LEGO Bricks" src="../documentation/legobricks_block.svg" title="LEGO Bricks block" /></p>
+	  <p>The <em>LEGO Bricks</em> widget represents a groundbreaking approach to music composition that bridges the physical and digital worlds. This innovative tool transforms tangible LEGO brick constructions into dynamic musical compositions through advanced computer vision and color detection algorithms.</p>
+	  <p><img alt="LEGO Bricks Widget" src="../documentation/legobricks_widget.svg" title="LEGO Bricks Widget Interface" /></p>
+	  <p>The widget operates by analyzing colored LEGO brick arrangements from uploaded images or live webcam feeds. Users can upload photos of their LEGO creations or use their device's camera to capture constructions in real-time. The widget features an intelligent color detection system that can adapt to different backgrounds and lighting conditions.</p>
+	  <p><img alt="LEGO Bricks Demo" src="../documentation/legobricks_demo.svg" title="LEGO Bricks Widget Demo Example" /></p>
+	  <p><strong>Key Features:</strong></p>
+	  <ul>
+	    <li><strong>Multiple Input Sources</strong>: Upload images of LEGO brick patterns or use webcam for live construction analysis</li>
+	    <li><strong>Smart Background Detection</strong>: Eye dropper tool allows selection of background color (green baseplates, white surfaces, etc.) for accurate color detection</li>
+	    <li><strong>Real-time Color Analysis</strong>: As the widget scans across the image with vertical lines, it identifies different colored bricks and maps them to musical pitches</li>
+	    <li><strong>Customizable Scanning</strong>: Adjustable scanning speed and column spacing for precise timing control</li>
+	    <li><strong>Interactive Color Selection</strong>: Live preview tooltip shows detected colors while hovering over the image</li>
+	  </ul>
+	  <p><strong>How It Works:</strong></p>
+	  <p>The widget scans the uploaded image or webcam feed using vertical scanning lines that move from left to right. Each vertical line represents a moment in time, while the vertical position corresponds to different musical pitches. When the scanner encounters a LEGO brick that differs from the selected background color, it triggers a musical note corresponding to that color and vertical position.</p>
+	  <p><strong>Musical Output:</strong></p>
+	  <ul>
+	    <li><strong>Real-time Audio Playback</strong>: Hear your LEGO creation as music while the scanning progresses</li>
+	    <li><strong>Action Block Export</strong>: Generate Music Blocks code that can be further edited and incorporated into larger compositions</li>
+	    <li><strong>Visual Feedback</strong>: Color detection visualization shows which areas of the image are being interpreted as musical notes</li>
+	    <li><strong>Downloadable Results</strong>: Save both the generated music blocks and visual analysis for future use</li>
+	  </ul>
+	  <p><strong>Educational Value:</strong></p>
+	  <p>The LEGO Bricks widget combines STEM learning with creative expression, teaching concepts of pattern recognition, color theory, rhythm and timing, and creative coding. It bridges physical construction with digital programming concepts, making it particularly effective for introducing younger learners to music composition while leveraging their natural affinity for construction play.</p>
+	  <p><strong>Advanced Features:</strong></p>
+	  <p><strong>Input Methods and Flexibility:</strong>
+	    <ul>
+	      <li>Image upload support for various formats (JPEG, PNG, WebP)</li>
+	      <li>Live webcam integration for real-time analysis</li>
+	      <li>Batch processing for creating longer musical compositions</li>
+	    </ul>
+	  </p>
+	  <p><strong>Color Detection System:</strong>
+	    <ul>
+	      <li>Adaptive color calibration for various lighting conditions</li>
+	      <li>Color family recognition to prevent minor shade variations</li>
+	      <li>User-configurable tolerance settings for different environments</li>
+	    </ul>
+	  </p>
+	  <p><strong>Scanning Technology:</strong>
+	    <ul>
+	      <li>Precise vertical line scanning with systematic left-to-right movement</li>
+	      <li>Height-to-pitch conversion for intuitive spatial-to-musical relationships</li>
+	      <li>Horizontal spacing check for natural rhythmic pattern generation</li>
+	    </ul>
+	  </p>
+	  <p><strong>Educational Applications:</strong></p>
+	  <p><strong>Musical Pedagogy:</strong>
+	    <ul>
+	      <li>Pattern recognition skills through visual-spatial construction</li>
+	      <li>Rhythm and timing concepts via spatial arrangement</li>
+	      <li>Pitch relationships through vertical construction patterns</li>
+	      <li>Composition techniques using systematic building approaches</li>
+	    </ul>
+	  </p>
+	  <p><strong>Creative Development:</strong>
+	    <ul>
+	      <li>Synesthetic learning connecting visual, spatial, and auditory perception</li>
+	      <li>Problem-solving skills for achieving specific musical outcomes</li>
+	      <li>Collaborative creativity in group construction projects</li>
+	    </ul>
+	  </p>
+	  <p>This widget exemplifies Music Blocks' philosophy of making music programming accessible and engaging by connecting familiar physical activities with abstract musical concepts. It serves as an ideal introduction to musical notations for a blind or a visually challenged individual. We can make it a lot more better in future and make many more activities with it LegoBlocks.</p>
+	  <h3><a name="rhythms">4.3 Generating Rhythms</a></h3>
+	  <p>The <em>Rhythm Maker</em> block is used to launch a widget similar to the
+	    <em>Phrase maker</em> block. The widget can be used to generate rhythmic
+	    patterns.</p>
+	  <p><img alt="widget" src="./rhythm1.svg" title="generating rhythms" /></p>
+	  <p>The argument to the <em>Rhythm Maker</em> block specifies the duration that
+	    will be subdivided to generate a rhythmic pattern. By default, it is 1
+	    / 1, e.g., a whole note.</p>
+	  <p>The <em>Set Drum</em> blocks contained in the clamp of the <em>Rhythm Maker</em>
+	    block indicates the number of rhythms to be defined simultaneously. By
+	    default, two rhythm "rulers" are defined. The embedded <em>Rhythm</em> blocks
+	    define the initial subdivision of each rhythm ruler.</p>
+	  <p><img alt="widget" src="./rhythm2.svg" title="rhythm maker" /></p>
+	  <p>When the <em>Rhythm Maker</em> block is clicked, the <em>Rhythm Maker</em> widget is
+	    opened. It contains a row for each rhythm ruler. An input in the top
+	    row of the widget is used to specify how many subdivisions will be
+	    created within a cell when it is clicked. By default, 2 subdivisions
+	    are created.</p>
+	  <p><img alt="widget" src="./rhythm3.svg" title="usage of rhythm maker" /></p>
+	  <p>As shown in the above figure, the top rhythm ruler has been divided
+	    into two half-notes and the bottom rhythm ruler has been divided into
+	    three third-notes. Clicking on the <em>Play</em> button to the left of each row
+	    will playback the rhythm using a drum for each beat. The <em>Play-all</em>
+	    button on the upper-left of the widget will play back all rhythms
+	    simultaneously.</p>
+	  <p><img alt="widget" src="./rhythm4.svg" title="divide cells in rhythm maker" /></p>
+	  <p>The rhythm can be further subdivided by clicking in individual
+	    cells. In the example above, two quarter-notes have been created by
+	    clicking on one of the half-notes.</p>
+	  <p><img alt="widget" src="./rhythm8.svg" title="tie cells in Rhythm Maker" /></p>
+	  <p>By dragging across multiple cells, they become tied. In the example
+	    above, two third-notes have been tied into one two-thirds-note.</p>
+	  <p><img alt="widget" src="./rhythm5.svg" title="save stack button" /></p>
+	  <p>The <em>Save stack</em> button will export rhythm stacks.</p>
+	  <p><img alt="widget" src="./rhythm6.svg" title="stacks of rhythms" /></p>
+	  <p>These stacks of rhythms can be used to define rhythmic patterns used
+	    with the <em>Phrase maker</em> block.</p>
+	  <p><img alt="widget" src="./rhythm7.svg" title="save drum machine button" /></p>
+	  <p>The <em>Save drum machine</em> button will export <em>Start</em> stacks that will
+	    play the rhythms as drum machines.</p>
+	  <p>Another feature of the <em>Rhythm Maker</em> widget is the ability to tap out
+	    a rhythm. By clicking on the <em>Tap</em> button and then clicking on a cell
+	    inside one of the rhythm rulers, you will be prompted (by four tones)
+	    to begin tapping the mouse button to divide the cell into
+	    sub-cells. Once the fourth tone has sounded, a progress bar will run
+	    from left to right across the screen. Each click of the mouse will
+	    define another beat within the cell. If you don't like your rhythm,
+	    use the <em>Undo</em> button and try again.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1725875683911786&amp;run=True">RUN LIVE</a></p>
+	  <h3><a name="modes">4.4 Musical Modes</a></h3>
+	  <p>Musical modes are used to specify the relationship between
+	    <a href="#327-intervals">intervals</a> (or steps) in a scale. Since
+	    Western music is based on 12 half-steps per octave, modes specify how
+	    many half steps there are between each note in a scale.</p>
+	  <p>By default, Music Blocks uses the <em>Major</em> mode, which, in the
+	    <a href="#343-setting-key-and-mode">Key</a> of C, maps to the white keys on a
+	    piano. The intervals in the <em>Major</em> mode are <code>2, 2, 1, 2, 2, 2,
+	      1</code>. Many other common modes are built into Music Blocks, including, of
+	    course, <em>Minor</em> mode, which uses <code>2, 1, 2, 2, 1, 2, 2</code> as its
+	    intervals.</p>
+	  <p>Note that not every mode uses 7 intervals per octave. For example, the
+	    <em>Chromatic</em> mode uses 11 intervals: <code>1, 1, 1, 1, 1, 1, 1, 1, 1,
+	      1, 1, 1</code>. The <em>Japanese</em> mode uses only 5 intervals: <code>1, 4,
+	      2, 3, 2</code>. What is important is that the sum of the intervals
+	    in an octave is 12 half-steps.</p>
+	  <p>The <em>Mode length</em> block will return the number of intervals (scalar
+	    steps) in the current mode.</p>
+	  <p><img alt="widget" src="./mode1.svg" title="mode widget" /></p>
+	  <p>The <em>Mode</em> widget lets you explore modes and generate custom
+	    modes. You invoke the widget with the <em>Custom mode</em> block. The mode
+	    specified in the <em>Set key</em> block will be the default mode when the
+	    widget launches.</p>
+	  <p><img alt="widget" src="./mode2.svg" title="launching widget with Major mode" /></p>
+	  <p>In the above example, the widget has been launched with <em>Major</em> mode
+	    (the default). Note that the notes included in the mode are indicated
+	    by the protruding sectors with 'X's, which are arrayed in a circular
+	    pattern of twelve half-steps to complete the octave.</p>
+	  <p>Since the intervals in the <em>Major</em> mode are <code>2, 2, 1, 2, 2, 2, 1</code>, the
+	    notes are <code>0</code>, <code>2</code>, <code>4</code>, <code>5</code>, <code>7</code>, <code>9</code>,<code>11</code>, and <code>12</code> (one octave
+	    above <code>0</code>).</p>
+	  <p>The widget controls run along the toolbar at the top. From left to
+	    right are:</p>
+	  <p><em>Play all</em>, which will play a scale using the current mode;</p>
+	  <p><em>Save</em>, which will save the current mode as the <em>Custom</em> mode and save
+	    a stack of <em>Pitch</em> blocks that can be used with the <em>Phrase Maker</em> block;</p>
+	  <p><em>Rotate counter-clockwise</em>, which will rotate the mode
+	    counter-clockwise (See the example below);</p>
+	  <p><em>Rotate clockwise</em>, which will rotate the mode clockwise (See the
+	    example below);</p>
+	  <p><em>Invert</em>, which will invert the mode (See the example below);</p>
+	  <p><em>Undo</em>, which will restore the mode to the previous version; and</p>
+	  <p><em>Close</em>, which will close the widget.</p>
+	  <p>You can also click on individual notes to activate or deactivate them.</p>
+	  <p>Note that the mode inside the <em>Custom mode</em> block is updated whenever
+	    the mode is changed inside the widget.</p>
+	  <p><img alt="widget" src="./mode3.svg" title="creating Dorian mode" /></p>
+	  <p>In the above example, the <em>Major</em> mode has been rotated counter-clockwise,
+	    transforming it into <em>Dorian</em>.</p>
+	  <p><img alt="widget" src="./mode4.svg" title="creating Locrian mode" /></p>
+	  <p>In the above example, the <em>Major</em> mode has been rotated
+	    clockwise, transforming it into <em>Locrian</em>.</p>
+	  <p><img alt="widget" src="./mode5.svg" title="creating Phrygian mode" /></p>
+	  <p>In the above example, the <em>Major</em> mode has been inverted, transforming
+	    it into <em>Phrygian</em>.</p>
+	  <p>Note: The build-in modes in Music Blocks can be found in
+	    <a href="https://github.com/sugarlabs/musicblocks/blob/master/js/utils/musicutils.js#L68">musicutils.js</a>.</p>
+	  <p><img alt="widget" src="./mode6.svg" title="phrase maker block" /></p>
+	  <p>The <em>Save</em> button exports a stack of blocks representing the mode that
+	    can be used inside the <em>Phrase maker</em> block.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1725877046734200&amp;run=True">RUN LIVE</a></p>
+	  <h3><a name="meters">4.5 Meters</a></h3>
+	  <p><img alt="widget" src="./meter1.svg" title="meter widget block" /></p>
+	  <p>The <em>Meter Widget</em> block is used to explore strong and weak
+	    beats. Launch the widget with the meter you want to explore. (In the
+	    example, the meter is 4 beats per measure, where each beat is one
+	    quarter note.)</p>
+	  <p><img alt="widget" src="./meter2.svg" title="Meter Widget" /></p>
+	  <p>Inside the widget, you can click on a sector to indicate a strong
+	    beat. (Clicking on the <em>X</em> will revert the beat to a weak beat.) In
+	    the figure, the first and third beats are strong.</p>
+	  <p>The <em>Play</em> button will play the beat, using a snare drum for strong
+	    beats and a kick drum for weak beats.</p>
+	  <p><img alt="widget" src="./meter3.svg" title="on strong beat do blocks" /></p>
+	  <p>The <em>Save</em> button will export <em>On strong beat do</em> blocks for each strong beat.</p>
+	  <h3><a name="pitch-drum">4.6 The Pitch-Drum Matrix</a></h3>
+	  <p><img alt="alt 
+		       tag" src="./drum2.svg" title="Pitch-drum matrix" /></p>
+	  <p>The <em>Set Drum</em> block is used to map the enclosed pitches into drum
+	    sounds. Drum sounds are played in a monopitch using the specified drum
+	    sample. In the example above, a <code>kick drum</code> will be substituted for
+	    each occurrence of a <code>sol</code> <code>4</code>.</p>
+	  <p><img alt="widget" src="./drum5a.svg" title="pitch-drum matrix 1" /></p>
+	  <p><img alt="widget" src="./drum5.svg" title="table for pitch-drum matrix" /></p>
+	  <p><img alt="widget" src="./drum6.svg" title="table for pitch-drum matrix" /></p>
+	  <p><img alt="widget" src="./drum7.svg" title="pitch-drum matrix 1" /></p>
+	  <p>As an experience for creating mapping with the <em>Set Drum</em> block, we
+	    provide the <em>Drum-Pitch</em> Matrix. You use it to map between pitches and
+	    drums. The output is a stack of <em>Set Drum</em> blocks.</p>
+	  <h3><a name="stairs">4.7 Exploring Musical Proportions</a></h3>
+	  <p>The <em>Pitch Staircase</em> block is used to launch a widget similar to the
+	    <em>Phrase maker</em>, which can be used to generate different pitches
+	    using a given pitch and musical proportion.</p>
+	  <p>The <em>Pitch</em> blocks contained in the clamp of the <em>Pitch Staircase</em>
+	    block define the pitches to be initialized simultaneously. By default,
+	    one pitch is defined and it have default note "sol" and octave "3".</p>
+	  <p><img alt="widget" src="./pitchstaircase0.svg" title="generating arbitrary pitches" /></p>
+	  <p>When <em>Pitch Staircase</em> block is clicked, the <em>Pitch Staircase</em> widget is
+	    initialized. The widget contains row for every <em>Pitch</em> block contained
+	    in the clamp of the <em>Pitch Staircase</em> block. The input fields in the top
+	    row of the widget specify the musical proportions used to create new
+	    pitches in the staircase. The inputs correspond to the numerator and
+	    denominator in the proportion respectively. By default the proportion
+	    is 3:2.</p>
+	  <p><img alt="widget" src="./pitchstaircase1.svg" title="notes associated with the step in  the stairs" /></p>
+	  <p><img alt="widget" src="./pitchstaircase2.svg" title="notes associated with the step in  the stairs" /></p>
+	  <p><img alt="widget" src="./pitchstaircase3.svg" title="notes associated with the step in  the stairs" /></p>
+	  <p>Clicking on the <em>Play</em> button to the left of each row will playback
+	    the notes associated with that step in the stairs. The <em>Play-all</em>
+	    button on the upper-left of the widget will play back all the pitch
+	    steps simultaneously. A second <em>Play-all</em> button to the right of the
+	    stair plays in increasing order of frequency first, then in 
+	    decreasing order of frequency as well, completing a scale.</p>
+	  <p>Clicking the wave icon shown in the widget will subdivide the pitch
+	    stacks according to the musical proportions defined in the widget's
+	    input fields. The <em>Save stack</em> button will export pitch stacks. For
+	    example, in the above configuration, the output from pressing the
+	    <em>Save stack</em> button is shown below:</p>
+	  <p><img alt="widget" src="./pitchstaircase4.svg" title="Pitch Stair block" /></p>
+	  <p>These stacks can be used with the <em>Phrase maker</em> block to define
+	    the rows in the matrix.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1736204720563059&amp;run=True">RUN LIVE</a></p>
+	  <p><img alt="widget" src="./pitchstaircase5.svg" title="Pitch Stair block" /></p>
+	  <h3><a name="slider">4.8 Generating Arbitrary Pitches</a></h3>
+	  <p>The <em>Pitch Slider</em> block is used to launch a widget that is used to
+	    generate arbitrary pitches. It differs from the <em>Pitch Staircase</em>
+	    widget in that it is used to create frequencies that vary continuously
+	    within the range of a specified octave.</p>
+	  <p>Each <em>Sine</em> block contained within the clamp of the <em>Pitch Slider</em>
+	    block defines the initial pitch for an octave.</p>
+	  <p><img alt="widget" src="./pitchslider0.svg" title="Pitch Slider" /></p>
+	  <p><img alt="widget" src="./pitchslider1.svg" title="Pitch Slider-One Column" /></p>
+	  <p>When the <em>Pitch Slider</em> block is clicked, the <em>Pitch Slider</em> widget is
+	    initialized. The widget will have one column for each <em>Sine</em> block in
+	    the clamp. Every column has a slider that can be used to move up or
+	    down in frequency, continuously or in intervals of 1/12th of the
+	    starting frequency. The mouse is used to move the frequency up and
+	    down continuously. Buttons are used for intervals. Arrow keys can also
+	    be used to move up and down, or between columns.</p>
+	  <p><img alt="widget" src="./pitchslider0a.svg" title="Pitch Slider Block" /></p>
+	  <p><img alt="widget" src="./pitchslider2.svg" title="Pitch Slider-Two Column" /></p>
+	  <p>Clicking in a column will extract the corresponding <em>Note</em> blocks, for
+	    example:</p>
+	  <p><img alt="widget" src="./pitchslider3.svg" title="Pitch Slider-Two Columns Adjusting" /></p>
+	  <p><img alt="widget" src="./pitchslider4.svg" title="Pitch Slider block" /></p>
+	  <p><img alt="widget" src="./pitchslider5.svg" title="Pitch Slider block" /></p>
+	  <h3><a name="tempo">4.9 Changing Tempo</a></h3>
+	  <p>The <em>Tempo</em> block is used to launch a widget that enables the user to
+	    visualize Tempo, defined in beats per minute (BPM). When the <em>Tempo</em> block
+	    is clicked, the <em>Tempo</em> widget is initialized.</p>
+	  <p>The <em>Master Beats per Minute</em> block contained in the clamp of the
+	    <em>Tempo</em> block sets the initial tempo used by the widget. This
+	    determines the speed at which the ball in the widget moves back and
+	    forth. If BPM is <code>60</code>, then it will take one second for the ball to move
+	    across the widget. A round-trip would take two seconds.</p>
+	  <p><img alt="widget" src="./tempo0.svg" title="changing tempo" /></p>
+	  <p>The top row of the widget holds the <em>Play/pause</em> button, the <em>Speed
+	      up</em> and <em>Slow down</em> buttons, and an input field for updating the
+	    Tempo.</p>
+	  <p><img alt="widget" src="./tempo1.svg" title="changing tempo" /></p>
+	  <p>You can also update the tempo by clicking twice in spaced succession
+	    in the widget: the new beats per minute (BPM) is determined as the
+	    time between the two clicks. For example, if there is <code>1/2</code> second
+	    between clicks, the new BPM will be set as <code>120</code>.</p>
+	  <h3><a name="timbre">4.10 Custom Timbres</a></h3>
+	  <p>While Music Blocks comes with many built-in instruments, it is also
+	    possible to create custom timbres with unique sound qualities.</p>
+	  <p><img alt="widget" src="./timbre1.svg" title="the Timbre widget" /></p>
+	  <p>The <em>Timbre</em> block can be used to launch the <em>Timbre</em> widget, which
+	    lets you add synthesizers, oscillators, effects, and filters to create
+	    a custom timbre, which can be used in your Music Blocks programs.</p>
+	  <p>The name of the custom timbre is defined by the argument passed to the
+	    block (by default, <code>custom</code>). This name is passed to the <em>Set timbre</em>
+	    block in order to use your custom timbre.</p>
+	  <p><img alt="widget" src="./timbre2.svg" title="the Timbre widget toolbar" /></p>
+	  <p>The <em>Timbre</em> widget has a number of different panels, each of which is
+	    used to set the parameters of the components that define your custom
+	    timbre.</p>
+	  <ul>
+	    <li>The <em>Play</em> button, which lets you test the sound quality of your
+	      custom timbre. By default, it will play <code>Sol</code>, <code>Mi</code>, <code>Sol</code> using the
+	      combination of filters you define.</li>
+	  </ul>
+	  <p><img alt="widget" src="./timbre1a.svg" title="the notes inside Timbre block" /></p>
+	  <p>You can also put notes in the <em>Timbre</em> block to use for testing your
+	    sound. In the example above, a scale will be used for the test.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1736280874343528&amp;run=True">RUN LIVE</a></p>
+	  <ul>
+	    <li>The <em>Save</em> button, which will save your custom timbre for use in
+	      your program.</li>
+	  </ul>
+	  <p><img alt="widget" src="./timbre3.svg" title="select synth" /></p>
+	  <ul>
+	    <li>The <em>Synth</em> button, which lets you choose between an AM synth, a FM
+	      synth, or a Duo synth.</li>
+	  </ul>
+	  <p><img alt="widget" src="./timbre4.svg" title="select osc" /></p>
+	  <ul>
+	    <li>The <em>Oscillator</em> button, which lets you choose between a sine wave,
+	      square wave, triangle wave, or sawtooth wave. You can also change
+	      the number of partials.</li>
+	  </ul>
+	  <p><img alt="widget" src="./timbre5.svg" title="set envelope" /></p>
+	  <ul>
+	    <li>The <em>Envelope</em> button, which lets you change the shape of the sound
+	      envelope, with controls for attack, decay, sustain, and release.</li>
+	  </ul>
+	  <p><img alt="widget" src="./timbre6.svg" title="select effect" /></p>
+	  <p><img alt="widget" src="./timbre6a.svg" title="tremolo" /></p>
+	  <ul>
+	    <li>The <em>Effects</em> button, which lets you add effects to your custom
+	      timbre: tremelo, vibrato, chorus, phaser, and distortion. When an
+	      effect is selected, additional controls will appear in the widget.</li>
+	  </ul>
+	  <p><img alt="widget" src="./timbre7.svg" title="select filter" /></p>
+	  <ul>
+	    <li>
+	      <p>The <em>Filter</em> button, which lets you choose between a number of
+		different filter types.</p>
+	    </li>
+	    <li>
+	      <p>The <em>Add filter</em> button, which lets you add addition filters to your
+		custom timbre.</p>
+	    </li>
+	    <li>
+	      <p>The <em>Undo</em> button.</p>
+	    </li>
+	  </ul>
+	  <p>As you add synthesizers, effects, and filters with the widget, blocks
+	    corresponding to your choices are added to the <em>Timbre</em> block. This
+	    lets you reopen the widget to fine-tune your custom timbre.</p>
+	  <h3><a name="keyboard">4.11 The Music Keyboard</a></h3>
+	  <p>The Music Keyboard is used to generate notes by pressing keys of a virtual
+	    keyboard.</p>
+	  <p>When there are no <em>Pitch</em> blocks inside the widget clamp, a keyboard with
+	    all keys between C4 and G5 is created.</p>
+	  <p><img alt="widget" src="./keyboard1.svg" title="keyboard block without clamp" /></p>
+	  <p><img alt="widget" src="./keyboard2.svg" title="keyboard widget without clamp" /></p>
+	  <p>When there are <em>Pitch</em> blocks inside the widget clamp, a keyboard with
+	    only those pitches is created.</p>
+	  <p>Click on the keys to hear sounds. Click on the Play button to playback
+	    all of the notes played. Click on the Save button to output code (a
+	    series of <em>Note</em> blocks). The Clear button is used to delete all keys
+	    pressed previously in order to start new.</p>
+	  <p>The MIDI input allows for a using a MIDI device to generate notes.</p>
+	  <p>The metronome feature will generate a beat to enable candence.</p>
+	  <h3><a name="temperament">4.12 Changing Temperament</a></h3>
+	  <p><em>Tempering</em> is the process of altering the size of an interval by
+	    making it narrower or wider than pure. It is also possible to change
+	    and create different tuning systems.</p>
+	  <p><img alt="widget" src="./temperament1.svg" title="the Temperament block" /></p>
+	  <p><a href="https://musicblocks.sugarlabs.org/index.html?id=1725879922065766&amp;run=True">RUN LIVE</a></p>
+	  <p>The <em>Temperament</em> block is used to launch a widget that enables the
+	    user to visualize and edit notes within an octave.</p>
+	  <p>You can select a temperament system from the pie menu which is passed
+	    as an argument to the block. This name is passed to the <em>Set
+	      temperament</em> block in order to play the notes in selected temperament
+	    system. <em>Starting Pitch</em> is the argument of pitch block inside
+	    temperament block. In the above example, starting pitch is <code>C4</code>.</p>
+	  <p><img alt="widget" src="./temperament2.svg" title="the Temperament widget" /></p>
+	  <p>In the above example, selected temperament is <em>Just Intonation</em>. Notes
+	    within an octave can be viewed in the form of circle. These circles
+	    represent <em>pitch numbers</em>. Note that the pitches that are closer
+	    together in selected temperament system are visually closer and
+	    pitches that are farther apart looks farther.</p>
+	  <p>The information regarding any note can be viewed by clicking on the
+	    respective circle. In the above example, circle (pitch number) <code>2</code> is
+	    <code>D4</code>. The frequency of note can be changed through edit button (left
+	    hand side corner of note information popup).</p>
+	  <p><img alt="widget" src="./temperament3.svg" title="the Temperament widget" /></p>
+	  <p>Information regarding notes can also be viewed in the form of a
+	    <em>table</em> as shown in the above example. The table will show all the
+	    information about pitches that lie within an octave. This information
+	    includes <em>pitch number</em>, <em>interval</em>, <em>ratio</em>, <em>note</em>, <em>frequency</em> and
+	    <em>mode</em>.</p>
+	  <p>The frequency of any note is calculated by <code>Starting Pitch Frequency</code>
+	    x <code>Ratio</code>.</p>
+	  <p>The widget controls are as follows:</p>
+	  <p>The <em>Clear</em> button at the bottom of the widget will clear all pitches
+	    except for a single <code>0</code> from which the user may add pitches.</p>
+	  <p>The <em>Play all</em> button will play through all the pitches in an octave
+	    and then it will play backwards down the pitches.</p>
+	  <p>The <em>Save</em> button will save custom temperament for use in your
+	    program. It will create a <em>set temperament</em> block. This block will
+	    tune the notes attached to it according to the selected temperament.</p>
+	  <p>The <em>Table</em> button is used to toggle between circular and tabular
+	    representation of notes.</p>
+	  <p>The <em>Add</em> button is used to edit notes through different tools:</p>
+	  <p><img alt="widget" src="./temperament4.svg" title="Equal Edit tool" /></p>
+	  <p><img alt="widget" src="./temperament4a.svg" title="Temperament widget with new element" /></p>
+	  <p>The <code>Equal</code> edit tool is used to make <em>equal divisions</em> between two
+	    pitch numbers.  In the above example, two equal divisions are made
+	    between pitch numbers <code>0</code> and <code>1</code> and the resultant number of notes
+	    within an octave are changed from 12 to 13.</p>
+	  <p><img alt="widget" src="./temperament5.svg" title="Ratio Edit tool" /></p>
+	  <p><img alt="widget" src="./temperament5a.svg" title="Temperament widget with new element" /></p>
+	  <p>The <code>Ratio</code> tool is used to add notes of specified ratios in such a
+	    way that the resultant pitches wrap inside a single octave. Recursion
+	    represents the number of times notes ratio calculation is repeated. In
+	    the above example, 2 notes are added in pitch space and the resultant
+	    number of notes within an octave are changed from 12 to 14. Frequency
+	    of first pitch is (Starting Pitch Frequency) * (16/13) and second
+	    pitch is (Starting Pitch Frequency) * (16/13)².</p>
+	  <p><img alt="widget" src="./temperament6.svg" title="Arbitrary Edit tool" /></p>
+	  <p>The <code>Arbitrary</code> edit tool is used to add a note in an arbitrary
+	    position. In this panel, whenever the user hovers over the outer
+	    circle, a frequency-slider window pops up, allowing the user to add a
+	    note according to a chosen frequency. In the above example, a new note
+	    will be added somewhere between pitch numbers <code>2</code> and <code>3</code> by adjusting
+	    the frequency slider.</p>
+	  <p><img alt="widget" src="./temperament7.svg" title="Octave Space Edit tool" /></p>
+	  <p>The <code>Octave Space</code> tool is used to edit the octave ratio. The standard
+	    octave space is 2:1. In the above example, octave space will be
+	    changed to 3:1 after clicking on <code>Done</code>.</p>
+	  <p>The <em>Drag</em> button will drag the widget.</p>
+	  <p>The <em>Close</em> button will close the widget.</p>
+	  <h3><a name="oscilloscope">4.13 The Oscilloscope</a></h3>
+	  <p>Music Blocks has an Oscilloscope Widget to visualize the music as it
+	    plays.</p>
+	  <p><img alt="widget" src="./oscilloscope1.svg" title="Oscilloscope" /></p>
+	  <p><img alt="widget" src="./oscilloscope2.svg" title="Oscilloscope" /></p>
+	  <p>A separate wave will be displayed for each mouse.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1725883406989554&amp;run=True">RUN LIVE</a></p>
+	  <h3><a name="sampler">4.14 The Sampler</a></h3>
+	  <p><img alt="widget" src="../documentation/sampler_block.svg" title="Sampler" /></p>
+	  <p>You can import sound samples (.WAV files) and use them with the <em>Set
+	      Instrument" block. The </em>Sampler* widget lets you set the center pitch
+	    of your sample so that it can be tuned.</p>
+	  <p>The pitch selector displays both the note name (such as A4) and its corresponding frequency in Hertz (Hz). This helps you understand the mathematical relationship between musical notes and sound frequencies - each octave represents a doubling of frequency (e.g., A4 is 440 Hz while A5 is 880 Hz).</p>
+	  <h3>How to import sound samples ?</h3>
+	  <p>By clicking the upload samples icon or by perfoming a drag and drop to sample canvas.  </p>
+	  <p><img alt="widget" src="./sampler1.svg" title="Sampler Widget" /></p>
+	  <p>You can then use the <em>Sample</em> block as you would any input to the <em>Set
+	      Instrument</em> block.</p>
+	  <p><img alt="widget" src="./sampler2.svg" title="Sampler Widget" /></p>
+	  <p><a href="https://musicblocks.sugarlabs.org/index.html?id=1725883527894966&amp;run=True">RUN LIVE</a></p>
+	  <h3><a name="arpeggio">4.15 Arpeggio</a></h3>
+	  <p><img alt="widget" src="../documentation/arpeggiomatrix_block.svg" title="Arpeggio Widget" /></p>
+	  <p>You can design custom sequences to use with the <em>Arpeggio</em> block using
+	    the <em>Arpeggio</em> widget. The widget lets you "paint" intervals that are
+	    then saved to a "custom" chord, which can be used with the <em>Arpeggio</em>
+	    block.</p>
+	  <p>The numeric argument to the widget block, <code>12</code> in the figure
+	    above, designates the number of columns. The widget always provides a
+	    range of half-steps (one octave in the default a <a href="#412-changing-temperament">12-step
+	      equal-temperament tuning</a>). (If you are in
+	    a temperament with more notes per ocatve, the grid will expand.) The
+	    rows that represent notes in the current mode are highlighted.</p>
+	  <p><img alt="widget" src="./arpeggio_widget.svg" title="Arpeggio_widget" /></p>
+	  <p>The horizonal axis is time and the verical axis is half-step offsets
+	    from the base note.</p>
+	  <p>The sequence in the pattern above is <code>do mi sol do do mi do sol mi
+	      do do sol</code>.</p>
+	  <p><img alt="widget" src="../documentation/custom_arpeggio.svg" title="Custom Arpeggio" /></p>
+	  <p><a href="https://musicblocks.sugarlabs.org/index.html?id=1725883915389933&amp;run=True">RUN LIVE</a></p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

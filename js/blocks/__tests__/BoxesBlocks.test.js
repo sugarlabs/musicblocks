@@ -423,4 +423,79 @@ describe("setupBoxesBlocks", () => {
             expect(logo.boxes["box1Key"]).toBe(777);
         });
     });
+    describe("AddToBlock lang=ja beginnerMode", () => {
+        test("covers beginnerMode + lang=ja constructor branch (line 52)", () => {
+            global._mockLang = "ja";
+            const reg2 = {};
+            class JaBlock {
+                constructor(name) {
+                    this.name = name;
+                    this.lang = "ja";
+                    reg2[name] = this;
+                }
+                setPalette() {
+                    return this;
+                }
+                beginnerBlock() {
+                    return this;
+                }
+                setHelpString() {
+                    return this;
+                }
+                formBlock() {
+                    return this;
+                }
+                makeMacro() {
+                    return this;
+                }
+                setup() {
+                    return this;
+                }
+            }
+            global.FlowBlock = JaBlock;
+            global.ValueBlock = JaBlock;
+            global.LeftBlock = JaBlock;
+            const jaActivity = { ...activity, beginnerMode: true };
+            setupBoxesBlocks(jaActivity);
+            expect(Object.keys(reg2).length).toBeGreaterThan(0);
+            global.FlowBlock = DummyFlowBlock;
+            global.ValueBlock = DummyValueBlock;
+            global.LeftBlock = DummyLeftBlock;
+        });
+    });
+
+    describe("NamedBoxBlock setter missing box (line 441)", () => {
+        test("setter calls errorMsg when named box does not exist", () => {
+            const namedBoxBlock = createdBlocks["namedbox"];
+            const testBlk = 140;
+            activity.blocks.blockList[testBlk] = {
+                privateData: "missingKey",
+                connections: []
+            };
+            delete logo.boxes["missingKey"];
+            namedBoxBlock.setter(logo, 42, "turtle0", testBlk);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                global.NOBOXERRORMSG,
+                testBlk,
+                "missingKey"
+            );
+        });
+    });
+
+    describe("NamedBoxBlock statusFields push (line 460)", () => {
+        test("arg pushes to statusFields when inStatusMatrix and connected block is print", () => {
+            const namedBoxBlock = createdBlocks["namedbox"];
+            const testBlk = 140;
+            activity.blocks.blockList[testBlk] = {
+                privateData: "namedBoxKey",
+                connections: [500],
+                name: "namedbox"
+            };
+            activity.blocks.blockList[500] = { name: "print" };
+            logo.inStatusMatrix = true;
+            logo.boxes["namedBoxKey"] = 77;
+            namedBoxBlock.arg(logo, "turtle0", testBlk);
+            expect(logo.statusFields).toContainEqual([testBlk, "namedbox"]);
+        });
+    });
 });

@@ -18,7 +18,7 @@
  * Internal functions' names are in PascalCase.
  */
 
-/* global JSEditor, last, importMembers, Singer, JSInterface, globalActivity */
+/* global JSEditor, last, importMembers, Singer, JSInterface, globalActivity, CAMERAVALUE */
 
 /**
  * @class
@@ -50,7 +50,7 @@ class Mouse {
         this.turtle.initTurtle(false);
 
         this.flow = flow;
-        // eslint-disable-next-line no-use-before-define
+
         this.MB = new MusicBlocks(this); // associate a MusicBlocks object with each Mouse
 
         Mouse.MouseList.push(this);
@@ -207,7 +207,10 @@ class MusicBlocks {
         // Remove any listeners that might be still active
         for (const mouse of Mouse.MouseList) {
             for (const listener in mouse.turtle.listeners) {
-                if (globalActivity.logo.stage && mouse.turtle.listeners.hasOwnProperty(listener)) {
+                if (
+                    globalActivity.logo.stage &&
+                    Object.prototype.hasOwnProperty.call(mouse.turtle.listeners, listener)
+                ) {
                     globalActivity.logo.stage.removeEventListener(
                         listener,
                         mouse.turtle.listeners[listener],
@@ -316,6 +319,25 @@ class MusicBlocks {
         }
     }
 
+    // ============================== BOXES ==================================
+
+    getBox(name) {
+        if (name in globalActivity.logo.boxes) {
+            return globalActivity.logo.boxes[name];
+        }
+        JSEditor.logConsole(`No box named "${name}"`, "maroon");
+        return 0;
+    }
+
+    setBox(name, value) {
+        globalActivity.logo.boxes[name] = value;
+    }
+
+    incrementBox(name, delta) {
+        const current = name in globalActivity.logo.boxes ? globalActivity.logo.boxes[name] : 0;
+        globalActivity.logo.boxes[name] = current + delta;
+    }
+
     // ========= Getters/Setters ===================================================================
 
     // ============================== GRAPHICS ================================
@@ -330,6 +352,19 @@ class MusicBlocks {
 
     get HEADING() {
         return this.turtle.orientation;
+    }
+
+    get BOTTOMPOS() {
+        const canvas = globalActivity.turtles._canvas;
+        const scale = globalActivity.turtles.scale;
+        if (!canvas || !canvas.height || !scale) {
+            return 0;
+        }
+        return -1 * (canvas.height / (2.0 * scale));
+    }
+
+    get CAMERA() {
+        return CAMERAVALUE;
     }
 
     // ================================ PEN ===================================

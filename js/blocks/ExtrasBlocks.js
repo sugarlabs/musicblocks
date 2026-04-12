@@ -518,7 +518,6 @@ function setupExtrasBlocks(activity) {
 
                         if (!tur.singer.suppressOutput) {
                             if (activity.blocks.blockList[cblk].name === "grid") {
-                                // eslint-disable-next-line no-use-before-define
                                 const temp = new DisplayGridBlock();
                                 temp.flow(args, logo, turtle, blk);
                             } else {

@@ -300,6 +300,40 @@ describe("MeterBlocks setup", () => {
         expect(measureBlock.arg(logo, 1, "measureBlk")).toBe(3);
         expect(beatBlock.arg(logo, 1, "beatBlk")).toBe(2);
     });
+    it("setter clamps BPM to 60 when NaN", () => {
+        const block = getBlock("bpmfactor");
+        const tur = { singer: { bpm: [120] } };
+        activity.turtles.ithTurtle.mockReturnValue(tur);
+        block.setter(logo, "notanumber", 0);
+        expect(tur.singer.bpm[0]).toBe(60);
+        expect(activity.errorMsg).toHaveBeenCalled();
+    });
+
+    it("setter clamps BPM to 30 when below minimum", () => {
+        const block = getBlock("bpmfactor");
+        const tur = { singer: { bpm: [120] } };
+        activity.turtles.ithTurtle.mockReturnValue(tur);
+        block.setter(logo, 10, 0);
+        expect(tur.singer.bpm[0]).toBe(30);
+        expect(activity.errorMsg).toHaveBeenCalled();
+    });
+
+    it("setter clamps BPM to 1000 when above maximum", () => {
+        const block = getBlock("bpmfactor");
+        const tur = { singer: { bpm: [120] } };
+        activity.turtles.ithTurtle.mockReturnValue(tur);
+        block.setter(logo, 9999, 0);
+        expect(tur.singer.bpm[0]).toBe(1000);
+        expect(activity.errorMsg).toHaveBeenCalled();
+    });
+
+    it("setter pushes BPM when bpm stack is empty", () => {
+        const block = getBlock("bpmfactor");
+        const tur = { singer: { bpm: [] } };
+        activity.turtles.ithTurtle.mockReturnValue(tur);
+        block.setter(logo, 120, 0);
+        expect(tur.singer.bpm[0]).toBe(120);
+    });
 
     it("counts notes and guards against missing inputs", () => {
         const noteCounter = getBlock("notecounter");
@@ -538,5 +572,94 @@ describe("MeterBlocks setup", () => {
 
         block.flow([6, 0.125], logo, 1, "meterBlk");
         expect(Singer.MeterActions.setMeter).toHaveBeenCalledWith(6, 0.125, 1);
+    });
+    it("bpmfactor arg pushes to statusFields when inStatusMatrix", () => {
+        const block = getBlock("bpmfactor");
+        activity.blocks.blockList.bpmBlk = { connections: ["printBlock"], value: 120 };
+        activity.blocks.blockList.printBlock = { name: "print" };
+        logo.inStatusMatrix = true;
+        block.arg(logo, 0, "bpmBlk");
+        expect(logo.statusFields).toContainEqual(["bpmBlk", "bpm"]);
+    });
+
+    it("notecounter arg returns 0 when connection is null", () => {
+        const block = getBlock("notecounter");
+        activity.blocks.blockList.ncBlk = { connections: [null, null] };
+        const result = block.arg(logo, 0, "ncBlk");
+        expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, "ncBlk");
+        expect(result).toBe(0);
+    });
+
+    it("notecounter2 arg returns 0 when connection is null", () => {
+        const block = getBlock("notecounter2");
+        activity.blocks.blockList.nc2Blk = { connections: [null, null] };
+        const result = block.arg(logo, 0, "nc2Blk");
+        expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, "nc2Blk");
+        expect(result).toBe(0);
+    });
+
+    it("elapsednotes2 arg pushes to statusFields when inStatusMatrix", () => {
+        const block = getBlock("elapsednotes2");
+        activity.blocks.blockList.en2Blk = { connections: ["printBlock3"], value: 0 };
+        activity.blocks.blockList.printBlock3 = { name: "print" };
+        logo.inStatusMatrix = true;
+        block.arg(logo, 0, "en2Blk");
+        expect(logo.statusFields).toContainEqual(["en2Blk", "elapsednotes2"]);
+    });
+
+    it("onbeatdo shows error when action not found", () => {
+        const block = getBlock("onbeatdo");
+        logo.actions = {};
+        block.flow([1, "missing"], logo, 0, "blk", null, [], false);
+        expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, "blk", "missing");
+    });
+
+    it("everybeatdonew shows error when action not found", () => {
+        const block = getBlock("everybeatdonew");
+        logo.actions = {};
+        block.flow(["missing"], logo, 0, "blk", null, [], false);
+        expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, "blk", undefined);
+    });
+
+    it("everybeatdo shows error when action not found", () => {
+        const block = getBlock("everybeatdo");
+        logo.actions = {};
+        block.flow(["missing"], logo, 0, "blk", null, [], false);
+        expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, "blk", undefined);
+    });
+
+    it("setter clamps BPM to 60 when value is not a number", () => {
+        const block = getBlock("bpmfactor");
+        const tur = { singer: { bpm: [120] } };
+        activity.turtles.ithTurtle.mockReturnValue(tur);
+        block.setter(logo, "notanumber", 0);
+        expect(tur.singer.bpm[0]).toBe(60);
+        expect(activity.errorMsg).toHaveBeenCalled();
+    });
+
+    it("setter clamps BPM to minimum of 30", () => {
+        const block = getBlock("bpmfactor");
+        const tur = { singer: { bpm: [120] } };
+        activity.turtles.ithTurtle.mockReturnValue(tur);
+        block.setter(logo, 10, 0);
+        expect(tur.singer.bpm[0]).toBe(30);
+        expect(activity.errorMsg).toHaveBeenCalled();
+    });
+
+    it("setter clamps BPM to maximum of 1000", () => {
+        const block = getBlock("bpmfactor");
+        const tur = { singer: { bpm: [120] } };
+        activity.turtles.ithTurtle.mockReturnValue(tur);
+        block.setter(logo, 9999, 0);
+        expect(tur.singer.bpm[0]).toBe(1000);
+        expect(activity.errorMsg).toHaveBeenCalled();
+    });
+
+    it("setter pushes BPM to empty stack", () => {
+        const block = getBlock("bpmfactor");
+        const tur = { singer: { bpm: [] } };
+        activity.turtles.ithTurtle.mockReturnValue(tur);
+        block.setter(logo, 120, 0);
+        expect(tur.singer.bpm[0]).toBe(120);
     });
 });

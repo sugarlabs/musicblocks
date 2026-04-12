@@ -65,6 +65,20 @@ class ReflectionMatrix {
          * @type {string}
          */
         this.code = "";
+
+        this.startChatTypingTimeout = null;
+    }
+
+    sanitizeLinks(html) {
+        return html.replace(/<a\s+[^>]*href\s*=\s*(['"]?)([^'">\s]+)\1/gi, (match, quote, url) => {
+            const unsafeSchemes = /^(javascript|data|vbscript):/i;
+
+            if (unsafeSchemes.test(url.trim())) {
+                return match.replace(url, "#");
+            }
+
+            return match;
+        });
     }
 
     /**
@@ -88,6 +102,10 @@ class ReflectionMatrix {
         widgetWindow.onclose = () => {
             this.isOpen = false;
             this.activity.isInputON = false;
+            if (this.startChatTypingTimeout) {
+                clearTimeout(this.startChatTypingTimeout);
+                this.startChatTypingTimeout = null;
+            }
             if (this.dotsInterval) {
                 clearInterval(this.dotsInterval);
             }
@@ -192,6 +210,7 @@ class ReflectionMatrix {
             this.startChatSession();
         }
 
+        widgetWindow.sendToCenter();
         activity.textMsg(_("Reflect on your project."), 3000);
     }
 
@@ -229,6 +248,11 @@ class ReflectionMatrix {
      * @returns {void}
      */
     hideTypingIndicator() {
+        if (this.startChatTypingTimeout) {
+            clearTimeout(this.startChatTypingTimeout);
+            this.startChatTypingTimeout = null;
+        }
+
         if (this.typingDiv) {
             clearInterval(this.dotsInterval);
             this.typingDiv.remove();
@@ -267,11 +291,14 @@ class ReflectionMatrix {
      *  @returns {Promise<void>}
      */
     async startChatSession() {
-        if (this.triggerFirst == true) return;
+        if (this.triggerFirst === true) return;
 
         this.triggerFirst = true;
-        setTimeout(() => {
-            this.showTypingIndicator("Reading code");
+        this.startChatTypingTimeout = setTimeout(() => {
+            this.startChatTypingTimeout = null;
+            if (this.isOpen) {
+                this.showTypingIndicator("Reading code");
+            }
         }, 1000);
 
         const code = await this.activity.prepareExport();
@@ -296,6 +323,7 @@ class ReflectionMatrix {
     async updateProjectCode() {
         const code = await this.activity.prepareExport();
         if (code === this.code) {
+            this.activity.textMsg(_("No changes were detected in your project."), 2500);
             return; // No changes in code
         }
 
@@ -439,7 +467,6 @@ class ReflectionMatrix {
         let reply;
         // check if message is from user or bot
         if (user_query === true) {
-            if (this.typingDiv) return;
             reply = await this.generateBotReply(
                 message,
                 this.chatHistory,
@@ -479,7 +506,10 @@ class ReflectionMatrix {
         const botReply = document.createElement("div");
 
         if (md) {
-            botReply.innerHTML = this.mdToHTML(reply.response);
+            const safeText = escapeHTML(reply.response);
+            let html = this.mdToHTML(safeText);
+            html = this.sanitizeLinks(html);
+            botReply.innerHTML = html;
         } else {
             botReply.innerText = reply.response;
         }
@@ -498,6 +528,9 @@ class ReflectionMatrix {
     sendMessage() {
         const text = this.input.value.trim();
         if (text === "") return;
+
+        // Prevent sending while the bot is still processing a previous query
+        if (this.typingDiv) return;
         this.chatHistory.push({
             role: "user",
             content: text
@@ -615,22 +648,6 @@ class ReflectionMatrix {
     }
 
     /**
-     * Escapes HTML special characters to prevent XSS attacks.
-     * @param {string} text - The text to escape.
-     * @returns {string} - The escaped text.
-     */
-    escapeHTML(text) {
-        const escapeMap = {
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#x27;"
-        };
-        return text.replace(/[&<>"']/g, char => escapeMap[char]);
-    }
-
-    /**
      * Sanitizes HTML content using DOMParser to prevent XSS.
      * Removes unsafe attributes and ensures links are safe.
      * @param {string} htmlString - The HTML string to sanitize.
@@ -681,7 +698,7 @@ class ReflectionMatrix {
      */
     mdToHTML(md) {
         // Step 1: Escape HTML first to prevent XSS attacks from raw tags
-        let html = this.escapeHTML(md);
+        let html = escapeHTML(md);
 
         // Step 2: Convert Markdown syntax to HTML
 

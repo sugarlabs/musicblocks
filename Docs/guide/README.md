@@ -113,13 +113,13 @@ may have to use a local server to expose all of the features.)
 
 This guide details the music-specific features of Music Blocks.  You
 may also be interested in the [Turtle Blocks
-Guide](http://github.com/sugarlabs/turtleblocksjs/tree/master/guide),
+Guide](https://github.com/sugarlabs/turtleblocksjs/tree/master/guide),
 which reviews many programming features common to both projects.
 
 For more details on how to use Music Blocks, see [Using Music
-Blocks](http://github.com/sugarlabs/musicblocks/tree/master/documentation).
+Blocks](https://github.com/sugarlabs/musicblocks/tree/master/documentation).
 For more details on how to use Turtle Blocks, see [Using Turtle Blocks
-JS](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
+JS](https://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
 
 ## <a name="NOTES">2. Making Sounds</a>
 
