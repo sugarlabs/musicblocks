@@ -184,7 +184,7 @@ const enableWheelScroll = (wheel, itemCount) => {
 // Accessibility helpers for pie menus (screen reader announcements)
 /**
  * this function is to ensure that the pie menu live region is created and returned
-*/
+ */
 const __ensurePieMenuLiveRegion = () => {
     let liveRegion = docById("pieMenuLiveRegion");
     if (liveRegion) {
@@ -204,10 +204,9 @@ const __ensurePieMenuLiveRegion = () => {
     return liveRegion;
 };
 
-
 /**
  * this function is to get the aria label from the title of the pie menu item
-*/
+ */
 const __pieMenuA11yLabelFromTitle = title => {
     if (title === null || title === undefined) {
         return "";
@@ -248,8 +247,8 @@ const __announcePieMenuLabel = label => {
     }
     /**
      * this logic is to prevent any duplicate announcements
-    * i.e if the same label is announced within 400ms, it will not be announced again
-    */
+     * i.e if the same label is announced within 400ms, it will not be announced again
+     */
     const now = Date.now();
     if (
         window.__wheelnavA11yLastLabel === trimmed &&
@@ -266,7 +265,7 @@ const __announcePieMenuLabel = label => {
 
 /**
  * this function is to speak the pie menu label to the screen reader
-*/
+ */
 const __speakPieMenuLabel = label => {
     const trimmed = String(label || "").trim();
     if (!trimmed) {
@@ -280,7 +279,7 @@ const __speakPieMenuLabel = label => {
     if (window.__wheelnavA11ySpeakEnabled === false) {
         return;
     }
-    
+
     try {
         window.speechSynthesis.cancel(); //Stop any current speech so the new label replaces it immediately.
         const utterance = new SpeechSynthesisUtterance(trimmed);
@@ -310,6 +309,8 @@ window.__wheelnavA11yAnnounce = navItem => {
 window.__wheelnavA11ySpeak = navItem => {
     const label = __pieMenuA11yLabelFromTitle(navItem && navItem.title);
     __speakPieMenuLabel(label);
+};
+
 // Ensure exit wheels behave like stateless buttons (no sticky selection)
 const configureExitWheel = exitWheel => {
     if (!exitWheel || !exitWheel.navItems) {
@@ -4605,5 +4606,4 @@ const piemenuDissectNumber = widget => {
             widget._dissectNumber.value = newValue;
         }
     };
-};
 };

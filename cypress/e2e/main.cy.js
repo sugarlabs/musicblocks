@@ -14,10 +14,8 @@ describe("MusicBlocks Application", () => {
     before(() => {
         cy.visit("http://localhost:3000");
         // Wait for loading to complete before any tests run
-        cy.get("#loading-image-container", { timeout: 20000 })
-            .should("not.be.visible");
-        cy.contains("#loadingText", "Loading Complete!", { timeout: 20000 })
-            .should("be.visible");
+        cy.get("#loading-image-container", { timeout: 20000 }).should("not.be.visible");
+        cy.contains("#loadingText", "Loading Complete!", { timeout: 20000 }).should("be.visible");
         cy.wait(2000); // Additional buffer for UI to fully render
     });
 
@@ -116,7 +114,7 @@ describe("MusicBlocks Application", () => {
         it("should verify sidebar elements exist, are visible, and clickable", () => {
             // Ensure loading overlay is gone
             cy.get("#loading-image-container").should("not.be.visible");
-            
+
             const sidebarElements = [
                 "thead > tr > :nth-child(1) > img",
                 "tr > :nth-child(2) > img",
