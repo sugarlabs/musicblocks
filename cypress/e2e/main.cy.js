@@ -84,7 +84,7 @@ describe("MusicBlocks Application", () => {
 
         it("should display all file save options", () => {
             cy.get("#hideContents").should("be.visible");
-            cy.get("#saveButton").should("be.visible").click();          
+            cy.get("#saveButton").should("be.visible").click();
             cy.get("#saveddropdownbeg").should("be.visible");
             cy.get("#save-html-beg").should("exist");
             cy.get("#save-png-beg").should("exist");
