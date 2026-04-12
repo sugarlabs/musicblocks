@@ -1262,7 +1262,10 @@ describe("Toolbar Class", () => {
             onclick: null,
             classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn(() => false) },
             style: { display: "block" },
-            innerHTML: ""
+            innerHTML: "",
+            addEventListener: jest.fn(),
+            querySelector: jest.fn(() => ({ textContent: "" })),
+            contains: jest.fn(() => false)
         };
         global.docById.mockImplementation(id => {
             if (id === "beginnerMode") return begIcon;
