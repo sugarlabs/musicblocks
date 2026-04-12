@@ -88,7 +88,10 @@ window.widgetWindows = {
         show: jest.fn(),
         destroy: jest.fn(),
         addButton: jest.fn().mockImplementation(() => ({
-            onclick: () => {}
+            onclick: () => {},
+            appendChild: jest.fn(),
+            textContent: "",
+            innerHTML: ""
         })),
         addInputButton: jest.fn().mockReturnValue({ value: 0, addEventListener: jest.fn() }), // Add this as it might be used
         getWidgetBody: jest.fn().mockReturnValue({
@@ -132,10 +135,12 @@ if (document.createElement) {
         return {
             style: {},
             innerHTML: "",
+            textContent: "",
             children: [],
             className: "",
             append: jest.fn(),
             appendChild: jest.fn(),
+            setAttribute: jest.fn(),
             getContext: jest.fn().mockReturnValue({
                 // For canvas if needed
                 clearRect: jest.fn(),
@@ -154,10 +159,12 @@ if (document.createElement) {
         return {
             style: {},
             innerHTML: "",
+            textContent: "",
             children: [],
             className: "",
             append: jest.fn(),
             appendChild: jest.fn(),
+            setAttribute: jest.fn(),
             getContext: jest.fn().mockReturnValue({
                 clearRect: jest.fn(),
                 beginPath: jest.fn(),

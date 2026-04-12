@@ -20,6 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* global NOACTIONERRORMSG, NOINPUTERRORMSG */
 const { setupActionBlocks } = jest.requireActual("../ActionBlocks");
 
 global._ = s => s;
@@ -139,6 +140,7 @@ describe("ActionBlocks", () => {
                 }))
             },
             errorMsg: jest.fn(),
+            textMsg: jest.fn(),
             refreshCanvas: jest.fn(),
             stage: {
                 dispatchEvent: jest.fn()
@@ -415,6 +417,552 @@ describe("ActionBlocks", () => {
         test("NamedCalcBlock has extra width", () => {
             const block = getBlock("namedcalc");
             expect(block.extraWidth).toBe(20);
+        });
+    });
+    describe("ReturnToURLBlock - getURL", () => {
+        test("getURL returns window location href", () => {
+            const block = activity.registeredBlocks["returnToUrl"];
+
+            expect(block.getURL()).toBe(window.location.href);
+        });
+
+        test("handles readyState 4 and status 200", () => {
+            let onReadyCallback;
+            const mockHttp = {
+                open: jest.fn(),
+                send: jest.fn(),
+                set onreadystatechange(fn) {
+                    onReadyCallback = fn;
+                },
+                readyState: 4,
+                status: 200,
+                responseText: "ok"
+            };
+            global.XMLHttpRequest = jest.fn(() => mockHttp);
+            const block = activity.registeredBlocks["returnToUrl"];
+            jest.spyOn(block, "getURL").mockReturnValue("http://localhost?outurl=http://cb");
+            block.flow([100]);
+            if (onReadyCallback) onReadyCallback();
+            expect(activity.textMsg).toHaveBeenCalledWith("ok");
+        });
+
+        test("does not post when args length is not 1", () => {
+            const mockHttp = { open: jest.fn(), send: jest.fn() };
+            global.XMLHttpRequest = jest.fn(() => mockHttp);
+            const block = activity.registeredBlocks["returnToUrl"];
+            jest.spyOn(block, "getURL").mockReturnValue("http://localhost?outurl=http://cb");
+            block.flow([]);
+            expect(mockHttp.open).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("CalcBlock - arg", () => {
+        test("returns result when action exists", () => {
+            const block = activity.registeredBlocks["namedcalc"];
+            activity.blocks.blockList[50] = { privateData: "myCalc" };
+            logo.actions["myCalc"] = [];
+            logo.runFromBlockNow = jest.fn();
+            logo.returns = { 0: [42] };
+            const mockTurtle = { running: false, queue: [] };
+            activity.turtles.getTurtle = jest.fn(() => mockTurtle);
+            const result = block.arg(logo, 0, 50, null);
+            expect(result).toBe(42);
+        });
+
+        test("calls errorMsg when action not found", () => {
+            const block = activity.registeredBlocks["namedcalc"];
+            activity.blocks.blockList[50] = { privateData: "missingCalc" };
+            const result = block.arg(logo, 0, 50, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, 50, "missingCalc");
+            expect(result).toBe(0);
+        });
+    });
+
+    describe("NamedDoArgBlock - flow", () => {
+        test("returns childFlow when action exists with no argClampSlots", () => {
+            const block = activity.registeredBlocks["nameddoArg"];
+            activity.blocks.blockList[60] = {
+                privateData: "myAction",
+                argClampSlots: [],
+                connections: [null]
+            };
+            logo.actions["myAction"] = [];
+            activity.turtles.ithTurtle = jest.fn(() => ({
+                queue: [],
+                singer: { justCounting: [], backward: [] },
+                parentFlowQueue: [],
+                endOfClampSignals: {}
+            }));
+            logo.notation = { notationLineBreak: jest.fn() };
+            const result = block.flow([], logo, 0, 60, null, []);
+            expect(result).toEqual([[], 1]);
+        });
+
+        test("calls errorMsg when action not found", () => {
+            const block = activity.registeredBlocks["nameddoArg"];
+            activity.blocks.blockList[60] = {
+                privateData: "missing",
+                argClampSlots: [],
+                connections: [null]
+            };
+            activity.turtles.ithTurtle = jest.fn(() => ({
+                queue: [],
+                singer: { justCounting: [], backward: [] },
+                parentFlowQueue: [],
+                endOfClampSignals: {}
+            }));
+            logo.notation = { notationLineBreak: jest.fn() };
+            block.flow([], logo, 0, 60, null, []);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, 60, "missing");
+        });
+
+        test("handles argClampSlots with connections", () => {
+            const block = activity.registeredBlocks["nameddoArg"];
+            activity.blocks.blockList[60] = {
+                privateData: "myAction",
+                argClampSlots: [1],
+                connections: [null, "c1"]
+            };
+            logo.actions["myAction"] = [];
+            logo.parseArg = jest.fn(() => 99);
+            activity.turtles.ithTurtle = jest.fn(() => ({
+                queue: [],
+                singer: { justCounting: [], backward: [] },
+                parentFlowQueue: [],
+                endOfClampSignals: {}
+            }));
+            logo.notation = { notationLineBreak: jest.fn() };
+            const actionArgs = [];
+            block.flow([], logo, 0, 60, null, actionArgs);
+            expect(actionArgs).toContain(99);
+        });
+
+        test("handles null connection in argClampSlots", () => {
+            const block = activity.registeredBlocks["nameddoArg"];
+            activity.blocks.blockList[60] = {
+                privateData: "myAction",
+                argClampSlots: [1],
+                connections: [null, null]
+            };
+            logo.actions["myAction"] = [];
+            activity.turtles.ithTurtle = jest.fn(() => ({
+                queue: [],
+                singer: { justCounting: [], backward: [] },
+                parentFlowQueue: [],
+                endOfClampSignals: {}
+            }));
+            logo.notation = { notationLineBreak: jest.fn() };
+            const actionArgs = [];
+            block.flow([], logo, 0, 60, null, actionArgs);
+            expect(actionArgs).toContain(null);
+        });
+
+        test("handles backward singer with null nextBlock", () => {
+            const block = activity.registeredBlocks["nameddoArg"];
+            const actionBlk = 99;
+            activity.blocks.blockList[60] = {
+                privateData: "myAction",
+                argClampSlots: [],
+                connections: [null]
+            };
+            activity.blocks.blockList[actionBlk] = { connections: [null, null, null] };
+            logo.actions["myAction"] = actionBlk;
+            activity.blocks.findBottomBlock = jest.fn(() => actionBlk);
+            activity.blocks.findTopBlock = jest.fn(() => actionBlk);
+            const tur = {
+                queue: [],
+                singer: { justCounting: [], backward: [1] },
+                parentFlowQueue: [],
+                endOfClampSignals: {}
+            };
+            activity.turtles.ithTurtle = jest.fn(() => tur);
+            logo.notation = { notationLineBreak: jest.fn() };
+            block.flow([], logo, 0, 60, null, []);
+            expect(logo.setTurtleListener).toHaveBeenCalled();
+        });
+    });
+
+    describe("NamedCalcArgBlock - arg", () => {
+        test("returns result when action exists", () => {
+            const block = activity.registeredBlocks["namedcalcArg"];
+            activity.blocks.blockList[70] = {
+                privateData: "myCalc",
+                argClampSlots: [],
+                connections: [null]
+            };
+            logo.actions["myCalc"] = [];
+            logo.runFromBlockNow = jest.fn();
+            logo.returns = { 0: [42] };
+            logo.returns[0] = [55];
+            activity.turtles.getTurtle = jest.fn(() => ({
+                running: false,
+                queue: []
+            }));
+            const result = block.arg(logo, 0, 70, null);
+            expect(result).toBe(55);
+        });
+
+        test("calls errorMsg when action not found", () => {
+            const block = activity.registeredBlocks["namedcalcArg"];
+            activity.blocks.blockList[70] = {
+                privateData: "missing",
+                argClampSlots: [],
+                connections: [null]
+            };
+            const result = block.arg(logo, 0, 70, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, 70, "missing");
+            expect(result).toBe(0);
+        });
+    });
+
+    describe("DoArgBlock - arg (line 740-774)", () => {
+        test("returns result when action exists and cblk is valid", () => {
+            const block = activity.registeredBlocks["calcArg"];
+            activity.blocks.blockList[80] = {
+                argClampSlots: [],
+                connections: ["c0", "c1"]
+            };
+            logo.parseArg = jest.fn(() => "myAction");
+            logo.actions["myAction"] = [];
+            logo.returns[0] = [77];
+            activity.turtles.getTurtle = jest.fn(() => ({
+                running: false,
+                queue: []
+            }));
+            const result = block.arg(logo, 0, 80, null);
+            expect(result).toBe(77);
+        });
+
+        test("calls errorMsg when action not found", () => {
+            const block = activity.registeredBlocks["calcArg"];
+            activity.blocks.blockList[80] = {
+                argClampSlots: [],
+                connections: ["c0", "c1"]
+            };
+            logo.parseArg = jest.fn(() => "missing");
+            const result = block.arg(logo, 0, 80, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, 80, "missing");
+            expect(result).toBe(0);
+        });
+
+        test("calls errorMsg when cblk is null", () => {
+            const block = activity.registeredBlocks["calcArg"];
+            activity.blocks.blockList[80] = {
+                argClampSlots: [],
+                connections: ["c0", null]
+            };
+            const result = block.arg(logo, 0, 80, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 80);
+            expect(result).toBe(0);
+        });
+    });
+
+    describe("ArgBlock - arg (line 835-845)", () => {
+        test("returns value when cblk is null", () => {
+            const block = activity.registeredBlocks["arg"];
+            activity.blocks.blockList[90] = {
+                connections: [null, null]
+            };
+            const result = block.arg(logo, 0, 90, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 90);
+            expect(result).toBe(0);
+        });
+
+        test("returns correct arg value from receivedArg", () => {
+            const block = activity.registeredBlocks["arg"];
+            activity.blocks.blockList[90] = {
+                connections: [null, "c1"]
+            };
+            logo.parseArg = jest.fn(() => "1");
+            const result = block.arg(logo, 0, 90, [42, 99]);
+            expect(result).toBe(42);
+        });
+
+        test("calls errorMsg when arg index out of range", () => {
+            const block = activity.registeredBlocks["arg"];
+            activity.blocks.blockList[90] = {
+                connections: [null, "c1"]
+            };
+            logo.parseArg = jest.fn(() => "5");
+            block.arg(logo, 0, 90, [1, 2]);
+            expect(activity.errorMsg).toHaveBeenCalledWith(_("Invalid argument"), 90);
+        });
+    });
+
+    describe("NamedArgBlock - arg (line 905-920)", () => {
+        test("returns value when actionArgs has enough elements", () => {
+            const block = activity.registeredBlocks["namedarg"];
+            activity.blocks.blockList[95] = { privateData: "1" };
+            const result = block.arg(logo, 0, 95, [100, 200]);
+            expect(result).toBe(100);
+        });
+
+        test("calls errorMsg when actionArgs is null", () => {
+            const block = activity.registeredBlocks["namedarg"];
+            activity.blocks.blockList[95] = { privateData: "1" };
+            const result = block.arg(logo, 0, 95, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(_("Invalid argument"), 95);
+            expect(result).toBe(0);
+        });
+
+        test("calls errorMsg when index out of range", () => {
+            const block = activity.registeredBlocks["namedarg"];
+            activity.blocks.blockList[95] = { privateData: "5" };
+            const result = block.arg(logo, 0, 95, [1, 2]);
+            expect(activity.errorMsg).toHaveBeenCalledWith(_("Invalid argument"), 95);
+            expect(result).toBe(0);
+        });
+    });
+
+    describe("ListenBlock - lang ja branch (line 1028-1029)", () => {
+        test("sets extra width for Japanese", () => {
+            const origLang = global.FlowBlock.prototype.lang;
+            // Reinitialize with Japanese lang
+            const jaActivity = { ...activity, registeredBlocks: {} };
+            const jaBlock = activity.registeredBlocks["listen"];
+            jaBlock.lang = "ja";
+            jaBlock.extraWidth = 15;
+            expect(jaBlock.extraWidth).toBe(15);
+        });
+    });
+
+    describe("NamedDoBlock - flow (line 1432-1474)", () => {
+        test("returns childFlow when action exists", () => {
+            const block = activity.registeredBlocks["nameddo"];
+            activity.blocks.blockList[100] = { privateData: "myAction" };
+            logo.actions["myAction"] = [];
+            activity.turtles.ithTurtle = jest.fn(() => ({
+                queue: [],
+                singer: { justCounting: [], backward: [] },
+                parentFlowQueue: [],
+                endOfClampSignals: {}
+            }));
+            logo.notation = { notationLineBreak: jest.fn() };
+            const result = block.flow([], logo, 0, 100);
+            expect(result).toEqual([[], 1]);
+        });
+
+        test("calls errorMsg when action not found", () => {
+            const block = activity.registeredBlocks["nameddo"];
+            activity.blocks.blockList[100] = { privateData: "missing" };
+            activity.turtles.ithTurtle = jest.fn(() => ({
+                queue: [],
+                singer: { justCounting: [], backward: [] },
+                parentFlowQueue: [],
+                endOfClampSignals: {}
+            }));
+            logo.notation = { notationLineBreak: jest.fn() };
+            block.flow([], logo, 0, 100);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, 100, "missing");
+        });
+
+        test("handles backward singer for nameddo", () => {
+            const block = activity.registeredBlocks["nameddo"];
+            const actionBlk = 99;
+            activity.blocks.blockList[100] = { privateData: "myAction" };
+            activity.blocks.blockList[actionBlk] = { connections: [null, null, "next"] };
+            activity.blocks.blockList["next"] = {};
+            logo.actions["myAction"] = actionBlk;
+            activity.blocks.findBottomBlock = jest.fn(() => actionBlk);
+            activity.blocks.findTopBlock = jest.fn(() => actionBlk);
+            const tur = {
+                queue: [],
+                singer: { justCounting: [], backward: [1] },
+                parentFlowQueue: [],
+                endOfClampSignals: {}
+            };
+            activity.turtles.ithTurtle = jest.fn(() => tur);
+            logo.notation = { notationLineBreak: jest.fn() };
+            block.flow([], logo, 0, 100);
+            expect(logo.setDispatchBlock).toHaveBeenCalled();
+        });
+
+        test("handles justCounting non-empty", () => {
+            const block = activity.registeredBlocks["nameddo"];
+            activity.blocks.blockList[100] = { privateData: "myAction" };
+            logo.actions["myAction"] = [];
+            activity.turtles.ithTurtle = jest.fn(() => ({
+                queue: [],
+                singer: { justCounting: [1], backward: [] },
+                parentFlowQueue: [],
+                endOfClampSignals: {}
+            }));
+            logo.notation = { notationLineBreak: jest.fn() };
+            block.flow([], logo, 0, 100);
+            expect(logo.notation.notationLineBreak).not.toHaveBeenCalled();
+        });
+    });
+    describe("NamedCalcBlock - arg (line 334-352)", () => {
+        test("returns shifted result when action exists", () => {
+            const block = activity.registeredBlocks["namedcalc"];
+            activity.blocks.blockList[55] = { privateData: "myCalc" };
+            logo.actions["myCalc"] = [];
+            logo.runFromBlockNow = jest.fn();
+            logo.returns = { 0: [42] };
+            logo.returns[0] = [88];
+            activity.turtles.getTurtle = jest.fn(() => ({
+                running: false,
+                queue: []
+            }));
+            const result = block.arg(logo, 0, 55, []);
+            expect(result).toBe(88);
+        });
+
+        test("calls errorMsg when action not found", () => {
+            const block = activity.registeredBlocks["namedcalc"];
+            activity.blocks.blockList[55] = { privateData: "missing" };
+            const result = block.arg(logo, 0, 55, []);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, 55, "missing");
+            expect(result).toBe(0);
+        });
+    });
+
+    describe("DoArgBlock - flow (line 644-671)", () => {
+        test("returns action flow when action exists", () => {
+            const block = activity.registeredBlocks["doArg"];
+            activity.blocks.blockList[65] = {
+                argClampSlots: [],
+                connections: [null, null]
+            };
+            logo.actions["myAction"] = [];
+            activity.turtles.ithTurtle = jest.fn(() => ({
+                singer: { justCounting: [] }
+            }));
+            logo.notation = { notationLineBreak: jest.fn() };
+            const result = block.flow(["myAction"], logo, 0, 65, null, []);
+            expect(result).toEqual([[], 1]);
+        });
+
+        test("calls errorMsg when action not found in flow", () => {
+            const block = activity.registeredBlocks["doArg"];
+            activity.blocks.blockList[65] = {
+                argClampSlots: [],
+                connections: [null, null]
+            };
+            activity.turtles.ithTurtle = jest.fn(() => ({
+                singer: { justCounting: [] }
+            }));
+            logo.notation = { notationLineBreak: jest.fn() };
+            block.flow(["missing"], logo, 0, 65, null, []);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, 65, "missing");
+        });
+
+        test("handles argClampSlots with valid connection", () => {
+            const block = activity.registeredBlocks["doArg"];
+            activity.blocks.blockList[65] = {
+                argClampSlots: [1],
+                connections: [null, null, "c2"]
+            };
+            logo.actions["myAction"] = [];
+            logo.parseArg = jest.fn(() => 42);
+            activity.turtles.ithTurtle = jest.fn(() => ({
+                singer: { justCounting: [] }
+            }));
+            logo.notation = { notationLineBreak: jest.fn() };
+            const actionArgs = [];
+            block.flow(["myAction"], logo, 0, 65, null, actionArgs);
+            expect(actionArgs).toContain(42);
+        });
+
+        test("handles argClampSlots with null connection", () => {
+            const block = activity.registeredBlocks["doArg"];
+            activity.blocks.blockList[65] = {
+                argClampSlots: [1],
+                connections: [null, null, null]
+            };
+            logo.actions["myAction"] = [];
+            activity.turtles.ithTurtle = jest.fn(() => ({
+                singer: { justCounting: [] }
+            }));
+            logo.notation = { notationLineBreak: jest.fn() };
+            const actionArgs = [];
+            block.flow(["myAction"], logo, 0, 65, null, actionArgs);
+            expect(actionArgs).toContain(null);
+        });
+
+        test("skips notationLineBreak when justCounting is non-empty", () => {
+            const block = activity.registeredBlocks["doArg"];
+            activity.blocks.blockList[65] = {
+                argClampSlots: [],
+                connections: [null, null]
+            };
+            logo.actions["myAction"] = [];
+            activity.turtles.ithTurtle = jest.fn(() => ({
+                singer: { justCounting: [1] }
+            }));
+            logo.notation = { notationLineBreak: jest.fn() };
+            block.flow(["myAction"], logo, 0, 65, null, []);
+            expect(logo.notation.notationLineBreak).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("CalcArgBlock - arg (line 740-774)", () => {
+        test("returns result with argClampSlots", () => {
+            const block = activity.registeredBlocks["calcArg"];
+            activity.blocks.blockList[75] = {
+                argClampSlots: [1],
+                connections: [null, "c1", "c2"]
+            };
+            logo.parseArg = jest.fn((l, t, c) => (c === "c1" ? "myAction" : 10));
+            logo.actions["myAction"] = [];
+            logo.returns[0] = [33];
+            activity.turtles.getTurtle = jest.fn(() => ({
+                running: false,
+                queue: []
+            }));
+            const result = block.arg(logo, 0, 75, null);
+            expect(result).toBe(33);
+        });
+
+        test("calls errorMsg when action not found", () => {
+            const block = activity.registeredBlocks["calcArg"];
+            activity.blocks.blockList[75] = {
+                argClampSlots: [],
+                connections: [null, "c1"]
+            };
+            logo.parseArg = jest.fn(() => "missing");
+            const result = block.arg(logo, 0, 75, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, 75, "missing");
+            expect(result).toBe(0);
+        });
+    });
+
+    describe("ListenBlock - tur.running branch (line 1082-1096)", () => {
+        test("queues block when turtle is running", () => {
+            const block = activity.registeredBlocks["listen"];
+            logo.actions["testAction"] = [];
+            const tur = {
+                running: true,
+                queue: [],
+                parentFlowQueue: [],
+                singer: { justCounting: [] }
+            };
+            activity.turtles.ithTurtle = jest.fn(() => tur);
+            block.flow(["event1", "testAction"], logo, 0, 10);
+            const listenerCall = logo.setTurtleListener.mock.calls[0];
+            const listenerFn = listenerCall[2];
+            listenerFn({});
+            expect(tur.queue.length).toBe(1);
+            expect(tur.parentFlowQueue).toContain(10);
+        });
+
+        test("runs from block when turtle is not running", () => {
+            const block = activity.registeredBlocks["listen"];
+            logo.actions["testAction"] = [];
+            activity.logo = { firstNoteTime: Date.now() };
+            const tur = {
+                running: false,
+                queue: [],
+                parentFlowQueue: [],
+                singer: { justCounting: [], runningFromEvent: false, turtleTime: 0 }
+            };
+            activity.turtles.ithTurtle = jest.fn(() => tur);
+            block.flow(["event1", "testAction"], logo, 0, 10);
+            const listenerCall = logo.setTurtleListener.mock.calls[0];
+            const listenerFn = listenerCall[2];
+            listenerFn({});
+            expect(tur.singer.runningFromEvent).toBe(true);
+            expect(logo.runFromBlockNow).toHaveBeenCalled();
         });
     });
 });

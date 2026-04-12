@@ -19,7 +19,9 @@ global.MATRIXBUTTONHEIGHT = 40;
 global.MATRIXSOLFEHEIGHT = 30;
 
 global.rationalToFraction = jest.fn().mockReturnValue([4, 1]);
-global.mixedNumber = jest.fn().mockImplementation(val => (val != null ? val.toString() : ""));
+global.mixedNumber = jest
+    .fn()
+    .mockImplementation(val => (val !== null && val !== undefined ? val.toString() : ""));
 global.toFixed2 = jest.fn().mockImplementation(val => val.toFixed(2));
 
 global.platformColor = {
@@ -29,9 +31,12 @@ global.platformColor = {
 const createMockElement = tagName => ({
     tagName,
     style: {},
-    appendChild: jest.fn(),
     append: jest.fn(),
     innerHTML: "",
+    textContent: "",
+    appendChild: jest.fn(),
+    setAttribute: jest.fn(),
+    querySelectorAll: jest.fn().mockReturnValue([]),
     addEventListener: jest.fn(),
     className: "",
     insertCell: jest.fn().mockImplementation(() => createMockElement("TD")),
@@ -178,6 +183,14 @@ describe("StatusMatrix Widget", () => {
             statusMatrix.init(mockActivity);
             expect(statusMatrix.activity).toBe(mockActivity);
         });
+        test("onmaximize toggles isMaximized and updates cell styles", () => {
+            statusMatrix.init(mockActivity);
+            statusMatrix.isMaximized = false;
+            statusMatrix.widgetWindow.onmaximize();
+            expect(statusMatrix.isMaximized).toBe(true);
+            statusMatrix.widgetWindow.onmaximize();
+            expect(statusMatrix.isMaximized).toBe(false);
+        });
     });
 
     describe("Onclose Handler", () => {
@@ -227,6 +240,32 @@ describe("StatusMatrix Widget", () => {
         });
 
         test("handles namedbox with privateData as label", () => {
+            statusMatrix.init(mockActivity);
+            expect(statusMatrix._statusTable).toBeDefined();
+        });
+        test("handles bpm block with ja language preference", () => {
+            Object.defineProperty(global, "localStorage", {
+                value: { languagePreference: "ja" },
+                writable: true,
+                configurable: true
+            });
+            mockActivity.blocks.blockList = {
+                0: { name: "bpm", protoblock: { staticLabels: ["beats per minute"] }, value: 120 }
+            };
+            mockActivity.logo.statusFields = [[0, "bpm"]];
+            statusMatrix.init(mockActivity);
+            expect(statusMatrix._statusTable).toBeDefined();
+            Object.defineProperty(global, "localStorage", {
+                value: { languagePreference: "en" },
+                writable: true,
+                configurable: true
+            });
+        });
+        it("uses privateData for outputtools block", () => {
+            mockActivity.blocks.blockList = {
+                0: { name: "outputtools", privateData: "someData", value: null }
+            };
+            mockActivity.logo.statusFields = [[0, "outputtools"]];
             statusMatrix.init(mockActivity);
             expect(statusMatrix._statusTable).toBeDefined();
         });
@@ -405,7 +444,7 @@ describe("StatusMatrix Widget", () => {
             });
 
             statusMatrix.updateAll();
-            expect(statusMatrix._statusTable.rows[1].cells[1].innerHTML).toBe(4);
+            expect(statusMatrix._statusTable.rows[1].cells[1].textContent).toBe(4);
         });
 
         test("handles namedbox with value from logo.boxes", () => {
@@ -437,6 +476,14 @@ describe("StatusMatrix Widget", () => {
 
             statusMatrix.updateAll();
             expect(mockActivity.logo.parseArg).toHaveBeenCalled();
+        });
+        test("handles default case for unknown block name", () => {
+            mockActivity.blocks.blockList = {
+                0: { name: "unknownblock", value: 99 }
+            };
+            mockActivity.logo.statusFields = [[0, "unknownblock"]];
+            statusMatrix.updateAll();
+            expect(statusMatrix._statusTable.rows[1].cells[1].textContent).toBe(99);
         });
     });
 
@@ -555,7 +602,7 @@ describe("StatusMatrix Widget", () => {
 
             statusMatrix.updateAll();
 
-            expect(mockCell.innerHTML).toContain("♯");
+            expect(mockCell.textContent).toContain("♯");
         });
 
         test("replaces b with ♭ in note display", () => {
@@ -568,7 +615,7 @@ describe("StatusMatrix Widget", () => {
             });
 
             statusMatrix.updateAll();
-            expect(statusMatrix._statusTable.rows[2].cells[1].innerHTML).toContain("♭");
+            expect(statusMatrix._statusTable.rows[2].cells[1].textContent).toContain("♭");
         });
 
         test("handles empty noteStatus array", () => {
