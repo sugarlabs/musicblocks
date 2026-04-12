@@ -29,6 +29,10 @@ describe("setupIntervalsActions", () => {
         global._ = x => x;
         global.NOINPUTERRORMSG = "NOINPUT";
 
+        // Mock temperament globals only for this test
+        global.isCustomTemperament = jest.fn(() => false);
+        global.TEMPERAMENT = { equal: { pitchNumber: 12 } };
+
         global.MUSICALMODES = {
             major: [2, 2, 1, 2, 2, 2, 1],
             minor: [2, 1, 2, 2, 1, 2, 2]
@@ -96,6 +100,12 @@ describe("setupIntervalsActions", () => {
         };
 
         setupIntervalsActions(activity);
+    });
+
+    afterEach(() => {
+        // Clean up globals to prevent test pollution
+        delete global.isCustomTemperament;
+        delete global.TEMPERAMENT;
     });
 
     describe("GetModename", () => {

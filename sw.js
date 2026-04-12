@@ -1,3 +1,14 @@
+// Copyright (c) 2014-26 Sugar Labs
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
 /*
   global
 
@@ -9,22 +20,17 @@
 const CACHE = "pwabuilder-precache";
 const precacheFiles = [
     /* Add an array of files to precache for your app */
-    "./index.html",
-    // Keep in sync with the query-param URL used in index.html.
-    "./css/activities.css?v=fixed"
+    "./index.html"
 ];
 
 self.addEventListener("install", function (event) {
-    // eslint-disable-next-line no-console
     console.log("[PWA Builder] Install Event processing");
 
-    // eslint-disable-next-line no-console
     console.log("[PWA Builder] Skip waiting on install");
     self.skipWaiting();
 
     event.waitUntil(
         caches.open(CACHE).then(function (cache) {
-            // eslint-disable-next-line no-console
             console.log("[PWA Builder] Caching pages during install");
             return cache.addAll(precacheFiles);
         })
@@ -33,51 +39,8 @@ self.addEventListener("install", function (event) {
 
 // Allow sw to control of current page
 self.addEventListener("activate", function (event) {
-    // eslint-disable-next-line no-console
     console.log("[PWA Builder] Claiming clients for current page");
-
-    // Cleanup: remove any previously-cached non-static GET responses.
-    // This prevents serving stale / user-specific / poisoned cache entries
-    // that older SW versions may have cached.
-    event.waitUntil(
-        (async () => {
-            await self.clients.claim();
-
-            const cache = await caches.open(CACHE);
-            const keys = await cache.keys();
-            const keepUrls = new Set(precacheFiles.map(path => new URL(path, self.location).href));
-
-            for (const request of keys) {
-                try {
-                    const url = new URL(request.url);
-                    if (keepUrls.has(url.href)) continue;
-                    if (url.origin !== self.location.origin) {
-                        await cache.delete(request);
-                        continue;
-                    }
-                    if (url.search) {
-                        await cache.delete(request);
-                        continue;
-                    }
-
-                    const pathname = url.pathname.toLowerCase();
-                    const isStaticPath =
-                        pathname === "/" ||
-                        pathname.endsWith("/index.html") ||
-                        /\.(css|js|mjs|json|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|otf|eot|mp3|wav|webm|mp4)$/i.test(
-                            pathname
-                        );
-
-                    if (!isStaticPath) {
-                        await cache.delete(request);
-                    }
-                } catch {
-                    // If the URL can't be parsed, treat it as unsafe.
-                    await cache.delete(request);
-                }
-            }
-        })()
-    );
+    event.waitUntil(self.clients.claim());
 });
 
 function isPrecachedRequest(request) {
@@ -150,11 +113,17 @@ function shouldCacheResponse(request, response) {
 }
 
 function updateCache(request, response) {
-    if (response.status === 206) {
-        console.log("Partial response is unsupported for caching.");
+    // Cache API only supports http:// and https:// requests.
+    if (!request.url.startsWith("http")) {
         return Promise.resolve();
     }
+
+    if (!shouldCacheResponse(request, response)) {
+        return Promise.resolve();
+    }
+
     return caches.open(CACHE).then(function (cache) {
+        // Store the response in cache so it can be served offline.
         return cache.put(request, response);
     });
 }
@@ -176,65 +145,46 @@ function fromCache(request) {
 
 // If any fetch fails, it will look for the request in the cache and
 // serve it from there first
+// add URL scheme check at the top
 self.addEventListener("fetch", function (event) {
+    // Only handle http/https requests.
+    // chrome-extension:// and other schemes are not supported by Cache API.
+    if (!event.request.url.startsWith("http")) return;
+
     if (event.request.method !== "GET") return;
-
-    // App-shell offline support: serve cached index.html for navigations.
-    if (isAppShellNavigation(event.request)) {
-        event.respondWith(
-            (async () => {
-                const indexRequest = new Request("./index.html");
-                try {
-                    const cached = await fromCache(indexRequest);
-                    // Update the cached app-shell in the background.
-                    event.waitUntil(
-                        fetch(indexRequest).then(function (response) {
-                            if (shouldCacheResponse(indexRequest, response)) {
-                                return updateCache(indexRequest, response.clone());
-                            }
-                        })
-                    );
-                    return cached;
-                } catch {
-                    // No cached app-shell yet: fall back to network.
-                    return fetch(event.request);
-                }
-            })()
-        );
-        return;
-    }
-
-    // Only use cache-first for explicit precache URLs and allowlisted static assets.
-    const canUseCache = isPrecachedRequest(event.request) || isStaticAssetRequest(event.request);
-    if (!canUseCache) {
-        // Network-only for everything else (prevents caching/serving user-specific responses).
-        event.respondWith(fetch(event.request));
-        return;
-    }
 
     event.respondWith(
         fromCache(event.request).then(
             function (response) {
-                // Cache hit: return immediately, then update in background.
+                // The response was found in the cache so we responde
+                // with it and update the entry
+
+                // This is where we call the server to get the newest
+                // version of the file to use the next time we show view
                 event.waitUntil(
-                    fetch(event.request).then(function (networkResponse) {
-                        if (shouldCacheResponse(event.request, networkResponse)) {
-                            return updateCache(event.request, networkResponse.clone());
-                        }
-                    })
+                    fetch(event.request)
+                        .then(function (response) {
+                            if (response.ok) {
+                                return updateCache(event.request, response);
+                            }
+                        })
+                        .catch(function () {
+                            // Ignore network fetch failures when offline.
+                            // The cached response has already been returned.
+                        })
                 );
                 return response;
             },
             async function () {
-                // Cache miss: fetch from network and cache if safe.
+                // The response was not found in the cache so we look
+                // for it on the server
                 try {
                     const response = await fetch(event.request);
-                    if (shouldCacheResponse(event.request, response)) {
+                    if (response.ok) {
                         event.waitUntil(updateCache(event.request, response.clone()));
                     }
                     return response;
                 } catch (error) {
-                    // eslint-disable-next-line no-console
                     console.log("[PWA Builder] Network request failed and no cache." + error);
 
                     if (typeof offlineFallbackPage !== "undefined") {
@@ -256,7 +206,6 @@ self.addEventListener("fetch", function (event) {
 // update the offline page
 self.addEventListener("refreshOffline", function () {
     if (typeof offlineFallbackPage !== "string" || offlineFallbackPage.trim().length === 0) {
-        // eslint-disable-next-line no-console
         console.log("[PWA Builder] refreshOffline ignored: offlineFallbackPage is not set");
         return Promise.resolve();
     }
@@ -265,7 +214,6 @@ self.addEventListener("refreshOffline", function () {
 
     return fetch(offlineFallbackPage).then(function (response) {
         return caches.open(CACHE).then(function (cache) {
-            // eslint-disable-next-line no-console
             console.log(
                 "[PWA Builder] Offline page updated from refreshOffline event: " + response.url
             );
