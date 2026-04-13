@@ -114,3 +114,39 @@ input[type="range"]:focus::-ms-fill-upper {
 .lego-size-1 { width: 20px; height: 10px; }
 .lego-size-2 { width: 40px; height: 10px; }
 /* ... more sizes ... */
+
+/* Zoom percentage overlay */
+#zoomOverlay {
+    /* Positioning: Center of the screen */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%); /* Safari/Old Chrome */
+    -ms-transform: translate(-50%, -50%);     /* IE 9 */
+
+    /* Visuals */
+    background-color: rgba(0, 0, 0, 0.6); /* Slightly transparent */
+    color: #ffffff;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-size: 40px;
+    font-weight: bold;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    
+    /* Cross-browser glass effect */
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+
+    /* Behavior */
+    z-index: 10000;
+    pointer-events: none; /* Allows clicking through the overlay */
+    opacity: 0;           /* Hidden by default */
+    transition: opacity 0.3s ease-in-out;
+    -webkit-transition: opacity 0.3s ease-in-out;
+}
+
+/* Class to trigger the fade-in */
+#zoomOverlay.visible {
+    opacity: 1;
+}

@@ -21,7 +21,7 @@
 
 /*
    global _, NOINPUTERRORMSG, Singer, MUSICALMODES, MusicBlocks, Mouse, getNote,
-   getModeLength
+   getModeLength, isCustomTemperament, TEMPERAMENT
 */
 
 /*
@@ -32,7 +32,8 @@
         NOINPUTERRORMSG
     js/utils/musicutils.js
         MUSICALMODES, MODE_PIE_MENUS, getNote, getModeLength, NOTESTEP,
-        GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP
+        GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
+        isCustomTemperament, TEMPERAMENT
     js/turtle-singer.js
         Singer
     js/js-export/export.js
@@ -67,6 +68,20 @@ function setupIntervalsActions(activity) {
         }
 
         /**
+         * Utility function to get the number of pitches in the current temperament.
+         *
+         * @static
+         * @returns {Number}
+         */
+        static getTemperamentLength() {
+            const currentTemperament = activity.logo.synth.inTemperament;
+            if (!currentTemperament) {
+                return 12; // Default fallback for tests/uninitialized state
+            }
+            return TEMPERAMENT[currentTemperament]["pitchNumber"];
+        }
+
+        /**
          * @static
          * @param {number} turtle
          * @returns {String}
@@ -76,16 +91,19 @@ function setupIntervalsActions(activity) {
             let { firstNote, secondNote, octave } = GetNotesForInterval(tur);
             let totalIntervals = Math.abs(ALLNOTESTEP[firstNote] - ALLNOTESTEP[secondNote]);
 
-            if (ALLNOTESTEP[secondNote] < ALLNOTESTEP[firstNote] && octave !== 0)
-                totalIntervals = 12 - totalIntervals;
+            // Use dynamic temperament length for custom tunings
+            const temperamentLength = this.getTemperamentLength();
 
-            if (octave < 0 && totalIntervals !== 0 && totalIntervals !== 12)
-                totalIntervals = 12 - totalIntervals;
+            if (ALLNOTESTEP[secondNote] < ALLNOTESTEP[firstNote] && octave !== 0)
+                totalIntervals = temperamentLength - totalIntervals;
+
+            if (octave < 0 && totalIntervals !== 0 && totalIntervals !== temperamentLength)
+                totalIntervals = temperamentLength - totalIntervals;
 
             if (octave < -1 || totalIntervals === 0) octave = Math.abs(octave);
 
             while (octave > 0) {
-                totalIntervals += 12;
+                totalIntervals += temperamentLength;
                 octave--;
             }
 
@@ -107,6 +125,9 @@ function setupIntervalsActions(activity) {
             const index2 = NOTENAMES.indexOf(secondNote.substring(0, 1));
             let lastWord = "";
             let letterGap = Math.abs(index2 - index1);
+
+            // Use dynamic temperament length for custom tunings
+            const temperamentLength = this.getTemperamentLength();
 
             if (index1 > index2 && octave !== 0) letterGap = NOTENAMES.length - letterGap;
 
@@ -142,7 +163,7 @@ function setupIntervalsActions(activity) {
                 if (octave >= 1) {
                     lastWord = ", " + _("plus") + " " + os + " " + plural;
                 }
-                while (totalIntervals > 12) totalIntervals -= 12;
+                while (totalIntervals > temperamentLength) totalIntervals -= temperamentLength;
             }
 
             if (octave < 0) {
@@ -153,7 +174,7 @@ function setupIntervalsActions(activity) {
             }
 
             const interval =
-                totalIntervals % 12 === 0 && letterGap === 0
+                totalIntervals % temperamentLength === 0 && letterGap === 0
                     ? SEMITONETOINTERVALMAP[totalIntervals][letterGap]
                     : SEMITONETOINTERVALMAP[totalIntervals][letterGap] + lastWord;
             return interval;
@@ -273,25 +294,32 @@ function setupIntervalsActions(activity) {
                     activity.errorMsg(_("Adding missing pitch number 0."));
                 }
 
-                const pitchNumbers = tur.singer.defineMode.sort((a, b) => a[0] - b[0]);
+                const pitchNumbers = tur.singer.defineMode.sort((a, b) => a - b);
+                const temperamentLength = Singer.IntervalsActions.getTemperamentLength();
 
                 for (let i = 0; i < pitchNumbers.length; i++) {
-                    if (pitchNumbers[i] < 0 || pitchNumbers[i] > 11) {
-                        activity.errorMsg(
-                            _("Ignoring pitch numbers less than zero or greater than eleven.")
-                        );
-                        continue;
+                    // Apply mod arithmetic for custom temperaments
+                    let normalizedPitchNumber = pitchNumbers[i] % temperamentLength;
+                    if (normalizedPitchNumber < 0) {
+                        normalizedPitchNumber += temperamentLength;
                     }
 
-                    if (i > 0 && pitchNumbers[i] === pitchNumbers[i - 1]) {
+                    if (
+                        i > 0 &&
+                        normalizedPitchNumber === pitchNumbers[i - 1] % temperamentLength
+                    ) {
                         activity.errorMsg(_("Ignoring duplicate pitch numbers."));
                         continue;
                     }
 
                     if (i < pitchNumbers.length - 1) {
-                        MUSICALMODES[modeName].push(pitchNumbers[i + 1] - pitchNumbers[i]);
+                        let nextPitchNumber = pitchNumbers[i + 1] % temperamentLength;
+                        if (nextPitchNumber < 0) {
+                            nextPitchNumber += temperamentLength;
+                        }
+                        MUSICALMODES[modeName].push(nextPitchNumber - normalizedPitchNumber);
                     } else {
-                        MUSICALMODES[modeName].push(12 - pitchNumbers[i]);
+                        MUSICALMODES[modeName].push(temperamentLength - normalizedPitchNumber);
                     }
                 }
 

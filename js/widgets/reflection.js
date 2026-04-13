@@ -65,6 +65,32 @@ class ReflectionMatrix {
          * @type {string}
          */
         this.code = "";
+
+        this.startChatTypingTimeout = null;
+
+        /**
+         * User messages waiting to be sent to the backend
+         * @type {Array}
+         */
+        this.pendingMessages = [];
+
+        /**
+         * Whether a queued user message is currently being processed
+         * @type {boolean}
+         */
+        this.isProcessingPendingMessage = false;
+    }
+
+    sanitizeLinks(html) {
+        return html.replace(/<a\s+[^>]*href\s*=\s*(['"]?)([^'">\s]+)\1/gi, (match, quote, url) => {
+            const unsafeSchemes = /^(javascript|data|vbscript):/i;
+
+            if (unsafeSchemes.test(url.trim())) {
+                return match.replace(url, "#");
+            }
+
+            return match;
+        });
     }
 
     /**
@@ -88,6 +114,10 @@ class ReflectionMatrix {
         widgetWindow.onclose = () => {
             this.isOpen = false;
             this.activity.isInputON = false;
+            if (this.startChatTypingTimeout) {
+                clearTimeout(this.startChatTypingTimeout);
+                this.startChatTypingTimeout = null;
+            }
             if (this.dotsInterval) {
                 clearInterval(this.dotsInterval);
             }
@@ -192,6 +222,7 @@ class ReflectionMatrix {
             this.startChatSession();
         }
 
+        widgetWindow.sendToCenter();
         activity.textMsg(_("Reflect on your project."), 3000);
     }
 
@@ -229,11 +260,126 @@ class ReflectionMatrix {
      * @returns {void}
      */
     hideTypingIndicator() {
+        if (this.startChatTypingTimeout) {
+            clearTimeout(this.startChatTypingTimeout);
+            this.startChatTypingTimeout = null;
+        }
+
         if (this.typingDiv) {
             clearInterval(this.dotsInterval);
             this.typingDiv.remove();
             this.typingDiv = null;
         }
+    }
+
+    /**
+     * Appends a user message to the chat log.
+     * @param {string} text - The user's message.
+     * @returns {void}
+     */
+    appendUserMessage(text) {
+        const messageContainer = document.createElement("div");
+        messageContainer.classList.add("message-container", "user");
+
+        const senderName = document.createElement("div");
+        senderName.style.fontSize = "12px";
+        senderName.style.fontWeight = "bold";
+        senderName.style.marginBottom = "4px";
+        senderName.style.color = "#555";
+        senderName.style.overflowWrap = "break-word";
+        senderName.style.alignSelf = "flex-start";
+        senderName.innerText = "You";
+
+        const userMsg = document.createElement("div");
+        userMsg.innerText = text;
+
+        messageContainer.appendChild(senderName);
+        messageContainer.appendChild(userMsg);
+
+        this.chatLog.appendChild(messageContainer);
+        this.chatLog.scrollTop = this.chatLog.scrollHeight;
+    }
+
+    /**
+     * Appends a bot reply to the chat log.
+     * @param {Object} reply - The backend response containing the bot reply.
+     * @param {string} role - The mentor role that generated the reply.
+     * @param {boolean} md - Whether the reply should be rendered as markdown.
+     * @returns {void}
+     */
+    appendBotReply(reply, role = this.AImentor, md = false) {
+        this.chatHistory.push({
+            role: role,
+            content: reply.response
+        });
+
+        if (this.chatHistory.length > 10) {
+            this.summaryButton.style.removeProperty("background");
+        }
+
+        const messageContainer = document.createElement("div");
+        messageContainer.className = "message-container";
+
+        const senderName = document.createElement("div");
+        senderName.style.fontSize = "12px";
+        senderName.style.fontWeight = "bold";
+        senderName.style.marginBottom = "4px";
+        senderName.style.color = "#383838ff";
+        senderName.style.alignSelf = "flex-start";
+        senderName.innerText = this.mentorsMap[role];
+
+        const botReply = document.createElement("div");
+
+        if (md) {
+            const safeText = escapeHTML(reply.response);
+            let html = this.mdToHTML(safeText);
+            html = this.sanitizeLinks(html);
+            botReply.innerHTML = html;
+        } else {
+            botReply.innerText = reply.response;
+        }
+
+        messageContainer.appendChild(senderName);
+        messageContainer.appendChild(botReply);
+
+        this.chatLog.appendChild(messageContainer);
+        this.chatLog.scrollTop = this.chatLog.scrollHeight;
+    }
+
+    /**
+     * Sends queued user messages one at a time so input is not lost.
+     * @returns {Promise<void>}
+     */
+    async processPendingMessages() {
+        if (this.isProcessingPendingMessage) return;
+
+        this.isProcessingPendingMessage = true;
+
+        while (this.pendingMessages.length > 0) {
+            const nextMessage = this.pendingMessages.shift();
+
+            this.chatHistory.push({
+                role: "user",
+                content: nextMessage.text
+            });
+
+            const reply = await this.generateBotReply(
+                nextMessage.text,
+                this.chatHistory,
+                nextMessage.mentor,
+                nextMessage.algorithm
+            );
+
+            if (reply.error) {
+                this.hideTypingIndicator();
+                this.activity.errorMsg(_("Failed to send message"), 3000);
+                continue;
+            }
+
+            this.appendBotReply(reply, nextMessage.mentor);
+        }
+
+        this.isProcessingPendingMessage = false;
     }
 
     /**
@@ -267,11 +413,14 @@ class ReflectionMatrix {
      *  @returns {Promise<void>}
      */
     async startChatSession() {
-        if (this.triggerFirst == true) return;
+        if (this.triggerFirst === true) return;
 
         this.triggerFirst = true;
-        setTimeout(() => {
-            this.showTypingIndicator("Reading code");
+        this.startChatTypingTimeout = setTimeout(() => {
+            this.startChatTypingTimeout = null;
+            if (this.isOpen) {
+                this.showTypingIndicator("Reading code");
+            }
         }, 1000);
 
         const code = await this.activity.prepareExport();
@@ -296,7 +445,7 @@ class ReflectionMatrix {
     async updateProjectCode() {
         const code = await this.activity.prepareExport();
         if (code === this.code) {
-            console.log("No changes in code detected.");
+            this.activity.textMsg(_("No changes were detected in your project."), 2500);
             return; // No changes in code
         }
 
@@ -308,15 +457,11 @@ class ReflectionMatrix {
             if (data.algorithm !== "unchanged") {
                 this.projectAlgorithm = data.algorithm; // update algorithm
                 this.code = code;
-            } else {
-                console.log("No changes in algorithm detected.");
             }
             this.botReplyDiv(data, false, false);
         } else {
             this.activity.errorMsg(_(data.error), 3000);
         }
-
-        this.projectAlgorithm = data.algorithm;
     }
 
     /**
@@ -416,7 +561,6 @@ class ReflectionMatrix {
      */
     async generateAnalysis() {
         try {
-            console.log("Summary stored", this.summary);
             const response = await fetch(`${this.PORT}/analysis`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -443,7 +587,6 @@ class ReflectionMatrix {
         let reply;
         // check if message is from user or bot
         if (user_query === true) {
-            if (this.typingDiv) return;
             reply = await this.generateBotReply(
                 message,
                 this.chatHistory,
@@ -460,39 +603,7 @@ class ReflectionMatrix {
             return;
         }
 
-        this.chatHistory.push({
-            role: this.AImentor,
-            content: reply.response
-        });
-
-        if (this.chatHistory.length > 10) {
-            this.summaryButton.style.removeProperty("background");
-        }
-
-        const messageContainer = document.createElement("div");
-        messageContainer.className = "message-container";
-
-        const senderName = document.createElement("div");
-        senderName.style.fontSize = "12px";
-        senderName.style.fontWeight = "bold";
-        senderName.style.marginBottom = "4px";
-        senderName.style.color = "#383838ff";
-        senderName.style.alignSelf = "flex-start";
-        senderName.innerText = this.mentorsMap[this.AImentor];
-
-        const botReply = document.createElement("div");
-
-        if (md) {
-            botReply.innerHTML = this.mdToHTML(reply.response);
-        } else {
-            botReply.innerText = reply.response;
-        }
-
-        messageContainer.appendChild(senderName);
-        messageContainer.appendChild(botReply);
-
-        this.chatLog.appendChild(messageContainer);
-        this.chatLog.scrollTop = this.chatLog.scrollHeight;
+        this.appendBotReply(reply, this.AImentor, md);
     }
 
     /**
@@ -502,33 +613,14 @@ class ReflectionMatrix {
     sendMessage() {
         const text = this.input.value.trim();
         if (text === "") return;
-        this.chatHistory.push({
-            role: "user",
-            content: text
+        this.appendUserMessage(text);
+        this.pendingMessages.push({
+            text: text,
+            mentor: this.AImentor,
+            algorithm: this.projectAlgorithm
         });
-
-        const messageContainer = document.createElement("div");
-        messageContainer.classList.add("message-container", "user");
-
-        const senderName = document.createElement("div");
-        senderName.style.fontSize = "12px";
-        senderName.style.fontWeight = "bold";
-        senderName.style.marginBottom = "4px";
-        senderName.style.color = "#555";
-        senderName.style.overflowWrap = "break-word";
-        senderName.style.alignSelf = "flex-start";
-        senderName.innerText = "You";
-
-        const userMsg = document.createElement("div");
-        userMsg.innerText = text;
-
-        messageContainer.appendChild(senderName);
-        messageContainer.appendChild(userMsg);
-
-        this.chatLog.appendChild(messageContainer);
         this.input.value = "";
-        this.botReplyDiv(text);
-        this.chatLog.scrollTop = this.chatLog.scrollHeight;
+        void this.processPendingMessages();
     }
 
     /**
@@ -580,7 +672,6 @@ class ReflectionMatrix {
         } catch (e) {
             console.warn("Could not save analysis report to localStorage:", e);
         }
-        console.log("Conversation saved in localStorage.");
     }
 
     /** Reads the analysis report from localStorage.
@@ -617,22 +708,6 @@ class ReflectionMatrix {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-    }
-
-    /**
-     * Escapes HTML special characters to prevent XSS attacks.
-     * @param {string} text - The text to escape.
-     * @returns {string} - The escaped text.
-     */
-    escapeHTML(text) {
-        const escapeMap = {
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#x27;"
-        };
-        return text.replace(/[&<>"']/g, char => escapeMap[char]);
     }
 
     /**
@@ -686,7 +761,7 @@ class ReflectionMatrix {
      */
     mdToHTML(md) {
         // Step 1: Escape HTML first to prevent XSS attacks from raw tags
-        let html = this.escapeHTML(md);
+        let html = escapeHTML(md);
 
         // Step 2: Convert Markdown syntax to HTML
 

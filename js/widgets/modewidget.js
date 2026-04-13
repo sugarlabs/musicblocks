@@ -1,4 +1,5 @@
 // Copyright (c) 2016-21 Walter Bender
+// Copyright (c) 2026 Ashutosh Karnatak (Dependency Injection Refactoring)
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -25,20 +26,67 @@
         platformColor
     - js/utils/musicutils.js
         keySignatureToMode, MUSICALMODES, getNote, DEFAULTVOICE, NOTESTABLE
+
+    Dependency Injection Pattern:
+    This widget uses dependency injection to reduce implicit global state.
+    Dependencies are passed via the constructor as part of the `activity` object.
+
+    Required Dependencies (accessed via this.activity):
+    - logo: Logo instance (provides synth, modeBlock, resetSynth)
+    - turtles: Turtles instance (provides ithTurtle for keySignature)
+    - blocks: Blocks instance (provides blockList, loadNewBlocks)
+    - hideMsgs: Function to hide messages
+    - textMsg: Function to display text messages
+    - errorMsg: Function to display error messages
+    - refreshCanvas: Function to refresh the canvas
+    - storage: Storage object for custom mode persistence
 */
 
 /*exported ModeWidget*/
+
+/**
+ * ModeWidget - A widget for creating and managing musical modes.
+ *
+ * This widget allows users to create custom musical modes by selecting
+ * notes on a circular wheel interface. It supports playing, saving,
+ * rotating, and inverting modes.
+ */
 class ModeWidget {
     static ICONSIZE = 32;
     static BUTTONSIZE = 53;
     static ROTATESPEED = 125;
     static BUTTONDIVWIDTH = 535;
+    static RESET_NOTES_DELAY = 500;
 
-    constructor(activity) {
+    /**
+     * Constructs a new ModeWidget instance.
+     * @param {object} activity - The activity instance providing dependencies
+     * @param {object} [deps] - Optional explicit dependencies (for testing)
+     */
+    constructor(activity, deps) {
+        // Store the activity reference for backward compatibility
         this.activity = activity;
-        this._modeBlock = this.activity.logo.modeBlock;
+
+        // Optional explicit dependencies for testing/isolation
+        // If deps is provided, use it; otherwise fall back to activity
+        this._deps = deps || {};
+
+        // Bind commonly-used dependencies locally for readability
+        // This reduces verbosity while maintaining explicit dependency injection
+        this.logo = this._deps.logo || this.activity.logo;
+        this.turtles = this._deps.turtles || this.activity.turtles;
+        this.blocks = this._deps.blocks || this.activity.blocks;
+        this.storage = this._deps.storage || this.activity.storage;
+        this.hideMsgs = this._deps.hideMsgs || this.activity.hideMsgs.bind(this.activity);
+        this.textMsg = this._deps.textMsg || this.activity.textMsg.bind(this.activity);
+        this.errorMsg = this._deps.errorMsg || this.activity.errorMsg.bind(this.activity);
+        this.refreshCanvas =
+            this._deps.refreshCanvas || this.activity.refreshCanvas.bind(this.activity);
+
+        // Initialize widget state
+        this._modeBlock = this.logo.modeBlock;
         this._locked = false;
-        this._pitch = this.activity.turtles.ithTurtle(0).singer.keySignature[0];
+        this._pitch = this.turtles.ithTurtle(0).singer.keySignature[0];
         this._noteValue = 0.333;
         this._undoStack = [];
         this._playing = false;
@@ -65,7 +113,7 @@ class ModeWidget {
 
         this.widgetWindow.onclose = () => {
             this._playing = false;
-            this.activity.hideMsgs();
+            this.hideMsgs();
             this.widgetWindow.destroy();
         };
 
@@ -77,7 +125,7 @@ class ModeWidget {
             _("Play")
         );
         this._playButton.onclick = () => {
-            this.activity.logo.resetSynth(0);
+            this.logo.resetSynth(0);
             if (this._playingStatus()) {
                 this._playing = false;
 
@@ -197,7 +245,7 @@ class ModeWidget {
         const windowHeight =
             this.getWidgetFrame().offsetHeight - this.getDragElement().offsetHeight;
         const widgetBody = this.getWidgetBody();
-        const scale = this.isMaximized ? windowHeight / widgetBody.offsetHeight : 1;
+        const scale = this.isMaximized() ? windowHeight / widgetBody.offsetHeight : 1;
         widgetBody.style.display = "flex";
         widgetBody.style.flexDirection = "column";
         widgetBody.style.alignItems = "center";
@@ -220,9 +268,7 @@ class ModeWidget {
      */
     _setMode() {
         // Read in the current mode to start
-        const currentModeName = keySignatureToMode(
-            this.activity.turtles.ithTurtle(0).singer.keySignature
-        );
+        const currentModeName = keySignatureToMode(this.turtles.ithTurtle(0).singer.keySignature);
         const currentMode = MUSICALMODES[currentModeName[1]];
 
         // Add the mode name in the bottom row of the table.
@@ -264,8 +310,19 @@ class ModeWidget {
         modePianoDiv.style.border = "0px";
         modePianoDiv.style.top = "0px";
         modePianoDiv.style.left = "0px";
-        modePianoDiv.innerHTML =
+        let pianoHTML =
             '<img src="images/piano_keys.png"  id="modeKeyboard" style="top:0px; left:0px; position:relative;">';
+        for (let i = 0; i < 12; i++) {
+            pianoHTML += '<img id="pkey_' + i + '" style="top:0px; left:0px; position:absolute;">';
+        }
+        modePianoDiv.innerHTML = pianoHTML;
+
+        // Cache piano key elements to avoid repeated getElementById calls
+        this._pianoKeys = [];
+        for (let i = 0; i < 12; i++) {
+            this._pianoKeys[i] = document.getElementById("pkey_" + i);
+        }
+
         const highlightImgs = [
             "images/highlights/sel_c.png",
             "images/highlights/sel_c_sharp.png",
@@ -280,9 +337,7 @@ class ModeWidget {
             "images/highlights/sel_a_sharp.png",
             "images/highlights/sel_b.png"
         ];
-        const currentModeName = keySignatureToMode(
-            this.activity.turtles.ithTurtle(0).singer.keySignature
-        );
+        const currentModeName = keySignatureToMode(this.turtles.ithTurtle(0).singer.keySignature);
         const letterName = currentModeName[0];
 
         const startDict = {
@@ -315,25 +370,9 @@ class ModeWidget {
             startingPosition = 0;
         }
 
-        modePianoDiv.innerHTML += '<img id="pkey_0" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_1" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_2" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_3" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_4" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_5" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_6" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_7" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_8" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_9" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML +=
-            '<img id="pkey_10" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML +=
-            '<img id="pkey_11" style="top:0px; left:0px; position:absolute;">';
-
         for (let i = 0; i < 12; ++i) {
             if (this._selectedNotes[i])
-                document.getElementById("pkey_" + i).src =
-                    highlightImgs[(i + startingPosition) % 12];
+                this._pianoKeys[i].src = highlightImgs[(i + startingPosition) % 12];
         }
     }
     /**
@@ -349,9 +388,7 @@ class ModeWidget {
 
         this._saveState();
         this.__invertOnePair(1);
-        const currentModeName = keySignatureToMode(
-            this.activity.turtles.ithTurtle(0).singer.keySignature
-        );
+        const currentModeName = keySignatureToMode(this.turtles.ithTurtle(0).singer.keySignature);
         if (currentModeName[0] === "C") {
             this._showPiano();
         }
@@ -382,7 +419,7 @@ class ModeWidget {
             this._saveState();
             this._setModeName();
             const currentModeName = keySignatureToMode(
-                this.activity.turtles.ithTurtle(0).singer.keySignature
+                this.turtles.ithTurtle(0).singer.keySignature
             );
             if (currentModeName[0] === "C") {
                 this._showPiano();
@@ -448,7 +485,7 @@ class ModeWidget {
                     this._saveState();
                     this._setModeName();
                     const currentModeName = keySignatureToMode(
-                        this.activity.turtles.ithTurtle(0).singer.keySignature
+                        this.turtles.ithTurtle(0).singer.keySignature
                     );
                     if (currentModeName[0] === "C") {
                         this._showPiano();
@@ -509,7 +546,7 @@ class ModeWidget {
                     this._saveState();
                     this._setModeName();
                     const currentModeName = keySignatureToMode(
-                        this.activity.turtles.ithTurtle(0).singer.keySignature
+                        this.turtles.ithTurtle(0).singer.keySignature
                     );
                     if (currentModeName[0] === "C") {
                         this._showPiano();
@@ -538,7 +575,7 @@ class ModeWidget {
             return;
         }
 
-        this.activity.logo.synth.stop();
+        this.logo.synth.stop();
         this._locked = true;
 
         // Make a list of notes to play
@@ -606,15 +643,13 @@ class ModeWidget {
         const startingposition = 0;
         const time = this._noteValue + 0.125;
 
-        const currentKey = keySignatureToMode(
-            this.activity.turtles.ithTurtle(0).singer.keySignature
-        )[0];
+        const currentKey = keySignatureToMode(this.turtles.ithTurtle(0).singer.keySignature)[0];
         if (currentKey === "C") {
             if (i > this._notesToPlay.length - 1) {
                 setTimeout(() => {
                     // Did we just play the last note?
                     this._playing = false;
-                    const note_key = document.getElementById("pkey_" + 0);
+                    const note_key = this._pianoKeys ? this._pianoKeys[0] : null;
                     if (note_key !== null) {
                         note_key.src = highlightImgs[0];
                     }
@@ -636,7 +671,9 @@ class ModeWidget {
             setTimeout(() => {
                 if (this._lastNotePlayed !== null) {
                     this._playWheel.navItems[this._lastNotePlayed % 12].navItem.hide();
-                    const note_key = document.getElementById("pkey_" + (this._lastNotePlayed % 12));
+                    const note_key = this._pianoKeys
+                        ? this._pianoKeys[this._lastNotePlayed % 12]
+                        : null;
                     if (note_key !== null) {
                         note_key.src =
                             highlightImgs[(this._lastNotePlayed + startingposition) % 12];
@@ -647,24 +684,16 @@ class ModeWidget {
                 this._playWheel.navItems[note % 12].navItem.show();
 
                 if (note !== 12) {
-                    const note_key = document.getElementById("pkey_" + (note % 12));
+                    const note_key = this._pianoKeys ? this._pianoKeys[note % 12] : null;
                     if (note_key !== null) {
                         note_key.src = animationImgs[(note + startingposition) % 12];
                     }
                 }
 
                 this._lastNotePlayed = note;
-                const ks = this.activity.turtles.ithTurtle(0).singer.keySignature;
-                const noteToPlay = getNote(
-                    this._pitch,
-                    4,
-                    note,
-                    ks,
-                    false,
-                    null,
-                    this.activity.errorMsg
-                );
-                this.activity.logo.synth.trigger(
+                const ks = this.turtles.ithTurtle(0).singer.keySignature;
+                const noteToPlay = getNote(this._pitch, 4, note, ks, false, null, this.errorMsg);
+                this.logo.synth.trigger(
                     0,
                     noteToPlay[0].replace(/♯/g, "#").replace(/♭/g, "b") + noteToPlay[1],
                     this._noteValue,
@@ -677,7 +706,7 @@ class ModeWidget {
                     this.__playNextNote(i + 1);
                 } else {
                     this._locked = false;
-                    setTimeout(() => this._resetNotes(), 500);
+                    setTimeout(() => this._resetNotes(), ModeWidget.RESET_NOTES_DELAY);
                     return;
                 }
             }, 1000 * time);
@@ -710,17 +739,9 @@ class ModeWidget {
                 this._playWheel.navItems[note % 12].navItem.show();
                 this._lastNotePlayed = note;
 
-                const ks = this.activity.turtles.ithTurtle(0).singer.keySignature;
-                const noteToPlay = getNote(
-                    this._pitch,
-                    4,
-                    note,
-                    ks,
-                    false,
-                    null,
-                    this.activity.errorMsg
-                );
-                this.activity.logo.synth.trigger(
+                const ks = this.turtles.ithTurtle(0).singer.keySignature;
+                const noteToPlay = getNote(this._pitch, 4, note, ks, false, null, this.errorMsg);
+                this.logo.synth.trigger(
                     0,
                     noteToPlay[0].replace(/♯/g, "#").replace(/♭/g, "b") + noteToPlay[1],
                     this._noteValue,
@@ -732,7 +753,7 @@ class ModeWidget {
                     this.__playNextNote(i + 1);
                 } else {
                     this._locked = false;
-                    setTimeout(() => this._resetNotes(), 500);
+                    setTimeout(() => this._resetNotes(), ModeWidget.RESET_NOTES_DELAY);
                     return;
                 }
             }, 1000 * time);
@@ -745,10 +766,10 @@ class ModeWidget {
      * @returns {void}
      */
     _playNote(i) {
-        const ks = this.activity.turtles.ithTurtle(0).singer.keySignature;
+        const ks = this.turtles.ithTurtle(0).singer.keySignature;
 
-        const noteToPlay = getNote(this._pitch, 4, i, ks, false, null, this.activity.errorMsg);
-        this.activity.logo.synth.trigger(
+        const noteToPlay = getNote(this._pitch, 4, i, ks, false, null, this.errorMsg);
+        this.logo.synth.trigger(
             0,
             noteToPlay[0].replace(/♯/g, "#").replace(/♭/g, "b") + noteToPlay[1],
             this._noteValue,
@@ -783,7 +804,7 @@ class ModeWidget {
             this._resetNotes();
             this._setModeName();
             const currentModeName = keySignatureToMode(
-                this.activity.turtles.ithTurtle(0).singer.keySignature
+                this.turtles.ithTurtle(0).singer.keySignature
             );
             if (currentModeName[0] === "C") {
                 this._showPiano();
@@ -806,9 +827,7 @@ class ModeWidget {
 
         this._resetNotes();
         this._setModeName();
-        const currentModeName = keySignatureToMode(
-            this.activity.turtles.ithTurtle(0).singer.keySignature
-        );
+        const currentModeName = keySignatureToMode(this.turtles.ithTurtle(0).singer.keySignature);
         if (currentModeName[0] === "C") {
             this._showPiano();
         }
@@ -842,26 +861,24 @@ class ModeWidget {
         const table = docById("modeTable");
         const n = table.rows.length - 1;
         const currentMode = JSON.stringify(this._calculateMode());
-        const currentKey = keySignatureToMode(
-            this.activity.turtles.ithTurtle(0).singer.keySignature
-        )[0];
+        const currentKey = keySignatureToMode(this.turtles.ithTurtle(0).singer.keySignature)[0];
 
         for (const mode in MUSICALMODES) {
             if (JSON.stringify(MUSICALMODES[mode]) === currentMode) {
                 // Update the value of the modename block inside of
                 // the mode widget block.
-                if (this._modeBlock != null) {
-                    for (const i in this.activity.blocks.blockList) {
-                        if (this.activity.blocks.blockList[i].name == "modename") {
-                            this.activity.blocks.blockList[i].value = mode;
-                            this.activity.blocks.blockList[i].text.text = _(mode);
-                            this.activity.blocks.blockList[i].updateCache();
-                        } else if (this.activity.blocks.blockList[i].name == "notename") {
-                            this.activity.blocks.blockList[i].value = currentKey;
-                            this.activity.blocks.blockList[i].text.text = _(currentKey);
+                if (this._modeBlock !== null) {
+                    for (const i in this.blocks.blockList) {
+                        if (this.blocks.blockList[i].name === "modename") {
+                            this.blocks.blockList[i].value = mode;
+                            this.blocks.blockList[i].text.text = _(mode);
+                            this.blocks.blockList[i].updateCache();
+                        } else if (this.blocks.blockList[i].name === "notename") {
+                            this.blocks.blockList[i].value = currentKey;
+                            this.blocks.blockList[i].text.text = _(currentKey);
                         }
                     }
-                    this.activity.refreshCanvas();
+                    this.refreshCanvas();
                 }
 
                 const name = currentKey + " " + _(mode);
@@ -888,7 +905,7 @@ class ModeWidget {
         if (table.rows[n].cells[0].innerHTML === "") {
             const customMode = this._calculateMode();
             // console.debug("custom mode: " + customMode);
-            this.activity.storage.custommode = JSON.stringify(customMode);
+            this.storage.custommode = JSON.stringify(customMode);
         }
 
         let modeName = table.rows[n].cells[0].innerHTML;
@@ -990,8 +1007,8 @@ class ModeWidget {
 
         // Create a new stack for the chunk.
         // console.debug(newStack);
-        this.activity.blocks.loadNewBlocks(newStack);
-        activity.textMsg(_("New action block generated."), 3000);
+        this.blocks.loadNewBlocks(newStack);
+        this.textMsg(_("New action block generated."), 3000);
 
         // And save a stack of pitchnumbers to be used with the define mode
         newStack = [
@@ -1058,7 +1075,7 @@ class ModeWidget {
         // Create a new stack for the chunk.
         // console.debug(newStack);
         setTimeout(() => {
-            this.activity.blocks.loadNewBlocks(newStack);
+            this.blocks.loadNewBlocks(newStack);
         }, 2000);
     }
 
@@ -1157,7 +1174,7 @@ class ModeWidget {
             this._playNote(i);
             this._setModeName();
             const currentModeName = keySignatureToMode(
-                this.activity.turtles.ithTurtle(0).singer.keySignature
+                this.turtles.ithTurtle(0).singer.keySignature
             );
             if (currentModeName[0] === "C") {
                 this._showPiano();
@@ -1167,7 +1184,7 @@ class ModeWidget {
         // If a noteWheel sector is selected, hide it.
         const __clearNote = () => {
             const i = this._noteWheel.selectedNavItemIndex;
-            if (i == 0) {
+            if (i === 0) {
                 return; // Never hide the first note.
             }
 
@@ -1176,7 +1193,7 @@ class ModeWidget {
             this._selectedNotes[i] = false;
             this._setModeName();
             const currentModeName = keySignatureToMode(
-                this.activity.turtles.ithTurtle(0).singer.keySignature
+                this.turtles.ithTurtle(0).singer.keySignature
             );
             if (currentModeName[0] === "C") {
                 this._showPiano();
