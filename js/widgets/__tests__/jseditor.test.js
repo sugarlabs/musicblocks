@@ -545,16 +545,17 @@ describe("JSEditor", () => {
             expect(editor.activity.sendAllToTrash).not.toHaveBeenCalled();
         });
 
-        test("_runCode does nothing when _showingHelp is true", () => {
+        test("_runCode does nothing when _showingHelp is true", async () => {
             const editor = createEditor();
             editor._showingHelp = true;
+            jest.spyOn(editor, "_codeToBlocks");
 
-            editor._runCode();
+            await editor._runCode();
 
-            expect(MusicBlocks.init).not.toHaveBeenCalled();
+            expect(editor._codeToBlocks).not.toHaveBeenCalled();
         });
 
-        test("_runCode clears old console output and logs new output", () => {
+        test("_runCode clears old console output and logs new output", async () => {
             const editor = createEditor();
 
             // The constructor's _setup() already created editorConsole
@@ -564,13 +565,13 @@ describe("JSEditor", () => {
 
             editor._code = "const a = 1;";
 
-            editor._runCode();
+            await editor._runCode();
 
             // Old content should be gone (clearConsole was called)
             expect(consoleEl.textContent).not.toContain("previous output");
         });
 
-        test("_runCode calls MusicBlocks.init on valid code", () => {
+        test("_runCode calls _codeToBlocks securely on valid code", async () => {
             const editor = createEditor();
             const consoleEl = document.createElement("div");
             consoleEl.id = "editorConsole";
@@ -579,12 +580,15 @@ describe("JSEditor", () => {
             editor._code = "const a = 1;";
             acorn.parse.mockImplementation(() => ({}));
 
-            editor._runCode();
+            // Mock _codeToBlocks
+            jest.spyOn(editor, "_codeToBlocks").mockResolvedValue();
 
-            expect(MusicBlocks.init).toHaveBeenCalledWith(true);
+            await editor._runCode();
+
+            expect(editor._codeToBlocks).toHaveBeenCalled();
         });
 
-        test("_runCode logs syntax error on parse failure", () => {
+        test("_runCode logs syntax error on parse failure", async () => {
             const editor = createEditor();
 
             const consoleEl = document.getElementById("editorConsole");
@@ -595,12 +599,12 @@ describe("JSEditor", () => {
                 throw new SyntaxError("Unexpected token");
             });
 
-            editor._runCode();
+            await editor._runCode();
 
             expect(consoleEl.textContent).toContain("Syntax Error");
         });
 
-        test("_runCode does not call MusicBlocks.init on syntax error", () => {
+        test("_runCode does not call _codeToBlocks on syntax error", async () => {
             const editor = createEditor();
             const consoleEl = document.createElement("div");
             consoleEl.id = "editorConsole";
@@ -611,9 +615,11 @@ describe("JSEditor", () => {
                 throw new SyntaxError("Bad");
             });
 
-            editor._runCode();
+            jest.spyOn(editor, "_codeToBlocks");
 
-            expect(MusicBlocks.init).not.toHaveBeenCalled();
+            await editor._runCode();
+
+            expect(editor._codeToBlocks).not.toHaveBeenCalled();
         });
 
         test("logConsole appends message to console element", () => {
