@@ -3853,7 +3853,15 @@ const piemenuBlockContext = block => {
     if (helpButton !== null) {
         wheel.navItems[helpButton].navigateFunction = () => {
             that.blocks.activeBlock = blockBlock;
-            new HelpWidget(that, true);
+            if (typeof HelpWidget === "undefined") {
+                if (typeof require !== "undefined") {
+                    require(["widgets/help"], function () {
+                        new HelpWidget(that, true);
+                    });
+                }
+            } else {
+                new HelpWidget(that, true);
+            }
             docById("contextWheelDiv").style.display = "none";
         };
     }
