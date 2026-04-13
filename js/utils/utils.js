@@ -1338,7 +1338,16 @@ function doStopVideoCam(cameraID, setCameraID) {
     }
 
     setCameraID(null);
-    document.querySelector("#camVideo").pause();
+    const video = document.querySelector("#camVideo");
+    if (video) {
+        video.pause();
+        if (video.srcObject) {
+            const tracks = video.srcObject.getTracks();
+            tracks.forEach(track => track.stop());
+            video.srcObject = null;
+        }
+    }
+    CameraManager.reset();
 }
 
 /**
