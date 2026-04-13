@@ -228,7 +228,7 @@ const doAnalyzeProject = function () {
 /**
  * Represents an activity in the application.
  */
-// eslint-disable-next-line no-redeclare
+
 class Activity {
     /**
      * Creates an Activity instance.
@@ -2499,13 +2499,22 @@ class Activity {
                 if (obj["PALETTEPLUGINS"] && this.palettes.activePalette in obj["PALETTEPLUGINS"]) {
                     delete obj["PALETTEPLUGINS"][this.palettes.activePalette];
                 }
-                if (obj["PALETTEFILLCOLORS"] && this.palettes.activePalette in obj["PALETTEFILLCOLORS"]) {
+                if (
+                    obj["PALETTEFILLCOLORS"] &&
+                    this.palettes.activePalette in obj["PALETTEFILLCOLORS"]
+                ) {
                     delete obj["PALETTEFILLCOLORS"][this.palettes.activePalette];
                 }
-                if (obj["PALETTESTROKECOLORS"] && this.palettes.activePalette in obj["PALETTESTROKECOLORS"]) {
+                if (
+                    obj["PALETTESTROKECOLORS"] &&
+                    this.palettes.activePalette in obj["PALETTESTROKECOLORS"]
+                ) {
                     delete obj["PALETTESTROKECOLORS"][this.palettes.activePalette];
                 }
-                if (obj["PALETTEHIGHLIGHTCOLORS"] && this.palettes.activePalette in obj["PALETTEHIGHLIGHTCOLORS"]) {
+                if (
+                    obj["PALETTEHIGHLIGHTCOLORS"] &&
+                    this.palettes.activePalette in obj["PALETTEHIGHLIGHTCOLORS"]
+                ) {
                     delete obj["PALETTEHIGHLIGHTCOLORS"][this.palettes.activePalette];
                 }
                 for (

@@ -697,7 +697,8 @@ class SaveInterface {
 
         const customAuthorData = activity.storage.getItem("customAuthor");
         if (customAuthorData !== undefined && customAuthorData !== null) {
-            docById("author").value = safeJSONParse(customAuthorData, _("Mr. Mouse")) || _("Mr. Mouse");
+            docById("author").value =
+                safeJSONParse(customAuthorData, _("Mr. Mouse")) || _("Mr. Mouse");
         } else {
             //.TRANS: default project author when saving as Lilypond
             docById("author").value = _("Mr. Mouse");
