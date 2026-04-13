@@ -38,7 +38,7 @@
    importMembers, isSVGEmpty, last, mixedNumber, nearestBeat,
    oneHundredToFraction, prepareMacroExports, preparePluginExports,
    processMacroData, processRawPluginData, rationalSum, rgbToHex,
-   safeSVG, toFixed2, toTitleCase, windowHeight, windowWidth,
+   safeSVG, safeJSONParse, toFixed2, toTitleCase, windowHeight, windowWidth,
     fnBrowserDetect, waitForReadiness, isSafeUrl
 */
 
@@ -56,6 +56,32 @@ const changeImage = (imgElement, from, to) => {
         imgElement.src = newSrc;
     }
 };
+
+/**
+ * Safely parses a JSON string, wrapping the operation in a try/catch block
+ * to prevent the application from crashing on malformed JSON payload data (e.g. from localStorage).
+ *
+ * @function
+ * @param {string} data - The JSON string to parse
+ * @param {*} fallback - The fallback value to return if JSON.parse throws an error. Defaults to null.
+ * @returns {*} The successfully parsed Object/Array, or the fallback value upon failure.
+ */
+const safeJSONParse = (data, fallback = null) => {
+    if (typeof data !== "string" || !data) return fallback;
+    try {
+        return JSON.parse(data);
+    } catch (e) {
+        console.warn("Failed to safely parse JSON:", e);
+        return fallback;
+    }
+};
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports.safeJSONParse = safeJSONParse;
+}
+if (typeof window !== "undefined") {
+    window.safeJSONParse = safeJSONParse;
+}
 
 /**
  * Enhanced _() method to handle case variations for translations
@@ -776,9 +802,7 @@ const processPluginData = (activity, pluginData, pluginSource) => {
     try {
         obj = JSON.parse(pluginData);
     } catch (e) {
-        console.log(pluginData);
-
-        console.log(e);
+        console.warn("Skipped loading malformed plugin data:", e.message);
         return null;
     }
     // Create a palette entry.

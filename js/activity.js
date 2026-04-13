@@ -2493,18 +2493,19 @@ class Activity {
          */
         this._deletePlugin = () => {
             if (this.palettes.activePalette !== null) {
-                const obj = JSON.parse(this.storage.plugins);
+                const obj = safeJSONParse(this.storage.plugins);
+                if (!obj) return;
 
-                if (this.palettes.activePalette in obj["PALETTEPLUGINS"]) {
+                if (obj["PALETTEPLUGINS"] && this.palettes.activePalette in obj["PALETTEPLUGINS"]) {
                     delete obj["PALETTEPLUGINS"][this.palettes.activePalette];
                 }
-                if (this.palettes.activePalette in obj["PALETTEFILLCOLORS"]) {
+                if (obj["PALETTEFILLCOLORS"] && this.palettes.activePalette in obj["PALETTEFILLCOLORS"]) {
                     delete obj["PALETTEFILLCOLORS"][this.palettes.activePalette];
                 }
-                if (this.palettes.activePalette in obj["PALETTESTROKECOLORS"]) {
+                if (obj["PALETTESTROKECOLORS"] && this.palettes.activePalette in obj["PALETTESTROKECOLORS"]) {
                     delete obj["PALETTESTROKECOLORS"][this.palettes.activePalette];
                 }
-                if (this.palettes.activePalette in obj["PALETTEHIGHLIGHTCOLORS"]) {
+                if (obj["PALETTEHIGHLIGHTCOLORS"] && this.palettes.activePalette in obj["PALETTEHIGHLIGHTCOLORS"]) {
                     delete obj["PALETTEHIGHLIGHTCOLORS"][this.palettes.activePalette];
                 }
                 for (
@@ -2514,7 +2515,7 @@ class Activity {
                 ) {
                     const name =
                         this.palettes.dict[this.palettes.activePalette].protoList[i]["name"];
-                    if (name in obj["FLOWPLUGINS"]) {
+                    if (obj["FLOWPLUGINS"] && name in obj["FLOWPLUGINS"]) {
                         debugLog("deleting " + name);
                         delete obj["FLOWPLUGINS"][name];
                     }
