@@ -13,15 +13,15 @@
 /*
    global
 
-    platformColor, docById, Singer, slicePath, wheelnav,
+   platformColor, docById, Singer, slicePath, wheelnav,
    DEFAULTVOICE, getDrumName, getNote, MUSICALMODES last, SHARP, FLAT,
    PREVIEWVOLUME, DEFAULTVOLUME, MODE_PIE_MENUS, HelpWidget,
    INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName,
    getMunsellColor, COLORS40, frequencyToPitch, instruments,
    DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
-   FIXEDSOLFEGE, NOTENAMES, FIXEDSOLFEGE, NOTENAMES, numberToPitch,
+   FIXEDSOLFEGE, NOTENAMES, numberToPitch,
    nthDegreeToPitch, SOLFEGENAMES, buildScale, _THIS_IS_TURTLE_BLOCKS_,
-    CHORDNAMES, Tone, Synth
+   CHORDNAMES, Synth, Tone, activity
 */
 
 /*
@@ -460,7 +460,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
         !pitchHasAccidental &&
         ((!block.activity.KeySignatureEnv[2] && block.name === "solfege") ||
             (block.name === "notename" &&
-                (block.connections[0] != undefined
+                (block.connections[0] !== undefined
                     ? !["setkey", "setkey2"].includes(
                           block.blocks.blockList[block.connections[0]].name
                       )
@@ -608,7 +608,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                 block.activity.KeySignatureEnv[0] + " " + block.activity.KeySignatureEnv[1];
 
             let obj;
-            if (that.name == "scaledegree2") {
+            if (that.name === "scaledegree2") {
                 note = note.replace(attr, "");
                 note = SOLFEGENAMES[note - 1];
                 note += attr;
@@ -699,7 +699,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
         if (
             (!block.activity.KeySignatureEnv[2] && that.name === "solfege") ||
             (that.name === "notename" &&
-                (that.connections[0] != undefined
+                (that.connections[0] !== undefined
                     ? !["setkey", "setkey2"].includes(
                           that.blocks.blockList[that.connections[0]].name
                       )
@@ -1177,7 +1177,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
 
     let j = selectedNote;
     for (const x in noteLabels[selectedCustom]) {
-        if (x != "pitchNumber" && noteLabels[selectedCustom][x][1] == j) {
+        if (x !== "pitchNumber" && noteLabels[selectedCustom][x][1] === j) {
             j = +x;
             break;
         }
@@ -2189,13 +2189,19 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         const actualPitch = frequencyToPitch(wheelValues[i]);
         const tur = that.activity.turtles.ithTurtle(0);
         if (!tur.singer.instrumentNames.includes(DEFAULTVOICE)) {
-            that.activity.logo.synth.createDefaultSynth(0);
-            that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
+            if (that.activity?.logo?.synth?.createDefaultSynth) {
+                that.activity.logo.synth.createDefaultSynth(0);
+            }
+            if (that.activity?.logo?.synth?.loadSynth) {
+                that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
+            }
         }
-        that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
-        that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+        if (that.activity?.logo?.synth) {
+            that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
+            that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+        }
         actualPitch[0] = actualPitch[0].replace(SHARP, "#").replace(FLAT, "b");
-        if (!that._triggerLock) {
+        if (!that._triggerLock && that.activity?.logo?.synth?.trigger) {
             that._triggerLock = true;
             that.activity.logo.synth.trigger(
                 0,
@@ -3847,7 +3853,15 @@ const piemenuBlockContext = block => {
     if (helpButton !== null) {
         wheel.navItems[helpButton].navigateFunction = () => {
             that.blocks.activeBlock = blockBlock;
-            new HelpWidget(that, true);
+            if (typeof HelpWidget === "undefined") {
+                if (typeof require !== "undefined") {
+                    require(["widgets/help"], function () {
+                        new HelpWidget(that, true);
+                    });
+                }
+            } else {
+                new HelpWidget(that, true);
+            }
             docById("contextWheelDiv").style.display = "none";
         };
     }
@@ -3864,6 +3878,7 @@ const piemenuBlockContext = block => {
  */
 const piemenuGrid = activity => {
     docById("wheelDivptm").style.display = "none";
+    docById("wheelDivptm").classList.add("grid-wheel");
     const x = activity.turtles.gridButton.getBoundingClientRect().x;
     const y = activity.turtles.gridButton.getBoundingClientRect().y;
     docById("wheelDivptm").style.position = "absolute";
@@ -3971,6 +3986,7 @@ const piemenuGrid = activity => {
 
     const hidePiemenu = activity => {
         docById("wheelDivptm").style.display = "none";
+        docById("wheelDivptm").classList.remove("grid-wheel");
         activity.turtles.gridWheel.removeWheel();
         activity.turtles._exitWheel.removeWheel();
     };
@@ -4185,7 +4201,7 @@ const piemenuKey = activity => {
         const ele = document.getElementsByName("movable");
         for (let i = 0; i < ele.length; i++) {
             if (ele[i].checked) {
-                activity.KeySignatureEnv[2] = ele[i].value == "true" ? true : false;
+                activity.KeySignatureEnv[2] = ele[i].value === "true" ? true : false;
             }
         }
         keyNameWheel.removeWheel();
@@ -4237,7 +4253,7 @@ const piemenuKey = activity => {
     const __setupActionKey = i => {
         keyNameWheel.navItems[i].navigateFunction = () => {
             for (let j = 0; j < keys2.length; j++) {
-                if (Math.floor(j / 2) != i) {
+                if (Math.floor(j / 2) !== i) {
                     keyNameWheel2.navItems[j].navItem.hide();
                 } else {
                     if (keys[i].length > 2) {
@@ -4294,7 +4310,7 @@ const piemenuKey = activity => {
         const ks = activity.storage.KeySignatureEnv.split(",");
         activity.KeySignatureEnv[0] = ks[0];
         activity.KeySignatureEnv[1] = ks[1];
-        activity.KeySignatureEnv[2] = ks[2] == "true" ? true : false;
+        activity.KeySignatureEnv[2] = ks[2] === "true" ? true : false;
         activity.storage.KeySignatureEnv = activity.KeySignatureEnv;
     } else {
         activity.KeySignatureEnv = ["C", "major", false];
@@ -4309,7 +4325,7 @@ const piemenuKey = activity => {
             keyNameWheel2.navigateWheel(i);
             for (let j = 0; j < keys2.length; j++) {
                 keyNameWheel2.navItems[j].navItem.hide();
-                if (i % 2 == 0) {
+                if (i % 2 === 0) {
                     keyNameWheel2.navItems[i].navItem.show();
                     keyNameWheel2.navItems[i + 1].navItem.show();
                 } else {

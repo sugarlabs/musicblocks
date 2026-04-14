@@ -1008,4 +1008,107 @@ describe("setupEnsembleBlocks", () => {
             expect(activity.errorMsg).toHaveBeenCalledWith("Mouse is already running.", 10);
         });
     });
+    describe("StartTurtleBlock foundStartBlock=true (lines 286-289)", () => {
+        it("should call runFromBlock when startBlock found in blockList array", () => {
+            const startTurtleBlock = createdBlocks["startTurtle"];
+            const tur = turtles.ithTurtle(0);
+            tur.running = false;
+            const startBlkObj = { name: "start" };
+            tur.startBlock = startBlkObj;
+            activity.blocks.blockList = [startBlkObj];
+            startTurtleBlock.flow(["Yertle"], logo, 0, 0, null, [], false);
+            expect(logo.runFromBlock).toHaveBeenCalled();
+        });
+    });
+
+    describe("NthTurtleNameBlock _THIS_IS_MUSIC_BLOCKS_ (line 1213)", () => {
+        it("should show mouse error when index out of range in music blocks mode", () => {
+            global._THIS_IS_MUSIC_BLOCKS_ = true;
+            createdBlocks = {};
+            setupEnsembleBlocks(activity);
+            const nthTurtleNameBlock = createdBlocks["nthturtle"];
+            activity.blocks.blockList[50] = { connections: [null, 100] };
+            logo.parseArg.mockReturnValue(10);
+            nthTurtleNameBlock.arg(logo, 0, 50, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("mouse"));
+            global._THIS_IS_MUSIC_BLOCKS_ = false;
+        });
+    });
+
+    describe("NewTurtleBlock __afterLoad callback (lines 998-1010)", () => {
+        it("should init and run turtle after finishedLoading event", () => {
+            const newTurtleBlock = createdBlocks["newturtle"];
+
+            activity.blocks.blockList = [];
+            activity.blocks.blockList[0] = { connections: [null, 1] };
+            activity.blocks.blockList[1] = { name: "text", value: "BrandNewTurtle" };
+            activity.blocks.loadNewBlocks = jest.fn();
+            activity.turtles.getTurtle = jest.fn(() => ({ x: 0, y: 0 }));
+
+            let capturedListener = null;
+            global.document.addEventListener = jest.fn((event, fn) => {
+                if (event === "finishedLoading") capturedListener = fn;
+            });
+
+            logo.parseArg.mockReturnValue("BrandNewTurtle");
+            newTurtleBlock.flow(["BrandNewTurtle"], logo, 0, 0, null);
+
+            activity.blocks.blockList[2] = { value: 0 };
+
+            expect(capturedListener).not.toBeNull();
+            capturedListener();
+
+            expect(logo.initTurtle).toHaveBeenCalled();
+            expect(logo.runFromBlock).toHaveBeenCalled();
+        });
+    });
+    describe("getHelperTurtle null targetTurtle (line 54)", () => {
+        it("should return null when parseArg returns null", () => {
+            const turtleColorBlock = createdBlocks["turtlecolor"];
+            const blk = 50;
+            activity.blocks.blockList[blk] = { connections: [null, 100] };
+            activity.blocks.blockList[100] = { name: "text", value: "Yertle" };
+            logo.parseArg.mockReturnValue(null);
+            const result = turtleColorBlock.arg(logo, 0, blk, null);
+            expect(result).toBe("#FF0000"); // falls back to current turtle
+        });
+    });
+
+    describe("NewTurtleBlock attachEvent fallback (line 1016)", () => {
+        it("should use attachEvent when addEventListener is not available", () => {
+            const newTurtleBlock = createdBlocks["newturtle"];
+            activity.blocks.blockList = [];
+            activity.blocks.blockList[0] = { connections: [null, 1] };
+            activity.blocks.blockList[1] = { name: "text", value: "BrandNewTurtle2" };
+            activity.blocks.loadNewBlocks = jest.fn();
+            activity.turtles.getTurtle = jest.fn(() => ({ x: 0, y: 0 }));
+
+            global.document.addEventListener = undefined;
+            global.document.attachEvent = jest.fn();
+
+            logo.parseArg.mockReturnValue("BrandNewTurtle2");
+            newTurtleBlock.flow(["BrandNewTurtle2"], logo, 0, 0, null);
+
+            expect(global.document.attachEvent).toHaveBeenCalledWith(
+                "finishedLoading",
+                expect.any(Function)
+            );
+
+            global.document.addEventListener = jest.fn();
+        });
+    });
+
+    describe("TurtlePitchBlock lastNotePlayed branch (lines 735-749)", () => {
+        it("should compute pitch from lastNotePlayed string", () => {
+            const turtlePitchBlock = createdBlocks["turtlepitch"];
+            const blk = 50;
+            activity.blocks.blockList[blk] = { connections: [null, 100], value: null };
+            activity.blocks.blockList[100] = { name: "text", value: "Yertle" };
+            const tur = turtles.ithTurtle(0);
+            tur.singer.lastNotePlayed = ["C4", 0.25];
+            logo.parseArg.mockReturnValue("Yertle");
+            turtlePitchBlock.arg(logo, 0, blk, null);
+            expect(pitchToNumber).toHaveBeenCalled();
+        });
+    });
 });

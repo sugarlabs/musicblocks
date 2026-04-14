@@ -16,7 +16,7 @@
    PALETTEFILLCOLORS, PALETTESTROKECOLORS,
    PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
    MULTIPALETTEICONS, PALETTEICONS, makePaletteIcons,
-   globalActivity
+   globalActivity, createjs
 */
 
 /* exported ThemeBox, themeConfigs */
@@ -24,7 +24,7 @@
 const themeConfigs = {
     dark: {
         textColor: "#E2E2E2",
-        blockText: "#000000",
+        blockText: "#FFFFFF",
         dialogueBox: "#1C1C1C",
         strokeColor: "#E2E2E2",
         fillColor: "#F9F9F9",
@@ -253,6 +253,34 @@ class ThemeBox {
     }
 
     /**
+     * Initialize theme on page load - apply theme state without notification
+     * @public
+     * @returns {void}
+     */
+    initializeTheme() {
+        const body = document.body;
+        // Update body classes
+        this._themes.forEach(theme => {
+            if (theme === this._theme) {
+                body.classList.add(theme);
+            } else {
+                body.classList.remove(theme);
+            }
+        });
+
+        // Sync platformColor with the active theme config on startup
+        if (themeConfigs[this._theme] && window.platformColor) {
+            Object.assign(window.platformColor, themeConfigs[this._theme]);
+        }
+
+        // Update theme icon immediately if DOM is ready
+        this.updateThemeIcon();
+
+        // Refresh UI components (including planet iframe) if they exist
+        this.refreshUIComponents();
+    }
+
+    /**
      * Apply theme instantly without page reload
      * @private
      * @returns {void}
@@ -453,23 +481,76 @@ class ThemeBox {
             this.activity.refreshCanvas();
         }
 
+        // Update grid colors for new theme
+        if (this.activity.turtles) {
+            const grids = [
+                this.activity.cartesianBitmap,
+                this.activity.polarBitmap,
+                this.activity.trebleBitmap,
+                this.activity.grandBitmap,
+                this.activity.sopranoBitmap,
+                this.activity.altoBitmap,
+                this.activity.tenorBitmap,
+                this.activity.bassBitmap
+            ];
+
+            const isDarkMode = this._theme === "dark";
+            const isHighContrastMode = this._theme === "highcontrast";
+
+            grids.forEach(grid => {
+                if (grid) {
+                    if (isDarkMode || isHighContrastMode) {
+                        // Apply invert filter for dark/high contrast mode (white grids)
+                        const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
+                        grid.filters = [invertFilter];
+                    } else {
+                        // Remove filter for light mode (black grids)
+                        grid.filters = [];
+                    }
+                    // Re-cache the bitmap to apply the new filter
+                    if (grid.visible) {
+                        grid.uncache();
+                        grid.cache(0, 0, 1200, 900);
+                        grid.updateCache();
+                    }
+                }
+            });
+        }
+
         // Update planet iframe theme if it exists
         const planetIframe = document.getElementById("planet-iframe");
-        if (planetIframe && planetIframe.contentDocument) {
-            try {
-                const planetBody = planetIframe.contentDocument.body;
-                if (planetBody) {
-                    this._themes.forEach(theme => {
-                        if (theme === this._theme) {
-                            planetBody.classList.add(theme);
-                        } else {
-                            planetBody.classList.remove(theme);
+        if (planetIframe) {
+            const applyPlanetTheme = () => {
+                if (
+                    planetIframe.contentDocument &&
+                    planetIframe.contentDocument.readyState === "complete"
+                ) {
+                    try {
+                        const planetBody = planetIframe.contentDocument.body;
+                        if (planetBody) {
+                            this._themes.forEach(theme => {
+                                if (theme === this._theme) {
+                                    planetBody.classList.add(theme);
+                                } else {
+                                    planetBody.classList.remove(theme);
+                                }
+                            });
                         }
-                    });
+                    } catch (e) {
+                        // Cross-origin restriction may prevent this
+                        console.debug("Could not update planet iframe theme:", e);
+                    }
                 }
-            } catch (e) {
-                // Cross-origin restriction may prevent this
-                console.debug("Could not update planet iframe theme:", e);
+            };
+
+            // Apply immediately if already loaded, otherwise wait for load event
+            if (
+                planetIframe.contentDocument &&
+                planetIframe.contentDocument.readyState === "complete"
+            ) {
+                applyPlanetTheme();
+            } else {
+                planetIframe.addEventListener("load", applyPlanetTheme, { once: true });
             }
         }
     }

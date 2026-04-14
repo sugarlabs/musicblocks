@@ -18,7 +18,7 @@
  * Internal functions' names are in PascalCase.
  */
 
-/* global JSEditor, last, importMembers, Singer, JSInterface, globalActivity */
+/* global JSEditor, last, importMembers, Singer, JSInterface, globalActivity, CAMERAVALUE */
 
 /**
  * @class
@@ -319,6 +319,35 @@ class MusicBlocks {
         }
     }
 
+    // ============================== BOXES ==================================
+
+    getBox(name) {
+        if (name in globalActivity.logo.boxes) {
+            return globalActivity.logo.boxes[name];
+        }
+        JSEditor.logConsole(`No box named "${name}"`, "maroon");
+        return 0;
+    }
+
+    setBox(name, value) {
+        globalActivity.logo.boxes[name] = value;
+    }
+
+    incrementBox(name, delta) {
+        const current = name in globalActivity.logo.boxes ? globalActivity.logo.boxes[name] : 0;
+        globalActivity.logo.boxes[name] = current + delta;
+    }
+
+    _ensureHeap() {
+        if (!globalActivity.logo.turtleHeaps) {
+            globalActivity.logo.turtleHeaps = {};
+        }
+        if (!(this.turIndex in globalActivity.logo.turtleHeaps)) {
+            globalActivity.logo.turtleHeaps[this.turIndex] = [];
+        }
+        return globalActivity.logo.turtleHeaps[this.turIndex];
+    }
+
     // ========= Getters/Setters ===================================================================
 
     // ============================== GRAPHICS ================================
@@ -333,6 +362,85 @@ class MusicBlocks {
 
     get HEADING() {
         return this.turtle.orientation;
+    }
+
+    get BOTTOMPOS() {
+        const canvas = globalActivity.turtles._canvas;
+        const scale = globalActivity.turtles.scale;
+        if (!canvas || !canvas.height || !scale) {
+            return 0;
+        }
+        return -1 * (canvas.height / (2.0 * scale));
+    }
+
+    get CAMERA() {
+        return CAMERAVALUE;
+    }
+
+    // =============================== HEAP ===================================
+
+    get HEAP() {
+        return JSON.stringify(this._ensureHeap());
+    }
+
+    get HEAPLENGTH() {
+        return this._ensureHeap().length;
+    }
+
+    get HEAPEMPTY() {
+        return this._ensureHeap().length === 0;
+    }
+
+    emptyHeap() {
+        this._ensureHeap();
+        globalActivity.logo.turtleHeaps[this.turIndex] = [];
+    }
+
+    reverseHeap() {
+        const heap = this._ensureHeap();
+        globalActivity.logo.turtleHeaps[this.turIndex] = heap.reverse();
+    }
+
+    setHeapEntry(index, value) {
+        if (index === null || index === undefined || value === null || value === undefined) {
+            JSEditor.logConsole("Missing heap index or value.", "maroon");
+            return;
+        }
+
+        if (typeof index !== "number" || typeof value !== "number") {
+            JSEditor.logConsole("Heap index and value must be numbers.", "maroon");
+            return;
+        }
+
+        let idx = Math.floor(index);
+        if (idx < 1) {
+            JSEditor.logConsole("Index must be > 0.", "maroon");
+            idx = 1;
+        }
+
+        if (idx > 1000) {
+            JSEditor.logConsole("Maximum heap size is 1000.", "maroon");
+            idx = 1000;
+        }
+
+        const heap = this._ensureHeap();
+        while (heap.length < idx) {
+            heap.push(0);
+        }
+        heap[idx - 1] = value;
+    }
+
+    setHeap(index, value) {
+        this.setHeapEntry(index, value);
+    }
+
+    push(value) {
+        if (value === null || value === undefined) {
+            JSEditor.logConsole("Missing heap value.", "maroon");
+            return;
+        }
+        const heap = this._ensureHeap();
+        heap.push(value);
     }
 
     // ================================ PEN ===================================

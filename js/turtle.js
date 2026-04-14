@@ -17,10 +17,10 @@
  */
 
 /*
-   globals
+   global
 
    createjs, DEFAULTVOLUME, delayExecution, importMembers, Painter, Singer,
-   DEFAULTVOICE
+   DEFAULTVOICE, retryWithBackoff, base64Encode
  */
 /* exported Turtle */
 /**
@@ -86,42 +86,68 @@ class Turtle {
 
     /**
      * Internal function for creating cache.
-     * Includes workaround for a race condition.
+     * Uses bounded retry with exponential backoff to handle the race
+     * condition where container bounds are not yet available.
      *
      * @private
+     * @returns {Promise} Resolves when cache is created, rejects after max retries.
      */
     _createCache() {
-        this.bounds = this.container.getBounds();
+        const that = this;
+        const MAX_RETRIES = 20;
+        const INITIAL_DELAY = 50;
 
-        if (this.bounds == null) {
-            setTimeout(() => {
-                this._createCache();
-            }, 200);
-        } else {
-            this.container.cache(
-                this.bounds.x,
-                this.bounds.y,
-                this.bounds.width,
-                this.bounds.height
-            );
-        }
+        return retryWithBackoff({
+            check: () => {
+                that.bounds = that.container.getBounds();
+                return that.bounds;
+            },
+            onSuccess: bounds => {
+                that.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+            },
+            maxRetries: MAX_RETRIES,
+            initialDelay: INITIAL_DELAY,
+            errorMessage:
+                "Turtle._createCache: could not get container bounds after " +
+                MAX_RETRIES +
+                " attempts"
+        });
     }
 
     /**
      * Internal function for updating cache.
-     * Includes workaround for a race condition.
+     * Uses bounded retry with exponential backoff to handle the race
+     * condition where bounds are not yet available.
      *
-     * @async
+     * @returns {Promise} Resolves when cache is updated, rejects after max retries.
      */
-    async updateCache() {
-        if (this.bounds == null) {
-            console.debug("Block container for " + this.name + " not yet ready.");
-            await delayExecution(300);
-            this.updateCache();
-        } else {
-            this.container.updateCache();
-            this.activity.refreshCanvas();
-        }
+    updateCache() {
+        const that = this;
+        const MAX_RETRIES = 15;
+        const INITIAL_DELAY = 100;
+
+        return retryWithBackoff({
+            check: () => that.bounds !== null && that.container && that.container.bitmapCache,
+            onSuccess: () => {
+                that.container.updateCache();
+                that.activity.refreshCanvas();
+            },
+            onRetry: attempt => {
+                console.debug(
+                    "Turtle container for " +
+                        that.name +
+                        " not yet ready (attempt " +
+                        (attempt + 1) +
+                        "/" +
+                        MAX_RETRIES +
+                        ")"
+                );
+            },
+            maxRetries: MAX_RETRIES,
+            initialDelay: INITIAL_DELAY,
+            errorMessage:
+                "Turtle.updateCache: bounds not available after " + MAX_RETRIES + " attempts"
+        });
     }
 
     /**
@@ -130,6 +156,7 @@ class Turtle {
      * (if they have not been already changed).
      */
     stopBlink() {
+        // eslint-disable-next-line eqeqeq
         if (this._blinkTimeout != null || !this._blinkFinished) {
             clearTimeout(this._blinkTimeout);
             this._blinkTimeout = null;
@@ -656,6 +683,7 @@ Turtle.TurtleModel = class {
 
         const startBlock = this._startBlock;
         // Use the name on the label of the start block
+        // eslint-disable-next-line eqeqeq
         if (startBlock != null) {
             startBlock.overrideName = this._name;
             startBlock.collapseText.text = this._name;
@@ -852,8 +880,12 @@ Turtle.TurtleView = class {
             this.container.hitArea = hitArea;
 
             const startBlock = this._startBlock;
+            // eslint-disable-next-line eqeqeq
             if (startBlock != null) {
-                startBlock.container.removeChild(this._decorationBitmap);
+                // eslint-disable-next-line eqeqeq
+                if (this._decorationBitmap != null) {
+                    startBlock.container.removeChild(this._decorationBitmap);
+                }
                 this._decorationBitmap = new createjs.Bitmap(myImage);
                 startBlock.container.addChild(this._decorationBitmap);
                 this._decorationBitmap.name = "decoration";
@@ -960,6 +992,7 @@ Turtle.TurtleView = class {
             this._createCache();
 
             const startBlock = this._startBlock;
+            // eslint-disable-next-line eqeqeq
             if (useTurtleArtwork && startBlock != null) {
                 startBlock.updateCache();
                 this._decorationBitmap = this._bitmap.clone();
@@ -986,4 +1019,8 @@ Turtle.TurtleView = class {
 
 if (typeof window !== "undefined") {
     window.Turtle = Turtle;
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Turtle;
 }

@@ -331,7 +331,7 @@ function MusicKeyboard(activity) {
                         ele.getAttribute("alt").split("__")[1];
                 }
 
-                if (id == "rest") {
+                if (id === "rest") {
                     return;
                 }
 
@@ -421,7 +421,7 @@ function MusicKeyboard(activity) {
                     processedDuration = 1 / unit;
                 }
 
-                if (id == "rest") {
+                if (id === "rest") {
                     this._notesPlayed.push({
                         startTime: startTime[id],
                         noteOctave: "R",
@@ -638,12 +638,12 @@ function MusicKeyboard(activity) {
             }
 
             myNode = document.getElementById("myrow");
-            if (myNode != null) {
+            if (myNode !== null) {
                 myNode.innerHTML = "";
             }
 
             myNode = document.getElementById("myrow2");
-            if (myNode != null) {
+            if (myNode !== null) {
                 myNode.innerHTML = "";
             }
 
@@ -1325,7 +1325,7 @@ function MusicKeyboard(activity) {
         const start = docById("cells-" + colIndex).getAttribute("start");
 
         this._notesPlayed = this._notesPlayed.filter(function (ele) {
-            return ele.startTime != parseInt(start);
+            return ele.startTime !== parseInt(start);
         });
 
         // Look for each cell that is marked in this column.
@@ -2089,9 +2089,17 @@ function MusicKeyboard(activity) {
                     }
                 }
 
+                let iterations = 0;
                 do {
                     rLabel = pitchLabels[(i + 1) % pitchLabels.length];
                     i = (i + 1) % pitchLabels.length;
+                    iterations++;
+                    if (iterations > pitchLabels.length) {
+                        this.activity.errorMsg(
+                            _("All 12 pitches are already in the keyboard. Adding duplicate.")
+                        );
+                        break;
+                    }
                 } while (this.layout.some(note => note.noteName === rLabel));
                 for (let j = this.layout.length; j > 0; j--) {
                     rArg = this.layout[j - 1].noteOctave;
@@ -2235,7 +2243,7 @@ function MusicKeyboard(activity) {
     this._sortLayout = function () {
         this.layout.sort((a, b) => {
             let aValue, bValue;
-            if (a.noteName == "hertz") {
+            if (a.noteName === "hertz") {
                 if (b.noteName !== "hertz") return 1;
                 aValue = a.noteOctave;
             } else {
@@ -2244,7 +2252,7 @@ function MusicKeyboard(activity) {
                     this.activity.turtles.ithTurtle(0).singer.keySignature
                 );
             }
-            if (b.noteName == "hertz") {
+            if (b.noteName === "hertz") {
                 if (a.noteName !== "hertz") return -1;
                 bValue = b.noteOctave;
             } else {
@@ -2525,7 +2533,7 @@ function MusicKeyboard(activity) {
             this.layout[index].noteOctave = parseInt(blockValue);
             cell.innerHTML = this.layout[index].noteName + this.layout[index].noteOctave.toString();
             this._notesPlayed.map(function (item) {
-                if (item.objId == this.layout[index].blockNumber) {
+                if (item.objId === this.layout[index].blockNumber) {
                     item.noteOctave = parseInt(blockValue);
                 }
                 return item;
@@ -2594,7 +2602,7 @@ function MusicKeyboard(activity) {
             }
 
             this._notesPlayed.map(item => {
-                if (item.objId == this.layout[index].blockNumber) {
+                if (item.objId === this.layout[index].blockNumber) {
                     item.noteOctave = temp2;
                 }
                 return item;
@@ -3039,7 +3047,7 @@ function MusicKeyboard(activity) {
                 } else if (selectedNotes[i].noteOctave[0] === "R") {
                     // Don't trigger a new group with a rest
                     newNotes[newNotes.length - 1].push(i);
-                } else if (selectedNotes[i].voice[0] != prevNote) {
+                } else if (selectedNotes[i].voice[0] !== prevNote) {
                     newNotes.push([i]);
                     prevNote = selectedNotes[i].voice[0];
                 } else {
@@ -3087,7 +3095,7 @@ function MusicKeyboard(activity) {
             const newStack = [
                 [0, ["action", { collapsed: false }], 100, 100, [null, 1, 2, null]],
                 [1, ["text", { value: _("action") + "" + actionGroup }], 0, 0, [0]],
-                [2, "hidden", 0, 0, [0, selectedNotes.length == 0 ? null : 3]]
+                [2, "hidden", 0, 0, [0, selectedNotes.length === 0 ? null : 3]]
             ];
 
             // Add BPM
@@ -3105,7 +3113,7 @@ function MusicKeyboard(activity) {
 
             for (let noteGrp = 0; noteGrp < newNotes.length; noteGrp++) {
                 const selectedNotesGrp = newNotes[noteGrp];
-                const isLast = noteGrp == newNotes.length - 1;
+                const isLast = noteGrp === newNotes.length - 1;
                 id = newStack.length;
                 let voice = selectedNotes[selectedNotesGrp[0]].voice[0] || DEFAULTVOICE;
                 // Don't use a drum name with set timbre.
@@ -3455,7 +3463,7 @@ function MusicKeyboard(activity) {
             const octave = pitchOctave[2];
             const key =
                 this.getElement[pitch1 + "" + octave] || this.getElement[pitch2 + "" + octave];
-            if (event.data[0] == 144 && event.data[2] != 0) {
+            if (event.data[0] === 144 && event.data[2] !== 0) {
                 __startNote(event, docById(key));
             } else {
                 __endNote(event, docById(key));

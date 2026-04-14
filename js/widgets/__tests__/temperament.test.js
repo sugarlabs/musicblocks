@@ -47,6 +47,9 @@ describe("TemperamentWidget basic tests", () => {
 
         global.docById = jest.fn(id => ({
             innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn(),
+            setAttribute: jest.fn(),
             style: {},
             append: jest.fn(),
             getElementsByTagName: jest.fn(() => []),
@@ -174,6 +177,9 @@ describe("TemperamentWidget basic tests", () => {
 
         widget.playButton = {
             innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn(),
+            setAttribute: jest.fn(),
             style: {}
         };
 
@@ -204,6 +210,9 @@ describe("TemperamentWidget basic tests", () => {
 
         global.docById = jest.fn(() => ({
             innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn(),
+            setAttribute: jest.fn(),
             style: {},
             append: jest.fn()
         }));
@@ -222,6 +231,9 @@ describe("TemperamentWidget basic tests", () => {
     test("equalEdit sets editMode to equal", () => {
         global.docById = jest.fn(() => ({
             innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn(),
+            setAttribute: jest.fn(),
             style: {},
             append: jest.fn()
         }));
@@ -234,6 +246,9 @@ describe("TemperamentWidget basic tests", () => {
     test("ratioEdit sets editMode to ratio", () => {
         global.docById = jest.fn(() => ({
             innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn(),
+            setAttribute: jest.fn(),
             style: {},
             append: jest.fn()
         }));
@@ -264,6 +279,9 @@ describe("TemperamentWidget basic tests", () => {
 
             return {
                 innerHTML: "",
+                textContent: "",
+                appendChild: jest.fn(),
+                setAttribute: jest.fn(),
                 style: {},
                 append: jest.fn(),
                 addEventListener: jest.fn() // 👈 ADD THIS
@@ -280,6 +298,9 @@ describe("TemperamentWidget basic tests", () => {
 
         global.docById = jest.fn(() => ({
             innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn(),
+            setAttribute: jest.fn(),
             style: {},
             append: jest.fn()
         }));
@@ -313,6 +334,133 @@ describe("TemperamentWidget basic tests", () => {
             null,
             null
         );
+    });
+
+    test("playNote uses note-name mapping for default temperaments", () => {
+        widget._logo = {
+            resetSynth: jest.fn(),
+            synth: {
+                trigger: jest.fn(),
+                inTemperament: "equal",
+                changeInTemperament: false
+            }
+        };
+
+        widget.inTemperament = "equal19";
+        widget.editMode = null;
+        widget.notes = [["D♭", 4]];
+        widget.frequencies = [440];
+
+        global.isCustomTemperament = jest.fn(() => false);
+        global.docById = jest.fn(() => null);
+
+        widget.playNote(0);
+
+        expect(widget._logo.synth.inTemperament).toBe("equal19");
+        expect(widget._logo.synth.changeInTemperament).toBe(true);
+        expect(widget._logo.synth.trigger).toHaveBeenCalledWith(
+            0,
+            "Db4",
+            expect.any(Number),
+            "electronic synth",
+            null,
+            null
+        );
+    });
+
+    test("playNote keeps equal temperament on frequency path", () => {
+        widget._logo = {
+            resetSynth: jest.fn(),
+            synth: {
+                trigger: jest.fn(),
+                inTemperament: "equal",
+                changeInTemperament: false
+            }
+        };
+
+        widget.inTemperament = "equal";
+        widget.editMode = null;
+        widget.notes = [["D♭", 4]];
+        widget.frequencies = [440];
+
+        global.isCustomTemperament = jest.fn(() => false);
+        global.docById = jest.fn(() => null);
+
+        widget.playNote(0);
+
+        expect(widget._logo.synth.trigger).toHaveBeenCalledWith(
+            0,
+            440,
+            expect.any(Number),
+            "electronic synth",
+            null,
+            null
+        );
+    });
+
+    test("playNote keeps custom temperament on frequency path", () => {
+        widget._logo = {
+            resetSynth: jest.fn(),
+            synth: {
+                trigger: jest.fn(),
+                inTemperament: "custom",
+                changeInTemperament: false
+            }
+        };
+
+        widget.inTemperament = "custom";
+        widget.editMode = null;
+        widget.notes = [["D♭", 4]];
+        widget.frequencies = [441.25];
+
+        global.isCustomTemperament = jest.fn(() => true);
+        global.docById = jest.fn(() => null);
+
+        widget.playNote(0);
+
+        expect(widget._logo.synth.trigger).toHaveBeenCalledWith(
+            0,
+            441.25,
+            expect.any(Number),
+            "electronic synth",
+            null,
+            null
+        );
+    });
+
+    test("playNote no-ops on out-of-range pitch index", () => {
+        widget._logo = {
+            resetSynth: jest.fn(),
+            synth: {
+                trigger: jest.fn(),
+                inTemperament: "equal19",
+                changeInTemperament: false
+            }
+        };
+
+        widget.inTemperament = "equal19";
+        widget.editMode = null;
+        widget.notes = [];
+        widget.frequencies = [];
+
+        global.isCustomTemperament = jest.fn(() => false);
+        global.docById = jest.fn(() => null);
+
+        widget.playNote(999);
+
+        expect(widget._logo.synth.trigger).not.toHaveBeenCalled();
+    });
+
+    test("playNote no-ops when synth is unavailable", () => {
+        widget._logo = null;
+        widget.inTemperament = "equal19";
+        widget.editMode = null;
+        widget.notes = [["C", 4]];
+        widget.frequencies = [440];
+
+        global.docById = jest.fn(() => null);
+
+        expect(() => widget.playNote(0)).not.toThrow();
     });
 
     test("toggleNotesButton switches icon when circle visible", () => {
@@ -349,9 +497,15 @@ describe("TemperamentWidget basic tests", () => {
 
         global.docById = jest.fn(() => ({
             innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn(),
+            setAttribute: jest.fn(),
             style: {},
             insertCell: jest.fn(() => ({
                 innerHTML: "",
+                textContent: "",
+                appendChild: jest.fn(),
+                setAttribute: jest.fn(),
                 style: {},
                 onmouseover: jest.fn(),
                 onmouseout: jest.fn()
@@ -383,11 +537,19 @@ describe("TemperamentWidget basic tests", () => {
                 return { value: 880 };
             }
             if (id === "frequencydiv") {
-                return { innerHTML: "" };
+                return {
+                    innerHTML: "",
+                    textContent: "",
+                    appendChild: jest.fn(),
+                    setAttribute: jest.fn()
+                };
             }
             return {
                 style: {},
-                innerHTML: ""
+                innerHTML: "",
+                textContent: "",
+                appendChild: jest.fn(),
+                setAttribute: jest.fn()
             };
         });
 
@@ -418,6 +580,9 @@ describe("TemperamentWidget basic tests", () => {
             if (id === "endNote") return { value: 1 };
             return {
                 innerHTML: "",
+                textContent: "",
+                appendChild: jest.fn(),
+                setAttribute: jest.fn(),
                 style: {},
                 append: jest.fn()
             };
@@ -442,7 +607,13 @@ describe("TemperamentWidget basic tests", () => {
             }
         };
 
-        widget.playButton = { innerHTML: "" };
+        widget.playButton = {
+            innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn(),
+            setAttribute: jest.fn(),
+            style: {}
+        };
         widget.pitchNumber = 1;
         widget.frequencies = [440, 880];
         widget.tempRatios1 = [1, 2];
@@ -472,7 +643,13 @@ describe("TemperamentWidget basic tests", () => {
             }
         };
 
-        widget.playButton = { innerHTML: "" };
+        widget.playButton = {
+            innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn(),
+            setAttribute: jest.fn(),
+            style: {}
+        };
         widget._playing = true;
         widget.tempRatios1 = [1];
 

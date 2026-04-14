@@ -57,6 +57,7 @@ global.platformColor = {
 global.DRUMNAMES = [];
 global.VOICENAMES = [];
 global.EFFECTSNAMES = [];
+global.getComputedStyle = jest.fn().mockReturnValue({ backgroundColor: "#303030" });
 
 // Mock Window Manager
 
@@ -78,6 +79,8 @@ const mockWindow = {
                 onblur: null
             })),
             getWidgetBody: jest.fn().mockReturnValue({
+                clientWidth: 500,
+                clientHeight: 400,
                 appendChild: jest.fn(),
                 append: jest.fn(),
                 insertRow: jest.fn().mockReturnValue({
@@ -125,12 +128,21 @@ global.document = {
         }),
         deleteCell: jest.fn(),
         classList: { add: jest.fn(), remove: jest.fn() },
+        parentNode: { style: { backgroundColor: "#303030" } },
         getContext: jest.fn().mockReturnValue({
             clearRect: jest.fn(),
             beginPath: jest.fn(),
+            arc: jest.fn(),
             fillStyle: "",
+            strokeStyle: "",
+            lineWidth: 1,
+            font: "",
+            textAlign: "",
+            textBaseline: "",
             fill: jest.fn(),
-            closePath: jest.fn()
+            stroke: jest.fn(),
+            closePath: jest.fn(),
+            fillText: jest.fn()
         })
     })),
     getElementById: jest.fn().mockReturnValue({
@@ -481,6 +493,246 @@ describe("RhythmRuler Widget", () => {
 
             rhythmRuler._fullscreenScaleFactor = 5;
             expect(rhythmRuler._fullscreenScaleFactor).toBe(5);
+        });
+    });
+
+    // =========================================================================
+    // CIRCULAR VIEW TESTS
+    // =========================================================================
+    describe("Circular View", () => {
+        function createMockCanvas() {
+            return {
+                width: 0,
+                height: 0,
+                style: { display: "", margin: "" },
+                parentNode: { style: { backgroundColor: "#303030" } },
+                addEventListener: jest.fn(),
+                getBoundingClientRect: jest.fn().mockReturnValue({ left: 0, top: 0 }),
+                getContext: jest.fn().mockReturnValue({
+                    clearRect: jest.fn(),
+                    beginPath: jest.fn(),
+                    arc: jest.fn(),
+                    moveTo: jest.fn(),
+                    lineTo: jest.fn(),
+                    closePath: jest.fn(),
+                    fill: jest.fn(),
+                    stroke: jest.fn(),
+                    fillText: jest.fn(),
+                    fillStyle: "",
+                    strokeStyle: "",
+                    lineWidth: 1,
+                    font: "",
+                    textAlign: "",
+                    textBaseline: ""
+                })
+            };
+        }
+
+        test("should initialize circular view state to false", () => {
+            expect(rhythmRuler._circularView).toBe(false);
+            expect(rhythmRuler._circularCanvas).toBeNull();
+            expect(rhythmRuler._circularHighlight).toEqual({});
+        });
+
+        test("should toggle _circularView flag", () => {
+            expect(rhythmRuler._circularView).toBe(false);
+            rhythmRuler._circularView = true;
+            expect(rhythmRuler._circularView).toBe(true);
+            rhythmRuler._circularView = false;
+            expect(rhythmRuler._circularView).toBe(false);
+        });
+
+        test("_toggleCircularView should show canvas and hide table when switching to circular", () => {
+            rhythmRuler._rhythmRulerTable = { style: {} };
+            rhythmRuler.Rulers = [[[4, 4, 4, 4], []]];
+            rhythmRuler._rulers = [{ cells: [] }];
+            rhythmRuler._circularView = true;
+            // Pre-set the canvas so _toggleCircularView skips document.createElement
+            rhythmRuler._circularCanvas = createMockCanvas();
+
+            rhythmRuler._toggleCircularView();
+
+            expect(rhythmRuler._circularCanvas.style.display).toBe("block");
+            expect(rhythmRuler._rhythmRulerTable.style.display).toBe("none");
+        });
+
+        test("_toggleCircularView should hide canvas when switching to linear", () => {
+            // Setup: create a mock canvas first
+            rhythmRuler._rhythmRulerTable = { style: {} };
+            rhythmRuler._circularCanvas = { style: {}, addEventListener: jest.fn() };
+            rhythmRuler.Rulers = [[[4, 4, 4, 4], []]];
+            rhythmRuler._rulers = [
+                {
+                    children: [],
+                    cells: [{ style: {} }, { style: {} }, { style: {} }, { style: {} }]
+                }
+            ];
+            rhythmRuler._circularView = false;
+
+            rhythmRuler._toggleCircularView();
+
+            expect(rhythmRuler._circularCanvas.style.display).toBe("none");
+            expect(rhythmRuler._rhythmRulerTable.style.display).toBe("");
+        });
+
+        test("_drawCircularView should not crash with empty rulers", () => {
+            rhythmRuler._circularCanvas = createMockCanvas();
+            rhythmRuler._rhythmRulerTable = { style: {} };
+            rhythmRuler.Rulers = [];
+
+            expect(() => rhythmRuler._drawCircularView()).not.toThrow();
+        });
+
+        test("_drawCircularView should not crash with single ruler", () => {
+            rhythmRuler._circularCanvas = createMockCanvas();
+            rhythmRuler._rhythmRulerTable = { style: {} };
+            rhythmRuler.Rulers = [[[4, 4, 4, 4], []]];
+
+            expect(() => rhythmRuler._drawCircularView()).not.toThrow();
+        });
+
+        test("_drawCircularView should not crash with multiple rulers (concentric)", () => {
+            rhythmRuler._circularCanvas = createMockCanvas();
+            rhythmRuler._rhythmRulerTable = { style: {} };
+            rhythmRuler.Rulers = [
+                [[4, 4, 4, 4], []],
+                [[3, 3, 3], []],
+                [[8, 8, 8, 8, 8, 8, 8, 8], []]
+            ];
+
+            expect(() => rhythmRuler._drawCircularView()).not.toThrow();
+        });
+
+        test("_drawCircularView should handle rests (negative note values)", () => {
+            rhythmRuler._circularCanvas = createMockCanvas();
+            rhythmRuler._rhythmRulerTable = { style: {} };
+            rhythmRuler.Rulers = [[[4, -4, 4, 4], []]];
+
+            expect(() => rhythmRuler._drawCircularView()).not.toThrow();
+        });
+
+        test("_drawCircularView should handle playback highlights", () => {
+            rhythmRuler._circularCanvas = createMockCanvas();
+            rhythmRuler._rhythmRulerTable = { style: {} };
+            rhythmRuler.Rulers = [[[4, 4, 4, 4], []]];
+            rhythmRuler._playing = true;
+            rhythmRuler._circularHighlight = { 0: 2 };
+
+            expect(() => rhythmRuler._drawCircularView()).not.toThrow();
+        });
+
+        test("_onCircularMouseDown should not record a hit while playing", () => {
+            rhythmRuler._playing = true;
+            rhythmRuler._circularCanvas = createMockCanvas();
+            rhythmRuler.Rulers = [[[4, 4, 4, 4], []]];
+
+            rhythmRuler._onCircularMouseDown({ clientX: 100, clientY: 100 });
+            expect(rhythmRuler._circularDownHit).toBeNull();
+        });
+
+        test("_onCircularMouseUp should not act while playing", () => {
+            rhythmRuler._playing = true;
+            rhythmRuler._circularCanvas = createMockCanvas();
+            rhythmRuler.Rulers = [[[4, 4, 4, 4], []]];
+
+            const dissectSpy = jest.spyOn(rhythmRuler, "__dissectByNumber").mockImplementation();
+            const tieSpy = jest.spyOn(rhythmRuler, "__tie").mockImplementation();
+            rhythmRuler._onCircularMouseUp({ clientX: 100, clientY: 100 });
+            expect(dissectSpy).not.toHaveBeenCalled();
+            expect(tieSpy).not.toHaveBeenCalled();
+        });
+
+        test("same-slice mousedown+mouseup should trigger dissect", () => {
+            rhythmRuler._playing = false;
+            rhythmRuler._circularCanvas = createMockCanvas();
+            rhythmRuler.Rulers = [[[4, 4, 4, 4], []]];
+            rhythmRuler._rulers = [
+                { cells: [{ style: {} }, { style: {} }, { style: {} }, { style: {} }] }
+            ];
+            rhythmRuler._dissectNumber = { value: "2" };
+
+            // Pretend both events landed on the same slice.
+            jest.spyOn(rhythmRuler, "_hitTestCircular").mockReturnValue({
+                rulerIndex: 0,
+                cellIndex: 1
+            });
+            const dissectSpy = jest.spyOn(rhythmRuler, "__dissectByNumber").mockImplementation();
+            jest.spyOn(rhythmRuler, "saveDissectHistory").mockImplementation();
+            jest.spyOn(rhythmRuler, "_drawCircularView").mockImplementation();
+
+            rhythmRuler._onCircularMouseDown({});
+            rhythmRuler._onCircularMouseUp({});
+
+            expect(dissectSpy).toHaveBeenCalledTimes(1);
+        });
+
+        test("cross-slice swipe on same ruler should trigger __tie", () => {
+            rhythmRuler._playing = false;
+            rhythmRuler._circularCanvas = createMockCanvas();
+            rhythmRuler.Rulers = [[[4, 4, 4, 4], []]];
+            rhythmRuler._rulers = [
+                { cells: [{ style: {} }, { style: {} }, { style: {} }, { style: {} }] }
+            ];
+
+            const hitSpy = jest.spyOn(rhythmRuler, "_hitTestCircular");
+            hitSpy.mockReturnValueOnce({ rulerIndex: 0, cellIndex: 0 });
+            hitSpy.mockReturnValueOnce({ rulerIndex: 0, cellIndex: 2 });
+
+            const tieSpy = jest.spyOn(rhythmRuler, "__tie").mockImplementation();
+            jest.spyOn(rhythmRuler, "saveDissectHistory").mockImplementation();
+            jest.spyOn(rhythmRuler, "_drawCircularView").mockImplementation();
+
+            rhythmRuler._onCircularMouseDown({});
+            rhythmRuler._onCircularMouseUp({});
+
+            expect(tieSpy).toHaveBeenCalledTimes(1);
+            expect(rhythmRuler._rulerSelected).toBe(0);
+        });
+
+        test("cross-ruler swipe should NOT tie (falls through to dissect)", () => {
+            rhythmRuler._playing = false;
+            rhythmRuler._circularCanvas = createMockCanvas();
+            rhythmRuler.Rulers = [
+                [[4, 4, 4, 4], []],
+                [[4, 4, 4, 4], []]
+            ];
+            rhythmRuler._rulers = [
+                { cells: [{ style: {} }, { style: {} }, { style: {} }, { style: {} }] },
+                { cells: [{ style: {} }, { style: {} }, { style: {} }, { style: {} }] }
+            ];
+            rhythmRuler._dissectNumber = { value: "2" };
+
+            const hitSpy = jest.spyOn(rhythmRuler, "_hitTestCircular");
+            hitSpy.mockReturnValueOnce({ rulerIndex: 0, cellIndex: 1 });
+            hitSpy.mockReturnValueOnce({ rulerIndex: 1, cellIndex: 2 });
+
+            const tieSpy = jest.spyOn(rhythmRuler, "__tie").mockImplementation();
+            const dissectSpy = jest.spyOn(rhythmRuler, "__dissectByNumber").mockImplementation();
+            jest.spyOn(rhythmRuler, "saveDissectHistory").mockImplementation();
+            jest.spyOn(rhythmRuler, "_drawCircularView").mockImplementation();
+
+            rhythmRuler._onCircularMouseDown({});
+            rhythmRuler._onCircularMouseUp({});
+
+            expect(tieSpy).not.toHaveBeenCalled();
+            expect(dissectSpy).toHaveBeenCalledTimes(1);
+        });
+
+        test("__pause should clear circular highlights", () => {
+            rhythmRuler._circularHighlight = { 0: 2, 1: 1 };
+            rhythmRuler._playing = true;
+            rhythmRuler._playAllCell = { innerHTML: "" };
+            rhythmRuler.Rulers = [[[4], []]];
+            rhythmRuler._rulers = [
+                {
+                    children: [],
+                    cells: [{ style: {} }]
+                }
+            ];
+
+            rhythmRuler.__pause();
+
+            expect(rhythmRuler._circularHighlight).toEqual({});
         });
     });
 });

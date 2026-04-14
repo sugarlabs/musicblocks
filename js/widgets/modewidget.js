@@ -56,6 +56,7 @@ class ModeWidget {
     static BUTTONSIZE = 53;
     static ROTATESPEED = 125;
     static BUTTONDIVWIDTH = 535;
+    static RESET_NOTES_DELAY = 500;
 
     /**
      * Constructs a new ModeWidget instance.
@@ -244,7 +245,7 @@ class ModeWidget {
         const windowHeight =
             this.getWidgetFrame().offsetHeight - this.getDragElement().offsetHeight;
         const widgetBody = this.getWidgetBody();
-        const scale = this.isMaximized ? windowHeight / widgetBody.offsetHeight : 1;
+        const scale = this.isMaximized() ? windowHeight / widgetBody.offsetHeight : 1;
         widgetBody.style.display = "flex";
         widgetBody.style.flexDirection = "column";
         widgetBody.style.alignItems = "center";
@@ -309,8 +310,19 @@ class ModeWidget {
         modePianoDiv.style.border = "0px";
         modePianoDiv.style.top = "0px";
         modePianoDiv.style.left = "0px";
-        modePianoDiv.innerHTML =
+        let pianoHTML =
             '<img src="images/piano_keys.png"  id="modeKeyboard" style="top:0px; left:0px; position:relative;">';
+        for (let i = 0; i < 12; i++) {
+            pianoHTML += '<img id="pkey_' + i + '" style="top:0px; left:0px; position:absolute;">';
+        }
+        modePianoDiv.innerHTML = pianoHTML;
+
+        // Cache piano key elements to avoid repeated getElementById calls
+        this._pianoKeys = [];
+        for (let i = 0; i < 12; i++) {
+            this._pianoKeys[i] = document.getElementById("pkey_" + i);
+        }
+
         const highlightImgs = [
             "images/highlights/sel_c.png",
             "images/highlights/sel_c_sharp.png",
@@ -358,25 +370,9 @@ class ModeWidget {
             startingPosition = 0;
         }
 
-        modePianoDiv.innerHTML += '<img id="pkey_0" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_1" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_2" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_3" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_4" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_5" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_6" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_7" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_8" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML += '<img id="pkey_9" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML +=
-            '<img id="pkey_10" style="top:0px; left:0px; position:absolute;">';
-        modePianoDiv.innerHTML +=
-            '<img id="pkey_11" style="top:0px; left:0px; position:absolute;">';
-
         for (let i = 0; i < 12; ++i) {
             if (this._selectedNotes[i])
-                document.getElementById("pkey_" + i).src =
-                    highlightImgs[(i + startingPosition) % 12];
+                this._pianoKeys[i].src = highlightImgs[(i + startingPosition) % 12];
         }
     }
     /**
@@ -653,7 +649,7 @@ class ModeWidget {
                 setTimeout(() => {
                     // Did we just play the last note?
                     this._playing = false;
-                    const note_key = document.getElementById("pkey_" + 0);
+                    const note_key = this._pianoKeys ? this._pianoKeys[0] : null;
                     if (note_key !== null) {
                         note_key.src = highlightImgs[0];
                     }
@@ -675,7 +671,9 @@ class ModeWidget {
             setTimeout(() => {
                 if (this._lastNotePlayed !== null) {
                     this._playWheel.navItems[this._lastNotePlayed % 12].navItem.hide();
-                    const note_key = document.getElementById("pkey_" + (this._lastNotePlayed % 12));
+                    const note_key = this._pianoKeys
+                        ? this._pianoKeys[this._lastNotePlayed % 12]
+                        : null;
                     if (note_key !== null) {
                         note_key.src =
                             highlightImgs[(this._lastNotePlayed + startingposition) % 12];
@@ -686,7 +684,7 @@ class ModeWidget {
                 this._playWheel.navItems[note % 12].navItem.show();
 
                 if (note !== 12) {
-                    const note_key = document.getElementById("pkey_" + (note % 12));
+                    const note_key = this._pianoKeys ? this._pianoKeys[note % 12] : null;
                     if (note_key !== null) {
                         note_key.src = animationImgs[(note + startingposition) % 12];
                     }
@@ -708,7 +706,7 @@ class ModeWidget {
                     this.__playNextNote(i + 1);
                 } else {
                     this._locked = false;
-                    setTimeout(() => this._resetNotes(), 500);
+                    setTimeout(() => this._resetNotes(), ModeWidget.RESET_NOTES_DELAY);
                     return;
                 }
             }, 1000 * time);
@@ -755,7 +753,7 @@ class ModeWidget {
                     this.__playNextNote(i + 1);
                 } else {
                     this._locked = false;
-                    setTimeout(() => this._resetNotes(), 500);
+                    setTimeout(() => this._resetNotes(), ModeWidget.RESET_NOTES_DELAY);
                     return;
                 }
             }, 1000 * time);
@@ -869,13 +867,13 @@ class ModeWidget {
             if (JSON.stringify(MUSICALMODES[mode]) === currentMode) {
                 // Update the value of the modename block inside of
                 // the mode widget block.
-                if (this._modeBlock != null) {
+                if (this._modeBlock !== null) {
                     for (const i in this.blocks.blockList) {
-                        if (this.blocks.blockList[i].name == "modename") {
+                        if (this.blocks.blockList[i].name === "modename") {
                             this.blocks.blockList[i].value = mode;
                             this.blocks.blockList[i].text.text = _(mode);
                             this.blocks.blockList[i].updateCache();
-                        } else if (this.blocks.blockList[i].name == "notename") {
+                        } else if (this.blocks.blockList[i].name === "notename") {
                             this.blocks.blockList[i].value = currentKey;
                             this.blocks.blockList[i].text.text = _(currentKey);
                         }
@@ -1186,7 +1184,7 @@ class ModeWidget {
         // If a noteWheel sector is selected, hide it.
         const __clearNote = () => {
             const i = this._noteWheel.selectedNavItemIndex;
-            if (i == 0) {
+            if (i === 0) {
                 return; // Never hide the first note.
             }
 
