@@ -228,7 +228,7 @@ const doAnalyzeProject = function () {
 /**
  * Represents an activity in the application.
  */
-// eslint-disable-next-line no-redeclare
+
 class Activity {
     /**
      * Creates an Activity instance.

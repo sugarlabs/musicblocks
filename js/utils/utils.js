@@ -1024,7 +1024,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
                 URL.revokeObjectURL(url);
                 resolve();
             };
-            script.onerror = (e) => {
+            script.onerror = e => {
                 URL.revokeObjectURL(url);
                 console.error("Failed to load CSP Blob script for plugins", e);
                 reject(e);
@@ -1033,7 +1033,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
         });
 
         // Map Registry back to dictionaries
-        const mapDict = (dict) => {
+        const mapDict = dict => {
             for (const key in dict) {
                 if (typeof dict[key] === "string" && dict[key].indexOf("_") !== -1) {
                     const registryName = dict[key];
@@ -1066,7 +1066,7 @@ window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivi
         const sUrl = URL.createObjectURL(sBlob);
         const sScript = document.createElement("script");
         sScript.src = sUrl;
-        await new Promise((resolve) => {
+        await new Promise(resolve => {
             sScript.onload = () => {
                 if (window.__mb_plugin_registry[registryName]) {
                     try {
