@@ -6748,9 +6748,9 @@ class Activity {
             const xhr = new XMLHttpRequest();
             xhr.open("GET", url, true);
             const that = this;
-            xhr.onload = () => {
+            xhr.onload = async () => {
                 if (xhr.status === 200) {
-                    const obj = processRawPluginData(that, xhr.responseText, url);
+                    const obj = await processRawPluginData(that, xhr.responseText, url);
                     // Save plugins to local storage.
                     if (obj !== null) {
                         that.storage.plugins = preparePluginExports(that, obj);
@@ -8175,10 +8175,8 @@ class Activity {
             // Load any plugins saved in local storage.
             this.pluginData = this.storage.plugins;
             if (this.pluginData !== null && this.pluginData !== "null") {
-                updatePluginObj(
-                    this,
-                    processPluginData(this, this.pluginData, "localStorage:plugins")
-                );
+                const obj = await processPluginData(this, this.pluginData, "localStorage:plugins");
+                updatePluginObj(this, obj);
             }
 
             // Load custom mode saved in local storage.
@@ -8465,8 +8463,8 @@ class Activity {
                         document.body.style.cursor = "wait";
                         //doLoadAnimation();
 
-                        setTimeout(() => {
-                            const obj = processRawPluginData(
+                        setTimeout(async () => {
+                            const obj = await processRawPluginData(
                                 that,
                                 reader.result,
                                 pluginFile && pluginFile.name
