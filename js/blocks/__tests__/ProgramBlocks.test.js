@@ -776,7 +776,7 @@ describe("ProgramBlocks", () => {
 
         beforeEach(() => {
             delete window.open;
-            window.open = jest.fn(() => ({ focus: jest.fn() }));
+            window.open = jest.fn(() => ({}));
             delete window.alert;
             window.alert = jest.fn();
         });
