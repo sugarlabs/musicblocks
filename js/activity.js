@@ -6792,7 +6792,11 @@ class Activity {
                 // Validate: only allow safe characters (alphanumeric and hyphens)
                 // This prevents path traversal attacks like "../../secrets"
                 if (!/^[a-z0-9\-]+$/.test(name)) {
-                    alert(_("Invalid plugin name. Only alphanumeric characters and hyphens are allowed."));
+                    alert(
+                        _(
+                            "Invalid plugin name. Only alphanumeric characters and hyphens are allowed."
+                        )
+                    );
                     return;
                 }
                 this._loadBuiltInPlugin(name);
