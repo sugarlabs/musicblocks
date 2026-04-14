@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Music Blocks Guide - 2. Making Sounds</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous"/>
+    <style>
+      body { padding-top: 20px; }
+      .sidebar { background-color: #f8f9fa; padding: 20px; border-radius: 4px; border-right: 1px solid #eee; }
+      .content { padding: 20px; }
+      img { max-width: 100%; height: auto; display: block; margin: 10px 0; }
+      pre { background-color: #f8f8f8; padding: 10px; border: 1px solid #ccc; white-space: pre-wrap; }
+      table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+      th, td { border: 1px solid #ddd; padding: 8px; }
+      th { background-color: #f2f2f2; text-align: left; }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid" style="max-width: 1200px;">
+      <div class="row">
+        <div class="col-md-3 sidebar">
+          <h4 style="margin-top: 0;">Navigation</h4>
+          <ul class="nav nav-pills nav-stacked" style="position: sticky; top: 20px;">
+	    <li><a href="index.html">Introduction</a></li>
+	    <li><a href="01-getting-started.html">1. Getting Started</a></li>
+	    <li class="active"><a href="02-making-sounds.html">2. Making Sounds</a></li>
+	    <li><a href="03-programming-with-music.html">3. Programming with Music</a></li>
+	    <li><a href="04-widgets.html">4. Widgets</a></li>
+	    <li><a href="05-beyond-music-blocks.html">5. Beyond Music Blocks</a></li>
+	    <li><a href="06-appendix.html">6. Appendix</a></li>
+	  </ul>
+        </div>
+        <div class="col-md-9 content">
+          <p>
+            <a href="../guide/index.html">English</a> |
+            <a href="../guide-es/index.html">Español</a> |
+            <a href="../guide-ja/index.html">日本語</a> |
+            <a href="../guide-zhCN/index.html">中文</a> |
+            <a href="../guide-pt/index.html">Português</a>
+          </p>
+          <hr>
+          <h2><a name="NOTES">2. Making Sounds</a></h2>
+	  <p><a href="#1-getting-started">Previous Section (1. Getting Started)</a> | <a href="#table-of-contents">Back to
+	      Table of Contents</a> | <a href="#3-programming-with-music">Next Section (3. Programming with
+	      Music)</a></p>
+	  <p>Music Blocks incorporates many common elements of music, such as
+	    <a href="#22-pitch-blocks">pitch</a>, <a href="#21-note-value-blocks">rhythm</a>,
+	    <a href="#341-set-volume-and-crescendo">volume</a>, and, to some degree,
+	    <a href="#342-setting-instrument">timbre</a> and
+	    <a href="#344-vibrato-tremelo-et-al">texture</a>.</p>
+	  <h3><a name="NOTE-VALUE">2.1 Note Value Blocks</a></h3>
+	  <p>At the heart of Music Blocks is the <em>Note value</em> block. The <em>Note
+	      value</em> block is a container for a <a href="#22-pitch-blocks"><em>Pitch</em> block</a> that
+	    specifies the duration (note value) of the pitch.</p>
+	  <p><img alt="notes" src="./note1.svg" title="A single Note value block (top) and two consecutive Note valueblocks (bottom)" /></p>
+	  <p>At the top of the example above, a single (detached) <em>Note value</em>
+	    block is shown. The <code>1/8</code> is value of the note, which is, in this
+	    case, an eighth note.</p>
+	  <p>At the bottom, two notes that are played consecutively are shown. They
+	    are both <code>1/8</code> notes, making the duration of the entire sequence
+	    <code>1/4</code>.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1726138873526815&amp;run=True">RUN LIVE</a></p>
+	  <p><img alt="notes" src="./note2.svg" title="A quarter note, a sixteenth note, and a half note Note value blocks" /></p>
+	  <p>In this example, different note values are shown. From top to bottom,
+	    they are: <code>1/4</code> for an quarter note, <code>1/16</code> for a sixteenth note, and
+	    <code>1/2</code> for a half note.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1726139143565736&amp;run=True">RUN LIVE</a></p>
+	  <p>Note that any mathematical operations can be used as input to the
+	    <em>Note value</em>.</p>
+	  <p><img alt="pie menu" src="./piemenu1.svg" title="A pie menu for selecting note values." /></p>
+	  <p>As a convenience, a pie menu is used for selecting common note values.</p>
+	  <p><img alt="Rest Chart" src="../charts/NotationRestChart.svg" title="A chart of note values and their corresponding note value blocks" /></p>
+	  <p>Please refer to the above picture for a visual representation of note
+	    values.</p>
+	  <h3><a name="PITCH">2.2 Pitch Blocks</a></h3>
+	  <p>As we have seen, <em>Pitch</em> blocks are used inside the
+	    <a href="#21-note-value-blocks"><em>Note value</em></a> blocks. The <em>Pitch</em> block specifies the
+	    pitch name and pitch octave of a note that in combination determines
+	    the frequency (and therefore pitch) at which the note is played.</p>
+	  <p><img alt="pitch block" src="./note3.svg" title="Specifying a pitch block's name and octave" /></p>
+	  <p><a href="https://musicblocks.sugarlabs.org/index.html?id=1733100820296221&amp;run=True">RUN LIVE</a></p>
+	  <p>There are many systems you can use to specify a <em>pitch</em> block's name
+	    and octave. Some examples are shown above.</p>
+	  <p>The top <em>Pitch</em> block is specified using a <em>Solfege</em> block (<code>Sol</code> in
+	    <code>Octave 4</code>), which contains the notes <code>Do Re Me Fa Sol La Ti</code>.</p>
+	  <p>The pitch of the next block is specified using a <em>Pitch-name</em> block
+	    (<code>G</code> in <code>Octave 4</code>), which contains the notes <code>C D E F G A B</code>.</p>
+	  <p>The next block is specified using a <em>Scale-degree</em> block (the <code>5th note</code>
+	    in the scale, 'G', also in 'Octave 4'), <code>C == 1, D == 2, ...</code>. The
+	    <em>Scale-Degree</em> block has numbers like the <em>Number</em> block, but also has 
+	    an accidental so that the user may play pitches outside a given key.</p>
+	  <p>The next blocks is specified using a <em>Nth Modal Pitch</em> block. This
+	    block takes a number argument and turns it into the "nth pitch of 
+	    a given scale" with an index of 0 (i.e. C for C major is 0). Therefore
+	    in order to get <code>G</code>, we input the number 4. The octave argument will
+	    force the octave up or down; otherwise the user may just keep going up
+	    or down in either direction to go through scalar pitches of any mode.</p>
+	  <p>The next block is specified using a <em>Pitch-number</em> block (the <code>7th
+	      semitone</code> above <code>C</code> in <code>Octave 4</code> is <code>G</code>). The offset for the pitch
+	    number can be modified using the <em>Set-pitch-number-offset</em> block.</p>
+	  <p>The pitch of the next block is specified using the <em>Hertz</em> block in
+	    conjunction with a <em>Number</em> block (<code>392</code> Hertz is <code>G</code> in <code>Octave 4</code>),
+	    which corresponds to the frequency of the sound made.</p>
+	  <p>The octave is specified using a number block and is restricted to
+	    whole numbers. In the case where the pitch name is specified by
+	    frequency, the octave is ignored.The octave argument can also be
+	    specified using a <em>Text</em> block with values <em>current</em>, <em>previous</em>,
+	    <em>next</em> which does as 0, -1, 1 respectively.</p>
+	  <p>The octave of the next block is specified using a <em>current</em> text block
+	    (<code>Sol</code> in <code>Octave 4</code>).</p>
+	  <p>The octave of the next block is specified using a <em>previous</em> text
+	    block (<code>G</code> in <code>Octave 3</code>).</p>
+	  <p>The octave of the last block is specified using a <em>next</em> text block
+	    (<code>G</code> in <code>Octave 5</code>).</p>
+	  <p>Note that the pitch name can also be specified using a <em>Text</em> block. </p>
+	  <p><img alt="pie menu" src="./piemenu2.svg" title="A pie menu for selecting pitch." /></p>
+	  <p>As a convenience, a pie menu is used for selecting pitch, accidental,
+	    and octave.</p>
+	  <p><img alt="Note Chart" src="../charts/KeyboardChart.svg" title="Note layout chart for keyboard" /></p>
+	  <p><img alt="Mallet Chart" src="../charts/MalletChart.svg" title="Note layout chart for mallet" /></p>
+	  <p>Please refer to the above charts for a visual representation of where
+	    notes are located on a keyboard or staff.</p>
+	  <h3><a name="MULTI-PITCH">2.3 Multiple Pitches</a></h3>
+	  <p><img alt="multiple pitch" src="./note4.svg" title="Playing multiple pitches in one note" /></p>
+	  <p>Multiple, simultaneous pitches can be specified by adding multiple
+	    <em>Pitch</em> blocks into a single <em>Note value</em> block, like the above
+	    example.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1725793652385126&amp;run=True">RUN LIVE</a></p>
+	  <h3><a name="RESTS">2.4 Rests</a></h3>
+	  <p><img alt="silence block" src="./silence.svg" title="Silence blocks create rests" /></p>
+	  <p>A rest of the specified note value duration can be constructed using a
+	    <em>Silence</em> block in place of a <em>Pitch</em> block.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1725793737126028&amp;run=True">RUN LIVE</a></p>
+	  <h3><a name="DRUMS">2.5 Drums</a></h3>
+	  <p><img alt="drum" src="./drum1.svg" title="Using Drum Sample block" /></p>
+	  <p>Anywhere a <em>Pitch</em> block can be used&mdash;e.g., inside of the matrix
+	    or a <em>Note value</em> block&mdash;a <em>Drum Sample</em> block can also be used
+	    instead. Currently there about two dozen different samples from which
+	    to choose. The default drum is a kick drum.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1725793852737369&amp;run=True">RUN LIVE</a></p>
+	  <p><img alt="drums" src="./note5.svg" title="Multiple Drum Sample blocks in combinations" /></p>
+	  <p>Just as in the <a href="#23-multiple-pitches">multi-pitch</a> example above, you
+	    can use multiple <em>Drum</em> blocks within a single <em>Note value</em> blocks,
+	    and combine them with <em>Pitch</em> blocks as well.
+	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1725793935277059&amp;run=True">RUN LIVE</a></p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

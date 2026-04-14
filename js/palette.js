@@ -9,16 +9,15 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/*
-   global
-
-   _, docById, LEADING, DEFAULTPALETTE, MULTIPALETTES, platformColor,
+/* global
+   docById, LEADING, DEFAULTPALETTE, MULTIPALETTES, platformColor,
    PALETTEICONS, MULTIPALETTEICONS, SKIPPALETTES, toTitleCase,
    i18nSolfege, NUMBERBLOCKDEFAULT, TEXTWIDTH, STRINGLEN,
    DEFAULTBLOCKSCALE, SVG, DISABLEDFILLCOLOR, DISABLEDSTROKECOLOR,
    PALETTEFILLCOLORS, PALETTESTROKECOLORS, last, getTextWidth,
-   STANDARDBLOCKHEIGHT, CLOSEICON, BUILTINPALETTES,
-   safeSVG, blockIsMacro, getMacroExpansion
+   STANDARDBLOCKHEIGHT, CLOSEICON, BUILTINPALETTES, base64Encode,
+   safeSVG, blockIsMacro, getMacroExpansion, StatusMatrix,
+   activity, cameraPALETTE, mediaPALETTE, videoPALETTE
 */
 
 /* exported Palettes, initPalettes */
@@ -53,11 +52,20 @@ const makePaletteIcons = (data, width, height) => {
     return img;
 };
 
+const buildPaletteImageMap = () => {
+    const map = {};
+    if (typeof mediaPALETTE !== "undefined") map.media = mediaPALETTE;
+    if (typeof cameraPALETTE !== "undefined") map.camera = cameraPALETTE;
+    if (typeof videoPALETTE !== "undefined") map.video = videoPALETTE;
+    return map;
+};
+
 class Palettes {
     constructor(activity) {
         this.activity = activity;
         // this.blocks = null;
         this.cellSize = Math.floor(this.activity.cellSize * PALETTE_SCALE_FACTOR + 0.5);
+        this.collapsed = false;
         this.paletteWidth = 55 * PALETTE_WIDTH_FACTOR;
         this.scrollDiff = 0;
         this.originalSize = 55; // this is the original svg size
@@ -86,6 +94,18 @@ class Palettes {
         this.buttons = {}; // The toolbar button for each palette.
         this.labels = {}; // The label for each button.
         this.pluginPalettes = []; // List of palettes not in multipalette list
+
+        // Keyboard navigation state
+        this._navSection = "type"; // 'type', 'search', 'blocks', or 'palette'
+        this._navTypeIndex = 0;
+        this._navBlockIndex = 0;
+        this._navPaletteBlockIndex = 0; // For navigating actual blocks in the right panel
+        this._keyboardNavActive = false;
+        this._menuOpenTimeout = null;
+        // Tracks whether the palette was collapsed before Tab focus entered,
+        // so we can restore its state when focus leaves.
+        this._wasCollapsedBeforeFocus = false;
+        this._expandedForKeyboardFocus = false;
     }
 
     init() {
@@ -96,6 +116,441 @@ class Palettes {
         for (let i = 0; i < MULTIPALETTES.length; i++) {
             this._makeSelectorButton(i);
         }
+        this._setupPaletteKeyboardNav();
+    }
+
+    /**
+     * Sets up keyboard navigation for the palette.
+     * - Left/Right arrows: navigate between type selector icons
+     * - Up/Down arrows: move between sections (type -> search -> blocks)
+     */
+    _setupPaletteKeyboardNav() {
+        const palette = docById("palette");
+        if (!palette) return;
+
+        // Make palette focusable
+        palette.setAttribute("tabindex", "0");
+
+        palette.addEventListener("keydown", event => {
+            const key = event.key;
+            if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Enter"].includes(key)) {
+                return;
+            }
+
+            // Don't handle keyboard events if search widget is focused
+            const searchWidget = document.getElementById("search");
+            if (searchWidget && document.activeElement === searchWidget) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+            this._keyboardNavActive = true;
+
+            const tr = palette.children[0]?.children[0]?.children[0]?.children[0];
+            const typeCount = tr ? tr.children.length : MULTIPALETTES.length;
+            const listBody = docById("palette")?.children[0]?.children[1]?.children[1];
+            const blockRows = listBody ? Array.from(listBody.children) : [];
+
+            if (key === "ArrowLeft" || key === "ArrowRight") {
+                // Navigate within type section or between blocks list and palette
+                if (this._navSection === "type") {
+                    if (key === "ArrowLeft") {
+                        this._navTypeIndex = (this._navTypeIndex - 1 + typeCount) % typeCount;
+                    } else {
+                        this._navTypeIndex = (this._navTypeIndex + 1) % typeCount;
+                    }
+                    this._updateKeyboardFocus(tr, blockRows);
+                    // Trigger the palette change
+                    this.showSelection(this._navTypeIndex, tr);
+                    this.makePalettes(this._navTypeIndex);
+                } else if (this._navSection === "blocks" && key === "ArrowRight") {
+                    // Move from block categories to palette blocks panel
+                    const paletteBlocks = this._getPaletteBlocks();
+                    if (paletteBlocks.length > 0) {
+                        this._navSection = "palette";
+                        this._navPaletteBlockIndex = 0;
+                        this._updateKeyboardFocus(tr, blockRows);
+                    }
+                } else if (this._navSection === "palette" && key === "ArrowLeft") {
+                    // Move from palette blocks back to block categories
+                    this._navSection = "blocks";
+                    this._updateKeyboardFocus(tr, blockRows);
+                }
+            } else if (key === "ArrowDown") {
+                if (this._navSection === "type") {
+                    this._navSection = "search";
+                    this._navBlockIndex = 0;
+                    // Close any open block menus when moving to search
+                    this._hideMenus();
+                } else if (this._navSection === "search") {
+                    // Move to first block category (skip search at index 0)
+                    if (blockRows.length > 1) {
+                        this._navSection = "blocks";
+                        this._navBlockIndex = 1;
+                        this._navPaletteBlockIndex = 0; // Reset palette block index
+                        // Auto-open the palette for this category
+                        const row = blockRows[this._navBlockIndex];
+                        if (row) {
+                            const paletteName = this._getPaletteNameFromRow(row);
+                            if (paletteName) {
+                                this.showPalette(paletteName);
+                            }
+                        }
+                    }
+                } else if (this._navSection === "blocks") {
+                    if (this._navBlockIndex < blockRows.length - 1) {
+                        this._navBlockIndex++;
+                        this._navPaletteBlockIndex = 0; // Reset palette block index
+                        // Auto-open the palette for this category
+                        const row = blockRows[this._navBlockIndex];
+                        if (row) {
+                            const paletteName = this._getPaletteNameFromRow(row);
+                            if (paletteName) {
+                                this.showPalette(paletteName);
+                            }
+                        }
+                    }
+                } else if (this._navSection === "palette") {
+                    // Navigate within palette blocks
+                    const paletteBlocks = this._getPaletteBlocks();
+                    if (this._navPaletteBlockIndex < paletteBlocks.length - 1) {
+                        this._navPaletteBlockIndex++;
+                    }
+                }
+                this._updateKeyboardFocus(tr, blockRows);
+            } else if (key === "ArrowUp") {
+                if (this._navSection === "blocks") {
+                    if (this._navBlockIndex > 1) {
+                        this._navBlockIndex--;
+                        this._navPaletteBlockIndex = 0; // Reset palette block index
+                        // Auto-open the palette for this category
+                        const row = blockRows[this._navBlockIndex];
+                        if (row) {
+                            const paletteName = this._getPaletteNameFromRow(row);
+                            if (paletteName) {
+                                this.showPalette(paletteName);
+                            }
+                        }
+                    } else {
+                        this._navSection = "search";
+                        this._navBlockIndex = 0;
+                        // Close any open block menus when moving to search
+                        this._hideMenus();
+                    }
+                } else if (this._navSection === "search") {
+                    this._navSection = "type";
+                    // Close any open block menus when moving to type section
+                    this._hideMenus();
+                } else if (this._navSection === "palette") {
+                    // Navigate within palette blocks
+                    if (this._navPaletteBlockIndex > 0) {
+                        this._navPaletteBlockIndex--;
+                    }
+                }
+                this._updateKeyboardFocus(tr, blockRows);
+            } else if (key === "Enter") {
+                this._activateCurrentNavItem(blockRows);
+            }
+        });
+
+        // Auto-expand the palette when it receives Tab focus (if it was collapsed),
+        // and restore the previous state when focus leaves.
+        palette.addEventListener("focus", () => {
+            // Mouse clicks can also focus the palette container. Only auto-expand
+            // when focus was entered via keyboard navigation.
+            if (!this._keyboardNavActive) {
+                this._wasCollapsedBeforeFocus = false;
+                this._expandedForKeyboardFocus = false;
+                return;
+            }
+
+            // Record the state at the moment Tab focus enters.
+            this._wasCollapsedBeforeFocus = this.collapsed;
+            this._expandedForKeyboardFocus = false;
+
+            // If the palette is collapsed, open it so the user can see it.
+            if (this.collapsed) {
+                this.toggleCollapse();
+                this._expandedForKeyboardFocus = true;
+            }
+        });
+
+        palette.addEventListener("focusout", event => {
+            // relatedTarget is where focus is moving to.
+            // If it's still inside the palette, do nothing.
+            if (palette.contains(event.relatedTarget)) return;
+            // Restore the palette to the state it was in before Tab focus entered.
+            if (
+                this._expandedForKeyboardFocus &&
+                this._wasCollapsedBeforeFocus &&
+                !this.collapsed
+            ) {
+                this.toggleCollapse();
+            }
+            this._wasCollapsedBeforeFocus = false;
+            this._expandedForKeyboardFocus = false;
+        });
+
+        // Clear keyboard nav highlight on mouse movement and restore mouse hover
+        palette.addEventListener("mousemove", () => {
+            if (this._keyboardNavActive) {
+                this._keyboardNavActive = false;
+                this._clearKeyboardFocus();
+            }
+        });
+    }
+
+    /**
+     * Gets the list of actual block elements in the currently open palette panel
+     */
+    _getPaletteBlocks() {
+        const paletteBody = docById("PaletteBody_items");
+        if (!paletteBody) return [];
+        return Array.from(paletteBody.getElementsByTagName("tr"));
+    }
+
+    /**
+     * Extracts the palette name from a category row
+     */
+    _getPaletteNameFromRow(row) {
+        // Get the label cell (second cell in the row)
+        const labelCell = row.cells[1];
+        if (!labelCell) return null;
+
+        // Get the text content and convert to lowercase (palette names are lowercase)
+        const text = labelCell.textContent.trim().toLowerCase();
+        return text;
+    }
+
+    /**
+     * Updates visual focus for keyboard navigation
+     */
+    _updateKeyboardFocus(tr, blockRows) {
+        this._clearKeyboardFocus();
+
+        if (this._navSection === "type" && tr) {
+            const td = tr.children[this._navTypeIndex];
+            if (td) {
+                // Use the same selection color as mouse hover (dark blue)
+                td.style.backgroundColor = platformColor.paletteLabelSelected;
+                td.dataset.keyboardFocus = "true";
+            }
+        } else if (this._navSection === "search" && blockRows.length > 0) {
+            const searchRow = blockRows[0];
+            if (searchRow) {
+                searchRow.style.backgroundColor = platformColor.hoverColor;
+                searchRow.dataset.keyboardFocus = "true";
+            }
+        } else if (this._navSection === "blocks" && blockRows[this._navBlockIndex]) {
+            const row = blockRows[this._navBlockIndex];
+            row.style.backgroundColor = platformColor.hoverColor;
+            row.dataset.keyboardFocus = "true";
+        } else if (this._navSection === "palette") {
+            // Highlight the focused block in the palette panel
+            const paletteBlocks = this._getPaletteBlocks();
+            if (paletteBlocks[this._navPaletteBlockIndex]) {
+                const blockRow = paletteBlocks[this._navPaletteBlockIndex];
+                blockRow.style.backgroundColor = platformColor.hoverColor;
+                blockRow.dataset.keyboardFocus = "true";
+                // Scroll into view if needed
+                blockRow.scrollIntoView({ block: "nearest", behavior: "smooth" });
+            }
+        }
+    }
+
+    /**
+     * Clears keyboard navigation focus highlights
+     */
+    _clearKeyboardFocus() {
+        const focused = document.querySelectorAll('[data-keyboard-focus="true"]');
+        focused.forEach(el => {
+            el.style.backgroundColor = platformColor.paletteBackground;
+            delete el.dataset.keyboardFocus;
+        });
+    }
+
+    /**
+     * Clears any delayed hover-triggered palette open so it cannot fire
+     * after keyboard focus has already moved to another zone.
+     */
+    _clearPendingMenuOpen() {
+        if (this._menuOpenTimeout !== null) {
+            clearTimeout(this._menuOpenTimeout);
+            this._menuOpenTimeout = null;
+        }
+    }
+
+    /**
+     * Resets palette keyboard navigation and optionally closes open menus.
+     * Used when focus leaves the palette via Tab or mouse interaction.
+     *
+     * @param {{closeMenus?: boolean, blur?: boolean}} options
+     * @returns {void}
+     */
+    resetKeyboardNavigation(options = {}) {
+        const { closeMenus = false, blur = false } = options;
+
+        this._keyboardNavActive = false;
+        this._navSection = "type";
+        this._navTypeIndex = 0;
+        this._navBlockIndex = 0;
+        this._navPaletteBlockIndex = 0;
+        this.activePalette = null;
+        this._clearPendingMenuOpen();
+        this._clearKeyboardFocus();
+
+        if (closeMenus) {
+            for (const name in this.dict) {
+                if (this.dict[name] && typeof this.dict[name].hideMenu === "function") {
+                    this.dict[name].hideMenu();
+                }
+            }
+            this._hideMenus();
+        }
+
+        if (blur) {
+            docById("palette")?.blur?.();
+        }
+    }
+
+    /**
+     * Activates the currently focused navigation item
+     */
+    _activateCurrentNavItem(blockRows) {
+        if (this._navSection === "search") {
+            this._hideMenus();
+            this.activity.showSearchWidget();
+
+            // Set up keyboard listener on search widget to allow navigation of results
+            setTimeout(() => {
+                const searchWidget = document.getElementById("search");
+                if (searchWidget) {
+                    // Track navigation state within search results
+                    let searchResultIndex = 0;
+
+                    const searchKeyHandler = event => {
+                        const exitKeys = ["Escape", "ArrowLeft", "ArrowRight"];
+                        if (exitKeys.includes(event.key)) {
+                            event.preventDefault();
+                            event.stopPropagation(); // Prevent global handlers
+                            this.activity.hideSearchWidget();
+
+                            // Return focus to palette
+                            const palette = docById("palette");
+                            if (palette) {
+                                palette.focus();
+                                this._navSection = "search";
+                                const tr =
+                                    palette.children[0]?.children[0]?.children[0]?.children[0];
+                                const listBody =
+                                    docById("palette")?.children[0]?.children[1]?.children[1];
+                                const blockRows = listBody ? Array.from(listBody.children) : [];
+                                this._updateKeyboardFocus(tr, blockRows);
+                            }
+
+                            searchWidget.removeEventListener("keydown", searchKeyHandler);
+                        } else if (["ArrowUp", "ArrowDown"].includes(event.key)) {
+                            event.preventDefault();
+                            event.stopPropagation(); // Prevent global/jQuery UI conflicts
+
+                            // Use jQuery UI autocomplete selectors
+                            const searchResults = document.querySelectorAll(".ui-menu-item");
+
+                            if (searchResults.length === 0) return;
+
+                            // Navigate through search results
+                            searchResults.forEach(row => {
+                                // Clear all potential highlight classes
+                                row.classList.remove("ui-state-active");
+                                row.classList.remove("ui-state-focus");
+                                row.style.backgroundColor = "";
+                                delete row.dataset.keyboardFocus;
+                            });
+
+                            if (event.key === "ArrowDown") {
+                                searchResultIndex = Math.min(
+                                    searchResultIndex + 1,
+                                    searchResults.length - 1
+                                );
+                            } else if (event.key === "ArrowUp") {
+                                searchResultIndex = Math.max(searchResultIndex - 1, 0);
+                            }
+
+                            const currentResult = searchResults[searchResultIndex];
+                            if (currentResult) {
+                                currentResult.classList.add("ui-state-active");
+                                currentResult.style.backgroundColor = platformColor.hoverColor;
+                                currentResult.dataset.keyboardFocus = "true";
+                                currentResult.scrollIntoView({
+                                    block: "nearest",
+                                    behavior: "smooth"
+                                });
+                            }
+                        } else if (event.key === "Enter") {
+                            event.preventDefault();
+                            event.stopPropagation(); // CRITICAL: Stop global "Play" shortcut
+
+                            const searchResults = document.querySelectorAll(".ui-menu-item");
+
+                            if (searchResults[searchResultIndex]) {
+                                // Trigger click on the item to select it
+                                searchResults[searchResultIndex].click();
+
+                                // Close search and return focus to palette
+                                this.activity.hideSearchWidget();
+                                const palette = docById("palette");
+                                if (palette) {
+                                    palette.focus();
+                                    this._navSection = "search";
+                                    const tr =
+                                        palette.children[0]?.children[0]?.children[0]?.children[0];
+                                    const listBody =
+                                        docById("palette")?.children[0]?.children[1]?.children[1];
+                                    const blockRows = listBody ? Array.from(listBody.children) : [];
+                                    this._updateKeyboardFocus(tr, blockRows);
+                                }
+                                searchWidget.removeEventListener("keydown", searchKeyHandler);
+                            }
+                        }
+                    };
+
+                    searchWidget.addEventListener("keydown", searchKeyHandler);
+                }
+            }, 600); // Wait for search widget to be shown and focused
+        } else if (this._navSection === "blocks" && blockRows[this._navBlockIndex]) {
+            const row = blockRows[this._navBlockIndex];
+            if (row && row.onclick) {
+                row.click();
+            }
+        } else if (this._navSection === "palette") {
+            // Create the focused block on the workspace
+            const paletteBlocks = this._getPaletteBlocks();
+            if (paletteBlocks[this._navPaletteBlockIndex]) {
+                const blockRow = paletteBlocks[this._navPaletteBlockIndex];
+                // Trigger a click on the block image to create it
+                const blockImg = blockRow.querySelector("img");
+                if (blockImg) {
+                    // Simulate a mousedown and mouseup to trigger block creation
+                    const mouseDownEvent = new MouseEvent("mousedown", {
+                        bubbles: true,
+                        cancelable: true,
+                        view: window,
+                        clientX: 100,
+                        clientY: 100
+                    });
+                    const mouseUpEvent = new MouseEvent("mouseup", {
+                        bubbles: true,
+                        cancelable: true,
+                        view: window,
+                        clientX: 200,
+                        clientY: 200
+                    });
+                    blockImg.dispatchEvent(mouseDownEvent);
+                    setTimeout(() => blockImg.dispatchEvent(mouseUpEvent), 50);
+                }
+            }
+        }
     }
 
     deltaY(dy) {
@@ -105,16 +560,38 @@ class Palettes {
         palette.style.top = curr + dy + "px";
     }
 
+    toggleCollapse() {
+        const palette = document.getElementById("palette");
+
+        if (!palette) return;
+
+        this.collapsed = !this.collapsed;
+
+        if (this.collapsed) {
+            palette.style.transform = "translateX(-100%)";
+            document.getElementById("paletteToggle").innerHTML = "▶";
+            palette.style.transition = "transform 0.3s ease";
+            this.paletteWidth = 0;
+        } else {
+            palette.style.transform = "translateX(0)";
+            document.getElementById("paletteToggle").innerHTML = "◀";
+            this.paletteWidth = 55 * PALETTE_WIDTH_FACTOR;
+        }
+    }
+
     _makeSelectorButton(i) {
         if (!document.getElementById("palette")) {
             const element = document.createElement("div");
             element.id = "palette";
             element.setAttribute("class", "disable_highlighting");
             element.classList.add("flex-palette");
-            element.setAttribute(
-                "style",
-                "position: absolute; z-index: 1000; left :0px; top:" + this.top + "px"
-            );
+
+            element.style.position = "absolute";
+            element.style.zIndex = "1000";
+            element.style.left = "0px";
+            element.style.top = this.top + "px";
+            element.style.transition = "transform 0.3s ease";
+
             element.innerHTML = `<div style="height:fit-content">
                     <table width="${1.5 * this.cellSize}" bgcolor="white">
                         <thead>
@@ -124,22 +601,77 @@ class Palettes {
                     <table width ="${4.5 * this.cellSize}" bgcolor="white">
                         <thead>
                             <tr>
-                                <td style= "width:28px"></td>
+                                <td style="width:28px"></td>
                             </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
                 </div>`;
+
             element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
+
             document.body.appendChild(element);
+
+            const toggleBtn = document.createElement("div");
+            toggleBtn.innerHTML = "◀";
+            toggleBtn.id = "paletteToggle";
+
+            toggleBtn.style.position = "absolute";
+            toggleBtn.style.top = "10px";
+            toggleBtn.style.right = "-30px";
+            toggleBtn.style.width = "30px";
+            toggleBtn.style.height = "30px";
+            toggleBtn.style.display = "flex";
+            toggleBtn.style.alignItems = "center";
+            toggleBtn.style.justifyContent = "center";
+            toggleBtn.style.cursor = "pointer";
+
+            toggleBtn.style.color = "white";
+            toggleBtn.style.backgroundColor = platformColor.paletteBackground;
+            toggleBtn.addEventListener("mouseover", () => {
+                toggleBtn.style.backgroundColor = platformColor.selectorSelected;
+            });
+            toggleBtn.addEventListener("mouseout", () => {
+                toggleBtn.style.backgroundColor = platformColor.paletteLabelBackground;
+            });
+
+            toggleBtn.style.borderRadius = "0 4px 4px 0";
+            toggleBtn.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
+
+            toggleBtn.onclick = () => this.toggleCollapse();
+
+            element.appendChild(toggleBtn);
+            toggleBtn.style.position = "absolute";
+            toggleBtn.style.top = "50%";
+            toggleBtn.style.right = "-25px";
+            toggleBtn.style.transform = "translateY(-50%)";
+
+            toggleBtn.style.height = "52px";
+            toggleBtn.style.width = "24px";
+
+            toggleBtn.style.display = "flex";
+            toggleBtn.style.alignItems = "center";
+            toggleBtn.style.justifyContent = "center";
+
+            toggleBtn.style.cursor = "pointer";
+            toggleBtn.style.background = platformColor.paletteLabelBackground;
+            toggleBtn.style.color = "white";
+
+            toggleBtn.style.borderRadius = "0 30px 30px 0";
+            toggleBtn.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
+
+            toggleBtn.style.fontWeight = "bold";
+            toggleBtn.style.fontSize = "14px";
         }
 
         const tr = docById("palette").children[0].children[0].children[0].children[0];
+
         const td = tr.insertCell();
         td.width = 1.5 * this.cellSize;
         td.height = 1.5 * this.cellSize;
         td.style.position = "relative";
         td.style.backgroundColor = platformColor.paletteBackground;
+
         td.appendChild(
             makePaletteIcons(
                 PALETTEICONS[MULTIPALETTEICONS[i]]
@@ -150,6 +682,7 @@ class Palettes {
                 1.5 * this.cellSize
             )
         );
+
         const cover = document.createElement("div");
         cover.style.position = "absolute";
         cover.style.zIndex = "10";
@@ -157,10 +690,21 @@ class Palettes {
         cover.style.width = "100%";
         cover.style.height = "1px";
         cover.style.background = platformColor.paletteLabelBackground;
+
         td.appendChild(cover);
+
+        // Mouse hover for type selectors - only if not in keyboard nav mode
         td.onmouseover = () => {
-            this.showSelection(i, tr);
-            this.makePalettes(i);
+            if (!this._keyboardNavActive) {
+                this.showSelection(i, tr);
+                this.makePalettes(i);
+            }
+        };
+
+        // Update keyboard nav state when clicked
+        td.onclick = () => {
+            this._navSection = "type";
+            this._navTypeIndex = i;
         };
     }
 
@@ -219,6 +763,7 @@ class Palettes {
 
     getPluginMacroExpansion(blkname, x, y) {
         const obj = this.pluginMacros[blkname];
+        // eslint-disable-next-line eqeqeq
         if (obj != null) {
             obj[0][2] = x;
             obj[0][3] = y;
@@ -312,6 +857,24 @@ class Palettes {
         row.style.width = "126px";
         row.style.backgroundColor = platformColor.paletteBackground;
 
+        // Mouse hover - only work if not in keyboard navigation mode
+        row.addEventListener("mouseover", () => {
+            if (!this._keyboardNavActive && !row.dataset.keyboardFocus) {
+                row.style.backgroundColor = platformColor.hoverColor;
+            }
+        });
+        row.addEventListener("mouseout", () => {
+            if (!row.dataset.keyboardFocus) {
+                row.style.backgroundColor = platformColor.paletteBackground;
+            }
+        });
+
+        // Update keyboard nav state when clicked
+        row.addEventListener("click", () => {
+            this._navSection = "search";
+            this._navBlockIndex = 0;
+        });
+
         this._loadPaletteButtonHandler(name, row);
     }
 
@@ -333,11 +896,27 @@ class Palettes {
         row.style.alignItems = "center";
         row.style.width = "126px";
         row.style.backgroundColor = platformColor.paletteBackground;
+
+        // Mouse hover - only work if not in keyboard navigation mode
         row.addEventListener("mouseover", () => {
-            row.style.backgroundColor = platformColor.hoverColor;
+            if (!this._keyboardNavActive && !row.dataset.keyboardFocus) {
+                row.style.backgroundColor = platformColor.hoverColor;
+            }
         });
         row.addEventListener("mouseout", () => {
-            row.style.backgroundColor = platformColor.paletteBackground;
+            if (!row.dataset.keyboardFocus) {
+                row.style.backgroundColor = platformColor.paletteBackground;
+            }
+        });
+
+        // Update keyboard nav state when clicked - need to get the index
+        row.addEventListener("click", () => {
+            const listBody = row.parentNode;
+            if (listBody) {
+                const rowIndex = Array.from(listBody.children).indexOf(row);
+                this._navSection = "blocks";
+                this._navBlockIndex = rowIndex;
+            }
         });
 
         this._loadPaletteButtonHandler(name, row);
@@ -359,6 +938,7 @@ class Palettes {
         // Hide the menu buttons and the palettes themselves.
 
         this.activity.hideSearchWidget(true);
+        this.activePalette = null;
 
         if (docById("PaletteBody"))
             docById("PaletteBody").parentNode.removeChild(docById("PaletteBody"));
@@ -366,12 +946,12 @@ class Palettes {
 
     getInfo() {
         for (const key in this.dict) {
-            // eslint-disable-next-line no-console
             console.debug(this.dict[key].getInfo());
         }
     }
 
     updatePalettes(showPalette) {
+        // eslint-disable-next-line eqeqeq
         if (showPalette != null) {
             // Show the action palette after adding/deleting new
             // nameddo blocks.
@@ -405,7 +985,7 @@ class Palettes {
         try {
             // First hide all palettes
             for (const name in this.dict) {
-                if (this.dict.hasOwnProperty(name)) {
+                if (Object.prototype.hasOwnProperty.call(this.dict, name)) {
                     const palette = this.dict[name];
                     if (palette && typeof palette.hideMenu === "function") {
                         palette.hideMenu();
@@ -454,6 +1034,31 @@ class Palettes {
                 </div>`;
             element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
             document.body.appendChild(element);
+
+            const toggleBtn = document.createElement("div");
+            toggleBtn.innerHTML = "◀";
+            toggleBtn.id = "paletteToggle";
+
+            toggleBtn.style.position = "absolute";
+            toggleBtn.style.top = "12px";
+            toggleBtn.style.right = "-18px";
+            toggleBtn.style.width = "22px";
+            toggleBtn.style.height = "40px";
+            toggleBtn.style.display = "flex";
+            toggleBtn.style.alignItems = "center";
+            toggleBtn.style.justifyContent = "center";
+            toggleBtn.style.cursor = "pointer";
+            toggleBtn.style.background = platformColor.selectorSelected;
+            toggleBtn.style.color = "white";
+
+            toggleBtn.style.borderRadius = "0 6px 6px 0";
+            toggleBtn.style.boxShadow = "0 2px 4px rgba(0,0,0,0.15)";
+            toggleBtn.style.fontWeight = "bold";
+            toggleBtn.style.fontSize = "14px";
+
+            toggleBtn.onclick = () => this.toggleCollapse();
+
+            element.appendChild(toggleBtn);
         } catch (e) {
             console.error("Error clearing palettes:", e);
         }
@@ -465,29 +1070,29 @@ class Palettes {
     }
 
     add(name) {
-        // eslint-disable-next-line no-use-before-define
         this.dict[name] = new Palette(this, name);
         return this;
     }
 
     // Palette Button event handlers
     _loadPaletteButtonHandler(name, row) {
-        let timeout;
-
         row.onmouseover = () => {
             if (name === "search") {
                 document.body.style.cursor = "text";
             } else {
                 document.body.style.cursor = "pointer";
-                clearTimeout(timeout);
-                timeout = setTimeout(() => this.showPalette(name), 400);
+                this._clearPendingMenuOpen();
+                this._menuOpenTimeout = setTimeout(() => {
+                    this._menuOpenTimeout = null;
+                    this.showPalette(name);
+                }, 400);
             }
         };
 
-        row.onmouseout = () => clearTimeout(timeout);
+        row.onmouseout = () => this._clearPendingMenuOpen();
 
         row.onclick = () => {
-            if (name == "search") {
+            if (name === "search") {
                 this._hideMenus();
                 this.activity.showSearchWidget();
             } else {
@@ -709,7 +1314,7 @@ class PaletteModel {
                 label = _("pitch converter");
                 break;
             default:
-                if (blkname != modname) {
+                if (blkname !== modname) {
                     // Override label for do, storein, box, and namedarg
                     if (blkname === "storein" && block.defaults[0] === _("box")) {
                         label = _("store in");
@@ -746,7 +1351,8 @@ class PaletteModel {
                 "calcArg",
                 "nameddoArg",
                 "namedcalcArg"
-            ].indexOf(protoBlock.name) != -1 &&
+            ].indexOf(protoBlock.name) !== -1 &&
+            // eslint-disable-next-line eqeqeq
             label != null
         ) {
             if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
@@ -856,6 +1462,14 @@ class Palette {
         this.fadedDownButton = null;
         this.count = 0;
         this._outsideClickListener = null;
+        this._paletteImageMap = null;
+    }
+
+    _getPaletteImageForBlockName(blkname) {
+        if (!this._paletteImageMap) {
+            this._paletteImageMap = buildPaletteImageMap();
+        }
+        return this._paletteImageMap[blkname] || null;
     }
 
     hide() {
@@ -867,9 +1481,8 @@ class Palette {
     }
 
     hideMenu() {
-        docById(
-            "palette"
-        ).childNodes[0].style.borderRight = `1px solid ${platformColor.selectorSelected}`;
+        docById("palette").childNodes[0].style.borderRight =
+            `1px solid ${platformColor.selectorSelected}`;
         if (this._outsideClickListener) {
             document.removeEventListener("click", this._outsideClickListener);
             this._outsideClickListener = null;
@@ -982,22 +1595,23 @@ class Palette {
         const blocks = this.model.blocks;
         blocks.reverse();
         const protoListScope = [...this.protoList];
-        if (last(blocks).blkname != last(protoListScope).name) protoListScope.reverse();
+        if (last(blocks).blkname !== last(protoListScope).name) protoListScope.reverse();
+        const fragment = document.createDocumentFragment();
         for (const blk in blocks) {
             const b = blocks[blk];
 
             if (b.hidden) {
                 continue;
             }
-            const itemRow = paletteList.insertRow();
-            const itemCell = itemRow.insertCell();
+            const itemRow = document.createElement("tr");
+            const itemCell = document.createElement("td");
+            itemRow.appendChild(itemCell);
             let img = makePaletteIcons(b.artwork);
 
             if (b.image) {
-                if (["media", "camera", "video"].includes(b.blkname)) {
-                    // Use artwork.js strings as images for:
-                    // cameraPALETTE, videoPALETTE, mediaPALETTE
-                    img = makePaletteIcons(eval(b.blkname + "PALETTE"));
+                const paletteImage = this._getPaletteImageForBlockName(b.blkname);
+                if (paletteImage) {
+                    img = makePaletteIcons(paletteImage);
                 } else {
                     // or use the plugin image...
                     img = makePaletteIcons(this.activity.pluginsImages[b.blkname]);
@@ -1021,10 +1635,14 @@ class Palette {
                 // to make it positioned relative to the body
                 document.body.appendChild(img);
 
+                // Cache dimensions once to avoid forced layout on every mousemove
+                const halfW = img.offsetWidth / 2;
+                const halfH = img.offsetHeight / 2;
+
                 // centers the img at (pageX, pageY) coordinates
                 const moveAt = (pageX, pageY) => {
-                    img.style.left = pageX - img.offsetWidth / 2 + "px";
-                    img.style.top = pageY - img.offsetHeight / 2 + "px";
+                    img.style.left = pageX - halfW + "px";
+                    img.style.top = pageY - halfH + "px";
                 };
 
                 const onMouseMove = e => {
@@ -1084,7 +1702,10 @@ class Palette {
             itemCell.style.width = `${img.width}px`;
             itemCell.style.paddingRight = `${this.palettes.cellSize}px`;
             itemCell.appendChild(img);
+            fragment.appendChild(itemRow);
         }
+
+        paletteList.appendChild(fragment);
 
         if (this.palettes.mobile) {
             this.hide();
@@ -1430,7 +2051,7 @@ class Palette {
                 // Add variables first
                 for (let i = 0; i < foundVariables.length; i++) {
                     const [blockId, blockType] = foundVariables[i];
-                    const block = activity.blocks.blockList[blockId];
+                    const block = this.activity.blocks.blockList[blockId];
                     const isLastVar = i === foundVariables.length - 1;
                     const hasBoxes = boxBlocks.length > 0;
 
@@ -1461,7 +2082,7 @@ class Palette {
                 // Then add box blocks
                 for (let i = 0; i < boxBlocks.length; i++) {
                     const boxBlockId = boxBlocks[i];
-                    const boxBlock = activity.blocks.blockList[boxBlockId];
+                    const boxBlock = this.activity.blocks.blockList[boxBlockId];
 
                     statusBlocks.push([
                         lastBlockIndex + 1,
