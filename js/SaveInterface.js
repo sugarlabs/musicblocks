@@ -202,6 +202,7 @@ class SaveInterface {
      * @returns {void}
      */
     download(extension, dataurl, defaultfilename) {
+        let message = _("Enter a filename to save your project:");
         let filename = null;
         //const self = this;
         const finishDownload = name => {
@@ -215,7 +216,14 @@ class SaveInterface {
             }
 
             this.downloadURL(name, dataurl);
-            this.showToast("Project saved successfully");
+            if (extension === "webm") {
+                message = _("Recording saved! Check Downloads.");
+            } else if (extension === "html") {
+                message = _("Project saved! Check Downloads.");
+            } else {
+                message = _("File saved! Check Downloads.");
+            }
+            this.showToast(message);
         };
         if (defaultfilename === undefined || defaultfilename === null) {
             if (this.activity.PlanetInterface === undefined) {
@@ -267,6 +275,10 @@ class SaveInterface {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+
+        if (typeof URL.revokeObjectURL === "function") {
+            URL.revokeObjectURL(dataurl);
+        }
     }
 
     /**

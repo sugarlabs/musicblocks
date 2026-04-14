@@ -1945,6 +1945,7 @@ class Activity {
                 downloadLink.download = `${filename}.webm`;
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
+                that.textMsg(_("Saved! Check your Downloads folder."));
                 URL.revokeObjectURL(blob);
                 document.body.removeChild(downloadLink);
                 flag = 0;
@@ -1992,7 +1993,15 @@ class Activity {
                 };
 
                 mediaRecorder.onstop = function () {
-                    saveFile(recordedChunks);
+                    //saveFile(recordedChunks);
+                    //recordedChunks = [];
+                    //flag = 0;
+                    //recInside.setAttribute("fill", "#ffffff");
+                    const blob = new Blob(recordedChunks, { type: "video/webm" });
+                    const url = URL.createObjectURL(blob);
+
+                    activity.save.download("webm", url, null);
+
                     recordedChunks = [];
                     flag = 0;
                     recInside.setAttribute("fill", "#ffffff");
