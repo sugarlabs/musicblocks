@@ -64,7 +64,6 @@ describe("TemperamentWidget basic tests", () => {
             height: 100,
             dataset: { message: "1" },
             append: jest.fn(),
-            appendChild: jest.fn(),
             remove: jest.fn(),
             getElementsByTagName: jest.fn(() => [createMockElement("img")]),
             addEventListener: jest.fn(),
