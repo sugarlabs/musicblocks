@@ -751,8 +751,15 @@ describe("TemperamentWidget basic tests", () => {
         global.window.innerWidth = 1200;
         global.buildScale = jest.fn(() => [["C"], []]);
         global.getNoteFromInterval = jest.fn(() => ["C", 4]);
+        global.getTemperament = jest.fn(() => ({
+            interval: [],
+            pitchNumber: 1,
+            0: 1,
+            1: 2
+        }));
 
         const mockActivity = {
+            errorMsg: jest.fn(),
             logo: {
                 synth: {
                     startingPitch: "C4",
@@ -768,10 +775,16 @@ describe("TemperamentWidget basic tests", () => {
         expect(mockWidgetWindow.clear).toHaveBeenCalled();
         expect(mockWidgetWindow.show).toHaveBeenCalled();
         expect(widget.activity).toBe(mockActivity);
-        expect(widget.pitchNumber).toBe(0); // getTemperament("equal") returns 0 in our mock
+        expect(widget.pitchNumber).toBe(1);
     });
 
     test("showNoteInfo creates a popup", () => {
+        document.body.innerHTML = `
+            <div id="wheelDiv2"></div>
+            <div id="information"></div>
+        `;
+        global.docById = jest.fn(id => document.getElementById(id));
+
         widget.notesCircle = {
             navItemCount: 1
         };
@@ -788,7 +801,9 @@ describe("TemperamentWidget basic tests", () => {
 
         widget.showNoteInfo(event);
 
-        expect(global.docById("information").innerHTML).toContain("popup");
+        const noteInfo = global.docById("noteInfo");
+        expect(noteInfo).not.toBeNull();
+        expect(noteInfo.className).toBe("popup");
     });
 
     test("editFrequency sets up a frequency slider", () => {
@@ -796,14 +811,25 @@ describe("TemperamentWidget basic tests", () => {
         widget.ratios = [1, 1.059, 1.122];
         widget.temporaryRatios = [];
 
+        document.body.innerHTML = `
+            <div id="noteInfo">
+                <div id="note"></div>
+                <div id="frequency"></div>
+                <div id="close"></div>
+            </div>
+        `;
+        global.docById = jest.fn(id => document.getElementById(id));
+
         const event = {
             target: { dataset: { message: "1" } }
         };
 
         widget.editFrequency(event);
 
-        expect(global.docById("noteInfo").innerHTML).toContain('type="range"');
-        expect(global.docById("noteInfo").innerHTML).toContain("frequencySlider1");
+        const slider = global.docById("frequencySlider1");
+        expect(slider).not.toBeNull();
+        expect(slider.type).toBe("range");
+        expect(slider.id).toBe("frequencySlider1");
     });
 
     test("checkTemperament identifies predefined temperament", () => {
