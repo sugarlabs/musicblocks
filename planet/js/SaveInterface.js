@@ -49,6 +49,7 @@ class SaveInterface {
         const a = document.createElement("a");
         a.setAttribute("href", dataurl);
         a.setAttribute("download", filename);
+        a.setAttribute("rel", "noopener noreferrer");
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

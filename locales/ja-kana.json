@@ -1480,7 +1480,7 @@
   "Number of Downloads:": "ダウンロード数",
   "Number of Likes:": "「いいね」の かず",
   "Tags:": "タッグ",
-  "Report projects which violate the <a href=\\\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\\\" target=\\\\\"_blank\\\\\">Sugar Labs Code of Conduct</a>.": "<a href=\\\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\\\" target=\\\\\"_blank\\\\\">シュガー・ラボ ",
+  "Report projects which violate the <a href=\\\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\\\" target=\\\\\"_blank\\\\\" rel=\\\\\"noopener noreferrer\\\\\">Sugar Labs Code of Conduct</a>.": "<a href=\\\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\\\" target=\\\\\"_blank\\\\\" rel=\\\\\"noopener noreferrer\\\\\">シュガー・ラボ ",
   "Reason for reporting project": "プロジェクトを つうほうする りゆう",
   "Download as File": "ファイルで ダウンロード する",
   "motion x": "x座標の動き",
