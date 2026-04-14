@@ -131,13 +131,13 @@ global.MathUtility = {
     doMod: (a, b) => Number(a) % Number(b),
     doPower: (a, b) => Math.pow(Number(a), Number(b)),
     doSqrt: a => {
-        if (Number(a) < 0) throw "NoSqrtError";
+        if (Number(a) < 0) throw new Error("NoSqrtError");
         return Math.sqrt(Number(a));
     },
     doAbs: a => Math.abs(Number(a)),
     doCalculateDistance: (x1, y1, x2, y2) => Math.hypot(x2 - x1, y2 - y1),
     doDivide: (a, b) => {
-        if (Number(b) === 0) throw "DivByZeroError";
+        if (Number(b) === 0) throw new Error("DivByZeroError");
         return Number(a) / Number(b);
     },
     doMultiply: (a, b) => Number(a) * Number(b),
@@ -320,7 +320,7 @@ describe("setupNumberBlocks", () => {
             activity.blocks.blockList[130] = { connections: [null, "c1"] };
             logo.parseArg = jest.fn(() => -9);
             global.MathUtility.doSqrt = a => {
-                if (Number(a) < 0) throw "NoSqrtError";
+                if (Number(a) < 0) throw new Error("NoSqrtError");
                 return Math.sqrt(Number(a));
             };
             const sqrtBlock = createdBlocks["sqrt"];
@@ -332,7 +332,7 @@ describe("setupNumberBlocks", () => {
             activity.blocks.blockList[130] = { connections: [null, "c1"] };
             logo.parseArg = jest.fn(() => "bad");
             global.MathUtility.doSqrt = () => {
-                throw "NanError";
+                throw new Error("NanError");
             };
             const sqrtBlock = createdBlocks["sqrt"];
             const result = sqrtBlock.arg(logo, 0, 130, null);
@@ -396,14 +396,14 @@ describe("setupNumberBlocks", () => {
             activity.blocks.blockList[160] = { connections: [null, "c1", "c2"] };
             logo.parseArg = jest.fn(() => 5);
             global.MathUtility.doDivide = () => {
-                throw "NanError";
+                throw new Error("NanError");
             };
             const divideBlock = createdBlocks["divide"];
             const result = divideBlock.arg(logo, 0, 160, null);
             expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 160);
             expect(result).toEqual(0);
             global.MathUtility.doDivide = (a, b) => {
-                if (Number(b) === 0) throw "DivByZeroError";
+                if (Number(b) === 0) throw new Error("DivByZeroError");
                 return Number(a) / Number(b);
             };
         });

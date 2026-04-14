@@ -573,7 +573,7 @@ function setupPitchActions(activity) {
                     return obj[1];
                 }
             } else {
-                throw "NoArgError";
+                throw new Error("NoArgError");
             }
         }
 
