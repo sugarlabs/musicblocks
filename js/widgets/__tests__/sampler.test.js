@@ -151,6 +151,7 @@ describe("Sampler Widget", () => {
 
         beforeEach(() => {
             widget = new SampleWidget();
+            widget.drawVisualIDs = {};
             realSetTimbre = widget.setTimbre;
             realUpdateBlocks = widget._updateBlocks;
             realPlayDelayedSample = widget._playDelayedSample;
