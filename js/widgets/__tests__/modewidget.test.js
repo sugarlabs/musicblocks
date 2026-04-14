@@ -148,7 +148,8 @@ describe("ModeWidget", () => {
             },
             textMsg: jest.fn(),
             hideMsgs: jest.fn(),
-            errorMsg: jest.fn()
+            errorMsg: jest.fn(),
+            refreshCanvas: jest.fn()
         };
 
         modeWidget = new ModeWidget(mockActivity);
