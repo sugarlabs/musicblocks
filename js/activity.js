@@ -1939,27 +1939,27 @@ class Activity {
                         alert(message);
                     }
                 };
-             const finalizeSave = filename => {
-                  if (filename === null || filename.trim() === "") {
-                  showDialog(_("File save canceled"));
-                  flag = 0;
-                  recording();
-                  doRecordButton();
-                  return;
-                   }
+                const finalizeSave = filename => {
+                    if (filename === null || filename.trim() === "") {
+                        showDialog(_("File save canceled"));
+                        flag = 0;
+                        recording();
+                        doRecordButton();
+                        return;
+                    }
 
-                  const blob = new Blob(recordedChunks, { type: "video/webm" });
-                  const url = URL.createObjectURL(blob);
+                    const blob = new Blob(recordedChunks, { type: "video/webm" });
+                    const url = URL.createObjectURL(blob);
 
-                  activity.save.download("webm", url, filename);
+                    activity.save.download("webm", url, filename);
 
-                   recordedChunks = [];
+                    recordedChunks = [];
                     flag = 0;
 
-                      // Allow multiple recordings
+                    // Allow multiple recordings
                     recording();
                     doRecordButton();
-                    };
+                };
                 // Prevent zero-byte files
                 if (!recordedChunks || recordedChunks.length === 0) {
                     showDialog(_("Recorded file is empty. File not saved."));
