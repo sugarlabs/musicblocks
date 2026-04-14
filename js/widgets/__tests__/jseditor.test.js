@@ -58,6 +58,10 @@ global.MusicBlocks = {
 global.JS_API =
     "// Music Blocks JavaScript API\n// Available functions:\n// playNote()\n// setTempo()";
 
+global.AST2BlockList = {
+    toBlockList: jest.fn()
+};
+
 /**
  * Creates a mock widgetWindow object with all required methods.
  * The widget body is appended to document.body so getElementById works.
@@ -127,6 +131,11 @@ beforeEach(() => {
     jest.clearAllMocks();
     global.JSGenerate.code = 'console.log("hello");';
     global.acorn.parse = jest.fn();
+    global.AST2BlockList.toBlockList.mockReset();
+    global.AST2BlockList.toBlockList.mockReturnValue(["blocks"]);
+    global.ast2blocklist_config = { ready: true };
+    window.ast2blocklist_config_ready = null;
+    window.ast2blocklist_config_failed = false;
     global.CodeJar = jest.fn().mockImplementation(() => ({
         updateCode: jest.fn(),
         updateOptions: jest.fn(),
@@ -496,16 +505,57 @@ describe("JSEditor", () => {
     });
 
     describe("export/run functionality", () => {
-        test("_runCode does nothing when _showingHelp is true", () => {
+        const ast = { type: "Program", body: [] };
+
+        test("_codeToBlocks waits for pending AST config", async () => {
             const editor = createEditor();
-            editor._showingHelp = true;
+            let resolveConfig;
 
-            editor._runCode();
+            global.ast2blocklist_config = undefined;
+            window.ast2blocklist_config_ready = new Promise(resolve => {
+                resolveConfig = resolve;
+            }).then(data => {
+                global.ast2blocklist_config = data;
+                return data;
+            });
+            acorn.parse.mockReturnValue(ast);
 
-            expect(MusicBlocks.init).not.toHaveBeenCalled();
+            const conversionPromise = editor._codeToBlocks();
+            expect(AST2BlockList.toBlockList).not.toHaveBeenCalled();
+
+            resolveConfig({ loaded: true });
+            await conversionPromise;
+
+            expect(AST2BlockList.toBlockList).toHaveBeenCalledWith(ast, { loaded: true });
         });
 
-        test("_runCode clears old console output and logs new output", () => {
+        test("_codeToBlocks logs a clear error when AST config fails", async () => {
+            const editor = createEditor();
+            const consoleEl = document.getElementById("editorConsole");
+
+            global.ast2blocklist_config = undefined;
+            window.ast2blocklist_config_ready = Promise.reject(new Error("network failed"));
+
+            await editor._codeToBlocks();
+
+            expect(consoleEl.textContent).toContain(
+                "JavaScript block conversion is unavailable because its configuration file failed to load."
+            );
+            expect(AST2BlockList.toBlockList).not.toHaveBeenCalled();
+            expect(editor.activity.sendAllToTrash).not.toHaveBeenCalled();
+        });
+
+        test("_runCode does nothing when _showingHelp is true", async () => {
+            const editor = createEditor();
+            editor._showingHelp = true;
+            jest.spyOn(editor, "_codeToBlocks");
+
+            await editor._runCode();
+
+            expect(editor._codeToBlocks).not.toHaveBeenCalled();
+        });
+
+        test("_runCode clears old console output and logs new output", async () => {
             const editor = createEditor();
 
             // The constructor's _setup() already created editorConsole
@@ -515,13 +565,13 @@ describe("JSEditor", () => {
 
             editor._code = "const a = 1;";
 
-            editor._runCode();
+            await editor._runCode();
 
             // Old content should be gone (clearConsole was called)
             expect(consoleEl.textContent).not.toContain("previous output");
         });
 
-        test("_runCode calls MusicBlocks.init on valid code", () => {
+        test("_runCode calls _codeToBlocks securely on valid code", async () => {
             const editor = createEditor();
             const consoleEl = document.createElement("div");
             consoleEl.id = "editorConsole";
@@ -530,12 +580,15 @@ describe("JSEditor", () => {
             editor._code = "const a = 1;";
             acorn.parse.mockImplementation(() => ({}));
 
-            editor._runCode();
+            // Mock _codeToBlocks
+            jest.spyOn(editor, "_codeToBlocks").mockResolvedValue();
 
-            expect(MusicBlocks.init).toHaveBeenCalledWith(true);
+            await editor._runCode();
+
+            expect(editor._codeToBlocks).toHaveBeenCalled();
         });
 
-        test("_runCode logs syntax error on parse failure", () => {
+        test("_runCode logs syntax error on parse failure", async () => {
             const editor = createEditor();
 
             const consoleEl = document.getElementById("editorConsole");
@@ -546,12 +599,12 @@ describe("JSEditor", () => {
                 throw new SyntaxError("Unexpected token");
             });
 
-            editor._runCode();
+            await editor._runCode();
 
             expect(consoleEl.textContent).toContain("Syntax Error");
         });
 
-        test("_runCode does not call MusicBlocks.init on syntax error", () => {
+        test("_runCode does not call _codeToBlocks on syntax error", async () => {
             const editor = createEditor();
             const consoleEl = document.createElement("div");
             consoleEl.id = "editorConsole";
@@ -562,9 +615,11 @@ describe("JSEditor", () => {
                 throw new SyntaxError("Bad");
             });
 
-            editor._runCode();
+            jest.spyOn(editor, "_codeToBlocks");
 
-            expect(MusicBlocks.init).not.toHaveBeenCalled();
+            await editor._runCode();
+
+            expect(editor._codeToBlocks).not.toHaveBeenCalled();
         });
 
         test("logConsole appends message to console element", () => {

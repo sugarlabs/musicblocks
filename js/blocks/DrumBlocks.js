@@ -582,7 +582,6 @@ function setupDrumBlocks(activity) {
                 // Handle other contexts
                 Singer.DrumActions.playDrum(args[0], turtle, blk);
             } else {
-                // eslint-disable-next-line no-console
                 console.debug("PLAY DRUM ERROR: missing context");
                 return;
             }

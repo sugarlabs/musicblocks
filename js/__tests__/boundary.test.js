@@ -108,6 +108,19 @@ describe("Boundary Class", () => {
         expect(mockImage.src).toContain("data:image/svg+xml;base64,");
         imgMock.mockRestore();
     });
+    it("should add bitmap to container when image loads", () => {
+        const mockImage = { onload: null, src: "" };
+        jest.spyOn(global, "Image").mockImplementation(() => mockImage);
+
+        boundary.create(800, 600, 2);
+
+        mockImage.onload();
+
+        expect(createjs.Bitmap).toHaveBeenCalledWith(mockImage);
+        expect(boundary._container.addChild).toHaveBeenCalled();
+
+        global.Image.mockRestore();
+    });
 });
 
 describe("offScreen edge cases", () => {

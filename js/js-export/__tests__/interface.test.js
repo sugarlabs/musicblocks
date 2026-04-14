@@ -46,6 +46,10 @@ describe("JSInterface", () => {
             expect(JSInterface.isGetter("mynotevalue")).toBe(true);
         });
 
+        it("should return true for heap getters", () => {
+            expect(JSInterface.isGetter("heapLength")).toBe(true);
+        });
+
         it("should return false for a block that is not a getter", () => {
             expect(JSInterface.isGetter("pickup")).toBe(false);
         });
@@ -54,6 +58,14 @@ describe("JSInterface", () => {
     describe("isMethod", () => {
         it("should return true for a valid method block", () => {
             expect(JSInterface.isMethod("newnote")).toBe(true);
+        });
+
+        it("should return true for heap methods", () => {
+            expect(JSInterface.isMethod("emptyHeap")).toBe(true);
+        });
+
+        it("should return true for heap push method", () => {
+            expect(JSInterface.isMethod("push")).toBe(true);
         });
 
         it("should return false for a block that is not a method", () => {
@@ -86,6 +98,10 @@ describe("JSInterface", () => {
             expect(JSInterface.getGetterName("mynotevalue")).toBe("NOTEVALUE");
         });
 
+        it("should return the correct heap getter name when available", () => {
+            expect(JSInterface.getGetterName("heapLength")).toBe("HEAPLENGTH");
+        });
+
         it("should return null when no getter exists for the given block", () => {
             expect(JSInterface.getGetterName("pickup")).toBeNull();
         });
@@ -94,6 +110,14 @@ describe("JSInterface", () => {
     describe("getMethodName", () => {
         it("should return the correct method name when available", () => {
             expect(JSInterface.getMethodName("newnote")).toBe("playNote");
+        });
+
+        it("should return the correct heap method name when available", () => {
+            expect(JSInterface.getMethodName("emptyHeap")).toBe("emptyHeap");
+        });
+
+        it("should return the correct heap push method name when available", () => {
+            expect(JSInterface.getMethodName("push")).toBe("push");
         });
 
         it("should return null when no method exists for the given block", () => {

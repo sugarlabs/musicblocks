@@ -76,17 +76,17 @@ function setupMeterActions(activity) {
             _clearDefaultStrongBeats(tur.singer);
 
             // setup default strong / weak beats until any strong beat block is used
-            if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 4) {
+            if (tur.singer.noteValuePerBeat === 4 && tur.singer.beatsPerMeasure === 4) {
                 tur.singer.beatList.push(1);
                 tur.singer.beatList.push(3);
                 tur.singer.defaultStrongBeats = true;
-            } else if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 2) {
+            } else if (tur.singer.noteValuePerBeat === 4 && tur.singer.beatsPerMeasure === 2) {
                 tur.singer.beatList.push(1);
                 tur.singer.defaultStrongBeats = true;
-            } else if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 3) {
+            } else if (tur.singer.noteValuePerBeat === 4 && tur.singer.beatsPerMeasure === 3) {
                 tur.singer.beatList.push(1);
                 tur.singer.defaultStrongBeats = true;
-            } else if (tur.singer.noteValuePerBeat == 8 && tur.singer.beatsPerMeasure == 6) {
+            } else if (tur.singer.noteValuePerBeat === 8 && tur.singer.beatsPerMeasure === 6) {
                 tur.singer.beatList.push(1);
                 tur.singer.beatList.push(4);
                 tur.singer.defaultStrongBeats = true;
