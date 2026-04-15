@@ -200,6 +200,9 @@ class Logo {
         this.meterWidget = null;
         this.statusMatrix = null;
         this.legobricks = null;
+        this.sample = null;
+        this.aiMusic = null;
+        this.aiDebugger = null;
 
         this.evalFlowDict = {};
         this.evalArgDict = {};
