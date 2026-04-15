@@ -94,8 +94,28 @@ function setupIntervalsActions(activity) {
             // Use dynamic temperament length for custom tunings
             const temperamentLength = this.getTemperamentLength();
 
-            if (ALLNOTESTEP[secondNote] < ALLNOTESTEP[firstNote] && octave !== 0)
-                totalIntervals = temperamentLength - totalIntervals;
+            // Handle octave boundary wrap-around for enharmonic equivalents
+            // When second note has smaller semitone value than first note,
+            // it may be a wrap-around case (e.g., B=12 to B#=0 should be 1 semitone, not 12)
+            if (ALLNOTESTEP[secondNote] < ALLNOTESTEP[firstNote]) {
+                if (octave !== 0) {
+                    // Different octaves: use wrap-around calculation
+                    totalIntervals = temperamentLength - totalIntervals;
+                } else {
+                    // Same octave number: use the shortest distance around the octave circle
+                    // This handles cases like B (12) to B# (0) at same octave number
+                    // Calculate forward distance (wrapping around the octave)
+                    let forwardDistance =
+                        temperamentLength - ALLNOTESTEP[firstNote] + ALLNOTESTEP[secondNote];
+                    // Handle edge case: when second note is at position 0 (B#/Cb),
+                    // the forward distance would be 0, but it should be 1 (B to C distance)
+                    if (forwardDistance === 0 && ALLNOTESTEP[secondNote] === 0) {
+                        forwardDistance = 1;
+                    }
+                    // Use the shorter of the two distances
+                    totalIntervals = Math.min(totalIntervals, forwardDistance);
+                }
+            }
 
             if (octave < 0 && totalIntervals !== 0 && totalIntervals !== temperamentLength)
                 totalIntervals = temperamentLength - totalIntervals;
