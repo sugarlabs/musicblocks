@@ -167,6 +167,30 @@ class SaveInterface {
         });
     }
 
+    showToast(message) {
+        const toast = document.createElement("div");
+        toast.className = "toast";
+        toast.innerText = message;
+
+        const canvas = document.querySelector("#canvas");
+        const container = canvas ? canvas.parentElement : document.body;
+
+        container.appendChild(toast);
+
+        toast.style.position = "absolute";
+        toast.style.bottom = "20px";
+        toast.style.right = "20px";
+        toast.style.background = "#4caf50";
+        toast.style.color = "white";
+        toast.style.padding = "12px 16px";
+        toast.style.borderRadius = "6px";
+        toast.style.zIndex = "9999999";
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
     /**
      * Download a file to the user's computer.
      * Uses MBDialog prompt when available to collect a filename with a modal UI.
@@ -176,7 +200,9 @@ class SaveInterface {
      * @returns {void}
      */
     download(extension, dataurl, defaultfilename) {
+        let message = _("Enter a filename to save your project:");
         let filename = null;
+        //const self = this;
         const finishDownload = name => {
             if (name === null) {
                 console.debug("save cancelled");
@@ -188,6 +214,14 @@ class SaveInterface {
             }
 
             this.downloadURL(name, dataurl);
+            if (extension === "webm") {
+                message = _("Recording saved! Check Downloads.");
+            } else if (extension === "html") {
+                message = _("Project saved! Check Downloads.");
+            } else {
+                message = _("File saved! Check Downloads.");
+            }
+            this.showToast(message);
         };
         if (defaultfilename === undefined || defaultfilename === null) {
             if (this.activity.PlanetInterface === undefined) {
@@ -239,6 +273,10 @@ class SaveInterface {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+
+        if (typeof URL.revokeObjectURL === "function") {
+            URL.revokeObjectURL(dataurl);
+        }
     }
 
     /**
@@ -695,10 +733,10 @@ class SaveInterface {
             docById("title").value = STR_MY_PROJECT;
         }
 
-        // Load custom author saved in local storage.
         const customAuthorData = activity.storage.getItem("customAuthor");
-        if (customAuthorData !== undefined) {
-            docById("author").value = JSON.parse(customAuthorData);
+        if (customAuthorData !== undefined && customAuthorData !== null) {
+            docById("author").value =
+                safeJSONParse(customAuthorData, _("Mr. Mouse")) || _("Mr. Mouse");
         } else {
             //.TRANS: default project author when saving as Lilypond
             docById("author").value = _("Mr. Mouse");

@@ -265,8 +265,8 @@ class WidgetWindow {
         };
 
         this._widget = this._create("div", "wfbWidget", this._body);
-        this._widget.addEventListener("wheel", disableScroll, false);
-        this._widget.addEventListener("DOMMouseScroll", disableScroll, false);
+        this._widget.addEventListener("wheel", disableScroll, { passive: true });
+        this._widget.addEventListener("DOMMouseScroll", disableScroll, { passive: true });
     }
 
     /**

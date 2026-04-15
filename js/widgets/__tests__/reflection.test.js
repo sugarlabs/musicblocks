@@ -431,7 +431,9 @@ describe("ReflectionMatrix", () => {
                     query: "msg",
                     messages: [],
                     mentor: "meta",
-                    algorithm: "alg"
+                    algorithm: "alg",
+                    conversation_summary: null,
+                    summarized_up_to: 0
                 })
             });
             expect(reflection.hideTypingIndicator).toHaveBeenCalled();

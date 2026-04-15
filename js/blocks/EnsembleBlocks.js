@@ -53,7 +53,11 @@ function _blockFindTurtle(activity, turtle, blk, receivedArg) {
         //Debug: target turtleName from arg not found, returning null
         return null;
     }
-    return activity.turtles.getTurtle(getTargetTurtle(activity.turtles, targetTurtle));
+    const targetTurtleId = getTargetTurtle(activity.turtles, targetTurtle);
+    if (targetTurtleId === null) {
+        return null;
+    }
+    return activity.turtles.getTurtle(targetTurtleId);
 }
 
 function setupEnsembleBlocks(activity) {

@@ -253,7 +253,7 @@ function setupProgramBlocks(activity) {
                             activity.blocks.blockList[c].value[1]
                         );
                         if (!Array.isArray(logo.turtleHeaps[turtle])) {
-                            throw "is not array";
+                            throw new Error("is not array");
                         }
                     } catch (e) {
                         logo.turtleHeaps[turtle] = oldHeap;
@@ -324,7 +324,7 @@ function setupProgramBlocks(activity) {
                 try {
                     logo.turtleHeaps[turtle] = JSON.parse(activity.blocks.blockList[c].value);
                     if (!Array.isArray(logo.turtleHeaps[turtle])) {
-                        throw "is not array";
+                        throw new Error("is not array");
                     }
                 } catch (e) {
                     logo.turtleHeaps[turtle] = oldHeap;
