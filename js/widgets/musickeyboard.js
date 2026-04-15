@@ -57,9 +57,6 @@ function MusicKeyboard(activity) {
     const WHITEKEYS = [65, 83, 68, 70, 71, 72, 74, 75, 76];
     const SPACE = 32;
 
-    const saveOnKeyDown = document.onkeydown;
-    const saveOnKeyUp = document.onkeyup;
-
     const w = window.innerWidth;
     /**
      * Reference to the activity associated with the keyboard.
@@ -91,11 +88,40 @@ function MusicKeyboard(activity) {
      */
     this._stopOrCloseClicked = false;
 
+    this._savedDocumentOnKeyDown = undefined;
+    this._savedDocumentOnKeyUp = undefined;
+
     /**
      * Flag indicating whether playback is currently active.
      * @type {boolean}
      */
     this.playingNow = false;
+
+    this._cacheDocumentKeyHandlers = function () {
+        if (
+            this._savedDocumentOnKeyDown !== undefined ||
+            this._savedDocumentOnKeyUp !== undefined
+        ) {
+            return;
+        }
+
+        this._savedDocumentOnKeyDown = document.onkeydown;
+        this._savedDocumentOnKeyUp = document.onkeyup;
+    };
+
+    this._restoreDocumentKeyHandlers = function () {
+        if (
+            this._savedDocumentOnKeyDown === undefined &&
+            this._savedDocumentOnKeyUp === undefined
+        ) {
+            return;
+        }
+
+        document.onkeydown = this._savedDocumentOnKeyDown;
+        document.onkeyup = this._savedDocumentOnKeyUp;
+        this._savedDocumentOnKeyDown = undefined;
+        this._savedDocumentOnKeyUp = undefined;
+    };
 
     /**
      * Array of instruments.
@@ -480,6 +506,7 @@ function MusicKeyboard(activity) {
             //event.preventDefault();
         };
 
+        this._cacheDocumentKeyHandlers();
         document.onkeydown = __keyboarddown;
         document.onkeyup = __keyboardup;
     };
@@ -630,8 +657,7 @@ function MusicKeyboard(activity) {
          */
         widgetWindow.onclose = () => {
             let myNode;
-            document.onkeydown = saveOnKeyDown;
-            document.onkeyup = saveOnKeyUp;
+            this._restoreDocumentKeyHandlers();
 
             if (document.getElementById("keyboardHolder2")) {
                 document.getElementById("keyboardHolder2").style.display = "none";
@@ -2666,6 +2692,7 @@ function MusicKeyboard(activity) {
      * It sets up event handling for key presses on the keyboard.
      */
     this._createKeyboard = function () {
+        this._cacheDocumentKeyHandlers();
         document.onkeydown = null;
         const mkbKeyboardDiv = this.keyboardDiv;
         mkbKeyboardDiv.style.display = "flex";
@@ -3512,4 +3539,8 @@ function MusicKeyboard(activity) {
          */
         navigator.requestMIDIAccess({ sysex: true }).then(onMIDISuccess, onMIDIFailure);
     };
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = MusicKeyboard;
 }
