@@ -2204,8 +2204,12 @@ class Singer {
                     if (notes.length > 0) {
                         const stopBtn = document.getElementById("stop");
                         if (stopBtn) {
-                            stopBtn.style.display = "inline-block";
-                            stopBtn.style.color = "#ea174c";
+                            if (stopBtn.style.display !== "inline-block") {
+                                stopBtn.style.display = "inline-block";
+                            }
+                            if (stopBtn.style.color !== "#ea174c") {
+                                stopBtn.style.color = "#ea174c";
+                            }
                         }
                         const len = notes[0].length;
                         if (typeof notes[0] === "number") {
