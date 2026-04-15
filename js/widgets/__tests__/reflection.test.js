@@ -23,6 +23,10 @@
 const fs = require("fs");
 const path = require("path");
 
+// Make shared escapeHTML available globally before loading reflection.js
+const { escapeHTML } = require("../../utils/utils");
+global.escapeHTML = escapeHTML;
+
 // Load the ReflectionMatrix class by reading the source and evaluating it
 const source = fs.readFileSync(path.resolve(__dirname, "../reflection.js"), "utf-8");
 // We put ReflectionMatrix in global scope
@@ -39,6 +43,7 @@ function createMockWidgetWindow() {
     return {
         clear: jest.fn(),
         show: jest.fn(),
+        sendToCenter: jest.fn(),
         onclose: null,
         addButton: jest.fn(() => {
             const btn = document.createElement("button");
@@ -107,6 +112,8 @@ describe("ReflectionMatrix", () => {
             expect(reflection.triggerFirst).toBe(false);
             expect(reflection.projectAlgorithm).toBe("");
             expect(reflection.code).toBe("");
+            expect(reflection.pendingMessages).toEqual([]);
+            expect(reflection.isProcessingPendingMessage).toBe(false);
         });
     });
 
@@ -424,7 +431,9 @@ describe("ReflectionMatrix", () => {
                     query: "msg",
                     messages: [],
                     mentor: "meta",
-                    algorithm: "alg"
+                    algorithm: "alg",
+                    conversation_summary: null,
+                    summarized_up_to: 0
                 })
             });
             expect(reflection.hideTypingIndicator).toHaveBeenCalled();
@@ -456,23 +465,85 @@ describe("ReflectionMatrix", () => {
             expect(reflection.chatHistory).toEqual([]);
         });
 
-        test("sendMessage adds user msg to history, updates UI, and triggers botReplyDiv", () => {
+        test("sendMessage queues user input, updates UI, and starts processing", () => {
+            jest.spyOn(reflection, "processPendingMessages").mockResolvedValue();
             reflection.input.value = "Hello AI";
-            reflection.sendMessage();
 
-            // Check history
-            expect(reflection.chatHistory.length).toBe(1);
-            expect(reflection.chatHistory[0]).toEqual({ role: "user", content: "Hello AI" });
+            reflection.sendMessage();
 
             // Check UI
             expect(reflection.chatLog.childNodes.length).toBe(1);
             expect(reflection.chatLog.childNodes[0].classList.contains("user")).toBe(true);
+            expect(reflection.chatLog.childNodes[0].lastChild.innerText).toBe("Hello AI");
+
+            // Check queue
+            expect(reflection.pendingMessages).toEqual([
+                {
+                    text: "Hello AI",
+                    mentor: "meta",
+                    algorithm: ""
+                }
+            ]);
 
             // Input cleared
             expect(reflection.input.value).toBe("");
 
-            // Triggered bot
-            expect(reflection.botReplyDiv).toHaveBeenCalledWith("Hello AI");
+            // Triggered queue processor
+            expect(reflection.processPendingMessages).toHaveBeenCalled();
+        });
+
+        test("sendMessage queues input instead of dropping it while a reply is pending", () => {
+            reflection.isProcessingPendingMessage = true;
+            reflection.input.value = "Hello again";
+
+            reflection.sendMessage();
+
+            expect(reflection.pendingMessages).toEqual([
+                {
+                    text: "Hello again",
+                    mentor: "meta",
+                    algorithm: ""
+                }
+            ]);
+            expect(reflection.chatLog.childNodes[0].lastChild.innerText).toBe("Hello again");
+        });
+
+        test("processPendingMessages sends queued messages in order", async () => {
+            reflection.pendingMessages = [
+                { text: "First", mentor: "meta", algorithm: "alg-1" },
+                { text: "Second", mentor: "code", algorithm: "alg-2" }
+            ];
+
+            jest.spyOn(reflection, "generateBotReply")
+                .mockResolvedValueOnce({ response: "Reply 1" })
+                .mockResolvedValueOnce({ response: "Reply 2" });
+            jest.spyOn(reflection, "appendBotReply").mockImplementation(() => {});
+
+            await reflection.processPendingMessages();
+
+            expect(reflection.generateBotReply).toHaveBeenCalledTimes(2);
+            expect(reflection.generateBotReply.mock.calls[0][0]).toBe("First");
+            expect(reflection.generateBotReply.mock.calls[0][2]).toBe("meta");
+            expect(reflection.generateBotReply.mock.calls[0][3]).toBe("alg-1");
+            expect(reflection.generateBotReply.mock.calls[1][0]).toBe("Second");
+            expect(reflection.generateBotReply.mock.calls[1][2]).toBe("code");
+            expect(reflection.generateBotReply.mock.calls[1][3]).toBe("alg-2");
+            expect(reflection.appendBotReply).toHaveBeenNthCalledWith(
+                1,
+                { response: "Reply 1" },
+                "meta"
+            );
+            expect(reflection.appendBotReply).toHaveBeenNthCalledWith(
+                2,
+                { response: "Reply 2" },
+                "code"
+            );
+            expect(reflection.chatHistory).toEqual([
+                { role: "user", content: "First" },
+                { role: "user", content: "Second" }
+            ]);
+            expect(reflection.pendingMessages).toEqual([]);
+            expect(reflection.isProcessingPendingMessage).toBe(false);
         });
 
         test("renderChatHistory clears log and appends history", () => {
@@ -545,8 +616,8 @@ describe("ReflectionMatrix", () => {
 
         test("escapeHTML replaces special characters", () => {
             const input = "<div id='test'>&\"</div>";
-            const output = reflection.escapeHTML(input);
-            expect(output).toBe("&lt;div id=&#x27;test&#x27;&gt;&amp;&quot;&lt;/div&gt;");
+            const output = escapeHTML(input);
+            expect(output).toBe("&lt;div id=&#039;test&#039;&gt;&amp;&quot;&lt;/div&gt;");
         });
 
         test("isUnsafeUrl flags javascript/data/vbscript correctly", () => {

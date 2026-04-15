@@ -1480,7 +1480,7 @@
   "Number of Downloads:": "डाउनलोडची संख्या:",
   "Number of Likes:": "आवडींची संख्या:",
   "Tags:": "टॅग:",
-  "Report projects which violate the <a href=\\\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\\\" target=\\\\\"_blank\\\\\">Sugar Labs Code of Conduct</a>.": "जे प्रकल्प <a href=\\\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\\\" target=\\\\\"_blank\\\\\">शुगर लॅब्स आचारसंहिता</a> चे उल्लंघन करतात त्यांचा अहवाल द्या.",
+  "Report projects which violate the <a href=\\\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\\\" target=\\\\\"_blank\\\\\" rel=\\\\\"noopener noreferrer\\\\\">Sugar Labs Code of Conduct</a>.": "जे प्रकल्प <a href=\\\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\\\" target=\\\\\"_blank\\\\\" rel=\\\\\"noopener noreferrer\\\\\">शुगर लॅब्स आचारसंहिता</a> चे उल्लंघन करतात त्यांचा अहवाल द्या.",
   "Reason for reporting project": "प्रकल्पाचा अहवाल देण्याचे कारण",
   "Download as File": "फाईल म्हणून डाउनलोड करा",
   "motion x": "x चलऩ",

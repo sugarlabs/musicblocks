@@ -132,7 +132,7 @@ class GlobalPlanet {
         const Planet = this.Planet;
 
         this.index = 0;
-        this.cards = [];
+        this._cleanupCards();
         document.getElementById("global-projects").innerHTML = "";
         this.showLoading();
         this.hideLoadMore();
@@ -196,7 +196,7 @@ class GlobalPlanet {
 
             this.oldSearchString = this.searchString;
             this.index = 0;
-            this.cards = [];
+            this._cleanupCards();
             document.getElementById("global-projects").innerHTML = "";
             this.showLoading();
             this.hideLoadMore();
@@ -208,6 +208,17 @@ class GlobalPlanet {
                 this.afterRefreshProjects.bind(this)
             );
         }
+    }
+
+    _cleanupCards() {
+        if (Array.isArray(this.cards)) {
+            this.cards.forEach(card => {
+                if (card && card.cleanup) {
+                    card.cleanup();
+                }
+            });
+        }
+        this.cards = [];
     }
 
     afterSearch() {
@@ -283,10 +294,12 @@ class GlobalPlanet {
         if (data.success) {
             this.cache[id] = data.data;
             this.cache[id].ProjectData = null;
-            this.loadCount -= 1;
+        } else {
+            this.throwOfflineError();
+        }
 
-            if (this.loadCount <= 0) callback();
-        } else this.throwOfflineError();
+        this.loadCount -= 1;
+        if (this.loadCount <= 0) callback();
     }
 
     forceAddToCache(id, callback) {

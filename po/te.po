@@ -7612,8 +7612,8 @@ msgid "Tags:"
 msgstr "ట్యాగ్‌లు:"
 
 #: planet/js/StringHelper.js:65
-msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">Sugar Labs Code of Conduct</a>."
-msgstr "ప్రోజెక్టులను అనుసరించిన <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">షుగార్ లాబ్స్ కోడ్ ఆఫ్ కండక్ట్</a> ను ఉల్లంఘించండి."
+msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a>."
+msgstr "ప్రోజెక్టులను అనుసరించిన <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">షుగార్ లాబ్స్ కోడ్ ఆఫ్ కండక్ట్</a> ను ఉల్లంఘించండి."
 
 #: planet/js/StringHelper.js:66
 msgid "Reason for reporting project"
@@ -11100,8 +11100,8 @@ msgstr "చలింపు"
 
 #: js/SaveInterface.js:24
 
-#~ msgid "For more information, please consult the <a href=\"https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md\" target=\"_blank\">Music Blocks guide</a>."
-#~ msgstr "మరియు మరిన్ని సమాచారానికి, దయచేసి <a href=\"https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md\" target=\"_blank\">మ్యూజిక్ బ్లాక్స్ గైడ్</a> ని సంప్రదించండి."
+#~ msgid "For more information, please consult the <a href=\"https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md\" target=\"_blank\" rel=\"noopener noreferrer\">Music Blocks guide</a>."
+#~ msgstr "మరియు మరిన్ని సమాచారానికి, దయచేసి <a href=\"https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md\" target=\"_blank\" rel=\"noopener noreferrer\">మ్యూజిక్ బ్లాక్స్ గైడ్</a> ని సంప్రదించండి."
 
 #: js/lilypond.js:21
 

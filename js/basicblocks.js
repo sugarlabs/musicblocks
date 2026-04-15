@@ -30,14 +30,14 @@
 /*
    exported
 
-   initBasicProtoBlocks, BACKWARDCOMPATIBILIYDICT
+   initBasicProtoBlocks, BACKWARDCOMPATIBILITYDICT
  */
 
 /**
  * Dictionary mapping old block names to their corresponding new block names for backward compatibility.
  * @constant {Object<string, string>}
  */
-const BACKWARDCOMPATIBILIYDICT = {
+const BACKWARDCOMPATIBILITYDICT = {
     fullscreen: "vspace",
     fillscreen2: "fillscreen",
     sandwichclampcollapsed: "clamp",
@@ -120,6 +120,6 @@ const initBasicProtoBlocks = activity => {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         initBasicProtoBlocks,
-        BACKWARDCOMPATIBILIYDICT
+        BACKWARDCOMPATIBILITYDICT
     };
 }

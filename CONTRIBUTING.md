@@ -160,6 +160,43 @@ Follow these steps when contributing:
 
 7.  Respond to review feedback and update your branch as needed.
 
+### Keeping Your PR Up-to-Date
+
+Our CI automatically rebases your PR onto the latest `master` whenever
+new changes are merged. For this to work on fork PRs, you **must** enable
+**"Allow edits from maintainers"** when creating your PR.
+
+> **Note:** This checkbox only grants maintainers push access to the
+> _specific branch_ associated with your PR. It does **not** affect
+> your fork's other branches or settings.
+
+If your PR develops merge conflicts that can't be auto-resolved, our bot
+will label it with `needs-rebase` and comment with step-by-step rebase
+instructions.
+
+**Manual rebase (if needed):**
+
+```bash
+# Add the upstream remote (one-time setup)
+git remote add upstream https://github.com/sugarlabs/musicblocks.git
+
+# Fetch the latest changes and rebase
+git fetch upstream
+git rebase upstream/master
+
+# Resolve any conflicts in your editor, then:
+git add .
+git rebase --continue
+
+# Push the updated branch
+git push --force-with-lease origin your-branch-name
+```
+
+> **Tip:** Enable **"Allow edits from maintainers"** on your PR so
+> maintainers and our automation can keep your branch current. This
+> setting only applies to the PR branch. Your other branches and
+> fork settings are not affected.
+
 ### After your PR is merged
 
 Please note that production deployments of Music Blocks are **manual**.
@@ -273,8 +310,8 @@ Feel free. But, please don't spam :p.
    [discussions](https://github.com/sugarlabs/musicblocks/discussions)
    tab on top the the repository, or the _Sugar-dev Devel
    <[sugar-devel@lists.sugarlabs.org](mailto:sugar-devel@lists.sugarlabs.org)>_
-   mailing list. Don't ask silly questions (unless you don't know it is
-   silly ;p) before searching it on the web.
+   mailing list. We also have a
+   [matrix channel](https://matrix.to/#/#music-blocks:matrix.org).
 
 10. Work on things that matter. Follow three milestones: `Port Ready`,
     `Migration`, and `Future`. Those tagged `Port Ready` are

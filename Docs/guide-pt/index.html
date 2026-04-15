@@ -9,44 +9,114 @@
       crossorigin="anonymous"
     />
     <style type="text/css">
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+        background-color: #f9f9f9;
+      }
+      .jumbotron {
+        background-color: #5bc0de;
+        color: white;
+        text-align: center;
+        border-radius: 8px;
+        margin-top: 20px;
+        padding: 40px 20px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      }
+      .jumbotron h1 {
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+      .content-wrapper {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-bottom: 40px;
+      }
+      .top-nav {
+        margin-bottom: 20px;
+        text-align: right;
+      }
+      .top-nav a {
+        color: #777;
+        margin-left: 10px;
+        text-decoration: none;
+      }
+      .top-nav a:hover {
+        color: #333;
+      }
       ol {
         counter-reset: item;
       }
       li {
         display: block;
+        margin-bottom: 8px;
       }
       li:before {
         content: counters(item, ".") " ";
         counter-increment: item;
+        font-weight: bold;
+        color: #5bc0de;
+      }
+      h2, h3, h4 {
+        color: #2c3e50;
+        margin-top: 30px;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+        margin: 15px 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .download-btn {
+        margin-top: 20px;
+        font-size: 1.1em;
+        padding: 10px 20px;
+        border-radius: 30px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        transition: all 0.3s;
+      }
+      .download-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0,0,0,0.3);
       }
     </style>
   </head>
-  <body> 
-     
-    <div class="container">
+  <body>
+    <div class="container content-wrapper">
+      <div class="top-nav">
+        <a href="../guide/index.html">English</a> |
+        <a href="../guide-es/index.html">Español</a> |
+        <a href="../guide-ja/index.html">日本語</a> |
+        <a href="../guide-zhCN/index.html">中文</a> |
+        <a href="../guide-pt/index.html">Português</a>
+      </div>
       <div id="content">
-        <h1 id="guide-to-programming-with-music-blocks">Guia de Programação com Music Blocks</h1>
-        <p>
-          <a href="../guide/index.html">English</a> |
-          <a href="../guide-es/index.html">Español</a> |
-          <a href="../guide-ja/index.html">日本語</a> |
-          <a href="../guide-zhCN/index.html">中文</a> |
-          <a href="../guide-pt/index.html">Português</a>
-        </p>
+        <div class="jumbotron">
+          <h1>Guia de Programação com Music Blocks</h1>
+          <p class="lead">Um guia completo para aprender e programar com o Music Blocks</p>
+          <a href="MusicBlocks_Guide_PT.pdf" class="btn btn-warning btn-lg download-btn" download>
+             <span class="glyphicon glyphicon-download-alt"></span> Baixar Guia em PDF
+          </a>
+        </div>
         <p>
           O
-          <a href="https://github.com/sugarlabs/turtleblocksjs/blob/master/guide/README.md"
+          <a href="https://github.com/sugarlabs/turtleblocksjs/blob/master/guide/README.md" target="_blank" rel="noopener noreferrer"
             >guia do Turtle Blocks</a
           >
           é um bom lugar para começar a aprender o básico. Neste guia, ilustramos os
           recursos musicais guiando o leitor através de numerosos exemplos.
         </p>
         <p>
-          A <a href="../documentation/README.md">documentação básica</a> do Music Blocks também é um
+          A <a href="../documentation/README.md" target="_blank" rel="noopener noreferrer">documentação básica</a> do Music Blocks também é um
           bom recurso.
         </p>
         <p>
-          E há um curto <a href="../Debugging.md">Guia de Depuração</a> para ajudá-lo com
+          E há um curto <a href="../Debugging.md" target="_blank" rel="noopener noreferrer">Guia de Depuração</a> para ajudá-lo com
           sua programação.
         </p>
         <p>Este guia detalha os muitos recursos musicais da linguagem.</p>
@@ -184,7 +254,7 @@
         </p>
         <h2 id="1-getting-started"><a name="#GETTING-STARTED">1. Começando</a></h2>
         <p>
-          <a href="#TOC">Voltar para o Índice</a> |
+          <a href="#table-of-contents">Voltar ao Índice</a> |
           <a href="#NOTES">Próxima Seção (2. Fazendo Sons)</a>
         </p>
         <p>
@@ -199,23 +269,23 @@
         <p>
           Este guia detalha os recursos específicos de música do Music Blocks. Você também pode estar interessado
           no
-          <a href="http://github.com/sugarlabs/turtleblocksjs/tree/master/guide"
+          <a href="https://github.com/sugarlabs/turtleblocksjs/tree/master/guide"
             >Guia do Turtle Blocks</a
           >, que revisa muitos recursos de programação comuns a ambos os projetos.
         </p>
         <p>
           Para mais detalhes sobre como usar o Music Blocks, veja
-          <a href="http://github.com/sugarlabs/musicblocks/tree/master/documentation"
+          <a href="https://github.com/sugarlabs/musicblocks/tree/master/documentation"
             >Usando Music Blocks</a
           >. Para mais detalhes sobre como usar o Turtle Blocks, veja
-          <a href="http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation"
+          <a href="https://github.com/sugarlabs/turtleblocksjs/tree/master/documentation"
             >Usando Turtle Blocks JS</a
           >.
         </p>
         <h2 id="2-making-sounds"><a name="NOTES">2. Fazendo Sons</a></h2>
         <p>
           <a href="#1-getting-started">Seção Anterior (1. Começando)</a> |
-          <a href="#TOC">Voltar para o Índice</a> |
+          <a href="#table-of-contents">Voltar ao Índice</a> |
           <a href="#3-programming-with-music">Próxima Seção (3. Programando com Música)</a>
         </p>
         <p>
@@ -247,7 +317,7 @@
         <p>
           Na parte inferior, duas notas que são tocadas consecutivamente são mostradas. Ambas são
           notas <code>1/8</code>, tornando a duração de toda a sequência <code>1/4</code>.
-          <a href="https://musicblocks.sugarlabs.org/index.html?id=1726138873526815&run=True" target="_blank"
+          <a href="https://musicblocks.sugarlabs.org/index.html?id=1726138873526815&run=True" target="_blank" rel="noopener noreferrer"
             >RUN LIVE</a
           >
         </p>
@@ -262,7 +332,7 @@
           Neste exemplo, diferentes valores de nota são mostrados. De cima para baixo, eles são:
           <code>1/4</code> para uma semínima, <code>1/16</code> para uma semicolcheia, e
           <code>1/2</code> para uma mínima.
-          <a href="https://musicblocks.sugarlabs.org/index.html?id=1726139143565736&run=True" target="_blank"
+          <a href="https://musicblocks.sugarlabs.org/index.html?id=1726139143565736&run=True" target="_blank" rel="noopener noreferrer"
             >RUN LIVE</a
           >
         </p>
@@ -311,7 +381,7 @@
           />
         </p>
         <p>
-          <a href="https://musicblocks.sugarlabs.org/index.html?id=1733100820296221&run=True" target="_blank"
+          <a href="https://musicblocks.sugarlabs.org/index.html?id=1733100820296221&run=True" target="_blank" rel="noopener noreferrer"
             >RUN LIVE</a
           >
         </p>
@@ -437,7 +507,7 @@
         <p>
           Múltiplas alturas simultâneas podem ser especificadas adicionando múltiplos blocos de <em>Altura</em>
           em um único bloco de <em>Valor da nota</em>, como no exemplo acima.
-          <a href="https://musicblocks.sugarlabs.org/index.html?id=1725793652385126&run=True" target="_blank"
+          <a href="https://musicblocks.sugarlabs.org/index.html?id=1725793652385126&run=True" target="_blank" rel="noopener noreferrer"
             >RUN LIVE</a
           >
         </p>
@@ -446,7 +516,7 @@
         <p>
           Uma pausa da duração do valor da nota especificado pode ser construída usando um
           bloco de <em>Silêncio</em> no lugar de um bloco de <em>Altura</em>.
-          <a href="https://musicblocks.sugarlabs.org/index.html?id=1725793737126028&run=True" target="_blank"
+          <a href="https://musicblocks.sugarlabs.org/index.html?id=1725793737126028&run=True" target="_blank" rel="noopener noreferrer"
             >RUN LIVE</a
           >
         </p>
@@ -456,7 +526,7 @@
           Em qualquer lugar que um bloco de <em>Altura</em> possa ser usado — por exemplo, dentro da matriz ou de um
           bloco de <em>Valor da nota</em> — um bloco de <em>Amostra de Tambor</em> também pode ser usado em seu lugar. Atualmente
           existem cerca de duas dúzias de amostras diferentes para escolher. O tambor padrão é um bumbo.
-          <a href="https://musicblocks.sugarlabs.org/index.html?id=1725793852737369&run=True" target="_blank"
+          <a href="https://musicblocks.sugarlabs.org/index.html?id=1725793852737369&run=True" target="_blank" rel="noopener noreferrer"
             >RUN LIVE</a
           >
         </p>
@@ -467,7 +537,7 @@
           Assim como no exemplo de <a href="#23-multiple-pitches">múltiplas alturas</a> acima, você pode usar
           múltiplos blocos de <em>Tambor</em> dentro de um único bloco de <em>Valor da nota</em>, e combiná-los
           com blocos de <em>Altura</em> também.
-          <a href="https://musicblocks.sugarlabs.org/index.html?id=1725793935277059&run=True" target="_blank"
+          <a href="https://musicblocks.sugarlabs.org/index.html?id=1725793935277059&run=True" target="_blank" rel="noopener noreferrer"
             >RUN LIVE</a
           >
         </p>
@@ -476,7 +546,7 @@
         </h2>
         <p>
           <a href="#2-making-sounds">Seção Anterior (2. Fazendo Sons)</a> |
-          <a href="#TOC">Voltar para o Índice</a> |
+          <a href="#table-of-contents">Voltar ao Índice</a> |
           <a href="#4-widgets">Próxima Seção (4. Widgets)</a>
         </p>
         <p>
@@ -489,7 +559,7 @@
         <p><img src="./chunk-2.svg" title="funcionamento da pilha de ação" alt="ação" /></p>
         <p><img src="./chunk-1.svg" title="usando ação dentro do bloco Iniciar" alt="ação" /></p>
         <p>
-          <a href="https://musicblocks.sugarlabs.org/index.html?id=1725788353457649&run=True" target="_blank"
+          <a href="https://musicblocks.sugarlabs.org/index.html?id=1725788353457649&run=True" target="_blank" rel="noopener noreferrer"
             >RUN LIVE</a
           >
         </p>
@@ -527,7 +597,7 @@
         <p>
           Você pode <a href="#333-repeating-notes">repetir</a> ações usando múltiplos
           blocos de <em>Ação</em> ou usando um bloco <em>Repetir</em>.
-          <a href="https://musicblocks.sugarlabs.org/index.html?id=1725788849659637&run=True" target="_blank"
+          <a href="https://musicblocks.sugarlabs.org/index.html?id=1725788849659637&run=True" target="_blank" rel="noopener noreferrer"
             >RUN LIVE</a
           >          
         </p>
@@ -537,7 +607,7 @@
           Você também pode misturar e combinar ações. Aqui tocamos o bloco de <em>Ação</em> com nome
           <code>chunk0</code>, seguido por <code>chunk1</code> duas vezes, e então
           <code>chunk0</code> novamente.
-          <a href="https://musicblocks.sugarlabs.org/index.html?id=1725789807251793&run=True" target="_blank"
+          <a href="https://musicblocks.sugarlabs.org/index.html?id=1725789807251793&run=True" target="_blank" rel="noopener noreferrer"
             >RUN LIVE</a
           >
         </p>
@@ -546,7 +616,7 @@
         <p>
           Mais alguns grupos e podemos fazer uma música. (Você consegue ler a notação do bloco bem o suficiente para
           adivinhar o resultado? Você está familiarizado com a música que criamos?)
-          <a href="https://musicblocks.sugarlabs.org/index.html?id=1725791527821787&run=True" target="_blank"
+          <a href="https://musicblocks.sugarlabs.org/index.html?id=1725791527821787&run=True" target="_blank" rel="noopener noreferrer"
             >RUN LIVE</a
           >
         </p>
@@ -561,7 +631,7 @@
           tocada. No exemplo acima, blocos de <em>Passo de Altura</em> são usados dentro de
           blocos <em>Repetir</em> para repetir o código <code>7</code> vezes, tocando para cima e para baixo em uma
           escala.
-          <a href="https://musicblocks.sugarlabs.org/index.html?id=1732586286359989&run=True" target="_blank"
+          <a href="https://musicblocks.sugarlabs.org/index.html?id=1732586286359989&run=True" target="_blank" rel="noopener noreferrer"
             >RUN LIVE</a
           >
         </p>
@@ -582,7 +652,7 @@
         <p>
           Neste exemplo, estamos usando o bloco <em>Comprimento do modo</em>, que retorna o número de
           passos escalares no modo atual (7 para modos Maior e Menor).
-          <a href="https://musicblocks.sugarlabs.org/index.html?id=1733192676935416&run=True" target="_blank"
+          <a href="https://musicblocks.sugarlabs.org/index.html?id=1733192676935416&run=True" target="_blank" rel="noopener noreferrer"
             >RUN LIVE</a
           >
         </p>
@@ -598,7 +668,7 @@
           bloco de <em>Altura</em> <code>ré</code> é abaixado em um meio tom; à direita, ambos os
           blocos de <em>Altura</em> são aumentados em um meio tom. (Você também pode usar um acidente dobrado-sustenido ou
           dobrado-bemol.)
-          <a href="https://musicblocks.sugarlabs.org/index.html?id=1733231694757697&run=True" target="_blank"
+          <a href="https://musicblocks.sugarlabs.org/index.html?id=1733231694757697&run=True" target="_blank" rel="noopener noreferrer"
             >RUN LIVE</a
           >
         </p>
@@ -622,7 +692,7 @@
           <code>Fá</code> é <code>1</code> passo escalar (ou <code>1</code> meio tom). Para deslocar uma
           oitava inteira, transponha escalarmente pelo comprimento do modo para cima ou para baixo. (Em escalas maiores, o comprimento do modo
           é <code>7</code>.)
-          <a href="https://musicblocks.sugarlabs.org/index.html?id=1733306280056376&run=True" target="_blank"
+          <a href="https://musicblocks.sugarlabs.org/index.html?id=1733306280056376&run=True" target="_blank" rel="noopener noreferrer"
             >RUN LIVE</a
           >
         </p>
@@ -637,7 +707,7 @@
           O bloco <em>Transpor-por-razão</em> desloca uma altura com base em uma razão. Por exemplo, uma
           razão de 2:1 deslocaria uma altura em uma oitava; uma razão de 3:2 deslocaria uma altura em uma
           quinta.
-          <a href="https://musicblocks.sugarlabs.org/index.html?id=1733307313746261&run=True" target="_blank"
+          <a href="https://musicblocks.sugarlabs.org/index.html?id=1733307313746261&run=True" target="_blank" rel="noopener noreferrer"
             >RUN LIVE</a
           >
         </p>
@@ -657,7 +727,7 @@
         <p>
           No exemplo acima, pegamos a música que programamos anteriormente e a aumentamos em uma
           oitava.
-          <a href="https://musicblocks.sugarlabs.org/index.html?id=1733340896349788&run=True" target="_blank"
+          <a href="https://musicblocks.sugarlabs.org/index.html?id=1733340896349788&run=True" target="_blank" rel="noopener noreferrer"
             >RUN LIVE</a
           >
         </p>
@@ -669,7 +739,7 @@
         </p>
         <p>
           No exemplo acima, G4 + 50 cents é 403Hz. (Lembre-se que G4 é 392Hz e G#4 é 415Hz).
-          <a href="https://musicblocks.sugarlabs.org/index.html?id=1733411391096443&run=True" target="_blank"
+          <a href="https://musicblocks.sugarlabs.org/index.html?id=1733411391096443&run=True" target="_blank" rel="noopener noreferrer"
             >RUN LIVE</a
           >
         </p>
@@ -679,7 +749,7 @@
         </p>
         <p>
           Você também pode usar o bloco de razão para cents, embora a matemática seja um pouco mais complicada.
-          <a href="https://musicblocks.sugarlabs.org/index.html?id=1733425512725578&run=True" target="_blank"
+          <a href="https://musicblocks.sugarlabs.org/index.html?id=1733425512725578&run=True" target="_blank" rel="noopener noreferrer"
             >RUN LIVE</a
           >
         </p>
@@ -689,7 +759,7 @@
           notas que o seguem. No exemplo acima, ele é usado primeiro para aumentar a
           nota <code>Mi 4</code> em uma oitava e depois para diminuir a nota <code>Sol 4</code>
           em uma oitava.
-          <a href="https://musicblocks.sugarlabs.org/index.html?id=1733426232664999&run=True" target="_blank"
+          <a href="https://musicblocks.sugarlabs.org/index.html?id=1733426232664999&run=True" target="_blank" rel="noopener noreferrer"
             >RUN LIVE</a
           >
         </p>
@@ -960,7 +1030,7 @@
         <h2 id="4-widgets"><a name="WIDGETS">4. Widgets</a></h2>
         <p>
           <a href="#3-programming-with-music">Seção Anterior (3. Programando com Música)</a> |
-          <a href="#TABLE-OF-CONTENTS">Voltar ao Índice</a> |
+          <a href="#table-of-contents">Voltar ao Índice</a> |
           <a href="#5-beyond-music-blocks">Próxima Seção (5. Além do Music Blocks)</a>
         </p>
         <p>
@@ -1720,7 +1790,7 @@
         <h2 id="5-beyond-music-blocks"><a name="BEYOND-MUSIC-BLOCKS">5. Além do Music Blocks</a></h2>
         <p>
           <a href="#4-widgets">Seção Anterior (4. Widgets)</a> |
-          <a href="#TABLE-OF-CONTENTS">Voltar ao Índice</a>
+          <a href="#table-of-contents">Voltar ao Índice</a>
         </p>
         <p>
           O Music Blocks é um ponto de passagem, não um destino. Um dos objetivos é apontar o aprendiz
@@ -1728,7 +1798,7 @@
         </p>
         <h2 id="51-lilypond"><a name="LILYPOND">5.1 Lilypond</a></h2>
         <p>
-          Uma dessas ferramentas é o <a href="http://lilypond.org">Lilypond</a>, um programa de gravação de música.
+          Uma dessas ferramentas é o <a href="https://lilypond.org">Lilypond</a>, um programa de gravação de música.
         </p>
         <p><img src="./lilypond1.svg" title="adicionando bloco Salvar como Lilypond" alt="lilypond" /></p>
         <p>
@@ -1871,7 +1941,7 @@
         <h2 id="6-appendix"><a name="APPENDIX">6. Apêndice</a></h2>
         <p>
           <a href="#5-beyond-music-blocks">Seção Anterior (5. Além do Music Blocks)</a> |
-          <a href="#TABLE-OF-CONTENTS">Voltar ao Índice</a>
+          <a href="#table-of-contents">Voltar ao Índice</a>
         </p>
         <h3 id="61-beginner-palettes"><a name="BEGINNER_PALETTES">6.1 Paletas para Iniciantes</a></h3>
         <p>
@@ -2403,6 +2473,7 @@
               <td style="text-align: center"></td>
               <td style="text-align: center"></td>
             </tr>
+            <tr class="odd">
               <td style="text-align: center"></td>
               <td style="text-align: center"></td>
               <td style="text-align: center"></td>
@@ -3986,8 +4057,18 @@
             </tr>
           </tbody>
         </table>
-        <p><a href="#TABLE-OF-CONTENTS">Voltar ao Índice</a></p>
+        <p><a href="#table-of-contents">Voltar ao Índice</a></p>
       </div>
-    </div>
+    <script>
+      function toggleImageSize(img) {
+        if (img.style.maxWidth === "none") {
+          img.style.maxWidth = "500px";
+          img.style.maxHeight = "500px";
+        } else {
+          img.style.maxWidth = "none";
+          img.style.maxHeight = "none";
+        }
+      }
+    </script>
   </body>
 </html>

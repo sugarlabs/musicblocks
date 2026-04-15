@@ -48,8 +48,7 @@ class LocalPlanet {
         this.projects = [];
 
         for (const project in this.ProjectTable) {
-            // eslint-disable-next-line no-prototype-builtins
-            if (this.ProjectTable.hasOwnProperty(project)) {
+            if (Object.prototype.hasOwnProperty.call(this.ProjectTable, project)) {
                 this.projects.push([project, null]);
             }
         }
@@ -78,7 +77,7 @@ class LocalPlanet {
             if (this.projects[i][0] === this.currentProjectID) index = i;
         }
 
-        if (index != -1) {
+        if (index !== -1) {
             const id = `local-project-image-${this.projects[index][0]}`;
 
             const cardimg = document.getElementById(id);
@@ -116,12 +115,12 @@ class LocalPlanet {
         Planet.loadProjectFromData(this.ProjectTable[id].ProjectData);
     }
 
-    mergeProject(id) {
+    async mergeProject(id) {
         const Planet = this.Planet;
-        const d = this.ProjectStorage.getCurrentProjectData();
+        const d = await Planet.ProjectStorage.getCurrentProjectData();
 
         if (d === null) {
-            this.ProjectStorage.initialiseNewProject();
+            await Planet.ProjectStorage.initialiseNewProject();
             Planet.loadProjectFromData(this.ProjectTable[id].ProjectData);
         } else Planet.loadProjectFromData(this.ProjectTable[id].ProjectData, true);
     }

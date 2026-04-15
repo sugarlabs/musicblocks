@@ -261,12 +261,11 @@ describe("JSGenerate Class", () => {
             "background: greenyellow; color: midnightblue; font-weight: bold"
         );
     });
-  
+
     test("should generate stack trees with various block types and arguments", () => {
         globalActivity.blocks.stackList = [1, 20];
-        const booleanGrandParent = { constructor: { name: "BooleanBlock" } };
-        const booleanParent = Object.create(booleanGrandParent);
-        const booleanProtoblock = Object.create(booleanParent);
+        window.BooleanBlock = class BooleanBlock {};
+        const booleanProtoblock = new window.BooleanBlock();
         booleanProtoblock.style = "value";
         const standardGrandParent = { constructor: { name: "StandardBlock" } };
         const standardParent = Object.create(standardGrandParent);

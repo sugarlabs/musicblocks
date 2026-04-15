@@ -304,8 +304,8 @@ class Publisher {
     parseProject(tb) {
         try {
             tb = JSON.parse(tb);
-        } catch (e) {
-            console.log(e);
+        } catch (error) {
+            console.error("Publisher: Failed to parse project data for keyword extraction.", error);
             return "";
         }
 

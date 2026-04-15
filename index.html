@@ -79,48 +79,17 @@
 
         <script src="lib/reqwest.js" defer></script>
 
-        <script src="lib/jquery-3.7.1.min.js"></script>
-        <script src="lib/jquery-ui.js"></script>
-        <script src="lib/materialize.min.js"></script>
-        <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
-        <script>
-            jQuery(document).ready(function () {
-                if (jQuery.ui && jQuery.ui.autocomplete) {
-                    jQuery.fn.materializeAutocomplete = jQuery.fn.autocomplete;
-                    jQuery.widget.bridge("autocomplete", jQuery.ui.autocomplete);
-                }
-            });
-        </script>
-        <script>
-            jQuery(document).ready(function () {
-                const fixAutocompletePosition = function () {
-                    const $search = jQuery("#search");
-                    if ($search.length && $search.data("ui-autocomplete")) {
-                        const instance = $search.autocomplete("instance");
-                        if (instance) {
-                            const originalRenderMenu = instance._renderMenu;
-                            instance._renderMenu = function (ul, items) {
-                                originalRenderMenu.call(this, ul, items);
-                                setTimeout(() => {
-                                    const searchInput = document.querySelector("#search");
-                                    const dropdown = ul[0];
-                                    if (searchInput && dropdown) {
-                                        const rect = searchInput.getBoundingClientRect();
-                                        dropdown.style.position = "fixed";
-                                        dropdown.style.left = rect.left + "px";
-                                        dropdown.style.top = rect.bottom + 2 + "px";
-                                        dropdown.style.width = rect.width + "px";
-                                    }
-                                }, 0);
-                            };
-                        }
-                    } else {
-                        setTimeout(fixAutocompletePosition, 500);
-                    }
-                };
-                setTimeout(fixAutocompletePosition, 1000);
-            });
-        </script>
+        <script src="lib/jquery-3.7.1.min.js" defer></script>
+        <script src="lib/jquery-ui.js" defer></script>
+        <script src="lib/materialize.min.js" defer></script>
+        <link
+            rel="preload"
+            href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"
+            as="style"
+            onload="this.onload=null;this.rel='stylesheet'"
+        />
+        <noscript><link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" /></noscript>
+        <script src="js/utils/jquery-setup.js" defer></script>
         <script src="lib/Tone.js" defer></script>
         <script src="lib/midi.js" defer></script>
         <script src="lib/jquery.ruler.js" defer></script>
@@ -131,14 +100,19 @@
         <script src="lib/codejar/codejar.min.js" defer></script>
         <script src="lib/codejar/highlight.pack.js" defer></script>
         <link
-            rel="stylesheet"
+            rel="preload"
             href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css"
+            as="style"
+            integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07"
+            crossorigin="anonymous"
+            onload="this.onload=null;this.rel='stylesheet'"
         />
+        <noscript><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css" integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07" crossorigin="anonymous" /></noscript>
 
         <!-- libgif.js (SuperGif) provides low-level GIF frame extraction.
-     Browsers expose only the first frame of a GIF; SuperGif lets us
-     step through frames so animated GIFs can be drawn onto our canvas. -->
-        <script src="https://cdn.jsdelivr.net/gh/buzzfeed/libgif-js/libgif.js" defer></script>
+             Browsers expose only the first frame of a GIF; SuperGif lets us
+             step through frames so animated GIFs can be drawn onto our canvas. -->
+        <script src="lib/libgif.js" defer></script>
 
         <!-- gif-animator.js integrates SuperGif with Music Blocks. It manages
      decoding and drawing GIF frames onto the turtle's overlay canvas.
@@ -152,23 +126,38 @@
     <script src="lib/astring.min.js" defer></script>
     <script src="js/utils/mb-dialog.js" defer></script>
     <script src="lib/acorn.min.js" defer></script>
-    <script src="env.js"></script>
+    <script src="env.js" defer></script>
 
 
     <script data-main="js/loader" src="lib/require.js" defer></script>
-    <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
     <link rel="preload" href="/fonts/material-icons.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-    <link rel="stylesheet" href="lib/materialize-iso.css">
-    <link rel="stylesheet" href="css/themes.css?v=fixed">
+    <link
+        rel="preload"
+        href="css/themes.css?v=fixed"
+        as="style"
+        onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript><link rel="stylesheet" href="css/themes.css?v=fixed" /></noscript>
     <script src="lib/easeljs.min.js" defer></script>
     <script src="lib/tweenjs.min.js" defer></script>
     <script>
         let ast2blocklist_config;
-        document.addEventListener("DOMContentLoaded", function () {
-            fetch("js/js-export/ast2blocks.min.json")
-                .then(response => response.json())
-                .then(data => { ast2blocklist_config = data });
-        });
+        window.ast2blocklist_config_failed = false;
+        window.ast2blocklist_config_ready = fetch("js/js-export/ast2blocks.min.json")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Failed to load AST block config: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                ast2blocklist_config = data;
+                return data;
+            })
+            .catch(() => {
+                window.ast2blocklist_config_failed = true;
+                return null;
+            });
     </script>
 </head>
 
@@ -184,7 +173,8 @@
             <div class="loading-text" id="loadingText"
                 style="color:#333; margin-top: 2rem; min-height: 1.5em; font-size: 1.2rem;">
             </div>
-        </header>
+        </div>
+    </header>
 
         <main>
             <!-- #96D3F3-->
@@ -595,10 +585,11 @@
                                 <li>
                                     <a
                                         id="helpIcon"
-                                        class="tooltipped"
+                                        class="tooltipped dropdown-trigger"
                                         data-position="bottom"
                                         role="button"
                                         tabindex="0"
+                                        data-activates="helpdropdown"
                                     >
                                         <i class="material-icons md-48">help</i>
                                     </a>
@@ -852,6 +843,11 @@
                         </li>
                     </ul>
 
+                    <ul id="helpdropdown" class="dropdown-content helpdropdown-menu">
+                        <li><a id="helpGuideItem" role="button" tabindex="0"></a></li>
+                        <li><a id="shortcutsGuideItem" role="button" tabindex="0"></a></li>
+                    </ul>
+
                     <ul id="languagedropdown" class="dropdown-content">
                         <li><a id="enUS" role="button" tabindex="0"></a></li>
                         <li><a id="enUK" role="button" tabindex="0"></a></li>
@@ -1030,6 +1026,7 @@
         <!-- Loading Dialog Script -->
         <script>
             document.addEventListener("DOMContentLoaded", function () {
+                window._ = window._ || (x => x);
                 let loadL10nSplashScreen = function () {
                     console.debug("The browser is set to " + navigator.language);
                     let lang = navigator.language;
@@ -1162,6 +1159,90 @@
         <script>
             var elem = document.documentElement;
 
+        function openFullscreen() {
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            } else if (elem.mozRequestFullscreen) {
+                elem.mozRequestFullscreen();
+            }
+        }
+
+        function closeFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            } else if (document.mozExitFullscreen) {
+                document.mozExitFullscreen();
+            }
+        }
+
+        function setIcon() {
+            var iconCode = document.querySelector('#FullScrIcon');
+            // Determine fullscreen state using the browser fullscreen API
+            // instead of relying on a manual counter. This keeps the icon
+            // in sync when fullscreen is exited via ESC or browser controls.
+            var isFullscreen =
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
+
+            if (!isFullscreen) {
+                openFullscreen();
+                iconCode.textContent = '\ue5d1'; // fullscreen_exit icon
+            } else {
+                closeFullscreen();
+                iconCode.textContent = '\ue5d0'; // fullscreen icon
+            }
+        }
+
+        function handleFullscreenChange() {
+            var iconCode = document.querySelector('#FullScrIcon');
+            // Update fullscreen icon based on actual fullscreen state.
+            // This removes the need for a separate state variable and
+            // prevents incorrect icon state when fullscreen is toggled
+            // outside the button (e.g., ESC key).
+            var isFullscreen =
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
+
+            iconCode.textContent = isFullscreen ? '\ue5d1' : '\ue5d0';
+        }
+
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+    </script>
+
+    <style>
+        #installButton.hidden {
+            display: none !important;
+        }
+    </style>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let persistentNotification = null;
+
+            function showPersistentNotification() {
+                if (!persistentNotification) {
+                    persistentNotification = document.createElement("div");
+                    persistentNotification.id = "persistentNotification";
+                    persistentNotification.innerHTML = "Play only mode enabled. For full Music Blocks experience, use a larger display.";
+                    document.body.appendChild(persistentNotification);
+                }
+            }} )
+
             function openFullscreen() {
                 if (elem.requestFullscreen) {
                     elem.requestFullscreen();
@@ -1232,6 +1313,8 @@
                 display: none !important;
             }
         </style>
+        
+        <script src="js/utils/zoomOverlay.js"></script>
 
         <script>
             document.addEventListener("DOMContentLoaded", function () {

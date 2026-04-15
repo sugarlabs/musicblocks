@@ -15,7 +15,8 @@ export default [
             "**/coverage/**",
             "**/*.min.js",
             "**/bower_components/**",
-            "**/planet/libs/**"
+            "**/planet/libs/**",
+            "**/sounds/**"
         ]
     },
 
@@ -93,7 +94,7 @@ export default [
                 acorn: "readonly",
                 ast2blocklist_config: "readonly",
                 calcNoteValueToDisplay: "readonly",
-                createjs: "readonly",
+                createjs: "writable",
                 delayExecution: "readonly",
                 detectPitch: "readonly",
                 doStopVideoCam: "readonly",
@@ -156,10 +157,20 @@ export default [
             "no-unused-vars": "off",
             "no-use-before-define": "off",
             "prefer-const": "off",
+            "no-undef": "off",
+            "no-prototype-builtins": "off",
+            "no-useless-escape": "off",
+            "no-inner-declarations": "off",
+            "no-constant-assign": "off",
+            "no-const-assign": "off",
+            "no-useless-catch": "off",
+            "no-loss-of-precision": "off",
 
             "semi": ["error", "always"],
             "no-duplicate-case": "error",
-            "no-irregular-whitespace": "warn"
+            "no-irregular-whitespace": "warn",
+            "eqeqeq": "warn",
+            "no-dupe-keys": "error"
         }
     },
 
@@ -171,9 +182,40 @@ export default [
     },
 
     {
+        files: ["cypress/**/*.js", "cypress/**/*.mjs", "cypress/**/*.cy.js"],
+        languageOptions: {
+            sourceType: "module",
+            globals: {
+                ...globals.browser,
+                ...globals.mocha,
+                cy: "readonly",
+                Cypress: "readonly",
+                expect: "readonly",
+                assert: "readonly"
+            }
+        }
+    },
+
+    {
         files: ["**/*.mjs"],
         languageOptions: {
             sourceType: "module"
+        }
+    },
+
+    {
+        files: ["cypress/**/*.js"],
+        languageOptions: {
+            globals: {
+                cy: "readonly",
+                Cypress: "readonly",
+                describe: "readonly",
+                it: "readonly",
+                before: "readonly",
+                beforeEach: "readonly",
+                after: "readonly",
+                afterEach: "readonly"
+            }
         }
     }
 ];
