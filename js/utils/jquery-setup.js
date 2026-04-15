@@ -56,6 +56,10 @@ jQuery(document).ready(function () {
         } else if (retries < MAX_RETRIES) {
             retries++;
             setTimeout(fixAutocompletePosition, 500);
+        } else {
+            console.error(
+                `Autocomplete setup failed: Could not initialize ui-autocomplete on #search after ${MAX_RETRIES} retries.`
+            );
         }
     };
     setTimeout(fixAutocompletePosition, 1000);
