@@ -521,7 +521,9 @@ function AIWidget() {
                 const firstNoteBlockId = baseBlocks[0][0][0];
 
                 // Find the meter block to connect it to the first note
-                const meterBlock = startBlockArray.find(b => b[1] === "meter" || b[1][0] === "meter");
+                const meterBlock = startBlockArray.find(
+                    b => b[1] === "meter" || b[1][0] === "meter"
+                );
                 if (meterBlock) {
                     meterBlock[4][3] = firstNoteBlockId;
                 }
@@ -894,7 +896,7 @@ function AIWidget() {
             const audioContext = this.activity.logo.synth.tone.context;
             try {
                 await audioContext.resume();
-                
+
                 if (this.midiBuffer) {
                     this.midiBuffer.stop();
                 }
@@ -1202,20 +1204,24 @@ function AIWidget() {
                     }
 
                     let responseText = data.choices[0].message?.content || "";
-                    
+
                     // Robustly strip markdown code blocks and JSON wrappers
-                    responseText = responseText.replace(/```[a-z]*\n?/gi, "").replace(/```/g, "").trim();
+                    responseText = responseText
+                        .replace(/```[a-z]*\n?/gi, "")
+                        .replace(/```/g, "")
+                        .trim();
                     if (responseText.startsWith("{") && responseText.includes('"abc":')) {
                         try {
                             const parsed = JSON.parse(responseText);
                             responseText = parsed.abc || responseText;
                         } catch (e) {
-                             // Fallback to substring search if JSON parse fails
+                            // Fallback to substring search if JSON parse fails
                         }
                     }
 
                     const abcStartIndex = responseText.indexOf("X:");
-                    let abcNotation = abcStartIndex !== -1 ? responseText.substring(abcStartIndex) : responseText;
+                    let abcNotation =
+                        abcStartIndex !== -1 ? responseText.substring(abcStartIndex) : responseText;
 
                     abcNotation = abcNotation.replace(/"|\}/g, "").trim();
 
