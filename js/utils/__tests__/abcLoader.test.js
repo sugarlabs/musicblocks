@@ -8,10 +8,10 @@ describe("ensureABCJS", () => {
     beforeEach(() => {
         // Reset require module cache to ensure clean state per test if needed
         jest.resetModules();
-        
+
         // Load the module properly
         ensureABCJS = require("../abcLoader");
-        
+
         // Clean up mutations on window and document
         delete window.ABCJS;
         document.head.innerHTML = "";
@@ -19,25 +19,25 @@ describe("ensureABCJS", () => {
 
     it("should resolve immediately and do nothing if window.ABCJS already exists", async () => {
         window.ABCJS = {}; // Mock ABCJS being already present
-        
+
         const appendChildSpy = jest.spyOn(document.head, "appendChild");
-        
+
         await expect(ensureABCJS()).resolves.toBeUndefined();
         expect(appendChildSpy).not.toHaveBeenCalled();
-        
+
         appendChildSpy.mockRestore();
     });
 
     it("should create and append a script tag if one doesn't exist", async () => {
         // We capture the script element that gets added
         let injectedScript = null;
-        const appendChildSpy = jest.spyOn(document.head, "appendChild").mockImplementation((node) => {
+        const appendChildSpy = jest.spyOn(document.head, "appendChild").mockImplementation(node => {
             injectedScript = node;
             // Native append child logic bypasses actual loading in jsdom, but we capture the element
         });
 
         const promise = ensureABCJS();
-        
+
         // It should have created the script
         expect(appendChildSpy).toHaveBeenCalled();
         expect(injectedScript).not.toBeNull();
@@ -55,12 +55,12 @@ describe("ensureABCJS", () => {
 
     it("should reject if the script fails to load", async () => {
         let injectedScript = null;
-        const appendChildSpy = jest.spyOn(document.head, "appendChild").mockImplementation((node) => {
+        const appendChildSpy = jest.spyOn(document.head, "appendChild").mockImplementation(node => {
             injectedScript = node;
         });
 
         const promise = ensureABCJS();
-        
+
         const mockError = new Error("Failed to load script");
         injectedScript.onerror(mockError);
 
@@ -80,7 +80,7 @@ describe("ensureABCJS", () => {
 
         // Should resolve immediately without adding a new script
         await expect(ensureABCJS()).resolves.toBeUndefined();
-        
+
         expect(appendChildSpy).not.toHaveBeenCalled();
 
         appendChildSpy.mockRestore();
@@ -99,7 +99,7 @@ describe("ensureABCJS", () => {
 
         // Should not append another script
         expect(appendChildSpy).not.toHaveBeenCalled();
-        
+
         // Should attach an event listener to wait for loading
         expect(addEventListenerSpy).toHaveBeenCalledWith("load", expect.any(Function));
 

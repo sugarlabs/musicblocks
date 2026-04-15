@@ -11,7 +11,7 @@ describe("showZoomOverlay", () => {
         if (existing) {
             existing.remove();
         }
-        
+
         // Mock setTimeout and clearTimeout
         jest.useFakeTimers();
     });
@@ -67,7 +67,7 @@ describe("showZoomOverlay", () => {
     it("should automatically fade out after 1200ms", () => {
         showZoomOverlay(1);
         const overlay = document.getElementById("zoomOverlay");
-        
+
         expect(overlay.style.opacity).toBe("1");
 
         // Advance timers but not fully to the end of timeout
@@ -82,7 +82,7 @@ describe("showZoomOverlay", () => {
     it("should reset the fade out timer if called again before fading out", () => {
         showZoomOverlay(1);
         const overlay = document.getElementById("zoomOverlay");
-        
+
         // Wait 1000ms, then call it again to reset timer
         jest.advanceTimersByTime(1000);
         showZoomOverlay(2);
