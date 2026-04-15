@@ -29,6 +29,9 @@ jQuery(document).ready(function () {
 
 // Fix autocomplete dropdown position to stay anchored to the search input.
 jQuery(document).ready(function () {
+    let retries = 0;
+    const MAX_RETRIES = 20;
+
     const fixAutocompletePosition = function () {
         const $search = jQuery("#search");
         if ($search.length && $search.data("ui-autocomplete")) {
@@ -50,7 +53,8 @@ jQuery(document).ready(function () {
                     }, 0);
                 };
             }
-        } else {
+        } else if (retries < MAX_RETRIES) {
+            retries++;
             setTimeout(fixAutocompletePosition, 500);
         }
     };
