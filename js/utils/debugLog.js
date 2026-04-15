@@ -74,3 +74,7 @@ const debugLog = (() => {
     }
     return () => {};
 })();
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = debugLog;
+}
