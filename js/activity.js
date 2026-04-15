@@ -6783,7 +6783,17 @@ class Activity {
         };
 
         this._loadBuiltInPlugin = name => {
-            const url = "plugins/" + name + ".json";
+            // Sanitize the plugin name to prevent path-traversal attacks
+            // (e.g. "../../sensitive-file").  Only allow alphanumeric
+            // characters, hyphens, and underscores — the characters that
+            // appear in legitimate plugin basenames.
+            const safeName = name.replace(/[^a-z0-9_-]/g, "");
+            if (safeName.length === 0) {
+                console.error("Invalid plugin name: " + name);
+                return;
+            }
+
+            const url = "plugins/" + safeName + ".json";
             const xhr = new XMLHttpRequest();
             xhr.open("GET", url, true);
             const that = this;
