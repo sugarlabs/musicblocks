@@ -67,7 +67,7 @@ class StringHelper {
             [
                 "projectviewer-report-conduct",
                 _(
-                    'Report projects which violate the <a href="https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md" target="_blank">Sugar Labs Code of Conduct</a>.'
+                    'Report projects which violate the <a href="https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md" target="_blank" rel="noopener noreferrer">Sugar Labs Code of Conduct</a>.'
                 )
             ],
             ["projectviewer-report-reason", _("Reason for reporting project")],

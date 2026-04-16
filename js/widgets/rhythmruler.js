@@ -2968,7 +2968,7 @@ class RhythmRuler {
                     fillColor = platformColor.rulerHighlight || "#FFEB3B";
                 } else if (nv < 0) {
                     // Rest: muted color
-                    fillColor = "#888888";
+                    fillColor = platformColor.selectorBackgroundHOFF || "#888888";
                 } else {
                     fillColor = i % 2 === 0 ? colors[j % 2] : colors[(j + 1) % 2];
                 }
@@ -2980,7 +2980,7 @@ class RhythmRuler {
                 ctx.closePath();
                 ctx.fillStyle = fillColor;
                 ctx.fill();
-                ctx.strokeStyle = "#666666";
+                ctx.strokeStyle = platformColor.strokeColor || "#666666";
                 ctx.lineWidth = 1;
                 ctx.stroke();
 
@@ -2993,7 +2993,10 @@ class RhythmRuler {
                 if (sweepAngle > 0.25 && ringThickness > 20) {
                     const obj = rationalToFraction(Math.abs(1 / nv));
                     const text = obj[0] + "/" + obj[1];
-                    ctx.fillStyle = isHighlighted || isInDragRange ? "#000000" : "#FFFFFF";
+                    ctx.fillStyle =
+                        isHighlighted || isInDragRange
+                            ? platformColor.background || "#000000"
+                            : platformColor.textColor || "#FFFFFF";
                     ctx.font = Math.min(Math.floor(ringThickness * 0.35), 14) + "px sans-serif";
                     ctx.textAlign = "center";
                     ctx.textBaseline = "middle";
@@ -3007,7 +3010,10 @@ class RhythmRuler {
         // Draw center hole (clear it).
         ctx.beginPath();
         ctx.arc(centerX, centerY, innerHoleRadius - 1, 0, 2 * Math.PI);
-        ctx.fillStyle = getComputedStyle(canvas.parentNode).backgroundColor || "#303030";
+        ctx.fillStyle =
+            getComputedStyle(canvas.parentNode).backgroundColor ||
+            platformColor.background ||
+            "#303030";
         ctx.fill();
 
         // Draw a "start here, plays clockwise" indicator at 12 o'clock.
@@ -3022,7 +3028,7 @@ class RhythmRuler {
         ctx.closePath();
         ctx.fillStyle = platformColor.rulerHighlight || "#FFEB3B";
         ctx.fill();
-        ctx.strokeStyle = "#000000";
+        ctx.strokeStyle = platformColor.textColor || "#000000";
         ctx.lineWidth = 1;
         ctx.stroke();
     }

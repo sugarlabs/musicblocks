@@ -79,7 +79,7 @@ function createMockWidgetWindow() {
     return {
         clear: jest.fn(),
         show: jest.fn(),
-        onclose: null,
+        onclose: jest.fn(),
         onmaximize: null,
         addButton: jest.fn(() => {
             const btn = document.createElement("div");
@@ -295,6 +295,26 @@ describe("JSEditor", () => {
             const editor = createEditor();
 
             expect(mockWidgetWindow.getWidgetBody().contains(editor._editor)).toBe(true);
+        });
+
+        test("calls onclose and updates editor state", () => {
+            const editor = createEditor();
+
+            editor._resizeHandlers = {
+                doResize: jest.fn(),
+                stopResize: jest.fn()
+            };
+
+            const removeEventListener = jest.spyOn(document, "removeEventListener");
+            const onclose = jest.spyOn(mockWidgetWindow, "onclose");
+            editor.widgetWindow.onclose();
+            expect(removeEventListener).toHaveBeenCalledWith("mousemove", expect.any(Function));
+            expect(removeEventListener).toHaveBeenCalledWith("mouseup", expect.any(Function));
+            expect(editor._resizeHandlers).toBeNull();
+            expect(editor.isOpen).toBe(false);
+            expect(onclose).toHaveBeenCalled();
+
+            removeEventListener.mockRestore();
         });
     });
 

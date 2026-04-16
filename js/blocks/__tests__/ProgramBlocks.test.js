@@ -776,7 +776,7 @@ describe("ProgramBlocks", () => {
 
         beforeEach(() => {
             delete window.open;
-            window.open = jest.fn(() => ({ focus: jest.fn() }));
+            window.open = jest.fn(() => ({}));
             delete window.alert;
             window.alert = jest.fn();
         });
@@ -785,7 +785,11 @@ describe("ProgramBlocks", () => {
             const block = getBlock("openProject");
             block.flow(["http://example.com"], logo, 0, 5);
 
-            expect(window.open).toHaveBeenCalledWith("http://example.com", "_blank");
+            expect(window.open).toHaveBeenCalledWith(
+                "http://example.com",
+                "_blank",
+                "noopener,noreferrer"
+            );
         });
 
         test("opens valid https URL", () => {
@@ -794,7 +798,8 @@ describe("ProgramBlocks", () => {
 
             expect(window.open).toHaveBeenCalledWith(
                 "https://musicblocks.sugarlabs.org/index.html",
-                "_blank"
+                "_blank",
+                "noopener,noreferrer"
             );
         });
 

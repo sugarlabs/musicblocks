@@ -6809,14 +6809,26 @@ class Activity {
 
         this._doOpenPlugin = () => {
             this.toolbar.closeAuxToolbar(showHideAuxMenu);
-            const name = prompt(
+            const rawName = prompt(
                 _("Enter the name of a built-in plugin, or leave blank to upload a plugin file:")
             );
-            if (name === null) {
+            if (rawName === null) {
                 return; // User cancelled the operation
             }
-            if (name.trim() !== "") {
-                this._loadBuiltInPlugin(name.trim().toLowerCase());
+
+            const name = rawName.trim().toLowerCase();
+            if (name !== "") {
+                // Validate: only allow safe characters (alphanumeric, hyphens, and underscores)
+                // This prevents path traversal attacks like "../../secrets"
+                if (!/^[a-z0-9\-_]+$/.test(name)) {
+                    alert(
+                        _(
+                            "Invalid plugin name. Only alphanumeric characters, hyphens, and underscores are allowed."
+                        )
+                    );
+                    return;
+                }
+                this._loadBuiltInPlugin(name);
             } else {
                 this.pluginChooser.focus();
                 this.pluginChooser.click();

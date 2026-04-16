@@ -435,6 +435,42 @@ describe("widgetWindows", () => {
             expect(removeSpy).toHaveBeenCalledWith("mousedown", win._docMouseDownHandler, true);
             removeSpy.mockRestore();
         });
+
+        test("removes widget-local wheel listeners", () => {
+            const win = createTestWindow();
+            const removeSpy = jest.spyOn(win._widget, "removeEventListener");
+
+            win.destroy();
+
+            expect(removeSpy).toHaveBeenCalledWith("wheel", win._widgetWheelHandler, false);
+            expect(removeSpy).toHaveBeenCalledWith(
+                "DOMMouseScroll",
+                win._widgetWheelHandler,
+                false
+            );
+            removeSpy.mockRestore();
+        });
+    });
+
+    describe("widget scroll handling", () => {
+        test("keeps window.onscroll untouched when scrolling inside a widget", () => {
+            const win = createTestWindow();
+            const existingScrollHandler = jest.fn();
+            window.onscroll = existingScrollHandler;
+            win._widget.scrollTop = 10;
+
+            const event = new window.WheelEvent("wheel", {
+                deltaY: 30,
+                bubbles: true,
+                cancelable: true
+            });
+
+            win._widget.dispatchEvent(event);
+
+            expect(win._widget.scrollTop).toBe(40);
+            expect(event.defaultPrevented).toBe(true);
+            expect(window.onscroll).toBe(existingScrollHandler);
+        });
     });
 
     describe("sendToCenter", () => {

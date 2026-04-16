@@ -282,6 +282,7 @@ class JSEditor {
      */
 
     _setup() {
+        const defaultOnClose = this.widgetWindow.onclose.bind(this.widgetWindow);
         this.widgetWindow.onclose = () => {
             if (this._resizeHandlers) {
                 document.removeEventListener("mousemove", this._resizeHandlers.doResize);
@@ -289,6 +290,7 @@ class JSEditor {
                 this._resizeHandlers = null;
             }
             this.isOpen = false;
+            defaultOnClose();
         };
 
         this.widgetWindow.onmaximize = () => {
