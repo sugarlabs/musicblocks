@@ -1480,7 +1480,7 @@
   "Number of Downloads:": "Numero de descargas:",
   "Number of Likes:": "Número de me gusta:",
   "Tags:": "Etiquetas:",
-  "Report projects which violate the <a href=\\\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\\\" target=\\\\\"_blank\\\\\">Sugar Labs Code of Conduct</a>.": "Reportar proyectos que violen <a href=\\\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\\\" target=\\\\\"_blank\\\\\">el código de conducta de Sugar Labs</a>.",
+  "Report projects which violate the <a href=\\\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\\\" target=\\\\\"_blank\\\\\" rel=\\\\\"noopener noreferrer\\\\\">Sugar Labs Code of Conduct</a>.": "Reportar proyectos que violen <a href=\\\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\\\" target=\\\\\"_blank\\\\\" rel=\\\\\"noopener noreferrer\\\\\">el código de conducta de Sugar Labs</a>.",
   "Reason for reporting project": "Razón para informar el proyecto",
   "Download as File": "Descargar como archivo",
   "motion x": "X unxtäwi",

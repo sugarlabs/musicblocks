@@ -118,7 +118,7 @@ function setupRhythmActions(activity) {
             const noteBeatValue = blkName === "newnote" ? 1 / value : value;
 
             tur.singer.inNoteBlock.push(blk);
-            tur.singer.multipleVoices = tur.singer.inNoteBlock.length > 1 ? true : false;
+            tur.singer.multipleVoices = tur.singer.inNoteBlock.length > 1;
 
             // Adjust the note value based on the beatFactor
             tur.singer.noteValue[last(tur.singer.inNoteBlock)] =
@@ -281,6 +281,7 @@ function setupRhythmActions(activity) {
                 if (tur.singer.tieCarryOver > 0) {
                     if (tur.singer.justCounting.length === 0) {
                         const lastNote = last(tur.singer.inNoteBlock);
+                        // eslint-disable-next-line eqeqeq
                         if (lastNote != null && lastNote in tur.singer.notePitches) {
                             // Remove the note from the Lilypond list
                             for (
@@ -295,7 +296,7 @@ function setupRhythmActions(activity) {
 
                     // Restore the extra note and play it
                     const saveBlk = tur.singer.tieNoteExtras[0];
-                    const noteValue = tur.singer.tieCarryOver;
+                    const _noteValue = tur.singer.tieCarryOver;
                     tur.singer.tieCarryOver = 0;
 
                     tur.singer.inNoteBlock.push(saveBlk);
@@ -319,18 +320,26 @@ function setupRhythmActions(activity) {
 
                     Singer.processNote(
                         activity,
-                        noteValue,
-                        activity.blocks.blockList[saveBlk].name === "osctime",
+                        tur.singer.tieNoteExtras[7], // rawDurationValue
+                        tur.singer.tieNoteExtras[6], // isOsc
                         saveBlk,
                         turtle
                     );
-                    const bpmFactor =
-                        TONEBPM / tur.singer.bpm.length > 0
-                            ? last(tur.singer.bpm)
-                            : Singer.masterBPM;
 
-                    // Wait until this note is played before continuing
-                    tur.doWait(bpmFactor / noteValue);
+                    // compute bpmFactor locally (same logic as Singer.processNote)
+                    const bpmFactor =
+                        TONEBPM /
+                        (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
+
+                    if (!tur.singer.suppressOutput) {
+                        const rawDuration = tur.singer.tieNoteExtras[7];
+                        const wasOsc = tur.singer.tieNoteExtras[6];
+
+                        const waitSeconds = wasOsc ? rawDuration / 1000 : bpmFactor / rawDuration;
+
+                        tur.singer.turtleTime += waitSeconds;
+                        tur.doWait(waitSeconds);
+                    }
 
                     tur.singer.inNoteBlock.pop();
 

@@ -260,10 +260,19 @@ class JSEditor {
         const beforeError = text.substring(0, start);
         const afterError = text.substring(end);
 
-        const highlightedHTML =
-            beforeError + `<span class="error" title="${message}">${errorText}</span>` + afterError;
+        const highlightedContent = document.createDocumentFragment();
+        highlightedContent.appendChild(document.createTextNode(beforeError));
 
-        editor.innerHTML = highlightedHTML;
+        const errorSpan = document.createElement("span");
+        errorSpan.className = "error";
+        errorSpan.title = String(message);
+        errorSpan.textContent = errorText;
+        highlightedContent.appendChild(errorSpan);
+
+        highlightedContent.appendChild(document.createTextNode(afterError));
+
+        editor.textContent = "";
+        editor.appendChild(highlightedContent);
     }
 
     /**
@@ -273,6 +282,17 @@ class JSEditor {
      */
 
     _setup() {
+        const defaultOnClose = this.widgetWindow.onclose.bind(this.widgetWindow);
+        this.widgetWindow.onclose = () => {
+            if (this._resizeHandlers) {
+                document.removeEventListener("mousemove", this._resizeHandlers.doResize);
+                document.removeEventListener("mouseup", this._resizeHandlers.stopResize);
+                this._resizeHandlers = null;
+            }
+            this.isOpen = false;
+            defaultOnClose();
+        };
+
         this.widgetWindow.onmaximize = () => {
             const editor = this.widgetWindow.getWidgetBody().childNodes[0];
             editor.style.width = this.widgetWindow._maximized ? "100%" : "39rem";
@@ -599,6 +619,7 @@ class JSEditor {
         this.widgetWindow.takeFocus();
 
         this._setupDividerResize(divider, editorContainer, editorconsole, consolelabel);
+        this._setupWindowResize();
 
         window.jsEditor = this;
 
@@ -614,26 +635,48 @@ class JSEditor {
      */
     _setupDividerResize(divider, editorContainer, editorconsole, consolelabel) {
         let isResizing = false;
+        let resizeRafId = null;
+        let latestClientY = 0;
 
         const onMouseMove = e => {
             if (!isResizing) return;
-            const parentRect = this._editor.getBoundingClientRect();
-            const menubarHeight = this._menubar ? this._menubar.offsetHeight : 0;
-            const availableHeight = this._editor.clientHeight - menubarHeight;
-            const dynamicTop = parentRect.top + menubarHeight;
 
-            const newEditorHeight = e.clientY - dynamicTop;
-            const dividerHeight = divider.offsetHeight;
-            const consoleHeaderHeight = consolelabel.offsetHeight;
-            const newConsoleHeight =
-                availableHeight - newEditorHeight - dividerHeight - consoleHeaderHeight;
+            latestClientY = e.clientY;
 
-            editorContainer.style.flexBasis = `${newEditorHeight}px`;
-            editorconsole.style.flexBasis = `${newConsoleHeight}px`;
+            if (resizeRafId) return;
+
+            resizeRafId = requestAnimationFrame(() => {
+                if (!isResizing) {
+                    resizeRafId = null;
+                    return;
+                }
+
+                const clientY = latestClientY;
+
+                const parentRect = this._editor.getBoundingClientRect();
+                const menubarHeight = this._menubar ? this._menubar.offsetHeight : 0;
+                const availableHeight = this._editor.clientHeight - menubarHeight;
+                const dynamicTop = parentRect.top + menubarHeight;
+
+                const newEditorHeight = clientY - dynamicTop;
+                const dividerHeight = divider.offsetHeight;
+                const consoleHeaderHeight = consolelabel.offsetHeight;
+                const newConsoleHeight =
+                    availableHeight - newEditorHeight - dividerHeight - consoleHeaderHeight;
+
+                editorContainer.style.flexBasis = `${newEditorHeight}px`;
+                editorconsole.style.flexBasis = `${newConsoleHeight}px`;
+
+                resizeRafId = null;
+            });
         };
 
         const onMouseUp = () => {
             isResizing = false;
+            if (resizeRafId) {
+                cancelAnimationFrame(resizeRafId);
+                resizeRafId = null;
+            }
             document.removeEventListener("mousemove", onMouseMove);
             document.removeEventListener("mouseup", onMouseUp);
         };
@@ -644,6 +687,195 @@ class JSEditor {
             document.addEventListener("mouseup", onMouseUp);
             e.preventDefault();
         });
+    }
+
+    /**
+     * Setup resize handles for the entire editor window.
+     * Allows users to resize by dragging edges (left, right, bottom) and corners.
+     * @returns {void}
+     */
+    _setupWindowResize() {
+        const windowFrame = this.widgetWindow._frame;
+        const windowBody = this.widgetWindow._body;
+
+        // Create resize handles
+        const createHandle = (position, cursor) => {
+            const handle = document.createElement("div");
+            handle.className = `resize-handle resize-handle-${position}`;
+            handle.style.position = "absolute";
+            handle.style.zIndex = "1000";
+
+            // Common styles for all handles
+            const handleStyles = {
+                "right": {
+                    top: "32px",
+                    right: "0",
+                    width: "5px",
+                    height: "calc(100% - 32px)",
+                    cursor: "ew-resize"
+                },
+                "left": {
+                    top: "32px",
+                    left: "0",
+                    width: "5px",
+                    height: "calc(100% - 32px)",
+                    cursor: "ew-resize"
+                },
+                "bottom": {
+                    bottom: "0",
+                    left: "0",
+                    width: "100%",
+                    height: "5px",
+                    cursor: "ns-resize"
+                },
+                "bottom-right": {
+                    bottom: "0",
+                    right: "0",
+                    width: "15px",
+                    height: "15px",
+                    cursor: "nwse-resize"
+                },
+                "bottom-left": {
+                    bottom: "0",
+                    left: "0",
+                    width: "15px",
+                    height: "15px",
+                    cursor: "nesw-resize"
+                }
+            };
+
+            Object.assign(handle.style, handleStyles[position]);
+            handle.style.background = "transparent";
+            handle.style.transition = "background 0.2s";
+
+            // Visual feedback on hover
+            handle.addEventListener("mouseenter", () => {
+                handle.style.background = "rgba(33, 150, 243, 0.3)";
+            });
+            handle.addEventListener("mouseleave", () => {
+                handle.style.background = "transparent";
+            });
+
+            return handle;
+        };
+
+        // Add handles to window frame
+        const handles = {
+            right: createHandle("right"),
+            left: createHandle("left"),
+            bottom: createHandle("bottom"),
+            bottomRight: createHandle("bottom-right"),
+            bottomLeft: createHandle("bottom-left")
+        };
+
+        Object.values(handles).forEach(handle => windowFrame.appendChild(handle));
+
+        // Resize logic
+        let isResizing = false;
+        let resizeDirection = null;
+        let startX, startY, startWidth, startHeight, startLeft, startTop;
+        let resizeRafId = null;
+        let latestClientX = 0;
+        let latestClientY = 0;
+
+        const startResize = (e, direction) => {
+            if (this.widgetWindow._maximized) return; // Don't resize when maximized
+
+            isResizing = true;
+            resizeDirection = direction;
+            startX = e.clientX;
+            startY = e.clientY;
+
+            const rect = windowFrame.getBoundingClientRect();
+            startWidth = rect.width;
+            startHeight = rect.height;
+            startLeft = rect.left;
+            startTop = rect.top;
+
+            e.preventDefault();
+            e.stopPropagation();
+        };
+
+        const doResize = e => {
+            if (!isResizing) return;
+
+            latestClientX = e.clientX;
+            latestClientY = e.clientY;
+
+            if (resizeRafId) return;
+
+            resizeRafId = requestAnimationFrame(() => {
+                if (!isResizing || !resizeDirection) {
+                    resizeRafId = null;
+                    return;
+                }
+
+                const clientX = latestClientX;
+                const clientY = latestClientY;
+
+                const deltaX = clientX - startX;
+                const deltaY = clientY - startY;
+
+                let newWidth = startWidth;
+                let newHeight = startHeight;
+                let newLeft = startLeft;
+
+                // Calculate new dimensions based on direction
+                if (resizeDirection.includes("right")) {
+                    newWidth = Math.max(400, startWidth + deltaX);
+                }
+                if (resizeDirection.includes("left")) {
+                    const widthDelta = startWidth - deltaX;
+                    if (widthDelta >= 400) {
+                        newWidth = widthDelta;
+                        newLeft = startLeft + deltaX;
+                    }
+                }
+                if (resizeDirection.includes("bottom")) {
+                    newHeight = Math.max(300, startHeight + deltaY);
+                }
+
+                // Apply new dimensions
+                windowFrame.style.width = newWidth + "px";
+                windowFrame.style.height = newHeight + "px";
+
+                if (resizeDirection.includes("left")) {
+                    windowFrame.style.left = newLeft + "px";
+                }
+
+                // Update editor content size
+                const editorDiv = this._editor;
+                if (editorDiv) {
+                    editorDiv.style.width = newWidth + "px";
+                    editorDiv.style.height = newHeight - 32 + "px"; // Subtract title bar height
+                }
+
+                resizeRafId = null;
+            });
+        };
+
+        const stopResize = () => {
+            if (!isResizing) return;
+            isResizing = false;
+            resizeDirection = null;
+            if (resizeRafId) {
+                cancelAnimationFrame(resizeRafId);
+                resizeRafId = null;
+            }
+        };
+
+        // Attach event listeners
+        handles.right.addEventListener("mousedown", e => startResize(e, "right"));
+        handles.left.addEventListener("mousedown", e => startResize(e, "left"));
+        handles.bottom.addEventListener("mousedown", e => startResize(e, "bottom"));
+        handles.bottomRight.addEventListener("mousedown", e => startResize(e, "bottom-right"));
+        handles.bottomLeft.addEventListener("mousedown", e => startResize(e, "bottom-left"));
+
+        document.addEventListener("mousemove", doResize);
+        document.addEventListener("mouseup", stopResize);
+
+        // Store references so onclose can remove them
+        this._resizeHandlers = { doResize, stopResize };
     }
 
     /**
@@ -673,30 +905,35 @@ class JSEditor {
      */
     static logConsole(message, color) {
         if (color === undefined) color = "midnightblue";
-        if (docById("editorConsole")) {
-            if (docById("editorConsole").innerHTML !== "")
-                docById("editorConsole").innerHTML += "</br>";
-            docById("editorConsole").innerHTML += `<span style="color: ${color}">${message}</span>`;
+        const consoleEl = docById("editorConsole");
+        if (consoleEl) {
+            if (consoleEl.childNodes.length > 0) {
+                consoleEl.appendChild(document.createElement("br"));
+            }
+            const line = document.createElement("span");
+            line.style.color = color;
+            line.textContent = message;
+            consoleEl.appendChild(line);
         } else {
             // console.error("EDITOR MISSING!");
         }
-        // eslint-disable-next-line
-        console.log("%c" + message, `color: ${color}`);
     }
 
     static clearConsole() {
-        if (docById("editorConsole")) {
-            docById("editorConsole").innerHTML = "";
+        const consoleEl = docById("editorConsole");
+        if (consoleEl) {
+            consoleEl.textContent = "";
         }
     }
 
     /**
-     * Triggerred when the "run" button on the widget is pressed.
-     * Runs the JavaScript code that is in the editor.
+     * Triggered when the "run" button on the widget is pressed.
+     * Evaluates the JavaScript code securely using an AST block mapping to ensure
+     * safe block-enforced execution inside the MusicBlocks Engine.
      *
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    _runCode() {
+    async _runCode() {
         if (this._showingHelp) return;
 
         JSEditor.clearConsole();
@@ -709,11 +946,15 @@ class JSEditor {
         }
 
         try {
-            MusicBlocks.init(true);
-            new Function(this._code)();
+            await this._codeToBlocks();
             JSEditor.logConsole("Code executed successfully!", "green");
+
+            const playNativeBtn = docById("play");
+            if (playNativeBtn) {
+                playNativeBtn.click();
+            }
         } catch (e) {
-            JSEditor.logConsole(`Runtime Error: ${e.message}`, "maroon");
+            JSEditor.logConsole(`Sandbox Error: ${e.message}`, "maroon");
             if (e.stack) {
                 JSEditor.logConsole(`Stack trace: ${e.stack}`, "maroon");
             }
@@ -725,10 +966,28 @@ class JSEditor {
      *
      * @returns {Void}
      */
-    _codeToBlocks() {
+    async _codeToBlocks() {
         JSEditor.clearConsole();
 
         try {
+            if (!ast2blocklist_config && window.ast2blocklist_config_ready) {
+                try {
+                    await window.ast2blocklist_config_ready;
+                } catch {
+                    window.ast2blocklist_config_failed = true;
+                }
+            }
+
+            if (!ast2blocklist_config) {
+                throw new Error(
+                    window.ast2blocklist_config_failed
+                        ? _(
+                              "JavaScript block conversion is unavailable because its configuration file failed to load."
+                          )
+                        : _("JavaScript block conversion is still loading. Please try again.")
+                );
+            }
+
             let ast = acorn.parse(this._code, { ecmaVersion: 2020 });
             let blockList = AST2BlockList.toBlockList(ast, ast2blocklist_config);
             const activity = this.activity;
@@ -998,4 +1257,8 @@ class JSEditor {
 
         JSEditor.logConsole("Status window opened.", "green");
     }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { JSEditor };
 }

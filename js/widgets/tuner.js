@@ -143,11 +143,11 @@ TunerDisplay.prototype.draw = function () {
     const meterY = height - 80; // Base position of meter
 
     // Draw the tuning meter background
-    ctx.fillStyle = "#e0e0e0";
+    ctx.fillStyle = platformColor.selectorBackground || "#e0e0e0";
     ctx.fillRect(meterX, meterY, meterWidth, meterHeight);
 
     // Draw the center line
-    ctx.fillStyle = "#000000";
+    ctx.fillStyle = platformColor.textColor || "#000000";
     ctx.fillRect(meterX + meterWidth / 2 - 1, meterY, 2, meterHeight);
 
     // Draw the indicator
@@ -159,7 +159,7 @@ TunerDisplay.prototype.draw = function () {
     // Draw the note
     ctx.font = "bold 48px Arial";
     ctx.textAlign = "center";
-    ctx.fillStyle = "#000000";
+    ctx.fillStyle = platformColor.textColor || "#000000";
     ctx.fillText(this.note, width / 2, height - 200); // Much lower position
 
     // Draw the cents deviation

@@ -18,7 +18,7 @@
    HIDEBLOCKSBUTTON, LANGUAGEBUTTON, LOADBUTTON, MENUBUTTON,
    NEWBUTTON, PLANETBUTTON, PLUGINSDELETEBUTTON, RESTORETRASHBUTTON,
    RHYTHMPALETTEICON, RUNBUTTON, SAVEBUTTON, SCROLLUNLOCKBUTTON,
-   SHORTCUTSBUTTON, SLOWBUTTON, SMALLERBUTTON, STATSBUTTON,
+   TABBUTTON_LIGHT, TABBUTTON_DARK, SLOWBUTTON, SMALLERBUTTON, STATSBUTTON,
    STEPBUTTON, STOPTURTLEBUTTON, WRAPTURTLEBUTTON, _THIS_IS_TURTLE_BLOCKS_,
    _THIS_IS_MUSIC_BLOCKS_, MOUSEPALETTEICON, FULLSCREENBUTTON, RECORDBUTTON,
    PLUGINSBUTTON, OPENMERGEBUTTON, PITCHPREVIEWBUTTON, JAVASCRIPTBUTTON,
@@ -35,7 +35,7 @@
    getAuxToolbarButtonNames, TITLESTRING
  */
 
-const VERSION = "3.7.0";
+const VERSION = "3.7.1";
 let LOGODEFAULT;
 let LOGOJA1 = LOGODEFAULT;
 let LOGOJA = LOGODEFAULT;
@@ -658,10 +658,16 @@ const createHelpContent = activity => {
         "data:image/svg+xml;base64," + window.btoa(base64Encode(EXTRACTBUTTON))
     ]);
     if (_THIS_IS_MUSIC_BLOCKS_) {
+        const tabButtonSvg =
+            activity.themebox && activity.themebox._theme === "dark"
+                ? TABBUTTON_DARK
+                : TABBUTTON_LIGHT;
         HELPCONTENT.push([
-            _("Keyboard shortcuts"),
-            _("You can type d to create a do block and r to create a re block etc."),
-            "data:image/svg+xml;base64," + window.btoa(base64Encode(SHORTCUTSBUTTON))
+            _("Tab Navigation"),
+            _(
+                "Press the Tab key on your keyboard to magically jump between the workspace, toolbar, and palette!"
+            ),
+            "data:image/svg+xml;base64," + window.btoa(base64Encode(tabButtonSvg))
         ]);
     }
     if (!activity.beginnerMode) {
@@ -800,4 +806,11 @@ if (typeof module !== "undefined" && module.exports) {
         DEFAULTPALETTE,
         TITLESTRING
     };
+}
+if (typeof window !== "undefined") {
+    window.createDefaultStack = createDefaultStack;
+    window.LOGOJA1 = LOGOJA1;
+    window.NUMBERBLOCKDEFAULT = NUMBERBLOCKDEFAULT;
+    window.DEFAULTPALETTE = DEFAULTPALETTE;
+    window.TITLESTRING = TITLESTRING;
 }

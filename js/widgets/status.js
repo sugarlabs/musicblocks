@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 // Copyright (c) 2016-20 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
@@ -66,7 +65,7 @@ class StatusMatrix {
         // cell.style.width = StatusMatrix.BUTTONSIZE * this._cellScale*2 + "px";
         cell.style.width = "212.5px";
 
-        cell.innerHTML = "&nbsp;";
+        cell.textContent = "\u00A0";
         // One column per mouse/turtle
         for (const turtle of this.activity.turtles.turtleList) {
             if (turtle.inTrash) {
@@ -77,37 +76,51 @@ class StatusMatrix {
             cell.style.backgroundColor = "#FFFFFF";
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
-                cell.innerHTML = `&nbsp;&nbsp;<img 
-                        src="images/mouse.svg" 
-                        title="${turtle.name}" 
-                        alt="${turtle.name}" 
-                        height="${iconSize}" 
-                        width="${iconSize}"
-                    >&nbsp;&nbsp;`;
+                cell.textContent = "\u00A0\u00A0";
+                const img = document.createElement("img");
+                img.src = "images/mouse.svg";
+                img.title = turtle.name;
+                img.alt = turtle.name;
+                img.setAttribute("height", iconSize);
+                img.setAttribute("width", iconSize);
+                cell.appendChild(img);
+                cell.appendChild(document.createTextNode("\u00A0\u00A0"));
             } else {
-                cell.innerHTML = `&nbsp;&nbsp;<img 
-                        src="header-icons/turtle-button.svg" 
-                        title="${turtle.name}" 
-                        alt="${turtle.name}" 
-                        height="${iconSize}"
-                        width="${iconSize}"
-                    >&nbsp;&nbsp;`;
+                cell.textContent = "\u00A0\u00A0";
+                const img = document.createElement("img");
+                img.src = "header-icons/turtle-button.svg";
+                img.title = turtle.name;
+                img.alt = turtle.name;
+                img.setAttribute("height", iconSize);
+                img.setAttribute("width", iconSize);
+                cell.appendChild(img);
+                cell.appendChild(document.createTextNode("\u00A0\u00A0"));
             }
             cell.style.width = "212.5px";
-            this.widgetWindow.onmaximize = () => {
-                this.isMaximized = !this.isMaximized;
-                cell.style.width = "100vw";
-                cell.style.paddingLeft = "30px";
-                cell.style.fontSize =
-                    Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
-                if (!this.isMaximized) {
-                    cell.style.width = "212.5px";
-                }
-            };
             // cell.style.width = StatusMatrix.BUTTONSIZE * this._cellScale*2 + "px";
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
             cell.className = "headcol";
         }
+
+        this.widgetWindow.onmaximize = () => {
+            this.isMaximized = !this.isMaximized;
+            const headerFontSize =
+                Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
+            const headerCells = this._statusTable.querySelectorAll("thead .headcol");
+            headerCells.forEach(headerCell => {
+                if (this.isMaximized) {
+                    headerCell.style.width = "100vw";
+                    headerCell.style.paddingLeft = "30px";
+                    headerCell.style.fontSize = headerFontSize;
+                } else {
+                    headerCell.style.width = "212.5px";
+                    headerCell.style.paddingLeft = "";
+                    headerCell.style.fontSize = "";
+                }
+            });
+        };
+
+        // console.debug("active turtles: " + turtles.turtleList.length);
 
         // One row per field, one column per mouse (plus the labels)
         let label;
@@ -156,7 +169,11 @@ class StatusMatrix {
             }
             let str = label;
             str = label.charAt(0).toUpperCase() + label.slice(1);
-            cell.innerHTML = `&nbsp;<b>${str}</b>`;
+            // console.log(str);
+            cell.textContent = "\u00A0";
+            const b = document.createElement("b");
+            b.textContent = str;
+            cell.appendChild(b);
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
             cell.style.paddingLeft = "10px";
@@ -165,7 +182,7 @@ class StatusMatrix {
                 cell.style.backgroundColor = platformColor.selectorBackground;
                 cell.style.fontSize =
                     Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
-                cell.innerHTML = "";
+                cell.textContent = "";
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.textAlign = "center";
             });
@@ -178,7 +195,10 @@ class StatusMatrix {
                 Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
             const str = _("note");
             const label = str.charAt(0).toUpperCase() + str.slice(1);
-            cell.innerHTML = `&nbsp;<b>${label}</b>`;
+            cell.textContent = "\u00A0";
+            const b = document.createElement("b");
+            b.textContent = label;
+            cell.appendChild(b);
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
             cell.style.paddingLeft = "10px";
@@ -187,7 +207,7 @@ class StatusMatrix {
                 cell.style.backgroundColor = platformColor.selectorBackground;
                 cell.style.fontSize =
                     Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
-                cell.innerHTML = "";
+                cell.textContent = "";
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.textAlign = "center";
             });
@@ -269,7 +289,7 @@ class StatusMatrix {
                         break;
                     case "pitchinhertz":
                         value = "";
-                        if (tur.singer.noteStatus != null) {
+                        if (tur.singer.noteStatus !== null) {
                             notes = tur.singer.noteStatus[0];
                             for (let j = 0; j < notes.length; j++) {
                                 if (j > 0) {
@@ -298,8 +318,8 @@ class StatusMatrix {
                 this.activity.logo.inStatusMatrix = saveStatus;
 
                 cell = this._statusTable.rows[i + 1].cells[activeTurtles + 1];
-                if (cell != null) {
-                    cell.innerHTML = value;
+                if (cell !== null) {
+                    cell.textContent = value;
                 }
                 i++;
             }
@@ -309,7 +329,7 @@ class StatusMatrix {
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 note = "";
                 value = "";
-                if (tur.singer.noteStatus != null) {
+                if (tur.singer.noteStatus !== null) {
                     notes = tur.singer.noteStatus[0];
                     for (let j = 0; j < notes.length; j++) {
                         if (typeof notes[j] === "number") {
@@ -327,8 +347,8 @@ class StatusMatrix {
                 }
 
                 cell = this._statusTable.rows[i + 1].cells[activeTurtles + 1];
-                if (cell != null) {
-                    cell.innerHTML = note.replace(/#/g, "♯").replace(/b/g, "♭");
+                if (cell !== null) {
+                    cell.textContent = note.replace(/#/g, "♯").replace(/b/g, "♭");
                 }
             }
 

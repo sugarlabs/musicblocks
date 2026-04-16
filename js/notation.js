@@ -283,14 +283,12 @@ class Notation {
             const d = this._notationStaging[turtle].length - this._pickupPoint[turtle];
             const pickup = [];
 
-            // eslint-disable-next-line
             for (const i in d) {
                 pickup.push(this._notationStaging[turtle].pop());
             }
 
             this._notationStaging[turtle].push("meter", count, value);
 
-            // eslint-disable-next-line
             for (const i in d) {
                 this._notationStaging[turtle].push(pickup.pop());
             }

@@ -9,13 +9,35 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global requirejs */
+/* global requirejs, define */
+
+// Localization helper for early bootstrap
+const t_ = typeof _ === "function" ? _ : s => s;
+
+const ASSET_VERSION = window.location.protocol === "file:" ? "" : "v=999999_fix7";
 
 requirejs.config({
-    baseUrl: "lib",
+    baseUrl: "./",
+    urlArgs: ASSET_VERSION,
+    waitSeconds: 60,
     shim: {
-        "easel": {
+        "easeljs.min": {
             exports: "createjs"
+        },
+        "tweenjs.min": {
+            exports: "createjs"
+        },
+        "preloadjs.min": {
+            exports: "createjs"
+        },
+        "Tone": {
+            exports: "Tone"
+        },
+        "howler": {
+            exports: "Howl"
+        },
+        "Chart": {
+            exports: "Chart"
         },
         "p5.min": {
             exports: "p5"
@@ -31,29 +53,134 @@ requirejs.config({
         },
         "p5-sound-adapter": {
             deps: ["p5.sound.min"]
+        },
+        "utils/utils": {
+            deps: ["utils/platformstyle"],
+            exports: "_"
+        },
+        "utils/retryWithBackoff": {
+            deps: ["utils/utils"],
+            exports: "retryWithBackoff"
+        },
+        "activity/turtledefs": {
+            deps: ["utils/utils"],
+            exports: "createDefaultStack"
+        },
+        "activity/block": {
+            deps: ["activity/turtledefs", "utils/retryWithBackoff"],
+            exports: "Block"
+        },
+        "activity/blocks": {
+            deps: ["activity/block"],
+            exports: "Blocks"
+        },
+        "activity/turtle-singer": {
+            exports: "Singer"
+        },
+        "activity/turtle-painter": {
+            exports: "Painter"
+        },
+        "activity/turtle": {
+            deps: [
+                "activity/turtledefs",
+                "activity/turtle-singer",
+                "activity/turtle-painter",
+                "utils/retryWithBackoff"
+            ],
+            exports: "Turtle"
+        },
+        "activity/turtles": {
+            deps: ["activity/turtle"],
+            exports: "Turtles"
+        },
+        "activity/notation": {
+            exports: "Notation"
+        },
+        "utils/synthutils": {
+            deps: ["utils/utils", "activity/activity-context"],
+            exports: "Synth"
+        },
+        "utils/ManagedTimer": {
+            exports: "ManagedTimer"
+        },
+        "activity/logo": {
+            deps: [
+                "activity/turtles",
+                "activity/notation",
+                "utils/synthutils",
+                "activity/logoconstants",
+                "utils/ManagedTimer"
+            ],
+            exports: "Logo"
+        },
+        "activity/activity": {
+            deps: [
+                "utils/utils",
+                "activity/activity-context",
+                "activity/logo",
+                "activity/blocks",
+                "activity/turtles"
+            ],
+            exports: "Activity"
+        },
+        "materialize": {
+            deps: ["jquery"],
+            exports: "M"
+        },
+        "jquery-ui": {
+            deps: ["jquery"]
+        },
+        "abc": {
+            exports: "ABCJS"
+        },
+        "libgif": {
+            exports: "SuperGif"
+        },
+        "highlight": {
+            exports: "hljs"
+        },
+        "activity/logoconstants": {
+            deps: ["utils/utils"]
+        },
+        "activity/js-export/constraints": {
+            deps: ["activity/js-export/interface"]
+        },
+        "activity/js-export/generate": {
+            deps: ["activity/js-export/ASTutils"]
         }
     },
     paths: {
-        "utils": "../js/utils",
-        "widgets": "../js/widgets",
-        "activity": "../js",
-        "easel": "../lib/easeljs",
-        "twewn": "../lib/tweenjs",
-        "prefixfree": "../bower_components/prefixfree/prefixfree.min",
-        "samples": "../sounds/samples",
-        "planet": "../js/planet",
-        "tonejsMidi": "../node_modules/@tonejs/midi/dist/Midi",
-        "p5.min": "../lib/p5.min",
-        "p5.sound.min": "../lib/p5.sound.min",
-        "p5.dom.min": "../lib/p5.dom.min",
-        "p5-adapter": "../js/p5-adapter",
-        "p5-sound-adapter": "../js/p5-sound-adapter",
+        "utils": "js/utils",
+        "widgets": "js/widgets",
+        "activity": "js",
+        "easeljs.min": "lib/easeljs.min",
+        "tweenjs.min": "lib/tweenjs.min",
+        "preloadjs.min": "lib/preloadjs.min",
+        "prefixfree.min": "lib/prefixfree.min",
+        "howler": "lib/howler",
+        "Chart": "lib/Chart",
+        "samples": "sounds/samples",
+        "planet": "js/planet",
+        "tonejsMidi": "node_modules/@tonejs/midi/dist/Midi",
+        "p5.min": "lib/p5.min",
+        "p5.sound.min": "lib/p5.sound.min",
+        "p5.dom.min": "lib/p5.dom.min",
+        "p5-adapter": "js/p5-adapter",
+        "p5-sound-adapter": "js/p5-sound-adapter",
+        "domReady": "lib/domReady",
+        "jquery": "lib/jquery-3.7.1.min",
+        "jquery-ui": "lib/jquery-ui",
+        "materialize": "lib/materialize.min",
+        "abc": "lib/abc.min",
+        "libgif": "https://cdn.jsdelivr.net/gh/buzzfeed/libgif-js/libgif",
+        "Tone": "lib/Tone",
+        "highlight": "//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min",
         "i18next": [
-            "../lib/i18next.min",
+            "lib/i18next.min",
             "https://cdn.jsdelivr.net/npm/i18next@23.11.5/dist/umd/i18next.min"
         ],
         "i18nextHttpBackend": [
-            "../lib/i18nextHttpBackend.min",
+            "lib/i18nextHttpBackend.min",
             "https://cdn.jsdelivr.net/npm/i18next-http-backend@2.5.1/i18nextHttpBackend.min"
         ]
     },
@@ -61,7 +188,106 @@ requirejs.config({
 });
 
 requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBackend) {
+    const perfTracker = (() => {
+        const canUsePerformance =
+            typeof window !== "undefined" &&
+            typeof window.performance !== "undefined" &&
+            typeof window.performance.now === "function";
+        if (!canUsePerformance) {
+            return {
+                enabled: false,
+                mark: () => {},
+                measure: () => {},
+                report: () => {}
+            };
+        }
+
+        const isEnabled = (() => {
+            try {
+                const params = new URLSearchParams(window.location.search || "");
+                return (
+                    params.get("mbPerf") === "1" || window.localStorage.getItem("mbPerf") === "1"
+                );
+            } catch (e) {
+                return false;
+            }
+        })();
+
+        const state = window.__mbPerf || {
+            enabled: isEnabled,
+            marks: {},
+            measures: {}
+        };
+        window.__mbPerf = state;
+
+        const mark = name => {
+            if (!state.enabled) return;
+            state.marks[name] = performance.now();
+        };
+
+        const measure = (name, startMark, endMark) => {
+            if (!state.enabled) return;
+            const start = state.marks[startMark];
+            const end = state.marks[endMark];
+            if (typeof start !== "number" || typeof end !== "number") return;
+            state.measures[name] = +(end - start).toFixed(2);
+        };
+
+        const report = () => {
+            if (!state.enabled) return;
+            console.log("[mbPerf] Startup measures (ms):", state.measures);
+            if (typeof console.table === "function") {
+                const rows = Object.keys(state.measures).map(name => ({
+                    measure: name,
+                    ms: state.measures[name]
+                }));
+                console.table(rows);
+            }
+        };
+
+        state.report = report;
+
+        return {
+            enabled: state.enabled,
+            mark,
+            measure,
+            report
+        };
+    })();
+
+    perfTracker.mark("loader.main.start");
+
+    // Use globally-loaded jQuery and Materialize (avoids AMD conflicts)
+    const $ = window.jQuery;
+    // Materialize v0.100.2 (bundled) uses 'Materialize' as global, not 'M'
+    const M = window.Materialize || window.M;
+
+    // Ensure both M and Materialize are available for compatibility
+    if (typeof M !== "undefined") {
+        window.M = M;
+        window.Materialize = M;
+    }
+
+    // Define essential globals for core modules
+    window._THIS_IS_MUSIC_BLOCKS_ = true;
+    window._THIS_IS_TURTLE_BLOCKS_ = false;
+
+    // Load highlight optionally
+    requirejs(
+        ["highlight"],
+        function (hljs) {
+            if (hljs) {
+                window.hljs = hljs;
+                hljs.highlightAll();
+            }
+        },
+        function (err) {
+            console.warn("Highlight.js failed to load, moving on...", err);
+        }
+    );
+
     function updateContent() {
+        if (!i18next.isInitialized) return;
         const elements = document.querySelectorAll("[data-i18n]");
         elements.forEach(element => {
             const key = element.getAttribute("data-i18n");
@@ -69,11 +295,28 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
         });
     }
 
-    function initializeI18next() {
+    function resolveInitialLanguage() {
+        try {
+            const savedLanguage = window.localStorage && window.localStorage.languagePreference;
+            if (savedLanguage) {
+                return savedLanguage.startsWith("ja") ? "ja" : savedLanguage;
+            }
+        } catch (e) {
+            // Continue with navigator fallback when storage is unavailable.
+        }
+
+        const browserLanguage = (window.navigator && window.navigator.language) || "en";
+        const normalized = browserLanguage.includes("-")
+            ? browserLanguage.slice(0, browserLanguage.indexOf("-"))
+            : browserLanguage;
+        return normalized || "en";
+    }
+
+    function initializeI18next(lang) {
         return new Promise(resolve => {
             i18next.use(i18nextHttpBackend).init(
                 {
-                    lng: "en",
+                    lng: lang,
                     fallbackLng: "en",
                     keySeparator: false,
                     nsSeparator: false,
@@ -81,7 +324,9 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                         escapeValue: false
                     },
                     backend: {
-                        loadPath: "locales/{{lng}}.json?v=" + Date.now()
+                        loadPath: ASSET_VERSION
+                            ? `locales/{{lng}}.json?${ASSET_VERSION}`
+                            : "locales/{{lng}}.json"
                     }
                 },
                 function (err) {
@@ -96,29 +341,143 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
     }
 
     async function main() {
-        await initializeI18next();
+        try {
+            const lang = resolveInitialLanguage();
+            await initializeI18next(lang);
+            perfTracker.mark("loader.i18n.ready");
+            perfTracker.measure(
+                "loader.main_to_i18n_ready",
+                "loader.main.start",
+                "loader.i18n.ready"
+            );
 
-        const lang = "en";
-
-        i18next.changeLanguage(lang, function (err) {
-            if (err) {
-                console.error("Error changing language:", err);
-                return;
+            if (typeof M !== "undefined" && M.AutoInit) {
+                M.AutoInit();
             }
-            updateContent();
-        });
 
-        if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", updateContent);
-        } else {
-            updateContent();
+            if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", updateContent);
+            } else {
+                updateContent();
+            }
+
+            i18next.on("languageChanged", updateContent);
+
+            // Two-phase bootstrap: load core modules first, then application modules
+            const waitForGlobals = async (retryCount = 0) => {
+                if (typeof window.createjs === "undefined" && retryCount < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    return waitForGlobals(retryCount + 1);
+                }
+            };
+
+            await waitForGlobals();
+
+            // Only pre-define modules that are loaded via script tags in index.html
+            // These modules are already available as globals before RequireJS loads them
+            const PRELOADED_SCRIPTS = [
+                { name: "easeljs.min", export: () => window.createjs },
+                { name: "tweenjs.min", export: () => window.createjs }
+            ];
+
+            PRELOADED_SCRIPTS.forEach(mod => {
+                if (!requirejs.defined(mod.name) && mod.export && mod.export()) {
+                    define(mod.name, [], function () {
+                        return mod.export();
+                    });
+                }
+            });
+
+            // Note: Other modules like activity/*, utils/* are loaded by RequireJS
+            // from their file paths as configured in requirejs.config().
+            // Do NOT pre-define them here as that prevents RequireJS from loading the actual files.
+
+            const CORE_BOOTSTRAP_MODULES = [
+                "easeljs.min",
+                "tweenjs.min",
+                "preloadjs.min",
+                "utils/platformstyle",
+                "utils/utils",
+                "activity/turtledefs",
+                "activity/block",
+                "activity/blocks",
+                "activity/turtle-singer",
+                "activity/turtle-painter",
+                "activity/turtle",
+                "activity/turtles",
+                "utils/synthutils",
+                "activity/notation",
+                "activity/logo"
+            ];
+
+            requirejs(
+                CORE_BOOTSTRAP_MODULES,
+                function () {
+                    perfTracker.mark("loader.core_modules.ready");
+                    perfTracker.measure(
+                        "loader.i18n_to_core_modules_ready",
+                        "loader.i18n.ready",
+                        "loader.core_modules.ready"
+                    );
+
+                    // Give scripts a moment to finish executing and set globals
+                    setTimeout(function () {
+                        // Verify core dependencies are loaded
+                        const verificationStatus = {
+                            createjs: typeof window.createjs !== "undefined",
+                            createDefaultStack: typeof window.createDefaultStack !== "undefined",
+                            Logo: typeof window.Logo !== "undefined",
+                            Blocks: typeof window.Blocks !== "undefined",
+                            Turtles: typeof window.Turtles !== "undefined"
+                        };
+
+                        // Check critical dependencies (only createjs is truly critical)
+                        if (typeof window.createjs === "undefined") {
+                            console.error(
+                                "FATAL: createjs (EaselJS/TweenJS) not found. Cannot proceed."
+                            );
+                            alert(t_("Failed to load EaselJS. Please refresh the page."));
+                            return;
+                        }
+
+                        // Proceed with activity loading
+                        requirejs(
+                            ["activity/activity"],
+                            function () {
+                                // Activity loaded successfully
+                                perfTracker.mark("loader.activity_module.ready");
+                                perfTracker.measure(
+                                    "loader.core_modules_to_activity_module_ready",
+                                    "loader.core_modules.ready",
+                                    "loader.activity_module.ready"
+                                );
+                                perfTracker.measure(
+                                    "loader.total_bootstrap",
+                                    "loader.main.start",
+                                    "loader.activity_module.ready"
+                                );
+                                perfTracker.report();
+                            },
+                            function (err) {
+                                console.error("Failed to load activity/activity:", err);
+                                alert(t_("Failed to load Music Blocks. Please refresh the page."));
+                            }
+                        );
+                    }, 100); // Small delay to allow globals to be set
+                },
+                function (err) {
+                    console.error("Core bootstrap failed:", err);
+                    alert(
+                        t_(
+                            "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: %s"
+                        ).replace(/%s/g, err.message || err)
+                    );
+                }
+            );
+        } catch (e) {
+            console.error("Error in main bootstrap:", e);
         }
-
-        i18next.on("languageChanged", updateContent);
-
-        // Load app only after i18n is ready
-        requirejs(["utils/utils", "activity/activity"]);
     }
 
-    main();
+    main().catch(err => console.error("Main execution failed:", err));
 });

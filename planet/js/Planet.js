@@ -55,7 +55,7 @@ class Planet {
 
     open(image) {
         if (this.LocalPlanet === null) {
-            console.log("Local Planet unavailable");
+            console.warn("Local Planet unavailable");
         } else {
             this.LocalPlanet.setCurrentProjectImage(image);
             this.LocalPlanet.updateProjects();
@@ -104,17 +104,14 @@ class Planet {
         this.ServerInterface = new ServerInterface(this);
         this.ServerInterface.init();
 
-        // eslint-disable-next-line no-unused-vars
         document.getElementById("close-planet").addEventListener("click", evt => {
             this.closeButton();
         });
 
-        // eslint-disable-next-line no-unused-vars
         document.getElementById("planet-open-file").addEventListener("click", evt => {
             this.loadProjectFromFile();
         });
 
-        // eslint-disable-next-line no-unused-vars
         document.getElementById("planet-new-project").addEventListener("click", evt => {
             this.loadNewProject();
         });
@@ -126,9 +123,9 @@ class Planet {
         );
     }
 
-    closeButton() {
+    async closeButton() {
         if (this.ProjectStorage.getCurrentProjectID() !== this.oldCurrentProjectID) {
-            const data = this.ProjectStorage.getCurrentProjectData();
+            const data = await this.ProjectStorage.getCurrentProjectData();
             !data ? this.loadNewProject() : this.loadProjectFromData(data);
         } else this.planetClose();
     }
@@ -152,7 +149,7 @@ class Planet {
 
 // sync the dark mode of the planet with the main page and themePreference
 document.addEventListener("DOMContentLoaded", function () {
-    let themes = ["light", "dark"];
+    let themes = ["light", "dark", "highcontrast"];
     for (let i = 0; i < themes.length; i++) {
         if (themes[i] === localStorage.getItem("themePreference")) {
             document.body.classList.add(themes[i]);

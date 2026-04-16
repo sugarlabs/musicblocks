@@ -7617,8 +7617,8 @@ msgid "Tags:"
 msgstr "Tags :"
 
 #: planet/js/StringHelper.js:65
-msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">Sugar Labs Code of Conduct</a>."
-msgstr "Signalez les projets qui violent le <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">code de conduite de Sugar Labs</a>."
+msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a>."
+msgstr "Signalez les projets qui violent le <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">code de conduite de Sugar Labs</a>."
 
 #: planet/js/StringHelper.js:66
 msgid "Reason for reporting project"
@@ -11055,8 +11055,8 @@ msgstr "mouvement"
 
 #: js/SaveInterface.js:24
 
-#~ msgid "For more information, please consult the <a href=\"https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md\" target=\"_blank\">Music Blocks guide</a>."
-#~ msgstr "Pour plus d'informations, veuillez consulter le <a href=\"https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md\" target=\"_blank\">guide Music Blocks</a>."
+#~ msgid "For more information, please consult the <a href=\"https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md\" target=\"_blank\" rel=\"noopener noreferrer\">Music Blocks guide</a>."
+#~ msgstr "Pour plus d'informations, veuillez consulter le <a href=\"https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md\" target=\"_blank\" rel=\"noopener noreferrer\">guide Music Blocks</a>."
 
 #: js/lilypond.js:21
 

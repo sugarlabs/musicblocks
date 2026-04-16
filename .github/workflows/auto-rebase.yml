@@ -1,0 +1,24 @@
+name: Auto Rebase PRs
+
+on:
+    push:
+        branches: [master]
+    workflow_dispatch:
+
+permissions:
+    contents: write
+    pull-requests: write
+
+jobs:
+    rebase:
+        name: Auto-rebase all open PRs onto latest master
+        runs-on: ubuntu-latest
+        steps:
+            - uses: peter-evans/rebase@v4
+              with:
+                  base: master
+                  exclude-labels: |
+                      no-rebase
+                      wip
+                      do-not-merge
+                  exclude-drafts: true

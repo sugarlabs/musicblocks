@@ -67,7 +67,7 @@ class GIFAnimator {
             img.style.display = "none";
             document.body.appendChild(img);
 
-            const gifPlayer = new SuperGif({ gif: img });
+            const gifPlayer = new window.SuperGif({ gif: img });
             await new Promise(resolve => gifPlayer.load(resolve));
 
             const totalFrames = gifPlayer.get_length();
@@ -210,21 +210,44 @@ class GIFAnimator {
     }
 
     /**
-     * Stops and removes a specific GIF animation.
+     * Stops and removes a specific GIF animation, freeing its resources.
      */
     stopAnimation(gifId) {
         const animation = this.animations.get(gifId);
         if (animation) {
             animation.disposed = true;
+            // Pause the GIF player and remove the hidden <img> from the DOM
+            if (animation.gifPlayer) {
+                animation.gifPlayer.pause();
+            }
+            if (animation.imgElement && animation.imgElement.parentNode) {
+                animation.imgElement.parentNode.removeChild(animation.imgElement);
+            }
+            // Release canvas references
+            animation.frameCanvas = null;
+            animation.frameCtx = null;
+            animation.gifPlayer = null;
             this.animations.delete(gifId);
         }
     }
 
     /**
-     * Stops all animations and resets internal state.
+     * Stops all animations and resets internal state, freeing all resources.
      */
     stopAll() {
-        this.animations.forEach(anim => (anim.disposed = true));
+        this.animations.forEach(anim => {
+            anim.disposed = true;
+            if (anim.gifPlayer) {
+                anim.gifPlayer.pause();
+            }
+            if (anim.imgElement && anim.imgElement.parentNode) {
+                anim.imgElement.parentNode.removeChild(anim.imgElement);
+            }
+            // Release canvas references
+            anim.frameCanvas = null;
+            anim.frameCtx = null;
+            anim.gifPlayer = null;
+        });
         this.animations.clear();
 
         if (this.frameRequestId) {
@@ -245,4 +268,8 @@ class GIFAnimator {
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = GIFAnimator;
+}
+
+if (typeof window !== "undefined") {
+    window.GIFAnimator = GIFAnimator;
 }
