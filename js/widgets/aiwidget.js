@@ -804,6 +804,15 @@ function AIWidget() {
             if (this._octavesWheel !== undefined) {
                 this._octavesWheel.removeWheel();
             }
+            for (const id in this.pitchAnalysers) {
+                const analyser = this.pitchAnalysers[id];
+                if (analyser) {
+                    for (const synth in instruments[0]) {
+                        instruments[0][synth].disconnect(analyser);
+                    }
+                    analyser.dispose();
+                }
+            }
             this.pitchAnalysers = {};
             widgetWindow.destroy();
         };
@@ -1004,7 +1013,7 @@ function AIWidget() {
      */
     this.reconnectSynthsToAnalyser = function () {
         // Make two pitchAnalysers for the ref tone and the sample.
-        for (const instrument in [0, 1]) {
+        for (const instrument of [0, 1]) {
             if (this.pitchAnalysers[instrument] === undefined) {
                 this.pitchAnalysers[instrument] = new Tone.Analyser({
                     type: "waveform",
@@ -1018,11 +1027,19 @@ function AIWidget() {
             let analyser = 1;
             if (synth === REFERENCESAMPLE) {
                 analyser = 0;
+            }
+
+            if (this.pitchAnalysers[analyser]) {
+                instruments[0][synth].disconnect(this.pitchAnalysers[analyser]);
                 instruments[0][synth].connect(this.pitchAnalysers[analyser]);
             }
+
             if (synth === "customsample_" + this.originalSampleName) {
                 analyser = 1;
-                instruments[0][synth].connect(this.pitchAnalysers[analyser]);
+                if (this.pitchAnalysers[analyser]) {
+                    instruments[0][synth].disconnect(this.pitchAnalysers[analyser]);
+                    instruments[0][synth].connect(this.pitchAnalysers[analyser]);
+                }
             }
         }
     };
