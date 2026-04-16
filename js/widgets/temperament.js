@@ -228,7 +228,7 @@ function TemperamentWidget() {
         ctx.fillStyle = "rgba(204, 0, 102, 0)";
         ctx.fill();
         ctx.lineWidth = 1;
-        ctx.strokeStyle = "#003300";
+        ctx.strokeStyle = platformColor.strokeColor || "#003300";
         ctx.stroke();
 
         let angle = [];
@@ -270,7 +270,8 @@ function TemperamentWidget() {
             const sliceAngle = [];
             const angleDiff = [];
             for (let i = 0; i < this.notesCircle.navItemCount; i++) {
-                this.notesCircle.navItems[i].fillAttr = "#c8C8C8";
+                this.notesCircle.navItems[i].fillAttr =
+                    platformColor.selectorBackground || "#c8C8C8";
                 this.notesCircle.navItems[i].titleAttr.font =
                     "20 20px Impact, Charcoal, sans-serif";
                 this.notesCircle.navItems[i].titleSelectedAttr.font =
@@ -863,14 +864,14 @@ function TemperamentWidget() {
             menuItems[i].style.fontWeight = "bold";
         }
 
-        menuItems[0].style.background = "#c8C8C8";
+        menuItems[0].style.background = platformColor.selectorBackground || "#c8C8C8";
         that.equalEdit();
 
         menuItems[0].onclick = function () {
             menuItems[1].style.background = platformColor.selectorBackground;
             menuItems[2].style.background = platformColor.selectorBackground;
             menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[0].style.background = "#c8C8C8";
+            menuItems[0].style.background = platformColor.selectorBackground || "#c8C8C8";
             that.equalEdit();
         };
 
@@ -878,7 +879,7 @@ function TemperamentWidget() {
             menuItems[0].style.background = platformColor.selectorBackground;
             menuItems[2].style.background = platformColor.selectorBackground;
             menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[1].style.background = "#c8C8C8";
+            menuItems[1].style.background = platformColor.selectorBackground || "#c8C8C8";
             that.ratioEdit();
         };
 
@@ -886,7 +887,7 @@ function TemperamentWidget() {
             menuItems[0].style.background = platformColor.selectorBackground;
             menuItems[1].style.background = platformColor.selectorBackground;
             menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = "#c8C8C8";
+            menuItems[2].style.background = platformColor.selectorBackground || "#c8C8C8";
             that.arbitraryEdit();
         };
 
@@ -894,7 +895,7 @@ function TemperamentWidget() {
             menuItems[0].style.background = platformColor.selectorBackground;
             menuItems[1].style.background = platformColor.selectorBackground;
             menuItems[2].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = "#c8C8C8";
+            menuItems[3].style.background = platformColor.selectorBackground || "#c8C8C8";
             that.octaveSpaceEdit();
         };
     };
@@ -907,7 +908,7 @@ function TemperamentWidget() {
         this.editMode = "equal";
         docById("userEdit").textContent = "";
         const equalEdit = docById("userEdit");
-        equalEdit.style.backgroundColor = "#c8C8C8";
+        equalEdit.style.backgroundColor = platformColor.selectorBackground || "#c8C8C8";
         equalEdit.appendChild(document.createElement("br"));
         equalEdit.appendChild(
             document.createTextNode(_("pitch number") + "\u00A0\u00A0\u00A0\u00A0 ")
@@ -1073,10 +1074,14 @@ function TemperamentWidget() {
                 docById("userEdit").appendChild(wheelDiv2);
                 this.createMainWheel(this.tempRatios, pitchNumber);
                 for (let i = 0; i < pitchNumber; i++) {
-                    this.notesCircle.navItems[i].fillAttr = "#e0e0e0";
-                    this.notesCircle.navItems[i].sliceHoverAttr.fill = "#e0e0e0";
-                    this.notesCircle.navItems[i].slicePathAttr.fill = "#e0e0e0";
-                    this.notesCircle.navItems[i].sliceSelectedAttr.fill = "#e0e0e0";
+                    this.notesCircle.navItems[i].fillAttr =
+                        platformColor.selectorBackground || "#e0e0e0";
+                    this.notesCircle.navItems[i].sliceHoverAttr.fill =
+                        platformColor.selectorBackground || "#e0e0e0";
+                    this.notesCircle.navItems[i].slicePathAttr.fill =
+                        platformColor.selectorBackground || "#e0e0e0";
+                    this.notesCircle.navItems[i].sliceSelectedAttr.fill =
+                        platformColor.selectorBackground || "#e0e0e0";
                 }
                 this.notesCircle.refreshWheel();
                 docById("userEdit").style.paddingLeft = "0px";
@@ -1129,7 +1134,7 @@ function TemperamentWidget() {
         this.editMode = "ratio";
         docById("userEdit").textContent = "";
         const ratioEdit = docById("userEdit");
-        ratioEdit.style.backgroundColor = "#c8C8C8";
+        ratioEdit.style.backgroundColor = platformColor.selectorBackground || "#c8C8C8";
         ratioEdit.appendChild(document.createElement("br"));
         ratioEdit.appendChild(document.createTextNode(_("ratio") + " \u00A0\u00A0\u00A0\u00A0 "));
         const ratioIn = document.createElement("input");
@@ -1268,10 +1273,14 @@ function TemperamentWidget() {
                 docById("userEdit").appendChild(wheelDiv2);
                 that.createMainWheel(that.tempRatios, pitchNumber);
                 for (let i = 0; i < pitchNumber; i++) {
-                    that.notesCircle.navItems[i].fillAttr = "#e0e0e0";
-                    that.notesCircle.navItems[i].sliceHoverAttr.fill = "#e0e0e0";
-                    that.notesCircle.navItems[i].slicePathAttr.fill = "#e0e0e0";
-                    that.notesCircle.navItems[i].sliceSelectedAttr.fill = "#e0e0e0";
+                    that.notesCircle.navItems[i].fillAttr =
+                        platformColor.selectorBackground || "#e0e0e0";
+                    that.notesCircle.navItems[i].sliceHoverAttr.fill =
+                        platformColor.selectorBackground || "#e0e0e0";
+                    that.notesCircle.navItems[i].slicePathAttr.fill =
+                        platformColor.selectorBackground || "#e0e0e0";
+                    that.notesCircle.navItems[i].sliceSelectedAttr.fill =
+                        platformColor.selectorBackground || "#e0e0e0";
                 }
                 that.notesCircle.refreshWheel();
                 docById("userEdit").style.paddingLeft = "0px";
@@ -1385,7 +1394,7 @@ function TemperamentWidget() {
             const angle = [];
             const angleDiff = [];
             for (let i = 0; i < this.wheel1.navItemCount; i++) {
-                this.wheel1.navItems[i].fillAttr = "#e0e0e0";
+                this.wheel1.navItems[i].fillAttr = platformColor.selectorBackground || "#e0e0e0";
                 this.wheel1.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
                 this.wheel1.navItems[i].titleSelectedAttr.font =
                     "20 20px Impact, Charcoal, sans-serif";
@@ -1449,7 +1458,7 @@ function TemperamentWidget() {
         ctx.fillStyle = "rgba(204, 0, 102, 0)";
         ctx.fill();
         ctx.lineWidth = 1;
-        ctx.strokeStyle = "#003300";
+        ctx.strokeStyle = platformColor.strokeColor || "#003300";
         ctx.stroke();
 
         this._createOuterWheel = function (ratios, pitchNumber) {
@@ -1473,7 +1482,10 @@ function TemperamentWidget() {
             this.wheel.slicePathCustom.maxRadiusPercent = 1.0;
             this.wheel.sliceSelectedPathCustom = this.wheel.slicePathCustom;
             this.wheel.sliceInitPathCustom = this.wheel.slicePathCustom;
-            this.wheel.colors = ["#c0c0c0", "#e0e0e0"];
+            this.wheel.colors = [
+                platformColor.selectorBackground || "#c0c0c0",
+                platformColor.selectorBackground || "#e0e0e0"
+            ];
             this.wheel.titleRotateAngle = 90;
             this.wheel.navItemsEnabled = false;
 
@@ -1703,7 +1715,7 @@ function TemperamentWidget() {
         const len = this.ratios.length;
         const octaveRatio = this.ratios[len - 1];
         const octaveSpaceEdit = docById("userEdit");
-        octaveSpaceEdit.style.backgroundColor = "#c8C8C8";
+        octaveSpaceEdit.style.backgroundColor = platformColor.selectorBackground || "#c8C8C8";
         octaveSpaceEdit.appendChild(document.createElement("br"));
         octaveSpaceEdit.appendChild(document.createElement("br"));
         octaveSpaceEdit.appendChild(
@@ -2259,35 +2271,55 @@ function TemperamentWidget() {
 
             if (that.circleIsVisible === false && docById("wheelDiv4") === null) {
                 if (i === pitchNumber && that._playing) {
-                    that.notesCircle.navItems[0].fillAttr = "#808080";
-                    that.notesCircle.navItems[0].sliceHoverAttr.fill = "#808080";
-                    that.notesCircle.navItems[0].slicePathAttr.fill = "#808080";
-                    that.notesCircle.navItems[0].sliceSelectedAttr.fill = "#808080";
+                    that.notesCircle.navItems[0].fillAttr =
+                        platformColor.selectorBackgroundHOFF || "#808080";
+                    that.notesCircle.navItems[0].sliceHoverAttr.fill =
+                        platformColor.selectorBackgroundHOFF || "#808080";
+                    that.notesCircle.navItems[0].slicePathAttr.fill =
+                        platformColor.selectorBackgroundHOFF || "#808080";
+                    that.notesCircle.navItems[0].sliceSelectedAttr.fill =
+                        platformColor.selectorBackgroundHOFF || "#808080";
                 } else if (that._playing) {
-                    that.notesCircle.navItems[i].fillAttr = "#808080";
-                    that.notesCircle.navItems[i].sliceHoverAttr.fill = "#808080";
-                    that.notesCircle.navItems[i].slicePathAttr.fill = "#808080";
-                    that.notesCircle.navItems[i].sliceSelectedAttr.fill = "#808080";
+                    that.notesCircle.navItems[i].fillAttr =
+                        platformColor.selectorBackgroundHOFF || "#808080";
+                    that.notesCircle.navItems[i].sliceHoverAttr.fill =
+                        platformColor.selectorBackgroundHOFF || "#808080";
+                    that.notesCircle.navItems[i].slicePathAttr.fill =
+                        platformColor.selectorBackgroundHOFF || "#808080";
+                    that.notesCircle.navItems[i].sliceSelectedAttr.fill =
+                        platformColor.selectorBackgroundHOFF || "#808080";
                 }
 
                 if (that.playbackForward === false && i < pitchNumber) {
                     if (i === pitchNumber - 1) {
-                        that.notesCircle.navItems[0].fillAttr = "#c8C8C8";
-                        that.notesCircle.navItems[0].sliceHoverAttr.fill = "#c8C8C8";
-                        that.notesCircle.navItems[0].slicePathAttr.fill = "#c8C8C8";
-                        that.notesCircle.navItems[0].sliceSelectedAttr.fill = "#c8C8C8";
+                        that.notesCircle.navItems[0].fillAttr =
+                            platformColor.selectorBackground || "#c8C8C8";
+                        that.notesCircle.navItems[0].sliceHoverAttr.fill =
+                            platformColor.selectorBackground || "#c8C8C8";
+                        that.notesCircle.navItems[0].slicePathAttr.fill =
+                            platformColor.selectorBackground || "#c8C8C8";
+                        that.notesCircle.navItems[0].sliceSelectedAttr.fill =
+                            platformColor.selectorBackground || "#c8C8C8";
                     } else {
-                        that.notesCircle.navItems[i + 1].fillAttr = "#c8C8C8";
-                        that.notesCircle.navItems[i + 1].sliceHoverAttr.fill = "#c8C8C8";
-                        that.notesCircle.navItems[i + 1].slicePathAttr.fill = "#c8C8C8";
-                        that.notesCircle.navItems[i + 1].sliceSelectedAttr.fill = "#c8C8C8";
+                        that.notesCircle.navItems[i + 1].fillAttr =
+                            platformColor.selectorBackground || "#c8C8C8";
+                        that.notesCircle.navItems[i + 1].sliceHoverAttr.fill =
+                            platformColor.selectorBackground || "#c8C8C8";
+                        that.notesCircle.navItems[i + 1].slicePathAttr.fill =
+                            platformColor.selectorBackground || "#c8C8C8";
+                        that.notesCircle.navItems[i + 1].sliceSelectedAttr.fill =
+                            platformColor.selectorBackground || "#c8C8C8";
                     }
                 } else {
                     if (i !== 0) {
-                        that.notesCircle.navItems[i - 1].fillAttr = "#c8C8C8";
-                        that.notesCircle.navItems[i - 1].sliceHoverAttr.fill = "#c8C8C8";
-                        that.notesCircle.navItems[i - 1].slicePathAttr.fill = "#c8C8C8";
-                        that.notesCircle.navItems[i - 1].sliceSelectedAttr.fill = "#c8C8C8";
+                        that.notesCircle.navItems[i - 1].fillAttr =
+                            platformColor.selectorBackground || "#c8C8C8";
+                        that.notesCircle.navItems[i - 1].sliceHoverAttr.fill =
+                            platformColor.selectorBackground || "#c8C8C8";
+                        that.notesCircle.navItems[i - 1].slicePathAttr.fill =
+                            platformColor.selectorBackground || "#c8C8C8";
+                        that.notesCircle.navItems[i - 1].sliceSelectedAttr.fill =
+                            platformColor.selectorBackground || "#c8C8C8";
                     }
                 }
 
@@ -2306,35 +2338,55 @@ function TemperamentWidget() {
                 }
             } else if (docById("wheelDiv4") !== null) {
                 if (i === pitchNumber) {
-                    that.wheel1.navItems[0].fillAttr = "#808080";
-                    that.wheel1.navItems[0].sliceHoverAttr.fill = "#808080";
-                    that.wheel1.navItems[0].slicePathAttr.fill = "#808080";
-                    that.wheel1.navItems[0].sliceSelectedAttr.fill = "#808080";
+                    that.wheel1.navItems[0].fillAttr =
+                        platformColor.selectorBackgroundHOFF || "#808080";
+                    that.wheel1.navItems[0].sliceHoverAttr.fill =
+                        platformColor.selectorBackgroundHOFF || "#808080";
+                    that.wheel1.navItems[0].slicePathAttr.fill =
+                        platformColor.selectorBackgroundHOFF || "#808080";
+                    that.wheel1.navItems[0].sliceSelectedAttr.fill =
+                        platformColor.selectorBackgroundHOFF || "#808080";
                 } else {
-                    that.wheel1.navItems[i].fillAttr = "#808080";
-                    that.wheel1.navItems[i].sliceHoverAttr.fill = "#808080";
-                    that.wheel1.navItems[i].slicePathAttr.fill = "#808080";
-                    that.wheel1.navItems[i].sliceSelectedAttr.fill = "#808080";
+                    that.wheel1.navItems[i].fillAttr =
+                        platformColor.selectorBackgroundHOFF || "#808080";
+                    that.wheel1.navItems[i].sliceHoverAttr.fill =
+                        platformColor.selectorBackgroundHOFF || "#808080";
+                    that.wheel1.navItems[i].slicePathAttr.fill =
+                        platformColor.selectorBackgroundHOFF || "#808080";
+                    that.wheel1.navItems[i].sliceSelectedAttr.fill =
+                        platformColor.selectorBackgroundHOFF || "#808080";
                 }
 
                 if (that.playbackForward === false && i < pitchNumber) {
                     if (i === pitchNumber - 1) {
-                        that.wheel1.navItems[0].fillAttr = "#e0e0e0";
-                        that.wheel1.navItems[0].sliceHoverAttr.fill = "#e0e0e0";
-                        that.wheel1.navItems[0].slicePathAttr.fill = "#e0e0e0";
-                        that.wheel1.navItems[0].sliceSelectedAttr.fill = "#e0e0e0";
+                        that.wheel1.navItems[0].fillAttr =
+                            platformColor.selectorBackground || "#e0e0e0";
+                        that.wheel1.navItems[0].sliceHoverAttr.fill =
+                            platformColor.selectorBackground || "#e0e0e0";
+                        that.wheel1.navItems[0].slicePathAttr.fill =
+                            platformColor.selectorBackground || "#e0e0e0";
+                        that.wheel1.navItems[0].sliceSelectedAttr.fill =
+                            platformColor.selectorBackground || "#e0e0e0";
                     } else {
-                        that.wheel1.navItems[i + 1].fillAttr = "#e0e0e0";
-                        that.wheel1.navItems[i + 1].sliceHoverAttr.fill = "#e0e0e0";
-                        that.wheel1.navItems[i + 1].slicePathAttr.fill = "#e0e0e0";
-                        that.wheel1.navItems[i + 1].sliceSelectedAttr.fill = "#e0e0e0";
+                        that.wheel1.navItems[i + 1].fillAttr =
+                            platformColor.selectorBackground || "#e0e0e0";
+                        that.wheel1.navItems[i + 1].sliceHoverAttr.fill =
+                            platformColor.selectorBackground || "#e0e0e0";
+                        that.wheel1.navItems[i + 1].slicePathAttr.fill =
+                            platformColor.selectorBackground || "#e0e0e0";
+                        that.wheel1.navItems[i + 1].sliceSelectedAttr.fill =
+                            platformColor.selectorBackground || "#e0e0e0";
                     }
                 } else {
                     if (i !== 0) {
-                        that.wheel1.navItems[i - 1].fillAttr = "#e0e0e0";
-                        that.wheel1.navItems[i - 1].sliceHoverAttr.fill = "#e0e0e0";
-                        that.wheel1.navItems[i - 1].slicePathAttr.fill = "#e0e0e0";
-                        that.wheel1.navItems[i - 1].sliceSelectedAttr.fill = "#e0e0e0";
+                        that.wheel1.navItems[i - 1].fillAttr =
+                            platformColor.selectorBackground || "#e0e0e0";
+                        that.wheel1.navItems[i - 1].sliceHoverAttr.fill =
+                            platformColor.selectorBackground || "#e0e0e0";
+                        that.wheel1.navItems[i - 1].slicePathAttr.fill =
+                            platformColor.selectorBackground || "#e0e0e0";
+                        that.wheel1.navItems[i - 1].sliceSelectedAttr.fill =
+                            platformColor.selectorBackground || "#e0e0e0";
                     }
                 }
 
@@ -2374,10 +2426,14 @@ function TemperamentWidget() {
                 this.inbetween = false;
                 setTimeout(
                     function () {
-                        that.notesCircle.navItems[0].fillAttr = "#c8C8C8";
-                        that.notesCircle.navItems[0].sliceHoverAttr.fill = "#c8C8C8";
-                        that.notesCircle.navItems[0].slicePathAttr.fill = "#c8C8C8";
-                        that.notesCircle.navItems[0].sliceSelectedAttr.fill = "#c8C8C8";
+                        that.notesCircle.navItems[0].fillAttr =
+                            platformColor.selectorBackground || "#c8C8C8";
+                        that.notesCircle.navItems[0].sliceHoverAttr.fill =
+                            platformColor.selectorBackground || "#c8C8C8";
+                        that.notesCircle.navItems[0].slicePathAttr.fill =
+                            platformColor.selectorBackground || "#c8C8C8";
+                        that.notesCircle.navItems[0].sliceSelectedAttr.fill =
+                            platformColor.selectorBackground || "#c8C8C8";
                         that.notesCircle.refreshWheel();
                     },
                     Singer.defaultBPMFactor * 1000 * duration

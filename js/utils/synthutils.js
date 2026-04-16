@@ -1701,12 +1701,14 @@ function Synth() {
         let numFilters;
         const temp_filters = [];
         const effectsToDispose = [];
+        const epoch = this._instrumentEpoch;
 
         try {
             if (paramsEffects === null && paramsFilters === null) {
                 // See https://github.com/sugarlabs/musicblocks/issues/2951
                 try {
                     await Tone.ToneAudioBuffer.loaded();
+                    if (this._instrumentEpoch !== epoch) return;
                     synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
                 } catch (e) {
                     console.debug("Error triggering note:", e);
@@ -1757,6 +1759,7 @@ function Synth() {
                     }
                     try {
                         await Tone.ToneAudioBuffer.loaded();
+                        if (this._instrumentEpoch !== epoch) return;
                         synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
                     } catch (e) {
                         console.debug("Error triggering note (no-graph-rewire fast path):", e);
@@ -1902,7 +1905,9 @@ function Synth() {
                     } else {
                         try {
                             await Tone.ToneAudioBuffer.loaded();
-                            synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
+                            if (this._instrumentEpoch === epoch) {
+                                synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
+                            }
                         } catch (e) {
                             console.debug("Error triggering note:", e);
                         }
@@ -3589,6 +3594,7 @@ function Synth() {
      * @returns {void}
      */
     this.disposeAllInstruments = () => {
+        this._instrumentEpoch++;
         _disposeRecordingPlayer();
         _revokeRecordingURL();
 
@@ -3645,6 +3651,7 @@ function Synth() {
         }
     };
 
+    this._instrumentEpoch = 0;
     this.tone = null;
     this.noteFrequencies = {};
     this.startingPitch = "C4";

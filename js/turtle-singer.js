@@ -2580,7 +2580,7 @@ class Singer {
                     if (activity.blocks.visible && blk in activity.blocks.blockList) {
                         activity.blocks.unhighlight(blk);
                         if (activity.stage) {
-                            activity.stage.update();
+                            activity.stageDirty = true;
                         }
                     }
                     delete tur.singer._unhighlightTimers[blk];

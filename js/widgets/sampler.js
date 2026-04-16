@@ -1044,7 +1044,7 @@ function SampleWidget() {
                 segments.forEach((d, i) => {
                     const segment = document.createElementNS("http://www.w3.org/2000/svg", "path");
                     segment.setAttribute("d", d);
-                    segment.setAttribute("fill", "#808080");
+                    segment.setAttribute("fill", platformColor.selectorBackground || "#808080");
                     tunerSvg.appendChild(segment);
                 });
 
@@ -1056,7 +1056,7 @@ function SampleWidget() {
                 modeToggle.style.left = "50%";
                 modeToggle.style.transform = "translateX(-50%)";
                 modeToggle.style.display = "flex";
-                modeToggle.style.backgroundColor = "#FFFFFF";
+                modeToggle.style.backgroundColor = platformColor.fillColor || "#FFFFFF";
                 modeToggle.style.borderRadius = "25px";
                 modeToggle.style.padding = "3px";
                 modeToggle.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
@@ -1108,12 +1108,14 @@ function SampleWidget() {
 
                 // Function to update button styles
                 const updateButtonStyles = () => {
+                    const activeColor = platformColor.selectorSelected || "#A6CEFF";
+                    const inactiveColor = platformColor.fillColor || "#FFFFFF";
                     if (tunerMode === "chromatic") {
-                        chromaticButton.style.backgroundColor = "#A6CEFF";
-                        targetPitchButton.style.backgroundColor = "#FFFFFF";
+                        chromaticButton.style.backgroundColor = activeColor;
+                        targetPitchButton.style.backgroundColor = inactiveColor;
                     } else {
-                        chromaticButton.style.backgroundColor = "#FFFFFF";
-                        targetPitchButton.style.backgroundColor = "#A6CEFF";
+                        chromaticButton.style.backgroundColor = inactiveColor;
+                        targetPitchButton.style.backgroundColor = activeColor;
                     }
                 };
 
@@ -1331,7 +1333,7 @@ function SampleWidget() {
                 const resetButton = document.createElement("button");
                 resetButton.textContent = _("Reset");
                 resetButton.style.padding = "10px 20px";
-                resetButton.style.backgroundColor = "#808080";
+                resetButton.style.backgroundColor = platformColor.selectorBackground || "#808080";
                 resetButton.style.color = "white";
                 resetButton.style.border = "none";
                 resetButton.style.borderRadius = "5px";
@@ -1937,7 +1939,7 @@ function SampleWidget() {
                 (this.pitchAnalysers[turtleIdx] && (this.running || resized))
             ) {
                 this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
-                canvasCtx.fillStyle = "#FFFFFF";
+                canvasCtx.fillStyle = platformColor.background || "#FFFFFF";
                 canvasCtx.font = "10px Verdana";
                 this.verticalOffset = -canvas.height / 4;
                 this.zoomFactor = 40.0;
@@ -1948,7 +1950,7 @@ function SampleWidget() {
                     //.TRANS: The sound sample that the user uploads.
                     oscText = this.sampleName !== "" ? this.sampleName : _("sample");
                 }
-                canvasCtx.fillStyle = "#000000";
+                canvasCtx.fillStyle = platformColor.textColor || "#000000";
                 //.TRANS: The reference tone is a sound used for comparison.
                 canvasCtx.fillText(_("reference tone"), 10, 10);
                 canvasCtx.fillText(oscText, 10, canvas.height / 2 + 10);

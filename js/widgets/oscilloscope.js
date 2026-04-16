@@ -248,7 +248,7 @@ class Oscilloscope {
             const dataArray = analyser.getValue();
             const bufferLength = dataArray.length;
 
-            ctx.fillStyle = "#FFFFFF";
+            ctx.fillStyle = platformColor.background || "#FFFFFF";
             ctx.fillRect(0, 0, state.width, state.height);
             ctx.lineWidth = 2;
             ctx.strokeStyle = state.turtle.painter._canvasColor;

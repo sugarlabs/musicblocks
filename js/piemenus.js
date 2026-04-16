@@ -226,7 +226,7 @@ const configureExitWheel = exitWheel => {
  * @returns {void}
  */
 const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accidental, custom) => {
-    let prevPitch = null;
+    let prevPitch = noteLabels.indexOf(note);
     // wheelNav pie menu for pitch selection
     if (block.blocks.stageClick) {
         return;
@@ -543,24 +543,21 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             const label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             const i = noteLabels.indexOf(label);
 
-            // Are we wrapping across C? We need to compare with the previous pitch
-            if (prevPitch === null) {
-                prevPitch = i;
-            }
-
+            const noteCount = noteLabels.length;
+            const halfSpan = noteCount / 2;
             const deltaPitch = i - prevPitch;
             let delta;
-            if (deltaPitch > 3) {
-                delta = deltaPitch - 7;
-            } else if (deltaPitch < -3) {
-                delta = deltaPitch + 7;
+            if (deltaPitch > halfSpan) {
+                delta = deltaPitch - noteCount;
+            } else if (deltaPitch < -halfSpan) {
+                delta = deltaPitch + noteCount;
             } else {
                 delta = deltaPitch;
             }
 
             // If we wrapped across C, we need to adjust the octave.
             let deltaOctave = 0;
-            if (prevPitch + delta > 6) {
+            if (prevPitch + delta > noteCount - 1) {
                 deltaOctave = -1;
             } else if (prevPitch + delta < 0) {
                 deltaOctave = 1;
@@ -715,15 +712,17 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             if (i === -1) {
                 i = NOTENAMES.indexOf(FIXEDSOLFEGE[that.value]);
             }
-            if (
-                NOTENAMES.includes(selection["note"]) ||
-                scale[i][0] === FIXEDSOLFEGE[selection["note"]] ||
-                scale[i][0] === FIXEDSOLFEGE[that.value] ||
-                scale[i][0] === selection["note"]
-            ) {
-                selection["attr"] = scale[i].substr(1);
-            } else {
-                selection["attr"] = EQUIVALENTACCIDENTALS[scale[i]].substr(1);
+            if (i !== -1) {
+                if (
+                    NOTENAMES.includes(selection["note"]) ||
+                    scale[i][0] === FIXEDSOLFEGE[selection["note"]] ||
+                    scale[i][0] === FIXEDSOLFEGE[that.value] ||
+                    scale[i][0] === selection["note"]
+                ) {
+                    selection["attr"] = scale[i].substr(1);
+                } else {
+                    selection["attr"] = EQUIVALENTACCIDENTALS[scale[i]].substr(1);
+                }
             }
             switch (selection["attr"]) {
                 case DOUBLEFLAT:
@@ -3579,7 +3578,7 @@ const piemenuModes = (block, selectedMode) => {
             activeTabs.push(last(activeTabs) - mode[k]);
         }
 
-        docById("wheelnav-_exitWheel-title-1").style.fill = "#ffffff";
+        docById("wheelnav-_exitWheel-title-1").style.fill = platformColor.textColor || "#ffffff";
         docById("wheelnav-_exitWheel-title-1").style.pointerEvents = "none";
         docById("wheelnav-_exitWheel-slice-1").style.pointerEvents = "none";
         setTimeout(
@@ -3587,7 +3586,7 @@ const piemenuModes = (block, selectedMode) => {
                 const playButtonTitle = docById("wheelnav-_exitWheel-title-1");
                 const playButtonSlice = docById("wheelnav-_exitWheel-slice-1");
                 if (playButtonTitle && playButtonSlice) {
-                    playButtonTitle.style.fill = "#000000";
+                    playButtonTitle.style.fill = platformColor.textColor || "#000000";
                     playButtonTitle.style.pointerEvents = "auto";
                     playButtonSlice.style.pointerEvents = "auto";
                 }
@@ -4485,3 +4484,7 @@ const piemenuDissectNumber = widget => {
         }
     };
 };
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { piemenuPitches };
+}

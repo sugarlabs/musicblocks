@@ -8396,8 +8396,8 @@ msgid "Tags:"
 msgstr "टैग्स:"
 
 #: planet/js/StringHelper.js:65
-msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">Sugar Labs Code of Conduct</a>."
-msgstr "उन प्रोजेक्ट्स की रिपोर्ट करें जो <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">Sugar Labs Code of Conduct</a> का उल्लंघन करते हैं।"
+msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a>."
+msgstr "उन प्रोजेक्ट्स की रिपोर्ट करें जो <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a> का उल्लंघन करते हैं।"
 
 #: planet/js/StringHelper.js:66
 msgid "Reason for reporting project"
@@ -8644,5 +8644,5 @@ msgstr "नीचा"
 #~msgstr ""
 
 #: planet/js/StringHelper.js:65
-#~msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">Sugar Labs Code of Conduct</a>."
+#~msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a>."
 #~msgstr ""

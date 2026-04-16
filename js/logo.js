@@ -1710,7 +1710,7 @@ class Logo {
                 logo._currentlyHighlightedBlock = blk;
                 // Force stage update so highlight is visible when blocks were shown during execution
                 if (logo.activity.stage) {
-                    logo.activity.stage.update();
+                    logo.activity.stageDirty = true;
                 }
             }
         }
@@ -1872,7 +1872,7 @@ class Logo {
                                         logo._currentlyHighlightedBlock = null;
                                     }
                                     if (logo.activity.stage) {
-                                        logo.activity.stage.update();
+                                        logo.activity.stageDirty = true;
                                     }
                                 }
                             },
@@ -1913,7 +1913,7 @@ class Logo {
                                         logo._currentlyHighlightedBlock = null;
                                     }
                                     if (logo.activity.stage) {
-                                        logo.activity.stage.update();
+                                        logo.activity.stageDirty = true;
                                     }
                                 } else {
                                     tur.unhighlightQueue.pop();
