@@ -8025,11 +8025,7 @@ class Activity {
 
             const that = this;
 
-            if (!jQuery.browser.mozilla) {
-                window.onblur = () => {
-                    doHardStopButton(that, true);
-                };
-            }
+            this.setupWindowBlurHandler(doHardStopButton);
 
             this.stage = new createjs.Stage(this.canvas);
             createjs.Touch.enable(this.stage);
@@ -8806,6 +8802,24 @@ class Activity {
         if (!target || typeof target.addEventListener !== "function") return;
         target.addEventListener(type, listener, options);
         this._listeners.push({ target, type, listener, options });
+    }
+
+    /**
+     * Installs the shared blur-stop hook without overwriting any existing
+     * global blur handler. Music Blocks no longer needs this stop-on-blur path.
+     *
+     * @param {Function} doHardStopButton - Shared stop action callback.
+     */
+    setupWindowBlurHandler(doHardStopButton) {
+        if (jQuery.browser.mozilla || !_THIS_IS_TURTLE_BLOCKS_) {
+            return;
+        }
+
+        this._handleWindowBlur = () => {
+            doHardStopButton(this, true);
+        };
+
+        this.addEventListener(window, "blur", this._handleWindowBlur);
     }
 
     /**
