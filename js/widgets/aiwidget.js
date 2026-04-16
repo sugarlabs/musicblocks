@@ -1050,11 +1050,14 @@ function AIWidget() {
      */
     this._scale = function () {
         let width, height;
-        const canvas = document.getElementsByClassName("samplerCanvas");
         const body = this.widgetWindow.getWidgetBody();
-        for (let i = canvas.length - 1; i >= 0; i--) {
-            body.removeChild(canvas[i]);
+
+        // Properly remove the entire previous interface container to avoid leaks
+        const containers = body.getElementsByClassName("ai-interface-container");
+        for (let i = containers.length - 1; i >= 0; i--) {
+            body.removeChild(containers[i]);
         }
+
         if (!this.widgetWindow.isMaximized()) {
             width = SAMPLEWIDTH;
             height = SAMPLEHEIGHT;
@@ -1062,7 +1065,7 @@ function AIWidget() {
             width = this.widgetWindow.getWidgetBody().getBoundingClientRect().width;
             height = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 70;
         }
-        document.getElementsByTagName("canvas")[0].innerHTML = "";
+
         this.makeCanvas(width, height, 0, true);
         this.reconnectSynthsToAnalyser();
     };
@@ -1081,6 +1084,7 @@ function AIWidget() {
 
         // Create a container to center the elements
         const container = document.createElement("div");
+        container.className = "ai-interface-container";
         fragment.appendChild(container);
 
         // Create a scrollable container for the textarea
