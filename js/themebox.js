@@ -15,24 +15,17 @@
 
 // Use constants from artwork.js
 // In Node/Jest we require them; in browser we rely on them being available as globals
-let getSVG, hasSVG, AssetRegistry;
-if (typeof require !== "undefined" && typeof module !== "undefined") {
-    try {
-        const artwork = require("./artwork");
-        getSVG = artwork.getSVG;
-        hasSVG = artwork.hasSVG;
-        AssetRegistry = artwork.AssetRegistry;
-    } catch (e) {
-        // Fallback for environments where require fails but globals might exist
-        getSVG = window.getSVG;
-        hasSVG = window.hasSVG;
-        AssetRegistry = window.AssetRegistry;
-    }
-} else {
-    getSVG = window.getSVG;
-    hasSVG = window.hasSVG;
-    AssetRegistry = window.AssetRegistry;
+if (typeof require !== "undefined") {
+    const artwork = require("./artwork");
+    global.getSVG = artwork.getSVG;
+    global.hasSVG = artwork.hasSVG;
+    global.AssetRegistry = artwork.AssetRegistry;
+    global.PALETTEFILLCOLORS = artwork.PALETTEFILLCOLORS;
+    global.PALETTESTROKECOLORS = artwork.PALETTESTROKECOLORS;
+    global.PALETTEHIGHLIGHTCOLORS = artwork.PALETTEHIGHLIGHTCOLORS;
+    global.HIGHLIGHTSTROKECOLORS = artwork.HIGHLIGHTSTROKECOLORS;
 }
+
 // MULTIPALETTEICONS is a global from turtledefs.js, so we access it via window/global
 // to ensure it is always the most up-to-date reference.
 const getMultiPaletteIcons = () =>
@@ -321,10 +314,10 @@ class ThemeBox {
         // Update palette colors in global variables used by blocks
         if (window.platformColor.paletteColors) {
             for (const p in window.platformColor.paletteColors) {
-                AssetRegistry.PALETTEFILLCOLORS[p] = window.platformColor.paletteColors[p][0];
-                AssetRegistry.PALETTESTROKECOLORS[p] = window.platformColor.paletteColors[p][1];
-                AssetRegistry.PALETTEHIGHLIGHTCOLORS[p] = window.platformColor.paletteColors[p][2];
-                AssetRegistry.HIGHLIGHTSTROKECOLORS[p] = window.platformColor.paletteColors[p][1];
+                PALETTEFILLCOLORS[p] = window.platformColor.paletteColors[p][0];
+                PALETTESTROKECOLORS[p] = window.platformColor.paletteColors[p][1];
+                PALETTEHIGHLIGHTCOLORS[p] = window.platformColor.paletteColors[p][2];
+                HIGHLIGHTSTROKECOLORS[p] = window.platformColor.paletteColors[p][1];
             }
         }
 
@@ -419,8 +412,8 @@ class ThemeBox {
             try {
                 // Update palette selector border color
                 const paletteElement = document.getElementById("palette");
-                if (paletteElement && paletteElement.children[0]) {
-                    paletteElement.children[0].style.border = `1px solid ${window.platformColor.selectorSelected}`;
+                if (paletteElement && paletteElement.childNodes[0]) {
+                    paletteElement.childNodes[0].style.border = `1px solid ${window.platformColor.selectorSelected}`;
                 }
 
                 // Refresh palette selector icons with new theme colors

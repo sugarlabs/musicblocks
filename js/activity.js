@@ -228,7 +228,6 @@ const doAnalyzeProject = function () {
 /**
  * Represents an activity in the application.
  */
-
 class Activity {
     /**
      * Creates an Activity instance.
@@ -5272,7 +5271,7 @@ class Activity {
             const pitch = pitches;
             pitchDuration = toFraction(pitchDuration);
             const adjustedNote = _adjustPitch(pitch.name, keySignature).toUpperCase();
-            if (triplet != null) {
+            if (triplet !== null) {
                 pitchDuration[1] = meterDen * triplet;
             }
 
@@ -8198,19 +8197,22 @@ class Activity {
             // data loss from browser crashes (see issue #2994).
             // Deferred while the project is actively running to avoid
             // interrupting playback.
-            this._autoSaveInterval = setInterval(() => {
-                try {
-                    if (this.logo && this.logo._alreadyRunning) {
-                        return;
-                    }
+            this._autoSaveInterval = setInterval(
+                () => {
+                    try {
+                        if (this.logo && this.logo._alreadyRunning) {
+                            return;
+                        }
 
-                    if (this.saveLocally !== null && this.saveLocally !== undefined) {
-                        this.saveLocally();
+                        if (this.saveLocally !== null && this.saveLocally !== undefined) {
+                            this.saveLocally();
+                        }
+                    } catch (e) {
+                        console.error("[AutoSave] Failed:", e);
                     }
-                } catch (e) {
-                    console.error("[AutoSave] Failed:", e);
-                }
-            }, 5 * 60 * 1000);
+                },
+                5 * 60 * 1000
+            );
 
             initBasicProtoBlocks(this);
 

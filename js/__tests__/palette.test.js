@@ -2416,34 +2416,46 @@ describe("Palettes Class", () => {
     });
 
     describe("clear method", () => {
-        test("clears dict and resets state", () => {
-            // Setup document mock for clear method
-            global.document = {
-                createElement: jest.fn(() => ({
-                    id: "",
-                    setAttribute: jest.fn(),
-                    classList: { add: jest.fn() },
-                    innerHTML: "",
-                    childNodes: [{ style: {} }]
-                })),
-                body: { appendChild: jest.fn() }
-            };
-            global.docById = jest.fn(id => {
-                if (id === "palette") {
-                    return { parentNode: { removeChild: jest.fn() } };
-                }
-                return null;
-            });
+        let originalDocById;
+        let createElementSpy;
 
+        beforeEach(() => {
+            originalDocById = global.docById;
+            createElementSpy = jest.spyOn(document, "createElement");
+
+            // Mock docById
+            global.docById = jest.fn(id => {
+                const el = document.getElementById(id);
+                if (el && !el.parentNode) {
+                    Object.defineProperty(el, "parentNode", {
+                        value: { removeChild: jest.fn() },
+                        configurable: true
+                    });
+                }
+                return el || { parentNode: { removeChild: jest.fn() }, style: {} };
+            });
+        });
+
+        afterEach(() => {
+            global.docById = originalDocById;
+            createElementSpy.mockRestore();
+        });
+
+        test("clears dict and resets state", () => {
             palettes.dict = { test: { hideMenu: jest.fn() } };
             palettes.visible = true;
             palettes.activePalette = "test";
+
+            // Mock document.body.appendChild to avoid errors during test
+            const appendSpy = jest.spyOn(document.body, "appendChild").mockImplementation(() => {});
 
             palettes.clear();
 
             expect(palettes.dict).toEqual({});
             expect(palettes.visible).toBe(false);
             expect(palettes.activePalette).toBeNull();
+
+            appendSpy.mockRestore();
         });
 
         test("handles errors gracefully", () => {
@@ -2453,8 +2465,13 @@ describe("Palettes Class", () => {
             });
             palettes.dict = {};
 
+            // Mock console.error to avoid failing the test due to expected logging
+            const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
             // Should not throw due to try-catch
             expect(() => palettes.clear()).not.toThrow();
+
+            errorSpy.mockRestore();
         });
     });
 

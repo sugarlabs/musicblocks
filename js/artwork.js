@@ -993,7 +993,12 @@ if (typeof module !== "undefined" && module.exports) {
         COLLAPSEBUTTONXOFF,
         STANDARDBLOCKHEIGHT,
         FILLCOLORS,
+        STROKECOLORS,
         TURTLESVG,
+        PALETTEFILLCOLORS,
+        PALETTESTROKECOLORS,
+        PALETTEHIGHLIGHTCOLORS,
+        HIGHLIGHTSTROKECOLORS,
         AssetRegistry,
         hasSVG,
         getSVG
@@ -1005,4 +1010,8 @@ if (typeof window !== "undefined") {
     window.getSVG = getSVG;
     window.hasSVG = hasSVG;
     window.AssetRegistry = AssetRegistry;
+    window.PALETTEFILLCOLORS = PALETTEFILLCOLORS;
+    window.PALETTESTROKECOLORS = PALETTESTROKECOLORS;
+    window.PALETTEHIGHLIGHTCOLORS = PALETTEHIGHLIGHTCOLORS;
+    window.HIGHLIGHTSTROKECOLORS = HIGHLIGHTSTROKECOLORS;
 }
