@@ -82,6 +82,26 @@ function setupIntervalsActions(activity) {
         }
 
         /**
+         * Returns the zero-based semitone step for a note name.
+         * `B#` and `Cb` both map to 0 in ALLNOTESTEP, but they sit on opposite
+         * sides of the octave boundary and must be distinguished here.
+         *
+         * @static
+         * @param {string} note
+         * @param {number} temperamentLength
+         * @returns {number}
+         */
+        static getNoteStep(note, temperamentLength) {
+            const step = ALLNOTESTEP[note];
+
+            if (step === 0) {
+                return note.startsWith("C") ? temperamentLength - 1 : 0;
+            }
+
+            return step - 1;
+        }
+
+        /**
          * @static
          * @param {number} turtle
          * @returns {String}
@@ -89,25 +109,13 @@ function setupIntervalsActions(activity) {
         static GetIntervalNumber(turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
             let { firstNote, secondNote, octave } = GetNotesForInterval(tur);
-            let totalIntervals = Math.abs(ALLNOTESTEP[firstNote] - ALLNOTESTEP[secondNote]);
 
             // Use dynamic temperament length for custom tunings
             const temperamentLength = this.getTemperamentLength();
+            const firstStep = this.getNoteStep(firstNote, temperamentLength);
+            const secondStep = this.getNoteStep(secondNote, temperamentLength);
 
-            if (ALLNOTESTEP[secondNote] < ALLNOTESTEP[firstNote] && octave !== 0)
-                totalIntervals = temperamentLength - totalIntervals;
-
-            if (octave < 0 && totalIntervals !== 0 && totalIntervals !== temperamentLength)
-                totalIntervals = temperamentLength - totalIntervals;
-
-            if (octave < -1 || totalIntervals === 0) octave = Math.abs(octave);
-
-            while (octave > 0) {
-                totalIntervals += temperamentLength;
-                octave--;
-            }
-
-            return totalIntervals;
+            return Math.abs(octave * temperamentLength + (secondStep - firstStep));
         }
 
         /**

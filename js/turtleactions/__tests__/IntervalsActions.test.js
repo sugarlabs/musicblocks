@@ -38,7 +38,17 @@ describe("setupIntervalsActions", () => {
             minor: [2, 1, 2, 2, 1, 2, 2]
         };
 
-        global.ALLNOTESTEP = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+        global.ALLNOTESTEP = {
+            "Cb": 0,
+            "C": 1,
+            "D": 3,
+            "E": 5,
+            "F": 6,
+            "G": 8,
+            "A": 10,
+            "B": 12,
+            "B#": 0
+        };
         global.NOTENAMES = ["C", "D", "E", "F", "G", "A", "B"];
 
         global.SEMITONETOINTERVALMAP = Array(13)
@@ -177,6 +187,26 @@ describe("setupIntervalsActions", () => {
             octave: -3
         });
         expect(typeof Singer.IntervalsActions.GetIntervalNumber(0)).toBe("number");
+    });
+
+    test("GetIntervalNumber treats B to B# as one semitone across the octave boundary", () => {
+        GetNotesForInterval.mockReturnValueOnce({
+            firstNote: "B",
+            secondNote: "B#",
+            octave: 1
+        });
+
+        expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(1);
+    });
+
+    test("GetIntervalNumber treats B to Cb as a unison", () => {
+        GetNotesForInterval.mockReturnValueOnce({
+            firstNote: "B",
+            secondNote: "Cb",
+            octave: 0
+        });
+
+        expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(0);
     });
 
     test("GetCurrentInterval normal", () => {
