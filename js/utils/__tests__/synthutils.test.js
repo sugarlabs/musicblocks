@@ -426,6 +426,54 @@ describe("Utility Functions (logic-only)", () => {
                 0
             );
         });
+
+        test("should abort a pending trigger when the synth epoch changes mid-load", async () => {
+            const instrumentName = "guitar";
+            const mockSynth = {
+                disposed: false,
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            const mockPerformNotes = jest.fn();
+            const originalPerformNotes = Synth._performNotes;
+
+            instruments[turtle] = {};
+            // Simulate stop/dispose work completing while trigger() is suspended.
+            const loadSynthSpy = jest.spyOn(Synth, "loadSynth").mockImplementation(async () => {
+                await Promise.resolve();
+                Synth._instrumentEpoch += 1;
+                instruments[turtle][instrumentName] = mockSynth;
+            });
+
+            const createDefaultSynthSpy = jest
+                .spyOn(Synth, "createDefaultSynth")
+                .mockImplementation(() => {});
+            const trackVoiceSpy = jest.spyOn(Synth, "_trackVoice").mockImplementation(() => {});
+
+            Synth._performNotes = mockPerformNotes;
+
+            try {
+                const pending = trigger(
+                    turtle,
+                    "C4",
+                    beatValue,
+                    instrumentName,
+                    null,
+                    null,
+                    true,
+                    0
+                );
+                await pending;
+
+                expect(mockPerformNotes).not.toHaveBeenCalled();
+                expect(mockSynth.triggerAttackRelease).not.toHaveBeenCalled();
+            } finally {
+                Synth._performNotes = originalPerformNotes;
+                loadSynthSpy.mockRestore();
+                createDefaultSynthSpy.mockRestore();
+                trackVoiceSpy.mockRestore();
+            }
+        });
     });
 
     describe("temperamentChanged", () => {
