@@ -972,11 +972,18 @@ class Painter {
      * @param radius - radius of arc
      */
     doArc(angle, radius) {
+        angle = Number(angle);
+        radius = Number(radius);
+        if (!Number.isFinite(angle) || !Number.isFinite(radius)) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+
         if (radius < 0) {
             radius = -radius;
         }
 
-        let adeg = Number(angle),
+        let adeg = angle,
             factor;
         if (adeg < 0) {
             factor = -1;

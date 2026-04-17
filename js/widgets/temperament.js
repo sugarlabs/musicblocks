@@ -22,7 +22,7 @@
    _, addTemperamentToDictionary, buildScale,
    deleteTemperamentFromList, docById, FLAT, getNoteFromInterval,
    getOctaveRatio, getTemperament, getTemperamentKeys,
-   isCustomTemperament, pitchToFrequency, platformColor,
+   isCustomTemperament, normalizeNoteAccidentals, pitchToFrequency, platformColor,
    rationalToFraction, setOctaveRatio, setOctaveRatio, SHARP, Singer,
    slicePath, updateTemperaments, wheelnav, frequencyToPitch
  */
@@ -2155,14 +2155,8 @@ function TemperamentWidget() {
                 // Preserve existing 12EDO/equal behavior by using direct frequency.
                 notes = this.frequencies[pitchIndex];
             } else if (this.notes[pitchIndex] && Array.isArray(this.notes[pitchIndex])) {
-                const noteName = this.notes[pitchIndex][0];
-                const octave = this.notes[pitchIndex][1];
                 notes =
-                    noteName
-                        .replace(/♭/g, "b")
-                        .replace(/♯/g, "#")
-                        .replace(/𝄫/g, "bb")
-                        .replace(/𝄪/g, "x") + octave;
+                    normalizeNoteAccidentals(this.notes[pitchIndex][0]) + this.notes[pitchIndex][1];
             } else {
                 notes = this.frequencies[pitchIndex];
             }

@@ -131,8 +131,6 @@ class StatusMatrix {
             cell.style.fontSize =
                 Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
 
-            // console.debug(statusField[1]);
-
             switch (statusField[1]) {
                 case "plus":
                 case "minus":
@@ -160,7 +158,6 @@ class StatusMatrix {
                             this.activity.blocks.blockList[statusField[0]].protoblock
                                 .staticLabels[0];
                     }
-                    // console.debug(label);
                     break;
                 case "outputtools":
                     label = this.activity.blocks.blockList[statusField[0]].privateData;

@@ -102,14 +102,41 @@ const getPieMenuSize = block => {
 
 // Debounce resize handler for performance
 let wheelResizeTimeout;
+let wheelResizeListenerAttached = false;
 const debouncedSetWheelSize = () => {
     clearTimeout(wheelResizeTimeout);
     wheelResizeTimeout = setTimeout(setWheelSize, 150);
 };
 
-// Call the function initially and whenever the window is resized
-setWheelSize();
-window.addEventListener("resize", debouncedSetWheelSize);
+const enableWheelResizeHandling = () => {
+    if (wheelResizeListenerAttached) return;
+    wheelResizeListenerAttached = true;
+    window.addEventListener("resize", debouncedSetWheelSize);
+    setWheelSize();
+};
+
+const disableWheelResizeHandling = () => {
+    if (!wheelResizeListenerAttached) return;
+    wheelResizeListenerAttached = false;
+    window.removeEventListener("resize", debouncedSetWheelSize);
+    clearTimeout(wheelResizeTimeout);
+};
+
+const showWheelDiv = () => {
+    const wheelDiv = docById("wheelDiv");
+    if (!wheelDiv) return null;
+    wheelDiv.style.display = "";
+    enableWheelResizeHandling();
+    return wheelDiv;
+};
+
+const hideWheelDiv = () => {
+    const wheelDiv = docById("wheelDiv");
+    if (!wheelDiv) return null;
+    docById("wheelDiv").style.display = "none";
+    disableWheelResizeHandling();
+    return wheelDiv;
+};
 
 /**
  * Enables mouse-wheel scrolling to rotate a wheelnav instance
@@ -254,8 +281,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
         noteValues = ["C", "G", "D", "A", "E", "B", "F"];
     }
 
-    const wheelDiv = docById("wheelDiv");
-    wheelDiv.style.display = ""; // Show the div but keep it invisible initially
+    const wheelDiv = showWheelDiv(); // Show the div but keep it invisible initially
     wheelDiv.style.opacity = "0";
 
     // The pitch selector
@@ -897,7 +923,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
         // Refresh the block's cache
         that.updateCache();
         // Hide the pie menu and remove the wheels
-        docById("wheelDiv").style.display = "none";
+        hideWheelDiv();
         that._pitchWheel.removeWheel();
         if (!custom) {
             that._accidentalsWheel.removeWheel();
@@ -925,7 +951,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
         return;
     }
 
-    docById("wheelDiv").style.display = "";
+    showWheelDiv();
 
     // Some blocks have both pitch and octave, so we can modify
     // both at once.
@@ -1188,7 +1214,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
 
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
-        docById("wheelDiv").style.display = "none";
+        hideWheelDiv();
     };
 
     const __selectionChanged = () => {
@@ -1277,7 +1303,7 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
     }
     noteLabels.push(null);
 
-    docById("wheelDiv").style.display = "";
+    showWheelDiv();
 
     const wheelSize = getPieMenuSize(block);
     block._pitchWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
@@ -1504,7 +1530,7 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
     // Hide the widget when the exit button is clicked.
     block._exitWheel.navItems[0].navigateFunction = () => {
         that._piemenuExitTime = new Date().getTime();
-        docById("wheelDiv").style.display = "none";
+        hideWheelDiv();
         that._pitchWheel.removeWheel();
         that._exitWheel.removeWheel();
         that._octavesWheel.removeWheel();
@@ -1527,7 +1553,7 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
         return;
     }
 
-    docById("wheelDiv").style.display = "";
+    showWheelDiv();
 
     // the accidental selector
     const wheelSize = getPieMenuSize(block);
@@ -1596,7 +1622,7 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
      */
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
-        docById("wheelDiv").style.display = "none";
+        hideWheelDiv();
         that._accidentalWheel.removeWheel();
         that._exitWheel.removeWheel();
     };
@@ -1669,7 +1695,7 @@ const piemenuNoteValue = (block, noteValue) => {
         return;
     }
 
-    docById("wheelDiv").style.display = "";
+    showWheelDiv();
 
     // We want powers of two on the bottom, nearest the input box
     // as it is most common.
@@ -1785,7 +1811,7 @@ const piemenuNoteValue = (block, noteValue) => {
      */
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
-        docById("wheelDiv").style.display = "none";
+        hideWheelDiv();
         that._noteValueWheel.removeWheel();
         that._exitWheel.removeWheel();
         that.label.style.display = "none";
@@ -1917,7 +1943,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     if (block.blocks.stageClick) {
         return;
     }
-    docById("wheelDiv").style.display = "";
+    showWheelDiv();
     // the number selector
     const wheelSize = getPieMenuSize(block);
     block._numberWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
@@ -2024,7 +2050,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
 
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
-        docById("wheelDiv").style.display = "none";
+        hideWheelDiv();
         that._numberWheel.removeWheel();
         that._exitWheel.removeWheel();
         that.label.style.display = "none";
@@ -2251,7 +2277,7 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
         return;
     }
 
-    docById("wheelDiv").style.display = "";
+    showWheelDiv();
 
     // the number selector
     const wheelSize = getPieMenuSize(block);
@@ -2338,7 +2364,7 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
 
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
-        docById("wheelDiv").style.display = "none";
+        hideWheelDiv();
         that._numberWheel.removeWheel();
         that._exitWheel.removeWheel();
         that.label.style.display = "none";
@@ -2438,7 +2464,7 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
         colors = platformColor.piemenuBasicundefined;
     }
 
-    docById("wheelDiv").style.display = "";
+    showWheelDiv();
 
     // reference to diameter of the basic wheel
     let size = 800;
@@ -2513,7 +2539,7 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
 
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
-        docById("wheelDiv").style.display = "none";
+        hideWheelDiv();
         that._basicWheel.removeWheel();
     };
 
@@ -2586,7 +2612,7 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
         return;
     }
 
-    docById("wheelDiv").style.display = "";
+    showWheelDiv();
 
     // the boolean selector
     const wheelSize = getPieMenuSize(block);
@@ -2627,7 +2653,7 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
 
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
-        docById("wheelDiv").style.display = "none";
+        hideWheelDiv();
         that._booleanWheel.removeWheel();
     };
 
@@ -2697,7 +2723,7 @@ const piemenuChords = (block, selectedChord) => {
         return;
     }
 
-    docById("wheelDiv").style.display = "";
+    showWheelDiv();
 
     // the chord selector
     block._chordWheel = new wheelnav("wheelDiv", null, 1000, 1000);
@@ -2762,7 +2788,7 @@ const piemenuChords = (block, selectedChord) => {
 
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
-        docById("wheelDiv").style.display = "none";
+        hideWheelDiv();
         that._chordWheel.removeWheel();
     };
 
@@ -2847,7 +2873,7 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
         colors.push(COLORS[categories[i] % COLORS.length]);
     }
 
-    docById("wheelDiv").style.display = "";
+    showWheelDiv();
 
     // the voice selector
     if (localStorage.kanaPreference === "kana") {
@@ -3008,7 +3034,7 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
     // Hide the widget when the exit button is clicked.
     block._exitWheel.navItems[0].navigateFunction = () => {
         that._piemenuExitTime = new Date().getTime();
-        docById("wheelDiv").style.display = "none";
+        hideWheelDiv();
     };
 };
 
@@ -3025,7 +3051,7 @@ const piemenuIntervals = (block, selectedInterval) => {
         return;
     }
 
-    docById("wheelDiv").style.display = "";
+    showWheelDiv();
 
     // Use advanced constructor for more wheelnav on same div
     const language = localStorage.languagePreference;
@@ -3186,7 +3212,7 @@ const piemenuIntervals = (block, selectedInterval) => {
 
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
-        docById("wheelDiv").style.display = "none";
+        hideWheelDiv();
     };
 
     const __selectionChanged = () => {
@@ -3275,7 +3301,7 @@ const piemenuModes = (block, selectedMode) => {
         }
     }
 
-    docById("wheelDiv").style.display = "";
+    showWheelDiv();
 
     //Use advanced constructor for more wheelnav on same div
     block._modeWheel = new wheelnav("wheelDiv", null, 1200, 1200);
@@ -3513,7 +3539,7 @@ const piemenuModes = (block, selectedMode) => {
             clearTimeout(timeout);
         }
         that._piemenuExitTime = new Date().getTime();
-        docById("wheelDiv").style.display = "none";
+        hideWheelDiv();
         if (that._modeNameWheel !== null) {
             that._modeNameWheel.removeWheel();
         }
@@ -4361,7 +4387,7 @@ const piemenuDissectNumber = widget => {
     const currentValue = parseInt(widget._dissectNumber.value) || 2;
 
     // Show the wheel div
-    docById("wheelDiv").style.display = "";
+    showWheelDiv();
 
     // Create the number wheel
     const wheelSize = getPieMenuSize({ blocks: widget.activity.logo.blocks });
@@ -4418,7 +4444,7 @@ const piemenuDissectNumber = widget => {
 
     // Handle exit
     const __exitMenu = () => {
-        docById("wheelDiv").style.display = "none";
+        hideWheelDiv();
         numberWheel.removeWheel();
         exitWheel.removeWheel();
     };

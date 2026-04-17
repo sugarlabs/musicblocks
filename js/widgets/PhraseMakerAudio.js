@@ -14,7 +14,7 @@
  * @description Audio playback and sound engine logic for PhraseMaker widget.
  */
 
-/* global PhraseMakerUtils, PhraseMakerUI */
+/* global PhraseMakerUtils, PhraseMakerUI, normalizeNoteAccidentals */
 
 const PhraseMakerAudio = {
     /**
@@ -72,7 +72,7 @@ const PhraseMakerAudio = {
                             this._processGraphics(pm, obj);
                         }
                     } else {
-                        pitchNotes.push(note[i].replace(/♭/g, "b").replace(/♯/g, "#"));
+                        pitchNotes.push(normalizeNoteAccidentals(note[i]));
                     }
                 }
 
@@ -411,7 +411,7 @@ const PhraseMakerAudio = {
                                 } else if (PhraseMakerUtils.MATRIXGRAPHICS2.includes(obj[0])) {
                                     this._processGraphics(pm, obj);
                                 } else {
-                                    pitchNotes.push(note[i].replace(/♭/g, "b").replace(/♯/g, "#"));
+                                    pitchNotes.push(normalizeNoteAccidentals(note[i]));
                                 }
                             }
                         }

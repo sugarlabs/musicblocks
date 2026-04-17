@@ -14,6 +14,7 @@
 
    docById, _, platformColor, keySignatureToMode, MUSICALMODES,
    getNote, DEFAULTVOICE, last, NOTESTABLE, slicePath, wheelnav,
+   normalizeNoteAccidentals,
  */
 
 /*
@@ -695,7 +696,7 @@ class ModeWidget {
                 const noteToPlay = getNote(this._pitch, 4, note, ks, false, null, this.errorMsg);
                 this.logo.synth.trigger(
                     0,
-                    noteToPlay[0].replace(/♯/g, "#").replace(/♭/g, "b") + noteToPlay[1],
+                    normalizeNoteAccidentals(noteToPlay[0]) + noteToPlay[1],
                     this._noteValue,
                     DEFAULTVOICE,
                     null,
@@ -743,7 +744,7 @@ class ModeWidget {
                 const noteToPlay = getNote(this._pitch, 4, note, ks, false, null, this.errorMsg);
                 this.logo.synth.trigger(
                     0,
-                    noteToPlay[0].replace(/♯/g, "#").replace(/♭/g, "b") + noteToPlay[1],
+                    normalizeNoteAccidentals(noteToPlay[0]) + noteToPlay[1],
                     this._noteValue,
                     DEFAULTVOICE,
                     null,
@@ -771,7 +772,7 @@ class ModeWidget {
         const noteToPlay = getNote(this._pitch, 4, i, ks, false, null, this.errorMsg);
         this.logo.synth.trigger(
             0,
-            noteToPlay[0].replace(/♯/g, "#").replace(/♭/g, "b") + noteToPlay[1],
+            normalizeNoteAccidentals(noteToPlay[0]) + noteToPlay[1],
             this._noteValue,
             DEFAULTVOICE,
             null,

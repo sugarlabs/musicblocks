@@ -1260,11 +1260,13 @@ class Block {
                 artwork = that.artwork
                     .replace(/fill_color/g, DISABLEDFILLCOLOR)
                     .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
+                    .replace(/block_text_color/g, platformColor.blockText)
                     .replace("block_label", safeSVG(block_label));
             } else {
                 artwork = that.artwork
                     .replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name])
                     .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
+                    .replace(/block_text_color/g, platformColor.blockText)
                     .replace("block_label", safeSVG(block_label));
             }
 
@@ -1300,6 +1302,7 @@ class Block {
                 artwork = that.artwork
                     .replace(/fill_color/g, DISABLEDFILLCOLOR)
                     .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
+                    .replace(/block_text_color/g, platformColor.blockText)
                     .replace("block_label", safeSVG(block_label));
             } else {
                 artwork = that.artwork
@@ -1308,6 +1311,7 @@ class Block {
                         platformColor.paletteColors[that.protoblock.palette.name][3]
                     )
                     .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
+                    .replace(/block_text_color/g, platformColor.blockText)
                     .replace("block_label", safeSVG(block_label));
             }
 
@@ -1340,11 +1344,13 @@ class Block {
                 artwork = that.artwork
                     .replace(/fill_color/g, DISABLEDFILLCOLOR)
                     .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
+                    .replace(/block_text_color/g, platformColor.blockText)
                     .replace("block_label", safeSVG(block_label));
             } else {
                 artwork = that.artwork
                     .replace(/fill_color/g, platformColor.disconnected)
                     .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
+                    .replace(/block_text_color/g, platformColor.blockText)
                     .replace("block_label", safeSVG(block_label));
             }
 
@@ -1405,11 +1411,13 @@ class Block {
             artwork = this.artwork
                 .replace(/fill_color/g, DISABLEDFILLCOLOR)
                 .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
+                .replace(/block_text_color/g, platformColor.blockText)
                 .replace("block_label", safeSVG(block_label));
         } else {
             artwork = this.artwork
                 .replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name])
                 .replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name])
+                .replace(/block_text_color/g, platformColor.blockText)
                 .replace("block_label", safeSVG(block_label));
         }
 
@@ -1879,6 +1887,7 @@ class Block {
             that.blocks.blockCollapseArt[that.blockIndex] = that.collapseArtwork
                 .replace(/fill_color/g, PALETTEFILLCOLORS[that.protoblock.palette.name])
                 .replace(/stroke_color/g, PALETTESTROKECOLORS[that.protoblock.palette.name])
+                .replace(/block_text_color/g, platformColor.blockText)
                 .replace("block_label", safeSVG(that.collapseText.text));
 
             __processExpandButton(that);
@@ -1903,6 +1912,7 @@ class Block {
                 artwork
                     .replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name])
                     .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
+                    .replace(/block_text_color/g, platformColor.blockText)
                     .replace("block_label", ""),
                 __processHighlightCollapseBitmap,
                 that
@@ -1912,6 +1922,7 @@ class Block {
         const artwork = this.collapseArtwork
             .replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name])
             .replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name])
+            .replace(/block_text_color/g, platformColor.blockText)
             .replace("block_label", "");
         _blockMakeBitmap(artwork, __processCollapseBitmap, this);
     }

@@ -17,7 +17,7 @@
 
    platformColor, _, docById, getNote, getDrumName, getDrumIcon,
    getDrumSynthName, Singer, MATRIXSOLFEHEIGHT, MATRIXSOLFEWIDTH,
-   SOLFEGECONVERSIONTABLE
+   SOLFEGECONVERSIONTABLE, normalizeNoteAccidentals
 */
 /*
    Global locations
@@ -932,7 +932,7 @@ class PitchDrumMatrix {
             const waitTime = Singer.defaultBPMFactor * 1000 * 0.25;
             this.activity.logo.synth.trigger(
                 0,
-                note.replace(/♭/g, "b").replace(/♯/g, "#"),
+                normalizeNoteAccidentals(note),
                 0.125,
                 "default",
                 null,

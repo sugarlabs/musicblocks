@@ -34,6 +34,13 @@ describe("TemperamentWidget basic tests", () => {
         };
 
         global.Singer = { defaultBPMFactor: 1 };
+        const util = require("util");
+        global.TextEncoder = util.TextEncoder;
+        global.TextDecoder = util.TextDecoder;
+        global.normalizeNoteAccidentals = note => {
+            const map = { "♭": "b", "♯": "#", "𝄫": "bb", "𝄪": "x" };
+            return note.replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
+        };
 
         global.getTemperamentKeys = jest.fn(() => []);
         global.isCustomTemperament = jest.fn(() => false);

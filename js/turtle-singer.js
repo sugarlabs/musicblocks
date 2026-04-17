@@ -24,7 +24,7 @@
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
    noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction,
-   SEMITONES
+   SEMITONES, normalizeNoteAccidentals
  */
 
 /*
@@ -2248,7 +2248,7 @@ class Singer {
 
                         for (let i = 0; i < notes.length; i++) {
                             if (typeof notes[i] === "string") {
-                                notes[i] = notes[i].replace(/♭/g, "b").replace(/♯/g, "#");
+                                notes[i] = normalizeNoteAccidentals(notes[i]);
                             }
                         }
 

@@ -1808,7 +1808,17 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = event => {
-                logo.sample.init(activity);
+                const interruption = _ensureWidget(
+                    logo,
+                    "aiMusic",
+                    ["widgets/aiwidget"],
+                    () => new AIWidget(),
+                    turtle,
+                    blk,
+                    ""
+                );
+                if (interruption) return interruption;
+                logo.aiMusic.init(activity);
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -2035,7 +2045,7 @@ function setupWidgetBlocks(activity) {
         new ChromaticBlock().setup(activity);
         new LegoBricksBlock().setup(activity);
         new ReflectionBlock().setup(activity);
-        // new AIMusicBlocks().setup(activity);
+        new AIMusicBlocks().setup(activity);
         new MusicKeyboard2Block().setup(activity);
         new MusicKeyboardBlock().setup(activity);
         new PitchStaircaseBlock().setup(activity);

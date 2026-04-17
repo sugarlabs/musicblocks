@@ -60,6 +60,16 @@
 */
 
 /**
+ * Normalize Unicode accidental symbols in a note string to ASCII equivalents.
+ * @param {string} note
+ * @returns {string}
+ */
+function normalizeNoteAccidentals(note) {
+    const map = { "♭": "b", "♯": "#", "𝄫": "bb", "𝄪": "x" };
+    return note.replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
+}
+
+/**
  * Scalable sinewave graphic.
  * @const
  * @type {string}
@@ -4118,10 +4128,8 @@ const GetNotesForInterval = tur => {
         octave = octaveblk[octaveblk.length - 1] - octaveblk[0];
     }
 
-    firstNote = firstNote.replace("♭", "b");
-    secondNote = secondNote.replace("♭", "b");
-    firstNote = firstNote.replace("♯", "#");
-    secondNote = secondNote.replace("♯", "#");
+    firstNote = normalizeNoteAccidentals(firstNote);
+    secondNote = normalizeNoteAccidentals(secondNote);
 
     return { firstNote, secondNote, octave };
 };
@@ -6447,6 +6455,7 @@ if (typeof module !== "undefined" && module.exports) {
         convertFactor,
         getPitchInfo,
         noteToFrequency,
+        normalizeNoteAccidentals,
         TEMPERAMENT,
         setOctaveRatio,
         getOctaveRatio,

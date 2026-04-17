@@ -15,7 +15,7 @@
    TITLESTRING, GUIDEURL, docById, docByClass, doSVG,
    fileExt, ABCHEADER, LILYPONDHEADER, platform, saveAbcOutput,
    saveLilypondOutput, saveMxmlOutput, getMidiInstrument, getMidiDrum,
-   Midi, activity
+   Midi, activity, normalizeNoteAccidentals
  */
 
 /**
@@ -395,10 +395,6 @@ class SaveInterface {
         const instrumentMIDI = getMidiInstrument();
         const drumMIDI = getMidiDrum();
         const generateMidi = data => {
-            const normalizeNote = note => {
-                return note.replace("♯", "#").replace("♭", "b");
-            };
-
             const midi = new Midi();
             midi.header.ticksPerBeat = 480;
 
@@ -453,7 +449,7 @@ class SaveInterface {
                         noteData.note.forEach(pitch => {
                             if (!pitch.includes("R")) {
                                 instrumentTrack.addNote({
-                                    name: normalizeNote(pitch),
+                                    name: normalizeNoteAccidentals(pitch),
                                     time: globalTime,
                                     duration: duration,
                                     velocity: 0.8
