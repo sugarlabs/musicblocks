@@ -64,16 +64,29 @@ describe("Activity blur handler setup", () => {
         jest.clearAllMocks();
     });
 
-    test("does not overwrite window.onblur in Music Blocks", () => {
+    test("uses a tracked blur listener in Music Blocks without overwriting window.onblur", () => {
         const Activity = loadActivity({ isMusicBlocks: true, isMozilla: false });
         const activity = new Activity();
         const existingBlurHandler = jest.fn();
+        const stopHandler = jest.fn();
 
         window.onblur = existingBlurHandler;
-        activity.setupWindowBlurHandler(jest.fn());
+        activity.setupWindowBlurHandler(stopHandler);
 
         expect(window.onblur).toBe(existingBlurHandler);
-        expect(activity._listeners).toHaveLength(0);
+        expect(activity._listeners).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    target: window,
+                    type: "blur",
+                    listener: expect.any(Function)
+                })
+            ])
+        );
+
+        activity._listeners[0].listener();
+
+        expect(stopHandler).toHaveBeenCalledWith(activity, true);
     });
 
     test("uses a tracked blur listener for Turtle Blocks without overwriting window.onblur", () => {

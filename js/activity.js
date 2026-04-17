@@ -8806,12 +8806,12 @@ class Activity {
 
     /**
      * Installs the shared blur-stop hook without overwriting any existing
-     * global blur handler. Music Blocks no longer needs this stop-on-blur path.
+     * global blur handler.
      *
      * @param {Function} doHardStopButton - Shared stop action callback.
      */
     setupWindowBlurHandler(doHardStopButton) {
-        if (jQuery.browser.mozilla || !_THIS_IS_TURTLE_BLOCKS_) {
+        if (jQuery.browser.mozilla) {
             return;
         }
 
