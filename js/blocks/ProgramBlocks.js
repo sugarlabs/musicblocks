@@ -82,6 +82,11 @@ function setupProgramBlocks(activity) {
             const oldHeap = name in logo.turtleHeaps ? logo.turtleHeaps[name] : [];
 
             // Use async fetch to avoid blocking the UI
+            if (!isSafeUrl(url)) {
+                activity.errorMsg(_("Invalid URL"));
+                return;
+            }
+
             fetch(url)
                 .then(response => {
                     if (!response.ok) {
@@ -172,6 +177,11 @@ function setupProgramBlocks(activity) {
 
             if (name in logo.turtleHeaps) {
                 const data = JSON.stringify(logo.turtleHeaps[name]);
+                if (!isSafeUrl(url)) {
+                    activity.errorMsg(_("Invalid URL"));
+                    return;
+                }
+
                 const xmlHttp = new XMLHttpRequest();
                 xmlHttp.open("POST", url, true);
                 xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");

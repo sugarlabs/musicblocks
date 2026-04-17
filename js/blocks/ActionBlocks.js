@@ -100,6 +100,14 @@ function setupActionBlocks(activity) {
      * @class
      * @extends FlowBlock
      */
+    function isSafeUrl(urlString) {
+        try {
+            const parsed = new URL(urlString);
+            return parsed.protocol === "http:" || parsed.protocol === "https:";
+        } catch (e) {
+            return false;
+        }
+    }
     class ReturnToURLBlock extends FlowBlock {
         /**
          * Constructor for the ReturnToURLBlock class.
@@ -168,36 +176,21 @@ function setupActionBlocks(activity) {
          * @param {Array} args - The arguments for the flow.
          */
         flow(args) {
-            const URL = this.getURL();
-            let urlParts;
-            let outurl;
+            const currentUrl = new URL(this.getURL());
+            let outurl = currentUrl.searchParams.get("outurl");
 
-            if (URL.indexOf("?") > 0) {
-                urlParts = URL.split("?");
-                if (urlParts[1].indexOf("&") > 0) {
-                    const newUrlParts = urlParts[1].split("&");
-
-                    for (let i = 0; i < newUrlParts.length; i++) {
-                        if (newUrlParts[i].indexOf("=") > 0) {
-                            const tempargs = newUrlParts[i].split("=");
-                            switch (tempargs[0].toLowerCase()) {
-                                case "outurl":
-                                    outurl = tempargs[1];
-                                    break;
-                            }
-                        }
-                    }
-                }
+            if (outurl === null) {
+                outurl = undefined;
+            }
+            if (outurl && !isSafeUrl(outurl)) {
+                activity.errorMsg(_("Invalid URL"));
+                return;
             }
 
             if (args.length === 1) {
-                const jsonRet = {};
-                jsonRet["result"] = args[0];
+                const jsonRet = { result: args[0] };
                 const json = JSON.stringify(jsonRet);
                 const xmlHttp = new XMLHttpRequest();
-
-                xmlHttp.open("POST", outurl, true);
-
                 // Call a function when the state changes.
                 xmlHttp.onreadystatechange = () => {
                     if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
@@ -205,6 +198,7 @@ function setupActionBlocks(activity) {
                     }
                 };
 
+                xmlHttp.open("POST", outurl, true);
                 xmlHttp.send(json);
             }
         }
@@ -428,7 +422,7 @@ function setupActionBlocks(activity) {
 
             if (activity.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (let i = 0; i < activity.blocks.blockList[blk].argClampSlots.length; i++) {
-                    if (activity.blocks.blockList[blk].connections[i + 1] != null) {
+                    if (activity.blocks.blockList[blk].connections[i + 1] !== null) {
                         const t = logo.parseArg(
                             logo,
                             turtle,
@@ -645,7 +639,7 @@ function setupActionBlocks(activity) {
 
             if (activity.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (let i = 0; i < activity.blocks.blockList[blk].argClampSlots.length; i++) {
-                    if (activity.blocks.blockList[blk].connections[i + 2] != null) {
+                    if (activity.blocks.blockList[blk].connections[i + 2] !== null) {
                         const t = logo.parseArg(
                             logo,
                             turtle,
