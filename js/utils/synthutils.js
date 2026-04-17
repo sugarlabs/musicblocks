@@ -2003,6 +2003,8 @@ function Synth() {
         setNote,
         future
     ) => {
+        const triggerEpoch = this._instrumentEpoch;
+
         // If audio is not running, try to start it
         if (Tone.context.state !== "running") {
             Tone.start().catch(function (e) {
@@ -2093,8 +2095,13 @@ function Synth() {
                 console.warn("Synth not initialized, creating default synth");
                 this.createDefaultSynth(turtle);
                 await this.loadSynth(turtle, instrumentName);
+                if (this._instrumentEpoch !== triggerEpoch) return;
                 tempSynth = instruments[turtle][instrumentName];
+                if (!tempSynth || tempSynth.disposed) return;
             }
+
+            if (this._instrumentEpoch !== triggerEpoch) return;
+            if (tempSynth && tempSynth.disposed) return;
 
             switch (flag) {
                 case 1: // drum
