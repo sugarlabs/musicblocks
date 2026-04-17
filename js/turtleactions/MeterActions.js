@@ -43,6 +43,22 @@
  * @returns {void}
  */
 function setupMeterActions(activity) {
+    /**
+     * Removes default numeric strong beats from the singer's beatList,
+     * preserving user-defined "everybeat" and "offbeat" entries.
+     * Resets the defaultStrongBeats flag to false.
+     *
+     * @param {Object} singer - The turtle's singer object
+     */
+    function _clearDefaultStrongBeats(singer) {
+        if (singer.defaultStrongBeats) {
+            singer.beatList = singer.beatList.filter(
+                beat => beat === "everybeat" || beat === "offbeat"
+            );
+            singer.defaultStrongBeats = false;
+        }
+    }
+
     Singer.MeterActions = class {
         /**
          * @param {Number} beatCount
@@ -56,18 +72,21 @@ function setupMeterActions(activity) {
             tur.singer.beatsPerMeasure = beatCount <= 0 ? 4 : beatCount;
             tur.singer.noteValuePerBeat = noteValue <= 0 ? 4 : 1 / noteValue;
 
+            // Clear previous default strong beats before setting new ones
+            _clearDefaultStrongBeats(tur.singer);
+
             // setup default strong / weak beats until any strong beat block is used
-            if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 4) {
+            if (tur.singer.noteValuePerBeat === 4 && tur.singer.beatsPerMeasure === 4) {
                 tur.singer.beatList.push(1);
                 tur.singer.beatList.push(3);
                 tur.singer.defaultStrongBeats = true;
-            } else if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 2) {
+            } else if (tur.singer.noteValuePerBeat === 4 && tur.singer.beatsPerMeasure === 2) {
                 tur.singer.beatList.push(1);
                 tur.singer.defaultStrongBeats = true;
-            } else if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 3) {
+            } else if (tur.singer.noteValuePerBeat === 4 && tur.singer.beatsPerMeasure === 3) {
                 tur.singer.beatList.push(1);
                 tur.singer.defaultStrongBeats = true;
-            } else if (tur.singer.noteValuePerBeat == 8 && tur.singer.beatsPerMeasure == 6) {
+            } else if (tur.singer.noteValuePerBeat === 8 && tur.singer.beatsPerMeasure === 6) {
                 tur.singer.beatList.push(1);
                 tur.singer.beatList.push(4);
                 tur.singer.defaultStrongBeats = true;
@@ -255,19 +274,8 @@ function setupMeterActions(activity) {
             const eventName = "__beat_" + beat + "_" + turtleID + "__";
             activity.logo.setTurtleListener(turtle, eventName, __listener);
 
-            //remove any default strong beats other than "everybeat " or  "offbeat"
-            if (tur.singer.defaultStrongBeats) {
-                for (let i = 0; i < tur.singer.beatList.length; i++) {
-                    if (
-                        tur.singer.beatList[i] !== "everybeat" &&
-                        tur.singer.beatList[i] !== "offbeat"
-                    ) {
-                        tur.singer.beatList.splice(i, 1);
-                        i--;
-                    }
-                }
-                tur.singer.defaultStrongBeats = false;
-            }
+            //remove any default strong beats other than "everybeat" or "offbeat"
+            _clearDefaultStrongBeats(tur.singer);
 
             if (beat > tur.singer.beatsPerMeasure) {
                 tur.singer.factorList.push(beat);

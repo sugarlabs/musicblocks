@@ -65,6 +65,44 @@ class ReflectionMatrix {
          * @type {string}
          */
         this.code = "";
+
+        /**
+         * Conversation summary
+         * @type {string}
+         */
+        this.conversationSummary = "";
+
+        /**
+         * Index up to which messages have been summarized
+         * @type {number}
+         */
+        this.summarizedUpTo = 0;
+
+        this.startChatTypingTimeout = null;
+
+        /**
+         * User messages waiting to be sent to the backend
+         * @type {Array}
+         */
+        this.pendingMessages = [];
+
+        /**
+         * Whether a queued user message is currently being processed
+         * @type {boolean}
+         */
+        this.isProcessingPendingMessage = false;
+    }
+
+    sanitizeLinks(html) {
+        return html.replace(/<a\s+[^>]*href\s*=\s*(['"]?)([^'">\s]+)\1/gi, (match, quote, url) => {
+            const unsafeSchemes = /^(javascript|data|vbscript):/i;
+
+            if (unsafeSchemes.test(url.trim())) {
+                return match.replace(url, "#");
+            }
+
+            return match;
+        });
     }
 
     /**
@@ -88,6 +126,10 @@ class ReflectionMatrix {
         widgetWindow.onclose = () => {
             this.isOpen = false;
             this.activity.isInputON = false;
+            if (this.startChatTypingTimeout) {
+                clearTimeout(this.startChatTypingTimeout);
+                this.startChatTypingTimeout = null;
+            }
             if (this.dotsInterval) {
                 clearInterval(this.dotsInterval);
             }
@@ -192,6 +234,7 @@ class ReflectionMatrix {
             this.startChatSession();
         }
 
+        widgetWindow.sendToCenter();
         activity.textMsg(_("Reflect on your project."), 3000);
     }
 
@@ -229,11 +272,126 @@ class ReflectionMatrix {
      * @returns {void}
      */
     hideTypingIndicator() {
+        if (this.startChatTypingTimeout) {
+            clearTimeout(this.startChatTypingTimeout);
+            this.startChatTypingTimeout = null;
+        }
+
         if (this.typingDiv) {
             clearInterval(this.dotsInterval);
             this.typingDiv.remove();
             this.typingDiv = null;
         }
+    }
+
+    /**
+     * Appends a user message to the chat log.
+     * @param {string} text - The user's message.
+     * @returns {void}
+     */
+    appendUserMessage(text) {
+        const messageContainer = document.createElement("div");
+        messageContainer.classList.add("message-container", "user");
+
+        const senderName = document.createElement("div");
+        senderName.style.fontSize = "12px";
+        senderName.style.fontWeight = "bold";
+        senderName.style.marginBottom = "4px";
+        senderName.style.color = "#555";
+        senderName.style.overflowWrap = "break-word";
+        senderName.style.alignSelf = "flex-start";
+        senderName.innerText = "You";
+
+        const userMsg = document.createElement("div");
+        userMsg.innerText = text;
+
+        messageContainer.appendChild(senderName);
+        messageContainer.appendChild(userMsg);
+
+        this.chatLog.appendChild(messageContainer);
+        this.chatLog.scrollTop = this.chatLog.scrollHeight;
+    }
+
+    /**
+     * Appends a bot reply to the chat log.
+     * @param {Object} reply - The backend response containing the bot reply.
+     * @param {string} role - The mentor role that generated the reply.
+     * @param {boolean} md - Whether the reply should be rendered as markdown.
+     * @returns {void}
+     */
+    appendBotReply(reply, role = this.AImentor, md = false) {
+        this.chatHistory.push({
+            role: role,
+            content: reply.response
+        });
+
+        if (this.chatHistory.length > 10) {
+            this.summaryButton.style.removeProperty("background");
+        }
+
+        const messageContainer = document.createElement("div");
+        messageContainer.className = "message-container";
+
+        const senderName = document.createElement("div");
+        senderName.style.fontSize = "12px";
+        senderName.style.fontWeight = "bold";
+        senderName.style.marginBottom = "4px";
+        senderName.style.color = "#383838ff";
+        senderName.style.alignSelf = "flex-start";
+        senderName.innerText = this.mentorsMap[role];
+
+        const botReply = document.createElement("div");
+
+        if (md) {
+            const safeText = escapeHTML(reply.response);
+            let html = this.mdToHTML(safeText);
+            html = this.sanitizeLinks(html);
+            botReply.innerHTML = html;
+        } else {
+            botReply.innerText = reply.response;
+        }
+
+        messageContainer.appendChild(senderName);
+        messageContainer.appendChild(botReply);
+
+        this.chatLog.appendChild(messageContainer);
+        this.chatLog.scrollTop = this.chatLog.scrollHeight;
+    }
+
+    /**
+     * Sends queued user messages one at a time so input is not lost.
+     * @returns {Promise<void>}
+     */
+    async processPendingMessages() {
+        if (this.isProcessingPendingMessage) return;
+
+        this.isProcessingPendingMessage = true;
+
+        while (this.pendingMessages.length > 0) {
+            const nextMessage = this.pendingMessages.shift();
+
+            this.chatHistory.push({
+                role: "user",
+                content: nextMessage.text
+            });
+
+            const reply = await this.generateBotReply(
+                nextMessage.text,
+                this.chatHistory,
+                nextMessage.mentor,
+                nextMessage.algorithm
+            );
+
+            if (reply.error) {
+                this.hideTypingIndicator();
+                this.activity.errorMsg(_("Failed to send message"), 3000);
+                continue;
+            }
+
+            this.appendBotReply(reply, nextMessage.mentor);
+        }
+
+        this.isProcessingPendingMessage = false;
     }
 
     /**
@@ -267,11 +425,18 @@ class ReflectionMatrix {
      *  @returns {Promise<void>}
      */
     async startChatSession() {
-        if (this.triggerFirst == true) return;
+        if (this.triggerFirst === true) return;
 
         this.triggerFirst = true;
-        setTimeout(() => {
-            this.showTypingIndicator("Reading code");
+
+        // Reset summarization state for a fresh session
+        this.conversationSummary = "";
+        this.summarizedUpTo = 0;
+        this.startChatTypingTimeout = setTimeout(() => {
+            this.startChatTypingTimeout = null;
+            if (this.isOpen) {
+                this.showTypingIndicator("Reading code");
+            }
         }, 1000);
 
         const code = await this.activity.prepareExport();
@@ -296,7 +461,7 @@ class ReflectionMatrix {
     async updateProjectCode() {
         const code = await this.activity.prepareExport();
         if (code === this.code) {
-            console.log("No changes in code detected.");
+            this.activity.textMsg(_("No changes were detected in your project."), 2500);
             return; // No changes in code
         }
 
@@ -308,15 +473,11 @@ class ReflectionMatrix {
             if (data.algorithm !== "unchanged") {
                 this.projectAlgorithm = data.algorithm; // update algorithm
                 this.code = code;
-            } else {
-                console.log("No changes in algorithm detected.");
             }
             this.botReplyDiv(data, false, false);
         } else {
             this.activity.errorMsg(_(data.error), 3000);
         }
-
-        this.projectAlgorithm = data.algorithm;
     }
 
     /**
@@ -376,18 +537,30 @@ class ReflectionMatrix {
     async generateBotReply(message, chatHistory, mentor, algorithm) {
         try {
             this.showTypingIndicator();
+
+            const safeIndex = Math.min(this.summarizedUpTo, chatHistory.length);
+            const unsummarizedMessages = chatHistory.slice(safeIndex);
+
             const response = await fetch(`${this.PORT}/chat`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     query: message,
-                    messages: chatHistory,
+                    messages: unsummarizedMessages,
                     mentor: mentor,
-                    algorithm: algorithm
+                    algorithm: algorithm,
+                    conversation_summary: this.conversationSummary || null,
+                    summarized_up_to: this.summarizedUpTo
                 })
             });
             this.hideTypingIndicator();
             const data = await response.json();
+
+            if (data.conversation_summary && data.summarized_up_to !== undefined) {
+                this.conversationSummary = data.conversation_summary;
+                this.summarizedUpTo = data.summarized_up_to;
+            }
+
             return data;
         } catch (error) {
             console.error("Error :", error);
@@ -416,7 +589,6 @@ class ReflectionMatrix {
      */
     async generateAnalysis() {
         try {
-            console.log("Summary stored", this.summary);
             const response = await fetch(`${this.PORT}/analysis`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -443,7 +615,6 @@ class ReflectionMatrix {
         let reply;
         // check if message is from user or bot
         if (user_query === true) {
-            if (this.typingDiv) return;
             reply = await this.generateBotReply(
                 message,
                 this.chatHistory,
@@ -460,39 +631,7 @@ class ReflectionMatrix {
             return;
         }
 
-        this.chatHistory.push({
-            role: this.AImentor,
-            content: reply.response
-        });
-
-        if (this.chatHistory.length > 10) {
-            this.summaryButton.style.removeProperty("background");
-        }
-
-        const messageContainer = document.createElement("div");
-        messageContainer.className = "message-container";
-
-        const senderName = document.createElement("div");
-        senderName.style.fontSize = "12px";
-        senderName.style.fontWeight = "bold";
-        senderName.style.marginBottom = "4px";
-        senderName.style.color = "#383838ff";
-        senderName.style.alignSelf = "flex-start";
-        senderName.innerText = this.mentorsMap[this.AImentor];
-
-        const botReply = document.createElement("div");
-
-        if (md) {
-            botReply.innerHTML = this.mdToHTML(reply.response);
-        } else {
-            botReply.innerText = reply.response;
-        }
-
-        messageContainer.appendChild(senderName);
-        messageContainer.appendChild(botReply);
-
-        this.chatLog.appendChild(messageContainer);
-        this.chatLog.scrollTop = this.chatLog.scrollHeight;
+        this.appendBotReply(reply, this.AImentor, md);
     }
 
     /**
@@ -502,33 +641,14 @@ class ReflectionMatrix {
     sendMessage() {
         const text = this.input.value.trim();
         if (text === "") return;
-        this.chatHistory.push({
-            role: "user",
-            content: text
+        this.appendUserMessage(text);
+        this.pendingMessages.push({
+            text: text,
+            mentor: this.AImentor,
+            algorithm: this.projectAlgorithm
         });
-
-        const messageContainer = document.createElement("div");
-        messageContainer.classList.add("message-container", "user");
-
-        const senderName = document.createElement("div");
-        senderName.style.fontSize = "12px";
-        senderName.style.fontWeight = "bold";
-        senderName.style.marginBottom = "4px";
-        senderName.style.color = "#555";
-        senderName.style.overflowWrap = "break-word";
-        senderName.style.alignSelf = "flex-start";
-        senderName.innerText = "You";
-
-        const userMsg = document.createElement("div");
-        userMsg.innerText = text;
-
-        messageContainer.appendChild(senderName);
-        messageContainer.appendChild(userMsg);
-
-        this.chatLog.appendChild(messageContainer);
         this.input.value = "";
-        this.botReplyDiv(text);
-        this.chatLog.scrollTop = this.chatLog.scrollHeight;
+        void this.processPendingMessages();
     }
 
     /**
@@ -580,7 +700,6 @@ class ReflectionMatrix {
         } catch (e) {
             console.warn("Could not save analysis report to localStorage:", e);
         }
-        console.log("Conversation saved in localStorage.");
     }
 
     /** Reads the analysis report from localStorage.
@@ -620,12 +739,59 @@ class ReflectionMatrix {
     }
 
     /**
+     * Sanitizes HTML content using DOMParser to prevent XSS.
+     * Removes unsafe attributes and ensures links are safe.
+     * @param {string} htmlString - The HTML string to sanitize.
+     * @returns {string} - The sanitized HTML string.
+     */
+    sanitizeHTML(htmlString) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlString, "text/html");
+
+        // Sanitize links
+        const links = doc.getElementsByTagName("a");
+        for (let i = 0; i < links.length; i++) {
+            const link = links[i];
+            const href = link.getAttribute("href");
+
+            // If no href, or it's unsafe, remove the attribute
+            if (!href || this.isUnsafeUrl(href)) {
+                link.removeAttribute("href");
+            } else {
+                // Enforce security attributes for external links
+                link.setAttribute("target", "_blank");
+                link.setAttribute("rel", "noopener noreferrer");
+            }
+        }
+
+        return doc.body.innerHTML;
+    }
+
+    /**
+     * Checks if a URL is unsafe (javascript:, data:, vbscript:).
+     * @param {string} url - The URL to check.
+     * @returns {boolean} - True if unsafe, false otherwise.
+     */
+    isUnsafeUrl(url) {
+        const trimmed = url.trim().toLowerCase();
+        const unsafeSchemes = ["javascript:", "data:", "vbscript:"];
+        // Check if it starts with any unsafe scheme
+        // Note: DOMParser handles HTML entity decoding, so we check the raw attribute safely here
+        // But for extra safety against control characters, we rely on the fact that
+        // we are operating on the parsed DOM attribute.
+        return unsafeSchemes.some(scheme => trimmed.replace(/\s+/g, "").startsWith(scheme));
+    }
+
+    /**
      * Converts Markdown text to HTML.
      * @param {string} md - The Markdown text.
      * @returns {string} - The converted HTML text.
      */
     mdToHTML(md) {
-        let html = md;
+        // Step 1: Escape HTML first to prevent XSS attacks from raw tags
+        let html = escapeHTML(md);
+
+        // Step 2: Convert Markdown syntax to HTML
 
         // Headings
         html = html.replace(/^###### (.*$)/gim, "<h6>$1</h6>");
@@ -639,12 +805,13 @@ class ReflectionMatrix {
         html = html.replace(/\*\*(.*?)\*\*/gim, "<b>$1</b>");
         html = html.replace(/\*(.*?)\*/gim, "<i>$1</i>");
 
-        // Links
-        html = html.replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2' target='_blank'>$1</a>");
+        // Links - Create raw anchor tags, sanitization happens in Step 3
+        html = html.replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2'>$1</a>");
 
         // Line breaks
         html = html.replace(/\n/gim, "<br>");
 
-        return html.trim();
+        // Step 3: Sanitize the generated HTML using DOMParser
+        return this.sanitizeHTML(html);
     }
 }

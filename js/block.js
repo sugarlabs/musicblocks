@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014-21 Walter Bender
+// Copyright (c) 2014-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -10,20 +10,19 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 //
 
-/*
-   global
+/* global
 
-   _, ACCIDENTALLABELS, ACCIDENTALNAMES, addTemperamentToDictionary,
-   blockBlocks, COLLAPSEBUTTON, COLLAPSETEXTX, COLLAPSETEXTY,
+   addTemperamentToDictionary, base64Encode,
+   ACCIDENTALLABELS, ACCIDENTALNAMES, blockBlocks, COLLAPSEBUTTON, COLLAPSETEXTX, COLLAPSETEXTY,
    createjs, DEFAULTACCIDENTAL, DEFAULTDRUM, DEFAULTEFFECT,
    DEFAULTFILTERTYPE, DEFAULTINTERVAL, DEFAULTINVERT, DEFAULTMODE,
    DEFAULTNOISE, DEFAULTOSCILLATORTYPE, DEFAULTTEMPERAMENT,
    DEFAULTVOICE, DEGREES, delayExecution, deleteTemperamentFromList,
    DISABLEDFILLCOLOR, DISABLEDSTROKECOLOR, docById, DOUBLEFLAT,
    DOUBLESHARP, DRUMNAMES, EASTINDIANSOLFNOTES, EFFECTSNAMES,
-   EXPANDBUTTON, FILTERTYPES, FLAT, getDrumName, getDrumSynthName,
+    EXPANDBUTTON, FILTERTYPES, FLAT, getDrumName, getDrumSynthName,
    getModeNumbers, getNoiseName, getTemperament, getTemperamentKeys,
-   getTemperamentsList, getTextWidth, hideDOMLabel, HIGHLIGHTSTROKECOLORS,
+    getTemperamentsList, getTextWidth, hideDOMLabel, HIGHLIGHTSTROKECOLORS,
    i18nSolfege, INVERTMODES, isCustomTemperament, last, MEDIASAFEAREA,
    NATURAL, NOISENAMES, NSYMBOLS, NUMBERBLOCKDEFAULT, OSCTYPES,
    PALETTEFILLCOLORS, PALETTEHIGHLIGHTCOLORS, PALETTESTROKECOLORS,
@@ -31,9 +30,9 @@
    piemenuBoolean, piemenuColor, piemenuCustomNotes, piemenuIntervals,
    piemenuModes, piemenuNoteValue, piemenuNumber, piemenuPitches,
    piemenuVoices, piemenuChords, platformColor, ProtoBlock, RSYMBOLS,
-   safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
+   retryWithBackoff, safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
    splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
-   topBlock, updateTemperaments, VALUETEXTX, DEFAULTCHORD,
+    topBlock, updateTemperaments, VALUETEXTX, DEFAULTCHORD, base64Encode,
    VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_
  */
 
@@ -71,7 +70,7 @@
         platformColor
  */
 
-/* exported Block, $ */
+/* exported Block */
 
 // Length of a long touch
 
@@ -231,7 +230,7 @@ const _blockMakeBitmap = (data, callback, args) => {
         callback(bitmap, args);
     };
 
-    img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
+    img.src = "data:image/svg+xml;base64," + window.btoa(window.base64Encode(data));
 };
 
 // Optimization: Cache static DOM elements to avoid repetitive querySelector/getElementById calls
@@ -273,6 +272,11 @@ class Block {
 
         this.name = protoblock.name;
         this.activity = this.blocks.activity;
+
+        // Cached index in blocks.blockList — set when block is added
+        // to blockList. Avoids O(N) blockList.indexOf() lookups that
+        // are scattered across the codebase (33+ call sites).
+        this.blockIndex = -1;
 
         this.collapsed = false; // Is this collapsible block collapsed?
         this.inCollapsed = false; // Is this block in a collapsed stack?
@@ -339,6 +343,136 @@ class Block {
         // Mouse position in events
         this.original = { x: 0, y: 0 };
         this.offset = { x: 0, y: 0 };
+
+        // Track temporary drag scaling used when hovering over trash.
+        this._trashHoverScaled = false;
+        this._trashHoverGroupState = null;
+        this._dragPointerDown = false;
+    }
+
+    /**
+     * Animate the current drag group scale while hovering over trash.
+     * @param {boolean} isOverTrash
+     * @param {number} dx
+     * @param {number} dy
+     * @param {boolean} immediate
+     * @returns {void}
+     */
+    _setDragGroupTrashHoverScale(isOverTrash, dx = 0, dy = 0, immediate = false) {
+        const thisBlock = this.blockIndex;
+        const duration = immediate ? 0 : 140;
+        const shrinkRatio = 0.5;
+        const epsilon = 0.001;
+
+        const getGroupOrigin = positions => {
+            let originX = Infinity;
+            let originY = Infinity;
+            positions.forEach(pos => {
+                originX = Math.min(originX, pos.x);
+                originY = Math.min(originY, pos.y);
+            });
+            return { x: originX, y: originY };
+        };
+
+        // Initialize only when first entering trash; otherwise normal dragging should stay untouched.
+        if (isOverTrash && !this._trashHoverGroupState) {
+            const activeDragGroup =
+                this.blocks.dragGroup && this.blocks.dragGroup.length > 0
+                    ? [...this.blocks.dragGroup]
+                    : [thisBlock];
+            const blockStates = [];
+            activeDragGroup.forEach(blockId => {
+                const block = this.blocks.blockList[blockId];
+                if (!block || !block.container) {
+                    return;
+                }
+                blockStates.push({
+                    id: blockId,
+                    x: block.container.x,
+                    y: block.container.y,
+                    scaleX: block.container.scaleX ?? 1,
+                    scaleY: block.container.scaleY ?? 1
+                });
+            });
+
+            if (blockStates.length === 0) {
+                return;
+            }
+
+            const origin = getGroupOrigin(blockStates);
+            this._trashHoverGroupState = {
+                ratio: shrinkRatio,
+                originX: origin.x,
+                originY: origin.y,
+                blocks: blockStates
+            };
+        }
+
+        // Keep logical (unscaled) baseline aligned with user dragging while hover-state exists.
+        if (this._trashHoverGroupState) {
+            this._trashHoverGroupState.originX += dx;
+            this._trashHoverGroupState.originY += dy;
+            this._trashHoverGroupState.blocks.forEach(entry => {
+                entry.x += dx;
+                entry.y += dy;
+            });
+        }
+
+        if (!this._trashHoverGroupState) {
+            return;
+        }
+
+        const state = this._trashHoverGroupState;
+        state.ratio = shrinkRatio;
+        const blocksToApply = state.blocks;
+
+        for (let b = 0; b < blocksToApply.length; b++) {
+            const item = blocksToApply[b];
+            const blockId = item.id;
+            const block = this.blocks.blockList[blockId];
+            if (!block || !block.container) {
+                continue;
+            }
+
+            let targetScaleX;
+            let targetScaleY;
+            let targetX = block.container.x;
+            let targetY = block.container.y;
+
+            if (isOverTrash) {
+                targetScaleX = item.scaleX * state.ratio;
+                targetScaleY = item.scaleY * state.ratio;
+                targetX = state.originX + (item.x - state.originX) * state.ratio;
+                targetY = state.originY + (item.y - state.originY) * state.ratio;
+            } else {
+                targetScaleX = item.scaleX;
+                targetScaleY = item.scaleY;
+                targetX = item.x;
+                targetY = item.y;
+            }
+
+            if (
+                block._trashHoverScaled === isOverTrash &&
+                Math.abs((block.container.scaleX ?? 1) - targetScaleX) < epsilon &&
+                Math.abs((block.container.scaleY ?? 1) - targetScaleY) < epsilon &&
+                Math.abs(block.container.x - targetX) < epsilon &&
+                Math.abs(block.container.y - targetY) < epsilon
+            ) {
+                continue;
+            }
+
+            block._trashHoverScaled = isOverTrash;
+            createjs.Tween.get(block.container, { override: true }).to(
+                { x: targetX, y: targetY, scaleX: targetScaleX, scaleY: targetScaleY },
+                duration
+            );
+        }
+
+        if (!isOverTrash && immediate) {
+            this._trashHoverGroupState = null;
+        }
+
+        this.activity.refreshCanvas();
     }
 
     /**
@@ -351,42 +485,24 @@ class Block {
      */
     _createCache(callback, args) {
         const that = this;
-        return new Promise((resolve, reject) => {
-            let loopCount = 0;
-            const MAX_RETRIES = 20;
-            const INITIAL_DELAY = 50;
+        const MAX_RETRIES = 20;
+        const INITIAL_DELAY = 50;
 
-            const checkBounds = async counter => {
-                try {
-                    if (counter !== undefined) {
-                        loopCount = counter;
-                    }
-                    if (loopCount > MAX_RETRIES) {
-                        throw new Error("COULD NOT CREATE CACHE");
-                    }
-
-                    that.bounds = that.container.getBounds();
-
-                    if (that.bounds === null) {
-                        const delayTime = INITIAL_DELAY * Math.pow(2, loopCount);
-                        await delayExecution(delayTime);
-                        that.regenerateArtwork(true, []);
-                        checkBounds(loopCount + 1);
-                    } else {
-                        that.container.cache(
-                            that.bounds.x,
-                            that.bounds.y,
-                            that.bounds.width,
-                            that.bounds.height
-                        );
-                        callback(that, args);
-                        resolve();
-                    }
-                } catch (e) {
-                    reject(e);
-                }
-            };
-            checkBounds();
+        return retryWithBackoff({
+            check: () => {
+                that.bounds = that.container.getBounds();
+                return that.bounds;
+            },
+            onSuccess: bounds => {
+                that.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+                callback(that, args);
+            },
+            onRetry: () => {
+                that.regenerateArtwork(true, []);
+            },
+            maxRetries: MAX_RETRIES,
+            initialDelay: INITIAL_DELAY,
+            errorMessage: "COULD NOT CREATE CACHE"
         });
     }
 
@@ -398,35 +514,25 @@ class Block {
      */
     updateCache() {
         const that = this;
-        return new Promise((resolve, reject) => {
-            let loopCount = 0;
-            const MAX_RETRIES = 15;
-            const INITIAL_DELAY = 100;
 
-            const updateBounds = async counter => {
-                try {
-                    if (counter !== undefined) {
-                        loopCount = counter;
-                    }
+        // If the container has no active bitmap cache (e.g., trashed
+        // blocks whose cache was freed), skip the update silently.
+        if (that.container && !that.container.bitmapCache) {
+            return Promise.resolve();
+        }
 
-                    if (loopCount > MAX_RETRIES) {
-                        throw new Error("COULD NOT UPDATE CACHE");
-                    }
+        const MAX_RETRIES = 15;
+        const INITIAL_DELAY = 100;
 
-                    if (that.bounds === null) {
-                        const delayTime = INITIAL_DELAY * Math.pow(2, loopCount);
-                        await that.pause(delayTime);
-                        updateBounds(loopCount + 1);
-                    } else {
-                        that.container.updateCache();
-                        that.activity.refreshCanvas();
-                        resolve();
-                    }
-                } catch (e) {
-                    reject(e);
-                }
-            };
-            updateBounds();
+        return retryWithBackoff({
+            check: () => that.bounds !== null && that.container && that.container.bitmapCache,
+            onSuccess: () => {
+                that.container.updateCache();
+                that.activity.refreshCanvas();
+            },
+            maxRetries: MAX_RETRIES,
+            initialDelay: INITIAL_DELAY,
+            errorMessage: "COULD NOT UPDATE CACHE"
         });
     }
 
@@ -1003,19 +1109,19 @@ class Block {
      */
     regenerateArtwork(collapse) {
         // First we need to remove the old artwork.
-        if (this.bitmap != null) {
+        if (this.bitmap !== null) {
             this.container.removeChild(this.bitmap);
         }
 
-        if (this.highlightBitmap != null) {
+        if (this.highlightBitmap !== null) {
             this.container.removeChild(this.highlightBitmap);
         }
 
-        if (this.disconnectedBitmap != null) {
+        if (this.disconnectedBitmap !== null) {
             this.container.removeChild(this.disconnectedBitmap);
         }
 
-        if (this.disconnectedHighlightBitmap != null) {
+        if (this.disconnectedHighlightBitmap !== null) {
             this.container.removeChild(this.disconnectedHighlightBitmap);
         }
 
@@ -1026,8 +1132,30 @@ class Block {
             this.container.removeChild(this.highlightCollapseBlockBitmap);
         }
 
+        // Temporarily remove imageBitmap to prevent it from corrupting bounds during regeneration
+        let tempImageBitmap = null;
+        if (this.imageBitmap !== null) {
+            tempImageBitmap = this.imageBitmap;
+            this.container.removeChild(this.imageBitmap);
+            this.imageBitmap = null;
+        }
+
         // Then we generate new artwork.
         this.generateArtwork(false);
+
+        // Restore the imageBitmap after artwork generation
+        if (tempImageBitmap !== null) {
+            this.imageBitmap = tempImageBitmap;
+            this.container.addChild(this.imageBitmap);
+            this._positionMedia(
+                this.imageBitmap,
+                this.imageBitmap.image.width,
+                this.imageBitmap.image.height,
+                this.protoblock.scale
+            );
+            const zIndex = this.container.children.length - 1;
+            this.container.setChildIndex(this.imageBitmap, zIndex);
+        }
     }
 
     /**
@@ -1039,7 +1167,7 @@ class Block {
     generateArtwork(firstTime) {
         // Get the block labels from the protoblock.
         const that = this;
-        const thisBlock = this.blocks.blockList.indexOf(this);
+        const thisBlock = this.blockIndex;
         let block_label = "";
 
         /**
@@ -1048,7 +1176,7 @@ class Block {
          * @param {object} that - Reference to the current object.
          */
         const __processHighlightBitmap = (bitmap, that) => {
-            if (that.highlightBitmap != null) {
+            if (that.highlightBitmap !== null) {
                 that.container.removeChild(that.highlightBitmap);
             }
 
@@ -1071,7 +1199,7 @@ class Block {
 
             const __callback = (that, firstTime) => {
                 that.activity.refreshCanvas();
-                const thisBlock = that.blocks.blockList.indexOf(that);
+                const thisBlock = that.blockIndex;
 
                 if (firstTime) {
                     that._loadEventHandlers();
@@ -1097,7 +1225,7 @@ class Block {
                         that.updateCache();
                     }
 
-                    if (that.postProcess != null) {
+                    if (that.postProcess !== null) {
                         that.postProcess(that.postProcessArg);
                         that.postProcess = null;
                     }
@@ -1113,7 +1241,7 @@ class Block {
          * @param {object} that - Reference to the current object.
          */
         const __processDisconnectedHighlightBitmap = (bitmap, that) => {
-            if (that.disconnectedHighlightBitmap != null) {
+            if (that.disconnectedHighlightBitmap !== null) {
                 that.container.removeChild(that.disconnectedHighlightBitmap);
             }
 
@@ -1132,11 +1260,13 @@ class Block {
                 artwork = that.artwork
                     .replace(/fill_color/g, DISABLEDFILLCOLOR)
                     .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
+                    .replace(/block_text_color/g, platformColor.blockText)
                     .replace("block_label", safeSVG(block_label));
             } else {
                 artwork = that.artwork
                     .replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name])
                     .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
+                    .replace(/block_text_color/g, platformColor.blockText)
                     .replace("block_label", safeSVG(block_label));
             }
 
@@ -1153,7 +1283,7 @@ class Block {
          * @param {object} that - Reference to the current object.
          */
         const __processDisconnectedBitmap = (bitmap, that) => {
-            if (that.disconnectedBitmap != null) {
+            if (that.disconnectedBitmap !== null) {
                 that.container.removeChild(that.disconnectedBitmap);
             }
 
@@ -1172,6 +1302,7 @@ class Block {
                 artwork = that.artwork
                     .replace(/fill_color/g, DISABLEDFILLCOLOR)
                     .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
+                    .replace(/block_text_color/g, platformColor.blockText)
                     .replace("block_label", safeSVG(block_label));
             } else {
                 artwork = that.artwork
@@ -1180,6 +1311,7 @@ class Block {
                         platformColor.paletteColors[that.protoblock.palette.name][3]
                     )
                     .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
+                    .replace(/block_text_color/g, platformColor.blockText)
                     .replace("block_label", safeSVG(block_label));
             }
 
@@ -1196,7 +1328,7 @@ class Block {
          * @param {object} that - Reference to the current object.
          */
         const __processBitmap = (bitmap, that) => {
-            if (that.bitmap != null) {
+            if (that.bitmap !== null) {
                 that.container.removeChild(that.bitmap);
             }
 
@@ -1212,11 +1344,13 @@ class Block {
                 artwork = that.artwork
                     .replace(/fill_color/g, DISABLEDFILLCOLOR)
                     .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
+                    .replace(/block_text_color/g, platformColor.blockText)
                     .replace("block_label", safeSVG(block_label));
             } else {
                 artwork = that.artwork
                     .replace(/fill_color/g, platformColor.disconnected)
                     .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
+                    .replace(/block_text_color/g, platformColor.blockText)
                     .replace("block_label", safeSVG(block_label));
             }
 
@@ -1277,11 +1411,13 @@ class Block {
             artwork = this.artwork
                 .replace(/fill_color/g, DISABLEDFILLCOLOR)
                 .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
+                .replace(/block_text_color/g, platformColor.blockText)
                 .replace("block_label", safeSVG(block_label));
         } else {
             artwork = this.artwork
                 .replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name])
                 .replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name])
+                .replace(/block_text_color/g, platformColor.blockText)
                 .replace("block_label", safeSVG(block_label));
         }
 
@@ -1289,7 +1425,7 @@ class Block {
             artwork = artwork.replace("arg_label_" + i, this.protoblock.staticLabels[i]);
         }
 
-        that.blocks.blockArt[that.blocks.blockList.indexOf(that)] = artwork;
+        that.blocks.blockArt[that.blockIndex] = artwork;
 
         _blockMakeBitmap(artwork, __processBitmap, this);
     }
@@ -1300,11 +1436,11 @@ class Block {
      * @returns {void}
      */
     _finishImageLoad() {
-        // const thisBlock = this.blocks.blockList.indexOf(this);
+        // const thisBlock = this.blockIndex;
         let proto, obj, label, attr;
         // Value blocks get a modifiable text label.
         if (SPECIALINPUTS.includes(this.name)) {
-            if (this.value == null) {
+            if (this.value === null) {
                 switch (this.name) {
                     case "text":
                         this.value = "---";
@@ -1490,7 +1626,7 @@ class Block {
      * @returns {void}
      */
     _generateCollapseArtwork(postProcess) {
-        const thisBlock = this.blocks.blockList.indexOf(this);
+        const thisBlock = this.blockIndex;
 
         /**
          * Run the postprocess function after the artwork is loaded.
@@ -1538,7 +1674,8 @@ class Block {
                 __finishCollapse(that);
             };
 
-            image.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBUTTON));
+            image.src =
+                "data:image/svg+xml;base64," + window.btoa(window.base64Encode(COLLAPSEBUTTON));
         };
 
         /**
@@ -1569,7 +1706,8 @@ class Block {
                 __processCollapseButton(that);
             };
 
-            image.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(EXPANDBUTTON));
+            image.src =
+                "data:image/svg+xml;base64," + window.btoa(window.base64Encode(EXPANDBUTTON));
         };
 
         /**
@@ -1746,9 +1884,10 @@ class Block {
             that._ensureDecorationOnTop();
 
             // Save the collapsed block artwork for export.
-            that.blocks.blockCollapseArt[that.blocks.blockList.indexOf(that)] = that.collapseArtwork
+            that.blocks.blockCollapseArt[that.blockIndex] = that.collapseArtwork
                 .replace(/fill_color/g, PALETTEFILLCOLORS[that.protoblock.palette.name])
                 .replace(/stroke_color/g, PALETTESTROKECOLORS[that.protoblock.palette.name])
+                .replace(/block_text_color/g, platformColor.blockText)
                 .replace("block_label", safeSVG(that.collapseText.text));
 
             __processExpandButton(that);
@@ -1773,6 +1912,7 @@ class Block {
                 artwork
                     .replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name])
                     .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
+                    .replace(/block_text_color/g, platformColor.blockText)
                     .replace("block_label", ""),
                 __processHighlightCollapseBitmap,
                 that
@@ -1782,6 +1922,7 @@ class Block {
         const artwork = this.collapseArtwork
             .replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name])
             .replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name])
+            .replace(/block_text_color/g, platformColor.blockText)
             .replace("block_label", "");
         _blockMakeBitmap(artwork, __processCollapseBitmap, this);
     }
@@ -2033,12 +2174,50 @@ class Block {
     }
 
     /**
+     * Determines what type of layout update this block requires when a child is connected
+     * at the specified connection index.
+     *
+     * This is a behavioral abstraction that encapsulates the logic of which blocks
+     * need pre-layout updates based on their child connections, rather than having
+     * the engine infer this from block type categories.
+     *
+     * @param {number} connectionIndex - The index of the connection where a child was attached
+     * @returns {string|null} - "ARG" for argument layout updates, "FLOW" for flow layout updates, null otherwise
+     */
+    getLayoutUpdateType(connectionIndex) {
+        // Guard against invalid indices (can occur during drag/undo/intermediate states)
+        if (connectionIndex < 0) {
+            return null;
+        }
+
+        // Two-argument blocks and expandable argument blocks need ARG layout updates
+        // when a child connects to their first argument slot (connection index 1)
+        if (connectionIndex === 1) {
+            if (this.isTwoArgBlock() || (this.isArgBlock() && this.isExpandableBlock())) {
+                return "ARG";
+            }
+        }
+
+        const n = this.connections.length;
+        if (
+            connectionIndex === n - 2 &&
+            !this.isArgClamp() &&
+            this.docks[n - 1] &&
+            this.docks[n - 1][2] === "in"
+        ) {
+            return "FLOW";
+        }
+
+        return null;
+    }
+
+    /**
      * Gets the unique identifier for the block.
      * @returns {string} - The unique identifier for the block.
      */
     getBlockId() {
         // Generate a UID based on the block index into the blockList.
-        const number = blockBlocks.blockList.indexOf(this);
+        const number = this.blockIndex;
         return "_" + number.toString();
     }
 
@@ -2061,7 +2240,7 @@ class Block {
      */
     loadThumbnail(imagePath) {
         // Load an image thumbnail onto block.
-        const thisBlock = this.blocks.blockList.indexOf(this);
+        const thisBlock = this.blockIndex;
         const that = this;
 
         if (this.blocks.blockList[thisBlock].value === null && imagePath === null) {
@@ -2128,7 +2307,7 @@ class Block {
      */
     _doOpenMedia(thisBlock) {
         const that = this;
-        const fileChooser = that.name == "media" ? docById("myMedia") : docById("audio");
+        const fileChooser = that.name === "media" ? docById("myMedia") : docById("audio");
 
         const __readerAction = () => {
             window.scroll(0, 0);
@@ -2147,9 +2326,7 @@ class Block {
                     fileChooser.value = "";
                 }
             };
-            if (that.name === "media") {
-                reader.readAsDataURL(fileChooser.files[0]);
-            } else if (that.name === "audiofile") {
+            if (that.name === "media" || that.name === "audiofile") {
                 reader.readAsDataURL(fileChooser.files[0]);
             } else {
                 reader.readAsText(fileChooser.files[0]);
@@ -2198,7 +2375,7 @@ class Block {
     collapseToggle() {
         // Find the blocks to collapse/expand inside of a collapable
         // block.
-        const thisBlock = this.blocks.blockList.indexOf(this);
+        const thisBlock = this.blockIndex;
         this.blocks.findDragGroup(thisBlock);
 
         if (this.collapseBlockBitmap === null) {
@@ -2317,7 +2494,7 @@ class Block {
         const intervals = [];
         let i = 0;
 
-        let c = this.blocks.blockList.indexOf(this),
+        let c = this.blockIndex,
             lastIntervalBlock;
         while (c !== null) {
             lastIntervalBlock = c;
@@ -2589,8 +2766,8 @@ class Block {
                 if (this.blocks.blockList[c2].name === "number") {
                     if (this.blocks.blockList[c1].name === "number") {
                         const degrees = DEGREES.split(" ");
-                        const i = this.blocks.blockList[c1].value - 1;
-                        if (i > 0 && i < degrees.length) {
+                        const i = this.blocks.blockList[c1].value;
+                        if (i >= 0 && i < degrees.length) {
                             return degrees[i] + " " + this.blocks.blockList[c2].value;
                         } else {
                             return (
@@ -2680,7 +2857,7 @@ class Block {
         }
 
         // Reposition the blocks below.
-        if (this.connections[3] != null) {
+        if (this.connections[3] !== null) {
             // The last connection is flow. The second to last
             // connection is child flow.  FIX ME: This will not work
             // if there is more than one arg, e.g. n > 4.
@@ -2772,21 +2949,22 @@ class Block {
      * @returns {void}
      */
     _positionMedia(bitmap, width, height, blockScale) {
-        if (width > height) {
-            bitmap.scaleX =
-                bitmap.scaleY =
-                bitmap.scale =
-                    ((MEDIASAFEAREA[2] / width) * blockScale) / 2;
-        } else {
-            bitmap.scaleX =
-                bitmap.scaleY =
-                bitmap.scale =
-                    ((MEDIASAFEAREA[3] / height) * blockScale) / 2;
-        }
+        // Use actual block dimensions instead of MEDIASAFEAREA to ensure image fits
+        // Account for padding (approximately 20% of block size for margins)
+        const maxWidth = this.width * 0.6; // Leave 40% for block chrome
+        const maxHeight = this.height * 0.6; // Leave 40% for block chrome
+
+        // Calculate scale to fit within both dimensions
+        const scaleX = maxWidth / width;
+        const scaleY = maxHeight / height;
+
+        // Use the minimum to ensure it fits in both dimensions
+        bitmap.scaleX = bitmap.scaleY = bitmap.scale = Math.min(scaleX, scaleY);
+
+        // Center the image within the block
         bitmap.x = ((MEDIASAFEAREA[0] - 10) * blockScale) / 2;
         bitmap.y = (MEDIASAFEAREA[1] * blockScale) / 2;
     }
-
     /**
      * Position the label for a collapsed block.
      * @private
@@ -2830,7 +3008,7 @@ class Block {
      */
     _loadEventHandlers() {
         const that = this;
-        const thisBlock = this.blocks.blockList.indexOf(this);
+        const thisBlock = this.blockIndex;
 
         this._calculateBlockHitArea();
 
@@ -2852,6 +3030,11 @@ class Block {
         let locked = false;
         let getInput = window.hasMouse;
 
+        // Cached drag state: computed once at mousedown, reused during pressmove.
+        // This avoids redundant O(N) findDragGroup and O(D) rest2 chain walks
+        // on every mouse move event (which fires 60+ times per second).
+        let _dragHasRest2 = false;
+
         /**
          * Handles the click event on the block container.
          * @param {Event} event - The click event.
@@ -2865,7 +3048,7 @@ class Block {
             }
             // We might be able to check which button was clicked.
             if ("nativeEvent" in event) {
-                if ("button" in event.nativeEvent && event.nativeEvent.button == 2) {
+                if ("button" in event.nativeEvent && event.nativeEvent.button === 2) {
                     that.blocks.stageClick = true;
                     _getStatic("wheelDiv").style.display = "none";
                     that.blocks.activeBlock = thisBlock;
@@ -2970,11 +3153,15 @@ class Block {
         this.container.on("mousedown", event => {
             docById("contextWheelDiv").style.display = "none";
 
+            // Reset any stale hover-scaling state from prior drags.
+            this._trashHoverGroupState = null;
+            this._dragPointerDown = true;
+
             // Track time for detecting long pause...
             that.blocks.mouseDownTime = new Date().getTime();
 
             that.blocks.longPressTimeout = setTimeout(() => {
-                that.blocks.activeBlock = that.blocks.blockList.indexOf(that);
+                that.blocks.activeBlock = that.blockIndex;
                 that._triggerLongPress = true;
                 that.blocks.triggerLongPress();
             }, LONGPRESSTIME);
@@ -3002,10 +3189,13 @@ class Block {
 
             // And possibly the collapse button.
             if (that.collapseContainer != null) {
-                that.activity.blocksContainer.setChildIndex(
-                    that.collapseContainer,
-                    that.activity.blocksContainer.children.length - 1
-                );
+                // Ensure the blocksContainer still exisits.
+                if (that.activity.blocksContainer != null) {
+                    that.activity.blocksContainer.setChildIndex(
+                        that.collapseContainer,
+                        that.activity.blocksContainer.children.length - 1
+                    );
+                }
             }
 
             moved = false;
@@ -3018,10 +3208,33 @@ class Block {
                 x: Math.round(that.container.x - that.original.x),
                 y: Math.round(that.container.y - that.original.y)
             };
+
+            // Cache the drag group once on mousedown instead of
+            // recomputing the tree traversal on every pressmove.
+            that.blocks.cacheDragGroup(thisBlock);
+            // Invalidate the top-block cache since a drag may
+            // disconnect blocks, changing the topology.
+            that.blocks.invalidateTopBlockCache();
+
+            // Pre-compute whether the chain below contains a rest2 block.
+            // This avoids walking the entire connection chain on every
+            // mouse move event.
+            _dragHasRest2 = false;
+            let checkBlock = that.blocks.blockList[that.connections[1]];
+            while (checkBlock != null) {
+                if (checkBlock?.name === "rest2") {
+                    _dragHasRest2 = true;
+                    break;
+                }
+                checkBlock = checkBlock?.blocks.blockList[checkBlock.connections[1]];
+            }
         });
 
         /**
          * Handles the pressmove event on the block container.
+         * Performance-optimized: uses cached drag group, batched block
+         * moves, throttled edge scroll, and a single deferred
+         * checkBounds + refreshCanvas per frame.
          * @param {Event} event - The pressmove event.
          */
         this.container.on("pressmove", event => {
@@ -3041,14 +3254,11 @@ class Block {
                 return;
             }
 
-            // Do not allow a stack of blocks to be dragged if the stack contains a silence block.
-            let block = that.blocks.blockList[that.connections[1]];
-            while (block != undefined) {
-                if (block?.name === "rest2") {
-                    this.activity.errorMsg(_("Silence block cannot be removed."), block);
-                    return;
-                }
-                block = block?.blocks.blockList[block.connections[1]];
+            // Use the cached rest2 check from mousedown instead of
+            // walking the chain on every mouse move event.
+            if (_dragHasRest2) {
+                this.activity.errorMsg(_("Silence block cannot be removed."), that);
+                return;
             }
 
             if (window.hasMouse) {
@@ -3081,55 +3291,84 @@ class Block {
                 dy += 45 - finalPos;
             }
 
-            // scroll when reached edges.
-            if (event.stageX < 10 && that.activity.scrollBlockContainer)
-                that.blocks.moveAllBlocksExcept(that, 10, 0);
-            else if (event.stageX > window.innerWidth - 10 && that.activity.scrollBlockContainer)
-                that.blocks.moveAllBlocksExcept(that, -10, 0);
-            else if (event.stageY > window.innerHeight - 10)
-                that.blocks.moveAllBlocksExcept(that, 0, -10);
-            else if (event.stageY < 60) that.blocks.moveAllBlocksExcept(that, 0, 10);
+            // Edge-scroll: throttled to ~60fps (16ms) to avoid
+            // running moveAllBlocksExcept on every mouse event.
+            const now = Date.now();
+            if (now - that.blocks._lastEdgeScrollTime >= 16) {
+                if (event.stageX < 10 && that.activity.scrollBlockContainer) {
+                    that.blocks.moveAllBlocksExcept(that, 10, 0);
+                    that.blocks._lastEdgeScrollTime = now;
+                } else if (
+                    event.stageX > window.innerWidth - 10 &&
+                    that.activity.scrollBlockContainer
+                ) {
+                    that.blocks.moveAllBlocksExcept(that, -10, 0);
+                    that.blocks._lastEdgeScrollTime = now;
+                } else if (event.stageY > window.innerHeight - 10) {
+                    that.blocks.moveAllBlocksExcept(that, 0, -10);
+                    that.blocks._lastEdgeScrollTime = now;
+                } else if (event.stageY < 60) {
+                    that.blocks.moveAllBlocksExcept(that, 0, 10);
+                    that.blocks._lastEdgeScrollTime = now;
+                }
+            }
 
-            if (that.blocks.longPressTimeout != null) {
+            if (that.blocks.longPressTimeout !== null) {
                 clearTimeout(that.blocks.longPressTimeout);
                 that.blocks.longPressTimeout = null;
                 that.blocks.clearLongPress();
             }
 
-            if (!moved && that.label != null) {
+            if (!moved && that.label !== null) {
                 that.label.style.display = "none";
             }
 
-            that.blocks.moveBlockRelative(thisBlock, dx, dy);
+            // Move the dragged block itself (batched — no checkBounds).
+            that.blocks.moveBlockRelativeBatched(thisBlock, dx, dy);
 
             // If we are over the trash, warn the user.
-            if (
-                that.activity.trashcan.overTrashcan(
-                    event.stageX / that.activity.getStageScale(),
-                    event.stageY / that.activity.getStageScale()
-                )
-            ) {
+            const overTrash = that.activity.trashcan.overTrashcan(
+                event.stageX / that.activity.getStageScale(),
+                event.stageY / that.activity.getStageScale()
+            );
+            if (overTrash) {
                 that.activity.trashcan.startHighlightAnimation();
             } else {
                 that.activity.trashcan.stopHighlightAnimation();
             }
-
             if (that.isValueBlock() && that.name !== "media") {
                 // Ensure text is on top
                 that.container.setChildIndex(that.text, that.container.children.length - 1);
             }
 
-            // ...and move any connected blocks.
-            that.blocks.findDragGroup(thisBlock);
-            if (that.blocks.dragGroup.length > 0) {
-                for (let b = 0; b < that.blocks.dragGroup.length; b++) {
-                    const blk = that.blocks.dragGroup[b];
-                    if (b !== 0) {
-                        that.blocks.moveBlockRelative(blk, dx, dy);
+            // Move connected blocks using the cached drag group
+            // (computed once on mousedown, not every pressmove).
+            const cachedGroup = that.blocks._cachedDragGroup;
+            if (cachedGroup !== null && cachedGroup.length > 0) {
+                for (let b = 0; b < cachedGroup.length; b++) {
+                    const blk = cachedGroup[b];
+                    if (blk !== thisBlock) {
+                        that.blocks.moveBlockRelativeBatched(blk, dx, dy);
+                    }
+                }
+            } else {
+                // Fallback: recompute if cache is missing
+                that.blocks.findDragGroup(thisBlock);
+                if (that.blocks.dragGroup.length > 0) {
+                    for (let b = 0; b < that.blocks.dragGroup.length; b++) {
+                        const blk = that.blocks.dragGroup[b];
+                        if (b !== 0) {
+                            that.blocks.moveBlockRelativeBatched(blk, dx, dy);
+                        }
                     }
                 }
             }
 
+            that._setDragGroupTrashHoverScale(overTrash, dx, dy);
+
+            // Single deferred checkBounds + single canvas refresh per frame
+            that.blocks.scheduleCheckBounds();
+            that._setDragGroupTrashHoverScale(overTrash, dx, dy);
             that.activity.refreshCanvas();
         });
 
@@ -3141,8 +3380,18 @@ class Block {
          * @param {Event} event - The mouseout event object.
          */
         this.container.on("mouseout", event => {
+            // Ignore transient mouseout while actively dragging.
+            if (that._dragPointerDown) {
+                if (that.blocks.longPressTimeout != null) {
+                    clearTimeout(that.blocks.longPressTimeout);
+                    that.blocks.longPressTimeout = null;
+                }
+                that.blocks.clearLongPress();
+                return;
+            }
+
             if (!that.blocks.getLongPressStatus()) {
-                that._mouseoutCallback(event, moved, haveClick, false);
+                that._mouseoutCallback(event, moved, haveClick, false, false);
             } else {
                 clearTimeout(that.blocks.longPressTimeout);
                 that.blocks.longPressTimeout = null;
@@ -3152,7 +3401,12 @@ class Block {
                 that.blocks.unhighlight(thisBlock, true);
             }
             that.blocks.activeBlock = null;
+            // Release cached drag group and top-block map
+            that.blocks.clearCachedDragGroup();
+            that.blocks.invalidateTopBlockCache();
 
+            // Clear cached drag state.
+            _dragHasRest2 = false;
             moved = false;
         });
 
@@ -3164,8 +3418,10 @@ class Block {
          * @param {Event} event - The pressup event object.
          */
         this.container.on("pressup", event => {
+            that._dragPointerDown = false;
+
             if (!that.blocks.getLongPressStatus()) {
-                that._mouseoutCallback(event, moved, haveClick, false);
+                that._mouseoutCallback(event, moved, haveClick, false, true);
             } else {
                 clearTimeout(that.blocks.longPressTimeout);
                 that.blocks.longPressTimeout = null;
@@ -3174,7 +3430,12 @@ class Block {
 
             that.blocks.unhighlight(thisBlock, true);
             that.blocks.activeBlock = null;
+            // Release cached drag group and top-block map
+            that.blocks.clearCachedDragGroup();
+            that.blocks.invalidateTopBlockCache();
 
+            // Clear cached drag state.
+            _dragHasRest2 = false;
             moved = false;
         });
     }
@@ -3186,13 +3447,19 @@ class Block {
      * @param {boolean} moved - Indicates if the cursor moved.
      * @param {boolean} haveClick - Indicates if a click event occurred.
      * @param {boolean} hideDOM - Indicates whether to hide DOM elements.
+     * @param {boolean} dragEnded - Indicates whether this callback is from drag release.
      * Sets cursor style to default.
      * @returns {void}
      */
-    _mouseoutCallback(event, moved, haveClick, hideDOM) {
-        const thisBlock = this.blocks.blockList.indexOf(this);
+    _mouseoutCallback(event, moved, haveClick, hideDOM, dragEnded = false) {
+        const thisBlock = this.blockIndex;
         if (!this.activity.logo.runningLilypond) {
             document.body.style.cursor = "default";
+        }
+
+        // Restore drag scaling only when drag interaction actually ends.
+        if (dragEnded) {
+            this._setDragGroupTrashHoverScale(false, 0, 0, true);
         }
 
         // Always hide the trash when there is no block selected.
@@ -3200,13 +3467,13 @@ class Block {
             this.activity.trashcan.hide();
         }
 
-        if (this.blocks.longPressTimeout != null) {
+        if (this.blocks.longPressTimeout !== null) {
             clearTimeout(this.blocks.longPressTimeout);
             this.blocks.longPressTimeout = null;
             this.blocks.clearLongPress();
         }
 
-        if (moved) {
+        if (moved && dragEnded) {
             // Check if block is in the trash.
             if (
                 this.activity.trashcan.overTrashcan(
@@ -3232,7 +3499,7 @@ class Block {
                 // Just in case the blocks are not properly docked after
                 // the move (workaround for issue #38 -- Blocks fly
                 // apart). Still need to get to the root cause.
-                this.blocks.adjustDocks(this.blocks.blockList.indexOf(this), true);
+                this.blocks.adjustDocks(this.blockIndex, true);
             }
         } else if (SPECIALINPUTS.includes(this.name) || ["media", "loadFile"].includes(this.name)) {
             if (!haveClick) {
@@ -3290,7 +3557,7 @@ class Block {
         }
 
         // Numeric pie menus
-        const blk = this.blocks.blockList.indexOf(this);
+        const blk = this.blockIndex;
 
         if (this.blocks.octaveNumber(blk)) {
             return true;
@@ -3343,11 +3610,14 @@ class Block {
             return false;
         }
 
-        if (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC1.length === 0) {
+        if (
+            (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC1?.length ?? 0) ===
+            0
+        ) {
             return false;
         }
 
-        return this.blocks.blockList[cblk].connections[1] === this.blocks.blockList.indexOf(this);
+        return this.blocks.blockList[cblk].connections[1] === this.blockIndex;
     }
 
     /**
@@ -3365,11 +3635,14 @@ class Block {
             return false;
         }
 
-        if (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC2.length === 0) {
+        if (
+            (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC2?.length ?? 0) ===
+            0
+        ) {
             return false;
         }
 
-        return this.blocks.blockList[cblk].connections[2] === this.blocks.blockList.indexOf(this);
+        return this.blocks.blockList[cblk].connections[2] === this.blockIndex;
     }
 
     /**
@@ -3387,11 +3660,14 @@ class Block {
             return false;
         }
 
-        if (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC3.length === 0) {
+        if (
+            (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC3?.length ?? 0) ===
+            0
+        ) {
             return false;
         }
 
-        return this.blocks.blockList[cblk].connections[3] === this.blocks.blockList.indexOf(this);
+        return this.blocks.blockList[cblk].connections[3] === this.blockIndex;
     }
 
     /**
@@ -3474,7 +3750,7 @@ class Block {
         }
 
         // A place in the DOM to put modifiable labels (textareas).
-        if (this.label != null) {
+        if (this.label !== null) {
             labelValue = this.label.value;
         } else {
             labelValue = this.value;
@@ -3553,7 +3829,11 @@ class Block {
                 const noteLabels = {};
                 const customLabels = [];
                 for (let i = 0; i < keys.length; i++) {
-                    noteLabels[keys[i]] = getTemperament(keys[i]);
+                    const temperament = getTemperament(keys[i]);
+                    // Only add valid temperaments to noteLabels
+                    if (temperament && typeof temperament === "object") {
+                        noteLabels[keys[i]] = temperament;
+                    }
                     if (isCustomTemperament(keys[i])) {
                         customLabels.push(keys[i]);
                     }
@@ -3568,7 +3848,18 @@ class Block {
                 if (this.value !== null) {
                     selectedNote = this.value;
                 } else {
-                    selectedNote = getTemperament(selectedCustom)["0"][1];
+                    // Ensure we have a valid temperament before accessing its properties
+                    const selectedTemperament = getTemperament(selectedCustom);
+                    if (
+                        selectedTemperament &&
+                        selectedTemperament["0"] &&
+                        selectedTemperament["0"][1]
+                    ) {
+                        selectedNote = selectedTemperament["0"][1];
+                    } else {
+                        // Fallback to a default note
+                        selectedNote = "C";
+                    }
                 }
 
                 piemenuCustomNotes(this, noteLabels, customLabels, selectedCustom, selectedNote);
@@ -3583,7 +3874,7 @@ class Block {
             }
         } else if (this.name === "notename") {
             const NOTENOTES = ["B", "A", "G", "F", "E", "D", "C"];
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedNote = this.value[0];
                 if (this.value.length === 1) {
                     selectedAttr = "♮";
@@ -3605,7 +3896,7 @@ class Block {
                 piemenuPitches(this, NOTENOTES, NOTENOTES, SOLFATTRS, selectedNote, selectedAttr);
             }
         } else if (this.name === "modename") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedMode = this.value;
             } else {
                 selectedMode = DEFAULTMODE;
@@ -3613,7 +3904,7 @@ class Block {
 
             piemenuModes(this, selectedMode);
         } else if (this.name === "chordname") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedChord = this.value;
             } else {
                 selectedChord = DEFAULTCHORD;
@@ -3621,7 +3912,7 @@ class Block {
 
             piemenuChords(this, selectedChord);
         } else if (this.name === "accidentalname") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedAccidental = this.value;
             } else {
                 selectedAccidental = DEFAULTACCIDENTAL;
@@ -3631,7 +3922,7 @@ class Block {
                 piemenuAccidentals(this, ACCIDENTALLABELS, ACCIDENTALNAMES, selectedAccidental);
             }
         } else if (this.name === "intervalname") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedInterval = this.value;
             } else {
                 selectedInterval = DEFAULTINTERVAL;
@@ -3641,7 +3932,7 @@ class Block {
                 piemenuIntervals(this, selectedInterval);
             }
         } else if (this.name === "invertmode") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedInvert = this.value;
             } else {
                 selectedInvert = DEFAULTINVERT;
@@ -3659,7 +3950,7 @@ class Block {
                 piemenuBasic(this, invertLabels, invertValues, selectedInvert);
             }
         } else if (this.name === "drumname") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedDrum = this.value;
             } else {
                 selectedDrum = DEFAULTDRUM;
@@ -3690,7 +3981,7 @@ class Block {
 
             piemenuVoices(this, drumLabels, drumValues, categories, selectedDrum);
         } else if (this.name === "effectsname") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedDrum = this.value;
             } else {
                 selectedEffect = DEFAULTEFFECT;
@@ -3721,7 +4012,7 @@ class Block {
 
             piemenuVoices(this, effectLabels, effectValues, effectcategories, selectedEffect);
         } else if (this.name === "filtertype") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedType = this.value;
             } else {
                 selectedType = DEFAULTFILTERTYPE;
@@ -3742,7 +4033,7 @@ class Block {
                 platformColor.piemenuBasic
             );
         } else if (this.name === "oscillatortype") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedType = this.value;
             } else {
                 selectedType = DEFAULTOSCILLATORTYPE;
@@ -3757,7 +4048,7 @@ class Block {
 
             piemenuBasic(this, oscLabels, oscValues, selectedType, platformColor.piemenuBasic);
         } else if (this.name === "voicename") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedVoice = this.value;
             } else {
                 selectedVoice = DEFAULTVOICE;
@@ -3791,7 +4082,7 @@ class Block {
 
             piemenuVoices(this, voiceLabels, voiceValues, categories, selectedVoice);
         } else if (this.name === "noisename") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedNoise = this.value;
             } else {
                 selectedNoise = DEFAULTNOISE;
@@ -3820,7 +4111,7 @@ class Block {
 
             piemenuVoices(this, noiseLabels, noiseValues, categories, selectedNoise, 90);
         } else if (this.name === "temperamentname") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedTemperament = this.value;
             } else {
                 selectedTemperament = DEFAULTTEMPERAMENT;
@@ -3852,7 +4143,7 @@ class Block {
                 platformColor.piemenuBasic
             );
         } else if (this.name === "boolean") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedValue = this.value;
             } else {
                 selectedValue = true;
@@ -3914,7 +4205,7 @@ class Block {
             }
             piemenuBasic(this, labels, values, selectedValue, platformColor.piemenuBasic);
         } else if (this.name === "wrapmode") {
-            if (this.value != null) {
+            if (this.value !== null) {
                 selectedWrap = this.value;
             } else {
                 selectedWrap = "on";
@@ -3938,7 +4229,7 @@ class Block {
         } else {
             // If the number block is connected to a pitch block, then
             // use the pie menu for octaves. Other special cases as well.
-            const blk = this.blocks.blockList.indexOf(this);
+            const blk = this.blockIndex;
             if (this.blocks.octaveNumber(blk)) {
                 piemenuNumber(this, [8, 7, 6, 5, 4, 3, 2, 1], this.value);
             } else if (this.blocks.noteValueNumber(blk, 2)) {
@@ -4086,7 +4377,7 @@ class Block {
             }
         }
 
-        // const blk = this.blocks.blockList.indexOf(this);
+        // const blk = this.blockIndex;
         if (!this._usePiemenu()) {
             let focused = false;
 
@@ -4111,7 +4402,7 @@ class Block {
                 labelElem.classList.remove("hasKeyboard");
 
                 window.scroll(0, 0);
-                // eslint-disable-next-line no-use-before-define
+
                 that.label.removeEventListener("keypress", __keypress);
 
                 if (movedStage) {
@@ -4163,7 +4454,6 @@ class Block {
             this.label.style.transform = `translate3d(${left}px, ${top}px, 0)`;
             this.label.style.left = "0px";
             this.label.style.top = "0px";
-
             this.label.style.width =
                 Math.round((selectorWidth * this.blocks.blockScale * this.protoblock.scale) / 2) +
                 "px";
@@ -4172,7 +4462,7 @@ class Block {
                 Math.round((20 * this.blocks.blockScale * this.protoblock.scale) / 2) + "px";
             this.label.style.display = "";
             this.label.focus();
-            if (this.labelattr != null) {
+            if (this.labelattr !== null) {
                 this.labelattr.style.display = "";
             }
 
@@ -4219,7 +4509,7 @@ class Block {
     _checkWidgets(closeInput) {
         // Detect if label is changed, then reinit widget windows
         // if they are open.
-        const thisBlock = this.blocks.blockList.indexOf(this);
+        const thisBlock = this.blockIndex;
         const topBlock = this.blocks.findTopBlock(thisBlock);
         const widgetTitle = document.getElementsByClassName("wftTitle");
         let lockInit = false;
@@ -4244,7 +4534,7 @@ class Block {
                         case "timbre":
                             lockInit = true;
                             if (
-                                this.blocks.blockList[topBlock].protoblock.staticLabels[0] ==
+                                this.blocks.blockList[topBlock].protoblock.staticLabels[0] ===
                                 widgetTitle[i].innerHTML
                             ) {
                                 this.blocks.reInitWidget(topBlock, 1500);
@@ -4276,7 +4566,7 @@ class Block {
 
         if (closeInput) {
             this.label.style.display = "none";
-            if (this.labelattr != null) {
+            if (this.labelattr !== null) {
                 this.labelattr.style.display = "none";
             }
             docById("wheelDiv").style.display = "none";
@@ -4290,7 +4580,7 @@ class Block {
         const oldValue = this.value;
         let newValue = this.label.value;
 
-        if (this.labelattr != null) {
+        if (this.labelattr !== null) {
             const attrValue = this.labelattr.value;
             switch (attrValue) {
                 case "𝄪":
@@ -4315,7 +4605,7 @@ class Block {
         }
 
         c = this.connections[0];
-        if (this.name === "text" && c != null) {
+        if (this.name === "text" && c !== null) {
             const cblock = this.blocks.blockList[c];
             let uniqueValue;
             switch (cblock.name) {
@@ -4389,7 +4679,7 @@ class Block {
                 cblk2 !== null &&
                 newValue < 0 &&
                 (this.blocks.blockList[cblk1].name === "newnote" ||
-                    this.blocks.blockList[cblk2].name == "newnote")
+                    this.blocks.blockList[cblk2].name === "newnote")
             ) {
                 this.label.value = 0;
                 this.value = 0;
@@ -4398,18 +4688,18 @@ class Block {
             }
 
             if (isNaN(this.value)) {
-                const thisBlock = this.blocks.blockList.indexOf(this);
+                const thisBlock = this.blockIndex;
                 this.activity.errorMsg(newValue + ": " + _("Not a number"), thisBlock);
                 this.activity.refreshCanvas();
                 this.value = oldValue;
             }
 
             if (
-                cblk1 != null &&
+                cblk1 !== null &&
                 this.blocks.blockList[cblk1].name === "pitch" &&
                 (this.value > 8 || this.value < 1)
             ) {
-                const thisBlock = this.blocks.blockList.indexOf(this);
+                const thisBlock = this.blockIndex;
                 this.activity.errorMsg(_("Octave value must be between 1 and 8."), thisBlock);
                 this.activity.refreshCanvas();
                 this.label.value = oldValue;
@@ -4417,7 +4707,7 @@ class Block {
             }
 
             if (String(this.value).length > 10) {
-                const thisBlock = this.blocks.blockList.indexOf(this);
+                const thisBlock = this.blockIndex;
                 this.activity.errorMsg(_("Numbers can have at most 10 digits."), thisBlock);
                 this.activity.refreshCanvas();
                 this.label.value = oldValue;
@@ -4480,7 +4770,7 @@ class Block {
         this.container.setChildIndex(this.text, this.container.children.length - 1);
         this.updateCache();
 
-        if (this.name === "text" && c != null) {
+        if (this.name === "text" && c !== null) {
             const cblock = this.blocks.blockList[c];
             switch (cblock.name) {
                 case "action":
@@ -4489,20 +4779,14 @@ class Block {
                     // Rename both do <- name and nameddo blocks.
                     this.blocks.renameDos(oldValue, newValue);
 
+                    // eslint-disable-next-line no-case-declarations
+                    const metadata = this.blocks.actionMetadata(c);
                     if (oldValue === _("action")) {
-                        this.blocks.newNameddoBlock(
-                            newValue,
-                            this.blocks.actionHasReturn(c),
-                            this.blocks.actionHasArgs(c)
-                        );
+                        this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
                         this.blocks.setActionProtoVisibility(false);
                     }
 
-                    this.blocks.newNameddoBlock(
-                        newValue,
-                        this.blocks.actionHasReturn(c),
-                        this.blocks.actionHasArgs(c)
-                    );
+                    this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
                     // eslint-disable-next-line no-case-declarations
                     const blockPalette = this.blocks.palettes.dict["action"];
                     for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
@@ -4519,11 +4803,7 @@ class Block {
                     }
 
                     if (oldValue === _("action")) {
-                        this.blocks.newNameddoBlock(
-                            newValue,
-                            this.blocks.actionHasReturn(c),
-                            this.blocks.actionHasArgs(c)
-                        );
+                        this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
                         this.blocks.setActionProtoVisibility(false);
                     }
                     this.blocks.renameNameddos(oldValue, newValue);
@@ -4535,10 +4815,7 @@ class Block {
                     // Check to see which connection we are using in
                     // cblock.  We only do something if blk is attached to
                     // the name connection (1).
-                    if (
-                        cblock.connections[1] === this.blocks.blockList.indexOf(this) &&
-                        closeInput
-                    ) {
+                    if (cblock.connections[1] === this.blockIndex && closeInput) {
                         // If the label was the name of a storein, update the
                         // associated box this.blocks and the palette buttons.
                         if (this.value !== "box") {
@@ -4585,30 +4862,6 @@ class Block {
         }
     }
 }
-
-/**
- * Set elements to an array; if element is string, then set element's id to element.
- * @public
- * @returns {Array|HTMLElement} - An array of elements or a single element.
- */
-const $ = () => {
-    const elements = new Array();
-
-    for (let i = 0; i < elements.length; i++) {
-        let element = elements[i];
-        if (typeof element === "string") {
-            element = docById(element);
-        }
-
-        if (elements.length === 1) {
-            return element;
-        }
-
-        elements.push(element);
-    }
-
-    return elements;
-};
 
 // Track mouse presence
 window.hasMouse = false;

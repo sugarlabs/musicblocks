@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * @file This contains the utilities for generating code from block stacks for JS Editor widget.
  * @author Anindya Kundu
@@ -133,7 +132,8 @@ class JSGenerate {
                         if (JSInterface.isGetter(arg.name)) {
                             args.push([arg.name, null]);
                         } else if (
-                            arg.protoblock.__proto__.__proto__.constructor.name === "BooleanBlock"
+                            window.BooleanBlock &&
+                            arg.protoblock instanceof window.BooleanBlock
                         ) {
                             if (arg.name === "boolean") {
                                 args.push("bool_" + arg.value);
@@ -162,7 +162,7 @@ class JSGenerate {
             while (nextBlk !== undefined) {
                 // ignore vertical spacers and hidden blocks
                 if (nextBlk.name !== "hidden" && nextBlk.name !== "vspace") {
-                    if (["storein2", "nameddo"].includes(nextBlk.name)) {
+                    if (["storein2", "nameddo", "nameddoArg"].includes(nextBlk.name)) {
                         tree.push([nextBlk.name + "_" + nextBlk.privateData]);
                     } else {
                         tree.push([nextBlk.name]);

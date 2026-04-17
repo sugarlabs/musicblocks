@@ -78,6 +78,10 @@ function LegoWidget() {
     this.selectedBackgroundColor = { name: "green", hue: 120 }; // Default green background
     this.eyeDropperCursor = null;
 
+    // Drag handler references for cleanup
+    this._dragMoveHandler = null;
+    this._dragUpHandler = null;
+
     // Pitch block handling properties (similar to PhraseMaker)
     this.blockNo = null;
     this.rowLabels = [];
@@ -268,11 +272,10 @@ function LegoWidget() {
         widgetWindow.clear();
         widgetWindow.show();
 
-        var that = this;
-
         widgetWindow.onclose = () => {
             this._stopWebcam();
             this._deactivateEyeDropper(); // Clean up eye dropper mode
+            this._cleanupDragListeners(); // Clean up drag event listeners
             this.running = false;
             widgetWindow.destroy();
         };
@@ -1378,7 +1381,7 @@ function LegoWidget() {
         try {
             ctx.drawImage(mediaElement, 0, 0, tempCanvas.width, tempCanvas.height);
         } catch (e) {
-            console.log("Could not draw media element to canvas for color sampling:", e);
+            console.warn("Could not draw media element to canvas for color sampling:", e);
             return null;
         }
 
@@ -1551,6 +1554,22 @@ function LegoWidget() {
     };
 
     /**
+     * Removes drag event listeners from document.
+     * @private
+     * @returns {void}
+     */
+    this._cleanupDragListeners = function () {
+        if (this._dragMoveHandler) {
+            document.removeEventListener("mousemove", this._dragMoveHandler);
+            this._dragMoveHandler = null;
+        }
+        if (this._dragUpHandler) {
+            document.removeEventListener("mouseup", this._dragUpHandler);
+            this._dragUpHandler = null;
+        }
+    };
+
+    /**
      * Makes image draggable.
      * @private
      * @param {HTMLElement} wrapper - The image wrapper element.
@@ -1575,7 +1594,11 @@ function LegoWidget() {
             e.preventDefault();
         };
 
-        document.onmousemove = e => {
+        // Remove old listeners if they exist (prevents accumulation)
+        this._cleanupDragListeners();
+
+        // Store handlers as instance properties for later cleanup
+        this._dragMoveHandler = e => {
             if (!isDragging) return;
             const dx = e.clientX - startX;
             const dy = e.clientY - startY;
@@ -1583,12 +1606,16 @@ function LegoWidget() {
             wrapper.style.top = `${initialY + dy}px`;
         };
 
-        document.onmouseup = () => {
+        this._dragUpHandler = () => {
             if (isDragging) {
                 isDragging = false;
                 wrapper.style.cursor = "grab";
             }
         };
+
+        // Use addEventListener instead of direct property assignment
+        document.addEventListener("mousemove", this._dragMoveHandler);
+        document.addEventListener("mouseup", this._dragUpHandler);
     };
 
     /**
@@ -2535,7 +2562,7 @@ function LegoWidget() {
 
         // Create a temporary canvas to sample pixel data
         const tempCanvas = document.createElement("canvas");
-        const ctx = tempCanvas.getContext("2d");
+        const ctx = tempCanvas.getContext("2d", { willReadFrequently: true });
 
         // Set canvas size to match the media element's display size
         const mediaRect = mediaElement.getBoundingClientRect();
@@ -2744,7 +2771,7 @@ function LegoWidget() {
                 vline.style.top = "0px";
                 vline.style.bottom = "0px";
                 vline.style.width = "2px";
-                vline.style.backgroundColor = "#0066FF";
+                vline.style.backgroundColor = platformColor.selectorSelected || "#0066FF";
                 vline.style.zIndex = "15"; // Above grid lines but below scanning lines
                 vline.style.left = `${x}px`;
 
@@ -2772,7 +2799,7 @@ function LegoWidget() {
             filteredBoundaries[filteredBoundaries.length - 1] - filteredBoundaries[0];
 
         // Draw blue vertical lines at filtered boundary positions
-        ctx.strokeStyle = "#0066FF";
+        ctx.strokeStyle = platformColor.selectorSelected || "#0066FF";
         ctx.lineWidth = 3; // Slightly thicker for PNG visibility
 
         filteredBoundaries.forEach((boundaryTime, index) => {
@@ -2812,7 +2839,7 @@ function LegoWidget() {
         const ctx = canvas.getContext("2d");
 
         // Fill background
-        ctx.fillStyle = "#f0f0f0";
+        ctx.fillStyle = platformColor.background || "#f0f0f0";
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
         // Color mapping
@@ -2837,11 +2864,14 @@ function LegoWidget() {
             const y = rowIndex * rowHeight;
 
             // Draw row background
-            ctx.fillStyle = rowIndex % 2 === 0 ? "#ffffff" : "#f8f8f8";
+            ctx.fillStyle =
+                rowIndex % 2 === 0
+                    ? platformColor.background || "#ffffff"
+                    : platformColor.selectorBackgroundHOFF || "#f8f8f8";
             ctx.fillRect(0, y, canvasWidth, rowHeight);
 
             // Draw row label
-            ctx.fillStyle = "#000000";
+            ctx.fillStyle = platformColor.textColor || "#000000";
             ctx.font = "12px Arial";
             ctx.textAlign = "left";
             ctx.fillText(`${rowData.label} (${rowData.note})`, 10, y + 20);
@@ -2871,7 +2901,7 @@ function LegoWidget() {
                     ctx.fillRect(currentX, segmentY, segmentWidth, segmentHeight);
 
                     // Draw segment border
-                    ctx.strokeStyle = "#333333";
+                    ctx.strokeStyle = platformColor.strokeColor || "#333333";
                     ctx.lineWidth = 1;
                     ctx.strokeRect(currentX, segmentY, segmentWidth, segmentHeight);
 
@@ -3066,4 +3096,8 @@ function LegoWidget() {
             this.synth.stopSound(0, this.selectedInstrument, note);
         });
     };
+}
+
+if (typeof module !== "undefined") {
+    module.exports = LegoWidget;
 }

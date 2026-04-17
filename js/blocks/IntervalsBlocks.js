@@ -12,7 +12,7 @@
 /*
    global
 
-   last, _, ValueBlock, FlowClampBlock, FlowBlock, NOINPUTERRORMSG,
+   deepClone, last, _, ValueBlock, FlowClampBlock, FlowBlock, NOINPUTERRORMSG,
    LeftBlock, Singer, CHORDNAMES, CHORDVALUES, DEFAULTCHORD,
    Queue, INTERVALVALUES
  */
@@ -292,10 +292,13 @@ function setupIntervalsBlocks(activity) {
          * @returns {*} - The argument for the IntervalNumber block.
          */
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId != null &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "intervalnumber"]);
             } else {
@@ -347,10 +350,13 @@ function setupIntervalsBlocks(activity) {
          * @returns {*} - The argument for the CurrentInterval block.
          */
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId != null &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "currentinterval"]);
             } else {
@@ -406,9 +412,11 @@ function setupIntervalsBlocks(activity) {
             const saveSuppressStatus = tur.singer.suppressOutput;
 
             // Save the state of the boxes, dicts, and heap
-            const saveBoxes = JSON.stringify(logo.boxes);
-            const saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
-            const saveTurtleDicts = JSON.stringify(logo.turtleDicts[turtle]);
+            const saveBoxes = deepClone(logo.boxes);
+            const saveTurtleHeaps =
+                logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle]) : undefined;
+            const saveTurtleDicts =
+                logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle]) : undefined;
 
             // Save the turtle state
             const saveX = tur.x;
@@ -420,6 +428,8 @@ function setupIntervalsBlocks(activity) {
             const saveCanvasAlpha = tur.painter.canvasAlpha;
             const saveOrientation = tur.orientation;
             const savePenState = tur.painter.penState;
+            const previousButNotThese = tur.butNotThese;
+            tur.butNotThese = deepClone(tur.butNotThese);
 
             tur.singer.suppressOutput = true;
             tur.singer.justCounting.push(true);
@@ -455,9 +465,9 @@ function setupIntervalsBlocks(activity) {
             tur.singer.notesPlayed = saveNoteCount;
 
             // Restore previous state
-            logo.boxes = JSON.parse(saveBoxes);
-            logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
-            logo.turtleDicts[turtle] = JSON.parse(saveTurtleDicts);
+            logo.boxes = saveBoxes;
+            logo.turtleHeaps[turtle] = saveTurtleHeaps != null ? saveTurtleHeaps : {};
+            logo.turtleDicts[turtle] = saveTurtleDicts != null ? saveTurtleDicts : {};
 
             tur.painter.doPenUp();
             tur.painter.doSetXY(saveX, saveY);
@@ -473,8 +483,7 @@ function setupIntervalsBlocks(activity) {
             tur.singer.justMeasuring.pop();
             tur.singer.suppressOutput = saveSuppressStatus;
 
-            // Handle cascading
-            tur.butNotThese = {};
+            tur.butNotThese = previousButNotThese;
 
             return distance;
         }
@@ -524,9 +533,11 @@ function setupIntervalsBlocks(activity) {
             // We need to save the state of the boxes, dicts, and heap
             // although there is a potential of a boxes
             // collision with other turtles.
-            const saveBoxes = JSON.stringify(logo.boxes);
-            const saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
-            const saveTurtleDicts = JSON.stringify(logo.turtleDicts[turtle]);
+            const saveBoxes = deepClone(logo.boxes);
+            const saveTurtleHeaps =
+                logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle]) : undefined;
+            const saveTurtleDicts =
+                logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle]) : undefined;
             // And the turtle state
             const saveX = tur.x;
             const saveY = tur.y;
@@ -537,6 +548,8 @@ function setupIntervalsBlocks(activity) {
             const saveCanvasAlpha = tur.painter.canvasAlpha;
             const saveOrientation = tur.orientation;
             const savePenState = tur.painter.penState;
+            const previousButNotThese = tur.butNotThese;
+            tur.butNotThese = deepClone(tur.butNotThese);
 
             tur.singer.suppressOutput = true;
 
@@ -573,9 +586,9 @@ function setupIntervalsBlocks(activity) {
             tur.singer.notesPlayed = saveNoteCount;
 
             // Restore previous state
-            logo.boxes = JSON.parse(saveBoxes);
-            logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
-            logo.turtleDicts[turtle] = JSON.parse(saveTurtleDicts);
+            logo.boxes = saveBoxes;
+            logo.turtleHeaps[turtle] = saveTurtleHeaps != null ? saveTurtleHeaps : {};
+            logo.turtleDicts[turtle] = saveTurtleDicts != null ? saveTurtleDicts : {};
 
             tur.painter.doPenUp();
             tur.painter.doSetXY(saveX, saveY);
@@ -591,8 +604,7 @@ function setupIntervalsBlocks(activity) {
             tur.singer.justMeasuring.pop();
             tur.singer.suppressOutput = saveSuppressStatus;
 
-            // FIXME: we need to handle cascading.
-            tur.butNotThese = {};
+            tur.butNotThese = previousButNotThese;
             return distance;
         }
     }
@@ -667,31 +679,8 @@ function setupIntervalsBlocks(activity) {
             this.setPalette("intervals", activity);
             // Values for the piemenu (circle menu) representing semi-tone intervals.
             this.piemenuValuesC1 = [
-                -12,
-                -11,
-                -10,
-                -9,
-                -8,
-                -7,
-                -6,
-                -5,
-                -4,
-                -3,
-                -2,
-                -1,
-                0,
-                1,
-                2,
-                3,
-                4,
-                5,
-                6,
-                7,
-                8,
-                9,
-                10,
-                11,
-                12
+                -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                11, 12
             ];
             this.setHelpString([
                 _(
@@ -798,7 +787,7 @@ function setupIntervalsBlocks(activity) {
             }
 
             // Queue each block in the clamp.
-            const listenerName = "_duplicate_" + turtle;
+            const listenerName = "_duplicate_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __lookForOtherTurtles = function (blk, turtle) {
@@ -847,7 +836,6 @@ function setupIntervalsBlocks(activity) {
                 });
             };
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = async event => {
                 tur.singer.inDuplicate = false;
                 tur.singer.duplicateFactor /= factor;
@@ -1066,7 +1054,6 @@ function setupIntervalsBlocks(activity) {
                 if (intervalName in INTERVALVALUES) {
                     r = INTERVALVALUES[intervalName][2];
                 } else {
-                    // eslint-disable-next-line no-console
                     console.log("could not find " + intervalName + " in INTERVALVALUES");
                     r = 1;
                 }
@@ -1074,7 +1061,7 @@ function setupIntervalsBlocks(activity) {
 
             if (isNaN(r) || r < 0) {
                 r = 1;
-                // eslint-disable-next-line no-console
+
                 console.debug("ratio " + r + " must be a number > 0");
             }
             Singer.IntervalsActions.setRatioInterval(r, turtle, blk);
@@ -1296,10 +1283,13 @@ function setupIntervalsBlocks(activity) {
          * @returns {any} - The argument value.
          */
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId != null &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "modelength"]);
             } else {
@@ -1349,10 +1339,13 @@ function setupIntervalsBlocks(activity) {
          * @returns {any} - The argument value.
          */
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId != null &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "currentmode"]);
             } else {
@@ -1402,10 +1395,13 @@ function setupIntervalsBlocks(activity) {
          * @returns {any} - The argument value.
          */
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId != null &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "key"]);
             } else {
@@ -1538,7 +1534,49 @@ function setupIntervalsBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for getting the length of the current temperament.
+     * @extends {ValueBlock}
+     */
+    class TemperamentLengthBlock extends ValueBlock {
+        constructor() {
+            //.TRANS: the number of pitches in the current temperament system
+            super("temperamentlength", _("temperament length"));
+            this.setPalette("intervals", activity);
+            this.beginnerBlock(true);
+            this.parameter = true;
+            this.setHelpString([
+                _(
+                    "The Temperament length block returns the number of pitches in the current temperament system. For example, 12 for standard equal temperament or 31 for a 31-tone temperament."
+                ),
+                "documentation",
+                ""
+            ]);
+            this.formBlock({ outType: "numberout" });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return activity.blocks.blockList[blk].value;
+        }
+
+        arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
+            if (
+                logo.inStatusMatrix &&
+                parentId != null &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
+            ) {
+                logo.statusFields.push([blk, "temperamentlength"]);
+            } else {
+                return Singer.IntervalsActions.getTemperamentLength();
+            }
+        }
+    }
+
     new SetTemperamentBlock().setup(activity);
+    new TemperamentLengthBlock().setup(activity);
     new TemperamentNameBlock().setup(activity);
     new ChordNameBlock().setup(activity);
     new ModeNameBlock().setup(activity);
@@ -1563,4 +1601,7 @@ function setupIntervalsBlocks(activity) {
     new KeyBlock().setup(activity);
     new SetKeyBlock().setup(activity);
     new SetKey2Block().setup(activity);
+}
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = setupIntervalsBlocks;
 }
