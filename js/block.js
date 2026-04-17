@@ -3188,8 +3188,10 @@ class Block {
             that.blocks.raiseStackToTop(thisBlock);
 
             // And possibly the collapse button.
+            // eslint-disable-next-line eqeqeq
             if (that.collapseContainer != null) {
                 // Ensure the blocksContainer still exisits.
+                // eslint-disable-next-line eqeqeq
                 if (that.activity.blocksContainer != null) {
                     that.activity.blocksContainer.setChildIndex(
                         that.collapseContainer,
@@ -3221,6 +3223,7 @@ class Block {
             // mouse move event.
             _dragHasRest2 = false;
             let checkBlock = that.blocks.blockList[that.connections[1]];
+            // eslint-disable-next-line eqeqeq
             while (checkBlock != null) {
                 if (checkBlock?.name === "rest2") {
                     _dragHasRest2 = true;
@@ -3382,6 +3385,7 @@ class Block {
         this.container.on("mouseout", event => {
             // Ignore transient mouseout while actively dragging.
             if (that._dragPointerDown) {
+                // eslint-disable-next-line eqeqeq
                 if (that.blocks.longPressTimeout != null) {
                     clearTimeout(that.blocks.longPressTimeout);
                     that.blocks.longPressTimeout = null;
@@ -4869,3 +4873,7 @@ window.hasMouse = false;
 document.addEventListener("mousemove", () => {
     window.hasMouse = true;
 });
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Block;
+}
