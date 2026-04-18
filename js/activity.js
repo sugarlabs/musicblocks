@@ -4885,6 +4885,14 @@ class Activity {
          * When turtle stops running restore stop button to normal state
          */
         this.onStopTurtle = () => {
+            if (this.showBlocksAfterRun) {
+                this.blocks.showBlocks();
+                const stopIcon = document.getElementById("stop");
+                if (stopIcon) {
+                    stopIcon.style.color = "white";
+                }
+                this.showBlocksAfterRun = false;
+            }
             // TODO: plugin support
         };
 
