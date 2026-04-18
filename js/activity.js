@@ -1605,7 +1605,7 @@ class Activity {
             confirmBtn.classList.add("confirm-button");
             confirmBtn.textContent = _("Confirm");
             confirmBtn.style.backgroundColor = platformColor.blueButton;
-            confirmBtn.style.color = "white";
+            confirmBtn.style.color = platformColor.blueButtonText;
             confirmBtn.style.border = "none";
             confirmBtn.style.borderRadius = "4px";
             confirmBtn.style.padding = "8px 16px";
