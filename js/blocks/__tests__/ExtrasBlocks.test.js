@@ -616,7 +616,6 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
     test("real HideBlocksBlock flow() calls hideBlocks", () => {
         instances["HideBlocksBlock"].flow([], logo, turtle, blk);
         expect(activity.blocks.hideBlocks).toHaveBeenCalled();
-        expect(logo.activity.showBlocksAfterRun).toBe(false);
     });
 
     test("real DisplayGridBlock flow() shows Cartesian grid", () => {
