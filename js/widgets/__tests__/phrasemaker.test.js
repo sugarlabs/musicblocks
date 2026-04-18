@@ -58,6 +58,7 @@ global.DEFAULTVOICE = "electronic synth";
 global.DEFAULTDRUM = "kick drum";
 global.DEFAULTVOLUME = 50;
 global.PREVIEWVOLUME = 50;
+global.normalizeNoteAccidentals = note => note;
 global.SHARP = "♯";
 global.FLAT = "♭";
 global.MATRIXSOLFEHEIGHT = 30;
@@ -82,7 +83,7 @@ global.isCustomTemperament = jest.fn(() => false);
 global.i18nSolfege = jest.fn(s => s);
 global.getNote = jest.fn(() => ["C", "", 4]);
 global.noteToFrequency = jest.fn(() => 440);
-global.calcNoteValueToDisplay = jest.fn(() => ["1/4", "♩"]);
+global.calcNoteValueToDisplay = jest.fn(() => "1/4");
 global.delayExecution = jest.fn(ms => new Promise(r => setTimeout(r, ms)));
 global.getTemperament = jest.fn(() => ({ pitchNumber: 12 }));
 global.docBySelector = jest.fn(() => []);
@@ -197,7 +198,7 @@ describe("PhraseMaker Widget", () => {
 
             last: arr => arr[arr.length - 1],
             LCD: (a, b) => (a * b) / (b === 0 ? 1 : 1), // simple stub
-            calcNoteValueToDisplay: jest.fn(() => ["1/4", "♩"]),
+            calcNoteValueToDisplay: jest.fn(() => "1/4"),
             getDrumName: jest.fn(() => null),
             getDrumIcon: jest.fn(() => ""),
             getDrumSynthName: jest.fn(() => "kick"),
@@ -544,12 +545,17 @@ describe("PhraseMaker Widget", () => {
                 insertCell: jest.fn(() => ({
                     style: {},
                     setAttribute: jest.fn(),
-                    addEventListener: jest.fn()
+                    addEventListener: jest.fn(),
+                    appendChild: jest.fn()
                 }))
             }
         ];
         phraseMaker._noteValueRow = {
-            insertCell: jest.fn(() => ({ style: {}, setAttribute: jest.fn() }))
+            insertCell: jest.fn(() => ({
+                style: {},
+                setAttribute: jest.fn(),
+                appendChild: jest.fn()
+            }))
         };
 
         phraseMaker.addNotes(2, 4);
@@ -561,7 +567,8 @@ describe("PhraseMaker Widget", () => {
             style: {},
             innerHTML: "",
             setAttribute: jest.fn(),
-            addEventListener: jest.fn()
+            addEventListener: jest.fn(),
+            appendChild: jest.fn()
         });
 
         phraseMaker._rows = [
@@ -672,7 +679,7 @@ describe("PhraseMaker Widget", () => {
             }
         };
 
-        phraseMaker.blockConnection(1);
+        phraseMaker.blockConnection(1, null);
 
         expect(phraseMaker.activity.blocks.clampBlocksToCheck.length).toBe(1);
     });
@@ -1173,7 +1180,8 @@ describe("PhraseMaker Widget", () => {
                 synth: {
                     inTemperament: "equal",
                     stopSound: jest.fn(),
-                    stop: jest.fn()
+                    stop: jest.fn(),
+                    loadSynth: jest.fn()
                 }
             },
             blocks: {
