@@ -43,11 +43,7 @@
    NOTATIONSTACCATO
 */
 // Clean up after all tests are done
-afterAll(() => {
-    delete global.performanceTrackerInstance;
-});
-// Constants moved to js/logoconstants.js to resolve circular dependency
-
+// Constants moved to js/logoconstants.js to resolve circular dependencies
 /**
  * @class
  * @classdesc Queue entry for managing running blocks.
