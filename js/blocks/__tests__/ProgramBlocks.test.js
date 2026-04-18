@@ -217,7 +217,7 @@ describe("ProgramBlocks", () => {
             // Wait for the async fetch to complete
             await new Promise(resolve => setTimeout(resolve, 0));
 
-            expect(activity.errorMsg).toHaveBeenCalledWith("404: Page not found");
+            expect(activity.errorMsg).toHaveBeenCalledWith("404: Page not found", 1);
         });
 
         test("handles JSON parse error", async () => {
@@ -282,7 +282,8 @@ describe("ProgramBlocks", () => {
             block.flow(["nonexistent", "http://test.com"], logo, 0, 1);
 
             expect(activity.errorMsg).toHaveBeenCalledWith(
-                "Cannot find a valid heap for nonexistent"
+                "Cannot find a valid heap for nonexistent",
+                1
             );
         });
     });
@@ -318,7 +319,8 @@ describe("ProgramBlocks", () => {
             block.flow([[null, null]], logo, 0, blk);
 
             expect(activity.errorMsg).toHaveBeenCalledWith(
-                "The file you selected does not contain a valid heap."
+                "The file you selected does not contain a valid heap.",
+                blk
             );
         });
 
@@ -336,7 +338,8 @@ describe("ProgramBlocks", () => {
             block.flow([[null, null]], logo, 0, blk);
 
             expect(activity.errorMsg).toHaveBeenCalledWith(
-                "The file you selected does not contain a valid heap."
+                "The file you selected does not contain a valid heap.",
+                blk
             );
         });
 
@@ -353,7 +356,8 @@ describe("ProgramBlocks", () => {
             block.flow([[null, null]], logo, 0, blk);
 
             expect(activity.errorMsg).toHaveBeenCalledWith(
-                "The loadHeap block needs a loadFile block."
+                "The loadHeap block needs a loadFile block.",
+                blk
             );
         });
     });
@@ -387,7 +391,8 @@ describe("ProgramBlocks", () => {
             block.flow([null], logo, 0, blk);
 
             expect(activity.errorMsg).toHaveBeenCalledWith(
-                "The block you selected does not contain a valid heap."
+                "The block you selected does not contain a valid heap.",
+                blk
             );
         });
 
@@ -400,7 +405,7 @@ describe("ProgramBlocks", () => {
             const block = getBlock("setHeap");
             block.flow([null], logo, 0, blk);
 
-            expect(activity.errorMsg).toHaveBeenCalledWith("The Set heap block needs a heap.");
+            expect(activity.errorMsg).toHaveBeenCalledWith("The Set heap block needs a heap.", blk);
         });
     });
 
@@ -476,7 +481,8 @@ describe("ProgramBlocks", () => {
             block.flow(["MyDict", [null, null]], logo, 0, blk);
 
             expect(activity.errorMsg).toHaveBeenCalledWith(
-                "The load dictionary block needs a load file block."
+                "The load dictionary block needs a load file block.",
+                blk
             );
         });
 
@@ -497,7 +503,8 @@ describe("ProgramBlocks", () => {
             block.flow(["MyDict", [null, null]], logo, turtle, blk);
 
             expect(activity.errorMsg).toHaveBeenCalledWith(
-                "The file you selected does not contain a valid dictionary."
+                "The file you selected does not contain a valid dictionary.",
+                blk
             );
         });
     });
@@ -545,7 +552,8 @@ describe("ProgramBlocks", () => {
             block.flow(["MyDict", {}], logo, turtle, blk);
 
             expect(activity.errorMsg).toHaveBeenCalledWith(
-                "The block you selected does not contain a valid dictionary."
+                "The block you selected does not contain a valid dictionary.",
+                blk
             );
         });
     });
@@ -808,7 +816,7 @@ describe("ProgramBlocks", () => {
             block.flow(["javascript:alert(document.cookie)"], logo, 0, 5);
 
             expect(window.open).not.toHaveBeenCalled();
-            expect(activity.errorMsg).toHaveBeenCalledWith("Please enter a valid URL.");
+            expect(activity.errorMsg).toHaveBeenCalledWith("Please enter a valid URL.", 5);
         });
 
         test("blocks data: URI scheme", () => {
@@ -816,7 +824,7 @@ describe("ProgramBlocks", () => {
             block.flow(["data:text/html,<script>alert(1)</script>"], logo, 0, 5);
 
             expect(window.open).not.toHaveBeenCalled();
-            expect(activity.errorMsg).toHaveBeenCalledWith("Please enter a valid URL.");
+            expect(activity.errorMsg).toHaveBeenCalledWith("Please enter a valid URL.", 5);
         });
 
         test("blocks vbscript: protocol", () => {
@@ -824,7 +832,7 @@ describe("ProgramBlocks", () => {
             block.flow(["vbscript:MsgBox('xss')"], logo, 0, 5);
 
             expect(window.open).not.toHaveBeenCalled();
-            expect(activity.errorMsg).toHaveBeenCalledWith("Please enter a valid URL.");
+            expect(activity.errorMsg).toHaveBeenCalledWith("Please enter a valid URL.", 5);
         });
 
         test("rejects bare domain without protocol", () => {
@@ -832,7 +840,7 @@ describe("ProgramBlocks", () => {
             block.flow(["evil.com"], logo, 0, 5);
 
             expect(window.open).not.toHaveBeenCalled();
-            expect(activity.errorMsg).toHaveBeenCalledWith("Please enter a valid URL.");
+            expect(activity.errorMsg).toHaveBeenCalledWith("Please enter a valid URL.", 5);
         });
 
         test("rejects null input", () => {
@@ -970,7 +978,7 @@ describe("ProgramBlocks", () => {
             ]);
             activity.blocks.protoBlockDict["proto1"] = { dockTypes: [null, "textin"] };
             getBlock("makeblock").arg(logo, 0, 0, null);
-            expect(activity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Warning"));
+            expect(activity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Warning"), 0);
         });
 
         test("handles string arg with dock type mismatch", () => {
@@ -982,7 +990,7 @@ describe("ProgramBlocks", () => {
             ]);
             activity.blocks.protoBlockDict["proto1"] = { dockTypes: [null, "numberin"] };
             getBlock("makeblock").arg(logo, 0, 0, null);
-            expect(activity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Warning"));
+            expect(activity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Warning"), 0);
         });
 
         test("handles boolean arg with dock type mismatch", () => {
@@ -994,7 +1002,7 @@ describe("ProgramBlocks", () => {
             ]);
             activity.blocks.protoBlockDict["proto1"] = { dockTypes: [null, "textin"] };
             getBlock("makeblock").arg(logo, 0, 0, null);
-            expect(activity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Warning"));
+            expect(activity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Warning"), 0);
         });
 
         test("handles unhandled arg type (object)", () => {
@@ -1006,7 +1014,7 @@ describe("ProgramBlocks", () => {
             ]);
             activity.blocks.protoBlockDict["proto1"] = { dockTypes: [null, "textin"] };
             getBlock("makeblock").arg(logo, 0, 0, null);
-            expect(activity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Warning"));
+            expect(activity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Warning"), 0);
         });
     });
 });
