@@ -24,6 +24,10 @@
  * @class
  * @classdesc pertains to the Mouse (corresponding to Turtle) in JavaScript based Music Blocks programs.
  */
+const resolvePath = path =>
+    path
+        .split(".")
+        .reduce((obj, key) => obj?.[key], typeof window !== "undefined" ? window : globalThis);
 class Mouse {
     /** Mouse objects in program */
     static MouseList = [];
@@ -159,7 +163,7 @@ class MusicBlocks {
             ].forEach(path => {
                 MusicBlocks._methodList[path] = [];
 
-                const classObj = path.split(".").reduce((obj, key) => obj?.[key], window);
+                const classObj = resolvePath(path);
 
                 if (!classObj) {
                     console.warn(`Class path "${path}" not found`);
@@ -258,7 +262,7 @@ class MusicBlocks {
                     throw new Error(`Class ${cname} not found`);
                 }
 
-                const classRef = cname === "Painter" ? this.turtle.painter : window[cname];
+                const classRef = cname === "Painter" ? this.turtle.painter : resolvePath(cname);
                 if (!classRef) {
                     throw new Error(`Class ${cname} not found`);
                 }
