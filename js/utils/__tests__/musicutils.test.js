@@ -108,10 +108,61 @@ const {
     base64Encode,
     NOTESTEP,
     ACCIDENTALNAMES,
-    NOTESFLAT
+    NOTESFLAT,
+    NOTENAMES,
+    SOLFEGENAMES1,
+    ALLNOTENAMES,
+    NOTENAMES1,
+    PITCHES1,
+    PITCHES3
 } = require("../musicutils");
 
 describe("musicutils", () => {
+    describe("musicutils core constants", () => {
+        const last = arr => arr[arr.length - 1];
+
+        it("keeps NOTENAMES as the seven natural note letters", () => {
+            expect(NOTENAMES).toEqual(["C", "D", "E", "F", "G", "A", "B"]);
+        });
+
+        it("keeps the expected solfege base syllables in SOLFEGENAMES1 without duplicates", () => {
+            const baseSolfegeNames = [
+                ...new Set(SOLFEGENAMES1.map(name => name.replace(/[♯♭𝄪𝄫]/gu, "")))
+            ];
+
+            expect(baseSolfegeNames).toEqual(["do", "re", "mi", "fa", "sol", "la", "ti"]);
+            expect(baseSolfegeNames).toHaveLength(7);
+        });
+
+        it("preserves the first and last entries for NOTENAMES and SOLFEGENAMES1", () => {
+            expect(NOTENAMES[0]).toBe("C");
+            expect(last(NOTENAMES)).toBe("B");
+            expect(SOLFEGENAMES1[0]).toBe("do");
+            expect(last(SOLFEGENAMES1)).toBe("ti");
+        });
+
+        it("includes sharps, flats, and double accidentals in ALLNOTENAMES", () => {
+            expect(ALLNOTENAMES).toEqual(
+                expect.arrayContaining(["C#", "Db", "Cx", "Dbb", "Fx", "Cb"])
+            );
+        });
+
+        it("keeps note and pitch collections as non-empty arrays of strings", () => {
+            [NOTENAMES, ALLNOTENAMES, NOTENAMES1, PITCHES1, PITCHES3].forEach(collection => {
+                expect(Array.isArray(collection)).toBe(true);
+                expect(collection.length).toBeGreaterThan(0);
+                expect(collection.every(item => typeof item === "string")).toBe(true);
+            });
+        });
+
+        it("keeps major and minor mode definitions at seven steps and one octave", () => {
+            expect(MUSICALMODES.major).toHaveLength(7);
+            expect(MUSICALMODES.minor).toHaveLength(7);
+            expect(MUSICALMODES.major.reduce((sum, step) => sum + step, 0)).toBe(12);
+            expect(MUSICALMODES.minor.reduce((sum, step) => sum + step, 0)).toBe(12);
+        });
+    });
+
     it("should set and get Octave Ratio", () => {
         setOctaveRatio(4);
         const octaveR = getOctaveRatio();
