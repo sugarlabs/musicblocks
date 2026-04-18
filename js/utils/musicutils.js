@@ -2963,31 +2963,26 @@ const frequencyToPitch = hz => {
 };
 
 /**
- * Get the articulation symbols from a note string.
+ * Get the articulation (accidental/direction) suffix from a note string by
+ * stripping the leading note-name prefix.
+ *
+ * Valid prefixes are the seven solfege syllables (do, re, mi, fa, sol, la, ti)
+ * and the seven letter note names (A–G). The prefix is matched only at the
+ * start of the string so that custom note names that happen to contain these
+ * letters elsewhere are not mangled.
+ *
  * @function
- * @param {string} note - The note string.
- * @returns {string} The note string without articulation symbols.
+ * @param {string} note - The note string (e.g. "C♯", "sol♭", "A^^").
+ * @returns {string} Whatever follows the note-name prefix (the articulation),
+ *     or the full string unchanged if no recognised prefix is found.
  */
 const getArticulation = note => {
-    return note
-        .replace("do", "")
-        .replace("re", "")
-        .replace("mi", "")
-        .replace("fa", "")
-        .replace("sol", "")
-        .replace("la", "")
-        .replace("ti", "")
-        .replace("A", "")
-        .replace("B", "")
-        .replace("C", "")
-        .replace("D", "")
-        .replace("E", "")
-        .replace("F", "")
-        .replace("G", "")
-        .replace("^^", "") // up/down from custom notes
-        .replace("vv", "")
-        .replace("^", "")
-        .replace("v", "");
+    // Match solfege names (longest first to avoid "sol" being shadowed by
+    // a later "la" replacement) or a single letter note name, anchored at
+    // the very start of the string.  Everything after the prefix is the
+    // articulation we want.
+    const match = note.match(/^(?:sol|do|re|mi|fa|la|ti|[A-G])(.*)/);
+    return match ? match[1] : note;
 };
 
 /**

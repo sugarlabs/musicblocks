@@ -1369,7 +1369,7 @@ function Synth() {
             attr = 0;
         }
 
-        const fragment = solfege.replace(attr, "");
+        const fragment = solfege.replace(getArticulation(solfege), "");
         let chromaticNumber = 0;
         if (fragment in solfegeDict) {
             chromaticNumber = solfegeDict[fragment];
