@@ -11,5 +11,5 @@ module.exports = {
         "!planet/js/__tests__/**"
     ],
     coverageReporters: ["text-summary", "text", "lcov"],
-    setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+    setupFilesAfterEnv: ["<rootDir>/jest.setup.js"]
 };
