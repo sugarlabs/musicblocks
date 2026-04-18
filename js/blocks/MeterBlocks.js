@@ -1015,7 +1015,11 @@ function setupMeterBlocks(activity) {
             if (logo.inTempo) {
                 logo.tempo.BPMBlocks.push(blk);
                 const bpmnumberblock = activity.blocks.blockList[blk].connections[1];
-                logo.tempo.BPMs.push(activity.blocks.blockList[bpmnumberblock].text.text);
+                const bpmValue =
+                    bpmnumberblock !== null && activity.blocks.blockList[bpmnumberblock]
+                        ? activity.blocks.blockList[bpmnumberblock].text.text
+                        : args[0].toString();
+                logo.tempo.BPMs.push(bpmValue);
             }
         }
     }
@@ -1071,7 +1075,11 @@ function setupMeterBlocks(activity) {
             if (logo.inTempo) {
                 logo.tempo.BPMBlocks.push(blk);
                 const bpmnumberblock = activity.blocks.blockList[blk].connections[1];
-                logo.tempo.BPMs.push(activity.blocks.blockList[bpmnumberblock].text.text);
+                const bpmValue =
+                    bpmnumberblock !== null && activity.blocks.blockList[bpmnumberblock]
+                        ? activity.blocks.blockList[bpmnumberblock].text.text
+                        : args[0].toString();
+                logo.tempo.BPMs.push(bpmValue);
             }
         }
     }
@@ -1141,7 +1149,11 @@ function setupMeterBlocks(activity) {
             if (logo.inTempo) {
                 logo.tempo.BPMBlocks.push(blk);
                 const bpmnumberblock = activity.blocks.blockList[blk].connections[1];
-                logo.tempo.BPMs.push(activity.blocks.blockList[bpmnumberblock].text.text);
+                const bpmValue =
+                    bpmnumberblock !== null && activity.blocks.blockList[bpmnumberblock]
+                        ? activity.blocks.blockList[bpmnumberblock].text.text
+                        : args[0].toString();
+                logo.tempo.BPMs.push(bpmValue);
             }
         }
     }
