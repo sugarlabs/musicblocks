@@ -903,45 +903,23 @@ describe("modeMapper", () => {
         global.FLAT = "♭";
     });
 
-    it("should map Ionian to major", () => {
-        expect(modeMapper("C", "ionian")).toEqual(["c", "major"]);
-        expect(modeMapper("D", "ionian")).toEqual(["d", "major"]);
-    });
-    it("should handle flats in Dorian mode", () => {
-        expect(modeMapper("E♭", "dorian")).toEqual(["e♭", "minor"]);
-        expect(modeMapper("B♭", "dorian")).toEqual(["f", "minor"]);
-    });
-    it("should handle flats in Locrian mode", () => {
-        expect(modeMapper("E♭", "locrian")).toEqual(["d♭", "minor"]);
-        expect(modeMapper("B♭", "locrian")).toEqual(["d♭", "minor"]);
-    });
-    it("should map Aeolian to minor", () => {
-        expect(modeMapper("A", "aeolian")).toEqual(["a", "minor"]);
-        expect(modeMapper("C", "aeolian")).toEqual(["c", "minor"]);
-    });
-
-    it("should map natural minor to minor", () => {
-        expect(modeMapper("D", "natural minor")).toEqual(["d", "minor"]);
-    });
-
-    it("should leave major unchanged", () => {
-        expect(modeMapper("E", "major")).toEqual(["e", "major"]);
-    });
-
-    it("should leave minor unchanged", () => {
-        expect(modeMapper("F♯", "minor")).toEqual(["f♯", "minor"]);
-    });
-
-    it("should correctly map Phrygian major branch", () => {
-        expect(modeMapper("C", "phrygian")).toEqual(["g♯", "major"]);
-    });
-
-    it("should correctly switch to minor in Mixolydian", () => {
-        expect(modeMapper("A♯", "mixolydian")).toEqual(["c", "minor"]);
-    });
-
-    it("should normalize uppercase input", () => {
-        expect(modeMapper("C", "DORIAN")).toEqual(["a♯", "major"]);
+    it.each([
+        ["C", "ionian", ["c", "major"]],
+        ["D", "ionian", ["d", "major"]],
+        ["E♭", "dorian", ["e♭", "minor"]],
+        ["B♭", "dorian", ["f", "minor"]],
+        ["E♭", "locrian", ["d♭", "minor"]],
+        ["B♭", "locrian", ["d♭", "minor"]],
+        ["A", "aeolian", ["a", "minor"]],
+        ["C", "aeolian", ["c", "minor"]],
+        ["D", "natural minor", ["d", "minor"]],
+        ["E", "major", ["e", "major"]],
+        ["F♯", "minor", ["f♯", "minor"]],
+        ["C", "phrygian", ["g♯", "major"]],
+        ["A♯", "mixolydian", ["c", "minor"]],
+        ["C", "DORIAN", ["a♯", "major"]]
+    ])("should correctly map %s %s to %j", (key, mode, expected) => {
+        expect(modeMapper(key, mode)).toEqual(expected);
     });
 });
 
@@ -2288,6 +2266,53 @@ describe("getPitchInfo", () => {
         expect(getPitchInfo(activity, "alphabet", "C4", tur)).toBe("C");
     });
 
+    it("should correctly parse string inputs", () => {
+        expect(getPitchInfo("C#5")).toEqual({
+            name: "C#",
+            octave: 5,
+            pitchNumber: 73
+        });
+
+        // High octave and textual variants
+        expect(getPitchInfo("C10").pitchNumber).toBe(132);
+        expect(getPitchInfo("Fx10").pitchNumber).toBe(139);
+        expect(getPitchInfo("Cx4").pitchNumber).toBe(62);
+
+        // Unicode double accidentals
+        // F𝄪5 (F double-sharp) → same pitch as G5 = 79
+        const infoDoubleSharp = getPitchInfo("F\u{1D12A}5");
+        expect(infoDoubleSharp.pitchNumber).toBe(79);
+
+        // Bb𝄫5 (B double-flat) → same pitch as A5 = 81
+        const infoDoubleFlat = getPitchInfo("B\u{1D12B}5");
+        expect(infoDoubleFlat.pitchNumber).toBe(81);
+    });
+
+    it("should correctly parse numeric inputs", () => {
+        expect(getPitchInfo(60)).toEqual({
+            name: "C",
+            octave: 4,
+            pitchNumber: 60
+        });
+    });
+
+    it("should handle invalid inputs", () => {
+        expect(getPitchInfo("InvalidNote")).toEqual({
+            name: null,
+            octave: null,
+            pitchNumber: "Not a valid pitch name"
+        });
+    });
+
+    it("should handle accidental offset accumulation edge cases", () => {
+        // Gb-1
+        expect(getPitchInfo("Gb-1").pitchNumber).toBe(6);
+        // D𝄫-1
+        expect(getPitchInfo("D\u{1D12B}-1").pitchNumber).toBe(0);
+        // E##4
+        expect(getPitchInfo("E##4").pitchNumber).toBe(66);
+    });
+
     it("returns correct alphabet class", () => {
         expect(getPitchInfo(activity, "alphabet class", "C4", tur)).toBe("C");
         expect(getPitchInfo(activity, "letter class", "D#4", tur)).toBe("E");
@@ -2503,77 +2528,3 @@ describe("_calculate_pitch_number", () => {
     });
 });
 
-describe("getPitchInfo", () => {
-    it("should correctly parse string inputs", () => {
-        const info = getPitchInfo("C#5");
-        expect(info).toEqual({
-            name: "C#",
-            octave: 5,
-            pitchNumber: 73
-        });
-
-        const info10 = getPitchInfo("C10");
-        expect(info10).toEqual({
-            name: "C",
-            octave: 10,
-            pitchNumber: 132
-        });
-
-        // F𝄪5 (F double-sharp) → same pitch as G5 = (5+1)*12 + 7 = 79
-        const infoDoubleSharp = getPitchInfo("F\u{1D12A}5");
-        expect(infoDoubleSharp.pitchNumber).toBe(79);
-        expect(infoDoubleSharp.octave).toBe(5);
-
-        // Bb𝄫5 (B double-flat) → same pitch as A5 = (5+1)*12 + 9 = 81
-        const infoDoubleFlat = getPitchInfo("B\u{1D12B}5");
-        expect(infoDoubleFlat.pitchNumber).toBe(81);
-        expect(infoDoubleFlat.octave).toBe(5);
-
-        // Cx4 (C textual double-sharp) → same pitch as D4 = (4+1)*12 + 2 = 62
-        const infoX = getPitchInfo("Cx4");
-        expect(infoX.pitchNumber).toBe(62);
-        expect(infoX.octave).toBe(4);
-    });
-
-    it("should correctly parse numeric inputs", () => {
-        const info = getPitchInfo(60);
-        expect(info).toEqual({
-            name: "C",
-            octave: 4,
-            pitchNumber: 60
-        });
-    });
-
-    it("should handle invalid inputs", () => {
-        const info = getPitchInfo("InvalidNote");
-        expect(info).toEqual({
-            name: null,
-            octave: null,
-            pitchNumber: "Not a valid pitch name"
-        });
-    });
-
-    it("should handle accidental offset accumulation edge cases", () => {
-        // Gb-1: G(7) + flat(-1) = index 6 (G♭). (-1+1)*12 + 6 = 6
-        const infoGbNeg1 = getPitchInfo("Gb-1");
-        expect(infoGbNeg1.pitchNumber).toBe(6);
-        expect(infoGbNeg1.octave).toBe(-1);
-
-        // D𝄫-1 enharmonic of C at oct -1: (-1+1)*12 + 2 + (-2) = 0
-        // Note: D𝄫-2 (oct=-2) gives -12; octave must be -1 to reach pitch 0.
-        const infoDdblFlatNeg1 = getPitchInfo("D\u{1D12B}-1");
-        expect(infoDdblFlatNeg1.pitchNumber).toBe(0);
-        expect(infoDdblFlatNeg1.octave).toBe(-1);
-
-        // E##4: E(4) + ##(+2) → index 6 (F#). (4+1)*12 + 4 + 2 = 66
-        // Spelled with two ASCII '#' chars; each contributes +1 via ACCIDENTAL_SEMITONE_MAP.
-        const infoEDblSharp4 = getPitchInfo("E##4");
-        expect(infoEDblSharp4.pitchNumber).toBe(66);
-        expect(infoEDblSharp4.octave).toBe(4);
-
-        // Fx10: F(5) + x(+2) → index 7 (G). (10+1)*12 + 5 + 2 = 139
-        const infoFx10 = getPitchInfo("Fx10");
-        expect(infoFx10.pitchNumber).toBe(139);
-        expect(infoFx10.octave).toBe(10);
-    });
-});
