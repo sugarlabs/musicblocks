@@ -1726,11 +1726,6 @@ class Activity {
                 this.logo.doStopTurtles();
             }
 
-            // Reset turtle running state before starting new run
-            for (let i = 0; i < this.turtles.turtleList.length; i++) {
-                this.turtles.getTurtle(i).running = false;
-            }
-
             const currentDelay = this.logo.turtleDelay;
             this.logo.turtleDelay = 0;
             if (this.logo?.synth?.resume) {
