@@ -1754,7 +1754,7 @@ class Activity {
                 const stopBtn = document.getElementById("stop");
                 if (stopBtn) {
                     stopBtn.style.display = "inline-block";
-                    stopBtn.style.color = "#ea174c";
+                    stopBtn.style.color = window.platformColor.stopIconcolor;
                 }
             } else {
                 if (currentDelay !== 0) {
@@ -1772,7 +1772,7 @@ class Activity {
                     setTimeout(() => {
                         const stopBtnDelay = document.getElementById("stop");
                         if (stopBtnDelay) {
-                            stopBtnDelay.style.color = "#ea174c";
+                            stopBtnDelay.style.color = window.platformColor.stopIconcolor;
                         }
                         that.logo.runLogoCommands(null, env);
                     }, 500);
