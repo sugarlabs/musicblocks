@@ -1006,6 +1006,12 @@ function setupMeterBlocks(activity) {
          * @param {string} blk - The block identifier.
          */
         flow(args, logo, turtle, blk) {
+            const bpmnumberblock = activity.blocks.blockList[blk].connections[1];
+            if (bpmnumberblock === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return;
+            }
+
             if (args.length === 2 && typeof args[0] === "number" && typeof args[1] === "number") {
                 Singer.MeterActions.setMasterBPM(args[0], args[1], blk);
 
@@ -1014,12 +1020,7 @@ function setupMeterBlocks(activity) {
 
             if (logo.inTempo) {
                 logo.tempo.BPMBlocks.push(blk);
-                const bpmnumberblock = activity.blocks.blockList[blk].connections[1];
-                const bpmValue =
-                    bpmnumberblock !== null && activity.blocks.blockList[bpmnumberblock]
-                        ? activity.blocks.blockList[bpmnumberblock].text.text
-                        : args[0].toString();
-                logo.tempo.BPMs.push(bpmValue);
+                logo.tempo.BPMs.push(activity.blocks.blockList[bpmnumberblock].text.text);
             }
         }
     }
@@ -1058,6 +1059,12 @@ function setupMeterBlocks(activity) {
          * @param {string} blk - The block identifier.
          */
         flow(args, logo, turtle, blk) {
+            const bpmnumberblock = activity.blocks.blockList[blk].connections[1];
+            if (bpmnumberblock === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return;
+            }
+
             if (args.length === 1 && typeof args[0] === "number") {
                 if (args[0] < 30) {
                     activity.errorMsg(_("Beats per minute must be > 30."), blk);
@@ -1074,12 +1081,7 @@ function setupMeterBlocks(activity) {
 
             if (logo.inTempo) {
                 logo.tempo.BPMBlocks.push(blk);
-                const bpmnumberblock = activity.blocks.blockList[blk].connections[1];
-                const bpmValue =
-                    bpmnumberblock !== null && activity.blocks.blockList[bpmnumberblock]
-                        ? activity.blocks.blockList[bpmnumberblock].text.text
-                        : args[0].toString();
-                logo.tempo.BPMs.push(bpmValue);
+                logo.tempo.BPMs.push(activity.blocks.blockList[bpmnumberblock].text.text);
             }
         }
     }
@@ -1140,6 +1142,12 @@ function setupMeterBlocks(activity) {
          * @param {string} blk - The block identifier.
          */
         flow(args, logo, turtle, blk) {
+            const bpmnumberblock = activity.blocks.blockList[blk].connections[1];
+            if (bpmnumberblock === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return;
+            }
+
             if (args.length === 2 && typeof args[0] === "number" && typeof args[1] === "number") {
                 Singer.MeterActions.setBPM(args[0], args[1], turtle, blk);
 
@@ -1148,12 +1156,7 @@ function setupMeterBlocks(activity) {
 
             if (logo.inTempo) {
                 logo.tempo.BPMBlocks.push(blk);
-                const bpmnumberblock = activity.blocks.blockList[blk].connections[1];
-                const bpmValue =
-                    bpmnumberblock !== null && activity.blocks.blockList[bpmnumberblock]
-                        ? activity.blocks.blockList[bpmnumberblock].text.text
-                        : args[0].toString();
-                logo.tempo.BPMs.push(bpmValue);
+                logo.tempo.BPMs.push(activity.blocks.blockList[bpmnumberblock].text.text);
             }
         }
     }
