@@ -1004,6 +1004,7 @@ class Palettes {
             this.visible = false;
             this.activePalette = null;
             this.paletteObject = null;
+            this.collapsed = false;
 
             // Recreate the palette using the original initialization code
             const element = document.createElement("div");
@@ -1014,7 +1015,7 @@ class Palettes {
                 "style",
                 `position: fixed; z-index: 1000; left: 0px; top: ${
                     60 + this.top
-                }px; overflow-y: auto;`
+                }px; overflow-y: auto; overflow-x: hidden;`
             );
             element.innerHTML = `<div style="height:fit-content">
                     <table width="${1.5 * this.cellSize}" bgcolor="white">
@@ -1040,19 +1041,20 @@ class Palettes {
             toggleBtn.id = "paletteToggle";
 
             toggleBtn.style.position = "absolute";
-            toggleBtn.style.top = "12px";
-            toggleBtn.style.right = "-18px";
-            toggleBtn.style.width = "22px";
-            toggleBtn.style.height = "40px";
+            toggleBtn.style.top = "50%";
+            toggleBtn.style.right = "-25px";
+            toggleBtn.style.width = "24px";
+            toggleBtn.style.height = "52px";
+            toggleBtn.style.transform = "translateY(-50%)";
             toggleBtn.style.display = "flex";
             toggleBtn.style.alignItems = "center";
             toggleBtn.style.justifyContent = "center";
             toggleBtn.style.cursor = "pointer";
-            toggleBtn.style.background = platformColor.selectorSelected;
+            toggleBtn.style.background = platformColor.paletteLabelBackground;
             toggleBtn.style.color = "white";
 
-            toggleBtn.style.borderRadius = "0 6px 6px 0";
-            toggleBtn.style.boxShadow = "0 2px 4px rgba(0,0,0,0.15)";
+            toggleBtn.style.borderRadius = "0 30px 30px 0";
+            toggleBtn.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
             toggleBtn.style.fontWeight = "bold";
             toggleBtn.style.fontSize = "14px";
 
