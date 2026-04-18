@@ -83,8 +83,8 @@ class Toolbar {
                 ["play", _("Play")],
                 ["stop", _("Stop")],
                 ["record", _("Record")],
-                ["Full screen", _("Full screen")],
-                ["FullScreen", _("Full screen")],
+                ["Full screen", _("Enter Fullscreen")],
+                ["FullScreen", _("Enter Fullscreen")],
                 ["Toggle Fullscreen", _("Toggle Fullscreen")],
                 ["newFile", _("New project")],
                 ["load", _("Load project from file")],
@@ -93,7 +93,9 @@ class Toolbar {
                 ["planetIcon", _("Find and share projects")],
                 ["planetIconDisabled", _("Offline. Sharing is unavailable")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
-                ["helpIcon", _("Help")],
+                ["helpIcon", _("Help and shortcuts")],
+                ["helpGuideItem", _("Help"), "innerHTML"],
+                ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -153,8 +155,8 @@ class Toolbar {
                 _("Play"),
                 _("Stop"),
                 _("Record"),
-                _("Full screen"),
-                _("Full screen"),
+                _("Enter Fullscreen"),
+                _("Enter Fullscreen"),
                 _("Toggle Fullscreen"),
                 _("New project"),
                 _("Load project from file"),
@@ -163,7 +165,9 @@ class Toolbar {
                 _("Find and share projects"),
                 _("Offline. Sharing is unavailable"),
                 _("Auxiliary menu"),
+                _("Help and shortcuts"),
                 _("Help"),
+                _("Keyboard shortcuts"),
                 _("Run slowly"),
                 _("Run step by step"),
                 _("Display statistics"),
@@ -227,8 +231,8 @@ class Toolbar {
                 ["play", _("Play")],
                 ["stop", _("Stop")],
                 ["record", _("Record")],
-                ["Full screen", _("Full screen")],
-                ["FullScreen", _("Full screen")],
+                ["Full screen", _("Enter Fullscreen")],
+                ["FullScreen", _("Enter Fullscreen")],
                 ["Toggle Fullscreen", _("Toggle Fullscreen")],
                 ["newFile", _("New project")],
                 ["load", _("Load project from file")],
@@ -237,7 +241,9 @@ class Toolbar {
                 ["planetIcon", _("Find and share projects")],
                 ["planetIconDisabled", _("Offline. Sharing is unavailable")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
-                ["helpIcon", _("Help")],
+                ["helpIcon", _("Help and shortcuts")],
+                ["helpGuideItem", _("Help"), "innerHTML"],
+                ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -291,8 +297,8 @@ class Toolbar {
                 _("Play"),
                 _("Stop"),
                 _("Record"),
-                _("Full screen"),
-                _("Full screen"),
+                _("Enter Fullscreen"),
+                _("Enter Fullscreen"),
                 _("Toggle Fullscreen"),
                 _("New project"),
                 _("Load project from file"),
@@ -301,7 +307,9 @@ class Toolbar {
                 _("Find and share projects"),
                 _("Offline. Sharing is unavailable"),
                 _("Auxiliary menu"),
+                _("Help and shortcuts"),
                 _("Help"),
+                _("Keyboard shortcuts"),
                 _("Run slowly"),
                 _("Run step by step"),
                 _("Display statistics"),
@@ -386,10 +394,30 @@ class Toolbar {
             $j(this).tooltip("close");
         });
 
+        const restoreWidgetFocus = () => {
+            const focusedWindow = window.widgetWindows?.focused;
+            if (focusedWindow?.takeFocus) {
+                focusedWindow.takeFocus();
+                return;
+            }
+
+            const helpWindow = window.widgetWindows?.openWindows?.help;
+            if (helpWindow?.takeFocus) {
+                helpWindow.takeFocus();
+                return;
+            }
+
+            const shortcutsWindow = window.widgetWindows?.openWindows?.["keyboard-shortcuts"];
+            if (shortcutsWindow?.takeFocus) {
+                shortcutsWindow.takeFocus();
+            }
+        };
+
         $j(".materialize-iso, .dropdown-trigger").dropdown({
             constrainWidth: false,
             hover: false,
-            belowOrigin: true // Displays dropdown below the button
+            belowOrigin: true, // Displays dropdown below the button
+            onCloseEnd: restoreWidgetFocus
         });
 
         // Setup keyboard navigation for toolbar
@@ -439,6 +467,15 @@ class Toolbar {
         const playIcon = docById("play");
         const stopIcon = docById("stop");
         const recordButton = docById("record");
+        playIcon.setAttribute("role", "button");
+        playIcon.setAttribute("aria-label", _("Play project"));
+        playIcon.setAttribute("tabindex", "0");
+        playIcon.addEventListener("keydown", e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                playIcon.click();
+            }
+        });
         let isPlayIconRunning = false;
 
         function handleClick() {
@@ -492,6 +529,15 @@ class Toolbar {
     renderStopIcon(onclick) {
         const stopIcon = docById("stop");
         const recordButton = docById("record");
+        stopIcon.setAttribute("role", "button");
+        stopIcon.setAttribute("aria-label", _("Stop project"));
+        stopIcon.setAttribute("tabindex", "0");
+        stopIcon.addEventListener("keydown", e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                stopIcon.click();
+            }
+        });
         stopIcon.onclick = () => {
             onclick(this.activity);
             stopIcon.style.color = "white";
@@ -844,13 +890,11 @@ class Toolbar {
                 saveButtonAdvanced.style.display = "none";
                 saveButton.onclick = () => {
                     const saveHTML = docById("save-html-beg");
-                    console.debug(saveHTML);
                     saveHTML.onclick = () => {
                         html_onclick(this.activity);
                     };
 
                     const savePNG = docById("save-png-beg");
-                    console.debug(savePNG);
                     const svgData = doSVG_onclick(
                         this.activity.canvas,
                         this.activity.logo,
@@ -873,7 +917,6 @@ class Toolbar {
                 };
             }
         } else {
-            console.debug("ADVANCED MODE BUTTONS");
             saveButton.style.display = "none";
             saveButtonAdvanced.style.display = "block";
             saveButtonAdvanced.onclick = () => {
@@ -885,7 +928,6 @@ class Toolbar {
                 };
                 const saveSVG = docById("save-svg");
                 const savePNG = docById("save-png");
-                console.debug(savePNG);
                 const svgData = doSVG_onclick(
                     this.activity.canvas,
                     this.activity.logo,
@@ -1168,12 +1210,41 @@ class Toolbar {
      * @param {Function} onclick - The onclick handler for the help icon.
      * @returns {void}
      */
-    renderHelpIcon(onclick) {
+    renderHelpIcon(onclick, shortcutsOnclick) {
         const helpIcon = docById("helpIcon");
+        const helpGuideItem = docById("helpGuideItem");
+        const shortcutsGuideItem = docById("shortcutsGuideItem");
+        const hasDropdownMenu = !!helpGuideItem || !!shortcutsGuideItem;
 
-        helpIcon.onclick = () => {
-            onclick(this.activity);
-        };
+        if (helpGuideItem) {
+            helpGuideItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                onclick(this.activity);
+            };
+        }
+
+        if (shortcutsGuideItem) {
+            shortcutsGuideItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                if (shortcutsOnclick) {
+                    shortcutsOnclick(this.activity);
+                }
+            };
+        }
+
+        if (helpIcon) {
+            helpIcon.onclick = hasDropdownMenu
+                ? null
+                : () => {
+                      onclick(this.activity);
+                  };
+        }
     }
 
     /**
@@ -1369,10 +1440,30 @@ class Toolbar {
             }
 
             // Reinitialize dropdowns
+            const restoreWidgetFocus = () => {
+                const focusedWindow = window.widgetWindows?.focused;
+                if (focusedWindow?.takeFocus) {
+                    focusedWindow.takeFocus();
+                    return;
+                }
+
+                const helpWindow = window.widgetWindows?.openWindows?.help;
+                if (helpWindow?.takeFocus) {
+                    helpWindow.takeFocus();
+                    return;
+                }
+
+                const shortcutsWindow = window.widgetWindows?.openWindows?.["keyboard-shortcuts"];
+                if (shortcutsWindow?.takeFocus) {
+                    shortcutsWindow.takeFocus();
+                }
+            };
+
             $j(".materialize-iso, .dropdown-trigger").dropdown({
                 constrainWidth: false,
                 hover: false,
-                belowOrigin: true
+                belowOrigin: true,
+                onCloseEnd: restoreWidgetFocus
             });
 
             if (onclick) {
@@ -1441,6 +1532,25 @@ class Toolbar {
         const restoreIcon = docById("restoreIcon");
 
         restoreIcon.onclick = () => {
+            onclick(this.activity);
+        };
+    }
+
+    /**
+     * Renders the keyboard shortcuts icon with the provided onclick handler.
+     *
+     * @public
+     * @param {Function} onclick - The onclick handler for the keyboard shortcuts icon.
+     * @returns {void}
+     */
+    renderKeyboardShortcutsIcon(onclick) {
+        const keyboardShortcutsIcon = docById("keyboardShortcutsIcon");
+
+        if (!keyboardShortcutsIcon) {
+            return;
+        }
+
+        keyboardShortcutsIcon.onclick = () => {
             onclick(this.activity);
         };
     }

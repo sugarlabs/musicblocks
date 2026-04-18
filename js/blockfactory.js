@@ -512,7 +512,7 @@ class SVG {
             '<text style="font-size:' +
             fontSize +
             "px;fill:" +
-            platformColor.blockText +
+            "block_text_color" +
             ";font-family:sans-serif;text-anchor:" +
             align +
             '">';

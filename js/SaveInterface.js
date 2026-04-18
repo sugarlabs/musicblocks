@@ -15,7 +15,7 @@
    TITLESTRING, GUIDEURL, docById, docByClass, doSVG,
    fileExt, ABCHEADER, LILYPONDHEADER, platform, saveAbcOutput,
    saveLilypondOutput, saveMxmlOutput, getMidiInstrument, getMidiDrum,
-   Midi, activity
+   Midi, activity, normalizeNoteAccidentals
  */
 
 /**
@@ -78,18 +78,18 @@ class SaveInterface {
             STR_MY_PROJECT +
             ' - {{ project_name }}</h3> <p>{{ project_description }}</p><hr> <div> <div style="color: #9E9E9E"><p>' +
             _("This project was created in Music Blocks") +
-            ' (<a href="https://musicblocks.sugarlabs.org" target="_blank">https://musicblocks.sugarlabs.org</a>). ' +
+            ' (<a href="https://musicblocks.sugarlabs.org" target="_blank" rel="noopener noreferrer">https://musicblocks.sugarlabs.org</a>). ' +
             TITLESTRING +
             " " +
             _("Music Blocks is a Free/Libre Software application.") +
             " " +
             _("The source code can be accessed at") +
-            ' <a href="https://github.com/sugarlabs/musicblocks" target="_blank">https://github.com/sugarlabs/musicblocks</a>.' +
+            ' <a href="https://github.com/sugarlabs/musicblocks" target="_blank" rel="noopener noreferrer">https://github.com/sugarlabs/musicblocks</a>.' +
             " " +
             _("For more information, please consult the") +
             ' <a href="' +
             GUIDEURL +
-            '" target="_blank">' +
+            '" target="_blank" rel="noopener noreferrer">' +
             _("Music Blocks Guide") +
             "</a>." +
             "</p><p>" +
@@ -102,7 +102,7 @@ class SaveInterface {
             _("Project Code") +
             "</h4>" +
             _("This code stores data about the blocks in a project.") +
-            '<a href="javascript:toggle();" id="showhide">' +
+            '<a href="#" onclick="toggle(); return false;" id="showhide">' +
             STR_SHOW +
             "</a>" +
             '<button class="btn" onclick="copyCode()" style="margin-left: 10px;">' +
@@ -167,6 +167,30 @@ class SaveInterface {
         });
     }
 
+    showToast(message) {
+        const toast = document.createElement("div");
+        toast.className = "toast";
+        toast.innerText = message;
+
+        const canvas = document.querySelector("#canvas");
+        const container = canvas ? canvas.parentElement : document.body;
+
+        container.appendChild(toast);
+
+        toast.style.position = "absolute";
+        toast.style.bottom = "20px";
+        toast.style.right = "20px";
+        toast.style.background = "#4caf50";
+        toast.style.color = "white";
+        toast.style.padding = "12px 16px";
+        toast.style.borderRadius = "6px";
+        toast.style.zIndex = "9999999";
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
     /**
      * Download a file to the user's computer.
      * Uses MBDialog prompt when available to collect a filename with a modal UI.
@@ -176,7 +200,9 @@ class SaveInterface {
      * @returns {void}
      */
     download(extension, dataurl, defaultfilename) {
+        let message = _("Enter a filename to save your project:");
         let filename = null;
+        //const self = this;
         const finishDownload = name => {
             if (name === null) {
                 console.debug("save cancelled");
@@ -188,6 +214,14 @@ class SaveInterface {
             }
 
             this.downloadURL(name, dataurl);
+            if (extension === "webm") {
+                message = _("Recording saved! Check Downloads.");
+            } else if (extension === "html") {
+                message = _("Project saved! Check Downloads.");
+            } else {
+                message = _("File saved! Check Downloads.");
+            }
+            this.showToast(message);
         };
         if (defaultfilename === undefined || defaultfilename === null) {
             if (this.activity.PlanetInterface === undefined) {
@@ -236,9 +270,14 @@ class SaveInterface {
         const a = document.createElement("a");
         a.setAttribute("href", dataurl);
         a.setAttribute("download", filename);
+        a.setAttribute("rel", "noopener noreferrer");
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+
+        if (typeof URL.revokeObjectURL === "function") {
+            URL.revokeObjectURL(dataurl);
+        }
     }
 
     /**
@@ -273,10 +312,10 @@ class SaveInterface {
         }
 
         file = file
-            .replace(new RegExp("{{ project_description }}", "g"), description)
-            .replace(new RegExp("{{ project_name }}", "g"), name)
-            .replace(new RegExp("{{ data }}", "g"), data)
-            .replace(new RegExp("{{ project_image }}", "g"), image);
+            .replace(new RegExp("{{ project_description }}", "g"), escapeHTML(description))
+            .replace(new RegExp("{{ project_name }}", "g"), escapeHTML(name))
+            .replace(new RegExp("{{ data }}", "g"), escapeHTML(data))
+            .replace(new RegExp("{{ project_image }}", "g"), escapeHTML(image));
         return file;
     }
 
@@ -356,10 +395,6 @@ class SaveInterface {
         const instrumentMIDI = getMidiInstrument();
         const drumMIDI = getMidiDrum();
         const generateMidi = data => {
-            const normalizeNote = note => {
-                return note.replace("♯", "#").replace("♭", "b");
-            };
-
             const midi = new Midi();
             midi.header.ticksPerBeat = 480;
 
@@ -386,7 +421,10 @@ class SaveInterface {
 
                         const drumTrack = trackMap.get(drum);
 
-                        const midiNumber = drumMIDI[drum] || 36; // default to Bass Drum
+                        const midiNumber =
+                            Object.prototype.hasOwnProperty.call(drumMIDI, drum) && drumMIDI[drum]
+                                ? drumMIDI[drum]
+                                : 36; // default to Bass Drum
                         drumTrack.addNote({
                             midi: midiNumber,
                             time: globalTime,
@@ -400,7 +438,9 @@ class SaveInterface {
                                 parseInt(blockIndex) + 1
                             } - ${instrument}`;
                             instrumentTrack.instrument.number =
-                                instrumentMIDI[instrument] ?? instrumentMIDI["default"];
+                                Object.prototype.hasOwnProperty.call(instrumentMIDI, instrument)
+                                    ? instrumentMIDI[instrument]
+                                    : instrumentMIDI["default"];
                             trackMap.set(instrument, instrumentTrack);
                         }
 
@@ -409,7 +449,7 @@ class SaveInterface {
                         noteData.note.forEach(pitch => {
                             if (!pitch.includes("R")) {
                                 instrumentTrack.addNote({
-                                    name: normalizeNote(pitch),
+                                    name: normalizeNoteAccidentals(pitch),
                                     time: globalTime,
                                     duration: duration,
                                     velocity: 0.8
@@ -533,6 +573,7 @@ class SaveInterface {
         document.body.style.cursor = "wait";
 
         // Lazy-load abc module before using ABCHEADER
+
         _lazyRequire(["activity/abc"], function () {
             // Check if we have buffered notation data (Issue #2330)
             if (activity.logo.recordingBuffer.hasData) {
@@ -540,11 +581,23 @@ class SaveInterface {
                 activity.logo.notationOutput = activity.logo.recordingBuffer.notationOutput;
                 activity.logo.notationNotes = activity.logo.recordingBuffer.notationNotes;
                 for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
-                    if (activity.logo.recordingBuffer.notationStaging[t]) {
+                    if (
+                        Object.prototype.hasOwnProperty.call(
+                            activity.logo.recordingBuffer.notationStaging,
+                            t
+                        ) &&
+                        activity.logo.recordingBuffer.notationStaging[t]
+                    ) {
                         activity.logo.notation.notationStaging[t] =
                             activity.logo.recordingBuffer.notationStaging[t];
                     }
-                    if (activity.logo.recordingBuffer.notationDrumStaging[t]) {
+                    if (
+                        Object.prototype.hasOwnProperty.call(
+                            activity.logo.recordingBuffer.notationDrumStaging,
+                            t
+                        ) &&
+                        activity.logo.recordingBuffer.notationDrumStaging[t]
+                    ) {
                         activity.logo.notation.notationDrumStaging[t] =
                             activity.logo.recordingBuffer.notationDrumStaging[t];
                     }
@@ -589,6 +642,7 @@ class SaveInterface {
      */
     afterSaveAbc() {
         // Lazy-load abc module before using saveAbcOutput
+
         _lazyRequire(["activity/abc"], () => {
             try {
                 const abc = encodeURIComponent(saveAbcOutput(this.activity));
@@ -621,11 +675,23 @@ class SaveInterface {
             activity.logo.notationOutput = activity.logo.recordingBuffer.notationOutput;
             activity.logo.notationNotes = activity.logo.recordingBuffer.notationNotes;
             for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
-                if (activity.logo.recordingBuffer.notationStaging[t]) {
+                if (
+                    Object.prototype.hasOwnProperty.call(
+                        activity.logo.recordingBuffer.notationStaging,
+                        t
+                    ) &&
+                    activity.logo.recordingBuffer.notationStaging[t]
+                ) {
                     activity.logo.notation.notationStaging[t] =
                         activity.logo.recordingBuffer.notationStaging[t];
                 }
-                if (activity.logo.recordingBuffer.notationDrumStaging[t]) {
+                if (
+                    Object.prototype.hasOwnProperty.call(
+                        activity.logo.recordingBuffer.notationDrumStaging,
+                        t
+                    ) &&
+                    activity.logo.recordingBuffer.notationDrumStaging[t]
+                ) {
                     activity.logo.notation.notationDrumStaging[t] =
                         activity.logo.recordingBuffer.notationDrumStaging[t];
                 }
@@ -664,10 +730,10 @@ class SaveInterface {
             docById("title").value = STR_MY_PROJECT;
         }
 
-        // Load custom author saved in local storage.
         const customAuthorData = activity.storage.getItem("customAuthor");
-        if (customAuthorData !== undefined) {
-            docById("author").value = JSON.parse(customAuthorData);
+        if (customAuthorData !== undefined && customAuthorData !== null) {
+            docById("author").value =
+                safeJSONParse(customAuthorData, _("Mr. Mouse")) || _("Mr. Mouse");
         } else {
             //.TRANS: default project author when saving as Lilypond
             docById("author").value = _("Mr. Mouse");
@@ -724,6 +790,7 @@ class SaveInterface {
         };
 
         // Lazy-load lilypond module before using LILYPONDHEADER
+
         _lazyRequire(["activity/lilypond"], () => {
             const lyheader = LILYPONDHEADER.replace(
                 /My Music Blocks Creation|Mr. Mouse/gi,
@@ -768,7 +835,14 @@ class SaveInterface {
 
                 // Trigger save after a short delay to let UI update
                 setTimeout(() => {
-                    this.afterSaveLilypond();
+                    try {
+                        this.afterSaveLilypond();
+                    } catch (e) {
+                        console.error("Error generating Lilypond output:", e);
+                        this.activity.errorMsg(_("Error generating Lilypond output. ") + e.message);
+                    } finally {
+                        document.body.style.cursor = "default";
+                    }
                 }, 100);
             } else {
                 // No buffered data - run the program to generate notation (original behavior)
@@ -808,6 +882,7 @@ class SaveInterface {
      */
     afterSaveLilypond(filename) {
         // Lazy-load lilypond module before using saveLilypondOutput
+
         _lazyRequire(["activity/lilypond"], () => {
             filename = docById("fileName").value;
             try {
@@ -848,7 +923,7 @@ class SaveInterface {
         const showCopiedMessage = () => {
             this.activity.textMsg(
                 _("The Lilypond code is copied to clipboard. You can paste it here: ") +
-                    "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a> "
+                    "<a href='http://hacklily.org' target='_blank' rel='noopener noreferrer'>http://hacklily.org</a> "
             );
         };
 
@@ -957,6 +1032,7 @@ class SaveInterface {
      */
     afterSaveMxml(filename) {
         // Lazy-load mxml module before using saveMxmlOutput
+
         _lazyRequire(["activity/mxml"], () => {
             const data = saveMxmlOutput(this.activity.logo);
             this.download("xml", "data:text;utf8," + encodeURIComponent(data), filename);

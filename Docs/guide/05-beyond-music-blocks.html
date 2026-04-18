@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Music Blocks Guide - 5. Beyond Music Blocks</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous"/>
+    <style>
+      body { padding-top: 20px; }
+      .sidebar { background-color: #f8f9fa; padding: 20px; border-radius: 4px; border-right: 1px solid #eee; }
+      .content { padding: 20px; }
+      img { max-width: 100%; height: auto; display: block; margin: 10px 0; }
+      pre { background-color: #f8f8f8; padding: 10px; border: 1px solid #ccc; white-space: pre-wrap; }
+      table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+      th, td { border: 1px solid #ddd; padding: 8px; }
+      th { background-color: #f2f2f2; text-align: left; }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid" style="max-width: 1200px;">
+      <div class="row">
+        <div class="col-md-3 sidebar">
+          <h4 style="margin-top: 0;">Navigation</h4>
+          <ul class="nav nav-pills nav-stacked" style="position: sticky; top: 20px;">
+	    <li><a href="index.html">Introduction</a></li>
+	    <li><a href="01-getting-started.html">1. Getting Started</a></li>
+	    <li><a href="02-making-sounds.html">2. Making Sounds</a></li>
+	    <li><a href="03-programming-with-music.html">3. Programming with Music</a></li>
+	    <li><a href="04-widgets.html">4. Widgets</a></li>
+	    <li class="active"><a href="05-beyond-music-blocks.html">5. Beyond Music Blocks</a></li>
+	    <li><a href="06-appendix.html">6. Appendix</a></li>
+	  </ul>
+        </div>
+        <div class="col-md-9 content">
+          <p>
+            <a href="../guide/index.html">English</a> |
+            <a href="../guide-es/index.html">Español</a> |
+            <a href="../guide-ja/index.html">日本語</a> |
+            <a href="../guide-zhCN/index.html">中文</a> |
+            <a href="../guide-pt/index.html">Português</a>
+          </p>
+          <hr>
+          <h2><a name="BEYOND-MUSIC-BLOCKS">5. Beyond Music Blocks</a></h2>
+	  <p><a href="#4-widgets">Previous Section (4. Widgets)</a> | <a href="#table-of-contents">Back to Table of Contents</a> | <a href="#6-appendix">Next Section (6. Appendix)</a></p>
+	  <p>Music Blocks is a waypoint, not a destination. One of the goals is to
+	    point the learner towards other powerful tools.</p>
+	  <h2><a name="LILYPOND">5.1 Lilypond</a></h2>
+	  <p>One such tool is <a href="https://lilypond.org">Lilypond</a>, a music engraving program.</p>
+	  <p><img alt="lilypond" src="./lilypond1.svg" title="adding Save as Lilypond block" /></p>
+	  <p>The <em>Save as Lilypond</em> option from the Save menu will transcribe your
+	    composition (Only available in Advanced Mode).</p>
+	  <p>Note that if you use a <em>Print</em> block inside of a note, Lilypond will
+	    create a "markup" or annotation for that note. It is a simple way to
+	    add lyrics to your score.</p>
+	  <p><img alt="lilypond" src="./lilypond2.svg" title="Save as Lilypond icon" /></p>
+	  <pre><code>\version &quot;2.18.2&quot;
+	      
+	      mouse = {
+	      c'8 c'8 c'8 c'8 c'4 c'4 g'8 g'8 g'8 g'8 g'4 g'4 a'8 a'8 a'8 a'8 a'4
+	      a'4 g'8 g'8 g'8 g'8 g'4 g'4 f'8 f'8 f'8 f'8 f'4 f'4 e'8 e'8 e'8 e'8
+	      e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
+	      }
+	      
+	      \score {
+	      &lt;&lt;
+	      \new Staff = &quot;treble&quot; {
+	      \clef &quot;treble&quot;
+	      \set Staff.instrumentName = #&quot;mouse&quot; \mouse
+	      }
+	      &gt;&gt;
+	      \layout { }
+	      }
+	  </code></pre>
+	  <p><img alt="sheet music" src="./hotdog.png" title="sheet music" /></p>
+	  <p><a href="https://musicblocks.sugarlabs.org/index.html?id=1523043053377623&amp;run=True">RUN LIVE</a></p>
+	  <h2><a name="EXPORTS">5.2 Other Exports</a></h2>
+	  <p>In addition to Lilypond, there are several other export formats
+	    supported, including ABC, MusicXML, WAV, SVG, and PNG.</p>
+	  <p><strong>ABC</strong> notation is a shorthand form of musical notation. In basic
+	    form it uses the letters A through G, letter notation, to represent
+	    the given notes, with other elements used to place added value on
+	    these – sharp, flat, the length of the note, key, ornamentation (See
+	    https://en.wikipedia.org/wiki/ABC_notation).</p>
+	  <p><strong>MusicXML</strong> is an XML-based file format for representing Western
+	    musical notation. The format is open, fully documented, and can be
+	    freely used under the W3C Community Final Specification Agreement
+	    (See https://en.wikipedia.org/wiki/MusicXML).</p>
+	  <p><strong>WAV</strong> (Waveform Audio File Format) is an audio file format standard,
+	    developed by IBM and Microsoft, for storing an audio bitstream on
+	    PCs (See https://en.wikipedia.org/wiki/WAV).</p>
+	  <p><strong>PNG</strong> (Portable Network Graphics) is a raster-graphics file format
+	    that supports lossless data compression (See
+	    https://en.wikipedia.org/wiki/Portable_Network_Graphics). You can
+	    save your artwork as PNG.</p>
+	  <p><strong>SVG</strong> (Scalable Vector Graphics) is an Extensible Markup Language
+	    (XML)-based vector image format for two-dimensional graphics with
+	    support for interactivity and animation (See
+	    https://en.wikipedia.org/wiki/Scalable_Vector_Graphics). You can
+	    also save your artwork as SVG.</p>
+	  <p>Note that artwork saved as PNG or SVG can subsequently be imported
+	    into Music Blocks to be used with either the <em>Show</em> or <em>Avatar</em>
+	    blocks.</p>
+	  <p><strong>MIDI</strong> (Musical Instrument Digital Interface) is a technical standard
+	    for communicating musical performance data between electronic instruments,
+	    computers, and other devices. It does not store actual sound but encodes
+	    note, pitch, velocity, and instrument information, making it widely used
+	    for digital music composition and playback (See <a href="https://en.wikipedia.org/wiki/MIDI">https://en.wikipedia.org/wiki/MIDI</a>).
+	    Exported MIDI files can also be imported, allowing seamless editing and
+	    reuse of musical data.</p>
+	  <p><strong>Help artwork</strong></p>
+	  <p>Note for translators: The artwork used by the help widget (and used in
+	    this README file) can be created by typing <em>Alt-H</em> into Music
+	    Blocks. Artwork for each block will be generated and saved by the
+	    browser.</p>
+	  <h2><a name="JAVASCRIPT">5.3 The JavaScript Editor</a></h2>
+	  <p>There are practical limits to the size and complexity of Music Blocks
+	    programs. At some point we expect Music Blocks programmers to move on
+	    to text-based programming languages. To facilitate this transition,
+	    there is a JavaScript widget that will convert your Music Blocks
+	    program into JavaScript.</p>
+	  <p>The JavaScript code is written and viewed on the <strong>JavaScript Editor</strong>
+	    widget which can be opened by pressing on the "<em>Toggle JavaScript
+	      Editor</em>" (<code>&lt;&gt;</code>) button in the auxilliary menu.</p>
+	  <h3>Example code</h3>
+	  <p>For the block stacks (and mouse art generated after running),</p>
+	  <p><img alt="Example Project" src="../js/js-export/samples/mode-up-down.png" /></p>
+	  <p><a href="https://musicblocks.sugarlabs.org/index.html?id=1725884337271676&amp;run=True">RUN LIVE</a></p>
+	  <p>the following code is generated:</p>
+	  <pre><code>
+let action = async mouse =&gt; {
+    await mouse.playNote(1 / 4, async () =&gt; {
+        await mouse.playPitch(&quot;do&quot;, 4);
+        console.log(mouse.NOTEVALUE);
+        return mouse.ENDFLOW;
+    });
+    let box1 = 0;
+    let box2 = 360 / mouse.MODELENGTH;
+    for (let i0 = 0; i0 &lt; mouse.MODELENGTH * 2; i0++) {
+        await mouse.playNote(1 / 4, async () =&gt; {
+            if (box1 &lt; mouse.MODELENGTH) {
+                await mouse.stepPitch(1);
+                await mouse.turnRight(box2);
+            } else {
+                await mouse.stepPitch(-1);
+                await mouse.turnLeft(box2);
+            }
+            await mouse.goForward(100);
+            return mouse.ENDFLOW;
+        });
+        box1 = box1 + 1;
+    }
+    return mouse.ENDFLOW;
+};
+new Mouse(async mouse =&gt; {
+    await mouse.clear();
+    await mouse.setInstrument(&quot;guitar&quot;, async () =&gt; {
+        await mouse.setColor(50);
+        await action(mouse);
+        return mouse.ENDFLOW;
+    });
+    return mouse.ENDMOUSE;
+});
+MusicBlocks.run();
+	  </code></pre>
+	  <p>Here's the complete <a href="../js/js-export/samples/sample.js">API</a> of
+	    methods, getters, setters.</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

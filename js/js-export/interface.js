@@ -126,6 +126,10 @@ class JSInterface {
         // Media blocks
         bottompos: "BOTTOMPOS",
         camera: "CAMERA",
+        // Heap blocks
+        heap: "HEAP",
+        heapLength: "HEAPLENGTH",
+        heapEmpty: "HEAPEMPTY",
         // Pen blocks
         pensize: "PENSIZE",
         color: "COLOR",
@@ -204,6 +208,11 @@ class JSInterface {
         setdrum: "setDrum",
         mapdrum: "mapPitchToDrum",
         playnoise: "playNoise",
+        // Heap blocks
+        emptyHeap: "emptyHeap",
+        reverseHeap: "reverseHeap",
+        setHeapEntry: "setHeapEntry",
+        push: "push",
         // Number blocks
         random: "MathUtility.doRandom",
         oneOf: "MathUtility.doOneOf",

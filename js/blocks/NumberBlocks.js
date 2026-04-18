@@ -307,9 +307,9 @@ function setupNumberBlocks(activity) {
                 return MathUtility.doSqrt(a);
             } catch (e) {
                 logo.stopTurtle = true;
-                if (e === "NanError") {
+                if (e.message === "NanError") {
                     activity.errorMsg(NANERRORMSG, blk);
-                } else if (e === "NoSqrtError") {
+                } else if (e.message === "NoSqrtError") {
                     activity.errorMsg(NOSQRTERRORMSG, blk);
                     return MathUtility.doSqrt(-a);
                 }
@@ -464,9 +464,9 @@ function setupNumberBlocks(activity) {
                 return MathUtility.doDivide(a, b);
             } catch (e) {
                 logo.stopTurtle = true;
-                if (e === "NanError") {
+                if (e.message === "NanError") {
                     activity.errorMsg(NANERRORMSG, blk);
-                } else if (e === "DivByZeroError") {
+                } else if (e.message === "DivByZeroError") {
                     activity.errorMsg(ZERODIVIDEERRORMSG, blk);
                 }
                 return 0;
@@ -785,9 +785,9 @@ function setupNumberBlocks(activity) {
                     return MathUtility.doPlus(a, b);
                 } catch (e) {
                     activity.errorMsg(NOINPUTERRORMSG, blk);
-                    // eslint-disable-next-line no-console
+
                     console.debug(a + " " + b);
-                    // eslint-disable-next-line no-console
+
                     console.debug(e);
                     if (!isNaN(a)) {
                         return a;

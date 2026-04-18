@@ -123,9 +123,9 @@ class Planet {
         );
     }
 
-    closeButton() {
+    async closeButton() {
         if (this.ProjectStorage.getCurrentProjectID() !== this.oldCurrentProjectID) {
-            const data = this.ProjectStorage.getCurrentProjectData();
+            const data = await this.ProjectStorage.getCurrentProjectData();
             !data ? this.loadNewProject() : this.loadProjectFromData(data);
         } else this.planetClose();
     }

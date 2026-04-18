@@ -272,6 +272,35 @@ describe("PhraseMaker Widget", () => {
             expect(Object.keys(phraseMaker._blockMap)).toHaveLength(2);
         });
 
+        test("loads default drum row synths before grid preview playback", () => {
+            const loadSynth = jest.fn();
+            const setSynthVolume = jest.fn();
+            const instrumentNames = [];
+            const pm = new PhraseMaker({
+                getDrumName: jest.fn(label => (label === "snare drum" ? "snare drum" : null)),
+                Singer: { setSynthVolume }
+            });
+
+            pm.activity = {
+                logo: {
+                    synth: { loadSynth }
+                },
+                turtles: {
+                    ithTurtle: jest.fn(() => ({
+                        singer: { instrumentNames }
+                    }))
+                }
+            };
+            pm.rowLabels = ["snare drum", "sol", "snare drum"];
+
+            pm._loadDrumSynthsForRows();
+
+            expect(instrumentNames).toEqual(["snare drum"]);
+            expect(loadSynth).toHaveBeenCalledTimes(1);
+            expect(loadSynth).toHaveBeenCalledWith(0, "snare drum");
+            expect(setSynthVolume).toHaveBeenCalledWith(pm.activity.logo, 0, "snare drum", 50);
+        });
+
         test("should track lyrics", () => {
             phraseMaker._lyrics.push("do");
             phraseMaker._lyrics.push("re");

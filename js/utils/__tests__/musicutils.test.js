@@ -106,6 +106,8 @@ const {
     numberToPitch,
     GetNotesForInterval,
     base64Encode,
+    NOTESTEP,
+    ACCIDENTALNAMES,
     NOTESFLAT
 } = require("../musicutils");
 
@@ -2528,3 +2530,28 @@ describe("_calculate_pitch_number", () => {
     });
 });
 
+    describe("NOTESTEP", () => {
+        it("should map all seven natural notes to their correct step values", () => {
+            expect(NOTESTEP).toEqual({
+                C: 1,
+                D: 3,
+                E: 5,
+                F: 6,
+                G: 8,
+                A: 10,
+                B: 12
+            });
+        });
+    });
+
+    describe("ACCIDENTALNAMES", () => {
+        it("should contain all five accidental names with correct symbols", () => {
+            expect(ACCIDENTALNAMES).toEqual([
+                "double sharp \ud834\udd2a",
+                "sharp \u266f",
+                "natural \u266e",
+                "flat \u266d",
+                "double flat \ud834\udd2b"
+            ]);
+        });
+    });

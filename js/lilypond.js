@@ -133,12 +133,10 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                 j++; // Jump to next note.
                 k++; // Increment notes in tuplet.
             } else if (logo.notation.notationStaging[turtle][i + j] === "tie") {
-                // console.debug("adding a tie");
                 logo.notationNotes[turtle] += "~";
                 j++; // Jump to next note.
                 k++; // Increment notes in tuplet.
             } else {
-                // console.debug("ignoring " + notes);
                 j++; // Jump to next note.
                 k++; // Increment notes in tuplet.
             }
@@ -324,7 +322,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                             }
 
                             modeDef += ")\n";
-                            // console.debug(modeDef);
+
                             lilypond.freygish += modeDef;
                             logo.notationNotes[turtle] +=
                                 " \\key " + key + " \\" + mode.replace(/ /g, "_") + "\n";
@@ -440,7 +438,6 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                     }
 
                     if (logo.notation.notationStaging[turtle][i + j] === "tie") {
-                        // console.debug("saw a tie");
                         k++; // Increment notes in tuplet.
                         j++;
                     } else if ([1, 0.5, 0.25, 0.125, 0.0625].includes(totalTupletDuration)) {
@@ -670,7 +667,6 @@ const saveLilypondOutput = function (activity) {
     let c = 0;
     const occupiedShortNames = [];
     for (const t in activity.logo.notation.notationStaging) {
-        // console.debug('value of t: ' + t);
         let tNumber = t;
         if (typeof t === "string") {
             tNumber = Number(t);
@@ -681,8 +677,6 @@ const saveLilypondOutput = function (activity) {
             let noteCount = 0;
             for (let i = 0; i < activity.logo.notation.notationStaging[t].length; i++) {
                 const obj = activity.logo.notation.notationStaging[t][i];
-                // console.log("obj is ");
-                // console.log(obj);
                 if (typeof obj === "object") {
                     for (let ii = 0; ii < obj[0].length; ii++) {
                         if (obj[0][ii] === "R") {
@@ -762,8 +756,6 @@ const saveLilypondOutput = function (activity) {
                 }
 
                 instrumentName = instrumentName.replace(/ /g, "").replace(".", "");
-
-                // console.log("L604: " + instrumentName);
                 activity.logo.notationOutput += instrumentName + " = {\n";
                 activity.logo.notationOutput += activity.logo.notationNotes[t];
 
@@ -843,9 +835,6 @@ const saveLilypondOutput = function (activity) {
                         }
                     }
                 }
-
-                // console.debug("instrumentName: " + instrumentName);
-                // console.debug("shortInstrumentName: " + shortInstrumentName);
             }
 
             activity.logo.notationOutput +=
@@ -859,7 +848,6 @@ const saveLilypondOutput = function (activity) {
             activity.logo.notationOutput += '   instrumentName = "' + instrumentName + '"\n';
             if (tNumber > startDrums - 1) {
                 const num = tNumber - startDrums;
-                // console.debug("shortInstrumentName = d" + num);
                 activity.logo.notationOutput += '   shortInstrumentName = "' + "d" + num + '"\n';
                 activity.logo.notationOutput += '   midiInstrument = "snare drum"\n';
             } else {
@@ -909,9 +897,6 @@ const saveLilypondOutput = function (activity) {
                         } else {
                             instrumentName = _("mouse");
                         }
-
-                        // console.debug("Source: " + instrumentName);
-
                         if (instrumentName === "") {
                             instrumentName = _("mouse");
                         }

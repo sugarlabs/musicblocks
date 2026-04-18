@@ -12,7 +12,7 @@
 /*
    global
 
-   LeftBlock, FlowBlock, NOINPUTERRORMSG, getTargetTurtle, Turtle
+   LeftBlock, FlowBlock, NOINPUTERRORMSG, getTargetTurtle, Turtle, isSafeUrl
  */
 
 /* exported setupProgramBlocks */
@@ -82,6 +82,11 @@ function setupProgramBlocks(activity) {
             const oldHeap = name in logo.turtleHeaps ? logo.turtleHeaps[name] : [];
 
             // Use async fetch to avoid blocking the UI
+            if (!isSafeUrl(url)) {
+                activity.errorMsg(_("Invalid URL"));
+                return;
+            }
+
             fetch(url)
                 .then(response => {
                     if (!response.ok) {
@@ -172,6 +177,11 @@ function setupProgramBlocks(activity) {
 
             if (name in logo.turtleHeaps) {
                 const data = JSON.stringify(logo.turtleHeaps[name]);
+                if (!isSafeUrl(url)) {
+                    activity.errorMsg(_("Invalid URL"));
+                    return;
+                }
+
                 const xmlHttp = new XMLHttpRequest();
                 xmlHttp.open("POST", url, true);
                 xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -244,7 +254,7 @@ function setupProgramBlocks(activity) {
             }
 
             const c = block.connections[1];
-            if (c != null && activity.blocks.blockList[c].name === "loadFile") {
+            if (c !== null && activity.blocks.blockList[c].name === "loadFile") {
                 if (args.length !== 1) {
                     activity.errorMsg(_("You must select a file."));
                 } else {
@@ -253,7 +263,7 @@ function setupProgramBlocks(activity) {
                             activity.blocks.blockList[c].value[1]
                         );
                         if (!Array.isArray(logo.turtleHeaps[turtle])) {
-                            throw "is not array";
+                            throw new Error("is not array");
                         }
                     } catch (e) {
                         logo.turtleHeaps[turtle] = oldHeap;
@@ -324,7 +334,7 @@ function setupProgramBlocks(activity) {
                 try {
                     logo.turtleHeaps[turtle] = JSON.parse(activity.blocks.blockList[c].value);
                     if (!Array.isArray(logo.turtleHeaps[turtle])) {
-                        throw "is not array";
+                        throw new Error("is not array");
                     }
                 } catch (e) {
                     logo.turtleHeaps[turtle] = oldHeap;
@@ -412,7 +422,7 @@ function setupProgramBlocks(activity) {
             }
 
             const c = block.connections[2];
-            if (c != null && activity.blocks.blockList[c].name === "loadFile") {
+            if (c !== null && activity.blocks.blockList[c].name === "loadFile") {
                 if (args.length !== 2) {
                     activity.errorMsg(_("You must select a file."));
                 } else {
@@ -517,7 +527,7 @@ function setupProgramBlocks(activity) {
             }
 
             const c = block.connections[2];
-            if (c != null) {
+            if (c !== null) {
                 try {
                     const d = JSON.parse(activity.blocks.blockList[c].value);
                     // Is the dictionary the same as a turtle name?
@@ -1011,11 +1021,7 @@ function setupProgramBlocks(activity) {
         constructor() {
             super("dockblock");
             this.setPalette("program", activity);
-            this.setHelpString([
-                _("The Dock block block connections two blocks."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Dock block connects two blocks."), "documentation", ""]);
 
             this.formBlock({
                 /**
@@ -1433,38 +1439,18 @@ function setupProgramBlocks(activity) {
 
             const url = args[0];
 
-            /**
-             * Checks if a given string is a valid URL.
-             * @param {string} str - The string to be checked.
-             * @returns {boolean} True if the string is a valid URL, false otherwise.
-             */
-            function ValidURL(str) {
-                const pattern = new RegExp(
-                    "^(https?:\\/\\/)?" + // protocol
-                        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
-                        "((\\d{1,3}\\.) {3}\\d{1,3}))" + // OR ip (v4) address
-                        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-                        "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
-                        "(\\#[-a-z\\d_]*)?$",
-                    "i"
-                ); // fragment locator
-                if (!pattern.test(str)) {
-                    activity.errorMsg(_("Please enter a valid URL."));
-                    return false;
-                } else {
-                    return true;
-                }
+            // Use the centralized isSafeUrl utility (from utils.js) to enforce
+            // only http: and https: protocols, preventing open redirect attacks
+            // via javascript:, data:, vbscript:, or other dangerous URI schemes.
+            if (!isSafeUrl(url)) {
+                activity.errorMsg(_("Please enter a valid URL."));
+                return;
             }
 
-            if (ValidURL(url)) {
-                const win = window.open(url, "_blank");
-                if (win) {
-                    // Browser has allowed it to be opened.
-                    win.focus();
-                } else {
-                    // Browser has blocked it.
-                    alert(_("Please allow popups for this site"));
-                }
+            const win = window.open(url, "_blank", "noopener,noreferrer");
+            if (win === null) {
+                // Browser has blocked it.
+                alert(_("Please allow popups for this site"));
             }
         }
     }

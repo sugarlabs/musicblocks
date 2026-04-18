@@ -81,10 +81,68 @@ This can help identify recursive or deeply nested block structures that may impa
 
 The performance instrumentation was implemented with a few guiding goals:
 
-* **No impact on normal users** – instrumentation is disabled by default.
-* **Developer-focused visibility** – metrics are printed to the console rather than displayed in the UI.
-* **Safe fallbacks** – memory APIs are detected at runtime to avoid crashes in unsupported browsers.
-* **Minimal overhead** – when the feature is disabled, it introduces virtually no runtime cost.
+- **No impact on normal users** – instrumentation is disabled by default.
+- **Developer-focused visibility** – metrics are printed to the console rather than displayed in the UI.
+- **Safe fallbacks** – memory APIs are detected at runtime to avoid crashes in unsupported browsers.
+- **Minimal overhead** – when the feature is disabled, it introduces virtually no runtime cost.
+
+---
+
+## Debug Logging
+
+Music Blocks includes a lightweight debug logging utility (`js/utils/debugLog.js`) that replaces raw `console.log()` calls throughout the codebase. In production, all debug log calls become complete **no-ops with zero runtime cost**.
+
+### Why?
+
+Every `console.log()` call in production JavaScript has hidden costs:
+
+- **String allocation** — the browser serializes arguments even when DevTools is closed.
+- **Object reference retention** — Chrome and Firefox hold references to logged objects, preventing garbage collection.
+- **Console DOM overhead** — each log appends a node to the browser's internal console tree.
+
+### Enabling Debug Logging
+
+Debug logging can be enabled in three ways, checked in the following priority order:
+
+#### 1. URL Parameter
+
+Add `?debug=true` to the URL when launching Music Blocks:
+
+```
+http://localhost:8000/?debug=true
+```
+
+This mirrors the existing `?performance=true` parameter.
+
+#### 2. localStorage Flag
+
+From the browser console:
+
+```js
+localStorage.setItem("MB_DEBUG", "true"); // enable, then reload
+localStorage.setItem("MB_DEBUG", "false"); // force-disable, then reload
+localStorage.removeItem("MB_DEBUG"); // restore auto-detection
+```
+
+#### 3. Automatic Detection
+
+When no flag or URL parameter is set, debug logging is **automatically enabled** on `localhost` and `127.0.0.1` (development environments).
+
+### Example Output
+
+When enabled, debug messages are prefixed with `[MB]`:
+
+```
+[MB] ⚡ Idle mode: Throttling to 1 FPS...
+[MB] Recording started
+[MB] Custom block loaded: myAction
+```
+
+### Design Principles
+
+- **Zero cost in production** — the logger resolves to an empty function at load time.
+- **No build step required** — detection happens at runtime via an IIFE.
+- **Errors and warnings unchanged** — `console.error` and `console.warn` always surface.
 
 ---
 
@@ -92,10 +150,10 @@ The performance instrumentation was implemented with a few guiding goals:
 
 This instrumentation layer is only the first step toward better performance analysis in Music Blocks. Possible future improvements include:
 
-* A visual performance panel for developers
-* Block-level execution profiling
-* Automated benchmarking in CI
-* Historical performance comparison between runs
+- A visual performance panel for developers
+- Block-level execution profiling
+- Automated benchmarking in CI
+- Historical performance comparison between runs
 
 ---
 

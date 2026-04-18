@@ -132,7 +132,8 @@ class JSGenerate {
                         if (JSInterface.isGetter(arg.name)) {
                             args.push([arg.name, null]);
                         } else if (
-                            arg.protoblock.__proto__.__proto__.constructor.name === "BooleanBlock"
+                            window.BooleanBlock &&
+                            arg.protoblock instanceof window.BooleanBlock
                         ) {
                             if (arg.name === "boolean") {
                                 args.push("bool_" + arg.value);

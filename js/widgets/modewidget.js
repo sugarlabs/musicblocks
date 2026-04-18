@@ -14,6 +14,7 @@
 
    docById, _, platformColor, keySignatureToMode, MUSICALMODES,
    getNote, DEFAULTVOICE, last, NOTESTABLE, slicePath, wheelnav,
+   normalizeNoteAccidentals,
  */
 
 /*
@@ -100,6 +101,8 @@ class ModeWidget {
         this.widgetWindow.clear();
         this.widgetWindow.show();
 
+        this._timeouts = [];
+
         // The mode table (holds a pie menu and a label)
         this.modeTableDiv = document.createElement("div");
         this.modeTableDiv.style.display = "inline";
@@ -112,6 +115,10 @@ class ModeWidget {
         this.widgetWindow.getWidgetBody().append(this.modeTableDiv);
 
         this.widgetWindow.onclose = () => {
+            if (this._timeouts) {
+                this._timeouts.forEach(id => clearTimeout(id));
+                this._timeouts = [];
+            }
             this._playing = false;
             this.hideMsgs();
             this.widgetWindow.destroy();
@@ -193,7 +200,22 @@ class ModeWidget {
 
         //.TRANS: A circle of notes represents the musical mode.
         activity.textMsg(_("Click in the circle to select notes for the mode."), 3000);
-        setTimeout(() => this.widgetWindow.sendToCenter(), 0);
+        this._setTimeout(() => this.widgetWindow.sendToCenter(), 0);
+    }
+
+    /**
+     * @private
+     * @param {Function} fn - function to execute
+     * @param {number} delay - delay in milliseconds
+     * @returns {number} timeout ID
+     */
+    _setTimeout(fn, delay) {
+        const id = setTimeout(() => {
+            this._timeouts = this._timeouts.filter(t => t !== id);
+            fn();
+        }, delay);
+        this._timeouts.push(id);
+        return id;
     }
 
     /**
@@ -245,7 +267,7 @@ class ModeWidget {
         const windowHeight =
             this.getWidgetFrame().offsetHeight - this.getDragElement().offsetHeight;
         const widgetBody = this.getWidgetBody();
-        const scale = this.isMaximized ? windowHeight / widgetBody.offsetHeight : 1;
+        const scale = this.isMaximized() ? windowHeight / widgetBody.offsetHeight : 1;
         widgetBody.style.display = "flex";
         widgetBody.style.flexDirection = "column";
         widgetBody.style.alignItems = "center";
@@ -257,7 +279,7 @@ class ModeWidget {
         svg.style.pointerEvents = "none";
         svg.setAttribute("height", `${400 * scale}px`);
         svg.setAttribute("width", `${400 * scale}px`);
-        setTimeout(() => {
+        this._setTimeout(() => {
             svg.style.pointerEvents = "auto";
         }, 100);
     }
@@ -426,7 +448,7 @@ class ModeWidget {
             }
             this._locked = false;
         } else {
-            setTimeout(() => {
+            this._setTimeout(() => {
                 this.__invertOnePair(i + 1);
             }, ModeWidget.ROTATESPEED);
         }
@@ -479,7 +501,7 @@ class ModeWidget {
         }
 
         if (i === 0) {
-            setTimeout(() => {
+            this._setTimeout(() => {
                 if (this._selectedNotes[0]) {
                     // We are done.
                     this._saveState();
@@ -498,7 +520,7 @@ class ModeWidget {
                 }
             }, ModeWidget.ROTATESPEED);
         } else {
-            setTimeout(() => {
+            this._setTimeout(() => {
                 this.__rotateRightOneCell((i + 1) % 12);
             }, ModeWidget.ROTATESPEED);
         }
@@ -540,7 +562,7 @@ class ModeWidget {
         }
 
         if (i === 0) {
-            setTimeout(() => {
+            this._setTimeout(() => {
                 if (this._selectedNotes[0]) {
                     // We are done.
                     this._saveState();
@@ -559,7 +581,7 @@ class ModeWidget {
                 }
             }, ModeWidget.ROTATESPEED);
         } else {
-            setTimeout(() => {
+            this._setTimeout(() => {
                 this.__rotateLeftOneCell(i - 1);
             }, ModeWidget.ROTATESPEED);
         }
@@ -646,7 +668,7 @@ class ModeWidget {
         const currentKey = keySignatureToMode(this.turtles.ithTurtle(0).singer.keySignature)[0];
         if (currentKey === "C") {
             if (i > this._notesToPlay.length - 1) {
-                setTimeout(() => {
+                this._setTimeout(() => {
                     // Did we just play the last note?
                     this._playing = false;
                     const note_key = this._pianoKeys ? this._pianoKeys[0] : null;
@@ -668,7 +690,7 @@ class ModeWidget {
                 return;
             }
 
-            setTimeout(() => {
+            this._setTimeout(() => {
                 if (this._lastNotePlayed !== null) {
                     this._playWheel.navItems[this._lastNotePlayed % 12].navItem.hide();
                     const note_key = this._pianoKeys
@@ -695,7 +717,7 @@ class ModeWidget {
                 const noteToPlay = getNote(this._pitch, 4, note, ks, false, null, this.errorMsg);
                 this.logo.synth.trigger(
                     0,
-                    noteToPlay[0].replace(/♯/g, "#").replace(/♭/g, "b") + noteToPlay[1],
+                    normalizeNoteAccidentals(noteToPlay[0]) + noteToPlay[1],
                     this._noteValue,
                     DEFAULTVOICE,
                     null,
@@ -706,13 +728,13 @@ class ModeWidget {
                     this.__playNextNote(i + 1);
                 } else {
                     this._locked = false;
-                    setTimeout(() => this._resetNotes(), ModeWidget.RESET_NOTES_DELAY);
+                    this._setTimeout(() => this._resetNotes(), ModeWidget.RESET_NOTES_DELAY);
                     return;
                 }
             }, 1000 * time);
         } else {
             if (i > this._notesToPlay.length - 1) {
-                setTimeout(() => {
+                this._setTimeout(() => {
                     // Did we just play the last note?
                     this._playing = false;
                     this._playButton.innerHTML = `&nbsp;&nbsp;<img 
@@ -730,7 +752,7 @@ class ModeWidget {
                 return;
             }
 
-            setTimeout(() => {
+            this._setTimeout(() => {
                 if (this._lastNotePlayed !== null) {
                     this._playWheel.navItems[this._lastNotePlayed % 12].navItem.hide();
                 }
@@ -743,7 +765,7 @@ class ModeWidget {
                 const noteToPlay = getNote(this._pitch, 4, note, ks, false, null, this.errorMsg);
                 this.logo.synth.trigger(
                     0,
-                    noteToPlay[0].replace(/♯/g, "#").replace(/♭/g, "b") + noteToPlay[1],
+                    normalizeNoteAccidentals(noteToPlay[0]) + noteToPlay[1],
                     this._noteValue,
                     DEFAULTVOICE,
                     null,
@@ -753,7 +775,7 @@ class ModeWidget {
                     this.__playNextNote(i + 1);
                 } else {
                     this._locked = false;
-                    setTimeout(() => this._resetNotes(), ModeWidget.RESET_NOTES_DELAY);
+                    this._setTimeout(() => this._resetNotes(), ModeWidget.RESET_NOTES_DELAY);
                     return;
                 }
             }, 1000 * time);
@@ -771,7 +793,7 @@ class ModeWidget {
         const noteToPlay = getNote(this._pitch, 4, i, ks, false, null, this.errorMsg);
         this.logo.synth.trigger(
             0,
-            noteToPlay[0].replace(/♯/g, "#").replace(/♭/g, "b") + noteToPlay[1],
+            normalizeNoteAccidentals(noteToPlay[0]) + noteToPlay[1],
             this._noteValue,
             DEFAULTVOICE,
             null,
@@ -867,13 +889,13 @@ class ModeWidget {
             if (JSON.stringify(MUSICALMODES[mode]) === currentMode) {
                 // Update the value of the modename block inside of
                 // the mode widget block.
-                if (this._modeBlock != null) {
+                if (this._modeBlock !== null) {
                     for (const i in this.blocks.blockList) {
-                        if (this.blocks.blockList[i].name == "modename") {
+                        if (this.blocks.blockList[i].name === "modename") {
                             this.blocks.blockList[i].value = mode;
                             this.blocks.blockList[i].text.text = _(mode);
                             this.blocks.blockList[i].updateCache();
-                        } else if (this.blocks.blockList[i].name == "notename") {
+                        } else if (this.blocks.blockList[i].name === "notename") {
                             this.blocks.blockList[i].value = currentKey;
                             this.blocks.blockList[i].text.text = _(currentKey);
                         }
@@ -1074,7 +1096,7 @@ class ModeWidget {
 
         // Create a new stack for the chunk.
         // console.debug(newStack);
-        setTimeout(() => {
+        this._setTimeout(() => {
             this.blocks.loadNewBlocks(newStack);
         }, 2000);
     }
@@ -1184,7 +1206,7 @@ class ModeWidget {
         // If a noteWheel sector is selected, hide it.
         const __clearNote = () => {
             const i = this._noteWheel.selectedNavItemIndex;
-            if (i == 0) {
+            if (i === 0) {
                 return; // Never hide the first note.
             }
 

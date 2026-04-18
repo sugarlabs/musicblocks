@@ -19,7 +19,9 @@ global.MATRIXBUTTONHEIGHT = 40;
 global.MATRIXSOLFEHEIGHT = 30;
 
 global.rationalToFraction = jest.fn().mockReturnValue([4, 1]);
-global.mixedNumber = jest.fn().mockImplementation(val => (val != null ? val.toString() : ""));
+global.mixedNumber = jest
+    .fn()
+    .mockImplementation(val => (val !== null && val !== undefined ? val.toString() : ""));
 global.toFixed2 = jest.fn().mockImplementation(val => val.toFixed(2));
 
 global.platformColor = {
@@ -29,9 +31,11 @@ global.platformColor = {
 const createMockElement = tagName => ({
     tagName,
     style: {},
-    appendChild: jest.fn(),
     append: jest.fn(),
     innerHTML: "",
+    textContent: "",
+    appendChild: jest.fn(),
+    setAttribute: jest.fn(),
     querySelectorAll: jest.fn().mockReturnValue([]),
     addEventListener: jest.fn(),
     className: "",
@@ -440,7 +444,7 @@ describe("StatusMatrix Widget", () => {
             });
 
             statusMatrix.updateAll();
-            expect(statusMatrix._statusTable.rows[1].cells[1].innerHTML).toBe(4);
+            expect(statusMatrix._statusTable.rows[1].cells[1].textContent).toBe(4);
         });
 
         test("handles namedbox with value from logo.boxes", () => {
@@ -479,7 +483,7 @@ describe("StatusMatrix Widget", () => {
             };
             mockActivity.logo.statusFields = [[0, "unknownblock"]];
             statusMatrix.updateAll();
-            expect(statusMatrix._statusTable.rows[1].cells[1].innerHTML).toBe(99);
+            expect(statusMatrix._statusTable.rows[1].cells[1].textContent).toBe(99);
         });
     });
 
@@ -598,7 +602,7 @@ describe("StatusMatrix Widget", () => {
 
             statusMatrix.updateAll();
 
-            expect(mockCell.innerHTML).toContain("♯");
+            expect(mockCell.textContent).toContain("♯");
         });
 
         test("replaces b with ♭ in note display", () => {
@@ -611,7 +615,7 @@ describe("StatusMatrix Widget", () => {
             });
 
             statusMatrix.updateAll();
-            expect(statusMatrix._statusTable.rows[2].cells[1].innerHTML).toContain("♭");
+            expect(statusMatrix._statusTable.rows[2].cells[1].textContent).toContain("♭");
         });
 
         test("handles empty noteStatus array", () => {

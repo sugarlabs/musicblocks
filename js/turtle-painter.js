@@ -40,6 +40,12 @@ const DEFAULTVALUE = 50; // also used in turtles.js
 const DEFAULTCHROMA = 100; // also used in turtles.js
 const DEFAULTSTROKE = 5;
 const DEFAULTFONT = "sans-serif"; // also used in PenBlocks.js
+/**
+ * Multiplier for scroll buffer canvas size relative to main canvas.
+ * The auxiliary canvas used during scrolling is this many times larger
+ * than the main canvas to accommodate scroll operations without losing content.
+ */
+const SCROLL_CANVAS_SCALE = 3;
 
 /**
  * Class pertaining to visual actions for each turtle.
@@ -786,6 +792,12 @@ class Painter {
      * @param steps - the number of steps the turtle goes forward by
      */
     doForward(steps, linePart) {
+        steps = Number(steps);
+        if (!Number.isFinite(steps)) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+
         this._processColor();
 
         if (!this._fillState) {
@@ -960,11 +972,18 @@ class Painter {
      * @param radius - radius of arc
      */
     doArc(angle, radius) {
+        angle = Number(angle);
+        radius = Number(radius);
+        if (!Number.isFinite(angle) || !Number.isFinite(radius)) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+
         if (radius < 0) {
             radius = -radius;
         }
 
-        let adeg = Number(angle),
+        let adeg = angle,
             factor;
         if (adeg < 0) {
             factor = -1;
@@ -1330,13 +1349,13 @@ class Painter {
         this.turtle.penstrokes.image = null;
         this.turtle.ctx.beginPath();
         this.turtle.ctx.clearRect(0, 0, this.turtle.canvas.width, this.turtle.canvas.height);
-        if (turtles.c1ctx != null) {
+        if (turtles.c1ctx) {
             turtles.c1ctx.beginPath();
             turtles.c1ctx.clearRect(
                 0,
                 0,
-                3 * this.turtle.canvas.width,
-                3 * this.turtle.canvas.height
+                SCROLL_CANVAS_SCALE * this.turtle.canvas.width,
+                SCROLL_CANVAS_SCALE * this.turtle.canvas.height
             );
         }
         this.turtle.penstrokes.image = this.turtle.canvas;
@@ -1350,7 +1369,7 @@ class Painter {
      * @param dy - change in y coordinate
      */
     doScrollXY(dx, dy) {
-        // FIXME: how big?
+        // Scroll canvas uses SCROLL_CANVAS_SCALE multiplier for buffer sizing
 
         const imgData = this.turtle.ctx.getImageData(
             0,
@@ -1360,20 +1379,20 @@ class Painter {
         );
 
         const turtles = this.turtles;
-        if (turtles.canvas1 == null) {
+        if (!turtles.canvas1) {
             turtles.gx = this.turtle.ctx.canvas.width;
             turtles.gy = this.turtle.ctx.canvas.height;
             turtles.canvas1 = document.createElement("canvas");
             // Use 2x viewport instead of 3x to save ~40 MB of memory.
             // At 1920x1080: 2x = 3840x2160x4 = 33 MB vs 3x = 5760x3240x4 = 75 MB.
-            turtles.canvas1.width = 2 * this.turtle.ctx.canvas.width;
-            turtles.canvas1.height = 2 * this.turtle.ctx.canvas.height;
-            turtles.c1ctx = turtles.canvas1.getContext("2d", { willReadFrequently: true });
+            turtles.canvas1.width = (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.width;
+            turtles.canvas1.height = (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.height;
+            turtles.c1ctx = turtles.canvas1.getContext("2d");
             turtles.c1ctx.rect(
                 0,
                 0,
-                2 * this.turtle.ctx.canvas.width,
-                2 * this.turtle.ctx.canvas.height
+                (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.width,
+                (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.height
             );
             turtles.c1ctx.fillStyle = "#F9F9F9";
             turtles.c1ctx.fill();
@@ -1383,13 +1402,11 @@ class Painter {
 
         turtles.gy -= dy;
         turtles.gx -= dx;
-        // Clamp to the bounds of the 2x scroll canvas (max offset = 1x viewport)
-        turtles.gx =
-            this.turtle.ctx.canvas.width > turtles.gx ? turtles.gx : this.turtle.ctx.canvas.width;
-        turtles.gx = 0 > turtles.gx ? 0 : turtles.gx;
-        turtles.gy =
-            this.turtle.ctx.canvas.height > turtles.gy ? turtles.gy : this.turtle.ctx.canvas.height;
-        turtles.gy = 0 > turtles.gy ? 0 : turtles.gy;
+        // Clamp scroll position to stay within buffer canvas bounds
+        const maxScrollX = (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.width;
+        const maxScrollY = (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.height;
+        turtles.gx = Math.max(0, Math.min(turtles.gx, maxScrollX));
+        turtles.gy = Math.max(0, Math.min(turtles.gy, maxScrollY));
 
         const newImgData = turtles.c1ctx.getImageData(
             turtles.gx,

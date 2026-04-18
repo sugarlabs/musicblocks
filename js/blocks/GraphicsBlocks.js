@@ -97,8 +97,8 @@ function setupGraphicsBlocks(activity) {
          * @returns {number} - The heading value.
          */
         arg(logo, turtle, blk) {
-            const connections = activity.blocks.blockList[blk]?.connections;
-            const parentId = connections?.[0];
+            const connections = activity.blocks.blockList?.[blk]?.connections || [];
+            const parentId = connections[0] ?? null;
             if (
                 logo.inStatusMatrix &&
                 parentId != null &&
@@ -182,8 +182,8 @@ function setupGraphicsBlocks(activity) {
          * @returns {number} - The Y-coordinate value.
          */
         arg(logo, turtle, blk) {
-            const connections = activity.blocks.blockList[blk]?.connections;
-            const parentId = connections?.[0];
+            const connections = activity.blocks.blockList?.[blk]?.connections || [];
+            const parentId = connections[0] ?? null;
             if (
                 logo.inStatusMatrix &&
                 parentId != null &&
@@ -268,8 +268,8 @@ function setupGraphicsBlocks(activity) {
          * @returns {number} - The X-coordinate value.
          */
         arg(logo, turtle, blk) {
-            const connections = activity.blocks.blockList[blk]?.connections;
-            const parentId = connections?.[0];
+            const connections = activity.blocks.blockList?.[blk]?.connections || [];
+            const parentId = connections[0] ?? null;
             if (
                 logo.inStatusMatrix &&
                 parentId != null &&

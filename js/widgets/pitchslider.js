@@ -121,7 +121,7 @@ class PitchSlider {
             );
 
             // Set the leftmost slider as active by default
-            if (id == 0) {
+            if (id === "0") {
                 this.activeSlider = id;
             }
 

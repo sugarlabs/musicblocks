@@ -86,6 +86,35 @@ function setupWidgetBlocks(activity) {
     }
 
     /**
+     * Ensures that a widget is loaded and initialized before executing block logic.
+     * If the widget is null, it initiates a lazy load and returns an interruption signal.
+     *
+     * @param {object} logo - The logo object.
+     * @param {string} widgetKey - The key for the widget in the logo object.
+     * @param {string[]} modules - The modules to require.
+     * @param {Function} initFn - Callback to initialize the widget instance.
+     * @param {object} turtle - The turtle object.
+     * @param {object} blk - The block object.
+     * @param {any} receivedArg - The received argument.
+     * @returns {[null, number, boolean]|null} - Interruption signal or null if already loaded.
+     */
+    function _ensureWidget(logo, widgetKey, modules, initFn, turtle, blk, receivedArg) {
+        if (logo[widgetKey] === null) {
+            logo[widgetKey] = "loading"; // Guard against multiple simultaneous loads
+            _lazyRequire(modules, function () {
+                logo[widgetKey] = initFn();
+                if (typeof logo.runFromBlockNow === "function") {
+                    logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
+                }
+            });
+            return [null, 0, true];
+        } else if (logo[widgetKey] === "loading") {
+            return [null, 0, true]; // Still loading, continue to interrupt
+        }
+        return null;
+    }
+
+    /**
      * Represents a block for controlling sound envelope (ADSR).
      * @extends FlowBlock
      */
@@ -153,7 +182,7 @@ function setupWidgetBlocks(activity) {
                 logo.timbre.synthVals["envelope"]["sustain"] = last(tur.singer.sustain);
                 logo.timbre.synthVals["envelope"]["release"] = last(tur.singer.release);
 
-                if (logo.timbre.env.length != 0) {
+                if (logo.timbre.env.length !== 0) {
                     activity.errorMsg(_("You are adding multiple envelope blocks."));
                 } else {
                     // Create the synth for the instrument.
@@ -295,13 +324,19 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.temperament === null) {
-                _lazyRequire(["widgets/temperament"], function () {
-                    logo.temperament = new TemperamentWidget();
-                });
-            }
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "temperament",
+                ["widgets/temperament"],
+                () => new TemperamentWidget(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
 
             logo.insideTemperament = true;
             logo.temperament.inTemperament = args[0];
@@ -453,14 +488,20 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {number[]} - The output values.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.timbre === null) {
-                _lazyRequire(["widgets/timbre"], function () {
-                    logo.timbre = new TimbreWidget();
-                });
-            }
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "timbre",
+                ["widgets/timbre"],
+                () => new TimbreWidget(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
 
             logo.inTimbre = true;
 
@@ -609,7 +650,7 @@ function setupWidgetBlocks(activity) {
                             blocks,
                             turtle,
                             Math.max(0, blocks.length - 2),
-                            turtle ==
+                            turtle ===
                                 activity.turtles.getTurtle(activity.turtles.getTurtleCount() - 1)
                         );
                 }
@@ -746,14 +787,20 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {number[]} - The output values.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.tempo === null) {
-                _lazyRequire(["widgets/tempo"], function () {
-                    logo.tempo = new Tempo();
-                });
-            }
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "tempo",
+                ["widgets/tempo"],
+                () => new Tempo(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
 
             logo.inTempo = true;
             logo.tempo.BPMBlocks = [];
@@ -817,14 +864,20 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {number[]} - The output values.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.arpeggio === null) {
-                _lazyRequire(["widgets/arpeggio"], function () {
-                    logo.arpeggio = new Arpeggio();
-                });
-            }
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "arpeggio",
+                ["widgets/arpeggio"],
+                () => new Arpeggio(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
 
             logo.inArpeggio = true;
 
@@ -894,13 +947,19 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.pitchDrumMatrix === null) {
-                _lazyRequire(["widgets/pitchdrummatrix"], function () {
-                    logo.pitchDrumMatrix = new PitchDrumMatrix();
-                });
-            }
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "pitchDrumMatrix",
+                ["widgets/pitchdrummatrix"],
+                () => new PitchDrumMatrix(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
 
             logo.inPitchDrumMatrix = true;
             logo.pitchDrumMatrix.rowLabels = [];
@@ -968,14 +1027,20 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {array} - The output array.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.pitchSlider === null) {
-                _lazyRequire(["widgets/pitchslider"], function () {
-                    logo.pitchSlider = new PitchSlider();
-                });
-            }
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "pitchSlider",
+                ["widgets/pitchslider"],
+                () => new PitchSlider(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
 
             logo.inPitchSlider = true;
             logo.pitchSlider.frequencies = [];
@@ -1121,14 +1186,20 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {any[]} - Returns an array of arguments.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.musicKeyboard === null) {
-                _lazyRequire(["widgets/musickeyboard"], function () {
-                    logo.musicKeyboard = new MusicKeyboard(activity);
-                });
-            }
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "musicKeyboard",
+                ["widgets/musickeyboard"],
+                () => new MusicKeyboard(activity),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
 
             logo.inMusicKeyboard = true;
             logo.musicKeyboard.blockNo = blk;
@@ -1187,14 +1258,20 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {any[]} - Returns an array of arguments.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.pitchStaircase === null) {
-                _lazyRequire(["widgets/pitchstaircase"], function () {
-                    logo.pitchStaircase = new PitchStaircase();
-                });
-            }
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "pitchStaircase",
+                ["widgets/pitchstaircase"],
+                () => new PitchStaircase(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
 
             logo.pitchStaircase.Stairs = [];
             logo.pitchStaircase.stairPitchBlocks = [];
@@ -1296,14 +1373,20 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {any[]} - Returns an array of arguments.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.rhythmRuler == null) {
-                _lazyRequire(["widgets/rhythmruler"], function () {
-                    logo.rhythmRuler = new RhythmRuler();
-                });
-            }
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "rhythmRuler",
+                ["widgets/rhythmruler"],
+                () => new RhythmRuler(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
 
             logo.rhythmRuler.Rulers = [];
             logo.rhythmRuler.Drums = [];
@@ -1497,60 +1580,66 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
             logo.inMatrix = true;
 
-            if (logo.phraseMaker === null) {
-                _lazyRequire(
-                    [
-                        "widgets/PhraseMakerUtils",
-                        "widgets/PhraseMakerGrid",
-                        "widgets/PhraseMakerUI",
-                        "widgets/PhraseMakerAudio",
-                        "widgets/phrasemaker"
-                    ],
-                    function () {
-                        // Create explicit dependency object for PhraseMaker
-                        const phraseMakerDeps = {
-                            activity: activity,
-                            _: _,
-                            platformColor: platformColor,
-                            docById: docById,
-                            docBySelector: docBySelector,
-                            MATRIXSOLFEHEIGHT: MATRIXSOLFEHEIGHT,
-                            MATRIXSOLFEWIDTH: MATRIXSOLFEWIDTH,
-                            toFraction: toFraction,
-                            Singer: Singer,
-                            SOLFEGECONVERSIONTABLE: SOLFEGECONVERSIONTABLE,
-                            slicePath: slicePath,
-                            wheelnav: wheelnav,
-                            delayExecution: delayExecution,
-                            DEFAULTVOICE: DEFAULTVOICE,
-                            getDrumName: getDrumName,
-                            getDrumIcon: getDrumIcon,
-                            noteIsSolfege: noteIsSolfege,
-                            isCustomTemperament: isCustomTemperament,
-                            i18nSolfege: i18nSolfege,
-                            getNote: getNote,
-                            DEFAULTDRUM: DEFAULTDRUM,
-                            last: last,
-                            DRUMS: DRUMS,
-                            SHARP: SHARP,
-                            FLAT: FLAT,
-                            PREVIEWVOLUME: PREVIEWVOLUME,
-                            DEFAULTVOLUME: DEFAULTVOLUME,
-                            noteToFrequency: noteToFrequency,
-                            LCD: LCD,
-                            calcNoteValueToDisplay: calcNoteValueToDisplay,
-                            NOTESYMBOLS: NOTESYMBOLS,
-                            EIGHTHNOTEWIDTH: EIGHTHNOTEWIDTH,
-                            getTemperament: getTemperament
-                        };
-                        logo.phraseMaker = new PhraseMaker(phraseMakerDeps);
-                    }
-                );
-            }
+            const interruption = _ensureWidget(
+                logo,
+                "phraseMaker",
+                [
+                    "widgets/PhraseMakerUtils",
+                    "widgets/PhraseMakerGrid",
+                    "widgets/PhraseMakerUI",
+                    "widgets/PhraseMakerAudio",
+                    "widgets/phrasemaker"
+                ],
+                () => {
+                    // Create explicit dependency object for PhraseMaker
+                    const phraseMakerDeps = {
+                        activity: activity,
+                        _: _,
+                        platformColor: platformColor,
+                        docById: docById,
+                        docBySelector: docBySelector,
+                        MATRIXSOLFEHEIGHT: MATRIXSOLFEHEIGHT,
+                        MATRIXSOLFEWIDTH: MATRIXSOLFEWIDTH,
+                        toFraction: toFraction,
+                        Singer: Singer,
+                        SOLFEGECONVERSIONTABLE: SOLFEGECONVERSIONTABLE,
+                        slicePath: slicePath,
+                        wheelnav: wheelnav,
+                        delayExecution: delayExecution,
+                        DEFAULTVOICE: DEFAULTVOICE,
+                        getDrumName: getDrumName,
+                        getDrumIcon: getDrumIcon,
+                        noteIsSolfege: noteIsSolfege,
+                        isCustomTemperament: isCustomTemperament,
+                        i18nSolfege: i18nSolfege,
+                        getNote: getNote,
+                        DEFAULTDRUM: DEFAULTDRUM,
+                        last: last,
+                        DRUMS: DRUMS,
+                        SHARP: SHARP,
+                        FLAT: FLAT,
+                        PREVIEWVOLUME: PREVIEWVOLUME,
+                        DEFAULTVOLUME: DEFAULTVOLUME,
+                        noteToFrequency: noteToFrequency,
+                        LCD: LCD,
+                        calcNoteValueToDisplay: calcNoteValueToDisplay,
+                        NOTESYMBOLS: NOTESYMBOLS,
+                        EIGHTHNOTEWIDTH: EIGHTHNOTEWIDTH,
+                        getTemperament: getTemperament
+                    };
+                    return new PhraseMaker(phraseMakerDeps);
+                },
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
+
             logo.phraseMaker.blockNo = blk;
 
             logo.phraseMaker._instrumentName = DEFAULTVOICE;
@@ -1719,7 +1808,17 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = event => {
-                logo.sample.init(activity);
+                const interruption = _ensureWidget(
+                    logo,
+                    "aiMusic",
+                    ["widgets/aiwidget"],
+                    () => new AIWidget(),
+                    turtle,
+                    blk,
+                    ""
+                );
+                if (interruption) return interruption;
+                logo.aiMusic.init(activity);
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -1757,13 +1856,19 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.reflection === null) {
-                _lazyRequire(["widgets/reflection"], function () {
-                    logo.reflection = new ReflectionMatrix();
-                });
-            }
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "reflection",
+                ["widgets/reflection"],
+                () => new ReflectionMatrix(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
 
             logo.reflection.init(activity);
             logo.statusFields = [];
@@ -1833,16 +1938,23 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {number[]} - The output values.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
             logo.inLegoWidget = true;
 
-            if (logo.legoWidget === null) {
-                _lazyRequire(["widgets/legobricks"], function () {
-                    logo.legoWidget = new LegoWidget();
-                });
-            }
+            const interruption = _ensureWidget(
+                logo,
+                "legoWidget",
+                ["widgets/legobricks"],
+                () => new LegoWidget(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
+
             logo.legoWidget.blockNo = blk;
 
             logo.legoWidget.rowLabels = [];
@@ -1933,7 +2045,7 @@ function setupWidgetBlocks(activity) {
         new ChromaticBlock().setup(activity);
         new LegoBricksBlock().setup(activity);
         new ReflectionBlock().setup(activity);
-        // new AIMusicBlocks().setup(activity);
+        new AIMusicBlocks().setup(activity);
         new MusicKeyboard2Block().setup(activity);
         new MusicKeyboardBlock().setup(activity);
         new PitchStaircaseBlock().setup(activity);
