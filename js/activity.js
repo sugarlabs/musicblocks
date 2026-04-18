@@ -3414,7 +3414,7 @@ class Activity {
                             document.getElementById("ui-id-1").contains(e.target))
                     ) {
                         //do nothing when clicked on the menu
-                    } else if (document.getElementsByTagName("tr")[2].contains(e.target)) {
+                    } else if (that._isSearchWidgetPaletteTarget(e.target)) {
                         //do nothing when clicked on the search row
                     } else {
                         // this will hide the search bar if someone clicks on menu items
@@ -8811,6 +8811,24 @@ class Activity {
         const end = window.__mbPerf.marks[endMark];
         if (typeof start !== "number" || typeof end !== "number") return;
         window.__mbPerf.measures[measureName] = +(end - start).toFixed(2);
+    }
+
+    /**
+     * Returns the palette search row, if it is currently rendered.
+     * @returns {HTMLTableRowElement|null}
+     */
+    _getSearchWidgetPaletteRow() {
+        return document.getElementById("palette")?.querySelector("tbody > tr") ?? null;
+    }
+
+    /**
+     * Checks whether an event target is inside the palette search row.
+     * @param {EventTarget|null} target - Event target to match.
+     * @returns {boolean} True when the target is the search row or a descendant.
+     */
+    _isSearchWidgetPaletteTarget(target) {
+        const searchRow = this._getSearchWidgetPaletteRow();
+        return !!(searchRow && target && (target === searchRow || searchRow.contains(target)));
     }
 
     /**

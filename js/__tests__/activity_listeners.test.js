@@ -87,6 +87,8 @@ describe("Activity Event Listener Management", () => {
             throw new Error("Could not load Activity class");
         }
 
+        document.body.innerHTML = "";
+
         // Instantiate lightly - might need to mock constructor calls
         // Constructor does: this._listeners = []; this.prepSearchWidget(); ...
         // We might need to mock prototype methods that run in constructor to avoid side effects
@@ -157,5 +159,29 @@ describe("Activity Event Listener Management", () => {
         activity.removeEventListener(target, "click", listener, { capture: true });
 
         expect(activity._listeners).toHaveLength(0);
+    });
+
+    test("returns false when the palette search row is missing", () => {
+        expect(activity._isSearchWidgetPaletteTarget(target)).toBe(false);
+    });
+
+    test("matches the rendered palette search row instead of a global tr index", () => {
+        const unrelatedTable = document.createElement("table");
+        unrelatedTable.innerHTML = "<tbody><tr></tr><tr></tr><tr><td id='wrong-row'></td></tr></tbody>";
+        document.body.appendChild(unrelatedTable);
+
+        const palette = document.createElement("div");
+        palette.id = "palette";
+        palette.innerHTML =
+            "<table><tbody><tr id='search-row'><td><span id='search-target'></span></td></tr></tbody></table>";
+        document.body.appendChild(palette);
+
+        const searchTarget = document.getElementById("search-target");
+
+        expect(activity._getSearchWidgetPaletteRow().id).toBe("search-row");
+        expect(activity._isSearchWidgetPaletteTarget(searchTarget)).toBe(true);
+        expect(activity._isSearchWidgetPaletteTarget(document.getElementById("wrong-row"))).toBe(
+            false
+        );
     });
 });
