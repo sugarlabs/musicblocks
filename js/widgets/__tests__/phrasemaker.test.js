@@ -180,6 +180,8 @@ global.document = {
     createTextNode: jest.fn(t => t)
 };
 
+global.normalizeNoteAccidentals = jest.fn(note => note);
+
 describe("PhraseMaker Widget", () => {
     let phraseMaker;
     let mockDeps;
@@ -198,7 +200,7 @@ describe("PhraseMaker Widget", () => {
 
             last: arr => arr[arr.length - 1],
             LCD: (a, b) => (a * b) / (b === 0 ? 1 : 1), // simple stub
-            calcNoteValueToDisplay: jest.fn(() => ["1/4", "♩"]),
+            calcNoteValueToDisplay: jest.fn(() => "1<br>&mdash;<br>4<br>♩"),
             getDrumName: jest.fn(() => null),
             getDrumIcon: jest.fn(() => ""),
             getDrumSynthName: jest.fn(() => "kick"),
@@ -545,12 +547,17 @@ describe("PhraseMaker Widget", () => {
                 insertCell: jest.fn(() => ({
                     style: {},
                     setAttribute: jest.fn(),
-                    addEventListener: jest.fn()
+                    addEventListener: jest.fn(),
+                    appendChild: jest.fn()
                 }))
             }
         ];
         phraseMaker._noteValueRow = {
-            insertCell: jest.fn(() => ({ style: {}, setAttribute: jest.fn() }))
+            insertCell: jest.fn(() => ({
+                style: {},
+                setAttribute: jest.fn(),
+                appendChild: jest.fn()
+            }))
         };
 
         phraseMaker.addNotes(2, 4);
@@ -562,7 +569,8 @@ describe("PhraseMaker Widget", () => {
             style: {},
             innerHTML: "",
             setAttribute: jest.fn(),
-            addEventListener: jest.fn()
+            addEventListener: jest.fn(),
+            appendChild: jest.fn()
         });
 
         phraseMaker._rows = [
@@ -673,7 +681,7 @@ describe("PhraseMaker Widget", () => {
             }
         };
 
-        phraseMaker.blockConnection(1);
+        phraseMaker.blockConnection(1, null);
 
         expect(phraseMaker.activity.blocks.clampBlocksToCheck.length).toBe(1);
     });
