@@ -3414,7 +3414,10 @@ class Activity {
                             document.getElementById("ui-id-1").contains(e.target))
                     ) {
                         //do nothing when clicked on the menu
-                    } else if (document.getElementsByTagName("tr")[2].contains(e.target)) {
+                    } else if (
+                        document.querySelector("#palette tbody tr") &&
+                        document.querySelector("#palette tbody tr").contains(e.target)
+                    ) {
                         //do nothing when clicked on the search row
                     } else {
                         // this will hide the search bar if someone clicks on menu items
