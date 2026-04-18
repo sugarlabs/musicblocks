@@ -47,6 +47,7 @@ const globalActivity = {
     logo: {
         prepSynths: jest.fn(),
         firstNoteTime: null,
+        turtleHeaps: {},
         stage: {
             removeEventListener: jest.fn()
         }
@@ -84,6 +85,20 @@ global.Singer = {
         setPanning: jest.fn(),
         setMasterVolume: jest.fn(),
         masterVolume: 1.0
+    },
+    ToneActions: {
+        toneMethod: jest.fn()
+    },
+    OrnamentActions: {
+        ornamentMethod: jest.fn()
+    },
+    DrumActions: {
+        drumMethod: jest.fn()
+    }
+};
+global.Turtle = {
+    DictActions: {
+        dictMethod: jest.fn()
     }
 };
 
@@ -138,6 +153,7 @@ describe("MusicBlocks Class", () => {
             doWait: jest.fn(),
             container: { x: 10, y: 20 }
         });
+        globalActivity.turtles.getIndexOfTurtle.mockReturnValue(0);
         mouse = new Mouse(jest.fn());
         mouse.run = jest.fn();
         musicBlocks = new MusicBlocks(mouse);
@@ -148,7 +164,12 @@ describe("MusicBlocks Class", () => {
         expect(musicBlocks.mouse).toBe(mouse);
         expect(musicBlocks.turtle).toBe(mouse.turtle);
     });
-
+    test("should get BLK and increment _blockNo", () => {
+        const before = MusicBlocks._blockNo;
+        const blk = MusicBlocks.BLK;
+        expect(blk).toBe("B" + before);
+        expect(MusicBlocks._blockNo).toBe(before + 1);
+    });
     test("should run all mice", () => {
         Mouse.MouseList.push(mouse);
         MusicBlocks.run();
@@ -234,6 +255,47 @@ describe("MusicBlocks Class", () => {
     test("should get GREY", () => {
         musicBlocks.turtle.painter = { chroma: 75 };
         expect(musicBlocks.GREY).toBe(75);
+    });
+
+    describe("Heap helpers", () => {
+        test("should get HEAP as JSON string", () => {
+            globalActivity.logo.turtleHeaps[musicBlocks.turIndex] = [1, 2, 3];
+            expect(musicBlocks.HEAP).toBe(JSON.stringify([1, 2, 3]));
+        });
+
+        test("should get HEAPLENGTH", () => {
+            globalActivity.logo.turtleHeaps[musicBlocks.turIndex] = [1, 2, 3, 4];
+            expect(musicBlocks.HEAPLENGTH).toBe(4);
+        });
+
+        test("should get HEAPEMPTY when heap is missing", () => {
+            delete globalActivity.logo.turtleHeaps[musicBlocks.turIndex];
+            expect(musicBlocks.HEAPEMPTY).toBe(true);
+        });
+
+        test("should emptyHeap", () => {
+            globalActivity.logo.turtleHeaps[musicBlocks.turIndex] = [1, 2];
+            musicBlocks.emptyHeap();
+            expect(globalActivity.logo.turtleHeaps[musicBlocks.turIndex]).toEqual([]);
+        });
+
+        test("should reverseHeap", () => {
+            globalActivity.logo.turtleHeaps[musicBlocks.turIndex] = [1, 2, 3];
+            musicBlocks.reverseHeap();
+            expect(globalActivity.logo.turtleHeaps[musicBlocks.turIndex]).toEqual([3, 2, 1]);
+        });
+
+        test("should setHeapEntry", () => {
+            globalActivity.logo.turtleHeaps[musicBlocks.turIndex] = [];
+            musicBlocks.setHeapEntry(2, 5);
+            expect(globalActivity.logo.turtleHeaps[musicBlocks.turIndex]).toEqual([0, 5]);
+        });
+
+        test("should push to heap", () => {
+            globalActivity.logo.turtleHeaps[musicBlocks.turIndex] = [1];
+            musicBlocks.push(2);
+            expect(globalActivity.logo.turtleHeaps[musicBlocks.turIndex]).toEqual([1, 2]);
+        });
     });
 
     test("should get NOTEVALUE", () => {
@@ -352,6 +414,117 @@ describe("MusicBlocks Class", () => {
         expect(musicBlocks.MASTERVOLUME).toBe(1.0);
     });
 
+    describe("MusicBlocks.run", () => {
+        beforeEach(() => {
+            Mouse.MouseList = [];
+            jest.clearAllMocks();
+        });
+
+        test("should call prepSynths on logo", () => {
+            MusicBlocks.run();
+            expect(globalActivity.logo.prepSynths).toHaveBeenCalled();
+        });
+
+        test("should reset firstNoteTime to null", () => {
+            globalActivity.logo.firstNoteTime = 100;
+            MusicBlocks.run();
+            expect(globalActivity.logo.firstNoteTime).toBeNull();
+        });
+
+        test("should run all mice in MouseList", () => {
+            const mouse1 = { run: jest.fn(), turtle: { listeners: {} } };
+            const mouse2 = { run: jest.fn(), turtle: { listeners: {} } };
+            Mouse.MouseList = [mouse1, mouse2];
+
+            MusicBlocks.run();
+
+            expect(mouse1.run).toHaveBeenCalled();
+            expect(mouse2.run).toHaveBeenCalled();
+        });
+
+        test("should remove active listeners from turtles", () => {
+            const mockListener = jest.fn();
+            const mockMouse = {
+                run: jest.fn(),
+                turtle: {
+                    listeners: { testEvent: mockListener }
+                }
+            };
+            Mouse.MouseList = [mockMouse];
+
+            MusicBlocks.run();
+
+            expect(globalActivity.logo.stage.removeEventListener).toHaveBeenCalledWith(
+                "testEvent",
+                mockListener,
+                false
+            );
+            expect(mockMouse.turtle.listeners).toEqual({});
+        });
+
+        test("should handle empty MouseList without error", () => {
+            Mouse.MouseList = [];
+            expect(() => MusicBlocks.run()).not.toThrow();
+        });
+
+        test("should handle null stage gracefully", () => {
+            const originalStage = globalActivity.logo.stage;
+            globalActivity.logo.stage = null;
+            const mockMouse = {
+                run: jest.fn(),
+                turtle: { listeners: { testEvent: jest.fn() } }
+            };
+            Mouse.MouseList = [mockMouse];
+
+            expect(() => MusicBlocks.run()).not.toThrow();
+            expect(mockMouse.run).toHaveBeenCalled();
+
+            globalActivity.logo.stage = originalStage;
+        });
+
+        test("should clear all listeners even with multiple events", () => {
+            const mockMouse = {
+                run: jest.fn(),
+                turtle: {
+                    listeners: {
+                        event1: jest.fn(),
+                        event2: jest.fn(),
+                        event3: jest.fn()
+                    }
+                }
+            };
+            Mouse.MouseList = [mockMouse];
+
+            MusicBlocks.run();
+
+            expect(mockMouse.turtle.listeners).toEqual({});
+        });
+        test("should only remove own properties from listeners and ignore inherited ones", () => {
+            const baseListeners = { inheritedSignal: jest.fn() };
+            const turtleListeners = Object.create(baseListeners);
+            turtleListeners.ownSignal = jest.fn();
+
+            const mockMouse = {
+                run: jest.fn(),
+                turtle: { listeners: turtleListeners }
+            };
+            Mouse.MouseList = [mockMouse];
+
+            MusicBlocks.run();
+
+            expect(globalActivity.logo.stage.removeEventListener).toHaveBeenCalledWith(
+                "ownSignal",
+                turtleListeners.ownSignal,
+                false
+            );
+            expect(globalActivity.logo.stage.removeEventListener).not.toHaveBeenCalledWith(
+                "inheritedSignal",
+                expect.any(Function),
+                expect.any(Boolean)
+            );
+        });
+    });
+
     describe("runCommand", () => {
         beforeEach(() => {
             musicBlocks.turtle.waitTime = 0;
@@ -403,6 +576,34 @@ describe("MusicBlocks Class", () => {
             const result = await musicBlocks.runCommand("draw", []);
             expect(mockPainterMethod).toHaveBeenCalled();
             expect(result).toBe("painted");
+        });
+    });
+    describe("MusicBlocks.init", () => {
+        test("should initialize the API method list and set isRun to true when start is true", () => {
+            MusicBlocks.init(true);
+
+            expect(MusicBlocks.isRun).toBe(true);
+            expect(MusicBlocks._methodList["Painter"]).toContain("method1");
+            expect(MusicBlocks._methodList["Painter"]).not.toContain("constructor");
+            expect(MusicBlocks._methodList["Turtle.DictActions"]).toContain("dictMethod");
+            expect(MusicBlocks._methodList["Singer.ToneActions"]).toContain("toneMethod");
+        });
+
+        test("should clean up added turtles, clear state, and set isRun to false when start is false", () => {
+            const mockTurtle = { container: { visible: true }, inTrash: false };
+            Mouse.AddedTurtles = [mockTurtle];
+            globalActivity.turtles.getIndexOfTurtle.mockReturnValue(5);
+
+            MusicBlocks.init(false);
+
+            expect(MusicBlocks.isRun).toBe(false);
+            expect(MusicBlocks._methodList).toEqual({});
+            expect(mockTurtle.container.visible).toBe(false);
+            expect(mockTurtle.inTrash).toBe(true);
+            expect(globalActivity.turtles.removeTurtle).toHaveBeenCalledWith(5);
+            expect(MusicBlocks._blockNo).toBe(-1);
+            expect(Mouse.MouseList).toEqual([]);
+            expect(Mouse.TurtleMouseMap).toEqual({});
         });
     });
 });

@@ -14,15 +14,19 @@
 
 /*
    global
-   _, getDrumSynthName
+   _, getDrumSynthName, Singer, TONEBPM
  */
 
 /*
    Global locations
     js/utils/musicutils.js
         getDrumSynthName
+    js/turtle-singer.js
+        Singer
     js/utils/utils.js
         _
+    js/logoconstants.js
+        TONEBPM
 */
 
 /* exported Tempo */
@@ -52,14 +56,14 @@ class Tempo {
         this._firstClickTimes = null;
         this._intervals = [];
         this.isMoving = true;
-        if (this._intervalID != undefined && this._intervalID != null) {
+        if (this._intervalID !== undefined && this._intervalID !== null) {
             clearInterval(this._intervalID);
         }
 
         this._intervalID = null;
         this.activity.logo.synth.loadSynth(0, getDrumSynthName(Tempo.TEMPOSYNTH));
 
-        if (this._intervalID != null) {
+        if (this._intervalID !== null) {
             clearInterval(this._intervalID);
         }
 
@@ -69,7 +73,7 @@ class Tempo {
         widgetWindow.show();
 
         widgetWindow.onclose = () => {
-            if (this._intervalID != null) {
+            if (this._intervalID !== null) {
                 clearInterval(this._intervalID);
             }
             widgetWindow.destroy();
@@ -103,19 +107,15 @@ class Tempo {
         };
 
         this._save_lock = false;
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            Tempo.ICONSIZE,
-            _("Save tempo"),
-            ""
-        ).onclick = () => {
-            // Debounce button
-            if (!this._get_save_lock()) {
-                this._save_lock = true;
-                this._saveTempo();
-                setTimeout(() => (this._save_lock = false), 1000);
-            }
-        };
+        widgetWindow.addButton("export-chunk.svg", Tempo.ICONSIZE, _("Save tempo"), "").onclick =
+            () => {
+                // Debounce button
+                if (!this._get_save_lock()) {
+                    this._save_lock = true;
+                    this._saveTempo();
+                    setTimeout(() => (this._save_lock = false), 1000);
+                }
+            };
 
         this.bodyTable = document.createElement("table");
         this.widgetWindow.getWidgetBody().appendChild(this.bodyTable);
@@ -139,13 +139,19 @@ class Tempo {
                 Tempo.ICONSIZE,
                 _("speed up"),
                 r1.insertCell()
-            ).onclick = (i => () => this.speedUp(i))(i);
+            ).onclick = (
+                i => () =>
+                    this.speedUp(i)
+            )(i);
             widgetWindow.addButton(
                 "down.svg",
                 Tempo.ICONSIZE,
                 _("slow down"),
                 r2.insertCell()
-            ).onclick = (i => () => this.slowDown(i))(i);
+            ).onclick = (
+                i => () =>
+                    this.slowDown(i)
+            )(i);
 
             this.BPMInputs[i] = widgetWindow.addInputButton(this.BPMs[i], r3.insertCell());
             this.tempoCanvases[i] = document.createElement("canvas");
@@ -161,7 +167,7 @@ class Tempo {
             this.tempoCanvases[i].onclick = (id => () => {
                 const d = new Date();
                 let newBPM, BPMInput;
-                if (this._firstClickTime == null) {
+                if (this._firstClickTime === null) {
                     this._firstClickTime = d.getTime();
                 } else {
                     newBPM = parseInt((60 * 1000) / (d.getTime() - this._firstClickTime));
@@ -201,15 +207,27 @@ class Tempo {
     _updateBPM(i) {
         this._intervals[i] = (60 / this.BPMs[i]) * 1000;
 
-        let blockNumber;
-        if (this.BPMBlocks[i] != null) {
-            blockNumber = this.activity.blocks.blockList[this.BPMBlocks[i]].connections[1];
-            if (blockNumber != null) {
-                this.activity.blocks.blockList[blockNumber].value = parseFloat(this.BPMs[i]);
-                this.activity.blocks.blockList[blockNumber].text.text = this.BPMs[i];
-                this.activity.blocks.blockList[blockNumber].updateCache();
-                this.activity.refreshCanvas();
-                this.activity.saveLocally();
+        if (this.BPMBlocks[i] === null) return;
+
+        const bpmBlock = this.activity.blocks.blockList[this.BPMBlocks[i]];
+        const blockNumber = bpmBlock.connections[1];
+        if (blockNumber !== null) {
+            this.activity.blocks.blockList[blockNumber].value = parseFloat(this.BPMs[i]);
+            this.activity.blocks.blockList[blockNumber].text.text = this.BPMs[i];
+            this.activity.blocks.blockList[blockNumber].updateCache();
+            this.activity.refreshCanvas();
+            this.activity.saveLocally();
+        }
+
+        const bpmValue = parseFloat(this.BPMs[i]);
+        if (bpmBlock.name === "setmasterbpm2" || bpmBlock.name === "setmasterbpm") {
+            Singer.masterBPM = bpmValue;
+            Singer.defaultBPMFactor = TONEBPM / bpmValue;
+        } else if (bpmBlock.name === "setbpm3" || bpmBlock.name === "setbpm2") {
+            for (const tur of this.activity.turtles.turtleList) {
+                if (tur.singer.bpm.length > 0) {
+                    tur.singer.bpm[tur.singer.bpm.length - 1] = bpmValue;
+                }
             }
         }
     }
@@ -317,7 +335,7 @@ class Tempo {
             if (!tempoCanvas) continue;
 
             // We start the music clock as the first note is being played.
-            if (this._widgetFirstTimes[i] == null) {
+            if (this._widgetFirstTimes[i] === null) {
                 this._widgetFirstTimes[i] = d.getTime();
                 this._widgetNextTimes[i] = this._widgetFirstTimes[i] + this._intervals[i];
             }
@@ -404,7 +422,6 @@ class Tempo {
      */
     __save(i) {
         setTimeout(() => {
-            // console.debug("saving a BPM block for " + this.BPMs[i]);
             const delta = i * 42;
             const newStack = [
                 [0, ["setbpm3", {}], 100 + delta, 100 + delta, [null, 1, 2, 5]],

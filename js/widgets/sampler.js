@@ -153,15 +153,15 @@ function SampleWidget() {
             this.sampleOctave,
             this.centAdjustmentValue || 0
         ];
-        if (this.timbreBlock != null) {
+        if (this.timbreBlock !== null) {
             mainSampleBlock = this.activity.blocks.blockList[this.timbreBlock].connections[1];
-            if (mainSampleBlock != null) {
+            if (mainSampleBlock !== null) {
                 this.activity.blocks.blockList[mainSampleBlock].value = this.sampleArray;
                 this.activity.blocks.blockList[mainSampleBlock].updateCache();
                 audiofileBlock = this.activity.blocks.blockList[mainSampleBlock].connections[1];
                 solfegeBlock = this.activity.blocks.blockList[mainSampleBlock].connections[2];
                 octaveBlock = this.activity.blocks.blockList[mainSampleBlock].connections[3];
-                if (audiofileBlock != null) {
+                if (audiofileBlock !== null) {
                     this.activity.blocks.blockList[audiofileBlock].value = [
                         this.sampleName,
                         this.sampleData
@@ -169,12 +169,12 @@ function SampleWidget() {
                     this.activity.blocks.blockList[audiofileBlock].text.text = this.sampleName;
                     this.activity.blocks.blockList[audiofileBlock].updateCache();
                 }
-                if (solfegeBlock != null) {
+                if (solfegeBlock !== null) {
                     this.activity.blocks.blockList[solfegeBlock].value = this.samplePitch;
                     this.activity.blocks.blockList[solfegeBlock].text.text = this.samplePitch;
                     this.activity.blocks.blockList[solfegeBlock].updateCache();
                 }
-                if (octaveBlock != null) {
+                if (octaveBlock !== null) {
                     this.activity.blocks.blockList[octaveBlock].value = this.sampleOctave;
                     this.activity.blocks.blockList[octaveBlock].text.text = this.sampleOctave;
                     this.activity.blocks.blockList[octaveBlock].updateCache();
@@ -189,8 +189,8 @@ function SampleWidget() {
                         this.activity.blocks.blockList[mainSampleBlock].text.text
                     ) {
                         // Append cent adjustment to the block text if possible
-                        const currentText = this.activity.blocks.blockList[mainSampleBlock].text
-                            .text;
+                        const currentText =
+                            this.activity.blocks.blockList[mainSampleBlock].text.text;
                         if (!currentText.includes("¢")) {
                             this.activity.blocks.blockList[mainSampleBlock].text.text +=
                                 " " + centText;
@@ -243,7 +243,7 @@ function SampleWidget() {
      */
     this._usePitch = function (p) {
         const number = SOLFEGENAMES.indexOf(p);
-        this.pitchCenter = number == -1 ? 0 : number;
+        this.pitchCenter = number === -1 ? 0 : number;
     };
 
     /**
@@ -479,6 +479,13 @@ function SampleWidget() {
 
             this.running = false;
 
+            // Stop current audio
+            if (this.audioPreview) {
+                this.audioPreview.pause();
+                this.audioPreview.currentTime = 0;
+                this.audioPreview = null;
+            }
+
             // Stop pitch detection and release resources (microphone, AudioContext)
             this.stopPitchDetection();
 
@@ -515,35 +522,30 @@ function SampleWidget() {
             if (this.isMoving) {
                 this.pause();
             } else {
-                if (!(this.sampleName == "")) {
+                if (!(this.sampleName === "")) {
                     this.resume();
                 }
                 this._playReferencePitch();
             }
         };
 
-        widgetWindow.addButton(
-            "load-media.svg",
-            ICONSIZE,
-            _("Upload sample"),
-            ""
-        ).onclick = function () {
-            stopTuner();
-            const fileChooser = docById("myOpenAll");
+        widgetWindow.addButton("load-media.svg", ICONSIZE, _("Upload sample"), "").onclick =
+            function () {
+                stopTuner();
+                const fileChooser = docById("myOpenAll");
 
-            // eslint-disable-next-line no-unused-vars
-            const __readerAction = function (event) {
+                const __readerAction = function (event) {
+                    window.scroll(0, 0);
+                    const sampleFile = fileChooser.files[0];
+                    that.handleFiles(sampleFile);
+                    fileChooser.removeEventListener("change", __readerAction);
+                };
+
+                fileChooser.addEventListener("change", __readerAction, false);
+                fileChooser.focus();
+                fileChooser.click();
                 window.scroll(0, 0);
-                const sampleFile = fileChooser.files[0];
-                that.handleFiles(sampleFile);
-                fileChooser.removeEventListener("change", __readerAction);
             };
-
-            fileChooser.addEventListener("change", __readerAction, false);
-            fileChooser.focus();
-            fileChooser.click();
-            window.scroll(0, 0);
-        };
 
         // Create a container for the pitch button and frequency display
         this.pitchBtnContainer = document.createElement("div");
@@ -576,22 +578,18 @@ function SampleWidget() {
         };
 
         this._save_lock = false;
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            ICONSIZE,
-            _("Save sample"),
-            ""
-        ).onclick = function () {
-            stopTuner();
-            // Debounce button
-            if (!that._get_save_lock()) {
-                that._save_lock = true;
-                that._saveSample();
-                setTimeout(function () {
-                    that._save_lock = false;
-                }, 1000);
-            }
-        };
+        widgetWindow.addButton("export-chunk.svg", ICONSIZE, _("Save sample"), "").onclick =
+            function () {
+                stopTuner();
+                // Debounce button
+                if (!that._get_save_lock()) {
+                    that._save_lock = true;
+                    that._saveSample();
+                    setTimeout(function () {
+                        that._save_lock = false;
+                    }, 1000);
+                }
+            };
 
         this._recordBtn = widgetWindow.addButton("mic.svg", ICONSIZE, _("Toggle Mic"), "");
 
@@ -607,6 +605,7 @@ function SampleWidget() {
         // );
 
         let generating = false;
+        this.audioPreview = null;
 
         this._promptBtn.onclick = () => {
             this.widgetWindow.clearScreen();
@@ -736,10 +735,23 @@ function SampleWidget() {
             preview.style.cursor = "pointer";
             preview.innerHTML = "Preview";
             preview.disabled = true;
-            preview.onclick = function () {
+            preview.onclick = () => {
+                if (that.audioPreview) {
+                    that.audioPreview.pause();
+                    that.audioPreview.currentTime = 0;
+                    that.audioPreview = null;
+                }
+
                 const audioURL = `http://13.61.94.100:8000/preview`;
-                const audio = new Audio(audioURL);
-                audio.play();
+                const newAudio = new Audio(audioURL);
+                that.audioPreview = newAudio;
+                newAudio.play();
+
+                newAudio.onended = function () {
+                    if (that.audioPreview === newAudio) {
+                        that.audioPreview = null;
+                    }
+                };
             };
 
             const save = document.createElement("button");
@@ -1053,7 +1065,7 @@ function SampleWidget() {
                 segments.forEach((d, i) => {
                     const segment = document.createElementNS("http://www.w3.org/2000/svg", "path");
                     segment.setAttribute("d", d);
-                    segment.setAttribute("fill", "#808080");
+                    segment.setAttribute("fill", platformColor.selectorBackground || "#808080");
                     tunerSvg.appendChild(segment);
                 });
 
@@ -1065,7 +1077,7 @@ function SampleWidget() {
                 modeToggle.style.left = "50%";
                 modeToggle.style.transform = "translateX(-50%)";
                 modeToggle.style.display = "flex";
-                modeToggle.style.backgroundColor = "#FFFFFF";
+                modeToggle.style.backgroundColor = platformColor.fillColor || "#FFFFFF";
                 modeToggle.style.borderRadius = "25px";
                 modeToggle.style.padding = "3px";
                 modeToggle.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
@@ -1117,12 +1129,14 @@ function SampleWidget() {
 
                 // Function to update button styles
                 const updateButtonStyles = () => {
+                    const activeColor = platformColor.selectorSelected || "#A6CEFF";
+                    const inactiveColor = platformColor.fillColor || "#FFFFFF";
                     if (tunerMode === "chromatic") {
-                        chromaticButton.style.backgroundColor = "#A6CEFF";
-                        targetPitchButton.style.backgroundColor = "#FFFFFF";
+                        chromaticButton.style.backgroundColor = activeColor;
+                        targetPitchButton.style.backgroundColor = inactiveColor;
                     } else {
-                        chromaticButton.style.backgroundColor = "#FFFFFF";
-                        targetPitchButton.style.backgroundColor = "#A6CEFF";
+                        chromaticButton.style.backgroundColor = inactiveColor;
+                        targetPitchButton.style.backgroundColor = activeColor;
                     }
                 };
 
@@ -1340,7 +1354,7 @@ function SampleWidget() {
                 const resetButton = document.createElement("button");
                 resetButton.textContent = _("Reset");
                 resetButton.style.padding = "10px 20px";
-                resetButton.style.backgroundColor = "#808080";
+                resetButton.style.backgroundColor = platformColor.selectorBackground || "#808080";
                 resetButton.style.color = "white";
                 resetButton.style.border = "none";
                 resetButton.style.borderRadius = "5px";
@@ -1407,7 +1421,7 @@ function SampleWidget() {
      */
     this._addSample = function () {
         for (let i = 0; i < CUSTOMSAMPLES.length; i++) {
-            if (CUSTOMSAMPLES[i][0] == this.sampleName) {
+            if (CUSTOMSAMPLES[i][0] === this.sampleName) {
                 // Update existing sample with new data and cent adjustment
                 CUSTOMSAMPLES[i] = [
                     this.sampleName,
@@ -1444,13 +1458,13 @@ function SampleWidget() {
         const sol = this.samplePitch;
 
         let lev;
-        if (sol.indexOf(SHARP) != -1) {
+        if (sol.indexOf(SHARP) !== -1) {
             lev = 1;
-        } else if (sol.indexOf(FLAT) != -1) {
+        } else if (sol.indexOf(FLAT) !== -1) {
             lev = -1;
-        } else if (sol.indexOf(DOUBLEFLAT) != -1) {
+        } else if (sol.indexOf(DOUBLEFLAT) !== -1) {
             lev = -2;
-        } else if (sol.indexOf(DOUBLESHARP) != -1) {
+        } else if (sol.indexOf(DOUBLESHARP) !== -1) {
             lev = 2;
         } else {
             lev = 0;
@@ -1492,7 +1506,7 @@ function SampleWidget() {
      * @returns {void}
      */
     this.setTimbre = function () {
-        if (this.sampleName != null && this.sampleName != "") {
+        if (this.sampleName !== null && this.sampleName !== "") {
             this.originalSampleName = this.sampleName + "_original";
             const sampleArray = [this.originalSampleName, this.sampleData, "la", 4];
             Singer.ToneActions.setTimbre(sampleArray, 0, this.timbreBlock);
@@ -1535,7 +1549,7 @@ function SampleWidget() {
      * @returns {void}
      */
     this._playSample = function () {
-        if (this.sampleName != null && this.sampleName != "") {
+        if (this.sampleName !== null && this.sampleName !== "") {
             this.reconnectSynthsToAnalyser();
 
             // Store the current note object for the cent adjustment
@@ -1783,9 +1797,8 @@ function SampleWidget() {
 
         const __selectionChanged = () => {
             const label = this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
-            const attr = this._accidentalsWheel.navItems[
-                this._accidentalsWheel.selectedNavItemIndex
-            ].title;
+            const attr =
+                this._accidentalsWheel.navItems[this._accidentalsWheel.selectedNavItemIndex].title;
             const octave = Number(
                 this._octavesWheel.navItems[this._octavesWheel.selectedNavItemIndex].title
             );
@@ -1857,6 +1870,12 @@ function SampleWidget() {
             height = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 70;
         }
         document.getElementsByTagName("canvas")[0].innerHTML = "";
+        // Cancel any existing RAF loop for this canvas before creating a new one
+        // to prevent multiple concurrent draw loops accumulating on resize/maximize.
+        if (this.drawVisualIDs[0]) {
+            cancelAnimationFrame(this.drawVisualIDs[0]);
+            this.drawVisualIDs[0] = null;
+        }
         this.makeCanvas(width, height, 0, true);
         this.reconnectSynthsToAnalyser();
     };
@@ -1932,12 +1951,16 @@ function SampleWidget() {
         }
 
         const draw = () => {
-            this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
+            // Only continue the RAF loop when there is active work to render.
+            // Scheduling inside the condition stops the loop naturally when idle
+            // (not recording and no active analyser) instead of spinning at ~60fps
+            // unconditionally — matching the lifecycle pattern of the Oscilloscope widget.
             if (
                 this.is_recording ||
                 (this.pitchAnalysers[turtleIdx] && (this.running || resized))
             ) {
-                canvasCtx.fillStyle = "#FFFFFF";
+                this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
+                canvasCtx.fillStyle = platformColor.background || "#FFFFFF";
                 canvasCtx.font = "10px Verdana";
                 this.verticalOffset = -canvas.height / 4;
                 this.zoomFactor = 40.0;
@@ -1946,9 +1969,9 @@ function SampleWidget() {
                 let oscText;
                 if (turtleIdx >= 0) {
                     //.TRANS: The sound sample that the user uploads.
-                    oscText = this.sampleName != "" ? this.sampleName : _("sample");
+                    oscText = this.sampleName !== "" ? this.sampleName : _("sample");
                 }
-                canvasCtx.fillStyle = "#000000";
+                canvasCtx.fillStyle = platformColor.textColor || "#000000";
                 //.TRANS: The reference tone is a sound used for comparison.
                 canvasCtx.fillText(_("reference tone"), 10, 10);
                 canvasCtx.fillText(oscText, 10, canvas.height / 2 + 10);
@@ -2016,6 +2039,9 @@ function SampleWidget() {
                         }
                     }
                 }
+            } else {
+                // No active work — clear the stored RAF id so the loop is fully stopped.
+                this.drawVisualIDs[turtleIdx] = null;
             }
         };
         draw();
@@ -2047,9 +2073,8 @@ function SampleWidget() {
             const playbackRate = TunerUtils.calculatePlaybackRate(0, this.centsValue);
             // Apply the playback rate to the sample
             if (instruments[0]["customsample_" + this.originalSampleName]) {
-                instruments[0][
-                    "customsample_" + this.originalSampleName
-                ].playbackRate.value = playbackRate;
+                instruments[0]["customsample_" + this.originalSampleName].playbackRate.value =
+                    playbackRate;
             }
         }
     };
@@ -2186,9 +2211,11 @@ function SampleWidget() {
 
     /**
      * Start pitch detection
+     * @param {HTMLElement} pitchElement - Widget-local span for displaying detected pitch
+     * @param {HTMLElement} noteElement - Widget-local span for displaying detected note
      * @returns {Promise<void>}
      */
-    const startPitchDetection = async () => {
+    const startPitchDetection = async (pitchElement, noteElement) => {
         // Stop any existing pitch detection first to avoid multiple instances
         this.stopPitchDetection();
 
@@ -2221,10 +2248,7 @@ function SampleWidget() {
                 analyser.getFloatTimeDomainData(buffer);
                 const pitch = detectPitch(buffer);
 
-                // Safely update DOM elements (check if they exist first)
-                const pitchElement = document.getElementById("pitch");
-                const noteElement = document.getElementById("note");
-
+                // Update widget-local DOM elements (passed in from makeTuner — no global query)
                 if (pitchElement && noteElement) {
                     if (pitch > 0) {
                         const { note, cents } = frequencyToNote(pitch);
@@ -2247,7 +2271,7 @@ function SampleWidget() {
             this.pitchDetectionAnimationId = requestAnimationFrame(updatePitch);
         } catch (err) {
             console.error(`${err.name}: ${err.message}`);
-            alert("Microphone access failed: " + err.message);
+            alert(_("Microphone access failed: %s").replace(/%s/g, err.message));
             // Clean up any partially initialized resources
             this.stopPitchDetection();
         }
@@ -2307,7 +2331,7 @@ function SampleWidget() {
 
         this.widgetWindow.getWidgetBody().appendChild(container);
 
-        document.getElementById("start").addEventListener("click", startPitchDetection);
+        startButton.addEventListener("click", () => startPitchDetection(pitchSpan, noteSpan));
     };
 
     /**
@@ -2385,4 +2409,8 @@ class PitchSmoother {
     reset() {
         this.pitchHistory = [];
     }
+}
+
+if (typeof module !== "undefined") {
+    module.exports = { SampleWidget, PitchSmoother };
 }

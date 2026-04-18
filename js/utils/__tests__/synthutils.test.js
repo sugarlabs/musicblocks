@@ -1100,6 +1100,20 @@ describe("Utility Functions (logic-only)", () => {
             stopTuner();
             expect(mockClose).toHaveBeenCalledTimes(1);
         });
+
+        it("should cancel any pending tuner animation frame", () => {
+            const originalCancel = global.cancelAnimationFrame;
+            const mockCancel = jest.fn();
+            global.cancelAnimationFrame = mockCancel;
+            Synth._tunerRafId = 123;
+            Synth._tunerActive = true;
+            Synth.tunerMic = null;
+            stopTuner();
+            expect(mockCancel).toHaveBeenCalledWith(123);
+            expect(Synth._tunerRafId).toBeNull();
+            expect(Synth._tunerActive).toBe(false);
+            global.cancelAnimationFrame = originalCancel;
+        });
     });
 
     describe("newTone", () => {
@@ -1121,6 +1135,76 @@ describe("Utility Functions (logic-only)", () => {
 
         it("should return immediately for empty array", async () => {
             await expect(preloadProjectSamples([])).resolves.toBeUndefined();
+        });
+    });
+
+    describe("recording cleanup", () => {
+        let originalURL;
+
+        beforeEach(() => {
+            originalURL = global.URL;
+            global.URL = {
+                createObjectURL: jest.fn(() => "blob:recording-url"),
+                revokeObjectURL: jest.fn()
+            };
+        });
+
+        afterEach(() => {
+            global.URL = originalURL;
+        });
+
+        it("revokes the previous recording URL before replacing it", async () => {
+            Synth.audioURL = "blob:old-recording";
+            Synth.player = {
+                stop: jest.fn(),
+                dispose: jest.fn()
+            };
+            Synth.recorder = {
+                stop: jest.fn().mockResolvedValue("recording-blob")
+            };
+            Synth.mic = {
+                close: jest.fn()
+            };
+
+            const result = await Synth.stopRecording();
+
+            expect(global.URL.revokeObjectURL).toHaveBeenCalledWith("blob:old-recording");
+            expect(Synth.player).toBeNull();
+            expect(Synth.mic.close).toHaveBeenCalled();
+            expect(global.URL.createObjectURL).toHaveBeenCalledWith("recording-blob");
+            expect(result).toBe("blob:recording-url");
+        });
+
+        it("disposes the existing player before starting playback again", async () => {
+            const oldPlayer = {
+                stop: jest.fn(),
+                dispose: jest.fn()
+            };
+
+            Synth.audioURL = "blob:recording-url";
+            Synth.player = oldPlayer;
+
+            await Synth.playRecording();
+
+            expect(oldPlayer.stop).toHaveBeenCalled();
+            expect(oldPlayer.dispose).toHaveBeenCalled();
+            expect(Synth.player).toBeInstanceOf(Tone.Player);
+            expect(Synth.player.load).toHaveBeenCalledWith("blob:recording-url");
+            expect(Synth.player.start).toHaveBeenCalled();
+        });
+
+        it("releases recording resources during synth teardown", () => {
+            Synth.audioURL = "blob:recording-url";
+            Synth.player = {
+                stop: jest.fn(),
+                dispose: jest.fn()
+            };
+
+            Synth.disposeAllInstruments();
+
+            expect(global.URL.revokeObjectURL).toHaveBeenCalledWith("blob:recording-url");
+            expect(Synth.player).toBeNull();
+            expect(Synth.audioURL).toBeNull();
         });
     });
 });
@@ -1468,5 +1552,143 @@ describe("Tuner Utilities (Audio Test Functions)", () => {
             // Verify low volume was set for safe testing
             expect(mockGainNode.gain.value).toBe(0.1);
         });
+    });
+});
+
+describe("Use-after-dispose race in Synth.trigger async path", () => {
+    function makeSynth(name) {
+        return {
+            name,
+            disposed: false,
+            triggers: [],
+            dispose() {
+                this.disposed = true;
+            },
+            triggerAttackRelease(notes, beat, when) {
+                this.triggers.push({ notes, beat, when, calledAfterDispose: this.disposed });
+            }
+        };
+    }
+
+    function disposeAllInstruments(instruments) {
+        for (const turtle in instruments) {
+            for (const name in instruments[turtle]) {
+                const s = instruments[turtle][name];
+                if (s && typeof s.dispose === "function") {
+                    try {
+                        s.dispose();
+                    } catch (e) {
+                        /* swallowed in prod */
+                    }
+                }
+                delete instruments[turtle][name];
+            }
+        }
+    }
+
+    async function trigger(instruments, turtle, name, notes, beat, bufferLoaded) {
+        const synth = instruments[turtle][name];
+        try {
+            await bufferLoaded;
+            synth.triggerAttackRelease(notes, beat, 0);
+        } catch (e) {
+            // swallowed
+        }
+    }
+
+    test("triggerAttackRelease fires on a disposed synth after stop", async () => {
+        const instruments = { 0: { "electronic synth": makeSynth("electronic synth") } };
+        const synthRef = instruments[0]["electronic synth"];
+
+        let resolveBuffer;
+        const bufferLoaded = new Promise(r => {
+            resolveBuffer = r;
+        });
+
+        const pending = trigger(instruments, 0, "electronic synth", "C4", 0.25, bufferLoaded);
+        disposeAllInstruments(instruments);
+
+        expect(instruments[0]["electronic synth"]).toBeUndefined();
+        expect(synthRef.disposed).toBe(true);
+
+        resolveBuffer();
+        await pending;
+
+        expect(synthRef.triggers).toHaveLength(1);
+        expect(synthRef.triggers[0].calledAfterDispose).toBe(true);
+    });
+
+    test("stale trigger lands on new instrument created by next run", async () => {
+        const instruments = { 0: { "electronic synth": makeSynth("OLD") } };
+        let resolveBuffer;
+        const bufferLoaded = new Promise(r => {
+            resolveBuffer = r;
+        });
+
+        async function triggerWithRelookup() {
+            try {
+                await bufferLoaded;
+                const liveSynth = instruments[0]?.["electronic synth"];
+                if (liveSynth) liveSynth.triggerAttackRelease("C4", 0.25, 0);
+            } catch (_) {
+                /* swallowed */
+            }
+        }
+
+        const pending = triggerWithRelookup();
+        disposeAllInstruments(instruments);
+
+        const NEW = makeSynth("NEW");
+        instruments[0]["electronic synth"] = NEW;
+
+        resolveBuffer();
+        await pending;
+
+        expect(NEW.triggers).toHaveLength(1);
+        expect(NEW.triggers[0].notes).toBe("C4");
+    });
+
+    test("epoch check after await suppresses the stale trigger", async () => {
+        const state = {
+            instruments: { 0: { "electronic synth": makeSynth("E1") } },
+            epoch: 0
+        };
+
+        function disposeAllWithEpoch() {
+            state.epoch++;
+            for (const t in state.instruments) {
+                for (const n in state.instruments[t]) {
+                    state.instruments[t][n].dispose();
+                    delete state.instruments[t][n];
+                }
+            }
+        }
+
+        let resolveBuffer;
+        const bufferLoaded = new Promise(r => {
+            resolveBuffer = r;
+        });
+
+        async function safeTrigger() {
+            const synth = state.instruments[0]["electronic synth"];
+            const epoch = state.epoch;
+            try {
+                await bufferLoaded;
+                if (state.epoch !== epoch) return;
+                if (synth.disposed) return;
+                synth.triggerAttackRelease("C4", 0.25, 0);
+            } catch (_e) {
+                // swallowed
+            }
+        }
+
+        const synthRef = state.instruments[0]["electronic synth"];
+        const pending = safeTrigger();
+        disposeAllWithEpoch();
+        resolveBuffer();
+        await pending;
+
+        expect(synthRef.triggers).toHaveLength(0);
+        expect(synthRef.disposed).toBe(true);
     });
 });

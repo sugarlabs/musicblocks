@@ -92,7 +92,6 @@ function toggleExpandable(id, c) {
 function hideOnClickOutside(eles, other) {
     // if click not in id, hide
     const outsideClickListener = event => {
-        // eslint-disable-next-line max-len
         const path =
             event.path ||
             (event.composedPath && event.composedPath()) ||
@@ -103,7 +102,7 @@ function hideOnClickOutside(eles, other) {
 
         if (ok === false) {
             document.getElementById(other).style.display = "none";
-            // eslint-disable-next-line no-use-before-define
+
             removeClickListener();
         }
     };
@@ -129,20 +128,20 @@ $(document).ready(() => {
     $("#publisher").modal();
     $("#deleter").modal();
     $("#projectviewer").modal();
-    // eslint-disable-next-line no-unused-vars
+
     document.getElementById("global-search").addEventListener("input", evt => {
         document.getElementById("search-close").style.display =
-            this.value === "" ? "none" : "initial";
+            evt.target.value === "" ? "none" : "initial";
     });
-    // eslint-disable-next-line no-unused-vars
+
     document.getElementById("local-tab").addEventListener("click", evt => {
         toggleSearch(false);
     });
-    // eslint-disable-next-line no-unused-vars
+
     document.getElementById("global-tab").addEventListener("click", evt => {
         toggleSearch(true);
     });
-    // eslint-disable-next-line no-unused-vars
+
     document.getElementById("view-more-chips").addEventListener("click", evt => {
         const showMore = _("Show more tags") + " ▼";
         const showLess = _("Show fewer tags") + " ▲";

@@ -12,7 +12,7 @@
 /*
    global
 
-   _, LeftBlock, FlowBlock, NOINPUTERRORMSG, getTargetTurtle, Turtle
+   LeftBlock, FlowBlock, NOINPUTERRORMSG, getTargetTurtle, Turtle, isSafeUrl
  */
 
 /* exported setupProgramBlocks */
@@ -82,10 +82,14 @@ function setupProgramBlocks(activity) {
             const oldHeap = name in logo.turtleHeaps ? logo.turtleHeaps[name] : [];
 
             // Use async fetch to avoid blocking the UI
+            if (!isSafeUrl(url)) {
+                activity.errorMsg(_("Invalid URL"));
+                return;
+            }
+
             fetch(url)
                 .then(response => {
                     if (!response.ok) {
-                        // eslint-disable-next-line no-console
                         console.debug("fetched the wrong page or network error...");
                         activity.errorMsg(_("404: Page not found"));
                         throw new Error("Network response was not ok");
@@ -93,20 +97,17 @@ function setupProgramBlocks(activity) {
                     return response.text();
                 })
                 .then(responseText => {
-                    // eslint-disable-next-line no-console
                     console.debug(responseText);
                     try {
                         const data = JSON.parse(responseText);
                         logo.turtleHeaps[name] = data;
                     } catch (e) {
-                        // eslint-disable-next-line no-console
                         console.debug(e);
                         activity.errorMsg(_("Error parsing JSON data:") + e);
                         logo.turtleHeaps[name] = oldHeap;
                     }
                 })
                 .catch(error => {
-                    // eslint-disable-next-line no-console
                     console.debug("Fetch error:", error);
                     logo.turtleHeaps[name] = oldHeap;
                 });
@@ -176,6 +177,11 @@ function setupProgramBlocks(activity) {
 
             if (name in logo.turtleHeaps) {
                 const data = JSON.stringify(logo.turtleHeaps[name]);
+                if (!isSafeUrl(url)) {
+                    activity.errorMsg(_("Invalid URL"));
+                    return;
+                }
+
                 const xmlHttp = new XMLHttpRequest();
                 xmlHttp.open("POST", url, true);
                 xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -248,7 +254,7 @@ function setupProgramBlocks(activity) {
             }
 
             const c = block.connections[1];
-            if (c != null && activity.blocks.blockList[c].name === "loadFile") {
+            if (c !== null && activity.blocks.blockList[c].name === "loadFile") {
                 if (args.length !== 1) {
                     activity.errorMsg(_("You must select a file."));
                 } else {
@@ -257,7 +263,7 @@ function setupProgramBlocks(activity) {
                             activity.blocks.blockList[c].value[1]
                         );
                         if (!Array.isArray(logo.turtleHeaps[turtle])) {
-                            throw "is not array";
+                            throw new Error("is not array");
                         }
                     } catch (e) {
                         logo.turtleHeaps[turtle] = oldHeap;
@@ -328,7 +334,7 @@ function setupProgramBlocks(activity) {
                 try {
                     logo.turtleHeaps[turtle] = JSON.parse(activity.blocks.blockList[c].value);
                     if (!Array.isArray(logo.turtleHeaps[turtle])) {
-                        throw "is not array";
+                        throw new Error("is not array");
                     }
                 } catch (e) {
                     logo.turtleHeaps[turtle] = oldHeap;
@@ -416,7 +422,7 @@ function setupProgramBlocks(activity) {
             }
 
             const c = block.connections[2];
-            if (c != null && activity.blocks.blockList[c].name === "loadFile") {
+            if (c !== null && activity.blocks.blockList[c].name === "loadFile") {
                 if (args.length !== 2) {
                     activity.errorMsg(_("You must select a file."));
                 } else {
@@ -521,7 +527,7 @@ function setupProgramBlocks(activity) {
             }
 
             const c = block.connections[2];
-            if (c != null) {
+            if (c !== null) {
                 try {
                     const d = JSON.parse(activity.blocks.blockList[c].value);
                     // Is the dictionary the same as a turtle name?
@@ -988,7 +994,7 @@ function setupProgramBlocks(activity) {
             if (activity.blocks.blockList[args[0]].name === "start") {
                 const thisTurtle = activity.blocks.blockList[args[0]].value;
                 const tur = activity.turtles.ithTurtle(thisTurtle);
-                // eslint-disable-next-line no-console
+
                 console.debug("run start " + thisTurtle);
 
                 logo.initTurtle(thisTurtle);
@@ -1015,11 +1021,7 @@ function setupProgramBlocks(activity) {
         constructor() {
             super("dockblock");
             this.setPalette("program", activity);
-            this.setHelpString([
-                _("The Dock block block connections two blocks."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Dock block connects two blocks."), "documentation", ""]);
 
             this.formBlock({
                 /**
@@ -1052,28 +1054,24 @@ function setupProgramBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             if (args.length < 3) {
-                // eslint-disable-next-line no-console
                 console.debug(args.length + " < 3");
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
             if (args[0] < 0 || args[0] > activity.blocks.blockList.length - 1) {
-                // eslint-disable-next-line no-console
                 console.debug(args[0] + " > " + activity.blocks.blockList.length - 1);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
             if (args[0] === args[2]) {
-                // eslint-disable-next-line no-console
                 console.debug(args[0] + " == " + args[2]);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
             if (args[2] < 0 || args[2] > activity.blocks.blockList.length - 1) {
-                // eslint-disable-next-line no-console
                 console.debug(args[2] + " > " + activity.blocks.blockList.length - 1);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
@@ -1086,7 +1084,6 @@ function setupProgramBlocks(activity) {
                 args[1] < 1 ||
                 args[1] > activity.blocks.blockList[args[0]].connections.length - 1
             ) {
-                // eslint-disable-next-line no-console
                 console.debug(args[1] + " out of bounds");
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
@@ -1108,7 +1105,7 @@ function setupProgramBlocks(activity) {
                         }
                     }
 
-                    activity.blocks.blockList[args[0]].connections[args][1] = null;
+                    activity.blocks.blockList[args[0]].connections[args[1]] = null;
                 }
             }
 
@@ -1328,7 +1325,7 @@ function setupProgramBlocks(activity) {
                 const protoName = obj[2];
                 if (protoblk === null) {
                     activity.errorMsg(_("Cannot find block") + " " + name);
-                    // eslint-disable-next-line no-console
+
                     console.debug("Cannot find block " + name);
                     return 0;
                 } else {
@@ -1365,7 +1362,7 @@ function setupProgramBlocks(activity) {
                                 activity.errorMsg(
                                     _("Warning: block argument type unhandled: ") + typeof arg
                                 );
-                                // eslint-disable-next-line no-console
+
                                 console.warn("Unhandled argument type", arg);
                                 newBlock[0][4].push(null);
                             }
@@ -1375,7 +1372,7 @@ function setupProgramBlocks(activity) {
                     }
 
                     activity.blocks.loadNewBlocks(newBlock);
-                    // eslint-disable-next-line no-console
+
                     console.debug("BLOCKNUMBER " + blockNumber);
                     return blockNumber;
                 }
@@ -1442,38 +1439,18 @@ function setupProgramBlocks(activity) {
 
             const url = args[0];
 
-            /**
-             * Checks if a given string is a valid URL.
-             * @param {string} str - The string to be checked.
-             * @returns {boolean} True if the string is a valid URL, false otherwise.
-             */
-            function ValidURL(str) {
-                const pattern = new RegExp(
-                    "^(https?:\\/\\/)?" + // protocol
-                        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
-                        "((\\d{1,3}\\.) {3}\\d{1,3}))" + // OR ip (v4) address
-                        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-                        "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
-                        "(\\#[-a-z\\d_]*)?$",
-                    "i"
-                ); // fragment locator
-                if (!pattern.test(str)) {
-                    activity.errorMsg(_("Please enter a valid URL."));
-                    return false;
-                } else {
-                    return true;
-                }
+            // Use the centralized isSafeUrl utility (from utils.js) to enforce
+            // only http: and https: protocols, preventing open redirect attacks
+            // via javascript:, data:, vbscript:, or other dangerous URI schemes.
+            if (!isSafeUrl(url)) {
+                activity.errorMsg(_("Please enter a valid URL."));
+                return;
             }
 
-            if (ValidURL(url)) {
-                const win = window.open(url, "_blank");
-                if (win) {
-                    // Browser has allowed it to be opened.
-                    win.focus();
-                } else {
-                    // Browser has blocked it.
-                    alert("Please allow popups for this site");
-                }
+            const win = window.open(url, "_blank", "noopener,noreferrer");
+            if (win === null) {
+                // Browser has blocked it.
+                alert(_("Please allow popups for this site"));
             }
         }
     }

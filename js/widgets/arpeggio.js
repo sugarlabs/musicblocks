@@ -16,7 +16,7 @@
    global
 
    platformColor, _, docById, getNote, setCustomChord, keySignatureToMode,
-   getModeNumbers, getTemperament
+   getModeNumbers, getTemperament, normalizeNoteAccidentals
 */
 /*
    Global locations
@@ -417,7 +417,7 @@ class Arpeggio {
                 cell = cellRow.cells[j];
 
                 arpeggioRow = arpeggioNoteTable.rows[0];
-                // eslint-disable-next-line no-unused-vars
+
                 arpeggioCell = arpeggioRow.cells[j];
 
                 cell.onclick = e => {
@@ -470,7 +470,7 @@ class Arpeggio {
 
                 cell = cellRow.cells[col];
 
-                if (cell != undefined) {
+                if (cell !== undefined) {
                     cell.style.backgroundColor = "black";
                     this.__playCell(row, col, cell, false);
                 }
@@ -605,8 +605,7 @@ class Arpeggio {
             if (this._playList[i][0].length > 0) {
                 this._activity.logo.synth.trigger(
                     0,
-                    this._playList[i][0][0].replace(/♭/g, "b").replace(/♯/g, "#") +
-                        this._playList[i][0][1],
+                    normalizeNoteAccidentals(this._playList[i][0][0]) + this._playList[i][0][1],
                     this._playList[i][1],
                     "default",
                     null,
@@ -697,7 +696,7 @@ class Arpeggio {
             const note = noteObj[0] + noteObj[1];
             this._activity.logo.synth.trigger(
                 0,
-                note.replace(/♭/g, "b").replace(/♯/g, "#"),
+                normalizeNoteAccidentals(note),
                 this.notesToPlay[0][1],
                 "default",
                 null,
