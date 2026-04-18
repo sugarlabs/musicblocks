@@ -194,6 +194,7 @@ describe("PhraseMaker Widget", () => {
             wheelnav: jest.fn(),
             slicePath: jest.fn(),
             DEFAULTVOICE: "electronic synth",
+            Singer: { setSynthVolume: jest.fn() },
 
             last: arr => arr[arr.length - 1],
             LCD: (a, b) => (a * b) / (b === 0 ? 1 : 1), // simple stub
@@ -1173,7 +1174,8 @@ describe("PhraseMaker Widget", () => {
                 synth: {
                     inTemperament: "equal",
                     stopSound: jest.fn(),
-                    stop: jest.fn()
+                    stop: jest.fn(),
+                    loadSynth: jest.fn()
                 }
             },
             blocks: {
