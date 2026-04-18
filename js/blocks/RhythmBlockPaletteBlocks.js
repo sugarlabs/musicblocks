@@ -36,10 +36,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
      * @param {number} timeout - The timeout in milliseconds.
      */
     const scheduleNote = (activity, beat, blk, turtle, callback, timeout) => {
-        setTimeout(
-            () => Singer.processNote(activity, beat, false, blk, turtle, callback),
-            timeout
-        );
+        setTimeout(() => Singer.processNote(activity, beat, false, blk, turtle, callback), timeout);
     };
 
     /**
@@ -63,9 +60,9 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 name:
                     this.lang === "ja"
                         ? //.TRANS: rhythm block
-                        _("rhythm1")
+                          _("rhythm1")
                         : //.TRANS: an arrangement of notes based on duration
-                        _("rhythm"),
+                          _("rhythm"),
 
                 /**
                  * @type {number}
@@ -129,7 +126,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 if (logo.inMatrix) {
                     logo.phraseMaker.addColBlock(blk, arg0);
 
-                    // Add individual entries for each beat to avoid extra ├ù blocks
+                    // Add individual entries for each beat to avoid extra × blocks
                     for (let i = 0; i < arg0; i++) {
                         logo.tupletRhythms.push(["individual", 1, noteBeatValue]);
                     }
@@ -199,10 +196,15 @@ function setupRhythmBlockPaletteBlocks(activity) {
                         __callback = null;
                     }
 
-                    scheduleNote(activity, noteBeatValue, blk, turtle, __callback, i * beatValue * 1000);
+                    scheduleNote(
+                        activity,
+                        noteBeatValue,
+                        blk,
+                        turtle,
+                        __callback,
+                        i * beatValue * 1000
+                    );
                 }
-
-
 
                 tur.doWait((arg0 - 1) * beatValue);
             }
@@ -237,7 +239,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 name:
                     this.lang === "ja"
                         ? //.TRANS: translate "rhythm1" as rhythm
-                        _("rhythm1")
+                          _("rhythm1")
                         : _("rhythm"),
 
                 /**
@@ -290,7 +292,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("sixtyfourthNote", _("1/64 note") + " ≡¥àú");
+                super("sixtyfourthNote", _("1/64 note") + " 𝅘𝅥𝅱");
             }
 
             this.setPalette(rhythmBlockPalette, activity);
@@ -321,7 +323,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("thirtysecondNote", _("1/32 note") + " ≡¥àó");
+                super("thirtysecondNote", _("1/32 note") + " 𝅘𝅥𝅰");
             }
 
             // Set the palette and activity for the block
@@ -355,7 +357,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("sixteenthNote", _("1/16 note") + " ≡¥àí");
+                super("sixteenthNote", _("1/16 note") + " 𝅘𝅥𝅯");
             }
 
             // Set the palette and activity for the block
@@ -384,7 +386,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         constructor() {
             // TRANS: Do not modify the following line
-            super("eighthNote", _("eighth note") + " ΓÖ¬");
+            super("eighthNote", _("eighth note") + " ♪");
 
             // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
@@ -412,7 +414,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         constructor() {
             // TRANS: Do not modify the following line
-            super("quarterNote", _("quarter note") + " ΓÖ⌐");
+            super("quarterNote", _("quarter note") + " ♩");
 
             // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
@@ -445,7 +447,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("halfNote", _("half note") + " ≡¥à₧");
+                super("halfNote", _("half note") + " 𝅗𝅥");
             }
 
             // Set the palette and activity for the block
@@ -479,7 +481,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("wholeNote", _("whole note") + " ≡¥à¥");
+                super("wholeNote", _("whole note") + " 𝅝");
             }
 
             // Set the palette and activity for the block
@@ -767,7 +769,6 @@ function setupRhythmBlockPaletteBlocks(activity) {
                         totalBeats += beatValue;
                     }
 
-
                     tur.doWait(totalBeats - beatValue);
                 }
             };
@@ -882,10 +883,10 @@ function setupRhythmBlockPaletteBlocks(activity) {
             // Set the help string for the block
             this.setHelpString([
                 _("Tuplets are a collection of notes that get scaled to a specific duration.") +
-                " " +
-                _(
-                    "Using tuplets makes it easy to create groups of notes that are not based on a power of 2."
-                ),
+                    " " +
+                    _(
+                        "Using tuplets makes it easy to create groups of notes that are not based on a power of 2."
+                    ),
                 "documentation",
                 null,
                 "matrix"
