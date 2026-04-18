@@ -156,22 +156,28 @@ class MusicBlocks {
                 "Singer.VolumeActions",
                 "Singer.DrumActions",
                 "Turtle.DictActions"
-            ].forEach(className => {
-                MusicBlocks._methodList[className] = [];
+            ].forEach(path => {
+                MusicBlocks._methodList[path] = [];
 
-                if (className === "Painter") {
-                    for (const methodName of Object.getOwnPropertyNames(
-                        eval(className + ".prototype")
-                    )) {
-                        if (methodName !== "constructor" && !methodName.startsWith("_"))
-                            MusicBlocks._methodList[className].push(methodName);
-                    }
+                const classObj = path.split(".").reduce((obj, key) => obj?.[key], window);
+
+                if (!classObj) {
+                    console.warn(`Class path "${path}" not found`);
                     return;
                 }
 
-                for (const methodName of Object.getOwnPropertyNames(eval(className))) {
-                    if (methodName !== "length" && methodName !== "prototype")
-                        MusicBlocks._methodList[className].push(methodName);
+                if (path === "Painter") {
+                    for (const methodName of Object.getOwnPropertyNames(classObj.prototype)) {
+                        if (methodName !== "constructor" && !methodName.startsWith("_")) {
+                            MusicBlocks._methodList[path].push(methodName);
+                        }
+                    }
+                } else {
+                    for (const methodName of Object.getOwnPropertyNames(classObj)) {
+                        if (methodName !== "length" && methodName !== "prototype") {
+                            MusicBlocks._methodList[path].push(methodName);
+                        }
+                    }
                 }
             });
         }
@@ -248,13 +254,19 @@ class MusicBlocks {
                         break;
                     }
                 }
+                if (!cname) {
+                    throw new Error(`Class ${cname} not found`);
+                }
 
-                cname = cname === "Painter" ? this.turtle.painter : eval(cname);
+                const classRef = cname === "Painter" ? this.turtle.painter : window[cname];
+                if (!classRef) {
+                    throw new Error(`Class ${cname} not found`);
+                }
 
                 returnVal =
                     args === undefined || (Array.isArray(args) && args.length === 0)
-                        ? cname[command]()
-                        : cname[command](...args);
+                        ? classRef[command]()
+                        : classRef[command](...args);
             }
 
             const delay = this.turtle.waitTime;
