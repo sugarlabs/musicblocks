@@ -14,21 +14,10 @@
 // (https://github.com/walterbender/turtleart), but implemented from
 // scratch. -- Walter Bender, October 2014.
 
-try {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has("layoutProfiling")) {
-        window.__ENABLE_REFRESH_PROFILING__ = urlParams.get("layoutProfiling") !== "false";
-    } else {
-        window.__ENABLE_REFRESH_PROFILING__ = false;
-    }
-} catch (e) {
-    window.__ENABLE_REFRESH_PROFILING__ = false;
-}
-
 /*
    global
 
-   ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON, debugLog,
+   ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON,
    ActivityContext,
    Boundary, CARTESIAN, changeImage, closeWidgets,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
@@ -52,7 +41,7 @@ try {
    SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
    MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
-   SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS
+   SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS
  */
 
 /*
@@ -90,10 +79,9 @@ let MYDEFINES = [
     // on demand when the widget is opened, saving ~3-5 MB of heap memory.
     // "Chart",
     "utils/utils",
-    "utils/retryWithBackoff",
-    "utils/debugLog",
     "activity/artwork",
     "widgets/status",
+    "widgets/help",
     "utils/munsell",
     "activity/toolbar",
     "activity/trash",
@@ -121,9 +109,28 @@ let MYDEFINES = [
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
+    "utils/performanceTracker",
     "activity/pastebox",
     "prefixfree.min",
     "Tone",
+    "activity/js-export/samples/sample",
+    "activity/js-export/export",
+    "activity/js-export/interface",
+    "activity/js-export/constraints",
+    "activity/js-export/ASTutils",
+    "activity/js-export/generate",
+    "activity/js-export/ast2blocklist",
+    "activity/js-export/API/GraphicsBlocksAPI",
+    "activity/js-export/API/PenBlocksAPI",
+    "activity/js-export/API/RhythmBlocksAPI",
+    "activity/js-export/API/MeterBlocksAPI",
+    "activity/js-export/API/PitchBlocksAPI",
+    "activity/js-export/API/IntervalsBlocksAPI",
+    "activity/js-export/API/ToneBlocksAPI",
+    "activity/js-export/API/OrnamentBlocksAPI",
+    "activity/js-export/API/VolumeBlocksAPI",
+    "activity/js-export/API/DrumBlocksAPI",
+    "activity/js-export/API/DictBlocksAPI",
     "activity/turtleactions/RhythmActions",
     "activity/turtleactions/MeterActions",
     "activity/turtleactions/PitchActions",
@@ -157,30 +164,10 @@ let MYDEFINES = [
     "activity/blocks/MediaBlocks",
     "activity/blocks/SensorsBlocks",
     "activity/blocks/EnsembleBlocks",
-    "widgets/widgetWindows"
+    "widgets/widgetWindows",
+    "widgets/statistics",
+    "widgets/jseditor"
 ];
-
-/**
- * Dynamically load one or more RequireJS modules on demand.
- * Returns a Promise that resolves once all modules are loaded.
- * RequireJS caches modules, so subsequent calls are instant.
- *
- * @param {string|string[]} modulePaths - Module path(s) to load.
- * @returns {Promise<void>}
- */
-function lazyLoad(modulePaths) {
-    // In Node/Jest (CommonJS), modules are already available as globals — resolve immediately.
-    if (typeof define !== "function" || !define.amd) {
-        return Promise.resolve();
-    }
-
-    // In browser with RequireJS (AMD), load modules dynamically.
-    return new Promise(resolve => {
-        require(Array.isArray(modulePaths) ? modulePaths : [modulePaths], function () {
-            resolve();
-        });
-    });
-}
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
     const MUSICBLOCKS_EXTRAS = [
@@ -205,7 +192,11 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         "widgets/oscilloscope",
         "widgets/sampler",
         "widgets/reflection",
-        "widgets/legobricks"
+        "widgets/legobricks",
+        "activity/lilypond",
+        "activity/abc",
+        "activity/midi",
+        "activity/mxml"
     ];
     MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
 }
@@ -244,8 +235,6 @@ class Activity {
         }
 
         this._listeners = [];
-        this._idleWatcherIntervalId = null;
-        this._idleWatcherResetHandler = null;
 
         this.cellSize = 55;
         this.searchSuggestions = [];
@@ -432,9 +421,6 @@ class Activity {
         this.setupDependencies = () => {
             this._stopRenderLoop();
             this.cleanupEventListeners();
-            if (this.toolbar && typeof this.toolbar.dispose === "function") {
-                this.toolbar.dispose();
-            }
             createDefaultStack();
             createHelpContent(this);
             window.scroll(0, 0);
@@ -1268,7 +1254,7 @@ class Activity {
                         const protoblk = obj[0];
                         const paletteName = obj[1];
                         const protoName = obj[2];
-
+                        // eslint-disable-next-line no-prototype-builtins
                         if (that.blocks.protoBlockDict.hasOwnProperty(protoName)) {
                             that.palettes.dict[paletteName].makeBlockFromSearch(
                                 protoblk,
@@ -1289,7 +1275,7 @@ class Activity {
                     }
 
                     setTimeout(() => {
-                        debugLog("Saving help artwork: " + name + "_block.svg");
+                        console.log("Saving help artwork: " + name + "_block.svg");
                         const svg = "data:image/svg+xml;utf8," + that.printBlockSVG();
                         that.save.download("svg", svg, name + "_block.svg");
                     }, 500);
@@ -1310,10 +1296,11 @@ class Activity {
             }
 
             let i = 0;
-            for (const name of blockHelpList) {
-                this.__saveHelpBlock(name, i * 2000);
-                i++;
+            for (const name in blockHelpList) {
+                this.__saveHelpBlock(blockHelpList[name], i * 2000);
+                i += 1;
             }
+
             this.sendAllToTrash(true, true);
         };
 
@@ -1337,7 +1324,7 @@ class Activity {
         this.printBlockSVG = () => {
             this.blocks.activeBlock = null;
             let startCounter = 0;
-            const svgParts = [];
+            let svg = "";
             let xMax = 0;
             let yMax = 0;
             let parts;
@@ -1359,19 +1346,18 @@ class Activity {
                     : this.blocks.blockArt[i];
 
                 if (this.blocks.blockList[i].isCollapsible()) {
-                    svgParts.push("<g>");
+                    svg += "<g>";
                 }
 
-                svgParts.push(
+                svg +=
                     '<g transform="translate(' +
-                        this.blocks.blockList[i].container.x +
-                        ", " +
-                        this.blocks.blockList[i].container.y +
-                        ')">'
-                );
+                    this.blocks.blockList[i].container.x +
+                    ", " +
+                    this.blocks.blockList[i].container.y +
+                    ')">';
 
                 if (!SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
-                    svgParts.push(extractSVGInner(rawSVG));
+                    svg += extractSVGInner(rawSVG);
                 } else {
                     // Safer SVG manipulation using DOM instead of string splitting
                     const parser = new DOMParser();
@@ -1413,10 +1399,10 @@ class Activity {
                     // remove outer svg tags because original code skipped them
                     serialized = serialized.replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "");
 
-                    svgParts.push(serialized);
+                    svg += serialized;
                 }
 
-                svgParts.push("</g>");
+                svg += "</g>";
 
                 if (this.blocks.blockList[i].isCollapsible()) {
                     let y;
@@ -1426,13 +1412,12 @@ class Activity {
                         y = this.blocks.blockList[i].container.y + 12;
                     }
 
-                    svgParts.push(
+                    svg +=
                         '<g transform="translate(' +
-                            this.blocks.blockList[i].container.x +
-                            ", " +
-                            y +
-                            ') scale(0.5 0.5)">'
-                    );
+                        this.blocks.blockList[i].container.x +
+                        ", " +
+                        y +
+                        ') scale(0.5 0.5)">';
                     if (this.blocks.blockList[i].collapsed) {
                         parts = EXPANDBUTTON.split("><");
                     } else {
@@ -1440,16 +1425,16 @@ class Activity {
                     }
 
                     for (let p = 2; p < parts.length - 1; p++) {
-                        svgParts.push("<" + parts[p] + ">");
+                        svg += "<" + parts[p] + ">";
                     }
 
-                    svgParts.push("</g>");
+                    svg += "</g>";
                 }
 
                 if (this.blocks.blockList[i].name === "start") {
                     const x = this.blocks.blockList[i].container.x + 110;
                     const y = this.blocks.blockList[i].container.y + 12;
-                    svgParts.push('<g transform="translate(' + x + ", " + y + ') scale(0.4 0.4)">');
+                    svg += '<g transform="translate(' + x + ", " + y + ') scale(0.4 0.4)">';
 
                     parts = TURTLESVG.replace(/fill_color/g, FILLCOLORS[startCounter])
                         .replace(/stroke_color/g, STROKECOLORS[startCounter])
@@ -1461,18 +1446,18 @@ class Activity {
                     }
 
                     for (let p = 2; p < parts.length - 1; p++) {
-                        svgParts.push("<" + parts[p] + ">");
+                        svg += "<" + parts[p] + ">";
                     }
 
-                    svgParts.push("</g>");
+                    svg += "</g>";
                 }
 
                 if (this.blocks.blockList[i].isCollapsible()) {
-                    svgParts.push("</g>");
+                    svg += "</g>";
                 }
             }
 
-            svgParts.push("</svg>");
+            svg += "</svg>";
 
             return (
                 '<svg xmlns="http://www.w3.org/2000/svg" width="' +
@@ -1480,7 +1465,7 @@ class Activity {
                 '" height="' +
                 yMax +
                 '">' +
-                encodeURIComponent(svgParts.join(""))
+                encodeURIComponent(svg)
             );
         };
 
@@ -1561,9 +1546,7 @@ class Activity {
             importConfirm.textContent = _("Confirm");
             importConfirm.addEventListener("click", () => {
                 const maxNoteBlocks = select.value;
-                require(["activity/midi"], function () {
-                    transcribeMidi(midi, maxNoteBlocks);
-                });
+                transcribeMidi(midi, maxNoteBlocks);
                 document.body.removeChild(modal);
             });
             modal.appendChild(importConfirm);
@@ -1691,10 +1674,6 @@ class Activity {
                     helpfulWheelDiv.style.display = "none";
                     this.__tick();
                 }
-
-                if (this.cleanupIdleWatcher) {
-                    this.cleanupIdleWatcher();
-                }
             };
 
             if (skipConfirmation) {
@@ -1713,26 +1692,13 @@ class Activity {
         };
 
         this._doFastButton = env => {
-            // Prevent spam-clicking by checking if already running
-            if (this.logo._alreadyRunning) {
-                return;
-            }
-
             this._onResize();
             this.blocks.activeBlock = null;
             hideDOMLabel();
 
-            // If music is currently playing, stop it first
-            if (this.turtles.running()) {
-                this.logo.doStopTurtles();
-            }
-
             const currentDelay = this.logo.turtleDelay;
             this.logo.turtleDelay = 0;
-            if (this.logo?.synth?.resume) {
-                this.logo.synth.resume();
-            }
-
+            this.logo.synth.resume();
             const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
                 if (widgetTitle[i].innerHTML === "tempo") {
@@ -1752,29 +1718,18 @@ class Activity {
                 }
 
                 this.logo.runLogoCommands(null, env);
-                const stopBtn = document.getElementById("stop");
-                if (stopBtn) {
-                    stopBtn.style.display = "inline-block";
-                    stopBtn.style.color = window.platformColor.stopIconcolor;
-                }
             } else {
                 if (currentDelay !== 0) {
                     // Keep playing at full speed.
                     this.logo.step();
                 } else {
                     // Stop and restart.
-                    const stopBtn = document.getElementById("stop");
-                    if (stopBtn) {
-                        stopBtn.style.color = "white";
-                    }
+                    document.getElementById("stop").style.color = "white";
                     this.logo.doStopTurtles();
 
                     const that = this;
                     setTimeout(() => {
-                        const stopBtnDelay = document.getElementById("stop");
-                        if (stopBtnDelay) {
-                            stopBtnDelay.style.color = window.platformColor.stopIconcolor;
-                        }
+                        document.getElementById("stop").style.color = "#ea174c";
                         that.logo.runLogoCommands(null, env);
                     }, 500);
                 }
@@ -1948,37 +1903,9 @@ class Activity {
             function saveFile(recordedChunks) {
                 flag = 1;
                 recInside.classList.remove("blink");
-                const showDialog = message => {
-                    if (window.MBDialog && typeof window.MBDialog.alert === "function") {
-                        window.MBDialog.alert(message, _("Save recording"));
-                    } else {
-                        alert(message);
-                    }
-                };
-                const finalizeSave = filename => {
-                    if (filename === null || filename.trim() === "") {
-                        showDialog(_("File save canceled"));
-                        flag = 0;
-                        recording();
-                        doRecordButton();
-                        return;
-                    }
-
-                    const blob = new Blob(recordedChunks, { type: "video/webm" });
-                    const url = URL.createObjectURL(blob);
-
-                    activity.save.download("webm", url, filename);
-
-                    recordedChunks = [];
-                    flag = 0;
-
-                    // Allow multiple recordings
-                    recording();
-                    doRecordButton();
-                };
                 // Prevent zero-byte files
                 if (!recordedChunks || recordedChunks.length === 0) {
-                    showDialog(_("Recorded file is empty. File not saved."));
+                    alert(_("Recorded file is empty. File not saved."));
                     flag = 0;
                     recording();
                     doRecordButton();
@@ -1988,7 +1915,7 @@ class Activity {
                     type: "video/webm"
                 });
                 if (blob.size === 0) {
-                    showDialog(_("Recorded file is empty. File not saved."));
+                    alert(_("Recorded file is empty. File not saved."));
                     flag = 0;
                     recording();
                     doRecordButton();
@@ -2018,7 +1945,6 @@ class Activity {
                 downloadLink.download = `${filename}.webm`;
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
-                that.textMsg(_("Saved! Check your Downloads folder."));
                 URL.revokeObjectURL(blob);
                 document.body.removeChild(downloadLink);
                 flag = 0;
@@ -2026,18 +1952,6 @@ class Activity {
                 recording();
                 doRecordButton();
                 that.textMsg(_("Recording stopped. File saved."));
-                if (window.MBDialog && typeof window.MBDialog.prompt === "function") {
-                    window.MBDialog.prompt({
-                        title: _("Save recording"),
-                        message: _("Filename:"),
-                        defaultValue: _("recording"),
-                        okText: _("Save"),
-                        cancelText: _("Cancel")
-                    }).then(result => finalizeSave(result));
-                } else {
-                    const filename = window.prompt(_("Enter file name"));
-                    finalizeSave(filename);
-                }
             }
             /**
              * Stops the recording process.
@@ -2072,21 +1986,13 @@ class Activity {
                 let recordedChunks = [];
                 mediaRecorder = new MediaRecorder(stream);
                 stream.oninactive = function () {
-                    debugLog("Recording is ready to save");
+                    console.log("Recording is ready to save");
                     stopRec();
                     flag = 0;
                 };
 
                 mediaRecorder.onstop = function () {
-                    //saveFile(recordedChunks);
-                    //recordedChunks = [];
-                    //flag = 0;
-                    //recInside.setAttribute("fill", "#ffffff");
-                    const blob = new Blob(recordedChunks, { type: "video/webm" });
-                    const url = URL.createObjectURL(blob);
-
-                    activity.save.download("webm", url, null);
-
+                    saveFile(recordedChunks);
                     recordedChunks = [];
                     flag = 0;
                     recInside.setAttribute("fill", "#ffffff");
@@ -2100,7 +2006,7 @@ class Activity {
 
                 mediaRecorder.start(200);
                 setTimeout(() => {
-                    debugLog("Resizing for Record", that.canvas.height);
+                    console.log("Resizing for Record", that.canvas.height);
                     that._onResize();
                 }, 500);
                 return mediaRecorder;
@@ -2119,7 +2025,7 @@ class Activity {
                         const stream = await recordScreen();
                         const mimeType = "video/webm";
                         mediaRecorder = createRecorder(stream, mimeType);
-                        if (flag === 1) {
+                        if (flag == 1) {
                             start.removeEventListener("click", handler);
                             // Add stop handler
                             const stopHandler = function stopHandler() {
@@ -2158,7 +2064,7 @@ class Activity {
             }
 
             // Start recording process if not already executing
-            if (flag === 0 && isExecuting) {
+            if (flag == 0 && isExecuting) {
                 recording();
                 start.dispatchEvent(clickEvent);
             }
@@ -2182,9 +2088,7 @@ class Activity {
             hideDOMLabel();
 
             this.logo.turtleDelay = DEFAULTDELAY;
-            if (this.logo?.synth?.resume) {
-                this.logo.synth.resume();
-            }
+            this.logo.synth.resume();
 
             if (!this.turtles.running()) {
                 this.logo.runLogoCommands();
@@ -2211,9 +2115,7 @@ class Activity {
             hideDOMLabel();
 
             const turtleCount = Object.keys(this.logo.stepQueue).length;
-            if (this.logo?.synth?.resume) {
-                this.logo.synth.resume();
-            }
+            this.logo.synth.resume();
 
             if (turtleCount === 0 || this.logo.turtleDelay !== this.TURTLESTEP) {
                 // Either we haven't set up a queue or we are
@@ -2266,7 +2168,6 @@ class Activity {
             }
 
             this.logo.doStopTurtles();
-            document.getElementById("stop").style.display = "none";
 
             const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
@@ -2276,10 +2177,6 @@ class Activity {
                     }
                     break;
                 }
-            }
-
-            if (this.cleanupIdleWatcher) {
-                this.cleanupIdleWatcher();
             }
         };
 
@@ -2497,9 +2394,6 @@ class Activity {
          * Sets the status of the smaller and larger block icons based on the current block size.
          */
         this.setSmallerLargerStatus = async () => {
-            // Guard: skip if containers are not yet initialized
-            if (!this.smallerContainer || !this.largerContainer) return;
-
             if (BLOCKSCALES[this.blockscale] < DEFAULTBLOCKSCALE) {
                 await changeImage(
                     this.smallerContainer.children[0],
@@ -2513,6 +2407,7 @@ class Activity {
                     SMALLERBUTTON
                 );
             }
+
             if (BLOCKSCALES[this.blockscale] === 4) {
                 await changeImage(
                     this.largerContainer.children[0],
@@ -2541,28 +2436,18 @@ class Activity {
          */
         this._deletePlugin = () => {
             if (this.palettes.activePalette !== null) {
-                const obj = safeJSONParse(this.storage.plugins);
-                if (!obj) return;
+                const obj = JSON.parse(this.storage.plugins);
 
-                if (obj["PALETTEPLUGINS"] && this.palettes.activePalette in obj["PALETTEPLUGINS"]) {
+                if (this.palettes.activePalette in obj["PALETTEPLUGINS"]) {
                     delete obj["PALETTEPLUGINS"][this.palettes.activePalette];
                 }
-                if (
-                    obj["PALETTEFILLCOLORS"] &&
-                    this.palettes.activePalette in obj["PALETTEFILLCOLORS"]
-                ) {
+                if (this.palettes.activePalette in obj["PALETTEFILLCOLORS"]) {
                     delete obj["PALETTEFILLCOLORS"][this.palettes.activePalette];
                 }
-                if (
-                    obj["PALETTESTROKECOLORS"] &&
-                    this.palettes.activePalette in obj["PALETTESTROKECOLORS"]
-                ) {
+                if (this.palettes.activePalette in obj["PALETTESTROKECOLORS"]) {
                     delete obj["PALETTESTROKECOLORS"][this.palettes.activePalette];
                 }
-                if (
-                    obj["PALETTEHIGHLIGHTCOLORS"] &&
-                    this.palettes.activePalette in obj["PALETTEHIGHLIGHTCOLORS"]
-                ) {
+                if (this.palettes.activePalette in obj["PALETTEHIGHLIGHTCOLORS"]) {
                     delete obj["PALETTEHIGHLIGHTCOLORS"][this.palettes.activePalette];
                 }
                 for (
@@ -2572,16 +2457,16 @@ class Activity {
                 ) {
                     const name =
                         this.palettes.dict[this.palettes.activePalette].protoList[i]["name"];
-                    if (obj["FLOWPLUGINS"] && name in obj["FLOWPLUGINS"]) {
-                        debugLog("deleting " + name);
+                    if (name in obj["FLOWPLUGINS"]) {
+                        console.log("deleting " + name);
                         delete obj["FLOWPLUGINS"][name];
                     }
                     if (name in obj["BLOCKPLUGINS"]) {
-                        debugLog("deleting " + name);
+                        console.log("deleting " + name);
                         delete obj["BLOCKPLUGINS"][name];
                     }
                     if (name in obj["ARGPLUGINS"]) {
-                        debugLog("deleting " + name);
+                        console.log("deleting " + name);
                         delete obj["ARGPLUGINS"][name];
                     }
                 }
@@ -2695,6 +2580,7 @@ class Activity {
          * Sets up block actions with regards to different mouse events
          */
         this._setupBlocksContainerEvents = () => {
+            const moving = false;
             const that = this;
             let lastCoords = { x: 0, y: 0, delta: 0 };
 
@@ -3028,15 +2914,6 @@ class Activity {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale = 1;
             bitmap.visible = false;
 
-            // Apply color filter based on theme
-            const isDarkMode = document.body.classList.contains("dark");
-            const isHighContrastMode = document.body.classList.contains("highcontrast");
-            if (isDarkMode || isHighContrastMode) {
-                // Create an invert filter to turn black elements white
-                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-                bitmap.filters = [invertFilter];
-            }
-
             return bitmap;
         };
 
@@ -3125,26 +3002,9 @@ class Activity {
             const IDLE_THRESHOLD = 5000; // 5 seconds
             const ACTIVE_FPS = 60;
             const IDLE_FPS = 1;
-            const idleEvents = ["mousemove", "mousedown", "keydown", "touchstart", "wheel"];
-
-            if (this._idleWatcherResetHandler) {
-                idleEvents.forEach(eventType => {
-                    window.removeEventListener(eventType, this._idleWatcherResetHandler);
-                });
-            }
-
-            if (this._idleWatcherIntervalId) {
-                clearInterval(this._idleWatcherIntervalId);
-                this._idleWatcherIntervalId = null;
-            }
 
             let lastActivity = Date.now();
             this.isAppIdle = false;
-
-            // Prevent duplicate intervals
-            if (this._idleWatcherIntervalId) {
-                clearInterval(this._idleWatcherIntervalId);
-            }
 
             // Wake up function - restores full framerate
             // Stored as instance property for cleanup
@@ -3163,7 +3023,7 @@ class Activity {
             this.addEventListener(window, "mousedown", this._resetIdleTimer);
             this.addEventListener(window, "keydown", this._resetIdleTimer);
             this.addEventListener(window, "touchstart", this._resetIdleTimer);
-            this.addEventListener(window, "wheel", this._resetIdleTimer, { passive: true });
+            this.addEventListener(window, "wheel", this._resetIdleTimer);
 
             // Periodic check for idle state - store interval ID for cleanup
             this._idleWatcherInterval = setInterval(() => {
@@ -3174,13 +3034,18 @@ class Activity {
                     if (!this.isAppIdle) {
                         this.isAppIdle = true;
                         createjs.Ticker.framerate = IDLE_FPS;
-                        debugLog("⚡ Idle mode: Throttling to 1 FPS to save battery");
+                        console.log("⚡ Idle mode: Throttling to 1 FPS to save battery");
                     }
                 } else if (this.isAppIdle && isMusicPlaying) {
                     // Music started playing - wake up immediately
                     this._resetIdleTimer();
                 }
             }, 1000);
+
+            // Expose activity instance for external checks
+            if (typeof window !== "undefined") {
+                window.activity = this;
+            }
         };
 
         /**
@@ -3253,8 +3118,8 @@ class Activity {
         };
 
         /*
-             Prepare a list of blocks for the search bar autocompletion.
-            */
+          Prepare a list of blocks for the search bar autocompletion.
+         */
         this.prepSearchWidget = () => {
             //searchWidget.style.visibility = "hidden";
             this.searchBlockPosition = [100, 100];
@@ -3278,11 +3143,9 @@ class Activity {
                     if (block.deprecated) {
                         this.deprecatedBlockNames.push(blockLabel);
                     } else {
-                        // Determine the primary label to display for this block.
-                        let label = blockLabel;
-                        if (label.length === 0) {
-                            // Swap in a preferred, localized name when there is no label.
-                            label = _(block.name);
+                        if (blockLabel.length === 0) {
+                            // Swap in a preferred name when there is no label.
+                            let label = _(block.name);
                             switch (block.name) {
                                 case "scaledegree2":
                                     label = _("scale degree");
@@ -3345,30 +3208,30 @@ class Activity {
                                     label = _("load file");
                                     break;
                             }
+                            this.searchSuggestions.push({
+                                label: label,
+                                value: block.name,
+                                specialDict: block,
+                                artwork: artwork
+                            });
+                        } else {
+                            this.searchSuggestions.push({
+                                label: blockLabel,
+                                value: block.name,
+                                specialDict: block,
+                                artwork: artwork
+                            });
                         }
-
-                        // Build a list of lowercased search terms (primary label + extra terms)
-                        // so we can match synonyms without duplicating the visual entry.
-                        const searchTerms = [];
-                        if (label && label.length > 0) {
-                            searchTerms.push(label.toLowerCase());
-                        }
-                        if (block.extraSearchTerms && Array.isArray(block.extraSearchTerms)) {
-                            for (let j = 0; j < block.extraSearchTerms.length; j++) {
-                                const term = block.extraSearchTerms[j];
-                                if (typeof term === "string" && term.length > 0) {
-                                    searchTerms.push(term.toLowerCase());
-                                }
+                        if (block.extraSearchTerms !== undefined) {
+                            for (let i = 0; i < block.extraSearchTerms.length; i++) {
+                                this.searchSuggestions.push({
+                                    label: block.extraSearchTerms[i],
+                                    value: block.name,
+                                    specialDict: block,
+                                    artwork: artwork
+                                });
                             }
                         }
-
-                        this.searchSuggestions.push({
-                            label: label,
-                            value: block.name,
-                            specialDict: block,
-                            artwork: artwork,
-                            searchTerms: searchTerms
-                        });
                     }
                 }
             }
@@ -3433,10 +3296,7 @@ class Activity {
                             document.getElementById("ui-id-1").contains(e.target))
                     ) {
                         //do nothing when clicked on the menu
-                    } else if (
-                        document.querySelector("#palette tbody tr") &&
-                        document.querySelector("#palette tbody tr").contains(e.target)
-                    ) {
+                    } else if (document.getElementsByTagName("tr")[2].contains(e.target)) {
                         //do nothing when clicked on the search row
                     } else {
                         // this will hide the search bar if someone clicks on menu items
@@ -3475,29 +3335,7 @@ class Activity {
 
             if (!$search.data("autocomplete-init")) {
                 $search.autocomplete({
-                    // Custom source so we can match on extraSearchTerms but show each block only once.
-                    source: (request, response) => {
-                        const term = (request.term || "").toLowerCase();
-                        const results = that.searchSuggestions.filter(item => {
-                            // If there is no active term, show all items.
-                            if (!term || term.length === 0) {
-                                return true;
-                            }
-
-                            // Prefer matching against searchTerms when present.
-                            if (item.searchTerms && Array.isArray(item.searchTerms)) {
-                                return item.searchTerms.some(t => t && t.indexOf(term) !== -1);
-                            }
-
-                            // Fallback to label matching for legacy entries.
-                            return (
-                                item.label &&
-                                typeof item.label === "string" &&
-                                item.label.toLowerCase().indexOf(term) !== -1
-                            );
-                        });
-                        response(results);
-                    },
+                    source: that.searchSuggestions,
                     appendTo: "body",
                     select: (event, ui) => {
                         event.preventDefault();
@@ -3611,7 +3449,7 @@ class Activity {
                         });
 
                         li.append(img);
-                        li.append($j("<a>").text(" " + item.label));
+                        li.append("<a> " + item.label + "</a>");
 
                         return li.appendTo(
                             ul.css({
@@ -3773,21 +3611,15 @@ class Activity {
             const KEYCODE_DOWN = 40;
             const DEL = 46;
             const V = 86;
-            const lilypondModal = document.getElementById("lilypondModal");
-            const samplerPrompt = document.getElementById("samplerPrompt");
-            const planetIframe = document.getElementById("planet-iframe");
-            const pasteEl = this.paste;
-            const wheelDiv = document.getElementById("wheelDiv");
-            const stopbtn = document.getElementById("stop");
             const disableKeys =
-                lilypondModal.style.display === "block" ||
+                document.getElementById("lilypondModal").style.display === "block" ||
                 this.searchWidget.style.visibility === "visible" ||
                 this.helpfulSearchWidget.style.visibility === "visible" ||
                 this.isInputON ||
-                samplerPrompt ||
-                planetIframe.style.display === "" ||
-                pasteEl.style.visibility === "visible" ||
-                wheelDiv.style.display === "" ||
+                document.getElementById("samplerPrompt") ||
+                document.getElementById("planet-iframe").style.display === "" ||
+                document.getElementById("paste").style.visibility === "visible" ||
+                document.getElementById("wheelDiv").style.display === "" ||
                 this.turtles.running();
             const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
@@ -3798,9 +3630,9 @@ class Activity {
             }
             if (
                 (event.altKey && !disableKeys) ||
-                event.keyCode === 13 ||
-                event.key === "/" ||
-                event.key === "\\"
+                event.keyCode == 13 ||
+                event.key == "/" ||
+                event.key == "\\"
             ) {
                 switch (event.keyCode) {
                     case 66: // 'B'
@@ -3818,6 +3650,7 @@ class Activity {
                     case 82: {
                         // 'R or ENTER'
                         this.textMsg("Alt-R " + _("Play"));
+                        const stopbtn = document.getElementById("stop");
                         if (stopbtn) {
                             stopbtn.style.color = platformColor.stopIconcolor;
                         }
@@ -3831,9 +3664,9 @@ class Activity {
                         if (this.searchWidget.style.visibility === "visible") {
                             return;
                         }
-                        if (pasteEl.style.visibility === "visible") {
+                        if (document.getElementById("paste").style.visibility === "visible") {
                             this.pasted();
-                            pasteEl.style.visibility = "hidden";
+                            document.getElementById("paste").style.visibility = "hidden";
                             return;
                         }
 
@@ -3844,6 +3677,7 @@ class Activity {
                         if (this.turtles.running()) {
                             this._doHardStopButton();
                         } else if (!hasOpenWidget) {
+                            const stopbtn = document.getElementById("stop");
                             if (stopbtn) {
                                 stopbtn.style.color = platformColor.stopIconcolor;
                             }
@@ -3865,9 +3699,9 @@ class Activity {
                         break;
                     case 191:
                         if (
-                            event.key === "/" &&
+                            event.key == "/" &&
                             !this.beginnerMode &&
-                            disableHorizScrollIcon.style.display === "block"
+                            disableHorizScrollIcon.style.display == "block"
                         ) {
                             this.blocksContainer.x += this.canvas.width / 10;
                             this.stageDirty = true;
@@ -3875,9 +3709,9 @@ class Activity {
                     // fall through
                     case 220:
                         if (
-                            event.key === "\\" &&
+                            event.key == "\\" &&
                             !this.beginnerMode &&
-                            disableHorizScrollIcon.style.display === "block"
+                            disableHorizScrollIcon.style.display == "block"
                         ) {
                             this.blocksContainer.x -= this.canvas.width / 10;
                             this.stageDirty = true;
@@ -3889,12 +3723,12 @@ class Activity {
                         // this.textMsg("Ctl-V " + _("Paste"));
                         this.pasteBox.createBox(this.turtleBlocksScale, 200, 200);
                         this.pasteBox.show();
-                        pasteEl.style.left =
+                        document.getElementById("paste").style.left =
                             (this.pasteBox.getPos()[0] + 10) * this.turtleBlocksScale + "px";
-                        pasteEl.style.top =
+                        document.getElementById("paste").style.top =
                             (this.pasteBox.getPos()[1] + 10) * this.turtleBlocksScale + "px";
-                        pasteEl.focus();
-                        pasteEl.style.visibility = "visible";
+                        document.getElementById("paste").focus();
+                        document.getElementById("paste").style.visibility = "visible";
                         this.update = true;
                         break;
                 }
@@ -3910,8 +3744,11 @@ class Activity {
                         break;
                 }
             } else {
-                if (pasteEl.style.visibility === "visible" && event.keyCode === RETURN) {
-                    if (pasteEl.value.length > 0) {
+                if (
+                    document.getElementById("paste").style.visibility === "visible" &&
+                    event.keyCode === RETURN
+                ) {
+                    if (document.getElementById("paste").value.length > 0) {
                         this.pasted();
                     }
                 } else if (event.keyCode === SPACE) {
@@ -3924,6 +3761,7 @@ class Activity {
                         this._doHardStopButton();
                     } else if (!disableKeys && !hasOpenWidget) {
                         event.preventDefault();
+                        const stopbtn = document.getElementById("stop");
                         if (stopbtn) {
                             stopbtn.style.color = platformColor.stopIconcolor;
                         }
@@ -4153,21 +3991,21 @@ class Activity {
             if (smallSide < this.cellSize * 9) {
                 mobileSize = false;
                 /*
-                   if (w < this.cellSize * 10) {
-                       this.turtleBlocksScale = smallSide / (this.cellSize * 11);
-                   } else {
-                       this.turtleBlocksScale = Math.max(smallSide / (this.cellSize * 11), 0.75);
-                   }
-                   */
+                if (w < this.cellSize * 10) {
+                    this.turtleBlocksScale = smallSide / (this.cellSize * 11);
+                } else {
+                    this.turtleBlocksScale = Math.max(smallSide / (this.cellSize * 11), 0.75);
+                }
+                */
             } else {
                 mobileSize = false;
                 /*
-                   if (w / 1200 > h / 900) {
-                       this.turtleBlocksScale = w / 1200;
-                   } else {
-                       this.turtleBlocksScale = h / 900;
-                   }
-                   */
+                if (w / 1200 > h / 900) {
+                    this.turtleBlocksScale = w / 1200;
+                } else {
+                    this.turtleBlocksScale = h / 900;
+                }
+                */
             }
 
             this.turtleBlocksScale = 1.0;
@@ -4331,7 +4169,7 @@ class Activity {
                 canvas.width = defaultWidth;
                 canvas.height = defaultHeight;
                 overCanvas.width = canvas.width;
-                overCanvas.height = canvas.height;
+                overCanvas.height = canvas.width;
                 canvasHolder.width = defaultWidth;
                 canvasHolder.height = defaultHeight;
             } else {
@@ -4345,8 +4183,10 @@ class Activity {
 
                 container.style.width = windowWidth + "px";
                 container.style.height = windowHeight + "px";
+                canvas.width = windowWidth;
+                canvas.height = windowHeight;
                 overCanvas.width = canvas.width;
-                overCanvas.height = canvas.height;
+                overCanvas.height = canvas.width;
                 canvasHolder.width = canvas.width;
                 canvasHolder.height = canvas.height;
             }
@@ -4786,21 +4626,6 @@ class Activity {
                 this.blocks.blockList[blk].trash = true;
                 this.blocks.moveBlockRelative(blk, dx, dy);
                 this.blocks.blockList[blk].hide();
-
-                // Free the backing canvas memory for trashed blocks.
-                // Each cached block holds a bitmap canvas (~0.5-2 MB).
-                // This matches the cleanup pattern in sendStackToTrash().
-                if (this.blocks.blockList[blk].container) {
-                    this.blocks.blockList[blk].container.uncache();
-                }
-
-                // Clean up SVG art strings to free memory.
-                if (this.blocks.blockArt[blk]) {
-                    delete this.blocks.blockArt[blk];
-                }
-                if (this.blocks.blockCollapseArt[blk]) {
-                    delete this.blocks.blockCollapseArt[blk];
-                }
             }
 
             if (addStartBlock) {
@@ -4887,14 +4712,6 @@ class Activity {
          * When turtle stops running restore stop button to normal state
          */
         this.onStopTurtle = () => {
-            if (this.showBlocksAfterRun) {
-                this.blocks.showBlocks();
-                const stopIcon = document.getElementById("stop");
-                if (stopIcon) {
-                    stopIcon.style.color = "white";
-                }
-                this.showBlocksAfterRun = false;
-            }
             // TODO: plugin support
         };
 
@@ -4930,19 +4747,13 @@ class Activity {
          * Updates all canvas elements by marking stage as dirty.
          * The actual render will happen on the next animation frame.
          */
-        let refreshCount = 0;
-        let totalRefreshTime = 0;
-        let maxRefreshTime = 0;
-        let lastRefreshReport = performance.now();
-
         this.refreshCanvas = () => {
             if (this.blockRefreshCanvas) {
                 return;
             }
 
-            const start = window.__ENABLE_REFRESH_PROFILING__ ? performance.now() : 0;
-
             this.blockRefreshCanvas = true;
+            // Mark stage as needing update
             this.stageDirty = true;
             this.update = true;
 
@@ -4950,27 +4761,6 @@ class Activity {
             setTimeout(() => {
                 that.blockRefreshCanvas = false;
                 that.stageDirty = true;
-
-                if (window.__ENABLE_REFRESH_PROFILING__) {
-                    const duration = performance.now() - start;
-                    refreshCount++;
-                    totalRefreshTime += duration;
-                    maxRefreshTime = Math.max(maxRefreshTime, duration);
-
-                    if (refreshCount % 25 === 0) {
-                        const now = performance.now();
-                        const cps = (25 / (now - lastRefreshReport)) * 1000;
-                        console.log(
-                            `refreshCanvas | Avg: ${(totalRefreshTime / refreshCount).toFixed(
-                                2
-                            )}ms | Max: ${maxRefreshTime.toFixed(2)}ms | Rate: ${cps.toFixed(
-                                1
-                            )} calls/sec`
-                        );
-                        maxRefreshTime = 0;
-                        lastRefreshReport = now;
-                    }
-                }
             }, 5);
         };
 
@@ -5301,7 +5091,7 @@ class Activity {
             const pitch = pitches;
             pitchDuration = toFraction(pitchDuration);
             const adjustedNote = _adjustPitch(pitch.name, keySignature).toUpperCase();
-            if (triplet !== null) {
+            if (triplet !== undefined && triplet !== null) {
                 pitchDuration[1] = meterDen * triplet;
             }
 
@@ -5347,14 +5137,14 @@ class Activity {
         }
 
         /*
-             The parseABC function converts ABC notation to Music Blocks
-             and is able to convert almost all the ABC notation to Music
-             Blocks. However, the following aspects need work:
-   
-             Hammers, pulls, and sliding offs grace notes (breaking the
-             conversion) Alternate endings (not failing but not showing
-             correctly) and DS al coda Bass voicing (failing)
-           */
+          The parseABC function converts ABC notation to Music Blocks
+          and is able to convert almost all the ABC notation to Music
+          Blocks. However, the following aspects need work:
+
+          Hammers, pulls, and sliding offs grace notes (breaking the
+          conversion) Alternate endings (not failing but not showing
+          correctly) and DS al coda Bass voicing (failing)
+        */
         this.parseABC = async function (tune) {
             const musicBlocksJSON = [];
             const staffBlocksMap = {};
@@ -5455,7 +5245,7 @@ class Activity {
                                     blockId + 13,
                                     [
                                         "modename",
-                                        { value: staff.key.mode === "m" ? "minor" : "major" }
+                                        { value: staff.key.mode == "m" ? "minor" : "major" }
                                     ],
                                     0,
                                     0,
@@ -5542,7 +5332,7 @@ class Activity {
 
                         // Update the namedo block if not first
                         // nameddo block appear
-                        if (staffBlocksMap[lineId].baseBlocks.length !== 0) {
+                        if (staffBlocksMap[lineId].baseBlocks.length != 0) {
                             staffBlocksMap[lineId].baseBlocks[
                                 staffBlocksMap[lineId].baseBlocks.length - 1
                             ][0][
@@ -5639,7 +5429,7 @@ class Activity {
                     ][0];
                 const repeatblockids = staffBlocksMap[staffIndex].repeatArray;
                 for (const repeatId of repeatblockids) {
-                    if (repeatId.start === 0) {
+                    if (repeatId.start == 0) {
                         staffBlocksMap[staffIndex].repeatBlock.push([
                             blockId,
                             "repeat",
@@ -5695,7 +5485,7 @@ class Activity {
                                 ]
                             );
 
-                            if (secondnammedo !== -1) {
+                            if (secondnammedo != -1) {
                                 staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0][
                                     secondnammedo
                                 ][4][0] = blockId;
@@ -5766,7 +5556,7 @@ class Activity {
                             100,
                             [blockId]
                         ]);
-                        if (prevnameddo !== -1) {
+                        if (prevnameddo != -1) {
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start - 1][0][
                                 prevnameddo
                             ][4][1] = blockId;
@@ -6131,15 +5921,6 @@ class Activity {
          */
         this._showCartesian = () => {
             this.cartesianBitmap.visible = true;
-            // Apply color filter based on theme
-            const isDarkMode = document.body.classList.contains("dark");
-            const isHighContrastMode = document.body.classList.contains("highcontrast");
-            if (isDarkMode || isHighContrastMode) {
-                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-                this.cartesianBitmap.filters = [invertFilter];
-            } else {
-                this.cartesianBitmap.filters = [];
-            }
             this.cartesianBitmap.cache(0, 0, 1200, 900);
             this.cartesianBitmap.updateCache();
             this.update = true;
@@ -6159,15 +5940,6 @@ class Activity {
          */
         this._showPolar = () => {
             this.polarBitmap.visible = true;
-            // Apply color filter based on theme
-            const isDarkMode = document.body.classList.contains("dark");
-            const isHighContrastMode = document.body.classList.contains("highcontrast");
-            if (isDarkMode || isHighContrastMode) {
-                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-                this.polarBitmap.filters = [invertFilter];
-            } else {
-                this.polarBitmap.filters = [];
-            }
             this.polarBitmap.cache(0, 0, 1200, 900);
             this.polarBitmap.updateCache();
             this.update = true;
@@ -6227,23 +5999,14 @@ class Activity {
          */
         this._showTreble = () => {
             this.trebleBitmap.visible = true;
-            // Apply color filter based on theme
-            const isDarkMode = document.body.classList.contains("dark");
-            const isHighContrastMode = document.body.classList.contains("highcontrast");
-            if (isDarkMode || isHighContrastMode) {
-                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-                this.trebleBitmap.filters = [invertFilter];
-            } else {
-                this.trebleBitmap.filters = [];
-            }
             this.trebleBitmap.cache(0, 0, 1200, 900);
             this.trebleBitmap.updateCache();
             this._hideAccidentals();
 
-            debugLog(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
+            console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
 
-            debugLog(scale);
+            console.log(scale);
             const _sharps = [
                 "F" + SHARP,
                 "C" + SHARP,
@@ -6294,23 +6057,14 @@ class Activity {
          */
         this._showGrand = () => {
             this.grandBitmap.visible = true;
-            // Apply color filter based on theme
-            const isDarkMode = document.body.classList.contains("dark");
-            const isHighContrastMode = document.body.classList.contains("highcontrast");
-            if (isDarkMode || isHighContrastMode) {
-                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-                this.grandBitmap.filters = [invertFilter];
-            } else {
-                this.grandBitmap.filters = [];
-            }
             this.grandBitmap.cache(0, 0, 1200, 900);
             this.grandBitmap.updateCache();
             this._hideAccidentals();
 
-            debugLog(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
+            console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
 
-            debugLog(scale);
+            console.log(scale);
             const _sharps = [
                 "F" + SHARP,
                 "C" + SHARP,
@@ -6359,23 +6113,14 @@ class Activity {
          */
         this._showSoprano = () => {
             this.sopranoBitmap.visible = true;
-            // Apply color filter based on theme
-            const isDarkMode = document.body.classList.contains("dark");
-            const isHighContrastMode = document.body.classList.contains("highcontrast");
-            if (isDarkMode || isHighContrastMode) {
-                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-                this.sopranoBitmap.filters = [invertFilter];
-            } else {
-                this.sopranoBitmap.filters = [];
-            }
             this.sopranoBitmap.cache(0, 0, 1200, 900);
             this.sopranoBitmap.updateCache();
             this._hideAccidentals();
 
-            debugLog(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
+            console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
 
-            debugLog(scale);
+            console.log(scale);
             const _sharps = [
                 "F" + SHARP,
                 "C" + SHARP,
@@ -6430,23 +6175,14 @@ class Activity {
          */
         this._showAlto = () => {
             this.altoBitmap.visible = true;
-            // Apply color filter based on theme
-            const isDarkMode = document.body.classList.contains("dark");
-            const isHighContrastMode = document.body.classList.contains("highcontrast");
-            if (isDarkMode || isHighContrastMode) {
-                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-                this.altoBitmap.filters = [invertFilter];
-            } else {
-                this.altoBitmap.filters = [];
-            }
             this.altoBitmap.cache(0, 0, 1200, 900);
             this.altoBitmap.updateCache();
             this._hideAccidentals();
 
-            debugLog(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
+            console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
 
-            debugLog(scale);
+            console.log(scale);
             const _sharps = [
                 "F" + SHARP,
                 "C" + SHARP,
@@ -6496,23 +6232,14 @@ class Activity {
          */
         this._showTenor = () => {
             this.tenorBitmap.visible = true;
-            // Apply color filter based on theme
-            const isDarkMode = document.body.classList.contains("dark");
-            const isHighContrastMode = document.body.classList.contains("highcontrast");
-            if (isDarkMode || isHighContrastMode) {
-                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-                this.tenorBitmap.filters = [invertFilter];
-            } else {
-                this.tenorBitmap.filters = [];
-            }
             this.tenorBitmap.cache(0, 0, 1200, 900);
             this.tenorBitmap.updateCache();
             this._hideAccidentals();
 
-            debugLog(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
+            console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
 
-            debugLog(scale);
+            console.log(scale);
             const _sharps = [
                 "F" + SHARP,
                 "C" + SHARP,
@@ -6563,23 +6290,14 @@ class Activity {
          */
         this._showBass = () => {
             this.bassBitmap.visible = true;
-            // Apply color filter based on theme
-            const isDarkMode = document.body.classList.contains("dark");
-            const isHighContrastMode = document.body.classList.contains("highcontrast");
-            if (isDarkMode || isHighContrastMode) {
-                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-                this.bassBitmap.filters = [invertFilter];
-            } else {
-                this.bassBitmap.filters = [];
-            }
             this.bassBitmap.cache(0, 0, 1200, 900);
             this.bassBitmap.updateCache();
             this._hideAccidentals();
 
-            debugLog(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
+            console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
 
-            debugLog(scale);
+            console.log(scale);
             const _sharps = [
                 "F" + SHARP,
                 "C" + SHARP,
@@ -6708,11 +6426,11 @@ class Activity {
                                         this.blocks.blockList[myBlock.connections[1]].value;
                                 }
 
-                                debugLog(customName);
+                                console.log(customName);
                                 args = {
                                     customName: customName,
                                     customTemperamentNotes: getTemperament(customName),
-                                    startingPitch: this.logo?.synth?.startingPitch || 392,
+                                    startingPitch: this.logo.synth.startingPitch,
                                     octaveSpace: getOctaveRatio()
                                 };
                             }
@@ -6812,57 +6530,10 @@ class Activity {
             activity._doOpenPlugin();
         };
 
-        this._loadBuiltInPlugin = name => {
-            const url = "plugins/" + name + ".json";
-            const xhr = new XMLHttpRequest();
-            xhr.open("GET", url, true);
-            const that = this;
-            xhr.onload = async () => {
-                if (xhr.status === 200) {
-                    const obj = await processRawPluginData(that, xhr.responseText, url);
-                    // Save plugins to local storage.
-                    if (obj !== null) {
-                        that.storage.plugins = preparePluginExports(that, obj);
-                    }
-                    // Refresh the palettes.
-                    setTimeout(() => {
-                        if (that.palettes.visible) {
-                            that.palettes.hide();
-                        }
-                    }, 1000);
-                } else {
-                    console.error("Could not load built-in plugin: " + name);
-                }
-            };
-            xhr.send();
-        };
-
         this._doOpenPlugin = () => {
             this.toolbar.closeAuxToolbar(showHideAuxMenu);
-            const rawName = prompt(
-                _("Enter the name of a built-in plugin, or leave blank to upload a plugin file:")
-            );
-            if (rawName === null) {
-                return; // User cancelled the operation
-            }
-
-            const name = rawName.trim().toLowerCase();
-            if (name !== "") {
-                // Validate: only allow safe characters (alphanumeric, hyphens, and underscores)
-                // This prevents path traversal attacks like "../../secrets"
-                if (!/^[a-z0-9\-_]+$/.test(name)) {
-                    alert(
-                        _(
-                            "Invalid plugin name. Only alphanumeric characters, hyphens, and underscores are allowed."
-                        )
-                    );
-                    return;
-                }
-                this._loadBuiltInPlugin(name);
-            } else {
-                this.pluginChooser.focus();
-                this.pluginChooser.click();
-            }
+            this.pluginChooser.focus();
+            this.pluginChooser.click();
         };
 
         /*
@@ -7152,25 +6823,7 @@ class Activity {
 
             if (!$helpfulSearch.data("autocomplete-init")) {
                 $helpfulSearch.autocomplete({
-                    source: (request, response) => {
-                        const term = (request.term || "").toLowerCase();
-                        const results = that.searchSuggestions.filter(item => {
-                            if (!term || term.length === 0) {
-                                return true;
-                            }
-
-                            if (item.searchTerms && Array.isArray(item.searchTerms)) {
-                                return item.searchTerms.some(t => t && t.indexOf(term) !== -1);
-                            }
-
-                            return (
-                                item.label &&
-                                typeof item.label === "string" &&
-                                item.label.toLowerCase().indexOf(term) !== -1
-                            );
-                        });
-                        response(results);
-                    },
+                    source: that.searchSuggestions,
                     appendTo: "body",
                     select: (event, ui) => {
                         event.preventDefault();
@@ -7187,13 +6840,17 @@ class Activity {
                 const instance = $helpfulSearch.autocomplete("instance");
                 if (instance) {
                     instance._renderItem = (ul, item) => {
-                        const li = $j("<li></li>");
-                        const img = document.createElement("img");
-                        img.src = item.artwork || "";
-                        img.height = 20;
-                        li.append(img);
-                        li.append($j("<a>").text(" " + item.label));
-                        return li.appendTo(ul.css("z-index", 35000));
+                        return $j("<li></li>")
+                            .append(
+                                '<img src="' +
+                                    (item.artwork || "") +
+                                    '" height = "20px">' +
+                                    "<a>" +
+                                    " " +
+                                    item.label +
+                                    "</a>"
+                            )
+                            .appendTo(ul.css("z-index", 35000));
                     };
                 }
                 $helpfulSearch.data("autocomplete-init", true);
@@ -7242,34 +6899,12 @@ class Activity {
         /**
          * Toggles display of javaScript editor widget.
          */
-        const toggleJSWindow = async activity => {
-            await lazyLoad([
-                "widgets/jseditor",
-                "activity/js-export/samples/sample",
-                "activity/js-export/export",
-                "activity/js-export/interface",
-                "activity/js-export/constraints",
-                "activity/js-export/ASTutils",
-                "activity/js-export/generate",
-                "activity/js-export/ast2blocklist",
-                "activity/js-export/API/GraphicsBlocksAPI",
-                "activity/js-export/API/PenBlocksAPI",
-                "activity/js-export/API/RhythmBlocksAPI",
-                "activity/js-export/API/MeterBlocksAPI",
-                "activity/js-export/API/PitchBlocksAPI",
-                "activity/js-export/API/IntervalsBlocksAPI",
-                "activity/js-export/API/ToneBlocksAPI",
-                "activity/js-export/API/OrnamentBlocksAPI",
-                "activity/js-export/API/VolumeBlocksAPI",
-                "activity/js-export/API/DrumBlocksAPI",
-                "activity/js-export/API/DictBlocksAPI"
-            ]);
+        const toggleJSWindow = activity => {
             new JSEditor(activity);
         };
 
-        const doAnalytics = async activity => {
+        const doAnalytics = activity => {
             if (!activity.statsWindow || !activity.statsWindow.isOpen) {
-                await lazyLoad("widgets/statistics");
                 activity.statsWindow = new StatsWindow(activity);
             }
         };
@@ -7278,261 +6913,12 @@ class Activity {
          * Shows help page
          */
         const showHelp = activity => {
-            if (window.widgetWindows?.isOpen("keyboard-shortcuts")) {
-                window.widgetWindows.clear("keyboard-shortcuts");
-            }
             activity._showHelp();
         };
 
-        this._showHelp = async () => {
+        this._showHelp = () => {
             // Will show welcome page by default.
-            await lazyLoad("widgets/help");
             new HelpWidget(this, false);
-        };
-
-        const showKeyboardShortcuts = activity => {
-            if (window.widgetWindows?.isOpen("help")) {
-                window.widgetWindows.clear("help");
-            }
-            activity._showKeyboardShortcuts();
-        };
-
-        this._showKeyboardShortcuts = () => {
-            const platformKeys = (windowsKeys, macKeys = windowsKeys) =>
-                `${_("Windows/Linux")}: ${windowsKeys}\n${_("Mac")}: ${macKeys}`;
-
-            const shortcutSections = [
-                {
-                    title: _("Workspace"),
-                    items: [
-                        {
-                            keys: platformKeys("Alt + R", "Option + R"),
-                            action: _("Play project")
-                        },
-                        {
-                            keys: platformKeys("Alt + S", "Option + S"),
-                            action: _("Stop project")
-                        },
-                        {
-                            keys: platformKeys("Alt + Enter", "Option + Enter"),
-                            action: _("Play or stop depending on the current state")
-                        },
-                        {
-                            keys: platformKeys("Space", "Space"),
-                            action: _("Play or stop when no text input or widget is active")
-                        },
-                        {
-                            keys: platformKeys("Shift + Space", "Shift + Space"),
-                            action: _("Toggle stage scale")
-                        },
-                        {
-                            keys: platformKeys("Home", "Home"),
-                            action: _("Jump to home position")
-                        },
-                        {
-                            keys: platformKeys("End", "End"),
-                            action: _("Jump to the bottom of the workspace")
-                        },
-                        {
-                            keys: platformKeys("Page Up", "Page Up"),
-                            action: _("Scroll workspace up")
-                        },
-                        {
-                            keys: platformKeys("Page Down", "Page Down"),
-                            action: _("Scroll workspace down")
-                        },
-                        {
-                            keys: platformKeys("Esc", "Esc"),
-                            action: _("Hide block search when it is open")
-                        },
-                        {
-                            keys: platformKeys("d,r,m,f,s,l,t", "d,r,m,f,s,l,t"),
-                            action: _(
-                                "You can type d to create a do block and r to create a re block etc."
-                            )
-                        }
-                    ]
-                },
-                {
-                    title: _("Editing"),
-                    items: [
-                        {
-                            keys: platformKeys("Alt + C", "Option + C"),
-                            action: _("Copy selected stack")
-                        },
-                        {
-                            keys: platformKeys("Alt + V", "Option + V"),
-                            action: _("Paste previous stack")
-                        },
-                        {
-                            keys: platformKeys("Ctrl + V", "Control + V"),
-                            action: _("Open the JSON paste box")
-                        },
-                        {
-                            keys: platformKeys("Enter", "Enter"),
-                            action: _("Paste JSON when the paste box is focused")
-                        },
-                        {
-                            keys: platformKeys("Delete", "Delete"),
-                            action: _("Extract the active block")
-                        },
-                        {
-                            keys: platformKeys("Alt + E", "Option + E"),
-                            action: _("Clear workspace")
-                        },
-                        {
-                            keys: platformKeys("Alt + B", "Option + B"),
-                            action: _("Save block artwork")
-                        },
-                        {
-                            keys: platformKeys("Alt + H", "Option + H"),
-                            action: _("Save block help")
-                        }
-                    ]
-                },
-                {
-                    title: _("Navigation"),
-                    items: [
-                        {
-                            keys: platformKeys("Tab / Shift + Tab", "Tab / Shift + Tab"),
-                            action: _("Move focus between the toolbar, palettes, and workspace")
-                        },
-                        {
-                            keys: platformKeys(_("Arrow keys"), _("Arrow keys")),
-                            action: _(
-                                "Move the active block, scroll palettes, adjust the tempo widget, or pan the workspace depending on context"
-                            )
-                        },
-                        {
-                            keys: platformKeys("/", "/"),
-                            action: _("Pan workspace right when horizontal scrolling is enabled")
-                        },
-                        {
-                            keys: platformKeys("\\", "\\"),
-                            action: _("Pan workspace left when horizontal scrolling is enabled")
-                        }
-                    ]
-                },
-                {
-                    title: _("Toolbar"),
-                    items: [
-                        {
-                            keys: platformKeys(
-                                _("Arrow Left / Arrow Right"),
-                                _("Arrow Left / Arrow Right")
-                            ),
-                            action: _("Move focus within the current toolbar")
-                        },
-                        {
-                            keys: platformKeys(
-                                _("Arrow Up / Arrow Down"),
-                                _("Arrow Up / Arrow Down")
-                            ),
-                            action: _("Move focus between main and auxiliary toolbars")
-                        },
-                        {
-                            keys: platformKeys("Enter", "Enter"),
-                            action: _("Activate the focused toolbar button")
-                        },
-                        {
-                            keys: platformKeys("Esc", "Esc"),
-                            action: _("Exit toolbar keyboard navigation")
-                        }
-                    ]
-                },
-                {
-                    title: _("Widget Windows"),
-                    items: [
-                        {
-                            keys: platformKeys("Esc", "Esc"),
-                            action: _("Close the focused widget window")
-                        },
-                        {
-                            keys: platformKeys("Ctrl + Shift + M", "Command + Shift + M"),
-                            action: _("Maximize or restore the focused widget window")
-                        }
-                    ]
-                },
-                {
-                    title: _("Help and Pitch Slider"),
-                    items: [
-                        {
-                            keys: platformKeys(
-                                _("Arrow Left / Arrow Right"),
-                                _("Arrow Left / Arrow Right")
-                            ),
-                            action: _("Move between help pages when Help is open")
-                        },
-                        {
-                            keys: platformKeys(_("Arrow keys"), _("Arrow keys")),
-                            action: _("Adjust pitch by semitone when Pitch Slider is open")
-                        }
-                    ]
-                }
-            ];
-
-            const widgetWindow = window.widgetWindows.windowFor(
-                this,
-                _("Keyboard shortcuts"),
-                "keyboard-shortcuts",
-                true
-            );
-            widgetWindow.clear();
-            widgetWindow.show();
-
-            const widgetBody = widgetWindow.getWidgetBody();
-            widgetBody.className = "wfbWidget keyboard-shortcuts-widget";
-            widgetBody.style.padding = "0";
-            widgetBody.style.display = "block";
-            widgetBody.style.height = "min(72vh, 680px)";
-            widgetBody.style.width = "min(68vw, 760px)";
-            widgetBody.style.maxWidth = "100%";
-            widgetBody.style.overflow = "hidden";
-
-            const wrapper = document.createElement("div");
-            wrapper.className = "keyboard-shortcuts-panel";
-
-            const intro = document.createElement("div");
-            intro.className = "keyboard-shortcuts-hero";
-            intro.innerHTML =
-                `<div class="keyboard-shortcuts-hero-title">${_("Keyboard shortcuts")}</div>` +
-                `<div class="keyboard-shortcuts-hero-copy">${_(
-                    "Shortcuts are context-sensitive. Some only work when a related panel, widget, or mode is active. Windows/Linux and Mac equivalents are shown together."
-                )}</div>`;
-            wrapper.appendChild(intro);
-
-            shortcutSections.forEach(section => {
-                const sectionCard = document.createElement("section");
-                sectionCard.className = "keyboard-shortcuts-section";
-
-                const heading = document.createElement("div");
-                heading.textContent = section.title;
-                heading.className = "keyboard-shortcuts-section-title";
-                sectionCard.appendChild(heading);
-
-                section.items.forEach(item => {
-                    const row = document.createElement("div");
-                    row.className = "keyboard-shortcuts-row";
-
-                    const key = document.createElement("div");
-                    key.textContent = item.keys;
-                    key.className = "keyboard-shortcuts-key";
-
-                    const action = document.createElement("div");
-                    action.textContent = item.action;
-                    action.className = "keyboard-shortcuts-action";
-
-                    row.appendChild(key);
-                    row.appendChild(action);
-                    sectionCard.appendChild(row);
-                });
-
-                wrapper.appendChild(sectionCard);
-            });
-
-            widgetBody.appendChild(wrapper);
-            widgetWindow.sendToCenter();
-            requestAnimationFrame(() => widgetWindow.sendToCenter());
         };
 
         /*
@@ -7542,9 +6928,8 @@ class Activity {
             activity._showAboutPage();
         };
 
-        this._showAboutPage = async () => {
+        this._showAboutPage = () => {
             // Will show welcome page by default.
-            await lazyLoad("widgets/help");
             new HelpWidget(this, false);
         };
 
@@ -7622,15 +7007,10 @@ class Activity {
             }
 
             const cleanData = rawData.replace("\n", " ");
-
             try {
                 obj = JSON.parse(cleanData);
             } catch (e) {
-                this.errorMsg(
-                    _(
-                        "Invalid clipboard data. To paste blocks, first copy them from the Music Blocks canvas. To paste text, click inside an input field."
-                    )
-                );
+                this.errorMsg(_("Could not parse JSON input."));
                 return;
             }
 
@@ -7678,14 +7058,7 @@ class Activity {
             this.update = true;
 
             // Get things started
-            this._perfMark("activity.domReady.start");
             await this.init();
-            this._perfMark("activity.domReady.end");
-            this._perfMeasure(
-                "activity.domReady_total",
-                "activity.domReady.start",
-                "activity.domReady.end"
-            );
         };
 
         this.__saveLocally = () => {
@@ -7976,27 +7349,25 @@ class Activity {
         // Unhighlight the selected blocks
 
         this.unhighlightSelectedBlocks = (unhighlight, selectionModeOn) => {
-            const blockIndexMap = new Map();
-            for (const [index, block] of this.blocks.blockList.entries()) {
-                if (block) {
-                    blockIndexMap.set(block, index);
-                }
-            }
-
+            // Build a Set of selected block indices for O(1) lookup
+            // instead of O(n*m) deep-equality comparisons.
+            const selectedSet = new Set();
             for (let i = 0; i < this.selectedBlocks.length; i++) {
-                const blockIndex = blockIndexMap.get(this.selectedBlocks[i]);
-                if (blockIndex === undefined) {
-                    continue;
-                }
-
-                if (unhighlight) {
-                    this.blocks.unhighlightSelectedBlocks(blockIndex, true);
-                } else {
-                    this.blocks.highlight(blockIndex, true);
+                const idx = this.blocks.blockList.indexOf(this.selectedBlocks[i]);
+                if (idx >= 0) {
+                    selectedSet.add(idx);
                 }
             }
 
-            if (!unhighlight && this.selectedBlocks.length > 0) {
+            for (const blk of selectedSet) {
+                if (unhighlight) {
+                    this.blocks.unhighlightSelectedBlocks(blk, true);
+                } else {
+                    this.blocks.highlight(blk, true);
+                }
+            }
+
+            if (!unhighlight && selectedSet.size > 0) {
                 this.refreshCanvas();
             }
         };
@@ -8031,14 +7402,7 @@ class Activity {
             if (this._initialized) return;
             this._initialized = true;
 
-            // Hide stop button on startup
-            const stopBtn = document.getElementById("stop");
-            if (stopBtn) {
-                stopBtn.style.display = "none";
-            }
-
             // Batch DOM reads before any writes to avoid forced synchronous layout
-            this._perfMark("activity.init.start");
             this._clientWidth = document.body.clientWidth;
             this._clientHeight = document.body.clientHeight;
             this._innerWidth = window.innerWidth;
@@ -8100,13 +7464,7 @@ class Activity {
             // Use managed addEventListener for automatic cleanup
             this.addEventListener(document, "mousemove", this.handleMouseMove);
             this.addEventListener(document, "click", this.handleDocumentClick);
-            this.addEventListener(window, "beforeunload", () => {
-                this._stopRenderLoop();
-                if (this._autoSaveInterval !== null) {
-                    clearInterval(this._autoSaveInterval);
-                    this._autoSaveInterval = null;
-                }
-            });
+            this.addEventListener(window, "beforeunload", this._stopRenderLoop);
 
             this._createMsgContainer(
                 "#ffffff",
@@ -8155,10 +7513,6 @@ class Activity {
             this.pasteBox = new PasteBox(this);
             this.languageBox = new LanguageBox(this);
             this.themeBox = new ThemeBox(this);
-            // Initialize theme state on page load if method exists
-            if (this.themeBox && typeof this.themeBox.initializeTheme === "function") {
-                this.themeBox.initializeTheme();
-            }
 
             // Show help on startup if first-time user.
             if (this.firstTimeUser) {
@@ -8197,7 +7551,7 @@ class Activity {
             );
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
             this.toolbar.renderMenuIcon(showHideAuxMenu);
-            this.toolbar.renderHelpIcon(showHelp, showKeyboardShortcuts);
+            this.toolbar.renderHelpIcon(showHelp);
             this.toolbar.renderModeSelectIcon(
                 doSwitchMode,
                 () => doRecordButton(this),
@@ -8217,7 +7571,6 @@ class Activity {
             this.toolbar.renderJavaScriptIcon(toggleJSWindow);
             this.toolbar.renderLanguageSelectIcon(this.languageBox);
             this.toolbar.renderWrapIcon();
-            this._perfMark("activity.init.ui_ready");
 
             initPalettes(this.palettes);
 
@@ -8228,27 +7581,6 @@ class Activity {
             }
 
             window.saveLocally = this.saveLocally;
-
-            // Auto-save live workspace every 5 minutes to guard against
-            // data loss from browser crashes (see issue #2994).
-            // Deferred while the project is actively running to avoid
-            // interrupting playback.
-            this._autoSaveInterval = setInterval(
-                () => {
-                    try {
-                        if (this.logo && this.logo._alreadyRunning) {
-                            return;
-                        }
-
-                        if (this.saveLocally !== null && this.saveLocally !== undefined) {
-                            this.saveLocally();
-                        }
-                    } catch (e) {
-                        console.error("[AutoSave] Failed:", e);
-                    }
-                },
-                5 * 60 * 1000
-            );
 
             initBasicProtoBlocks(this);
 
@@ -8262,8 +7594,10 @@ class Activity {
             // Load any plugins saved in local storage.
             this.pluginData = this.storage.plugins;
             if (this.pluginData !== null && this.pluginData !== "null") {
-                const obj = await processPluginData(this, this.pluginData, "localStorage:plugins");
-                updatePluginObj(this, obj);
+                updatePluginObj(
+                    this,
+                    processPluginData(this, this.pluginData, "localStorage:plugins")
+                );
             }
 
             // Load custom mode saved in local storage.
@@ -8377,20 +7711,10 @@ class Activity {
                     };
 
                     midiReader.onload = e => {
-                        try {
-                            const midi = new Midi(e.target.result);
-                            console.debug(midi);
-                            midiImportBlocks(midi);
-                        } catch (err) {
-                            console.error("MIDI import failed:", err);
-                            if (that && typeof that.errorMsg === "function") {
-                                that.errorMsg(
-                                    _(
-                                        "Cannot load project from the file. Please check the file type."
-                                    )
-                                );
-                            }
-                        }
+                        const midi = new Midi(e.target.result);
+
+                        console.debug(midi);
+                        midiImportBlocks(midi);
                     };
 
                     const file = that.fileChooser.files[0];
@@ -8484,30 +7808,21 @@ class Activity {
                     }, 200);
                 };
                 midiReader.onload = e => {
-                    try {
-                        const midi = new Midi(e.target.result);
-                        console.debug(midi);
-                        midiImportBlocks(midi);
-                    } catch (err) {
-                        console.error("MIDI import failed:", err);
-                        if (that && typeof that.errorMsg === "function") {
-                            that.errorMsg(
-                                _("Cannot load project from the file. Please check the file type.")
-                            );
-                        }
-                    }
+                    const midi = new Midi(e.target.result);
+
+                    console.debug(midi);
+                    midiImportBlocks(midi);
                 };
 
                 // Music Block Parser from abc to MB
-                abcReader.onload = async event => {
+                abcReader.onload = event => {
                     //get the abc data and replace the / so that the block does not break
                     let abcData = event.target.result;
                     abcData = abcData.replace(/\\/g, "");
 
-                    await ensureABCJS();
                     const tunebook = new ABCJS.parseOnly(abcData);
 
-                    debugLog(tunebook);
+                    console.log(tunebook);
                     tunebook.forEach(tune => {
                         //call parseABC to parse abcdata to MB json
                         this.parseABC(tune);
@@ -8519,13 +7834,13 @@ class Activity {
                 if (files[0] !== undefined) {
                     const extension = files[0].name.split(".").pop().toLowerCase(); //file extension from input file
 
-                    const isMidi = extension === "mid" || extension === "midi";
+                    const isMidi = extension == "mid" || extension == "midi";
                     if (isMidi) {
                         midiReader.readAsArrayBuffer(files[0]);
                         return;
                     }
 
-                    const isABC = extension === "abc";
+                    const isABC = extension == "abc";
                     if (isABC) {
                         abcReader.readAsText(files[0]);
                         return;
@@ -8568,13 +7883,11 @@ class Activity {
                         document.body.style.cursor = "wait";
                         //doLoadAnimation();
 
-                        setTimeout(async () => {
-                            const obj = await processRawPluginData(
+                        setTimeout(() => {
+                            const obj = processRawPluginData(
                                 that,
                                 reader.result,
-                                pluginFile && pluginFile.name
-                                    ? "file:" + pluginFile.name
-                                    : "file:local-file"
+                                pluginFile && pluginFile.name ? pluginFile.name : "local-file"
                             );
                             // Save plugins to local storage.
                             if (obj !== null) {
@@ -8610,50 +7923,72 @@ class Activity {
             // Enabled mouse over and mouse out events.
             this.stage.enableMouseOver(10); // default is 20
 
-            // Cache encoded SVG data URIs to avoid re-encoding identical artwork on startup.
-            const gridDataUri = svg =>
-                "data:image/svg+xml;base64," + window.btoa(base64Encode(svg));
-            const encodedGridUris = {
-                cartesian: gridDataUri(CARTESIAN),
-                polar: gridDataUri(POLAR),
-                treble: gridDataUri(TREBLE),
-                grand: gridDataUri(GRAND),
-                soprano: gridDataUri(SOPRANO),
-                alto: gridDataUri(ALTO),
-                tenor: gridDataUri(TENOR),
-                bass: gridDataUri(BASS),
-                grandG: gridDataUri(GRAND_G),
-                grandF: gridDataUri(GRAND_F),
-                trebleG: gridDataUri(TREBLE_G),
-                trebleF: gridDataUri(TREBLE_F)
-            };
-
-            this.cartesianBitmap = this._createGrid(encodedGridUris.cartesian);
-            this.polarBitmap = this._createGrid(encodedGridUris.polar);
-            this.trebleBitmap = this._createGrid(encodedGridUris.treble);
-            this.grandBitmap = this._createGrid(encodedGridUris.grand);
-            this.sopranoBitmap = this._createGrid(encodedGridUris.soprano);
-            this.altoBitmap = this._createGrid(encodedGridUris.alto);
-            this.tenorBitmap = this._createGrid(encodedGridUris.tenor);
-            this.bassBitmap = this._createGrid(encodedGridUris.bass);
+            this.cartesianBitmap = this._createGrid(
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(CARTESIAN))
+            );
+            this.polarBitmap = this._createGrid(
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(POLAR))
+            );
+            this.trebleBitmap = this._createGrid(
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE))
+            );
+            this.grandBitmap = this._createGrid(
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(GRAND))
+            );
+            this.sopranoBitmap = this._createGrid(
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(SOPRANO))
+            );
+            this.altoBitmap = this._createGrid(
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(ALTO))
+            );
+            this.tenorBitmap = this._createGrid(
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(TENOR))
+            );
+            this.bassBitmap = this._createGrid(
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(BASS))
+            );
 
             // We use G (one sharp) and F (one flat) as prototypes for all
             // of the accidentals. When applied, these graphics are offset
             // vertically to rendering different sharps and flats and
             // horizontally so as not to overlap.
             for (let i = 0; i < 7; i++) {
-                this.grandSharpBitmap[i] = this._createGrid(encodedGridUris.grandG);
-                this.grandFlatBitmap[i] = this._createGrid(encodedGridUris.grandF);
-                this.trebleSharpBitmap[i] = this._createGrid(encodedGridUris.trebleG);
-                this.trebleFlatBitmap[i] = this._createGrid(encodedGridUris.trebleF);
-                this.sopranoSharpBitmap[i] = this._createGrid(encodedGridUris.trebleG);
-                this.sopranoFlatBitmap[i] = this._createGrid(encodedGridUris.trebleF);
-                this.altoSharpBitmap[i] = this._createGrid(encodedGridUris.trebleG);
-                this.altoFlatBitmap[i] = this._createGrid(encodedGridUris.trebleF);
-                this.tenorSharpBitmap[i] = this._createGrid(encodedGridUris.trebleG);
-                this.tenorFlatBitmap[i] = this._createGrid(encodedGridUris.trebleF);
-                this.bassSharpBitmap[i] = this._createGrid(encodedGridUris.trebleG);
-                this.bassFlatBitmap[i] = this._createGrid(encodedGridUris.trebleF);
+                this.grandSharpBitmap[i] = this._createGrid(
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(GRAND_G))
+                );
+                this.grandFlatBitmap[i] = this._createGrid(
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(GRAND_F))
+                );
+                this.trebleSharpBitmap[i] = this._createGrid(
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_G))
+                );
+                this.trebleFlatBitmap[i] = this._createGrid(
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_F))
+                );
+                this.sopranoSharpBitmap[i] = this._createGrid(
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_G))
+                );
+                this.sopranoFlatBitmap[i] = this._createGrid(
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_F))
+                );
+                this.altoSharpBitmap[i] = this._createGrid(
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_G))
+                );
+                this.altoFlatBitmap[i] = this._createGrid(
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_F))
+                );
+                this.tenorSharpBitmap[i] = this._createGrid(
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_G))
+                );
+                this.tenorFlatBitmap[i] = this._createGrid(
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_F))
+                );
+                this.bassSharpBitmap[i] = this._createGrid(
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_G))
+                );
+                this.bassFlatBitmap[i] = this._createGrid(
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_F))
+                );
             }
 
             const URL = window.location.href;
@@ -8719,9 +8054,7 @@ class Activity {
                                         },
                                         () => {
                                             alert(
-                                                _(
-                                                    "Something went wrong reading JSON-encoded project data."
-                                                )
+                                                "Something went wrong reading JSON-encoded project data."
                                             );
                                         }
                                     );
@@ -8766,9 +8099,9 @@ class Activity {
             this._create2Ddrag();
 
             /*
-               document.addEventListener("mousewheel", scrollEvent, false);
-               document.addEventListener("DOMMouseScroll", scrollEvent, false);
-               */
+            document.addEventListener("mousewheel", scrollEvent, false);
+            document.addEventListener("DOMMouseScroll", scrollEvent, false);
+            */
 
             // Named event handler for proper cleanup
             const activity = this;
@@ -8782,71 +8115,7 @@ class Activity {
             if (this.planet !== undefined) {
                 this.planet.planet.setAnalyzeProject(doAnalyzeProject);
             }
-
-            this._perfMark("activity.init.end");
-            this._perfMeasure("activity.init_total", "activity.init.start", "activity.init.end");
-            this._perfMeasure(
-                "activity.init_to_ui_ready",
-                "activity.init.start",
-                "activity.init.ui_ready"
-            );
-            this._perfMeasure(
-                "loader_to_activity_init_complete",
-                "loader.main.start",
-                "activity.init.end"
-            );
-
-            if (
-                typeof window !== "undefined" &&
-                window.__mbPerf &&
-                typeof window.__mbPerf.report === "function"
-            ) {
-                window.__mbPerf.report();
-            }
         };
-    }
-
-    /**
-     * Record a named performance mark in the global mbPerf tracker.
-     * @param {string} markName - The mark identifier.
-     * @returns {void}
-     */
-    _perfMark(markName) {
-        if (
-            typeof window === "undefined" ||
-            !window.__mbPerf ||
-            !window.__mbPerf.enabled ||
-            !window.__mbPerf.marks
-        ) {
-            return;
-        }
-        if (typeof performance === "undefined" || typeof performance.now !== "function") {
-            return;
-        }
-        window.__mbPerf.marks[markName] = performance.now();
-    }
-
-    /**
-     * Measure elapsed milliseconds between two mbPerf marks.
-     * @param {string} measureName - The measure identifier.
-     * @param {string} startMark - Start mark name.
-     * @param {string} endMark - End mark name.
-     * @returns {void}
-     */
-    _perfMeasure(measureName, startMark, endMark) {
-        if (
-            typeof window === "undefined" ||
-            !window.__mbPerf ||
-            !window.__mbPerf.enabled ||
-            !window.__mbPerf.marks ||
-            !window.__mbPerf.measures
-        ) {
-            return;
-        }
-        const start = window.__mbPerf.marks[startMark];
-        const end = window.__mbPerf.marks[endMark];
-        if (typeof start !== "number" || typeof end !== "number") return;
-        window.__mbPerf.measures[measureName] = +(end - start).toFixed(2);
     }
 
     /**
@@ -8906,18 +8175,6 @@ class Activity {
             if (target && typeof target.removeEventListener === "function") {
                 target.removeEventListener(type, listener, options);
             }
-        }
-
-        if (this._idleWatcherResetHandler) {
-            ["mousemove", "mousedown", "keydown", "touchstart", "wheel"].forEach(eventType => {
-                window.removeEventListener(eventType, this._idleWatcherResetHandler);
-            });
-            this._idleWatcherResetHandler = null;
-        }
-
-        if (this._idleWatcherIntervalId) {
-            clearInterval(this._idleWatcherIntervalId);
-            this._idleWatcherIntervalId = null;
         }
     }
 

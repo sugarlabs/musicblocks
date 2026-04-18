@@ -66,21 +66,12 @@ global.Tone = {
     }))
 };
 
-const mockTracker = {
-    enable: jest.fn(),
-    disable: jest.fn(),
-    startRun: jest.fn(),
-    enterBlock: jest.fn(),
-    exitBlock: jest.fn(),
-    endRun: jest.fn(),
-    logStats: jest.fn()
-};
-jest.mock("../../js/utils/performanceTracker", () => mockTracker);
-// Set tracker instance directly — beforeAll/afterAll not allowed here
-global.performanceTrackerInstance = mockTracker;
-if (typeof window !== "undefined") {
-    window.performanceTrackerInstance = mockTracker;
-}
+// Mock Tone.js
+jest.mock("tone", () => ({
+    UserMedia: jest.fn().mockImplementation(() => ({
+        open: jest.fn()
+    }))
+}));
 
 // Now require the module after globals are set up
 const {
@@ -105,11 +96,6 @@ const {
     EMPTYHEAPERRORMSG,
     POSNUMBER
 } = require("../logo");
-
-// Expose constants that logo.js references as bare globals at runtime
-// (e.g. TURTLESTEP in runFromBlock, NOTEDIV in dispatchTurtleSignals).
-const logoconstants = require("../logoconstants");
-Object.assign(global, logoconstants);
 
 describe("Queue Class", () => {
     test("constructor initializes all properties correctly", () => {
@@ -755,8 +741,6 @@ describe("Logo comprehensive method coverage", () => {
         global.window.widgetWindows = {
             isOpen: jest.fn(() => false)
         };
-        global.window.performanceTrackerInstance = mockTracker;
-        global.performanceTrackerInstance = mockTracker;
 
         if (!global.document) {
             global.document = { body: { style: {} } };
