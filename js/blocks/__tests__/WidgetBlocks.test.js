@@ -118,6 +118,7 @@ global.TimbreWidget = jest.fn(() => ({
     init: jest.fn()
 }));
 global.SampleWidget = jest.fn(() => ({ init: jest.fn() }));
+global.AIDebuggerWidget = jest.fn(() => ({ init: jest.fn() }));
 global.TemperamentWidget = jest.fn(() => ({
     inTemperament: null,
     scale: null,
@@ -208,6 +209,7 @@ const createMockLogo = () => {
         tempo: null,
         timbre: null,
         sample: null,
+        aiDebugger: null,
         temperament: null,
         meterWidget: null,
         modeWidget: null,
@@ -232,6 +234,8 @@ describe("setupWidgetBlocks", () => {
     beforeEach(() => {
         activity = createMockActivity();
         logo = createMockLogo();
+        global.SampleWidget.mockClear();
+        global.AIDebuggerWidget.mockClear();
         global.instrumentsEffects[0] = {};
         global.instrumentsFilters[0] = {};
         setupWidgetBlocks(activity);
@@ -405,12 +409,69 @@ describe("setupWidgetBlocks", () => {
     });
 
     describe("SamplerBlock", () => {
-        it("initializes sample widget and returns child block", () => {
+        it("lazy-loads sample widget and returns child block on replay", () => {
             const sampler = getBlock("sampler");
+
+            const interruption = sampler.flow(["childBlk"], logo, 0, "samplerBlk", "received");
+            expect(interruption).toEqual([null, 0, true]);
+            expect(global.SampleWidget).toHaveBeenCalledTimes(1);
+            expect(logo.runFromBlockNow).toHaveBeenCalledWith(
+                logo,
+                0,
+                "samplerBlk",
+                true,
+                "received"
+            );
+
             const result = sampler.flow(["childBlk"], logo, 0, "samplerBlk");
             expect(logo.inSample).toBe(true);
             expect(logo.sample).toBeDefined();
             expect(result).toEqual(["childBlk", 1]);
+        });
+
+        it("lazy-loads sample widget when logo.sample is undefined", () => {
+            const sampler = getBlock("sampler");
+            delete logo.sample;
+
+            const result = sampler.flow(["childBlk"], logo, 0, "samplerBlk", "received");
+
+            expect(result).toEqual([null, 0, true]);
+            expect(global.SampleWidget).toHaveBeenCalledTimes(1);
+            expect(logo.sample).toBeDefined();
+        });
+    });
+
+    describe("AIDebuggerBlock", () => {
+        it("uses its own widget instance instead of sampler state", () => {
+            const sampler = getBlock("sampler");
+            const aiDebugger = getBlock("aidebugger");
+
+            sampler.flow(["childBlk"], logo, 0, "samplerBlk");
+            sampler.flow(["childBlk"], logo, 0, "samplerBlk");
+            aiDebugger.flow(["childBlk"], logo, 0, "debuggerBlk");
+            aiDebugger.flow(["childBlk"], logo, 0, "debuggerBlk");
+
+            expect(global.SampleWidget).toHaveBeenCalledTimes(1);
+            expect(global.AIDebuggerWidget).toHaveBeenCalledTimes(1);
+            expect(logo.sample).toBeDefined();
+            expect(logo.aiDebugger).toBeDefined();
+            expect(logo.sample).not.toBe(logo.aiDebugger);
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith("debuggerBlk", 0, "_aidebugger_0");
+        });
+
+        it("does not depend on sampler state being initialized", () => {
+            const aiDebugger = getBlock("aidebugger");
+
+            const interruption = aiDebugger.flow(["childBlk"], logo, 0, "debuggerBlk", "received");
+            expect(interruption).toEqual([null, 0, true]);
+            expect(global.AIDebuggerWidget).toHaveBeenCalledTimes(1);
+            expect(logo.aiDebugger).toBeDefined();
+            expect(logo.sample).toBeNull();
+            expect(logo.inSample).toBe(false);
+
+            const result = aiDebugger.flow(["childBlk"], logo, 0, "debuggerBlk");
+            expect(result).toEqual(["childBlk", 1]);
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith("debuggerBlk", 0, "_aidebugger_0");
         });
     });
 

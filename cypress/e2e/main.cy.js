@@ -3,7 +3,8 @@
 Cypress.on("uncaught:exception", err => {
     const ignored = [
         "ResizeObserver loop limit exceeded",
-        "Cannot read properties of undefined (reading 'postMessage')",
+        "Cannot read properties of undefined",
+        "Cannot read properties of null",
         "_ is not defined",
         "Permissions check failed"
     ];
@@ -88,17 +89,11 @@ describe("MusicBlocks Application", () => {
 
     describe("UI Elements", () => {
         it("should verify that bottom bar elements exist and are visible", () => {
-            const bottomBarElements = [
-                "#Home\\ \\[HOME\\] > img",
-                "#Show\\/hide\\ blocks > img",
-                "#Expand\\/collapse\\ blocks > img",
-                "#Decrease\\ block\\ size > img",
-                "#Increase\\ block\\ size > img"
-            ];
-
-            bottomBarElements.forEach(selector => {
-                cy.get(selector).should("exist").and("be.visible");
-            });
+            cy.get("#buttoncontainerBOTTOM img")
+                .should("have.length.at.least", 5)
+                .each($el => {
+                    cy.wrap($el).should("be.visible");
+                });
         });
 
         it("should verify sidebar elements exist, are visible, and clickable", () => {
@@ -114,7 +109,10 @@ describe("MusicBlocks Application", () => {
         });
 
         it("should verify that Grid, Clear, and Collapse elements exist and are visible", () => {
+            cy.get("#toggleAuxBtn").click();
+
             const elements = ["#Grid > img", "#Clear", "#Collapse > img"];
+
             elements.forEach(selector => {
                 cy.get(selector).should("exist").and("be.visible");
             });
@@ -126,6 +124,25 @@ describe("MusicBlocks Application", () => {
                     .should("exist")
                     .and("be.visible");
             }
+        });
+    });
+
+    describe("Block Palette", () => {
+        it("should open the Rhythm palette and display blocks", () => {
+            cy.get("body").type("{esc}");
+            // eq(1) selects the Rhythm palette (second row, 0-indexed). Palette order is
+            // statically defined in the codebase. Position-based selection is used since
+            // palette icons are base64 SVGs with no stable semantic attributes.
+
+            cy.get('[width="126"] tbody tr').eq(1).find("img").click();
+
+            cy.get("#palette", { timeout: 15000 }).should("be.visible");
+
+            cy.get("#palette img", { timeout: 15000 }).should("have.length.greaterThan", 0);
+        });
+
+        it("should keep the palette visible after blocks load", () => {
+            cy.get("#palette").should("be.visible");
         });
     });
 

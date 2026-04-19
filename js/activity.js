@@ -8050,9 +8050,7 @@ class Activity {
 
             const that = this;
 
-            window.onblur = () => {
-                doHardStopButton(that, true);
-            };
+            this.setupWindowBlurHandler(doHardStopButton);
 
             this.stage = new createjs.Stage(this.canvas);
             createjs.Touch.enable(this.stage);
@@ -8847,6 +8845,20 @@ class Activity {
         if (!target || typeof target.addEventListener !== "function") return;
         target.addEventListener(type, listener, options);
         this._listeners.push({ target, type, listener, options });
+    }
+
+    /**
+     * Installs the shared blur-stop hook without overwriting any existing
+     * global blur handler.
+     *
+     * @param {Function} doHardStopButton - Shared stop action callback.
+     */
+    setupWindowBlurHandler(doHardStopButton) {
+        this._handleWindowBlur = () => {
+            doHardStopButton(this, true);
+        };
+
+        this.addEventListener(window, "blur", this._handleWindowBlur);
     }
 
     /**
